@@ -37,7 +37,7 @@ function nextUpdate()
 {
 	if(nextUpdateVal==0) nextUpdateVal=initialUpdateVal+1;
 	
-	nextUpdateVal--;
+	nextUpdateVal = nextUpdateVal - 1;
 	
 	$("#nextUpdate").text(nextUpdateVal);
 	
@@ -189,6 +189,7 @@ function showHealth(id) {
 
 		<div id="deployment_navigation">
 		<ul id="deployment_menu">
+		<li />
 		</ul>
 		</div>	
 		

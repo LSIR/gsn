@@ -17,6 +17,7 @@
         <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
         <script type="text/javascript" src="js/uptime.js"></script>
         <script type="text/javascript">
+	    <!--//<![CDATA[
             /* XML object loaded from the REQUEST_LIST_OF_VIRTUAL_SENSORS GSN request */
             var lovs = null;
             /* Mapping from virtual sensor name to list of fields name */
@@ -497,6 +498,7 @@
                     $('#navigation').html(data);
                 });
             });
+	//]]>-->
         </script>
     </head>
     <body>
@@ -533,7 +535,7 @@
                                         </div>
                                         <div class="data-outputs-container">
                                             <a id="add-data-output" href="#">Add Output</a>
-                                            <ul id="data-outputs"></ul>
+                                            <ul id="data-outputs"><li /></ul>
                                         </div>
                                     </div>
                                 </div>
@@ -548,7 +550,7 @@
                                         </div>
                                         <div class="conditions-container">
                                             <a id="add-condition" href="#">Add Condition</a>
-                                            <ul id="conditions"></ul>
+                                            <ul id="conditions"><li /></ul>
                                         </div>
                                     </div>
                                 </div>
@@ -606,6 +608,7 @@
 				</table>
 			</div>
 		</div>
+</div>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -615,5 +618,5 @@ var pageTracker = _gat._getTracker("UA-5632004-2");
 pageTracker._initData();
 pageTracker._trackPageview();
 </script>
-    </body>
+</body>
 </html>

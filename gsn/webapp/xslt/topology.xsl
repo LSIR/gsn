@@ -207,7 +207,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
         <tessellate>0</tessellate>
         <altitudeMode>clampToGround</altitudeMode>
         <coordinates><xsl:value-of select="@longitude"/>,<xsl:value-of select="@latitude"/>,<xsl:value-of select="@altitude"/><xsl:text> </xsl:text>
-          <xsl:value-of select="../sensornode[@node_id=$parent_id]/@longitude"/>,<xsl:value-of select="../sensornode[@node_id=$parent_id]/@latitude"/>,<xsl:value-of select="../sensornode[@node_id=$parent_id]/@altitude"/></coordinates>
+          <xsl:value-of select="../sensornode[@node_id=$parent_id][@longitude][@latitude][@altitude]/@longitude"/>,<xsl:value-of select="../sensornode[@node_id=$parent_id][@longitude][@latitude][@altitude]/@latitude"/>,<xsl:value-of select="../sensornode[@node_id=$parent_id][@longitude][@latitude][@altitude]/@altitude"/></coordinates>
       </LineString>
     </Placemark>
   </xsl:for-each>

@@ -33,7 +33,7 @@ function updateHealth()
 function nextUpdate() {
 	if(nextUpdateVal==0) nextUpdateVal=initialUpdateVal+1;
 	
-	nextUpdateVal--;
+	nextUpdateVal = nextUpdateVal - 1;
 	
 	$("#nextUpdate").text(nextUpdateVal);
 	

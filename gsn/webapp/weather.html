@@ -39,7 +39,7 @@ function nextUpdate()
 	
 	if(nextUpdateVal==0) nextUpdateVal=initialUpdateVal+1;
 	
-	nextUpdateVal--;
+	nextUpdateVal=nextUpdateVal-1;
 	
 	$("#nextUpdate").text(nextUpdateVal);
 	
@@ -51,7 +51,9 @@ function nextUpdate()
 }
 
 $(document).ready(function() {
-
+	$.get('/menu.jsp', {selected: "weather"}, function(data) {
+	  $('#navigation').html(data);
+	});
         $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
         
         $("#nextUpdate").text(nextUpdateVal);
@@ -118,7 +120,11 @@ $(document).ready(function() {
         $(".webcamimage").each(function(){
           var im = $(this);
           var parent = im.parent();
-          var div = $('<div style="float:left;position:relative;margin:2px;padding:0;width:'+im.attr('width')+'px;height:'+im.attr('height')+'px"><div style="position:absolute;bottom:0px;width:171px;height:12px;background:url('+im.attr('src')+');background-position: -63px top;margin:0;padding:0"></div><a href="'+im.attr('src')+'"></a></div>');
+	  var div;
+	  if ($(this).attr('class').indexOf("nodate") > 0)
+	    div = $('<div style="float:left;position:relative;margin:2px;padding:0;width:'+im.attr('width')+'px;height:'+im.attr('height')+'px"><a href="'+im.attr('src')+'"><\/a><\/div>');
+	  else
+	    div = $('<div style="float:left;position:relative;margin:2px;padding:0;width:'+im.attr('width')+'px;height:'+im.attr('height')+'px"><div style="position:absolute;bottom:0px;width:171px;height:12px;background:url('+im.attr('src')+');background-position: -63px top;margin:0;padding:0"><\/div><a href="'+im.attr('src')+'"><\/a><\/div>');
           $("a",div).append(im.clone());
           im.after(div);
           im.remove();
@@ -135,7 +141,7 @@ function showTopology(id) {
   $.cookie("deployment" , deployments[id]);
 }
 
-//]]>-->
+//]]> -->
 </script>
 </head>
 <body>
@@ -145,17 +151,6 @@ function showTopology(id) {
 		<h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
 	</div>
 	<div id="navigation">
-		<ul id="menu">
-			<li><a href="index.html#home">home</a></li>
-			<li><a href="data.html#data">data browser</a></li>
-			<li><a href="topology.html#topology">network topology</a></li>
-			<li><a href="nodehealth.html#nodehealth">node health</a></li>
-            <li><a href="basehealth.html#basehealth">base health</a></li>
-			<li class="selected"><a href="weather.html#weather">on-site weather</a></li>
-			<li><a href="map.html#map">map</a></li>
-			<!-- <li><a href="fullmap.html#fullmap">fullmap</a></li> -->
-		</ul>
-		<ul id="linkWebsite"><li><a href="http://www.permasense.ch" target="_blank">PermaSense Home</a></li></ul>
 	</div>
 	
 	<div id="separator">
@@ -170,6 +165,7 @@ function showTopology(id) {
 	<div id="maindiv">
                 <div id="deployment_navigation">
                 <ul id="deployment_menu">
+		<li />
                 </ul>
                 </div>  
         
@@ -183,30 +179,30 @@ function showTopology(id) {
                         <td>
                                 <b>Live Webcam:</b><br/><br/>
                                 
-                                <table><tr><td><img src="http://zermatt.ch/html/bergbahnen/webcams/matterhorn2.jpg"/></td></tr></table>
+                                <table><tr><td><img src="http://zermatt.ch/html/bergbahnen/webcams/matterhorn2.jpg" alt="Matterhorn"/></td></tr></table>
                         </td>
                         <td valign="top">
                                 <b>Weather-Info </b><br/>
                                 
                                 <table><tr><td>Kleines Matterhorn</td><td>Solvay</td></tr>
-                                       <tr><td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067471.png"/></td>
-                                           <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069730.png"/></td>
+                                       <tr><td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067471.png" alt="Weather Klein Matterhorn"/></td>
+                                           <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069730.png" alt="Weather Klein Matterhorn"/></td>
                                         </tr>
                                 </table>
-                                <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_mhsummit__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
+                                <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_mhsummit__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="Matterhorn Summit" />
                         </td>
                         </tr>
                 </table>
                 <p style="text-align:center;margin-top:30px;">
                         <b>Forecast Zermatt</b><br/><br/>
-                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067480.png"/>
+                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067480.png" alt="Weather Forecast Zermatt"/>
                 </p>
                 <p style="text-align:center;margin-top:30px;">
                         <b>Forecast Klein Matterhorn</b><br/><br/>
-                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067471.png"/>
+                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067471.png" alt="Weather Forecast Klein Matterhorn"/>
                 </p>
-                <p style="margin-top:30px;">
-                        <b>Measured values from Zermatt Weatherstation (&copy; MeteoSchweiz)</b><br/><br/>
+                <div> style="margin-top:30px;">
+                        <b>Measured values from Zermatt Weatherstation (&copy; MeteoSchweiz)</b><br /><br />
                 
                         <table width="100%">
                 
@@ -214,65 +210,65 @@ function showTopology(id) {
                                         <td><b>Temperature (mean):</b></td>
                                 </tr>
                                 <tr>
-                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.temp.ZER.gif"/></td>
+                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.temp.ZER.gif" alt="Weather Measurements Zermatt"/></td>
                                 </tr>
                                 <tr>
                                         <td><b>Minutes of Sunshine:</b></td>
                                 </tr>
                                 <tr>
-                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.son.ZER.gif"/></td>
+                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.son.ZER.gif" alt="Weather Measurements Zermatt"/></td>
                                         
                                 </tr>
                                 <tr>
                                         <td><b>Precipitation:</b></td>
                                 </tr>
                                 <tr>
-                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.reg.ZER.gif"/></td>
+                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.reg.ZER.gif" alt="Weather Measurements Zermatt"/></td>
                                 </tr>
                                 <tr>
                                         <td><b>Windspeed (peak and mean) [km/h]:</b></td>
                                 </tr>
                                 <tr>
-                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.win.ZER.gif"/></td>                                        
+                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.win.ZER.gif" alt="Weather Measurements Zermatt"/></td>                                        
                                 </tr>
                         </table>
                 
-                </p>
-                <p>
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_hoernlihuette__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_mhsummit__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_powerbox__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_wlanstation__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_zermatt__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_path3__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_path2__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_path1__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_detachmentbottom__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_detachmenttop__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_mountainviewclose__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_mountainview__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_position9__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_leaningtower__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_position21__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_position5__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=matterhorn_camera_pos23_positioin20__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
+                </div>
+                <div>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_hoernlihuette__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_mhsummit__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_powerbox__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_wlanstation__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_zermatt__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_path3__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_path2__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_path1__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_detachmentbottom__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_detachmenttop__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_mountainviewclose__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_mountainview__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_position9__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_leaningtower__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_position21__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_position5__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_positioin20__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
                   <div style="clear:left"></div>
-                </p>
+                </div>
                 </div>
 
                 <div id="weather_Jungfraujoch" style="display:none">
                 <table width="100%">
                         <tr>
                         <td>
-                                <table><tr><td><img src="http://www.swisspanorama.com/assets/images/jungfraujoch.jpg"/>
-                                               <img src="http://www.swisspanorama.com/assets/images/maennlichen.jpg"/></td></tr></table>
+                                <table><tr><td><img src="http://www.swisspanorama.com/assets/images/jungfraujoch.jpg" alt="Webcam Jungfraujoch"/>
+                                               <img src="http://www.swisspanorama.com/assets/images/maennlichen.jpg" alt="Webcam Jungfraujoch"/></td></tr></table>
                         </td>
                         <td>
                                 <table>
                                         <tr><td>Jungfraujoch</td><td>Konkordiahuette</td></tr>
                                         <tr>
-                                                <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067300.png"/></td>
-                                                <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069710.png"/></td>
+                                                <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067300.png" alt="Weather Jungfraujoch"/></td>
+                                                <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069710.png" alt="Weather Konkordiah&uuml;tte"/></td>
                                         </tr>
                                 </table>
                         </td>
@@ -280,48 +276,48 @@ function showTopology(id) {
         
                 </table>
                 <p style="text-align:center;margin-top:30px;">
-                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067300.png"/>
+                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067300.png" alt="Weather Forecast Jungfraujoch"/>
                 </p>
 
                 </div>
                 <div id="weather_Thur" style="display:none">
                       <div style="position:relative;height:430px;width:500px;float:left">
                       <div style="position:absolute;top:0px;left:0px;z-index:2">
-                        <a href="http://www.hochwasser.zh.ch/internet/bd/awel/wb/hw/de/messwerte/abfluss_wasserstand/thur.html"><img src="http://www.hw.zh.ch/hochwasser/mac/aawthur_map.gif" width="500" height="405"></a>
+                        <a href="http://www.hochwasser.zh.ch/internet/bd/awel/wb/hw/de/messwerte/abfluss_wasserstand/thur.html"><img src="http://www.hw.zh.ch/hochwasser/mac/aawthur_map.gif" width="500" height="405" alt="Water level Thur"/></a>
                       </div>
                       <div style="position:absolute;top:0px;left:0px;z-index:1">
-                        <img src="http://www.hw.zh.ch/hochwasser/mac/aawthur.gif" width="500" height="405">
+                        <img src="http://www.hw.zh.ch/hochwasser/mac/aawthur.gif" width="500" height="405" alt="Water level Thur"/>
                       </div>
                       </div>
                       <div style="height:430px">
-                        <a href="http://data.permasense.ch/field?vs=thur_camera_pos0__scaled&field=JPEG_SCALED&pk=latest"><img src="http://data.permasense.ch/field?vs=thur_camera_pos0__scaled&field=JPEG_SCALED&pk=latest" width="448" height="336">
+                        <img class="webcamimage nodate" src="field?vs=thur_camera_pos0__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="448" height="336" alt="webcam image" />
                       </div>
                 </div>
 
                 <div id="weather_Dirruhorn" style="display:none">
                 <table style="margin-left:5px">
                      <tr><td>Weisshorn</td><td>Weather-Info Randa</td><td>Heliport Air Zermatt</td></tr>
-                     <tr><td><img class="webcamimage" style="margin-top:10px" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_weisshorn__scaled&field=JPEG_SCALED&pk=latest" width="400" height="327"></td>
-                         <td><img style="margin-top:10px" src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069141.png"/></td>
-                         <td><a href="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1"><img style="margin-top:21px" src="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1" width="400" height="327"></td>
+                     <tr><td><img class="webcamimage" style="margin-top:10px" src="field?vs=dirruhorn_camera_pos11_weisshorn__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="400" height="327" alt="webcam image"/></td>
+                         <td><img style="margin-top:10px" src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069141.png" alt="Weather Randa"/></td>
+                         <td><a href="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1"><img style="margin-top:21px" src="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1" width="400" height="327" alt="Webcam Zermatt direction north"/></a></td>
                      </tr>
                 </table>
                 <p style="text-align:center;margin-top:30px;">
                         <b>Forecast Randa</b><br/><br/>
-                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/069141.png"/>
+                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/069141.png" alt="Weather forecast Randa"/>
                 </p>
-                <p>
-                  <div style="float:left;position:relative;margin:2px;padding:0"><a href="http://data.permasense.ch/field?vs=dirruhorn_camera_pos8__scaled&field=JPEG_SCALED&pk=latest"><img src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos8__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250"></div>
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_basestation__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_dirrubottom__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_position7__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_randa__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_powerbox__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_refdgpsposition__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_weatherwest__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
-                  <img class="webcamimage" src="http://data.permasense.ch/field?vs=dirruhorn_camera_pos11_weisshorn__scaled&field=JPEG_SCALED&pk=latest" width="300" height="250">
+                <div>
+		  <img class="webcamimage nodate" src="field?vs=dirruhorn_camera_pos8__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_basestation__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_dirrubottom__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_position7__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_randa__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_powerbox__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_refdgpsposition__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_weatherwest__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
+                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_weisshorn__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
                   <div style="clear:left"></div>
-                </p>
+                </div>
                 </div>
 
                 </div>
@@ -330,11 +326,11 @@ function showTopology(id) {
 
 		<p style="text-align:center;margin-top:30px;">
 			<b>Precipitation Radar:</b><br/><br/>
-			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter/radarbild.Par.0004.Image.gif"/>
+			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter/radarbild.Par.0004.Image.gif" alt="Precipitation Radar Switzerland"/>
 		</p>
 		<p style="text-align:center;margin-top:30px;">
 			<b>Precipitation Forecast:</b><br/><br/>
-			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/modelle/Vorhersagen.Par.0002.DownloadFile.ext.tmp/gross.gif"/>
+			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/modelle/Vorhersagen.Par.0002.DownloadFile.ext.tmp/gross.gif" alt="Precipitation Forecast Switzerland"/>
 		</p>
 	</div>
 	<div class="separator">
