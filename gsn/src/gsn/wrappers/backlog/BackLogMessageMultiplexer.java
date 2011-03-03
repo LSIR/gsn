@@ -501,8 +501,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	@Override
 	public void connectionLost() {
 		connected = false;
-		if (logger.isDebugEnabled())
-			logger.debug("connection lost");
+		logger.info("connection to core station with device id " + coreStationDeviceId + " at " + deploymentName + " deployment lost");
 		
     	// stop ping timer
 		if (pingTimer != null)
