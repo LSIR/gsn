@@ -1,4 +1,4 @@
-
+# -*- coding: UTF-8 -*-
 __author__      = "Ben Buchli <bbuchli@ethz.ch"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Ben Buchli"
 __license__     = "GPL"

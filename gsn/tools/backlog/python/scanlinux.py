@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: UTF-8 -*-
 """\
 Scan for serial ports. Linux specific variant that also includes USB/Serial
 adapters.

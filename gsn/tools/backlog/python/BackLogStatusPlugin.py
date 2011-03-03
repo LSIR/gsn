@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
