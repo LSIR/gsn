@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+ xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+ xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:ns3="http://datarequest.http.gsn/xsd"
+ xmlns:ns2="http://standard.webservice.gsn/xsd"
+ xmlns:ns4="http://standard.webservice.gsn/GSNWebServiceSoap12Binding"
+ xmlns:ns1="http://standard.webservice.gsn"
+ xmlns:ns5="http://standard.webservice.gsn/GSNWebServiceSoap11Binding">
+ <SOAP-ENV:Body>
+  <ns1:getNextDataResponse>
+   <ns1:queryResult ns1:hasNext="false" ns1:vsname="" ns1:sid="">
+    <ns2:format ns2:timed="">
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+    </ns2:format>
+    <ns2:streamElements ns2:timed="">
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+    </ns2:streamElements>
+    <ns2:streamElements ns2:timed="">
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+    </ns2:streamElements>
+    <ns2:executedQuery></ns2:executedQuery>
+   </ns1:queryResult>
+   <ns1:queryResult ns1:hasNext="false" ns1:vsname="" ns1:sid="">
+    <ns2:format ns2:timed="">
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+    </ns2:format>
+    <ns2:streamElements ns2:timed="">
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+    </ns2:streamElements>
+    <ns2:streamElements ns2:timed="">
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+     <ns2:field ns2:name="" ns2:type="" ns2:description=""></ns2:field>
+    </ns2:streamElements>
+    <ns2:executedQuery></ns2:executedQuery>
+   </ns1:queryResult>
+  </ns1:getNextDataResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

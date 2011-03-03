@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+ xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+ xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:ns3="http://datarequest.http.gsn/xsd"
+ xmlns:ns2="http://standard.webservice.gsn/xsd"
+ xmlns:ns4="http://standard.webservice.gsn/GSNWebServiceSoap12Binding"
+ xmlns:ns1="http://standard.webservice.gsn"
+ xmlns:ns5="http://standard.webservice.gsn/GSNWebServiceSoap11Binding">
+ <SOAP-ENV:Body>
+  <ns1:getVirtualSensorsDetailsResponse>
+   <ns1:virtualSensorDetails ns1:vsname="">
+    <ns2:addressing>
+     <ns2:predicates ns2:name=""></ns2:predicates>
+     <ns2:predicates ns2:name=""></ns2:predicates>
+    </ns2:addressing>
+    <ns2:info>
+     <ns2:author></ns2:author>
+     <ns2:description></ns2:description>
+     <ns2:email></ns2:email>
+     <ns2:rate></ns2:rate>
+    </ns2:info>
+    <ns2:outputStructure>
+     <ns2:fields ns2:name="" ns2:type="" ns2:description=""></ns2:fields>
+     <ns2:fields ns2:name="" ns2:type="" ns2:description=""></ns2:fields>
+    </ns2:outputStructure>
+    <ns2:processor ns2:className="">
+     <ns2:initParams ns2:name=""></ns2:initParams>
+     <ns2:initParams ns2:name=""></ns2:initParams>
+    </ns2:processor>
+    <ns2:wrapper>
+     <ns2:wrapperDetails>
+      <ns2:wrapperURLs ns2:virtualSensor="" ns2:source="" ns2:stream="" ns2:wrapper="">
+      </ns2:wrapperURLs>
+      <ns2:outputFormat ns2:name="" ns2:type="" ns2:description=""></ns2:outputFormat>
+      <ns2:outputFormat ns2:name="" ns2:type="" ns2:description=""></ns2:outputFormat>
+      <ns2:predicates ns2:name=""></ns2:predicates>
+      <ns2:predicates ns2:name=""></ns2:predicates>
+     </ns2:wrapperDetails>
+     <ns2:wrapperDetails>
+      <ns2:wrapperURLs ns2:virtualSensor="" ns2:source="" ns2:stream="" ns2:wrapper="">
+      </ns2:wrapperURLs>
+      <ns2:outputFormat ns2:name="" ns2:type="" ns2:description=""></ns2:outputFormat>
+      <ns2:outputFormat ns2:name="" ns2:type="" ns2:description=""></ns2:outputFormat>
+      <ns2:predicates ns2:name=""></ns2:predicates>
+      <ns2:predicates ns2:name=""></ns2:predicates>
+     </ns2:wrapperDetails>
+    </ns2:wrapper>
+   </ns1:virtualSensorDetails>
+   <ns1:virtualSensorDetails ns1:vsname="">
+    <ns2:addressing>
+     <ns2:predicates ns2:name=""></ns2:predicates>
+     <ns2:predicates ns2:name=""></ns2:predicates>
+    </ns2:addressing>
+    <ns2:info>
+     <ns2:author></ns2:author>
+     <ns2:description></ns2:description>
+     <ns2:email></ns2:email>
+     <ns2:rate></ns2:rate>
+    </ns2:info>
+    <ns2:outputStructure>
+     <ns2:fields ns2:name="" ns2:type="" ns2:description=""></ns2:fields>
+     <ns2:fields ns2:name="" ns2:type="" ns2:description=""></ns2:fields>
+    </ns2:outputStructure>
+    <ns2:processor ns2:className="">
+     <ns2:initParams ns2:name=""></ns2:initParams>
+     <ns2:initParams ns2:name=""></ns2:initParams>
+    </ns2:processor>
+    <ns2:wrapper>
+     <ns2:wrapperDetails>
+      <ns2:wrapperURLs ns2:virtualSensor="" ns2:source="" ns2:stream="" ns2:wrapper="">
+      </ns2:wrapperURLs>
+      <ns2:outputFormat ns2:name="" ns2:type="" ns2:description=""></ns2:outputFormat>
+      <ns2:outputFormat ns2:name="" ns2:type="" ns2:description=""></ns2:outputFormat>
+      <ns2:predicates ns2:name=""></ns2:predicates>
+      <ns2:predicates ns2:name=""></ns2:predicates>
+     </ns2:wrapperDetails>
+     <ns2:wrapperDetails>
+      <ns2:wrapperURLs ns2:virtualSensor="" ns2:source="" ns2:stream="" ns2:wrapper="">
+      </ns2:wrapperURLs>
+      <ns2:outputFormat ns2:name="" ns2:type="" ns2:description=""></ns2:outputFormat>
+      <ns2:outputFormat ns2:name="" ns2:type="" ns2:description=""></ns2:outputFormat>
+      <ns2:predicates ns2:name=""></ns2:predicates>
+      <ns2:predicates ns2:name=""></ns2:predicates>
+     </ns2:wrapperDetails>
+    </ns2:wrapper>
+   </ns1:virtualSensorDetails>
+  </ns1:getVirtualSensorsDetailsResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

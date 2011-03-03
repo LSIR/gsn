@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+ xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+ xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:ns3="http://datarequest.http.gsn/xsd"
+ xmlns:ns2="http://standard.webservice.gsn/xsd"
+ xmlns:ns4="http://standard.webservice.gsn/GSNWebServiceSoap12Binding"
+ xmlns:ns1="http://standard.webservice.gsn"
+ xmlns:ns5="http://standard.webservice.gsn/GSNWebServiceSoap11Binding">
+ <SOAP-ENV:Body>
+   <ns1:getMultiData from="0" to="0" nb="0" timeFormat="">
+    <ns1:acDetails>
+     <ns2:username></ns2:username>
+     <ns2:password></ns2:password>
+    </ns1:acDetails>
+    <ns1:fieldSelector ns1:vsname="">
+     <ns2:fieldNames></ns2:fieldNames>
+     <ns2:fieldNames></ns2:fieldNames>
+    </ns1:fieldSelector>
+    <ns1:fieldSelector ns1:vsname="">
+     <ns2:fieldNames></ns2:fieldNames>
+     <ns2:fieldNames></ns2:fieldNames>
+    </ns1:fieldSelector>
+    <ns1:conditions ns1:critJoin="" ns1:field="" ns1:negation="" ns1:operator="" ns1:value="" ns1:vsname="">
+    </ns1:conditions>
+    <ns1:conditions ns1:critJoin="" ns1:field="" ns1:negation="" ns1:operator="" ns1:value="" ns1:vsname="">
+    </ns1:conditions>
+    <ns1:aggregation ns1:groupOperator="" ns1:timeRange="">
+    </ns1:aggregation>
+   </ns1:getMultiData>
+
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

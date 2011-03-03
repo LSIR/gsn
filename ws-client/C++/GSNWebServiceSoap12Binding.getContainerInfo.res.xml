@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+ xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+ xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:ns3="http://datarequest.http.gsn/xsd"
+ xmlns:ns2="http://standard.webservice.gsn/xsd"
+ xmlns:ns4="http://standard.webservice.gsn/GSNWebServiceSoap12Binding"
+ xmlns:ns1="http://standard.webservice.gsn"
+ xmlns:ns5="http://standard.webservice.gsn/GSNWebServiceSoap11Binding">
+ <SOAP-ENV:Body>
+  <ns1:getContainerInfoResponse>
+   <ns1:containerDetails>
+    <ns2:port>0</ns2:port>
+    <ns2:sslPort>0</ns2:sslPort>
+    <ns2:author></ns2:author>
+    <ns2:description></ns2:description>
+    <ns2:email></ns2:email>
+    <ns2:name></ns2:name>
+    <ns2:sslKeyPassword></ns2:sslKeyPassword>
+    <ns2:sslKeystorePassword></ns2:sslKeystorePassword>
+    <ns2:timeFormat></ns2:timeFormat>
+   </ns1:containerDetails>
+  </ns1:getContainerInfoResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

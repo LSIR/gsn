@@ -1,0 +1,3 @@
+
+wsdl2h GSNWebService.wsdl -o gsnwebservice.h
+soapcpp2 gsnwebservice.h -C -IC:\bin\gsoap-2.7\gsoap\import

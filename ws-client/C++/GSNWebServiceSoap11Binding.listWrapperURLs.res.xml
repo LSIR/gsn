@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+ xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+ xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:ns3="http://datarequest.http.gsn/xsd"
+ xmlns:ns2="http://standard.webservice.gsn/xsd"
+ xmlns:ns4="http://standard.webservice.gsn/GSNWebServiceSoap12Binding"
+ xmlns:ns1="http://standard.webservice.gsn"
+ xmlns:ns5="http://standard.webservice.gsn/GSNWebServiceSoap11Binding">
+ <SOAP-ENV:Body>
+  <ns1:listWrapperURLsResponse>
+   <ns1:wrapperURLs ns1:virtualSensor="" ns1:source="" ns1:stream="" ns1:wrapper="">
+   </ns1:wrapperURLs>
+   <ns1:wrapperURLs ns1:virtualSensor="" ns1:source="" ns1:stream="" ns1:wrapper="">
+   </ns1:wrapperURLs>
+  </ns1:listWrapperURLsResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
