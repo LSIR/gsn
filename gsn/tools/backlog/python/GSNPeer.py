@@ -275,8 +275,9 @@ class GSNPeerClass(Thread, Statistics):
             ret = self._backlogMain.backlog.storeMsg(timestamp, msgType, msg.getMessage())
             
         # if not blocked send the message to the GSN backend
-        if not self._gsnqueuelimitreached and self.sendToGSN(msg, priority):
-            self.counterAction(self._msgOutCounterId)
+        if not self._gsnqueuelimitreached:
+            if self.sendToGSN(msg, priority):
+                self.counterAction(self._msgOutCounterId)
                 
         return ret
 
