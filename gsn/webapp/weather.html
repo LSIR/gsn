@@ -21,6 +21,7 @@
 var initialUpdateVal = 600;
 var nextUpdateVal = initialUpdateVal;
 var deployments = new Array();
+var deployment_cameras = new Array();
 
 function updateTopology()
 {
@@ -81,8 +82,17 @@ $(document).ready(function() {
                     var deploymentname = $(this).attr("name").split("_", 1)[0];
                     if(deploymentname.length > 1) {
                         deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
-                        if (deploymentname!='Statistics' && $.inArray(deploymentname, deployments) < 0) {
+                        if (deploymentname!='Statistics') {
+			  if ($.inArray(deploymentname, deployments) < 0) {
                             deployments.push(deploymentname);
+			    deployment_cameras.push(new Array());
+			  }
+			  if ($(this).attr("name").indexOf("scaled")>0) {
+			    for(var i = 0; i<deployments.length;i++)
+			      if (deployments[i]==deploymentname)
+				break;
+			    deployment_cameras[i].push($(this).attr("name"));
+			  }
                         }
                     }
                 });
@@ -103,8 +113,24 @@ $(document).ready(function() {
                       $("#weathercontainer").append(
                         $.DIV({
                             "id":"weather_"+deployments[i]
-                              }));
+                              }, 
+			$.DIV({
+			     "class":"scaledimages"
+			     })));
                     }
+		    deployment_cameras[i].sort();
+		    var webcam_div = $("#weather_"+deployments[i]+" .scaledimages").get(0);
+		    $(deployment_cameras[i]).each(function() {
+		      if ($(webcam_div).attr("class").indexOf("nodate")>0)
+			$(webcam_div).append('<div style="float:left;position:relative;margin:2px;padding:0;width:300px;height:250px">'
+					  +'<a href="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest">'
+					  +'<img src="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"></a></div>');
+		      else
+			$(webcam_div).append('<div style="float:left;position:relative;margin:2px;padding:0;width:300px;height:250px">'
+					  +'<div style="position:absolute;bottom:0px;width:171px;height:12px;background:url(field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest);background-position: -63px top;margin:0;padding:0">'
+					  +'</div><a href="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest">'
+					  +'<img src="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"></a></div>');
+		    });
                     if (deployments[i]!=visible) {
                       $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
                       $("#weather_"+deployments[i]).hide();
@@ -115,19 +141,6 @@ $(document).ready(function() {
                     }
                 }
               }
-        });
-        // add date magnifier
-        $(".webcamimage").each(function(){
-          var im = $(this);
-          var parent = im.parent();
-	  var div;
-	  if ($(this).attr('class').indexOf("nodate") > 0)
-	    div = $('<div style="float:left;position:relative;margin:2px;padding:0;width:'+im.attr('width')+'px;height:'+im.attr('height')+'px"><a href="'+im.attr('src')+'"><\/a><\/div>');
-	  else
-	    div = $('<div style="float:left;position:relative;margin:2px;padding:0;width:'+im.attr('width')+'px;height:'+im.attr('height')+'px"><div style="position:absolute;bottom:0px;width:171px;height:12px;background:url('+im.attr('src')+');background-position: -63px top;margin:0;padding:0"><\/div><a href="'+im.attr('src')+'"><\/a><\/div>');
-          $("a",div).append(im.clone());
-          im.after(div);
-          im.remove();
         });
 });
 
@@ -189,7 +202,6 @@ function showTopology(id) {
                                            <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069730.png" alt="Weather Klein Matterhorn"/></td>
                                         </tr>
                                 </table>
-                                <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_mhsummit__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="Matterhorn Summit" />
                         </td>
                         </tr>
                 </table>
@@ -234,25 +246,7 @@ function showTopology(id) {
                         </table>
                 
                 </div>
-                <div>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_hoernlihuette__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_mhsummit__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_powerbox__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_wlanstation__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_zermatt__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_path3__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_path2__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_path1__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_detachmentbottom__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_detachmenttop__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_mountainviewclose__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_mountainview__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_position9__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_leaningtower__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_position21__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_position5__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=matterhorn_camera_pos23_positioin20__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <div style="clear:left"></div>
+                <div class="scaledimages">
                 </div>
                 </div>
 
@@ -278,6 +272,8 @@ function showTopology(id) {
                 <p style="text-align:center;margin-top:30px;">
                         <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067300.png" alt="Weather Forecast Jungfraujoch"/>
                 </p>
+		<div class="scaledimages">
+                </div>
 
                 </div>
                 <div id="weather_Thur" style="display:none">
@@ -289,15 +285,14 @@ function showTopology(id) {
                         <img src="http://www.hw.zh.ch/hochwasser/mac/aawthur.gif" width="500" height="405" alt="Water level Thur"/>
                       </div>
                       </div>
-                      <div style="height:430px">
-                        <img class="webcamimage nodate" src="field?vs=thur_camera_pos0__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="448" height="336" alt="webcam image" />
-                      </div>
+		      <div style="margin-left:540px;height:430px" class="scaledimages nodate">
+		      </div>
                 </div>
 
                 <div id="weather_Dirruhorn" style="display:none">
-                <table style="margin-left:5px">
-                     <tr><td>Weisshorn</td><td>Weather-Info Randa</td><td>Heliport Air Zermatt</td></tr>
-                     <tr><td><img class="webcamimage" style="margin-top:10px" src="field?vs=dirruhorn_camera_pos11_weisshorn__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="400" height="327" alt="webcam image"/></td>
+                <table style="margin-left:55px">
+                     <tr><td>Weather-Info Randa</td><td>Heliport Air Zermatt</td></tr>
+                     <tr>
                          <td><img style="margin-top:10px" src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069141.png" alt="Weather Randa"/></td>
                          <td><a href="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1"><img style="margin-top:21px" src="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1" width="400" height="327" alt="Webcam Zermatt direction north"/></a></td>
                      </tr>
@@ -306,17 +301,7 @@ function showTopology(id) {
                         <b>Forecast Randa</b><br/><br/>
                         <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/069141.png" alt="Weather forecast Randa"/>
                 </p>
-                <div>
-		  <img class="webcamimage nodate" src="field?vs=dirruhorn_camera_pos8__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_basestation__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_dirrubottom__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_position7__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_randa__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_powerbox__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_refdgpsposition__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_weatherwest__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <img class="webcamimage" src="field?vs=dirruhorn_camera_pos11_weisshorn__scaled&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"/>
-                  <div style="clear:left"></div>
+                <div class="scaledimages">
                 </div>
                 </div>
 
