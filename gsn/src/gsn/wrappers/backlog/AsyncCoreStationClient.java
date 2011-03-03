@@ -525,15 +525,6 @@ public class AsyncCoreStationClient extends Thread  {
 			logger.error(e.getMessage(), e);
 		}
 	}
-	
-	
-	public boolean isConnected(CoreStationListener listener) {
-		SocketChannel sc = listenerToSocketList.get(listener);
-		if (sc == null)
-			return false;
-		else
-			return sc.isConnected();
-	}
 }
 
 

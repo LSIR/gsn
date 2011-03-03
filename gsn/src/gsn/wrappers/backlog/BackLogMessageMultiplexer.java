@@ -59,6 +59,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private int hostPort;
 	private String deploymentName;
 	boolean stuff = false;
+	boolean connected = false;
 	
 	
 	public BackLogMessageMultiplexer() throws Exception {
@@ -465,6 +466,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			sendQueueReadyMsg();
 			logger.warn("message queue ready => sending queue ready message");
 		}
+		
+		connected = true;
 
 		Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
 		synchronized (msgTypeListener) {
@@ -497,6 +500,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	@Override
 	public void connectionLost() {
+		connected = false;
 		if (logger.isDebugEnabled())
 			logger.debug("connection lost");
 		
@@ -570,7 +574,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	
 	
 	public boolean isConnected() {
-		return asyncCoreStationClient.isConnected(this);
+		return connected;
 	}
 
 
