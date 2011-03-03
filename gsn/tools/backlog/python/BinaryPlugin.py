@@ -223,18 +223,18 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def connectionToGSNestablished(self):
         self.debug('connection established')
-        self._lastRecvPacketType = None
-        self._lastSentPacketType = None
-        self._backlogMain._waitforack = False
         if self._filedescriptor:
             if os.path.exists(self._filedescriptor.name):
                 self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
             self._filedescriptor.close()
+        self._msgdeque.clear()
+        self._lastRecvPacketType = None
+        self._lastSentPacketType = None
+        self._backlogMain._waitforack = False
         
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
-        self._msgdeque.clear()
         self._workEvent.clear()
            
         
