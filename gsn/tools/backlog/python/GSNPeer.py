@@ -90,6 +90,7 @@ class GSNPeerClass(Thread, Statistics):
         
         self._connected = False
         self._gsnPeerStop = False
+        self._gsnqueuelimitreached = False
         self._work = Event()
         
         # try to open a server socket to which GSN can connect to
@@ -200,6 +201,12 @@ class GSNPeerClass(Thread, Statistics):
             self.counterAction(self._msgAckInCounterId)
             # if it is an acknowledge, tell BackLogMain to have received one
             self._backlogMain.ackReceived(msg.getTimestamp(), msg.getData()[0])
+        elif msgType == BackLogMessage.MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE:
+            self._gsnqueuelimitreached = True
+            self._logger.info('GSN message queue reached its limit => stop sending messages')
+        elif msgType == BackLogMessage.MESSAGE_QUEUE_READY_MESSAGE_TYPE:
+            self._gsnqueuelimitreached = False
+            self._logger.info('GSN message queue is ready => send messages')
         else:
             self.counterAction(self._msgInCounterId)
             self._backlogMain.gsnMsgReceived(msgType, msg)
@@ -267,8 +274,8 @@ class GSNPeerClass(Thread, Statistics):
             # back log the message
             ret = self._backlogMain.backlog.storeMsg(timestamp, msgType, msg.getMessage())
             
-        # send the message to the GSN backend
-        if self.sendToGSN(msg, priority):
+        # if not blocked send the message to the GSN backend
+        if not self._gsnqueuelimitreached and self.sendToGSN(msg, priority):
             self.counterAction(self._msgOutCounterId)
                 
         return ret

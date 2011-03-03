@@ -30,6 +30,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	public static final int PING_ACK_CHECK_INTERVAL_SEC = 60;
 	
 	public static final int PLUGIN_MESSAGE_QUEUE_SIZE = 1000;
+	public static final int PLUGIN_MESSAGE_QUEUE_WARN = 800;
+	public static final int PLUGIN_MESSAGE_QUEUE_READY = 400;
 	
 	public static final byte STUFFING_BYTE = 0x7e;
 	
@@ -481,6 +483,15 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
+		
+		if (pluginMessageHandler.isMsgQueueLimitReached()) {
+			sendQueueLimitMsg();
+			logger.warn("message queue limit reached => sending queue limit message");
+		}
+		else if (pluginMessageHandler.isMsgQueueReady()) {
+			sendQueueReadyMsg();
+			logger.warn("message queue ready => sending queue ready message");
+		}
 	}
 
 
@@ -566,6 +577,22 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	public Integer getDeviceID() {
 		return coreStationDeviceId;
 	}
+
+	protected void sendQueueLimitMsg() {
+		try {
+			sendMessage(new BackLogMessage(BackLogMessage.MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE, System.currentTimeMillis()), null, 1);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	protected void sendQueueReadyMsg() {
+		try {
+			sendMessage(new BackLogMessage(BackLogMessage.MESSAGE_QUEUE_READY_MESSAGE_TYPE, System.currentTimeMillis()), null, 1);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+		}
+	}
 	
 	private static long arr2uint (byte[] arr, int start) {
 		int i = 0;
@@ -611,6 +638,7 @@ class PluginMessageHandler extends Thread {
 
 	private BlockingQueue<BackLogMessage> plugMsgQueue;
 	private boolean dispose = false;
+	private boolean queueLimitReached = false;
 	BackLogMessageMultiplexer blMsgMulti;
 	
 	public PluginMessageHandler(BackLogMessageMultiplexer parent, int maxQueueSize) {
@@ -622,9 +650,27 @@ class PluginMessageHandler extends Thread {
 	
 	public boolean newPluginMessage(BackLogMessage msg) {
 		boolean ret = plugMsgQueue.offer(msg);
+		if (!queueLimitReached && isMsgQueueLimitReached()) {
+			blMsgMulti.sendQueueLimitMsg();
+			logger.warn("message queue limit reached => sending queue limit message");
+			queueLimitReached = true;
+		}
+		else if (queueLimitReached && isMsgQueueReady()) {
+			blMsgMulti.sendQueueReadyMsg();
+			logger.warn("message queue ready again => sending queue ready message");
+			queueLimitReached = false;
+		}
 		if (!ret)
 			logger.warn("message queue is full");
 		return ret;
+	}
+	
+	protected boolean isMsgQueueReady() {
+		return plugMsgQueue.size() <= BackLogMessageMultiplexer.PLUGIN_MESSAGE_QUEUE_READY;
+	}
+	
+	protected boolean isMsgQueueLimitReached() {
+		return plugMsgQueue.size() >= BackLogMessageMultiplexer.PLUGIN_MESSAGE_QUEUE_WARN;
 	}
 	
 	public void run() {

@@ -120,6 +120,12 @@ public class BackLogMessage {
 	/** The ping acknowledge message type. This message type is used to
 	 *  acknowledge a ping request. */
 	public static final byte PING_ACK_MESSAGE_TYPE = 3;
+	/** The message queue full message type. This message type is used
+	 *  to control the message flow. */
+	public static final byte MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE = 4;
+	/** The message queue ready message type. This message type is used
+	 *  to control the message flow. */
+	public static final byte MESSAGE_QUEUE_READY_MESSAGE_TYPE = 5;
 	
 
 	/** 

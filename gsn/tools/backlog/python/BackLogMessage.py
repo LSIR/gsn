@@ -27,6 +27,14 @@ PING_MESSAGE_TYPE = 2
 # acknowledge a ping request.
 PING_ACK_MESSAGE_TYPE = 3
 
+# The message queue full message type. This message type is used
+# to control the message flow.
+MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE = 4
+
+# The message queue ready message type. This message type is used
+# to control the message flow.
+MESSAGE_QUEUE_READY_MESSAGE_TYPE = 5
+
 
 ### plugin message types ###
 
