@@ -456,6 +456,15 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
         pingTimer.schedule( new PingTimer(this), PING_INTERVAL_SEC * 1000, PING_INTERVAL_SEC * 1000 );
 
         resetWatchDog();
+		
+		if (pluginMessageHandler.isMsgQueueLimitReached()) {
+			sendQueueLimitMsg();
+			logger.warn("message queue limit reached => sending queue limit message");
+		}
+		else if (pluginMessageHandler.isMsgQueueReady()) {
+			sendQueueReadyMsg();
+			logger.warn("message queue ready => sending queue ready message");
+		}
 
 		Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
 		synchronized (msgTypeListener) {
@@ -482,15 +491,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			asyncCoreStationClient.sendHelloMsg(this);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-		}
-		
-		if (pluginMessageHandler.isMsgQueueLimitReached()) {
-			sendQueueLimitMsg();
-			logger.warn("message queue limit reached => sending queue limit message");
-		}
-		else if (pluginMessageHandler.isMsgQueueReady()) {
-			sendQueueReadyMsg();
-			logger.warn("message queue ready => sending queue ready message");
 		}
 	}
 
