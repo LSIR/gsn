@@ -79,7 +79,7 @@ class BinaryPluginClass(AbstractPluginClass):
     _notifier
     _plugStop
     _filedeque
-    _msgdeque
+    _msgqueue
     _isBusy
     _msgEvent
     _workEvent
@@ -90,6 +90,7 @@ class BinaryPluginClass(AbstractPluginClass):
     _resendcounter
     _lastRecvPacketType
     _lastSentPacketType
+    _sentPacketNr
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
     '''
@@ -126,10 +127,9 @@ class BinaryPluginClass(AbstractPluginClass):
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
         
-        self._msgEvent = Event()
-        self._workEvent = Event()
+        self._fileEvent = Event()
         self._filedeque = deque()
-        self._msgdeque = deque()
+        self._msgqueue = Queue()
         
         self._watches = []
         filetime = []
@@ -203,6 +203,9 @@ class BinaryPluginClass(AbstractPluginClass):
             self._isBusy = True
         else:
             self._isBusy = False
+            
+        if self._filedeque:
+            self._fileEvent.set()
                 
         self._filedescriptor = None
         self._waitforack = True
@@ -216,7 +219,7 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def msgReceived(self, data):
         self.debug('message received')
-        self._msgdeque.appendleft(data)
+        self._msgqueue.put(data)
         self._msgEvent.set()
         self._workEvent.set()
         
@@ -227,7 +230,6 @@ class BinaryPluginClass(AbstractPluginClass):
             if os.path.exists(self._filedescriptor.name):
                 self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
             self._filedescriptor.close()
-        self._msgdeque.clear()
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
         self._backlogMain._waitforack = False
@@ -247,285 +249,254 @@ class BinaryPluginClass(AbstractPluginClass):
         except Exception, e:
             if not self._stopped:
                 self.exception(e)
-        chunkNumber = 0
+
+        packet = None
         self._lastRecvPacketType = None
         self._lastSentPacketType = None
                 
         while not self._plugStop:
-            # wait for the next file event to happen
-            self._workEvent.wait()
+            if packet == None:
+                # wait for the next message to arrive from GSN
+                data = self._msgqueue.get()
+            else:
+                self._sentPacketNr = pktNr
+                self.processMsg(self.getTimeStamp(), [self._sentPacketNr] + packet, self._priority, self._backlog)
+                while not self._plugStop:
+                    try:
+                        data = self._msgqueue.get(timeout=RESEND_INTERVAL_SEC)
+                    except Queue.Empty:
+                        if self._plugStop:
+                            break
+                        self.debug('resend message')
+                        self._resendcounter += 1
+                        packet[3] += 1
+                        self.processMsg(self.getTimeStamp(), [self._sentPacketNr] + packet, self._priority, self._backlog)
+                    else:
+                        break
+                
             if self._plugStop:
                 break
-            self._waitforack = False
-                
-            try:
-                data = self._msgdeque.pop()
-                # the first byte of the data defines its type
-                pktType = data[0]
-                self.debug('packet type: ' + str(pktType))
-                
-                if pktType == ACK_PACKET:
-                    ackType = data[1]
-                    alreadyReceived = False
-                        
+            
+            # the first entry of the data defines its packet number
+            pktNr = data[0]
+            self.debug('packet number: ' + str(pktNr))
+            # the second entry of the data defines its type
+            pktType = data[1]
+            self.debug('packet type: ' + str(pktType))
+            
+            # send an acknowledge
+            self.processMsg(self.getTimeStamp(), [pktNr, ACK_PACKET, pkt_type], self._priority, self._backlog)
+            
+            # if the type is INIT_PACKET we have to send a new file
+            if pktType == INIT_PACKET:
+                if self._lastRecvPacketType == INIT_PACKET:
+                    self.debug('init packet already received')
+                else:
+                    self.debug('new binary request received')
+                    packet = self._getInitialBinaryPacket()
+                    self._lastRecvPacketType = INIT_PACKET
+            # if the type is RESEND_PACKET we have to resend a part of a file...
+            elif pktType == RESEND_PACKET:
+                if self._lastRecvPacketType == RESEND_PACKET:
+                    self.debug('binary retransmission request already received')
+                else:
+                    self.debug('binary retransmission request received')
+                    if self._reopenFile(data[2], data[3], struct.unpack('i', struct.pack('I', data[4]))[0], data[5]):
+                        packet = self._getNextChunk()
+                        self._lastRecvPacketType = RESEND_PACKET
+                    else:
+                        packet = None
+            elif pktType == ACK_PACKET:
+                ackType = data[2]
+                    
+                if pktNr == self._sentPacketNr+1:
                     if ackType == INIT_PACKET and self._lastSentPacketType == INIT_PACKET:
                         self.debug('acknowledge received for init packet')
-                        chunkNumber = 0
-                    elif ackType == INIT_PACKET and self._lastSentPacketType == CHUNK_PACKET and chunkNumber-1 == 0:
-                        self.debug('acknowledge for init packet already received')
-                        alreadyReceived = True
+                        packet = self._getNextChunk()
                     elif ackType == CHUNK_PACKET and self._lastSentPacketType == CHUNK_PACKET:
-                        chkNr = data[2]
-                        if chkNr == chunkNumber-1:
-                            self.debug('acknowledge for chunk number >' + str(chkNr) + '< received')
-                        elif chkNr == chunkNumber-2:
-                            self.debug('acknowledge for chunk number >' + str(chkNr) + '< already received')
-                            alreadyReceived = True
-                        else:
-                            self.error('acknowledge received for chunk number >' + str(chkNr) + '< sent chunk number was >' + str(chunkNumber-1) + '<')
-                            continue
-                    elif ackType == CHUNK_PACKET and self._lastSentPacketType == CRC_PACKET:
-                        chkNr = data[2]
-                        self.debug('acknowledge for chunk number >' + str(chkNr) + '< already received')
-                        alreadyReceived = True
+                        self.debug('acknowledge for packet number >' + str(pktNr) + '< received')
+                        packet = self._getNextChunk()
                     elif ackType == CRC_PACKET and self._lastSentPacketType == CRC_PACKET:
+                        filename = self._filedescriptor.name
+                        os.chmod(filename, 0744)
+                        self._filedescriptor.close()
                         if os.path.isfile(filename):
                             # crc has been accepted by GSN
                             self.debug('crc has been accepted for ' + filename)
                             # remove it from disk
                             os.remove(filename)
+                            packet = self._getInitialBinaryPacket()
                         else:
-                            self.debug('crc acknowledge for ' + filename + ' already received')
-                            alreadyReceived = True
-                    elif ackType == CRC_PACKET and self._lastSentPacketType == INIT_PACKET:
-                        self.debug('acknowledge for crc packet already received')
-                        alreadyReceived = True
-                    else:
-                        self.error('received acknowledge type >' + str(ackType) + '< does not match the sent packet type >' + str(self._lastSentPacketType) + '<')
-                        alreadyReceived = True
-                        
-                    if alreadyReceived:
-                        if not self._msgdeque:
-                            self._workEvent.clear()
-                        continue
-                        
+                            self.error('crc acknowledge file does not exist')
+                            
                     self._lastRecvPacketType = ACK_PACKET
-                    
-                # if the type is INIT_PACKET we have to send a new file
-                elif pktType == INIT_PACKET:
-                    if self._lastRecvPacketType == INIT_PACKET:
-                        self.debug('init packet already received')
-                        self.processMsg(self.getTimeStamp(), [ACK_PACKET, INIT_PACKET], self._priority, self._backlog)
-                        if not self._msgdeque:
-                            self._workEvent.clear()
-                        continue
-                    else:
-                        self.debug('new binary request received')
-                        
-                        if self._filedescriptor and not self._filedescriptor.closed:
-                            filename = self._filedescriptor.name
-                            self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
-                            os.chmod(filename, 0744)
-                            self._filedescriptor.close()
-                            os.remove(filename)
-                    
-                    self._lastRecvPacketType = INIT_PACKET
-                    self._lastSentPacketType = ACK_PACKET
-                    self.processMsg(self.getTimeStamp(), [ACK_PACKET, INIT_PACKET], self._priority, self._backlog)
-                # if the type is RESEND_PACKET we have to resend a part of a file...
-                elif pktType == RESEND_PACKET:
-                    if self._lastRecvPacketType == RESEND_PACKET:
-                        self.debug('binary retransmission request already received')
-                        self.processMsg(self.getTimeStamp(), [ACK_PACKET, RESEND_PACKET], self._priority, self._backlog)
-                        if not self._msgdeque:
-                            self._workEvent.clear()
-                        continue
-                    else:
-                        self.debug('binary retransmission request received')
-                        
-                        # how much of the file has already been downloaded
-                        downloaded = data[1]
-                        # what chunk number are we at
-                        chunkNumber = data[2]
-                        # what crc do we have at GSN
-                        gsnCRC = struct.unpack('i', struct.pack('I', data[3]))[0]
-                        # what is the name of the file to resend
-                        filenamenoprefix = data[4]
-                        filename = os.path.join(self._rootdir, filenamenoprefix)
-                        self.debug('downloaded size: ' + str(downloaded))
-                        self.debug('chunk number to send: ' + str(chunkNumber))
-                        self.debug('crc at GSN: ' + str(gsnCRC))
-                        self.debug('file: ' + filename)
-                        
-                        try:
-                            if downloaded > 0:
-                                try:
-                                    self._filedeque.remove([filename, os.path.getsize(filename)])
-                                except:
-                                    pass
-                                else:
-                                    self.debug('copy >' + filename + '< removed from file queue')
-                                # open the specified file
-                                self._filedescriptor = open(filename, 'rb')
-                                os.chmod(filename, 0444)
-                                
-                                # recalculate the crc
-                                sizecalculated = 0
-                                crc = None
-                                while sizecalculated != downloaded:
-                                    if downloaded - sizecalculated > 4096:
-                                        part = self._filedescriptor.read(4096)
-                                    else:
-                                        part = self._filedescriptor.read(downloaded - sizecalculated)
-                                        
-                                    if crc:
-                                        crc = zlib.crc32(part, crc)
-                                    else:
-                                        crc = zlib.crc32(part)
-                                    sizecalculated += len(part)
-                                        
-                                    if part == '':
-                                        self.warning('end of file reached while calculating CRC')
-                                        break
-                                    
-                                if crc != gsnCRC:
-                                    self.warning('crc received from gsn >' + str(gsnCRC) + '< does not match local one >' + str(crc) + '< -> resend complete binary')
-                                    os.chmod(filename, 0744)
-                                    self._filedeque.append([filename, os.path.getsize(filename)])
-                                    self._filedescriptor.close()
-                                else:
-                                    self.debug('crc received from gsn matches local one -> resend following part of binary')
-                            else:
-                                # resend the whole binary
-                                self._filedeque.append([filename, os.path.getsize(filename)])
-                        except IOError, e:
-                            self.warning(e)
-                    
-                    self._lastRecvPacketType = RESEND_PACKET
-                    self._lastSentPacketType = ACK_PACKET
-                    self.processMsg(self.getTimeStamp(), [ACK_PACKET, RESEND_PACKET], self._priority, self._backlog)
-            except  IndexError:
-                pass
-        
-            try:
-                if not self._filedescriptor or self._filedescriptor.closed:
-                    # get the next file to send out of the fifo
-                    fileobj = self._filedeque.pop()
-                    filename = fileobj[0]
-                    
-                    if os.path.isfile(filename):
-                        # open the file
-                        self._filedescriptor = open(filename, 'rb')
-                        os.chmod(filename, 0444)
-                    else:
-                        # if the file does not exist we are continuing in the fifo
-                        continue
-                    
-                    # get the size of the file
-                    filelen = fileobj[1]
-                    
-                    if filelen == 0:
-                        # if the file is empty we ignore it and continue in the fifo
-                        self.debug('ignore empty file: ' + filename)
-                        os.chmod(filename, 0744)
-                        self._filedescriptor.close()
-                        os.remove(filename)
-                        continue
-                    
-                    filenamenoprefix = filename.replace(self._rootdir, '')
-                    self.debug('filename without prefix: ' + filenamenoprefix)
-                    filenamelen = len(filenamenoprefix)
-                    if filenamelen > 255:
-                        filenamelen = 255
-                    
-                    # check witch watch this file belongs to
-                    l = -1
-                    watch = None
-                    for w in self._watches:
-                        if (filename.count(w[0]) > 0 or w[0] == './') and len(w[0]) > l:
-                            watch = w
-                            l = len(w[0])
-                    if not watch:
-                        self.error('no watch specified for ' + filename + ' (this is very strange!!!) -> close file')
-                        os.chmod(filename, 0744)
-                        self._filedescriptor.close()
-                        continue
-                    
-                    self._resendcounter = 0
-                        
-                    packet = [INIT_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter, watch[2], long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
-                    packet.append(filenamenoprefix)
-                    packet.append(watch[3])
-                    
-                    self.debug('sending initial binary packet for ' + self._filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '<, device id >' + str(watch[2]) + ' and time date format >' + watch[3] + '<')
-                
-                    crc = None
-                        
-                    self._lastSentPacketType = INIT_PACKET
-                # or are we already sending chunks of a file?
+                elif pktNr == self._sentPacketNr:
+                    self.debug('acknowledge already received')
                 else:
-                    # read the next chunk out of the opened file
-                    chunk = self._filedescriptor.read(CHUNK_SIZE)
-                    
-                    if crc:
-                        crc = zlib.crc32(chunk, crc)
-                    else:
-                        crc = zlib.crc32(chunk)
-                    
-                    if not chunk:
-                        # so we have reached the end of the file...
-                        self.debug('binary completely sent')
-                        
-                        # create the crc packet [type, crc]
-                        packet = [CRC_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter, struct.unpack('I', struct.pack('i', crc))[0]]
-                        
-                        filename = self._filedescriptor.name
-                        os.chmod(filename, 0744)
-                        self._filedescriptor.close()
-                        
-                        # send it
-                        self.debug('sending crc: ' + str(crc))
-                        timestamp = self.getTimeStamp()
-                        self._lasttimestamp = timestamp
-                        
-                        self._lastSentPacketType = CRC_PACKET
-                    else:
-                        # create the packet [type, chunk number (4bytes)]
-                        packet = [CHUNK_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter, chunkNumber]
-                        packet.append(bytearray(chunk))
-                        
-                        self._lastSentPacketType = CHUNK_PACKET
-                        self.debug('sending binary chunk number ' + str(chunkNumber) + ' for ' + self._filedescriptor.name)
-                        
-                        # increase the chunk number
-                        chunkNumber = chunkNumber + 1
+                    self.error('acknowledge out of order')
+                
+                
+    def _getInitialBinaryPacket(self):
+        if self._filedescriptor and not self._filedescriptor.closed:
+            filename = self._filedescriptor.name
+            self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
+            os.chmod(filename, 0744)
+            self._filedescriptor.close()
+            os.remove(filename)
             
-                # tell BackLogMain to send the packet to GSN
-                first = True
-                self._msgEvent.clear()
-                while (not self._msgEvent.isSet() or first) and self.isGSNConnected():
-                    if not first:
-                        self.debug('resend message')
-                        self._resendcounter += 1
-                        packet[3] += 1
-                    self._waitforack = True
-                    self.processMsg(self.getTimeStamp(), packet, self._priority, self._backlog)
-                    # and resend it if no ack has been received
-                    self._msgEvent.wait(RESEND_INTERVAL_SEC)
-                    first = False
+        self._fileEvent.wait()
+        if self._plugStop:
+            return None
+            
+        ret = self._openNewFile()
+        if not ret:
+            return None
+            
+        self._resendcounter = 0
+            
+        packet = [INIT_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter] + ret
+        packet.append(filenamenoprefix)
+        packet.append(watch[3])
+        
+        self.debug('sending initial binary packet for ' + self._filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '<, device id >' + str(watch[2]) + ' and time date format >' + watch[3] + '<')
+    
+        crc = None
+        return packet
+    
+    
+    def _openNewFile(self):
+        while not self._plugStop:
+            try:
+                # get the next file to send out of the fifo
+                fileobj = self._filedeque.pop()
             except IndexError:
-                # fifo is empty
+                self._fileEvent.clear()
                 self.debug('file FIFO is empty waiting for next file to arrive')
-                self._workEvent.clear()
-                if not self._waitforfile:
-                    self._isBusy = False
-            except Exception, e:
-                self.exception(e)
-                self._waitforack = False
+                return None
+                
+            filename = fileobj[0]
+            
+            if os.path.isfile(filename):
+                # open the file
+                self._filedescriptor = open(filename, 'rb')
+                os.chmod(filename, 0444)
+            else:
+                # if the file does not exist we are continuing in the fifo
+                continue
+            
+            # get the size of the file
+            filelen = fileobj[1]
+            
+            if filelen == 0:
+                # if the file is empty we ignore it and continue in the fifo
+                self.debug('ignore empty file: ' + filename)
                 os.chmod(filename, 0744)
                 self._filedescriptor.close()
-
-        self.info('died')
+                os.remove(filename)
+                continue
+            
+            filenamenoprefix = filename.replace(self._rootdir, '')
+            self.debug('filename without prefix: ' + filenamenoprefix)
+            filenamelen = len(filenamenoprefix)
+            if filenamelen > 255:
+                filenamelen = 255
+            
+            # check witch watch this file belongs to
+            l = -1
+            watch = None
+            for w in self._watches:
+                if (filename.count(w[0]) > 0 or w[0] == './') and len(w[0]) > l:
+                    watch = w
+                    l = len(w[0])
+            if not watch:
+                self.error('no watch specified for ' + filename + ' (this is very strange!!!) -> close file')
+                os.chmod(filename, 0744)
+                self._filedescriptor.close()
+                continue
+            
+            return [watch[2], long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
+        
+        
+    def _reopenFile(self, downloaded, gsnCRC, filenamenoprefix):
+        filename = os.path.join(self._rootdir, filenamenoprefix)
+        self.debug('downloaded size: ' + str(downloaded))
+        self.debug('crc at GSN: ' + str(gsnCRC))
+        self.debug('file: ' + filename)
+        
+        try:
+            if downloaded > 0:
+                try:
+                    self._filedeque.remove([filename, os.path.getsize(filename)])
+                except:
+                    pass
+                else:
+                    self.debug('copy >' + filename + '< removed from file queue')
+                # open the specified file
+                self._filedescriptor = open(filename, 'rb')
+                os.chmod(filename, 0444)
+                
+                # recalculate the crc
+                sizecalculated = 0
+                crc = None
+                while sizecalculated != downloaded:
+                    if downloaded - sizecalculated > 4096:
+                        part = self._filedescriptor.read(4096)
+                    else:
+                        part = self._filedescriptor.read(downloaded - sizecalculated)
+                        
+                    if crc:
+                        crc = zlib.crc32(part, crc)
+                    else:
+                        crc = zlib.crc32(part)
+                    sizecalculated += len(part)
+                        
+                    if part == '':
+                        self.warning('end of file reached while calculating CRC')
+                        break
+                    
+                if crc != gsnCRC:
+                    self.warning('crc received from gsn >' + str(gsnCRC) + '< does not match local one >' + str(crc) + '< -> resend complete binary')
+                    os.chmod(filename, 0744)
+                    self._filedeque.append([filename, os.path.getsize(filename)])
+                    self._filedescriptor.close()
+                    return self._openNewFile()
+                else:
+                    self.debug('crc received from gsn matches local one -> resend following part of binary')
+                    return True
+            else:
+                # resend the whole binary
+                self._filedeque.append([filename, os.path.getsize(filename)])
+                return self._openNewFile()
+        except IOError, e:
+            self.error(e)
+            return self._openNewFile()
+        
+        
+    def _getNextChunk(self):
+        # read the next chunk out of the opened file
+        chunk = self._filedescriptor.read(CHUNK_SIZE)
+        
+        if crc:
+            crc = zlib.crc32(chunk, crc)
+        else:
+            crc = zlib.crc32(chunk)
+        
+        if not chunk:
+            # so we have reached the end of the file...
+            self.debug('binary completely sent')
+            
+            # create the crc packet [type, crc]
+            packet = [CRC_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter, struct.unpack('I', struct.pack('i', crc))[0]]
+            
+            # send it
+            self.debug('sending crc: ' + str(crc))
+        else:
+            # create the packet [type, chunk number (4bytes)]
+            packet = [CHUNK_PACKET, self._getFileQueueSize(), len(self._filedeque), self._resendcounter]
+            packet.append(bytearray(chunk))
+            
+            self.debug('sending binary chunk for ' + self._filedescriptor.name)
+        return packet
         
         
     def _getFileQueueSize(self):
@@ -594,6 +565,4 @@ class BinaryChangedProcessing(ProcessEvent):
         self._logger.debug(event.pathname + ' changed')
         
         self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
-        if self._binaryPlugin.isGSNConnected() and not self._binaryPlugin._waitforack:
-            self._binaryPlugin._isBusy = True
-            self._binaryPlugin._workEvent.set()
+        self._binaryPlugin._fileEvent.set()
