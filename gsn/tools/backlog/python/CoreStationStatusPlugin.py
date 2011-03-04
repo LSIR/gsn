@@ -1299,6 +1299,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             val = int(line)
             if val == -240000:
                 self._lm92Temp = False
+                self.info('there seems not to be a LM92 temperature sensor connected')
         except Exception, e:
             self._lm92Temp = False
             self.error(str(e))
