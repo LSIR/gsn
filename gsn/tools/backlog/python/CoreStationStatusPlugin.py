@@ -1297,6 +1297,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             line = file.readline()
             file.close()
             val = int(line)
+            if val == -240000:
+                self._lm92Temp = False
         except Exception, e:
             self._lm92Temp = False
             self.error(str(e))
