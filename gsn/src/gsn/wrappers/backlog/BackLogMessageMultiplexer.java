@@ -653,15 +653,10 @@ class PluginMessageHandler extends Thread {
 	
 	public boolean newPluginMessage(BackLogMessage msg) {
 		boolean ret = plugMsgQueue.offer(msg);
-		if (!queueLimitReached && isMsgQueueLimitReached()) {
+		if (isMsgQueueLimitReached()) {
 			blMsgMulti.sendQueueLimitMsg();
 			logger.warn("message queue limit reached => sending queue limit message");
 			queueLimitReached = true;
-		}
-		else if (queueLimitReached && isMsgQueueReady()) {
-			blMsgMulti.sendQueueReadyMsg();
-			logger.warn("message queue ready again => sending queue ready message");
-			queueLimitReached = false;
 		}
 		if (!ret)
 			logger.warn("message queue is full");
@@ -682,6 +677,12 @@ class PluginMessageHandler extends Thread {
 		while (!dispose) {
 			try {
 				msg = plugMsgQueue.take();
+				if (queueLimitReached && isMsgQueueReady()) {
+					//TODO: send queue ready msg is only sent once... what if it does not reach the Core Station?
+					blMsgMulti.sendQueueReadyMsg();
+					logger.warn("message queue ready again => sending queue ready message");
+					queueLimitReached = false;
+				}
 				if (dispose)
 					break;
 				

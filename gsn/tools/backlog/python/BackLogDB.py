@@ -304,11 +304,11 @@ class BackLogDBClass(Thread, Statistics):
         self._logger.info('died')
         
         
-    def connectionToGSNlost(self):
+    def pauseResending(self):
         self._resendtimer.pause()
         
         
-    def connectionToGSNestablished(self):
+    def resumeResending(self):
         self._resendtimer.resume()
 
 

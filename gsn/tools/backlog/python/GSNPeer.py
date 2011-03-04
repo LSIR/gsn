@@ -203,9 +203,11 @@ class GSNPeerClass(Thread, Statistics):
             self._backlogMain.ackReceived(msg.getTimestamp(), msg.getData()[0])
         elif msgType == BackLogMessage.MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE:
             self._gsnqueuelimitreached = True
+            self._backlogMain.backlog.pauseResending()
             self._logger.info('GSN message queue reached its limit => stop sending messages')
         elif msgType == BackLogMessage.MESSAGE_QUEUE_READY_MESSAGE_TYPE:
             self._gsnqueuelimitreached = False
+            self._backlogMain.backlog.resumeResending()
             self._logger.info('GSN message queue is ready => send messages')
         else:
             self.counterAction(self._msgInCounterId)

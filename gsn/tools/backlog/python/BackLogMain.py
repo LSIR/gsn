@@ -539,7 +539,7 @@ class BackLogMainClass(Thread, Statistics):
                 self.incrementExceptionCounter()
                 self._logger.exception(e)
         self.schedulehandler.connectionToGSNestablished()
-        self.backlog.connectionToGSNestablished()
+        self.backlog.resumeResending()
         
     def connectionToGSNlost(self):
         # tell the plugins that the connection to GSN has been lost
@@ -549,7 +549,7 @@ class BackLogMainClass(Thread, Statistics):
             except Exception, e:
                 self.incrementExceptionCounter()
                 self._logger.exception(e)
-        self.backlog.connectionToGSNlost()
+        self.backlog.pauseResending()
     
     
     def wlanNeeded(self):
