@@ -82,7 +82,7 @@ class GPSPluginClass(AbstractPluginClass):
             
         #Wlan must only be cycled when in dc mode!!
         if (self.isDutyCycleMode()):    	
-            self._WlanThread = WlanThread(self,self.getOptionValue('wlan_on_time'),self.getOptionValue('wlan_off_time'))
+            self._WlanThread = WlanThread(self,int(self.getOptionValue('wlan_on_time')),int(self.getOptionValue('wlan_off_time')))
         
         #counter
         try:
@@ -243,7 +243,7 @@ class WlanThread(Thread):
         while not self._stopped: 
             self._parent._logger.info('WlanThread: Waiting for ' + str(self._uptime) + ' secs before cycling WLAN')
             self._work.wait(self._uptime)
-            if (self._parent.getPowerControlObject().getWlanStatus()):
+            if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?
                 p = subprocess.Popen('/usr/bin/who')
                 p.wait()
                 user = p.communicate()[0]
@@ -251,22 +251,20 @@ class WlanThread(Thread):
                 #self._parent._logger.info(str("HOST\nroot" in user))
                 start = time.time()
                 while ((("HOST\nroot" in user) or (self._parent.isResendingDB())) and not self._stopped):
-                    #self._parent._logger.info("Flushing: " + str(self._parent.isResendingDB()))
                     self._parent._logger.info('Someone is logged in or we are flushing DB... NOT power cycling WLAN!')
                     self._parent._logger.info('Waiting for 10 sec')
                     self._work.wait(10)
                     p = subprocess.Popen('/usr/bin/who')
                     p.wait()
                     user = p.communicate()[0]
-                    #user = commands.getoutput('/usr/bin/who')
-                    #self._parent._logger.info(str(user))
                 if (not self._stopped):
-                    duration = time.time() - start
-                    self._parent.getPowerControlObject().wlanOff()
-                    self._parent._logger.info('Waiting for ' + str(self._downtime-duration) + ' secs')
-                    self._work.wait(self._downtime - duration)
-            #Todo: Turn Wlan on
-            if (not self._stopped):
+                    duration = time.time() - start 
+                    if (self._downtime - duration > 0):
+                        self._parent.getPowerControlObject().wlanOff()
+                        self._parent._logger.info('Waiting for ' + str(self._downtime-duration) + ' secs')
+                        self._work.wait(self._downtime - duration)
+            #If WLAN is off, turn it on
+            if (not self._stopped and not self._parent.getPowerControlObject().getWlanStatus()):
                 self._parent._logger.info("We are not online, so turn on wlan")
                 self._parent.getPowerControlObject().wlanOn()  
         self._parent._logger.info('WlanThread: died')
