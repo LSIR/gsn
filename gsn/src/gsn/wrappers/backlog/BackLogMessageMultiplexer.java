@@ -490,6 +490,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		if (logger.isDebugEnabled())
 			logger.debug("connection established");
 		
+		recvQueue.clear();
+		
 		resetWatchDog();
 
 		try {
