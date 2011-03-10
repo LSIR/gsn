@@ -294,7 +294,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		
 		pluginMessageHandler.dispose();
 		
-		blMultiplexerMap.remove(coreStationAddress);
+		if (blMultiplexerMap.remove(coreStationAddress) == null)
+			logger.error("there is no " + coreStationAddress + " available in the map");
 		
 		asyncCoreStationClient.deregisterListener(this);
 	}
@@ -385,11 +386,12 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		if (vec.size() == 0)
 			msgTypeListener.remove(msgTypeInt);
 		
-		if (isPlugin)
+		if (isPlugin) {
 			activPluginCounter--;
 		
-		if (activPluginCounter == 0)
-			dispose();
+			if (activPluginCounter == 0)
+				dispose();
+		}
 	}
 	
 

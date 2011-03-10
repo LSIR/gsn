@@ -331,6 +331,10 @@ public class AsyncCoreStationClient extends Thread  {
 	{
 		synchronized(listenerToSocketList) {
 			SocketChannel sc = listenerToSocketList.get(listener);
+			if (sc == null) {
+				logger.error("this listener is not available in the listener map");
+				return;
+			}
 			try {
 				sc.close();
 			} catch (IOException e) {
