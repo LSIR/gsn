@@ -115,7 +115,7 @@ class GPSPluginClass(AbstractPluginClass):
     ##########################################################################################
     '''
     def action(self,parameters):
-        self.info("Action called!")
+        self.debug("Action called!")
         if (not self.isDutyCycleMode()):
             self.warning("GPSPlugin's action called even though we are not in duty-cycle mode!")
             return
