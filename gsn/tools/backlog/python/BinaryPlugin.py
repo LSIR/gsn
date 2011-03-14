@@ -234,8 +234,8 @@ class BinaryPluginClass(AbstractPluginClass):
             self._filedescriptor.close()
         self._binaryWriter.stopSending()
         self._emptyQueue()
-           
         
+    
     def run(self):
         self.info('started')
         
@@ -308,6 +308,8 @@ class BinaryPluginClass(AbstractPluginClass):
                 self._msgqueue.task_done()
             except ValueError, e:
                 self.exception(e)
+            
+        self._logger.info('died')
 
 
     def _emptyQueue(self):
@@ -339,6 +341,8 @@ class BinaryPluginClass(AbstractPluginClass):
                 self._fileEvent.clear()
                 self.debug('file FIFO is empty waiting for next file to arrive')
                 self._fileEvent.wait()
+                if self._plugStop:
+                    return
                 continue
                 
             filename = fileobj[0]
@@ -523,6 +527,8 @@ class BinaryPluginClass(AbstractPluginClass):
         if self._waitforfile:
             self._waitforfiletimer.cancel()
         self._notifier.stop()
+        self._binaryWriter.stop()
+        self._fileEvent.set()
         self._filedeque.clear()
         if self._filedescriptor and not self._filedescriptor.closed:
             os.chmod(self._filedescriptor.name, 0744)
@@ -558,13 +564,13 @@ class BinaryWriter(Thread):
 
     def run(self):
         self._logger.info('started')
+        
         while not self._binaryWriterStop:
             msg = self._sendqueue.get()
             self._stopsending.clear()
             self._lock.acquire()
             
             if not self._binaryWriterStop:
-                self._messageNr = (self._messageNr+1)%MESSAGE_NUMBER_MOD
                 self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
                 while not self._stopsending.isSet() and not self._binaryWriterStop:
                     self._stopsending.wait(RESEND_INTERVAL_SEC)
@@ -579,10 +585,11 @@ class BinaryWriter(Thread):
         
         
     def sendMessage(self, msg):
+        self._messageNr = (self._messageNr+1)%MESSAGE_NUMBER_MOD
         try:
             self._sendqueue.put_nowait(msg)
-        except Queue.Full, e:
-            self._exception(str(e))
+        except Queue.Full:
+            self._exception('send queue is full')
         return self._messageNr
         
         
@@ -602,7 +609,10 @@ class BinaryWriter(Thread):
     def stop(self):
         self._binaryWriterStop = True
         self._stopsending.set()
-        self._sendqueue.put_nowait('stop')
+        try:
+            self._sendqueue.put_nowait('stop')
+        except:
+            pass
         self._logger.info('stopped')
 
 
