@@ -1302,7 +1302,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 self.info('there seems not to be a LM92 temperature sensor connected')
         except Exception, e:
             self._lm92Temp = False
-            self.error(str(e))
+            self.warning(str(e))
     
     
     def _getLM92Temp(self):
