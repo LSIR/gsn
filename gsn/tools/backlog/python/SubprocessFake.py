@@ -93,7 +93,7 @@ class Popen(Thread):
         f.close()
         
         self.start()
-        self._checkPidTimer = Timer(5.0, self._checkPidEvent, [args])
+        self._checkPidTimer = Timer(30.0, self._checkPidEvent, [args])
         self._checkPidTimer.start()
         
         
