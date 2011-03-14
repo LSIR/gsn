@@ -524,6 +524,7 @@ class BinaryPluginClass(AbstractPluginClass):
         if self._filedescriptor and not self._filedescriptor.closed:
             os.chmod(self._filedescriptor.name, 0744)
             self._filedescriptor.close()
+        self._msgqueue.put('end')
         self.info('stopped')
 
 
