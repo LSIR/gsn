@@ -255,6 +255,8 @@ public class BinaryPlugin extends AbstractPlugin {
 					logger.warn(e.getMessage());
 				}
     		}
+    		else
+    			logger.warn("sendPacket is null");
     	}
         
         logger.info("thread stopped");

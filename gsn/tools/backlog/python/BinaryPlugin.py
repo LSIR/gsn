@@ -32,6 +32,8 @@ RESEND_PACKET = 3
 CHUNK_PACKET = 4
 CRC_PACKET = 5
 
+MESSAGE_NUMBER_MOD = 0xFFFFFFF
+
 class BinaryPluginClass(AbstractPluginClass):
     '''
     This plugin offers the functionality to send binaries to GSN
@@ -297,10 +299,10 @@ class BinaryPluginClass(AbstractPluginClass):
                         self._getInitialBinaryPacket()
                     else:
                         self.error('unexpected acknowledge received')
-            elif pktNr-1 == self._binaryWriter.getSentMsgNr():
+            elif pktNr == self._binaryWriter.getSentMsgNr()-1 or (pktNr == MESSAGE_NUMBER_MOD-1 and self._binaryWriter.getSentMsgNr() == 0):
                 self.debug('packet number already received')
             else:
-                self.error('packet number out of order')
+                self.error('packet number out of order (recv=' + str(pktNr) + ', sent=' + str(self._binaryWriter.getSentMsgNr()) + ')')
                     
             try:
                 self._msgqueue.task_done()
@@ -562,7 +564,7 @@ class BinaryWriter(Thread):
             self._lock.acquire()
             
             if not self._binaryWriterStop:
-                self._messageNr = (self._messageNr+1)%0xFFFFFFF
+                self._messageNr = (self._messageNr+1)%MESSAGE_NUMBER_MOD
                 self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
                 while not self._stopsending.isSet() and not self._binaryWriterStop:
                     self._stopsending.wait(RESEND_INTERVAL_SEC)
