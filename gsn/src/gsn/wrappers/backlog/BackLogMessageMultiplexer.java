@@ -490,8 +490,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		if (logger.isDebugEnabled())
 			logger.debug("connection established");
 		
-		recvQueue.clear();
-		
 		resetWatchDog();
 
 		try {
@@ -506,6 +504,9 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	public void connectionLost() {
 		connected = false;
 		logger.info("connection to core station with device id " + coreStationDeviceId + " at " + deploymentName + " deployment lost");
+		
+		recvQueue.clear();
+		pluginMessageHandler.clearMsgQueue();
 		
     	// stop ping timer
 		if (pingTimer != null)
@@ -696,6 +697,10 @@ class PluginMessageHandler extends Thread {
 			}
 		}
 		logger.info("thread died");
+	}
+	
+	public void clearMsgQueue() {
+		plugMsgQueue.clear();
 	}
 	
 	public void dispose() {

@@ -127,7 +127,6 @@ class BinaryPluginClass(AbstractPluginClass):
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
         
         self._binaryWriter = BinaryWriter(self)
-        self._fileEvent = Event()
         self._filedeque = deque()
         self._msgqueue = Queue.Queue()
         
@@ -203,9 +202,6 @@ class BinaryPluginClass(AbstractPluginClass):
             self._isBusy = True
         else:
             self._isBusy = False
-            
-        if self._filedeque:
-            self._fileEvent.set()
                 
         self._filedescriptor = None
         self._plugStop = False
@@ -338,12 +334,8 @@ class BinaryPluginClass(AbstractPluginClass):
                 # get the next file to send out of the fifo
                 fileobj = self._filedeque.pop()
             except IndexError:
-                self._fileEvent.clear()
                 self.debug('file FIFO is empty waiting for next file to arrive')
-                self._fileEvent.wait()
-                if self._plugStop:
-                    return
-                continue
+                return
                 
             filename = fileobj[0]
             
@@ -528,7 +520,6 @@ class BinaryPluginClass(AbstractPluginClass):
             self._waitforfiletimer.cancel()
         self._notifier.stop()
         self._binaryWriter.stop()
-        self._fileEvent.set()
         self._filedeque.clear()
         if self._filedescriptor and not self._filedescriptor.closed:
             os.chmod(self._filedescriptor.name, 0744)
@@ -638,5 +629,9 @@ class BinaryChangedProcessing(ProcessEvent):
     def process_default(self, event):
         self._logger.debug(event.pathname + ' changed')
         
+        sendBinary = False
+        if not self._binaryPlugin._filedeque and (not self._binaryPlugin._filedescriptor or self._binaryPlugin._filedescriptor.closed) and self._binaryPlugin.isGSNConnected():
+            sendBinary = True
         self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
-        self._binaryPlugin._fileEvent.set()
+        if sendBinary:
+            self._binaryPlugin._getInitialBinaryPacket()
