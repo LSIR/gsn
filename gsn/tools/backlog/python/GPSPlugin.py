@@ -164,9 +164,9 @@ class GPSPluginClass(AbstractPluginClass):
                     self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, cnt, ((rawMsg[4]-8)/24), bytearray(rawMsg[2])])
                 elif (self._mode == "raw" and self._logMode == "ascii"):
                     self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, parseRawMsg(rawMsg[2])])
-                self.info("GPS Sample Nr: " + str(cnt))
+                self.debug("GPS Sample Nr: " + str(cnt))
                 self.writeToFile(cnt)
-                self.info(str((rawMsg[4]-8)/24) + " Satellites (" + str(rawMsg[4]) + " Bytes)")
+                self.debug(str((rawMsg[4]-8)/24) + " Satellites (" + str(rawMsg[4]) + " Bytes)")
             self._runEv.wait(self._interval-1)
 
         # die...
