@@ -267,56 +267,56 @@ class GPSDriver():
     ##########################################################################################
     '''
     def _serialAccess(self,dev,data,mode):
-	d = False
-	fd = None
-	#self._logger.info("Opening " + str(dev))
-    try:
-    	self._device.open()
-    	if (mode == 'w'):
-    		self._device.write(data)
-    		self._device.close()
-    		return True
-    	elif (mode == 'r'):
-    		d = self._device.read(data)
-    		self._device.close()
-    		return d
-    	else:
-    		self._logger.info("serialAccess: Wrong mode specified")
-    		self._device.close()
-    		return False
-    except Exception as e:
-        if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug( "serialAccess Exception (1) %s" % (e,))
-    	dev = scanlinux.scan()
-    	while (dev == ''):
-    		dev = scanlinux.scan()
-    	for i in range(0, len(dev)):
-            if (len(dev[i])):
-                dev = dev[i]
-                break
-            if (len(dev)):
+    	d = False
+    	fd = None
+    	#self._logger.info("Opening " + str(dev))
+        try:
+        	self._device.open()
+        	if (mode == 'w'):
+        		self._device.write(data)
+        		self._device.close()
+        		return True
+        	elif (mode == 'r'):
+        		d = self._device.read(data)
+        		self._device.close()
+        		return d
+        	else:
+        		self._logger.info("serialAccess: Wrong mode specified")
+        		self._device.close()
+        		return False
+        except Exception as e:
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug( "serialAccess Exception (1) %s" % (e,))
+            dev = scanlinux.scan()
+            while (dev == ''):
+            	dev = scanlinux.scan()
+            for i in range(0, len(dev)):
+                if (len(dev[i])):
+                    dev = dev[i]
+                    break
+                if (len(dev)):
+                    if self._logger.isEnabledFor(logging.DEBUG):
+                        self._logger.debug("Found new device: %s" % (dev,))
+         	else:
+        		if (self.retries > 0):
+        			self.retries -= 1
+        			self._logger.debug("No device found, trying again!")
+        			self._runEv.wait(1)
+        			return self._serialAccess(dev,data,mode)
+        		else:
+        			self._logger.info("No device found... Giving up!!")
+        			exit()
+            self._device = dev
+            try:
+                self._device = serial.Serial(dev, 19200, timeout=self._serialTimeout)
                 if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug("Found new device: %s" % (dev,))
-     	else:
-    		if (self.retries > 0):
-    			self.retries -= 1
-    			self._logger.debug("No device found, trying again!")
-    			self._runEv.wait(1)
-    			return self._serialAccess(dev,data,mode)
-    		else:
-    			self._logger.info("No device found... Giving up!!")
-    			exit()
-    	self._device = dev
-    	try:
-            self._device = serial.Serial(dev, 19200, timeout=self._serialTimeout)
-            if self._logger.isEnabledFor(logging.DEBUG):
-                self._logger.debug("Successfully opened %s" % (self._device,))
-            return self._serialAccess(dev,data,mode)
-    	except Exception as e:
-            self.cleanUp(fd,dev)
-            if self._logger.isEnabledFor(logging.DEBUG):
-                self._logger.debug("serialAccess Exception (2) %s" % (e,))
-            return False
+                    self._logger.debug("Successfully opened %s" % (self._device,))
+                return self._serialAccess(dev,data,mode)
+            except Exception as e:
+                self.cleanUp(fd,dev)
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.debug("serialAccess Exception (2) %s" % (e,))
+                return False
 
     '''
     ###########################################################################################
