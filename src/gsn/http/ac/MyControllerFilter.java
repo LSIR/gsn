@@ -40,11 +40,6 @@ public class MyControllerFilter implements Filter {
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        //TODO: debug only
-        listParameters((HttpServletRequest) request);
-        //TODO: debug only
-
-
         if (request instanceof HttpServletRequest) {
             HttpServletRequest req = (HttpServletRequest) request;
             HttpServletResponse res = (HttpServletResponse) response;
@@ -158,17 +153,6 @@ public class MyControllerFilter implements Filter {
 
                 }
             }
-        }
-    }
-
-    private void listParameters(HttpServletRequest req) {
-
-        Enumeration e = req.getParameterNames();
-
-        while (e.hasMoreElements()) {
-            String key = (String) e.nextElement();
-            if (key.startsWith("vs["))
-                System.out.println(key + " => " + req.getParameter(key));
         }
     }
 
