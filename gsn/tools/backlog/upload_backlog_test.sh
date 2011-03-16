@@ -40,4 +40,7 @@ scp $* root@permasense-etz-gps06:$BACKLOG_PYTHON_DIR
 echo "to permasense-etz-cam01:"
 scp $* root@permasense-etz-cam01:$BACKLOG_PYTHON_DIR
 
+echo "to pc-5225:"
+scp $* tgsell@pc-5225:/home/tgsell/backlog/python/
+
 echo "finished uploading"
