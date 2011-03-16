@@ -63,7 +63,7 @@ class BackLogDBClass(Thread, Statistics):
         
         @raise Exception: if there is a problem with the sqlite3 database.
         '''
-        Thread.__init__(self)
+        Thread.__init__(self, name='BackLogDB-Thread')
         Statistics.__init__(self)
         
         self._storeCounterId = self.createCounter(60)
@@ -128,7 +128,8 @@ class BackLogDBClass(Thread, Statistics):
         
         self._resendtimer = ResendTimer(backlog_db_resend_hr*3600, self.resend)
         
-        self._logger.debug('database %s ready to use' % (self._dbname,))
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug('database %s ready to use' % (self._dbname,))
         
         
     def storeMsg(self, timestamp, msgType, data):
@@ -156,7 +157,8 @@ class BackLogDBClass(Thread, Statistics):
             self.counterAction(self._storeTimeId, storeTime)
             self.counterAction(self._storeCounterId)
 
-            self._logger.debug('store (%d,%d,%d): %f s' % (msgType, timestamp, len(data), storeTime))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('store (%d,%d,%d): %f s' % (msgType, timestamp, len(data), storeTime))
             return True
         except sqlite3.Error, e:
             self._dblock.release()
@@ -192,7 +194,8 @@ class BackLogDBClass(Thread, Statistics):
                 self.counterAction(self._removeTimeId, removeTime)
                 self.counterAction(self._removeCounterId)
 
-            self._logger.debug('del (%d,%d,?): %f s' % (msgType, timestamp, removeTime))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('del (%d,%d,?): %f s' % (msgType, timestamp, removeTime))
         except sqlite3.Error, e:
             self.timeMeasurementDiff(id)
             self._dblock.release()
@@ -289,7 +292,8 @@ class BackLogDBClass(Thread, Statistics):
                 # should be blocking until queue is free and ready to send
                 self._logger.debug('rsnd...')
                 if self._backlogMain.gsnpeer.processResendMsg(msgType, timestamp, message):
-                    self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
+                    if self._logger.isEnabledFor(logging.DEBUG):
+                        self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
                 else:
                     self._logger.info('resend interrupted')
                     self._isBusy = False
@@ -353,7 +357,7 @@ class ResendTimer(Thread):
     '''
     
     def __init__(self, interval, action):
-        Thread.__init__(self)
+        Thread.__init__(self, name='ResendTimer-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         self._interval = interval
         self._action = action

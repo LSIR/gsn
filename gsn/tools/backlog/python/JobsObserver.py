@@ -20,7 +20,7 @@ JOB_PROCESS_CHECK_INTERVAL_SECONDS = 2
 class JobsObserverClass(Thread):
     
     def __init__(self, parent):
-        Thread.__init__(self)
+        Thread.__init__(self, name='JobsObserver-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         
         self._backlogMain = parent
@@ -55,14 +55,16 @@ class JobsObserverClass(Thread):
                                     self._logger.warning('plugin (%s) has not finished in time -> stop it' % (job_name,))
                                 del self._jobList[index]
                             else:
-                                self._logger.debug('plugin (%s) has not yet finished -> %s time to run' % (job_name, runtime_end-datetime.utcnow()))
+                                if self._logger.isEnabledFor(logging.DEBUG):
+                                    self._logger.debug('plugin (%s) has not yet finished -> %s time to run' % (job_name, runtime_end-datetime.utcnow()))
                         else:
                             st = self._backlogMain.pluginStop(job_name)
                             if st:
                                 if self._backlogMain.duty_cycle_mode:
                                     self._logger.info('plugin (%s) finished successfully' % (job_name,))
                                 else:
-                                    self._logger.debug('plugin (%s) finished successfully' % (job_name,))
+                                    if self._logger.isEnabledFor(logging.DEBUG):
+                                        self._logger.debug('plugin (%s) finished successfully' % (job_name,))
                             del self._jobList[index]
                     else:
                         ret = job.poll()
@@ -90,14 +92,16 @@ class JobsObserverClass(Thread):
                                     self._logger.warning('job (%s) has been killed (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
                                     del self._jobList[index]
                                 else:
-                                    self._logger.debug('job (%s) with PID %s not yet finished -> %s time to run' % (job_name, job.pid(), runtime_end-datetime.utcnow()))
+                                    if self._logger.isEnabledFor(logging.DEBUG):
+                                        self._logger.debug('job (%s) with PID %s not yet finished -> %s time to run' % (job_name, job.pid(), runtime_end-datetime.utcnow()))
                         else:
                             stdoutdata, stderrdata = job.communicate()
                             if ret == 0:
                                 if self._backlogMain.duty_cycle_mode:
                                     self._logger.info('job (%s) finished successfully (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
                                 else:
-                                    self._logger.debug('job (%s) finished successfully (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
+                                    if self._logger.isEnabledFor(logging.DEBUG):
+                                        self._logger.debug('job (%s) finished successfully (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
                             else:
                                 self.error('job (%s) finished with return code %s (STDOUT=%s /STDERR=%s)' % (job_name, ret, stdoutdata.decode(), stderrdata.decode()))
                             del self._jobList[index]
@@ -125,17 +129,20 @@ class JobsObserverClass(Thread):
                     if job_name == joblistentry[2]:
                         self._jobList[index] = (isPlugin, job, job_name, datetime.utcnow()+timedelta(minutes=max_runtime_minutes))
                         jobexists = True
-                        self._logger.debug('job (%s) updated with the maximum runtime of %s minutes' % (job_name, max_runtime_minutes))
+                        if self._logger.isEnabledFor(logging.DEBUG):
+                            self._logger.debug('job (%s) updated with the maximum runtime of %s minutes' % (job_name, max_runtime_minutes))
                         break
                 if not jobexists:
                     self._jobList.append((isPlugin, job, job_name, datetime.utcnow()+timedelta(minutes=max_runtime_minutes)))
-                    self._logger.debug('new job (%s) added with a maximum runtime of %s minutes' % (job_name, max_runtime_minutes))
+                    if self._logger.isEnabledFor(logging.DEBUG):
+                        self._logger.debug('new job (%s) added with a maximum runtime of %s minutes' % (job_name, max_runtime_minutes))
             else:
                 if max_runtime_minutes:
                     self._jobList.append((isPlugin, job, job_name, datetime.utcnow()+timedelta(minutes=max_runtime_minutes)))
                 else:
                     self._jobList.append((isPlugin, job, job_name, -1))
-                self._logger.debug('new job (%s) added with a maximum runtime of %s minutes' % (job_name, max_runtime_minutes))
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.debug('new job (%s) added with a maximum runtime of %s minutes' % (job_name, max_runtime_minutes))
             self._lock.release()
             self._work.set()
             

@@ -109,7 +109,7 @@ class ScheduleHandlerClass(Thread):
     '''
     
     def __init__(self, parent, dutycyclemode, options):
-        Thread.__init__(self)
+        Thread.__init__(self, name='ScheduleHandler-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         
         self._backlogMain = parent
@@ -177,7 +177,7 @@ class ScheduleHandlerClass(Thread):
         self._max_next_schedule_wait_delta = timedelta(minutes=max_next_schedule_wait_minutes)
             
         if self._duty_cycle_mode:
-            self._pingThread = PingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
+            self._pingThread = TOSPingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
         
         if os.path.isfile('%s.parsed' % (self.getOptionValue('schedule_file'),)):
             try:
@@ -283,7 +283,8 @@ class ScheduleHandlerClass(Thread):
                     continue
             
             for nextdt, pluginclassname, commandstring, runtimemax in nextschedules:
-                self._logger.debug('(%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax))
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.debug('(%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax))
                 dtnow = datetime.utcnow()
                 timediff = nextdt - dtnow
                 if self._duty_cycle_mode and not self._beacon:
@@ -292,7 +293,8 @@ class ScheduleHandlerClass(Thread):
                     else:
                         service_time = self._serviceTime()
                     if nextdt <= dtnow:
-                        self._logger.debug('executing >%s %s< now' % (pluginclassname, commandstring))
+                        if self._logger.isEnabledFor(logging.DEBUG):
+                            self._logger.debug('executing >%s %s< now' % (pluginclassname, commandstring))
                     elif timediff < self._max_next_schedule_wait_delta or timediff < service_time:
                         if pluginclassname:
                             self._logger.info('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
@@ -325,12 +327,14 @@ class ScheduleHandlerClass(Thread):
                             if self._beacon:
                                 self._logger.info('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                             else:
-                                self._logger.debug('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                                if self._logger.isEnabledFor(logging.DEBUG):
+                                    self._logger.debug('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                         else:
                             if self._beacon:
                                 self._logger.info('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                             else:
-                                self._logger.debug('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                                if self._logger.isEnabledFor(logging.DEBUG):
+                                    self._logger.debug('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if (self._scheduleHandlerStop or self._newSchedule) or (self._duty_cycle_mode and not self._beacon):
                             if self._newSchedule:
@@ -342,7 +346,8 @@ class ScheduleHandlerClass(Thread):
                     if self._duty_cycle_mode:
                         self._logger.info('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
                     else:
-                        self._logger.debug('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
+                        if self._logger.isEnabledFor(logging.DEBUG):
+                            self._logger.debug('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
                     try:
                         plugin = self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
                     except Exception, e:
@@ -351,7 +356,8 @@ class ScheduleHandlerClass(Thread):
                     if self._duty_cycle_mode:
                         self._logger.info('executing >%s< now' % (commandstring,))
                     else:
-                        self._logger.debug('executing >%s< now' % (commandstring,))
+                        if self._logger.isEnabledFor(logging.DEBUG):
+                            self._logger.debug('executing >%s< now' % (commandstring,))
                     try:
                         job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
                     except Exception, e:
@@ -448,7 +454,8 @@ class ScheduleHandlerClass(Thread):
             self._logger.info('new schedule from GSN received')
             # Get the schedule creation time
             creationtime = data[1]
-            self._logger.debug('creation time: ' + str(creationtime))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('creation time: ' + str(creationtime))
             # Get the schedule
             schedule = data[2]
             try:
@@ -482,10 +489,12 @@ class ScheduleHandlerClass(Thread):
             
     def tosMsgReceived(self, timestamp, packet):
         response = tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, packet['data'])
-        self._logger.debug('rcv (cmd=%s, argument=%s)' % (response['command'], response['argument']))
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug('rcv (cmd=%s, argument=%s)' % (response['command'], response['argument']))
         if response['command'] == TOSTypes.CONTROL_CMD_WAKEUP_QUERY:
             node_state = response['argument']
-            self._logger.debug('CONTROL_CMD_WAKEUP_QUERY response received with argument: %s' % (node_state,))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('CONTROL_CMD_WAKEUP_QUERY response received with argument: %s' % (node_state,))
             if node_state != self._tosNodeState:
                 s = ''
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED) == TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED:
@@ -515,7 +524,8 @@ class ScheduleHandlerClass(Thread):
         elif response['command'] == TOSTypes.CONTROL_CMD_NET_STATUS:
             self._logger.info('CONTROL_CMD_NET_STATUS response received with argument: %s' % (response['argument'],))
         elif response['command'] == TOSTypes.CONTROL_CMD_RESET_WATCHDOG:
-            self._logger.debug('CONTROL_CMD_RESET_WATCHDOG response received with argument: %s' % (response['argument'],))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('CONTROL_CMD_RESET_WATCHDOG response received with argument: %s' % (response['argument'],))
         else:
             return False
         
@@ -543,7 +553,8 @@ class ScheduleHandlerClass(Thread):
         resendCounter = 1
         self._tosSentCmd = cmd
         while True:
-            self._logger.debug('snd (cmd=%s, argument=%s)' % (cmd, argument))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('snd (cmd=%s, argument=%s)' % (cmd, argument))
             self._backlogMain._tospeer.sendTOSMsg(tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, [cmd, argument]), TOSTypes.AM_CONTROLCOMMAND, 1)
             self._tosMessageAckEvent.wait(3)
             if self._scheduleHandlerStop:
@@ -705,10 +716,10 @@ class ScheduleHandlerClass(Thread):
         
         
         
-class PingThread(Thread):
+class TOSPingThread(Thread):
     
     def __init__(self, parent, ping_interval_seconds=30, watchdog_timeout_seconds=300):
-        Thread.__init__(self)
+        Thread.__init__(self, name='%s-Thread' % (self.__class__.__name__,))
         self._logger = logging.getLogger(self.__class__.__name__)
         self._ping_interval_seconds = ping_interval_seconds
         self._watchdog_timeout_seconds = watchdog_timeout_seconds

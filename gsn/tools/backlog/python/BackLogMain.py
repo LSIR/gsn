@@ -79,7 +79,7 @@ class BackLogMainClass(Thread, Statistics):
         
         @param options: options from the OptionParser
         '''
-        Thread.__init__(self)
+        Thread.__init__(self, name='BackLogMain-Thread')
         Statistics.__init__(self)
         
         self._uptimeId = self.timeMeasurementStart()
@@ -380,11 +380,13 @@ class BackLogMainClass(Thread, Statistics):
         
     def processTOSMsg(self, timestamp, type, packet):
         ret = False
-        self._logger.debug('received TOS message with AM type %s' % (type,))
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug('received TOS message with AM type %s' % (type,))
         listeners = self._tosListeners.get('all')
         if listeners != None:
             for listener in listeners:
-                self._logger.debug('forwarding TOS message to listener %s (listening to all AM types)' % (listener.__class__.__name__,))
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.debug('forwarding TOS message to listener %s (listening to all AM types)' % (listener.__class__.__name__,))
                 try:
                     if listener.tosMsgReceived(timestamp, packet):
                         ret = True
@@ -395,7 +397,8 @@ class BackLogMainClass(Thread, Statistics):
         listeners = self._tosListeners.get(type)
         if listeners != None:
             for listener in listeners:
-                self._logger.debug('forwarding TOS message to listener %s (listening only to some types)' % (listener.__class__.__name__,))
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.debug('forwarding TOS message to listener %s (listening only to some types)' % (listener.__class__.__name__,))
                 try:
                     if listener.tosMsgReceived(timestamp, packet):
                         ret = True
@@ -638,6 +641,7 @@ def main():
     # read config file for logging options
     try:
         logging.config.fileConfig(options.config_file)
+        logging.logProcesses = 0
     except ConfigParser.NoSectionError, e:
         print e.__str__()
         

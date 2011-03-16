@@ -49,6 +49,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
             
         
     def run(self):
+        self.name = 'VaisalaWXT520Plugin-Thread'
         self.info('started')
 
         os.system('echo GPIO out clear > /proc/gpio/GPIO65')

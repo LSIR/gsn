@@ -45,7 +45,7 @@ class Popen(Thread):
                  cwd=None, env=None, universal_newlines=False,
                  startupinfo=None, creationflags=0):
         
-        Thread.__init__(self)
+        Thread.__init__(self, name='SubprocessFake-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         
         if startupinfo is not None:

@@ -39,6 +39,7 @@ class TOSPluginClass(AbstractPluginClass):
         self._QueueClosedEvent = Event()
     
     def run(self):
+        self.name = 'TOSPlugin-Thread'
         # open accessnode queue, just in case if we closed it before...
         while not self._sendOpenQueueCommand() and not self._plugstop:
             self.error('could not send OpenQueue command')
@@ -58,11 +59,11 @@ class TOSPluginClass(AbstractPluginClass):
     
     def tosMsgReceived(self, timestamp, packet):
         if self._shutdown and packet['type'] == TOSTypes.AM_COMMANDMSG:
-            self._logger.debug('AM_COMMANDMSG')         
+            self.debug('AM_COMMANDMSG')         
             response = tos.Packet(TOSTypes.DOZER_BEACON_STRUCTURE, packet['data'])
-            self._logger.debug('rcv (cmd=%s, destination=%s, repetition count=%s)' % (response['cmd'], response['destination'], response['repetitionCnt']))
+            self.debug('rcv (cmd=%s, destination=%s, repetition count=%s)' % (response['cmd'], response['destination'], response['repetitionCnt']))
             if (response['cmd'] >> 12) == TOSTypes.ACCESSNODE_QUEUE_CTRL_CMD and response['cmd'] & 0x0fff == TOSTypes.ACCESSNODE_QUEUE_CTRL_CMD_VAL_CLOSED:
-                self._logger.debug('access node queue closed')
+                self.debug('access node queue closed')
                 self._QueueClosedEvent.set()
         return self.processMsg(timestamp, self._tos2backlog(packet), self._priority, self._backlog)
         

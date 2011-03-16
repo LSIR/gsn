@@ -206,7 +206,8 @@ class HDLC:
         #
 
         if self._s.getTimeout() != timeout and timeout != None:
-            self._logger.debug("Set the timeout to %s, previous one was %s" % (timeout, self._s.getTimeout()))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug("Set the timeout to %s, previous one was %s" % (timeout, self._s.getTimeout()))
             self._s.setTimeout(timeout)
 
         #    +--- FLAG -----+
@@ -237,12 +238,14 @@ class HDLC:
             d = self._s.getByte()
             ts = time.time()
             if d != HDLC_FLAG_BYTE:
-                self._logger.debug("Skipping byte %d" % d)
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.debug("Skipping byte %d" % d)
                 while d != HDLC_FLAG_BYTE:
                     if self._hdlcStop:
                         return None
                     d = self._s.getByte()
-                    self._logger.debug("Skipping byte %d" % d)
+                    if self._logger.isEnabledFor(logging.DEBUG):
+                        self._logger.debug("Skipping byte %d" % d)
                     ts = time.time()
 
             # Store HDLC_FLAG_BYTE at the start of the retrieved packet
@@ -272,7 +275,8 @@ class HDLC:
                 packet.append(d)
 
             # Done reading a whole packet from serial
-            self._logger.debug("SimpleSerial:_read: unescaped %s" % packet)
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug("SimpleSerial:_read: unescaped %s" % packet)
 
             # Decode the packet, and check CRC:
             packet = self._unescape(packet)
@@ -285,7 +289,8 @@ class HDLC:
                 return None
             if not self._s._ts:
                 self._s._ts = ts
-            self._logger.debug("Serial:_read: %.4f (%.4f) Recv: %s" % (ts, ts - self._s._ts, self._format(packet[1:-3])))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug("Serial:_read: %.4f (%.4f) Recv: %s" % (ts, ts - self._s._ts, self._format(packet[1:-3])))
             self._ts = ts
 
             # Packet was successfully retrieved, so return it in a
@@ -318,7 +323,8 @@ class HDLC:
         packet.append((crc >> 8) & 0xff)
         packet = [HDLC_FLAG_BYTE] + self._escape(packet) + [HDLC_FLAG_BYTE]
 
-        self._logger.debug("Serial: write %s" % packet)
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug("Serial: write %s" % packet)
         self._s.putBytes(packet)
         
     def sendAck(self, seqno):
@@ -332,7 +338,8 @@ class HDLC:
         packet.append((crc >> 8) & 0xff)
         packet = [HDLC_FLAG_BYTE] + self._escape(packet) + [HDLC_FLAG_BYTE]
 
-        self._logger.debug("Serial: write ACK %s" % packet)
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug("Serial: write ACK %s" % packet)
         self._s.putBytes(packet)
 
     def _format(self, payload):
@@ -415,7 +422,7 @@ class SimpleAM(Thread):
         self._DataLock = Lock()
         self._DataEvent = Event()
         self._WriteLock = Lock()
-        Thread.__init__(self)
+        Thread.__init__(self, name='%s-Thread' % (self.__class__.__name__,))
         self._simpleAMStop = False
 
     def run(self):

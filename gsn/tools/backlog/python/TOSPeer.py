@@ -36,7 +36,7 @@ class TOSPeerClass(Thread):
     '''
     
     def __init__(self, parent, address, version):
-        Thread.__init__(self)
+        Thread.__init__(self, name='TOSPeer-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         
         # split the address (it should have the form serial@port:baudrate)
@@ -88,7 +88,8 @@ class TOSPeerClass(Thread):
 
             length = len(packet.payload())
 
-            self._logger.debug('rcv (?,%d,%d)' % (timestamp, length))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('rcv (?,%d,%d)' % (timestamp, length))
 
             # tell PSBackLogMain to send the packet to the plugins
             # using the serial port we can guarantee flow control to the backlog database!
@@ -133,7 +134,7 @@ class TOSWriter(Thread):
     '''
 
     def __init__(self, parent):
-        Thread.__init__(self)
+        Thread.__init__(self, name='%s-Thread' % (self.__class__.__name__,))
         self._logger = logging.getLogger(self.__class__.__name__)
         self._tosPeer = parent
         self._sendqueue = Queue.Queue(SEND_QUEUE_SIZE)
@@ -158,7 +159,8 @@ class TOSWriter(Thread):
                 
                 try:
                     self._tosPeer._serialsource.write(packet, amId, timeout, blocking, maxretries)
-                    self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(packet)))
+                    if self._logger.isEnabledFor(logging.DEBUG):
+                        self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(packet)))
                 except Exception, e:
                     if not self._tosWriterStop:
                         self._logger.warning('could not write message to serial port: %s' % (e,))

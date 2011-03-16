@@ -11,7 +11,7 @@ import os
 import uuid
 import logging
 from datetime import datetime, timedelta
-from threading import Lock, Thread
+from threading import Lock
 
 MIN_RING_BUFFER_CLEAR_INTERVAL_SEC = 5
 
@@ -545,7 +545,8 @@ class PowerControl:
             
     def tosMsgReceived(self, timestamp, payload):
         response = tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, payload['data'])
-        self._logger.debug('rcv (cmd=' + str(response['command']) + ', argument=' + str(response['argument']) + ')')
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug('rcv (cmd=' + str(response['command']) + ', argument=' + str(response['argument']) + ')')
         if response['command'] == TOSTypes.CONTROL_CMD_WLAN_ON:
             self.wlanOn()
         elif response['command'] == TOSTypes.CONTROL_CMD_WLAN_OFF:

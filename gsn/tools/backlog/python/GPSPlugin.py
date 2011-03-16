@@ -52,8 +52,6 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     
     def __init__(self, parent, config):
-        Thread.__init__(self)
-    
     	AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG, needPowerControl=True)
         self.info('Init GPSPlugin...')
         self._stopped = False
@@ -128,6 +126,7 @@ class GPSPluginClass(AbstractPluginClass):
     ##########################################################################################
     '''
     def run(self):
+        self.name = 'GPSPlugin-Thread'
         if (self.isDutyCycleMode()):
             return
         else:
@@ -138,7 +137,7 @@ class GPSPluginClass(AbstractPluginClass):
     runPlugin():  This function is essentially the run function
     ##########################################################################################
     '''
-    def runPlugin(self,param):  
+    def runPlugin(self,param):
         self.gps = GPSDriver.GPSDriver([self._deviceStr, self._interval,self._mode])
         # scheduling my death...
         self._endTime = time.time() + self._measTime
@@ -227,7 +226,7 @@ class WlanThread(Thread):
     # init()
     #*********************************************************
     def __init__(self, parent,uptime=10,downtime=40):
-        Thread.__init__(self)
+        Thread.__init__(self, name='Wlan-Thrad')
         self._uptime=uptime*60
         self._downtime=downtime*60
         self._parent = parent

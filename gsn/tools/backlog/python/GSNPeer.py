@@ -69,7 +69,7 @@ class GSNPeerClass(Thread, Statistics):
         
         @raise Exception: if there is a problem opening the server socket
         '''
-        Thread.__init__(self)
+        Thread.__init__(self, name='GSNPeer-Thread')
         Statistics.__init__(self)
         
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -112,14 +112,16 @@ class GSNPeerClass(Thread, Statistics):
         self._pingwatchdog.start()
         self._pingtimer.start()
         self._work.set()
-            
+        
+        threadnr = 1
         while not self._gsnPeerStop:
             self._work.wait()
             if self._gsnPeerStop:
                 break
             self._work.clear()
         
-            self._gsnlistener = GSNListener(self, self._port, self._serversocket)
+            self._gsnlistener = GSNListener(self, self._port, self._serversocket, threadnr)
+            threadnr = (threadnr+1)%0xFF
             if not self._gsnPeerStop:
                 self._gsnlistener.start()
                 
@@ -186,7 +188,8 @@ class GSNPeerClass(Thread, Statistics):
         # get the message type
         msgType = msg.getType()
         
-        self._logger.debug('rcv (%d,%d,%d)' % (msgType, msg.getTimestamp(), len(pkt)))
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug('rcv (%d,%d,%d)' % (msgType, msg.getTimestamp(), len(pkt)))
         
         # is it an answer to a ping?
         if msgType == BackLogMessage.PING_ACK_MESSAGE_TYPE:
@@ -314,7 +317,7 @@ class GSNListener(Thread):
     _stuffread
     '''
 
-    def __init__(self, parent, port, serversocket):
+    def __init__(self, parent, port, serversocket, threadnr):
         '''
         Inititalizes the GSN server.
         
@@ -323,7 +326,7 @@ class GSNListener(Thread):
         
         @raise Exception: if there is a problem opening the server socket
         '''
-        Thread.__init__(self)
+        Thread.__init__(self, name='%s-Thread-%d' % (self.__class__.__name__,threadnr))
         
         self._logger = logging.getLogger(self.__class__.__name__)
         
@@ -333,7 +336,7 @@ class GSNListener(Thread):
         self._serversocket = serversocket
         self._stuff = False
         
-        self._gsnwriter = GSNWriter(self)
+        self._gsnwriter = GSNWriter(self, threadnr)
 
         self.clientsocket = None
         self._clientaddr = None
@@ -432,7 +435,8 @@ class GSNListener(Thread):
                     self._gsnPeer.pktReceived(pkt)
         except Exception, e:
             self.disconnect()
-            self._logger.debug(str(e))
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug(str(e))
             
         self._gsnwriter.join()
 
@@ -506,7 +510,7 @@ class PingTimer(Thread):
     '''
     
     def __init__(self, interval, action):
-        Thread.__init__(self)
+        Thread.__init__(self, name='%s-Thread' % (self.__class__.__name__,))
         self._logger = logging.getLogger(self.__class__.__name__)
         self._interval = interval
         self._action = action
@@ -576,8 +580,8 @@ class GSNWriter(Thread):
         
     
 
-    def __init__(self, parent):
-        Thread.__init__(self)
+    def __init__(self, parent, threadnr):
+        Thread.__init__(self, name='%s-Thread-%d' % (self.__class__.__name__,threadnr))
         self._logger = logging.getLogger(self.__class__.__name__)
         self._gsnListener = parent
         self._sendqueue = Queue.PriorityQueue(SEND_QUEUE_SIZE)
@@ -614,7 +618,8 @@ class GSNWriter(Thread):
                 try:
                     self._gsnListener.clientsocket.sendall(pkt)
                     if isinstance(msg, BackLogMessage.BackLogMessageClass):
-                        self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
+                        if self._logger.isEnabledFor(logging.DEBUG):
+                            self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
                     elif isinstance(msg, self.HelloMessage):
                         self._logger.debug('hello message sent')
                 except (IOError, socket.error), e:

@@ -41,7 +41,7 @@ class AbstractPluginClass(Thread, Statistics):
     '''
 
     def __init__(self, parent, config, backlog_default=True, priority_default=99, needPowerControl=False):
-        Thread.__init__(self)
+        Thread.__init__(self, name='AbstractPlugin-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         Statistics.__init__(self)
         if needPowerControl:
@@ -490,5 +490,6 @@ class AbstractPluginClass(Thread, Statistics):
         
         @param debug: the debug to be logged
         '''
-        self._logger.debug(msg)
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug(msg)
         

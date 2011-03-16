@@ -86,6 +86,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
        
         
     def run(self):
+        self.name = 'CoreStationStatusPlugin-Thread'
         self.info('started')
         
         self.info('checking status providers for correctness')

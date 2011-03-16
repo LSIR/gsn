@@ -70,6 +70,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
        
         
     def run(self):
+        self.name = 'BackLogStatusPlugin-Thread'
         self.info('started')
         
         self._checkStatus()

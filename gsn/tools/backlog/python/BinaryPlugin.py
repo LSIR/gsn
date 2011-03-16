@@ -185,7 +185,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 if os.path.isfile(f):
                     time = os.stat(f).st_mtime
                     filetime.append((time, f))
-                    
+           
         for path, storage, device_id, time_format in self._watches:
             self.debug('watch: %s - %d - %d - %s' % (path, storage, device_id, time_format))
         
@@ -233,6 +233,7 @@ class BinaryPluginClass(AbstractPluginClass):
         
     
     def run(self):
+        self.name = 'BinaryPlugin-Thread'
         self.info('started')
         
         self._binaryWriter.start()
@@ -543,7 +544,7 @@ class BinaryWriter(Thread):
     '''
 
     def __init__(self, parent):
-        Thread.__init__(self)
+        Thread.__init__(self, name='BinaryWriter-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         self._binaryPluginClass = parent
         self._sendqueue = Queue.Queue(1)
@@ -628,7 +629,8 @@ class BinaryChangedProcessing(ProcessEvent):
         self._binaryPlugin = parent
 
     def process_default(self, event):
-        self._logger.debug('%s changed' % (event.pathname,))
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug('%s changed' % (event.pathname,))
         
         sendBinary = False
         if not self._binaryPlugin._filedeque and (not self._binaryPlugin._filedescriptor or self._binaryPlugin._filedescriptor.closed) and self._binaryPlugin.isGSNConnected():
