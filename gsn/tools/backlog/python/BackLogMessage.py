@@ -130,7 +130,7 @@ class BackLogMessageClass:
         try:
             self._header = struct.pack('<Bq', type, timestamp)
         except Exception, e:
-            raise TypeError('cannot pack message: ' + e.__str__())
+            raise TypeError('cannot pack message: %s' % (e,))
 
         if payload == None:
             self._payload = None
@@ -161,7 +161,7 @@ class BackLogMessageClass:
             self._type = int(struct.unpack('<B', bytes[0])[0])
             self._timestamp = int(struct.unpack('<q', bytes[1:9])[0])
         except Exception, e:
-            raise TypeError('cannot unpack message: ' + e.__str__())
+            raise TypeError('cannot unpack message: %s' % (e,))
        
         self._header = bytes[0:9]
         
@@ -292,7 +292,7 @@ class BackLogMessageClass:
                     format += 'X'
                     data += struct.pack('<i', len(val)) + val
                 else:
-                    raise ValueError('value at index %d in passed list is of unsupported %s' % (index, str(type(val))))
+                    raise ValueError('value at index %d in passed list is of unsupported %s' % (index, type(val)))
                     
         return struct.pack('<i', len(format)) + struct.pack('<%ds' % len(format), format) + data
     

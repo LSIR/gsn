@@ -88,17 +88,17 @@ class GPSPluginClass(AbstractPluginClass):
         try:
             fp = open(str(self.getOptionValue('cnt_file')),"rw")
         except Exception as e:
-            self.exception( "could not open sample count file: " + str(self.getOptionValue('cnt_file')) + " " + str(e))
+            self.exception( "could not open sample count file: %s %s" % (self.getOptionValue('cnt_file'), e))
         cnt = int(fp.readline())
         if (cnt >= (pow(2,32)-1) or cnt == ""):
-            self._logger.warning("Sample counter wrapped around! " + str(cnt))
+            self._logger.warning("Sample counter wrapped around! %s" % (cnt,))
             self._cnt = 0
         else:
             self._cnt = cnt
         fp.close()
         
         self._stats = Statistics()
-        self.info("Starting with " + str(self._cnt))
+        self.info("Starting with %d" % (self._cnt,))
         self._counterID = self._stats.createCounter(0,self._cnt)
         
         self.debug("Done init GPS Plugin")
@@ -164,9 +164,9 @@ class GPSPluginClass(AbstractPluginClass):
                     self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, cnt, ((rawMsg[4]-8)/24), bytearray(rawMsg[2])])
                 elif (self._mode == "raw" and self._logMode == "ascii"):
                     self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, parseRawMsg(rawMsg[2])])
-                self.debug("GPS Sample Nr: " + str(cnt))
+                self.debug("GPS Sample Nr: %d" % (cnt,))
                 self.writeToFile(cnt)
-                self.debug(str((rawMsg[4]-8)/24) + " Satellites (" + str(rawMsg[4]) + " Bytes)")
+                self.debug("%d Satellites (%d Bytes)" %((rawMsg[4]-8)/24, rawMsg[4]))
             self._runEv.wait(self._interval-1)
 
         # die...
@@ -241,7 +241,7 @@ class WlanThread(Thread):
     def run(self):
         self._parent._logger.info('WlanThread: started')
         while not self._stopped: 
-            self._parent._logger.info('WlanThread: Waiting for ' + str(self._uptime) + ' secs before cycling WLAN')
+            self._parent._logger.info('WlanThread: Waiting for %d secs before cycling WLAN' % (self._uptime,))
             self._work.wait(self._uptime)
             if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?
                 p = subprocess.Popen('/usr/bin/who')
@@ -261,7 +261,7 @@ class WlanThread(Thread):
                     duration = time.time() - start 
                     if (self._downtime - duration > 0):
                         self._parent.getPowerControlObject().wlanOff()
-                        self._parent._logger.info('Waiting for ' + str(self._downtime-duration) + ' secs')
+                        self._parent._logger.info('Waiting for %d secs' % (self._downtime-duration,))
                         self._work.wait(self._downtime - duration)
             #If WLAN is off, turn it on
             if (not self._stopped and not self._parent.getPowerControlObject().getWlanStatus()):

@@ -102,7 +102,7 @@ class BackLogMainClass(Thread, Statistics):
         try:
             config_options = self._config.items('options')
         except ConfigParser.NoSectionError:
-            self._logger.warning('no [options] section specified in ' + config_file)
+            self._logger.warning('no [options] section specified in %s' % (config_file,))
             config_options = []
 
         # set default options
@@ -144,19 +144,13 @@ class BackLogMainClass(Thread, Statistics):
             raise TypeError('device_id has to be specified in the configuration file')
         if self.device_id >= 65535 or self.device_id < 0:
             raise TypeError('device_id has to be in the range of 0 and 65534 (both inclusive)')
-
-        # printout info
-        self._logger.info(str(__version__))
-        self._logger.info(str(__date__))
-        self._logger.info(str(__id__))
-        self._logger.info(str(__source__))
                 
         if not folder_to_check_size:
             raise TypeError('folder_to_check_size has to be specified in the configuration file')
         else:
             if os.path.isdir(folder_to_check_size):
                 self._folder_to_check_size = folder_to_check_size
-                self._logger.info('folder_to_check_size: ' + folder_to_check_size)
+                self._logger.info('folder_to_check_size: %s' % (folder_to_check_size,))
             else:
                 raise TypeError('folder_to_check_size has to be an existing directory')
                 
@@ -165,19 +159,19 @@ class BackLogMainClass(Thread, Statistics):
         else:
             if folder_min_free_mb > 0:
                 self._folder_min_free_mb = folder_min_free_mb
-                self._logger.info('folder_min_free_mb: ' + str(folder_min_free_mb))
+                self._logger.info('folder_min_free_mb: %s' % (folder_min_free_mb,))
             else:
                 raise TypeError('folder_min_free_mb has to be a positive number')
             
         if not self.checkFolderUsage():
-            raise Exception('Not enough space left on ' + self._folder_to_check_size + ' (' + str(self.getFolderAvailableMb()) + '<' + str(self._folder_min_free_mb) + ')')
+            raise Exception('Not enough space left on %s (%f<%f)' % (self._folder_to_check_size, self.getFolderAvailableMb(), self._folder_min_free_mb))
         else:
-            self._logger.info('folder check succeeded (' + self._folder_to_check_size + ': ' + str(self.getFolderAvailableMb()) + ' MB available)')
+            self._logger.info('folder check succeeded (%s: %f MB available)' % (self._folder_to_check_size, self.getFolderAvailableMb()))
         
         # printout options
-        self._logger.info('device_id: ' + str(self.device_id))
-        self._logger.info('gsn_port: ' + str(gsn_port))
-        self._logger.info('backlog_db: ' + backlog_db)
+        self._logger.info('device_id: %s' % (self.device_id,))
+        self._logger.info('gsn_port: %s' % (gsn_port,))
+        self._logger.info('backlog_db: %s' % (backlog_db,))
         
         # create the backlog root directory if inexistent
         if not os.path.exists(os.path.dirname(backlog_db)):
@@ -187,9 +181,9 @@ class BackLogMainClass(Thread, Statistics):
                 
         if backlog_db_resend_hr == None:
             backlog_db_resend_hr = DEFAULT_BACKLOG_DB_RESEND
-            self._logger.info('backlog_db_resend_hr is not set using default value: ' + str(backlog_db_resend_hr))
+            self._logger.info('backlog_db_resend_hr is not set using default value: %s' % (backlog_db_resend_hr,))
         else:
-            self._logger.info('backlog_db_resend_hr: ' + str(backlog_db_resend_hr))
+            self._logger.info('backlog_db_resend_hr: %s' % (backlog_db_resend_hr,))
         
         if dutycyclemode is None:
             raise TypeError('duty_cycle_mode has to be specified in the configuration file')
@@ -206,7 +200,7 @@ class BackLogMainClass(Thread, Statistics):
         try:
             config_schedule = self._config.items('schedule')
         except ConfigParser.NoSectionError:
-            raise TypeError('no [schedule] section specified in ' + config_file)
+            raise TypeError('no [schedule] section specified in %s' % (config_file,))
         
         # check for proper shutdown
         self._last_clean_shutdown = None
@@ -240,9 +234,9 @@ class BackLogMainClass(Thread, Statistics):
         try:
             config_plugins = self._config.items('plugins')
         except ConfigParser.NoSectionError:
-            self._logger.warning('no [plugins] section specified in ' + config_file)
+            self._logger.warning('no [plugins] section specified in %s' % (config_file,))
             config_plugins = DEFAULT_PLUGINS
-            self._logger.warning('use default plugins: ' + config_plugins)
+            self._logger.warning('use default plugins: %s' % (config_plugins,))
 
         # init each plugin
         self.plugins = {}
@@ -255,14 +249,14 @@ class BackLogMainClass(Thread, Statistics):
                 try:
                     config_plugins_options = self._config.items(module_name + '_options')
                 except ConfigParser.NoSectionError:
-                    self._logger.warning('no [' + module_name + '_options] section specified in ' + config_file)
+                    self._logger.warning('no [%s_options] section specified in %s' % (module_name, config_file,))
                     config_plugins_options = []
                 plugin = pluginclass(self, config_plugins_options)
                 self.plugins.update({module_name: plugin})
                 self.jobsobserver.observeJob(plugin, module_name, True, plugin.getMaxRuntime())
-                self._logger.info('loaded plugin ' + module_name)
+                self._logger.info('loaded plugin %s' % (module_name,))
             except Exception, e:
-                self._logger.error('could not load plugin ' + module_name + ': ' + str(e))
+                self._logger.error('could not load plugin %s: %s' % (module_name, e))
                 self.incrementErrorCounter()
                 continue
 
@@ -281,7 +275,7 @@ class BackLogMainClass(Thread, Statistics):
         self.jobsobserver.start()
 
         for plugin_name, plugin in self.plugins.items():
-            self._logger.info('starting ' + plugin_name)
+            self._logger.info('starting %s' % (plugin_name,))
             try:
                 plugin.start()
             except Exception, e:
@@ -336,15 +330,15 @@ class BackLogMainClass(Thread, Statistics):
             if self._tos_address:
                 if not self._tos_version:
                     self._tos_version = DEFAULT_TOS_VERSION
-                self._logger.info('tos_source_addr: ' + self._tos_address)
-                self._logger.info('tos_version: ' + str(self._tos_version))
+                self._logger.info('tos_source_addr: %s' % (self._tos_address,))
+                self._logger.info('tos_version: %s' % (self._tos_version,))
                 try:
                     self._tospeer = TOSPeerClass(self, self._tos_address, self._tos_version)
                     self._tospeer.start()
                     self._logger.info('TOSPeerClass instantiated')
                 except Exception, e:
                     self._tosPeerLock.release()
-                    raise Exception('TOSPeerClass could not be loaded: ' + str(e))
+                    raise Exception('TOSPeerClass could not be loaded: %s' % (e,))
             else:
                 self._tosPeerLock.release()
                 raise TypeError('TOSPeer can not be loaded as no tos_source_addr is specified in config file')
@@ -360,7 +354,7 @@ class BackLogMainClass(Thread, Statistics):
             else:
                 listeners.append(listener)
                 self._tosListeners.update({type: listeners})
-        self._logger.info(listener.__class__.__name__ + ' registered as TOS listener (types ' + str(types) + ')')
+        self._logger.info('%s registered as TOS listener (types %s)' % (listener.__class__.__name__, types))
         
         
     def deregisterTOSListener(self, listener):
@@ -374,7 +368,7 @@ class BackLogMainClass(Thread, Statistics):
                         self._tosListeners.update({type: listeners})
                     break
             
-        self._logger.info(listener.__class__.__name__ + ' deregistered as TOS listener')
+        self._logger.info('%s deregistered as TOS listener' % (listener.__class__.__name__,))
         if not self._tosListeners:
             self._logger.info('no more TOS listeners around -> stop TOSPeer')
             self._tosPeerLock.acquire()
@@ -386,11 +380,11 @@ class BackLogMainClass(Thread, Statistics):
         
     def processTOSMsg(self, timestamp, type, packet):
         ret = False
-        self._logger.debug('received TOS message with AM type ' + str(type))
+        self._logger.debug('received TOS message with AM type %s' % (type,))
         listeners = self._tosListeners.get('all')
         if listeners != None:
             for listener in listeners:
-                self._logger.debug('forwarding TOS message to listener ' + listener.__class__.__name__ + ' (listening to all AM types)')
+                self._logger.debug('forwarding TOS message to listener %s (listening to all AM types)' % (listener.__class__.__name__,))
                 try:
                     if listener.tosMsgReceived(timestamp, packet):
                         ret = True
@@ -401,7 +395,7 @@ class BackLogMainClass(Thread, Statistics):
         listeners = self._tosListeners.get(type)
         if listeners != None:
             for listener in listeners:
-                self._logger.debug('forwarding TOS message to listener ' + listener.__class__.__name__ + ' (listening only to some types)')
+                self._logger.debug('forwarding TOS message to listener %s (listening only to some types)' % (listener.__class__.__name__,))
                 try:
                     if listener.tosMsgReceived(timestamp, packet):
                         ret = True
@@ -410,7 +404,7 @@ class BackLogMainClass(Thread, Statistics):
                     self._logger.exception(e)
         
         if not ret:
-            self._logger.warning('TOS message with AM type ' + str(type) + ' has not been processed.')
+            self._logger.warning('TOS message with AM type %s has not been processed.' % (type,))
 
         return ret
     
@@ -430,11 +424,11 @@ class BackLogMainClass(Thread, Statistics):
         if not pluginactive:
             try:
                 module = __import__(pluginclassname)
-                pluginclass = getattr(module, pluginclassname + 'Class')
+                pluginclass = getattr(module, '%sClass' % (pluginclassname,))
                 try:
-                    config_plugins_options = self._config.items(pluginclassname + '_options')
+                    config_plugins_options = self._config.items('%s_options' % (pluginclassname,))
                 except ConfigParser.NoSectionError:
-                    self._logger.warning('no [' + pluginclassname + '_options] section specified in configuration file')
+                    self._logger.warning('no [%s_options] section specified in configuration file' % (pluginclassname,))
                     config_plugins_options = []
                 plugin = pluginclass(self, config_plugins_options)
                 self.plugins.update({pluginclassname: plugin})
@@ -442,9 +436,9 @@ class BackLogMainClass(Thread, Statistics):
                     self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
                 else:
                     self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
-                self._logger.info('loaded plugin ' + pluginclassname)
+                self._logger.info('loaded plugin %s' % (pluginclassname))
             except Exception, e:
-                raise Exception('could not load plugin ' + pluginclassname + ': ' + str(e))
+                raise Exception('could not load plugin %s: %s' % (pluginclassname, e))
             try:
                 plugin.start()
                 thread.start_new_thread(plugin.action, (parameters,))
@@ -458,7 +452,7 @@ class BackLogMainClass(Thread, Statistics):
         for plugin_name, plugin in self.plugins.items():
             if pluginclassname == plugin_name:
                 if ((self.schedulehandler._beacon or not self.schedulehandler._duty_cycle_mode) and not plugin.stopIfNotInDutyCycle() and not stopAnyway):
-                    self._logger.info(pluginclassname + ' should not be stopped if not in duty-cycle mode (or beacon) => keep running')
+                    self._logger.info('%s should not be stopped if not in duty-cycle mode (or beacon) => keep running' % (pluginclassname,))
                     return False
                 else:
                     try:
@@ -493,7 +487,7 @@ class BackLogMainClass(Thread, Statistics):
                         self._logger.exception(e)
                     break
         if not msgTypeValid:
-            self._logger.error('unknown message type ' + str(msgType) + ' received')
+            self._logger.error('unknown message type %s received' % (msgType,))
             self.incrementErrorCounter()
         
         
@@ -557,7 +551,7 @@ class BackLogMainClass(Thread, Statistics):
         for plugin_name, plugin in self.plugins.items():
             try:
                 if plugin.needsWLAN():
-                    self._logger.info('wlan is still needed by ' + plugin_name)
+                    self._logger.info('wlan is still needed by %s' % (plugin_name,))
                     return True
             except Exception, e:
                 self.incrementExceptionCounter()
@@ -638,7 +632,7 @@ def main():
     
         # config file?
     if not os.path.isfile(options.config_file):
-        print 'config file (' + options.config_file + ') not found'
+        print 'config file (%s) not found' % (options.config_file,)
         sys.exit(1)
 
     # read config file for logging options

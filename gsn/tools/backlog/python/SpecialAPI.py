@@ -204,7 +204,7 @@ class Statistics:
             for dt, entry in self._counterRingBuffers[uniqueCounterId]:
                 for i in range(n):
                     if minOverLastNSecondsList[i] > self._counterRingBufSizeSec[uniqueCounterId]:
-                        raise Exception('minOverLastNSecondsList entry can not be bigger than counterRingBufferSizeInSeconds (%d > %d)' % (minOverLastNSecondsList[i], self._counterRingBufSizeSec[uniqueCounterId]))
+                        raise Exception('minOverLastNSecondsList entry can not be bigger than counterRingBufferSizeInSeconds (%s > %s)' % (minOverLastNSecondsList[i], self._counterRingBufSizeSec[uniqueCounterId]))
                     if dt >= now - timedelta(seconds=minOverLastNSecondsList[i]) and (min[i] == None or entry < min[i]):
                         min[i] = entry
             self._counterLocks[uniqueCounterId].release()
@@ -375,7 +375,7 @@ class PowerControl:
         
         self._linkfolder = None
         if not os.path.isdir(linkFolder):
-            self._logger.warning('linkFolder >' + linkFolder + '< is not an existing folder => power control API can not be used')
+            self._logger.warning('linkFolder >%s< is not an existing folder => power control API can not be used' % (linkFolder,))
             raise
         
         self._linkfolder = linkFolder
@@ -393,7 +393,7 @@ class PowerControl:
                 elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
                     self._wlanGPIOOnOnSet = False
                 else:
-                    raise Exception('file >' + os.path.join(linkFolder, file) + '< does not end with a proper suffix')
+                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
             elif file.startswith(PHOTOCAM_GPIO_LINK_PREFIX):
                 self._photocamGPIOLink = os.path.join(linkFolder, file)
                 if file.endswith(GPIO_ON_ON_SET_SUFFIX):
@@ -401,7 +401,7 @@ class PowerControl:
                 elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
                     self._photocamGPIOOnOnSet = False
                 else:
-                    raise Exception('file >' + os.path.join(linkFolder, file) + '< does not end with a proper suffix')
+                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
         
         if self._backlogMain.duty_cycle_mode:
             self._backlogMain.registerTOSListener(self, [TOSTypes.AM_BEACONCOMMAND])
@@ -425,7 +425,7 @@ class PowerControl:
                 self._gpioLinkAction(self._photocamGPIOLink, False)
             self._photocamGPIOLock.release()
         else:
-            raise Exception('photo camera GPIO link file is inexistent in >' + self._linkfolder + '<')
+            raise Exception('photo camera GPIO link file is inexistent in >%s<' % (self._linkfolder,))
         
     
     
@@ -446,7 +446,7 @@ class PowerControl:
                 self._gpioLinkAction(self._photocamGPIOLink, True)
             self._photocamGPIOLock.release()
         else:
-            raise Exception('photo camera GPIO link file is inexistent in >' + self._linkfolder + '<')
+            raise Exception('photo camera GPIO link file is inexistent in >%s<' % (self._linkfolder,))
     
     
     def getPhotoCamStatus(self):
@@ -468,7 +468,7 @@ class PowerControl:
             else:
                 return False
         else:
-            raise Exception('photo camera GPIO link file is inexistent in >' + self._linkfolder + '<')
+            raise Exception('photo camera GPIO link file is inexistent in >%s<' % (self._linkfolder,))
                 
     
     
@@ -489,7 +489,7 @@ class PowerControl:
                 self._gpioLinkAction(self._wlanGPIOLink, False)
             self._wlanGPIOLock.release()
         else:
-            raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
+            raise Exception('Wlan GPIO link file is inexistent in >%s<' % (self._linkfolder,))
         
     
     
@@ -518,7 +518,7 @@ class PowerControl:
                 self._wlanGPIOLock.release()
                 return True
         else:
-            raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
+            raise Exception('Wlan GPIO link file is inexistent in >%s<' % (self._linkfolder,))
     
     
     def getWlanStatus(self):
@@ -540,7 +540,7 @@ class PowerControl:
             else:
                 return False
         else:
-            raise Exception('Wlan GPIO link file is inexistent in >' + self._linkfolder + '<')
+            raise Exception('Wlan GPIO link file is inexistent in >%s<' % (self._linkfolder,))
             
             
     def tosMsgReceived(self, timestamp, payload):

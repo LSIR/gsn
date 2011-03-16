@@ -118,7 +118,7 @@ class BackLogDBClass(Thread, Statistics):
             self._con.commit()
         except sqlite3.Error, e:
             self._dblock.release()
-            raise TypeError('sqlite3: ' + e.__str__())
+            raise TypeError('sqlite3: %s' % (e,))
         except Exception, e:
             self._dblock.release()
             raise TypeError(e.__str__())
@@ -128,7 +128,7 @@ class BackLogDBClass(Thread, Statistics):
         
         self._resendtimer = ResendTimer(backlog_db_resend_hr*3600, self.resend)
         
-        self._logger.debug('database ' + self._dbname + ' ready to use')
+        self._logger.debug('database %s ready to use' % (self._dbname,))
         
         
     def storeMsg(self, timestamp, msgType, data):

@@ -106,7 +106,7 @@ class BinaryPluginClass(AbstractPluginClass):
             self._waitforfile = True
             self._waitforfiletimer = Timer(float(wait_min_for_file) * 60, self.checkForFileTimerAction)
             self._waitforfiletimer.start()
-            self.info('waiting at least ' + wait_min_for_file + ' minutes for a file to arrive')
+            self.info('waiting at least %s minutes for a file to arrive' % (wait_min_for_file,))
         else:
             self._waitforfile = False
 
@@ -117,7 +117,7 @@ class BinaryPluginClass(AbstractPluginClass):
             self._rootdir += '/'
         
         if not os.path.isdir(self._rootdir):
-            self.warning('rootdir >' + self._rootdir + '< is not a directory -> creating it')
+            self.warning('rootdir >%s< is not a directory -> creating it' % (self._rootdir,))
             os.makedirs(self._rootdir)
 
         if not watches:
@@ -141,7 +141,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 w[0] += '/'
                 
             if len(w) != 4:
-                raise TypeError('watch >' + watch + '< in the configuration file is not well formatted')
+                raise TypeError('watch >%s< in the configuration file is not well formatted' % (watch,))
             else:
                 w[1] = w[1].lower()
                 if w[1] == 'database':
@@ -149,13 +149,13 @@ class BinaryPluginClass(AbstractPluginClass):
                 elif w[1] == 'filesystem':
                     w[1] = 0
                 else:
-                    raise TypeError('the second part of watch >' + watch + '< in the configuration file has to be database or filesystem')
+                    raise TypeError('the second part of watch >%s< in the configuration file has to be database or filesystem' %( watch,))
                     
                 if not w[2]:
                     w[2] = self.getDeviceId()
                 else:
                     if not w[2].isdigit():
-                        raise TypeError('the device id in watch >' + watch + '< has to be a number')
+                        raise TypeError('the device id in watch >%s< has to be a number' % (watch,))
                     else:
                         w[2] = int(w[2])
                         
@@ -163,7 +163,7 @@ class BinaryPluginClass(AbstractPluginClass):
                     w[3] = DEFAULT_DATE_TIME_FORMATE
                 else:
                     if len(w[3]) > 255:
-                        raise TypeError('the date time format in watch >' + watch + '< is longer than 255 characters')
+                        raise TypeError('the date time format in watch >%s< is longer than 255 characters' % (watch,))
             
             dir = w[0]
             pathname = os.path.join(self._rootdir, dir)
@@ -173,7 +173,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 
             # tell the watch manager which folders to watch for newly written files
             wm.add_watch(pathname, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'])
-            self.info('enable close-after-write notification for path ' + pathname)
+            self.info('enable close-after-write notification for path %s' % (pathname,))
             
             files = os.listdir(pathname)
             
@@ -187,16 +187,16 @@ class BinaryPluginClass(AbstractPluginClass):
                     filetime.append((time, f))
                     
         for path, storage, device_id, time_format in self._watches:
-            self.debug('watch: ' + path + '  -  ' + str(storage) + '  -  ' + str(device_id) + ' - ' + time_format)
+            self.debug('watch: %s - %d - %d - %s' % (path, storage, device_id, time_format))
         
         # sort the existing files by time
         filetime.sort()
         # and put it into the fifo
         for file in filetime:
             self._filedeque.appendleft([file[1], os.path.getsize(file[1])])
-            self.debug('putting existing file into FIFO: ' + file[1])
+            self.debug('putting existing file into FIFO: %s' % (file[1],))
         if filetime:
-            self.info('files to be transmitted: ' + str(len(filetime)))
+            self.info('files to be transmitted: %d' % (len(filetime),))
             
         if self._filedeque or self.getMaxRuntime():
             self._isBusy = True
@@ -273,13 +273,13 @@ class BinaryPluginClass(AbstractPluginClass):
                         self._getInitialBinaryPacket()
                 elif pktType == ACK_PACKET:
                     ackType = data[2]
-                    self.debug('acknowledge received for packet type ' + str(ackType))
+                    self.debug('acknowledge received for packet type %d' % (ackType,))
                         
                     if ackType == INIT_PACKET:
                         self.debug('acknowledge received for init packet')
                         self._getNextChunk()
                     elif ackType == CHUNK_PACKET:
-                        self.debug('acknowledge for packet number >' + str(pktNr) + '< received')
+                        self.debug('acknowledge for packet number >%d< received' % (pktNr,))
                         self._getNextChunk()
                     elif ackType == CRC_PACKET:
                         filename = self._filedescriptor.name
@@ -287,7 +287,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         self._filedescriptor.close()
                         if os.path.isfile(filename):
                             # crc has been accepted by GSN
-                            self.debug('crc has been accepted for ' + filename)
+                            self.debug('crc has been accepted for %s' % (filename,))
                             # remove it from disk
                             os.remove(filename)
                         else:
@@ -298,7 +298,7 @@ class BinaryPluginClass(AbstractPluginClass):
             elif pktNr == self._binaryWriter.getSentMsgNr()-1 or (pktNr == MESSAGE_NUMBER_MOD-1 and self._binaryWriter.getSentMsgNr() == 0):
                 self.debug('packet number already received')
             else:
-                self.error('packet number out of order (recv=' + str(pktNr) + ', sent=' + str(self._binaryWriter.getSentMsgNr()) + ')')
+                self.error('packet number out of order (recv=%d, sent=%d)' % (pktNr, self._binaryWriter.getSentMsgNr()))
                     
             try:
                 self._msgqueue.task_done()
@@ -324,7 +324,7 @@ class BinaryPluginClass(AbstractPluginClass):
     def _getInitialBinaryPacket(self):
         if self._filedescriptor and not self._filedescriptor.closed:
             filename = self._filedescriptor.name
-            self.warning('new file request, but actual file (' + filename + ') not yet closed -> remove it!')
+            self.warning('new file request, but actual file (%s) not yet closed -> remove it!' % (filename,))
             os.chmod(filename, 0744)
             self._filedescriptor.close()
             os.remove(filename)
@@ -352,14 +352,14 @@ class BinaryPluginClass(AbstractPluginClass):
             
             if filelen == 0:
                 # if the file is empty we ignore it and continue in the fifo
-                self.debug('ignore empty file: ' + filename)
+                self.debug('ignore empty file: %s' % (filename,))
                 os.chmod(filename, 0744)
                 self._filedescriptor.close()
                 os.remove(filename)
                 continue
             
             filenamenoprefix = filename.replace(self._rootdir, '')
-            self.debug('filename without prefix: ' + filenamenoprefix)
+            self.debug('filename without prefix: %s' % (filenamenoprefix,))
             filenamelen = len(filenamenoprefix)
             if filenamelen > 255:
                 filenamelen = 255
@@ -372,7 +372,7 @@ class BinaryPluginClass(AbstractPluginClass):
                     watch = w
                     l = len(w[0])
             if not watch:
-                self.error('no watch specified for ' + filename + ' (this is very strange!!!) -> close file')
+                self.error('no watch specified for %s (this is very strange!!!) -> close file' % (filename,))
                 os.chmod(filename, 0744)
                 self._filedescriptor.close()
                 continue
@@ -385,7 +385,7 @@ class BinaryPluginClass(AbstractPluginClass):
         packet.append(filenamenoprefix)
         packet.append(watch[3])
         
-        self.debug('sending initial binary packet for ' + self._filedescriptor.name + ' from watch directory >' + watch[0] + '<, storage type: >' + str(watch[1]) + '<, device id >' + str(watch[2]) + ' and time date format >' + watch[3] + '<')
+        self.debug('sending initial binary packet for %s from watch directory >%s<, storage type: >%d<, device id >%d and time date format >%s<' % (self._filedescriptor.name, watch[0], watch[1], watch[2], watch[3]))
     
         self._packetCRC = None
         self._emptyQueue()
@@ -395,9 +395,9 @@ class BinaryPluginClass(AbstractPluginClass):
         
     def _reopenFile(self, downloaded, gsnCRC, filenamenoprefix):
         filename = os.path.join(self._rootdir, filenamenoprefix)
-        self.debug('downloaded size: ' + str(downloaded))
-        self.debug('crc at GSN: ' + str(gsnCRC))
-        self.debug('file: ' + filename)
+        self.debug('downloaded size: %d' % (downloaded,))
+        self.debug('crc at GSN: %d' % (gsnCRC,))
+        self.debug('file: %s' % (filename,))
         
         try:
             if downloaded > 0:
@@ -406,7 +406,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 except:
                     pass
                 else:
-                    self.debug('copy >' + filename + '< removed from file queue')
+                    self.debug('copy >%s< removed from file queue' % (filename,))
                 # open the specified file
                 self._filedescriptor = open(filename, 'rb')
                 os.chmod(filename, 0444)
@@ -431,7 +431,7 @@ class BinaryPluginClass(AbstractPluginClass):
                         break
                     
                 if self._packetCRC != gsnCRC:
-                    self.warning('crc received from gsn >' + str(gsnCRC) + '< does not match local one >' + str(self._packetCRC) + '< -> resend complete binary')
+                    self.warning('crc received from gsn >%d< does not match local one >%s< -> resend complete binary' % (gsnCRC, self._packetCRC))
                     os.chmod(filename, 0744)
                     self._filedeque.append([filename, os.path.getsize(filename)])
                     self._filedescriptor.close()
@@ -469,13 +469,13 @@ class BinaryPluginClass(AbstractPluginClass):
             packet = [CRC_PACKET, self._getFileQueueSize(), len(self._filedeque), struct.unpack('I', struct.pack('i', self._packetCRC))[0]]
             
             # send it
-            self.debug('sending crc: ' + str(self._packetCRC))
+            self.debug('sending crc: %d' % (self._packetCRC,))
         else:
             # create the packet [type, chunk number (4bytes)]
             packet = [CHUNK_PACKET, self._getFileQueueSize(), len(self._filedeque)]
             packet.append(bytearray(chunk))
             
-            self.debug('sending binary chunk for ' + self._filedescriptor.name)
+            self.debug('sending binary chunk for %s' % (self._filedescriptor.name,))
             
         self._binaryWriter.sendMessage(packet)
         
@@ -628,7 +628,7 @@ class BinaryChangedProcessing(ProcessEvent):
         self._binaryPlugin = parent
 
     def process_default(self, event):
-        self._logger.debug(event.pathname + ' changed')
+        self._logger.debug('%s changed' % (event.pathname,))
         
         sendBinary = False
         if not self._binaryPlugin._filedeque and (not self._binaryPlugin._filedescriptor or self._binaryPlugin._filedescriptor.closed) and self._binaryPlugin.isGSNConnected():

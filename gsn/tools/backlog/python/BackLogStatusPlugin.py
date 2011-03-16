@@ -48,7 +48,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         else:
             self._interval = float(value)
         
-        self.info('interval: ' + str(self._interval))
+        self.info('interval: %s' % (self._interval,))
     
     
     def getMsgType(self):
@@ -99,7 +99,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
                 self._timer = threading.Timer(int(paramlist[0]), self.action, [''])
                 self._timer.start()
             else:
-                self.error('parameter has to be a digit (parameter=' + parameters + ')')
+                self.error('parameter has to be a digit (parameter=%s)' % (parameters,))
         
         if self._initFinish:
             payload = [DYNAMIC_TYPE]
@@ -151,14 +151,14 @@ class BackLogStatusPluginClass(AbstractPluginClass):
                         check = False
                         if nameindex <= 9:
                             if len(linelist) != 3:
-                                self.exception('splitted line /proc/self/status containing ' + name + ' did not return 3 values')
+                                self.exception('splitted line /proc/self/status containing %s did not return 3 values' % (name,))
                             elif linelist[2] != 'kB':
-                                self.exception('/proc/self/status ' + name + ' does not end with kB')
+                                self.exception('/proc/self/status %s does not end with kB' % (name,))
                             else:
                                 check = True
                         else:
                             if len(linelist) != 2:
-                                self.exception('splitted line /proc/self/status containing ' + name + ' did not return 2 values')
+                                self.exception('splitted line /proc/self/status containing %s did not return 2 values' % (name,))
                             else:
                                 check = True
                         if check:
@@ -169,7 +169,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             
         for index, b in enumerate(self._statusLineIndexes):
             if b == None:
-                self.exception('/proc/self/status ' + names[index] + ' could not be found')
+                self.exception('/proc/self/status %s could not be found' % (names[index],))
         
         
     def _getStatus(self):

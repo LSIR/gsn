@@ -53,7 +53,7 @@ class TOSPeerClass(Thread):
                     serial.setTimeout(5)
                     self._serialsource = tos1x.AM(serial)
             except Exception, e:
-                raise TypeError('could not initialize serial source: ' + e.__str__())
+                raise TypeError('could not initialize serial source: %s' % (e,))
         else:
             raise TypeError('address type must be serial')
         
@@ -76,7 +76,7 @@ class TOSPeerClass(Thread):
                 packet = self._serialsource.read()
             except Exception, e:
                 if not self._tosPeerStop:
-                    self.exception('could not read from serial source: ' + str(e))
+                    self.exception('could not read from serial source: %s' % (e,))
                 continue
             
             # if the packet is None just continue
@@ -97,7 +97,7 @@ class TOSPeerClass(Thread):
                     self._serialsource.sendAck()
                 except Exception, e:
                     if not self._tosPeerStop:
-                        self.exception('could not send ack: ' + str(e))
+                        self.exception('could not send ack: %s' % (e,))
                         
         self._toswriter.join()
         self._serialsource.join()
@@ -161,7 +161,7 @@ class TOSWriter(Thread):
                     self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(packet)))
                 except Exception, e:
                     if not self._tosWriterStop:
-                        self._logger.warning('could not write message to serial port: ' + e.__str__())
+                        self._logger.warning('could not write message to serial port: %s' % (e,))
                 finally:
                     self._sendqueue.task_done()
  

@@ -206,7 +206,7 @@ class GPSDriver():
                     	success = True
                     else:
                     	self._logger.warning('The submitted checksum did not match the expected one')
-                    	self._logger.warning('Expected: ' +str(calculatedChecksum) + ' got: ' +str(submitChecksum))
+                    	self._logger.warning('Expected: %s got: %s' % (calculatedChecksum, submitChecksum))
                     	success = False
 
         if (success):
@@ -285,7 +285,7 @@ class GPSDriver():
 			self._device.close()
 			return False
 	except Exception as e:
-		self._logger.debug( "serialAccess Exception (1)" + str(e))
+		self._logger.debug( "serialAccess Exception (1) %s" % (e,))
 		dev = scanlinux.scan()
 		while (dev == ''):
 			dev = scanlinux.scan()
@@ -294,7 +294,7 @@ class GPSDriver():
 				dev = dev[i]
 				break
                 if (len(dev)):
-		       self._logger.debug("Found new device: " + str(dev))
+		       self._logger.debug("Found new device: %s" % (dev,))
 	 	else:
 			if (self.retries > 0):
 				self.retries -= 1
@@ -307,11 +307,11 @@ class GPSDriver():
 		self._device = dev
 		try:
 			self._device = serial.Serial(dev, 19200, timeout=self._serialTimeout)
-			self._logger.debug("Successfully opened " + str(self._device))
+			self._logger.debug("Successfully opened %s" % (self._device,))
 			return self._serialAccess(dev,data,mode)
 		except Exception as e:
 			self.cleanUp(fd,dev)
-			self._logger.debug("serialAccess Exception (2)" + str(e))
+			self._logger.debug("serialAccess Exception (2) %s" % (e,))
 			return False
 
     '''
@@ -324,12 +324,12 @@ class GPSDriver():
 		pid = os.getpid()
 		print(dev)
 		ret = commands.getstatus(dev)
-		self._logger.debug("cleanUp: " + str(ret))
+		self._logger.debug("cleanUp: %s" % (ret,))
 
 		if (len(ret)):
-			ret = commands.getoutput('rm -r ' + str(dev))
-			self._logger.debug("Deleting stray file " + str(fd))
-			ret = commands.getoutput('rm -r /proc/' + str(pid) + '/fd/' + str(fd))
+			ret = commands.getoutput('rm -r %s' % (dev,))
+			self._logger.debug("Deleting stray file %s" % (fd,))
+			ret = commands.getoutput('rm -r /proc/%d/fd/%s' % (pid, fd))
 			if (len(ret)):
 				return True
 			return False
@@ -384,11 +384,11 @@ class GPSDriver():
             for i in range(3,19):
                 if want[i]!=rec[i+1]:
                     prtchange=True
-                    self._logger.debug('Bit '+str(i)+' from prtMessage not matching ' +str(rec[i]) + ' instead of ' +str(want[i]))
+                    self._logger.debug('Bit %d from prtMessage not matching %s instead of %s' % (i, rec[i], want[i]))
                     
             if prtchange==True:
                 self._logger.debug('Port protocols changed')
-                self._logger.info("New Protocol: " + str(want))
+                self._logger.info("New Protocol: %s" % (want,))
                 cnt=0
                 ACK=0
                 while not ACK and cnt<=3:
@@ -411,7 +411,7 @@ class GPSDriver():
             while (not rate):
                 rate = self._pollGpsMessage(self._rateMessageId)
             if rate[3] != newrate:
-                self._logger.debug('Rate changed from ' + str(struct.unpack('3H',rate[3])[0]) + " to " + str(self._interval*1000))
+                self._logger.debug('Rate changed from %d to %d' % (struct.unpack('3H',rate[3])[0], self._interval*1000))
                 cnt=0
                 ACK=0
                 while not ACK and cnt<=3:
@@ -429,7 +429,7 @@ class GPSDriver():
     	#Set mode
     	#IMPORTANT: Next 3 statements only for LEA-6
     	##################################################
-    	self._logger.debug("Setting " + self._mode + " on USB...")
+    	self._logger.debug('Setting %s on USB...' % (self._mode,))
     	if (self._mode == "raw"):
             newOutput=struct.pack('8B',0x02,0x10,0x00,0x00,0x00,0x01,0x00,0x00)
     	elif (self._mode == "nav"):
@@ -440,7 +440,7 @@ class GPSDriver():
             old = self._readRaw(self._msgMessageId)
             if old!=newOutput:
                 self._logger.debug('Output message changed')
-                self._logger.info("Msg Port Mode: " + str(newOutput))
+                self._logger.info("Msg Port Mode: %s" % (newOutput,))
                 cnt=0
                 ACK=0
                 while not ACK and cnt<=3:
@@ -452,7 +452,7 @@ class GPSDriver():
                     self._runEv.wait(1)
                 change=True
             
-    	self._logger.debug("Done setting " + self._mode + " on USB...")
+    	self._logger.debug('Done setting %s on USB...' % (self._mode,))
     
     	self._logger.debug("WARNING! NOT setting Powermode!!")
     	'''

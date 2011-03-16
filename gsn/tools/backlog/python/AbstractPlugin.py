@@ -73,10 +73,10 @@ class AbstractPluginClass(Thread, Statistics):
         else:
             self._maxruntime = int(value)
             
-        self.info('backlog: ' + str(self._backlog))
-        self.info('priority: ' + str(self._priority))
+        self.info('backlog: %s' % (self._backlog,))
+        self.info('priority: %d' % (self._priority,))
         if self._maxruntime:
-            self.info('max_runtime: ' + str(self._maxruntime))
+            self.info('max_runtime: %s' % (self._maxruntime,))
         
 
     def getOptionValue(self, key):

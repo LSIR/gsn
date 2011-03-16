@@ -179,10 +179,10 @@ class ScheduleHandlerClass(Thread):
         if self._duty_cycle_mode:
             self._pingThread = PingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
         
-        if os.path.isfile(self.getOptionValue('schedule_file')+'.parsed'):
+        if os.path.isfile('%s.parsed' % (self.getOptionValue('schedule_file'),)):
             try:
                 # Try to load the parsed schedule
-                parsed_schedule_file = open(self.getOptionValue('schedule_file')+'.parsed', 'r')
+                parsed_schedule_file = open('%s.parsed' % (self.getOptionValue('schedule_file'),), 'r')
                 self._schedule = pickle.load(parsed_schedule_file)
                 parsed_schedule_file.close()
             except Exception, e:
@@ -240,10 +240,10 @@ class ScheduleHandlerClass(Thread):
             nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
             if error:
                 for e in error:
-                    self.error('error while parsing the schedule file: ' + str(e))
+                    self.error('error while parsing the schedule file: %s' % (e,))
             if nextschedule:
                 nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
-                self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), pluginclassname + ' ' + commandstring)
+                self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
                 
         if self._schedule:
             thread.start_new_thread(self.waitForGSN, (None,))
@@ -266,7 +266,7 @@ class ScheduleHandlerClass(Thread):
                 self._scheduleLock.acquire()
                 nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback)
                 for e in error:
-                    self.error('error while parsing the schedule file: ' + str(e))
+                    self.error('error while parsing the schedule file: %s' % (e,))
                 self._scheduleEvent.clear()
                 lookback = False
                 self._scheduleLock.release()
@@ -283,7 +283,7 @@ class ScheduleHandlerClass(Thread):
                     continue
             
             for nextdt, pluginclassname, commandstring, runtimemax in nextschedules:
-                self._logger.debug('(' + str(nextdt) + ',' + pluginclassname + ',' + commandstring  + ',' + str(runtimemax) + ')')
+                self._logger.debug('(%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax))
                 dtnow = datetime.utcnow()
                 timediff = nextdt - dtnow
                 if self._duty_cycle_mode and not self._beacon:
@@ -292,12 +292,12 @@ class ScheduleHandlerClass(Thread):
                     else:
                         service_time = self._serviceTime()
                     if nextdt <= dtnow:
-                        self._logger.debug('executing >' + pluginclassname + ' ' + commandstring  + '< now')
+                        self._logger.debug('executing >%s %s< now' % (pluginclassname, commandstring))
                     elif timediff < self._max_next_schedule_wait_delta or timediff < service_time:
                         if pluginclassname:
-                            self._logger.info('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                            self._logger.info('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                         else:
-                            self._logger.info('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                            self._logger.info('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if self._scheduleHandlerStop:
                             break
@@ -308,9 +308,9 @@ class ScheduleHandlerClass(Thread):
                             break
                     else:
                         if service_time <= self._max_next_schedule_wait_delta:
-                            self._logger.info('nothing more to do in the next ' + self.getOptionValue('max_next_schedule_wait_minutes') + ' minutes (max_next_schedule_wait_minutes)')
+                            self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self.getOptionValue('max_next_schedule_wait_minutes'),))
                         else:
-                            self._logger.info('nothing more to do in the next ' + str(service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes'))) + ' minutes (rest of service time plus max_next_schedule_wait_minutes)')
+                            self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes')),))
                         
                         self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
                         if self._scheduleHandlerStop:
@@ -323,14 +323,14 @@ class ScheduleHandlerClass(Thread):
                     if nextdt > dtnow:
                         if pluginclassname:
                             if self._beacon:
-                                self._logger.info('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                                self._logger.info('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                             else:
-                                self._logger.debug('executing >' + pluginclassname + '.action("' + commandstring + '")< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                                self._logger.debug('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                         else:
                             if self._beacon:
-                                self._logger.info('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                                self._logger.info('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                             else:
-                                self._logger.debug('executing >' + commandstring + '< in ' + str(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0) + ' seconds')
+                                self._logger.debug('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                         self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if (self._scheduleHandlerStop or self._newSchedule) or (self._duty_cycle_mode and not self._beacon):
                             if self._newSchedule:
@@ -340,22 +340,22 @@ class ScheduleHandlerClass(Thread):
                 
                 if pluginclassname:
                     if self._duty_cycle_mode:
-                        self._logger.info('executing >' + pluginclassname + '.action("' + commandstring + '")< now')
+                        self._logger.info('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
                     else:
-                        self._logger.debug('executing >' + pluginclassname + '.action("' + commandstring + '")< now')
+                        self._logger.debug('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
                     try:
                         plugin = self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
                     except Exception, e:
-                        self.error('error in scheduled plugin >' + pluginclassname + ' ' + commandstring + '<:' + str(e))
+                        self.error('error in scheduled plugin >%s %s<: %s' % (pluginclassname, commandstring, e))
                 else:
                     if self._duty_cycle_mode:
-                        self._logger.info('executing >' + commandstring + '< now')
+                        self._logger.info('executing >%s< now' % (commandstring,))
                     else:
-                        self._logger.debug('executing >' + commandstring + '< now')
+                        self._logger.debug('executing >%s< now' % (commandstring,))
                     try:
                         job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
                     except Exception, e:
-                        self.error('error in scheduled script >' + commandstring + '<:' + str(e))
+                        self.error('error in scheduled script >%s<: %s' % (commandstring, e))
                     else:
                         self._backlogMain.jobsobserver.observeJob(job, commandstring, False, runtimemax)
                     
@@ -374,7 +374,7 @@ class ScheduleHandlerClass(Thread):
         if self._backlogMain.gsnpeer.isConnected():
             self._gsnconnected = True
         else:
-            self._logger.info('waiting for gsn to connect for a maximum of ' + self.getOptionValue('max_gsn_connect_wait_minutes') + ' minutes')
+            self._logger.info('waiting for gsn to connect for a maximum of %s minutes' % (self.getOptionValue('max_gsn_connect_wait_minutes'),))
             self._connectionEvent.wait((int(self.getOptionValue('max_gsn_connect_wait_minutes')) * 60))
             self._connectionEvent.clear()
             if self._scheduleHandlerStop:
@@ -383,7 +383,7 @@ class ScheduleHandlerClass(Thread):
         # if GSN is connected try to get a new schedule for a while
         if self._gsnconnected:
             timeout = 0
-            self._logger.info('waiting for gsn to answer a schedule request for a maximum of ' + self.getOptionValue('max_gsn_get_schedule_wait_minutes') + ' minutes')
+            self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self.getOptionValue('max_gsn_get_schedule_wait_minutes'),))
             while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
                 self._scheduleEvent.wait(3)
                 if self._scheduleHandlerStop:
@@ -464,13 +464,13 @@ class ScheduleHandlerClass(Thread):
                 schedule_file.write(schedule)
                 schedule_file.close()
             
-                compiled_schedule_file = open(self.getOptionValue('schedule_file')+'.parsed', 'w')
+                compiled_schedule_file = open('%s.parsed' % (self.getOptionValue('schedule_file'),), 'w')
                 pickle.dump(self._schedule, compiled_schedule_file)
                 compiled_schedule_file.close()
 
-                self._logger.info('updated %s and %s with the current schedule' % (schedule_file.name, schedule_file.name+".parsed"))
+                self._logger.info('updated %s and %s.parsed with the current schedule' % (schedule_file.name, schedule_file.name))
             except Exception, e:
-                self.exception('received schedule can not be used: ' + str(e))
+                self.exception('received schedule can not be used: %s' % (e,))
                 if self._schedule:
                     self._logger.info('using locally stored schedule file')
                     
@@ -482,10 +482,10 @@ class ScheduleHandlerClass(Thread):
             
     def tosMsgReceived(self, timestamp, packet):
         response = tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, packet['data'])
-        self._logger.debug('rcv (cmd=' + str(response['command']) + ', argument=' + str(response['argument']) + ')')
+        self._logger.debug('rcv (cmd=%s, argument=%s)' % (response['command'], response['argument']))
         if response['command'] == TOSTypes.CONTROL_CMD_WAKEUP_QUERY:
             node_state = response['argument']
-            self._logger.debug('CONTROL_CMD_WAKEUP_QUERY response received with argument: ' + str(node_state))
+            self._logger.debug('CONTROL_CMD_WAKEUP_QUERY response received with argument: %s' % (node_state,))
             if node_state != self._tosNodeState:
                 s = ''
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED) == TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED:
@@ -504,18 +504,18 @@ class ScheduleHandlerClass(Thread):
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT) == TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT:
                     s += 'NODE_REBOOT'
                 if s:
-                    self._logger.info('TinyNode wake-up states are: ' + s)
+                    self._logger.info('TinyNode wake-up states are: %s' % (s,))
                 self._tosNodeState = node_state
         elif response['command'] == TOSTypes.CONTROL_CMD_SERVICE_WINDOW:
-            self._logger.info('CONTROL_CMD_SERVICE_WINDOW response received with argument: ' + str(response['argument']))
+            self._logger.info('CONTROL_CMD_SERVICE_WINDOW response received with argument: %s' % (response['argument'],))
         elif response['command'] == TOSTypes.CONTROL_CMD_NEXT_WAKEUP:
-            self._logger.info('CONTROL_CMD_NEXT_WAKEUP response received with argument: ' + str(response['argument']))
+            self._logger.info('CONTROL_CMD_NEXT_WAKEUP response received with argument: %s' % (response['argument'],))
         elif response['command'] == TOSTypes.CONTROL_CMD_SHUTDOWN:
-            self._logger.info('CONTROL_CMD_SHUTDOWN response received with argument: ' + str(response['argument']))
+            self._logger.info('CONTROL_CMD_SHUTDOWN response received with argument: %s' % (response['argument'],))
         elif response['command'] == TOSTypes.CONTROL_CMD_NET_STATUS:
-            self._logger.info('CONTROL_CMD_NET_STATUS response received with argument: ' + str(response['argument']))
+            self._logger.info('CONTROL_CMD_NET_STATUS response received with argument: %s' % (response['argument'],))
         elif response['command'] == TOSTypes.CONTROL_CMD_RESET_WATCHDOG:
-            self._logger.debug('CONTROL_CMD_RESET_WATCHDOG response received with argument: ' + str(response['argument']))
+            self._logger.debug('CONTROL_CMD_RESET_WATCHDOG response received with argument: %s' % (response['argument'],))
         else:
             return False
         
@@ -526,7 +526,7 @@ class ScheduleHandlerClass(Thread):
                 self._tosSentCmd = None
                 self._tosMessageAckEvent.set()
             elif self._tosSentCmd != None:
-                self.error('received TOS message type (' + str(response['command']) + ') does not match the sent command type (' + str(self._tosSentCmd) + ')')
+                self.error('received TOS message type (%s) does not match the sent command type (%s)' % (response['command'], self._tosSentCmd))
                 return False
                 
         return True
@@ -543,7 +543,7 @@ class ScheduleHandlerClass(Thread):
         resendCounter = 1
         self._tosSentCmd = cmd
         while True:
-            self._logger.debug('snd (cmd=' + str(cmd) + ', argument=' + str(argument) + ')')
+            self._logger.debug('snd (cmd=%s, argument=%s)' % (cmd, argument))
             self._backlogMain._tospeer.sendTOSMsg(tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, [cmd, argument]), TOSTypes.AM_CONTROLCOMMAND, 1)
             self._tosMessageAckEvent.wait(3)
             if self._scheduleHandlerStop:
@@ -553,10 +553,10 @@ class ScheduleHandlerClass(Thread):
                 break
             else:
                 if resendCounter == 5:
-                    self.error('no answer for TOS command (' + str(self._tosSentCmd) + ') received from TOS node')
+                    self.error('no answer for TOS command (%s) received from TOS node' % (self._tosSentCmd,))
                     self._tosMessageLock.release()
                     return False
-                self._logger.info('resend command (' + str(self._tosSentCmd) + ') to TOS node')
+                self._logger.info('resend command (%s) to TOS node' % (self._tosSentCmd,))
                 resendCounter += 1
         self._tosMessageLock.release()
         return True
@@ -597,9 +597,9 @@ class ScheduleHandlerClass(Thread):
         if self._duty_cycle_mode:
             time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
             if self.tosMsgSend(TOSTypes.CONTROL_CMD_NEXT_WAKEUP, time_to_wakeup):
-                self._logger.info('successfully scheduled the next duty wake-up for >'+schedule_name+'< (that\'s in '+str(time_to_wakeup)+' seconds)')
+                self._logger.info('successfully scheduled the next duty wake-up for >%s< (that\'s in %d seconds)' % (schedule_name, time_to_wakeup))
             else:
-                self.error('could not schedule the next duty wake-up for >'+schedule_name+'<')
+                self.error('could not schedule the next duty wake-up for >%s<' % (schedule_name,))
             
 
     def _shutdown(self, sleepdelta=timedelta()):
@@ -608,7 +608,7 @@ class ScheduleHandlerClass(Thread):
             now = datetime.utcnow()
             if now + sleepdelta > now:
                 waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + sleepdelta.microseconds/1000000.0
-                self._logger.info('waiting ' + str(waitfor/60.0) + ' minutes for service windows to finish')
+                self._logger.info('waiting %f minutes for service windows to finish' % (waitfor/60.0,))
                 self._stopEvent.wait(waitfor)
                 if self._scheduleHandlerStop:
                     return True
@@ -620,7 +620,7 @@ class ScheduleHandlerClass(Thread):
             maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
             if not self._allJobsFinishedEvent.isSet() and maxruntime:
                 if maxruntime != -1:
-                    self._logger.info('waiting for all active jobs to finish for a maximum of ' + str(maxruntime) + ' seconds')
+                    self._logger.info('waiting for all active jobs to finish for a maximum of %f seconds' % (maxruntime,))
                     self._allJobsFinishedEvent.wait(5+maxruntime)
                 else:
                     self._logger.info('waiting for all active jobs to finish indefinitely')
@@ -647,10 +647,10 @@ class ScheduleHandlerClass(Thread):
             if time_to_service < 0-int(self.getOptionValue('approximate_startup_seconds')):
                 time_to_service += 86400
             if not self._service_wakeup_disabled:
-                self._logger.info('next service window is in ' + str(time_to_service/60.0) + ' minutes')
+                self._logger.info('next service window is in %f minutes' % (time_to_service/60.0,))
             if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, time_to_service):
                 if not self._service_wakeup_disabled:
-                    self._logger.info('successfully scheduled the next service window wake-up (that\'s in '+str(time_to_service)+' seconds)')
+                    self._logger.info('successfully scheduled the next service window wake-up (that\'s in %d seconds)' % (time_to_service,))
             else:
                 self.error('could not schedule the next service window wake-up')
             if self._service_wakeup_disabled:
@@ -664,11 +664,11 @@ class ScheduleHandlerClass(Thread):
                 td = timedelta(seconds=int(self.getOptionValue('approximate_startup_seconds')))
                 nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
                 for e in error:
-                    self.error('error while parsing the schedule file: ' + str(e))
+                    self.error('error while parsing the schedule file: %s' % (e,))
                 if nextschedule:
                     nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
                     self._logger.info('schedule next duty wake-up')
-                    self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), pluginclassname + ' ' + commandstring)
+                    self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
                     
             # last time to check if a new schedule has been sent from GSN
             if self._scheduleHandlerStop:
@@ -690,13 +690,13 @@ class ScheduleHandlerClass(Thread):
             self._pingThread.stop()
             shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
             if self.tosMsgSend(TOSTypes.CONTROL_CMD_SHUTDOWN, shutdown_offset):
-                self._logger.info('we\'re going to do a hard shut down in '+str(shutdown_offset)+' seconds ...')
+                self._logger.info('we\'re going to do a hard shut down in %s seconds ...' % (shutdown_offset,))
             else:
                 self.error('could not communicate the hard shut down time with the TOS node')
     
             self._backlogMain.shutdown = True
             parentpid = os.getpid()
-            self._logger.info('sending myself (pid=' + str(parentpid) + ') SIGINT')
+            self._logger.info('sending myself (pid=%d) SIGINT' % (parentpid,))
             os.kill(parentpid, signal.SIGINT)
             return True
         else:
@@ -767,7 +767,7 @@ class ScheduleCron(CronTab):
             try:
                 commandstring = splited[1]
             except IndexError:
-                error.append('PLUGIN or SCRIPT definition is missing in the current schedule >' + str(schedule) + '<')
+                error.append('PLUGIN or SCRIPT definition is missing in the current schedule >%s<' % (schedule,))
                 continue
             pluginclassname = ''
             if type.lower() == SCHEDULE_TYPE_PLUGIN:
@@ -778,7 +778,7 @@ class ScheduleCron(CronTab):
                 except IndexError:
                     commandstring = ''
             elif type.lower() != SCHEDULE_TYPE_SCRIPT:
-                error.append('PLUGIN or SCRIPT definition is missing in the current schedule >' + str(schedule) + '<')
+                error.append('PLUGIN or SCRIPT definition is missing in the current schedule >%s<' % (schedule,))
                 continue
             
             if look_backward and backwardmin:
@@ -805,11 +805,11 @@ class ScheduleCron(CronTab):
         
         try:
             if commandstring[param_end_index] != '=':
-                raise TypeError('wrongly formatted \'' + param_name + '\' parameter in the schedule file (format: ' + param_name + '=INTEGER)')
+                raise TypeError('wrongly formatted \'%s\' parameter in the schedule file (format: %s=INTEGER)' % (param_name, param_name))
             else:
                 param_end_index += 1
         except IndexError, e:
-            raise TypeError('wrongly formatted \'' + param_name + '\' parameter in the schedule file (format: ' + param_name + '=INTEGER)')
+            raise TypeError('wrongly formatted \'%s\' parameter in the schedule file (format: %s=INTEGER)' % (param_name, param_name))
             
         digit = ''
         while True:
@@ -821,14 +821,14 @@ class ScheduleCron(CronTab):
                     param_end_index += 1
                     break
                 else:
-                    raise TypeError('wrongly formatted \'' + param_name + '\' parameter in the schedule file (format: ' + param_name + '=INTEGER)')
+                    raise TypeError('wrongly formatted \'%s\' parameter in the schedule file (format: %s=INTEGER)' % (param_name, param_name))
             except IndexError:
                 break
             
         if not digit:
-            raise TypeError('wrongly formatted \'' + param_name + '\' parameter in the schedule file (format: ' + param_name + '=INTEGER)')
+            raise TypeError('wrongly formatted \'%s\' parameter in the schedule file (format: %s=INTEGER)' % (param_name, param_name))
             
-        commandstring = commandstring[:param_start_index].strip() + ' ' + commandstring[param_end_index:].strip()
+        commandstring = '%s %s' % (commandstring[:param_start_index].strip(), commandstring[param_end_index:].strip())
         return (int(digit), commandstring)
         
     
@@ -905,10 +905,10 @@ class ScheduleCron(CronTab):
         for part in cronslice.parts:
             if str(part).find("/") > 0 or str(part).find("-") > 0 or str(part).find('*') > -1:
                 if part.value_to > max or part.value_from < min:
-                    raise ValueError('Invalid value ' + str(part))
+                    raise ValueError('Invalid value %s' % (part,))
             else:
                 if part > max or part < min:
-                    raise ValueError('Invalid value ' + str(part))
+                    raise ValueError('Invalid value %s' % (part,))
         
     
     

@@ -25,7 +25,7 @@ PING_INTERVAL_SEC = 10.0
 # been received, the connection is considered broken.
 PING_ACK_CHECK_INTERVAL_SEC = 60.0
 
-SEND_QUEUE_SIZE = 25
+SEND_QUEUE_SIZE = 100
 
 STUFFING_BYTE = 0x7e
 HELLO_BYTE = 0x7d
@@ -356,7 +356,7 @@ class GSNListener(Thread):
         connecting = True
         
         # listen for a connection request by a GSN instance (this is blocking)
-        self._logger.info('listening on port ' + str(self._port))
+        self._logger.info('listening on port %d' % (self._port,))
         try:
             (self.clientsocket, self._clientaddr) = self._serversocket.accept()
             if self._gsnListenerStop:
@@ -367,13 +367,13 @@ class GSNListener(Thread):
         except (IOError, socket.error), e:
             if not self._gsnListenerStop:
                 self._gsnPeer._backlogMain.incrementExceptionCounter()
-                self._logger.exception('exception while accepting connection: ' + str(e))
+                self._logger.exception('exception while accepting connection: %s' % (e,))
                 self.disconnect()
             self._logger.info('died')
             return
 
         try:
-            self._logger.info('got connection from ' + str(self._clientaddr))
+            self._logger.info('got connection from %s' % (self._clientaddr,))
 
             self.clientsocket.settimeout(None)
 

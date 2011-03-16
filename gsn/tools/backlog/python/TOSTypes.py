@@ -37,6 +37,18 @@ AM_STATECOUNTER = 0x9e
 AM_DOZEROBJECTSTATUS = 0x90
 
 
+'''
+ Dozer Beacon commands
+'''
+# Dozer Beacon Structure
+DOZER_BEACON_STRUCTURE = [('destination', 'int', 2), ('cmd', 'int', 2), ('repetitionCnt','int',1)]
+
+# The Commands
+ACCESSNODE_QUEUE_CTRL_CMD = 8
+ACCESSNODE_QUEUE_CTRL_CMD_VAL_CLOSE = 0
+ACCESSNODE_QUEUE_CTRL_CMD_VAL_OPEN = 1
+ACCESSNODE_QUEUE_CTRL_CMD_VAL_CLOSED = 2
+
 
 '''
  BBv2PowerControl commands

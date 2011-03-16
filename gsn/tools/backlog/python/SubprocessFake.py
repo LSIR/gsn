@@ -79,16 +79,16 @@ class Popen(Thread):
         if isinstance(args, types.StringTypes):
             args = args
         else:
-            args = " ".join(args)
+            args = ' '.join(args)
 
         if shell:
-            args = "/bin/sh -c " + args
+            args = '/bin/sh -c %s' % (args,)
 
         try:
             os.makedirs(SUBPROCESS_FAKE_FOLDER_NEW)
         except:
             pass
-        f = open(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName,'w')
+        f = open('%s%s' % (SUBPROCESS_FAKE_FOLDER_NEW, self._uniqueFileName),'w')
         f.write(args)
         f.close()
         
@@ -168,27 +168,27 @@ class Popen(Thread):
             self.finishEvent.set()
             if os.path.exists(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName):
                 os.remove(SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName)
-            self._logger.error('could not execute >' + args + '< (is subprocessfaked.sh running?)')
+            self._logger.error('could not execute >%s< (is subprocessfaked.sh running?)' % (args,))
     
     
     def _fileFinishEvent(self, file):
         if (file == SUBPROCESS_FAKE_FOLDER_NEW+self._uniqueFileName):
             
             stdout = ''
-            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.out'):
-                fout = open(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.out', 'r')
+            if os.path.exists('%s%s.out' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName)):
+                fout = open('%s%s.out' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName), 'r')
                 stdout = ''.join(fout.readlines()).rstrip('\n')
                 fout.close()
             
             stderr = ''
-            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.err'):
-                ferr = open(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.err', 'r')
+            if os.path.exists('%s%s.err' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName)):
+                ferr = open('%s%s.err' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName), 'r')
                 stderr = ''.join(ferr.readlines()).rstrip('\n')
                 ferr.close()
             
             ret = None
-            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.ret'):
-                fret = open(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.ret', 'r')
+            if os.path.exists('%s%s.ret' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName)):
+                fret = open('%s%s.ret' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName), 'r')
                 ret = fret.readline().strip('\n')
                 fret.close()
             
@@ -202,19 +202,19 @@ class Popen(Thread):
             self.stdLock.release()
             
             self.finishEvent.set()
-            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.pid'):
-                os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.pid')
-            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.ret'):
-                os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.ret')
-            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.out'):
-                os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.out')
-            if os.path.exists(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.err'):
-                os.remove(SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.err')
+            if os.path.exists('%s%s.pid' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName)):
+                os.remove('%s%s.pid' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName))
+            if os.path.exists('%s%s.ret' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName)):
+                os.remove('%s%s.ret' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName))
+            if os.path.exists('%s%s.out' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName)):
+                os.remove('%s%s.out' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName))
+            if os.path.exists('%s%s.err' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName)):
+                os.remove('%s%s.err' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName))
             
             
     def _pidEvent(self, file):
         if self._pid == None and os.path.exists(file):
-            if file == SUBPROCESS_FAKE_FOLDER_FINISH+self._uniqueFileName+'.pid':
+            if file == '%s%s.pid' % (SUBPROCESS_FAKE_FOLDER_FINISH, self._uniqueFileName):
                 f = open(file, 'r')
                 pid = f.readline().strip('\n')
                 f.close()

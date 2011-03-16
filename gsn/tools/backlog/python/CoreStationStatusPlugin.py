@@ -70,7 +70,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         else:
             self._interval = float(value)
         
-        self.info('interval: ' + str(self._interval))
+        self.info('interval: %s' % (self._interval,))
         
     
     def getMsgType(self):
@@ -131,7 +131,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 self._timer = Timer(int(paramlist[0]), self.action, [''])
                 self._timer.start()
             else:
-                self.error('parameter has to be a digit (parameter=' + parameters + ')')
+                self.error('parameter has to be a digit (parameter=%s)' % (parameters,))
         
 #        print '##########################################################################'
 #        print '_getNumberOfUsers :' + self._getNumberOfUsers()
@@ -359,7 +359,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 self.error('chronyc tracking has not generated any output')
                 self._chronyTracking = False
             if output[1]:
-                self.error('chronyc tracking: (STDERR=' + output[1] + ')')
+                self.error('chronyc tracking: (STDERR=%s)' % (output[1],))
                 self._chronyTracking = False
         except Exception, e:
             self._chronyTracking = False
@@ -397,7 +397,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 self.error('chronyc tracking has not generated any output')
                 self._chronyRTC = False
             if output[1]:
-                self.error('chronyc tracking: (STDERR=' + output[1] + ')')
+                self.error('chronyc tracking: (STDERR=%s)' % (output[1],))
                 self._chronyRTC = False
         except Exception, e:
             self._chronyRTC = False
@@ -594,9 +594,9 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                     if line.find(name) != -1:
                         linelist = line.split()
                         if len(linelist) != 4:
-                            self.error('splitted line /proc/interrupts containing ' + name + ' did not return 4 values')
+                            self.error('splitted line /proc/interrupts containing %s did not return 4 values' % (name,))
                         elif linelist[2] != 'SC':
-                            self.error('/proc/interrupts ' + name + ' does not contain SC on 3. position')
+                            self.error('/proc/interrupts %s does not contain SC on 3. position' % (name,))
                         else:
                             self._interruptsLineIndexes[nameindex] = lineindex
                         break
@@ -606,7 +606,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             
         for index, b in enumerate(self._interruptsLineIndexes):
             if b == None:
-                self.warning('/proc/interrupts ' + names[index] + ' could not be found')
+                self.warning('/proc/interrupts %s could not be found' % (names[index],))
         
         
     def _getInterrupts(self):
@@ -699,9 +699,9 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                     if line.strip().startswith(name):
                         linelist = line.split()
                         if len(linelist) != 3:
-                            self.error('splitted line /proc/meminfo containing ' + name + ' did not return 3 values')
+                            self.error('splitted line /proc/meminfo containing %s did not return 3 values' % (name,))
                         elif linelist[2] != 'kB':
-                            self.error('/proc/meminfo ' + name + ' does not end with kB')
+                            self.error('/proc/meminfo %s does not end with kB' % (name,))
                         else:
                             self._memInfoLineIndexes[nameindex] = lineindex
                         break
@@ -711,7 +711,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             
         for index, b in enumerate(self._memInfoLineIndexes):
             if b == None:
-                self.error('/proc/meminfo ' + names[index] + ' could not be found')
+                self.error('/proc/meminfo %s could not be found' % (names[index],))
         
         
     def _getMemInfo(self):
@@ -875,7 +875,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             
         for index, b in enumerate(self._netSNMPLineIndexPair):
             if b == None:
-                self.error('/proc/net/snmp ' + names[index] + ' could not be found')
+                self.error('/proc/net/snmp %s could not be found' % (names[index],))
         
         
     def _getNetSNMP(self):
@@ -964,7 +964,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             
         for index, b in enumerate(self._netStatLineIndexPair):
             if b == None:
-                self.error('/proc/net/netstat ' + names[index] + ' could not be found')
+                self.error('/proc/net/netstat %s could not be found' % (names[index],))
         
         
         
@@ -1111,7 +1111,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                     if line.strip().startswith(name):
                         linelist = line.split()
                         if len(linelist) != 2:
-                            self.error('splitted line /proc/softirqs containing ' + name + ' did not return 2 values')
+                            self.error('splitted line /proc/softirqs containing %s did not return 2 values' % (name,))
                         else:
                             self._softIRQLineIndexes[nameindex] = lineindex
                         break
@@ -1121,7 +1121,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             
         for index, b in enumerate(self._softIRQLineIndexes):
             if b == None:
-                self.error('/proc/softirqs ' + names[index] + ' could not be found')
+                self.error('/proc/softirqs %s could not be found' % (names[index],))
         
         
     def _getSoftIRQ(self):
@@ -1337,14 +1337,14 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         output = p.communicate()
         if output[0]:
             if output[1]:
-                self.info('modprobe ad77x8: (STDOUT=' + output[0] + 'STDERR=' + output[1] + ')')
+                self.info('modprobe ad77x8: (STDOUT=%s STDERR=%s)' % (output[0], output[1]))
             else:
-                self.info('modprobe ad77x8: (STDOUT=' + output[0] + ')')
+                self.info('modprobe ad77x8: (STDOUT=%s)' % (output[0],))
         elif output[1]:
-                self.info('modprobe ad77x8: (STDERR=' + output[1] + ')')
+                self.info('modprobe ad77x8: (STDERR=%s)' % (output[1],))
                 
         if ret != 0:
-            self.warning('module ad77x8 is not available (modprobe ad77x8 returned with code ' + str(ret) + ')')
+            self.warning('module ad77x8 is not available (modprobe ad77x8 returned with code %d)' % (ret,))
             self._ad77x8 = False
         
         if self._ad77x8 and not self._calibrated and os.path.isfile(CALIB_FILE) and self._conf_calibrate:

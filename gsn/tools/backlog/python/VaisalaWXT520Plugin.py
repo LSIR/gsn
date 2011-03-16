@@ -41,7 +41,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
         else:
             self._interval = float(value)
         
-        self.info('interval: ' + str(self._interval))
+        self.info('interval: %s' % (self._interval,))
         
     
     def getMsgType(self):
@@ -72,51 +72,51 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
 
         self._serial.write('?\r\n')
         self._id = self._serial.readline().strip()
-        self.info('device address: ' + self._id)
+        self.info('device address: %s' % (self._id,))
         if len(self._id) != 1 or not self._id.isalnum():
             self.error('received invalid device address')
         else:
-            self._serial.write(self._id + 'XZM\r\n')
+            self._serial.write('%sXZM\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'XZ\r\n')
+            self._serial.write('%sXZ\r\n' % (self._id,))
             self._serial.readline()
     
-            self._serial.write(self._id + 'XU\r\n')
+            self._serial.write('%sXU\r\n' % (self._id,))
             output = self._serial.readline().strip()
             if output:
                 self.info(output)
     
-            self._serial.write(self._id + 'WU,R=1111110000000000,I=30\r\n')
+            self._serial.write('%sWU,R=1111110000000000,I=30\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'WU,A=3,G=1,U=K,D=0,N=W,F=4\r\n')
+            self._serial.write('%sWU,A=3,G=1,U=K,D=0,N=W,F=4\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'WU\r\n')
+            self._serial.write('%sWU\r\n')
             output = self._serial.readline().strip()
             if output:
                 self.info(output)
-            self._serial.write(self._id + 'TU,R=1111000000000000,I=30\r\n')
+            self._serial.write('%sTU,R=1111000000000000,I=30\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'TU,P=H,T=C\r\n')
+            self._serial.write('%sTU,P=H,T=C\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'TU\r\n')
+            self._serial.write('%sTU\r\n' % (self._id,))
             output = self._serial.readline().strip()
             if output:
                 self.info(output)
-            self._serial.write(self._id + 'RU,R=1111111100000000,I=30\r\n')
+            self._serial.write('%sRU,R=1111111100000000,I=30\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'RU,U=M,S=M,Z=M\r\n')
+            self._serial.write('%sRU,U=M,S=M,Z=M\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'RU,X=65535,Y=65535\r\n')
+            self._serial.write('%sRU,X=65535,Y=65535\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'RU\r\n')
+            self._serial.write('%sRU\r\n')
             output = self._serial.readline().strip()
             if output:
                 self.info(output)
-            self._serial.write(self._id + 'SU,R=1111000000000000,I=30\r\n')
+            self._serial.write('%sSU,R=1111000000000000,I=30\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'SU,S=N,H=Y\r\n')
+            self._serial.write('%sSU,S=N,H=Y\r\n' % (self._id,))
             self._serial.readline()
-            self._serial.write(self._id + 'SU\r\n')
+            self._serial.write('%sSU\r\n' % (self._id,))
             output = self._serial.readline().strip()
             if output:
                 self.info(output)
@@ -140,7 +140,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
             try:
                 send = False
                 packet = []
-                self._serial.write(self._id + 'R1\r\n')
+                self._serial.write('%sR1\r\n' % (self._id,))
                 line = self._serial.readline().strip()
                 if line:
                     self.debug(line)
@@ -149,7 +149,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
                 else:
                     packet.append(None)
                 
-                self._serial.write(self._id + 'R2\r\n')
+                self._serial.write('%sR2\r\n' % (self._id,))
                 line = self._serial.readline().strip()
                 if line:
                     self.debug(line)
@@ -158,7 +158,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
                 else:
                     packet.append(None)
                 
-                self._serial.write(self._id + 'R3\r\n')
+                self._serial.write('%sR3\r\n' % (self._id,))
                 line = self._serial.readline().strip()
                 if line:
                     self.debug(line)
@@ -167,7 +167,7 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
                 else:
                     packet.append(None)
                 
-                self._serial.write(self._id + 'R5\r\n')
+                self._serial.write('%sR5\r\n' % (self._id,))
                 line = self._serial.readline().strip()
                 if line:
                     self.debug(line)
