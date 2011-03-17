@@ -1477,8 +1477,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 if ad77x8_9 < 0:
                     ad77x8_9 = 0
     
-                ad77x8_1 = int(round(ad77x8_1 * 11))
-                ad77x8_2 = None
+                ad77x8_1 = int(round(ad77x8_1 * 23 / 3.0))
+                ad77x8_2 = int(round(ad77x8_2 * 23 / 3.0))
                 ad77x8_3 = int(round(ad77x8_3 * 23 / 3.0))
                 ad77x8_4 = int(round(ad77x8_4 * 10000))
                 ad77x8_5 = int(round(ad77x8_5 * 23 / 3.0))
