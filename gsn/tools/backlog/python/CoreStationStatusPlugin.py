@@ -18,7 +18,7 @@ if SUBPROCESS_BUG_BYPASS:
     subprocess = SubprocessFake
 else:
     import subprocess
-    
+
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
@@ -69,6 +69,12 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             self._interval = None
         else:
             self._interval = float(value)
+        
+        value = self.getOptionValue('old_board')
+        self._oldBoard = False
+        if value != None and int(value) == 1:
+            self.info('an old CoreBoard is used')
+            self._oldBoard = True
         
         self.info('interval: %s' % (self._interval,))
         
@@ -1480,7 +1486,10 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                 ad77x8_1 = int(round(ad77x8_1 * 23 / 3.0))
                 ad77x8_2 = int(round(ad77x8_2 * 23 / 3.0))
                 ad77x8_3 = int(round(ad77x8_3 * 23 / 3.0))
-                ad77x8_4 = int(round(ad77x8_4 * 10000))
+                if self._oldBoard:
+                    ad77x8_4 = int(round(ad77x8_4 * 20000))
+                else:
+                    ad77x8_4 = int(round(ad77x8_4 * 10000))
                 ad77x8_5 = int(round(ad77x8_5 * 23 / 3.0))
                 ad77x8_6 = int(round(ad77x8_6 * 2000))
                 ad77x8_7 = int(round(ad77x8_7 * 151 / 51.0))
