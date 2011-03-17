@@ -18,13 +18,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Behnaz Bostanipour
- * Date: Apr 15, 2010
- * Time: 7:25:07 PM
- * To change this template use File | Settings | File Templates.
- */
 public class MyControllerFilter implements Filter {
 
     private FilterConfig config = null;
@@ -45,7 +38,7 @@ public class MyControllerFilter implements Filter {
             HttpServletResponse res = (HttpServletResponse) response;
             HttpSession session = req.getSession();
             User user = (User) session.getAttribute("user");
-            if (Main.getContainerConfig().isAcEnabled() == false)// do as filter does not exist
+            if (Main.getContainerConfig().isAcEnabled() == false) // do as filter does not exist
             {
                 chain.doFilter(request, response);
             } else {
@@ -72,7 +65,7 @@ public class MyControllerFilter implements Filter {
                         reqVirtualSensorName = req.getParameter("vsName");
                 }
 
-                if ((reqUsername == null) && (reqPassword == null) && ("/multidata".equals(req.getServletPath()))) { // generally request from web client for plotting
+                if ((reqUsername == null) && (reqPassword == null) && (user == null) && ("/multidata".equals(req.getServletPath()))) { // generally request from web client for plotting
                     List<String> listOfVirtualSensors = createListOfVirtualSensorsFromRequest(req);
                     boolean flag = UserUtils.userHasAccessToAllVirtualSensorsInList(reqUsername, reqPassword, listOfVirtualSensors) || DataSource.allVirtualSensorsInListAreNotManaged(listOfVirtualSensors);
                     if (flag) {
