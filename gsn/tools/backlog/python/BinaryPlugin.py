@@ -90,6 +90,7 @@ class BinaryPluginClass(AbstractPluginClass):
     _filedescriptor
     _watches
     _packetCRC
+    _readyfornewbinary
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
     '''
@@ -123,6 +124,7 @@ class BinaryPluginClass(AbstractPluginClass):
         if not watches:
             watches.append('.,filesystem,,')
 
+        self._readyfornewbinary = False
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, BinaryChangedProcessing(self))
         
@@ -224,6 +226,7 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
+        self._readyfornewbinary = False
         if self._filedescriptor:
             if os.path.exists(self._filedescriptor.name):
                 self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
@@ -246,65 +249,69 @@ class BinaryPluginClass(AbstractPluginClass):
                 self.exception(e)
                 
         while not self._plugStop:
-            data = self._msgqueue.get()
-            if self._plugStop:
+            try:
+                data = self._msgqueue.get()
+                if self._plugStop:
+                    try:
+                        self._msgqueue.task_done()
+                    except ValueError, e:
+                        self.exception(e)
+                    break
+                
+                # the first entry of the data defines its packet number
+                pktNr = data[0]
+                # the second entry of the data defines its type
+                pktType = data[1]
+                
+                if pktNr == self._binaryWriter.getSentMsgNr():
+                    self._binaryWriter.stopSending()
+                    # if the type is INIT_PACKET we have to send a new file
+                    if pktType == INIT_PACKET:
+                        self.debug('new binary request received')
+                        self._getInitialBinaryPacket()
+                    # if the type is RESEND_PACKET we have to resend a part of a file...
+                    elif pktType == RESEND_PACKET:
+                        self.debug('binary retransmission request received')
+                        if self._reopenFile(data[2], struct.unpack('i', struct.pack('I', data[3]))[0], data[4]):
+                            self._getNextChunk()
+                        else:
+                            self._getInitialBinaryPacket()
+                    elif pktType == ACK_PACKET:
+                        ackType = data[2]
+                        self.debug('acknowledge received for packet type %d' % (ackType,))
+                            
+                        if ackType == INIT_PACKET:
+                            self.debug('acknowledge received for init packet')
+                            self._getNextChunk()
+                        elif ackType == CHUNK_PACKET:
+                            self.debug('acknowledge for packet number >%d< received' % (pktNr,))
+                            self._getNextChunk()
+                        elif ackType == CRC_PACKET:
+                            filename = self._filedescriptor.name
+                            os.chmod(filename, 0744)
+                            self._filedescriptor.close()
+                            if os.path.isfile(filename):
+                                # crc has been accepted by GSN
+                                self.debug('crc has been accepted for %s' % (filename,))
+                                # remove it from disk
+                                os.remove(filename)
+                            else:
+                                self.error('crc acknowledge file does not exist')
+                            self._getInitialBinaryPacket()
+                        else:
+                            self.error('unexpected acknowledge received')
+                elif pktNr == self._binaryWriter.getSentMsgNr()-1 or (pktNr == MESSAGE_NUMBER_MOD-1 and self._binaryWriter.getSentMsgNr() == 0):
+                    self.debug('packet number already received')
+                else:
+                    self.error('packet number out of order (recv=%d, sent=%d)' % (pktNr, self._binaryWriter.getSentMsgNr()))
+                        
                 try:
                     self._msgqueue.task_done()
                 except ValueError, e:
                     self.exception(e)
-                break
-            
-            # the first entry of the data defines its packet number
-            pktNr = data[0]
-            # the second entry of the data defines its type
-            pktType = data[1]
-            
-            if pktNr == self._binaryWriter.getSentMsgNr():
-                self._binaryWriter.stopSending()
-                # if the type is INIT_PACKET we have to send a new file
-                if pktType == INIT_PACKET:
-                    self.debug('new binary request received')
-                    self._getInitialBinaryPacket()
-                # if the type is RESEND_PACKET we have to resend a part of a file...
-                elif pktType == RESEND_PACKET:
-                    self.debug('binary retransmission request received')
-                    if self._reopenFile(data[2], struct.unpack('i', struct.pack('I', data[3]))[0], data[4]):
-                        self._getNextChunk()
-                    else:
-                        self._getInitialBinaryPacket()
-                elif pktType == ACK_PACKET:
-                    ackType = data[2]
-                    self.debug('acknowledge received for packet type %d' % (ackType,))
-                        
-                    if ackType == INIT_PACKET:
-                        self.debug('acknowledge received for init packet')
-                        self._getNextChunk()
-                    elif ackType == CHUNK_PACKET:
-                        self.debug('acknowledge for packet number >%d< received' % (pktNr,))
-                        self._getNextChunk()
-                    elif ackType == CRC_PACKET:
-                        filename = self._filedescriptor.name
-                        os.chmod(filename, 0744)
-                        self._filedescriptor.close()
-                        if os.path.isfile(filename):
-                            # crc has been accepted by GSN
-                            self.debug('crc has been accepted for %s' % (filename,))
-                            # remove it from disk
-                            os.remove(filename)
-                        else:
-                            self.error('crc acknowledge file does not exist')
-                        self._getInitialBinaryPacket()
-                    else:
-                        self.error('unexpected acknowledge received')
-            elif pktNr == self._binaryWriter.getSentMsgNr()-1 or (pktNr == MESSAGE_NUMBER_MOD-1 and self._binaryWriter.getSentMsgNr() == 0):
-                self.debug('packet number already received')
-            else:
-                self.error('packet number out of order (recv=%d, sent=%d)' % (pktNr, self._binaryWriter.getSentMsgNr()))
-                    
-            try:
-                self._msgqueue.task_done()
-            except ValueError, e:
-                self.exception(e)
+            except Exception, e:
+                self._backlogMain.incrementExceptionCounter()
+                self._logger.exception(str(e))
             
         self._logger.info('died')
 
@@ -336,6 +343,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 fileobj = self._filedeque.pop()
             except IndexError:
                 self.debug('file FIFO is empty waiting for next file to arrive')
+                self._readyfornewbinary = True
                 return
                 
             filename = fileobj[0]
@@ -629,12 +637,14 @@ class BinaryChangedProcessing(ProcessEvent):
         self._binaryPlugin = parent
 
     def process_default(self, event):
-        if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug('%s changed' % (event.pathname,))
-        
-        sendBinary = False
-        if not self._binaryPlugin._filedeque and (not self._binaryPlugin._filedescriptor or self._binaryPlugin._filedescriptor.closed) and self._binaryPlugin.isGSNConnected():
-            sendBinary = True
-        self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
-        if sendBinary:
-            self._binaryPlugin._getInitialBinaryPacket()
+        try:
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('%s changed' % (event.pathname,))
+    
+            self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
+            if self._binaryPlugin._readyfornewbinary:
+                self._binaryPlugin._readyfornewbinary = False
+                self._binaryPlugin._getInitialBinaryPacket()
+        except Exception, e:
+            self._binaryPlugin._backlogMain.incrementExceptionCounter()
+            self._logger.exception(str(e))
