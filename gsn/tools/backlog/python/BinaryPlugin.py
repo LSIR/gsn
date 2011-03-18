@@ -103,7 +103,7 @@ class BinaryPluginClass(AbstractPluginClass):
         watches = self.getOptionValues('watch')
         
         wait_min_for_file = self.getOptionValue('wait_min_for_file')
-        if wait_min_for_file:
+        if wait_min_for_file and self.isDutyCycleMode():
             self._waitforfile = True
             self._waitforfiletimer = Timer(float(wait_min_for_file) * 60, self.checkForFileTimerAction)
             self._waitforfiletimer.start()
