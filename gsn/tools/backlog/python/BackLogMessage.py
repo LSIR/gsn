@@ -158,8 +158,8 @@ class BackLogMessageClass:
         '''
         
         try:
-            self._type = int(struct.unpack('<B', bytes[0])[0])
-            self._timestamp = int(struct.unpack('<q', bytes[1:9])[0])
+            self._type = struct.unpack('<B', bytes[0])[0]
+            self._timestamp = struct.unpack('<q', bytes[1:9])[0]
         except Exception, e:
             raise TypeError('cannot unpack message: %s' % (e,))
        
@@ -214,85 +214,88 @@ class BackLogMessageClass:
     
     
     def _unpackPayload(self, payload):
-        fmt_len = struct.unpack_from('<i', payload)[0]
-        fmt = struct.unpack_from('<%ds' % fmt_len, payload, 4)[0]
-        plength = struct.calcsize('<i%ds' % fmt_len)
-        
         ret = []
+        append = ret.append
+        unpack_from = struct.unpack_from
+        calcsize = struct.calcsize
+        
+        fmt_len = unpack_from('<i', payload)[0]
+        fmt = unpack_from('<%ds' % fmt_len, payload, 4)[0]
+        plength = calcsize('<i%ds' % fmt_len)
+        
         for c in fmt:
             if c == '0':
-                ret.append(None)
+                append(None)
             elif c == 'X':
-                l = struct.unpack_from('<i', payload, plength)[0]
-                ret.append(payload[plength+4:plength+4+l])
+                l = unpack_from('<i', payload, plength)[0]
+                append(payload[plength+4:plength+4+l])
                 plength += 4+l
             elif c == 's':
-                l = struct.unpack_from('<i', payload, plength)[0]
-                ret.append(struct.unpack_from('<%ds' % l, payload, plength+4)[0])
-                plength += struct.calcsize('<i%ds' % l)
+                l = unpack_from('<i', payload, plength)[0]
+                append(unpack_from('<%ds' % l, payload, plength+4)[0])
+                plength += calcsize('<i%ds' % l)
             else:
-                ret.append(struct.unpack_from('<'+c, payload, plength)[0])
-                plength += struct.calcsize(c)
+                append(unpack_from('<'+c, payload, plength)[0])
+                plength += calcsize(c)
         return ret
 
     
     def _packList(self, values):
+        pack = struct.pack
         format = ''
         data = ''
-        bitstr = ''
-        bitlist = []
         for index, val in enumerate(values):
+            t = type(val)
             if val == None:
                 format += '0'
             else:
-                if type(val) == bool:
+                if t == bool:
                     format += '?'
                     if val:
-                        data += struct.pack('<b', 1)
+                        data += pack('<b', 1)
                     else:
-                        data += struct.pack('<b', 0)
-                elif type(val) == int:
+                        data += pack('<b', 0)
+                elif t == int:
                     if val < 127 and val > -128:
                         format += 'b'
-                        data += struct.pack('<b', val)
+                        data += pack('<b', val)
                     elif val < 32767 and val > -32768:
                         format += 'h'
-                        data += struct.pack('<h', val)
+                        data += pack('<h', val)
                     elif val < 2147483647 and val > -2147483648:
                         format += 'i'
-                        data += struct.pack('<i', val)
+                        data += pack('<i', val)
                     elif val < 9223372036854775807 and val > -9223372036854775808:
                         format += 'q'
-                        data += struct.pack('<q', val)
+                        data += pack('<q', val)
                     else:
                         raise ValueError('the passed integer value is too big to be transfered using 8 bytes')
-                elif type(val) == long:
+                elif t == long:
                     if val < 127 and val > -128:
                         format += 'b'
-                        data += struct.pack('<b', val)
+                        data += pack('<b', val)
                     elif val < 32767 and val > -32768:
                         format += 'h'
-                        data += struct.pack('<h', val)
+                        data += pack('<h', val)
                     elif val < 2147483647 and val > -2147483648:
                         format += 'i'
-                        data += struct.pack('<i', val)
+                        data += pack('<i', val)
                     elif val < 9223372036854775807 and val > -9223372036854775808:
                         format += 'q'
-                        data += struct.pack('<q', val)
+                        data += pack('<q', val)
                     else:
                         raise ValueError('the passed integer value is too big to be transfered using 8 bytes')
-                elif type(val) == float:
+                elif t == float:
                     format += 'd'
-                    data += struct.pack('<d', val)
-                elif type(val) == str:
+                    data += pack('<d', val)
+                elif t == str:
                     format += 's'
-                    data += struct.pack('<i', len(val))
-                    data += struct.pack('<%ds' % len(val), val)
-                elif type(val) == bytearray:
+                    data += pack('<i%ds' % len(val), len(val), val)
+                elif t == bytearray:
                     format += 'X'
-                    data += struct.pack('<i', len(val)) + val
+                    data += pack('<i', len(val)) + val
                 else:
-                    raise ValueError('value at index %d in passed list is of unsupported %s' % (index, type(val)))
+                    raise ValueError('value at index %d in passed list is of unsupported %s' % (index, t))
                     
-        return struct.pack('<i', len(format)) + struct.pack('<%ds' % len(format), format) + data
+        return pack('<i', len(format)) + pack('<%ds' % len(format), format) + data
     

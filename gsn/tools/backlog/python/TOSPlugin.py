@@ -29,8 +29,8 @@ class TOSPluginClass(AbstractPluginClass):
     _QueueClosedEvent
     '''
     
-    def __init__(self, parent, options):
-        AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
+    def __init__(self, parent, config):
+        AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         self.registerTOSListener([TOSTypes.AM_ALL])
         
         self._plugstop = False

@@ -8,7 +8,6 @@ __id__          = "$Id$"
 __source__      = "$URL$"
 
 import sqlite3
-import time
 import os
 import logging
 from threading import Thread, Lock, Event
@@ -220,17 +219,16 @@ class BackLogDBClass(Thread, Statistics):
                                                  average remove time, 
                                                  maximum remove time]
         '''
-        stat = []
-        stat.append(self.getCounterValue(self._dbNumberOfEntriesId))
-        stat.append(int(os.path.getsize(self._dbname)/1024))
-        stat.append(self.getCounterValue(self._storeCounterId))
-        stat.append(self.getCounterValue(self._removeCounterId))
-        stat.append(self._convert(self.getMinCounterInc(self._storeTimeId, [intervalSec])[0]))
-        stat.append(self._convert(self.getAvgCounterInc(self._storeTimeId, [intervalSec])[0]))
-        stat.append(self._convert(self.getMaxCounterInc(self._storeTimeId, [intervalSec])[0]))
-        stat.append(self._convert(self.getMinCounterInc(self._removeTimeId, [intervalSec])[0]))
-        stat.append(self._convert(self.getAvgCounterInc(self._removeTimeId, [intervalSec])[0]))
-        stat.append(self._convert(self.getMaxCounterInc(self._removeTimeId, [intervalSec])[0]))
+        stat = [self.getCounterValue(self._dbNumberOfEntriesId), \
+                int(os.path.getsize(self._dbname)/1024), \
+                self.getCounterValue(self._storeCounterId), \
+                self.getCounterValue(self._removeCounterId), \
+                self._convert(self.getMinCounterInc(self._storeTimeId, [intervalSec])[0]), \
+                self._convert(self.getAvgCounterInc(self._storeTimeId, [intervalSec])[0]), \
+                self._convert(self.getMaxCounterInc(self._storeTimeId, [intervalSec])[0]), \
+                self._convert(self.getMinCounterInc(self._removeTimeId, [intervalSec])[0]), \
+                self._convert(self.getAvgCounterInc(self._removeTimeId, [intervalSec])[0]), \
+                self._convert(self.getMaxCounterInc(self._removeTimeId, [intervalSec])[0])]
         return stat
     
     

@@ -36,7 +36,7 @@ else:
     import subprocess
 
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
-DEFAULT_PLUGINS = [ 'BackLogStatusPlugin' ]
+DEFAULT_PLUGINS = [('BackLogStatusPlugin',1)]
 DEFAULT_OPTION_GSN_PORT = 9003
 DEFAULT_OPTION_BACKLOG_DB = '/tmp/backlog.db'
 DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
@@ -65,6 +65,7 @@ class BackLogMainClass(Thread, Statistics):
     gsnpeer
     backlog
     plugins
+    _msgtypetoplugin
     duty_cycle_mode
     _exceptionCounterId
     _errorCounterId
@@ -98,13 +99,6 @@ class BackLogMainClass(Thread, Statistics):
         self._config.optionxform = str # case sensitive
         self._config.read(config_file)
 
-        # get options section from config file
-        try:
-            config_options = self._config.items('options')
-        except ConfigParser.NoSectionError:
-            self._logger.warning('no [options] section specified in %s' % (config_file,))
-            config_options = []
-
         # set default options
         gsn_port = DEFAULT_OPTION_GSN_PORT
         backlog_db = DEFAULT_OPTION_BACKLOG_DB
@@ -117,28 +111,29 @@ class BackLogMainClass(Thread, Statistics):
         folder_to_check_size = None
         folder_min_free_mb = None
 
-        # readout options from config
-        for entry in config_options:
-            name = entry[0]
-            value = entry[1]
-            if name == 'gsn_port':
-                gsn_port = int(value)
-            elif name == 'backlog_db':
-                backlog_db = value
-            elif name == 'backlog_db_resend_hr':
-                backlog_db_resend_hr = int(value)
-            elif name == 'device_id':
-                self.device_id = int(value)
-            elif name == 'tos_source_addr':
-                tos_address = value
-            elif name == 'tos_version':
-                tos_version = int(value)
-            elif name == 'duty_cycle_mode':
-                dutycyclemode = int(value)
-            elif name == 'folder_to_check_size':
-                folder_to_check_size = value
-            elif name == 'folder_min_free_mb':
-                folder_min_free_mb = int(value)
+        try:
+            # readout options from config
+            for name, value in self._config.items('options'):
+                if name == 'gsn_port':
+                    gsn_port = int(value)
+                elif name == 'backlog_db':
+                    backlog_db = value
+                elif name == 'backlog_db_resend_hr':
+                    backlog_db_resend_hr = int(value)
+                elif name == 'device_id':
+                    self.device_id = int(value)
+                elif name == 'tos_source_addr':
+                    tos_address = value
+                elif name == 'tos_version':
+                    tos_version = int(value)
+                elif name == 'duty_cycle_mode':
+                    dutycyclemode = int(value)
+                elif name == 'folder_to_check_size':
+                    folder_to_check_size = value
+                elif name == 'folder_min_free_mb':
+                    folder_min_free_mb = int(value)
+        except ConfigParser.NoSectionError:
+            raise TypeError('no [options] section specified in %s' % (config_file,))
                 
         if self.device_id == None:
             raise TypeError('device_id has to be specified in the configuration file')
@@ -221,6 +216,7 @@ class BackLogMainClass(Thread, Statistics):
         self._logger.info('loaded BackLogDBClass')
             
         self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, config_schedule)
+        self._msgtypetoplugin = {self.schedulehandler.getMsgType(): [self.schedulehandler]}
         
         self.powerControl = None
         try:
@@ -240,25 +236,32 @@ class BackLogMainClass(Thread, Statistics):
 
         # init each plugin
         self.plugins = {}
-        for plugin_entry in config_plugins:
-            if plugin_entry[1] == '0': continue
-            module_name = plugin_entry[0]
+        for module_name, enabled in config_plugins:
+            if enabled == '0': continue
             try:
                 module = __import__(module_name)
                 pluginclass = getattr(module, module_name + 'Class')
                 try:
-                    config_plugins_options = self._config.items(module_name + '_options')
+                    config_plugins_options = dict(self._config.items(module_name + '_options'))
                 except ConfigParser.NoSectionError:
                     self._logger.warning('no [%s_options] section specified in %s' % (module_name, config_file,))
-                    config_plugins_options = []
+                    config_plugins_options = {}
                 plugin = pluginclass(self, config_plugins_options)
+                
+                # update message type to plugin dict
+                plugs = self._msgtypetoplugin.get(plugin.getMsgType())
+                if plugs == None:
+                    self._msgtypetoplugin[plugin.getMsgType()] = [plugin]
+                else:
+                    plugs.append(plugin)
+                    self._msgtypetoplugin.update({plugin.getMsgType(): plugs})
+                
                 self.plugins.update({module_name: plugin})
                 self.jobsobserver.observeJob(plugin, module_name, True, plugin.getMaxRuntime())
                 self._logger.info('loaded plugin %s' % (module_name,))
             except Exception, e:
                 self._logger.error('could not load plugin %s: %s' % (module_name, e))
                 self.incrementErrorCounter()
-                continue
 
   
     def run(self):
@@ -269,10 +272,10 @@ class BackLogMainClass(Thread, Statistics):
         @param plugins: all plugins tuple as specified in the plugin configuration file under the [plugins] section
         '''
 
-        self.gsnpeer.start()
         self.backlog.start()
-        self.schedulehandler.start()
+        self.gsnpeer.start()
         self.jobsobserver.start()
+        self.schedulehandler.start()
 
         for plugin_name, plugin in self.plugins.items():
             self._logger.info('starting %s' % (plugin_name,))
@@ -382,58 +385,64 @@ class BackLogMainClass(Thread, Statistics):
         ret = False
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug('received TOS message with AM type %s' % (type,))
-        listeners = self._tosListeners.get('all')
-        if listeners != None:
-            for listener in listeners:
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug('forwarding TOS message to listener %s (listening to all AM types)' % (listener.__class__.__name__,))
-                try:
-                    if listener.tosMsgReceived(timestamp, packet):
-                        ret = True
-                except Exception, e:
-                    self.incrementExceptionCounter()
-                    self._logger.exception(e)
             
-        listeners = self._tosListeners.get(type)
-        if listeners != None:
-            for listener in listeners:
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug('forwarding TOS message to listener %s (listening only to some types)' % (listener.__class__.__name__,))
-                try:
-                    if listener.tosMsgReceived(timestamp, packet):
-                        ret = True
-                except Exception, e:
-                    self.incrementExceptionCounter()
-                    self._logger.exception(e)
+        alllisteners = self._tosListeners.get('all')
+        somelisteners = self._tosListeners.get(type)
+        if alllisteners != None and somelisteners != None:
+            listeners = alllisteners + somelisteners
+        elif alllisteners != None:
+            listeners = alllisteners
+        elif somelisteners != None:
+            listeners = somelisteners
+        else:
+            self._logger.warning('There is no listener for TOS message with AM type %s.' % (type,))
+            return False
         
+        for listener in listeners:
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('forwarding TOS message to listener %s' % (listener.__class__.__name__,))
+            try:
+                if listener.tosMsgReceived(timestamp, packet):
+                    ret = True
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
+                
         if not ret:
-            self._logger.warning('TOS message with AM type %s has not been processed.' % (type,))
+            self._logger.warning('TOS message with AM type %s could not be processed properly by the plugin(s).' % (type,))
 
         return ret
     
     
     def pluginAction(self, pluginclassname, parameters, runtimemax):
         pluginactive = False
-        for plugin_name, plugin in self.plugins.items():
-            if plugin_name == pluginclassname:
-                if runtimemax:
-                    self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
-                else:
-                    self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
-                thread.start_new_thread(plugin.action, (parameters,))
-                pluginactive = True
-                return plugin
-                
-        if not pluginactive:
+        plugin = self.plugins.get(pluginclassname)
+        if plugin != None:
+            if runtimemax:
+                self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
+            else:
+                self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
+            thread.start_new_thread(plugin.action, (parameters,))
+            pluginactive = True
+        else:
             try:
                 module = __import__(pluginclassname)
                 pluginclass = getattr(module, '%sClass' % (pluginclassname,))
                 try:
-                    config_plugins_options = self._config.items('%s_options' % (pluginclassname,))
+                    config_plugins_options = dict(self._config.items('%s_options' % (pluginclassname,)))
                 except ConfigParser.NoSectionError:
                     self._logger.warning('no [%s_options] section specified in configuration file' % (pluginclassname,))
-                    config_plugins_options = []
+                    config_plugins_options = {}
                 plugin = pluginclass(self, config_plugins_options)
+                
+                # update message type to plugin dict
+                plugs = self._msgtypetoplugin.get(plugin.getMsgType())
+                if plugs == None:
+                    self._msgtypetoplugin[plugin.getMsgType()] = [plugin]
+                else:
+                    plugs.append(plugin)
+                    self._msgtypetoplugin.update({plugin.getMsgType(): plugs})
+                    
                 self.plugins.update({pluginclassname: plugin})
                 if runtimemax:
                     self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
@@ -448,25 +457,38 @@ class BackLogMainClass(Thread, Statistics):
             except Exception, e:
                 self.incrementExceptionCounter()
                 self._logger.exception(e)
-            return plugin
+        return plugin
         
         
     def pluginStop(self, pluginclassname, stopAnyway=False):
-        for plugin_name, plugin in self.plugins.items():
-            if pluginclassname == plugin_name:
-                if ((self.schedulehandler._beacon or not self.schedulehandler._duty_cycle_mode) and not plugin.stopIfNotInDutyCycle() and not stopAnyway):
-                    self._logger.info('%s should not be stopped if not in duty-cycle mode (or beacon) => keep running' % (pluginclassname,))
-                    return False
-                else:
-                    try:
-                        plugin.stop()
-                    except Exception, e:
-                        self.incrementExceptionCounter()
-                        self._logger.exception(e)
-                        
-                    del self.plugins[plugin_name]
-                    return True
-        return False
+        plugin = self.plugins.get(pluginclassname)
+        if plugin != None:
+            if ((self.schedulehandler._beacon or not self.schedulehandler._duty_cycle_mode) and not plugin.stopIfNotInDutyCycle() and not stopAnyway):
+                self._logger.info('%s should not be stopped if not in duty-cycle mode (or beacon) => keep running' % (pluginclassname,))
+                return False
+            else:
+                # update message type to plugin dict
+                plugs = self._msgtypetoplugin.get(plugin.getMsgType())
+                for index, p in enumerate(plugs):
+                    if p == plugin:
+                        del plugs[index]
+                        if not plugs:
+                            del self._msgtypetoplugin[plugin.getMsgType()]
+                        else:
+                            self._msgtypetoplugin.update({plugin.getMsgType(): plugs})
+                        break
+                    
+                try:
+                    plugin.stop()
+                except Exception, e:
+                    self.incrementExceptionCounter()
+                    self._logger.exception(e)
+                    
+                del self.plugins[pluginclassname]
+                return True
+        else:
+            self._logger.warning('there is no plugin named %s to be stopped' % (pluginclassname, ))
+            return False
         
     
     def resend(self):
@@ -474,35 +496,32 @@ class BackLogMainClass(Thread, Statistics):
         
         
     def gsnMsgReceived(self, msgType, message):
-        msgTypeValid = False
-        if msgType == self.schedulehandler.getMsgType():
-            self.schedulehandler.msgReceived(message.getData())
-            msgTypeValid = True
+        try:
+            plugs = self._msgtypetoplugin.get(msgType)
+            data = message.getData()
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
+        if plugs:
+            try:
+                [plug.msgReceived(data) for plug in plugs]
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
         else:
-            # send the packet to all plugins which 'use' this message type
-            for plugin in self.plugins.values():
-                if msgType == plugin.getMsgType():
-                    try:
-                        plugin.msgReceived(message.getData())
-                        msgTypeValid = True
-                    except Exception, e:
-                        self.incrementExceptionCounter()
-                        self._logger.exception(e)
-                    break
-        if not msgTypeValid:
             self._logger.error('unknown message type %s received' % (msgType,))
             self.incrementErrorCounter()
         
         
     def ackReceived(self, timestamp, msgType):
         # tell the plugins to have received an acknowledge message
-        for plugin in self.plugins.values():
-            if plugin.getMsgType() == msgType:
-                try:
-                    plugin.ackReceived(timestamp)
-                except Exception, e:
-                    self.incrementExceptionCounter()
-                    self._logger.exception(e)
+        plugs = self._msgtypetoplugin.get(msgType)
+        if plugs:
+            try:
+                [plug.ackReceived(timestamp) for plug in plugs]
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
             
         # remove the message from the backlog database using its timestamp and message type
         self.backlog.removeMsg(timestamp, msgType)
@@ -510,42 +529,38 @@ class BackLogMainClass(Thread, Statistics):
     def beaconSet(self):
         self._logger.info('beacon set')
         # tell the plugins that beacon has been set
-        for plugin in self.plugins.values():
-            try:
-                plugin.beaconSet()
-            except Exception, e:
-                self.incrementExceptionCounter()
-                self._logger.exception(e)
+        try:
+            [plugin.beaconSet() for plugin in self.plugins.values()]
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
         
     def beaconCleared(self):
         self._logger.info('beacon cleared')
         # tell the plugins that beacon has been cleared
-        for plugin in self.plugins.values():
-            try:
-                plugin.beaconCleared()
-            except Exception, e:
-                self.incrementExceptionCounter()
-                self._logger.exception(e)
+        try:
+            [plugin.beaconCleared() for plugin in self.plugins.values()]
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
         
     def connectionToGSNestablished(self):
         # tell the plugins that the connection to GSN has been established
-        for plugin in self.plugins.values():
-            try:
-                plugin.connectionToGSNestablished()
-            except Exception, e:
-                self.incrementExceptionCounter()
-                self._logger.exception(e)
+        try:
+            [plugin.connectionToGSNestablished() for plugin in self.plugins.values()]
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
         self.schedulehandler.connectionToGSNestablished()
         self.backlog.resumeResending()
         
     def connectionToGSNlost(self):
         # tell the plugins that the connection to GSN has been lost
-        for plugin in self.plugins.values():
-            try:
-                plugin.connectionToGSNlost()
-            except Exception, e:
-                self.incrementExceptionCounter()
-                self._logger.exception(e)
+        try:
+            [plugin.connectionToGSNlost() for plugin in self.plugins.values()]
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
         self.backlog.pauseResending()
     
     

@@ -73,6 +73,8 @@ class AbstractPluginClass(Thread, Statistics):
         else:
             self._maxruntime = int(value)
             
+        self._procMsg = self._backlogMain.gsnpeer.processMsg
+            
         self.info('backlog: %s' % (self._backlog,))
         self.info('priority: %d' % (self._priority,))
         if self._maxruntime:
@@ -87,14 +89,10 @@ class AbstractPluginClass(Thread, Statistics):
         
         @param key: The key as written in the configuration file as string.
                             
-        @return: The value specified by key as string
+        @return: The value specified by key as string or None if key does not
+                 exist.
         '''
-        for entry in self._config:
-            entry_key = entry[0]
-            entry_value = entry[1]
-            if key == entry_key:
-                return entry_value
-        return None
+        return self._config.get(key)
     
     def getOptionValues(self, keystart):
         '''
@@ -108,9 +106,7 @@ class AbstractPluginClass(Thread, Statistics):
         @return: The values of keys starting with keystart
         '''
         entries = []
-        for entry in self._config:
-            entry_key = entry[0]
-            entry_value = entry[1]
+        for entry_key, entry_value in self._config.items():
             if entry_key.startswith(keystart):
                 entries.append(entry_value)
         return entries
@@ -196,7 +192,7 @@ class AbstractPluginClass(Thread, Statistics):
         if priority == None:
             priority = self._priority
         
-        return self._backlogMain.gsnpeer.processMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
+        return self._procMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
     
     
     def registerTOSListener(self, types):

@@ -34,8 +34,8 @@ class BackLogStatusPluginClass(AbstractPluginClass):
     _interval
     '''
     
-    def __init__(self, parent, options):
-        AbstractPluginClass.__init__(self, parent, options, DEFAULT_BACKLOG)
+    def __init__(self, parent, config):
+        AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         self._timer = None
         
         self._sleeper = threading.Event()

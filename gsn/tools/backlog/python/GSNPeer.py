@@ -109,6 +109,8 @@ class GSNPeerClass(Thread, Statistics):
     def run(self):
         self._logger.info('started')
         
+        self._storeMsg = self._backlogMain.backlog.storeMsg
+        
         self._pingwatchdog.start()
         self._pingtimer.start()
         self._work.set()
@@ -149,15 +151,14 @@ class GSNPeerClass(Thread, Statistics):
         
         @return: status of the GSN peer
         '''
-        stat = []
-        stat.append(self.getCounterValue(self._msgInCounterId))
-        stat.append(self.getCounterValue(self._msgOutCounterId))
-        stat.append(self.getCounterValue(self._msgAckInCounterId))
-        stat.append(self.getCounterValue(self._pingOutCounterId))
-        stat.append(self.getCounterValue(self._pingAckInCounterId))
-        stat.append(self.getCounterValue(self._pingInCounterId))
-        stat.append(self.getCounterValue(self._pingAckOutCounterId))
-        stat.append(self.getCounterValue(self._connectionLossesId))
+        stat = [self.getCounterValue(self._msgInCounterId), \
+                self.getCounterValue(self._msgOutCounterId), \
+                self.getCounterValue(self._msgAckInCounterId), \
+                self.getCounterValue(self._pingOutCounterId), \
+                self.getCounterValue(self._pingAckInCounterId), \
+                self.getCounterValue(self._pingInCounterId), \
+                self.getCounterValue(self._pingAckOutCounterId), \
+                self.getCounterValue(self._connectionLossesId)]
         return stat
             
             
@@ -205,13 +206,15 @@ class GSNPeerClass(Thread, Statistics):
             # if it is an acknowledge, tell BackLogMain to have received one
             self._backlogMain.ackReceived(msg.getTimestamp(), msg.getData()[0])
         elif msgType == BackLogMessage.MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE:
-            self._gsnqueuelimitreached = True
-            self._backlogMain.backlog.pauseResending()
-            self._logger.info('GSN message queue reached its limit => stop sending messages')
+            if not self._gsnqueuelimitreached:
+                self._gsnqueuelimitreached = True
+                self._backlogMain.backlog.pauseResending()
+                self._logger.info('GSN message queue reached its limit => stop sending messages')
         elif msgType == BackLogMessage.MESSAGE_QUEUE_READY_MESSAGE_TYPE:
-            self._gsnqueuelimitreached = False
-            self._backlogMain.backlog.resumeResending()
-            self._logger.info('GSN message queue is ready => send messages')
+            if self._gsnqueuelimitreached:
+                self._gsnqueuelimitreached = False
+                self._backlogMain.backlog.resumeResending()
+                self._logger.info('GSN message queue is ready => send messages')
         else:
             self.counterAction(self._msgInCounterId)
             self._backlogMain.gsnMsgReceived(msgType, msg)
@@ -277,7 +280,7 @@ class GSNPeerClass(Thread, Statistics):
         
         if backlog:
             # back log the message
-            ret = self._backlogMain.backlog.storeMsg(timestamp, msgType, msg.getMessage())
+            ret = self._storeMsg(timestamp, msgType, msg.getMessage())
             
         # if not blocked send the message to the GSN backend
         if not self._gsnqueuelimitreached:
@@ -349,8 +352,6 @@ class GSNListener(Thread):
 
     def run(self):
         self._logger.info('started')
-        # thread is waiting for the first resume to continue
-        self._gsnwriter.start()
         
         pkt_len = None
         pkt = None
@@ -366,6 +367,7 @@ class GSNListener(Thread):
                 self._logger.info('died')
                 return
             self._connected = True
+            self._gsnwriter.start()
             self._gsnwriter.sendHelloMsg()
         except (IOError, socket.error), e:
             if not self._gsnListenerStop:
@@ -382,6 +384,9 @@ class GSNListener(Thread):
 
             # let BackLogMain know that GSN successfully connected
             self._gsnPeer._backlogMain.backlog.resend(True)
+            
+            # speed optimizations
+            pktReceived = self._gsnPeer.pktReceived
 
             while not self._gsnListenerStop:
                 self._logger.debug('rcv...')
@@ -419,7 +424,7 @@ class GSNListener(Thread):
                             raise
                         break
                     
-                    pkt_len = int(struct.unpack('<i', pkt)[0])
+                    pkt_len = struct.unpack('<i', pkt)[0]
                     try:
                         pkt = self.pktReadAndDestuff(pkt_len)
                         if not pkt:
@@ -432,7 +437,7 @@ class GSNListener(Thread):
                             raise
                         break
                     
-                    self._gsnPeer.pktReceived(pkt)
+                    pktReceived(pkt)
         except Exception, e:
             self.disconnect()
             if self._logger.isEnabledFor(logging.DEBUG):
@@ -444,12 +449,13 @@ class GSNListener(Thread):
         
         
     def pktReadAndDestuff(self, length):
+        recv = self.clientsocket.recv
         out = self._stuffread
         if length == 1 and out:
             self._stuffread = ''
             return out
         while True:
-            c = self.clientsocket.recv(1)
+            c = recv(1)
             if not c:
                 raise IOError('None returned from socket')
             
@@ -569,7 +575,6 @@ class GSNWriter(Thread):
     _logger
     _gsnListener
     _sendqueue
-    _work
     _gsnWriterStop
     '''
     class HelloMessage:
@@ -585,7 +590,6 @@ class GSNWriter(Thread):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._gsnListener = parent
         self._sendqueue = Queue.PriorityQueue(SEND_QUEUE_SIZE)
-        self._work = Event()
         self._stuff = chr(STUFFING_BYTE)
         self._dblstuff = self._stuff + self._stuff
         self._gsnWriterStop = False
@@ -593,48 +597,48 @@ class GSNWriter(Thread):
 
     def run(self):
         self._logger.info('started')
+        
+        # speed optimizations
+        pack = struct.pack
+        pktStuffing = self.pktStuffing
+        sendall = self._gsnListener.clientsocket.sendall
+        isEnabledFor = self._logger.isEnabledFor
+        
         while not self._gsnWriterStop:
-            self._work.wait()
+            msg = self._sendqueue.get()[1]
             if self._gsnWriterStop:
                 break
-            self._work.clear()
-            # is there something to do?
-            while self._gsnListener._connected and not self._sendqueue.empty() and not self._gsnWriterStop:
-                try:
-                    msg = self._sendqueue.get_nowait()[1]
-                except Queue.Empty:
-                    self._logger.warning('send queue is empty')
-                    break
-            
-                if isinstance(msg, BackLogMessage.BackLogMessageClass):
-                    message = msg.getMessage()
-                    msglen = len(message)
-                    pkt = self.pktStuffing(struct.pack('<i', msglen) + message)
-                elif isinstance(msg, self.HelloMessage):
-                    pkt = msg.getMessage()
-                else:
-                    pkt = self.pktStuffing(struct.pack('<i', len(msg)) + str(msg))
-            
-                try:
-                    self._gsnListener.clientsocket.sendall(pkt)
+        
+            if isinstance(msg, BackLogMessage.BackLogMessageClass):
+                message = msg.getMessage()
+                msglen = len(message)
+                pkt = pktStuffing(pack('<i', msglen) + message)
+            elif isinstance(msg, self.HelloMessage):
+                pkt = msg.getMessage()
+            else:
+                pkt = pktStuffing(pack('<i', len(msg)) + str(msg))
+        
+            try:
+                sendall(pkt)
+                if isEnabledFor(logging.DEBUG):
                     if isinstance(msg, BackLogMessage.BackLogMessageClass):
-                        if self._logger.isEnabledFor(logging.DEBUG):
-                            self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
+                        self._logger.debug('snd (%d,%d,%d)' % (msg.getType(), msg.getTimestamp(), msglen)) 
                     elif isinstance(msg, self.HelloMessage):
                         self._logger.debug('hello message sent')
-                except (IOError, socket.error), e:
-                    try:
-                        self._sendqueue.task_done()
-                    except ValueError, e1:
-                        self.exception(e1)
-                    if not self._gsnWriterStop:
-                        self._gsnListener.disconnect() # sets connected to false
-                        self._logger.error(str(e))
-                else:
-                    try:
-                        self._sendqueue.task_done()
-                    except ValueError, e:
-                        self.exception(e)
+            except (IOError, socket.error), e:
+                try:
+                    self._sendqueue.task_done()
+                except ValueError, e1:
+                    self.exception(e1)
+                if not self._gsnWriterStop:
+                    self._gsnListener.disconnect() # sets connected to false
+                    if isEnabledFor(logging.DEBUG):
+                        self._logger.debug(str(e))
+            else:
+                try:
+                    self._sendqueue.task_done()
+                except ValueError, e:
+                    self.exception(e)
  
         self._logger.info('died')
         
@@ -652,7 +656,13 @@ class GSNWriter(Thread):
 
     def stop(self):
         self._gsnWriterStop = True
-        self._work.set()
+        try:
+            self._sendqueue.put_nowait((0, 'end'))
+        except Queue.Full:
+            pass
+        except Exception, e:
+            self._logger.exception(e)
+        self.join()
         self.emptyQueue() # to unblock addResendMsg
         self._logger.info('stopped')
 
@@ -671,7 +681,7 @@ class GSNWriter(Thread):
 
 
     def addMsg(self, msg, priority):
-        if self._gsnListener._connected and not self._gsnWriterStop:
+        if not self._gsnWriterStop:
             try:
                 self._sendqueue.put_nowait((priority, msg))
             except Queue.Full:
@@ -679,7 +689,6 @@ class GSNWriter(Thread):
             except Exception, e:
                 self.exception(e)
             else:
-                self._work.set()
                 return True
         return False
 
@@ -696,7 +705,6 @@ class GSNWriter(Thread):
             except Exception, e:
                 self.exception(e)
             else:
-                self._work.set()
                 return True
         return False
 
