@@ -1,0 +1,22 @@
+Acccess control
+---------------
+
+1. Configuration
+
+ * Access control is disabled by default, for activation of the access control,set the value of acEnabled variable in
+   gsn.beans.ContainerConfig to true.
+ * AC uses the EmailService. Please configure yours in the emails.properties file.
+ * Https certificate
+  
+  Create a X.509 certificate
+  Keystor name: servertestkeystore
+  certificate name: servertestcer
+  store password for keystore in keystore.properties
+
+
+2. Defalut adminstrator
+
+ username:Admin
+ password:changeit
+
+
