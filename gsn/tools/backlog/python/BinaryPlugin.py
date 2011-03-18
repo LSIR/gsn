@@ -288,11 +288,11 @@ class BinaryPluginClass(AbstractPluginClass):
                             self._getNextChunk()
                         elif ackType == CRC_PACKET:
                             filename = self._filedescriptor.name
-                            os.chmod(filename, 0744)
-                            self._filedescriptor.close()
                             if os.path.isfile(filename):
+                                os.chmod(filename, 0744)
+                                self._filedescriptor.close()
                                 # crc has been accepted by GSN
-                                self.debug('crc has been accepted for %s' % (filename,))
+                                self.debug('crc has been accepted for %s => remove it' % (filename,))
                                 # remove it from disk
                                 os.remove(filename)
                             else:
@@ -332,10 +332,13 @@ class BinaryPluginClass(AbstractPluginClass):
     def _getInitialBinaryPacket(self):
         if self._filedescriptor and not self._filedescriptor.closed:
             filename = self._filedescriptor.name
-            self.warning('new file request, but actual file (%s) not yet closed -> remove it!' % (filename,))
-            os.chmod(filename, 0744)
-            self._filedescriptor.close()
-            os.remove(filename)
+            if os.path.isfile(filename):
+                self.warning('new file request, but actual file (%s) not yet closed -> remove it!' % (filename,))
+                os.chmod(filename, 0744)
+                self._filedescriptor.close()
+                os.remove(filename)
+            else:
+                self._filedescriptor.close()
             
         while not self._plugStop:
             try:
