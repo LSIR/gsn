@@ -347,6 +347,7 @@ class BinaryPluginClass(AbstractPluginClass):
             except IndexError:
                 self.debug('file FIFO is empty waiting for next file to arrive')
                 self._readyfornewbinary = True
+                self._isBusy = False
                 return
                 
             filename = fileobj[0]
@@ -501,7 +502,7 @@ class BinaryPluginClass(AbstractPluginClass):
         
     def checkForFileTimerAction(self):
         self._waitforfile = False
-        if not self._filedeque and (not self._filedescriptor or self._filedescriptor.closed):
+        if self._readyfornewbinary:
             self._isBusy = False
             self.info('there is no file to be transmitted')
         else:
@@ -521,7 +522,7 @@ class BinaryPluginClass(AbstractPluginClass):
         
         
     def beaconCleared(self):
-        if not self._filedeque and (not self._filedescriptor or self._filedescriptor.closed) and not self._waitforfile:
+        if self._readyfornewbinary and not self._waitforfile:
             self._isBusy = False
     
     
@@ -647,6 +648,7 @@ class BinaryChangedProcessing(ProcessEvent):
             self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
             if self._binaryPlugin._readyfornewbinary:
                 self._binaryPlugin._readyfornewbinary = False
+                self._binaryPlugin._isBusy = True
                 self._binaryPlugin._getInitialBinaryPacket()
         except Exception, e:
             self._binaryPlugin._backlogMain.incrementExceptionCounter()
