@@ -77,13 +77,13 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 						// get Doppler
 						serialized_data[11] = bbuffer.getInt();
 						// get SV nbr
-						serialized_data[12] = (short) bbuffer.get() & 0xFF;
+						serialized_data[12] = (short) ((int)bbuffer.get() & 0xFF);
 						// get Quality
 						serialized_data[13] = (short) bbuffer.get();
 						// get C/No
 						serialized_data[14] = (short) bbuffer.get();
 						// get LLI
-						serialized_data[15] = (short) bbuffer.get() & 0xFF;
+						serialized_data[15] = (short) ((int)bbuffer.get() & 0xFF);
 
 						data = new StreamElement(dataField, serialized_data, data.getTimeStamp());
 						super.dataAvailable(inputStreamName, data);
