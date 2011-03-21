@@ -666,7 +666,6 @@ class GSNWriter(Thread):
             pass
         except Exception, e:
             self._logger.exception(e)
-        self.join()
         self.emptyQueue() # to unblock addResendMsg
         self._logger.info('stopped')
 
