@@ -213,6 +213,8 @@ class GSNPeerClass(Thread, Statistics):
         elif msgType == BackLogMessage.MESSAGE_QUEUE_READY_MESSAGE_TYPE:
             if self._gsnqueuelimitreached:
                 self._gsnqueuelimitreached = False
+                # let BackLogMain know that GSN successfully connected
+                self._backlogMain.backlog.resend()
                 self._backlogMain.backlog.resumeResending()
                 self._logger.info('GSN message queue is ready => send messages')
         else:
@@ -291,7 +293,9 @@ class GSNPeerClass(Thread, Statistics):
 
 
     def processResendMsg(self, msgType, timestamp, msg):
-        ret = self.sendToGSN(msg, 99, True)
+        ret = False
+        if not self._gsnqueuelimitreached:
+            ret = self.sendToGSN(msg, 99, True)
         if ret:
             self.counterAction(self._msgOutCounterId)
         return ret

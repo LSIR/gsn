@@ -89,7 +89,6 @@ class ScheduleHandlerClass(Thread):
     _scheduleLock
     _stopEvent
     _allJobsFinishedEvent
-    _gsnconnected
     _schedule
     _newSchedule
     _duty_cycle_mode
@@ -167,7 +166,6 @@ class ScheduleHandlerClass(Thread):
         self._tosSentCmd = None
         self._tosNodeState = None
         
-        self._gsnconnected = False
         self._schedule = None
         self._newSchedule = False
         self._scheduleHandlerStop = False
@@ -202,7 +200,6 @@ class ScheduleHandlerClass(Thread):
     
     def connectionToGSNestablished(self):
         self._logger.debug('connection established')
-        self._gsnconnected = True
         self._logger.debug('request schedule from gsn')
         if self._schedule:
             self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
@@ -377,9 +374,7 @@ class ScheduleHandlerClass(Thread):
         
     def waitForGSN(self, param=None):
         # wait some time for GSN to connect
-        if self._backlogMain.gsnpeer.isConnected():
-            self._gsnconnected = True
-        else:
+        if not self.isGSNConnected():
             self._logger.info('waiting for gsn to connect for a maximum of %s minutes' % (self.getOptionValue('max_gsn_connect_wait_minutes'),))
             self._connectionEvent.wait((int(self.getOptionValue('max_gsn_connect_wait_minutes')) * 60))
             self._connectionEvent.clear()
@@ -387,25 +382,26 @@ class ScheduleHandlerClass(Thread):
                 return
         
         # if GSN is connected try to get a new schedule for a while
-        if self._gsnconnected:
-            timeout = 0
-            self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self.getOptionValue('max_gsn_get_schedule_wait_minutes'),))
-            while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
-                self._scheduleEvent.wait(3)
-                if self._scheduleHandlerStop:
-                    return
-                if self._scheduleEvent.isSet():
-                    self._scheduleEvent.clear()
-                    break
-                self._logger.debug('request schedule from gsn')
-                if self._schedule:
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
-                else:
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
-                timeout += 3
-            
-            if timeout >= int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
-                self._logger.warning('gsn has not answered on any schedule request')
+        if self.isGSNConnected():
+            if not self._scheduleEvent.isSet():
+                timeout = 0
+                self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self.getOptionValue('max_gsn_get_schedule_wait_minutes'),))
+                while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
+                    self._scheduleEvent.wait(3)
+                    if self._scheduleHandlerStop:
+                        return
+                    if self._scheduleEvent.isSet():
+                        self._scheduleEvent.clear()
+                        break
+                    self._logger.debug('request schedule from gsn')
+                    if self._schedule:
+                        self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+                    else:
+                        self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+                    timeout += 3
+                
+                if timeout >= int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
+                    self._logger.warning('gsn has not answered on any schedule request')
         else:
             self._logger.warning('gsn has not connected')
     
