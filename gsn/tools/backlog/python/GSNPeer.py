@@ -661,7 +661,7 @@ class GSNWriter(Thread):
     def stop(self):
         self._gsnWriterStop = True
         try:
-            self._sendqueue.put_nowait((0, 'end'))
+            self._sendqueue.put_nowait((0, BackLogMessage.BackLogMessageClass()))
         except Queue.Full:
             pass
         except Exception, e:
