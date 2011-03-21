@@ -57,18 +57,32 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 			bbuffer.order(ByteOrder.LITTLE_ENDIAN);
 			
 			try {
+				// skip header and payload length
+				bbuffer.position(bbuffer.position()+6);
+				// get GPS time
 				serialized_data[7] = bbuffer.getInt();
+				// get GPS week
 				serialized_data[8] = bbuffer.getShort();
 
+				// get number of satellites
 				int s = (int) bbuffer.get() & 0xFF;
+				// skip reserved byte
+				bbuffer.position(bbuffer.position()+1);
 				if (sats.compareTo(s) == 0) {
 					for (int i=0; i<s; i++) {
+						// get Carrier Phase
 						serialized_data[9] = bbuffer.getDouble();
+						// get Pseudorange
 						serialized_data[10] = bbuffer.getDouble();
+						// get Doppler
 						serialized_data[11] = bbuffer.getInt();
+						// get SV nbr
 						serialized_data[12] = (short) bbuffer.get() & 0xFF;
+						// get Quality
 						serialized_data[13] = (short) bbuffer.get();
+						// get C/No
 						serialized_data[14] = (short) bbuffer.get();
+						// get LLI
 						serialized_data[15] = (short) bbuffer.get() & 0xFF;
 
 						data = new StreamElement(dataField, serialized_data, data.getTimeStamp());
