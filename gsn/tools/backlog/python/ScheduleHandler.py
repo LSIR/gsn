@@ -374,7 +374,7 @@ class ScheduleHandlerClass(Thread):
         
     def waitForGSN(self, param=None):
         # wait some time for GSN to connect
-        if not self.isGSNConnected():
+        if not self._backlogMain.gsnpeer.isConnected():
             self._logger.info('waiting for gsn to connect for a maximum of %s minutes' % (self.getOptionValue('max_gsn_connect_wait_minutes'),))
             self._connectionEvent.wait((int(self.getOptionValue('max_gsn_connect_wait_minutes')) * 60))
             self._connectionEvent.clear()
@@ -382,7 +382,7 @@ class ScheduleHandlerClass(Thread):
                 return
         
         # if GSN is connected try to get a new schedule for a while
-        if self.isGSNConnected():
+        if self._backlogMain.gsnpeer.isConnected():
             if not self._scheduleEvent.isSet():
                 timeout = 0
                 self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self.getOptionValue('max_gsn_get_schedule_wait_minutes'),))
