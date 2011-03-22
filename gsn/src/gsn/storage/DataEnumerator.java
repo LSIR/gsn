@@ -46,6 +46,8 @@ public class DataEnumerator implements DataEnumeratorIF {
     private StorageManager   storageManager           = null;
 
 	private boolean manualCloseConnection;
+	
+	private boolean hadError = false;
 
 	/**
 	 * Creats an empty data enumerator.
@@ -109,6 +111,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 		} catch ( Exception e ) {
 			logger.error( e.getMessage( ) , e );
 			hasNext = false;
+			hadError = true;
 		}finally {
 			if (hasNext==false) close();
 		}
@@ -116,6 +119,10 @@ public class DataEnumerator implements DataEnumeratorIF {
 
 	private StreamElement streamElement = null;
 
+	public boolean hadError() {
+		return hadError;
+	}
+	
 	public boolean hasMoreElements ( ) {
 		return hasNext;
 	}
