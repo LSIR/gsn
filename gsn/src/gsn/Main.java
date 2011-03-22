@@ -22,31 +22,21 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.SplashScreen;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
 
@@ -81,7 +71,7 @@ import org.eclipse.jetty.server.AbstractConnector;
  * Web Service URL : http://localhost:22001/services/Service?wsdl
  *
  */
-public final class Main {
+public final class Main implements UncaughtExceptionHandler {
 
 	private static Main singleton ;
 
@@ -90,6 +80,7 @@ public final class Main {
     private Main() throws Exception {
     	
     	startTime = System.currentTimeMillis();
+		Thread.setDefaultUncaughtExceptionHandler(this);
 
 		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
@@ -491,4 +482,12 @@ public final class Main {
     public static Long getUptime() {
     	return System.currentTimeMillis() - startTime;
     }
+
+	@Override
+	public void uncaughtException(Thread arg0, Throwable arg1) {
+		logger.error("Uncaught exception in thread "+arg0.getName());
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		arg1.printStackTrace(new PrintStream(baos));
+		logger.error("Error was: "+baos.toString());		
+	}
 }
