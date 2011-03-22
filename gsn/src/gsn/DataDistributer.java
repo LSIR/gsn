@@ -7,15 +7,17 @@ import gsn.http.rest.DistributionRequest;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLValidator;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import gsn.storage.StorageManager;
@@ -28,129 +30,166 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     private static int keepAlivePeriod = -1;
 
-    private javax.swing.Timer keepAliveTimer = null;
+    private Timer keepAliveTimer = null;
 
     private static transient Logger logger = Logger.getLogger(DataDistributer.class);
 
     private static HashMap<Class<? extends DeliverySystem>, DataDistributer> singletonMap = new HashMap<Class<? extends DeliverySystem>, DataDistributer>();
-    private Thread thread;
+    private Thread distributer_thread;
+    
+    private ArrayList<ListenerEntry> MyListeners = new ArrayList<ListenerEntry>();
+    private LinkedBlockingQueue<ListenerEntry> DataUpdateQueue = new LinkedBlockingQueue<ListenerEntry>();
+    private LinkedBlockingQueue<ListenerEntry> DataDistributerQueue = new LinkedBlockingQueue<ListenerEntry>();
     
     private ArrayList<Thread> DataUpdateThreadPool;
-    private ArrayList<DistributionRequest> FetchList = new ArrayList<DistributionRequest>();
-    private LinkedBlockingQueue<DistributionRequest> DataUpdateQueue = new LinkedBlockingQueue<DistributionRequest>();
-    private ConcurrentHashMap<DistributionRequest, Integer> DeliveryCount = new ConcurrentHashMap<DistributionRequest, Integer>();
+    private String delivery_system_name;
 
-    private DataDistributer() {
-        try {
-            thread = new Thread(this);
-            thread.start();
-            // Start the keep alive Timer -- Note that the implementation is backed by one single thread for all the RestDelivery instances.
-            keepAliveTimer = new  javax.swing.Timer(getKeepAlivePeriod(), new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    // write the keep alive message to the stream
-                    synchronized (listeners) {
-                        ArrayList<DistributionRequest> clisteners = (ArrayList<DistributionRequest>) listeners.clone();
-                        for (DistributionRequest listener : clisteners) {
-                            if ( ! listener.deliverKeepAliveMessage()) {
-                                logger.debug("remove the listener.");
-                                removeListener(listener);
-                            }
-                        }
-                    }
-                }
-            });
-            keepAliveTimer.start();
-            DataUpdateThreadPool = new ArrayList<Thread>(DATA_UPDATE_THREAD_POOL_SIZE);
-            for (int i = 0; i<DATA_UPDATE_THREAD_POOL_SIZE;i++) {
-            	DataUpdateThreadPool.add(new Thread("DataUpdateThread "+i) {
-            		
-            	    private HashMap<StorageManager, Connection> connections = new HashMap<StorageManager, Connection>();
-            	    private Connection getPersistantConnection(VSensorConfig config) throws Exception {
-            	        StorageManager sm = Main.getStorage(config);
-            	        
-            	        Connection c = connections.get(sm);
-            	        if (c == null) {
-            	        	logger.debug("get new connection.");
-            	            c = sm.getConnection();
-            	            c.setReadOnly(true);
-            	            connections.put(sm, c);
-            	        }
-            	        return c;
-            	    }
+    private DataDistributer(String delivery_system_name) {
+    	this.delivery_system_name = delivery_system_name;
+    	try {
+    		distributer_thread = new Thread(this, "DataDistributer["+this.delivery_system_name+"]");
+    		distributer_thread.start();
+    		// keep alive timer
+    		keepAliveTimer = new Timer("keepAliveTimer-" + delivery_system_name);
+    		keepAliveTimer.scheduleAtFixedRate( new TimerTask() {
 
-            		public void run() {
-            			DataEnumerator dataEnum;
-    	                PreparedStatement prepareStatement = null;
-            			try {
-            			while  (true)
-            			try {
-            				DistributionRequest listener= DataUpdateQueue.take();
-            				logger.debug("Fetching data for listener: " + listener.toString()+".");
-            				synchronized (listener) {
-            					if (listener.isClosed())
-            						continue;
-            					// make statement
-            	                try {
-            	                    prepareStatement = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(queries.get(listener)); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
-            	                    String maxRows = listener.getVSensorConfig().getMainClassInitialParams().get("maxrows");
-            	                    if (maxRows == null) {
-            	                        prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
-            	                    } else {
-            	                    	try {
-            	                    		prepareStatement.setMaxRows(Integer.parseInt(maxRows));
-            	                    	} catch (NumberFormatException nfe) {
-            	                    		logger.warn("maxrows init-param is unparsable, set to default (1000)");
-            	                    		prepareStatement.setMaxRows(1000);
-            	                    	}
-            	                    }
-            			            prepareStatement.setLong(1, listener.getStartTime());
-            			            //prepareStatement.setLong(1, listener.getLastVisitedPk());
-            			            DeliveryCount.put(listener, new Integer(prepareStatement.getMaxRows()));
-            	                } catch (Exception e) {
-            			            logger.error(e.getMessage(), e);
-            	                    throw new RuntimeException(e);
-            	                }
-            			        dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
-            				}
-            				synchronized (listeners) {
-            					if (dataEnum.hasMoreElements()) {
-			        				if (listeners.contains(listener)) {
-			        					// an element is only put to DataUpdateQueue if it is not in candidateListeners
-			        					logger.debug("Fetching data done for listener: " + listener.toString()+".");
-			        					candidateListeners.put(listener, dataEnum);
-	            			            preparedStatements.put(listener, prepareStatement);
-			        					locker.add(listener);
-			        					FetchList.remove(listener);
-			        				}
-								}
-            					else {
-            						prepareStatement.close();
-            						FetchList.remove(listener);
-            						logger.debug("Fetching data done, empty resultset. listener: " + listener.toString()+".");
-            					}
-			        		}
-						} catch (InterruptedException e) {
-							logger.error(e.getMessage(), e);
-						} catch (SQLException e) {
-							logger.error(e.getMessage());
-						}
-            			}catch (RuntimeException e) {
-            	    		logger.error(e.getMessage());
-            	    	}
-            		}
-            	});
-            	DataUpdateThreadPool.get(DataUpdateThreadPool.size()-1).start();
-            }
-        //} catch (SQLException e) {
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    			@SuppressWarnings("unchecked")
+				@Override
+				public void run() {
+    				ArrayList<ListenerEntry> MyListenersCopy;
+    				// write the keep alive message to the stream
+    				synchronized (MyListeners) {
+    					MyListenersCopy = (ArrayList<ListenerEntry>) MyListeners.clone();
+    				}
+    				logger.debug("keep alive event, "+MyListenersCopy.size()+" listeners.");
+    				try {
+    					Iterator<ListenerEntry> i = MyListenersCopy.iterator();
+    					while (i.hasNext()) {
+    						ListenerEntry listener = i.next();
+    						logger.debug("about to send keep alive to listener: "+listener.request.toString());
+    						if ( ! listener.request.deliverKeepAliveMessage()) {
+    							synchronized (MyListeners) {
+   									removeListenerEntry(listener);
+    							}
+    						}
+    						else {
+    							logger.debug("sent keep alive to listener: "+listener.request.toString());
+    						}
+    					}
+    				} catch (RuntimeException re) {
+    					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    					re.printStackTrace(new PrintStream(baos));
+    					logger.error(baos.toString());
+    				} 
+    			}
+    		},   getKeepAlivePeriod(), getKeepAlivePeriod());
+    		
+    		DataUpdateThreadPool = new ArrayList<Thread>(DATA_UPDATE_THREAD_POOL_SIZE);
+    		for (int i = 0; i<DATA_UPDATE_THREAD_POOL_SIZE;i++) {
+    			DataUpdateThreadPool.add(new Thread("DataUpdateThread "+i) {
+
+    				private HashMap<StorageManager, Connection> connections = new HashMap<StorageManager, Connection>();
+    				private Connection getPersistantConnection(VSensorConfig config) throws Exception {
+    					StorageManager sm = Main.getStorage(config);
+
+    					Connection c = connections.get(sm);
+    					if (c == null) {
+    						logger.debug("get new connection.");
+    						c = sm.getConnection();
+    						c.setReadOnly(true);
+    						connections.put(sm, c);
+    					}
+    					return c;
+    				}
+
+    				public void run() {
+    					DataEnumerator dataEnum;
+    					PreparedStatement prepareStatement = null;
+    					try {
+    						while  (true)
+    							try {
+    								ListenerEntry listener= DataUpdateQueue.take();
+    								logger.debug("Fetching data for listener: " + listener.request.toString()+".");
+    								synchronized (MyListeners) {
+    									if (listener.removed || listener.request.isClosed()) {
+    										logger.debug("Listener was removed: " + listener.request.toString()+".");
+    										continue;
+    									}
+    								}
+    								// make statement
+    								try {
+    									prepareStatement = getPersistantConnection(listener.request.getVSensorConfig()).prepareStatement(listener.query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
+    									String maxRows = listener.request.getVSensorConfig().getMainClassInitialParams().get("maxrows");
+    									if (maxRows == null) {
+    										prepareStatement.setMaxRows(1000); // Limit the number of rows loaded in memory.
+    									} else {
+    										try {
+    											prepareStatement.setMaxRows(Integer.parseInt(maxRows));
+    										} catch (NumberFormatException nfe) {
+    											logger.warn("maxrows init-param is unparsable, set to default (1000)");
+    											prepareStatement.setMaxRows(1000);
+    										}
+    									}
+    									prepareStatement.setLong(1, listener.request.getStartTime());
+    									//prepareStatement.setLong(1, listener.getLastVisitedPk());
+    									listener.delivery_count =  new Integer(prepareStatement.getMaxRows());
+    								} catch (Exception e) {
+    									logger.error(e.getMessage(), e);
+    									throw new RuntimeException(e);
+    								}
+    								dataEnum = new DataEnumerator(Main.getStorage(listener.request.getVSensorConfig().getName()), prepareStatement, false, true);
+    								synchronized (MyListeners) {
+    									if (!listener.removed) {
+    										if (dataEnum.hasMoreElements()) {
+    											logger.debug("Fetching data done for listener: " + listener.request.toString()+".");
+    											listener.dataEnum = dataEnum;
+    											listener.statement = prepareStatement;
+    											DataDistributerQueue.add(listener);
+    											listener.current_queue = DataDistributerQueue;
+    										}
+    										else { // no new data found
+    											logger.debug("Fetching data done, empty resultset. listener: " + listener.request.toString()+".");
+    											prepareStatement.close();
+    											// try again if there was an error or when the check flag is set
+    											if (dataEnum.hadError() || listener.check_for_new_data) {
+    												DataUpdateQueue.put(listener);
+    												listener.check_for_new_data = false;
+    												listener.current_queue = DataUpdateQueue;
+    											}
+    											else {
+    												listener.current_queue = null;
+    											}    											
+    										}
+    									}
+    									else {
+    										prepareStatement.close();
+    									}
+    								}
+    							} catch (InterruptedException e) {
+    								logger.error(e.getMessage(), e);
+    							} catch (SQLException e) {
+    								logger.error(e.getMessage());
+    							}
+    					}catch (RuntimeException e) {
+    						logger.error(e.getMessage());
+    					}
+    				}
+    			});
+    			DataUpdateThreadPool.get(DataUpdateThreadPool.size()-1).start();
+    		}
+    	} catch (Exception e) {
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			e.printStackTrace(new PrintStream(baos));
+			logger.error(baos.toString());
+    		throw new RuntimeException(e);
+    	}
     }
 
     public static DataDistributer getInstance(Class<? extends DeliverySystem> c) {
         DataDistributer toReturn = singletonMap.get(c);
-        if (toReturn == null)
-            singletonMap.put(c, (toReturn = new DataDistributer()));
+        if (toReturn == null) {
+            singletonMap.put(c, (toReturn = new DataDistributer(c.getName())));
+        }
         return toReturn;
     }
 
@@ -159,85 +198,28 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             keepAlivePeriod = System.getProperty("remoteKeepAlivePeriod") == null ? KEEP_ALIVE_PERIOD : Integer.parseInt(System.getProperty("remoteKeepAlivePeriod"));
         return keepAlivePeriod;
     }
-    
-    private HashMap<DistributionRequest, PreparedStatement> preparedStatements = new HashMap<DistributionRequest, PreparedStatement>();
-    private HashMap<DistributionRequest, String> queries = new HashMap<DistributionRequest, String>();
-    private ArrayList<DistributionRequest> listeners = new ArrayList<DistributionRequest>();
 
-    private ConcurrentHashMap<DistributionRequest, DataEnumerator> candidateListeners = new ConcurrentHashMap<DistributionRequest, DataEnumerator>();
-
-    private LinkedBlockingQueue<DistributionRequest> locker = new LinkedBlockingQueue<DistributionRequest>();
-
-    private ConcurrentHashMap<DistributionRequest, Boolean> candidatesForNextRound = new ConcurrentHashMap<DistributionRequest, Boolean>();
-    
-    public void addListener(DistributionRequest listener) {
-        synchronized (listeners) {
-            if (!listeners.contains(listener)) {
-                logger.warn("Adding a listener to Distributer:" + listener.toString());
-                boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
+    public void addListener(DistributionRequest request) {
+        synchronized (MyListeners) {
+            if (getListenerEntry(request)==null) {
+            	ListenerEntry newListener = new ListenerEntry(request);
+                logger.warn("Adding a listener to Distributer:" + request.toString());
+                boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(request.getQuery())).indexOf(" where ") > 0;
                 //String query = SQLValidator.addPkField(listener.getQuery());
-                String query = listener.getQuery();
+                String query = request.getQuery();
                 if (needsAnd)
                     query += " AND ";
                 else
                     query += " WHERE ";
                 //query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
                 query += " timed > ? order by timed asc ";
-                queries.put(listener, query);
-                listeners.add(listener);
-                addListenerToCandidates(listener);
+                newListener.query = query;
+                MyListeners.add(newListener);
+                newListener.request.getDeliverySystem().setTimeout(getKeepAlivePeriod() * 2);
+                moveListenerToQueue(newListener, DataUpdateQueue);
             } else {
-                logger.warn("Adding a listener to Distributer failed, duplicated listener! " + listener.toString());
+                logger.warn("Adding a listener to Distributer failed, duplicated listener! " + request.toString());
             }
-        }
-    }
-
-
-    private boolean addListenerToCandidates(DistributionRequest listener) {
-        /**
-         * Locker variable should be modified EXACTLY like candidateListeners variable.
-         */
-       	if (!DataUpdateQueue.contains(listener) && !candidateListeners.containsKey(listener) && !FetchList.contains(listener)) {
-            logger.debug("Adding the listener: " + listener.toString() + " to the candidates.");
-            FetchList.add(listener);
-       		try {
-       			DataUpdateQueue.put(listener);
-       			logger.debug(DataUpdateQueue.size() + " Entries in the update queue.");
-       		} catch (InterruptedException e) {
-       			FetchList.remove(listener);
-       			logger.error(e.getMessage(), e);
-       		}
-       		return true;
-        }
-       	else {
-       		if (DataUpdateQueue.contains(listener))
-       			logger.debug("Listener in update queue, not added. listener: " + listener.toString());
-       		if (candidateListeners.containsKey(listener))
-       			logger.debug("Listener in candidateListeners, not added. listener: " + listener.toString());
-       		if (FetchList.contains(listener))
-       			logger.debug("Listener in FetchList, not added. listener: " + listener.toString());
-       		return false;
-       	}
-    }
-
-    private void removeListenerFromCandidates(DistributionRequest listener) {
-        /**
-         * Locker variable should be modified EXACTLY like candidateListeners variable.
-         */
-        logger.debug("Updating the candidate list [" + listener.toString() + " (removed)].");
-        locker.remove(listener);
-        try {
-        	preparedStatements.get(listener).close();
-        } catch (SQLException e) {
-        	logger.error(e.getMessage(), e);
-        } finally {
-        	preparedStatements.remove(listener);
-        }
-        candidateListeners.remove(listener);
-        DeliveryCount.remove(listener);
-        if (candidatesForNextRound.containsKey(listener)) {
-        	addListenerToCandidates(listener);
-        	candidatesForNextRound.remove(listener);
         }
     }
 
@@ -249,89 +231,124 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
      * @param listener
      * @return
      */
-    private boolean flushStreamElement(DataEnumerator dataEnum, DistributionRequest listener) {
-        if (listener.isClosed()) {
-            logger.debug("Flushing an stream element failed, isClosed=true [Listener: " + listener.toString() + "]");
+    private boolean flushStreamElement(DataEnumerator dataEnum, DistributionRequest request) {
+        if (request.isClosed()) {
+            logger.debug("Flushing an stream element failed, isClosed=true [Listener: " + request.toString() + "]");
             return false;
         }
-
-        if (!dataEnum.hasMoreElements()) {
-            logger.debug("Nothing to flush to [Listener: " + listener.toString() + "]");
-            return true;
-        }
-
         StreamElement se = dataEnum.nextElement();
         //		boolean success = true;
-        boolean success = listener.deliverStreamElement(se);
+        boolean success = request.deliverStreamElement(se); // This could take some time if db tables are locked (Local delivery)
         if (!success) {
-            logger.debug("FLushing an stream element failed, delivery failure [Listener: " + listener.toString() + "]");
+            logger.debug("FLushing an stream element failed, delivery failure [Listener: " + request.toString() + "]");
             return false;
         }
-        logger.debug("Flushing an stream element succeed [Listener: " + listener.toString() + "]");
+        logger.debug("Flushing an stream element succeed [Listener: " + request.toString() + "]");
         return true;
     }
 
-    public void removeListener(DistributionRequest listener) {
-    	synchronized (listeners) {
-    		if (listeners.remove(listener)) {
-    			candidatesForNextRound.remove(listener);
-    			removeListenerFromCandidates(listener);
-    			FetchList.remove(listener);
-    			synchronized (listener) {
-    				listener.close();						
-    			}
-    			logger.warn("Removing listener completely from Distributer [Listener: " + listener.toString() + "]");
+    public void removeListener(DistributionRequest request) {
+    	synchronized (MyListeners) {
+    		ListenerEntry listener = getListenerEntry(request);
+    		if (listener==null) {
+    			logger.warn("Can't remove unregistered listener from distributer [Listener: " + request.toString() + "]");
+    		}
+    		else {
+    			removeListenerEntry(listener);
     		}
     	}
     }
 
     public void consume(StreamElement se, VSensorConfig config) {
-        synchronized (listeners) {
-            for (DistributionRequest listener : listeners)
-                if (listener.getVSensorConfig() == config) {
-                    logger.debug("sending stream element " + (se == null ? "second-chance-se" : se.toString()) + " produced by " + config.getName() + " to listener =>" + listener.toString());
-                    if (!addListenerToCandidates(listener))
-                    	candidatesForNextRound.put(listener, Boolean.TRUE);
+        synchronized (MyListeners) {
+            for ( ListenerEntry listener : MyListeners)
+                if (listener.request.getVSensorConfig() == config) {
+                    logger.debug("sending stream element " + (se == null ? "second-chance-se" : se.toString()) + " produced by " + config.getName() + " to listener =>" + listener.request.toString());
+                    if (listener.current_queue == null)
+                    	moveListenerToQueue(listener, DataUpdateQueue);
+                    else
+                        listener.check_for_new_data = true;
                 }
         }
     }
 
     public void run() {
     	try {
-        while (true) {
-            try {
-                if (locker.isEmpty()) {
-                    logger.debug("Waiting(locked) for requests or data items, Number of total listeners: " + listeners.size());
-                    locker.put(locker.take());
-                    logger.debug("Lock released, trying to find interest listeners (total listeners:" + listeners.size() + ")");
-                }
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
-            }
+    		while (true) {
+    			try {
+    				if (DataDistributerQueue.isEmpty()) {
+    					logger.debug("Waiting(locked) for requests or data items, Number of total listeners: " + MyListeners.size()+" ["+delivery_system_name+"]");
+    					DataDistributerQueue.put(DataDistributerQueue.take());
+    					logger.debug("Lock released, trying to find interest listeners (total listeners:" + MyListeners.size() + " ["+delivery_system_name+"])");
+    				}
+    			} catch (InterruptedException e) {
+    				logger.error(e.getMessage(), e);
+    			}
 
+    			Iterator<ListenerEntry> i = DataDistributerQueue.iterator();
+    			while (i.hasNext()) {
+    				ListenerEntry listener = i.next();
+    				synchronized (MyListeners) {
+    					if (listener.removed) {
+    						i.remove();
+    						try {
+    							listener.statement.close();
+    						} catch (SQLException e) {
+    							logger.error(e.getMessage());
+    						}
+    						continue;
+    					}
+    				}
+    				if (!listener.dataEnum.hasMoreElements()) {
+    					synchronized (MyListeners) {
+    						i.remove();
+   							try {
+   								listener.statement.close();
+   							} catch (SQLException e) {
+   								logger.error(e.getMessage());
+   							}
+       						if (listener.removed)
+    							continue;
+    						listener.current_queue = null;
+    						logger.debug("deliverycount = "+ listener.delivery_count);
+    						if (listener.delivery_count==0) {
+    							logger.debug("reached maxrows, look for new data for [Listener: "+listener.request.toString()+"]");
+    							listener.current_queue = DataUpdateQueue;
+    							DataUpdateQueue.add(listener);
+    						}
+    						if (listener.check_for_new_data) {
+    							logger.debug("new data available, look for new data for [Listener: "+listener.request.toString()+"]");
+    							listener.check_for_new_data = false;
+    							listener.current_queue = DataUpdateQueue;
+    							DataUpdateQueue.add(listener);
+    						}
+    					}
+    				}
+    				else {
+    					boolean success = flushStreamElement(listener.dataEnum, listener.request);
+    					if (success == false) {
+    						i.remove();
+    						synchronized (MyListeners) {
+   								removeListenerEntry(listener);
+    							try {
+    								listener.statement.close();
+    							} catch (SQLException e) {
+    								logger.error(e.getMessage());
+    							}
+    						}
+    					}
+    					else {
+    						listener.delivery_count--;
+    					}
+    				}
+    			}
+    		}
 
-            for (Entry<DistributionRequest, DataEnumerator> item : candidateListeners.entrySet()) {
-            	boolean success = flushStreamElement(item.getValue(), item.getKey());
-                if (success == false)
-                    removeListener(item.getKey());
-                else {
-                	DeliveryCount.put(item.getKey(), DeliveryCount.get(item.getKey()).intValue()-1);
-                    if (!item.getValue().hasMoreElements()) {
-                    	logger.debug("deliverycount = "+ DeliveryCount.get(item.getKey()).intValue());
-                    	if (DeliveryCount.get(item.getKey()).intValue()==0) {
-                    		logger.debug("reached maxrows, look for new data for [Listener: "+item.getKey().toString()+"]");
-                    		candidatesForNextRound.put(item.getKey(), Boolean.TRUE);
-                    	}
-                    	synchronized(listeners) {
-                        	removeListenerFromCandidates(item.getKey());
-                    	}
-                    }
-                }
-            }
-        }
-    	}catch (RuntimeException e) {
-    		logger.error(e.getMessage());
-    	}
+    	} catch (RuntimeException e) {
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		e.printStackTrace(new PrintStream(baos));
+    		logger.error(baos.toString());
+    	} 
     }
 
     public boolean vsLoading(VSensorConfig config) {
@@ -339,43 +356,94 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     }
 
     public boolean vsUnLoading(VSensorConfig config) {
-        synchronized (listeners) {
-            logger.debug("Distributer unloading: " + listeners.size());
-            ArrayList<DistributionRequest> toRemove = new ArrayList<DistributionRequest>();
-            for (DistributionRequest listener : listeners) {
-                if (listener.getVSensorConfig() == config)
-                    toRemove.add(listener);
-            }
-            for (DistributionRequest listener : toRemove) {
-                try {
-                    removeListener(listener);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
+        synchronized (MyListeners) {
+            logger.debug("Distributer unloading: " + MyListeners.size() +" ["+delivery_system_name+"]");
+            Iterator<ListenerEntry> i = MyListeners.iterator();
+            while (i.hasNext()) {
+            	ListenerEntry listener = i.next();
+            	if (listener.request.getVSensorConfig() == config) {
+            		i.remove();
+            		listener.removed = true;
+            		listener.request.close();
+            		logger.debug("remove the listener: "+listener.request.toString());
+            	}            		
             }
         }
         return true;
     }
 
     public void release() {
-        synchronized (listeners) {
-            while (!listeners.isEmpty())
-                removeListener(listeners.get(0));
-        }
-        if (keepAliveTimer != null)
-            keepAliveTimer.stop();
     }
 
     public boolean contains(DeliverySystem delivery) {
-        synchronized (listeners) {
-            for (DistributionRequest listener : listeners)
-                if (listener.getDeliverySystem().equals(delivery))
+        synchronized (MyListeners) {
+            for (ListenerEntry listener : MyListeners)
+                if (listener.request.getDeliverySystem().equals(delivery))
                     return true;
             return false;
 		}
-
 	}
-
+    
+    
+    /* Each listener entry traverses following steps:
+     * 
+     *  newDataAvailable -- [DataUpdateQueue] --> get data -- [DataDistributerQueue] --> distribute data --\
+     *                                                                                                     |
+     *       ^---------------------------------------------------------------------------------------------/
+     * 
+     * Available queues in the delivery system:
+     * 
+     * 
+     * 
+     */
+    
+    // queue moving methods for listeners
+    
+    /*
+     * remove a ListenerEntry from the list. There should only be synchronized calls to this method
+     */
+    private void removeListenerEntry(ListenerEntry listener) {
+    	if (!listener.removed) {
+    		MyListeners.remove(listener);
+    		listener.removed = true;
+    		listener.request.close();
+    		logger.debug("remove the listener: "+listener.request.toString());
+    	}
+    }
+    
+    private ListenerEntry getListenerEntry(DistributionRequest request) {
+    	for (ListenerEntry listener: MyListeners) {
+    		if (listener.request.equals(request))
+    			return listener;
+    	}
+    	return null;
+    }
+    
+    private void moveListenerToQueue(ListenerEntry listener, Collection<ListenerEntry> c) {
+    	if (listener.current_queue != null) {
+    		logger.warn("current queue was not null while assigning new queue.");
+    	}
+    	if (listener.removed) {
+    		listener.current_queue = null;
+    	}
+    	else {
+    	   	listener.current_queue = c;
+   	   		c.add(listener);
+    	}
+    }
+    
+    private class ListenerEntry {
+    	DistributionRequest request;
+    	Integer delivery_count = 0;
+    	PreparedStatement statement = null;
+    	String query = null;
+    	DataEnumerator dataEnum = null;
+    	Boolean check_for_new_data = false; // indicates that new data may had become available during fetching or delivering data
+    	Boolean removed = false; // indicates whether this listener has been removed 
+    	Collection<ListenerEntry> current_queue = null;    	
+    	
+    	public ListenerEntry(DistributionRequest request) {
+    		this.request = request;
+    	}
+    }
 }
-
-
