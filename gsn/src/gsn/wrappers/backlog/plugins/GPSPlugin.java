@@ -2,7 +2,6 @@ package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
 import java.util.Hashtable;
-import java.lang.Integer;
 
 import org.apache.log4j.Logger;
 

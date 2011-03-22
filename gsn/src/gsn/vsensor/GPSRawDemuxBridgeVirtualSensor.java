@@ -25,7 +25,7 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 						new DataField("GPS_WEEK", "SMALLINT"),
 						new DataField("CARRIER_PHASE", "DOUBLE"),
 						new DataField("PSEUDO_RANGE", "DOUBLE"),
-						new DataField("DOPPLER", "INTEGER"),
+						new DataField("DOPPLER", "DOUBLE"),
 						new DataField("SPACE_VEHICLE", "SMALLINT"),
 						new DataField("MEASUREMENT_QUALITY", "SMALLINT"),
 						new DataField("SIGNAL_STRENGTH", "SMALLINT"),
@@ -75,7 +75,7 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 						// get Pseudorange
 						serialized_data[10] = bbuffer.getDouble();
 						// get Doppler
-						serialized_data[11] = bbuffer.getInt();
+						serialized_data[11] = (double)bbuffer.getFloat();
 						// get SV nbr
 						serialized_data[12] = (short) ((int)bbuffer.get() & 0xFF);
 						// get Quality

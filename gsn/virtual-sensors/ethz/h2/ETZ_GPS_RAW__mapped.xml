@@ -14,7 +14,7 @@
             <field name="GPS_WEEK" type="SMALLINT" />
             <field name="CARRIER_PHASE" type="DOUBLE" />
             <field name="PSEUDO_RANGE" type="DOUBLE" />
-            <field name="DOPPLER" type="INTEGER" />
+            <field name="DOPPLER" type="DOUBLE" />
             <field name="SPACE_VEHICLE" type="SMALLINT" />
             <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
             <field name="SIGNAL_STRENGTH" type="SMALLINT" />
