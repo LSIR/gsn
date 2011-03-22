@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerAEDAQHealthDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 17;
+    public static final int DEFAULT_MESSAGE_SIZE = 30;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 194;
 
-    /** Create a new DozerAEDAQHealthDataMsg of size 17. */
+    /** Create a new DozerAEDAQHealthDataMsg of size 30. */
     public DozerAEDAQHealthDataMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -112,6 +112,24 @@ public class DozerAEDAQHealthDataMsg extends ch.ethz.permasense.tinyos2x.message
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.VccOpa=0x"+Long.toHexString(get_payload_VccOpa())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.Vcc55V=0x"+Long.toHexString(get_payload_Vcc55V())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.I12V=0x"+Long.toHexString(get_payload_I12V())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.I55VAnalog=0x"+Long.toHexString(get_payload_I55VAnalog())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.I55VDigital=0x"+Long.toHexString(get_payload_I55VDigital())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.SDEventsFree=0x"+Long.toHexString(get_payload_SDEventsFree())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.DAQPowerState=0x"+Long.toHexString(get_payload_DAQPowerState())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -683,6 +701,384 @@ public class DozerAEDAQHealthDataMsg extends ch.ethz.permasense.tinyos2x.message
      */
     public static int sizeBits_payload_VccOpa() {
         return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.Vcc55V
+    //   Field type: int
+    //   Offset (bits): 136
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.Vcc55V' is signed (false).
+     */
+    public static boolean isSigned_payload_Vcc55V() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.Vcc55V' is an array (false).
+     */
+    public static boolean isArray_payload_Vcc55V() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.Vcc55V'
+     */
+    public static int offset_payload_Vcc55V() {
+        return (136 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.Vcc55V'
+     */
+    public static int offsetBits_payload_Vcc55V() {
+        return 136;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.Vcc55V'
+     */
+    public int get_payload_Vcc55V() {
+        return (int)getUIntBEElement(offsetBits_payload_Vcc55V(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.Vcc55V'
+     */
+    public void set_payload_Vcc55V(int value) {
+        setUIntBEElement(offsetBits_payload_Vcc55V(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.Vcc55V'
+     */
+    public static int size_payload_Vcc55V() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.Vcc55V'
+     */
+    public static int sizeBits_payload_Vcc55V() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.I12V
+    //   Field type: int
+    //   Offset (bits): 152
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.I12V' is signed (false).
+     */
+    public static boolean isSigned_payload_I12V() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.I12V' is an array (false).
+     */
+    public static boolean isArray_payload_I12V() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.I12V'
+     */
+    public static int offset_payload_I12V() {
+        return (152 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.I12V'
+     */
+    public static int offsetBits_payload_I12V() {
+        return 152;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.I12V'
+     */
+    public int get_payload_I12V() {
+        return (int)getUIntBEElement(offsetBits_payload_I12V(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.I12V'
+     */
+    public void set_payload_I12V(int value) {
+        setUIntBEElement(offsetBits_payload_I12V(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.I12V'
+     */
+    public static int size_payload_I12V() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.I12V'
+     */
+    public static int sizeBits_payload_I12V() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.I55VAnalog
+    //   Field type: int
+    //   Offset (bits): 168
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.I55VAnalog' is signed (false).
+     */
+    public static boolean isSigned_payload_I55VAnalog() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.I55VAnalog' is an array (false).
+     */
+    public static boolean isArray_payload_I55VAnalog() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.I55VAnalog'
+     */
+    public static int offset_payload_I55VAnalog() {
+        return (168 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.I55VAnalog'
+     */
+    public static int offsetBits_payload_I55VAnalog() {
+        return 168;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.I55VAnalog'
+     */
+    public int get_payload_I55VAnalog() {
+        return (int)getUIntBEElement(offsetBits_payload_I55VAnalog(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.I55VAnalog'
+     */
+    public void set_payload_I55VAnalog(int value) {
+        setUIntBEElement(offsetBits_payload_I55VAnalog(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.I55VAnalog'
+     */
+    public static int size_payload_I55VAnalog() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.I55VAnalog'
+     */
+    public static int sizeBits_payload_I55VAnalog() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.I55VDigital
+    //   Field type: int
+    //   Offset (bits): 184
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.I55VDigital' is signed (false).
+     */
+    public static boolean isSigned_payload_I55VDigital() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.I55VDigital' is an array (false).
+     */
+    public static boolean isArray_payload_I55VDigital() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.I55VDigital'
+     */
+    public static int offset_payload_I55VDigital() {
+        return (184 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.I55VDigital'
+     */
+    public static int offsetBits_payload_I55VDigital() {
+        return 184;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.I55VDigital'
+     */
+    public int get_payload_I55VDigital() {
+        return (int)getUIntBEElement(offsetBits_payload_I55VDigital(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.I55VDigital'
+     */
+    public void set_payload_I55VDigital(int value) {
+        setUIntBEElement(offsetBits_payload_I55VDigital(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.I55VDigital'
+     */
+    public static int size_payload_I55VDigital() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.I55VDigital'
+     */
+    public static int sizeBits_payload_I55VDigital() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.SDEventsFree
+    //   Field type: long
+    //   Offset (bits): 200
+    //   Size (bits): 32
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.SDEventsFree' is signed (false).
+     */
+    public static boolean isSigned_payload_SDEventsFree() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.SDEventsFree' is an array (false).
+     */
+    public static boolean isArray_payload_SDEventsFree() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.SDEventsFree'
+     */
+    public static int offset_payload_SDEventsFree() {
+        return (200 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.SDEventsFree'
+     */
+    public static int offsetBits_payload_SDEventsFree() {
+        return 200;
+    }
+
+    /**
+     * Return the value (as a long) of the field 'payload.SDEventsFree'
+     */
+    public long get_payload_SDEventsFree() {
+        return (long)getUIntBEElement(offsetBits_payload_SDEventsFree(), 32);
+    }
+
+    /**
+     * Set the value of the field 'payload.SDEventsFree'
+     */
+    public void set_payload_SDEventsFree(long value) {
+        setUIntBEElement(offsetBits_payload_SDEventsFree(), 32, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.SDEventsFree'
+     */
+    public static int size_payload_SDEventsFree() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.SDEventsFree'
+     */
+    public static int sizeBits_payload_SDEventsFree() {
+        return 32;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.DAQPowerState
+    //   Field type: short
+    //   Offset (bits): 232
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.DAQPowerState' is signed (false).
+     */
+    public static boolean isSigned_payload_DAQPowerState() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.DAQPowerState' is an array (false).
+     */
+    public static boolean isArray_payload_DAQPowerState() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.DAQPowerState'
+     */
+    public static int offset_payload_DAQPowerState() {
+        return (232 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.DAQPowerState'
+     */
+    public static int offsetBits_payload_DAQPowerState() {
+        return 232;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.DAQPowerState'
+     */
+    public short get_payload_DAQPowerState() {
+        return (short)getUIntBEElement(offsetBits_payload_DAQPowerState(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.DAQPowerState'
+     */
+    public void set_payload_DAQPowerState(short value) {
+        setUIntBEElement(offsetBits_payload_DAQPowerState(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.DAQPowerState'
+     */
+    public static int size_payload_DAQPowerState() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.DAQPowerState'
+     */
+    public static int sizeBits_payload_DAQPowerState() {
+        return 8;
     }
 
 }
