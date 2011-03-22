@@ -14,14 +14,17 @@ import logging
 from datetime import datetime, timedelta
 from threading import Event, Lock, Thread
 
+from SpecialAPI import Statistics
+
 JOB_PROCESS_CHECK_INTERVAL_SECONDS = 2
         
         
-class JobsObserverClass(Thread):
+class JobsObserverClass(Thread, Statistics):
     
     def __init__(self, parent):
         Thread.__init__(self, name='JobsObserver-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
+        Statistics.__init__(self)
         
         self._backlogMain = parent
         self._lock = Lock()
@@ -30,6 +33,12 @@ class JobsObserverClass(Thread):
         self._wait = Event()
         self._waitforjob = Event()
         self._jobsObserverStop = False
+        
+        self._plugFinInTimeCounterId = self.createCounter()
+        self._plugNotFinInTimeCounterId = self.createCounter()
+        self._scriptFinSucInTimeCounterId = self.createCounter()
+        self._scriptFinUnsucInTimeCounterId = self.createCounter()
+        self._scriptNotFinInTimeCounterId = self.createCounter()
         
         
     def run(self):
@@ -54,6 +63,7 @@ class JobsObserverClass(Thread):
                                 if st:
                                     self._logger.warning('plugin (%s) has not finished in time -> stop it' % (job_name,))
                                 del self._jobList[index]
+                                self.counterAction(self._plugNotFinInTimeCounterId)
                             else:
                                 if self._logger.isEnabledFor(logging.DEBUG):
                                     self._logger.debug('plugin (%s) has not yet finished -> %s time to run' % (job_name, runtime_end-datetime.utcnow()))
@@ -65,6 +75,7 @@ class JobsObserverClass(Thread):
                                 else:
                                     if self._logger.isEnabledFor(logging.DEBUG):
                                         self._logger.debug('plugin (%s) finished successfully' % (job_name,))
+                                self.counterAction(self._plugFinInTimeCounterId)
                             del self._jobList[index]
                     else:
                         ret = job.poll()
@@ -91,6 +102,7 @@ class JobsObserverClass(Thread):
                                     stdoutdata, stderrdata = job.communicate()
                                     self._logger.warning('job (%s) has been killed (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
                                     del self._jobList[index]
+                                    self.counterAction(self._scriptNotFinInTimeCounterId)
                                 else:
                                     if self._logger.isEnabledFor(logging.DEBUG):
                                         self._logger.debug('job (%s) with PID %s not yet finished -> %s time to run' % (job_name, job.pid(), runtime_end-datetime.utcnow()))
@@ -102,8 +114,10 @@ class JobsObserverClass(Thread):
                                 else:
                                     if self._logger.isEnabledFor(logging.DEBUG):
                                         self._logger.debug('job (%s) finished successfully (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
+                                self.counterAction(self._scriptFinSucInTimeCounterId)
                             else:
                                 self.error('job (%s) finished with return code %s (STDOUT=%s /STDERR=%s)' % (job_name, ret, stdoutdata.decode(), stderrdata.decode()))
+                                self.counterAction(self._scriptFinUnsucInTimeCounterId)
                             del self._jobList[index]
                 
                 self._lock.acquire()
@@ -159,6 +173,23 @@ class JobsObserverClass(Thread):
                 if  overallMaxRuntime < runtime_left:
                     overallMaxRuntime = runtime_left
         return overallMaxRuntime.seconds + overallMaxRuntime.days * 86400 + overallMaxRuntime.microseconds/1000000.0
+            
+            
+    def getStatus(self):
+        '''
+        Returns the status of the jobs observer as list:
+        
+        @return: status of the jobs observer [plugin finished in time,
+                                              plugin still busy after max runtime,
+                                              script finished successfully in time,
+                                              script finished unsuccessfully in time,
+                                              script not finished in time]
+        '''
+        return [self.getCounterValue(self._plugFinInTimeCounterId), \
+                self.getCounterValue(self._plugNotFinInTimeCounterId), \
+                self.getCounterValue(self._scriptFinSucInTimeCounterId), \
+                self.getCounterValue(self._scriptFinUnsucInTimeCounterId), \
+                self.getCounterValue(self._scriptNotFinInTimeCounterId)]
 
 
     def stop(self):

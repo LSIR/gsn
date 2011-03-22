@@ -108,6 +108,11 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             payload += [self.getUptime(), self.getErrorCounter(), self.getExceptionCounter()]
             payload += self._backlogMain.gsnpeer.getStatus()
             payload += self._backlogMain.backlog.getStatus(30)
+            
+            payload += self._backlogMain.schedulehandler.getStatus()
+            payload += self._backlogMain.jobsobserver.getStatus()
+            payload += self._backlogMain.getTOSPeerStatus()
+            
             payload += self._getStatus()
             payload += self._getRUsage()
             

@@ -36,6 +36,7 @@ import BackLogMessage
 import tos
 import TOSTypes
 from crontab import CronTab
+from SpecialAPI import Statistics
 
 ############################################
 # Some Constants
@@ -60,7 +61,7 @@ MAX_RUNTIME_NAME = 'max_runtime_minutes'
 ############################################
 
 
-class ScheduleHandlerClass(Thread):
+class ScheduleHandlerClass(Thread, Statistics):
     '''
     The ScheduleHandler offers the functionality to schedule different
     jobs (bash scripts, programs, etc.) on the deployment system in a
@@ -110,6 +111,7 @@ class ScheduleHandlerClass(Thread):
     def __init__(self, parent, dutycyclemode, options):
         Thread.__init__(self, name='ScheduleHandler-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
+        Statistics.__init__(self)
         
         self._backlogMain = parent
         self._duty_cycle_mode = dutycyclemode
@@ -171,6 +173,10 @@ class ScheduleHandlerClass(Thread):
         self._scheduleHandlerStop = False
         self._beacon = False
         self._servicewindow = False
+        
+        self._pluginScheduleCounterId = self.createCounter()
+        self._scriptScheduleCounterId = self.createCounter()
+        self._scheduleCreationTime = None
             
         self._max_next_schedule_wait_delta = timedelta(minutes=max_next_schedule_wait_minutes)
             
@@ -183,6 +189,7 @@ class ScheduleHandlerClass(Thread):
                 parsed_schedule_file = open('%s.parsed' % (self.getOptionValue('schedule_file'),), 'r')
                 self._schedule = pickle.load(parsed_schedule_file)
                 parsed_schedule_file.close()
+                self._scheduleCreationTime = self._schedule.getCreationTime()
             except Exception, e:
                 self.exception(str(e))
         else:
@@ -346,9 +353,11 @@ class ScheduleHandlerClass(Thread):
                         if self._logger.isEnabledFor(logging.DEBUG):
                             self._logger.debug('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
                     try:
-                        plugin = self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
+                        self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
                     except Exception, e:
                         self.error('error in scheduled plugin >%s %s<: %s' % (pluginclassname, commandstring, e))
+                    else:
+                        self.counterAction(self._pluginScheduleCounterId)
                 else:
                     if self._duty_cycle_mode:
                         self._logger.info('executing >%s< now' % (commandstring,))
@@ -361,6 +370,7 @@ class ScheduleHandlerClass(Thread):
                         self.error('error in scheduled script >%s<: %s' % (commandstring, e))
                     else:
                         self._backlogMain.jobsobserver.observeJob(job, commandstring, False, runtimemax)
+                        self.counterAction(self._scriptScheduleCounterId)
                     
             if stop and self._duty_cycle_mode and not self._scheduleHandlerStop and not self._beacon:
                 stop = self._shutdown(service_time)
@@ -404,6 +414,19 @@ class ScheduleHandlerClass(Thread):
                     self._logger.warning('gsn has not answered on any schedule request')
         else:
             self._logger.warning('gsn has not connected')
+            
+            
+    def getStatus(self):
+        '''
+        Returns the status of the schedule handler as list:
+        
+        @return: status of the schedule handler [schedule creation time,
+                                                 plugin schedule counter,
+                                                 script schedule counter]
+        '''
+        return [self._scheduleCreationTime, \
+                self.getCounterValue(self._pluginScheduleCounterId), \
+                self.getCounterValue(self._scriptScheduleCounterId)]
     
     
     def stop(self):
@@ -471,6 +494,7 @@ class ScheduleHandlerClass(Thread):
                 pickle.dump(self._schedule, compiled_schedule_file)
                 compiled_schedule_file.close()
 
+                self._scheduleCreationTime = creationtime
                 self._logger.info('updated %s and %s.parsed with the current schedule' % (schedule_file.name, schedule_file.name))
             except Exception, e:
                 self.exception('received schedule can not be used: %s' % (e,))

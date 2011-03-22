@@ -74,6 +74,20 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 			new DataField("DB_REMOVE_TIME_MIN", "INTEGER"),
 			new DataField("DB_REMOVE_TIME_MEAN", "INTEGER"),
 			new DataField("DB_REMOVE_TIME_MAX", "INTEGER"),
+            
+			new DataField("SCHEDULE_CREATED", "BIGINT"),
+			new DataField("SCHEDULE_PLUG_ACTION_COUNTER", "INTEGER"),
+			new DataField("SCHEDULE_SCRIPT_EXEC_COUNTER", "INTEGER"),
+            
+			new DataField("PLUG_FIN_IN_TIME_COUNTER", "INTEGER"),
+			new DataField("PLUG_NOT_FIN_IN_TIME_COUNTER", "INTEGER"),
+			new DataField("SCRIPT_FIN_SUC_IN_TIME_COUNTER", "INTEGER"),
+			new DataField("SCRIPT_FIN_UNSUC_IN_TIME_COUNTER", "INTEGER"),
+			new DataField("SCRIPT_NOT_FIN_IN_TIME_COUNTER", "INTEGER"),
+
+			new DataField("TOS_MSG_RECV_COUNTER", "INTEGER"),
+			new DataField("TOS_ACK_SEND_COUNTER", "INTEGER"),
+			new DataField("TOS_MSG_SEND_COUNTER", "INTEGER"),
 
 			new DataField("VM_PEAK", "INTEGER"),
 			new DataField("VM_SIZE", "INTEGER"),

@@ -15,12 +15,13 @@ from threading import Thread, Event
 import tos
 import tos1x
 import BackLogMessage
+from SpecialAPI import Statistics
 
 DEFAULT_BACKLOG = True
 
 SEND_QUEUE_SIZE = 25
 
-class TOSPeerClass(Thread):
+class TOSPeerClass(Thread, Statistics):
     '''
     Offers the functionality to communicate with a node running TOS.
     '''
@@ -38,6 +39,7 @@ class TOSPeerClass(Thread):
     def __init__(self, parent, address, version):
         Thread.__init__(self, name='TOSPeer-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
+        Statistics.__init__(self)
         
         # split the address (it should have the form serial@port:baudrate)
         source = address.split('@')
@@ -56,6 +58,10 @@ class TOSPeerClass(Thread):
                 raise TypeError('could not initialize serial source: %s' % (e,))
         else:
             raise TypeError('address type must be serial')
+        
+        self._msgSentCounterId = self.createCounter()
+        self._msgReceivedCounterId = self.createCounter()
+        self._ackSentCounterId = self.createCounter()
         
         self._toswriter = TOSWriter(self)
 
@@ -97,11 +103,13 @@ class TOSPeerClass(Thread):
             if isEnabledFor(logging.DEBUG):
                 self._logger.debug('rcv (?,%d,%d)' % (timestamp, length))
 
+            self.counterAction(self._msgReceivedCounterId)
             # tell BackLogMain to send the packet to the plugins
             # using the serial port we can guarantee flow control to the backlog database!
             if processTOSMsg(timestamp, packet['type'], packet):
                 try:
                     sendAck()
+                    self.counterAction(self._ackSentCounterId)
                 except Exception, e:
                     if not self._tosPeerStop:
                         self.exception('could not send ack: %s' % (e,))
@@ -110,9 +118,23 @@ class TOSPeerClass(Thread):
         self._serialsource.join()
 
         self._logger.info('died')
+        
             
     def sendTOSMsg(self, packet, amId, timeout=None, blocking=True, maxretries = None):
         return self._toswriter.addMsg(packet, amId, timeout, blocking, maxretries)
+            
+            
+    def getStatus(self):
+        '''
+        Returns the status of the TOS peer as list:
+        
+        @return: status of the TOS peer [received message counter,
+                                         sent acknowledge counter,
+                                         sent message counter]
+        '''
+        return [self.getCounterValue(self._msgReceivedCounterId), \
+                self.getCounterValue(self._ackSentCounterId), \
+                self.getCounterValue(self._msgSentCounterId)]
 
 
     def exception(self, exception):
@@ -161,6 +183,7 @@ class TOSWriter(Thread):
             
             try:
                 write(packet, amId, timeout, blocking, maxretries)
+                self._tosPeer.counterAction(self._tosPeer._msgSentCounterId)
                 if isEnabledFor(logging.DEBUG):
                     self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(packet)))
             except Exception, e:

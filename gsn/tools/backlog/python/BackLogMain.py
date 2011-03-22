@@ -414,6 +414,13 @@ class BackLogMainClass(Thread, Statistics):
         return ret
     
     
+    def getTOSPeerStatus(self):
+        if self._tospeer:
+            return self._tospeer.getStatus()
+        else:
+            return [None]*3
+    
+    
     def pluginAction(self, pluginclassname, parameters, runtimemax):
         pluginactive = False
         plugin = self.plugins.get(pluginclassname)
