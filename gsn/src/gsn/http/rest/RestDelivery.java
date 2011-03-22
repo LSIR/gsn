@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
+import org.eclipse.jetty.io.RuntimeIOException;
 import org.eclipse.jetty.io.WriterOutputStream;
 
 import com.thoughtworks.xstream.XStream;
@@ -66,11 +67,20 @@ public class RestDelivery implements DeliverySystem {
 
     public boolean isClosed() {
         try {
-            return continuation.getServletResponse().getWriter().checkError();
+            return continuation.getServletResponse().getWriter().checkError() || continuation.isExpired();
         } catch (IOException e) {
+            e.printStackTrace();
+            return true;
+        } catch (RuntimeIOException e) {
             e.printStackTrace();
             return true;
         }
 
+
     }
+
+	@Override
+	public void setTimeout(long timeoutMs) {
+		continuation.setTimeout(timeoutMs);
+	}
 }

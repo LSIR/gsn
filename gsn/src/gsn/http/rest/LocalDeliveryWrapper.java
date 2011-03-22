@@ -182,6 +182,9 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		
 	}
 
+	public void setTimeout(long timeoutMs) {
+	}
+
 
 }
 

@@ -119,4 +119,11 @@ public class PushDelivery implements DeliverySystem {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
+
+
+	@Override
+	public void setTimeout(long timeoutMs) {
+		// TODO Auto-generated method stub
+		
+	}
 }
