@@ -26,9 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
+import org.eclipse.jetty.continuation.ContinuationListener;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 
-public class RestStreamHanlder extends HttpServlet {
+public class RestStreamHanlder extends HttpServlet implements ContinuationListener {
 
 	public static final int SUCCESS_200 = 200;
 
@@ -40,8 +41,6 @@ public class RestStreamHanlder extends HttpServlet {
 
 	public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws ServletException{
 
-
-		Object is2ndPass = request.getAttribute("2ndPass");
 		Continuation continuation = ContinuationSupport.getContinuation(request);
 
         if(continuation.isExpired()){
@@ -64,10 +63,9 @@ public class RestStreamHanlder extends HttpServlet {
             }
         }
 
-		if(is2ndPass == null) {
-            continuation.setAttribute("2ndPass", Boolean.TRUE);
+		if(continuation.isInitial()) {
             continuation.setAttribute("status", new LinkedBlockingQueue<Boolean>(1));
-            continuation.setTimeout(-1); // Disable the timeout on the continuation.
+            continuation.addContinuationListener(this);
             continuation.suspend();
             final DefaultDistributionRequest streamingReq;
             try {
@@ -84,7 +82,6 @@ public class RestStreamHanlder extends HttpServlet {
                         }
                     }
                 }
-                //
                 RestDelivery deliverySystem = new RestDelivery(continuation);
                 streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
                 DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
@@ -101,6 +98,7 @@ public class RestStreamHanlder extends HttpServlet {
             }
             continuation.suspend();
             try {
+            	logger.debug("continuation supended, set status.");
                 ((LinkedBlockingQueue<Boolean>)continuation.getAttribute("status")).put(status);
             } catch (InterruptedException e) {
                 logger.debug(e.getMessage(), e);
@@ -249,6 +247,18 @@ public class RestStreamHanlder extends HttpServlet {
 			return startTime;
 		}
 
+	}
+
+	@Override
+	public void onComplete(Continuation continuation) {
+		logger.warn("continuation completed: "+continuation);
+		((LinkedBlockingQueue<Boolean>)continuation.getAttribute("status")).offer(new Boolean(false));
+	}
+	
+	@Override
+	public void onTimeout(Continuation continuation) {
+		logger.warn("continuation expired: "+continuation);
+		continuation.complete();
 	}
 
 }

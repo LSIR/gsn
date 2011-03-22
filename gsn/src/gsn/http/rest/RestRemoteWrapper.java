@@ -256,6 +256,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
             }
             catch (Exception e) {
                 logger.warn("Connection to the remote host: " + initParams.getRemoteContactPoint() + " is lost, trying to reconnect in 3 seconds...");
+                logger.debug("Connection loss reason: "+e.getMessage());
                 try {
                     if (isActive()) {
                         Thread.sleep(3000);
