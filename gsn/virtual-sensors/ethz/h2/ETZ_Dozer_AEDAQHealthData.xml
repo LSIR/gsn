@@ -1,0 +1,178 @@
+<virtual-sensor name="ETZ_Dozer_AEDAQHealthData" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_VCCCH1" type="INTEGER" />            
+            <field name="PAYLOAD_VCCCH2" type="INTEGER" />
+            <field name="PAYLOAD_VCCADC" type="INTEGER" />
+            <field name="PAYLOAD_REFADC" type="INTEGER" />
+            <field name="PAYLOAD_VCCOPA" type="INTEGER" />
+            <field name="PAYLOAD_VCC55V" type="INTEGER" />
+            <field name="PAYLOAD_I12V" type="INTEGER" />
+            <field name="PAYLOAD_I55VANALOG" type="INTEGER" />
+            <field name="PAYLOAD_I55VDIGITAL" type="INTEGER" />
+            <field name="PAYLOAD_SDEVENTSFREE" type="BIGINT" />
+            <field name="PAYLOAD_DAQPOWERSTATE" type="SMALLINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerAEDAQHealthDataMsg) from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etzg-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data3">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data4">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data5">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data6">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data7">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data8">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">nb-tgsell.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data9">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">pc-5225.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data10">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data11">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data12">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps05.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data13">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEDAQHealthDataMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        </streams>
+</virtual-sensor>

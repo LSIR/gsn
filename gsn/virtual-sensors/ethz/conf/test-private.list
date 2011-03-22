@@ -24,6 +24,9 @@ ETZ_Dozer_WXT520Prec.xml
 ETZ_Dozer_WXT520Sup.xml
 ETZ_Dozer_WXT520WindPth.xml
 ETZ_Dozer_WXT520Ident.xml
+ETZ_Dozer_AEDAQHealthData.xml
+ETZ_Dozer_AEData.xml
+ETZ_Dozer_AEStatistics.xml
 ETZ_GPS_RAW.xml
 ETZ_Schedule.xml
 ETZ_Topology.xml
