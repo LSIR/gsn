@@ -196,13 +196,13 @@ public class MySQLStorageManager extends StorageManager {
     }
 
     @Override
-    public DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked, Connection conn) throws SQLException {
+    public DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked, String timedfield, Connection conn) throws SQLException {
         PreparedStatement ps = null;
         // Support streamed queries for MySQL -- see MySQL Implementation notes:
         // http://dev.mysql.com/doc/refman/5.0/en/connector-j-reference-implementation-notes.html
         ps = conn.prepareStatement(query, java.sql.ResultSet.TYPE_FORWARD_ONLY, java.sql.ResultSet.CONCUR_READ_ONLY);
         ps.setFetchSize(Integer.MIN_VALUE);
-        return new DataEnumerator(this, ps, binaryFieldsLinked);
+        return new DataEnumerator(this, ps, binaryFieldsLinked, timedfield);
     }
 
 }

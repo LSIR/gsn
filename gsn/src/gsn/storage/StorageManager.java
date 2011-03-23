@@ -515,7 +515,7 @@ public abstract class StorageManager {
         return executeQuery(query, binaryFieldsLinked, getConnection());
     }
 
-    private DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked, String timedfield, Connection conn) throws SQLException {
+    public DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked, String timedfield, Connection conn) throws SQLException {
         if (timedfield==null)
         	return new DataEnumerator(this, conn.prepareStatement(query), binaryFieldsLinked);
         else
