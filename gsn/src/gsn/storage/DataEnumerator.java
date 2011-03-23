@@ -61,10 +61,18 @@ public class DataEnumerator implements DataEnumeratorIF {
 	}
 
 	public DataEnumerator (StorageManager storageManager, PreparedStatement preparedStatement , boolean binaryLinked ) {
-		this(storageManager, preparedStatement,binaryLinked,false);
+		this(storageManager, preparedStatement,binaryLinked,false, "timed");
+	}
+
+	public DataEnumerator (StorageManager storageManager, PreparedStatement preparedStatement , boolean binaryLinked, String timedfield) {
+		this(storageManager, preparedStatement,binaryLinked,false, timedfield);
 	}
 	
 	public DataEnumerator ( StorageManager storageManager, PreparedStatement preparedStatement , boolean binaryLinked ,boolean manualClose) {
+		this(storageManager, preparedStatement,binaryLinked,manualClose, "timed");
+	}
+
+	public DataEnumerator ( StorageManager storageManager, PreparedStatement preparedStatement , boolean binaryLinked ,boolean manualClose, String timedfield) {
 		this.storageManager = storageManager;
         this.manualCloseConnection=manualClose;
 		if ( preparedStatement == null ) {
@@ -98,7 +106,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 				int colScale=resultSet.getMetaData().getScale(i);
 				if ( colName.equalsIgnoreCase( "PK" ) ) {
 					indexofPK = i;
-				} else if ( colName.equalsIgnoreCase( "timed" ) ) {
+				} else if ( colName.equalsIgnoreCase( timedfield ) ) {
 					indexOfTimedField = i;
 				} else {
 					fieldNames.add( colName );

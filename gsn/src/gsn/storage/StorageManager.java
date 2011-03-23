@@ -500,28 +500,31 @@ public abstract class StorageManager {
             logger.debug("Executing query: " + query + "(" + binaryFieldsLinked + ")");
         return new DataEnumerator(this, connection.prepareStatement(query.toString()), binaryFieldsLinked);
     }
-
-    public DataEnumerator streamedExecuteQuery(AbstractQuery abstractQuery, boolean binaryFieldsLinked, Connection connection) throws SQLException {
+    
+    public DataEnumerator streamedExecuteQuery(AbstractQuery abstractQuery, boolean binaryFieldsLinked, String timedfield, Connection connection) throws SQLException {
         if (abstractQuery.getLimitCriterion() == null) {
-            return streamedExecuteQuery(abstractQuery.getStandardQuery().toString(), binaryFieldsLinked, connection);
+            return streamedExecuteQuery(abstractQuery.getStandardQuery().toString(), binaryFieldsLinked, timedfield, connection);
         }
         String query = addLimit(abstractQuery.getStandardQuery().toString(), abstractQuery.getLimitCriterion().getSize(), abstractQuery.getLimitCriterion().getOffset());
         if (logger.isDebugEnabled())
             logger.debug("Executing query: " + query + "(" + binaryFieldsLinked + ")");
-        return streamedExecuteQuery(query, binaryFieldsLinked, connection);
+        return streamedExecuteQuery(query, binaryFieldsLinked, timedfield, connection);
     }
 
     public DataEnumerator executeQuery(StringBuilder query, boolean binaryFieldsLinked) throws SQLException {
         return executeQuery(query, binaryFieldsLinked, getConnection());
     }
 
-    public DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked, Connection conn) throws SQLException {
-        return new DataEnumerator(this, conn.prepareStatement(query), binaryFieldsLinked);
+    private DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked, String timedfield, Connection conn) throws SQLException {
+        if (timedfield==null)
+        	return new DataEnumerator(this, conn.prepareStatement(query), binaryFieldsLinked);
+        else
+        	return new DataEnumerator(this, conn.prepareStatement(query), binaryFieldsLinked, timedfield);
     }
 
 
     public DataEnumerator streamedExecuteQuery(String query, boolean binaryFieldsLinked) throws SQLException {
-        return streamedExecuteQuery(query, binaryFieldsLinked, getConnection());
+        return streamedExecuteQuery(query, binaryFieldsLinked, null, getConnection());
     }
 
 
@@ -896,7 +899,6 @@ public abstract class StorageManager {
     public boolean isSqlServer(){ return isSqlServer; }
     public boolean isMysqlDB(){ return isMysql; }
     public boolean isPostgres(){ return isPostgres; }
-
 
 
 }

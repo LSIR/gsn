@@ -92,7 +92,7 @@ public class DownloadData extends AbstractDataRequest {
                 Connection connection = null;
 
                 connection = Main.getStorage(nextSqlQuery.getKey()).getConnection();
-                de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, connection);
+                de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, timedfield, connection);
                 
                 logger.debug("Data Enumerator: " + de);
                 if (ot == AllowedOutputType.csv) {
@@ -102,9 +102,7 @@ public class DownloadData extends AbstractDataRequest {
                     respond.println("\t<!-- " + nextSqlQuery.getValue().getStandardQuery() + " -->");
                     respond.println("\t<data vsname=\"" + nextSqlQuery.getKey() + "\">");
                 }
-                boolean wantTimed=false;
-                if (timedfield.equals("timed"))
-                	wantTimed = true;
+                boolean wantTimed = true;
                 boolean firstLine = true;
                 while (de.hasMoreElements()) {
                     if (ot == AllowedOutputType.csv) {
@@ -141,14 +139,11 @@ public class DownloadData extends AbstractDataRequest {
             if (wantTimed && se.getData().length != 0)
                 respond.print(cvsDelimiter);
             if (wantTimed)
-                respond.print("timed");
+                respond.print(timedfield);
             respond.println();
         }
         for (int i = 0; i < se.getData().length; i++) {
-        	if (se.getFieldNames()[i].equals(timedfield))
-        		respond.print(qbuilder.getSdf() == null ? timestampInUTC((Long)se.getData()[i]) : qbuilder.getSdf().format(new Date((Long)se.getData()[i])));
-        	else
-        		respond.print(se.getData()[i]);
+       		respond.print(se.getData()[i]);
             if (i != se.getData().length - 1)
                 respond.print(cvsDelimiter);
         }
