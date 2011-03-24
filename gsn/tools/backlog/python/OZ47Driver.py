@@ -1,7 +1,7 @@
 #! /usr/bin/python
 # -*- coding: UTF-8 -*-
-__author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
-__copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
+__author__      = "David Hasenfratz <hasenfratz@tik.ee.ethz.ch>"
+__copyright__   = "Copyright 2011, ETH Zurich, Switzerland, David Hasenfratz"
 __license__     = "GPL"
 __version__     = "$Revision$"
 __date__        = "$Date$"
