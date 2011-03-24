@@ -7,18 +7,17 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="UTC_POS_TIME" type="INTEGER"/>
-            <field name="LATITUDE" type="SMALLINT" />
-            <field name="LAT_HEMISPHERE" type="DOUBLE" />
+            <field name="LATITUDE" type="DOUBLE" />
+            <field name="LAT_HEMISPHERE" type="VARCHAR(1)" />
             <field name="LONGITUDE" type="DOUBLE" />
-            <field name="LONG_HEMISPHERE" type="DOUBLE" />
-            <field name="QUALITY" type="SMALLINT" />
-            <field name="NR_SATELLITES" type="SMALLINT" />
-            <field name="HDOP" type="SMALLINT" />
-            <field name="GEOID_HEIGHT" type="SMALLINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
-            <field name="HEIGHT_DIF" type="SMALLINT" />
-            <field name="AGE_DGPS" type="SMALLINT" />
-            <field name="CHECKSUM" type="SMALLINT" />
+            <field name="LONG_HEMISPHERE" type="VARCHAR(1)" />
+            <field name="QUALITY" type="INTEGER" />
+            <field name="NR_SATELLITES" type="INTEGER" />
+            <field name="HDOP" type="DOUBLE" />
+            <field name="GEOID_HEIGHT" type="DOUBLE" />
+            <field name="GEOID_HEIGHT_UNIT" type="VARCHAR(1)" />
+            <field name="GEOID_SEP" type="DOUBLE" />
+            <field name="GEOID_SEP_UNIT" type="VARCHAR(1)" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
@@ -108,6 +107,27 @@
             </source>
             <query> select * from source </query>
         </stream>
-
-        </streams>
+        <stream name="data7">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">opensense-etz-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
+                    <predicate key="gps-data-type">nav</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+	<stream name="data8">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">opensense-etz-bs02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
+                    <predicate key="gps-data-type">nav</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
 </virtual-sensor>
