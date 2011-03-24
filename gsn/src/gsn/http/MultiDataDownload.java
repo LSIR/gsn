@@ -141,7 +141,6 @@ public class MultiDataDownload extends HttpServlet {
     }
 	
 	private Map<String, String[]> parseParameters (HttpServletRequest req, String downloadFormat, SimpleDateFormat sdfWeb) {
-		
 		Map<String, String[]> parameterMap = new Hashtable<String, String[]>();
 
 		Hashtable<String, ArrayList<String>> vssfm = buildVirtualSensorsFieldsMapping(req.getParameterMap());
@@ -157,7 +156,7 @@ public class MultiDataDownload extends HttpServlet {
 			vsname = new StringBuilder();
 			vsname.append(vsAndFieldsEntry.getKey());
 			fieldsIterator = vsAndFieldsEntry.getValue().iterator();
-			boolean hasPk = false;
+			boolean hasPk=false;
             while (fieldsIterator.hasNext()) {
 				vsname.append(":");
 				String n = fieldsIterator.next();
@@ -165,12 +164,12 @@ public class MultiDataDownload extends HttpServlet {
                 if ("pk".equalsIgnoreCase(n)) 
                     hasPk = true;
 			}
-            if (! hasPk) 
-                vsname.append(":pk");
+            //if (! hasPk)
+            //    vsname.append(":pk");
 			vsnames.add(vsname.toString());
 		}
 		parameterMap.put("vsname", vsnames.toArray(new String[] {}));
-
+		
 		// TIME LINE
 		String req_timeline = req.getParameter("timeline");
 		String timedfield;

@@ -95,6 +95,11 @@ public class DownloadData extends AbstractDataRequest {
                 de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, timedfield, connection);
                 
                 logger.debug("Data Enumerator: " + de);
+                boolean wantPK = false;
+                for (String field: nextSqlQuery.getValue().getFields()) {
+                	if (field.equalsIgnoreCase("pk"))
+                		wantPK=true;
+                }
                 if (ot == AllowedOutputType.csv) {
                     respond.println("##vsname:" + nextSqlQuery.getKey());
                     respond.println("##query:" + nextSqlQuery.getValue().getStandardQuery() + (nextSqlQuery.getValue().getLimitCriterion() == null ? "" : "(" + nextSqlQuery.getValue().getLimitCriterion() + ")"));
@@ -106,9 +111,9 @@ public class DownloadData extends AbstractDataRequest {
                 boolean firstLine = true;
                 while (de.hasMoreElements()) {
                     if (ot == AllowedOutputType.csv) {
-                        formatCSVElement(respond, de.nextElement(), wantTimed, csvDelimiter, firstLine);
+                        formatCSVElement(respond, de.nextElement(), wantTimed, wantPK, csvDelimiter, firstLine);
                     } else if (ot == AllowedOutputType.xml) {
-                        formatXMLElement(respond, de.nextElement(), wantTimed, firstLine);
+                        formatXMLElement(respond, de.nextElement(), wantTimed, wantPK, firstLine);
                     }
                     firstLine = false;
                 }
@@ -128,7 +133,7 @@ public class DownloadData extends AbstractDataRequest {
     }
 
 
-    private void formatCSVElement(PrintWriter respond, StreamElement se, boolean wantTimed, String cvsDelimiter, boolean firstLine) {
+    private void formatCSVElement(PrintWriter respond, StreamElement se, boolean wantTimed, boolean wantPK,  String cvsDelimiter, boolean firstLine) {
         if (firstLine) {
             respond.print("#");
             for (int i = 0; i < se.getData().length; i++) {
@@ -136,10 +141,19 @@ public class DownloadData extends AbstractDataRequest {
                 if (i != se.getData().length - 1)
                     respond.print(cvsDelimiter);
             }
-            if (wantTimed && se.getData().length != 0)
+            int len = se.getData().length;
+            if (wantTimed && len != 0)
                 respond.print(cvsDelimiter);
-            if (wantTimed)
+            if (wantTimed) {
                 respond.print(timedfield);
+                len++;
+            }
+            if (wantPK && len != 0)
+                respond.print(cvsDelimiter);
+            if (wantPK) {
+                respond.print("pk");
+                len++;
+            }
             respond.println();
         }
         for (int i = 0; i < se.getData().length; i++) {
@@ -147,22 +161,32 @@ public class DownloadData extends AbstractDataRequest {
             if (i != se.getData().length - 1)
                 respond.print(cvsDelimiter);
         }
+        int len = se.getData().length;
         if (wantTimed) {
-            if (se.getData().length != 0)
+            if (len != 0)
                 respond.print(cvsDelimiter);
             respond.print(qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
+            len++;
+        }
+        if (wantPK) {
+            if (len != 0)
+                respond.print(cvsDelimiter);
+            respond.print(se.getInternalPrimayKey());
+            len++;
         }
         respond.println();
     }
 
-    private void formatXMLElement(PrintWriter respond, StreamElement se, boolean wantTimed, boolean firstLine) {
+    private void formatXMLElement(PrintWriter respond, StreamElement se, boolean wantTimed, boolean wantPK, boolean firstLine) {
         if (firstLine) {
             respond.println("\t\t<header>");
             for (int i = 0; i < se.getData().length; i++) {
                 respond.println("\t\t\t<field>" + se.getFieldNames()[i] + "</field>");
             }
             if (wantTimed)
-                respond.println("\t\t\t<field>timed</field>");
+                respond.println("\t\t\t<field>"+timedfield+"</field>");
+            if (wantPK)
+                respond.println("\t\t\t<field>pk</field>");
             respond.println("\t\t</header>");
         }
         respond.println("\t\t<tuple>");
@@ -171,6 +195,8 @@ public class DownloadData extends AbstractDataRequest {
         }
         if (wantTimed)
             respond.println("\t\t\t<field>" + (qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
+        if (wantPK)
+            respond.println("\t\t\t<field>" + se.getInternalPrimayKey() + "</field>");
         respond.println("\t\t</tuple>");
     }
 
