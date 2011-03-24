@@ -2,7 +2,6 @@ package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
 import java.util.Hashtable;
-
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
@@ -16,21 +15,21 @@ public class GPSPlugin extends AbstractPlugin {
 	private static final String NAV_NAMING = "nav";
 
 	private static final DataField[] navDataField = {
-		    new DataField("TIMESTAMP", "BIGINT"),
+		  new DataField("TIMESTAMP", "BIGINT"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
-			new DataField("UTC_POS_TIME", "DOUBLE"),
+			new DataField("UTC_POS_TIME", "INTEGER"),
 			new DataField("LATITUDE", "DOUBLE"),
-			new DataField("LAT_HEMISPHERE", "DOUBLE"),
+			new DataField("LAT_HEMISPHERE", "VARCHAR(1)"),
 			new DataField("LONGITUDE", "DOUBLE"),
-			new DataField("LONG_HEMISPHERE", "DOUBLE"),
-			new DataField("QUALITY", "SMALLINT"),
-			new DataField("NR_SATELLITES", "SMALLINT"),
-			new DataField("HDOP", "SMALLINT"),
-			new DataField("GEOID_HEIGHT", "SMALLINT"),
-			new DataField("HEIGHT_DIF", "SMALLINT"),
-			new DataField("AGE_DGPS", "SMALLINT"),
-			new DataField("CHECKSUM", "SMALLINT")
+			new DataField("LONG_HEMISPHERE", "VARCHAR(1)"),
+			new DataField("QUALITY", "INTEGER"),
+			new DataField("NR_SATELLITES", "INTEGER"),
+			new DataField("HDOP", "DOUBLE"),
+			new DataField("GEOID_HEIGHT", "DOUBLE"),
+			new DataField("GEOID_HEIGHT_UNIT", "VARCHAR(1)"),
+			new DataField("GEOID_SEP", "DOUBLE"),
+			new DataField("GEOID_SEP_UNIT", "VARCHAR(1)")
 			};
 
 	private static final DataField[] rawDataField = {
@@ -109,7 +108,22 @@ public class GPSPlugin extends AbstractPlugin {
 			if (msgType == gpsNamingTable.get(gpsDataType).typeNumber) {
 				logger.debug("msgType: " + msgType);
 				if (gpsDataType.equalsIgnoreCase(NAV_NAMING)) {
-					
+
+          try {
+					  int utcPosTime = (int) Double.parseDouble((String)data[1]);
+					  double latitude = Double.parseDouble((String)data[2]);
+					  double longitude = Double.parseDouble((String)data[4]);
+					  int quality = Short.parseShort((String)data[6]);
+					  int nrSatellites = Short.parseShort((String)data[7]);
+					  double hdop = Double.parseDouble((String)data[8]);
+					  double geoidHeight = Double.parseDouble((String)data[9]);
+					  double geoidSep = Double.parseDouble((String)data[11]);
+					  out = new Serializable[]{timestamp, timestamp, deviceId, utcPosTime, latitude, data[3], longitude, data[5], quality, nrSatellites, hdop, geoidHeight, data[10], geoidSep, data[12]};
+          } catch(Exception ex) {
+			      logger.warn(ex.getMessage(), ex);
+            logger.warn("GPS NAV data could not be parsed.");
+					  out = new Serializable[]{timestamp, timestamp, deviceId, null, null, null, null, null, null, null, null, null, null, null, null};
+          }
 				}
 				else if (gpsDataType.equalsIgnoreCase(RAW_NAMING)) {
 					out = new Serializable[]{timestamp, timestamp, deviceId, toShort(data[1]), toInteger(data[2]), toInteger(data[3]), data[4]};
@@ -126,6 +140,7 @@ public class GPSPlugin extends AbstractPlugin {
 				}
 			}
 		} catch (Exception e) {
+      logger.warn("Exception while storing message in the data base.");
 			logger.warn(e.getMessage(), e);
 			return true;
 		}
