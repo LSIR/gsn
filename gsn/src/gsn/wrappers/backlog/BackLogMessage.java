@@ -429,7 +429,22 @@ public class BackLogMessage {
 	}
 	
 	
-	private void checkPayload(Serializable[] payload) throws IOException {
+	/** 
+	 * Get the size of the message.
+	 * 
+	 * @return the the size of the message
+	 * 
+	 * @throws IOException if the payload length exceeds MAX_PAYLOAD_SIZE
+	 */
+	public int getSize() throws IOException {
+		if (payloadBin == null)
+			return checkPayload(payload);
+		else
+			return payloadBin.length;
+	}
+	
+	
+	private int checkPayload(Serializable[] payload) throws IOException {
 		int length = 2;
 		for (int i=0; i<payload.length; i++) {
 			if (payload[i] == null)
@@ -458,5 +473,7 @@ public class BackLogMessage {
 
 		if( length > MAX_PAYLOAD_SIZE )
 			throw new IOException("The payload exceeds the maximum size of " + MAX_PAYLOAD_SIZE + "bytes.");
+		
+		return length;
 	}
 }

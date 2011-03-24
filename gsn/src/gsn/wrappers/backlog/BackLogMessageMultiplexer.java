@@ -1,5 +1,8 @@
 package gsn.wrappers.backlog;
 
+import gsn.wrappers.backlog.statistics.CoreStationStatistics;
+import gsn.wrappers.backlog.statistics.StatisticsMain;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -45,6 +48,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private Map<Integer,Vector<BackLogMessageListener>> msgTypeListener; // Mapping from type to Listener
 
 	protected AsyncCoreStationClient asyncCoreStationClient = null;
+	private CoreStationStatistics coreStationStatistics = null;
 	private BlockingQueue<byte []> recvQueue = new LinkedBlockingQueue<byte[]>();
 	private PluginMessageHandler pluginMessageHandler;
 	private boolean dispose = false;
@@ -70,7 +74,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private BackLogMessageMultiplexer(String deployment, InetAddress inetAddress, Integer port) throws Exception {
 		msgTypeListener = Collections.synchronizedMap(new HashMap<Integer,Vector<BackLogMessageListener>> ());
 		
-		this.coreStationAddress = inetAddress.getHostName() + ":" + hostPort;
+		coreStationAddress = inetAddress.getHostName() + ":" + hostPort;
 		this.inetAddress = inetAddress;
 		this.hostPort = port;
     	this.deploymentName = deployment;
@@ -78,6 +82,8 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
     	pluginMessageHandler = new PluginMessageHandler(this, PLUGIN_MESSAGE_QUEUE_SIZE);
     	
     	asyncCoreStationClient = AsyncCoreStationClient.getSingletonObject();
+    	
+    	coreStationStatistics = StatisticsMain.getCoreStationStatsInstance(deployment, coreStationAddress);
 		
 		setName("BackLogMessageMultiplexer-" + getCoreStationName() + "-Thread");
 	}
@@ -93,20 +99,16 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		// a first pattern match test for >host:port<
     	Matcher m = Pattern.compile("(.*):(.*)").matcher(coreStationAddress);
     	if ( m.find() ) {
-			try {
-				inetAddress = InetAddress.getByName(m.group(1));
-                hostPort = new Integer(m.group(2));
-				coreStationAddress_noIp = inetAddress.getHostName() + ":" + hostPort;
-				if(blMultiplexerMap.containsKey(coreStationAddress_noIp)) {
-					return blMultiplexerMap.get(coreStationAddress_noIp);
-				}
-				else {
-					BackLogMessageMultiplexer blMulti = new BackLogMessageMultiplexer(deployment, inetAddress, hostPort);
-					blMultiplexerMap.put(coreStationAddress_noIp, blMulti);
-					return blMulti;
-				}
-			} catch(Exception e) {
-				throw new IOException("Remote BackLog host string (" + coreStationAddress + ") does not match >host:port<");
+			inetAddress = InetAddress.getByName(m.group(1));
+            hostPort = new Integer(m.group(2));
+			coreStationAddress_noIp = inetAddress.getHostName() + ":" + hostPort;
+			if(blMultiplexerMap.containsKey(coreStationAddress_noIp)) {
+				return blMultiplexerMap.get(coreStationAddress_noIp);
+			}
+			else {
+				BackLogMessageMultiplexer blMulti = new BackLogMessageMultiplexer(deployment, inetAddress, hostPort);
+				blMultiplexerMap.put(coreStationAddress_noIp, blMulti);
+				return blMulti;
 			}
     	}
     	else {
@@ -228,6 +230,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 						}
 						if (logger.isDebugEnabled())
 							logger.debug("rcv (" + msg.getType() + "," + msg.getTimestamp() + "," + msg.getBinaryMessage().length + ")");
+						coreStationStatistics.msgReceived(msg.getType(), msg.getSize());
 			    		if( msg.getType() == BackLogMessage.PING_MESSAGE_TYPE ) {
 			    			sendPingAck(msg.getTimestamp());
 			    		}
@@ -298,6 +301,12 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			logger.error("there is no " + coreStationAddress + " available in the map");
 		
 		asyncCoreStationClient.deregisterListener(this);
+		
+		try {
+			StatisticsMain.removeCoreStationStatsInstance(deploymentName, coreStationAddress);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+		}
 	}
 
 
@@ -327,11 +336,18 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		if (logger.isDebugEnabled())
 			logger.debug("snd (" + message.getType() + "," + message.getTimestamp() + "," + message.getBinaryMessage().length + ")");
 		if (id == null) {
-			return asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, priority, message.getBinaryMessage());
+			if (asyncCoreStationClient.send(deploymentName, coreStationDeviceId, this, priority, message.getBinaryMessage())) {
+				coreStationStatistics.msgSent(message.getType(), message.getSize());
+				return true;
+			}
 		}
 		else {
-			return asyncCoreStationClient.send(deploymentName, id, this, priority, message.getBinaryMessage());
+			if (asyncCoreStationClient.send(deploymentName, id, this, priority, message.getBinaryMessage())) {
+				coreStationStatistics.msgSent(message.getType(), message.getSize());
+				return true;
+			}
 		}
+		return false;
 	}
 
 
@@ -468,8 +484,10 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			sendQueueReadyMsg();
 			logger.warn("message queue ready => sending queue ready message");
 		}
-		
+
+		coreStationStatistics.setDeviceId(coreStationDeviceId);
 		connected = true;
+		coreStationStatistics.setConnected(true);
 
 		Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
 		synchronized (msgTypeListener) {
@@ -503,6 +521,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	@Override
 	public void connectionLost() {
 		connected = false;
+		coreStationStatistics.setConnected(false);
 		logger.info("connection to core station with device id " + coreStationDeviceId + " at " + deploymentName + " deployment lost");
 		
 		recvQueue.clear();
