@@ -660,7 +660,8 @@ class PluginMessageHandler extends Thread {
 		boolean ret = plugMsgQueue.offer(msg);
 		if (isMsgQueueLimitReached()) {
 			blMsgMulti.sendQueueLimitMsg();
-			logger.warn("message queue limit reached => sending queue limit message");
+			if (!queueLimitReached)
+				logger.warn("message queue limit reached => sending queue limit message");
 			queueLimitReached = true;
 		}
 		if (!ret)
