@@ -65,6 +65,11 @@ SCHEDULE_MESSAGE_TYPE = 50
 # The GPS message type.
 GPS_MESSAGE_TYPE = 60
 
+# The OZ-47 sensor message type.
+OZ47_MESSAGE_TYPE = 70
+# The ECVQ-EK3 evaluation kit message type.
+ECVQEK3_MESSAGE_TYPE = 71
+
 # The maximum supported payload size (2^32-9bytes). This is due to
 # the sending mechanism. A sent message is defined by preceding
 # four bytes containing the message size. A message consists of
