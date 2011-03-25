@@ -95,10 +95,14 @@ public class DownloadData extends AbstractDataRequest {
                 de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, timedfield, connection);
                 
                 logger.debug("Data Enumerator: " + de);
-                boolean wantPK = false;
+                int pkIndex = -1;
+                int i=0;
                 for (String field: nextSqlQuery.getValue().getFields()) {
-                	if (field.equalsIgnoreCase("pk"))
-                		wantPK=true;
+                	if (field.equalsIgnoreCase("pk")) {
+                		pkIndex=i;
+                		break;
+                	}
+                	i++;
                 }
                 if (ot == AllowedOutputType.csv) {
                     respond.println("##vsname:" + nextSqlQuery.getKey());
@@ -111,9 +115,9 @@ public class DownloadData extends AbstractDataRequest {
                 boolean firstLine = true;
                 while (de.hasMoreElements()) {
                     if (ot == AllowedOutputType.csv) {
-                        formatCSVElement(respond, de.nextElement(), wantTimed, wantPK, csvDelimiter, firstLine);
+                        formatCSVElement(respond, de.nextElement(), wantTimed, pkIndex, csvDelimiter, firstLine);
                     } else if (ot == AllowedOutputType.xml) {
-                        formatXMLElement(respond, de.nextElement(), wantTimed, wantPK, firstLine);
+                        formatXMLElement(respond, de.nextElement(), wantTimed, pkIndex, firstLine);
                     }
                     firstLine = false;
                 }
@@ -133,70 +137,85 @@ public class DownloadData extends AbstractDataRequest {
     }
 
 
-    private void formatCSVElement(PrintWriter respond, StreamElement se, boolean wantTimed, boolean wantPK,  String cvsDelimiter, boolean firstLine) {
+    private void formatCSVElement(PrintWriter respond, StreamElement se, boolean wantTimed, int pkIndex,  String cvsDelimiter, boolean firstLine) {
+    	boolean firstel;
         if (firstLine) {
             respond.print("#");
-            for (int i = 0; i < se.getData().length; i++) {
-                respond.print(se.getFieldNames()[i]);
-                if (i != se.getData().length - 1)
-                    respond.print(cvsDelimiter);
+            firstel = true;
+            int i = 0;
+            for (; i < se.getData().length; i++) {
+            	if (i == pkIndex) {
+            		if (!firstel)
+                		respond.print(cvsDelimiter);
+            		respond.print("pk");
+            		firstel = false;
+            	}
+            	if (!firstel)
+            		respond.print(cvsDelimiter);            	
+           	    respond.print(se.getFieldNames()[i]);
+           	    firstel = false;
             }
-            int len = se.getData().length;
-            if (wantTimed && len != 0)
-                respond.print(cvsDelimiter);
+            if (i == pkIndex) {
+        		if (!firstel)
+            		respond.print(cvsDelimiter);
+        		respond.print("pk");
+        		firstel = false;
+        	}
             if (wantTimed) {
-                respond.print(timedfield);
-                len++;
-            }
-            if (wantPK && len != 0)
-                respond.print(cvsDelimiter);
-            if (wantPK) {
-                respond.print("pk");
-                len++;
+            	if (!firstel)
+            		respond.print(cvsDelimiter);       
+            	respond.print(timedfield);
             }
             respond.println();
         }
-        for (int i = 0; i < se.getData().length; i++) {
-       		respond.print(se.getData()[i]);
-            if (i != se.getData().length - 1)
-                respond.print(cvsDelimiter);
+        firstel = true;
+        int i = 0;
+        for (;i < se.getData().length; i++) {
+        	if (i == pkIndex) {
+        		if (!firstel)
+            		respond.print(cvsDelimiter);
+        		respond.print(se.getInternalPrimayKey());
+        		firstel = false;
+        	}
+        	if (!firstel)
+        		respond.print(cvsDelimiter);            	
+       	    respond.print(se.getData()[i]);
+       	    firstel = false;
         }
-        int len = se.getData().length;
+        if (i == pkIndex) {
+    		if (!firstel)
+        		respond.print(cvsDelimiter);
+    		respond.print(se.getInternalPrimayKey());
+    		firstel = false;
+    	}
         if (wantTimed) {
-            if (len != 0)
-                respond.print(cvsDelimiter);
-            respond.print(qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
-            len++;
-        }
-        if (wantPK) {
-            if (len != 0)
-                respond.print(cvsDelimiter);
-            respond.print(se.getInternalPrimayKey());
-            len++;
+        	if (!firstel)
+        		respond.print(cvsDelimiter);       
+        	respond.print(qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
         }
         respond.println();
     }
 
-    private void formatXMLElement(PrintWriter respond, StreamElement se, boolean wantTimed, boolean wantPK, boolean firstLine) {
+    private void formatXMLElement(PrintWriter respond, StreamElement se, boolean wantTimed, int pkIndex, boolean firstLine) {
         if (firstLine) {
             respond.println("\t\t<header>");
             for (int i = 0; i < se.getData().length; i++) {
+            	if (i == pkIndex)
+            		respond.println("\t\t\t<field>pk</field>");
                 respond.println("\t\t\t<field>" + se.getFieldNames()[i] + "</field>");
             }
             if (wantTimed)
                 respond.println("\t\t\t<field>"+timedfield+"</field>");
-            if (wantPK)
-                respond.println("\t\t\t<field>pk</field>");
             respond.println("\t\t</header>");
         }
         respond.println("\t\t<tuple>");
         for (int i = 0; i < se.getData().length; i++) {
+        	if (i == pkIndex)
+        		respond.println("\t\t\t<field>"+se.getInternalPrimayKey()+"</field>");
             respond.println("\t\t\t<field>" + se.getData()[i] + "</field>");
         }
         if (wantTimed)
             respond.println("\t\t\t<field>" + (qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
-        if (wantPK)
-            respond.println("\t\t\t<field>" + se.getInternalPrimayKey() + "</field>");
         respond.println("\t\t</tuple>");
     }
 

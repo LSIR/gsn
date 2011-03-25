@@ -164,8 +164,6 @@ public class MultiDataDownload extends HttpServlet {
                 if ("pk".equalsIgnoreCase(n)) 
                     hasPk = true;
 			}
-            //if (! hasPk)
-            //    vsname.append(":pk");
 			vsnames.add(vsname.toString());
 		}
 		parameterMap.put("vsname", vsnames.toArray(new String[] {}));
@@ -337,16 +335,19 @@ public class MultiDataDownload extends HttpServlet {
 		Hashtable<String, String> vsnames = buildWebParameterMapping("vs[", pm); 	// key = [x], value = vsname
 		Hashtable<String, String> fields = buildWebParameterMapping("field[", pm); 	// key = [x], value = fieldname
 		//
-		Iterator<Entry <String, String>> iter2 = vsnames.entrySet().iterator();
+		//Iterator<Entry <String, String>> iter2 = vsnames.entrySet().iterator();
+		ArrayList<String> vskeys = new ArrayList<String>(vsnames.keySet());
+		java.util.Collections.sort(vskeys);
+		Iterator<String> iter2 = vskeys.iterator();
 		String vsname;
 		String field;
+		String el;
 		Set<Entry <String, ArrayList<String>>> entries ;
-		Entry<String, String> en2;
 		ArrayList<String> availableFields;
 		while (iter2.hasNext()) {
-			en2 = iter2.next();
-			vsname = (String) en2.getValue();
-			field = fields.get(en2.getKey());
+			el = iter2.next();
+			vsname = (String) vsnames.get(el);
+			field = fields.get(el);
 			if (vsname.compareToIgnoreCase("All") == 0) {
 				entries = allVsAndFieldsMapping.entrySet();
 				Iterator<Entry<String, ArrayList<String>>> inneriter = entries.iterator();
