@@ -1,3 +1,12 @@
+#! /usr/bin/python
+# -*- coding: UTF-8 -*-
+__author__      = "David Hasenfratz <hasenfratz@tik.ee.ethz.ch>"
+__copyright__   = "Copyright 2011, ETH Zurich, Switzerland, David Hasenfratz"
+__license__     = "GPL"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+
 import struct
 import time
 import serial
@@ -55,22 +64,22 @@ class GPSDriverNAV():
    	    self._deviceStr = config[0]
     	    self._device = self._deviceStr
 
-  	try:                                                                                                    
-            self._device = serial.Serial(self._deviceStr, 19200, timeout=self._serialTimeout)                           
-            self._logger.debug("Successfully opened " + str(self._device))                                  
-        except Exception as e:                                                                                  
-            self._logger.debug("serialAccess Exception (2) " + str(e))                                       
-	    self._logger.info("Could not access gps device " + self._deviceStr)
-	    return
+        try:
+            self._device = serial.Serial(self._deviceStr, 19200, timeout=self._serialTimeout)
+            self._logger.debug("Successfully opened " + str(self._device))
+        except Exception as e:
+            self._logger.debug("serialAccess Exception (2) " + str(e))
+            self._logger.info("Could not access gps device " + self._deviceStr)
+            return
 
     	if (config[1] != None): # The measurement interval in seconds
-   	    self._interval = config[1]
+            self._interval = config[1]
 
         self._runEv = Event()
-    	self._initialized = False
-    	#device is tested by config in that it tries to write to it.
-    	self._logger.info("Config GPS device")
-    	ret = self._config_device()
+        self._initialized = False
+        #device is tested by config in that it tries to write to it.
+        self._logger.info("Config GPS device")
+        ret = self._config_device()
     	if (ret == True):
     	    self._logger.info("Done GPS Driver init")
     	else:
@@ -197,33 +206,33 @@ class GPSDriverNAV():
     	success = False
     	timeout = 5
     	while timeout and not success:
-  	    timeout -= 1
+            timeout -= 1
     	    a = ''
     	    while (a != "$"):
-    		a = self._serialAccess(self._device,1,'r')
+                a = self._serialAccess(self._device,1,'r')
     	    if (a == "$"):
-    	        while (a != "GP"):
-    		    a = self._serialAccess(self._device,2,'r')
-    		    #print(str(a))
-    		while (a != "GG"):
-    		    a = self._serialAccess(self._device,2,'r')
-    		while (a != "A,"):
-    		    a = self._serialAccess(self._device,2,'r')
-    		a = self._serialAccess(self._device,100,'r')
-    		b = a.split('\r')[0]
-    		b = b.split(',')
-    		header = ["$GPGGA", "0xF0 0x00"] 
-    		payload = b 
-    		success = True
-    		break
-    	    else:
-    		success = False
-    	if (success):
-    	    #self._logger.debug("readGpsMessage: Returned payload")
-    	    return (header[0], header[1], payload) #ID, class, payload
-    	else:
-    	    self._logger.debug("readGpsMessage: returned nothing!")
-    	    return False
+                while (a != "GP"):
+                    a = self._serialAccess(self._device,2,'r')
+                    #print(str(a))
+                while (a != "GG"):
+                    a = self._serialAccess(self._device,2,'r')
+                while (a != "A,"):
+                    a = self._serialAccess(self._device,2,'r')
+                a = self._serialAccess(self._device,100,'r')
+                b = a.split('\r')[0]
+                b = b.split(',')
+                header = ["$GPGGA", "0xF0 0x00"] 
+                payload = b 
+                success = True
+                break
+            else:
+                success = False
+        if (success):
+            #self._logger.debug("readGpsMessage: Returned payload")
+            return (header[0], header[1], payload) #ID, class, payload
+        else:
+            self._logger.debug("readGpsMessage: returned nothing!")
+            return False
 
     '''
     ##########################################################################################

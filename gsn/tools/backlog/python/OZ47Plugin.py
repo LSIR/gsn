@@ -44,14 +44,14 @@ class OZ47PluginClass(AbstractPluginClass):
     def getMsgType(self):
         return BackLogMessage.OZ47_MESSAGE_TYPE
 
-    def isBusy(self):
-        return False
-
-    def needsWLAN(self):
-        return False
-
-    def run(self):
-        self.info('OZ47Plugin running...')
+#    def isBusy(self):
+#        return False
+#
+#    def needsWLAN(self):
+#        return False
+#
+#    def run(self):
+#        self.info('OZ47Plugin running...')
 
     def action(self, parameters):
 
@@ -67,6 +67,6 @@ class OZ47PluginClass(AbstractPluginClass):
 
         self.info('OZ47 reading done')
 
-    def stop(self):
-        self._stopped = True
-        self.info('stopped')
+#    def stop(self):
+#        self._stopped = True
+#        self.info('stopped')
