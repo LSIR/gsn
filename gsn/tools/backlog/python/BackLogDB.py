@@ -310,6 +310,8 @@ class BackLogDBClass(Thread, Statistics):
                 self._resentMsgIdentifier = [msgType, timestamp]
                 self._ackLock.release()
                 self._waitForAck.wait(MAX_WAIT_FOR_ACK)
+                if self._backlogMain.gsnpeer.isConnected() and not self._waitForAck.isSet():
+                    self._logger.warning('resent message (%d,%d,%d) has not been acknowledged whithin %f seconds' % (msgType, timestamp, len(message), MAX_WAIT_FOR_ACK))
                 self._waitForAck.clear()
                 if not self._backlogMain.gsnpeer.isConnected() or self._stopped:
                     break
