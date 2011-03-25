@@ -643,6 +643,8 @@ class GSNWriter(Thread):
                     self._sendqueue.task_done()
                 except ValueError, e:
                     self.exception(e)
+                    
+        self.emptyQueue() # to unblock addResendMsg
  
         self._logger.info('died')
         
@@ -666,7 +668,6 @@ class GSNWriter(Thread):
             pass
         except Exception, e:
             self._logger.exception(e)
-        self.emptyQueue() # to unblock addResendMsg
         self._logger.info('stopped')
 
 
