@@ -17,7 +17,7 @@ from SpecialAPI import Statistics
 
 SLEEP_BEFORE_RESEND_ON_RECONNECT = 30
 
-SLEEP_BETWEEN_RESEND = 0.01
+MAX_WAIT_FOR_ACK = 5.0
 
 
 class BackLogDBClass(Thread, Statistics):
@@ -80,6 +80,9 @@ class BackLogDBClass(Thread, Statistics):
         self._dblock = Lock()
         self._resend = Event()
         self._sleepEvent = Event()
+        self._waitForAck = Event()
+        self._ackLock = Lock()
+        self._resentMsgIdentifier = [None, None]
         
         # try to create/open database
         self._dblock.acquire()
@@ -189,6 +192,12 @@ class BackLogDBClass(Thread, Statistics):
             removeTime = self.timeMeasurementDiff(id)
             
             if cnt >= 1:
+                self._ackLock.acquire()
+                if self._resentMsgIdentifier[0] == msgType and self._resentMsgIdentifier[1] == timestamp:
+                    if self._logger.isEnabledFor(logging.DEBUG):
+                        self._logger.debug('acknowledge for resent msg (%d,%d,?) received' % (msgType, timestamp))
+                    self._waitForAck.set()
+                self._ackLock.release()
                 self.counterAction(self._dbNumberOfEntriesId, -cnt)
                 self.counterAction(self._removeTimeId, removeTime)
                 self.counterAction(self._removeCounterId)
@@ -297,9 +306,13 @@ class BackLogDBClass(Thread, Statistics):
                     self._isBusy = False
                     break
                 
-                # TODO: make it adaptive to CPU load
-                if SLEEP_BETWEEN_RESEND > 0:
-                    self._sleepEvent.wait(SLEEP_BETWEEN_RESEND)
+                self._ackLock.acquire()
+                self._resentMsgIdentifier = [msgType, timestamp]
+                self._ackLock.release()
+                self._waitForAck.wait(MAX_WAIT_FOR_ACK)
+                self._waitForAck.clear()
+                if not self._backlogMain.gsnpeer.isConnected() or self._stopped:
+                    break
 
             self._resend.clear()
 
@@ -332,6 +345,7 @@ class BackLogDBClass(Thread, Statistics):
         self._stopped = True
         self._resend.set()
         self._sleepEvent.set()
+        self._waitForAck.set()
         self._resendtimer.stop()
         self._logger.info('stopped')
         
