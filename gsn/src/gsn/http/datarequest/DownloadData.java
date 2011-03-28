@@ -89,12 +89,6 @@ public class DownloadData extends AbstractDataRequest {
             }
             while (iter.hasNext()) {
                 nextSqlQuery = iter.next();
-                Connection connection = null;
-
-                connection = Main.getStorage(nextSqlQuery.getKey()).getConnection();
-                de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, timedfield, connection);
-                
-                logger.debug("Data Enumerator: " + de);
                 int pkIndex = -1;
                 int i=0;
                 for (String field: nextSqlQuery.getValue().getFields()) {
@@ -104,6 +98,17 @@ public class DownloadData extends AbstractDataRequest {
                 	}
                 	i++;
                 }
+                // add pk field for linked binary fields
+                if (pkIndex<0) {
+                	nextSqlQuery.getValue().addField("pk");
+                }
+                
+                Connection connection = null;
+
+                connection = Main.getStorage(nextSqlQuery.getKey()).getConnection();
+                de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, timedfield, connection);
+                
+                logger.debug("Data Enumerator: " + de);
                 if (ot == AllowedOutputType.csv) {
                     respond.println("##vsname:" + nextSqlQuery.getKey());
                     respond.println("##query:" + nextSqlQuery.getValue().getStandardQuery() + (nextSqlQuery.getValue().getLimitCriterion() == null ? "" : "(" + nextSqlQuery.getValue().getLimitCriterion() + ")"));
