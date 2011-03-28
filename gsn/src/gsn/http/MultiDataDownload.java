@@ -221,13 +221,13 @@ public class MultiDataDownload extends HttpServlet {
 		}
 
 		// CONDITIONS
-		Hashtable<String, String> cVss = buildWebParameterMapping("c_vs[", req.getParameterMap());
-		Hashtable<String, String> cJoins = buildWebParameterMapping("c_join[", req.getParameterMap());
-		Hashtable<String, String> cFields = buildWebParameterMapping("c_field[", req.getParameterMap());
-		Hashtable<String, String> cMins = buildWebParameterMapping("c_min[", req.getParameterMap());
-		Hashtable<String, String> cMaxs = buildWebParameterMapping("c_max[", req.getParameterMap());
-		Iterator<Entry <String, String>> iter = cJoins.entrySet().iterator();
-		Entry<String, String> entry;
+		Hashtable<Integer, String> cVss = buildWebParameterMapping("c_vs[", req.getParameterMap());
+		Hashtable<Integer, String> cJoins = buildWebParameterMapping("c_join[", req.getParameterMap());
+		Hashtable<Integer, String> cFields = buildWebParameterMapping("c_field[", req.getParameterMap());
+		Hashtable<Integer, String> cMins = buildWebParameterMapping("c_min[", req.getParameterMap());
+		Hashtable<Integer, String> cMaxs = buildWebParameterMapping("c_max[", req.getParameterMap());
+		Iterator<Entry <Integer, String>> iter = cJoins.entrySet().iterator();
+		Entry<Integer, String> entry;
 		while (iter.hasNext()) {
 			entry = iter.next();
 			String cField = cFields.get(entry.getKey());
@@ -332,16 +332,16 @@ public class MultiDataDownload extends HttpServlet {
 		//
 		Hashtable<String, ArrayList<String>> allVsAndFieldsMapping = buildAllVirtualSensorsAndFieldsMapping () ;
 		//
-		Hashtable<String, String> vsnames = buildWebParameterMapping("vs[", pm); 	// key = [x], value = vsname
-		Hashtable<String, String> fields = buildWebParameterMapping("field[", pm); 	// key = [x], value = fieldname
+		Hashtable<Integer, String> vsnames = buildWebParameterMapping("vs[", pm); 	// key = [x], value = vsname
+		Hashtable<Integer, String> fields = buildWebParameterMapping("field[", pm); 	// key = [x], value = fieldname
 		//
 		//Iterator<Entry <String, String>> iter2 = vsnames.entrySet().iterator();
-		ArrayList<String> vskeys = new ArrayList<String>(vsnames.keySet());
+		ArrayList<Integer> vskeys = new ArrayList<Integer>(vsnames.keySet());
 		java.util.Collections.sort(vskeys);
-		Iterator<String> iter2 = vskeys.iterator();
+		Iterator<Integer> iter2 = vskeys.iterator();
 		String vsname;
 		String field;
-		String el;
+		Integer el;
 		Set<Entry <String, ArrayList<String>>> entries ;
 		ArrayList<String> availableFields;
 		while (iter2.hasNext()) {
@@ -420,8 +420,8 @@ public class MultiDataDownload extends HttpServlet {
 		vssfm.put(vsname, vsnameFields);
 	}
 
-	private Hashtable<String, String> buildWebParameterMapping(String prefix, Map<String, String[]> pm) {
-		Hashtable<String, String> mapping = new Hashtable<String, String> () ;
+	private Hashtable<Integer, String> buildWebParameterMapping(String prefix, Map<String, String[]> pm) {
+		Hashtable<Integer, String> mapping = new Hashtable<Integer, String> () ;
 		Set<Entry <String,String[]>> sp = pm.entrySet();
 		Iterator<Entry <String,String[]>> iter = sp.iterator();
 		Entry<String, String[]> en;
@@ -431,7 +431,7 @@ public class MultiDataDownload extends HttpServlet {
 			key = (String) en.getKey() ;
 			if (key.length() > prefix.length() && key.substring(0,prefix.length()).compareToIgnoreCase(prefix) == 0) {	// look for "vs["
 				String[] vals = (String[]) en.getValue();
-				mapping.put(key.substring(prefix.length() - 1), vals[0]);
+				mapping.put(new Integer(key.substring(prefix.length(), key.indexOf("]"))), vals[0]);
 			}
 		}
 		return mapping;
