@@ -183,6 +183,8 @@ public class DataMapping {
 					if (rs.wasNull())
 						res = null;
 				}
+				if (res==null)
+					logger.warn("No position mapping available for deployment "+deployment+" device-id "+device_id);
 			}
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
@@ -209,6 +211,8 @@ public class DataMapping {
 					if (rs.wasNull())
 						res = null;
 				}
+				if (res==null)
+					logger.warn("No coordinate mapping available for deployment "+deployment+" position "+position);
 			}
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
