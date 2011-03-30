@@ -24,8 +24,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import sun.net.InetAddressCachePolicy;
-
 public class BackLogMessageMultiplexer extends Thread implements CoreStationListener {
 
 	/** Ping request interval in seconds. */
@@ -77,7 +75,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private BackLogMessageMultiplexer(String deployment, String hostName, Integer port) throws Exception {
 		msgTypeListener = Collections.synchronizedMap(new HashMap<Integer,Vector<BackLogMessageListener>> ());
 		
-		coreStationAddress = hostName + ":" + hostPort;
+		coreStationAddress = hostName + ":" + port;
 		this.hostName = hostName;
 		this.hostPort = port;
     	this.deploymentName = deployment;
@@ -92,6 +90,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 	
 	
+	@SuppressWarnings("unused")
 	public synchronized static BackLogMessageMultiplexer getInstance(String deployment, String coreStationAddress) throws Exception {
 		String coreStationAddress_noIp;
 		InetAddress inetAddress;
