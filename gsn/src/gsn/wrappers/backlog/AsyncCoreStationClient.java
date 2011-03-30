@@ -2,6 +2,7 @@ package gsn.wrappers.backlog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
@@ -426,11 +427,11 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	public boolean send(String deployment, Integer id, CoreStationListener listener, int priority, byte[] data) throws IOException {
-		boolean ret = false;
+	public Serializable[] send(String deployment, Integer id, CoreStationListener listener, int priority, byte[] data) throws IOException {
+		Serializable[] ret = new Serializable[]{false, null};
 		if (deployment == null) {
 			logger.error("deployment should not be null...");
-			return false;
+			return ret;
 		}
 		Map<Integer, CoreStationListener> corestationMap = null;
 		corestationMap = deploymentToIdListenerMapList.get(deployment);
@@ -441,8 +442,9 @@ public class AsyncCoreStationClient extends Thread  {
 			if (id == 65535) {
 				Iterator<Integer> iter = corestationMap.keySet().iterator();
 				while (iter.hasNext()) {
-					if(send(corestationMap.get(iter.next()), priority, data, true))
-						ret = true;
+					Serializable[] tmp = send(corestationMap.get(iter.next()), priority, data, true);
+					if((Boolean) tmp[0])
+						ret = tmp;
 				}
 			}
 			else {
@@ -460,7 +462,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 
 
-	private boolean send(CoreStationListener listener, int priority, byte[] data, boolean stuff) throws IOException {
+	private Serializable[] send(CoreStationListener listener, int priority, byte[] data, boolean stuff) throws IOException {
 		if (data.length > PACKET_SIZE-4) 
 			throw new IOException("packet size limited to " + (PACKET_SIZE-4) + " bytes");
 		
@@ -468,6 +470,7 @@ public class AsyncCoreStationClient extends Thread  {
 		socketChannel = listenerToSocketList.get(listener);
 
 		if (socketChannel != null && socketChannel.isConnected()) {
+			Long size = null;
 			synchronized (this.changeRequests) {
 				// Indicate we want the interest ops set changed
 				this.changeRequests.add(new ChangeRequest(socketChannel, ChangeRequest.TYPE_CHANGEOPS, SelectionKey.OP_WRITE | SelectionKey.OP_READ));
@@ -487,25 +490,29 @@ public class AsyncCoreStationClient extends Thread  {
 						out.position(0);
 						byte [] arr = new byte [data.length + 4];
 						out.get(arr);
-						queue.offer(new PriorityDataElement(priority, pktStuffing(arr)));
+						byte [] tmp = pktStuffing(arr);
+						size = new Long(tmp.length);
+						queue.offer(new PriorityDataElement(priority, tmp));
 					}
-					else
+					else {
+						size = new Long(data.length);
 						queue.offer(new PriorityDataElement(priority, data));
+					}
 				}
 			}
 		    
 		    // Finally, wake up our selecting thread so it can make the required changes
 			this.selector.wakeup();
-			return true;
+			return new Serializable[]{true, size};
 		}
 		else {
 			logger.warn("not connected");
-			return false;
+			return new Serializable[]{false, null};
 		}
 	}
 
 
-	public boolean sendHelloMsg(CoreStationListener listener) throws IOException {
+	public Serializable[] sendHelloMsg(CoreStationListener listener) throws IOException {
 		if (logger.isDebugEnabled())
 			logger.debug("send hello message");
 		byte[] data = {BackLogMessageMultiplexer.STUFFING_BYTE, BackLogMessageMultiplexer.HELLO_BYTE};

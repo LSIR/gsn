@@ -1,7 +1,7 @@
 package gsn.wrappers.backlog.statistics;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -14,10 +14,12 @@ public class CoreStationStatistics {
 	private String coreStationAddress = null;
 	private Boolean isConnected = null;
 	private Integer deviceId = null;
-	private Map<Integer,Long> msgRecvCounterMap = Collections.synchronizedMap(new HashMap<Integer,Long>());
-	private Map<Integer,Long> msgRecvByteCounterMap = Collections.synchronizedMap(new HashMap<Integer,Long>());
-	private Map<Integer,Long> msgSendCounterMap = Collections.synchronizedMap(new HashMap<Integer,Long>());
-	private Map<Integer,Long> msgSendByteCounterMap = Collections.synchronizedMap(new HashMap<Integer,Long>());
+	Long recvTotal = null;
+	Long sendTotal = null;
+	private Map<Integer,Long> msgRecvCounterMap = Collections.synchronizedMap(new Hashtable<Integer,Long>());
+	private Map<Integer,Long> msgRecvByteCounterMap = Collections.synchronizedMap(new Hashtable<Integer,Long>());
+	private Map<Integer,Long> msgSendCounterMap = Collections.synchronizedMap(new Hashtable<Integer,Long>());
+	private Map<Integer,Long> msgSendByteCounterMap = Collections.synchronizedMap(new Hashtable<Integer,Long>());
 	
 	
 	public CoreStationStatistics(String corestation) {
@@ -33,6 +35,8 @@ public class CoreStationStatistics {
 	public void setDeviceId(int id) {
 		if (deviceId != null && id != deviceId) {
 			logger.warn("device id for CoreStation " + coreStationAddress + " has changed => reseting all statistics");
+			recvTotal = null;
+			sendTotal = null;
 			msgRecvCounterMap.clear();
 			msgRecvByteCounterMap.clear();
 			msgSendCounterMap.clear();
@@ -56,6 +60,17 @@ public class CoreStationStatistics {
 			msgRecvByteCounterMap.put(type, size);
 		else
 			msgRecvByteCounterMap.put(type, val + size);
+	}
+	
+	public void bytesReceived(long size) {
+		if (recvTotal == null)
+			recvTotal = size;
+		else
+			recvTotal += size;
+	}
+	
+	public Long getTotalRecvByteCounter() {
+		return recvTotal;
 	}
 	
 	public Long getTotalMsgRecvCounter() {
@@ -89,6 +104,17 @@ public class CoreStationStatistics {
 			msgSendByteCounterMap.put(type, new Long(size));
 		else
 			msgSendByteCounterMap.put(type, val + size);
+	}
+	
+	public void bytesSent(long size) {
+		if (sendTotal == null)
+			sendTotal = size;
+		else
+			sendTotal += size;
+	}
+	
+	public Long getTotalSendByteCounter() {
+		return sendTotal;
 	}
 	
 	public Long getTotalMsgSendCounter() {

@@ -1,0 +1,94 @@
+<virtual-sensor name="ETZ_Statistics" priority="10" protected="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            
+			<field name="connected" type="TINYINT" />
+			
+			<field name="in_total" type="BIGINT" unit="bytes" />
+			<field name="in_msg_total_counter" type="BIGINT" />
+			<field name="in_msg_total" type="BIGINT" unit="bytes" />
+			<field name="out_total" type="BIGINT" unit="bytes" />
+			<field name="out_msg_total_counter" type="BIGINT" />
+			<field name="out_msg_total" type="BIGINT" unit="bytes" />
+			
+			<field name="in_ack_msg_counter" type="BIGINT" />
+			<field name="in_ack_msg" type="BIGINT" unit="bytes" />
+			<field name="in_ping_msg_counter" type="BIGINT" />
+			<field name="in_ping_msg" type="BIGINT" unit="bytes" />
+			<field name="in_ping_ack_msg_counter" type="BIGINT" />
+			<field name="in_ping_ack_msg" type="BIGINT" unit="bytes" />
+			<field name="in_tos_msg_counter" type="BIGINT" />
+			<field name="in_tos_msg" type="BIGINT" unit="bytes" />
+			<field name="in_tos1x_msg_counter" type="BIGINT" />
+			<field name="in_tos1x_msg" type="BIGINT" unit="bytes" />
+			<field name="in_backlogstatus_msg_counter" type="BIGINT" />
+			<field name="in_backlogstatus_msg" type="BIGINT" unit="bytes" />
+			<field name="in_corestationstatus_msg_counter" type="BIGINT" />
+			<field name="in_corestationstatus_msg" type="BIGINT" unit="bytes" />
+			<field name="in_binary_msg_counter" type="BIGINT" />
+			<field name="in_binary_msg" type="BIGINT" unit="bytes" />
+			<field name="in_vaisala_wxt520_msg_counter" type="BIGINT" />
+			<field name="in_vaisala_wxt520_msg" type="BIGINT" unit="bytes" />
+			<field name="in_schedule_msg_counter" type="BIGINT" />
+			<field name="in_schedule_msg" type="BIGINT" unit="bytes" />
+			<field name="in_gps_msg_counter" type="BIGINT" />
+			<field name="in_gps_msg" type="BIGINT" unit="bytes" />
+			<field name="in_OZ47_msg_counter" type="BIGINT" />
+			<field name="in_OZ47_msg" type="BIGINT" unit="bytes" />
+			<field name="in_ECVQEK3_msg_counter" type="BIGINT" />
+			<field name="in_ECVQEK3_msg" type="BIGINT" unit="bytes" />
+			
+			<field name="out_ack_msg_counter" type="BIGINT" />
+			<field name="out_ack_msg" type="BIGINT" unit="bytes" />
+			<field name="out_ping_msg_counter" type="BIGINT" />
+			<field name="out_ping_msg" type="BIGINT" unit="bytes" />
+			<field name="out_ping_ack_msg_counter" type="BIGINT" />
+			<field name="out_ping_ack_msg" type="BIGINT" unit="bytes" />
+			<field name="out_queue_limit_msg_counter" type="BIGINT" />
+			<field name="out_queue_limit_msg" type="BIGINT" unit="bytes" />
+			<field name="out_queue_ready_msg_counter" type="BIGINT" />
+			<field name="out_queue_ready_msg" type="BIGINT" unit="bytes" />
+			<field name="out_tos_msg_counter" type="BIGINT" />
+			<field name="out_tos_msg" type="BIGINT" unit="bytes" />
+			<field name="out_tos1x_msg_counter" type="BIGINT" />
+			<field name="out_tos1x_msg" type="BIGINT" unit="bytes" />
+			<field name="out_backlogstatus_msg_counter" type="BIGINT" />
+			<field name="out_backlogstatus_msg" type="BIGINT" unit="bytes" />
+			<field name="out_corestationstatus_msg_counter" type="BIGINT" />
+			<field name="out_corestationstatus_msg" type="BIGINT" unit="bytes" />
+			<field name="out_binary_msg_counter" type="BIGINT" />
+			<field name="out_binary_msg" type="BIGINT" unit="bytes" />
+			<field name="out_vaisala_wxt520_msg_counter" type="BIGINT" />
+			<field name="out_vaisala_wxt520_msg" type="BIGINT" unit="bytes" />
+			<field name="out_schedule_msg_counter" type="BIGINT" />
+			<field name="out_schedule_msg" type="BIGINT" unit="bytes" />
+			<field name="out_gps_msg_counter" type="BIGINT" />
+			<field name="out_gps_msg" type="BIGINT" unit="bytes" />
+			<field name="out_OZ47_msg_counter" type="BIGINT" />
+			<field name="out_OZ47_msg" type="BIGINT" unit="bytes" />
+			<field name="out_ECVQEK3_msg_counter" type="BIGINT" />
+			<field name="out_ECVQEK3_msg" type="BIGINT" unit="bytes" />
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>show statistics of the ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+		<stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog-stats">
+                    <predicate key="sampling-rate">30</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

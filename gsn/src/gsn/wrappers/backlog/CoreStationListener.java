@@ -1,6 +1,7 @@
 package gsn.wrappers.backlog;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public interface CoreStationListener {
 
@@ -13,7 +14,7 @@ public interface CoreStationListener {
     public int getPort();
 
 
-    public InetAddress getInetAddress();
+    public InetAddress getInetAddress() throws UnknownHostException;
 
     
     public void connectionLost();
