@@ -437,7 +437,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		while (en.hasMoreElements()) {
 			BackLogMessageListener temp = en.nextElement();
 			// send the message to the listener
-			if (temp.messageReceived(coreStationDeviceId, message.getTimestamp(), message.getPayload()) == true)
+			if (temp.messageReceived(coreStationDeviceId, message) == true)
 				ReceiverCount++;
 		}
 		if (ReceiverCount == 0)
@@ -457,7 +457,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	}
 
 
-	public void sendAck(long timestamp, int msgType, int priority) {
+	public boolean sendAck(long timestamp, int msgType, int priority) {
 		// send ACK with corresponding timestamp and message type
 		BackLogMessage ack;
 		try {
@@ -466,10 +466,11 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			if (logger.isDebugEnabled())
 				logger.debug("Ack sent: (timestamp=" + timestamp + "/messageType=" + msgType + ")");
 
-				sendMessage(ack, null, priority);
+			return sendMessage(ack, null, priority);
 		} catch (Exception e) {
 			logger.warn(e.getMessage());
 		}
+		return false;
 	}
 	
 	

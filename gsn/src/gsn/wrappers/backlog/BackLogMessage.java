@@ -433,14 +433,9 @@ public class BackLogMessage {
 	 * Get the size of the message.
 	 * 
 	 * @return the the size of the message
-	 * 
-	 * @throws IOException if the payload length exceeds MAX_PAYLOAD_SIZE
 	 */
-	public int getSize() throws IOException {
-		if (payloadBin == null)
-			return checkPayload(payload);
-		else
-			return payloadBin.length;
+	public int getSize() {
+		return getBinaryMessage().length;
 	}
 	
 	

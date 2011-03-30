@@ -7,6 +7,12 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
+            <field name="RECV_MSG_COUNTER" type="BIGINT" />
+            <field name="RECV_MSG_VOLUME" type="BIGINT" unit="bytes" />
+            <field name="SEND_MSG_COUNTER" type="BIGINT" />
+            <field name="SEND_MSG_VOLUME" type="BIGINT" unit="bytes" />
+            <field name="SEND_ACK_COUNTER" type="BIGINT" />
+            
             <field name="V_EXT1" type="INTEGER" unit="mV"/>
             <field name="V_EXT2" type="INTEGER" unit="mV"/>
             <field name="V_EXT3" type="INTEGER" unit="mV"/>
