@@ -367,10 +367,8 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 *          priority to send this message as soon as possible is. It should be somewhere
 	 *          between 10 and 1000. If it is set null, the default priority will be
 	 *          used.
-	 * 
-	 * @return false if not connected to the deployment
 	 */
-	public boolean ackMessage(long timestamp, Integer priority) {
+	public void ackMessage(long timestamp, Integer priority) {
 		boolean ret;
 		if (priority == null)
 			ret = activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), DEFAULT_ACK_PRIORITY);
@@ -379,8 +377,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		
 		if (ret)
 			sendAckCounter += 1;
-		
-		return ret;
 	}
 
 
