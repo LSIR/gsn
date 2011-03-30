@@ -1,10 +1,12 @@
 package gsn.http.datarequest;
 
 import gsn.Main;
+import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.http.MultiDataDownload;
 import gsn.storage.DataEnumerator;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -25,7 +27,8 @@ public class DownloadData extends AbstractDataRequest {
 
     public enum AllowedOutputType {
         csv,
-        xml
+        xml,
+        binary,
     }
 
     private AllowedOutputType ot;
@@ -106,7 +109,10 @@ public class DownloadData extends AbstractDataRequest {
                 Connection connection = null;
 
                 connection = Main.getStorage(nextSqlQuery.getKey()).getConnection();
-                de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, timedfield, connection);
+                if (ot == AllowedOutputType.binary)
+                	de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), false, timedfield, connection);
+                else
+                	de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, timedfield, connection);
                 
                 logger.debug("Data Enumerator: " + de);
                 if (ot == AllowedOutputType.csv) {
@@ -123,7 +129,9 @@ public class DownloadData extends AbstractDataRequest {
                         formatCSVElement(respond, de.nextElement(), wantTimed, pkIndex, csvDelimiter, firstLine);
                     } else if (ot == AllowedOutputType.xml) {
                         formatXMLElement(respond, de.nextElement(), wantTimed, pkIndex, firstLine);
-                    }
+                	} else if (ot == AllowedOutputType.binary) {
+                		formatBinaryElement(os, de.nextElement(), wantTimed, pkIndex, firstLine);
+                	}
                     firstLine = false;
                 }
                 if (ot == AllowedOutputType.xml)
@@ -223,6 +231,23 @@ public class DownloadData extends AbstractDataRequest {
             respond.println("\t\t\t<field>" + (qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
         respond.println("\t\t</tuple>");
     }
+    
+    private void formatBinaryElement(OutputStream os, StreamElement se, boolean wantTimed, int pkIndex, boolean firstLine) {
+    	for (int i = 0; i < se.getData().length; i++) {
+        	if (se.getFieldTypes()[i] == DataTypes.BINARY) {
+        		byte[] data = (byte[]) se.getData()[i];
+        		try {
+					os.write(data);
+				} catch (IOException e) {
+					logger.error(e.getMessage());
+				}
+        	}
+        	else {
+        		logger.error("field type not binary");
+        	}
+        }
+    }
+
 
     private long timestampInUTC(long timestamp) {
         Calendar cal = Calendar.getInstance();

@@ -13,6 +13,7 @@ public class AbstractQuery {
     private String vsName;
     private ArrayList<StandardCriterion> criteria;
     private String timedfield;
+    private String temporalorder;
 
     private static transient Logger logger = Logger.getLogger(AbstractQuery.class);
 
@@ -24,9 +25,10 @@ public class AbstractQuery {
         this.fields = fields;
         this.criteria = criteria;
         this.timedfield = "timed";
+        this.temporalorder = "desc";
 	}
 
-	public AbstractQuery (LimitCriterion limitCriterion, AggregationCriterion aggregation, String vsname, String[] fields, ArrayList<StandardCriterion> criteria, String timedfield) {
+	public AbstractQuery (LimitCriterion limitCriterion, AggregationCriterion aggregation, String vsname, String[] fields, ArrayList<StandardCriterion> criteria, String timedfield, String temporalorder) {
 		//this.standardQuery = standardQuery;
 		this.limitCriterion = limitCriterion;
         this.aggregation = aggregation;
@@ -34,6 +36,7 @@ public class AbstractQuery {
         this.fields = fields;
         this.criteria = criteria;
         this.timedfield = timedfield;
+        this.temporalorder = temporalorder;
 	}
 
 	public StringBuilder getStandardQuery() {
@@ -91,8 +94,8 @@ public class AbstractQuery {
 			sqlQuery.append(partFields);
 			sqlQuery.append("from ").append(vsName).append(" ");
 			sqlQuery.append(partStandardCriteria);
-			if (aggregation == null)	sqlQuery.append("order by "+timedfield+" desc ");
-			else 								sqlQuery.append("group by aggregation_interval order by aggregation_interval desc ");
+			if (aggregation == null)	sqlQuery.append("order by "+timedfield+" "+temporalorder+" ");
+			else 								sqlQuery.append("group by aggregation_interval order by aggregation_interval "+temporalorder+" ");
 
 			logger.debug("SQL Query built >" + sqlQuery.toString() + "<");
         return sqlQuery;

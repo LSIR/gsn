@@ -115,6 +115,25 @@ public class MultiDataDownload extends HttpServlet {
 				rpd.outputResult(res.getOutputStream());
 				res.getOutputStream().flush();
 			}
+			else if ("binary".equals(downloadFormat)) {
+				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
+                //
+                if (Main.getContainerConfig().isAcEnabled()) {
+                    ArrayList<String> noAccess = checkAccessControl(user, dd.getQueryBuilder());
+                    if (noAccess != null && noAccess.size() > 0) {
+                        res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsNames:" + noAccess + " and user: " + (user == null ? "not logged in" : user.getUserName()));
+                        return;
+                    }
+                }
+                //
+                dd.process();
+			    res.setContentType("application/x-download");
+                if (! "inline".equals(downloadMode)) {
+				    res.setHeader("content-disposition","attachment; filename=data.bin");
+                }
+				dd.outputResult(res.getOutputStream());
+				res.getOutputStream().flush();
+			}
 			else {
 				throw new DataRequestException("Unknown download_format >" + downloadFormat + "<");
 			}
@@ -156,34 +175,40 @@ public class MultiDataDownload extends HttpServlet {
 			vsname = new StringBuilder();
 			vsname.append(vsAndFieldsEntry.getKey());
 			fieldsIterator = vsAndFieldsEntry.getValue().iterator();
-			boolean hasPk=false;
             while (fieldsIterator.hasNext()) {
 				vsname.append(":");
 				String n = fieldsIterator.next();
                 vsname.append(n);
-                if ("pk".equalsIgnoreCase(n)) 
-                    hasPk = true;
 			}
 			vsnames.add(vsname.toString());
 		}
-		parameterMap.put("vsname", vsnames.toArray(new String[] {}));
+		parameterMap.put(QueriesBuilder.PARAM_VSNAMES_AND_FIELDS, vsnames.toArray(new String[] {}));
 		
 		// TIME LINE
 		String req_timeline = req.getParameter("timeline");
 		String timedfield;
 		if (req_timeline != null) {
 			timedfield = req_timeline;
-			parameterMap.put("timeline", new String[] {req_timeline});
+			parameterMap.put(QueriesBuilder.PARAM_TIME_LINE, new String[] {req_timeline});
 		}
 		else {
 			timedfield = "timed";
-			parameterMap.put("timeline", new String[] {"timed"});
+			parameterMap.put(QueriesBuilder.PARAM_TIME_LINE, new String[] {"timed"});
 		}
 		
 		// TIME FORMAT
 		String req_time_format = req.getParameter("time_format");
 		if (req_time_format != null) {
-			parameterMap.put("timeformat", new String[] {req_time_format});
+			parameterMap.put(QueriesBuilder.PARAM_TIME_FORMAT, new String[] {req_time_format});
+		}
+		
+		// TEMPORAL ORDER
+		String req_temp_order = req.getParameter("order");
+		if (req_temp_order != null) {
+			parameterMap.put(QueriesBuilder.PARAM_TEMP_ORDER, new String[] {req_time_format});
+		}
+		else {
+			parameterMap.put(QueriesBuilder.PARAM_TEMP_ORDER, new String[] {"desc"});
 		}
 		
 		// Download format

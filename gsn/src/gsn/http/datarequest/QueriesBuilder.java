@@ -25,6 +25,7 @@ public class QueriesBuilder {
 	public static final String 			PARAM_MAX_NB				= "nb";
 	public static final String			PARAM_TIME_FORMAT			= "timeformat";
 	public static final String			PARAM_TIME_LINE				= "timeline";
+	public static final String			PARAM_TEMP_ORDER			= "temporalorder";
 
 	/* Parsed Parameters */
 	private HashMap<String, FieldsCollection> 	vsnamesAndStreams 			= null;
@@ -32,6 +33,7 @@ public class QueriesBuilder {
 	private ArrayList<StandardCriterion> 		standardCriteria 			= null;
 	private LimitCriterion						limitCriterion				= null;
 	private String timedfield;
+	private String temporalorder;
 
 	private Hashtable<String, AbstractQuery> sqlQueries ;
 
@@ -60,6 +62,7 @@ public class QueriesBuilder {
 			timedfield = tf[0];
 		else
 			timedfield="timed";
+		temporalorder = requestParameters.get(PARAM_TEMP_ORDER)[0];
 		String[] vsnamesParameters = requestParameters.get(PARAM_VSNAMES_AND_FIELDS);
 
 		if (vsnamesParameters == null) throw new DataRequestException ("You must specify at least one >" + PARAM_VSNAMES_AND_FIELDS + "< parameter.") ; 
@@ -119,7 +122,7 @@ public class QueriesBuilder {
 			next = iter.next();
 			fields = next.getValue().getFields();
 			vsname = next.getKey();
-			this.sqlQueries.put(vsname, new AbstractQuery(limitCriterion, aggregationCriterion, vsname, fields, standardCriteria, timedfield));
+			this.sqlQueries.put(vsname, new AbstractQuery(limitCriterion, aggregationCriterion, vsname, fields, standardCriteria, timedfield, temporalorder));
 		}
 	}
 
