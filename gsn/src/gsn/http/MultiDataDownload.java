@@ -205,7 +205,7 @@ public class MultiDataDownload extends HttpServlet {
 		// TEMPORAL ORDER
 		String req_temp_order = req.getParameter("order");
 		if (req_temp_order != null) {
-			parameterMap.put(QueriesBuilder.PARAM_TEMP_ORDER, new String[] {req_time_format});
+			parameterMap.put(QueriesBuilder.PARAM_TEMP_ORDER, new String[] {req_temp_order});
 		}
 		else {
 			parameterMap.put(QueriesBuilder.PARAM_TEMP_ORDER, new String[] {"desc"});
