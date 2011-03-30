@@ -159,7 +159,7 @@ public class MultiDataDownload extends HttpServlet {
         return null;
     }
 	
-	private Map<String, String[]> parseParameters (HttpServletRequest req, String downloadFormat, SimpleDateFormat sdfWeb) {
+	private Map<String, String[]> parseParameters (HttpServletRequest req, String downloadFormat, SimpleDateFormat sdfWeb) throws DataRequestException {
 		Map<String, String[]> parameterMap = new Hashtable<String, String[]>();
 
 		Hashtable<String, ArrayList<String>> vssfm = buildVirtualSensorsFieldsMapping(req.getParameterMap());
@@ -205,6 +205,8 @@ public class MultiDataDownload extends HttpServlet {
 		// TEMPORAL ORDER
 		String req_temp_order = req.getParameter("order");
 		if (req_temp_order != null) {
+			if (!("desc".compareToIgnoreCase(req_temp_order)==0 || "asc".compareToIgnoreCase(req_temp_order)==0))
+				throw new DataRequestException("Temporal oder must be 'asc' or 'desc'.");
 			parameterMap.put(QueriesBuilder.PARAM_TEMP_ORDER, new String[] {req_temp_order});
 		}
 		else {
