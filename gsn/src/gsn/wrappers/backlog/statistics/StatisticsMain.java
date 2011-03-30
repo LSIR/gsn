@@ -53,9 +53,9 @@ public class StatisticsMain {
 		if (!deploymentToDeploymentStatsList.containsKey(deploymentName))
 			throw new IOException("deployment " + deploymentName + " does not exist in the statistics");
 		
-		DeploymentStatistics deplstats = deploymentToDeploymentStatsList.get(deploymentName);
+		BackLogStatsWrapper deplstats = deploymentToDeploymentStatsList.get(deploymentName).getStatsWrapper();
 		if (deplstats != null)
-			deplstats.getStatsWrapper().connectionStatusChanged(deviceId);
+			deplstats.connectionStatusChanged(deviceId);
 	}
 
 
