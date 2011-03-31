@@ -17,7 +17,7 @@ from SpecialAPI import Statistics
 
 SLEEP_BEFORE_RESEND_ON_RECONNECT = 30
 
-MAX_WAIT_FOR_ACK = 5.0
+MAX_WAIT_FOR_ACK = 30.0
 
 
 class BackLogDBClass(Thread, Statistics):
@@ -298,6 +298,10 @@ class BackLogDBClass(Thread, Statistics):
                 message = row[2]
                 # should be blocking until queue is free and ready to send
                 self._logger.debug('rsnd...')
+                self._ackLock.acquire()
+                self._resentMsgIdentifier = [msgType, timestamp]
+                self._waitForAck.clear()
+                self._ackLock.release()
                 if self._backlogMain.gsnpeer.processResendMsg(msgType, timestamp, message):
                     if self._logger.isEnabledFor(logging.DEBUG):
                         self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
@@ -306,13 +310,9 @@ class BackLogDBClass(Thread, Statistics):
                     self._isBusy = False
                     break
                 
-                self._ackLock.acquire()
-                self._resentMsgIdentifier = [msgType, timestamp]
-                self._ackLock.release()
                 self._waitForAck.wait(MAX_WAIT_FOR_ACK)
                 if self._backlogMain.gsnpeer.isConnected() and not self._waitForAck.isSet():
-                    self._logger.warning('resent message (%d,%d,%d) has not been acknowledged whithin %f seconds' % (msgType, timestamp, len(message), MAX_WAIT_FOR_ACK))
-                self._waitForAck.clear()
+                    self._logger.debug('resent message (%d,%d,%d) has not been acknowledged whithin %f seconds' % (msgType, timestamp, len(message), MAX_WAIT_FOR_ACK))
                 if not self._backlogMain.gsnpeer.isConnected() or self._stopped:
                     break
 
