@@ -11,12 +11,6 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            
-            <field name="RECV_MSG_COUNTER" type="BIGINT" />
-            <field name="RECV_MSG_VOLUME" type="BIGINT" unit="bytes" />
-            <field name="SEND_MSG_COUNTER" type="BIGINT" />
-            <field name="SEND_MSG_VOLUME" type="BIGINT" unit="bytes" />
-            <field name="SEND_ACK_COUNTER" type="BIGINT" />
 
             <field name="FILE_REVISION" type="VARCHAR(255)" />
             <field name="FILE_MD5" type="VARCHAR(255)" />

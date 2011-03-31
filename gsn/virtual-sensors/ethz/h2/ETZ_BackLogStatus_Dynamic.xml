@@ -12,12 +12,6 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-            <field name="RECV_MSG_COUNTER" type="BIGINT" />
-            <field name="RECV_MSG_VOLUME" type="BIGINT" unit="bytes" />
-            <field name="SEND_MSG_COUNTER" type="BIGINT" />
-            <field name="SEND_MSG_VOLUME" type="BIGINT" unit="bytes" />
-            <field name="SEND_ACK_COUNTER" type="BIGINT" />
-            
             <field name="UPTIME" type="INTEGER" unit="relatime" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />

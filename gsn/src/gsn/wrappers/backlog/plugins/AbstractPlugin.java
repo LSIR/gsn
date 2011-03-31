@@ -29,12 +29,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	protected BackLogWrapper activeBackLogWrapper = null;
 	protected Integer priority = null;
 
-    private long recvMsgCounter = 0;
-    private long recvMsgVolume = 0;
-    private long sendMsgCounter = 0;
-    private long sendMsgVolume = 0;
-    private long sendAckCounter = 0;
-
 
 	/**
 	 * Initialize the plugin.
@@ -90,29 +84,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	
 	
 	public abstract String getPluginName();
-	
-	
-	public DataField[] getOutFormat() {
-		return concat(getOutputFormat(), new DataField[] {
-			new DataField("recv_msg_counter", DataTypes.BIGINT),
-			new DataField("recv_msg_volume", DataTypes.BIGINT),
-			new DataField("send_msg_counter", DataTypes.BIGINT),
-			new DataField("send_msg_volume", DataTypes.BIGINT),
-			new DataField("send_ack_counter", DataTypes.BIGINT)});
-	}
-	
-	
-	public void messageReceived(int volume) {
-		recvMsgCounter += 1;
-		recvMsgVolume += volume;
-	}
-	
-
-    public boolean messageReceived(int deviceId, BackLogMessage msg) {
-		recvMsgCounter += 1;
-		recvMsgVolume += msg.getSize();
-		return messageReceived(deviceId, msg.getTimestamp(), msg.getPayload());
-    }
 
 
 	/**
@@ -213,20 +184,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @return the output structure of the plugin in a DataField
 	 */
 	public abstract DataField[] getOutputFormat();
-    
-
-	
-    /**
-     * This method is called to signal message reception. It must be
-     * implemented by any plugin.
-	 *
-     * @param deviceId the DeviceId the message has been received from
-     * @param timestamp contained in the message {@link BackLogMessage}
-     * @param data of the message
-     * 
-     * @return true, if the plugin did acknowledge the message
-     */
-    public abstract boolean messageReceived(int deviceId, long timestamp, Serializable[] data);
 
 
 
@@ -243,12 +200,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @param timestamp
 	 * 			The timestamp in milliseconds this data has been
 	 * 			generated.
-	 * @param nrProcessedMsg
-     *          The number of received backlog messages which have been
-	 *          processed to generate this stream element.
-	 * @param bytesrecv
-     *          The number of received bytes which have been processed
-	 *          to generate this stream element.
 	 * @param data 
 	 * 			The data to be processed. Its format must correspond
 	 * 			to the one specified by the plugin's getOutputFormat()
@@ -256,7 +207,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @return false if storing the new item fails otherwise true
 	 */
 	public boolean dataProcessed(long timestamp, Serializable... data) {
-		return activeBackLogWrapper.dataProcessed(timestamp, concat(data, new Serializable[]{recvMsgCounter, recvMsgVolume, sendMsgCounter, sendMsgVolume, sendAckCounter}));
+		return activeBackLogWrapper.dataProcessed(timestamp, data);
 	}
 
 
@@ -285,18 +236,10 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * @throws IOException if the message length exceeds MAX_PAYLOAD_SIZE+9
 	 */
 	public boolean sendRemote(long timestamp, Serializable[] data, Integer priority) throws IOException {
-		boolean ret;
-		BackLogMessage msg = new BackLogMessage(getMessageType(), timestamp, data);
 		if (priority == null)
-			ret = activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, DEFAULT_PACKET_SEND_PRIORITY);
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, DEFAULT_PACKET_SEND_PRIORITY);
 		else
-			ret = activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, priority);
-		
-		if (ret) {
-			sendMsgCounter += 1;
-			sendMsgVolume += msg.getSize();
-		}
-		return ret;
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), null, priority);
 	}
 
 
@@ -330,18 +273,10 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * 			or the DeviceId is not connected or does not exist.
 	 */
 	public boolean sendRemote(long timestamp, Serializable[] data, Integer id, Integer priority) throws IOException {
-		boolean ret;
-		BackLogMessage msg = new BackLogMessage(getMessageType(), timestamp, data);
 		if (priority == null)
-			ret = activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(msg, id, DEFAULT_PACKET_SEND_PRIORITY);
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, DEFAULT_PACKET_SEND_PRIORITY);
 		else
-			ret = activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(msg, id, priority);
-		
-		if (ret) {
-			sendMsgCounter += 1;
-			sendMsgVolume += msg.getSize();
-		}
-		return ret;
+			return activeBackLogWrapper.getBLMessageMultiplexer().sendMessage(new BackLogMessage(getMessageType(), timestamp, data), id, priority);
 	}
 
 
@@ -369,14 +304,10 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 *          used.
 	 */
 	public void ackMessage(long timestamp, Integer priority) {
-		boolean ret;
 		if (priority == null)
-			ret = activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), DEFAULT_ACK_PRIORITY);
+			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), DEFAULT_ACK_PRIORITY);
 		else
-			ret = activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), priority);
-		
-		if (ret)
-			sendAckCounter += 1;
+			activeBackLogWrapper.getBLMessageMultiplexer().sendAck(timestamp, getMessageType(), priority);
 	}
 
 
@@ -455,7 +386,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	}
 	
 	
-	public static <T> T[] concat(T[] first, T[] second) {
+	protected static <T> T[] concat(T[] first, T[] second) {
 		T[] result = Arrays.copyOf(first, first.length + second.length);
 		System.arraycopy(second, 0, result, first.length, second.length);
 		return result;

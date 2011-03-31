@@ -6,13 +6,6 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            
-            <field name="RECV_MSG_COUNTER" type="BIGINT" />
-            <field name="RECV_MSG_VOLUME" type="BIGINT" unit="bytes" />
-            <field name="SEND_MSG_COUNTER" type="BIGINT" />
-            <field name="SEND_MSG_VOLUME" type="BIGINT" unit="bytes" />
-            <field name="SEND_ACK_COUNTER" type="BIGINT" />
-            
             <field name="BIAS_VOLTAGE" type="BIGINT" unit="mV" />
             <field name="MEASURED_CONCENTRATION" type="DOUBLE" unit="ppm" />
             <field name="SENSOR_OUTPUT_CURRENT" type="BIGINT" unit="nA" />

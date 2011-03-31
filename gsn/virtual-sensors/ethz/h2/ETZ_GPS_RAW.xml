@@ -6,13 +6,6 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            
-            <field name="RECV_MSG_COUNTER" type="BIGINT" />
-            <field name="RECV_MSG_VOLUME" type="BIGINT" unit="bytes" />
-            <field name="SEND_MSG_COUNTER" type="BIGINT" />
-            <field name="SEND_MSG_VOLUME" type="BIGINT" unit="bytes" />
-            <field name="SEND_ACK_COUNTER" type="BIGINT" />
-            
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
 		    <field name="GPS_SATS" type="INTEGER"/>

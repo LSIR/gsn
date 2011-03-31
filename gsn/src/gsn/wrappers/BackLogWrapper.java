@@ -208,7 +208,7 @@ public class BackLogWrapper extends AbstractWrapper {
 	 */
 	@Override
 	public DataField[] getOutputFormat() {
-		return pluginObject.getOutFormat();
+		return pluginObject.getOutputFormat();
 	}
 
 
