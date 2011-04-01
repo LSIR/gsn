@@ -86,7 +86,7 @@ class GPSDriverNAV():
     	if (ret == True):
     	    self._logger.info("Done GPS Driver init")
     	else:
-    	    self._logger.error("There was a problem initializing the GPS device")
+    	    self._logger.info("There was a problem initializing the GPS device")
 	
     '''
     ##########################################################################################
@@ -406,7 +406,7 @@ class GPSDriverNAV():
     '''
     
     def _config_device(self):
-        change = False        
+        #change = False        
     
         #########################################
         #set Message type depending on mode
@@ -414,61 +414,71 @@ class GPSDriverNAV():
         self._logger.info("Setting message type...")
         newport = struct.pack('19B',0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x03,0x00,0x00,0x00,0x00,0x00)
 
-        old = ''
-        while (not old):
-            old = self._pollGpsMessage(self._prtMessageId)
-            rec=struct.unpack('20B',old[2])
-            want=struct.unpack('19B',newport)
-            prtchange=False
-            if want[0]!=rec[0]:
-                prtchange=True
-                self._logger.error('Wrong Portnumber')
-            for i in range(3,19):
-                if want[i]!=rec[i+1]:
-                    prtchange=True
-                    if self._logger.isEnabledFor(logging.DEBUG):
-                        self._logger.debug('Bit %d from prtMessage not matching %s instead of %s' % (i, rec[i], want[i]))
-                    
-            if prtchange==True:
-                self._logger.info('Port protocols changed')
-                self._logger.info("New Protocol: %s" % (want,))
-                cnt=0
-                ACK=0
-                while not ACK and cnt<=3:
-                    self._write(self._prtMessageId,newport)
-                    ACK=self._readRaw(self._ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.error('New configuration could not be sent!')
-                        break
-                    self._runEv.wait(1)
-                change=True
-            self._logger.info("Done setting message type...")       
+        #cnt=0
+        #old = ''
+        #while (not old and cnt<=3):
+        #    old = self._pollGpsMessage(self._prtMessageId)
+        #    cnt=cnt+1
+        #    if cnt==3:
+        #        self._logger.error('New configuration could not be sent!')
+        #        return False
+        #rec=struct.unpack('20B',old[2])
+        #want=struct.unpack('19B',newport)
+        #prtchange=False
+        #if want[0]!=rec[0]:
+        #    prtchange=True
+        #    self._logger.error('Wrong Portnumber')
+        #for i in range(3,19):
+        #    if want[i]!=rec[i+1]:
+        #        prtchange=True
+        #        if self._logger.isEnabledFor(logging.DEBUG):
+        #            self._logger.debug('Bit %d from prtMessage not matching %s instead of %s' % (i, rec[i], want[i]))
+                
+        #if prtchange==True:
+        #    self._logger.info('Port protocols changed')
+        #    self._logger.info("New Protocol: %s" % (want,))
+        cnt=0
+        ACK=0
+        while not ACK and cnt<=3:
+            self._write(self._prtMessageId,newport)
+            ACK=self._readRaw(self._ACK)
+            cnt=cnt+1
+            if cnt==3:
+                self._logger.error('New configuration could not be sent!')
+                break
+            self._runEv.wait(1)
+        #change=True
+        self._logger.info("Done setting message type...")
     
-            ###################################
-            #set the measurement rate
-            ##################################
-            self._logger.info("Setting rate...")
-            newrate=struct.pack('3H', self._interval*1000, 0x01,0x01)
-            rate = False
-            while (not rate):
-                rate = self._pollGpsMessage(self._rateMessageId)
-            if rate[2] != newrate:
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.info('Rate changed from %d to %d' % (struct.unpack('3H',rate[2])[0], self._interval*1000))
-                cnt=0
-                ACK=0
-                while not ACK and cnt<=3:
-                    self._write(self._rateMessageId, newrate)
-                    ACK=self._readRaw(self._ACK)
-                    #self._logger.info(ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.error('New configuration could not be sent!')
-                        break
-                    self._runEv.wait(1)
-                change=True
-            self._logger.info("Done setting rate.")
+        ###################################
+        #set the measurement rate
+        ##################################
+        self._logger.info("Setting rate...")
+        newrate=struct.pack('3H', self._interval*1000, 0x01,0x01)
+        #rate = False
+        #cnt=0
+        #while (not rate and cnt<=3):
+        #    rate = self._pollGpsMessage(self._rateMessageId)
+        #    cnt=cnt+1
+        #    if cnt==3:
+        #        self._logger.error('New configuration could not be sent!')
+        #        return False
+        #if rate[2] != newrate:
+        #    if self._logger.isEnabledFor(logging.DEBUG):
+        #        self._logger.info('Rate changed from %d to %d' % (struct.unpack('3H',rate[2])[0], self._interval*1000))
+        cnt=0
+        ACK=0
+        while not ACK and cnt<=3:
+            self._write(self._rateMessageId, newrate)
+            ACK=self._readRaw(self._ACK)
+            #self._logger.info(ACK)
+            cnt=cnt+1
+            if cnt==3:
+                self._logger.error('New configuration could not be sent!')
+                break
+            self._runEv.wait(1)
+        change=True
+        self._logger.info("Done setting rate.")
     
         ##################################################
         #Set mode
@@ -476,40 +486,40 @@ class GPSDriverNAV():
         ##################################################
         self._logger.info('Setting NAV USB...')
         newOutput = struct.pack('10B',0x08,0x00,0xF0,0x00,0x00,0x00,0x00,0x01,0x00,0x01) 
-        self._write(self._msgMessageId,self._messageId)
-        old = self._pollGpsMessage(self._msgMessageId)
-        while (old == None):
-            old = self._readRaw(self._msgMessageId)
-            if old!=newOutput:
-                self._logger.info('Output message changed')
-                self._logger.info("Msg Port Mode: %s" % (newOutput,))
-                cnt=0
-                ACK=0
-                while not ACK and cnt<=3:
-                    self._write(self._msgMessageId,newOutput)
-                    ACK=self._readRaw(self._ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.error('New configuration could not be sent!')
-                        break
-                    self._runEv.wait(1)
-                change=True
+        #self._write(self._msgMessageId,self._messageId)
+        #old = self._pollGpsMessage(self._msgMessageId)
+        #while (old == None):
+        #    old = self._readRaw(self._msgMessageId)
+        #    if old!=newOutput:
+        #        self._logger.info('Output message changed')
+        #        self._logger.info("Msg Port Mode: %s" % (newOutput,))
+        cnt=0
+        ACK=0
+        while not ACK and cnt<=3:
+            self._write(self._msgMessageId,newOutput)
+            ACK=self._readRaw(self._ACK)
+            cnt=cnt+1
+            if cnt==3:
+                self._logger.error('New configuration could not be sent!')
+                break
+            self._runEv.wait(1)
+        #        change=True
             
         self._logger.info('Done setting NAV USB...')
     
         
         #Save configuration on Flash memory of LEA-6T
-        if change==True:
-            savecfg=struct.pack('13B',0x00,0x00,0x00,0x00,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x07)
-            self._logger.info('Saving new GPS configuration')
-            cnt=0
-            ACK=0
-            while not ACK and cnt<=3:
-                self._write(self._saveMessageId,savecfg)
-                ACK=self._readRaw(self._ACK)
-                cnt=cnt+1
-                if cnt==3:
-                    self._logger.error('New configuration could not be saved!')
-                self._runEv.wait(1)
-            self._logger.info("Done saving")
+        #if change==True:
+        #    savecfg=struct.pack('13B',0x00,0x00,0x00,0x00,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x07)
+        #    self._logger.info('Saving new GPS configuration')
+        #    cnt=0
+        #    ACK=0
+        #    while not ACK and cnt<=3:
+        #        self._write(self._saveMessageId,savecfg)
+        #        ACK=self._readRaw(self._ACK)
+        #        cnt=cnt+1
+        #        if cnt==3:
+        #            self._logger.error('New configuration could not be saved!')
+        #        self._runEv.wait(1)
+        #    self._logger.info("Done saving")
         return True

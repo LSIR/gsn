@@ -44,8 +44,6 @@ class GPSPluginNAVClass(AbstractPluginClass):
         
         # serial port timeout
         self._serialTimeout = 1
-        self._serialCount = 0
-        self._zombiesKilled = 0
         
         self._deviceStr = self.getOptionValue('gps_device')
         self.gps = GPSDriverNAV.GPSDriverNAV([self._deviceStr, self._interval])
@@ -55,16 +53,8 @@ class GPSPluginNAVClass(AbstractPluginClass):
     def getMsgType(self):
         return BackLogMessage.GPS_MESSAGE_TYPE
 
-#    def isBusy(self):
-#        return False
-#    
-#    def needsWLAN(self):
-#        return False
-#
-#    def run(self):
-#	
-#        self.info('GPSPluginNAV running...')
-#	#self.action('')	
+    def isBusy(self):
+        return False
 
     def action(self, parameters):
 
@@ -78,9 +68,9 @@ class GPSPluginNAVClass(AbstractPluginClass):
         
         self.info('GPS reading done')
 
-#    def stop(self):
-#        self._stopped = True
-#        self.info('stopped')
+    def stop(self):
+        self._stopped = True
+        self.info('stopped')
 
     def _parseNavMsg(self, msg):
         if (msg):
