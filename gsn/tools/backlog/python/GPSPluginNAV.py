@@ -38,7 +38,7 @@ class GPSPluginNAVClass(AbstractPluginClass):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         self._timer = None
         self._stopped = False
-        self._interval = 5
+        self._interval = 1
         
         self.info('Init GPSPluginNAV...')
         

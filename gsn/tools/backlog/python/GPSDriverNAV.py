@@ -56,34 +56,37 @@ class GPSDriverNAV():
         self._pmMessageId = struct.pack('2B',0x06,0x32)
     	self._ACK = struct.pack('2B', 0x05, 0x01)
     	self._NACK = struct.pack('2B', 0x05, 0x00)
-
+        
     	# serial port timeout
     	self._serialTimeout = 1
     	
         if (config[0] != None): #Device string
-   	    self._deviceStr = config[0]
-    	    self._device = self._deviceStr
+            #self._deviceStr = config[0]
+            #self._device = self._deviceStr
+            self._device = config[0]
 
         try:
-            self._device = serial.Serial(self._deviceStr, 19200, timeout=self._serialTimeout)
-            self._logger.debug("Successfully opened " + str(self._device))
+            self._device = serial.Serial(self._device, 19200, timeout=self._serialTimeout)
+            self._logger.info("Successfully opened " + str(self._device))
         except Exception as e:
-            self._logger.debug("serialAccess Exception (2) " + str(e))
-            self._logger.info("Could not access gps device " + self._deviceStr)
+            self._logger.error("serialAccess Exception (2) " + str(e))
+            self._logger.error("Could not access gps device " + self._device)
             return
 
     	if (config[1] != None): # The measurement interval in seconds
             self._interval = config[1]
+        else:
+            self._interval = 1
 
         self._runEv = Event()
-        self._initialized = False
+        #self._initialized = False
         #device is tested by config in that it tries to write to it.
         self._logger.info("Config GPS device")
         ret = self._config_device()
     	if (ret == True):
     	    self._logger.info("Done GPS Driver init")
     	else:
-    	    self._logger.info("There was a problem initializing the GPS device")
+    	    self._logger.error("There was a problem initializing the GPS device")
 	
     '''
     ##########################################################################################
@@ -135,11 +138,11 @@ class GPSDriverNAV():
         '''
         #self._logger.info("pollGpsMessage: " + str(msgId))
         if (not self._write(msgId,'')):
-                self._logger.info("pollGpsMessage: sending gps message didn't succeed")
+                self._logger.error("pollGpsMessage: sending gps message didn't succeed")
                 return False
         d = self._readRaw(msgId)
         if (d == False or len(d) == 0):
-                self._logger.info("pollGpsMessage: reading gps message didn't succeed")
+                self._logger.error("pollGpsMessage: reading gps message didn't succeed")
                 return False
         return d
 
@@ -202,23 +205,47 @@ class GPSDriverNAV():
     #_readNav(): reads GPGGA data
     #########################################################################
     '''	
-    def _readNav(self,msgId):	  
-    	success = False
+    def _readNav(self,msgId):
+        
+        try:
+            self._device.open()
+            while self._device.inWaiting() != 0:
+                self._device.flushInput()
+            self._logger.info("readGpsMessage: input buffer flushed")
+            self._device.close()
+    	except Exception as e:
+            self._logger.error( "serialAccess Exception (1)" + str(e))
+            self._logger.error("Could not flush input buffer")
+            self._device.close()
+            return False
+        
+        success = False
     	timeout = 5
     	while timeout and not success:
             timeout -= 1
     	    a = ''
-    	    while (a != "$"):
+    	    while (timeout and a != "$"):
                 a = self._serialAccess(self._device,1,'r')
+                if a == False:
+                    timeout -= 1
     	    if (a == "$"):
-                while (a != "GP"):
+                while (timeout and a != "GP"):
                     a = self._serialAccess(self._device,2,'r')
-                    #print(str(a))
-                while (a != "GG"):
+                    if a == False:
+                        timeout -= 1
+                while (timeout and a != "GG"):
                     a = self._serialAccess(self._device,2,'r')
-                while (a != "A,"):
+                    if a == False:
+                        timeout -= 1
+                while (timeout and a != "A,"):
                     a = self._serialAccess(self._device,2,'r')
+                    if a == False:
+                        timeout -= 1
                 a = self._serialAccess(self._device,100,'r')
+                if a == False:
+                    timeout -= 1
+                    success = False
+                    break
                 b = a.split('\r')[0]
                 b = b.split(',')
                 header = ["$GPGGA", "0xF0 0x00"] 
@@ -228,11 +255,11 @@ class GPSDriverNAV():
             else:
                 success = False
         if (success):
-            #self._logger.debug("readGpsMessage: Returned payload")
             return (header[0], header[1], payload) #ID, class, payload
         else:
             self._logger.debug("readGpsMessage: returned nothing!")
             return False
+        
 
     '''
     ##########################################################################################
@@ -249,26 +276,27 @@ class GPSDriverNAV():
     ##########################################################################################
     '''
     def _serialAccess(self,dev,data,mode):
-	d = False
-	fd = None
-	try:
-		self._device.open()
-		if (mode == 'w'):
-			self._device.write(data)
-			self._device.close()
-			return True
-		elif (mode == 'r'):
-			d = self._device.read(data)
-			self._device.close()
-			return d
-		else:
-			self._logger.info("serialAccess: Wrong mode specified")
-			self._device.close()
-			return False
-	except Exception as e:
-		self._logger.debug( "serialAccess Exception (1)" + str(e))
-		self._logger.info("Could not access gps device!")
-		return
+        d = False
+        fd = None
+        try:
+            self._device.open()
+            if (mode == 'w'):
+                self._device.write(data)
+                self._device.close()
+                return True
+            elif (mode == 'r'):
+                d = self._device.read(data)
+                self._device.close()
+                return d
+            else:
+                self._logger.error("serialAccess: Wrong mode specified")
+                self._device.close()
+                return False
+        except Exception as e:
+            self._device.close()
+            self._logger.error( "serialAccess Exception (1)" + str(e))
+            self._logger.error("Could not access gps device!")
+            return False
 
     '''
     ###########################################################################################
@@ -277,7 +305,6 @@ class GPSDriverNAV():
     '''
     def cleanUp(self,fd,dev):
 		pid = os.getpid()
-		print(dev)
 		ret = commands.getstatus(dev)
 		self._logger.debug("cleanUp: " + str(ret))
 
@@ -315,31 +342,96 @@ class GPSDriverNAV():
     _config_device()
     ##########################################################################################
     '''
+    '''
     def _config_device(self):
-    	change = False        
+    	#change = False        
     
     	#########################################
         #set Message type depending on mode
     	#########################################
         self._logger.debug("Setting message type...")
-    	newport = struct.pack('19B',0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x03,0x00,0x00,0x00,0x00,0x00)
-    	old = ''
-    	while (not old):
+    	newport = struct.pack('20B',0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x03,0x00,0x00,0x00,0x00,0x00)
+
+        want=struct.unpack('20B',newport)
+        self._logger.info("New Protocol: " + str(want))
+        cnt=0
+        ACK=0
+        while not ACK and cnt<=3:
+            self._write(self._prtMessageId,newport)
+            ACK=self._readRaw(self._ACK)
+            cnt=cnt+1
+            if cnt==3:
+                self._logger.error("New port could not be sent!")
+                break
+            self._runEv.wait(1)
+        self._logger.info("Done setting new protocol type...")
+            
+        ###################################
+        #set the measurement rate
+        ##################################
+        self._logger.info("Setting rate...")
+        newrate=struct.pack('3H', self._interval*1000, 0x01,0x01)
+        cnt=0
+        ACK=0
+        while not ACK and cnt<=3:
+            self._write(self._rateMessageId, newrate)
+            ACK=self._readRaw(self._ACK)
+            cnt=cnt+1
+            if cnt==3:
+                self._logger.error("New measurement rate could not be sent!")
+                break
+            self._runEv.wait(1)
+        self._logger.info("Done setting rate.")
+    
+    	##################################################
+    	#Set mode
+    	#IMPORTANT: Next 3 statements only for LEA-6
+    	##################################################
+    	self._logger.info("Setting nav mode on USB...")
+        newOutput = struct.pack('8B',0xF0,0x00,0x00,0x00,0x00,0x01,0x00,0x01) 
+        cnt=0
+        ACK=0
+        while not ACK and cnt<=3:
+            self._write(self._msgMessageId,newOutput)
+            ACK=self._readRaw(self._ACK)
+            cnt=cnt+1
+            if cnt==3:
+                self._logger.error("NAV mode could not be sent!")
+                break
+            self._runEv.wait(1)
+            
+    	self._logger.info("Done setting nav mode on USB...")
+    
+        return True
+    '''
+    
+    def _config_device(self):
+        change = False        
+    
+        #########################################
+        #set Message type depending on mode
+        #########################################
+        self._logger.info("Setting message type...")
+        newport = struct.pack('19B',0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x03,0x00,0x00,0x00,0x00,0x00)
+
+        old = ''
+        while (not old):
             old = self._pollGpsMessage(self._prtMessageId)
             rec=struct.unpack('20B',old[2])
             want=struct.unpack('19B',newport)
             prtchange=False
             if want[0]!=rec[0]:
                 prtchange=True
-                self._logger.debug('Wrong Portnumber')
+                self._logger.error('Wrong Portnumber')
             for i in range(3,19):
                 if want[i]!=rec[i+1]:
                     prtchange=True
-                    self._logger.debug('Bit '+str(i)+' from prtMessage not matching ' +str(rec[i]) + ' instead of ' +str(want[i]))
+                    if self._logger.isEnabledFor(logging.DEBUG):
+                        self._logger.debug('Bit %d from prtMessage not matching %s instead of %s' % (i, rec[i], want[i]))
                     
             if prtchange==True:
-                self._logger.debug('Port protocols changed')
-                self._logger.info("New Protocol: " + str(want))
+                self._logger.info('Port protocols changed')
+                self._logger.info("New Protocol: %s" % (want,))
                 cnt=0
                 ACK=0
                 while not ACK and cnt<=3:
@@ -347,22 +439,23 @@ class GPSDriverNAV():
                     ACK=self._readRaw(self._ACK)
                     cnt=cnt+1
                     if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
+                        self._logger.error('New configuration could not be sent!')
                         break
                     self._runEv.wait(1)
                 change=True
-            self._logger.debug("Done setting message type...")       
+            self._logger.info("Done setting message type...")       
     
             ###################################
             #set the measurement rate
             ##################################
-            self._logger.debug("Setting rate...")
+            self._logger.info("Setting rate...")
             newrate=struct.pack('3H', self._interval*1000, 0x01,0x01)
             rate = False
             while (not rate):
                 rate = self._pollGpsMessage(self._rateMessageId)
             if rate[2] != newrate:
-                self._logger.debug('Rate changed from ' + str(struct.unpack('3H',rate[2])[0]) + " to " + str(self._interval*1000))
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.info('Rate changed from %d to %d' % (struct.unpack('3H',rate[2])[0], self._interval*1000))
                 cnt=0
                 ACK=0
                 while not ACK and cnt<=3:
@@ -371,24 +464,25 @@ class GPSDriverNAV():
                     #self._logger.info(ACK)
                     cnt=cnt+1
                     if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
+                        self._logger.error('New configuration could not be sent!')
+                        break
                     self._runEv.wait(1)
                 change=True
-            self._logger.debug("Done setting rate.")
+            self._logger.info("Done setting rate.")
     
-    	##################################################
-    	#Set mode
-    	#IMPORTANT: Next 3 statements only for LEA-6
-    	##################################################
-    	self._logger.debug("Setting nav mode on USB...")
+        ##################################################
+        #Set mode
+        #IMPORTANT: Next 3 statements only for LEA-6
+        ##################################################
+        self._logger.info('Setting NAV USB...')
         newOutput = struct.pack('10B',0x08,0x00,0xF0,0x00,0x00,0x00,0x00,0x01,0x00,0x01) 
         self._write(self._msgMessageId,self._messageId)
-    	old = self._pollGpsMessage(self._msgMessageId)
-    	while (old == None):
+        old = self._pollGpsMessage(self._msgMessageId)
+        while (old == None):
             old = self._readRaw(self._msgMessageId)
             if old!=newOutput:
-                self._logger.debug('Output message changed')
-                self._logger.info("Msg Port Mode: " + str(newOutput))
+                self._logger.info('Output message changed')
+                self._logger.info("Msg Port Mode: %s" % (newOutput,))
                 cnt=0
                 ACK=0
                 while not ACK and cnt<=3:
@@ -396,48 +490,15 @@ class GPSDriverNAV():
                     ACK=self._readRaw(self._ACK)
                     cnt=cnt+1
                     if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
+                        self._logger.error('New configuration could not be sent!')
+                        break
                     self._runEv.wait(1)
                 change=True
             
-    	self._logger.debug("Done setting nav mode on USB...")
+        self._logger.info('Done setting NAV USB...')
     
-    	self._logger.debug("WARNING! NOT setting Powermode!!")
-    	'''
-    	self._logger.debug("Setting Powermode...")
-            newPowerMode=struct.pack('2B',0,1)
-            if self._pollGpsMessage(self._rxmMessageId)[2]!= newPowerMode:
-                self._logger.debug('PowerMode changed')
-                cnt=0
-                ACK=0
-                while not ACK and cnt<3:
-                    self._write(self._rxmMessageId,newPowerMode)
-                    ACK=self._readRaw(self._ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
-                    self._runEv.wait(1)
-                change=True
-            
-            newPSM=struct.pack('24B',0,0x3C,0,0,0x10,0,0,0,0x88,0x13,0,0,0xE8,0x03,0,0,0,0,0,0,0,0,0,0)
-            if self._pollGpsMessage(self._pmMessageId)[2]!=newPSM:
-                self._logger.debug('Power Save Mode settings changed')
-                cnt=0
-                ACK=0
-                while not ACK and cnt<=3:
-                    self._write(self._pmMessageId,newPSM)
-                    ACK=self._readRaw(self._ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
-                    self._runEv.wait(1)
-                change=True
-    
-    	self._logger.debug("Done setting Powermode")
-    	'''
-    	
+        
         #Save configuration on Flash memory of LEA-6T
-    	self._logger.debug("Saving changes (if any) to flash")
         if change==True:
             savecfg=struct.pack('13B',0x00,0x00,0x00,0x00,0xFF,0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x07)
             self._logger.info('Saving new GPS configuration')
@@ -448,7 +509,7 @@ class GPSDriverNAV():
                 ACK=self._readRaw(self._ACK)
                 cnt=cnt+1
                 if cnt==3:
-                    self._logger.info('New configuration could not be saved!')
+                    self._logger.error('New configuration could not be saved!')
                 self._runEv.wait(1)
-        self._logger.debug("Done saving")
+            self._logger.info("Done saving")
         return True
