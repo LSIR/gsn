@@ -113,6 +113,12 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.ECVQEK3Plugin ECVQEK3Plugin}. */
 	public static final byte ECVQEK3_MESSAGE_TYPE = 71;
 	
+	/** PowerManager 
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.PowerManagerPlugin PowerManagerPlugin}. */
+	public static final byte POWERMANAGER_MESSAGE_TYPE = 72;
+	
+	
 	/* #                                                            #
 	 * #                                                            #
 	 * ############################################################## */
