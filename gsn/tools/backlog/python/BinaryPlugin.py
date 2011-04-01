@@ -83,6 +83,7 @@ class BinaryPluginClass(AbstractPluginClass):
     _binaryWriter
     _notifier
     _plugStop
+    _filedequelock
     _filedeque
     _msgqueue
     _isBusy
@@ -130,6 +131,7 @@ class BinaryPluginClass(AbstractPluginClass):
         
         self._binaryWriter = BinaryWriter(self)
         self._filedeque = deque()
+        self._filedequelock = Lock()
         self._msgqueue = Queue.Queue()
         
         self._watches = []
@@ -195,7 +197,9 @@ class BinaryPluginClass(AbstractPluginClass):
         filetime.sort()
         # and put it into the fifo
         for file in filetime:
+            self._filedequelock.acquire()
             self._filedeque.appendleft([file[1], os.path.getsize(file[1])])
+            self._filedequelock.release()
             self.debug('putting existing file into FIFO: %s' % (file[1],))
         if filetime:
             self.info('files to be transmitted: %d' % (len(filetime),))
@@ -229,7 +233,9 @@ class BinaryPluginClass(AbstractPluginClass):
         self._readyfornewbinary = False
         if self._filedescriptor:
             if os.path.exists(self._filedescriptor.name):
+                self._filedequelock.acquire()
                 self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
+                self._filedequelock.release()
             self._filedescriptor.close()
         self._binaryWriter.stopSending()
         self._emptyQueue()
@@ -495,8 +501,10 @@ class BinaryPluginClass(AbstractPluginClass):
         
     def _getFileQueueSize(self):
         counter = 0
+        self._filedequelock.acquire()
         for file, size in self._filedeque:
             counter += size
+        self._filedequelock.release()
         return counter
         
         
@@ -533,7 +541,9 @@ class BinaryPluginClass(AbstractPluginClass):
             self._waitforfiletimer.cancel()
         self._notifier.stop()
         self._binaryWriter.stop()
+        self._filedequelock.acquire()
         self._filedeque.clear()
+        self._filedequelock.release()
         if self._filedescriptor and not self._filedescriptor.closed:
             os.chmod(self._filedescriptor.name, 0744)
             self._filedescriptor.close()
@@ -645,7 +655,9 @@ class BinaryChangedProcessing(ProcessEvent):
             if self._logger.isEnabledFor(logging.DEBUG):
                 self._logger.debug('%s changed' % (event.pathname,))
     
+            self._binaryPlugin._filedequelock.acquire()
             self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
+            self._binaryPlugin._filedequelock.release()
             if self._binaryPlugin._readyfornewbinary:
                 self._binaryPlugin._readyfornewbinary = False
                 self._binaryPlugin._isBusy = True
