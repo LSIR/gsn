@@ -70,6 +70,9 @@ OZ47_MESSAGE_TYPE = 70
 # The ECVQ-EK3 evaluation kit message type.
 ECVQEK3_MESSAGE_TYPE = 71
 
+#Power Manager
+POWERMANAGER_MESSAGE_TYPE = 72
+
 # The maximum supported payload size (2^32-9bytes). This is due to
 # the sending mechanism. A sent message is defined by preceding
 # four bytes containing the message size. A message consists of
