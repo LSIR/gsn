@@ -240,10 +240,6 @@ public abstract class AbstractWrapper extends Thread {
 		}
 	}
 
-	protected boolean inputEvent(long volume) {
-		return inputEvent(System.currentTimeMillis(), getActiveAddressBean().getInputStreamName(), volume);
-	}
-
 	protected boolean inputEvent(long timestamp, long volume) {
 		return inputEvent(timestamp, getActiveAddressBean().getInputStreamName(), volume);
 	}
