@@ -3,6 +3,7 @@ var DataClean = {
     debugmode : false,
     theData : null,
     plot : null,
+    quality_plot : null,
     previewPlot : null,
     orderOfDirtyPoint : null,
     errorOfDirtyPoint : null,
