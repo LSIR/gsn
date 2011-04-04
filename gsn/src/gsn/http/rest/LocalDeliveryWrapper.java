@@ -34,6 +34,8 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 	
 	private VSensorConfig vSensorConfig;
 	
+	private String vsName;
+	
 	public VSensorConfig getVSensorConfig() {
 		return vSensorConfig;
 	}
@@ -50,7 +52,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		AddressBean params = getActiveAddressBean( );
 		String query = params.getPredicateValue("query");
 		
-		String vsName = params.getPredicateValue( "name" );
+		vsName = params.getPredicateValue( "name" );
 		String startTime = params.getPredicateValueWithDefault("start-time",CURRENT_TIME );
 
 		if (query==null && vsName == null) {
@@ -169,6 +171,8 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 	}
 
 	public boolean writeStreamElement(StreamElement se) {
+		if (se.isProducingStatistics())
+			inputEvent(vsName, se.getVolume());
 		boolean isSucced = postStreamElement(se);
 		logger.debug("wants to deliver stream element:"+ se.toString()+ "["+isSucced+"]");
 		return true;
