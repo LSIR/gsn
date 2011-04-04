@@ -4,6 +4,7 @@ import gsn.ContainerImpl;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.statistics.StatisticsElement;
 import gsn.statistics.StatisticsHandler;
@@ -53,7 +54,7 @@ public abstract class AbstractVirtualSensor {
 	 */
 	protected synchronized void dataProduced ( StreamElement streamElement,boolean adjust ) {
 		if (streamElement.isProducingStatistics()) {
-			StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), "vs", null, streamElement.getVolume());
+			StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), "vs-intern", null, streamElement.getVolume());
 			StatisticsHandler.getInstance().outputEvent(getVirtualSensorConfiguration().getName(), statisticsElement);
 		}
 		try {
@@ -176,8 +177,13 @@ public abstract class AbstractVirtualSensor {
 	
 
 	public void dataAvail ( String inputStreamName , StreamElement streamElement ) {
-		StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), null, inputStreamName, streamElement.getVolume());
-		StatisticsHandler.getInstance().inputEvent(getVirtualSensorConfiguration().getName(), statisticsElement);
+		if (streamElement.isProducingStatistics()) {
+			String sourcestring = "";
+			for (StreamSource source: getVirtualSensorConfiguration().getInputStream(inputStreamName).getSources())
+				sourcestring += (source.getWrapper().getWrapperName() + " ");
+			StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), sourcestring.trim(), inputStreamName, streamElement.getVolume());
+			StatisticsHandler.getInstance().inputEvent(getVirtualSensorConfiguration().getName(), statisticsElement);
+		}
 		dataAvailable(inputStreamName, streamElement);
 	}
 }

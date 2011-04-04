@@ -219,7 +219,7 @@ public abstract class AbstractWrapper extends Thread {
 						+ listeners.size());
 			
 			if (streamElement.isProducingStatistics()) {
-				StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), "wrapper", getActiveAddressBean().getInputStreamName(), streamElement.getVolume());
+				StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), "wrapper-intern", null, streamElement.getVolume());
 				StatisticsHandler.getInstance().outputEvent(getActiveAddressBean().getVirtualSensorName(), statisticsElement);
 			}
 
