@@ -191,11 +191,11 @@
             series: { lines: { show: true }, points: { show: false }, shadowSize: 1 },
             grid: { hoverable: true, clickable: true },
             xaxis: { mode: "time", timeformat: "%y/%m/%d %h:%M" },
-            y2axis: {  min:-1, max: 1, ticks: function(range) {
+            /*y2axis: {  min:-1, max: 1, ticks: function(range) {
                 return []
-            } },
+            } },*/
             selection: { mode: "xy" } ,
-            colors: ["#22F722", "#111111", "#ff0000", "#0000ff"]
+            colors: ["#0000ff", "#22F722", "#111111", "#ff0000" ]
         };
 
         var vs = document.getElementById("vs").value;
@@ -255,13 +255,16 @@
                                      bars:{show:true, fill:true},
                                      label:"dirtiness",
                                      yaxis:2
-                                 },
+                                 }
+                                 /*
+                                 ,
                                      {
                                      data:pltQuality,
                                      bars:{show:true, fill:true},
                                      label:"quality",
                                      yaxis:2
                                  }
+                                 */
                              ],
                              options);
 
@@ -270,7 +273,7 @@
 
                                      {
                                      data:pltQuality,
-                                     bars:{show:true, fill:true},
+                                     //bars:{show:true, fill:true}, /* don't use bars for plotting*/
                                      label:"quality",
                                      yaxis:2
                                  }
