@@ -1,5 +1,6 @@
 package gsn.wrappers.backlog.plugins;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -177,14 +178,15 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 	
 	
 	@Override
-	public boolean messageReceived(int deviceID, long timestamp, Serializable[] data) {
+	public boolean messageRecv(int deviceID, BackLogMessage message) {
+		byte [] data = (byte[]) message.getPayload()[0];
 		// which TinyOS messages are we looking for?
 		if (tinyos1x_platform != null) {
 			// the following functionality has been extracted from net.tinyos1x.message.Receiver
 			// from the packetReceived function
 			
 			// create a TOS message (TinyOS1.x)
-			final TOSMsg msg = createTOSMsg ( (byte[]) data[0] ) ;
+			final TOSMsg msg = createTOSMsg ( data ) ;
 
 			Integer type = new Integer ( msg.get_type () );
 
@@ -220,9 +222,15 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 			// send the message to all listeners
 			while (en.hasMoreElements()) {
 				MigMessagePlugin temp = en.nextElement();
-				
+
+				// create statistics event
+				try {
+					temp.activeBackLogWrapper.inputEvent(temp.activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
+				} catch (IOException e) {
+					logger.error(e.getMessage());
+				}
 				// send the message to the listener
-				if (temp.messageReceived(deviceID, timestamp, new Serializable[] {received.dataGet()}) == true)
+				if (temp.messageReceived(deviceID, message.getTimestamp(), new Serializable[] {received.dataGet()}) == true)
 					ReceiverCount++;
 			}
 			if (ReceiverCount == 0)
@@ -233,11 +241,11 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 			// the following functionality has been extracted from net.tinyos.message.Receiver
 			// from the packetReceived function
 			
-			if (((byte[]) data[0])[0] != Serial.TOS_SERIAL_ACTIVE_MESSAGE_ID)
+			if (data[0] != Serial.TOS_SERIAL_ACTIVE_MESSAGE_ID)
 				return false; // not for us.
 	
 			// create a SerialPacket message
-			SerialPacket msg = new SerialPacket((byte[]) data[0], 1);
+			SerialPacket msg = new SerialPacket(data, 1);
 			int type = msg.get_header_type();
 
 		    int length = msg.get_header_length();
@@ -265,9 +273,15 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 			// send the message to all listeners
 			while (en.hasMoreElements()) {
 				MigMessagePlugin temp = en.nextElement();
-				
+
+				// create statistics event
+				try {
+					temp.activeBackLogWrapper.inputEvent(temp.activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
+				} catch (IOException e) {
+					logger.error(e.getMessage());
+				}
 				// send the message to the listener
-				if (temp.messageReceived(deviceID, timestamp, new Serializable[] {received.dataGet()}) == true)
+				if (temp.messageReceived(deviceID, message.getTimestamp(), new Serializable[] {received.dataGet()}) == true)
 					ReceiverCount++;
 			}
 			if (ReceiverCount == 0)

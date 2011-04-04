@@ -84,6 +84,19 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	
 	
 	public abstract String getPluginName();
+	
+	
+    /**
+     * This method is called to signal message reception. It must be
+     * implemented by any plugin.
+	 *
+     * @param deviceId the DeviceId the message has been received from
+     * @param timestamp contained in the message {@link BackLogMessage}
+     * @param data of the message
+     * 
+     * @return true, if the plugin did acknowledge the message
+     */
+    public abstract boolean messageReceived(int deviceId, long timestamp, Serializable[] data);
 
 
 	/**
@@ -334,6 +347,16 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	
 	public final AddressBean getActiveAddressBean ( ) {
 		return activeBackLogWrapper.getActiveAddressBean();
+	}
+	
+	
+	public boolean messageRecv(int deviceId, BackLogMessage message) {
+		try {
+			activeBackLogWrapper.inputEvent(activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return messageReceived(deviceId, message.getTimestamp(), message.getPayload());
 	}
 
 

@@ -3,7 +3,6 @@ package gsn.beans;
 import gsn.Main;
 import gsn.VirtualSensor;
 import gsn.VirtualSensorInitializationFailedException;
-import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
 
@@ -274,7 +273,7 @@ public class InputStream implements Serializable{
 				while ( resultOfTheQuery.hasMoreElements( ) ) {
 					elementCounterForDebugging++;
 					StreamElement element= resultOfTheQuery.nextElement( );
-					sensor.dataAvailable( this.getInputStreamName( ) , element );
+					sensor.dataAvail( this.getInputStreamName( ) , element );
 				}
 			} catch ( final UnsupportedOperationException e ) {
 				logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );

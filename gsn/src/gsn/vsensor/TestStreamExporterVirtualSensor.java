@@ -107,7 +107,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
       StreamElement streamElement = new StreamElement( fieldTypes.toArray( new DataField[] {} ) , ( Serializable [ ] ) data , timeStamp );
       
       // give datastream to vs
-      vs.dataAvailable( streamName , streamElement );
+      vs.dataAvail( streamName , streamElement );
       
       // clean up and control
       boolean result = true;

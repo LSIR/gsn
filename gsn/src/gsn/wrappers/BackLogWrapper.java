@@ -58,6 +58,7 @@ public class BackLogWrapper extends AbstractWrapper {
 	private AbstractPlugin pluginObject = null;
 	private AddressBean addressBean = null;
     private static int threadCounter = 0;
+    private String remoteConnectionPoint = null;
 	
 	private final transient Logger logger = Logger.getLogger( BackLogWrapper.class );
 
@@ -92,16 +93,15 @@ public class BackLogWrapper extends AbstractWrapper {
 	    addressBean = getActiveAddressBean();
 
 		String deployment = addressBean.getVirtualSensorName().split("_")[0].toLowerCase();
-		String coreStationAddress = null;
 		try {
-			coreStationAddress = addressBean.getPredicateValueWithException("remote-connection");
+			remoteConnectionPoint = addressBean.getPredicateValueWithException("remote-connection");
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
 		
 		try {
-			blMsgMultiplexer = BackLogMessageMultiplexer.getInstance(deployment, coreStationAddress);
+			blMsgMultiplexer = BackLogMessageMultiplexer.getInstance(deployment, remoteConnectionPoint);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return false;
@@ -195,8 +195,13 @@ public class BackLogWrapper extends AbstractWrapper {
 		return blMsgMultiplexer;
 	}
 
+	public String getRemoteConnectionPoint() {
+		return remoteConnectionPoint;
+	}
 
-
+	public boolean inputEvent(String sourcename, long volume) {
+		return super.inputEvent(sourcename, volume);
+	}
 
 
 	/**

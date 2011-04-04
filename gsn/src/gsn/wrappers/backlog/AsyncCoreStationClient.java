@@ -65,6 +65,7 @@ public class AsyncCoreStationClient extends Thread  {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	public synchronized static AsyncCoreStationClient getSingletonObject() throws Exception {
 		if( RECONNECT_TIMEOUT_SEC <= 0 )
 			throw new Exception("RECONNECT_TIMEOUT_SEC must be a positive integer");

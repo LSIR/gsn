@@ -437,7 +437,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		while (en.hasMoreElements()) {
 			BackLogMessageListener temp = en.nextElement();
 			// send the message to the listener
-			if (temp.messageReceived(coreStationDeviceId, message.getTimestamp(), message.getPayload()) == true)
+			if (temp.messageRecv(coreStationDeviceId, message) == true)
 				ReceiverCount++;
 		}
 		if (ReceiverCount == 0)

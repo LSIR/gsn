@@ -29,6 +29,10 @@ public final class StreamElement implements Serializable {
 	private transient long                                   internalPrimayKey = -1;
 
 	private static final String NULL_ENCODING = "NULL"; // null encoding for transmission over xml-rpc
+	
+	private Long volume = null;
+	
+	private boolean produceStatistics = true;
 
 	public StreamElement (StreamElement other) {
 		int len = other.fieldNames.length;
@@ -42,6 +46,8 @@ public final class StreamElement implements Serializable {
 		}
 		this.timeStamp=other.timeStamp;
 		this.internalPrimayKey = other.internalPrimayKey;
+		this.volume = other.volume;
+		this.produceStatistics = other.produceStatistics;
 	}
 	
 	public StreamElement (StreamElement other, final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data) {
@@ -61,6 +67,8 @@ public final class StreamElement implements Serializable {
 		}
 		this.timeStamp=other.timeStamp;
 		this.internalPrimayKey = other.internalPrimayKey;
+		this.volume = null;
+		this.produceStatistics = other.produceStatistics;
 	}	
 	
 	public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data  ) {
@@ -78,6 +86,7 @@ public final class StreamElement implements Serializable {
 		if ( outputStructure.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
 		this.verifyTypesCompatibility( this.fieldTypes , data );
 		this.fieldValues = data;
+		this.volume = null;
 	}
 
 	public StreamElement ( final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data ) {
@@ -92,6 +101,7 @@ public final class StreamElement implements Serializable {
 		this.fieldTypes = dataFieldTypes;
 		this.fieldNames = dataFieldNames;
 		this.fieldValues = data;
+		this.volume = null;
 		this.verifyTypesCompatibility( dataFieldTypes , data );
 	}
 
@@ -127,6 +137,7 @@ public final class StreamElement implements Serializable {
 		this.fieldValues=fieldValues;
 		this.indexedFieldNames=indexedFieldNames;
 		this.timeStamp=timestamp;
+		this.volume = null;
 	}
 	
 	private void verifyTypesCompatibility ( final Byte [ ] fieldTypes , final Serializable [ ] data ) throws IllegalArgumentException {
@@ -422,5 +433,55 @@ public final class StreamElement implements Serializable {
 	public StreamElement4Rest toRest() {
 		StreamElement4Rest toReturn = new StreamElement4Rest(this);
 		return toReturn;
+	}
+
+	public long getVolume() {
+		if (volume == null) {
+			volume = (long) 0;
+			for ( int i = 0 ; i < fieldNames.length ; i++ ) {
+				if ( fieldValues[ i ] == null ) continue;
+				switch ( fieldTypes[ i ] ) {
+				case DataTypes.TINYINT :
+					volume += 1;
+					break;
+				case DataTypes.SMALLINT :
+					volume += 2;
+					break;
+				case DataTypes.BIGINT :
+					volume += 8;
+					break;
+				case DataTypes.CHAR :
+					volume += 2;
+					break;
+				case DataTypes.VARCHAR :
+					volume += ((String)fieldValues[ i ]).getBytes().length;
+					break;
+				case DataTypes.INTEGER :
+					volume += 4;
+					break;
+				case DataTypes.DOUBLE:
+					if (fieldValues[ i ] instanceof Float)
+						volume += 4;
+					else if(fieldValues[ i ] instanceof Double)
+						volume += 8;
+					break;
+				case DataTypes.BINARY :
+					if ( fieldValues[ i ] instanceof byte [ ])
+						volume += ((byte[])fieldValues[ i ]).length;
+					else if (fieldValues[ i ] instanceof String)
+						volume += ((String)fieldValues[ i ]).getBytes().length;
+					break;
+				}
+			}
+		}
+		return volume;
+	}
+
+	public boolean isProducingStatistics() {
+		return produceStatistics;
+	}
+
+	public void doNotProduceStatistics() {
+		produceStatistics = false;
 	}
 }

@@ -10,7 +10,8 @@ import gsn.beans.windowing.RemoteTimeBasedSlidingHandler;
 import gsn.beans.windowing.SlidingHandler;
 import gsn.beans.windowing.TupleBasedSlidingHandler;
 import gsn.beans.windowing.WindowType;
-import gsn.storage.StorageManager;
+import gsn.statistics.StatisticsElement;
+import gsn.statistics.StatisticsHandler;
 import gsn.utils.GSNRuntimeException;
 
 import java.io.Serializable;
@@ -200,7 +201,6 @@ public abstract class AbstractWrapper extends Thread {
 	 * @return If the method returns false, it means the insertion doesn't
 	 *         effected any input stream.
 	 */
-
 	protected Boolean postStreamElement(StreamElement streamElement) {
 		if (streamElement == null) {
 			logger.info("postStreamElement is called with null ! Wrapper "
@@ -217,6 +217,11 @@ public abstract class AbstractWrapper extends Thread {
 			if (logger.isDebugEnabled())
 				logger.debug("Size of the listeners to be evaluated - "
 						+ listeners.size());
+			
+			if (streamElement.isProducingStatistics()) {
+				StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), "wrapper", getActiveAddressBean().getInputStreamName(), streamElement.getVolume());
+				StatisticsHandler.getInstance().outputEvent(getActiveAddressBean().getVirtualSensorName(), statisticsElement);
+			}
 
 			for (SlidingHandler slidingHandler : slidingHandlers.values()) {
 				toReturn = slidingHandler.dataAvailable(streamElement)
@@ -233,6 +238,37 @@ public abstract class AbstractWrapper extends Thread {
 			logger.error("Produced data item from the wrapper couldn't be propagated inside the system.");
 			return false;
 		}
+	}
+
+	protected boolean inputEvent(long volume) {
+		return inputEvent(System.currentTimeMillis(), getActiveAddressBean().getInputStreamName(), volume);
+	}
+
+	protected boolean inputEvent(long timestamp, long volume) {
+		return inputEvent(timestamp, getActiveAddressBean().getInputStreamName(), volume);
+	}
+
+	protected boolean inputEvent(String sourcename, long volume) {
+		return inputEvent(System.currentTimeMillis(), sourcename, volume);
+	}
+
+	/**
+	 * This method gets the generated statistics element and notifies the
+	 * statistics handler that an input event has occurred. It should be
+	 * called by a wrapper once on any sensor data input event if it does not
+	 * produce its data by itself. The return value specifies if the newly
+	 * provided statistics element could be handled properly.
+	 * 
+	 * @param sourcename a unique source identifier (per wrapper) of the
+	 *                   sensor data packet
+	 * @param volume the amount of data received in bytes
+	 * 
+	 * @return If the method returns false, statistics element could not be
+	 *         handled
+	 */
+	protected boolean inputEvent(long timestamp, String sourcename, long volume) {
+		StatisticsElement statisticsElement = new StatisticsElement(timestamp, sourcename, getActiveAddressBean().getInputStreamName(), volume);
+		return StatisticsHandler.getInstance().inputEvent(getActiveAddressBean().getVirtualSensorName(), statisticsElement);
 	}
 
 	/**

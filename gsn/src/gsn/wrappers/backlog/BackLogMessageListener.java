@@ -1,7 +1,5 @@
 package gsn.wrappers.backlog;
 
-import java.io.Serializable;
-
 
 /**
  * An interface for listening to messages built from
@@ -19,11 +17,12 @@ public interface BackLogMessageListener extends java.util.EventListener {
 	 *
      * @param deviceId the DeviceId the message has been received from
      * @param timestamp contained in the message {@link BackLogMessage}
+     * @param volume the size in bytes of the message
      * @param data of the message
      * 
      * @return true, if the listener did acknowledge the message
      */
-    public boolean messageReceived(int deviceId, long timestamp, Serializable[] data);
+    public boolean messageRecv(int deviceId, BackLogMessage message);
 
     /**
      * This method is called to signal remote connection lost. It must be

@@ -5,6 +5,8 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.statistics.StatisticsElement;
+import gsn.statistics.StatisticsHandler;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -50,6 +52,10 @@ public abstract class AbstractVirtualSensor {
 	 * @param adjust Default is false.
 	 */
 	protected synchronized void dataProduced ( StreamElement streamElement,boolean adjust ) {
+		if (streamElement.isProducingStatistics()) {
+			StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), "vs", null, streamElement.getVolume());
+			StatisticsHandler.getInstance().outputEvent(getVirtualSensorConfiguration().getName(), statisticsElement);
+		}
 		try {
 			validateStreamElement( streamElement,adjust );
 		} catch ( Exception e ) {
@@ -167,4 +173,11 @@ public abstract class AbstractVirtualSensor {
 	 * be delivered to the virtual sensor for possible processing.
 	 */
 	public abstract void dataAvailable ( String inputStreamName , StreamElement streamElement );
+	
+
+	public void dataAvail ( String inputStreamName , StreamElement streamElement ) {
+		StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), null, inputStreamName, streamElement.getVolume());
+		StatisticsHandler.getInstance().inputEvent(getVirtualSensorConfiguration().getName(), statisticsElement);
+		dataAvailable(inputStreamName, streamElement);
+	}
 }
