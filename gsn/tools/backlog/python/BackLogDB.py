@@ -291,6 +291,7 @@ class BackLogDBClass(Thread, Statistics):
                     if logresend:
                         self._logger.info('all packets are sent')
                     self._isBusy = False
+                    self._backlogMain.schedulehandler.backlogResendFinished()
                     break
 
                 timestamp = row[0]
