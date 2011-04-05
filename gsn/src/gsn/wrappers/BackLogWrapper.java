@@ -199,8 +199,8 @@ public class BackLogWrapper extends AbstractWrapper {
 		return remoteConnectionPoint;
 	}
 
-	public boolean inputEvent(String sourcename, long volume) {
-		return super.inputEvent(sourcename, volume);
+	public boolean inputEvent(long timestamp, String sourcename, long volume) {
+		return super.inputEvent(timestamp, sourcename, volume);
 	}
 
 

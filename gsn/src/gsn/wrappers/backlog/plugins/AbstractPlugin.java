@@ -94,7 +94,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
      * @param timestamp contained in the message {@link BackLogMessage}
      * @param data of the message
      * 
-     * @return true, if the plugin did acknowledge the message
+     * @return true, if the plugin did process the message properly
      */
     public abstract boolean messageReceived(int deviceId, long timestamp, Serializable[] data);
 
@@ -351,12 +351,16 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	
 	
 	public boolean messageRecv(int deviceId, BackLogMessage message) {
-		try {
-			activeBackLogWrapper.inputEvent(activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
-		} catch (IOException e) {
-			e.printStackTrace();
+		long timestamp = System.currentTimeMillis();
+		boolean ret = messageReceived(deviceId, message.getTimestamp(), message.getPayload());
+		if (ret) {
+			try {
+				activeBackLogWrapper.inputEvent(timestamp, activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		return messageReceived(deviceId, message.getTimestamp(), message.getPayload());
+		return ret;
 	}
 
 

@@ -20,7 +20,7 @@ public interface BackLogMessageListener extends java.util.EventListener {
      * @param volume the size in bytes of the message
      * @param data of the message
      * 
-     * @return true, if the listener did acknowledge the message
+     * @return true, if the listener did process the message properly
      */
     public boolean messageRecv(int deviceId, BackLogMessage message);
 

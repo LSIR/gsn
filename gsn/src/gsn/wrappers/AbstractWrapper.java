@@ -255,6 +255,7 @@ public abstract class AbstractWrapper extends Thread {
 	 * produce its data by itself. The return value specifies if the newly
 	 * provided statistics element could be handled properly.
 	 * 
+	 * @param timestamp the timestamp when this input event has been generated
 	 * @param sourcename a unique source identifier (per wrapper) of the
 	 *                   sensor data packet
 	 * @param volume the amount of data received in bytes

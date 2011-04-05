@@ -225,7 +225,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 
 				// create statistics event
 				try {
-					temp.activeBackLogWrapper.inputEvent(temp.activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
+					temp.activeBackLogWrapper.inputEvent(System.currentTimeMillis(), temp.activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
 				} catch (IOException e) {
 					logger.error(e.getMessage());
 				}
@@ -276,7 +276,7 @@ public class MigMessageMultiplexer implements BackLogMessageListener {
 
 				// create statistics event
 				try {
-					temp.activeBackLogWrapper.inputEvent(temp.activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
+					temp.activeBackLogWrapper.inputEvent(System.currentTimeMillis(), temp.activeBackLogWrapper.getRemoteConnectionPoint(), message.getSize());
 				} catch (IOException e) {
 					logger.error(e.getMessage());
 				}
