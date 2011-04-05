@@ -1,6 +1,6 @@
 <virtual-sensor name="Statistics_DataFlow" priority="10" protected="true" statistics="false" >
     <processing-class>
-        <class-name>gsn.vsensor.DataFlowStatsBridgeVirtualSensor</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
