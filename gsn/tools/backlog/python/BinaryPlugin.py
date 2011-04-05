@@ -106,11 +106,13 @@ class BinaryPluginClass(AbstractPluginClass):
         wait_min_for_file = self.getOptionValue('wait_min_for_file')
         if wait_min_for_file and self.isDutyCycleMode():
             self._waitforfile = True
+            self._isBusy = True
             self._waitforfiletimer = Timer(float(wait_min_for_file) * 60, self.checkForFileTimerAction)
             self._waitforfiletimer.start()
             self.info('waiting at least %s minutes for a file to arrive' % (wait_min_for_file,))
         else:
             self._waitforfile = False
+            self._isBusy = False
 
         if self._rootdir is None:
             raise TypeError('no rootdir specified')
@@ -206,8 +208,6 @@ class BinaryPluginClass(AbstractPluginClass):
             
         if self._filedeque or self.getMaxRuntime():
             self._isBusy = True
-        else:
-            self._isBusy = False
                 
         self._filedescriptor = None
         self._plugStop = False
@@ -353,7 +353,8 @@ class BinaryPluginClass(AbstractPluginClass):
             except IndexError:
                 self.debug('file FIFO is empty waiting for next file to arrive')
                 self._readyfornewbinary = True
-                self._isBusy = False
+                if not self._waitforfile:
+                    self._isBusy = False
                 return
                 
             filename = fileobj[0]
