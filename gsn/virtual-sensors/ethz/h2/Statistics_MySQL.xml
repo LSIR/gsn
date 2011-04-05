@@ -1,4 +1,4 @@
-<virtual-sensor name="Statistics_MySQL" priority="10" statistics="true" >
+<virtual-sensor name="Statistics_MySQL" priority="10" statistics="false" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>

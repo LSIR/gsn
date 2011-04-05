@@ -29,7 +29,9 @@ ETZ_Dozer_AEData.xml
 ETZ_Dozer_AEStatistics.xml
 ETZ_GPS_RAW.xml
 ETZ_Schedule.xml
+ETZ_Statistics.xml
 ETZ_Topology.xml
 ETZ_VaisalaWXT520.xml
+Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml

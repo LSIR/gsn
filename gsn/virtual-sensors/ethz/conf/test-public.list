@@ -37,6 +37,7 @@ ETZ_Dozer_Rssi__muxed__mapped.xml
 ETZ_Dozer_StateCounter__conv.xml
 ETZ_Dozer_StateCounter__mapped.xml
 ETZ_Schedule__mapped.xml
+ETZ_Statistics__mapped.xml
 ETZ_VaisalaWXT520__mapped.xml
 ETZ_VaisalaWXT520__muxed__mapped.xml
 ETZ_Topology__public.xml
@@ -50,5 +51,6 @@ ETZ_Dozer_WXT520Ident__mapped.xml
 ETZ_Dozer_WXT520Ident__conv.xml
 ETZ_GPS_RAW__mapped.xml
 ETZ_GPS_RAW__muxed__mapped.xml
+Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
