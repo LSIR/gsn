@@ -397,7 +397,7 @@ public class VSensorConfig implements Serializable {
 			builder.append( ")" );
 		}
 		builder.append( "]" );
-		return "VSensorConfig{" + "name='" + this.name + '\'' + ", priority=" + this.priority + ", mainClass='" + this.mainClass + '\'' 
+		return "VSensorConfig{" + "name='" + this.name + '\'' + ", priority=" + this.priority + ", statistics=" + this.statistics + ", mainClass='" + this.mainClass + '\'' 
 		+ ", description='" + this.description + '\'' + ", outputStreamRate=" + this.outputStreamRate
 		+ ", addressing=" + this.addressing + ", outputStructure=" + this.outputStructure + ", storageHistorySize='" + this.storageHistorySize + '\'' + builder.toString( )
 		+ ", mainClassInitialParams=" + this.mainClassInitialParams + ", lastModified=" + this.lastModified + ", fileName='" + this.fileName + '\'' + ", logger=" + this.logger + ", nameInitialized="
