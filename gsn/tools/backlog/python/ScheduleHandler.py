@@ -709,7 +709,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                     
             # wait for backlog to finish resend data
             max_wait = int(self.getOptionValue('max_db_resend_runtime'))*60.0
-            if max_wait > self._backlogMain.getUptime():
+            if not self._resendFinishEvent.isSet() and max_wait > self._backlogMain.getUptime():
                 self._logger.info('waiting for database resend process to finish for a maximum of %f seconds' % (max_wait-self._backlogMain.getUptime(),))
                 self._resendFinishEvent.wait(max_wait-self._backlogMain.getUptime())
                 if self._scheduleHandlerStop:
