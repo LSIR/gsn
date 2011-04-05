@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_VaisalaWXT520__mapped" priority="10" >
+<virtual-sensor name="ETZ_VaisalaWXT520__mapped" priority="10" statistics="true" >
     <processing-class>
         <class-name>gsn.vsensor.VaisalaDemuxBridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>

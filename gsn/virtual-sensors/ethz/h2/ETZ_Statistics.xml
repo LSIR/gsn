@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Statistics" priority="10" protected="true" >
+<virtual-sensor name="ETZ_Statistics" priority="10" statistics="true" protected="true" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>

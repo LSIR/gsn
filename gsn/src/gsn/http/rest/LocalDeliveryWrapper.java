@@ -171,7 +171,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 	}
 
 	public boolean writeStreamElement(StreamElement se) {
-		if (se.isProducingStatistics())
+		if (getActiveAddressBean().getVirtualSensorConfig().isProducingStatistics())
 			inputEvent(vsName, se.getVolume());
 		boolean isSucced = postStreamElement(se);
 		logger.debug("wants to deliver stream element:"+ se.toString()+ "["+isSucced+"]");

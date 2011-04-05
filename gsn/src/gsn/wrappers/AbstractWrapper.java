@@ -218,7 +218,7 @@ public abstract class AbstractWrapper extends Thread {
 				logger.debug("Size of the listeners to be evaluated - "
 						+ listeners.size());
 			
-			if (streamElement.isProducingStatistics()) {
+			if (activeAddressBean.getVirtualSensorConfig().isProducingStatistics()) {
 				StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), "wrapper-intern", null, streamElement.getVolume());
 				StatisticsHandler.getInstance().outputEvent(getActiveAddressBean().getVirtualSensorName(), statisticsElement);
 			}
@@ -263,6 +263,8 @@ public abstract class AbstractWrapper extends Thread {
 	 *         handled
 	 */
 	protected boolean inputEvent(long timestamp, String sourcename, long volume) {
+		if (!activeAddressBean.getVirtualSensorConfig().isProducingStatistics())
+			return false;
 		StatisticsElement statisticsElement = new StatisticsElement(timestamp, sourcename, getActiveAddressBean().getInputStreamName(), volume);
 		return StatisticsHandler.getInstance().inputEvent(getActiveAddressBean().getVirtualSensorName(), statisticsElement);
 	}

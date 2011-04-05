@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Camera_pos0__scaled" priority="10" >
+<virtual-sensor name="ETZ_Camera_pos0__scaled" priority="10" statistics="true" >
     <processing-class>
         <class-name>gsn.vsensor.FileGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>

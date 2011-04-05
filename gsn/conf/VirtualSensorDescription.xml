@@ -3,6 +3,7 @@
        <value name="name" field="name" style="attribute" />
        <value name="protected" field="access_protected" style="attribute"  usage="optional" />
        <value name="priority" field="priority" usage="optional" style="attribute" />
+       <value name="statistics" field="statistics" usage="optional" style="attribute" />
        <value name="publish-to-microsoft-research-sensor-map" field="sensorMap" usage="optional" style="attribute" />
        <value name="time-zone" field="timeZone" usage="optional" style="attribute" />
        <structure name="processing-class" usage="optional" >

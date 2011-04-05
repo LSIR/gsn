@@ -31,21 +31,29 @@ public class StatisticsHandler {
 	}
 
 	public boolean inputEvent(String producerVS, StatisticsElement statisticsElement) {
+		if (producerVS == null) {
+			logger.error("producer virtual sensor name should not be null");
+			return false;
+		}
 		if (statisticsListeners.isEmpty())
 			return false;
 		boolean ret = false;
 		for(Iterator<StatisticsListener> iter = statisticsListeners.iterator(); iter.hasNext();)
-			if(iter.next().inputEvent(producerVS, statisticsElement))
+			if(iter.next().inputEvent(producerVS.toLowerCase().trim(), statisticsElement))
 				ret = true;
 		return ret;
 	}
 
 	public boolean outputEvent(String producerVS, StatisticsElement statisticsElement) {
+		if (producerVS == null) {
+			logger.error("producer virtual sensor name should not be null");
+			return false;
+		}
 		if (statisticsListeners.isEmpty())
 			return false;
 		boolean ret = false;
 		for(Iterator<StatisticsListener> iter = statisticsListeners.iterator(); iter.hasNext();)
-			if(iter.next().outputEvent(producerVS, statisticsElement))
+			if(iter.next().outputEvent(producerVS.toLowerCase().trim(), statisticsElement))
 				ret = true;
 		return ret;
 	}

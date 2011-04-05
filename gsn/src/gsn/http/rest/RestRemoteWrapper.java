@@ -4,7 +4,6 @@ import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.statistics.StatisticsHandler;
 import gsn.wrappers.AbstractWrapper;
 
 import java.io.File;
@@ -77,7 +76,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
     private RemoteWrapperParamParser initParams;
 
     public String getWrapperName() {
-        return "Rest Remote Wrapper";
+        return "RestRemoteWrapper";
     }
 
     public boolean initialize() {
@@ -244,7 +243,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
                 while (isActive() && (se = (StreamElement4Rest) inputStream.readObject()) != null) {
                     StreamElement streamElement = se.toStreamElement();
                     //TODO: get actual size of transmitted input stream not of stream element
-                    if (streamElement.isProducingStatistics())
+                    if (getActiveAddressBean().getVirtualSensorConfig().isProducingStatistics())
                     	inputEvent(initParams.getRemoteContactPoint(), streamElement.getVolume());
                     if ( ! (streamElement.getFieldNames().length == 1 && streamElement.getFieldNames()[0].equals("keepalive"))) {
                         boolean status = manualDataInsertion(streamElement);

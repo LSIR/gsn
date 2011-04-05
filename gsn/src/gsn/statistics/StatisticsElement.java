@@ -2,20 +2,15 @@ package gsn.statistics;
 
 public final class StatisticsElement {
 	
-	private String source;
+	private String source = null;
 	
-	private String stream;
+	private String stream = null;
 	
-	private Long volume;
+	private Long volume = null;
 	
-	private Long timestamp;
+	private Long timestamp = null;
 	
-	public StatisticsElement() {
-		source = null;
-		stream = null;
-		volume = null;
-		timestamp = null;
-	}
+	public StatisticsElement() { }
 	
 	/**
 	 * 
@@ -27,8 +22,10 @@ public final class StatisticsElement {
 	 *                  created.
 	 */
 	public StatisticsElement(long timestamp, String source, String stream, long volume) {
-		this.source = source;
-		this.stream = stream;
+		if (source != null)
+			this.source = source.toLowerCase().trim();
+		if (stream != null)
+			this.stream = stream.toLowerCase().trim();
 		this.volume = volume;
 		this.timestamp = timestamp;
 	}

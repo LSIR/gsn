@@ -31,8 +31,6 @@ public final class StreamElement implements Serializable {
 	private static final String NULL_ENCODING = "NULL"; // null encoding for transmission over xml-rpc
 	
 	private Long volume = null;
-	
-	private boolean produceStatistics = true;
 
 	public StreamElement (StreamElement other) {
 		int len = other.fieldNames.length;
@@ -47,7 +45,6 @@ public final class StreamElement implements Serializable {
 		this.timeStamp=other.timeStamp;
 		this.internalPrimayKey = other.internalPrimayKey;
 		this.volume = other.volume;
-		this.produceStatistics = other.produceStatistics;
 	}
 	
 	public StreamElement (StreamElement other, final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data) {
@@ -68,7 +65,6 @@ public final class StreamElement implements Serializable {
 		this.timeStamp=other.timeStamp;
 		this.internalPrimayKey = other.internalPrimayKey;
 		this.volume = null;
-		this.produceStatistics = other.produceStatistics;
 	}	
 	
 	public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data  ) {
@@ -475,13 +471,5 @@ public final class StreamElement implements Serializable {
 			}
 		}
 		return volume;
-	}
-
-	public boolean isProducingStatistics() {
-		return produceStatistics;
-	}
-
-	public void doNotProduceStatistics() {
-		produceStatistics = false;
 	}
 }

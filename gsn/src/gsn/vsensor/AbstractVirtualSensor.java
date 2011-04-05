@@ -53,7 +53,7 @@ public abstract class AbstractVirtualSensor {
 	 * @param adjust Default is false.
 	 */
 	protected synchronized void dataProduced ( StreamElement streamElement,boolean adjust ) {
-		if (streamElement.isProducingStatistics()) {
+		if (virtualSensorConfiguration.isProducingStatistics()) {
 			StatisticsElement statisticsElement = new StatisticsElement(System.currentTimeMillis(), "vs-intern", null, streamElement.getVolume());
 			StatisticsHandler.getInstance().outputEvent(getVirtualSensorConfiguration().getName(), statisticsElement);
 		}
@@ -177,7 +177,7 @@ public abstract class AbstractVirtualSensor {
 	
 
 	public void dataAvail ( String inputStreamName , StreamElement streamElement ) {
-		if (streamElement.isProducingStatistics()) {
+		if (virtualSensorConfiguration.isProducingStatistics()) {
 			String sourcestring = "";
 			for (StreamSource source: getVirtualSensorConfiguration().getInputStream(inputStreamName).getSources())
 				sourcestring += (source.getWrapper().getWrapperName() + " ");

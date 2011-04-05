@@ -78,7 +78,6 @@ public class DataFlowStatsWrapper extends AbstractWrapper implements StatisticsL
 	public boolean inputEvent(String producerVS, StatisticsElement se) {
 		Serializable [] data = new Serializable[]{se.getProcessTime(), (byte)0, producerVS, se.getSource(), se.getStream(), se.getVolume()};
 		StreamElement streamElement = new StreamElement(outputStructure, data);
-		streamElement.doNotProduceStatistics();
 		if (seQueue.offer(streamElement))
 			return true;
 		else {
@@ -91,7 +90,6 @@ public class DataFlowStatsWrapper extends AbstractWrapper implements StatisticsL
 	public boolean outputEvent(String producerVS, StatisticsElement se) {
 		Serializable [] data = new Serializable[]{se.getProcessTime(), (byte)1, producerVS, se.getSource(), se.getStream(), se.getVolume()};
 		StreamElement streamElement = new StreamElement(outputStructure, data);
-		streamElement.doNotProduceStatistics();
 		if (seQueue.offer(streamElement))
 			return true;
 		else {

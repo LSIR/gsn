@@ -20,6 +20,8 @@ public class VSensorConfig implements Serializable {
 
 	public static final int                        DEFAULT_POOL_SIZE                         = 10;
 
+	public static final boolean                     DEFAULT_STATISTICS                        = false;
+
 	private String                                 name;
 
 	private int                                    priority                                  = DEFAULT_PRIORITY;
@@ -61,6 +63,9 @@ public class VSensorConfig implements Serializable {
 	private String directoryQuery ;
 
 		private WebInput[] webinput;
+		
+	private String statistics = Boolean.toString(DEFAULT_STATISTICS);
+	private Boolean stats = null;
 
 	private String sensorMap = "false";
 
@@ -429,6 +434,22 @@ public class VSensorConfig implements Serializable {
         }
         return sdf;
     }
+
+
+
+
+	/**
+	 * @return if statistics should be produced
+	 */
+	public boolean isProducingStatistics() {
+		if (stats == null) {
+			if (statistics==null)
+				stats = DEFAULT_STATISTICS;
+			else
+				stats = Boolean.parseBoolean(statistics.trim());
+		}
+		return stats;
+	}
 
 
 

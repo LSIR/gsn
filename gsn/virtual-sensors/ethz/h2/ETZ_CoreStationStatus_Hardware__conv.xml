@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_CoreStationStatus_Hardware__conv" priority="10" >
+<virtual-sensor name="ETZ_CoreStationStatus_Hardware__conv" priority="10" statistics="true" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>

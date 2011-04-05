@@ -1,4 +1,4 @@
-<virtual-sensor name="Statistics_GSN" priority="10" >
+<virtual-sensor name="Statistics_GSN" priority="10" statistics="true" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
