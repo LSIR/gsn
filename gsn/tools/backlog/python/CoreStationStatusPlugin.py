@@ -943,7 +943,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                     if linepair != None:
                         ret[index] = long(splittedlines[linepair[0]][linepair[1]])
             except Exception, e:
-                self.exception(e)
+                self._checkNetSNMP()
         return ret
         
         
