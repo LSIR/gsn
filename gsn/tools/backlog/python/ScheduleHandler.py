@@ -718,7 +718,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._scheduleEvent.clear()
                     return False
                 if not self._resendFinishEvent.isSet():
-                    self.warning('backlog database is not finish with resending')
+                    self._logger.warning('backlog database is not finish with resending')
                     
             if self._schedule:
                 dtnow = datetime.utcnow()
