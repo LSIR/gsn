@@ -15,7 +15,7 @@ from threading import Thread, Lock, Event
 from SpecialAPI import Statistics
 
 
-SLEEP_BEFORE_RESEND_ON_RECONNECT = 30
+SLEEP_BEFORE_RESEND_ON_RECONNECT = 5
 
 MAX_WAIT_FOR_ACK = 30.0
 
@@ -309,6 +309,7 @@ class BackLogDBClass(Thread, Statistics):
                 else:
                     self._logger.info('resend interrupted')
                     self._isBusy = False
+                    self._backlogMain.schedulehandler.backlogResendFinished()
                     break
                 
                 self._waitForAck.wait(MAX_WAIT_FOR_ACK)

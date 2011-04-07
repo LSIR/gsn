@@ -91,6 +91,7 @@ class ScheduleHandlerClass(Thread, Statistics):
     _stopEvent
     _allJobsFinishedEvent
     _resendFinishEvent
+    _waitForGSNFinishEvent
     _schedule
     _newSchedule
     _duty_cycle_mode
@@ -202,6 +203,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._allJobsFinishedEvent = Event()
         self._allJobsFinishedEvent.set()
         self._resendFinishEvent = Event()
+        self._waitForGSNFinishEvent = Event()
         self._tosMessageLock = Lock()
         self._tosMessageAckEvent = Event()
         self._tosSentCmd = None
@@ -451,6 +453,9 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._logger.warning('gsn has not answered on any schedule request')
         else:
             self._logger.warning('gsn has not connected')
+            self._resendFinishEvent.set()
+            
+        self._waitForGSNFinishEvent.set()
             
             
     def getStatus(self):
@@ -468,6 +473,7 @@ class ScheduleHandlerClass(Thread, Statistics):
     
     def stop(self):
         self._scheduleHandlerStop = True
+        self._waitForGSNFinishEvent.set()
         self._connectionEvent.set()
         self._scheduleEvent.set()
         self._allJobsFinishedEvent.set()
@@ -706,6 +712,10 @@ class ScheduleHandlerClass(Thread, Statistics):
                 if not self._allJobsFinishedEvent.isSet():
                     self._backlogMain.incrementErrorCounter()
                     self.error('not all jobs have been killed (should not happen)')
+                    
+            if not self._waitForGSNFinishEvent.isSet():
+                self._logger.info('waiting for GSN')
+                self._waitForGSNFinishEvent.wait()
                     
             # wait for backlog to finish resend data
             max_wait = int(self.getOptionValue('max_db_resend_runtime'))*60.0
