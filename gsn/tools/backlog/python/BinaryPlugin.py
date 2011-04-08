@@ -514,6 +514,9 @@ class BinaryPluginClass(AbstractPluginClass):
         if self._readyfornewbinary:
             self._isBusy = False
             self.info('there is no file to be transmitted')
+        elif not self.isGSNConnected():
+            self._isBusy = False
+            self.info('there are still files to be transmitted but GSN is not connected')
         else:
             self.info('there are still files to be transmitted')
         
@@ -531,7 +534,7 @@ class BinaryPluginClass(AbstractPluginClass):
         
         
     def beaconCleared(self):
-        if self._readyfornewbinary and not self._waitforfile:
+        if (self._readyfornewbinary or not self.isGSNConnected()) and not self._waitforfile:
             self._isBusy = False
     
     
