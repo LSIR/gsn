@@ -682,7 +682,7 @@ class ScheduleHandlerClass(Thread, Statistics):
             
 
     def _shutdown(self, sleepdelta=timedelta()):
-        self._logger.info('entering shutdown function')
+        self._logger.debug('entering shutdown function')
         if self._duty_cycle_mode:
             now = datetime.utcnow()
             if now + sleepdelta > now:
