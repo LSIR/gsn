@@ -17,33 +17,33 @@ public class OZ47Plugin extends AbstractPlugin {
 	private static final String READINGS_NAMING = "readings";
 
 	private static DataField[] readingsDataField = {	
-            new DataField("TIMESTAMP", "BIGINT"),
-						new DataField("GENERATION_TIME", "BIGINT"),
-						new DataField("DEVICE_ID", "INTEGER"),
-						new DataField("OZONE_SENSOR_1", "INTEGER"),
-						new DataField("OZONE_SENSOR_2", "INTEGER"),
-						new DataField("RESISTANCE_1", "INTEGER"),
-						new DataField("RESISTANCE_2", "INTEGER"),
-						new DataField("TEMPERATURE", "DOUBLE"),
-						new DataField("HUMIDITY", "INTEGER")
+		new DataField("TIMESTAMP", "BIGINT"),
+		new DataField("GENERATION_TIME", "BIGINT"),
+		new DataField("DEVICE_ID", "INTEGER"),
+		new DataField("OZONE_SENSOR_1", "INTEGER"),
+		new DataField("OZONE_SENSOR_2", "INTEGER"),
+		new DataField("RESISTANCE_1", "INTEGER"),
+		new DataField("RESISTANCE_2", "INTEGER"),
+		new DataField("TEMPERATURE", "DOUBLE"),
+		new DataField("HUMIDITY", "INTEGER")
   };
   
   private static DataField[] statisticsDataField = {	
-            new DataField("TIMESTAMP", "BIGINT"),
-						new DataField("GENERATION_TIME", "BIGINT"),
-						new DataField("DEVICE_ID", "INTEGER"),
-						new DataField("LOT_NO", "INTEGER"),
-						new DataField("CELL_NO", "INTEGER"),
-						new DataField("CALIB_WEEK", "INTEGER"),
-						new DataField("CALIB_YEAR", "INTEGER"),
-						new DataField("TIMER_PRE_HEAT", "INTEGER"),
-						new DataField("AUTO_CALIB", "INTEGER"),
-						new DataField("TIMER_DELAY", "INTEGER"),
-						new DataField("TIMER_CYCLE", "INTEGER"),
-						new DataField("TIMER_PULSE", "INTEGER"),
-						new DataField("OFFSET_MEM", "INTEGER"),
-						new DataField("OFFSET_VERIF", "INTEGER"),
-						new DataField("OFFSET", "INTEGER")
+        new DataField("TIMESTAMP", "BIGINT"),
+		new DataField("GENERATION_TIME", "BIGINT"),
+		new DataField("DEVICE_ID", "INTEGER"),
+		new DataField("LOT_NO", "INTEGER"),
+		new DataField("CELL_NO", "INTEGER"),
+		new DataField("CALIB_WEEK", "INTEGER"),
+		new DataField("CALIB_YEAR", "INTEGER"),
+		new DataField("TIMER_PRE_HEAT", "INTEGER"),
+		new DataField("AUTO_CALIB", "INTEGER"),
+		new DataField("TIMER_DELAY", "INTEGER"),
+		new DataField("TIMER_CYCLE", "INTEGER"),
+		new DataField("TIMER_PULSE", "INTEGER"),
+		new DataField("OFFSET_MEM", "INTEGER"),
+		new DataField("OFFSET_VERIF", "INTEGER"),
+		new DataField("OFFSET", "INTEGER")
   };
 
   private static final Hashtable<String, NameDataFieldPair> statusNamingTable = new Hashtable<String, NameDataFieldPair>();
