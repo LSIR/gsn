@@ -7,7 +7,6 @@ import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
 import gsn.http.WebConstants;
 import org.apache.log4j.Logger;
-import sun.util.logging.resources.logging;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
