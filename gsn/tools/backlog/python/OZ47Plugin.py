@@ -15,6 +15,9 @@ import OZ47Driver
 
 DEFAULT_BACKLOG = True
 
+STATISTICS_NAMING = 1
+READINGS_NAMING = 2
+
 # Reads messages from the OZ47Driver and sends them to GSN
 class OZ47PluginClass(AbstractPluginClass):
     
@@ -63,7 +66,9 @@ class OZ47PluginClass(AbstractPluginClass):
             msg = self.oz47._read()
             self.info(msg)
         
-        self.processMsg(self.getTimeStamp(), [msg])
+        dataPackage = [READINGS_NAMING]
+	dataPackage += [msg]
+	self.processMsg(self.getTimeStamp(), dataPackage)
 
         self.info('OZ47 reading done')
 
