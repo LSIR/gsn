@@ -19,6 +19,9 @@
         </tstamp>
         <property environment="env"/>
         <copy file="conf/gsn.xml.svn" tofile="conf/gsn.xml" overwrite="false"/>
+        <copy file="conf/log4j.properties.svn" tofile="conf/log4j.properties" overwrite="false"/>
+        <copy file="conf/emails.properties.svn" tofile="conf/emails.properties" overwrite="false"/>
+        <copy file="conf/realm.properties.svn" tofile="conf/realm.properties" overwrite="false"/>
         <xmlproperty file="conf/gsn.xml" collapseAttributes="true"/>
         <condition property="isPrivateStyle">
           <contains string="${sensor-server.name}" substring="private" casesensitive="false" />
