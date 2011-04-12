@@ -15,6 +15,7 @@ ETZ_Dozer_DecagonMux.xml
 ETZ_Dozer_DigitalDCX.xml
 ETZ_Dozer_Drift.xml
 ETZ_Dozer_EventLogger.xml
+ETZ_Dozer_GPSData.xml
 ETZ_Dozer_NodeHealth.xml
 ETZ_Dozer_NodeInfo.xml
 ETZ_Dozer_PowerSwitch.xml

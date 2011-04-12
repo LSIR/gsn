@@ -27,6 +27,7 @@ ETZ_Dozer_Drift__mapped.xml
 ETZ_Dozer_Drift__muxed__mapped.xml
 ETZ_Dozer_EventLogger__mapped.xml
 ETZ_Dozer_EventLogger__muxed__mapped.xml
+ETZ_Dozer_GPSData__mapped.xml
 ETZ_Dozer_NodeHealth__mapped.xml
 ETZ_Dozer_NodeHealth__conv.xml
 ETZ_Dozer_NodeInfo__mapped.xml
