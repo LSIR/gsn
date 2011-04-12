@@ -326,11 +326,11 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         self._chronyTracking = True
         try:
-            p = subprocess.Popen(['chronyc', 'tracking'])
+            p = subprocess.Popen(['chronyc', 'tracking'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             p.wait()
             output = p.communicate()
             if output[0]:
-                lines = output[0].split('\n')
+                lines = output[0].strip().split('\n')
                 for lineindex, line in enumerate(lines):
                     if line.strip().startswith('Stratum'):
                         lst = line.split()
@@ -374,13 +374,13 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         self._chronyRTC = True
         try:
-            p = subprocess.Popen(['chronyc', 'rtcdata'])
+            p = subprocess.Popen(['chronyc', 'rtcdata'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             p.wait()
             output = p.communicate()
             if output[0]:
-                lines = output[0].split('\n')
+                lines = output[0].strip().split('\n')
                 if len(lines) != 6:
-                    self.error('chronyc rtcdata did not return the expected output')
+                    self.error('chronyc rtcdata did not return the expected output: stdout: %s, stderr: %s' % (output[0], output[1]))
                     self._chronyRTC = False
                 else:
                     line = lines[4]
@@ -424,7 +424,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         if self._chronyTracking:
             try:
-                p = subprocess.Popen(['chronyc', 'tracking'])
+                p = subprocess.Popen(['chronyc', 'tracking'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 p.wait()
                 output = p.communicate()
 #                print '#############################################################################'
@@ -434,7 +434,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #                print output[0]
 #                print ''
                 if output[0]:
-                    lines = output[0].split('\n')
+                    lines = output[0].strip().split('\n')
                     for lineindex, line in enumerate(lines):
                         if self._chronyTrackingLineIndexes[0] == lineindex:
                             ret[0] = int(line.split()[2])
@@ -461,7 +461,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         if self._chronyRTC:
             try:
-                p = subprocess.Popen(['chronyc', 'rtcdata'])
+                p = subprocess.Popen(['chronyc', 'rtcdata'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 p.wait()
                 output = p.communicate()
 #                print ''
@@ -470,7 +470,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
 #                print output[0]
 #                print ''
                 if output[0]:
-                    lines = output[0].split('\n')
+                    lines = output[0].strip().split('\n')
                     if self._chronyRTCDataAvailable[0]:
                         ret[4] = float(lines[4].split()[-2])
                         
@@ -1338,7 +1338,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
     def _initAD77x8(self):
         self._ad77x8 = True
-        p = subprocess.Popen(['modprobe', 'ad77x8'])
+        p = subprocess.Popen(['modprobe', 'ad77x8'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.info('wait for modprobe ad77x8 to finish')
         ret = p.wait()
         output = p.communicate()
