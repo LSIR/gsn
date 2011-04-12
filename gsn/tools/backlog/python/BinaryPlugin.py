@@ -302,7 +302,7 @@ class BinaryPluginClass(AbstractPluginClass):
                                 # remove it from disk
                                 os.remove(filename)
                             else:
-                                self.error('crc acknowledge file does not exist')
+                                self.debug('crc acknowledge file does not exist')
                             self._getInitialBinaryPacket()
                         else:
                             self.error('unexpected acknowledge received')
@@ -336,39 +336,35 @@ class BinaryPluginClass(AbstractPluginClass):
                 
                 
     def _getInitialBinaryPacket(self):
-        if self._filedescriptor and not self._filedescriptor.closed:
-            filename = self._filedescriptor.name
-            if os.path.isfile(filename):
-                self.warning('new file request, but actual file (%s) not yet closed -> remove it!' % (filename,))
-                os.chmod(filename, 0744)
-                self._filedescriptor.close()
-                os.remove(filename)
-            else:
-                self._filedescriptor.close()
-            
         while not self._plugStop:
-            try:
-                # get the next file to send out of the fifo
-                fileobj = self._filedeque.pop()
-            except IndexError:
-                self.debug('file FIFO is empty waiting for next file to arrive')
-                self._readyfornewbinary = True
-                if not self._waitforfile:
-                    self._isBusy = False
-                return
-                
-            filename = fileobj[0]
-            
-            if os.path.isfile(filename):
-                # open the file
-                self._filedescriptor = open(filename, 'rb')
-                os.chmod(filename, 0444)
+            if self._filedescriptor and not self._filedescriptor.closed:
+                filename = self._filedescriptor.name
+                if not os.path.isfile(filename):
+                    self._filedescriptor.close()
+                    continue
             else:
-                # if the file does not exist we are continuing in the fifo
-                continue
+                try:
+                    # get the next file to send out of the fifo
+                    fileobj = self._filedeque.pop()
+                except IndexError:
+                    self.debug('file FIFO is empty waiting for next file to arrive')
+                    self._readyfornewbinary = True
+                    if not self._waitforfile:
+                        self._isBusy = False
+                    return
+                    
+                filename = fileobj[0]
+            
+                if os.path.isfile(filename):
+                    # open the file
+                    self._filedescriptor = open(filename, 'rb')
+                    os.chmod(filename, 0444)
+                else:
+                    # if the file does not exist we are continuing in the fifo
+                    continue
             
             # get the size of the file
-            filelen = fileobj[1]
+            filelen = os.path.getsize(filename)
             
             if filelen == 0:
                 # if the file is empty we ignore it and continue in the fifo
