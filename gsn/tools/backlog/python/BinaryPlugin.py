@@ -231,6 +231,8 @@ class BinaryPluginClass(AbstractPluginClass):
     def connectionToGSNlost(self):
         self.debug('connection lost')
         self._readyfornewbinary = False
+        if not self._waitforfile:
+            self._isBusy = False
         if self._filedescriptor:
             if os.path.exists(self._filedescriptor.name):
                 self._filedequelock.acquire()
