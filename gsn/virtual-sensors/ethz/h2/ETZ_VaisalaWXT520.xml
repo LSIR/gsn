@@ -1,7 +1,47 @@
 <virtual-sensor name="ETZ_VaisalaWXT520" priority="10" statistics="true" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <class-name>gsn.processor.ScriptletProcessor</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    if ( ! isdef('deviceIdMap')) { deviceIdMap = [:]; }
+                    deviceIdMap.put(DEVICE_ID, System.currentTimeMillis());
+                ]]>
+            </param>
+            <param name="period">150000</param>
+            <param name="scriplet-periodic">
+                <![CDATA[
+                	// default alarm time after which an email is sent if no messages have been received
+                    def timeDifferenceOffsetDefault = 300000;
+                	// a list of alarm time per device id
+                    def timeDifferenceOffsetDevicIdMap = [:];
+                    // the mail recipients
+                    def mailrecipients = ["tgsell@tik.ee.ethz.ch"];
+                    
+                    if ( isdef('deviceIdMap')) {
+                    	for (entry in deviceIdMap) {
+                        	def timeDifference = System.currentTimeMillis() - entry.value;
+                        	if (timeDifferenceOffsetDevicIdMap.containsKey(entry.key)) {
+                        		timeDifferenceOffset = timeDifferenceOffsetDevicIdMap.get(entry.key)
+                        	} else { timeDifferenceOffset = timeDifferenceOffsetDefault; }
+                        	if (timeDifference > timeDifferenceOffset) {
+                        		deviceIdMap.remove(entry.key);
+                        		def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
+                        		
+                        		// Notify by email
+                        		def emailTitle = "[PermaSense-GSN-Test] - WARNING: No more " + vsname + " messages received from device id " + entry.key;
+                        		def emailContent = "WARNING: No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes from device with id " + entry.key + ".";
+
+								logger.warn(emailContent);
+                        		sendEmail(mailrecipients, emailTitle, emailContent); // note that the sendMail method is, by default, imported statically to the script.
+                        	}
+                        }
+                    }
+                ]]>
+            </param>
+        </init-params>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>

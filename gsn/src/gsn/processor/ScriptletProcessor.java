@@ -227,6 +227,8 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
         scriptlet.append("import static ").append(gsn.utils.services.TwitterService.class.getCanonicalName()).append(".*;\n");
         // Add the syntactic sugars
         scriptlet.append("def isdef(var){(binding.getVariables().containsKey(var))}\n");
+        // Add virtual sensor name
+        scriptlet.append("def vsname = '").append(getVirtualSensorConfiguration().getName()).append("'\n");
         scriptlet.append("// end auto generated part --\n");
         // Append the scriplet from the parameter
         scriptlet.append(ps);

@@ -3,6 +3,7 @@ package gsn.vsensor;
 import gsn.ContainerImpl;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
+import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
@@ -11,6 +12,7 @@ import gsn.statistics.StatisticsHandler;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
@@ -139,9 +141,22 @@ public abstract class AbstractVirtualSensor {
 	 * finalizing an instance of the virtual sensor
 	 */
 	public abstract void dispose ( );
-
-	public boolean dataFromWeb ( String action,String[] paramNames, Serializable[] paramValues ) {
-		return false;
+	
+	public boolean dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
+		boolean ret = false;
+		Iterator<InputStream> streams = getVirtualSensorConfiguration().getInputStreams().iterator();
+		while (streams.hasNext()) {
+			StreamSource[] sources = streams.next().getSources();
+			for (int j=0; j<sources.length; j++) {
+				try {
+					if (sources[j].getWrapper().sendToWrapper(command, paramNames, paramValues))
+						ret = true;
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+		}
+		return ret;
 	}
 
 	/**

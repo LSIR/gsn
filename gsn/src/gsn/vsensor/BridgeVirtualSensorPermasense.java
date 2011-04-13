@@ -10,21 +10,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
 import gsn.beans.DataTypes;
-import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
-import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.utils.ParamParser;
-import gsn.wrappers.AbstractWrapper;
 
 import org.apache.log4j.Logger;
 
@@ -41,7 +35,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 
 	protected String deployment;
 	private int width;
-	private List<AbstractWrapper> backlogWrapperList = new LinkedList<AbstractWrapper>();
 	private Vector<String> jpeg_scaled;
 	private String rotate_image;
 	private boolean position_mapping = false;
@@ -59,14 +52,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		width = ParamParser.getInteger(params.get("width"), DEFAULT_WIDTH);
 
 		rotate_image = params.get("rotate_image");
-		
-		Iterator<InputStream> streams = vsensor.getInputStreams().iterator();
-		while (streams.hasNext()) {
-			StreamSource[] sources = streams.next().getSources();
-			for (int j=0; j<sources.length; j++) {
-				backlogWrapperList.add(sources[j].getWrapper());
-			}
-		}
 		
 		String[] jpeg = null;
 		s = params.get("jpeg_scaled");
@@ -159,23 +144,6 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		}
 
 		super.dataAvailable(inputStreamName, data);
-	}
-	
-	@Override
-	public boolean dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
-		boolean ret = false;
-		
-		Iterator<AbstractWrapper> wrappers = backlogWrapperList.iterator();
-		while (wrappers.hasNext()) {
-			try {
-				if (wrappers.next().sendToWrapper(command, paramNames, paramValues))
-					ret = true;
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-		
-		return ret;
 	}
 	
 	public synchronized void dispose() {
