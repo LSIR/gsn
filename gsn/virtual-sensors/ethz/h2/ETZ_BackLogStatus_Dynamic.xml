@@ -9,25 +9,29 @@
                     // the mail recipients for error and exception counter increase
                     def mailrecipients = ["tgsell@tik.ee.ethz.ch"];
                     
-                	if ( ! isdef('lastErrorCounter')) { lastErrorCounter = ERROR_COUNTER; }
-                	if ( ERROR_COUNTER > lastErrorCounter ) {
-                        // Notify by email
-                        def emailTitle = "[PermaSense-GSN-Test] - ERROR: BackLog error counter increased (vs=" + vsname + ", id=" + DEVICE_ID + ")";
-                        def emailContent = "ERROR: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounter) + " on device id " + DEVICE_ID + " at " + vsname + ".";
+                	if ( ! isdef('lastErrorCounterMap')) { lastErrorCounterMap = [:]; }
+                	if (lastErrorCounterMap.containsKey(DEVICE_ID)) {
+                		if ( ERROR_COUNTER > lastErrorCounterMap.get(DEVICE_ID) ) {
+                        	// Notify by email
+                        	def emailTitle = "[PermaSense-GSN-Test] - ERROR: BackLog error counter increased (vs=" + vsname + ", id=" + DEVICE_ID + ")";
+                        	def emailContent = "ERROR: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(DEVICE_ID)) + " on device id " + DEVICE_ID + " at " + vsname + ".";
 
-                        sendEmail(mailrecipients, emailTitle, emailContent);
-                		lastErrorCounter = ERROR_COUNTER;
-                	}
+                        	sendEmail(mailrecipients, emailTitle, emailContent);
+                			lastErrorCounterMap.put(DEVICE_ID, ERROR_COUNTER);
+                		}
+                	} else { lastErrorCounterMap.put(DEVICE_ID, ERROR_COUNTER); }
                     
-                	if ( ! isdef('lastExceptionCounter')) { lastExceptionCounter = EXCEPTION_COUNTER; }
-                	if ( EXCEPTION_COUNTER > lastExceptionCounter ) {
-                        // Notify by email
-                        def emailTitle = "[PermaSense-GSN-Test] - EXCEPTION: BackLog exception counter increased (vs=" + vsname + ", id=" + DEVICE_ID + ")";
-                        def emailContent = "EXCEPTION: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounter) + " on device id " + DEVICE_ID + " at " + vsname + ".";
+                	if ( ! isdef('lastExceptionCounterMap')) { lastExceptionCounterMap = [:]; }
+                	if (lastExceptionCounterMap.containsKey(DEVICE_ID)) {
+                		if ( EXCEPTION_COUNTER > lastExceptionCounterMap.get(DEVICE_ID) ) {
+                        	// Notify by email
+                        	def emailTitle = "[PermaSense-GSN-Test] - EXCEPTION: BackLog exception counter increased (vs=" + vsname + ", id=" + DEVICE_ID + ")";
+                        	def emailContent = "EXCEPTION: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(DEVICE_ID)) + " on device id " + DEVICE_ID + " at " + vsname + ".";
 
-                        sendEmail(mailrecipients, emailTitle, emailContent);
-                		lastExceptionCounter = EXCEPTION_COUNTER;
-                	}
+                        	sendEmail(mailrecipients, emailTitle, emailContent);
+                			lastExceptionCounterMap.put(DEVICE_ID, EXCEPTION_COUNTER);
+                		}
+                	} else { lastExceptionCounterMap.put(DEVICE_ID, EXCEPTION_COUNTER); }
                 
                     if ( ! isdef('deviceIdMap')) { deviceIdMap = [:]; }
                     deviceIdMap.put(DEVICE_ID, System.currentTimeMillis());
