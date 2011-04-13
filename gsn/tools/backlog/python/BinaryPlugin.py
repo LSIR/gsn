@@ -224,13 +224,14 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def connectionToGSNestablished(self):
         self.debug('connection established')
+        if (self._filedescriptor and not self._filedescriptor.closed) or self._filedeque:
+            self._isBusy = True
         self._binaryWriter.resetResendCounter()
         self._binaryWriter.sendMessage([START_PACKET])
         
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
-        self._readyfornewbinary = False
         if not self._waitforfile:
             self._isBusy = False
         if self._filedescriptor:
@@ -660,7 +661,7 @@ class BinaryChangedProcessing(ProcessEvent):
             self._binaryPlugin._filedequelock.acquire()
             self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
             self._binaryPlugin._filedequelock.release()
-            if self._binaryPlugin._readyfornewbinary:
+            if self._binaryPlugin._readyfornewbinary and self._binaryPlugin.isGSNConnected():
                 self._binaryPlugin._readyfornewbinary = False
                 self._binaryPlugin._isBusy = True
                 self._binaryPlugin._getInitialBinaryPacket()
