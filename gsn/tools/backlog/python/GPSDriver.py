@@ -2,6 +2,10 @@
 __author__      = "Ben Buchli <bbuchli@ethz.ch"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Ben Buchli"
 __license__     = "GPL"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 '''
 backlog imports
 

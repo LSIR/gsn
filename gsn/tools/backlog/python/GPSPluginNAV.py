@@ -1,4 +1,3 @@
-#! /usr/bin/python
 # -*- coding: UTF-8 -*-
 __author__      = "David Hasenfratz <hasenfratz@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2011, ETH Zurich, Switzerland, David Hasenfratz"

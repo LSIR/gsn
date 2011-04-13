@@ -1,11 +1,11 @@
-
+# -*- coding: UTF-8 -*-
 __author__      = "Ben Buchli <bbuchli@ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland"
 __license__     = "GPL"
-__version__     = "$Revision: 2767 $"
-__date__        = "$Date: 2011-02-22 12:56:55 +0100 (Tue, 22 Feb 2011) $"
-__id__          = "$Id: BatteryPlugin.py 2767 2011-02-22 11:56:55Z bbuchli $"
-__source__      = "$URL: http://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/BatteryPlugin.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 '''
 backlog imports
 '''
