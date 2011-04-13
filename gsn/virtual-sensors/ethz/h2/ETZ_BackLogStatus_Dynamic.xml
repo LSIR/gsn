@@ -14,7 +14,7 @@
                 		if ( ERROR_COUNTER > lastErrorCounterMap.get(DEVICE_ID) ) {
                         	// Notify by email
                         	def emailTitle = "[PermaSense-GSN-Test] - ERROR: BackLog error counter increased (vs=" + vsname + ", id=" + DEVICE_ID + ")";
-                        	def emailContent = "ERROR: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(DEVICE_ID)) + " on device id " + DEVICE_ID + " at " + vsname + ".";
+                        	def emailContent = "ERROR: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(DEVICE_ID)) + " to " + ERROR_COUNTER + " on device id " + DEVICE_ID + " at " + vsname + ".";
 
                         	sendEmail(mailrecipients, emailTitle, emailContent);
                 		}
@@ -26,7 +26,7 @@
                 		if ( EXCEPTION_COUNTER > lastExceptionCounterMap.get(DEVICE_ID) ) {
                         	// Notify by email
                         	def emailTitle = "[PermaSense-GSN-Test] - EXCEPTION: BackLog exception counter increased (vs=" + vsname + ", id=" + DEVICE_ID + ")";
-                        	def emailContent = "EXCEPTION: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(DEVICE_ID)) + " on device id " + DEVICE_ID + " at " + vsname + ".";
+                        	def emailContent = "EXCEPTION: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(DEVICE_ID)) + " to " + EXCEPTION_COUNTER + " on device id " + DEVICE_ID + " at " + vsname + ".";
 
                         	sendEmail(mailrecipients, emailTitle, emailContent);
                 		}
