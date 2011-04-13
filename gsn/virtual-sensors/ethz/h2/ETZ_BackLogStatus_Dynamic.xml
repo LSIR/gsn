@@ -17,9 +17,9 @@
                         	def emailContent = "ERROR: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(DEVICE_ID)) + " on device id " + DEVICE_ID + " at " + vsname + ".";
 
                         	sendEmail(mailrecipients, emailTitle, emailContent);
-                			lastErrorCounterMap.put(DEVICE_ID, ERROR_COUNTER);
                 		}
-                	} else { lastErrorCounterMap.put(DEVICE_ID, ERROR_COUNTER); }
+                	}
+                	lastErrorCounterMap.put(DEVICE_ID, ERROR_COUNTER);
                     
                 	if ( ! isdef('lastExceptionCounterMap')) { lastExceptionCounterMap = [:]; }
                 	if (lastExceptionCounterMap.containsKey(DEVICE_ID)) {
@@ -29,9 +29,9 @@
                         	def emailContent = "EXCEPTION: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(DEVICE_ID)) + " on device id " + DEVICE_ID + " at " + vsname + ".";
 
                         	sendEmail(mailrecipients, emailTitle, emailContent);
-                			lastExceptionCounterMap.put(DEVICE_ID, EXCEPTION_COUNTER);
                 		}
-                	} else { lastExceptionCounterMap.put(DEVICE_ID, EXCEPTION_COUNTER); }
+                	}
+                	lastExceptionCounterMap.put(DEVICE_ID, EXCEPTION_COUNTER);
                 
                     if ( ! isdef('deviceIdMap')) { deviceIdMap = [:]; }
                     deviceIdMap.put(DEVICE_ID, System.currentTimeMillis());
