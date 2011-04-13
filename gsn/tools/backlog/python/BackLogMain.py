@@ -602,11 +602,12 @@ class BackLogMainClass(Thread, Statistics):
     
     
     def getCodeRevisionList(self):
-        m = re.compile('.+\$Id: ([\w.:\- ]+)\$')
+        m = re.compile('.+\$Id: ([^$]+)\$')
         ret = []
         for root, dirs, files in os.walk(BACKLOG_PYTHON_DIRECTORY):
             for file in files:
                 if file.endswith('.py'):
+                    hasRevisionLine = False
                     fd = open(os.path.join(root, file), 'r')
                     for line in fd:
                         if line.strip().startswith('__id__'):
@@ -618,8 +619,15 @@ class BackLogMainClass(Thread, Statistics):
                                 if not data:
                                     break
                                 md5.update(data)
-                            ret.append([m.match(line.strip()).group(1), md5.hexdigest()])
+                            tmp = m.match(line.strip())
+                            if tmp != None:
+                                ret.append([tmp.group(1), md5.hexdigest()])
+                            else:
+                                self._logger.warning('revision line in file %s is mall formated: %s' % (os.path.join(root, file), line.strip()))
+                            hasRevisionLine = True
                             break
+                    if not hasRevisionLine:
+                        self._logger.warning('there is no revision line in file %s' % (os.path.join(root, file), ))
         return ret
 
 
