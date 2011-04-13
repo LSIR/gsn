@@ -1353,6 +1353,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         if ret != 0:
             self.warning('module ad77x8 is not available (modprobe ad77x8 returned with code %d)' % (ret,))
             self._ad77x8 = False
+        else:
+            self.info('modprobe ad77x8 finished successfully')
         
         if self._ad77x8 and not self._calibrated and os.path.isfile(CALIB_FILE) and self._conf_calibrate:
             # get the calibration data with channel offsets
