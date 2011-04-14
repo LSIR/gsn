@@ -16,7 +16,7 @@
                 	// default alarm time after which an email is sent if no messages have been received
                     def timeDifferenceOffsetDefault = 300000;
                 	// a list of alarm time per device id
-                    def timeDifferenceOffsetDevicIdMap = [5006:3600000,5008:3600000];
+                    def timeDifferenceOffsetDevicIdMap = [5006:3600000,5007:3600000,5008:3600000];
                     // the mail recipients
                     def mailrecipients = ["tgsell@tik.ee.ethz.ch"];
                     
