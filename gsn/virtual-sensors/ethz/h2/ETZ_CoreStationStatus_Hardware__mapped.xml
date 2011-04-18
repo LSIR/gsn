@@ -28,7 +28,7 @@
                         		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key)
                         	} else { timeDifferenceOffset = timeDifferenceOffsetDefault; }
                         	if (timeDifference > timeDifferenceOffset) {
-                        		positionMap.remove(entry.key);
+                        		entry.remove();
                         		def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
                         		
                         		// Notify by email
