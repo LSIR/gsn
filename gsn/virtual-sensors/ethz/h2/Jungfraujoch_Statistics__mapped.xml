@@ -1,4 +1,4 @@
-<virtual-sensor name="Jungfraujoch_Statistics" priority="10" statistics="false" >
+<virtual-sensor name="Jungfraujoch_Statistics__mapped" priority="10" statistics="false" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
