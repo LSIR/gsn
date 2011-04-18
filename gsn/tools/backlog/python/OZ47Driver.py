@@ -1,3 +1,4 @@
+#! /usr/bin/python
 # -*- coding: UTF-8 -*-
 __author__      = "David Hasenfratz <hasenfratz@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2011, ETH Zurich, Switzerland, David Hasenfratz"
@@ -39,10 +40,10 @@ class OZ47Driver():
         
         try:
             self._device = serial.Serial(self._deviceStr, 19200, timeout=self._serialTimeout)
-            self._logger.debug("Successfully opened " + str(self._device))
+            self._logger.info("Successfully opened " + str(self._device))
         except Exception as e:
-            self._logger.info("serial access exception " + str(e))
-            self._logger.info("Could not access OZ-47 device " + self._deviceStr)
+            self._logger.error("serial access exception " + str(e))
+            self._logger.error("Could not access OZ-47 device " + self._deviceStr)
             self._device = 0
             return
 
@@ -70,14 +71,14 @@ class OZ47Driver():
                 c -= 1
             self._device.close()
             if d == '':
-                self._logger.info("No answer from the OZ-47 device to {M} request")
+                self._logger.warning("No answer from the OZ-47 device to {M} request")
             else:
                 self._logger.info("Read OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
-            self._logger.info("serial access exception: " + str(e))
-            self._logger.info("Could not read OZ-47 sensor reading")
+            self._logger.error("serial access exception: " + str(e))
+            self._logger.error("Could not read OZ-47 sensor reading")
     
     def _setAuto(self):   
         msg = '{S}'                                                                       
@@ -93,18 +94,18 @@ class OZ47Driver():
                 c -= 1
             self._device.close()
             if d == '':
-                self._logger.info("No answer from the OZ-47 device to {S} request")
+                self._logger.warning("No answer from the OZ-47 device to {S} request")
             else:
                 self._logger.info("Read OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
-            self._logger.info("serial access exception: " + str(e))
-            self._logger.info("Could not read OZ-47 sensor reading")
+            self._logger.error("serial access exception: " + str(e))
+            self._logger.error("Could not read OZ-47 sensor reading")
 
     def _setgTimer(self):
-        msg = '{W0?0:059>02}'
-
+        msg = '{W0?3<05821>}'        #0?0:00C30:}'   #59<21
+        
         try:
             self._device.open()
             self._device.write(msg)
@@ -116,11 +117,128 @@ class OZ47Driver():
                 c -= 1
             self._device.close()
             if d == '':
-                self._logger.info("No answer from the OZ-47 device to {W0?0:059>02} request")
+                self._logger.warning("No answer from the OZ-47 device to {W0?3<00330:} request")
             else:
                 self._logger.info("Read OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
-            self._logger.info("serial access exception: " + str(e))
-            self._logger.info("Could not read OZ-47 sensor reading")
+            self._logger.error("serial access exception: " + str(e))
+            self._logger.error("Could not read OZ-47 sensor reading")
+
+
+    '''
+    ##########################################################################################
+    # _readPageIndex(self, pageValue, indexValue): 
+        Read and return the content of given page and index value.
+    ##########################################################################################
+    '''
+            
+    def _readPageIndex(self, pageValue, indexValue):
+        msg = '{R' + pageValue + indexValue + '}'
+        self._logger.info (" Read Command: " + msg)
+
+        try:
+            self._device.open()
+            self._device.write(msg)
+            d = ''
+            c = self._readCount
+            while d == '' and c > 0:
+                # read 19 bytes
+                d = self._device.read(15)
+                c -= 1
+            self._device.close()
+            if d == '':
+                self._logger.warning("No answer from the OZ-47 device for read request")
+            else:
+                self._logger.info("Read OZ-47 device: " + d)
+            return d.strip()
+
+        except Exception as e:
+            self._logger.error("serial access exception: " + str(e))
+            self._logger.error("Could not read OZ-47 sensor reading")
+            
+    '''
+    ##########################################################################################
+    # _writePageIndex(self, pageValue, indexValue, registerValue):
+        Writes user defined data to a given page index.
+    ##########################################################################################
+    '''
+            
+    def _writePageIndex(self, pageValue, indexValue, registerValue):
+        msg = '{W' + pageValue + indexValue + registerValue + '}'
+        self._logger.info (" Write Command: " + msg)
+
+        try:
+            self._device.open()
+            self._device.write(msg)
+            d = ''
+            c = self._readCount
+            while d == '' and c > 0:
+                # read 19 bytes
+                d = self._device.read(15)
+                c -= 1
+            self._device.close()
+            if d == '':
+                self._logger.warning("No answer from the OZ-47 device for write request")
+            else:
+                self._logger.info("Read OZ-47 device: " + d)
+            return d.strip()
+
+        except Exception as e:
+            self._logger.error("serial access exception: " + str(e))
+            self._logger.error("Could not read OZ-47 sensor reading")   
+            
+    '''
+    ##########################################################################################
+    # _readState(self): returns OZ sensor module status.
+    ##########################################################################################
+    '''
+                        
+    def _readState(self):
+        msg = '{E}'
+
+        try:
+            self._device.open()
+            self._device.write(msg)
+            d = ''
+            c = self._readCount
+            while d == '' and c > 0:
+                # read 19 bytes
+                d = self._device.read(9)
+                c -= 1
+            self._device.close()
+            if d == '':
+                self._logger.warning("No answer from the OZ-47 device for command state")
+            else:
+                self._logger.info("Read OZ-47 device: " + d)
+            return d.strip()
+
+        except Exception as e:
+            self._logger.error("serial access exception: " + str(e))
+            self._logger.error("Could not read OZ-47 sensor reading")
+            
+            
+    def _erasePage(self, pageValue):   
+        msg = '{X' + pageValue + '}'
+                                                                
+        try:
+            self._device.open()
+            self._device.write(msg)
+            d = ''
+            c = self._readCount
+            while d == '' and c > 0:
+                # read 4 bytes
+                d = self._device.read(4)
+                c -= 1
+            self._device.close()
+            if d == '':
+                self._logger.warning("No answer from the OZ-47 device to {X} request")
+            else:
+                self._logger.info("Read OZ-47 device: " + d)
+            return d.strip()
+
+        except Exception as e:
+            self._logger.error("serial access exception: " + str(e))
+            self._logger.error("Could not read OZ-47 sensor reading")                         
+     

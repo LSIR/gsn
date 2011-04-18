@@ -1,3 +1,4 @@
+#! /usr/bin/python
 # -*- coding: UTF-8 -*-
 __author__      = "David Hasenfratz <hasenfratz@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2011, ETH Zurich, Switzerland, David Hasenfratz"
@@ -33,14 +34,8 @@ class ECVQEK3PluginClass(AbstractPluginClass):
     def getMsgType(self):
         return BackLogMessage.ECVQEK3_MESSAGE_TYPE
 
-#    def isBusy(self):
-#        return False
-#
-#    def needsWLAN(self):
-#        return False
-#
-#    def run(self):
-#        self.info('ECVQEK3Plugin running...')
+    def isBusy(self):
+        return False
 
     def action(self, parameters):
 
@@ -48,13 +43,24 @@ class ECVQEK3PluginClass(AbstractPluginClass):
 	
         # Read message
         msg = ''
-        while len(msg) != 69:
+        countRead = 0
+        readSuccessFlag = 0
+        while len(msg) != 69 and countRead < 10:
             msg = self.ecvqek3._read()
-        self.info(msg)
-        
-        self.processMsg(self.getTimeStamp(), [msg])
-        self.info('ECVQEK3 reading done')
+            if str(msg) != 'None':
+                if msg != '[NAK]' and msg.find('EK3 ECM') >= 0:
+                    self.info(msg)
+                    readSuccessFlag = 1
+                    break
+            else:
+                countRead += 1
+                
+        if readSuccessFlag == 1:
+            self.processMsg(self.getTimeStamp(), [msg])
+            self.info('ECVQEK3 reading done')
+        else:
+            self.error('ECVQEK3 reading failed')
 
-#    def stop(self):
-#        self._stopped = True
+    def stop(self):
+        self._stopped = True
 #        self.info('stopped')
