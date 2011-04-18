@@ -107,6 +107,7 @@ class ScheduleHandlerClass(Thread, Statistics):
     _tosMessageLock
     _tosMessageAckEvent
     _tosSentCmd
+    _tosLastReceivedCmd
     _tosNodeState
     '''
     
@@ -207,6 +208,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._tosMessageLock = Lock()
         self._tosMessageAckEvent = Event()
         self._tosSentCmd = None
+        self._tosLastReceivedCmd = None
         self._tosNodeState = None
         
         self._schedule = None
@@ -602,10 +604,14 @@ class ScheduleHandlerClass(Thread, Statistics):
             if response['command'] == self._tosSentCmd:
                 self._logger.debug('TOS packet acknowledge received')
                 self._tosSentCmd = None
+                self._tosLastReceivedCmd = response['command'];
                 self._tosMessageAckEvent.set()
             elif self._tosSentCmd != None:
-                self.error('received TOS message type (%s) does not match the sent command type (%s)' % (response['command'], self._tosSentCmd))
-                return False
+                if self._tosLastReceivedCmd == response['command']:
+                    self._logger.debug('TOS packet acknowledge already received')
+                else:
+                    self.error('received TOS message type (%s) does not match the sent command type (%s)' % (response['command'], self._tosSentCmd))
+                    return False
                 
         return True
         
