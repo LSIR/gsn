@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.processor.ScriptletProcessor;
 import gsn.utils.ParamParser;
 
 import org.apache.log4j.Logger;
@@ -27,7 +28,7 @@ import org.apache.log4j.Logger;
  * @author Tonio Gsell
  * @author Mustafa Yuecel
  */
-public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
+public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 {
 	private static final int DEFAULT_WIDTH = 610;
 	
@@ -40,7 +41,9 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 	private boolean position_mapping = false;
 	private boolean sensortype_mapping = false;
 	private boolean sensorvalue_conversion = false;
+	private boolean processScriptlet;
 
+	@Override
 	public boolean initialize() {
 		String s;
 		int i;
@@ -80,9 +83,12 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 				return false;
 			}
 		}
+		
+		processScriptlet = super.initialize();
 		return true;
 	}
-	
+
+	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		String s;
 		if (position_mapping && data.getData("device_id") != null) {
@@ -143,10 +149,17 @@ public class BridgeVirtualSensorPermasense extends BridgeVirtualSensor
 		    }
 		}
 
-		super.dataAvailable(inputStreamName, data);
+		if (processScriptlet)
+			super.dataAvailable(inputStreamName, data);
+		else
+			dataProduced( data );
+			
 	}
 	
+	@Override
 	public synchronized void dispose() {
+		if (processScriptlet)
+			super.dispose();
 		DataMapping.removeVS(this);
 	}
 }

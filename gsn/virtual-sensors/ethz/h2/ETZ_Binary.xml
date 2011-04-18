@@ -11,7 +11,7 @@
                     deviceIdMap.put(DEVICE_ID, System.currentTimeMillis());
                 ]]>
             </param>
-            <param name="period">150000</param>
+            <param name="period">300000</param>
             <param name="scriplet-periodic">
                 <![CDATA[
                 	// default alarm time after which an email is sent if no messages have been received
