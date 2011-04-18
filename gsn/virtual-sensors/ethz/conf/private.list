@@ -26,6 +26,7 @@ Dirruhorn_Dozer_WXT520Sup.xml
 Dirruhorn_Dozer_WXT520WindPth.xml
 Dirruhorn_GPS_RAW.xml
 Dirruhorn_Schedule.xml
+Dirruhorn_Statistics.xml
 Dirruhorn_VaisalaWXT520.xml
 Dirruhorn_Topology.xml
 Jungfraujoch_BackLogStatus_Dynamic.xml
@@ -48,6 +49,7 @@ Jungfraujoch_Dozer_NodeInfo.xml
 Jungfraujoch_Dozer_Rssi.xml
 Jungfraujoch_Dozer_StateCounter.xml
 Jungfraujoch_Schedule.xml
+Jungfraujoch_Statistics.xml
 Jungfraujoch_Topology.xml
 Matterhorn_BackLogStatus_Dynamic.xml
 Matterhorn_BackLogStatus_Revision.xml
@@ -75,6 +77,7 @@ Matterhorn_Dozer_WXT520Prec.xml
 Matterhorn_Dozer_WXT520Sup.xml
 Matterhorn_Dozer_WXT520WindPth.xml
 Matterhorn_Schedule.xml
+Matterhorn_Statistics.xml
 Matterhorn_VaisalaWXT520.xml
 Matterhorn_Topology.xml
 Thur_BackLogStatus_Dynamic.xml
@@ -99,6 +102,7 @@ Thur_Dozer_NodeInfo.xml
 Thur_Dozer_Rssi.xml
 Thur_Dozer_StateCounter.xml
 Thur_Schedule.xml
+Thur_Statistics.xml
 Thur_Topology.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
