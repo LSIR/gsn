@@ -351,7 +351,7 @@ public class BinaryPlugin extends AbstractPlugin {
 			    if ((new File(localBinaryName)).exists())
 			    	return calcChecksum(localBinaryName);
 			    else {
-			    	logger.error("binary >" + localBinaryName + "< does not exist -> request retransmission");
+			    	logger.info("binary >" + localBinaryName + "< does not exist -> request retransmission");
 			    	return binaryRetransmissionRequestPacket(remoteBinaryName);
 			    }
 			} catch (Exception e) {
