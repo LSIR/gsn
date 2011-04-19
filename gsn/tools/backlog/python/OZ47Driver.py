@@ -96,7 +96,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device to {S} request")
             else:
-                self._logger.info("Read OZ-47 device: " + d)
+                self._logger.info("Write OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -119,7 +119,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device to {W0?3<00330:} request")
             else:
-                self._logger.info("Read OZ-47 device: " + d)
+                self._logger.info("Write OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -182,7 +182,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device for write request")
             else:
-                self._logger.info("Read OZ-47 device: " + d)
+                self._logger.info("Write OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -235,7 +235,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device to {X} request")
             else:
-                self._logger.info("Read OZ-47 device: " + d)
+                self._logger.info("Write OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:

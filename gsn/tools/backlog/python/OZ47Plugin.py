@@ -168,48 +168,124 @@ class OZ47PluginClass(AbstractPluginClass):
         m3 = ''
         m4 = ''
         m5 = ''
+        x0_1 = ''
+        x1_1 = ''
+        x2_1 = ''
+        x3_1 = ''
+        kt_1 = ''
+        x0_2 = ''
+        x1_2 = ''
+        x2_2 = ''
+        x3_2 = ''
+        kt_2 = ''
         statCount = 0
         while len(str(m1)) != 13 and statCount < 10:
             m1 = self.oz47._readPageIndex('0', '0')
-            if str(m1) != 'None':
-                if m1.find('{W00') >= 0:
-                    break
+            if str(m1) != 'None' and m1.find('{R00') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(x0_1)) != 13 and statCount < 10:
+            x0_1 = self.oz47._readPageIndex('0', '1')
+            if str(x0_1) != 'None' and x0_1.find('{R01') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(x1_1)) != 13 and statCount < 10:
+            x1_1 = self.oz47._readPageIndex('0', '2')
+            if str(x1_1) != 'None' and x1_1.find('{R02') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(x2_1)) != 13 and statCount < 10:
+            x2_1 = self.oz47._readPageIndex('0', '3')
+            if str(x2_1) != 'None' and x2_1.find('{R03') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(x3_1)) != 13 and statCount < 10:
+            x3_1 = self.oz47._readPageIndex('0', '4')
+            if str(x3_1) != 'None' and x3_1.find('{R04') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(kt_1)) != 13 and statCount < 10:
+            kt_1 = self.oz47._readPageIndex('0', '5')
+            if str(kt_1) != 'None' and kt_1.find('{R05') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(x0_2)) != 13 and statCount < 10:
+            x0_2 = self.oz47._readPageIndex('0', '7')
+            if str(x0_2) != 'None' and x0_2.find('{R07') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(x1_2)) != 13 and statCount < 10:
+            x1_2 = self.oz47._readPageIndex('0', '8')
+            if str(x1_2) != 'None' and x1_2.find('{R08') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(x2_2)) != 13 and statCount < 10:
+            x2_2 = self.oz47._readPageIndex('0', '9')
+            if str(x2_2) != 'None' and x2_2.find('{R09') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(x3_2)) != 13 and statCount < 10:
+            x3_2 = self.oz47._readPageIndex('0', 'A')
+            if str(x3_2) != 'None' and x3_2.find('{R0A') >= 0:
+                break
+            else:
+                statCount += 1
+        statCount = 0
+        while len(str(kt_2)) != 13 and statCount < 10:
+            kt_2 = self.oz47._readPageIndex('0', 'B')
+            if str(kt_2) != 'None' and kt_2.find('{R0B') >= 0:
+                break
             else:
                 statCount += 1
         statCount = 0
         while len(str(m2)) != 13 and statCount < 10:
             m2 = self.oz47._readPageIndex('0', '=')
-            if str(m2) != 'None':
-                if m2.find('{W0=') >= 0:
-                    break
+            if str(m2) != 'None' and m2.find('{R0=') >= 0:
+                break
             else:
                 statCount += 1
         statCount = 0
         while len(str(m3)) != 13 and statCount < 10:
             m3 = self.oz47._readPageIndex('0', '?')
-            if str(m3) != 'None':
-                if m3.find('{W0?') >= 0:
-                    break
+            if str(m3) != 'None' and m3.find('{R0?') >= 0:
+                break
             else:
                 statCount += 1
         statCount = 0
         while len(str(m4)) != 13 and statCount < 10:
             m4 = self.oz47._readPageIndex('1', '0')
-            if str(m4) != 'None':
-                if m4.find('{W10') >= 0:
-                    break
+            if str(m4) != 'None' and m4.find('{R10') >= 0:
+                break
             else:
                 statCount += 1
         statCount = 0
         while len(str(m5)) != 13 and statCount < 10:
             m5 = self.oz47._readPageIndex('2', '0')
-            if str(m5) != 'None':
-                if m5.find('{W20') >= 0:
-                    break
+            if str(m5) != 'None' and m5.find('{R20') >= 0:
+                break
             else:
                 statCount += 1
         # Read message
-        msg = m1 + m2 + m3 + m4 + m5
+        msg = m1 + m2 + m3 + m4 + m5 + x0_1 + x1_1 + x2_1 + x3_1 + kt_1 + x0_2 + x1_2 + x2_2 + x3_2 + kt_2
+        
         self.info('statistics message' + msg)
         dataPackage = [STATISTICS_NAMING]
         dataPackage += [msg]

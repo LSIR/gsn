@@ -47,11 +47,10 @@ class ECVQEK3PluginClass(AbstractPluginClass):
         readSuccessFlag = 0
         while len(msg) != 69 and countRead < 10:
             msg = self.ecvqek3._read()
-            if str(msg) != 'None':
-                if msg != '[NAK]' and msg.find('EK3 ECM') >= 0:
-                    self.info(msg)
-                    readSuccessFlag = 1
-                    break
+            if str(msg) != 'None' and msg != '[NAK]' and msg.find('EK3 ECM') >= 0:
+                self.info(msg)
+                readSuccessFlag = 1
+                break
             else:
                 countRead += 1
                 
