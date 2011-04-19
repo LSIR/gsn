@@ -50,8 +50,6 @@ public class BackLogWrapper extends AbstractWrapper {
 	 * The field name for the deployment as used in the virtual sensor's XML file.
 	 */
 	private static final String BACKLOG_PLUGIN = "plugin-classname";
-
-	private static final long WAIT_FOR_STARTUP = 20;
 	
 	private BackLogMessageMultiplexer blMsgMultiplexer = null;
 	private String plugin = null;
@@ -145,15 +143,6 @@ public class BackLogWrapper extends AbstractWrapper {
 	
 	@Override
 	public void run() {
-		long timetowait = WAIT_FOR_STARTUP*1000-(System.currentTimeMillis()-blMsgMultiplexer.getStartTime());
-		if (timetowait > 0)
-		try {
-			logger.info("wait " + timetowait + " ms till startup");
-			sleep(timetowait);
-		} catch (InterruptedException e) {
-			logger.error(e);
-		}
-		
 		synchronized (blMsgMultiplexer) {
 			if (!blMsgMultiplexer.isAlive())
 				blMsgMultiplexer.start();

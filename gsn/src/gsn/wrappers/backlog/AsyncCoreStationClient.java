@@ -47,14 +47,11 @@ public class AsyncCoreStationClient extends Thread  {
 
 	private ByteBuffer writeBuffer;
 	private ByteBuffer readBuffer;
-
-	private long startTime;
 	
 	private boolean dispose = false;
 	
 	
 	private AsyncCoreStationClient() throws IOException {
-		startTime = System.currentTimeMillis();
 		this.selector = Selector.open();
 
 		writeBuffer = ByteBuffer.allocate(PACKET_SIZE*2);
@@ -171,11 +168,6 @@ public class AsyncCoreStationClient extends Thread  {
 	    }
 	    
 		logger.info("thread stoped");
-	}
-	
-	
-	public long getStartTime() {
-		return startTime;
 	}
 	
 	

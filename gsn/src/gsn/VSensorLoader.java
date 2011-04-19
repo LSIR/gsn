@@ -96,10 +96,18 @@ public class VSensorLoader extends Thread {
 			logger.fatal ( "The Storage Manager shouldn't be null, possible a BUG." );
 			return;
 		}
+		boolean startup = true;
 		while ( isActive ) {
 			try {
 				
-				loadPlugin ( );
+				loadPlugin ( startup );
+				if (startup) {
+		            Iterator<VSensorConfig> iter = Mappings.getAllVSensorConfigs();
+		            while (iter.hasNext()) {
+		                Mappings.getVSensorInstanceByVSName(iter.next().getName()).start();
+		            }
+					startup = false;
+				}
 			} catch ( Exception e ) {
 				logger.error ( e.getMessage ( ) , e );
 			}
@@ -135,7 +143,7 @@ public class VSensorLoader extends Thread {
         return Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY + File.separator + fileName + ".xml";
     }
 
-    public synchronized void loadPlugin() throws SQLException, JiBXException {
+    public synchronized void loadPlugin(boolean startup) throws SQLException, JiBXException {
 
         Modifications modifications = getUpdateStatus(pluginsDir);
         ArrayList<VSensorConfig> removeIt = modifications.getRemove();
@@ -144,7 +152,7 @@ public class VSensorLoader extends Thread {
             removeVirtualSensor(configFile);
         }
         for (VSensorConfig vs : addIt) {
-            loadPlugin(vs);
+            loadPlugin(vs, startup);
         }
         
 		try {
@@ -168,11 +176,11 @@ public class VSensorLoader extends Thread {
         if (!found)
             return false;
         else
-            return loadPlugin(addIt.get(0));
+            return loadPlugin(addIt.get(0), false);
     }
 
 
-    private synchronized boolean loadPlugin(VSensorConfig vs) throws SQLException, JiBXException {
+    private synchronized boolean loadPlugin(VSensorConfig vs, boolean startup) throws SQLException, JiBXException {
 
         if (!isVirtualSensorValid(vs))
             return false;
@@ -217,7 +225,8 @@ public class VSensorLoader extends Thread {
         if (Mappings.addVSensorInstance(pool)) {
             try {
                 fireVSensorLoading(pool.getConfig());
-                pool.start();
+                if (!startup)
+                	pool.start();
             } catch (VirtualSensorInitializationFailedException e1) {
                 logger.error("Creating the virtual sensor >" + vs.getName() + "< failed.", e1);
                 removeVirtualSensor(vs);

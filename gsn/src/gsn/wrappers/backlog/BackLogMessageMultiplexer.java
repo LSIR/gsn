@@ -117,11 +117,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			throw new IOException("Remote BackLog host string (" + coreStationAddress + ") does not match >host:port<");
     	}
 	}
-	
-	
-	public long getStartTime() {
-		return asyncCoreStationClient.getStartTime();
-	}
 	  
 	
 	public void processData(byte[] data, int count) {
