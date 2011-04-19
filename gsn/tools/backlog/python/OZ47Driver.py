@@ -58,6 +58,19 @@ class OZ47Driver():
     ##########################################################################################
     '''
     def _read(self):
+        
+        try:
+            self._device.open()
+            while self._device.inWaiting() != 0:
+                self._device.flushInput()
+            self._logger.info("readGpsMessage: input buffer flushed")
+            self._device.close()
+        except Exception as e:
+            self._logger.error( "serialAccess Exception (1)" + str(e))
+            self._logger.error("Could not flush input buffer")
+            self._device.close()
+            return False
+        
         msg = '{M}'
 
         try:
