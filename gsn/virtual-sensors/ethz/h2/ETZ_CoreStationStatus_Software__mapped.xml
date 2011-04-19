@@ -24,9 +24,10 @@
                     if ( isdef('positionMap')) {
                     	for (entry in positionMap) {
                         	def timeDifference = System.currentTimeMillis() - entry.value;
+                        	def timeDifferenceOffset = timeDifferenceOffsetDefault;
                         	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
-                        		def timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key)
-                        	} else { def timeDifferenceOffset = timeDifferenceOffsetDefault; }
+                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key)
+                        	}
                         	if (timeDifference > timeDifferenceOffset) {
                         		def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
                         		
