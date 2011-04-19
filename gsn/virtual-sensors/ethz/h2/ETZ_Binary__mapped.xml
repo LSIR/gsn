@@ -26,7 +26,7 @@
                         	def timeDifference = System.currentTimeMillis() - entry.value;
                         	def timeDifferenceOffset = timeDifferenceOffsetDefault;
                         	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
-                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key)
+                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
                         	}
                         	if (timeDifference > timeDifferenceOffset) {
                         		def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
