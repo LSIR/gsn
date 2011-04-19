@@ -24,19 +24,18 @@
                     if ( isdef('positionMap')) {
                     	for (entry in positionMap) {
                         	def timeDifference = System.currentTimeMillis() - entry.value;
+                        	def timeDifferenceOffset = timeDifferenceOffsetDefault;
                         	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
-                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key)
-                        	} else { timeDifferenceOffset = timeDifferenceOffsetDefault; }
+                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
+                        	}
                         	if (timeDifference > timeDifferenceOffset) {
-                        		entry.remove();
-                        		def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
-                        		
                         		// Notify by email
                         		def emailTitle = "[PermaSense-GSN-Public] - WARNING: No more " + vsname + " messages received from position " + entry.key;
                         		def emailContent = "WARNING: No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
 
-								logger.warn(emailContent);
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
+                        		entry.remove();
                         	}
                         }
                     }
