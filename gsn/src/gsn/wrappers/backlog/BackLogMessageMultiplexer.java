@@ -64,7 +64,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 	private int hostPort;
 	private String deploymentName;
 	boolean stuff = false;
-	boolean connected = false;
+	Boolean connected = false;
 	
 	
 	public BackLogMessageMultiplexer() throws Exception {
@@ -492,23 +492,25 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 			logger.warn("message queue ready => sending queue ready message");
 		}
 
-		coreStationStatistics.setDeviceId(coreStationDeviceId);
-		connected = true;
-		coreStationStatistics.setConnected(true);
-		try {
-			StatisticsMain.connectionStatusChanged(deploymentName, coreStationDeviceId);
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-		}
-
-		Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
-		synchronized (msgTypeListener) {
-			Iterator<Vector<BackLogMessageListener>> iter = val.iterator();
-			while (iter.hasNext()) {
-				Enumeration<BackLogMessageListener> en = iter.next().elements();
-				// send the message to all listeners
-				while (en.hasMoreElements()) {
-					en.nextElement().remoteConnEstablished(coreStationDeviceId);
+		synchronized (connected) {
+			coreStationStatistics.setDeviceId(coreStationDeviceId);
+			connected = true;
+			coreStationStatistics.setConnected(true);
+			try {
+				StatisticsMain.connectionStatusChanged(deploymentName, coreStationDeviceId);
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+			}
+	
+			Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
+			synchronized (msgTypeListener) {
+				Iterator<Vector<BackLogMessageListener>> iter = val.iterator();
+				while (iter.hasNext()) {
+					Enumeration<BackLogMessageListener> en = iter.next().elements();
+					// send the message to all listeners
+					while (en.hasMoreElements()) {
+						en.nextElement().remoteConnEstablished(coreStationDeviceId);
+					}
 				}
 			}
 		}
@@ -532,13 +534,6 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	@Override
 	public void connectionLost() {
-		connected = false;
-		coreStationStatistics.setConnected(false);
-		try {
-			StatisticsMain.connectionStatusChanged(deploymentName, coreStationDeviceId);
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-		}
 		logger.info("connection to core station with device id " + coreStationDeviceId + " at " + deploymentName + " deployment lost");
 		
 		recvQueue.clear();
@@ -550,20 +545,32 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
     	// stop ping checker timer
 		if (pingWatchDogTimer != null)
 			pingWatchDogTimer.cancel();
-
-		Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
-		synchronized (msgTypeListener) {
-		Iterator<Vector<BackLogMessageListener>> iter = val.iterator();
-			while (iter.hasNext()) {
-				Enumeration<BackLogMessageListener> en = iter.next().elements();
-				// send the message to all listeners
-				while (en.hasMoreElements()) {
-					en.nextElement().remoteConnLost();
+		
+		synchronized (connected) {
+			if (connected) {
+				connected = false;
+				coreStationStatistics.setConnected(false);
+				try {
+					StatisticsMain.connectionStatusChanged(deploymentName, coreStationDeviceId);
+				} catch (IOException e) {
+					logger.error(e.getMessage());
 				}
+		
+				Collection<Vector<BackLogMessageListener>> val = msgTypeListener.values();
+				synchronized (msgTypeListener) {
+				Iterator<Vector<BackLogMessageListener>> iter = val.iterator();
+					while (iter.hasNext()) {
+						Enumeration<BackLogMessageListener> en = iter.next().elements();
+						// send the message to all listeners
+						while (en.hasMoreElements()) {
+							en.nextElement().remoteConnLost();
+						}
+					}
+				}
+				
+				asyncCoreStationClient.removeDeviceId(deploymentName, coreStationDeviceId);
 			}
 		}
-		
-		asyncCoreStationClient.removeDeviceId(deploymentName, coreStationDeviceId);
 	}
 	
 	
