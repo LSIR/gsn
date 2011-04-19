@@ -17,33 +17,45 @@ public class OZ47Plugin extends AbstractPlugin {
 	private static final String READINGS_NAMING = "readings";
 
 	private static DataField[] readingsDataField = {	
-		new DataField("TIMESTAMP", "BIGINT"),
-		new DataField("GENERATION_TIME", "BIGINT"),
-		new DataField("DEVICE_ID", "INTEGER"),
-		new DataField("OZONE_SENSOR_1", "INTEGER"),
-		new DataField("OZONE_SENSOR_2", "INTEGER"),
-		new DataField("RESISTANCE_1", "INTEGER"),
-		new DataField("RESISTANCE_2", "INTEGER"),
-		new DataField("TEMPERATURE", "DOUBLE"),
-		new DataField("HUMIDITY", "INTEGER")
+            new DataField("TIMESTAMP", "BIGINT"),
+						new DataField("GENERATION_TIME", "BIGINT"),
+						new DataField("DEVICE_ID", "INTEGER"),
+						new DataField("OZONE_SENSOR_1", "INTEGER"),
+						new DataField("OZONE_SENSOR_2", "INTEGER"),
+						new DataField("RESISTANCE_1", "INTEGER"),
+						new DataField("RESISTANCE_2", "INTEGER"),
+						new DataField("TEMPERATURE", "DOUBLE"),
+						new DataField("HUMIDITY", "INTEGER"),
+						new DataField("SENSOR_ID", "INTEGER")
   };
   
   private static DataField[] statisticsDataField = {	
-        new DataField("TIMESTAMP", "BIGINT"),
-		new DataField("GENERATION_TIME", "BIGINT"),
-		new DataField("DEVICE_ID", "INTEGER"),
-		new DataField("LOT_NO", "INTEGER"),
-		new DataField("CELL_NO", "INTEGER"),
-		new DataField("CALIB_WEEK", "INTEGER"),
-		new DataField("CALIB_YEAR", "INTEGER"),
-		new DataField("TIMER_PRE_HEAT", "INTEGER"),
-		new DataField("AUTO_CALIB", "INTEGER"),
-		new DataField("TIMER_DELAY", "INTEGER"),
-		new DataField("TIMER_CYCLE", "INTEGER"),
-		new DataField("TIMER_PULSE", "INTEGER"),
-		new DataField("OFFSET_MEM", "INTEGER"),
-		new DataField("OFFSET_VERIF", "INTEGER"),
-		new DataField("OFFSET", "INTEGER")
+            new DataField("TIMESTAMP", "BIGINT"),
+						new DataField("GENERATION_TIME", "BIGINT"),
+						new DataField("DEVICE_ID", "INTEGER"),
+						new DataField("LOT_NO", "INTEGER"),
+						new DataField("CELL_NO", "INTEGER"),
+						new DataField("CALIB_WEEK", "INTEGER"),
+						new DataField("CALIB_YEAR", "INTEGER"),
+						new DataField("TIMER_PRE_HEAT", "INTEGER"),
+						new DataField("AUTO_CALIB", "INTEGER"),
+						new DataField("TIMER_DELAY", "INTEGER"),
+						new DataField("TIMER_CYCLE", "INTEGER"),
+						new DataField("TIMER_PULSE", "INTEGER"),
+						new DataField("OFFSET_MEM", "INTEGER"),
+						new DataField("OFFSET_VERIF", "INTEGER"),
+						new DataField("OFFSET", "INTEGER"),
+						new DataField("CALIB_PARAM_X0_1", "DOUBLE"),
+						new DataField("CALIB_PARAM_X1_1", "DOUBLE"),
+						new DataField("CALIB_PARAM_X2_1", "DOUBLE"),
+						new DataField("CALIB_PARAM_X3_1", "DOUBLE"),
+						new DataField("CALIB_PARAM_KT_1", "DOUBLE"),
+						new DataField("CALIB_PARAM_X0_2", "DOUBLE"),
+						new DataField("CALIB_PARAM_X1_2", "DOUBLE"),
+						new DataField("CALIB_PARAM_X2_2", "DOUBLE"),
+						new DataField("CALIB_PARAM_X3_2", "DOUBLE"),
+						new DataField("CALIB_PARAM_KT_2", "DOUBLE"),
+						new DataField("SENSOR_ID", "INTEGER")
   };
 
   private static final Hashtable<String, NameDataFieldPair> statusNamingTable = new Hashtable<String, NameDataFieldPair>();
@@ -109,13 +121,28 @@ public class OZ47Plugin extends AbstractPlugin {
   public static String replaceCharAt(String s, int pos, char c) {
     return s.substring(0,pos) + c + s.substring(pos+1);
   }
+  
+  public static double  hex2double(long valueHex) {
+	
+	  double exp = (double)((valueHex >>23 & 255)-127);
+	  double sign = (double)(valueHex>>31);
+
+	  if (sign == 0)
+		  sign = 1;
+
+  	double man = ((double)1.0f + (double)((valueHex & 8388607)/(double)8388608));
+  	double expVal = Math.pow(2.0,exp);
+  	double ans = sign * expVal * man;
+  	return ans;
+
+  }
 
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 
 		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 		
-    if (data.length != 2) {
+    if (data.length != 2 && data.length != 3) {
 			logger.error("The message with timestamp >" + timestamp + "< seems unparsable.(length: " + data.length + ")");
       return true;
 		}
@@ -133,7 +160,11 @@ public class OZ47Plugin extends AbstractPlugin {
       }
 
       short msgType = toShort(data[0]);
-			
+      
+      int sensor_id = -1;
+      if (data.length == 3)
+        sensor_id = toInteger(data[2]);
+      
 			if (msgType == statusNamingTable.get(statusDataType).typeNumber) {
 				if (statusDataType.equalsIgnoreCase(STATISTICS_NAMING)) {
 				
@@ -146,11 +177,32 @@ public class OZ47Plugin extends AbstractPlugin {
           int gTimerDelay = Integer.parseInt(str.substring(30,32),16);
           int gTimerCycle = Integer.parseInt(str.substring(32,36),16);
           int gTimerPulse = Integer.parseInt(str.substring(36,38),16);
-          int offsetMem = Integer.parseInt(str.substring(43,45),16);
-          int offsetVerif = Integer.parseInt(str.substring(45,47),16);
-          int gOffset = Integer.parseInt(str.substring(56,58),16);
+          int offsetMem = Integer.parseInt(str.substring(43,45),16) - 127;
+          int offsetVerif = Integer.parseInt(str.substring(45,47),16) - 127;
+          int gOffset = Integer.parseInt(str.substring(56,58),16) - 127;
           
-          if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, lotNo, cellNo, calibWeek, calibYear, gTimerPreHeat, gAutoCalib, gTimerDelay, gTimerCycle, gTimerPulse, offsetMem, offsetVerif, gOffset}) )
+          long v = Long.parseLong(str.substring(69,77),16);
+          double x0_1 = hex2double(v);
+          v = Long.parseLong(str.substring(82,90),16);
+          double x1_1 = hex2double(v);
+          v = Long.parseLong(str.substring(95,103),16);
+          double x2_1 = hex2double(v);
+          v = Long.parseLong(str.substring(108,116),16);
+          double x3_1 = hex2double(v);
+          v = Long.parseLong(str.substring(121,129),16);
+          double kt_1 = hex2double(v);
+          v = Long.parseLong(str.substring(134,142),16);
+          double x0_2 = hex2double(v);
+          v = Long.parseLong(str.substring(147,155),16);
+          double x1_2 = hex2double(v);
+          v = Long.parseLong(str.substring(160,168),16);
+          double x2_2 = hex2double(v);
+          v = Long.parseLong(str.substring(173,181),16);
+          double x3_2 = hex2double(v);
+          v = Long.parseLong(str.substring(186,194),16);
+          double kt_2 = hex2double(v);
+          
+          if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, lotNo, cellNo, calibWeek, calibYear, gTimerPreHeat, gAutoCalib, gTimerDelay, gTimerCycle, gTimerPulse, offsetMem, offsetVerif, gOffset, x0_1, x1_1, x2_1, x3_1, kt_1, x0_2, x1_2, x2_2, x3_2, kt_2, sensor_id}) )
             ackMessage(timestamp, super.priority);
           else
             logger.warn("The OZ47 statistics message with timestamp >" + timestamp + "< could not be stored in the database.");
@@ -175,7 +227,7 @@ public class OZ47Plugin extends AbstractPlugin {
          
           //logger.info("OZ47 readings: " + s1 + " " + s2 + " " + r1 + " " + r2 + " " + t + " " + h );
 
-          if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, s1, s2, r1, r2, t, h}) )
+          if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, s1, s2, r1, r2, t, h, sensor_id}) )
             ackMessage(timestamp, super.priority);
           else
             logger.warn("The OZ47 readings message with timestamp >" + timestamp + "< could not be stored in the database.");       
