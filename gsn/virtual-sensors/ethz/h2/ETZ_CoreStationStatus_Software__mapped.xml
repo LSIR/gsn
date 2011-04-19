@@ -25,10 +25,9 @@
                     	for (entry in positionMap) {
                         	def timeDifference = System.currentTimeMillis() - entry.value;
                         	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
-                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key)
-                        	} else { timeDifferenceOffset = timeDifferenceOffsetDefault; }
+                        		def timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key)
+                        	} else { def timeDifferenceOffset = timeDifferenceOffsetDefault; }
                         	if (timeDifference > timeDifferenceOffset) {
-                        		entry.remove();
                         		def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
                         		
                         		// Notify by email
@@ -37,6 +36,7 @@
 
 								logger.warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
+                        		entry.remove();
                         	}
                         }
                     }

@@ -1,74 +1,7 @@
 <virtual-sensor name="ETZ_BackLogStatus_Dynamic" priority="10" statistics="true" >
     <processing-class>
-        <class-name>gsn.processor.ScriptletProcessor</class-name>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="persistant">true</param>
-            <param name="scriptlet">
-                <![CDATA[
-                    // the mail recipients for error and exception counter increase
-                    def mailrecipients = ["tgsell@tik.ee.ethz.ch"];
-                    
-                	if ( ! isdef('lastErrorCounterMap')) { lastErrorCounterMap = [:]; }
-                	if (lastErrorCounterMap.containsKey(DEVICE_ID)) {
-                		if ( ERROR_COUNTER > lastErrorCounterMap.get(DEVICE_ID) ) {
-                        	// Notify by email
-                        	def emailTitle = "[PermaSense-GSN-Test] - ERROR: BackLog error counter increased (vs=" + vsname + ", id=" + DEVICE_ID + ")";
-                        	def emailContent = "ERROR: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(DEVICE_ID)) + " to " + ERROR_COUNTER + " on device id " + DEVICE_ID + " at " + vsname + ".";
-
-                        	sendEmail(mailrecipients, emailTitle, emailContent);
-                		}
-                	}
-                	lastErrorCounterMap.put(DEVICE_ID, ERROR_COUNTER);
-                    
-                	if ( ! isdef('lastExceptionCounterMap')) { lastExceptionCounterMap = [:]; }
-                	if (lastExceptionCounterMap.containsKey(DEVICE_ID)) {
-                		if ( EXCEPTION_COUNTER > lastExceptionCounterMap.get(DEVICE_ID) ) {
-                        	// Notify by email
-                        	def emailTitle = "[PermaSense-GSN-Test] - EXCEPTION: BackLog exception counter increased (vs=" + vsname + ", id=" + DEVICE_ID + ")";
-                        	def emailContent = "EXCEPTION: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(DEVICE_ID)) + " to " + EXCEPTION_COUNTER + " on device id " + DEVICE_ID + " at " + vsname + ".";
-
-                        	sendEmail(mailrecipients, emailTitle, emailContent);
-                		}
-                	}
-                	lastExceptionCounterMap.put(DEVICE_ID, EXCEPTION_COUNTER);
-                
-                    if ( ! isdef('deviceIdMap')) { deviceIdMap = [:]; }
-                    deviceIdMap.put(DEVICE_ID, System.currentTimeMillis());
-                ]]>
-            </param>
-            <param name="period">150000</param>
-            <param name="scriplet-periodic">
-                <![CDATA[
-                	// default alarm time after which an email is sent if no messages have been received
-                    def timeDifferenceOffsetDefault = 300000;
-                	// a list of alarm time per device id
-                    def timeDifferenceOffsetDevicIdMap = [5006:3600000,5007:3600000,5008:3600000];
-                    // the mail recipients
-                    def mailrecipients = ["tgsell@tik.ee.ethz.ch"];
-                    
-                    if ( isdef('deviceIdMap')) {
-                    	for (entry in deviceIdMap) {
-                        	def timeDifference = System.currentTimeMillis() - entry.value;
-                        	if (timeDifferenceOffsetDevicIdMap.containsKey(entry.key)) {
-                        		timeDifferenceOffset = timeDifferenceOffsetDevicIdMap.get(entry.key)
-                        	} else { timeDifferenceOffset = timeDifferenceOffsetDefault; }
-                        	if (timeDifference > timeDifferenceOffset) {
-                        		entry.remove();
-                        		def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
-                        		
-                        		// Notify by email
-                        		def emailTitle = "[PermaSense-GSN-Test] - WARNING: No more " + vsname + " messages received from device id " + entry.key;
-                        		def emailContent = "WARNING: No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes from device with id " + entry.key + ".";
-
-								logger.warn(emailContent);
-                        		sendEmail(mailrecipients, emailTitle, emailContent);
-                        	}
-                        }
-                    }
-                ]]>
-            </param>
-        </init-params>
         <web-input password="test">
             <command name="resend_backlogged_data">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
