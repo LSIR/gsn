@@ -217,6 +217,16 @@ public class BinaryPlugin extends AbstractPlugin {
 			}
 			if (dispose)
 				break;
+			
+			if (deviceID != null && deviceID.compareTo(getDeviceID()) != 0) {
+				logger.warn("device id has changed from " + Integer.toString(deviceID) + " to " + getDeviceID());
+				String propertyfile = rootBinaryDir + deploymentName + "/." + Integer.toString(deviceID) + "_" + PROPERTY_FILE_NAME;
+				File sf = new File(propertyfile);
+				if (sf.delete())
+					logger.warn("property file >" + propertyfile + "< for old device id " + Integer.toString(deviceID) + " has been deleted");
+			}
+			
+			deviceID = getDeviceID();
         	
 			int chunkresend;
     		// get packet type
@@ -228,7 +238,7 @@ public class BinaryPlugin extends AbstractPlugin {
 	    		pktType = (Byte) msg.getData()[2];
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				break;
+				continue;
 			}
     		
     		if (pktNr == lastReceivedPacketNr)
@@ -264,16 +274,6 @@ public class BinaryPlugin extends AbstractPlugin {
 
 
 	private Serializable[] startPacketReceived() {
-		if (deviceID != null && deviceID.compareTo(getDeviceID()) != 0) {
-			logger.warn("device id has changed from " + Integer.toString(deviceID) + " to " + getDeviceID());
-			String propertyfile = rootBinaryDir + deploymentName + "/." + Integer.toString(deviceID) + "_" + PROPERTY_FILE_NAME;
-			File sf = new File(propertyfile);
-			if (sf.delete())
-				logger.warn("property file >" + propertyfile + "< for old device id " + Integer.toString(deviceID) + " has been deleted");
-		}
-		
-		deviceID = getDeviceID();
-		
 		String propertyfile = rootBinaryDir + deploymentName + "/." + Integer.toString(deviceID) + "_" + PROPERTY_FILE_NAME;
 		File sf = new File(propertyfile);
 		if (sf.exists()) {
