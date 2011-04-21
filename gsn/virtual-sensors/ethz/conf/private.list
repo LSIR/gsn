@@ -29,6 +29,15 @@ Dirruhorn_Schedule.xml
 Dirruhorn_Statistics.xml
 Dirruhorn_VaisalaWXT520.xml
 Dirruhorn_Topology.xml
+Glaciers_BackLogStatus_Dynamic.xml
+Glaciers_BackLogStatus_Revision.xml
+Glaciers_BackLogStatus_Static.xml
+Glaciers_Binary.xml
+Glaciers_CoreStationStatus_Hardware.xml
+Glaciers_CoreStationStatus_Software.xml
+Glaciers_CoreStationStatus_Static.xml
+Glaciers_Schedule.xml
+Glaciers_Statistics.xml
 Jungfraujoch_BackLogStatus_Dynamic.xml
 Jungfraujoch_BackLogStatus_Revision.xml
 Jungfraujoch_BackLogStatus_Static.xml

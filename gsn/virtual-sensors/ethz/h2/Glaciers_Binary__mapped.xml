@@ -1,0 +1,85 @@
+<virtual-sensor name="Glaciers_Binary__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    if ( ! isdef('positionMap')) { positionMap = [:]; }
+                    positionMap.put(POSITION, System.currentTimeMillis());
+                ]]>
+            </param>
+            <param name="period">3600000</param>
+            <param name="scriplet-periodic">
+                <![CDATA[
+                	// default alarm time after which an email is sent if no messages have been received
+                    def timeDifferenceOffsetDefault = 86400000;
+                	// a list of alarm time per position
+                    def timeDifferenceOffsetPositionMap = [:];
+                    // the mail recipients
+                    def mailrecipients = ["tgsell@tik.ee.ethz.ch", "yuecel@tik.ee.ethz.ch", "beutel@tik.ee.ethz.ch"];
+                    
+                    if ( isdef('positionMap')) {
+                    	for (entry in positionMap) {
+                        	def timeDifference = System.currentTimeMillis() - entry.value;
+                        	def timeDifferenceOffset = timeDifferenceOffsetDefault;
+                        	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
+                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
+                        	}
+                        	if (timeDifference > timeDifferenceOffset) {
+                        		// Notify by email
+                        		def emailTitle = "[PermaSense-GSN-Public] - WARNING: No more " + vsname + " messages received from position " + entry.key;
+                        		def emailContent = "WARNING: No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
+
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+                        		sendEmail(mailrecipients, emailTitle, emailContent);
+                        		entry.remove();
+                        	}
+                        }
+                    }
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+
+            <field name="FILE_SIZE" type="BIGINT" unit="bytes" />
+            <field name="TRANSMITTED" type="BIGINT" unit="bytes" />
+            <field name="TRANSMISSION_TIME_EFF" type="INTEGER" unit="ms" />
+            <field name="TRANSMISSION_TIME_TOT" type="INTEGER" unit="ms" />
+            <field name="CHUNK_RETRANSMISSIONS" type="INTEGER" />
+            <field name="FILE_QUEUE_LENGTH" type="INTEGER" />
+            <field name="FILE_QUEUE_SIZE" type="BIGINT" unit="bytes" />
+			
+            <field name="RELATIVE_FILE" type="VARCHAR(255)" />
+            <field name="FILE_COMPLETE" type="SMALLINT" />
+            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>binaries from the Glaciers deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+        <predicate key="type">PermaSense Glaciers deployment</predicate>
+        <predicate key="LATITUDE">46.579943</predicate>
+        <predicate key="LONGITUDE">8.388476</predicate>
+    </addressing>
+    <storage storage-directory="/home/perma/gsn-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query">select * from Glaciers_Binary</predicate>
+                    <predicate key="remote-contact-point">http://yosemite.ee.ethz.ch:22001/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
