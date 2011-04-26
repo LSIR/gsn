@@ -83,15 +83,13 @@ class SyslogNgPluginClass(AbstractPluginClass):
                 logbuf += rcv
                 if logbuf.endswith('\n'):
                     for line in logbuf.splitlines():
-                        self.info(line)
-                        self.processMsg(self.getTimeStamp(), line)
+                        self.processMsg(self.getTimeStamp(), [line])
                     logbuf = ''
                 else:
                     spl = logbuf.splitlines()
                     if len(spl) > 1:
                         for index in range(len(spl)-1):
-                            self.info(spl[index])
-                            self.processMsg(self.getTimeStamp(), line)
+                            self.processMsg(self.getTimeStamp(), [line])
                     elif len(spl) == 1:
                         logbuf = spl[len(spl)-1]
                     else:
