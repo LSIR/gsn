@@ -20,8 +20,8 @@
     <life-cycle pool-size="10" />
     <addressing>
         <predicate key="type">PermaSense Glaciers deployment</predicate>
-        <predicate key="LATITUDE">46.579943</predicate>
-        <predicate key="LONGITUDE">8.388476</predicate>
+        <predicate key="LATITUDE">46.590496</predicate>
+        <predicate key="LONGITUDE">8.377630</predicate>
     </addressing>
     <storage />
     <streams>
