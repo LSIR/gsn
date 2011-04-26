@@ -47,6 +47,10 @@ BACKLOG_STATUS_MESSAGE_TYPE = 10
 # send CoreStation status messages to GSN.
 CORESTATION_STATUS_MESSAGE_TYPE = 11
 
+# The syslog-ng message type. This message type is used to
+# send syslog-ng log messages to GSN.
+SYSLOG_NG_MESSAGE_TYPE = 12
+
 # The TOS message type. This message type is used to
 # send/receive TOS messages by the plugins.TOSPlugin.
 TOS_MESSAGE_TYPE = 20

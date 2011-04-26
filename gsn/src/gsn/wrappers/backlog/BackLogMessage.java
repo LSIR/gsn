@@ -77,6 +77,11 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.CoreStationStatusPlugin CoreStationStatusPlugin}. */
 	public static final byte CORESTATION_STATUS_MESSAGE_TYPE = 11;
 
+	/** The syslog-ng message type. This message type is used to
+     *  receive syslog-ng log messages by the
+	 *  {@link gsn.wrappers.backlog.plugins.SyslogNgPlugin SyslogNgPlugin}. */
+	public static final byte SYSLOG_NG_MESSAGE_TYPE = 12;
+
 	/** The TOS message type. This message type is used to
 	 *  send/receive TOS messages by the
 	 *  {@link gsn.wrappers.backlog.plugins.MigMessagePlugin MigMessagePlugin}. */
