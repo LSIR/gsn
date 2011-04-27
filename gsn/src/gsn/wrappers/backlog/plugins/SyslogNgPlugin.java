@@ -46,7 +46,7 @@ public class SyslogNgPlugin extends AbstractPlugin {
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		try {
-			if( dataProcessed(System.currentTimeMillis(), concat(new Serializable[]{timestamp, (Long)data[0], deviceId}, checkAndCastData(data, 1, dataField, 3))) ) {
+			if( dataProcessed(System.currentTimeMillis(), concat(new Serializable[]{timestamp, toLong(data[0])*1000, deviceId}, checkAndCastData(data, 1, dataField, 3))) ) {
 				ackMessage(timestamp, super.priority);
 				return true;
 			} else {
