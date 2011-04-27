@@ -100,8 +100,7 @@ class SyslogNgPluginClass(AbstractPluginClass):
                         for index in range(len(spl)-1):
                             lnspl = spl[index].split(None, 1)
                             self.processMsg(self.getTimeStamp(), [long(lnspl[0]), lnspl[1]])
-                    else:
-                        logbuf = spl[len(spl)-1]
+                    logbuf = spl[len(spl)-1]
             
         self.info('died')
     
