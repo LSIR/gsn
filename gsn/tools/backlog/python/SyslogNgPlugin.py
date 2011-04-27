@@ -25,6 +25,7 @@ class SyslogNgPluginClass(AbstractPluginClass):
 
     '''
     _logSocket
+    _clientSocket
     _stopped
     '''
     
@@ -40,8 +41,11 @@ class SyslogNgPluginClass(AbstractPluginClass):
             os.remove(logSocketName)
 
         self._logSocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self._logSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._logSocket.bind(logSocketName)
+        self._logSocket.listen(1)
         
+        self._clientSocket = None
         self._stopped = False
     
     
@@ -63,8 +67,8 @@ class SyslogNgPluginClass(AbstractPluginClass):
         
         while not self._stopped:
             try:
-                self._logSocket.listen(1)
-                conn, addr = self._logSocket.accept()
+                self._clientSocket, addr = self._logSocket.accept()
+                self.info('syslog-ng connected')
             except socket.error, e:
                 self.exception(e)
                 break
@@ -73,33 +77,40 @@ class SyslogNgPluginClass(AbstractPluginClass):
             logbuf = ''
             while not self._stopped:
                 try:
-                    rcv = conn.recv(4096)
+                    rcv = self._clientSocket.recv(4096)
                 except socket.error:
+                    self.warning('syslog-ng disconnected')
+                    self._clientSocket.close()
                     break
                 
-                if rcv == None:
+                if not rcv:
+                    self.warning('syslog-ng disconnected')
+                    self._clientSocket.close()
                     break
                 
                 logbuf += rcv
                 if logbuf.endswith('\n'):
                     for line in logbuf.splitlines():
-                        self.processMsg(self.getTimeStamp(), [line])
+                        lnspl = line.split(None, 1)
+                        self.processMsg(self.getTimeStamp(), [long(lnspl[0]), lnspl[1]])
                     logbuf = ''
                 else:
                     spl = logbuf.splitlines()
                     if len(spl) > 1:
                         for index in range(len(spl)-1):
-                            self.processMsg(self.getTimeStamp(), [line])
-                    elif len(spl) == 1:
-                        logbuf = spl[len(spl)-1]
+                            lnspl = spl[index].split(None, 1)
+                            self.processMsg(self.getTimeStamp(), [long(lnspl[0]), lnspl[1]])
                     else:
-                        logbuf = ''
+                        logbuf = spl[len(spl)-1]
             
         self.info('died')
     
     
     def stop(self):
         self._stopped = True
+        if self._clientSocket:
+            self._clientSocket.shutdown(socket.SHUT_RDWR)
+            self._clientSocket.close()
         self._logSocket.shutdown(socket.SHUT_RDWR)
         self._logSocket.close()
         self.info('stopped')
