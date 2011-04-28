@@ -23,7 +23,7 @@ import com.sun.media.jai.codec.SeekableStream;
 
 public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	
-	private static final String DCRAW = "/home/perma/dcraw-x64/dcraw";
+	private static final String DCRAW = "/home/perma/bin/dcraw-x64/dcraw";
 
 	private static final transient Logger logger = Logger.getLogger(FileGetterVirtualSensor.class);
 
