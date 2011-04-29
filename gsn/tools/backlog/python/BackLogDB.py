@@ -44,7 +44,6 @@ class BackLogDBClass(Thread, Statistics):
     _removeCounterId
     _removeTimeId
     _dblock
-    _sleep
     _resend
     _resendtimer
     _stopped
@@ -126,7 +125,6 @@ class BackLogDBClass(Thread, Statistics):
             raise TypeError(e.__str__())
     
         self._stopped = False
-        self._sleep = False
         
         self._resendtimer = ResendTimer(backlog_db_resend_hr*3600, self.resend)
         
@@ -248,12 +246,11 @@ class BackLogDBClass(Thread, Statistics):
             return int(value*1000)
             
                 
-    def resend(self, sleep=False):
+    def resend(self):
         '''
         Resend all messages which are in the backlog database to GSN.
         '''
         self._isBusy = True
-        self._sleep = sleep
         self._resend.set()
 
 
@@ -264,15 +261,13 @@ class BackLogDBClass(Thread, Statistics):
             self._resend.wait()
             if self._stopped:
                 break
-            if self._sleep:
-                self._sleepEvent.wait(SLEEP_BEFORE_RESEND_ON_RECONNECT)
             if self._stopped:
                 break
 
             timestamp = 0
             
             logresend = False
-            if self.getCounterValue(self._dbNumberOfEntriesId) > 10:
+            if self.getCounterValue(self._dbNumberOfEntriesId) > 0:
                 self._logger.info('resend')
                 logresend = True
                 

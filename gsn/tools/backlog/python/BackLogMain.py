@@ -497,10 +497,6 @@ class BackLogMainClass(Thread, Statistics):
             self._logger.warning('there is no plugin named %s to be stopped' % (pluginclassname, ))
             return False
         
-    
-    def resend(self):
-        self.backlog.resend()
-        
         
     def gsnMsgReceived(self, msgType, message):
         try:

@@ -387,7 +387,7 @@ class GSNListener(Thread):
             self.clientsocket.settimeout(None)
 
             # let BackLogMain know that GSN successfully connected
-            self._gsnPeer._backlogMain.backlog.resend(True)
+            self._gsnPeer._backlogMain.backlog.resend()
             
             # speed optimizations
             pktReceived = self._gsnPeer.pktReceived
@@ -489,6 +489,10 @@ class GSNListener(Thread):
         self._gsnwriter.stop()
         if self._connected:
             try:
+                try:
+                    self.clientsocket.shutdown(socket.SHUT_RDWR)
+                except Exception, e1:
+                    self._logger.debug(str(e1))
                 self.clientsocket.close()
             except Exception, e:
                 self._gsnPeer._backlogMain.incrementExceptionCounter()
@@ -584,6 +588,7 @@ class GSNWriter(Thread):
     class HelloMessage:
         def __init__(self, helloMsg):
             self._helloMsg = helloMsg
+            self._timestamp = 0
         def getMessage(self):
             return self._helloMsg
         

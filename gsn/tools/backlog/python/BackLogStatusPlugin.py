@@ -66,7 +66,7 @@ class BackLogStatusPluginClass(AbstractPluginClass):
     def msgReceived(self, data):
         if data[0] == 1:
             self.info('received command resend')
-            self._backlogMain.resend()
+            self._backlogMain.backlog.resend()
        
         
     def run(self):

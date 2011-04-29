@@ -286,13 +286,6 @@ class AbstractPluginClass(Thread, Statistics):
         @return: the system timestamp (UTC) in milliseconds as float
         '''
         return int(time.time()*1000)
-    
-    
-    def resend(self):
-        '''
-        Tells the BackLogDB class to resend all unacknowledged packets.
-        '''
-        self._backlogMain.backlog.resend()
         
         
     def getUptime(self):
