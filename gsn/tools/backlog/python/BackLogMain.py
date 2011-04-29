@@ -548,6 +548,8 @@ class BackLogMainClass(Thread, Statistics):
             self._logger.exception(e)
         
     def connectionToGSNestablished(self):
+        # start resending
+        self.backlog.resend()
         # tell the plugins that the connection to GSN has been established
         try:
             [plugin.connectionToGSNestablished() for plugin in self.plugins.values()]

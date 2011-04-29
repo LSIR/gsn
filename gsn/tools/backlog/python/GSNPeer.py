@@ -385,9 +385,6 @@ class GSNListener(Thread):
             self._logger.info('got connection from %s' % (self._clientaddr,))
 
             self.clientsocket.settimeout(None)
-
-            # let BackLogMain know that GSN successfully connected
-            self._gsnPeer._backlogMain.backlog.resend()
             
             # speed optimizations
             pktReceived = self._gsnPeer.pktReceived
