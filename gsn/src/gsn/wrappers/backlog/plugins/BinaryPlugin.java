@@ -245,14 +245,25 @@ public class BinaryPlugin extends AbstractPlugin {
     			logger.debug("packet number " + pktNr + " already received");
     		else {
     			lastReceivedPacketNr = pktNr;
-    			if (pktType == START_PACKET)
-    				sendPacket = startPacketReceived();
-    			else if (pktType == INIT_PACKET)
-    				sendPacket = initPacketReceived(msg, pktNr, chunkresend);
-				else if (pktType == CHUNK_PACKET)
-					sendPacket = chunkPacketReceived(msg, pktNr, chunkresend);
-				else if (pktType == CRC_PACKET)
-					sendPacket = crcPacketReceived(msg, pktNr, chunkresend);
+    			try {
+	    			if (pktType == START_PACKET)
+	    				sendPacket = startPacketReceived();
+	    			else if (pktType == INIT_PACKET)
+	    				sendPacket = initPacketReceived(msg, pktNr, chunkresend);
+					else if (pktType == CHUNK_PACKET)
+						sendPacket = chunkPacketReceived(msg, pktNr, chunkresend);
+					else if (pktType == CRC_PACKET)
+						sendPacket = crcPacketReceived(msg, pktNr, chunkresend);
+    			} catch (Exception e) {
+    				if (remoteBinaryName != null) {
+				    	logger.error(e.getMessage() + " -> request retransmission", e);
+				    	sendPacket = binaryRetransmissionRequestPacket(remoteBinaryName);
+    				}
+    				else {
+				    	logger.error(e.getMessage() + " -> request new binary", e);
+				    	sendPacket = newBinaryRequestPacket();
+    				}
+    			}
     		}
 
     		if (sendPacket != null) {

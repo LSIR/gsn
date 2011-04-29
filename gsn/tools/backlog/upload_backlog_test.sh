@@ -15,7 +15,7 @@ echo "uploading $*"
 
 echo ""
 echo "to permasense-etzg-bs01:"
-scp $* root@permasense-etzg-bs01:$BACKLOG_PYTHON_DIR
+scp $* root@permasense-etzg-bs01:/media/card/backlog/python2.6/
 
 echo ""
 echo "to permasense-etzl-bs01:"

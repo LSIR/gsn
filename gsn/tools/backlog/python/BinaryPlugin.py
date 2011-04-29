@@ -587,6 +587,7 @@ class BinaryWriter(Thread):
             msg = self._sendqueue.get()
             self._stopsending.clear()
             self._lock.acquire()
+            self._messageNr = (self._messageNr+1)%MESSAGE_NUMBER_MOD
             
             if not self._binaryWriterStop:
                 self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
@@ -603,12 +604,10 @@ class BinaryWriter(Thread):
         
         
     def sendMessage(self, msg):
-        self._messageNr = (self._messageNr+1)%MESSAGE_NUMBER_MOD
         try:
             self._sendqueue.put_nowait(msg)
         except Queue.Full:
             self._exception('send queue is full')
-        return self._messageNr
         
         
     def stopSending(self):
