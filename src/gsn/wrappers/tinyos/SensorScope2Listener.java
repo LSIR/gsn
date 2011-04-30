@@ -22,11 +22,21 @@ public class SensorScope2Listener implements Runnable {
     private ServerSocket serverSocket = null;
     private Socket client = null;
 
+    private Thread thread;
+
     public ConcurrentLinkedQueue<SensorScope2Packet> queue = new ConcurrentLinkedQueue<SensorScope2Packet>();
+
+    //public SensorScope2Packet
+
+    public void start() {
+        this.thread.start();
+    }
 
     public SensorScope2Listener(int server_port) {
         this.server_port = server_port;
         this.initialized = true;
+
+        this.thread = new Thread(this);
 
         // Create a server socket
         logger.warn("Trying to open a server socket on port " + server_port);
