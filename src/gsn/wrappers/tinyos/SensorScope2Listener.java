@@ -13,7 +13,9 @@ public class SensorScope2Listener implements Runnable {
 
     private static final int MAX_BUFFER_SIZE = 128;
     private boolean initialized = false;
-    private boolean running = true;
+    private boolean running = false;
+
+    private static SensorScope2Listener instance = null;
 
     private transient Logger logger = Logger.getLogger(this.getClass());
     private int server_port;
@@ -29,15 +31,21 @@ public class SensorScope2Listener implements Runnable {
     //public SensorScope2Packet
 
     public void start() {
-        this.thread.start();
+        if (!running && initialized) {
+            this.thread.start();
+            running = true;
+        } else {
+            logger.warn("Listener thread already running or not initialized.");
+        }
     }
 
-    public SensorScope2Listener(int server_port) {
+    public void setPort(int server_port) {
+        if (initialized) {
+            logger.warn("Port already initialized. (Singleton can be initialized only once)");
+            return; // initialize only once
+        }
         this.server_port = server_port;
         this.initialized = true;
-
-        this.thread = new Thread(this);
-
         // Create a server socket
         logger.warn("Trying to open a server socket on port " + server_port);
         try {
@@ -46,6 +54,19 @@ public class SensorScope2Listener implements Runnable {
             logger.error("Cannot open a server socket on port " + server_port + ".");
             this.initialized = false;
         }
+    }
+
+    public static SensorScope2Listener getInstance() {
+         if (instance != null) {
+             return instance;
+         } else {
+             instance = new SensorScope2Listener();
+             return instance;
+         }
+    }
+
+    private SensorScope2Listener() {
+        this.thread = new Thread(this);
     }
 
     public void run() {
@@ -70,9 +91,9 @@ public class SensorScope2Listener implements Runnable {
 
                 byte[] real_packet = new byte[n_read];
 
-                System.arraycopy(packet,0,real_packet,0,n_read);
+                System.arraycopy(packet, 0, real_packet, 0, n_read);
 
-                SensorScope2Packet _packet = new SensorScope2Packet(System.currentTimeMillis(),real_packet);
+                SensorScope2Packet _packet = new SensorScope2Packet(System.currentTimeMillis(), real_packet);
 
                 queue.add(_packet);
 
@@ -97,7 +118,6 @@ public class SensorScope2Listener implements Runnable {
         }
 
     }
-
 
     public void stopAcquisition() {
         running = false;

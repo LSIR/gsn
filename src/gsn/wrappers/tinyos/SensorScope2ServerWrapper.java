@@ -425,7 +425,8 @@ public class SensorScope2ServerWrapper extends AbstractWrapper {
             count[i] = 0;
         }
 
-        sensorScope2Listener = new SensorScope2Listener(server_port);
+        sensorScope2Listener = SensorScope2Listener.getInstance();
+        sensorScope2Listener.setPort(server_port);
         sensorScope2Listener.start();
 
         return to_return;
