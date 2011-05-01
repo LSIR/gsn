@@ -1,8 +1,28 @@
 package gsn.wrappers.tinyos;
 
+import java.util.Arrays;
+
 public class SensorScope2Packet {
     public byte[] bytes;
     long timestamp;
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SensorScope2Packet that = (SensorScope2Packet) o;
+
+        if (timestamp != that.timestamp) return false;
+        if (!Arrays.equals(bytes, that.bytes)) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result = bytes != null ? Arrays.hashCode(bytes) : 0;
+        result = 31 * result + (int) (timestamp ^ (timestamp >>> 32));
+        return result;
+    }
 
     public String toString() {
 

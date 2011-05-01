@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SensorScope2Listener implements Runnable {
@@ -25,10 +26,76 @@ public class SensorScope2Listener implements Runnable {
     private Socket client = null;
 
     private Thread thread;
+    private static final long PACKET_AGE_LIMIT = 600000; // packet stay for a maximum of PACKET_AGE_LIMIT (ms) before being recycled
 
     public ConcurrentLinkedQueue<SensorScope2Packet> queue = new ConcurrentLinkedQueue<SensorScope2Packet>();
 
     //public SensorScope2Packet
+
+    public SensorScope2Packet getNextPacketAfter(SensorScope2Packet latestPacket) {
+
+        RecyclePackets();
+
+        long timestamp = 0;
+
+        if (latestPacket != null)
+            timestamp = latestPacket.timestamp;
+
+        Iterator iter = queue.iterator();
+        boolean found = false;
+        SensorScope2Packet packet = null;
+        while (iter.hasNext() && !found) {
+            packet = (SensorScope2Packet) iter.next();
+            if (packet.timestamp >= timestamp) {  // duplicate timestamps are possible because of multiple station ids
+                if (packet != latestPacket) // skip same packet already processed
+                    if (queue.contains(latestPacket)) {
+                        if (indexOf(packet) > indexOf(latestPacket))
+                        found = true;
+                    } else {
+                        found = true;
+                    }
+            }
+        }
+        if (found)
+            return packet;
+        else
+            return null;
+    }
+
+    private int indexOf(SensorScope2Packet packet) {
+        Iterator iter  = queue.iterator();
+        int index = -1;
+        boolean found = false;
+        while (iter.hasNext() && !found) {
+            index++;
+            if (packet == iter.next())
+                found = true;
+        }
+        if (found)
+            return index;
+        else
+            return -1;
+    }
+
+    /*
+    * Delete elements older than age limit
+    * */
+    public void RecyclePackets() {
+        Iterator iter = queue.iterator();
+        long currentTimeMillis = System.currentTimeMillis();
+        int n_packets_deleted = 0;
+        SensorScope2Packet packet = null;
+        while (iter.hasNext()) {
+            packet = (SensorScope2Packet) iter.next();
+            if (currentTimeMillis - packet.timestamp > PACKET_AGE_LIMIT) {
+                queue.remove(packet);
+                n_packets_deleted++;
+
+            }
+        }
+        if (n_packets_deleted != 0)
+            logger.warn("Deleted " + n_packets_deleted + " packet(s). New size => " + queue.size());
+    }
 
     public void start() {
         if (!running && initialized) {
@@ -57,12 +124,12 @@ public class SensorScope2Listener implements Runnable {
     }
 
     public static SensorScope2Listener getInstance() {
-         if (instance != null) {
-             return instance;
-         } else {
-             instance = new SensorScope2Listener();
-             return instance;
-         }
+        if (instance != null) {
+            return instance;
+        } else {
+            instance = new SensorScope2Listener();
+            return instance;
+        }
     }
 
     private SensorScope2Listener() {
@@ -79,7 +146,6 @@ public class SensorScope2Listener implements Runnable {
             byte[] packet = null;
 
             try {
-
 
                 // Wait for a  request
                 client = serverSocket.accept();
@@ -102,6 +168,8 @@ public class SensorScope2Listener implements Runnable {
                 logger.warn(order + " " + _packet.toString());
 
                 counter++;
+
+                //RecyclePackets(); // recycle old packets. Calling
 
             } catch (IOException e) {
                 logger.error("Error in Server: " + e.getMessage(), e);

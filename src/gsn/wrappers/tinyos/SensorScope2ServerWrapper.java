@@ -5,12 +5,7 @@ import gsn.beans.DataField;
 import gsn.wrappers.AbstractWrapper;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.text.DecimalFormat;
 
 public class SensorScope2ServerWrapper extends AbstractWrapper {
@@ -19,7 +14,7 @@ public class SensorScope2ServerWrapper extends AbstractWrapper {
 
     private static final int MAX_BUFFER_SIZE = 128;
 
-    private static final int DEFAULT_SAMPLING_RATE_IN_MSEC = 10; //default thread_rate, every 1 second.
+    private static final int DEFAULT_SAMPLING_RATE_IN_MSEC = 1000; //default thread_rate, every 1 second.
     private int thread_rate = DEFAULT_SAMPLING_RATE_IN_MSEC;
     private int selected_station_id;
     private int server_port;
@@ -385,6 +380,10 @@ public class SensorScope2ServerWrapper extends AbstractWrapper {
     private int[] count = new int[OUTPUT_STRUCTURE_SIZE];
 
     private boolean doPostStreamElement;
+    private long latestPacketReceivedTimestamp = 0;
+    private SensorScope2Packet latestPacketReceived = null;
+
+    private long packetsCount = 0;
 
     public boolean initialize() {
         setName("SensorScope2Server-Thread" + (++threadCounter));
@@ -445,15 +444,19 @@ public class SensorScope2ServerWrapper extends AbstractWrapper {
 
             try {
 
-                SensorScope2Packet ss2packet = sensorScope2Listener.queue.poll();
+                SensorScope2Packet ss2packet = sensorScope2Listener.getNextPacketAfter(latestPacketReceived);
 
-                if (ss2packet == null) // skip empty packets
+                if (ss2packet == null) // skip empty packets or no packet at all
                     continue;
+
+                latestPacketReceivedTimestamp = ss2packet.timestamp;
+                latestPacketReceived = ss2packet;
 
                 byte[] original_packet = ss2packet.bytes;
 
                 logger.warn(ss2packet.toString());
-                logger.warn("size => " + sensorScope2Listener.queue.size());
+                logger.warn("Queue size => " + sensorScope2Listener.queue.size());
+                logger.warn("Processed packets => " + packetsCount++);
 
                 packet = new int[original_packet.length];
 
