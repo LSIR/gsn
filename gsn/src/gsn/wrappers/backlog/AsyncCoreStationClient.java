@@ -351,7 +351,7 @@ public class AsyncCoreStationClient extends Thread  {
 
 	public void addDeviceId(String deployment, Integer id, CoreStationListener listener) {
 		if (logger.isDebugEnabled())
-			logger.debug("adding DeviceId " + id + "for " + deployment + " deployment");
+			logger.debug("adding DeviceId " + id + " for " + deployment + " deployment");
 
 		try {
 			if (!deploymentToIdListenerMapList.containsKey(deployment)) {
