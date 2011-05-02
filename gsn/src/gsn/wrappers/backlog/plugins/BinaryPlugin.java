@@ -255,7 +255,7 @@ public class BinaryPlugin extends AbstractPlugin {
 					else if (pktType == CRC_PACKET)
 						sendPacket = crcPacketReceived(msg, pktNr, chunkresend);
     			} catch (Exception e) {
-    				if (remoteBinaryName != null) {
+    				if (remoteBinaryName != null && localBinaryName != null) {
 				    	logger.error(e.getMessage() + " -> request retransmission", e);
 				    	sendPacket = binaryRetransmissionRequestPacket(remoteBinaryName);
     				}
