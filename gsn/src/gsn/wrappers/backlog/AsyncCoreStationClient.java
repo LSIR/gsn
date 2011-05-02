@@ -514,19 +514,24 @@ public class AsyncCoreStationClient extends Thread  {
 	
 	
 	public void reconnect(CoreStationListener listener) {
-		try {
-			writeBuffer.clear();
-	    	writeBuffer.flip();
-			synchronized (changeRequests) {
-				if (logger.isDebugEnabled())
-					logger.debug("add reconnect request");
-				// Indicate we want the interest ops set changed
-				changeRequests.add(new ChangeRequest(listenerToSocketList.get(listener), ChangeRequest.TYPE_RECONNECT, -1));
+		SocketChannel sc = listenerToSocketList.get(listener);
+		if (sc != null) {
+			try {
+				writeBuffer.clear();
+		    	writeBuffer.flip();
+				synchronized (changeRequests) {
+					if (logger.isDebugEnabled())
+						logger.debug("add reconnect request");
+					// Indicate we want the interest ops set changed
+					changeRequests.add(new ChangeRequest(sc, ChangeRequest.TYPE_RECONNECT, -1));
+				}
+				selector.wakeup();
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
 			}
-			selector.wakeup();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
 		}
+		else
+			logger.warn("no socket for listener (" + listener.getCoreStationName() + ") in list");
 	}
 }
 
