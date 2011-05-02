@@ -183,7 +183,8 @@ public class AsyncCoreStationClient extends Thread  {
 					logger.debug("connection closed");
 	        	// Remote entity shut the socket down cleanly. Do the
 	        	// same from our end and cancel the channel.
-				reconnect(socketToListenerList.get(socketChannel));
+				if (!dispose && socketToListenerList.containsKey(socketChannel))
+					reconnect(socketToListenerList.get(socketChannel));
 				return;
 	        }
 			
@@ -193,7 +194,8 @@ public class AsyncCoreStationClient extends Thread  {
 			if (logger.isDebugEnabled())
 				logger.debug("connection closed: " + e.getMessage());
 	    	// The remote forcibly closed the connection
-			reconnect(socketToListenerList.get(socketChannel));
+			if (!dispose && socketToListenerList.containsKey(socketChannel))
+				reconnect(socketToListenerList.get(socketChannel));
 	    }
 	}
 	
@@ -256,8 +258,8 @@ public class AsyncCoreStationClient extends Thread  {
 			if (logger.isDebugEnabled())
 				logger.debug("connection closed: " + e.getMessage());
 	    	// The remote forcibly closed the connection
-			reconnect(socketToListenerList.get(socketChannel));
-	    	return;
+			if (!dispose && socketToListenerList.containsKey(socketChannel))
+				reconnect(socketToListenerList.get(socketChannel));
 	    }
 	}
 	
@@ -270,14 +272,16 @@ public class AsyncCoreStationClient extends Thread  {
 		try {
 			socketChannel.finishConnect();
 		} catch (IOException e) {
-			logger.debug("could not connect to " + socketToListenerList.get(socketChannel).getCoreStationName() + ": " + e.getMessage());
-			reconnect(socketToListenerList.get(socketChannel));
+			if (!dispose && socketToListenerList.containsKey(socketChannel)) {
+				logger.debug("could not connect to " + socketToListenerList.get(socketChannel).getCoreStationName() + ": " + e.getMessage());
+				reconnect(socketToListenerList.get(socketChannel));
+			}
 			return;
 		}
 
 		try {
 			CoreStationListener listener;
-			listener = socketToListenerList.get((SocketChannel)key.channel());
+			listener = socketToListenerList.get(socketChannel);
 			listener.connectionEstablished();
 			logger.info("connection established to core station: " + listener.getCoreStationName());
 		  
