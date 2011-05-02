@@ -107,7 +107,7 @@ public class AsyncCoreStationClient extends Thread  {
 	    					try {
 		    					if (logger.isDebugEnabled())
 		    						logger.debug("Selector:reconnect");
-		    					if (change.socket.keyFor(selector).isValid())
+		    					if (change.socket.keyFor(selector) != null && change.socket.keyFor(selector).isValid())
 		    						closeConnection(change.socket.keyFor(selector), change.socket);
 		    					CoreStationListener listener;
 
