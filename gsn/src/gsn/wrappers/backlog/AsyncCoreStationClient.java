@@ -93,8 +93,6 @@ public class AsyncCoreStationClient extends Thread  {
 	    					if (key == null || !key.isValid())
 	    						continue;
 	    					if (!change.socket.isConnectionPending()) {
-	    						if (logger.isDebugEnabled())
-	    							logger.debug("Selector:changeops");
 	    						key.interestOps(change.ops);
 	    						key.attach(change);
 	    					}
