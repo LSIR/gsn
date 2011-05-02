@@ -12,6 +12,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,8 +42,8 @@ public class AsyncCoreStationClient extends Thread  {
 	// Maps a SocketChannel to a list of ByteBuffer instances
 	private Map<SocketChannel, PriorityQueue<PriorityDataElement>> pendingData = new HashMap<SocketChannel, PriorityQueue<PriorityDataElement>>();
 
-	protected Map<SocketChannel,CoreStationListener> socketToListenerList = Collections.synchronizedMap(new HashMap<SocketChannel,CoreStationListener>());
-	protected Map<CoreStationListener,SocketChannel> listenerToSocketList = Collections.synchronizedMap(new HashMap<CoreStationListener,SocketChannel>());
+	protected Map<SocketChannel,CoreStationListener> socketToListenerList = new Hashtable<SocketChannel,CoreStationListener>();
+	protected Map<CoreStationListener,SocketChannel> listenerToSocketList = new Hashtable<CoreStationListener,SocketChannel>();
 	private static Map<String,Map<Integer,CoreStationListener>> deploymentToIdListenerMapList = Collections.synchronizedMap(new HashMap<String,Map<Integer,CoreStationListener>>());
 
 	private ByteBuffer writeBuffer;
