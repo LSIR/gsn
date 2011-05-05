@@ -86,6 +86,7 @@ class BinaryPluginClass(AbstractPluginClass):
     _filedequelock
     _filedeque
     _msgqueue
+    _minruntime
     _isBusy
     _rootdir
     _filedescriptor
@@ -103,15 +104,15 @@ class BinaryPluginClass(AbstractPluginClass):
         
         watches = self.getOptionValues('watch')
         
-        wait_min_for_file = self.getOptionValue('wait_min_for_file')
-        if wait_min_for_file and self.isDutyCycleMode():
-            self._waitforfile = True
+        minimum_runtime = self.getOptionValue('minimum_runtime')
+        if minimum_runtime and self.isDutyCycleMode():
+            self._minruntime = True
             self._isBusy = True
-            self._waitforfiletimer = Timer(float(wait_min_for_file) * 60, self.checkForFileTimerAction)
-            self._waitforfiletimer.start()
-            self.info('waiting at least %s minutes for a file to arrive' % (wait_min_for_file,))
+            self._minruntimetimer = Timer(float(minimum_runtime) * 60, self.checkMinRuntimeTimerAction)
+            self._minruntimetimer.start()
+            self.info('minimum runtime: %s minutes' % (minimum_runtime,))
         else:
-            self._waitforfile = False
+            self._minruntime = False
             self._isBusy = False
 
         if self._rootdir is None:
@@ -232,7 +233,7 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
-        if not self._waitforfile:
+        if not self._minruntime:
             self._isBusy = False
         if self._filedescriptor:
             if os.path.exists(self._filedescriptor.name):
@@ -352,7 +353,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 except IndexError:
                     self.debug('file FIFO is empty waiting for next file to arrive')
                     self._readyfornewbinary = True
-                    if not self._waitforfile:
+                    if not self._minruntime:
                         self._isBusy = False
                     return
                     
@@ -508,16 +509,16 @@ class BinaryPluginClass(AbstractPluginClass):
         return counter
         
         
-    def checkForFileTimerAction(self):
-        self._waitforfile = False
+    def checkMinRuntimeTimerAction(self):
+        self._minruntime = False
         if self._readyfornewbinary:
             self._isBusy = False
-            self.info('there is no file to be transmitted')
+            self.info('minimum runtime is over and there is no file to be transmitted -> stop')
         elif not self.isGSNConnected():
             self._isBusy = False
-            self.info('there are still files to be transmitted but GSN is not connected')
+            self.info('minimum runtime is over and there are still files to be transmitted but GSN is not connected -> stop')
         else:
-            self.info('there are still files to be transmitted')
+            self.info('minimum runtime is over and there are still files to be transmitted -> keep running')
         
          
     def isBusy(self):
@@ -533,15 +534,15 @@ class BinaryPluginClass(AbstractPluginClass):
         
         
     def beaconCleared(self):
-        if (self._readyfornewbinary or not self.isGSNConnected()) and not self._waitforfile:
+        if (self._readyfornewbinary or not self.isGSNConnected()) and not self._minruntime:
             self._isBusy = False
     
     
     def stop(self):
         self._isBusy = False
         self._plugStop = True
-        if self._waitforfile:
-            self._waitforfiletimer.cancel()
+        if self._minruntime:
+            self._minruntimetimer.cancel()
         self._notifier.stop()
         self._binaryWriter.stop()
         self._filedequelock.acquire()
