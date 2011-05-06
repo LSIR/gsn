@@ -291,6 +291,8 @@ class BackLogDBClass(Thread, Statistics):
 
                 interrupt = False
                 for index, row in enumerate(rows):
+                    if self._stopped:
+                        break
                     timestamp = row[0]
                     msgType = row[1]
                     message = row[2]
@@ -311,7 +313,7 @@ class BackLogDBClass(Thread, Statistics):
                         interrupt = True
                         break
                     
-                if interrupt:
+                if interrupt or self._stopped:
                     break
                 
                 self._waitForAck.wait(MAX_WAIT_FOR_ACK)
