@@ -15,8 +15,8 @@ from threading import Thread, Lock, Event
 from SpecialAPI import Statistics
 
 
-SLEEP_BEFORE_RESEND_ON_RECONNECT = 5
 
+RESEND_BUNCH_SIZE = 10
 MAX_WAIT_FOR_ACK = 30.0
 
 
@@ -274,37 +274,44 @@ class BackLogDBClass(Thread, Statistics):
             while not self._stopped:
                 try:
                     self._dblock.acquire()
-                    self._cur.execute('SELECT * FROM backlogmsg WHERE timestamp > ? order by timestamp asc LIMIT 1', (timestamp,))
-                    row = self._cur.fetchone()
+                    self._cur.execute('SELECT * FROM backlogmsg WHERE timestamp > ? order by timestamp asc LIMIT ?', (timestamp,RESEND_BUNCH_SIZE))
+                    rows = self._cur.fetchall()
                     self._dblock.release()
                 except sqlite3.Error, e:
                     self._dblock.release()
                     self.exception(e)
                     break
                     
-                if row is None:
+                if not rows:
                     if logresend:
                         self._logger.info('all packets are sent')
                     self._isBusy = False
                     self._backlogMain.schedulehandler.backlogResendFinished()
                     break
 
-                timestamp = row[0]
-                msgType = row[1]
-                message = row[2]
-                # should be blocking until queue is free and ready to send
-                self._logger.debug('rsnd...')
-                self._ackLock.acquire()
-                self._resentMsgIdentifier = [msgType, timestamp]
-                self._waitForAck.clear()
-                self._ackLock.release()
-                if self._backlogMain.gsnpeer.processResendMsg(msgType, timestamp, message):
-                    if self._logger.isEnabledFor(logging.DEBUG):
-                        self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
-                else:
-                    self._logger.info('resend interrupted')
-                    self._isBusy = False
-                    self._backlogMain.schedulehandler.backlogResendFinished()
+                interrupt = False
+                for index, row in enumerate(rows):
+                    timestamp = row[0]
+                    msgType = row[1]
+                    message = row[2]
+                    # should be blocking until queue is free and ready to send
+                    self._logger.debug('rsnd...')
+                    if index == 1:
+                        self._ackLock.acquire()
+                        self._resentMsgIdentifier = [msgType, timestamp]
+                        self._waitForAck.clear()
+                        self._ackLock.release()
+                    if self._backlogMain.gsnpeer.processResendMsg(msgType, timestamp, message):
+                        if self._logger.isEnabledFor(logging.DEBUG):
+                            self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
+                    else:
+                        self._logger.info('resend interrupted')
+                        self._isBusy = False
+                        self._backlogMain.schedulehandler.backlogResendFinished()
+                        interrupt = True
+                        break
+                    
+                if interrupt:
                     break
                 
                 self._waitForAck.wait(MAX_WAIT_FOR_ACK)
