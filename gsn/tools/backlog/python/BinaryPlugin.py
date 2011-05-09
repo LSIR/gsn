@@ -117,10 +117,10 @@ class BinaryPluginClass(AbstractPluginClass):
             
         chunk_resend_timeout = self.getOptionValue('chunk_resend_timeout')
         if chunk_resend_timeout:
-            self._chunk_resend_timeout = CHUNK_RESEND_TIMEOUT_DEFAULT
+            self._chunk_resend_timeout = int(chunk_resend_timeout)
             self.info('chunk_resend_timeout: %d seconds' % (self._chunk_resend_timeout,))
         else:
-            self._chunk_resend_timeout = False
+            self._chunk_resend_timeout = CHUNK_RESEND_TIMEOUT_DEFAULT
             self.info('no chunk_resend_timeout set. Using default: %d seconds' % (self._chunk_resend_timeout,))
 
         if self._rootdir is None:
