@@ -21,7 +21,7 @@ from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_DATE_TIME_FORMATE = 'yyyy-MM-dd'
 
-RESEND_INTERVAL_SEC = 30
+CHUNK_RESEND_TIMEOUT_DEFAULT = 30
 
 CHUNK_SIZE = 64000
 
@@ -114,6 +114,14 @@ class BinaryPluginClass(AbstractPluginClass):
         else:
             self._minruntime = False
             self._isBusy = False
+            
+        chunk_resend_timeout = self.getOptionValue('chunk_resend_timeout')
+        if chunk_resend_timeout:
+            self._chunk_resend_timeout = CHUNK_RESEND_TIMEOUT_DEFAULT
+            self.info('chunk_resend_timeout: %d seconds' % (self._chunk_resend_timeout,))
+        else:
+            self._chunk_resend_timeout = False
+            self.info('no chunk_resend_timeout set. Using default: %d seconds' % (self._chunk_resend_timeout,))
 
         if self._rootdir is None:
             raise TypeError('no rootdir specified')
@@ -593,7 +601,7 @@ class BinaryWriter(Thread):
             if not self._binaryWriterStop:
                 self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
                 while not self._stopsending.isSet() and not self._binaryWriterStop:
-                    self._stopsending.wait(RESEND_INTERVAL_SEC)
+                    self._stopsending.wait(self._binaryPluginClass._chunk_resend_timeout)
                     if not self._stopsending.isSet() and not self._binaryWriterStop:
                         self._logger.debug('resend message')
                         self._resendcounter += 1
