@@ -30,7 +30,7 @@
         <predicate key="LATITUDE">46.121808</predicate>
         <predicate key="LONGITUDE">7.821777</predicate>
     </addressing>
-    <storage storage-directory="/home/perma/gsn-binaries/" />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
     <streams>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">

@@ -26,7 +26,7 @@
         <predicate key="VERFOV">20.455</predicate>
         <predicate key="NEAR">9.821</predicate>
     </addressing>
-    <storage storage-directory="/home/perma/gsn-binaries/" history-size="1"/>
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
