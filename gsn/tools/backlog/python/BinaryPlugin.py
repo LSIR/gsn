@@ -613,10 +613,11 @@ class BinaryWriter(Thread):
         
         
     def sendMessage(self, msg):
-        try:
-            self._sendqueue.put_nowait(msg)
-        except Queue.Full:
-            self._exception('send queue is full')
+        if not self._binaryWriterStop:
+            try:
+                self._sendqueue.put_nowait(msg)
+            except Queue.Full:
+                self._exception('send queue is full')
         
         
     def stopSending(self):
@@ -636,7 +637,7 @@ class BinaryWriter(Thread):
         self._binaryWriterStop = True
         self._stopsending.set()
         try:
-            self._sendqueue.put_nowait('stop')
+            self._sendqueue.put('stop')
         except:
             pass
         self._logger.info('stopped')
