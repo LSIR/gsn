@@ -98,7 +98,6 @@ class GSNPeerClass(Thread, Statistics):
             self._serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self._serversocket.bind(('0.0.0.0', port))
-            self._serversocket.listen(1)
         except Exception, e:
             raise TypeError(e.__str__())
 
@@ -114,6 +113,8 @@ class GSNPeerClass(Thread, Statistics):
         self._pingwatchdog.start()
         self._pingtimer.start()
         self._work.set()
+        
+        self._serversocket.listen(1)
         
         threadnr = 1
         while not self._gsnPeerStop:
@@ -174,7 +175,7 @@ class GSNPeerClass(Thread, Statistics):
         
         @return: True if the message could have been sent to GSN otherwise False
         '''
-        if not self._connected:
+        if not self._connected or self._gsnPeerStop:
             return False
         if resend:
             return self._gsnlistener._gsnwriter.addResendMsg(msg, priority)        
@@ -705,9 +706,7 @@ class GSNWriter(Thread):
         assert self._sendqueue.not_empty != True
         if self._gsnListener._connected and not self._gsnWriterStop:
             try:
-                self._sendqueue.put_nowait((priority, msg))
-            except Queue.Full:
-                self._logger.warning('send queue is full (resend)')
+                self._sendqueue.put((priority, msg))
             except Exception, e:
                 self.exception(e)
             else:
