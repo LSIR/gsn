@@ -172,8 +172,13 @@ public class ContainerInfoHandler implements RequestHandler {
             		  sb.append("null");
             	  }
               }
-              else
-                sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
+              else {
+            	Serializable s = se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) );
+            	if (s instanceof String)
+            		sb.append( StringEscapeUtils.escapeXml( (String)se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) ) );
+            	else 
+            		sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
+              }
             sb.append("</field>\n");
           }
           sb.append("\t<field name=\"timed\" type=\"string\" description=\"The timestamp associated with the stream element\">" ).append( se == null ? "" : sdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
