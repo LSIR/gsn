@@ -9,6 +9,7 @@ __source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/pe
 
 import os
 import socket
+from logging.handlers import SysLogHandler
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
@@ -113,3 +114,36 @@ class SyslogNgPluginClass(AbstractPluginClass):
         self._logSocket.shutdown(socket.SHUT_RDWR)
         self._logSocket.close()
         self.info('stopped')
+
+
+class SyslogNgHandler(SysLogHandler):
+    def emit(self, record):
+        """
+        Emit a record.
+        
+        The record is formatted, and then sent to the syslog server. If
+        exception information is present, it is NOT sent to the server.
+        """
+        msg = self.format(record)
+        """
+        We need to convert record level to lowercase, maybe this will
+        change in the future.
+        """
+        msg = self.log_format_string % (
+            self.encodePriority(self.facility,
+                                self.mapPriority(record.levelname)),
+                                msg)
+        
+        try:
+            if self.unixsocket:
+                try:
+                    self.socket.send(msg)
+                except socket.error:
+                    self._connect_unixsocket(self.address)
+                    self.socket.send(msg)
+            else:
+                self.socket.sendto(msg, self.address)
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            self.handleError(record)
