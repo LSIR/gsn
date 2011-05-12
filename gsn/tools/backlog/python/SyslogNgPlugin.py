@@ -69,7 +69,7 @@ class SyslogNgPluginClass(AbstractPluginClass):
         while not self._stopped:
             try:
                 self._clientSocket, addr = self._logSocket.accept()
-                self.info('syslog-ng connected')
+                self.debug('syslog-ng connected')
             except socket.error, e:
                 self.exception(e)
                 break
@@ -80,12 +80,12 @@ class SyslogNgPluginClass(AbstractPluginClass):
                 try:
                     rcv = self._clientSocket.recv(4096)
                 except socket.error:
-                    self.warning('syslog-ng disconnected')
+                    self.debug('syslog-ng disconnected')
                     self._clientSocket.close()
                     break
                 
                 if not rcv:
-                    self.warning('syslog-ng disconnected')
+                    self.debug('syslog-ng disconnected')
                     self._clientSocket.close()
                     break
                 

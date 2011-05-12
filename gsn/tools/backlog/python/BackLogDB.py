@@ -404,13 +404,13 @@ class ResendTimer(Thread):
     def pause(self):
         self._wait = None
         self._timer.set()
-        self._logger.info('paused')
+        self._logger.debug('paused')
     
             
     def resume(self):
         self._wait = self._interval
         self._timer.set()
-        self._logger.info('resumed')
+        self._logger.debug('resumed')
     
     
     def stop(self):

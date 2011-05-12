@@ -356,7 +356,7 @@ class GSNListener(Thread):
 
 
     def run(self):
-        self._logger.info('started')
+        self._logger.debug('started')
         
         pkt_len = None
         pkt = None
@@ -365,11 +365,11 @@ class GSNListener(Thread):
         connecting = True
         
         # listen for a connection request by a GSN instance (this is blocking)
-        self._logger.info('listening on port %d' % (self._port,))
+        self._logger.debug('listening on port %d' % (self._port,))
         try:
             (self.clientsocket, self._clientaddr) = self._serversocket.accept()
             if self._gsnListenerStop:
-                self._logger.info('died')
+                self._logger.debug('died')
                 return
             self._connected = True
             self._gsnwriter.start()
@@ -379,7 +379,7 @@ class GSNListener(Thread):
                 self._gsnPeer._backlogMain.incrementExceptionCounter()
                 self._logger.exception('exception while accepting connection: %s' % (e,))
                 self.disconnect()
-            self._logger.info('died')
+            self._logger.debug('died')
             return
 
         try:
@@ -447,7 +447,7 @@ class GSNListener(Thread):
             
         self._gsnwriter.join()
 
-        self._logger.info('died')
+        self._logger.debug('died')
         
         
     def pktReadAndDestuff(self, length):
@@ -496,7 +496,7 @@ class GSNListener(Thread):
                 self._gsnPeer._backlogMain.incrementExceptionCounter()
                 self._logger.exception(str(e))
             self._connected = False
-        self._logger.info('stopped')
+        self._logger.debug('stopped')
 
 
     def disconnect(self):
@@ -550,13 +550,13 @@ class PingTimer(Thread):
     def pause(self):
         self._wait = None
         self._timer.set()
-        self._logger.info('paused')
+        self._logger.debug('paused')
     
             
     def resume(self):
         self._wait = self._interval
         self._timer.set()
-        self._logger.info('resumed')
+        self._logger.debug('resumed')
     
     
     def stop(self):
@@ -603,7 +603,7 @@ class GSNWriter(Thread):
 
 
     def run(self):
-        self._logger.info('started')
+        self._logger.debug('started')
         
         # speed optimizations
         pack = struct.pack
@@ -649,7 +649,7 @@ class GSNWriter(Thread):
                     
         self.emptyQueue() # to unblock addResendMsg
  
-        self._logger.info('died')
+        self._logger.debug('died')
         
         
     def pktStuffing(self, pkt):
@@ -671,7 +671,7 @@ class GSNWriter(Thread):
             pass
         except Exception, e:
             self._logger.exception(e)
-        self._logger.info('stopped')
+        self._logger.debug('stopped')
 
 
     def emptyQueue(self):
