@@ -6,7 +6,7 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                    def spl = LOG_MESSAGE.split("\s+", 6);
+                    def spl = LOG_MESSAGE.split("\\s+", 6);
                     PRIORITY = spl[0].substring(1, spl[0].length()-1).toShort();
                     HOST = spl[4];
                     spl = spl.split(":", 2);
