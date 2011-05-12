@@ -6,11 +6,14 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                    def spl = LOG_MESSAGE.strip().split("\s+", 7);
+                    def spl = LOG_MESSAGE.split("\s+", 6);
                     PRIORITY = spl[0].substring(1, spl[0].length()-1).toShort();
                     HOST = spl[4];
-                    PROGRAM = spl[5].substring(0, spl[5].length()-1);
-                    MESSAGE = spl[6];
+                    spl = spl.split(":", 2);
+                    if ( spl.length() == 2) {
+                    	PROGRAM = spl[0];
+                    	MESSAGE = spl[1];
+                    } else { MESSAGE = spl[0]; }
                 ]]>
             </param>
         </init-params>
