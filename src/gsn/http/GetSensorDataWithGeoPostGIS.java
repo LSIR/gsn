@@ -328,6 +328,8 @@ public class GetSensorDataWithGeoPostGIS {
                         s = o.toString();
                     if (col < numCols - 1)
                         sb.append(s).append(SEPARATOR);
+                    else
+                        sb.append(s);
                 }
                 sb.append(NEWLINE);
             }
@@ -343,6 +345,11 @@ public class GetSensorDataWithGeoPostGIS {
 
     public static String executeQuery(String envelope, String matchingSensors, String query) throws ParseException {
         return executeQuery(envelope, query, matchingSensors, CSV_FORMAT);
+    }
+
+    public static String executeQueryWithUnion(String envelope, String matchingSensors, String query, String union) throws ParseException {
+        String _query = reformatQuery(query, matchingSensors, union);
+        return executeQuery(envelope, _query, matchingSensors, CSV_FORMAT);
     }
 
     public static void main(String[] args) throws ParseException, SQLException {

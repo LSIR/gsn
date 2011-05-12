@@ -151,7 +151,6 @@ public class GetSensorDataWithGeo {
     }
 
 
-
     public static String reformatQuery(String query, String matchingSensors, String unionElement) {
 
         String lower_query = query.toLowerCase();
@@ -174,7 +173,8 @@ public class GetSensorDataWithGeo {
                         unionOfAll.append("\n union \n");
                 }
             }
-            System.out.println("unionofAll => " + unionOfAll);
+            //System.out.println("unionofAll => " + unionOfAll);
+            //System.out.println("union keyword => " + UNION_RESERVED_WORD_REGEX);
             ref_query = ref_query.replaceAll(UNION_RESERVED_WORD_REGEX, unionOfAll.toString());
         }
 
@@ -190,6 +190,72 @@ public class GetSensorDataWithGeo {
     *
     * */
     public static String executeQuery(String envelope, String query, String matchingSensors, String format) throws ParseException {
+
+        //String matchingSensors = getListOfSensorsAsString(envelope);
+
+        String reformattedQuery = reformatQuery(query, matchingSensors);
+        StringBuilder sb = new StringBuilder();
+        Connection connection = null;
+
+        try {
+            connection = Main.getDefaultStorage().getConnection();
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet results = statement.executeQuery(reformattedQuery);
+            ResultSetMetaData metaData;    // Additional information about the results
+            int numCols, numRows;          // How many rows and columns in the table
+            metaData = results.getMetaData();       // Get metadata on them
+            numCols = metaData.getColumnCount();    // How many columns?
+            results.last();                         // Move to last row
+            numRows = results.getRow();             // How many rows?
+
+            String s;
+
+            //System.out.println("* Executing query *\n" + reformattedQuery + "\n***");
+
+            // headers
+            sb.append("# Query: " + query + NEWLINE);
+            sb.append("# Reformatted: " + reformattedQuery + NEWLINE);
+
+            sb.append("# ");
+            //System.out.println("ncols: " + numCols);
+            //System.out.println("nrows: " + numRows);
+            for (int col = 0; col < numCols; col++) {
+                sb.append(metaData.getColumnLabel(col + 1));
+                if (col < numCols - 1)
+                    sb.append(SEPARATOR);
+            }
+            sb.append(NEWLINE);
+
+            for (int row = 0; row < numRows; row++) {
+                results.absolute(row + 1);                // Go to the specified row
+                for (int col = 0; col < numCols; col++) {
+                    Object o = results.getObject(col + 1); // Get value of the column
+                    //logger.warn(row + " , "+col+" : "+ o.toString());
+                    if (o == null)
+                        s = "null";
+                    else
+                        s = o.toString();
+                    if (col < numCols - 1)
+                        sb.append(s).append(SEPARATOR);
+                    else
+                        sb.append(s);
+                }
+                sb.append(NEWLINE);
+            }
+        } catch (SQLException e) {
+            sb.append("ERROR in execution of query: " + e.getMessage());
+        } finally {
+            Main.getDefaultStorage().close(connection);
+        }
+
+        return sb.toString();
+    }
+
+    /*
+    * Execute query against a list of sensors
+    *
+    * */
+    public static String executeQueryWithUnionFormatted(String envelope, String query, String matchingSensors, String format, String union) throws ParseException {
 
         //String matchingSensors = getListOfSensorsAsString(envelope);
         String reformattedQuery = reformatQuery(query, matchingSensors);
@@ -234,8 +300,7 @@ public class GetSensorDataWithGeo {
                 }
                 sb.append(NEWLINE);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
             Main.getDefaultStorage().close(connection);
@@ -244,8 +309,13 @@ public class GetSensorDataWithGeo {
         return sb.toString();
     }
 
-    public static String executeQuery(String envelope,String matchingSensors, String query) throws ParseException {
+    public static String executeQuery(String envelope, String matchingSensors, String query) throws ParseException {
         return executeQuery(envelope, query, matchingSensors, CSV_FORMAT);
+    }
+
+    public static String executeQueryWithUnion(String envelope, String matchingSensors, String query, String union) throws ParseException {
+        String _query = reformatQuery(query, matchingSensors, union);
+        return executeQuery(envelope, _query, matchingSensors, CSV_FORMAT);
     }
 
     public static void main(String[] args) throws ParseException, SQLException {
