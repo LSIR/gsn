@@ -4,17 +4,17 @@
         <unique-timestamps>false</unique-timestamps>
 		<init-params>
             <param name="persistant">true</param>
-	    	<param name="scriptlet" />
+	    	<param name="scriptlet">
 				<![CDATA[
-		    		VCCCH1 = 2 * PAYLOAD_VCCCH1;
-		    		VCCCH2 = 2 * PAYLOAD_VCCCH2;
-		    		VCCADC = PAYLOAD_VCCADC;
-		    		REFADC = 2 * PAYLOAD_REFADC;
-		    		VCCOPA = 2 * PAYLOAD_VCCOPA;
-	  	    		VCC55V = 1.83 * PAYLOAD_VCC55V;
-	 	    		I12V = 0;
-		    		I55VANALOG = 0;
-		    		I55VDIGITAL = 0;
+		    		if (PAYLOAD_VCCCH1 != null) { VCCCH1 = 2 * PAYLOAD_VCCCH1 };
+		    		if (PAYLOAD_VCCCH2 != null) { VCCCH2 = 2 * PAYLOAD_VCCCH2 };
+		    		if (PAYLOAD_VCCADC != null) { VCCADC = PAYLOAD_VCCADC };
+		    		if (PAYLOAD_REFADC != null) { REFADC = 2 * PAYLOAD_REFADC };
+		    		if (PAYLOAD_VCCOPA != null) { VCCOPA = 2 * PAYLOAD_VCCOPA };
+	  	    		if (PAYLOAD_VCC55V != null) { VCC55V = 1.83 * PAYLOAD_VCC55V };
+	 	    		I12V = PAYLOAD_I12V;
+		    		I55VANALOG = PAYLOAD_I55VANALOG;
+		    		I55VDIGITAL = PAYLOAD_I55VDIGITAL;
 		    		SDEVENTSFREE = PAYLOAD_SDEVENTSFREE;
 		    		DAQPOWERSTATE = PAYLOAD_DAQPOWERSTATE;
 				]]>
