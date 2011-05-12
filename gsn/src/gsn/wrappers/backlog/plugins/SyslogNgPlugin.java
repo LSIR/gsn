@@ -23,7 +23,7 @@ public class SyslogNgPlugin extends AbstractPlugin {
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
-			new DataField("LOG_MESSAGE", "VARCHAR(2048)")};
+			new DataField("LOG_MESSAGE", "BINARY")};
 
 	private final transient Logger logger = Logger.getLogger( SyslogNgPlugin.class );
 
