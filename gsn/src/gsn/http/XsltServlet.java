@@ -92,9 +92,10 @@ public class XsltServlet extends HttpServlet {
         	query = new StringBuilder( ).append( prefix ).append( vsName ).append(" where timed = (select max(timed) from " ).append(vsName).append(")");
         	// 	TODO : Check to see if the requested column exists.
         	Connection conn = null;
+            ResultSet rs = null;
         	try {
         		conn = Main.getStorage(vsName).getConnection();
-        		ResultSet rs = Main.getStorage(vsName).getBinaryFieldByQuery( query , colName , null ,conn);
+        		rs = Main.getStorage(vsName).getBinaryFieldByQuery( query , colName , null ,conn);
         		if ( !rs.next() ) {
         			res.sendError( HttpServletResponse.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
         		}else {
@@ -128,6 +129,7 @@ public class XsltServlet extends HttpServlet {
         		logger.error(e1.getMessage(),e1);
         		logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
         	}finally{
+        		Main.getStorage(vsName).close(rs);
         		Main.getStorage(vsName).close(conn);
         	}
         }

@@ -150,8 +150,9 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                 logger.debug("Query for getting oldest timestamp : " + query);
             }
             Connection conn = null;
+            ResultSet resultSet = null;
             try {
-            	ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
+            	resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
                 if (resultSet.next()) {
                     timed2 = resultSet.getLong(1);
                 } else {
@@ -160,6 +161,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);
             } finally {
+            	Main.getWindowStorage().close(resultSet);
                	Main.getWindowStorage().close(conn);
             }
         }

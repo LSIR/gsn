@@ -89,7 +89,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     			DataUpdateThreadPool.add(new Thread("DataUpdateThread "+i) {
 
     				private HashMap<StorageManager, Connection> connections = new HashMap<StorageManager, Connection>();
-    				private Connection getPersistantConnection(VSensorConfig config) throws Exception {
+    				private Connection getPersistantConnection(VSensorConfig config) throws SQLException {
     					StorageManager sm = Main.getStorage(config);
 
     					Connection c = connections.get(sm);
@@ -133,23 +133,24 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     									prepareStatement.setLong(1, listener.request.getStartTime());
     									//prepareStatement.setLong(1, listener.getLastVisitedPk());
     									listener.delivery_count =  new Integer(prepareStatement.getMaxRows());
-    								} catch (Exception e) {
+    								} catch (SQLException e) {
+    									Main.getStorage(listener.request.getVSensorConfig()).close(prepareStatement);
     									logger.error(e.getMessage(), e);
     									throw new RuntimeException(e);
     								}
     								dataEnum = new DataEnumerator(Main.getStorage(listener.request.getVSensorConfig().getName()), prepareStatement, false, true);
     								synchronized (MyListeners) {
+    									listener.dataEnum = dataEnum;
+										listener.statement = prepareStatement;
     									if (!listener.removed) {
     										if (dataEnum.hasMoreElements()) {
     											logger.debug("Fetching data done for listener: " + listener.request.toString()+".");
-    											listener.dataEnum = dataEnum;
-    											listener.statement = prepareStatement;
     											DataDistributerQueue.add(listener);
     											listener.current_queue = DataDistributerQueue;
     										}
     										else { // no new data found
+    											listener.releaseResources();
     											logger.debug("Fetching data done, empty resultset. listener: " + listener.request.toString()+".");
-    											prepareStatement.close();
     											// try again if there was an error or when the check flag is set
     											if (dataEnum.hadError() || listener.check_for_new_data) {
     												DataUpdateQueue.put(listener);
@@ -162,16 +163,16 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     										}
     									}
     									else {
-    										prepareStatement.close();
+    										listener.releaseResources();
     									}
     								}
     							} catch (InterruptedException e) {
     								logger.error(e.getMessage(), e);
-    							} catch (SQLException e) {
-    								logger.error(e.getMessage());
     							}
     					}catch (RuntimeException e) {
-    						logger.error(e.getMessage());
+    						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    						e.printStackTrace(new PrintStream(baos));
+    						logger.error(baos.toString());
     					}
     				}
     			});
@@ -291,33 +292,27 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     				synchronized (MyListeners) {
     					if (listener.removed) {
     						i.remove();
-    						try {
-    							listener.statement.close();
-    						} catch (SQLException e) {
-    							logger.error(e.getMessage());
-    						}
+    						listener.releaseResources();
     						continue;
     					}
     				}
     				if (!listener.dataEnum.hasMoreElements()) {
     					synchronized (MyListeners) {
     						i.remove();
-   							try {
-   								listener.statement.close();
-   							} catch (SQLException e) {
-   								logger.error(e.getMessage());
-   							}
+    						listener.releaseResources();
        						if (listener.removed)
     							continue;
-    						listener.current_queue = null;
-    						logger.debug("deliverycount = "+ listener.delivery_count);
-    						if (listener.delivery_count==0) {
-    							logger.debug("reached maxrows, look for new data for [Listener: "+listener.request.toString()+"]");
-    							listener.current_queue = DataUpdateQueue;
-    							DataUpdateQueue.add(listener);
-    						}
-    						if (listener.check_for_new_data) {
-    							logger.debug("new data available, look for new data for [Listener: "+listener.request.toString()+"]");
+       						listener.current_queue = null;
+       						if (logger.isDebugEnabled()) {
+       							logger.debug("deliverycount = "+ listener.delivery_count);
+       							if (listener.delivery_count==0) {
+       								logger.debug("reached maxrows, look for new data for [Listener: "+listener.request.toString()+"]");
+       							}
+       							if (listener.check_for_new_data) {
+       								logger.debug("new data available, look for new data for [Listener: "+listener.request.toString()+"]");
+       							}    						
+       						}
+    						if (listener.delivery_count==0 || listener.check_for_new_data) {
     							listener.check_for_new_data = false;
     							listener.current_queue = DataUpdateQueue;
     							DataUpdateQueue.add(listener);
@@ -330,11 +325,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     						i.remove();
     						synchronized (MyListeners) {
    								removeListenerEntry(listener);
-    							try {
-    								listener.statement.close();
-    							} catch (SQLException e) {
-    								logger.error(e.getMessage());
-    							}
+   								listener.releaseResources();
     						}
     					}
     					else {
@@ -444,6 +435,14 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     	
     	public ListenerEntry(DistributionRequest request) {
     		this.request = request;
+    	}
+    	
+    	public void releaseResources() {
+    		// close datenum
+    		if (dataEnum != null)
+    			dataEnum.close();
+    		// close statement
+    		Main.getStorage(request.getVSensorConfig()).close(statement);
     	}
     }
 }

@@ -28,6 +28,8 @@ public class DataEnumerator implements DataEnumeratorIF {
 	private transient Logger logger                   = Logger.getLogger( DataEnumerator.class );
 
 	private ResultSet        resultSet                = null;
+	private PreparedStatement preparedStatement		  = null;
+	private java.sql.Connection connection	  = null;
 
 	private String [ ]       dataFieldNames;
 
@@ -93,6 +95,8 @@ public class DataEnumerator implements DataEnumeratorIF {
 		Vector < Byte > fieldTypes = new Vector < Byte >( );
 		try {
 			this.resultSet = preparedStatement.executeQuery( );
+			this.preparedStatement = preparedStatement;
+			this.connection = preparedStatement.getConnection();
 			hasNext = resultSet.next( );
 			// Initializing the fieldNames and fieldTypes.
 			// Also setting the values for <code> hasTimedFieldInResultSet</code>
@@ -201,27 +205,16 @@ public class DataEnumerator implements DataEnumeratorIF {
 
 	public void close ( ) {
 		this.hasNext = false;
-		if(resultSet == null)
-			return;
-		try {
-			if (!manualCloseConnection && resultSet.getStatement() != null) {
-                java.sql.Statement s = resultSet.getStatement();
-                java.sql.Connection c = s.getConnection();
-                String tableName = resultSet.getMetaData().getTableName(1);
-                storageManager.close(resultSet);
-                storageManager.closeStatement(s);
-                storageManager.close(c);
-                resultSet = null;
-            }else {
-				try {
-					resultSet.close();
-				}catch (SQLException e) {
-					logger.debug(e.getMessage(),e);
-				}
-			}
-
-		} catch (SQLException e) {
-			logger.error(e.getMessage(),e);
+		if (!manualCloseConnection) {
+			storageManager.close(resultSet);
+			storageManager.close(preparedStatement);
+			storageManager.close(connection);
+			resultSet = null;
+			preparedStatement = null;
+			connection = null;
+		}else {
+			storageManager.close(resultSet);
+			resultSet = null;
 		}
 	}
 

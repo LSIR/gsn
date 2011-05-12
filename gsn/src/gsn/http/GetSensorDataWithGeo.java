@@ -195,11 +195,11 @@ public class GetSensorDataWithGeo {
         String reformattedQuery = reformatQuery(query, matchingSensors);
         StringBuilder sb = new StringBuilder();
         Connection connection = null;
-
+        ResultSet results = null;
         try {
             connection = Main.getDefaultStorage().getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            ResultSet results = statement.executeQuery(reformattedQuery);
+            results = statement.executeQuery(reformattedQuery);
             ResultSetMetaData metaData;    // Additional information about the results
             int numCols, numRows;          // How many rows and columns in the table
             metaData = results.getMetaData();       // Get metadata on them
@@ -238,6 +238,7 @@ public class GetSensorDataWithGeo {
         catch (SQLException e) {
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
+        	Main.getDefaultStorage().close(results);
             Main.getDefaultStorage().close(connection);
         }
 

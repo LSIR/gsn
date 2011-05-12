@@ -118,13 +118,15 @@ public abstract class StorageManager {
         StringBuilder query = null;
         long timedToRemove = -1;
         Connection conn = null;
+        ResultSet rs = null;
         try {
-            ResultSet rs = Main.getStorage(virtualSensorName).executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName), conn = Main.getStorage(virtualSensorName).getConnection());
+            rs = Main.getStorage(virtualSensorName).executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName), conn = Main.getStorage(virtualSensorName).getConnection());
             if (rs.next())
                 timedToRemove = rs.getLong(1);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } finally {
+        	Main.getStorage(virtualSensorName).close(rs);
             Main.getStorage(virtualSensorName).close(conn);
         }
         query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed < ").append(timedToRemove);
@@ -267,15 +269,17 @@ public abstract class StorageManager {
     public boolean isThereAnyResult(StringBuilder sqlQuery) {
         boolean toreturn = false;
         Connection connection = null;
+        ResultSet resultSet = null;
         try {
             connection = getConnection();
             PreparedStatement prepareStatement = connection.prepareStatement(
                     sqlQuery.toString());
-            ResultSet resultSet = prepareStatement.executeQuery();
+            resultSet = prepareStatement.executeQuery();
             toreturn = resultSet.next();
         } catch (SQLException error) {
             logger.error(error.getMessage(), error);
         } finally {
+        	close(resultSet);
             close(connection);
         }
         return toreturn;
@@ -440,7 +444,6 @@ public abstract class StorageManager {
         StringBuilder sql = getStatementCreateTable(tableName, structure, connection);
         if (logger.isDebugEnabled())
             logger.debug(new StringBuilder().append("The create table statement is : ").append(sql).toString());
-
         PreparedStatement prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
         prepareStatement.close();
@@ -803,7 +806,7 @@ public abstract class StorageManager {
 
     /**
      * Obtains the default database connection.
-     * The conneciton comes from the data source which is configured through gsn.xml file.
+     * The connection comes from the data source which is configured through gsn.xml file.
      * @return
      * @throws SQLException
      */
@@ -829,11 +832,11 @@ public abstract class StorageManager {
     public long getTimeDifferenceInMillis() {
         String query = getStatementDifferenceTimeInMillis();
         Connection connection = null;
+        ResultSet resultSet = null;
         try {
             connection = getConnection();
             PreparedStatement prepareStatement = connection.prepareStatement(query);
             long time1 = System.currentTimeMillis();
-            ResultSet resultSet;
             resultSet = prepareStatement.executeQuery();
             resultSet.next();
             long time2 = System.currentTimeMillis();
@@ -841,6 +844,7 @@ public abstract class StorageManager {
         } catch (SQLException error) {
             logger.error(error.getMessage(), error);
         } finally {
+        	close(resultSet);
             close(connection);
         }
         return 0;

@@ -86,6 +86,7 @@ public class DownloadReport extends AbstractDataRequest {
 		Collection<Stream> streams = null;
 		// create all the streams for this Virtual Sensor
 		Connection connection = null;
+		ResultSet rs = null;
 		
 		try {
 			// Get the last update for this Virtual Sensor (In GSN, all the Virtual Sensor streams are inserted in the same record)
@@ -95,7 +96,7 @@ public class DownloadReport extends AbstractDataRequest {
 
 			// Create the streams
 			connection = Main.getStorage(vsname).getConnection();
-			ResultSet rs = Main.getStorage(vsname).executeQueryWithResultSet(qbuilder.getSqlQueries().get(vsname), connection);
+			rs = Main.getStorage(vsname).executeQueryWithResultSet(qbuilder.getSqlQueries().get(vsname), connection);
 			ResultSetMetaData rsmd = rs.getMetaData();
 
 			Hashtable<String, Stream> dataStreams = new Hashtable<String, Stream> () ;
@@ -135,6 +136,7 @@ public class DownloadReport extends AbstractDataRequest {
 			logger.debug("The query: ",e);
 			return null;
 		}finally{
+			Main.getStorage(vsname).close(rs);
 			Main.getStorage(vsname).close(connection);
 		}
 		//

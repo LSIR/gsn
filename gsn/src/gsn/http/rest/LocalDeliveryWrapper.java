@@ -67,13 +67,15 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		long lastVisited = -1;
 		if (startTime.equals("continue")) {
 			Connection conn = null;
+			ResultSet rs = null;
 			try {
 				conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
 				
-				ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
+				rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
 				if (rs.next()) {
 					StringBuilder dbquery = new StringBuilder();
 					dbquery.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
+					Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
 
 					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(dbquery, conn);
 					if (rs.next()) {
@@ -83,6 +85,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
+				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
 				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
 			}
 		} else if (startTime.startsWith("-")) {

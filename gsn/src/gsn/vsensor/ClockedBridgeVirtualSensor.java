@@ -64,10 +64,10 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 		logger.warn("select max(timed) from "+output_table_name);
 
 		Connection connection = null;
-
+		ResultSet rs = null;
 		try {
 			connection = Main.getStorage(output_table_name).getConnection();
-			ResultSet rs = Main.getStorage(output_table_name).executeQueryWithResultSet(query, connection);
+			rs = Main.getStorage(output_table_name).executeQueryWithResultSet(query, connection);
 			if (rs.next()) {
 				Long i = rs.getLong(1); // get result from first column (1)
 				logger.warn("LAST UPDATE: "+ Long.toString(i));
@@ -76,6 +76,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 		} finally {
+			Main.getStorage(output_table_name).close(rs);
 			Main.getStorage(output_table_name).close(connection);
 		}
 

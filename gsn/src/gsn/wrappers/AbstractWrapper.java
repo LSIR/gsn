@@ -304,6 +304,7 @@ public abstract class AbstractWrapper extends Thread {
         if (listeners.size() == 0)
 			return false;
         Connection conn = null;
+        ResultSet rs = null;
 		try {
 			// Checks if the stream element is out of order
             if (lastInOrderTimestamp == null) {
@@ -311,7 +312,7 @@ public abstract class AbstractWrapper extends Thread {
                 StringBuilder query = new StringBuilder();
 				query.append("select max(timed) from ").append(aliasCodeS);
 
-				ResultSet rs = Main.getWindowStorage().executeQueryWithResultSet(query,
+				rs = Main.getWindowStorage().executeQueryWithResultSet(query,
 						conn);
 				if (rs.next()) {
 					lastInOrderTimestamp = rs.getLong(1);
@@ -321,6 +322,7 @@ public abstract class AbstractWrapper extends Thread {
 			}
             return (se.getTimeStamp() <= lastInOrderTimestamp);
 		} finally {
+			Main.getWindowStorage().close(rs);
 			Main.getWindowStorage().close(conn);
 		}
     }

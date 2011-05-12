@@ -100,14 +100,16 @@ public class RestRemoteWrapper extends AbstractWrapper {
 	        String startTime = getActiveAddressBean().getPredicateValue("start-time");
 			if (startTime != null && startTime.equals("continue")) {
 				Connection conn = null;
+				ResultSet rs = null;
 				try {
 					conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
 	
 					// check if table already exists
-					ResultSet rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
+					rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
 					if (rs.next()) {
 						StringBuilder query = new StringBuilder();
 						query.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
+						Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
 						rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
 						if (rs.next()) {
 							lastReceivedTimestamp = rs.getLong(1);
@@ -119,6 +121,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 					logger.error(e.getMessage(), e);
 					return false;
 				} finally {
+					Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
 					Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
 				}
 			} else if (startTime != null && startTime.startsWith("-")) {

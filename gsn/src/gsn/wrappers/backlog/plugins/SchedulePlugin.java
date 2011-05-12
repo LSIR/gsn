@@ -64,12 +64,13 @@ public class SchedulePlugin extends AbstractPlugin {
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		if (((Byte)data[0]) == GSN_TYPE_GET_SCHEDULE) {
 			Connection conn = null;
+			ResultSet rs = null;
 			try {
 				// get the newest schedule from the SQL database
 				conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
 				StringBuilder query = new StringBuilder();
 				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" order by timed desc limit 1");
-				ResultSet rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+				rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
 				
 				if (rs.next()) {
 					// get the creation time of the newest schedule
@@ -125,6 +126,7 @@ public class SchedulePlugin extends AbstractPlugin {
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			} finally {
+				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
 				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
 			}
 			return true;

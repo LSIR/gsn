@@ -123,8 +123,9 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 				logger.debug("Query1 for getting oldest timestamp : " + query);
 			}
 			Connection conn = null;
+			ResultSet resultSet = null;
 			try {
-				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn = Main.getWindowStorage().getConnection());
+				resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn = Main.getWindowStorage().getConnection());
 				if (resultSet.next()) {
 					timed1 = resultSet.getLong(1);
 				} else {
@@ -133,6 +134,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
+				Main.getWindowStorage().close(resultSet);
 				Main.getWindowStorage().close(conn);
 			}
 		}
@@ -151,8 +153,9 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 				logger.debug("Query2 for getting oldest timestamp : " + query);
 			}
 			Connection conn = null;
+			ResultSet resultSet = null;
 			try {
-				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
+				resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
 				if (resultSet.next()) {
 					timed2 = resultSet.getLong(1);
 				} else {
@@ -161,6 +164,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
+				Main.getWindowStorage().close(resultSet);
 				Main.getWindowStorage().close(conn);
 			}
 		}
