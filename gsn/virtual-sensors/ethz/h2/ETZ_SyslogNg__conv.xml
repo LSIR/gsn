@@ -25,7 +25,7 @@
             <field name="PRIORITY" type="SMALLINT" />
             <field name="HOST" type="VARCHAR(256)" />
             <field name="PROGRAM" type="VARCHAR(256)" />
-            <field name="MESSAGE" type="BINARY" />
+            <field name="MESSAGE" type="VARCHAR(4096)" />
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>

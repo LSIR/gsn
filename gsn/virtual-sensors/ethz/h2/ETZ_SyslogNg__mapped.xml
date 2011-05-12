@@ -10,7 +10,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-            <field name="LOG_MESSAGE" type="BINARY" />
+            <field name="LOG_MESSAGE" type="VARCHAR(4096)" />
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
