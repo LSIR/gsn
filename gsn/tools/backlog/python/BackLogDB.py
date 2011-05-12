@@ -285,7 +285,6 @@ class BackLogDBClass(Thread, Statistics):
                 if not rows:
                     if logresend:
                         self._logger.info('all packets are sent')
-                    self._isBusy = False
                     self._backlogMain.schedulehandler.backlogResendFinished()
                     break
 
@@ -308,7 +307,6 @@ class BackLogDBClass(Thread, Statistics):
                             self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
                     else:
                         self._logger.info('resend interrupted')
-                        self._isBusy = False
                         self._backlogMain.schedulehandler.backlogResendFinished()
                         interrupt = True
                         break
@@ -320,9 +318,9 @@ class BackLogDBClass(Thread, Statistics):
                 if self._backlogMain.gsnpeer.isConnected() and not self._waitForAck.isSet():
                     self._logger.debug('resent message (%d,%d,%d) has not been acknowledged whithin %f seconds' % (msgType, timestamp, len(message), MAX_WAIT_FOR_ACK))
                 if not self._backlogMain.gsnpeer.isConnected() or self._stopped:
-                    self._isBusy = False
                     break
 
+            self._isBusy = False
             self._resend.clear()
 
         self._logger.info('died')
