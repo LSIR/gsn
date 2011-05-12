@@ -6,10 +6,11 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                    def spl = LOG_MESSAGE.split(" ", 6);
+                    def spl = LOG_MESSAGE.strip().split("\s+", 7);
                     PRIORITY = spl[0].substring(1, spl[0].length()-1).toShort();
                     HOST = spl[4];
-                    MESSAGE = spl[5];
+                    PROGRAM = spl[5].substring(0, spl[5].length()-1);
+                    MESSAGE = spl[6];
                 ]]>
             </param>
         </init-params>
@@ -20,6 +21,7 @@
             
             <field name="PRIORITY" type="SMALLINT" />
             <field name="HOST" type="VARCHAR(256)" />
+            <field name="PROGRAM" type="VARCHAR(256)" />
             <field name="MESSAGE" type="VARCHAR(2048)" />
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
