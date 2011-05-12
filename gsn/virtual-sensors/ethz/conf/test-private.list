@@ -8,6 +8,9 @@ ETZ_Binary.xml
 ETZ_Dozer_AdcComDiff.xml
 ETZ_Dozer_AdcMux1.xml
 ETZ_Dozer_AdcMux2.xml
+ETZ_Dozer_AEDAQHealthData.xml
+ETZ_Dozer_AEData.xml
+ETZ_Dozer_AEStatistics.xml
 ETZ_Dozer_BaseDebug.xml
 ETZ_Dozer_BaseStatus.xml
 ETZ_Dozer_Command.xml
@@ -25,9 +28,6 @@ ETZ_Dozer_WXT520Prec.xml
 ETZ_Dozer_WXT520Sup.xml
 ETZ_Dozer_WXT520WindPth.xml
 ETZ_Dozer_WXT520Ident.xml
-ETZ_Dozer_AEDAQHealthData.xml
-ETZ_Dozer_AEData.xml
-ETZ_Dozer_AEStatistics.xml
 ETZ_GPS_RAW.xml
 ETZ_Schedule.xml
 ETZ_Statistics.xml

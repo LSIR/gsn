@@ -1,0 +1,65 @@
+<virtual-sensor name="ETZ_Dozer_AEDAQHealthData__conv" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+		<init-params>
+            <param name="persistant">true</param>
+	    	<param name="scriptlet" />
+				<![CDATA[
+		    		VCCCH1 = 2 * PAYLOAD_VCCCH1;
+		    		VCCCH2 = 2 * PAYLOAD_VCCCH2;
+		    		VCCADC = PAYLOAD_VCCADC;
+		    		REFADC = 2 * PAYLOAD_REFADC;
+		    		VCCOPA = 2 * PAYLOAD_VCCOPA;
+	  	    		VCC55V = 1.83 * PAYLOAD_VCC55V;
+	 	    		I12V = 0;
+		    		I55VANALOG = 0;
+		    		I55VDIGITAL = 0;
+		    		SDEVENTSFREE = PAYLOAD_SDEVENTSFREE;
+		    		DAQPOWERSTATE = PAYLOAD_DAQPOWERSTATE;
+				]]>
+	    	</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="VCCCH1" type="INTEGER" unit="mV"/>            
+            <field name="VCCCH2" type="INTEGER" unit="mV"/>
+            <field name="VCCADC" type="INTEGER" unit="mV"/>
+            <field name="REFADC" type="INTEGER" unit="mV"/>
+            <field name="VCCOPA" type="INTEGER" unit="mV"/>
+            <field name="VCC55V" type="INTEGER" unit="mV"/>
+            <field name="I12V" type="INTEGER" />
+            <field name="I55VANALOG" type="INTEGER" />
+            <field name="I55VDIGITAL" type="INTEGER" />
+            <field name="SDEVENTSFREE" type="BIGINT" />
+            <field name="DAQPOWERSTATE" type="SMALLINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerAEDAQHealthDataMsg) from ETZ deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+        <predicate key="type">PermaSense ETZ test deployment</predicate>
+        <predicate key="LATITUDE">47.377326</predicate>
+        <predicate key="LONGITUDE">8.552935</predicate>
+    </addressing>
+    <storage />
+    <streams>
+    	<stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_AEDAQHealthData__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>    
+    </streams>
+</virtual-sensor>

@@ -1,0 +1,63 @@
+<virtual-sensor name="ETZ_Dozer_AEData__conv" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+		<init-params>
+            <param name="persistant">true</param>
+	    	<param name="scriptlet" />
+				<![CDATA[
+		   			CHANNEL = (PAYLOAD_THRESHOLDCHANNEL % 2) - 1;
+	            	SERIAL = PAYLOAD_SERIAL;
+		    		STARTSAMPLE = 2 * PAYLOAD_STARTSAMPLE;
+		    		LENGTH = 2 * PAYLOAD_LENGTH;
+		    		RISETIME = 2 * PAYLOAD_RISETIME;
+		    		AMPLITUDE = 4.5 * PAYLOAD_AMPLITUDE / 65536;
+		    		COUNT = PAYLOAD_COUNT;
+		    		ENERGY = PAYLOAD_ENERGY * 20.25 / 8388608;
+		    		POSTTRIGGER = PAYLOAD_POSTTRIGGER;
+		    		THRESHOLD = Math.floor(PAYLOAD_THRESHOLDCHANNEL / 2);
+				]]>
+	    	</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="CHANNEL" type="SMALLINT" />
+            <field name="SERIAL" type="BIGINT" />            
+            <field name="STARTSAMPLE" type="BIGINT" unit="us"/>
+            <field name="LENGTH" type="INTEGER" unit="us" />
+            <field name="RISETIME" type="INTEGER" unit="us"/>
+            <field name="AMPLITUDE" type="INTEGER" unit="V"/>
+            <field name="COUNT" type="INTEGER" />
+            <field name="ENERGY" type="BIGINT" unit="V^2"/>
+            <field name="POSTTRIGGER" type="INTEGER" />
+	    	<field name="THRESHOLD" type="SMALLINT" unit="dB"/>
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerAEDataMsg) from ETZ deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing>
+        <predicate key="type">PermaSense ETZ test deployment</predicate>
+        <predicate key="LATITUDE">47.377326</predicate>
+        <predicate key="LONGITUDE">8.552935</predicate>
+    </addressing>
+    <storage />
+    <streams>
+    	<stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_AEData__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream> 
+    </streams>
+</virtual-sensor>
