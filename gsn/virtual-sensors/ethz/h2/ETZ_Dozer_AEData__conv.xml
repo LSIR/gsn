@@ -6,14 +6,14 @@
             <param name="persistant">true</param>
 	    	<param name="scriptlet">
 				<![CDATA[
-		   			if (PAYLOAD_THRESHOLDCHANNEL != null) { CHANNEL = (PAYLOAD_THRESHOLDCHANNEL % 2) - 1 as short };
+		   			if (PAYLOAD_THRESHOLDCHANNEL != null) { CHANNEL = ((PAYLOAD_THRESHOLDCHANNEL % 2) - 1) as short };
 	            	SERIAL = PAYLOAD_SERIAL;
 		    		if (PAYLOAD_STARTSAMPLE != null) { STARTSAMPLE = 2 * PAYLOAD_STARTSAMPLE };
 		    		if (PAYLOAD_LENGTH != null) { LENGTH = 2 * PAYLOAD_LENGTH };
 		    		if (PAYLOAD_RISETIME != null) { RISETIME = 2 * PAYLOAD_RISETIME };
-		    		if (PAYLOAD_AMPLITUDE != null) { AMPLITUDE = 4.5 * PAYLOAD_AMPLITUDE / 65536 as int };
+		    		if (PAYLOAD_AMPLITUDE != null) { AMPLITUDE = (4.5 * PAYLOAD_AMPLITUDE / 65536) as int };
 		    		COUNT = PAYLOAD_COUNT;
-		    		if (PAYLOAD_ENERGY != null) { ENERGY = PAYLOAD_ENERGY * 20.25 / 8388608 as long };
+		    		if (PAYLOAD_ENERGY != null) { ENERGY = (PAYLOAD_ENERGY * 20.25 / 8388608) as long };
 		    		POSTTRIGGER = PAYLOAD_POSTTRIGGER;
 		    		if (PAYLOAD_THRESHOLDCHANNEL != null) { THRESHOLD = Math.floor(PAYLOAD_THRESHOLDCHANNEL / 2) as short };
 				]]>
