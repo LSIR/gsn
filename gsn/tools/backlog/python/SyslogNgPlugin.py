@@ -71,7 +71,8 @@ class SyslogNgPluginClass(AbstractPluginClass):
                 self._clientSocket, addr = self._logSocket.accept()
                 self.debug('syslog-ng connected')
             except socket.error, e:
-                self.exception(e)
+                if not self._stopped:
+                    self.exception(e)
                 break
                 
             
