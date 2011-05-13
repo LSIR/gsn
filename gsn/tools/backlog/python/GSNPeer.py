@@ -709,9 +709,10 @@ class GSNWriter(Thread):
         if self._gsnListener._connected and not self._gsnWriterStop:
             try:
                 self._sendqueue.put_nowait((priority, msg))
+                return True
             except Queue.Full:
                 self._logger.warning('send queue is full')
-                return true
+                return True
             except Exception, e:
                 self.exception(e)
         return False
