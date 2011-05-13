@@ -8,7 +8,7 @@
             <param name="scriptlet">
                 <![CDATA[
                     if ( ! isdef('positionMap')) { positionMap = [:]; }
-                    if (POSITION != null) { positionMap.put(POSITION, System.currentTimeMillis()); }
+                    if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
                 ]]>
             </param>
             <param name="period">3600000</param>
@@ -22,6 +22,7 @@
                     def mailrecipients = ["tgsell@tik.ee.ethz.ch", "yuecel@tik.ee.ethz.ch", "beutel@tik.ee.ethz.ch"];
                     
                     if ( isdef('positionMap')) {
+                    	def rmlist = [];
                     	for (entry in positionMap) {
                         	def timeDifference = System.currentTimeMillis() - entry.value;
                         	def timeDifferenceOffset = timeDifferenceOffsetDefault;
@@ -35,9 +36,10 @@
 
 								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
-                        		entry.remove();
+                        		rmlist.add(entry.key)
                         	}
                         }
+                        deviceIdMap.keySet().removeAll( rmlist as Set );
                     }
                 ]]>
             </param>

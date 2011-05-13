@@ -7,7 +7,7 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                	if (POSITION != null) {
+                	if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
                     // the mail recipients for error and exception counter increase
                     def mailrecipients = ["tgsell@tik.ee.ethz.ch"];
                     
@@ -17,7 +17,7 @@
                 			if ( ERROR_COUNTER > lastErrorCounterMap.get(POSITION)[0] ) {
                         		// Notify by email
                         		def emailTitle = "[PermaSense-GSN-Test] - ERROR: BackLog error counter increased (vs=" + vsname + ", pos=" + POSITION + ")";
-                        		def emailContent = "ERROR: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(POSITION)[0]) + " to " + ERROR_COUNTER + " on position " + POSITION + " at " + vsname + ".";
+                        		def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "]: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(POSITION)[0]) + " to " + ERROR_COUNTER + " on position " + POSITION + " at " + vsname + ".;
 
 								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
@@ -32,7 +32,7 @@
                 			if ( EXCEPTION_COUNTER > lastExceptionCounterMap.get(POSITION)[0] ) {
                         		// Notify by email
                         		def emailTitle = "[PermaSense-GSN-Test] - EXCEPTION: BackLog exception counter increased (vs=" + vsname + ", pos=" + POSITION + ")";
-                        		def emailContent = "EXCEPTION: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(POSITION)[0]) + " to " + EXCEPTION_COUNTER + " on position " + POSITION + " at " + vsname + ".";
+                        		def emailContent = "EXCEPTION [" + (new Date(GENERATION_TIME)).getDateTimeString() + "]: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(POSITION)[0]) + " to " + EXCEPTION_COUNTER + " on position " + POSITION + " at " + vsname + ".";
 
 								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
@@ -57,6 +57,7 @@
                     def mailrecipients = ["tgsell@tik.ee.ethz.ch"];
                     
                     if ( isdef('positionMap')) {
+                    	def rmlist = [];
                     	for (entry in positionMap) {
                         	def timeDifference = System.currentTimeMillis() - entry.value;
                         	def timeDifferenceOffset = timeDifferenceOffsetDefault;
@@ -70,9 +71,10 @@
 
 								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
-                        		entry.remove();
+                        		rmlist.add(entry.key)
                         	}
                         }
+                        deviceIdMap.keySet().removeAll( rmlist as Set );
                     }
                 ]]>
             </param>
