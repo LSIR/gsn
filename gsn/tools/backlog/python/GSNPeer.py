@@ -614,6 +614,7 @@ class GSNWriter(Thread):
         while not self._gsnWriterStop:
             msg = self._sendqueue.get()[1]
             if self._gsnWriterStop:
+                self._sendqueue.task_done()
                 break
         
             if isinstance(msg, BackLogMessage.BackLogMessageClass):
@@ -665,6 +666,7 @@ class GSNWriter(Thread):
 
     def stop(self):
         self._gsnWriterStop = True
+        self.emptyQueue()
         try:
             self._sendqueue.put_nowait((0, BackLogMessage.BackLogMessageClass()))
         except Queue.Full:
@@ -706,11 +708,12 @@ class GSNWriter(Thread):
         assert self._sendqueue.not_empty != True
         if self._gsnListener._connected and not self._gsnWriterStop:
             try:
-                self._sendqueue.put((priority, msg))
+                self._sendqueue.put_nowait((priority, msg))
+            except Queue.Full:
+                self._logger.warning('send queue is full')
+                return true
             except Exception, e:
                 self.exception(e)
-            else:
-                return True
         return False
 
 

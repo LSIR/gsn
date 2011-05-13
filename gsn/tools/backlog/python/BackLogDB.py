@@ -78,7 +78,6 @@ class BackLogDBClass(Thread, Statistics):
         # thread lock to coordinate access to the database
         self._dblock = Lock()
         self._resend = Event()
-        self._sleepEvent = Event()
         self._waitForAck = Event()
         self._ackLock = Lock()
         self._resentMsgIdentifier = [None, None]
@@ -261,8 +260,6 @@ class BackLogDBClass(Thread, Statistics):
             self._resend.wait()
             if self._stopped:
                 break
-            if self._stopped:
-                break
 
             timestamp = 0
             
@@ -351,7 +348,6 @@ class BackLogDBClass(Thread, Statistics):
         self._isBusy = False
         self._stopped = True
         self._resend.set()
-        self._sleepEvent.set()
         self._waitForAck.set()
         self._resendtimer.stop()
         self._logger.info('stopped')
