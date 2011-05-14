@@ -213,8 +213,8 @@ public class GetSensorDataWithGeo {
             //System.out.println("* Executing query *\n" + reformattedQuery + "\n***");
 
             // headers
-            sb.append("# Query: " + query + NEWLINE);
-            sb.append("# Reformatted: " + reformattedQuery + NEWLINE);
+            //sb.append("# Query: " + query + NEWLINE);
+            sb.append("# Query: " + reformattedQuery.replaceAll("\n","\n# ") + NEWLINE);
 
             sb.append("# ");
             //System.out.println("ncols: " + numCols);
@@ -239,64 +239,6 @@ public class GetSensorDataWithGeo {
                         sb.append(s).append(SEPARATOR);
                     else
                         sb.append(s);
-                }
-                sb.append(NEWLINE);
-            }
-        } catch (SQLException e) {
-            sb.append("ERROR in execution of query: " + e.getMessage());
-        } finally {
-            Main.getDefaultStorage().close(connection);
-        }
-
-        return sb.toString();
-    }
-
-    /*
-    * Execute query against a list of sensors
-    *
-    * */
-    public static String executeQueryWithUnionFormatted(String envelope, String query, String matchingSensors, String format, String union) throws ParseException {
-
-        //String matchingSensors = getListOfSensorsAsString(envelope);
-        String reformattedQuery = reformatQuery(query, matchingSensors);
-        StringBuilder sb = new StringBuilder();
-        Connection connection = null;
-
-        try {
-            connection = Main.getDefaultStorage().getConnection();
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            ResultSet results = statement.executeQuery(reformattedQuery);
-            ResultSetMetaData metaData;    // Additional information about the results
-            int numCols, numRows;          // How many rows and columns in the table
-            metaData = results.getMetaData();       // Get metadata on them
-            numCols = metaData.getColumnCount();    // How many columns?
-            results.last();                         // Move to last row
-            numRows = results.getRow();             // How many rows?
-
-            String s;
-
-            // headers
-            sb.append("# Query: " + query + NEWLINE);
-            sb.append("# Reformatted: " + reformattedQuery + NEWLINE);
-
-            sb.append("# ");
-            for (int col = 0; col < numCols; col++) {
-                sb.append(metaData.getColumnLabel(col + 1));
-                if (col < numCols - 1)
-                    sb.append(SEPARATOR);
-            }
-            sb.append(NEWLINE);
-
-            for (int row = 0; row < numRows; row++) {
-                results.absolute(row + 1);                // Go to the specified row
-                for (int col = 0; col < numCols; col++) {
-                    Object o = results.getObject(col + 1); // Get value of the column
-                    if (o == null)
-                        s = "null";
-                    else
-                        s = o.toString();
-                    if (col < numCols - 1)
-                        sb.append(s).append(SEPARATOR);
                 }
                 sb.append(NEWLINE);
             }

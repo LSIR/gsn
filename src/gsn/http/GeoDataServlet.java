@@ -22,6 +22,7 @@ public class GeoDataServlet extends HttpServlet {
     private boolean usePostGIS = true; // by default use JTS
     private User user = null;
     private boolean useUnion;
+    private boolean debugMode;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -40,6 +41,12 @@ public class GeoDataServlet extends HttpServlet {
             String env = HttpRequestUtils.getStringParameter("env", null, request); // e.g. "POLYGON ((0 0, 0 100, 100 100, 100 0, 0 0))";
             String query = HttpRequestUtils.getStringParameter("query", null, request);
             String union = HttpRequestUtils.getStringParameter("union", null, request);
+            String debug = HttpRequestUtils.getStringParameter("debug", null, request);
+
+            if (debug!= null && debug.trim().toLowerCase().compareTo("true") == 0)
+                debugMode = true;
+            else
+                debugMode = false;
 
             if (union != null)
                 useUnion = true;
@@ -79,16 +86,19 @@ public class GeoDataServlet extends HttpServlet {
 
         GetSensorDataWithGeo.buildGeoIndex();
 
-        response.append("List of all sensors: \n" + GetSensorDataWithGeo.getListOfSensors() + "\n");
-        response.append("Envelope: " + env + "\n");
 
         ArrayList<String> sensors = GetSensorDataWithGeo.getListOfSensors(env);
         String matchingSensors = getMatchingSensors(sensors);
 
-        response.append("List of all sensors within envelope: \n" + matchingSensors + "\n");
+        if (debugMode) {
+            response.append("# List of all sensors: \n# " + GetSensorDataWithGeo.getListOfSensors().replaceAll("\n","\n# ") + "\n");
+            response.append("# Envelope: " + env + "\n");
 
-        response.append("Query:" + query + "\n");
-        response.append("Query result: \n");
+            response.append("# List of all sensors within envelope: \n# " + matchingSensors + "\n");
+
+            response.append("# Query:" + query + "\n");
+            response.append("# Result: \n");
+        }
         if (useUnion)
             response.append(GetSensorDataWithGeo.executeQueryWithUnion(env, matchingSensors.toString(), query, union));
         else
@@ -104,16 +114,18 @@ public class GeoDataServlet extends HttpServlet {
 
         GetSensorDataWithGeoPostGIS.buildGeoIndex();
 
-        response.append("List of all sensors: \n" + GetSensorDataWithGeoPostGIS.getListOfSensors() + "\n");
-        response.append("Envelope: " + env + "\n");
-
         ArrayList<String> sensors = GetSensorDataWithGeoPostGIS.getListOfSensors(env);
         String matchingSensors = getMatchingSensors(sensors);
 
-        response.append("List of all sensors within envelope: \n" + matchingSensors + "\n");
+        if (debugMode) {
+            response.append("# List of all sensors: \n# " + GetSensorDataWithGeoPostGIS.getListOfSensors().replaceAll("\n","\n# ") + "\n");
+            response.append("# Envelope: " + env + "\n");
 
-        response.append("Query:" + query + "\n");
-        response.append("Query result: \n");
+            response.append("# List of all sensors within envelope: \n" + matchingSensors + "\n");
+
+            response.append("# Query:" + query + "\n");
+            response.append("# Result: \n");
+        }
         if (useUnion)
             response.append(GetSensorDataWithGeoPostGIS.executeQueryWithUnion(env, matchingSensors.toString(), query, union));
         else

@@ -307,8 +307,8 @@ public class GetSensorDataWithGeoPostGIS {
             String s;
 
             // headers
-            sb.append("# Query: " + query + NEWLINE);
-            sb.append("# Reformatted: " + reformattedQuery + NEWLINE);
+            //sb.append("# Query: " + query + NEWLINE);
+            sb.append("# Query: " + reformattedQuery.replaceAll("\n","\n# ") + NEWLINE);
 
             sb.append("# ");
             for (int col = 0; col < numCols; col++) {
