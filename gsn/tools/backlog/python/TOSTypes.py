@@ -12,8 +12,6 @@ __source__      = "$URL$"
 '''
  The AM Msg Types
 '''
-AM_ALL = 'all'
-
 AM_CONTROLCOMMAND = 0x21
 AM_BEACONCOMMAND = 0x22
 

@@ -31,7 +31,8 @@ class TOSPluginClass(AbstractPluginClass):
     
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
-        self.registerTOSListener([TOSTypes.AM_ALL])
+        # register all possible AM types except AM_CONTROLCOMMAND and AM_BEACONCOMMAND
+        self.registerTOSListener([TOSTypes.AM_CONTROLCOMMAND ,TOSTypes.AM_BEACONCOMMAND], True)
         
         self._plugstop = False
         self._ready = False
@@ -51,8 +52,9 @@ class TOSPluginClass(AbstractPluginClass):
     def stop(self):
         self._ready = False
         self._plugstop = True
-        # send close queue cmd to access node
-        self._sendCloseQueueCommand()
+        if not self._backlogMain.shutdown:
+            # send close queue cmd to access node
+            self._sendCloseQueueCommand()
         self.deregisterTOSListener()
         self.info('stopped')
     

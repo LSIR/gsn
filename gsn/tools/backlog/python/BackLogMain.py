@@ -348,16 +348,26 @@ class BackLogMainClass(Thread, Statistics):
         self._tosPeerLock.release()
         
         
-    def registerTOSListener(self, listener, types):
+    def registerTOSListener(self, listener, types=[], excempted=False):
         self.instantiateTOSPeer()
-        for type in types:
+        if excempted:
+            tmp = range(0,256)
+            for type in types:
+                tmp.remove(type)
+        else:
+            tmp = types
+            
+        for type in tmp:
             listeners = self._tosListeners.get(type)
             if listeners == None:
                 self._tosListeners[type] = [listener]
             else:
                 listeners.append(listener)
                 self._tosListeners.update({type: listeners})
-        self._logger.info('%s registered as TOS listener (types %s)' % (listener.__class__.__name__, types))
+        if excempted:
+            self._logger.info('%s registered as TOS listener (listening to all types except %s)' % (listener.__class__.__name__, types))
+        else:
+            self._logger.info('%s registered as TOS listener (listening to types %s)' % (listener.__class__.__name__, types))
         
         
     def deregisterTOSListener(self, listener):
@@ -386,15 +396,8 @@ class BackLogMainClass(Thread, Statistics):
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug('received TOS message with AM type %s' % (type,))
             
-        alllisteners = self._tosListeners.get('all')
-        somelisteners = self._tosListeners.get(type)
-        if alllisteners != None and somelisteners != None:
-            listeners = alllisteners + somelisteners
-        elif alllisteners != None:
-            listeners = alllisteners
-        elif somelisteners != None:
-            listeners = somelisteners
-        else:
+        listeners = self._tosListeners.get(type)
+        if not listeners:
             self._logger.warning('There is no listener for TOS message with AM type %s.' % (type,))
             return False
         

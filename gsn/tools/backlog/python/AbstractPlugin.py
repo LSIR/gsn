@@ -195,7 +195,7 @@ class AbstractPluginClass(Thread, Statistics):
         return self._procMsg(self.getMsgType(), timestamp, payload, priority, backlogging)
     
     
-    def registerTOSListener(self, types):
+    def registerTOSListener(self, types, excempted=False):
         '''
         Register a plugin as a TOS listener.
         
@@ -203,11 +203,13 @@ class AbstractPluginClass(Thread, Statistics):
         After registering the specified TOS AM messages will be received with tosMsgReceived(...).
         
         @param types: A list containing all TOS AM types this listener is listening to.
-                      Can be ['all'] if it is listening to all TOS AM types.
+        
+        @param excempted: if set to True all TOS AM types will be listened to except the ones
+                          specified in types.
         
         @raise Exception: if the TOSPeerClass can not be started.
         '''
-        self._backlogMain.registerTOSListener(self, types)
+        self._backlogMain.registerTOSListener(self, types, excempted)
     
     
     def deregisterTOSListener(self):
