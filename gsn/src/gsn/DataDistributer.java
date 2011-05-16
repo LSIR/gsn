@@ -140,8 +140,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     								}
     								dataEnum = new DataEnumerator(Main.getStorage(listener.request.getVSensorConfig().getName()), prepareStatement, false, true);
     								synchronized (MyListeners) {
-    									listener.dataEnum = dataEnum;
-										listener.statement = prepareStatement;
+    									listener.setResources(dataEnum, prepareStatement);
     									if (!listener.removed) {
     										if (dataEnum.hasMoreElements()) {
     											logger.debug("Fetching data done for listener: " + listener.request.toString()+".");
@@ -426,9 +425,9 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     private class ListenerEntry {
     	DistributionRequest request;
     	Integer delivery_count = 0;
-    	PreparedStatement statement = null;
+    	private PreparedStatement statement = null;
     	String query = null;
-    	DataEnumerator dataEnum = null;
+    	private DataEnumerator dataEnum = null;
     	Boolean check_for_new_data = false; // indicates that new data may had become available during fetching or delivering data
     	Boolean removed = false; // indicates whether this listener has been removed 
     	Collection<ListenerEntry> current_queue = null;    	
@@ -437,7 +436,13 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     		this.request = request;
     	}
     	
-    	public void releaseResources() {
+    	public void setResources(DataEnumerator dataEnum,
+				PreparedStatement prepareStatement) {
+    		this.dataEnum = dataEnum;
+    		this.statement = prepareStatement;
+		}
+
+		public void releaseResources() {
     		// close datenum
     		if (dataEnum != null)
     			dataEnum.close();
