@@ -76,7 +76,8 @@ public class GeoDataServlet extends HttpServlet {
                 matchingSensors.append(GetSensorDataWithGeo.SEPARATOR);
             }
         }
-        matchingSensors.setLength(matchingSensors.length() - 1); // remove the last SEPARATOR
+        if (matchingSensors.length()>0)
+            matchingSensors.setLength(matchingSensors.length() - 1); // remove the last SEPARATOR
         return matchingSensors.toString();
     }
 
@@ -89,6 +90,11 @@ public class GeoDataServlet extends HttpServlet {
 
         ArrayList<String> sensors = GetSensorDataWithGeo.getListOfSensors(env);
         String matchingSensors = getMatchingSensors(sensors);
+
+        if (matchingSensors.length() == 0) {
+            response.append("# No matching sensors for envelope: "+env);
+            return response.toString();
+        }
 
         if (debugMode) {
             response.append("# List of all sensors: \n# " + GetSensorDataWithGeo.getListOfSensors().replaceAll("\n","\n# ") + "\n");
@@ -116,6 +122,11 @@ public class GeoDataServlet extends HttpServlet {
 
         ArrayList<String> sensors = GetSensorDataWithGeoPostGIS.getListOfSensors(env);
         String matchingSensors = getMatchingSensors(sensors);
+
+        if (matchingSensors.length() == 0) {
+            response.append("# No matching sensors for envelope: "+env);
+            return response.toString();
+        }
 
         if (debugMode) {
             response.append("# List of all sensors: \n# " + GetSensorDataWithGeoPostGIS.getListOfSensors().replaceAll("\n","\n# ") + "\n");
