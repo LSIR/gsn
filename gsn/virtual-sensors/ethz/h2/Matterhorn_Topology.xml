@@ -29,6 +29,7 @@
             <param name="evenlogger-value-field">EVENT_VALUE</param>
             
             <!-- param name="dozer-command-vs">Matterhorn_Dozer_Command</param -->
+            <!-- param name="ae-stream-name">data18</param -->
         </init-params>
         <!-- web-input>
             <command name="dataconfiguration">
@@ -459,5 +460,41 @@
       </source>
       <query> select * from source </query>
     </stream>
+    <!-- stream name="data18">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_aedaqhealthdata
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data19">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_aestatistics
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data20">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from etz_dozer_aedata
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream -->
     </streams>
 </virtual-sensor>
