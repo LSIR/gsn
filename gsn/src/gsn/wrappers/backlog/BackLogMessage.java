@@ -108,20 +108,10 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.GPSPlugin GPSPlugin}. */
 	public static final byte GPS_MESSAGE_TYPE = 60;
 	
-	/** The OZ47 message type. This message type is used to
-     *  send/receive OZ47 sensor data.
-	 *  {@link gsn.wrappers.backlog.plugins.OZ47Plugin OZ47Plugin}. */
-	public static final byte OZ47_MESSAGE_TYPE = 70;
-	
-	/** The ECVQ-EK3 message type. This message type is used to
-     *  send/receive sensor data from the sensor evaluation kit.
-	 *  {@link gsn.wrappers.backlog.plugins.ECVQEK3Plugin ECVQEK3Plugin}. */
-	public static final byte ECVQEK3_MESSAGE_TYPE = 71;
-	
 	/** PowerManager 
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.PowerManagerPlugin PowerManagerPlugin}. */
-	public static final byte POWERMANAGER_MESSAGE_TYPE = 72;
+	public static final byte POWERMANAGER_MESSAGE_TYPE = 70;
 	
 	
 	/* #                                                            #
