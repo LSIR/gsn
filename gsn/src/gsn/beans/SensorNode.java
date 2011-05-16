@@ -3,10 +3,7 @@ package gsn.beans;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import org.apache.log4j.Logger;
-import org.codehaus.groovy.tools.shell.ParseStatus;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
@@ -21,6 +18,7 @@ public class SensorNode {
 	static final int NODE_TYPE_ACCESS_NODE = 1;
 	static final int NODE_TYPE_POWERSWITCH = 2;
 	static final int NODE_TYPE_BBCONTROL = 3;
+	static final int NODE_TYPE_AE = 4;
 	
 	static final int VOLTAGE_HISTORY_SIZE = 60; // ~ 2h 
 	
@@ -80,7 +78,19 @@ public class SensorNode {
 	public boolean isBBControl() {
 		return nodetype == NODE_TYPE_BBCONTROL;
 	}
+
+	public boolean isAENode() {
+		return nodetype == NODE_TYPE_AE;
+	}
 	
+	public boolean hasSHT21() {
+		return isBBControl() || isAccessNode() || isAENode();
+	}
+	
+	public boolean hasSHT15() {
+		return isSibNode() || isPowerSwitch();
+	}
+
 	public void setSibNode() {
 		nodetype = NODE_TYPE_SIB;
 	}
@@ -96,6 +106,10 @@ public class SensorNode {
 	public void setBBControl() {
 		nodetype = NODE_TYPE_BBCONTROL;
 	}
+	
+	public void setAENode() {
+		nodetype = NODE_TYPE_AE;	
+	}	
 	
 	public String getVsys() {
 		if (vsys!=null)

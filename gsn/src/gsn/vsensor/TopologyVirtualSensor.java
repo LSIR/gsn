@@ -78,6 +78,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		"powerswitch-p1-field",
 		"powerswitch-p2-field",
 		"sdivoltage-field",
+		"ae-stream-name",
 	};
 	
 	private static final String commandConfigurationParameter = "dozer-command-vs";
@@ -226,134 +227,143 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			// do not count events to packets
 		}
 		else {
-		node.packet_count++;
-		if (inputStreamName.equals(configuration[10]) && !node.isAccessNode()) {
-			node.setAccessNode();
-			// adjust configuration
-			node.pendingConfiguration=null;
-			if (node.configuration!=null)
-				node.configuration=new SensorNodeConfiguration(node.configuration, node.nodetype);
-		}
-		else if (inputStreamName.equals(configuration[11])) { // power switch packets
-			if (!node.isPowerSwitch()) {
-				node.setPowerSwitch();
-				// 	adjust configuration
+			node.packet_count++;
+			if (inputStreamName.equals(configuration[10]) && !node.isAccessNode()) {
+				node.setAccessNode();
+				// adjust configuration
 				node.pendingConfiguration=null;
 				if (node.configuration!=null)
 					node.configuration=new SensorNodeConfiguration(node.configuration, node.nodetype);
 			}
-			s = data.getData(configuration[19]);
-			if (s instanceof Byte)
-				p1 = ((Byte)s == 1);
-			s = data.getData(configuration[20]);
-			if (s instanceof Byte)
-				p2 = ((Byte)s == 1);
-			if (p1!=null && p2!=null) {
-				if (node.configuration==null)
-					node.configuration=new SensorNodeConfiguration();
-				node.configuration.update(p1, p2);
-				logger.debug("received port info: "+p1+" "+p2);
-				if (node.pendingConfiguration!=null) {
-					if (node.pendingConfiguration.hasPortConfig())
-						logger.debug("pending config: "+node.pendingConfiguration.powerswitch_p1+" "+node.pendingConfiguration.powerswitch_p2);
-					if (node.pendingConfiguration.hasPortConfig() && node.pendingConfiguration.powerswitch_p1.equals(p1) && node.pendingConfiguration.powerswitch_p2.equals(p2)) {
-						node.pendingConfiguration.removePortConfig();
+			else if (inputStreamName.equals(configuration[11])) { // power switch packets
+				if (!node.isPowerSwitch()) {
+					node.setPowerSwitch();
+					// 	adjust configuration
+					node.pendingConfiguration=null;
+					if (node.configuration!=null)
+						node.configuration=new SensorNodeConfiguration(node.configuration, node.nodetype);
+				}
+				s = data.getData(configuration[19]);
+				if (s instanceof Byte)
+					p1 = ((Byte)s == 1);
+				s = data.getData(configuration[20]);
+				if (s instanceof Byte)
+					p2 = ((Byte)s == 1);
+				if (p1!=null && p2!=null) {
+					if (node.configuration==null)
+						node.configuration=new SensorNodeConfiguration();
+					node.configuration.update(p1, p2);
+					logger.debug("received port info: "+p1+" "+p2);
+					if (node.pendingConfiguration!=null) {
+						if (node.pendingConfiguration.hasPortConfig())
+							logger.debug("pending config: "+node.pendingConfiguration.powerswitch_p1+" "+node.pendingConfiguration.powerswitch_p2);
+						if (node.pendingConfiguration.hasPortConfig() && node.pendingConfiguration.powerswitch_p1.equals(p1) && node.pendingConfiguration.powerswitch_p2.equals(p2)) {
+							node.pendingConfiguration.removePortConfig();
+						}
+						if (!node.pendingConfiguration.hasDataConfig() && !node.pendingConfiguration.hasPortConfig())
+							node.pendingConfiguration=null;
 					}
-					if (!node.pendingConfiguration.hasDataConfig() && !node.pendingConfiguration.hasPortConfig())
-						node.pendingConfiguration=null;
+					notifyscheduler=true;
+					event_id = EVENT_PSB_POWER;
+					node_type = new Integer(node.nodetype);
 				}
-				notifyscheduler=true;
-				event_id = EVENT_PSB_POWER;
-				node_type = new Integer(node.nodetype);
 			}
-		}
-		s = data.getData(configuration[1]);
-		if (s instanceof Integer) {
-			node.parent_id = (Integer)s;
-		}
+			else if (inputStreamName.equals(configuration[22])) { // ae-board packets
+				node.setAENode();
+			}
+			s = data.getData(configuration[1]);
+			if (s instanceof Integer) {
+				node.parent_id = (Integer)s;
+			}
 
-		// health
-		// save always latest health information
-		if (node.timestamp == timestamp) {
-			// Vsys
-			s = data.getData(configuration[4]);
-			if (s instanceof Integer) {
-				if (node.isSibNode()) {
-					node.setVsys(new Double((Integer)s)  * (2.56d/65536d) * (39d/24d));
+			// health
+			// save always latest health information
+			if (node.timestamp == timestamp) {
+				// Vsys
+				s = data.getData(configuration[4]);
+				if (s instanceof Integer) {
+					if (node.isSibNode()) {
+						node.setVsys(new Double((Integer)s)  * (2.56d/65536d) * (39d/24d));
+					}
+					else if (node.isPowerSwitch()) {
+						node.setVsys(new Double((Integer)s)  * (1.5d / 4095d) * (8d/3d));
+					} 
+					else if (node.isAENode()) {
+						node.setVsys(new Double((Integer)s)  * 0.00091);
+					}
 				}
-				else if (node.isPowerSwitch()) {
-					node.setVsys(new Double((Integer)s)  * (1.5d / 4095d) * (8d/3d));
-				} 
-			}
-			// Current
-			s = data.getData(configuration[5]);
-			if (s instanceof Integer) {
-				if ((Integer)s==0xffff || !node.isSibNode())
-					node.current=null;
-				else
-					node.current = new Double((Integer)s) * 2.56 / Math.pow(2, 16) / 0.15 * 10;
-			}
-			// Valid
-			s = data.getData(configuration[18]);
-			if (s instanceof Byte) {
-				valid = (Byte)s;
-				logger.debug("valid is "+valid);
-			}
-			// Temperature
-			s = data.getData(configuration[6]);
-			if (s instanceof Integer) {
-				if ((Integer)s==0xffff || (valid!=null && valid==0)) {
-					node.temperature = null;
-					node.humidity = null;
+				// Current
+				s = data.getData(configuration[5]);
+				if (s instanceof Integer) {
+					if ((Integer)s==0xffff || !node.isSibNode())
+						node.current=null;
+					else
+						node.current = new Double((Integer)s) * 2.56 / Math.pow(2, 16) / 0.15 * 10;
 				}
-				else {
-					if (node.isBBControl() || node.isAccessNode())
-						node.temperature = new Double(-46.85 + 175.72 * (new Double((Integer)s))/Math.pow(2,14)); // SHT21
-					else 
-						node.temperature = new Double(-39.63d + (0.01d * (new Double((Integer)s)))); // SHT75
-					// Humidity
-					s = data.getData(configuration[7]);
-					if (s instanceof Integer) {
-						if ((Integer)s==0xffff)
-							node.humidity = null;
-						else {
-							if (node.isBBControl() || node.isAccessNode()) { // SHT21
-								node.humidity = -6d + 125d * new Double((Integer)s) / Math.pow(2, 12);
-							}
-							else { // SHT75
-								Double d = new Double((Integer)s);
-								Double hum_rel = new Double(-4 + (0.0405d * d) - 0.0000028d * Math.pow(d, 2));				
-								node.humidity = new Double((node.temperature - 25) * (0.01d + (0.00008d * d)) + hum_rel);
+				// Valid
+				s = data.getData(configuration[18]);
+				if (s instanceof Byte) {
+					valid = (Byte)s;
+					logger.debug("valid is "+valid);
+				}
+				// Temperature
+				s = data.getData(configuration[6]);
+				if (s instanceof Integer) {
+					if ((Integer)s==0xffff || (valid!=null && valid==0)) {
+						node.temperature = null;
+						node.humidity = null;
+					}
+					else {
+						if (node.hasSHT15())
+							node.temperature = new Double(-46.85 + 175.72 * (new Double((Integer)s))/Math.pow(2,14)); // SHT21
+						else if (node.hasSHT21())
+							node.temperature = new Double(-39.63d + (0.01d * (new Double((Integer)s)))); // SHT15
+						// Humidity
+						s = data.getData(configuration[7]);
+						if (s instanceof Integer) {
+							if ((Integer)s==0xffff)
+								node.humidity = null;
+							else {
+								if (node.hasSHT15()) { // SHT15
+									Double d = new Double((Integer)s);
+									Double hum_rel = new Double(-4 + (0.0405d * d) - 0.0000028d * Math.pow(d, 2));				
+									node.humidity = new Double((node.temperature - 25) * (0.01d + (0.00008d * d)) + hum_rel);
+								}
+								else if (node.hasSHT21()) { // SHT21
+									node.humidity = -6d + 125d * new Double((Integer)s) / Math.pow(2, 12);
+								} 
 							}
 						}
 					}
 				}
+				// Flash count
+				s = data.getData(configuration[8]);
+				if (s instanceof Integer)
+					node.flash_count = (Integer)s;
+				// Uptime
+				s = data.getData(configuration[9]);
+				if (s instanceof Integer)
+					node.uptime = (Integer)s;
+				// VSdi
+				s = data.getData(configuration[21]);
+				if (s instanceof Integer) {
+					Double vsdi = null;
+					if (node.isSibNode()) {
+						vsdi = new Double((Integer)s)  * (2.56d/65536d) * (204d/24d);
+					}
+					else if (node.isPowerSwitch()) {
+						vsdi = new Double((Integer)s)  * (1.5d / 4095d) * 12d;
+					}
+					else if (node.isBBControl() || node.isAccessNode()) {
+						vsdi = new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d);
+						node.setVsys(vsdi);
+					}
+					else if (node.isAENode()) {
+						vsdi = new Double((Integer)s) * 0.00483;
+					}
+					node.setVsdi(vsdi);
+				}
 			}
-			// Flash count
-			s = data.getData(configuration[8]);
-			if (s instanceof Integer)
-				node.flash_count = (Integer)s;
-			// Uptime
-			s = data.getData(configuration[9]);
-			if (s instanceof Integer)
-				node.uptime = (Integer)s;
-			// VSdi
-			s = data.getData(configuration[21]);
-			if (s instanceof Integer) {
-				Double vsdi = null;
-				if (node.isSibNode()) {
-					vsdi = new Double((Integer)s)  * (2.56d/65536d) * (204d/24d);
-				}
-				else if (node.isPowerSwitch()) {
-					vsdi = new Double((Integer)s)  * (1.5d / 4095d) * 12d;
-				}
-				else if (node.isBBControl() || node.isAccessNode()) {
-					vsdi = new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d);
-					node.setVsys(vsdi);
-				}
-				node.setVsdi(vsdi);
-			}
-		}
 		}
 		// remove outdated information
 		Long now = System.currentTimeMillis();
