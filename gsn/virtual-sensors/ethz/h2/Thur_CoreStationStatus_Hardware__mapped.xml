@@ -39,7 +39,7 @@
                         		rmlist.add(entry.key)
                         	}
                         }
-                        deviceIdMap.keySet().removeAll( rmlist as Set );
+                        positionMap.keySet().removeAll( rmlist as Set );
                     }
                 ]]>
             </param>
