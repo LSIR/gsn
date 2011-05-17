@@ -17,7 +17,7 @@
                 			if ( ERROR_COUNTER > lastErrorCounterMap.get(POSITION)[0] ) {
                         		// Notify by email
                         		def emailTitle = "[PermaSense-GSN-Test] - ERROR: BackLog error counter increased (vs=" + vsname + ", pos=" + POSITION + ")";
-                        		def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "]: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(POSITION)[0]) + " to " + ERROR_COUNTER + " on position " + POSITION + " at " + vsname + ".;
+                        		def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "]: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(POSITION)[0]) + " to " + ERROR_COUNTER + " on position " + POSITION + " at " + vsname + ".";
 
 								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
