@@ -21,8 +21,8 @@
             /* XML object loaded from the REQUEST_LIST_OF_VIRTUAL_SENSORS GSN request */
             var lovs = null;
             /* Mapping from virtual sensor name to list of fields name */
-            var virtual_sensor_to_fields = []
-            var field_to_virtual_sensor = []
+            var virtual_sensor_to_fields = new Object()
+            var field_to_virtual_sensor = new Object()
             $(function(){
                 function csv_to_json(tag,callback,format){
                     callback = callback || function(){};
