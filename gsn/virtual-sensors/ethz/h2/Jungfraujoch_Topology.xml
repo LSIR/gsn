@@ -29,7 +29,7 @@
             <param name="evenlogger-value-field">EVENT_VALUE</param>
             
             <!-- param name="dozer-command-vs">Jungfraujoch_Dozer_Command</param -->
-            <!-- param name="ae-stream-name">data18</param -->
+            <param name="ae-stream-name">data18</param>
         </init-params>
         <!-- web-input>
             <command name="dataconfiguration">
