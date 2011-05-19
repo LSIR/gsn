@@ -4,7 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
@@ -28,6 +30,7 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 	private String deployment;
 	private Hashtable<Integer, MappingEntry> cachedmappings = new Hashtable<Integer, MappingEntry>();
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void dataAvailable(String inputStreamName,
 			StreamElement streamElement) {	
@@ -44,8 +47,11 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 					topology = (NetworkTopology) uctx.unmarshalDocument(new ByteArrayInputStream(
 						(byte[])s), "UTF-8");
 					long now = System.currentTimeMillis(); 
+					Hashtable<Integer, MappingEntry> node_ids = (Hashtable<Integer, MappingEntry>) cachedmappings.clone();
+					
 					for (SensorNode n: topology.sensornodes) {
 						if (n.node_id !=null && n.generation_time != null) {
+							node_ids.remove(n.node_id);
 							if (now - n.timestamp < MAPPING_UPDATE_TIMEOUT_MS) {
 								n.position = DataMapping.getPosition(deployment, n.node_id.intValue(), new Timestamp(n.generation_time));
 								if (n.position != null)
@@ -60,6 +66,9 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 								}
 							}
 						}
+					}
+					for (Entry<Integer, MappingEntry> e: node_ids.entrySet()) {
+						cachedmappings.remove(e.getKey());
 					}
 					topology.mapped = true;
 					logger.debug("successfully imported network topology.");
