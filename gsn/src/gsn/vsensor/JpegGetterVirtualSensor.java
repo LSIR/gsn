@@ -21,11 +21,11 @@ import org.apache.log4j.Logger;
 
 import com.sun.media.jai.codec.SeekableStream;
 
-public class FileGetterVirtualSensor extends BridgeVirtualSensorPermasense {
+public class JpegGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	
 	private static final String DCRAW = "/home/perma/bin/dcraw-x64/dcraw";
 
-	private static final transient Logger logger = Logger.getLogger(FileGetterVirtualSensor.class);
+	private static final transient Logger logger = Logger.getLogger(JpegGetterVirtualSensor.class);
 
 	private String filetype = null;
 	private String storage_directory = null;
