@@ -30,7 +30,7 @@
 # position 12
 "8888","2011-03-08 12:00:00+02:00","9999-01-01 00:00:00","12","Corestation near Base Station"
 # position 13
-"2051","2011-03-08 12:00:00+02:00","2011-05-02 00:00:00+02:00","13","Weather station near Base Station"
+"2051","2011-03-08 12:00:00+02:00","9999-01-01 00:00:00","13","Weather station near Base Station"
 
 # GPS logger mapping
 "1031","2011-03-08 12:00:00+02:00","2011-05-02 00:00:00+02:00","14","GPS Reference @ position 0"
