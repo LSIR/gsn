@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
@@ -17,10 +18,15 @@ import gsn.beans.SensorNode;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
+	
+	private static final int MAPPING_UPDATE_TIMEOUT_MS = 5 * 60 * 1000;
 	
 	private static final transient Logger logger = Logger.getLogger( MappedTopologyVirtualSensor.class );
 	private String deployment;
+	private Hashtable<Integer, MappingEntry> cachedmappings = new Hashtable<Integer, MappingEntry>();
 	
 	@Override
 	public void dataAvailable(String inputStreamName,
@@ -37,11 +43,22 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 					IUnmarshallingContext uctx = bfact.createUnmarshallingContext();		
 					topology = (NetworkTopology) uctx.unmarshalDocument(new ByteArrayInputStream(
 						(byte[])s), "UTF-8");
+					long now = System.currentTimeMillis(); 
 					for (SensorNode n: topology.sensornodes) {
 						if (n.node_id !=null && n.generation_time != null) {
-							n.position = DataMapping.getPosition(deployment, n.node_id.intValue(), new Timestamp(n.generation_time));
-							if (n.position != null)
-								n.coordinate = DataMapping.getCoordinate(deployment, n.position.intValue());
+							if (now - n.timestamp < MAPPING_UPDATE_TIMEOUT_MS) {
+								n.position = DataMapping.getPosition(deployment, n.node_id.intValue(), new Timestamp(n.generation_time));
+								if (n.position != null)
+									n.coordinate = DataMapping.getCoordinate(deployment, n.position.intValue());
+								cachedmappings.put(n.node_id, new MappingEntry(n.position, n.coordinate));
+							}
+							else {
+								// use cached mapping
+								if (cachedmappings.containsKey(n.node_id)) {
+									n.position = cachedmappings.get(n.node_id).position;
+									n.coordinate = cachedmappings.get(n.node_id).coordinate;
+								}
+							}
 						}
 					}
 					topology.mapped = true;
@@ -92,6 +109,16 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 			return false;
 		}
 		return true;
+	}
+	
+	private class MappingEntry {
+		public Coordinate coordinate;
+		public Integer position;
+		
+		public MappingEntry(Integer position, Coordinate coordinate) {
+			this.position = position;
+			this.coordinate = coordinate;
+		}
 	}
 
 }
