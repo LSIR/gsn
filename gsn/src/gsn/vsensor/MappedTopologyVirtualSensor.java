@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
