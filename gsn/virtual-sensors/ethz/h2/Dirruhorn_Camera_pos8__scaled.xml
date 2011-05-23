@@ -18,7 +18,7 @@
         <predicate key="LATITUDE">46.115594</predicate>
         <predicate key="LONGITUDE">7.769967</predicate>
     </addressing>
-    <storage user="user" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db;DB_CLOSE_DELAY=-1" storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
