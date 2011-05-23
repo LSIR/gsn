@@ -1,0 +1,16 @@
+GSN Change logs
+---------------
+
+r1.0.1
+Added the 'ScriptletProcessor' processing class which can be used to implement arbitrary complex processing class by specifying its logic in the Groovy language, directly in the virtual sensor description file.
+Added pagination support for MySQL (/data and /multidata servlet and DataDistributer) which enable GSN to stream an arbitrary large amount of data.
+Fixed OutOfMemory errors due to large amount of data requests.
+Fixed OutOfMemory errors due to a dbcp library memory leak when calling multiple time the getMetadata (This is going to be fixed in the dbcp 1.4.1).
+Fixed GSN hang forever due to a database connection leak in the (/data and /multidata servlets).
+Fixed synchronization bug related to jetty Continuation, in the remote-rest wrapper.
+Fixed reconnection bug in the remote-rest and remote-push wrappers.
+Fixed the org.apache.commons.dbcp.DelegatingPreparedStatement is closed Exception.
+Fixed exceptions thrown (such as: java.lang.NumberFormatException: multiple points) due to concurrent access to the /multidata servlet.
+Integrated the GSN installer in the trunk through the 'installer' ant task.
+Added the 'download_mode=inline' parameter to the /multidata servlet, in order to get the data not as an attachment.
+Removed the unused virtual-sensor pool, marked the 'lifeCyclePool' configuration element as deprecated.

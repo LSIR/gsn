@@ -1,0 +1,95 @@
+<virtual-sensor name="a3d_scheduler_geotop">
+    <processing-class>
+        <class-name>gsn.vsensor.A3DVirtualSensor</class-name>
+        <unique-timestamps>true</unique-timestamps>
+        <init-params>
+            <param name="hostname">lsir-hydrosys01</param>
+            <!--hostname of server running Alpine3D-->
+            <param name="username">sim</param>
+            <!-- username for running Alpine3D -->
+            <param name="password">*******</param>
+            <param name="base-dir">/data/hydrosys/zwischbergen/</param>
+            <param name="local-working-dir">C:\temp\</param>
+            <!--<param name="scriptname">ls -al</param>-->
+            <param name="scriptname">cd setup; ./run.pl</param>
+            <param name="script-type">geotop</param> <!-- possible values: 'geotop', 'a3d' -->
+            <!-- name of script to be invoked through ssh -->
+            <param name="window-size">14400</param>
+            <!-- size of the window needed for one simulation step (in seconds) -->
+            <param name="timeout">3600</param>
+            <!-- timeout for A3D response -->
+            <!-- 3600 seconds -->
+            <param name="control-port">20000</param>
+            <!-- udp port to use for notifications -->
+            <param name="start-from">2009-08-07T12:00:00</param>
+
+        </init-params>
+        <output-structure>
+            <field name="status" type="integer"/>
+            <field name="chart" type="binary:image/png" />
+            <!-- <field name="comment" type="VARCHAR(50)"/> -->
+        </output-structure>
+    </processing-class>
+
+    <description>Alpine3D scheduler VS</description>
+    <life-cycle pool-size="10"/>
+    <addressing>
+        <predicate key='geographical'>EPFL, BC</predicate>
+        <predicate key='LATITUDE'>45.898031</predicate>
+        <predicate key='LONGITUDE'>7.107333</predicate>
+        <predicate key='ALTITUDE'>300</predicate>
+
+    </addressing>
+    <storage/>
+
+    <streams>
+        <stream name="lafouly_st_1040">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="replay">
+                    <predicate key="dbname">lafouly_st_1040</predicate>
+                    <predicate key="speed">60000</predicate><!-- Speed of 1 implies replaying with the original speed, speed of 2 means replaying 2 times faster, ...-->
+                </address>
+                <query>select timed from wrapper</query>
+            </source>
+            <query>select timed from source</query>
+        </stream>
+        <!--
+        <stream name="lafouly_st_1041">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="replay">
+                    <predicate key="dbname">lafouly_st_1041</predicate>
+                    <predicate key="speed">6000</predicate>
+                </address>
+                <query>select timed from wrapper</query>
+            </source>
+            <query>select timed from source</query>
+        </stream> -->
+
+        <stream name="lafouly_st_1042">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="replay">
+                    <predicate key="dbname">lafouly_st_1042</predicate>
+                    <predicate key="speed">60000</predicate><!-- Speed of 1 implies replaying with the original speed, speed of 2 means replaying 2 times faster, ...-->
+                </address>
+                <query>select timed from wrapper</query>
+            </source>
+            <query>select timed from source</query>
+        </stream>
+       <!--
+        <stream name="lafouly_st_1043">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="replay">
+                    <predicate key="dbname">lafouly_st_1043</predicate>
+                    <predicate key="speed">6000</predicate>
+                </address>
+                <query>select timed from wrapper</query>
+            </source>
+            <query>select timed from source</query>
+        </stream>
+
+        -->
+
+    </streams>
+
+</virtual-sensor>
+
