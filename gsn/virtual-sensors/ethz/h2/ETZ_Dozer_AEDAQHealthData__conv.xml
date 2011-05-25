@@ -11,7 +11,7 @@
 		    		if (PAYLOAD_VCCADC != null) { VCCADC = PAYLOAD_VCCADC };
 		    		if (PAYLOAD_REFADC != null) { REFADC = 2 * PAYLOAD_REFADC };
 		    		if (PAYLOAD_VCCOPA != null) { VCCOPA = 2 * PAYLOAD_VCCOPA };
-	  	    		if (PAYLOAD_VCC55V != null) { VCC55V = (1.83 * PAYLOAD_VCC55V) as int };
+	  	    		if (PAYLOAD_VCC55V != null) { VCC55V = Math.round(1.83 * PAYLOAD_VCC55V) as int };
 	 	    		I12V = PAYLOAD_I12V;
 		    		I55VANALOG = PAYLOAD_I55VANALOG;
 		    		I55VDIGITAL = PAYLOAD_I55VDIGITAL;

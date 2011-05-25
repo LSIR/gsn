@@ -6,14 +6,14 @@
             <param name="persistant">true</param>
 	    	<param name="scriptlet">
 				<![CDATA[
-		   			if (PAYLOAD_THRESHOLDCHANNEL != null) { CHANNEL = ((PAYLOAD_THRESHOLDCHANNEL % 2) - 1) as short };
+		   			if (PAYLOAD_THRESHOLDCHANNEL != null) { CHANNEL = ((PAYLOAD_THRESHOLDCHANNEL % 2) + 1) as short };
 	            	SERIAL = PAYLOAD_SERIAL;
 		    		if (PAYLOAD_STARTSAMPLE != null) { STARTSAMPLE = 2 * PAYLOAD_STARTSAMPLE };
 		    		if (PAYLOAD_LENGTH != null) { LENGTH = 2 * PAYLOAD_LENGTH };
 		    		if (PAYLOAD_RISETIME != null) { RISETIME = 2 * PAYLOAD_RISETIME };
-		    		if (PAYLOAD_AMPLITUDE != null) { AMPLITUDE = (4.5 * PAYLOAD_AMPLITUDE / 65536) as int };
+		    		if (PAYLOAD_AMPLITUDE != null) { AMPLITUDE = 4.5 * PAYLOAD_AMPLITUDE / 65536 };
 		    		COUNT = PAYLOAD_COUNT;
-		    		if (PAYLOAD_ENERGY != null) { ENERGY = (PAYLOAD_ENERGY * 20.25 / 8388608) as long };
+		    		if (PAYLOAD_ENERGY != null) { ENERGY = PAYLOAD_ENERGY * 20.25 / 8388608 };
 		    		POSTTRIGGER = PAYLOAD_POSTTRIGGER;
 		    		if (PAYLOAD_THRESHOLDCHANNEL != null) { THRESHOLD = Math.floor(PAYLOAD_THRESHOLDCHANNEL / 2) as short };
 				]]>
@@ -32,9 +32,9 @@
             <field name="STARTSAMPLE" type="BIGINT" unit="µs"/>
             <field name="LENGTH" type="INTEGER" unit="µs" />
             <field name="RISETIME" type="INTEGER" unit="µs"/>
-            <field name="AMPLITUDE" type="INTEGER" unit="V"/>
+            <field name="AMPLITUDE" type="DOUBLE" unit="V"/>
             <field name="COUNT" type="INTEGER" />
-            <field name="ENERGY" type="BIGINT" unit="V²"/>
+            <field name="ENERGY" type="DOUBLE" unit="V²"/>
             <field name="POSTTRIGGER" type="INTEGER" />
 	    	<field name="THRESHOLD" type="SMALLINT" unit="dB"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
