@@ -1,0 +1,28 @@
+<virtual-sensor name="ETZ_GPS_Logger__parsed" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.GPSLoggerDataParser</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>GPS Logger parsed data information from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_GPS_Logger__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
