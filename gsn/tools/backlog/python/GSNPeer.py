@@ -582,6 +582,7 @@ class GSNWriter(Thread):
     _gsnListener
     _sendqueue
     _gsnWriterStop
+    _emptyLock
     '''
     class HelloMessage:
         def __init__(self, helloMsg):
@@ -600,6 +601,7 @@ class GSNWriter(Thread):
         self._stuff = chr(STUFFING_BYTE)
         self._dblstuff = self._stuff + self._stuff
         self._gsnWriterStop = False
+        self._emptyLock = Lock()
 
 
     def run(self):
@@ -647,8 +649,13 @@ class GSNWriter(Thread):
                     self._sendqueue.task_done()
                 except ValueError, e:
                     self.exception(e)
+                    
+        self._emptyLock.acquire()
+        # to unblock addResendMsg
+        self.emptyQueue()
  
         self._logger.debug('died')
+        self._emptyLock.release()
         
         
     def pktStuffing(self, pkt):
@@ -664,15 +671,15 @@ class GSNWriter(Thread):
 
     def stop(self):
         self._gsnWriterStop = True
-        try:
-            self._sendqueue.put_nowait((0, BackLogMessage.BackLogMessageClass()))
-        except Queue.Full:
-            pass
-        except Exception, e:
-            self._logger.exception(e)
-        self.join()
-        # to unblock addResendMsg
-        self.emptyQueue()
+        self._emptyLock.acquire()
+        if self.isAlive():
+            try:
+                self._sendqueue.put_nowait((0, BackLogMessage.BackLogMessageClass()))
+            except Queue.Full:
+                pass
+            except Exception, e:
+                self._logger.exception(e)
+        self._emptyLock.release()
         self._logger.debug('stopped')
 
 
