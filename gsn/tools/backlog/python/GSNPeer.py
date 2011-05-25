@@ -647,8 +647,6 @@ class GSNWriter(Thread):
                     self._sendqueue.task_done()
                 except ValueError, e:
                     self.exception(e)
-                    
-        self.emptyQueue() # to unblock addResendMsg
  
         self._logger.debug('died')
         
@@ -666,13 +664,15 @@ class GSNWriter(Thread):
 
     def stop(self):
         self._gsnWriterStop = True
-        self.emptyQueue()
         try:
             self._sendqueue.put_nowait((0, BackLogMessage.BackLogMessageClass()))
         except Queue.Full:
             pass
         except Exception, e:
             self._logger.exception(e)
+        self.join()
+        # to unblock addResendMsg
+        self.emptyQueue()
         self._logger.debug('stopped')
 
 
@@ -703,10 +703,12 @@ class GSNWriter(Thread):
 
         
     def addResendMsg(self, msg, priority=100):
-        # wait until send queue is empty
-        self._sendqueue.join()
-        assert self._sendqueue.not_empty != True
         if self._gsnListener._connected and not self._gsnWriterStop:
+            # wait until send queue is empty
+            self._sendqueue.join()
+            assert self._sendqueue.not_empty != True
+            if self._gsnWriterStop:
+                return False
             try:
                 self._sendqueue.put_nowait((priority, msg))
                 return True

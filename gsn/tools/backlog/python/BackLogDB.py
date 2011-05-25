@@ -164,6 +164,10 @@ class BackLogDBClass(Thread, Statistics):
             if not self._stopped:
                 self.exception(e)
             return False
+        except Exception, e:
+            self._dblock.release()
+            self.exception(e)
+            return False
 
         
     def removeMsg(self, timestamp, msgType):
@@ -206,6 +210,10 @@ class BackLogDBClass(Thread, Statistics):
             self._dblock.release()
             if not self._stopped:
                 self.exception(e) 
+        except Exception, e:
+            self.timeMeasurementDiff(id)
+            self._dblock.release()
+            self.exception(e)
             
             
     def getStatus(self, intervalSec):
