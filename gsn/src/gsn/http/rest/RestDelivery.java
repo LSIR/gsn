@@ -19,10 +19,18 @@ public class RestDelivery implements DeliverySystem {
 
     private Continuation continuation;
     private ObjectOutputStream objectStream;
+    private Integer limit = null;
 
     private static final StreamElement keepAliveMsg = new StreamElement(new DataField[]{new DataField("keepalive", "string")}, new Serializable[]{"keep-alive message"});
 
     public RestDelivery(Continuation connection) throws IOException {
+        this.continuation = connection;
+        XStream dataStream = StreamElement4Rest.getXstream();
+        objectStream = dataStream.createObjectOutputStream((new WriterOutputStream(continuation.getServletResponse().getWriter())));
+    }
+    
+    public RestDelivery(Continuation connection, Integer limit) throws IOException {
+    	this.limit = limit;
         this.continuation = connection;
         XStream dataStream = StreamElement4Rest.getXstream();
         objectStream = dataStream.createObjectOutputStream((new WriterOutputStream(continuation.getServletResponse().getWriter())));
@@ -41,6 +49,7 @@ public class RestDelivery implements DeliverySystem {
             objectStream.writeObject(new StreamElement4Rest(se));
             objectStream.flush();
             continuation.resume();
+            limit--;
             return ((LinkedBlockingQueue<Boolean>) continuation.getAttribute("status")).take();
         } catch (Exception e) {
             logger.debug(e.getMessage(), e);
@@ -51,6 +60,7 @@ public class RestDelivery implements DeliverySystem {
     public boolean writeKeepAliveStreamElement() {
         logger.debug("Sending the keepalive message.");
         keepAliveMsg.setTimeStamp(System.currentTimeMillis());
+        limit++;
         return writeStreamElement(keepAliveMsg);
     }
 
@@ -82,5 +92,11 @@ public class RestDelivery implements DeliverySystem {
 	@Override
 	public void setTimeout(long timeoutMs) {
 		continuation.setTimeout(timeoutMs);
+	}
+
+	public boolean isLimitReached() {
+		if (limit != null && limit <= 0)
+			return true;
+		return false;
 	}
 }

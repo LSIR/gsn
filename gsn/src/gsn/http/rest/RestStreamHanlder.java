@@ -4,7 +4,6 @@ import gsn.DataDistributer;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
-import gsn.http.WebConstants;
 import gsn.http.ac.DataSource;
 import gsn.http.ac.GeneralServicesAPI;
 import gsn.http.ac.User;
@@ -16,6 +15,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.servlet.ServletException;
@@ -38,6 +39,18 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 	private static final String STREAMING = "/streaming/";
 
 	private static transient Logger       logger     = Logger.getLogger ( RestStreamHanlder.class );
+	
+	protected DefaultDistributionRequest streamingReq;
+	private Timer timeoutTimer = null;
+
+
+	class TimeoutTimerTask extends TimerTask
+	{
+		public void run()
+		{
+			DataDistributer.getInstance(streamingReq.getDeliverySystem().getClass()).removeListener(streamingReq);
+		}
+	}
 
 	public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws ServletException{
 
@@ -67,7 +80,6 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
             continuation.setAttribute("status", new LinkedBlockingQueue<Boolean>(1));
             continuation.addContinuationListener(this);
             continuation.suspend();
-            final DefaultDistributionRequest streamingReq;
             try {
                 URLParser parser = new URLParser(request);
                 //
@@ -82,7 +94,12 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
                         }
                     }
                 }
-                RestDelivery deliverySystem = new RestDelivery(continuation);
+                if (parser.getTimeout() != null) {
+                	timeoutTimer = new Timer("timeoutTimer");
+                	timeoutTimer.schedule(new TimeoutTimerTask(), parser.getTimeout()*1000);
+                }
+                
+                RestDelivery deliverySystem = new RestDelivery(continuation, parser.getLimit());
                 streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
                 DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
 			}catch (Exception e) {
@@ -103,6 +120,11 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
             } catch (InterruptedException e) {
                 logger.debug(e.getMessage(), e);
             }
+        	if (((RestDelivery)streamingReq.getDeliverySystem()).isLimitReached()) {
+        		if (timeoutTimer != null)
+        			timeoutTimer.cancel();
+        		DataDistributer.getInstance(streamingReq.getDeliverySystem().getClass()).removeListener(streamingReq);
+        	}
 		}
 	}
 	/**
@@ -218,15 +240,39 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 	class URLParser{
 		private String query,tableName;
 		private long startTime;
+		private Integer limit = null;
+		private Integer timeout = null;
 		private VSensorConfig config;
 		public URLParser(HttpServletRequest request) throws UnsupportedEncodingException, Exception {
 			String requestURI = request.getRequestURI().substring(request.getRequestURI().toLowerCase().indexOf(STREAMING)+STREAMING.length());
-			StringTokenizer tokens = new StringTokenizer(requestURI,"/");
+			StringTokenizer tokens = new StringTokenizer(requestURI,"/",true);
 			startTime = System.currentTimeMillis();
 			query = tokens.nextToken();
 			query = URLDecoder.decode(query,"UTF-8");
-			if (tokens.hasMoreTokens()) 
-				startTime= Helpers.convertTimeFromIsoToLong(URLDecoder.decode(tokens.nextToken(),"UTF-8"));
+			int pos = 0;
+			while (tokens.hasMoreTokens()) {
+				String token = tokens.nextToken();
+				if (token.equals("/")) {
+					pos++;
+				}
+				else {
+					switch (pos) {
+					case 1:
+						startTime= Helpers.convertTimeFromIsoToLong(URLDecoder.decode(token,"UTF-8"));
+						continue;
+					case 2:
+						timeout = Integer.parseInt(URLDecoder.decode(token,"UTF-8"));
+						continue;
+					case 3:
+						limit = Integer.parseInt(URLDecoder.decode(token,"UTF-8"));
+						continue;
+					default:
+						throw new Exception("URL mall formated >" + requestURI + "<");
+					}
+				}
+				if (pos > 4)
+					throw new Exception("URL mall formated >" + requestURI + "<");
+			}
 			tableName = SQLValidator.getInstance().validateQuery(query);
 			if (tableName==null)
 				throw new RuntimeException("Bad Table name in the query:"+query);
@@ -245,6 +291,12 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 		}
 		public long getStartTime() {
 			return startTime;
+		}
+		public Integer getLimit() {
+			return limit;
+		}
+		public Integer getTimeout() {
+			return timeout;
 		}
 
 	}
