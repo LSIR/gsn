@@ -1,0 +1,64 @@
+<virtual-sensor name="OpenSense_OZ47_Static" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="LOT_NO" type="INTEGER"/>
+            <field name="CELL_NO" type="INTEGER"/>
+            <field name="CALIB_WEEK" type="INTEGER" unit="week"/>
+            <field name="CALIB_YEAR" type="INTEGER" unit="year"/>
+            <field name="TIMER_PRE_HEAT" type="INTEGER" unit="seconds"/>
+            <field name="AUTO_CALIB" type="INTEGER"/>
+            <field name="TIMER_DELAY" type="INTEGER" unit="seconds"/>
+            <field name="TIMER_CYCLE" type="INTEGER" unit="minutes"/>
+            <field name="TIMER_PULSE" type="INTEGER" unit="seconds"/>
+            <field name="OFFSET_MEM" type="INTEGER" unit="ppb"/>
+            <field name="OFFSET_VERIF" type="INTEGER" unit="ppb"/>
+            <field name="OFFSET" type="INTEGER" unit="ppb"/>
+            <field name="CALIB_PARAM_X0_1" type="DOUBLE"/>
+            <field name="CALIB_PARAM_X1_1" type="DOUBLE"/>
+            <field name="CALIB_PARAM_X2_1" type="DOUBLE"/>
+            <field name="CALIB_PARAM_X3_1" type="DOUBLE"/>
+            <field name="CALIB_PARAM_KT_1" type="DOUBLE"/>
+            <field name="CALIB_PARAM_X0_2" type="DOUBLE"/>
+            <field name="CALIB_PARAM_X1_2" type="DOUBLE"/>
+            <field name="CALIB_PARAM_X2_2" type="DOUBLE"/>
+            <field name="CALIB_PARAM_X3_2" type="DOUBLE"/>
+            <field name="CALIB_PARAM_KT_2" type="DOUBLE"/>
+            <field name="SENSOR_ID" type="INTEGER"/>
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>OZ-47 sensor reading from the OpenSense deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data0">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <!--predicate key="remote-connection">opensense-etz-bs01.ethz.ch:9003</predicate-->
+                    <predicate key="remote-connection">opensense-caa-etz-1.dyndns.biz:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.OZ47Plugin</predicate>
+                    <predicate key="status-data-type">statistics</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+	<stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">opensense-etz-bs02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.OZ47Plugin</predicate>
+                    <predicate key="status-data-type">statistics</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
