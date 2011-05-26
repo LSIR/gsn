@@ -17,7 +17,7 @@
                 			if ( ERROR_COUNTER > lastErrorCounterMap.get(POSITION)[0] ) {
                         		// Notify by email
                         		def emailTitle = "[PermaSense-GSN-Public] - ERROR: BackLog error counter increased (vs=" + vsname + ", pos=" + POSITION + ")";
-                        		def emailContent = "ERROR: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(POSITION)[0]) + " to " + ERROR_COUNTER + " on position " + POSITION + " at " + vsname + ".";
+                        		def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "]: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(POSITION)[0]) + " to " + ERROR_COUNTER + " on position " + POSITION + " at " + vsname + ".";
 
 								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
@@ -32,7 +32,7 @@
                 			if ( EXCEPTION_COUNTER > lastExceptionCounterMap.get(POSITION)[0] ) {
                         		// Notify by email
                         		def emailTitle = "[PermaSense-GSN-Public] - EXCEPTION: BackLog exception counter increased (vs=" + vsname + ", pos=" + POSITION + ")";
-                        		def emailContent = "EXCEPTION: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(POSITION)[0]) + " to " + EXCEPTION_COUNTER + " on position " + POSITION + " at " + vsname + ".";
+                        		def emailContent = "EXCEPTION [" + (new Date(GENERATION_TIME)).getDateTimeString() + "]: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(POSITION)[0]) + " to " + EXCEPTION_COUNTER + " on position " + POSITION + " at " + vsname + ".";
 
 								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
