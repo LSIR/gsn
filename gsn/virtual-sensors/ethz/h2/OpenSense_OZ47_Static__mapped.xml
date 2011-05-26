@@ -1,8 +1,12 @@
-<virtual-sensor name="OpenSense_OZ47_Static" priority="10" statistics="true" >
+<virtual-sensor name="OpenSense_OZ47_Static__mapped" priority="10" statistics="true" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <class-name>gsn.vsensor.OZ47VirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="message_type">static</param>
+        </init-params>
         <output-structure>
+            <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
@@ -37,24 +41,11 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data0">
+        <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <!--predicate key="remote-connection">opensense-etz-bs01.ethz.ch:9003</predicate-->
-                    <predicate key="remote-connection">opensense-caa-etz-1.dyndns.biz:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.OZ47Plugin</predicate>
-                    <predicate key="status-data-type">statistics</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-	<stream name="data1">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-etz-bs02.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.OZ47Plugin</predicate>
-                    <predicate key="status-data-type">statistics</predicate>
+                <address wrapper="local">
+                    <predicate key="query">select * from OpenSense_OZ47__muxed__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

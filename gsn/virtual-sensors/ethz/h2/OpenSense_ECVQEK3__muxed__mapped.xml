@@ -1,8 +1,12 @@
-<virtual-sensor name="OpenSense_ECVQEK3" priority="10" statistics="true" >
+<virtual-sensor name="OpenSense_ECVQEK3__muxed__mapped" priority="10" statistics="true" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>
         <output-structure>
+            <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
@@ -15,22 +19,12 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data0">
+        <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <!--predicate key="remote-connection">opensense-etz-bs01.ethz.ch:9003</predicate-->
-                    <predicate key="remote-connection">opensense-caa-etz-1.dyndns.biz:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.ECVQEK3Plugin</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-	<stream name="data1">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-etz-bs02.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.ECVQEK3Plugin</predicate>
+                <address wrapper="remote-rest">
+                    <predicate key="query">select * from OpenSense_ECVQEK3</predicate>
+                    <predicate key="remote-contact-point">http://whymper.ee.ethz.ch:22001/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

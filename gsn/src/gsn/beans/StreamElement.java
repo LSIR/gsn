@@ -47,6 +47,26 @@ public final class StreamElement implements Serializable {
 		this.volume = other.volume;
 	}
 	
+	public StreamElement (StreamElement other, final DataField [ ] outputStructure , final Serializable [ ] data) {
+		int len = other.fieldNames.length + outputStructure.length;
+		this.fieldNames=new String[len];
+		this.fieldValues=new Serializable[len];
+		this.fieldTypes=new Byte[len]; 
+		for (int i=0;i<other.fieldNames.length;i++) {
+			this.fieldNames[i]=other.fieldNames[i];
+			this.fieldValues[i]=other.fieldValues[i];
+			this.fieldTypes[i]=other.fieldTypes[i];
+		}
+		for (int i=0;i<outputStructure.length;i++) {
+			this.fieldNames[other.fieldNames.length+i]=outputStructure[i].getName();
+			this.fieldValues[other.fieldNames.length+i]=data[i];
+			this.fieldTypes[other.fieldNames.length+i]=outputStructure[i].getDataTypeID();			
+		}
+		this.timeStamp=other.timeStamp;
+		this.internalPrimayKey = other.internalPrimayKey;
+		this.volume = null;
+	}
+	
 	public StreamElement (StreamElement other, final String [ ] dataFieldNames , final Byte [ ] dataFieldTypes , final Serializable [ ] data) {
 		int len = other.fieldNames.length + dataFieldNames.length;
 		this.fieldNames=new String[len];
@@ -65,7 +85,7 @@ public final class StreamElement implements Serializable {
 		this.timeStamp=other.timeStamp;
 		this.internalPrimayKey = other.internalPrimayKey;
 		this.volume = null;
-	}	
+	}
 	
 	public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data  ) {
 		this(outputStructure,data,System.currentTimeMillis());

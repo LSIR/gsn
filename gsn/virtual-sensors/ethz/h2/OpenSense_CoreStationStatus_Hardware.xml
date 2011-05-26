@@ -23,11 +23,7 @@
     </processing-class>
     <description>show hardware status information of the CoreStations from the OpenSense deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">OpenSense deployment</predicate>
-        <predicate key="LATITUDE">47.377326</predicate>
-        <predicate key="LONGITUDE">8.552935</predicate>
-    </addressing>
+    <addressing />
     <storage />
     <streams>
         <stream name="data0">
