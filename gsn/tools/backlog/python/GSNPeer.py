@@ -56,7 +56,6 @@ class GSNPeerClass(Thread, Statistics):
     _pingOutCounterId
     _msgOutCounterId
     _connectionLossesId
-    _work
     _gsnPeerStop
     '''
 
@@ -91,7 +90,6 @@ class GSNPeerClass(Thread, Statistics):
         self._connected = False
         self._gsnPeerStop = False
         self._gsnqueuelimitreached = False
-        self._work = Event()
         
         # try to open a server socket to which GSN can connect to
         try:
@@ -112,25 +110,20 @@ class GSNPeerClass(Thread, Statistics):
         
         self._pingwatchdog.start()
         self._pingtimer.start()
-        self._work.set()
         
         self._serversocket.listen(1)
         
         threadnr = 1
         while not self._gsnPeerStop:
-            self._work.wait()
-            if self._gsnPeerStop:
-                break
-            self._work.clear()
-        
             self._gsnlistener = GSNListener(self, self._port, self._serversocket, threadnr)
             threadnr = (threadnr+1)%0xFF
             if not self._gsnPeerStop:
                 self._gsnlistener.start()
                 
+            self._gsnlistener.join()
+            
         self._pingwatchdog.join()
         self._pingtimer.join()
-        self._gsnlistener.join()
  
         self._logger.info('died')
 
@@ -140,7 +133,6 @@ class GSNPeerClass(Thread, Statistics):
         self._pingtimer.stop()
         self._gsnlistener.stop()
         self._gsnPeerStop = True
-        self._work.set()
         self._serversocket.shutdown(socket.SHUT_RDWR)
         self._serversocket.close()
         self._logger.info('stopped')
@@ -230,7 +222,6 @@ class GSNPeerClass(Thread, Statistics):
         self._backlogMain.connectionToGSNlost()
         self._pingwatchdog.pause()
         self._pingtimer.pause()
-        self._work.set()
         
         
     def watchdogdisconnect(self):
@@ -319,7 +310,7 @@ class GSNListener(Thread):
     clientsocket
     _connected
     _clientaddr
-    _lock
+    _disconnectLock
     _gsnListenerStop
     _stuff
     _stuffread
@@ -351,7 +342,7 @@ class GSNListener(Thread):
         self._stuffread = ''
 
         self._connected = False
-        self._lock = Lock()
+        self._disconnectLock = Lock()
         self._gsnListenerStop = False
 
 
@@ -371,6 +362,14 @@ class GSNListener(Thread):
             if self._gsnListenerStop:
                 self._logger.debug('died')
                 return
+            
+            self._logger.info('got connection from %s' % (self._clientaddr,))
+
+            self.clientsocket.settimeout(None)
+            
+            # speed optimizations
+            pktReceived = self._gsnPeer.pktReceived
+
             self._connected = True
             self._gsnwriter.start()
             self._gsnwriter.sendHelloMsg()
@@ -383,19 +382,14 @@ class GSNListener(Thread):
             return
 
         try:
-            self._logger.info('got connection from %s' % (self._clientaddr,))
-
-            self.clientsocket.settimeout(None)
-            
-            # speed optimizations
-            pktReceived = self._gsnPeer.pktReceived
-
             while not self._gsnListenerStop:
                 self._logger.debug('rcv...')
                 
                 if connecting:
                     try:
                         helloByte = self.pktReadAndDestuff(1)
+                        if self._gsnListenerStop:
+                            break;
                         if not helloByte:
                             continue
                     
@@ -416,6 +410,8 @@ class GSNListener(Thread):
                     # read the length (4 bytes) of the incoming packet (this is blocking)
                     try:
                         pkt = self.pktReadAndDestuff(4)
+                        if self._gsnListenerStop:
+                            break;
                         if not pkt:
                             continue
                     
@@ -429,6 +425,8 @@ class GSNListener(Thread):
                     pkt_len = struct.unpack('<i', pkt)[0]
                     try:
                         pkt = self.pktReadAndDestuff(pkt_len)
+                        if self._gsnListenerStop:
+                            break;
                         if not pkt:
                             continue
                     
@@ -501,11 +499,11 @@ class GSNListener(Thread):
 
     def disconnect(self):
         # synchonized method, guarantee that stop is called only once
-        self._lock.acquire()
+        self._disconnectLock.acquire()
         if self._connected:
             self.stop()
             self._gsnPeer.disconnect()
-        self._lock.release()
+        self._disconnectLock.release()
 
 
 
