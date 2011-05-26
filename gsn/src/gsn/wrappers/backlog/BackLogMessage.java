@@ -112,6 +112,16 @@ public class BackLogMessage {
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.PowerManagerPlugin PowerManagerPlugin}. */
 	public static final byte POWERMANAGER_MESSAGE_TYPE = 70;
+
+	/** MiCS-OZ-47 Ozone Sensor 
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.OZ47Plugin OZ47Plugin}. */
+	public static final byte OZ47_MESSAGE_TYPE = 80;
+
+	/** ECVQ-EK3 Gas Sensor 
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.ECVQEK3Plugin ECVQEK3Plugin}. */
+	public static final byte ECVQEK3_MESSAGE_TYPE = 81;
 	
 	
 	/* #                                                            #
