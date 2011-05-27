@@ -3,9 +3,9 @@
 __author__      = "David Hasenfratz <hasenfratz@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2011, ETH Zurich, Switzerland, David Hasenfratz"
 __license__     = "GPL"
-__version__     = "$Revision: 2925 $"
-__date__        = "$Date: 2011-03-25 08:50:27 +0100 (Fri, 25 Mar 2011) $"
-__id__          = "$Id: GPSPluginNAV.py 2925 2011-03-25 07:50:27Z dhasenfratz $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
 
 '''
 backlog imports

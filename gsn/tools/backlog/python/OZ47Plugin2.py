@@ -3,10 +3,10 @@
 __author__      = "David Hasenfratz <hasenfratz@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2011, ETH Zurich, Switzerland, David Hasenfratz"
 __license__     = "GPL"
-__version__     = "$Revision: 3022 $"
-__date__        = "$Date: 2011-04-19 17:10:32 +0200 (Tue, 19 Apr 2011) $"
-__id__          = "$Id: OZ47Plugin.py 3022 2011-04-19 15:10:32Z dhasenfratz $"
-__source__      = "$URL: http://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/OZ47Plugin.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
+__source__      = "$URL$"
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
