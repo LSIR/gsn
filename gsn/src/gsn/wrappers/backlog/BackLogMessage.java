@@ -108,6 +108,11 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.GPSPlugin GPSPlugin}. */
 	public static final byte GPS_MESSAGE_TYPE = 60;
 	
+	/** The GPS NAV message type. This message type is used to
+     *  send/receive GPS data.
+	 *  {@link gsn.wrappers.backlog.plugins.GPSNAVPlugin GPSNAVPlugin}. */
+	public static final byte GPS_NAV_MESSAGE_TYPE = 61;
+	
 	/** PowerManager 
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.PowerManagerPlugin PowerManagerPlugin}. */

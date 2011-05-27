@@ -1,0 +1,64 @@
+<virtual-sensor name="OpenSense_GPS_NAV__mapped" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+    		<init-params>
+            <param name="persistant">true</param>
+	    	<param name="scriptlet">
+				<![CDATA[
+					try {
+						UTC_POS_TIME = UTC_RAW_DATA.toInteger();
+						LATITUDE = LAT_RAW_DATA.toDouble();
+						LAT_HEMISPHERE = LAT_N_RAW_DATA;
+						LONGITUDE = LONG_RAW_DATA.toDouble();
+						LONG_HEMISPHERE = LONG_N_RAW_DATA;
+						QUALITY = QUAL_RAW_DATA.toInteger();
+						NR_SATELLITES = SAT_RAW_DATA.toInteger();
+						HDOP = HDOP_RAW_DATA.toDouble();
+						GEOID_HEIGHT = GEO_HEIGHT_RAW_DATA.toDouble();
+						GEOID_HEIGHT_UNIT = GEO_HEIGHT_U_RAW_DATA;
+						GEOID_SEP = GEO_SEP_RAW_DATA.toDouble();
+						GEOID_SEP_UNIT = GEO_SEP_U_RAW_DATA;
+					}catch(Throwable e){
+						org.apache.log4j.Logger.getLogger(gsn.vsensor.BridgeVirtualSensorPermasense.class).error(e);
+					}
+				]]>
+	    	</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="UTC_POS_TIME" type="INTEGER"/>
+            <field name="LATITUDE" type="DOUBLE" />
+            <field name="LAT_HEMISPHERE" type="VARCHAR(32)" />
+            <field name="LONGITUDE" type="DOUBLE" />
+            <field name="LONG_HEMISPHERE" type="VARCHAR(32)" />
+            <field name="QUALITY" type="INTEGER" />
+            <field name="NR_SATELLITES" type="INTEGER" />
+            <field name="HDOP" type="DOUBLE" />
+            <field name="GEOID_HEIGHT" type="DOUBLE" />
+            <field name="GEOID_HEIGHT_UNIT" type="VARCHAR(32)" />
+            <field name="GEOID_SEP" type="DOUBLE" />
+            <field name="GEOID_SEP_UNIT" type="VARCHAR(32)" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>show Navigation GPS information from the OpenSense deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OpenSense_GPS_NAV__muxed__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

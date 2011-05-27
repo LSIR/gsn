@@ -1,8 +1,8 @@
-<virtual-sensor name="OpenSense_ECVQEK3__conv" priority="10" >
+<virtual-sensor name="OpenSense_ECVQEK3__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-		<init-params>
+				<init-params>
             <param name="persistant">true</param>
 	    	<param name="scriptlet">
 				<![CDATA[
