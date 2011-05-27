@@ -33,24 +33,22 @@ case "$1" in
     fi
     echo "done."
     ;;
-#  restart)
-#    echo -n "Restarting $DESC... "
-#    PID=`pgrep -f -x "$EXEC"`
-#    if [ -x $SUBPROCESSFAKED ]; then
-#    	echo -n "and $SUBPROCESSFAKENAME... "
-#		killall $SUBPROCESSFAKENAME
-#    fi
-#    if [ $? = 0 ]; then
-#        kill -INT $PID
-#        wait $PID
-#	fi
-#    if [ -x $SUBPROCESSFAKED ]; then
-#		$SUBPROCESSFAKED | logger -t $SUBPROCESSFAKENAME &
-#	fi
-#    screen -S backlog -d -m $EXEC
-#    echo "done."
-#    ;;
+  restart)
+    echo -n "Restarting $DESC... waiting for $DESC to shutdown... "
+    PID=`pgrep -f -x "$EXEC"`
+    if [ $? = 0 ]; then
+        kill -INT $PID
+        while ps -p $PID > /dev/null; do sleep 1; done
+	fi
+    echo -n "restarting $SUBPROCESSFAKENAME... "
+    if [ -x $SUBPROCESSFAKED ]; then
+		$SUBPROCESSFAKED | logger -t $SUBPROCESSFAKENAME &
+	fi
+    echo -n "starting $DESC... "
+    screen -S backlog -d -m $EXEC
+    echo "done."
+    ;;
   *)
-    echo "Usage: /etc/init.d/backlog {start|stop}" #|restart}"
+    echo "Usage: /etc/init.d/backlog {start|stop|restart}"
     ;;
 esac
