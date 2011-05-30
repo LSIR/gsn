@@ -51,7 +51,7 @@ class GPSPluginNAVClass(AbstractPluginClass):
         self.info("Done init")
 
     def getMsgType(self):
-        return BackLogMessage.GPS_MESSAGE_TYPE
+        return BackLogMessage.GPS_NAV_MESSAGE_TYPE
 
     def isBusy(self):
         return False

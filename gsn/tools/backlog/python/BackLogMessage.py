@@ -69,8 +69,17 @@ SCHEDULE_MESSAGE_TYPE = 50
 # The GPS message type.
 GPS_MESSAGE_TYPE = 60
 
+# GPSNAVPlugin
+GPS_NAV_MESSAGE_TYPE = 61
+
 #Power Manager
 POWERMANAGER_MESSAGE_TYPE = 70
+
+# MiCS-OZ-47 Ozone Sensor 
+OZ47_MESSAGE_TYPE = 80
+
+# ECVQ-EK3 Gas Sensor 
+ECVQEK3_MESSAGE_TYPE = 81
 
 # The maximum supported payload size (2^32-9bytes). This is due to
 # the sending mechanism. A sent message is defined by preceding
