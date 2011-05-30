@@ -7,11 +7,11 @@
 	    	<param name="scriptlet">
 				<![CDATA[
 					try {
-						BIAS_VOLTAGE = RAW_DATA.substring(10,14).toLong();
-						MEASURED_CONCENTRATION = RAW_DATA.substring(16,24).toLong / 100.0 as double;
-						SENSOR_OUTPUT_CURRENT = RAW_DATA.substring(26,34).toLong();
-						ELECTROCHEM_SPAN_CONCENTRATION = RAW_DATA.substring(36,44).toLong / 100.0 as double;
-						SPAN_CURRENT = RAW_DATA.substring(46,54).toLong();
+						BIAS_VOLTAGE = Long.parseLong(RAW_DATA.substring(10,14),16);
+						MEASURED_CONCENTRATION = Long.parseLong(RAW_DATA.substring(16,24),16) / 100.0 as double;
+						SENSOR_OUTPUT_CURRENT = Long.parseLong(RAW_DATA.substring(26,34),16);
+						ELECTROCHEM_SPAN_CONCENTRATION = Long.parseLong(RAW_DATA.substring(36,44),16) / 100.0 as double;
+						SPAN_CURRENT = Long.parseLong(RAW_DATA.substring(46,54),16);
 						TEMPERATURE = RAW_DATA.substring(55,59).toDouble();
 						CURRENT_RANGE = RAW_DATA.substring(61,64);
 						SELECTED_RANGE = RAW_DATA.substring(65,68);

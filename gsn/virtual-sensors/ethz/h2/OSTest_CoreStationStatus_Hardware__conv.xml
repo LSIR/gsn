@@ -1,0 +1,41 @@
+<virtual-sensor name="OSTest_CoreStationStatus_Hardware__conv" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+            <field name="V_EXT1" type="VARCHAR(30)" unit="V"/>
+            <field name="V_EXT2" type="VARCHAR(30)" unit="V"/>
+            <field name="V_EXT3" type="VARCHAR(30)" unit="V"/>
+            <field name="I_V12DC_EXT" type="VARCHAR(30)" unit="mA"/>
+            <field name="V12DC_IN" type="VARCHAR(30)" unit="V"/>
+            <field name="I_V12DC_IN" type="VARCHAR(30)" unit="mA"/>
+            <field name="VCC_5_0" type="VARCHAR(30)" unit="V"/>
+            <field name="VCC_NODE" type="VARCHAR(30)" unit="V"/>
+            <field name="I_VCC_NODE" type="VARCHAR(30)" unit="mA"/>
+            <field name="VCC_4_2" type="VARCHAR(30)" unit="V"/>
+            <field name="LM92_TEMP" type="VARCHAR(30)" unit="°C" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>converted CoreStation hardware status from OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from OSTest_CoreStationStatus_Hardware__mapped </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, cast(round(V_EXT1/1000.0, 3) as CHAR(30)) as V_EXT1, cast(round(V_EXT2/1000.0, 3) as CHAR(30)) as V_EXT2, cast(round(V_EXT3/1000.0, 3) as CHAR(30)) as V_EXT3, cast(round(i_v12dc_ext/1000.0, 3) as CHAR(30)) as i_v12dc_ext, cast(round(V12DC_IN/1000.0, 3) as CHAR(30)) as V12DC_IN, cast(round(I_V12DC_IN/1000.0, 3) as CHAR(30)) as I_V12DC_IN, cast(round(VCC_5_0/1000.0, 3) as CHAR(30)) as VCC_5_0, cast(round(VCC_NODE/1000.0, 3) as CHAR(30)) as VCC_NODE, cast(round(I_VCC_NODE/1000.0, 3) as CHAR(30)) as I_VCC_NODE, cast(round(VCC_4_2/1000.0, 3) as CHAR(30)) as VCC_4_2, cast(round(LM92_TEMP/1000.0, 3) as CHAR(30)) as LM92_TEMP, DATA_IMPORT_SOURCE from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
