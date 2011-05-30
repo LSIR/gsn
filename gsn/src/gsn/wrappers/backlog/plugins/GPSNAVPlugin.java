@@ -46,7 +46,7 @@ public class GPSNAVPlugin extends AbstractPlugin {
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 
-		if (data.length != 12) {
+		if (data.length != 15) {
 			logger.error("The message with timestamp >" + timestamp + "< seems unparsable.(length: " + data.length + ")");
 			ackMessage(timestamp, super.priority);
 			return true;
