@@ -1,0 +1,56 @@
+<virtual-sensor name="OSTest_ECVQEK3__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+				<init-params>
+            <param name="persistant">true</param>
+	    	<param name="scriptlet">
+				<![CDATA[
+					try {
+						BIAS_VOLTAGE = RAW_DATA.substring(10,14).toLong();
+						MEASURED_CONCENTRATION = RAW_DATA.substring(16,24).toLong / 100.0 as double;
+						SENSOR_OUTPUT_CURRENT = RAW_DATA.substring(26,34).toLong();
+						ELECTROCHEM_SPAN_CONCENTRATION = RAW_DATA.substring(36,44).toLong / 100.0 as double;
+						SPAN_CURRENT = RAW_DATA.substring(46,54).toLong();
+						TEMPERATURE = RAW_DATA.substring(55,59).toDouble();
+						CURRENT_RANGE = RAW_DATA.substring(61,64);
+						SELECTED_RANGE = RAW_DATA.substring(65,68);
+					}catch(Throwable e){
+						org.apache.log4j.Logger.getLogger(gsn.vsensor.BridgeVirtualSensorPermasense.class).error(e);
+					}
+				]]>
+	    	</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="BIAS_VOLTAGE" type="BIGINT" unit="mV" />
+            <field name="MEASURED_CONCENTRATION" type="DOUBLE" unit="ppm" />
+            <field name="SENSOR_OUTPUT_CURRENT" type="BIGINT" unit="nA" />
+            <field name="ELECTROCHEM_SPAN_CONCENTRATION" type="DOUBLE" unit="ppm" />
+            <field name="SPAN_CURRENT" type="BIGINT" unit="nA" />
+            <field name="TEMPERATURE" type="DOUBLE" unit="C" />
+            <field name="CURRENT_RANGE" type="VARCHAR(3)" />
+            <field name="SELECTED_RANGE" type="VARCHAR(3)" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Sensor evaluation kit ECVQEK3 reading from the OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OSTest_ECVQEK3__muxed__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

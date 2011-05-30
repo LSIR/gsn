@@ -1,4 +1,4 @@
-<virtual-sensor name="OpenSense_OZ47" priority="10" statistics="true" >
+<virtual-sensor name="OSTest_OZ47" priority="10" statistics="true" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -12,7 +12,7 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>OZ-47 sensor reading from the OpenSense deployment</description>
+    <description>OZ-47 sensor reading from the OSTest deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -21,7 +21,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <!--predicate key="remote-connection">opensense-etz-bs01.ethz.ch:9003</predicate-->
-                    <predicate key="remote-connection">opensense-caa-etz-1.dyndns.biz:9003</predicate>
+                    <predicate key="remote-connection">opensense-etz-bs02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.OZ47Plugin</predicate>
                     <predicate key="status-data-type">statistics</predicate>
                 </address>
