@@ -89,6 +89,17 @@ Matterhorn_Schedule.xml
 Matterhorn_Statistics.xml
 Matterhorn_VaisalaWXT520.xml
 Matterhorn_Topology.xml
+OpenSense_BackLogStatus_Static.xml
+OpenSense_BackLogStatus_Revision.xml
+OpenSense_BackLogStatus_Dynamic.xml
+OpenSense_CoreStationStatus_Static.xml
+OpenSense_CoreStationStatus_Software.xml
+OpenSense_CoreStationStatus_Hardware.xml
+OpenSense_ECVQEK3.xml
+OpenSense_GPS_NAV.xml
+OpenSense_OZ47.xml
+OpenSense_Schedule.xml
+OpenSense_Statistics.xml
 Thur_BackLogStatus_Dynamic.xml
 Thur_BackLogStatus_Revision.xml
 Thur_BackLogStatus_Static.xml
