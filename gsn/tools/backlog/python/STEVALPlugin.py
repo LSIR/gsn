@@ -68,8 +68,8 @@ class STEVALPluginClass(AbstractPluginClass):
         self.info('STEVAL: unsetSensor() success')
         dataPackage = [STATIC_DATA]
         dataPackage += [op_msg]
-        #self.processMsg(self.getTimeStamp(), dataPackage)
-        self.info(dataPackage)
+        self.processMsg(self.getTimeStamp(), dataPackage)
+        self.info('STEVAL data sent to backlog')
 
     def getMsgType(self):
         return BackLogMessage.STEVAL_MESSAGE_TYPE        
@@ -130,9 +130,8 @@ class STEVALPluginClass(AbstractPluginClass):
                     dataPackage = [DYNAMIC_RAW_PROC_DATA]
             
             dataPackage += [op_msg]
-            #self.processMsg(self.getTimeStamp(), dataPackage)
-            self.info(dataPackage)
-            
+            self.processMsg(self.getTimeStamp(), dataPackage)
+            self.info('STEVAL data sent to backlog')
 
     def stop(self):
         self._stopped = True
