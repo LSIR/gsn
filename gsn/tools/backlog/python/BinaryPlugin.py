@@ -249,8 +249,8 @@ class BinaryPluginClass(AbstractPluginClass):
                 self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
                 self._filedequelock.release()
             self._filedescriptor.close()
-        self._binaryWriter.stopSending()
         self._emptyQueue()
+        self._binaryWriter.stopSending()
         
     
     def run(self):
@@ -582,7 +582,6 @@ class BinaryWriter(Thread):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._binaryPluginClass = parent
         self._sendqueue = Queue.Queue(1)
-        self._lock = Lock()
         self._stopsending = Event()
         self._messageNr = -1
         self._resendcounter = 0
@@ -595,25 +594,23 @@ class BinaryWriter(Thread):
         while not self._binaryWriterStop:
             msg = self._sendqueue.get()
             self._stopsending.clear()
-            self._lock.acquire()
             self._messageNr = (self._messageNr+1)%MESSAGE_NUMBER_MOD
             
             if not self._binaryWriterStop:
                 self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
-                while not self._stopsending.isSet() and not self._binaryWriterStop:
+                while not self._stopsending.isSet() and self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop:
                     self._stopsending.wait(self._binaryPluginClass._chunk_resend_timeout)
-                    if not self._stopsending.isSet() and not self._binaryWriterStop:
+                    if not self._stopsending.isSet() and self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop:
                         self._logger.debug('resend message')
                         self._resendcounter += 1
                         self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
-            self._lock.release()
             self._sendqueue.task_done()
             
         self._logger.info('died')
         
         
     def sendMessage(self, msg):
-        if not self._binaryWriterStop:
+        if self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop:
             try:
                 self._sendqueue.put_nowait(msg)
             except Queue.Full:
@@ -625,9 +622,7 @@ class BinaryWriter(Thread):
         
         
     def resetResendCounter(self):
-        self._lock.acquire()
         self._resendcounter = 0
-        self._lock.release()
         
     def getSentMsgNr(self):
         return self._messageNr
