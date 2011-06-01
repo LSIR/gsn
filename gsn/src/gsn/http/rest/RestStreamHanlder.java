@@ -258,7 +258,12 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 				else {
 					switch (pos) {
 					case 1:
-						startTime= Helpers.convertTimeFromIsoToLong(URLDecoder.decode(token,"UTF-8"));
+						String time = URLDecoder.decode(token,"UTF-8");
+						try {
+							startTime = Long.parseLong(time);
+						} catch (NumberFormatException e) {
+							startTime= Helpers.convertTimeFromIsoToLong(time);
+						}
 						continue;
 					case 2:
 						timeout = Integer.parseInt(URLDecoder.decode(token,"UTF-8"));
