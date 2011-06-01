@@ -81,6 +81,12 @@ OZ47_MESSAGE_TYPE = 80
 # ECVQ-EK3 Gas Sensor 
 ECVQEK3_MESSAGE_TYPE = 81
 
+# STEVAL Accelerometer 
+STEVAL_MESSAGE_TYPE = 82
+
+# STEVAL Accelerometer 
+ALPHASENSE_MESSAGE_TYPE = 83
+
 # The maximum supported payload size (2^32-9bytes). This is due to
 # the sending mechanism. A sent message is defined by preceding
 # four bytes containing the message size. A message consists of
