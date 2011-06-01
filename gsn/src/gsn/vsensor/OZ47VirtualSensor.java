@@ -144,9 +144,9 @@ public class OZ47VirtualSensor extends BridgeVirtualSensorPermasense {
 				int h= Integer.parseInt(str.substring(15,17),16);
 	
 				data = new StreamElement(data, dynamicDataField, new Serializable[] {s1, s2, r1, r2, t, h});
-	
-				super.dataAvailable(inputStreamName, data);
 			}
+			super.dataAvailable(inputStreamName, data);
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

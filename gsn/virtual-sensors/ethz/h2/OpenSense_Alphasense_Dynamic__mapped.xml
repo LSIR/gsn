@@ -1,0 +1,38 @@
+<virtual-sensor name="OpenSense_Alphasense_Dynamic__mapped" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.AlphasenseVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="message_type">dynamic</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="SENSOR_CURRENT" type="DOUBLE" unit="uA" />
+            <field name="SENSOR_PPM_1" type="DOUBLE" unit="ppm" />
+            <field name="SENSOR_PPM_2" type="DOUBLE" unit="ppm" />
+            <field name="AMBIENT_TEMP" type="DOUBLE" unit="C" />
+            <field name="OFFSET_COMP" type="DOUBLE" unit="uA" />
+            <field name="SENSITIVITY_COMP" type="DOUBLE" unit="%" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Alphasense sensor reading from the OpenSense deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OpenSense_Alphasense__muxed__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

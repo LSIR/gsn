@@ -75,6 +75,9 @@ OSTest_GPS_NAV__muxed__mapped.xml
 OSTest_OZ47_Dynamic__mapped.xml
 OSTest_OZ47_Static__mapped.xml
 OSTest_OZ47__muxed__mapped.xml
+OSTest_Alphasense_Dynamic__mapped.xml
+OSTest_Alphasense__muxed__mapped.xml
+OSTest_Alphasense_Static__mapped.xml
 OSTest_Schedule__mapped.xml
 OSTest_Statistics__mapped.xml
 Statistics_DataFlow.xml
