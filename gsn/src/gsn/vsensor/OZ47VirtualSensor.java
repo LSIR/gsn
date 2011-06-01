@@ -126,6 +126,7 @@ public class OZ47VirtualSensor extends BridgeVirtualSensorPermasense {
 				double kt_2 = hex2double(v);
 				
 				data = new StreamElement(data, staticDataField, new Serializable[] {lotNo, cellNo, calibWeek, calibYear, gTimerPreHeat, gAutoCalib, gTimerDelay, gTimerCycle, gTimerPulse, offsetMem, offsetVerif, gOffset, x0_1, x1_1, x2_1, x3_1, kt_1, x0_2, x1_2, x2_2, x3_2, kt_2});
+				super.dataAvailable(inputStreamName, data);
 			}
 			else if (messageType == DYNAMIC_NAMING && type == DYNAMIC_NAMING) {
 				// split string:
@@ -144,8 +145,8 @@ public class OZ47VirtualSensor extends BridgeVirtualSensorPermasense {
 				int h= Integer.parseInt(str.substring(15,17),16);
 	
 				data = new StreamElement(data, dynamicDataField, new Serializable[] {s1, s2, r1, r2, t, h});
+				super.dataAvailable(inputStreamName, data);
 			}
-			super.dataAvailable(inputStreamName, data);
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
