@@ -104,7 +104,7 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			    i = Long.parseLong(currentAtSpan, 16); 
 			    _currentAtSpan = Float.intBitsToFloat(i.intValue()); 
 				
-			    data = new StreamElement(data, staticDataField, new Serializable[] {_ppmAtZero, _currentAtZero, _ppmAtSpan, _currentAtSpan, calibrationDate.reverse().toString()});
+			    data = new StreamElement(data, staticDataField, new Serializable[] {_ppmAtZero, _currentAtZero, _ppmAtSpan, _currentAtSpan, calibrationDate.toString()});
 			    super.dataAvailable(inputStreamName, data);
 			}
 			else if (messageType == DYNAMIC_NAMING && type == DYNAMIC_NAMING) {
