@@ -98,6 +98,8 @@ OpenSense_CoreStationStatus_Hardware.xml
 OpenSense_ECVQEK3.xml
 OpenSense_GPS_NAV.xml
 OpenSense_OZ47.xml
+OpenSense_Alphasense.xml
+OpenSense_STEVAL.xml
 OpenSense_Schedule.xml
 OpenSense_Statistics.xml
 Thur_BackLogStatus_Dynamic.xml

@@ -128,6 +128,16 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.ECVQEK3Plugin ECVQEK3Plugin}. */
 	public static final byte ECVQEK3_MESSAGE_TYPE = 81;
 	
+	/** STEVAL Accelerometer 
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.STEVALPlugin STEVALPlugin}. */
+	public static final byte STEVAL_MESSAGE_TYPE = 82;
+	
+	/** Alphasense Gas Sensor 
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.AlphasensePlugin AlphasensePlugin}. */
+	public static final byte ALPHASENSE_MESSAGE_TYPE = 83;
+	
 	
 	/* #                                                            #
 	 * #                                                            #
