@@ -313,13 +313,13 @@ class STEVALPluginClass(AbstractPluginClass):
                 dataPackage += [startTime]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [xOut[i][j]]
+                        dataPackage += [float(xOut[i][j])]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [yOut[i][j]]
+                        dataPackage += [float(yOut[i][j])]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [zOut[i][j]]
+                        dataPackage += [float(zOut[i][j])]
             
             else: # option == RAW_PROC_OPT :
                 dataPackage += [duration]
@@ -341,13 +341,13 @@ class STEVALPluginClass(AbstractPluginClass):
                 dataPackage += [tmp_msg.replace("\n",",")]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [xOut[i][j]]
+                        dataPackage += [float(xOut[i][j])]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [yOut[i][j]]
+                        dataPackage += [float(yOut[i][j])]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [zOut[i][j]]
+                        dataPackage += [float(zOut[i][j])]
             
             if self._log_save_flag == "TRUE":
                 destTime = tFile
