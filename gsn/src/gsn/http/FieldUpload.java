@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -41,7 +40,7 @@ public class FieldUpload extends HttpServlet {
 		Integer code;
 		PrintWriter out = res.getWriter();
 		ArrayList<String> paramNames = new ArrayList<String>();
-		ArrayList<String> paramValues = new ArrayList<String>();
+		ArrayList<Serializable> paramValues = new ArrayList<Serializable>();
 		
 		//Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(req);
@@ -58,7 +57,7 @@ public class FieldUpload extends HttpServlet {
 			ServletFileUpload upload = new ServletFileUpload(factory);
 
 			// Set overall request size constraint
-			upload.setSizeMax(5*1024*1024);
+//			upload.setSizeMax(5*1024*1024);
 			
 			
 			List items;
@@ -69,52 +68,47 @@ public class FieldUpload extends HttpServlet {
 				//building xml data out of the input
 				String cmd = "";
 				String vsname = "";
-				Base64 b64 = new Base64();
-				StringBuilder sb = new StringBuilder("<input>\n" );
 				Iterator iter = items.iterator();
 				while (iter.hasNext()) {
 					FileItem item = (FileItem) iter.next();
 				    if (item.getFieldName().equals("vsname")){
 				    	//define which cmd block is sent
-				    	sb.append("<vsname>"+item.getString()+"</vsname>\n");
 				    	vsname = item.getString();
 				    } else if (item.getFieldName().equals("cmd")){
 				    	//define which cmd block is sent
 				    	cmd = item.getString();
-				    	sb.append("<command>"+item.getString()+"</command>\n");
-				    	sb.append("<fields>\n");
 				    } else if (item.getFieldName().split(";")[0].equals(cmd)) {
-				    	//only for the defined cmd    	
-				    	sb.append("<field>\n");
-			    	    sb.append("<name>"+item.getFieldName().split(";")[1]+"</name>\n");
+				    	//only for the defined cmd
 			    	    paramNames.add(item.getFieldName().split(";")[1]);
 			    	    if (item.isFormField()) {
-					    	sb.append("<value>"+item.getString()+"</value>\n");
 					    	paramValues.add(item.getString());
 			    	    } else {
-			    	    	sb.append("<value>"+new String(b64.encode(item.get()))+"</value>\n");
-					    	paramValues.add(new String(b64.encode(item.get())));
+			    	    	paramValues.add(item);
 			    	    }
-			    	    sb.append("</field>\n");
 				    }
 				}
-				sb.append("</fields>\n");
-				sb.append("</input>\n" );
 			
 				//do something with xml aka statement.toString()
 			
 			    AbstractVirtualSensor vs = null;
+			    boolean ret = false;
 			    try {
 			    	vs = Mappings.getVSensorInstanceByVSName( vsname ).borrowVS( );
-			    	vs.dataFromWeb( cmd , paramNames.toArray(new String[]{}) , paramValues.toArray(new Serializable[]{}) );
+			    	ret = vs.dataFromWeb( cmd , paramNames.toArray(new String[]{}) , paramValues.toArray(new Serializable[]{}) );
 			    } catch ( VirtualSensorInitializationFailedException e ) {
 			      logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
 			    } finally {
 			    	Mappings.getVSensorInstanceByVSName(vsname).returnVS(vs);
 			    }
 				
-				code = 200;
-				msg = "The upload to the virtual sensor went successfully! ("+vsname+")";
+			    if (ret) {
+					code = 200;
+					msg = "The upload to the virtual sensor went successfully! ("+vsname+")";
+			    }
+			    else {
+					code = 500;
+					msg = "The upload could not be processed successfully! ("+vsname+")";
+			    }
 			} catch (ServletFileUpload.SizeLimitExceededException e) {
 				code = 600;
 				msg = "Upload size exceeds maximum limit!";

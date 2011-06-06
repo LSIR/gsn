@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 
 import gsn.Main;
@@ -146,7 +147,7 @@ public class SchedulePlugin extends AbstractPlugin {
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("schedule") == 0 ) {
 					// store the schedule received from the web input in the database
-					schedule = decode(((String)paramValues[i]).toCharArray());
+					schedule = ((FileItem)paramValues[i]).get();
 				}
 				else if( paramNames[i].compareToIgnoreCase("core_station") == 0 ) {
 					id = Integer.parseInt((String)paramValues[i]);
