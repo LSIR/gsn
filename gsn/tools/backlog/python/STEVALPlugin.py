@@ -1,7 +1,7 @@
 #! /usr/bin/python
 # -*- coding: UTF-8 -*-
-__author__      = ""
-__copyright__   = "Copyright 2011, ETH Zurich, Switzerland,"
+__author__      = "David Hasenfratz <hasenfratz@tik.ee.ethz.ch>"
+__copyright__   = "Copyright 2011, ETH Zurich, Switzerland, David Hasenfratz"
 __license__     = "GPL"
 __version__     = "$Revision$"
 __date__        = "$Date$"
@@ -36,6 +36,7 @@ adc_factor = pow(2,15)
 NOTEXIST = 0
 sampling_rate = 40
 selection_points = 10
+
     
 # Reads messages from the STEVALDriver and send it to GSN
 class STEVALPluginClass(AbstractPluginClass):
@@ -46,7 +47,6 @@ class STEVALPluginClass(AbstractPluginClass):
         self._timer = None
         self._stopped = False
         self._interval = None
-        self.statisticsCounterValue = 0
 
         self.info('Init STEVALPlugin...')
         
@@ -60,16 +60,13 @@ class STEVALPluginClass(AbstractPluginClass):
         self.steval._openDevice()
         self._deviceNum = self.steval._getDevName();
         self._firmwareNum = self.steval._getVerNumber();
-        op_msg = []
-        op_msg.append(self._deviceNum)
-        op_msg.append(self._firmwareNum)
         self.steval._unsetSensor()
         self.steval._closeDevice()
         self.info('STEVAL: unsetSensor() success')
         dataPackage = [STATIC_DATA]
-        dataPackage += [op_msg]
+        dataPackage += [self._deviceNum]
+        dataPackage += [self._firmwareNum]
         self.processMsg(self.getTimeStamp(), dataPackage)
-        self.info('STEVAL data sent to backlog')
 
     def getMsgType(self):
         return BackLogMessage.STEVAL_MESSAGE_TYPE        
@@ -114,24 +111,22 @@ class STEVALPluginClass(AbstractPluginClass):
             tFile.write(str(start))
             tFile.write('\n')
             tFile.close()
-            op_msg = self.dataProcessing(self._outputOpt)
             
             self.info('STEVAL reading done')
         else:
             self.warning ('STEVAL read failed')
-            
+        
         if readFlag == 1:
             if self._outputOpt == RAW_OPT:
                 dataPackage = [DYNAMIC_RAW_DATA]
+            elif self._outputOpt == PROC_OPT:
+                dataPackage = [DYNAMIC_PROC_DATA]
             else:
-                if self._outputOpt == PROC_OPT:
-                    dataPackage = [DYNAMIC_PROC_DATA]
-                else:
-                    dataPackage = [DYNAMIC_RAW_PROC_DATA]
+                dataPackage = [DYNAMIC_RAW_PROC_DATA]
             
-            dataPackage += [op_msg]
+            self.dataProcessing(self._outputOpt, dataPackage)
             self.processMsg(self.getTimeStamp(), dataPackage)
-            self.info('STEVAL data sent to backlog')
+            
 
     def stop(self):
         self._stopped = True
@@ -157,12 +152,11 @@ class STEVALPluginClass(AbstractPluginClass):
                 if (buffer[i]>buffer[lmax]):
                     buffer[lmax] = NOTEXIST
                     lmax = i
+                elif ((buffer[i]<buffer[lmin]) or ((buffer[lmax]-buffer[i]) > threshold)):
+                    lmin = i
+                    update = 0
                 else: 
-                    if ((buffer[i]<buffer[lmin]) or ((buffer[lmax]-buffer[i]) > threshold)):
-                        lmin = i
-                        update = 0
-                    else: 
-                        buffer[i] = NOTEXIST
+                    buffer[i] = NOTEXIST
             else:
                 if (((buffer[lmax]-buffer[lmin]) > threshold) and (update != 1)) :
                     update = 1
@@ -170,12 +164,11 @@ class STEVALPluginClass(AbstractPluginClass):
                 if (buffer[i] < buffer[lmin]):
                     buffer[lmin] = NOTEXIST
                     lmin = i
-                else: 
-                    if ((buffer[i] > buffer[lmax]) or ((buffer[i]-buffer[lmin]) > threshold)):
-                        update = 0
-                        lmax = i
-                    else:
-                        buffer[i] = NOTEXIST
+                elif ((buffer[i] > buffer[lmax]) or ((buffer[i]-buffer[lmin]) > threshold)):
+                    update = 0
+                    lmax = i
+                else:
+                    buffer[i] = NOTEXIST
             i=i+1
         buffer[0]=abs(buffer[0])
         return buffer
@@ -264,7 +257,7 @@ class STEVALPluginClass(AbstractPluginClass):
         return max
 
     
-    def dataProcessing(self, option):
+    def dataProcessing(self, option, dataPackage):
         dataFile = self._log_path
         dataFile += '/data.txt'
         xFile = self._log_path
@@ -282,33 +275,33 @@ class STEVALPluginClass(AbstractPluginClass):
         tFile +='/time.txt'        
         timeFile = open(tFile,'r')
         duration = timeFile.readline()
-	duration = duration.rstrip('\n')
+        duration = duration.rstrip('\n')
         startTime = timeFile.readline()
-	startTime = startTime.rstrip('\n')
-        msg = []
+        startTime = startTime.rstrip('\n')
+        #msg = []
         
         if option == RAW_OPT:
-            #msg.append(str(option))
-            msg.append(duration)
-            msg.append(startTime)
+            #msg += [str(option)]
+            dataPackage += [duration]
+            dataPackage += [startTime]
             fp = open(xFile,'r')
             tmp_msg = fp.read()
             fp.close()
             len1 = len(tmp_msg)
-            msg.append(str(len1))
-            msg.append(tmp_msg)
+            dataPackage += [str(len1)]
+            dataPackage += [tmp_msg.replace("\n",",")]
             fp = open(yFile,'r')
             tmp_msg = fp.read()
             fp.close()
             len1 = len(tmp_msg)
-            msg.append(str(len1))
-            msg.append(tmp_msg)
+            dataPackage += [str(len1)]
+            dataPackage += [tmp_msg.replace("\n",",")]
             fp = open(zFile,'r')
             tmp_msg = fp.read()
             fp.close()
             len1 = len(tmp_msg)
-            msg.append(str(len1))
-            msg.append(tmp_msg)            
+            dataPackage += [str(len1)]
+            dataPackage += [tmp_msg.replace("\n",",")]            
             
         else:
             xData = self.generate_fftresult(xFile)
@@ -319,50 +312,63 @@ class STEVALPluginClass(AbstractPluginClass):
             yOut = self.dataSelection(yData)
             zOut = self.dataSelection(zData)
             if option == PROC_OPT:
-                #msg.append(str(option))
-                msg.append(duration)
-                msg.append(startTime)
-                msg.append(str(xOut.size))
-                msg.append(str(xOut.itemsize))
-                msg.append(str(xOut))
-                msg.append(str(yOut.size))
-                msg.append(str(yOut.itemsize))
-                msg.append(str(yOut))
-                msg.append(str(zOut.size))
-                msg.append(str(zOut.itemsize))
-                msg.append(str(zOut))
+                #msg += [str(option))
+                dataPackage += [duration]
+                dataPackage += [startTime]
+                dataPackage += [str(xOut.size)]
+                dataPackage += [str(xOut.itemsize)]
+                for i in range(0,selection_points):
+                    for j in range(0,2):
+                        dataPackage += [str(xOut[i][j])]
+                dataPackage += [str(yOut.size)]
+                dataPackage += [str(yOut.itemsize)]
+                for i in range(0,selection_points):
+                    for j in range(0,2):
+                        dataPackage += [str(yOut[i][j])]
+                dataPackage += [str(zOut.size)]
+                dataPackage += [str(zOut.itemsize)]
+                for i in range(0,selection_points):
+                    for j in range(0,2):
+                        dataPackage += [str(zOut[i][j])]
             
             else: # option == RAW_PROC_OPT :
-                #msg.append(str(option))
-                msg.append(duration)
-                msg.append(startTime)
+                #msg += [str(option))
+                dataPackage += [duration]
+                dataPackage += [startTime]
                 fp = open(xFile,'r')
                 tmp_msg = fp.read()
                 fp.close()
                 len1 = len(tmp_msg)
-                msg.append(str(len1))
-                msg.append(tmp_msg)
+                dataPackage += [str(len1)]
+                dataPackage += [tmp_msg.replace("\n",",")]
                 fp = open(yFile,'r')
                 tmp_msg = fp.read()
                 fp.close()
                 len1 = len(tmp_msg)
-                msg.append(str(len1))
-                msg.append(tmp_msg)
+                dataPackage += [str(len1)]
+                dataPackage += [tmp_msg.replace("\n",",")]
                 fp = open(zFile,'r')
                 tmp_msg = fp.read()
                 fp.close()
                 len1 = len(tmp_msg)
-                msg.append(str(len1))
-                msg.append(tmp_msg)
-                msg.append(str(xOut.size))
-                msg.append(str(xOut.itemsize))
-                msg.append(str(xOut))
-                msg.append(str(yOut.size))
-                msg.append(str(yOut.itemsize))
-                msg.append(str(yOut))
-                msg.append(str(zOut.size))
-                msg.append(str(zOut.itemsize))
-                msg.append(str(zOut))
+                dataPackage += [str(len1)]
+                dataPackage += [tmp_msg.replace("\n",",")]
+                dataPackage += [str(xOut.size)]
+                dataPackage += [str(xOut.itemsize)]
+                dataPackage += [str(len(xOut))]
+                for i in range(0,selection_points):
+                    for j in range(0,2):
+                        dataPackage += [str(xOut[i][j])]
+                dataPackage += [str(yOut.size)]
+                dataPackage += [str(yOut.itemsize)]
+                for i in range(0,selection_points):
+                    for j in range(0,2):
+                        dataPackage += [str(yOut[i][j])]
+                dataPackage += [str(zOut.size)]
+                dataPackage += [str(zOut.itemsize)]
+                for i in range(0,selection_points):
+                    for j in range(0,2):
+                        dataPackage += [str(zOut[i][j])]
             
             if self._log_save_flag == "TRUE":
                 destTime = tFile
@@ -388,7 +394,7 @@ class STEVALPluginClass(AbstractPluginClass):
                 os.remove(yFile)
                 os.remove(zFile)
             os.remove(dataFile)
-        return msg        
+        #return msg        
 
     
 

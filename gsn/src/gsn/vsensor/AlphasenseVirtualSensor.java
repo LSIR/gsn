@@ -64,6 +64,10 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			short type = (Short) data.getData("MESSAGE_TYPE");
 		    
 		    String inputString = new String((String)data.getData("RAW_DATA"));
+		    if (inputString.length() != 110 && inputString.length() != 117) {
+		    	logger.warn("RAW_DATA has length " + inputString.length() + " instead of 141 or 111");
+		    	return;
+		    }
 		    String delims = "[ ]+";
 		    String[] tokens = inputString.split(delims);
 		    
@@ -154,22 +158,5 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-	}
-
-	private static String replaceCharAt(String s, int pos, char c) {
-		return s.substring(0,pos) + c + s.substring(pos+1);
-	}
-	  
-	private static double  hex2double(long valueHex) {
-		double exp = (double)((valueHex >>23 & 255)-127);
-		double sign = (double)(valueHex>>31);
-
-		if (sign == 0)
-			sign = 1;
-
-		double man = ((double)1.0f + (double)((valueHex & 8388607)/(double)8388608));
-		double expVal = Math.pow(2.0,exp);
-		double ans = sign * expVal * man;
-		return ans;
 	}
 }
