@@ -8,7 +8,6 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="DURATION" type="DOUBLE" />
             <field name="TIME_OF_DATA" type="DOUBLE" />
-            <field name="Xp_LEN" type="INTEGER" />
             <field name="Xp_DATA1" type="DOUBLE" />
             <field name="Xp_FREQ1" type="DOUBLE" />
             <field name="Xp_DATA2" type="DOUBLE" />
@@ -29,7 +28,6 @@
             <field name="Xp_FREQ9" type="DOUBLE" />
             <field name="Xp_DATA10" type="DOUBLE" />
             <field name="Xp_FREQ10" type="DOUBLE" />
-            <field name="Yp_LEN" type="INTEGER" />
             <field name="Yp_DATA1" type="DOUBLE" />
             <field name="Yp_FREQ1" type="DOUBLE" />
             <field name="Yp_DATA2" type="DOUBLE" />
@@ -50,7 +48,6 @@
             <field name="Yp_FREQ9" type="DOUBLE" />
             <field name="Yp_DATA10" type="DOUBLE" />
             <field name="Yp_FREQ10" type="DOUBLE" />
-            <field name="Zp_LEN" type="INTEGER" />
             <field name="Zp_DATA1" type="DOUBLE" />
             <field name="Zp_FREQ1" type="DOUBLE" />
             <field name="Zp_DATA2" type="DOUBLE" />

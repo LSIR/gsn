@@ -32,11 +32,8 @@ public class STEVALPlugin extends AbstractPlugin {
 			
 			new DataField("DURATION", "DOUBLE"),
 	        new DataField("TIME_OF_DATA", "DOUBLE"),
-	        new DataField("X_LEN", "INTEGER"),
 	        new DataField("X_DATA", "VARCHAR(8192)"),
-	        new DataField("Y_LEN", "INTEGER"),
 	        new DataField("Y_DATA", "VARCHAR(8192)"),
-	        new DataField("Z_LEN", "INTEGER"),
 	        new DataField("Z_DATA", "VARCHAR(8192)")};
 	
 	private static DataField[] dynamicProcDataField = {
@@ -46,7 +43,6 @@ public class STEVALPlugin extends AbstractPlugin {
 			
 			new DataField("DURATION", "DOUBLE"),
 	        new DataField("TIME_OF_DATA", "DOUBLE"),
-	        new DataField("Xp_LEN", "INTEGER"),
 	        new DataField("Xp_DATA1", "DOUBLE"),
 	        new DataField("Xp_FREQ1", "DOUBLE"),
 	        new DataField("Xp_DATA2", "DOUBLE"),
@@ -67,7 +63,6 @@ public class STEVALPlugin extends AbstractPlugin {
 	        new DataField("Xp_FREQ9", "DOUBLE"),
 	        new DataField("Xp_DATA10", "DOUBLE"),
 	        new DataField("Xp_FREQ10", "DOUBLE"),
-	        new DataField("Yp_LEN", "INTEGER"),
 	        new DataField("Yp_DATA1", "DOUBLE"),
 	        new DataField("Yp_FREQ1", "DOUBLE"),
 	        new DataField("Yp_DATA2", "DOUBLE"),
@@ -88,7 +83,6 @@ public class STEVALPlugin extends AbstractPlugin {
 	        new DataField("Yp_FREQ9", "DOUBLE"),
 	        new DataField("Yp_DATA10", "DOUBLE"),
 	        new DataField("Yp_FREQ10", "DOUBLE"),
-	        new DataField("Zp_LEN", "INTEGER"),
 	        new DataField("Zp_DATA1", "DOUBLE"),
 	        new DataField("Zp_FREQ1", "DOUBLE"),
 	        new DataField("Zp_DATA2", "DOUBLE"),
@@ -117,13 +111,9 @@ public class STEVALPlugin extends AbstractPlugin {
 		
 		new DataField("DURATION", "DOUBLE"),
         new DataField("TIME_OF_DATA", "DOUBLE"),
-        new DataField("X_LEN", "INTEGER"),
         new DataField("X_DATA", "VARCHAR(8192)"),
-        new DataField("Y_LEN", "INTEGER"),
         new DataField("Y_DATA", "VARCHAR(8192)"),
-        new DataField("Z_LEN", "INTEGER"),
         new DataField("Z_DATA", "VARCHAR(8192)"),
-        new DataField("Xp_LEN", "INTEGER"),
         new DataField("Xp_DATA1", "DOUBLE"),
         new DataField("Xp_FREQ1", "DOUBLE"),
         new DataField("Xp_DATA2", "DOUBLE"),
@@ -144,7 +134,6 @@ public class STEVALPlugin extends AbstractPlugin {
         new DataField("Xp_FREQ9", "DOUBLE"),
         new DataField("Xp_DATA10", "DOUBLE"),
         new DataField("Xp_FREQ10", "DOUBLE"),
-        new DataField("Yp_LEN", "INTEGER"),
         new DataField("Yp_DATA1", "DOUBLE"),
         new DataField("Yp_FREQ1", "DOUBLE"),
         new DataField("Yp_DATA2", "DOUBLE"),
@@ -165,7 +154,6 @@ public class STEVALPlugin extends AbstractPlugin {
         new DataField("Yp_FREQ9", "DOUBLE"),
         new DataField("Yp_DATA10", "DOUBLE"),
         new DataField("Yp_FREQ10", "DOUBLE"),
-        new DataField("Zp_LEN", "INTEGER"),
         new DataField("Zp_DATA1", "DOUBLE"),
         new DataField("Zp_FREQ1", "DOUBLE"),
         new DataField("Zp_DATA2", "DOUBLE"),

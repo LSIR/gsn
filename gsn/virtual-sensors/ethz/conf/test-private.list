@@ -47,7 +47,7 @@ OSTest_Alphasense.xml
 OSTest_STEVAL_Dynamic_Proc.xml
 OSTest_STEVAL_Dynamic_Raw.xml
 OSTest_STEVAL_Static.xml
-OSTest_STEVAL_Dynamic_Raw_Proc.xml
+OSTest_STEVAL_Dynamic_RawProc.xml
 OSTest_Schedule.xml
 OSTest_Statistics.xml
 Statistics_DataFlow.xml

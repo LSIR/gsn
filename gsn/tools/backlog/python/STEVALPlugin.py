@@ -126,6 +126,8 @@ class STEVALPluginClass(AbstractPluginClass):
             
             self.dataProcessing(self._outputOpt, dataPackage)
             self.processMsg(self.getTimeStamp(), dataPackage)
+            if self._outputOpt == PROC_OPT:
+                self.info(dataPackage)
             
 
     def stop(self):
@@ -288,19 +290,16 @@ class STEVALPluginClass(AbstractPluginClass):
             tmp_msg = fp.read()
             fp.close()
             len1 = len(tmp_msg)
-            dataPackage += [str(len1)]
             dataPackage += [tmp_msg.replace("\n",",")]
             fp = open(yFile,'r')
             tmp_msg = fp.read()
             fp.close()
             len1 = len(tmp_msg)
-            dataPackage += [str(len1)]
             dataPackage += [tmp_msg.replace("\n",",")]
             fp = open(zFile,'r')
             tmp_msg = fp.read()
             fp.close()
             len1 = len(tmp_msg)
-            dataPackage += [str(len1)]
             dataPackage += [tmp_msg.replace("\n",",")]            
             
         else:
@@ -312,21 +311,14 @@ class STEVALPluginClass(AbstractPluginClass):
             yOut = self.dataSelection(yData)
             zOut = self.dataSelection(zData)
             if option == PROC_OPT:
-                #msg += [str(option))
                 dataPackage += [duration]
                 dataPackage += [startTime]
-                dataPackage += [str(xOut.size)]
-                dataPackage += [str(xOut.itemsize)]
                 for i in range(0,selection_points):
                     for j in range(0,2):
                         dataPackage += [str(xOut[i][j])]
-                dataPackage += [str(yOut.size)]
-                dataPackage += [str(yOut.itemsize)]
                 for i in range(0,selection_points):
                     for j in range(0,2):
                         dataPackage += [str(yOut[i][j])]
-                dataPackage += [str(zOut.size)]
-                dataPackage += [str(zOut.itemsize)]
                 for i in range(0,selection_points):
                     for j in range(0,2):
                         dataPackage += [str(zOut[i][j])]
@@ -339,33 +331,23 @@ class STEVALPluginClass(AbstractPluginClass):
                 tmp_msg = fp.read()
                 fp.close()
                 len1 = len(tmp_msg)
-                dataPackage += [str(len1)]
                 dataPackage += [tmp_msg.replace("\n",",")]
                 fp = open(yFile,'r')
                 tmp_msg = fp.read()
                 fp.close()
                 len1 = len(tmp_msg)
-                dataPackage += [str(len1)]
                 dataPackage += [tmp_msg.replace("\n",",")]
                 fp = open(zFile,'r')
                 tmp_msg = fp.read()
                 fp.close()
                 len1 = len(tmp_msg)
-                dataPackage += [str(len1)]
                 dataPackage += [tmp_msg.replace("\n",",")]
-                dataPackage += [str(xOut.size)]
-                dataPackage += [str(xOut.itemsize)]
-                dataPackage += [str(len(xOut))]
                 for i in range(0,selection_points):
                     for j in range(0,2):
                         dataPackage += [str(xOut[i][j])]
-                dataPackage += [str(yOut.size)]
-                dataPackage += [str(yOut.itemsize)]
                 for i in range(0,selection_points):
                     for j in range(0,2):
                         dataPackage += [str(yOut[i][j])]
-                dataPackage += [str(zOut.size)]
-                dataPackage += [str(zOut.itemsize)]
                 for i in range(0,selection_points):
                     for j in range(0,2):
                         dataPackage += [str(zOut[i][j])]
