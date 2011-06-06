@@ -350,6 +350,7 @@ class BinaryPluginClass(AbstractPluginClass):
     def _getInitialBinaryPacket(self):
         while not self._plugStop:
             if self._filedescriptor and not self._filedescriptor.closed:
+                self._filedescriptor.seek(0)
                 filename = self._filedescriptor.name
                 if not os.path.isfile(filename):
                     self._filedescriptor.close()
@@ -581,7 +582,7 @@ class BinaryWriter(Thread):
         Thread.__init__(self, name='BinaryWriter-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         self._binaryPluginClass = parent
-        self._sendqueue = Queue.Queue(1)
+        self._sendqueue = Queue.Queue(2)
         self._stopsending = Event()
         self._messageNr = -1
         self._resendcounter = 0
