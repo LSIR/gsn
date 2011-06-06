@@ -57,6 +57,8 @@ Dirruhorn_GPS_RAW__mapped.xml
 Dirruhorn_GPS_RAW__muxed__mapped.xml
 Dirruhorn_Schedule__mapped.xml
 Dirruhorn_Statistics__mapped.xml
+Dirruhorn_SyslogNg__conv.xml
+Dirruhorn_SyslogNg__mapped.xml
 Dirruhorn_Topology__public.xml
 Dirruhorn_VaisalaWXT520__mapped.xml
 Dirruhorn_VaisalaWXT520__muxed__mapped.xml
@@ -72,6 +74,8 @@ Glaciers_CoreStationStatus_Software__mapped.xml
 Glaciers_CoreStationStatus_Static__mapped.xml
 Glaciers_Schedule__mapped.xml
 Glaciers_Statistics__mapped.xml
+Glaciers_SyslogNg__conv.xml
+Glaciers_SyslogNg__mapped.xml
 Jungfraujoch_BackLogStatus_Dynamic__mapped.xml
 Jungfraujoch_BackLogStatus_Revision__mapped.xml
 Jungfraujoch_BackLogStatus_Static__mapped.xml
@@ -104,6 +108,8 @@ Jungfraujoch_Sensorrod1.xml
 Jungfraujoch_Sensorrod2.xml
 #Jungfraujoch_Sensorrod.xml
 Jungfraujoch_Statistics__mapped.xml
+Jungfraujoch_SyslogNg__conv.xml
+Jungfraujoch_SyslogNg__mapped.xml
 Jungfraujoch_Thermistorchain1.xml
 Jungfraujoch_Thermistorchain2.xml
 #Jungfraujoch_Thermistorchain.xml
@@ -180,6 +186,8 @@ Matterhorn_Sensorrod1.xml
 Matterhorn_Sensorrod2.xml
 #Matterhorn_Sensorrod.xml
 Matterhorn_Statistics__mapped.xml
+Matterhorn_SyslogNg__conv.xml
+Matterhorn_SyslogNg__mapped.xml
 Matterhorn_Temperature_ntnn.xml
 Matterhorn_Thermistorchain1.xml
 Matterhorn_Thermistorchain2.xml
@@ -208,6 +216,8 @@ OpenSense_Alphasense_Static__mapped.xml
 OpenSense_Alphasense_Dynamic__mapped.xml
 OpenSense_Schedule__mapped.xml
 OpenSense_Statistics__mapped.xml
+OpenSense_SyslogNg__conv.xml
+OpenSense_SyslogNg__mapped.xml
 Thur_BackLogStatus_Dynamic__mapped.xml
 Thur_BackLogStatus_Revision__mapped.xml
 Thur_BackLogStatus_Static__mapped.xml
@@ -241,6 +251,8 @@ Thur_Dozer_StateCounter__conv.xml
 Thur_Dozer_StateCounter__mapped.xml
 Thur_Schedule__mapped.xml
 Thur_Statistics__mapped.xml
+Thur_SyslogNg__conv.xml
+Thur_SyslogNg__mapped.xml
 Thur_Topology__public.xml
 Statistics_GSN.xml
 Statistics_MySQL.xml

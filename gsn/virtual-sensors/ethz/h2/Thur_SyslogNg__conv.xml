@@ -1,0 +1,49 @@
+<virtual-sensor name="Thur_SyslogNg__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    def spl = LOG_MESSAGE.split("\\s+", 6);
+                    PRIORITY = spl[0].substring(1, spl[0].length()-1).toShort();
+                    HOST = spl[4];
+                    spl = spl[5].split(":", 2);
+                    if ( spl.size() == 2) {
+                    	PROGRAM = spl[0];
+                    	MESSAGE = spl[1];
+                    } else { MESSAGE = spl[0]; }
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+            <field name="PRIORITY" type="SMALLINT" />
+            <field name="HOST" type="VARCHAR(256)" />
+            <field name="PROGRAM" type="VARCHAR(256)" />
+            <field name="MESSAGE" type="VARCHAR(4096)" />
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>parsed syslog-ng messages from Thur deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Thur_SyslogNg__mapped </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

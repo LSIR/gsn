@@ -27,6 +27,7 @@ Dirruhorn_Dozer_WXT520WindPth.xml
 Dirruhorn_GPS_RAW.xml
 Dirruhorn_Schedule.xml
 Dirruhorn_Statistics.xml
+Dirruhorn_SyslogNg.xml
 Dirruhorn_VaisalaWXT520.xml
 Dirruhorn_Topology.xml
 Glaciers_BackLogStatus_Dynamic.xml
@@ -38,6 +39,7 @@ Glaciers_CoreStationStatus_Software.xml
 Glaciers_CoreStationStatus_Static.xml
 Glaciers_Schedule.xml
 Glaciers_Statistics.xml
+Glaciers_SyslogNg.xml
 Jungfraujoch_BackLogStatus_Dynamic.xml
 Jungfraujoch_BackLogStatus_Revision.xml
 Jungfraujoch_BackLogStatus_Static.xml
@@ -59,6 +61,7 @@ Jungfraujoch_Dozer_Rssi.xml
 Jungfraujoch_Dozer_StateCounter.xml
 Jungfraujoch_Schedule.xml
 Jungfraujoch_Statistics.xml
+Jungfraujoch_SyslogNg.xml
 Jungfraujoch_Topology.xml
 Matterhorn_BackLogStatus_Dynamic.xml
 Matterhorn_BackLogStatus_Revision.xml
@@ -87,6 +90,7 @@ Matterhorn_Dozer_WXT520Sup.xml
 Matterhorn_Dozer_WXT520WindPth.xml
 Matterhorn_Schedule.xml
 Matterhorn_Statistics.xml
+Matterhorn_SyslogNg.xml
 Matterhorn_VaisalaWXT520.xml
 Matterhorn_Topology.xml
 OpenSense_BackLogStatus_Static.xml
@@ -102,6 +106,7 @@ OpenSense_Alphasense.xml
 OpenSense_STEVAL.xml
 OpenSense_Schedule.xml
 OpenSense_Statistics.xml
+OpenSense_SyslogNg.xml
 Thur_BackLogStatus_Dynamic.xml
 Thur_BackLogStatus_Revision.xml
 Thur_BackLogStatus_Static.xml
@@ -125,6 +130,7 @@ Thur_Dozer_Rssi.xml
 Thur_Dozer_StateCounter.xml
 Thur_Schedule.xml
 Thur_Statistics.xml
+Thur_SyslogNg.xml
 Thur_Topology.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
