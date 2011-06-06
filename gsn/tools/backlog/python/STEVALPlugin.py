@@ -280,10 +280,8 @@ class STEVALPluginClass(AbstractPluginClass):
         duration = duration.rstrip('\n')
         startTime = timeFile.readline()
         startTime = startTime.rstrip('\n')
-        #msg = []
         
         if option == RAW_OPT:
-            #msg += [str(option)]
             dataPackage += [duration]
             dataPackage += [startTime]
             fp = open(xFile,'r')
@@ -315,16 +313,15 @@ class STEVALPluginClass(AbstractPluginClass):
                 dataPackage += [startTime]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [str(xOut[i][j])]
+                        dataPackage += [xOut[i][j]]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [str(yOut[i][j])]
+                        dataPackage += [yOut[i][j]]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [str(zOut[i][j])]
+                        dataPackage += [zOut[i][j]]
             
             else: # option == RAW_PROC_OPT :
-                #msg += [str(option))
                 dataPackage += [duration]
                 dataPackage += [startTime]
                 fp = open(xFile,'r')
@@ -344,13 +341,13 @@ class STEVALPluginClass(AbstractPluginClass):
                 dataPackage += [tmp_msg.replace("\n",",")]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [str(xOut[i][j])]
+                        dataPackage += [xOut[i][j]]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [str(yOut[i][j])]
+                        dataPackage += [yOut[i][j]]
                 for i in range(0,selection_points):
                     for j in range(0,2):
-                        dataPackage += [str(zOut[i][j])]
+                        dataPackage += [zOut[i][j]]
             
             if self._log_save_flag == "TRUE":
                 destTime = tFile
