@@ -139,17 +139,29 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			    Float _sensorCurrent, _sensorPpm1, _sensorPpm2, _ambientTemp, _offsetComp, _sensitivityComp;
 
 			    i = Long.parseLong(sensorCurrent, 16); 
-			    _sensorCurrent = Float.intBitsToFloat(i.intValue()); 
+			    _sensorCurrent = Float.intBitsToFloat(i.intValue());
+			    if (Float.isNaN(_sensorCurrent))
+			    	_sensorCurrent = null;
 			    i = Long.parseLong(sensorPpm1, 16); 
-			    _sensorPpm1 = Float.intBitsToFloat(i.intValue()); 
+			    _sensorPpm1 = Float.intBitsToFloat(i.intValue());
+			    if (Float.isNaN(_sensorPpm1))
+			    	_sensorPpm1 = null;
 			    i = Long.parseLong(sensorPpm2, 16); 
-			    _sensorPpm2 = Float.intBitsToFloat(i.intValue()); 
+			    _sensorPpm2 = Float.intBitsToFloat(i.intValue());
+			    if (Float.isNaN(_sensorPpm2))
+			    	_sensorPpm2 = null;
 			    i = Long.parseLong(ambientTemp, 16); 
-			    _ambientTemp = Float.intBitsToFloat(i.intValue()); 
+			    _ambientTemp = Float.intBitsToFloat(i.intValue());
+			    if (Float.isNaN(_ambientTemp))
+			    	_ambientTemp = null;
 			    i = Long.parseLong(offsetComp, 16); 
-			    _offsetComp = Float.intBitsToFloat(i.intValue()); 
+			    _offsetComp = Float.intBitsToFloat(i.intValue());
+			    if (Float.isNaN(_offsetComp))
+			    	_offsetComp = null;
 			    i = Long.parseLong(sensitivityComp, 16); 
 			    _sensitivityComp = Float.intBitsToFloat(i.intValue());
+			    if (Float.isNaN(_sensitivityComp))
+			    	_sensitivityComp = null;
 			    
 			    data = new StreamElement(data, dynamicDataField, new Serializable[] {_sensorCurrent, _sensorPpm1, _sensorPpm2, _ambientTemp, _offsetComp, _sensitivityComp});
 			    super.dataAvailable(inputStreamName, data);

@@ -103,6 +103,10 @@ OpenSense_ECVQEK3.xml
 OpenSense_GPS_NAV.xml
 OpenSense_OZ47.xml
 OpenSense_Alphasense.xml
+OpenSense_STEVAL_Dynamic_Proc.xml
+OpenSense_STEVAL_Dynamic_Raw.xml
+OpenSense_STEVAL_Static.xml
+OpenSense_STEVAL_Dynamic_RawProc.xml
 OpenSense_STEVAL.xml
 OpenSense_Schedule.xml
 OpenSense_Statistics.xml

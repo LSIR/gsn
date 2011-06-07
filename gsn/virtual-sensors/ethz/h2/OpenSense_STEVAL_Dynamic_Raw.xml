@@ -1,4 +1,4 @@
-<virtual-sensor name="OpenSense_STEVAL" priority="10" statistics="true" >
+<virtual-sensor name="OpenSense_STEVAL_Dynamic_Raw" priority="10" statistics="true" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -6,8 +6,11 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <field name="MESSAGE_TYPE" type="SMALLINT"/>
-            <field name="RAW_DATA" type="VARCHAR(32768)"/>
+            <field name="DURATION" type="VARCHAR(32)" />
+            <field name="TIME_OF_DATA" type="VARCHAR(32)" />
+            <field name="X_DATA" type="VARCHAR(8192)" />
+            <field name="Y_DATA" type="VARCHAR(8192)" />
+            <field name="Z_DATA" type="VARCHAR(8192)" />            
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
@@ -19,9 +22,9 @@
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <!--predicate key="remote-connection">opensense-etz-bs01.ethz.ch:9003</predicate-->
-                    <predicate key="remote-connection">opensense-caa-etz-1.dyndns.biz:9003</predicate>
+                    <predicate key="remote-connection">opensense-etz-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.STEVALPlugin</predicate>
+                    <predicate key="status-data-type">dynamic_raw</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
