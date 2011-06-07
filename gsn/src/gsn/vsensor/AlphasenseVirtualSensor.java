@@ -64,8 +64,8 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			short type = (Short) data.getData("MESSAGE_TYPE");
 		    
 		    String inputString = new String((String)data.getData("RAW_DATA"));
-		    if (inputString.length() != 110 && inputString.length() != 117) {
-		    	logger.warn("RAW_DATA has length " + inputString.length() + " instead of 141 or 111");
+		    if (inputString.length() != 140 && inputString.length() != 110) {
+		    	logger.warn("RAW_DATA has length " + inputString.length() + " instead of 140 or 110");
 		    	return;
 		    }
 		    String delims = "[ ]+";
