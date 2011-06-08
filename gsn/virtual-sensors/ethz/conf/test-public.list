@@ -88,6 +88,8 @@ OSTest_STEVAL_Dynamic_RawProc__mapped.xml
 OSTest_STEVAL_Dynamic_Raw__mapped.xml
 OSTest_Schedule__mapped.xml
 OSTest_Statistics__mapped.xml
+OSTest_SyslogNg__mapped.xml
+OSTest_SyslogNg__conv.xml
 Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml

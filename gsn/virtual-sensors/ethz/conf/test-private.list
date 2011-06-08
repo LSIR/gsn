@@ -50,6 +50,7 @@ OSTest_STEVAL_Static.xml
 OSTest_STEVAL_Dynamic_RawProc.xml
 OSTest_Schedule.xml
 OSTest_Statistics.xml
+OSTest_SyslogNg.xml
 Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
