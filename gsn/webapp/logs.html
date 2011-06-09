@@ -6,91 +6,293 @@
 	<title>GSN</title>
 	
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
-	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+	<link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
+	<script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
+	
+	<!-- styles needed by jScrollPane -->
+	<link type="text/css" href="style/jquery.jscrollpane.css" rel="stylesheet" media="all" />
+	<link type="text/css" href="style/jquery.jscrollpane.lozenge.css" rel="stylesheet" media="all" />
+	
+	<!-- the mousewheel plugin - optional to provide mousewheel support -->
+	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
 
-	<script type="text/javascript" src="js/constants.js"></script>
-	<script type="text/javascript" src="js/functions.js"></script>
-        <script type="text/javascript" src="js/uptime.js"></script>
+	<!-- the jScrollPane script -->
+	<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+	
+	<style type="text/css" id="page-css">
+		/* Styles specific to this particular page */
+		.scroll-pane
+		{
+			width: 100%;
+			height: 600px;
+			overflow: auto;
+		}
+	</style>
+
+    <script type="text/javascript" src="js/uptime.js"></script>
 
 <script type="text/javascript">
 <!--//<![CDATA[
 
+var LOOK_N_DAYS_BACK = 5;
+var MAX_LOGS = 500;
+var UPDATE_INTERVAL = 2;
+
 var deployments = new Array();
+var selectedDeploymentNr;
+var scrollPane;
+
+var fieldIdentifier = "device_id";
+var tableEnding = "";
+
+function deployment(name) {
+	this.name = name;
+	this.coreStations = new Array();
+	this.lastLogTime = "";
+}
+
+function coreStation(fieldId) {
+	this.fieldId = fieldId;
+	this.selected = false;
+}
+
+function getFieldIds(deploymentId) {
+	var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
+	var ids = new Array();
+	$.ajax({
+		type: "GET",
+		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=" + fieldIdentifier + "&orderby=timestamp&groupby=" + fieldIdentifier + "&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime(),
+        async: false,
+        cache: false,
+        timeout: 30000,
+		success: function(data){
+			$("line", data).each(function(){
+				var l = $("field", this).text();
+				if (l != fieldIdentifier && l.toLowerCase() != "null")
+					ids.push(new coreStation(l))
+			});
+		}
+	});
+	return ids;
+}
+
+function getLastLogs(deploymentId, fieldId) {
+	$.ajax({
+		type: "GET",
+		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=log_message&orderby=timestamp&critfield=" + fieldIdentifier + "&neg=&critop==&critval=" + fieldId + "&nb=" + MAX_LOGS,
+        async: false,
+        cache: false,
+        timeout: 30000,
+		success: function(data){
+			var lastLogTime = "";
+			$($("line", data).get().reverse()).each(function(){
+				if ($("field:eq(0)", this).text() != "timestamp") {
+					lastLogTime = $("field:eq(0)", this).text();
+					$('.jspPane',"#corestation_" + deployments[deploymentId].name + "_" + fieldId).append("<div style=\"width: 10000px\">" + $("field:eq(1)", this).text() + "</div>");
+				}
+			});
+			deployments[deploymentId].lastLogTime = lastLogTime;
+		}
+	});
+}
+
+function fieldIdExists(depl, id) {
+	var exists = false;
+	$.each(depl.coreStations, function() {
+		if (id == this.fieldId) {
+			exists = true;
+			return false;
+		}
+	});
+	return exists;
+}
+
+function getLogs() {
+	var seldepl = selectedDeploymentNr;
+	var crit = "&nb=1";
+	if (deployments[seldepl].lastLogTime != "")
+		crit = "&critfield=timestamp&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=" + MAX_LOGS;
+	$.ajax({
+		type: "GET",
+		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=" + fieldIdentifier + "&fields=log_message&orderby=timestamp" + crit,
+		success: function(data){
+			var lastLogTime = "";
+			$($("line", data).get().reverse()).each(function(){
+				var l = $("field:eq(1)", this).text();
+				if ($("field:eq(0)", this).text() != "timestamp" && l.toLowerCase() != "null") {
+					if (!fieldIdExists(deployments[seldepl], $("field:eq(1)", this).text()))
+						addNewCoreStation(deployments[seldepl], l, true);
+					
+					var container = $('.jspPane',"#corestation_" + deployments[seldepl].name + "_" + parseInt(l));
+					lastLogTime = $("field:eq(0)", this).text();
+					container.append("<div style=\"width: 10000px\">" + $("field:eq(2)", this).text() + "</div>");
+					
+					$($(container).children().get().reverse()).each(
+						function(i, elemLi) {
+							if(i >= MAX_LOGS)
+								$(this).remove();
+						}
+					);
+				}
+			});
+			if (lastLogTime != "") {
+				scrollPane.reinitialise();
+				deployments[seldepl].lastLogTime = lastLogTime;
+			}
+			setTimeout("getLogs()",UPDATE_INTERVAL*1000);
+		}
+	});
+}
+
+function addNewCoreStation(depl, id, show) {
+	var cs = new coreStation(id);
+	$("#corestation_menu_"+depl.name).append($.LI({}, $.A({
+	"id":"corestation_menu_item_"+depl.name+"_"+id,
+	"href":"javascript:showCoreStation("+id+")"
+	},id)));
+	// add div
+	$("#logscontainer").append("<div class=\"scroll-pane\" id=\"corestation_"+depl.name+"_"+id+"\"></div>");
+	if (show) {
+		$("#corestation_menu_"+depl.name).show();
+		$("#corestation_"+depl.name+"_"+id).show();
+	}
+	else {
+		$("#corestation_menu_"+depl.name).hide();
+		$("#corestation_"+depl.name+"_"+id).hide();
+	}
+	scrollPane = $(".scroll-pane").jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
+	if (depl.coreStations.length < 1) {
+		$("#corestation_menu_item_"+depl.name+"_"+id).addClass("selected");
+		cs.selected = true;
+	}
+	depl.coreStations.push(cs)
+}
 
 $(document).ready(function() {
-        $.get('/menu.jsp', {selected: "logging"}, function(data) {
-          $('#navigation').html(data);
-        });
+	$.get('/menu.jsp', {selected: "logs"}, function(data) {
+		$('#navigation').html(data);
+	}, 'html');
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 	
 	// deployments
 	// load deployments
 	$.ajax({
-	      type: "GET",
-	      url: "/gsn?structure",
-	      success: function(data){
-              if ($(document).attr("title")=="GSN") {
-                  var gsn = $("gsn",data);
-                  $(document).attr("title",$(gsn).attr("name"));
-                  $("#gsn-name").empty().append($(gsn).attr("name"));
-                  $("#gsn-desc").empty().append($(gsn).attr("description"));
-                  $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
-                  var gsnname = $(gsn).attr("name").replace(/.*::\s*GSN\s*-\s*/, "").replace(/\s/g,"").toLowerCase();
-                  $('head', document).append('<link rel="shortcut icon" href="/img/favicon/permasense-'+gsnname+'.ico"><link rel="icon" href="/img/favicon/permasense-'+gsnname+'.ico">');
-                }
-                $("#gsn-name").show();
-                uptime.setTime($(gsn).attr("uptime"));
-		var arraySize = 0;
-		$("virtual-sensor",data).each(function(){
-		    var deploymentname = $(this).attr("name").split("_", 1)[0];
-		    if(deploymentname.length > 1) {
-			deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
-			if (deploymentname!='Statistics' && $.inArray(deploymentname, deployments) < 0) {
-			    deployments.push(deploymentname);
+		type: "GET",
+		url: "/gsn?structure",
+		success: function(data){
+			if ($(document).attr("title")=="GSN") {
+			    var gsn = $("gsn",data);
+			    $(document).attr("title",$(gsn).attr("name"));
+			    $("#gsn-name").empty().append($(gsn).attr("name"));
+			    $("#gsn-desc").empty().append($(gsn).attr("description"));
+			    $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+			    var gsnname = $(gsn).attr("name").replace(/.*::\s*GSN\s*-\s*/, "").replace(/\s/g,"").toLowerCase();
+			    $('head', document).append('<link rel="shortcut icon" href="/img/favicon/permasense-'+gsnname+'.ico"><link rel="icon" href="/img/favicon/permasense-'+gsnname+'.ico">');
 			}
-		    }
-		});
-		// display
-		var visible;
-		if ($.inArray($.cookie("deployment"), deployments)>-1)
-		  visible = $.cookie("deployment");
-		else
-		  visible = deployments[0];
-		for (var i in deployments) {
-		    // add tab
-		    $("#deployment_menu").append($.LI({}, $.A({
-			"id":"deployment_menu_item_"+deployments[i],
-			"href":"javascript:showLogging("+i+")"
-		    },deployments[i])));
-		    // add div
-		    $("#loggingcontainer").append(
-			$.DIV({
-			    "id":"logging_"+deployments[i]
-			      },
-			  $.P({},)
-			));
-		    if (deployments[i]!=visible)
-			$("#logging_"+deployments[i]).hide();
-		    else
-			$("#deployment_menu_item_"+deployments[i]).addClass("selected");
+			$("#gsn-name").show();
+			uptime.setTime($(gsn).attr("uptime"));
+			var arraySize = 0;
+			$("virtual-sensor",data).each(function(){
+				if ($(this).attr("name").indexOf("syslogng") != -1) {
+					if ($(this).attr("name").indexOf("__mapped") != -1) {
+						tableEnding = "__mapped";
+						fieldIdentifier = "position";
+					}
+				    var deploymentname = $(this).attr("name").split("_", 1)[0];
+				    if(deploymentname.length > 1) {
+						deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
+						if (deploymentname!='Statistics') {
+							var exists = false;
+							$.each(deployments, function(){
+								if (this.name == deploymentname) {
+									exists = true;
+									return false;
+								}
+							});
+							if (!exists)
+						    	deployments.push(new deployment(deploymentname));
+						}
+				    }
+				}
+			});
+			// display
+			var visible = 0;
+			$.each(deployments, function(i, l){
+				if (this.name == $.cookie("deployment")) {
+					visible = i;
+					return false;
+				}
+			});
+			
+			$.each(deployments, function(i, depl) {
+			    // add tab
+			    $("#deployment_menu").append($.LI({}, $.A({
+				"id":"deployment_menu_item_"+depl.name,
+				"href":"javascript:showDeployment("+i+")"
+			    },depl.name)));
+			    
+			    $("#corestation_menu").append($.LI({
+			    "id":"corestation_menu_"+depl.name
+			    }));
+			    
+				$.each(getFieldIds(i), function(){
+					addNewCoreStation(depl, this.fieldId, false);
+				});
+				
+				$.each(depl.coreStations, function(){
+				    getLastLogs(i, this.fieldId);
+				});
+				$("#deployment_"+depl.name).hide();
+			});
+			showDeployment(visible);
+		  	getLogs();
 		}
-	      }
-	});	
+	});
 });
 
-function showLogging(id) {
-  for (var i in deployments) {
-      $("#logging_"+deployments[i]).hide();
-      $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
-  }
-  $("#logging_"+deployments[id]).show();
-  $("#deployment_menu_item_"+deployments[id]).addClass("selected");
-  $.cookie("deployment" , deployments[id]);
-}	
+function showDeployment(id) {
+	$.each(deployments, function() {
+		var depl = this;
+		$("#corestation_menu_"+depl.name).hide();
+		$("#deployment_"+depl.name).hide();
+		$("#deployment_menu_item_"+depl.name).removeClass("selected");
+		$.each(depl.coreStations, function() {
+			if ((depl.name == deployments[id].name) && this.selected)
+				scrollPane = $("#corestation_"+depl.name+"_"+this.fieldId).show().jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
+			else
+				$("#corestation_"+depl.name+"_"+this.fieldId).hide();
+		});
+	});
+	$("#deployment_"+deployments[id].name).show();
+	$("#deployment_menu_item_"+deployments[id].name).addClass("selected");
+	$.cookie("deployment" , deployments[id].name);
+	selectedDeploymentNr = id;
+	if (deployments[id].coreStations.length > 0) {
+		$("#corestation_menu_"+deployments[id].name).show();
+		scrollPane.reinitialise();
+		scrollPane.scrollToBottom();
+	}
+}
+
+function showCoreStation(fieldId) {
+	$.each(deployments[selectedDeploymentNr].coreStations, function() {
+		$("#corestation_"+deployments[selectedDeploymentNr].name+"_"+this.fieldId).hide();
+		$("#corestation_menu_item_"+deployments[selectedDeploymentNr].name+"_"+this.fieldId).removeClass("selected");
+		if (this.fieldId == fieldId)
+			this.selected = true;
+		else
+			this.selected = false;
+	});
+	scrollPane = $("#corestation_"+deployments[selectedDeploymentNr].name+"_"+fieldId).show().jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
+	$("#corestation_menu_item_"+deployments[selectedDeploymentNr].name+"_"+fieldId).addClass("selected");
+	scrollPane.reinitialise();
+	scrollPane.scrollToBottom();
+}
 //]]>-->
 </script>
 </head>
@@ -119,8 +321,14 @@ function showLogging(id) {
 		<li />
 		</ul>
 		</div>
-
-		<div id="loggingcontainer"></div>
+		
+		<div id="corestation_navigation">
+		<ul id="corestation_menu">
+		<li />
+		</ul>
+		</div>
+		
+		<div id="logscontainer" style="text-align:left;margin:5px"></div>
 		
 	</div>
 	<div class="separator">
