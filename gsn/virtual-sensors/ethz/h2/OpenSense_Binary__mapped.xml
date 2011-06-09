@@ -1,4 +1,4 @@
-<virtual-sensor name="OSTest_Binary__mapped" priority="10" statistics="true" >
+<virtual-sensor name="OpenSense_Binary__mapped" priority="10" statistics="true" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -31,7 +31,7 @@
                         	}
                         	if (timeDifference > timeDifferenceOffset) {
                         		// Notify by email
-                        		def emailTitle = "[PermaSense-GSN-Test] - WARNING: No more " + vsname + " files received from position " + entry.key;
+                        		def emailTitle = "[PermaSense-GSN] - WARNING: No more " + vsname + " files received from position " + entry.key;
                         		def emailContent = "WARNING: No " + vsname + " files received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
 
 								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
@@ -66,13 +66,13 @@
     <description>binaries from the OSTest deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
-                    <predicate key="query"> select * from OSTest_Binary</predicate>
-                    <predicate key="remote-contact-point">http://whymper.ethz.ch:23001/streaming/</predicate>
+                    <predicate key="query"> select * from OpenSense_Binary</predicate>
+                    <predicate key="remote-contact-point">http://whymper.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

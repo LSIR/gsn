@@ -110,6 +110,7 @@ OpenSense_STEVAL_Dynamic_RawProc.xml
 OpenSense_Schedule.xml
 OpenSense_Statistics.xml
 OpenSense_SyslogNg.xml
+OpenSense_Binary.xml
 Thur_BackLogStatus_Dynamic.xml
 Thur_BackLogStatus_Revision.xml
 Thur_BackLogStatus_Static.xml
