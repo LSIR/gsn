@@ -50,7 +50,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
             
         self._conf_calibrate = False
-        if int(self.getOptionValue('calibrate')) == 1:
+        value = self.getOptionValue('calibrate')
+        if value != None and int(value) == 1:
             self._conf_calibrate = True
             
         self._initFinish = False
