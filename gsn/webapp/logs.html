@@ -6,13 +6,12 @@
 	<title>GSN</title>
 	
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
-	<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
 	<link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
-	<script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
 	
 	<!-- styles needed by jScrollPane -->
 	<link type="text/css" href="style/jquery.jscrollpane.css" rel="stylesheet" media="all" />
@@ -84,7 +83,7 @@ function getFieldIds(deploymentId) {
 function getLastLogs(deploymentId, fieldId) {
 	$.ajax({
 		type: "GET",
-		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=log_message&orderby=timestamp&critfield=" + fieldIdentifier + "&neg=&critop==&critval=" + fieldId + "&nb=" + MAX_LOGS,
+		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=log_message&orderby=timestamp&critfield=" + fieldIdentifier + "&neg=&critop==&critval=" + fieldId + "&nb=50",
         async: false,
         cache: false,
         timeout: 30000,
@@ -116,7 +115,7 @@ function getLogs() {
 	var seldepl = selectedDeploymentNr;
 	var crit = "&nb=1";
 	if (deployments[seldepl].lastLogTime != "")
-		crit = "&critfield=timestamp&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=" + MAX_LOGS;
+		crit = "&critfield=timestamp&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=50";
 	$.ajax({
 		type: "GET",
 		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=" + fieldIdentifier + "&fields=log_message&orderby=timestamp" + crit,
