@@ -41,6 +41,8 @@ public class DataDownload extends HttpServlet {
      * param-name: display , if there is a value it should be CSV.
      * param-name: delimiter, useful for CSV output (can be "tab","space","other")
      * param-name: otherdelimiter useful in the case of having delimiter=other
+     * param-name: distinct can be set to 1 if needed.
+     * param-name: orderby can be used to order the output by a specified field. (default = timed)
      * param-name: groupby can point to one of the fields in the stream element. In case groupby=timed then the parameter groupbytimed points to the period for which data should be aggregated [in milliseconds].
      * param-name: nb give the maximum number of elements to be outputed (most recent values first).
      * param-name:
@@ -138,19 +140,20 @@ public class DataDownload extends HttpServlet {
                     if ( ! wantPk )
                         generated_request_query += ", pk";
                 }
-                if (req.getParameter("groupby") != null) {
-                    if (req.getParameter("groupby").equals("timed")) {
-                        groupByTimed = true;
-                        int periodmeasure = 1;
-                        if (req.getParameter("groupbytimed") != null) {
-                            periodmeasure = new Integer(req.getParameter("groupbytimed"));
-                            periodmeasure = java.lang.Math.max(periodmeasure, 1);
-                        }
-                        generated_request_query += ", Min(timed), FLOOR(timed/" + periodmeasure + ") period ";
-                        groupby = "GROUP BY period";
-                    } else {
-                        groupby = "GROUP BY " + req.getParameter("groupby");
+            }
+            
+            if (req.getParameter("groupby") != null) {
+                if (req.getParameter("groupby").equals("timed")) {
+                    groupByTimed = true;
+                    int periodmeasure = 1;
+                    if (req.getParameter("groupbytimed") != null) {
+                        periodmeasure = new Integer(req.getParameter("groupbytimed"));
+                        periodmeasure = java.lang.Math.max(periodmeasure, 1);
                     }
+                    generated_request_query += ", Min(timed), FLOOR(timed/" + periodmeasure + ") period ";
+                    groupby = "GROUP BY period";
+                } else {
+                    groupby = "GROUP BY " + req.getParameter("groupby");
                 }
             }
 
@@ -211,7 +214,10 @@ public class DataDownload extends HttpServlet {
                 if (!commonReq) {
                     expression = generated_request_query;
                 }
-                generated_request_query = "select " + generated_request_query + " from " + vsName + where + "  order by timed DESC  ";
+                String orderby = req.getParameter("orderby");
+                if (orderby == null)
+                	orderby = "timed";
+                generated_request_query = "select " + generated_request_query + " from " + vsName + where + " " + groupby + " order by " + orderby + " DESC  ";
                 if (commonReq)
                     if (req.getParameter("nb") != null && req.getParameter("nb") != "") {
                         int nb = new Integer(req.getParameter("nb"));
@@ -227,7 +233,6 @@ public class DataDownload extends HttpServlet {
                         }
                     }
 
-                generated_request_query += " " + groupby;
                 generated_request_query += ";";
 
                 if (req.getParameter("sql") != null) {
@@ -236,7 +241,7 @@ public class DataDownload extends HttpServlet {
                     return;
                 }
 
-
+                logger.debug("generated_request_query: " + generated_request_query);
                 try {
                     result = Main.getStorage(vsName).streamedExecuteQuery(generated_request_query, true);
                 } catch (SQLException e) {
@@ -280,13 +285,13 @@ public class DataDownload extends HttpServlet {
                             //line += delimiter+se.getData( )[ i ].toString( );
 
                             if (!commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
-                                line += separator + sdf.format(se.getData()[i]);
+                                line += encodeXML(separator + sdf.format(se.getData()[i]));
                             } else {
-                                line += separator + se.getData()[i].toString();
+                                line += encodeXML(separator + se.getData()[i].toString());
                             }
                         if (wantTimeStamp) {
                             Date d = new Date(se.getTimeStamp());
-                            line += separator + sdf.format(d);
+                            line += encodeXML(separator + sdf.format(d));
                         }
                         respond.println(line.substring(separator.length()));
                     }
@@ -324,17 +329,17 @@ public class DataDownload extends HttpServlet {
 
                             //if ( !commonReq && expression.contains("timed")) {
                             if (!commonReq && ((i >= fields.length) || (fields[i].contains("timed")))) {
-                                respond.println("\t\t<field>" + sdf.format(se.getData()[i]) + "</field>");
+                                respond.println("\t\t<field>" + encodeXML(sdf.format(se.getData()[i])) + "</field>");
                             } else {
                                 if (se.getData()[i] == null)
                                     respond.println("\t\t<field>Null</field>");
                                 else
-                                    respond.println("\t\t<field>" + se.getData()[i].toString() + "</field>");
+                                    respond.println("\t\t<field>" + encodeXML(se.getData()[i].toString()) + "</field>");
                             }
                         }
                         if (wantTimeStamp) {
                             Date d = new Date(se.getTimeStamp());
-                            respond.println("\t\t<field>" + sdf.format(d) + "</field>");
+                            respond.println("\t\t<field>" + encodeXML(sdf.format(d)) + "</field>");
                         }
                         respond.println("\t</line>");
                     }
@@ -351,5 +356,9 @@ public class DataDownload extends HttpServlet {
             if (result != null) result.close();
             respond.flush();
         }
+    }
+    
+    private static String encodeXML(String str) {
+    	return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
     }
 }

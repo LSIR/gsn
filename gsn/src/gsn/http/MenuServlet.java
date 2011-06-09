@@ -20,6 +20,7 @@ public class MenuServlet extends HttpServlet {
         out.println("<li" + ("index".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"index.html#home\">home</a></li>");
         out.println("<li" + ("data".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"data.html#data\">data</a></li>");
         out.println("<li" + ("topology".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"topology.html#topology\">network topology</a></li>");
+        out.println("<li" + ("logs".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"logs.html#logs\">logs</a></li>");
         out.println("<li" + ("systemhealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"systemhealth.html#systemhealth\">system</a></li>");
         out.println("<li" + ("nodehealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"nodehealth.html#nodehealth\">node health</a></li>");
         out.println("<li" + ("basehealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"basehealth.html#basehealth\">base health</a></li>");
