@@ -87,7 +87,7 @@ function getLastLogs(deploymentId, fieldId) {
 			$($("line", data).get().reverse()).each(function(){
 				if ($("field:eq(0)", this).text() != "timestamp") {
 					lastLogTime = $("field:eq(0)", this).text();
-					$('.jspPane',"#corestation_" + deployments[deploymentId].name + "_" + fieldId).append("<div style=\"width: 10000px\">" + $("field:eq(1)", this).text() + "</div>");
+					$('.jspPane',"#corestation_" + deployments[deploymentId].name + "_" + fieldId).append(generateLogMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
 				}
 			});
 			deployments[deploymentId].lastLogTime = lastLogTime;
@@ -124,7 +124,7 @@ function getLogs() {
 					
 					var container = $('.jspPane',"#corestation_" + deployments[seldepl].name + "_" + parseInt(l));
 					lastLogTime = $("field:eq(0)", this).text();
-					container.append("<div style=\"width: 10000px\">" + $("field:eq(2)", this).text() + "</div>");
+					container.append(generateLogMessageDiv(lastLogTime, $("field:eq(2)", this).text()));
 					
 					$($(container).children().get().reverse()).each(
 						function(i, elemLi) {
@@ -141,6 +141,15 @@ function getLogs() {
 			setTimeout("getLogs()",UPDATE_INTERVAL*1000);
 		}
 	});
+}
+
+function generateLogMessageDiv(timestamp, msg) {
+	var color = "";
+	var spl = msg.split(" ", 5);
+	var message = msg.substring(msg.indexOf(spl[4])+spl[4].length+1, msg.length);
+	if (parseInt(spl[0].slice(1,spl[0].length-1))%8<=3)
+		color = ";color:red";
+	return "<div style=\"width: 10000px" + color + "\">" + (new Date(parseFloat(timestamp))).toString() + ": " + message + "</div>";
 }
 
 function addNewCoreStation(depl, id, show) {
@@ -168,6 +177,8 @@ function addNewCoreStation(depl, id, show) {
 }
 
 $(document).ready(function() {
+	$("#starttext").append($.P({},"Loading syslog-ng data..."));
+	
 	$("#corestation_navigation").hide();
 	$.get('/menu.jsp', {selected: "logs"}, function(data) {
 		$('#navigation').html(data);
@@ -248,6 +259,7 @@ $(document).ready(function() {
 			});
 			showDeployment(visible);
 			$("#corestation_navigation").show();
+			$("#starttext").html("<p>CoreStation syslog-ng data.</p>");
 		  	getLogs();
 		}
 	});
@@ -304,11 +316,7 @@ function showCoreStation(fieldId) {
 	</div>
 	
 	<div id="separator">
-		<div id="starttext">
-			<p>
-				CoreStation syslog-ng data.
-			</p>
-		</div>
+		<div id="starttext" />
 	</div>
 	
 	
