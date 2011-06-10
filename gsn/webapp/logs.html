@@ -11,11 +11,6 @@
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
-	<link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
-	
-	<!-- styles needed by jScrollPane -->
-	<link type="text/css" href="style/jquery.jscrollpane.css" rel="stylesheet" media="all" />
-	<link type="text/css" href="style/jquery.jscrollpane.lozenge.css" rel="stylesheet" media="all" />
 	
 	<!-- the mousewheel plugin - optional to provide mousewheel support -->
 	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
@@ -83,7 +78,7 @@ function getFieldIds(deploymentId) {
 function getLastLogs(deploymentId, fieldId) {
 	$.ajax({
 		type: "GET",
-		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=log_message&orderby=timestamp&critfield=" + fieldIdentifier + "&neg=&critop==&critval=" + fieldId + "&nb=50",
+		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=log_message&orderby=timestamp&critfield=" + fieldIdentifier + "&neg=&critop==&critval=" + fieldId + "&nb=" + MAX_LOGS,
         async: false,
         cache: false,
         timeout: 30000,
@@ -115,7 +110,7 @@ function getLogs() {
 	var seldepl = selectedDeploymentNr;
 	var crit = "&nb=1";
 	if (deployments[seldepl].lastLogTime != "")
-		crit = "&critfield=timestamp&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=50";
+		crit = "&critfield=timestamp&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=" + MAX_LOGS;
 	$.ajax({
 		type: "GET",
 		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=" + fieldIdentifier + "&fields=log_message&orderby=timestamp" + crit,
@@ -238,6 +233,8 @@ $(document).ready(function() {
 			    $("#corestation_menu").append($.LI({
 			    "id":"corestation_menu_"+depl.name
 			    }));
+			    $("#corestation_menu_"+depl.name).append($.LI({
+			    }, $.A({},fieldIdentifier + ": ")));
 			    
 				$.each(getFieldIds(i), function(){
 					addNewCoreStation(depl, this.fieldId, false);
