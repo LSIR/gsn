@@ -1239,17 +1239,21 @@ text-decoration:none;
 
 .jspTrack
 {
-	background: #dde;
+	background: #eeeef4;
 	position: relative;
 }
 
 .jspDrag
 {
-	background: #bbd;
+	background:  #adc4dc;
 	position: relative;
 	top: 0;
 	left: 0;
 	cursor: pointer;
+
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
 }
 
 .jspHorizontalBar .jspTrack,
@@ -1308,19 +1312,9 @@ text-decoration:none;
 }
 
 .jspHorizontalBar,
-.jspVerticalBar,
-.jspTrack
+.jspVerticalBar
 {
-	background: #eeeef4;
-}
-
-.jspDrag
-{
-	background:  #adc4dc;
-
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
+	background: #e0e0ed;
 }
 
 .jspTrack .jspActive,

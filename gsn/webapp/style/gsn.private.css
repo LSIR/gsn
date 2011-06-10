@@ -1243,13 +1243,13 @@ text-decoration:none;
 
 .jspTrack
 {
-	background: #dde;
+	background: #edfbe7;
 	position: relative;
 }
 
 .jspDrag
 {
-	background:  #a6dc91;
+	background:  #bcdbaf;
 	position: relative;
 	top: 0;
 	left: 0;
@@ -1316,8 +1316,7 @@ text-decoration:none;
 }
 
 .jspHorizontalBar,
-.jspVerticalBar,
-.jspTrack
+.jspVerticalBar
 {
 	background: #e1f0db;
 }
