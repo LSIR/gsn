@@ -168,6 +168,7 @@ function addNewCoreStation(depl, id, show) {
 }
 
 $(document).ready(function() {
+	$("#corestation_navigation").hide();
 	$.get('/menu.jsp', {selected: "logs"}, function(data) {
 		$('#navigation').html(data);
 	}, 'html');
@@ -246,6 +247,7 @@ $(document).ready(function() {
 				$("#deployment_"+depl.name).hide();
 			});
 			showDeployment(visible);
+			$("#corestation_navigation").show();
 		  	getLogs();
 		}
 	});
