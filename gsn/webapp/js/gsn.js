@@ -72,10 +72,10 @@ var GSN = {
             $("#msg").hide();
             $("#main #datachooser").show();
             if (!GSN.loaded) GSN.updateall();
-        } else if (GSN.context=="map")	{
+        } else if (GSN.context=="position")	{
             GSN.vsbox.container = "#vs4map";
             $("#msg").hide();
-            $("#main #control").show();
+            $("#main #control").hide();
             $("#control #closeall").hide();
             $("#main #mapdiv").show();
             $("#toggleallmarkers").show();
@@ -772,8 +772,9 @@ var GSN = {
             if (GSN.map.loaded){
                 var lat = $("field[@name=latitude]",vs).text();
                 var lon = $("field[@name=longitude]",vs).text();
-                if (lat != "" && lon != ""){
-                    GSN.map.updateMarker($(vs).attr("name"),lat,lon);
+                var id = $("field[@name=node_id]",vs).text();
+                if (lat != "" && lon != "" && id != ""){
+                    GSN.map.updateMarker($(vs).attr("name"),id,lat,lon);
                 }
             }
 			
@@ -1053,23 +1054,23 @@ var GSN = {
 		* Add marker
 		*/
         ,
-        addMarker: function(vsName,lat,lon){
+        addMarker: function(vsName, text,lat,lon){
             var marker = new Marker(new LatLonPoint(lat,lon));
-            marker.setAttribute("vsname",vsName);
+            marker.setAttribute("vsname",text);
   		
   		
             if(mapProvider=="microsoft"){
                 marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("Show/Hide Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
+                marker.setInfoBubble("Show/Hide Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+text+"\");'>"+text+"</a>");
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
+                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+text+"\");</script>Selected Sensor: "+text);
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
+                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+text+"\");</script>Selected Sensor: "+text);
                 GSN.map.markers.push(marker);
             }
 			
@@ -1088,16 +1089,27 @@ var GSN = {
 		* Update marker
 		*/
         ,
-        updateMarker: function(vsName,lat,lon){
+        
+        updateMarker: function(vsName, text, lat,lon){
+	    			var points = new Array(new LatLonPoint(lat,lon));
+
             for (x=0; x<GSN.map.markers.length; x++) {
                 var m = GSN.map.markers[x];
-                if (m.getAttribute("vsname") == vsName) {
+                if (m.getAttribute("vsname") == text) {
                     m.hide();
+		    						points.push(new LatLonPoint(m.location.lat,m.location.lon));
+
                     map.removeMarker(m);
                     GSN.map.markers.splice(x,1);
                 }
             }
-            GSN.map.addMarker(vsName,lat,lon);
+            GSN.map.addMarker(vsName,text,lat,lon);
+
+	    			points.push(new LatLonPoint(lat,lon));
+	    			var polyline = new Polyline(points);
+	    			polyline.setColor("#00ff00");
+
+	    			map.addPolyline(polyline, false);
         }
 		
 		
