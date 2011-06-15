@@ -42,40 +42,80 @@
 
         GSN.load();
         GSN.map.toggleAllMarkers();
-        topologyUpdateTimer = setTimeout("fetchTopologyInfo", 5000);
+        topologyUpdateTimer = setTimeout("fetchTopologyInfo", 10000);
         fetchTopologyInfo();
         GSN.map.showAllMarkers();
 		});
 
 function fetchTopologyInfo() {
-  	$.ajax({
-        	type: "GET",
-	        url: "/field?vs=ostest_gps_position__public&field=DATA&pk=latest",
-        	dataType: "xml",
-	        success: function(data){
-			$("sensornode",$("sensornodes",data)).each(function() {
-      				var id = $(this).attr("node_id");
-				var lati = $(this).attr("latitude");
-				var longi = $(this).attr("longitude");
 
-				var absdlat = Math.abs( Math.round(Math.round(lati/100) * 1000000.));
-				var absmlat = Math.abs( Math.round((lati - absdlat/10000) * 1000000.));
-
-				var absdlon = Math.abs( Math.round(Math.round(longi/100) * 1000000.));
-				var absmlon = Math.abs( Math.round((longi - absdlon/10000) * 1000000.));
-
-				lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
-				longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
-
-				GSN.map.updateMarker("ostest_gps_nav__mapped", id, longi, lati);
-			})
-			GSN.load();
-        	  	topologyUpdateTimer = setTimeout("fetchTopologyInfo()",5000);
-        	},
-        	error : function(XMLHttpRequest, textStatus, errorThrown) {
-          		topologyUpdateTimer = setTimeout("fetchTopologyInfo()",10000);
-        	}
-      	});
+		$.ajax({
+				type: "GET",
+				url: "/data?vsName=ostest_gps_nav__mapped&fields=device_id&fields=longitude&fields=latitude&critfield=device_id&neg=&critop==&critval=1&nb=1",
+		        async: false,
+		        cache: false,
+		        timeout: 30000,
+				success: function(data){
+					var dev_id = "";
+					var lati;
+					var longi;
+					$("line", data).each(function(){
+						if ($("field:eq(0)", this).text() != "device_id") {
+							dev_id = $("field:eq(0)", this).text();
+							longi = $("field:eq(1)", this).text();
+							lati = $("field:eq(2)", this).text();
+							
+							var absdlat = Math.abs( Math.round(Math.round(lati/100) * 1000000.));
+							var absmlat = Math.abs( Math.round((lati - absdlat/10000) * 1000000.));
+			
+							var absdlon = Math.abs( Math.round(Math.round(longi/100) * 1000000.));
+							var absmlon = Math.abs( Math.round((longi - absdlon/10000) * 1000000.));
+			
+							lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
+							longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
+			
+							GSN.map.updateMarker("ostest_gps_nav__mapped", dev_id, lati, longi);
+						}
+					})
+      	}
+		});
+		
+		$.ajax({
+				type: "GET",
+				url: "/data?vsName=ostest_gps_nav__mapped&fields=device_id&fields=longitude&fields=latitude&critfield=device_id&neg=&critop==&critval=2&nb=1",
+		        async: false,
+		        cache: false,
+		        timeout: 30000,
+				success: function(data){
+					var dev_id = "";
+					var lati;
+					var longi;
+					$("line", data).each(function(){
+						if ($("field:eq(0)", this).text() != "device_id") {
+							dev_id = $("field:eq(0)", this).text();
+							longi = $("field:eq(1)", this).text();
+							lati = $("field:eq(2)", this).text();
+							
+							var absdlat = Math.abs( Math.round(Math.round(lati/100) * 1000000.));
+							var absmlat = Math.abs( Math.round((lati - absdlat/10000) * 1000000.));
+			
+							var absdlon = Math.abs( Math.round(Math.round(longi/100) * 1000000.));
+							var absmlon = Math.abs( Math.round((longi - absdlon/10000) * 1000000.));
+			
+							lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
+							longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
+			
+							GSN.map.updateMarker("ostest_gps_nav__mapped", dev_id, lati, longi);
+						}
+					})
+					GSN.load();
+        	topologyUpdateTimer = setTimeout("fetchTopologyInfo()",10000);
+      	},
+      	error : function(XMLHttpRequest, textStatus, errorThrown) {
+        	topologyUpdateTimer = setTimeout("fetchTopologyInfo()",60000);
+      	}
+     
+		});
 };
 
 //]]>-->
