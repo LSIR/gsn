@@ -64,8 +64,8 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			short type = (Short) data.getData("MESSAGE_TYPE");
 		    
 		    String inputString = new String((String)data.getData("RAW_DATA"));
-		    if (inputString.length() != 140 && inputString.length() != 110) {
-		    	logger.warn("RAW_DATA has length " + inputString.length() + " instead of 140 or 110");
+		    if (inputString.length() != 140 && inputString.length() != 110 && inputString.length() != 137) {
+		    	logger.warn("RAW_DATA has length " + inputString.length() + " instead of 140,137,110");
 		    	return;
 		    }
 		    String delims = "[ ]+";
@@ -119,20 +119,39 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			    String ambientTemp = new String();
 			    String offsetComp = new String();
 			    String sensitivityComp = new String();
+			    
+			    if (inputString.length() == 140) {
 			   
-			    for (int i = tokens.length-1; i >= 0; i--) {
-			      if (i >= 14 && i <= 17)
-			        sensorCurrent = sensorCurrent.concat(tokens[i]);
-			      else if (i >= 18 && i <= 21)
-			        sensorPpm1 = sensorPpm1.concat(tokens[i]);
-			      else if (i >= 22 && i <= 25)
-			        sensorPpm2 = sensorPpm2.concat(tokens[i]);
-			      else if (i >= 30 && i <= 33)
-			        ambientTemp = ambientTemp.concat(tokens[i]);
-			      else if (i >= 34 && i <= 37)
-			        offsetComp = offsetComp.concat(tokens[i]);
-			      else if (i >= 38 && i <= 41)
-			        sensitivityComp = sensitivityComp.concat(tokens[i]);
+				    for (int i = tokens.length-1; i >= 0; i--) {
+				      if (i >= 14 && i <= 17)
+				        sensorCurrent = sensorCurrent.concat(tokens[i]);
+				      else if (i >= 18 && i <= 21)
+				        sensorPpm1 = sensorPpm1.concat(tokens[i]);
+				      else if (i >= 22 && i <= 25)
+				        sensorPpm2 = sensorPpm2.concat(tokens[i]);
+				      else if (i >= 30 && i <= 33)
+				        ambientTemp = ambientTemp.concat(tokens[i]);
+				      else if (i >= 34 && i <= 37)
+				        offsetComp = offsetComp.concat(tokens[i]);
+				      else if (i >= 38 && i <= 41)
+				        sensitivityComp = sensitivityComp.concat(tokens[i]);
+				    }
+			    }
+			    else {
+			    	for (int i = tokens.length-1; i >= 0; i--) {
+				      if (i >= 14+3 && i <= 17+3)
+				        sensorCurrent = sensorCurrent.concat(tokens[i]);
+				      else if (i >= 18+3 && i <= 21+3)
+				        sensorPpm1 = sensorPpm1.concat(tokens[i]);
+				      else if (i >= 22+3 && i <= 25+3)
+				        sensorPpm2 = sensorPpm2.concat(tokens[i]);
+				      else if (i >= 30+3 && i <= 33+3)
+				        ambientTemp = ambientTemp.concat(tokens[i]);
+				      else if (i >= 34+3 && i <= 37+3)
+				        offsetComp = offsetComp.concat(tokens[i]);
+				      else if (i >= 38+3 && i <= 41+3)
+				        sensitivityComp = sensitivityComp.concat(tokens[i]);
+				    }
 			    }
 
 			    Long i;
