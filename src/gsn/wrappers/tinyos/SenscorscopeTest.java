@@ -8,6 +8,7 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import net.tinyos.packet.BuildSource;
 import net.tinyos.packet.PacketSource;
+import net.tinyos.util.PrintStreamMessenger;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -943,6 +944,20 @@ public class SenscorscopeTest {
         System.out.println(args[0]);
         String source = args[0];
         reader = BuildSource.makePacketSource(source);
+
+        if (reader == null) {
+            logger.warn("Invalid packet source: " + source);
+        }
+
+        boolean to_return = true;
+
+        try {
+            reader.open(PrintStreamMessenger.err);
+        }
+        catch (IOException e) {
+            logger.warn("Error on " + reader.getName() + ": " + e);
+            to_return = false;
+        }
         run();
     }
 
