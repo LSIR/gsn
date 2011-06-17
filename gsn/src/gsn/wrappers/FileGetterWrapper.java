@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -23,6 +24,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 
 	private File deploymentBinaryDir = null;
 	private String subdirectoryName = null;
+	private Pattern filenamePattern = null;
 	final static private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
 
 	@Override
@@ -69,6 +71,12 @@ public class FileGetterWrapper extends AbstractWrapper {
 	    		logger.info("created new storage directory >" + deploymentBinaryDir + "<");
 		}
 		
+		String regex = getActiveAddressBean().getPredicateValue("filename-regex");
+		if (regex != null) {
+			filenamePattern = Pattern.compile(regex);
+			logger.info("filename has to match regular expression: " + regex);
+		}
+		
 		return true;
 	}
 	
@@ -98,6 +106,11 @@ public class FileGetterWrapper extends AbstractWrapper {
 					logger.error("Could not interprete logger_file arguments: " + e.getMessage());
 					return false;
 				}
+			}
+			
+			if (filenamePattern != null && !filenamePattern.matcher(inputFileItem.getName()).matches()) {
+				logger.error("filename " + inputFileItem.getName() + " does not match regular expression " + filenamePattern.toString());
+				return false;
 			}
 
 			if (deviceid.equals("")) {

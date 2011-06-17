@@ -25,6 +25,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="file-getter">
                     <predicate key="subdirectory-name">gps-logger</predicate>
+                    <predicate key="filename-regex">^D_\d+_\d+_\d+\.dat$</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
