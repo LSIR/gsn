@@ -22,7 +22,7 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
                     <predicate key="query">select * from ETZ_GPS_RAW</predicate>
@@ -30,6 +30,16 @@
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_GPS_Logger__muxed__parsed</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, SAMPLE_COUNT as GPS_SAMPLE_COUNT, SATS as GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

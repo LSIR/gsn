@@ -51,6 +51,9 @@ ETZ_Dozer_WXT520Sup__mapped.xml
 ETZ_Dozer_WXT520WindPth__mapped.xml
 ETZ_Dozer_WXT520Ident__mapped.xml
 ETZ_Dozer_WXT520Ident__conv.xml
+ETZ_GPS_Logger__mapped.xml
+ETZ_GPS_Logger__muxed__parsed.xml
+ETZ_GPS_Logger__status.xml
 ETZ_GPS_RAW__mapped.xml
 ETZ_GPS_RAW__muxed__mapped.xml
 ETZ_Schedule__mapped.xml

@@ -1,15 +1,49 @@
 package gsn.vsensor;
 
+import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
 public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
+	
+	private static final byte RAW_DATA_TYPE = 0;
+	private static final byte STATUS_TYPE = 1;
+	
+	private static final byte[] rawHeader = {(byte) 0xB5, 0x62, 0x02, 0x10};
+	private static final byte[] statusHeader = {0x6D, 0x74, 0x01, 0x01};
 
 	private static final transient Logger logger = Logger.getLogger(GPSLoggerDataParser.class);
 
 	private String storage_directory = null;
+	
+	private static DataField[] dataField = {
+			new DataField("POSITION", "INTEGER"),
+			new DataField("GENERATION_TIME", "BIGINT"),
+			new DataField("TIMESTAMP", "BIGINT"),
+			new DataField("DEVICE_ID", "INTEGER"),
+
+			new DataField("DATA_TYPE", "TINYINT"),
+			new DataField("SAMPLE_COUNT", "INTEGER"),
+			new DataField("GPS_SATS", "INTEGER"),
+			new DataField("STATUS_SOLAR", "SMALLINT"),
+			new DataField("STATUS_HUMIDITY", "SMALLINT"),
+			new DataField("STATUS_TEMPERATURE", "SMALLINT"),
+			new DataField("STATUS_INCL_X", "SMALLINT"),
+			new DataField("STATUS_INCL_Y", "SMALLINT"),
+			new DataField("RAW_DATA", "BINARY")};
 	
 	@Override
 	public boolean initialize() {
@@ -26,12 +60,198 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), (String) data.getData("relative_file"));
 		file = file.getAbsoluteFile();
-		
-//		data = new StreamElement(data, 
-//				new String[]{"jpeg_scaled"},
-//				new Byte[]{DataTypes.BINARY},
-//				new Serializable[]{os.toByteArray()});
 
-		super.dataAvailable(inputStreamName, data);
+		int rawSampleCount = 0;
+		int rawIncorrectChecksumCount = 0;
+		int statusSampleCount = 0;
+		int statusIncorrectChecksumCount = 0;
+		try {
+			DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
+			
+			int b = dis.readUnsignedByte();
+			while (true) {
+				boolean readOn = false;
+				if (b == rawHeader[0]) {
+					b = dis.readUnsignedByte();
+					if (b == rawHeader[1]) {
+						b = dis.readUnsignedByte();
+						if (b == rawHeader[2]) {
+							b = dis.readUnsignedByte();
+							if (b == rawHeader[3]) {
+								// gps logger raw data
+								byte [] rawPacket = getRawPacket(dis, rawHeader, file.getAbsolutePath());
+								if (checkChecksum(rawPacket)) {
+									long timestamp = getGPSRawTimestamp(rawPacket);
+									data = new StreamElement(dataField, new Serializable[]{
+											data.getData(dataField[0].getName()),
+											timestamp,
+											timestamp,
+											data.getData(dataField[3].getName()),
+											RAW_DATA_TYPE,
+											rawSampleCount,
+											getSatCount(rawPacket),
+											null,
+											null,
+											null,
+											null,
+											null,
+											rawPacket});
+
+									super.dataAvailable(inputStreamName, data);
+								}
+								else {
+									rawIncorrectChecksumCount++;
+									logger.warn("checksum for gps raw data is not correct in " + file.getAbsolutePath() + " for sample " + rawSampleCount);
+									dis.reset();
+								}
+								
+								rawSampleCount++;
+								if (rawSampleCount==Integer.MAX_VALUE)
+									rawSampleCount = 0;
+								
+								readOn = true;
+							}
+						}
+					}
+				}
+				else if (b == statusHeader[0]) {
+					b = dis.readUnsignedByte();
+					if (b == statusHeader[1]) {
+						b = dis.readUnsignedByte();
+						if (b == statusHeader[2]) {
+							b = dis.readUnsignedByte();
+							if (b == statusHeader[3]) {
+								// gps logger status data
+								byte [] rawPacket = getRawPacket(dis, statusHeader, file.getAbsolutePath());
+								if (checkChecksum(rawPacket)) {
+									ByteBuffer buf = ByteBuffer.wrap(rawPacket);
+									buf.order(ByteOrder.LITTLE_ENDIAN);
+									buf.position(6);
+									long timestamp = (long)buf.getInt()*1000L;
+									data = new StreamElement(dataField, new Serializable[]{
+											data.getData(dataField[0].getName()),
+											timestamp,
+											timestamp,
+											data.getData(dataField[3].getName()),
+											STATUS_TYPE,
+											statusSampleCount,
+											null,
+											buf.getShort(),
+											(short)(buf.getShort()/10),
+											(short)(buf.getShort()/10),
+											buf.getShort(),
+											buf.getShort(),
+											rawPacket});
+
+									super.dataAvailable(inputStreamName, data);
+								}
+								else {
+									statusIncorrectChecksumCount++;
+									logger.warn("checksum for gps status data is not correct in " + file.getAbsolutePath() + " for sample " + statusSampleCount);
+									dis.reset();
+								}
+								
+								statusSampleCount++;
+								if (statusSampleCount==Integer.MAX_VALUE)
+									statusSampleCount = 0;
+								
+								readOn = true;
+							}
+						}
+					}
+				}
+				else
+					readOn = true;
+				
+				if (readOn)
+					b = dis.readUnsignedByte();
+			}
+		} catch (EOFException e) {
+			logger.debug("end of file reached");
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		if (rawIncorrectChecksumCount > 0)
+			logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data in " + file.getAbsolutePath());
+		if (statusIncorrectChecksumCount > 0)
+			logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data in " + file.getAbsolutePath());
+	}
+	
+	
+	private byte[] getRawPacket(DataInputStream dis, byte[] header, String filename) throws IOException, EOFException {
+		dis.mark(65538);
+		byte [] length = new byte [2];
+		dis.read(length);
+		byte [] rest = new byte [((length[0]&0xFF) | ((length[1]&0xFF) << 8)) + 2];
+		int plength = dis.read(rest);
+		if (plength != rest.length) {
+			if (plength != -1)
+				logger.warn("could not read a whole data packet at the end of file " + filename + " -> drop " + plength + " bytes");
+			throw new EOFException();
+		}
+		
+		return concatAll(header, new byte [] {length[0], length[1]}, rest);
+	}
+	
+	
+	private long getGPSRawTimestamp(byte[] rawPacket) {
+		ByteBuffer buf = ByteBuffer.wrap(rawPacket);
+		buf.order(ByteOrder.LITTLE_ENDIAN);
+		return (315964800L+(604800L*(long)buf.getShort(10)))*1000L+(long)buf.getInt(6);
+	}
+
+
+	private int getSatCount(byte[] rawPacket) {
+		return rawPacket[12]&0xFF;
+	}
+
+
+	private File fixFile(File f) throws IOException {
+		FileInputStream fis = new FileInputStream(f);
+		FileOutputStream fos = new FileOutputStream(f.getAbsolutePath() + ".fix");
+		
+		byte[] tmp = new byte [1016];
+		while (fis.skip(8) == 8) {
+			int i = fis.read(tmp);
+			if (i == -1)
+				break;
+			else if (i != 1016)
+				logger.warn("less than 1016 bytes have been read at the end of file " + f.getAbsolutePath() + " -> drop " + i + " bytes");
+			
+			fos.write(tmp);
+		}
+		fis.close();
+		fos.close();
+		
+		return new File(f.getAbsolutePath() + ".fix");
+	}
+	
+	
+	private boolean checkChecksum(byte [] check) {
+		long ck_a = 0x00;
+		long ck_b = 0x00;
+		
+		for (int i=2; i<check.length-2; i++) {
+			ck_a += (long) check[i] & 0xFF;
+			ck_b += ck_a;
+		}
+		ck_a &= 0xFF;
+		ck_b &= 0xFF;
+		return ((check[check.length-2] & 0xFF) == ck_a) && ((check[check.length-1] & 0xFF) == ck_b);
+	}
+	
+	private static byte[] concatAll(byte[] first, byte[]... rest) {
+		int totalLength = first.length;
+		for (byte[] array : rest) {
+			totalLength += array.length;
+		}
+		byte[] result = Arrays.copyOf(first, totalLength);
+		int offset = first.length;
+		for (byte[] array : rest) {
+			System.arraycopy(array, 0, result, offset, array.length);
+			offset += array.length;
+		}
+		return result;
 	}
 }
