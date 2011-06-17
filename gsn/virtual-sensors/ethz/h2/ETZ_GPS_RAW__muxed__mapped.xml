@@ -39,7 +39,7 @@
                     <predicate key="query">select * from ETZ_GPS_Logger__muxed__parsed</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+                <query> select timed, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
             </source>
             <query> select * from source </query>
         </stream>

@@ -46,7 +46,10 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 		// gps data version
 		serialized_data[4] = data.getData(dataField[4].getName());
 
-		if (((Short)data.getData("gps_raw_data_version")) == 1) {
+		Short version = (Short)data.getData("gps_raw_data_version");
+		if (version == null)
+			logger.error("gps_raw_data_version data should not be NULL");
+		else if (version == 1) {
 			// gps sample count
 			serialized_data[5] = data.getData(dataField[5].getName());
 			// gps sats
@@ -96,5 +99,7 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 				logger.error(e);
 			}
 		}
+		else
+			logger.warn("gps_raw_data_version data version not supported (gps_raw_data_version=" + version + ")");
 	}
 }

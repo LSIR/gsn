@@ -9,10 +9,11 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true"/>
 		    <field name="DATA_TYPE" type="TINYINT"/>
 		    <field name="SAMPLE_COUNT" type="INTEGER"/>
+            <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
-			<field name="STATUS_SOLAR" type="SMALLINT"/>
-			<field name="STATUS_HUMIDITY" type="SMALLINT"/>
-			<field name="STATUS_TEMPERATURE" type="SMALLINT"/>
+			<field name="STATUS_SOLAR" type="INTEGER" unit="mV"/>
+			<field name="STATUS_HUMIDITY" type="INTEGER" unit="%"/>
+			<field name="STATUS_TEMPERATURE" type="SMALLINT" unit="°C"/>
 			<field name="STATUS_INCL_X" type="SMALLINT"/>
 			<field name="STATUS_INCL_Y" type="SMALLINT"/>
             <field name="RAW_DATA" type="binary"/>

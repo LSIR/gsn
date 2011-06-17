@@ -8,9 +8,9 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true"/>
 		    <field name="SAMPLE_COUNT" type="INTEGER"/>
-			<field name="SOLAR" type="SMALLINT"/>
-			<field name="HUMIDITY" type="SMALLINT"/>
-			<field name="TEMPERATURE" type="SMALLINT"/>
+			<field name="SOLAR" type="INTEGER" unit="mV"/>
+			<field name="HUMIDITY" type="INTEGER" unit="%"/>
+			<field name="TEMPERATURE" type="SMALLINT" unit="°C"/>
 			<field name="INCL_X" type="SMALLINT"/>
 			<field name="INCL_Y" type="SMALLINT"/>
             <field name="RAW_DATA" type="binary"/>
@@ -28,7 +28,7 @@
                     <predicate key="query">select * from ETZ_GPS_Logger__muxed__parsed</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SAMPLE_COUNT, STATUS_SOLAR as SOLAR, STATUS_HUMIDITY as HUMIDITY, STATUS_TEMPERATURE as TEMPERATURE, STATUS_INCL_X as INCL_X, STATUS_INCL_Y as INCL_Y, RAW_DATA from wrapper where data_type = 1</query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SAMPLE_COUNT, STATUS_SOLAR as SOLAR, STATUS_HUMIDITY as HUMIDITY, STATUS_TEMPERATURE as TEMPERATURE, STATUS_INCL_X as INCL_X, STATUS_INCL_Y as INCL_Y, RAW_DATA from wrapper where data_type = 1</query>
             </source>
             <query> select * from source </query>
         </stream>

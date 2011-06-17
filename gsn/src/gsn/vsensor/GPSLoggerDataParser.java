@@ -37,9 +37,10 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 
 			new DataField("DATA_TYPE", "TINYINT"),
 			new DataField("SAMPLE_COUNT", "INTEGER"),
+			new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
 			new DataField("GPS_SATS", "INTEGER"),
-			new DataField("STATUS_SOLAR", "SMALLINT"),
-			new DataField("STATUS_HUMIDITY", "SMALLINT"),
+			new DataField("STATUS_SOLAR", "INTEGER"),
+			new DataField("STATUS_HUMIDITY", "INTEGER"),
 			new DataField("STATUS_TEMPERATURE", "SMALLINT"),
 			new DataField("STATUS_INCL_X", "SMALLINT"),
 			new DataField("STATUS_INCL_Y", "SMALLINT"),
@@ -63,22 +64,23 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		
 		logger.info("new incoming file (" + file.getAbsolutePath() + ")");
 
-		int rawSampleCount = 0;
+		short GPS_RAW_DATA_VERSION = 1;
+		int rawSampleCount = 1;
 		int rawIncorrectChecksumCount = 0;
-		int statusSampleCount = 0;
+		int statusSampleCount = 1;
 		int statusIncorrectChecksumCount = 0;
 		try {
 			DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
 			
-			int b = dis.readUnsignedByte();
+			int b = dis.readByte();
 			while (true) {
 				boolean readOn = false;
 				if (b == rawHeader[0]) {
-					b = dis.readUnsignedByte();
+					b = dis.readByte();
 					if (b == rawHeader[1]) {
-						b = dis.readUnsignedByte();
+						b = dis.readByte();
 						if (b == rawHeader[2]) {
-							b = dis.readUnsignedByte();
+							b = dis.readByte();
 							if (b == rawHeader[3]) {
 								// gps logger raw data
 								byte [] rawPacket = getRawPacket(dis, rawHeader, file.getAbsolutePath());
@@ -91,7 +93,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 											data.getData(dataField[3].getName()),
 											RAW_DATA_TYPE,
 											rawSampleCount,
-											getSatCount(rawPacket),
+											GPS_RAW_DATA_VERSION,
+											(int)getUByte(rawPacket[12]),
 											null,
 											null,
 											null,
@@ -103,13 +106,13 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								}
 								else {
 									rawIncorrectChecksumCount++;
-									logger.warn("checksum for gps raw data is not correct in " + file.getAbsolutePath() + " for sample " + rawSampleCount);
+									logger.warn("checksum for gps raw data sample " + rawSampleCount + " is not correct in " + file.getAbsolutePath());
 									dis.reset();
 								}
 								
 								rawSampleCount++;
 								if (rawSampleCount==Integer.MAX_VALUE)
-									rawSampleCount = 0;
+									rawSampleCount = 1;
 								
 								readOn = true;
 							}
@@ -117,11 +120,11 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					}
 				}
 				else if (b == statusHeader[0]) {
-					b = dis.readUnsignedByte();
+					b = dis.readByte();
 					if (b == statusHeader[1]) {
-						b = dis.readUnsignedByte();
+						b = dis.readByte();
 						if (b == statusHeader[2]) {
-							b = dis.readUnsignedByte();
+							b = dis.readByte();
 							if (b == statusHeader[3]) {
 								// gps logger status data
 								byte [] rawPacket = getRawPacket(dis, statusHeader, file.getAbsolutePath());
@@ -129,7 +132,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 									ByteBuffer buf = ByteBuffer.wrap(rawPacket);
 									buf.order(ByteOrder.LITTLE_ENDIAN);
 									buf.position(6);
-									long timestamp = (long)buf.getInt()*1000L;
+									long timestamp = getUInt(new byte[]{buf.get(),buf.get(),buf.get(),buf.get()})*1000L;
 									data = new StreamElement(dataField, new Serializable[]{
 											data.getData(dataField[0].getName()),
 											timestamp,
@@ -138,8 +141,9 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 											STATUS_TYPE,
 											statusSampleCount,
 											null,
-											buf.getShort(),
-											(short)(buf.getShort()/10),
+											null,
+											getUShort(new byte[]{buf.get(),buf.get()}),
+											getUShort(new byte[]{buf.get(),buf.get()})/10,
 											(short)(buf.getShort()/10),
 											buf.getShort(),
 											buf.getShort(),
@@ -149,13 +153,13 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								}
 								else {
 									statusIncorrectChecksumCount++;
-									logger.warn("checksum for gps status data is not correct in " + file.getAbsolutePath() + " for sample " + statusSampleCount);
+									logger.warn("checksum for gps status data sample " + statusSampleCount + " is not correct in " + file.getAbsolutePath());
 									dis.reset();
 								}
 								
 								statusSampleCount++;
 								if (statusSampleCount==Integer.MAX_VALUE)
-									statusSampleCount = 0;
+									statusSampleCount = 1;
 								
 								readOn = true;
 							}
@@ -166,7 +170,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					readOn = true;
 				
 				if (readOn)
-					b = dis.readUnsignedByte();
+					b = dis.readByte();
 			}
 		} catch (EOFException e) {
 			logger.debug("end of file reached");
@@ -174,10 +178,11 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			logger.error(e.getMessage(), e);
 		}
 
+		logger.info((rawSampleCount-1) + " raw samples and " + (statusSampleCount-1) + " status samples read");
 		if (rawIncorrectChecksumCount > 0)
-			logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data in " + file.getAbsolutePath());
+			logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data samples in " + file.getAbsolutePath());
 		if (statusIncorrectChecksumCount > 0)
-			logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data in " + file.getAbsolutePath());
+			logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data samples in " + file.getAbsolutePath());
 	}
 	
 	
@@ -201,11 +206,6 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		ByteBuffer buf = ByteBuffer.wrap(rawPacket);
 		buf.order(ByteOrder.LITTLE_ENDIAN);
 		return (315964800L+(604800L*(long)buf.getShort(10)))*1000L+(long)buf.getInt(6);
-	}
-
-
-	private int getSatCount(byte[] rawPacket) {
-		return rawPacket[12]&0xFF;
 	}
 
 
@@ -241,6 +241,18 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		ck_a &= 0xFF;
 		ck_b &= 0xFF;
 		return ((check[check.length-2] & 0xFF) == ck_a) && ((check[check.length-1] & 0xFF) == ck_b);
+	}
+	
+	private static short getUByte(byte b) {
+		return (short) (b&0xFF);
+	}
+	
+	private static int getUShort(byte[] array) {
+		return (array[1]&0xFF) << 8 | (array[0]&0xFF);
+	}
+	
+	private static long getUInt(byte[] array) {
+		return (long) ((array[3]&0xFF) << 24 | (array[2]&0xFF) << 16 | (array[1]&0xFF) << 8 | (array[0]&0xFF));
 	}
 	
 	private static byte[] concatAll(byte[] first, byte[]... rest) {
