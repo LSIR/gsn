@@ -60,6 +60,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), (String) data.getData("relative_file"));
 		file = file.getAbsoluteFile();
+		
+		logger.info("new incoming file (" + file.getAbsolutePath() + ")");
 
 		int rawSampleCount = 0;
 		int rawIncorrectChecksumCount = 0;
