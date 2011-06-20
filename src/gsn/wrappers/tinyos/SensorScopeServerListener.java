@@ -62,10 +62,11 @@ public class SensorScopeServerListener {
     }
 
     int receive(byte[] buffer, int n) {
+        logger.warn("Trying to read " + n + " bytes...");
         try {
             return client.getInputStream().read(buffer, 0, n);
         } catch (IOException e) {
-            logger.warn("Exception\n" + e.toString());
+            logger.warn(e.getMessage(), e);
             return -1;
         }
     }
@@ -97,8 +98,11 @@ public class SensorScopeServerListener {
     }
 
 
-
     boolean ReceivePacket(int packet, int length) {
+
+        logger.warn("ReceivePacket(packet=" + packet + ",length=" + length + ")");
+
+
         boolean escape = false;
         boolean lengthOk = false;
         int idx = 0;
@@ -315,6 +319,8 @@ public class SensorScopeServerListener {
 
     private void ProcessPackets() {
 
+        logger.warn("Processing packets");
+
         int rxIdx = 0;
         int nbPkts = 0;
         int pktLen = 0;
@@ -408,11 +414,11 @@ public class SensorScopeServerListener {
     }
 
     private void LogData(byte[] bytes) {
-        // Write data to logger
+        listArray(bytes, bytes.length);
     }
 
     private byte[] ExtractData(byte[] buffer, int len, byte type) {
-        return new byte[0];
+        return buffer;
     }
 
     private boolean CheckAuthentication(String passkey, int i, int i1, byte b, byte b1) {
@@ -499,10 +505,6 @@ public class SensorScopeServerListener {
         logger.warn("Server started on port: " + port);
         SensorScopeServerListener server = new SensorScopeServerListener();
         logger.warn("Entering server mode...");
-
-        //int[] challenge = new int[25];
-
-        //server.FillAuthChallenge(challenge);
 
         server.entry();
     }
