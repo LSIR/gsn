@@ -38,7 +38,7 @@ public class SensorScopeServerListener {
         try {
             return client.getInputStream().read(buffer);
         } catch (IOException e) {
-            System.out.println("Exception\n" + e.toString());
+            logger.warn("Exception\n" + e.toString());
             return -1;
         }
     }
@@ -50,7 +50,7 @@ public class SensorScopeServerListener {
             out.write(buffer);
             out.flush();
         } catch (IOException e) {
-            System.out.println("Exception\n"+e);
+            logger.warn("Exception\n"+e);
             success = false;
         }
         return success;
@@ -61,7 +61,7 @@ public class SensorScopeServerListener {
     }
 
     void listArray(byte[] a, int len, String header) {
-        System.out.println("* " + header + " *");
+        logger.warn("* " + header + " *");
         listArray(a, len);
     }
 
@@ -83,10 +83,10 @@ public class SensorScopeServerListener {
         dec_sb.append("(").append(String.format("%2d", len)).append(")");
         dec_sb_2.append("(").append(String.format("%2d", len)).append(")");
 
-        System.out.println(hex_sb.toString());
-        System.out.println(hex_sb_2.toString());
-        System.out.println(dec_sb.toString());
-        System.out.println(dec_sb_2.toString());
+        logger.warn(hex_sb.toString());
+        logger.warn(hex_sb_2.toString());
+        logger.warn(dec_sb.toString());
+        logger.warn(dec_sb_2.toString());
 
     }
 
@@ -129,7 +129,7 @@ public class SensorScopeServerListener {
                 if (buffer_1 <= 31) rssi = -113 + (2 * buffer_1);
                 else rssi = -255;
 
-                System.out.println("RSSI = " + rssi);
+                logger.warn("RSSI = " + rssi);
 
                 // Send the authentication challenge
                 FillAuthChallenge(challenge);
