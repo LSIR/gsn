@@ -16,7 +16,7 @@
                     		MESSAGE = spl[1];
                     	} else { MESSAGE = spl[0]; }
 					} catch(Throwable e){
-						org.apache.log4j.Logger.getLogger(gsn.wrapppers.backlog.plugins.SyslogNgPlugin.class).error(e);
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
                 ]]>
             </param>

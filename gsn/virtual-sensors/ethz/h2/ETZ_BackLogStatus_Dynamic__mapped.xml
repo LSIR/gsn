@@ -19,7 +19,7 @@
                         		def emailTitle = "[PermaSense-GSN-Test] - ERROR: BackLog error counter increased (vs=" + vsname + ", pos=" + POSITION + ")";
                         		def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "]: BackLog error counter increased by " + (ERROR_COUNTER-lastErrorCounterMap.get(POSITION)[0]) + " to " + ERROR_COUNTER + " on position " + POSITION + " at " + vsname + ".";
 
-								org.apache.log4j.Logger.getLogger(gsn.wrappers.backlog.plugins.BackLogStatusPlugin.class).warn(emailContent);
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
                 			}
                 			lastErrorCounterMap.put(POSITION, [ERROR_COUNTER, GENERATION_TIME]);
@@ -34,7 +34,7 @@
                         		def emailTitle = "[PermaSense-GSN-Test] - EXCEPTION: BackLog exception counter increased (vs=" + vsname + ", pos=" + POSITION + ")";
                         		def emailContent = "EXCEPTION [" + (new Date(GENERATION_TIME)).getDateTimeString() + "]: BackLog exception counter increased by " + (EXCEPTION_COUNTER-lastExceptionCounterMap.get(POSITION)[0]) + " to " + EXCEPTION_COUNTER + " on position " + POSITION + " at " + vsname + ".";
 
-								org.apache.log4j.Logger.getLogger(gsn.wrappers.backlog.plugins.BackLogStatusPlugin.class).warn(emailContent);
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
                 			}
                 			lastExceptionCounterMap.put(POSITION, [EXCEPTION_COUNTER, GENERATION_TIME]);
@@ -69,7 +69,7 @@
                         		def emailTitle = "[PermaSense-GSN-Test] - WARNING: No more " + vsname + " messages received from position " + entry.key;
                         		def emailContent = "WARNING: No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
 
-								org.apache.log4j.Logger.getLogger(gsn.wrappers.backlog.plugins.BackLogStatusPlugin.class).warn(emailContent);
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
                         		rmlist.add(entry.key)
                         	}

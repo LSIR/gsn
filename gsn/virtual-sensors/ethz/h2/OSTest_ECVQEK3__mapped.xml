@@ -16,7 +16,7 @@
 						CURRENT_RANGE = RAW_DATA.substring(61,64);
 						SELECTED_RANGE = RAW_DATA.substring(65,68);
 					}catch(Throwable e){
-						org.apache.log4j.Logger.getLogger(gsn.wrapppers.backlog.plugins.ECVQEK3Plugin.class).error(e);
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
 				]]>
 	    	</param>

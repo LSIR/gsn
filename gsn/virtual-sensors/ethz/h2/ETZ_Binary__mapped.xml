@@ -34,7 +34,7 @@
                         		def emailTitle = "[PermaSense-GSN-Test] - WARNING: No more " + vsname + " messages received from position " + entry.key;
                         		def emailContent = "WARNING: No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
 
-								org.apache.log4j.Logger.getLogger(gsn.wrapppers.backlog.plugins.BinaryPlugin.class).warn(emailContent);
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                         		sendEmail(mailrecipients, emailTitle, emailContent);
                         		rmlist.add(entry.key)
                         	}

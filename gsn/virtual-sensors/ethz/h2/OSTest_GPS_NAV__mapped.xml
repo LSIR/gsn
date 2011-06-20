@@ -20,7 +20,7 @@
 						GEOID_SEP = GEO_SEP_RAW_DATA.toDouble();
 						GEOID_SEP_UNIT = GEO_SEP_U_RAW_DATA;
 					}catch(Throwable e){
-						org.apache.log4j.Logger.getLogger(gsn.wrapppers.backlog.plugins.GPSNAVPlugin.class).error(e);
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
 				]]>
 	    	</param>
