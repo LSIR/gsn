@@ -87,6 +87,7 @@ class BackLogMainClass(Thread, Statistics):
 
         self._logger = logging.getLogger(self.__class__.__name__)
         
+        self._backlogStopped = False
         self.shutdown = False
 
         self.jobsobserver = JobsObserverClass(self)
@@ -305,6 +306,7 @@ class BackLogMainClass(Thread, Statistics):
 
 
     def stop(self):
+        self._backlogStopped = True
         if self.powerControl:
             self.powerControl.stop()
         self.schedulehandler.stop()
@@ -425,6 +427,9 @@ class BackLogMainClass(Thread, Statistics):
     
     
     def pluginAction(self, pluginclassname, parameters, runtimemax):
+        if self._backlogStopped:
+            return None
+        
         pluginactive = False
         plugin = self.plugins.get(pluginclassname)
         if plugin != None:
@@ -516,7 +521,8 @@ class BackLogMainClass(Thread, Statistics):
                 self._logger.exception(e)
         else:
             self._logger.error('unknown message type %s received' % (msgType,))
-            self.incrementErrorCounter()
+            if not self._backlogStopped:
+                self.incrementErrorCounter()
         
         
     def ackReceived(self, timestamp, msgType):
