@@ -21,6 +21,7 @@ public class SensorScopeServerListener {
 
     private static final int TX_BUFFER_SIZE = 10;
     private static final int RX_BUFFER_SIZE = 100000;
+    public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
 
     byte[] mRxBuf;
     byte[] mTxBuf;
@@ -206,7 +207,7 @@ public class SensorScopeServerListener {
     }
 
     public static void main(java.lang.String[] args) {
-        PropertyConfigurator.configure(Main.DEFAULT_GSN_LOG4J_PROPERTIES);
+        PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
         SensorScopeServerListener server = new SensorScopeServerListener();
         logger.warn("Entering server mode...");
         server.entry();
