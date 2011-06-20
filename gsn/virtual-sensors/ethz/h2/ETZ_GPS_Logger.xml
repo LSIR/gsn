@@ -4,8 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
        	<web-input password="test">
          	<command name="logger_file">
-                <field name="device_id" type="*text">the device_id of the gps logger</field>
-				<field name="file" type="*binary">file</field>
+				<field name="file" type="*binary">the gps logger file</field>
         	</command>
    		</web-input>
         <output-structure>
@@ -25,7 +24,8 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="file-getter">
                     <predicate key="subdirectory-name">gps-logger</predicate>
-                    <predicate key="filename-regex">^D_\d+_\d+_\d+\.dat$</predicate>
+                    <predicate key="filename-regex">^D_(\d+)_\d+_\d+\.dat$</predicate>
+                    <predicate key="deviceid-from-filename">true</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
