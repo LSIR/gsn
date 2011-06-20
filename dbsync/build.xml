@@ -165,7 +165,7 @@
      eg: ant -Dwsroot=foo/bar -Dwsname=MyWebService dev-ws-generate-aar
 
      http://localhost:22001/services/standard/GSNWebService?wsdl
-     
+
       -->
 
      <!-- Default Web Service root path -->
@@ -238,7 +238,7 @@
      <target name="dev-ws-compile" depends="bind" description="Compile the Web Service java classes.">
          <javac debug="true" srcdir="${wsroot}/src" optimize="off" destdir="${wsroot}/build" failonerror="true" classpathref="classpath"/>
      </target>
-    
+
 
     <target name="compile-reports" depends="init" description="Compile the Jasper Reports Layout files (.jrxml).">
         <taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask">
@@ -254,6 +254,13 @@
         </jrc>
     </target>
 
+    <target name="dbsync" depends="build" description="Synchronizes databases.">
+        <java classname="gsn.tools.dbsync" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+            <classpath refid="classpath"/>
+            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+        </java>
+    </target>
+
     <target name="clean" depends="init" description="Erase built files and target.">
         <delete includeEmptyDirs="yes" failonerror="no">
             <fileset dir="${build.dir}" includes="**/*.class,**/*.xml"/>
@@ -262,7 +269,7 @@
             <fileset dir="${jars}" includes="**/*"/>
         </delete>
     </target>
-    
+
 
     <!-- Tests -->
 
@@ -296,6 +303,31 @@
             </fileset>
             <report format="frames" todir="${reports}/junit"/>
         </junitreport>
+    </target>
+
+    <target name="test-sensorscope" depends="build" description="Tests sensorscope server">
+        <java classname="gsn.wrappers.tinyos.SenscorscopeTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+            <classpath refid="classpath"/>
+            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+            <arg id="sensorscope-server" value="sf@climaps.com:5010"/>
+            <arg id="log-conf-file" value="conf/debug.log"/>
+        </java>
+    </target>
+
+    <target name="test-server-sensorscope" depends="build" description="Tests sensorscope server">
+        <java classname="gsn.wrappers.tinyos.SensorScopeServerListener" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+            <classpath refid="classpath"/>
+            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+            <arg id="port" value="33333"/>
+        </java>
+    </target>
+
+    <target name="test-DB" depends="build" description="Tests sensorscope server">
+        <java classname="gsn.tests.testDB" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+            <classpath refid="classpath"/>
+            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+            <arg id="port" value="33333"/>
+        </java>
     </target>
 
     <target name="test-wsclient" depends="build" description="Tests web service client.">
@@ -412,7 +444,7 @@
         </documentdoclet>
         -->
     </target>
-        
+
     <target name="jar" depends="clean,bind" description="Create a jar file containing the GSN classes.">
         <jar destfile="${jars}/${jar.file}" basedir="${build.dir}">
             <manifest>
