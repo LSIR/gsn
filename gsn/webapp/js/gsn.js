@@ -72,33 +72,6 @@ var GSN = {
             $("#msg").hide();
             $("#main #datachooser").show();
             if (!GSN.loaded) GSN.updateall();
-        } else if (GSN.context=="position")	{
-            GSN.vsbox.container = "#vs4map";
-            $("#msg").hide();
-            $("#main #control").hide();
-            $("#control #closeall").hide();
-            $("#main #mapdiv").show();
-            $("#toggleallmarkers").show();
-            $("#vsmenu .toggle").show();
-            if(!GSN.map.loaded) {
-                GSN.updateall();
-                GSN.map.init();
-            }
-			
-            //take care of params
-            if (params.length>1) {
-                var lat=lng=zoom=null;
-                for (var i=1;i<params.length;i++){
-                    val = params[i].split("=");
-                    if (val[0]=="lt") lat = val[1];
-                    if (val[0]=="lo") lng = val[1];
-                    if (val[0]=="z") zoom = parseInt(val[1]);
-                }
-                if (lat!=null) {
-                    map.setCenterAndZoom(new LatLonPoint(lat,lng),zoom);
-                }
-            }
-            GSN.map.showAllMarkers();
         } else if (GSN.context=="fullmap")	{
             GSN.vsbox.container = "#vs";
             if(!GSN.map.loaded) {
