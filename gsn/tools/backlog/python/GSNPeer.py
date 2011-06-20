@@ -119,8 +119,7 @@ class GSNPeerClass(Thread, Statistics):
             threadnr = (threadnr+1)%0xFF
             if not self._gsnPeerStop:
                 self._gsnlistener.start()
-                
-            self._gsnlistener.join()
+                self._gsnlistener.join()
             
         self._pingwatchdog.join()
         self._pingtimer.join()
