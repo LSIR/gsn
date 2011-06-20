@@ -1,6 +1,7 @@
 package gsn.wrappers.tinyos;
 
 
+import com.izforge.izpack.util.CleanupClient;
 import gsn.Main;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -26,10 +27,26 @@ public class SensorScopeServerListener {
     byte[] mTxBuf;
     private static int port;
 
+    private int mStationID;
+    private static final int CLIMAPS_ID = 0;
+    private static final byte BYTE_SYNC = 0x7E;
+    private static final byte BYTE_ESC = 0x7D;
+    private static final byte PKT_TYPE_DATA = 0x00;
+    private static final byte PKT_TYPE_CRC = 0x01;
+    private static final byte BYTE_ACK = 0x00;
+    private static final byte BYTE_NACK = 0x01;
+    private static final byte BUFTYPE_GPRS = 0x00; // TODO: check exact value in sensor.h
 
     public SensorScopeServerListener() {
+        // Create a server socket
+        try {
+            serverSocket = new ServerSocket(port);
+        } catch (IOException e) {
+            logger.warn(e.getMessage(), e);
+        }
         mRxBuf = new byte[RX_BUFFER_SIZE];
         mTxBuf = new byte[TX_BUFFER_SIZE];
+        logger.warn("Server initialized.");
     }
 
     Socket client = null;
@@ -44,6 +61,15 @@ public class SensorScopeServerListener {
         }
     }
 
+    int receive(byte[] buffer, int n) {
+        try {
+            return client.getInputStream().read(buffer, 0, n);
+        } catch (IOException e) {
+            logger.warn("Exception\n" + e.toString());
+            return -1;
+        }
+    }
+
     boolean send(byte[] buffer) {
         boolean success = true;
         try {
@@ -51,14 +77,85 @@ public class SensorScopeServerListener {
             out.write(buffer);
             out.flush();
         } catch (IOException e) {
-            logger.warn("Exception\n" + e);
+            logger.warn("Exception while trying to send data\n" + e);
             success = false;
         }
         return success;
     }
 
-    void ReceivePacket() {
+    boolean send(byte[] buffer, int len) {
+        boolean success = true;
+        try {
+            OutputStream out = client.getOutputStream();
+            out.write(buffer, 0, len);
+            out.flush();
+        } catch (IOException e) {
+            logger.warn("Exception while trying to send data\n" + e);
+            success = false;
+        }
+        return success;
+    }
 
+
+
+    boolean ReceivePacket(int packet, int length) {
+        boolean escape = false;
+        boolean lengthOk = false;
+        int idx = 0;
+        byte _byte = 0;
+
+        while (true) {
+
+            if (!ReceiveByte(_byte))
+                return false;
+
+            // Synchronization byte?
+            if (_byte == BYTE_SYNC) {
+                length = 1;
+                mRxBuf[packet + 0] = BYTE_SYNC;    // packet[0] = BYTE_SYNC
+                return true;
+            }
+
+            // Beware of escaped bytes
+            if (escape) {
+                _byte ^= 0x20;
+                escape = false;
+            } else if (_byte == BYTE_ESC) {
+                escape = true;
+                continue;
+            }
+
+            // First 'real' byte is the packet length
+            if (lengthOk == false) {
+                length = _byte;
+                lengthOk = true;
+            } else {
+                mRxBuf[packet + idx++] = _byte; // packet[idx++] = byte;
+
+                // The GPRS sends '+++' upon disconnection
+                if (mRxBuf[length] == '+' && mRxBuf[packet + 0] == '+' && mRxBuf[1] == '+') {
+                    mRxBuf[length] = 3;
+                    mRxBuf[packet + 2] = '+';
+
+                    return true;
+                }
+
+                // Do we have a complete packet?
+                if (idx == length)
+                    return true;
+            }
+        }
+    }
+
+    private boolean ReceiveByte(byte b) {
+        byte[] _oneByte = new byte[1];
+        int n_bytes = receive(_oneByte, 1);
+        if (n_bytes < 1)
+            return false;
+        else {
+            b = _oneByte[0];
+            return true;
+        }
     }
 
     void listArray(byte[] a, int len, String header) {
@@ -91,55 +188,119 @@ public class SensorScopeServerListener {
 
     }
 
+    void listArray(int[] a, int len, String header) {
+        logger.warn("* " + header + " *");
+        listArray(a, len);
+    }
 
-    public void entry() {
+    void listArray(int[] a, int len) {
+
+        StringBuilder hex_sb = new StringBuilder();
+        StringBuilder hex_sb_2 = new StringBuilder();
+        StringBuilder dec_sb = new StringBuilder();
+        StringBuilder dec_sb_2 = new StringBuilder();
+        for (int i = 0; (i < a.length && i < len); i++) {
+            hex_sb.append(String.format("%02x", a[i])).append(" ");
+            hex_sb_2.append(String.format("%02x", a[i] & 0xff)).append(" ");
+            dec_sb.append(a[i]).append(" ");
+            dec_sb_2.append(a[i] & 0xff).append(" ");
+        }
+
+        hex_sb.append("(").append(String.format("%2d", len)).append(")");
+        hex_sb_2.append("(").append(String.format("%2d", len)).append(")");
+        dec_sb.append("(").append(String.format("%2d", len)).append(")");
+        dec_sb_2.append("(").append(String.format("%2d", len)).append(")");
+
+        logger.warn(hex_sb.toString());
+        //logger.warn(hex_sb_2.toString());
+        logger.warn(dec_sb.toString());
+        //logger.warn(dec_sb_2.toString());
+
+    }
+
+
+    public int entry() {
 
         int rssi;
         long rtt;
 
-        byte[] challenge = new byte[25];
+        int[] challenge = new int[25];
+        byte[] buffer = new byte[7];
 
+        if (serverSocket == null) {
+            logger.error("Failed connection");
+            return 0;
+        }
 
         long counter = 0;
 
         try {
-            // Create a server socket
-            serverSocket = new ServerSocket(port);
 
-            while (true) {
-                // Wait for a  request
-                client = serverSocket.accept();
+            // Wait for a  request
+            logger.warn("Server listening...");
+            client = serverSocket.accept();
 
-                logger.warn("Connection from: " + client.getRemoteSocketAddress().toString());
+            logger.warn("Connection from: " + client.getRemoteSocketAddress().toString());
 
-                // Get rssi
-                logger.warn("Trying to receive RSSI...");
-                byte[] buffer = new byte[MAX_BUFFER_SIZE];
-                int n_read = receive(buffer);
+            // Get rssi
+            logger.warn("Trying to receive RSSI...");
 
-                if (n_read < 2) {
-                    logger.warn("Couldn't get RSSI");
-                    listArray(buffer, n_read);
-                    continue;
-                }
+            int n_read = receive(buffer, 2);
 
+            if (n_read < 2) {
+                CleanUp("receiving RSSI");
                 listArray(buffer, n_read);
-
-                int buffer_1 = (buffer[1] & 0xff);
-
-                if (buffer_1 <= 31) rssi = -113 + (2 * buffer_1);
-                else rssi = -255;
-
-                logger.warn("RSSI = " + rssi);
-
-                // Send the authentication challenge
-                FillAuthChallenge(challenge);
-                rtt = System.currentTimeMillis();
-
-                //send
-
-                counter++;
+                return 0;
             }
+
+            listArray(buffer, n_read);
+
+            int buffer_1 = ((int) buffer[1] & 0xff);
+
+            if (buffer_1 <= 31) rssi = -113 + (2 * buffer_1);
+            else rssi = -255;
+
+            logger.warn("RSSI = " + rssi);
+
+            // Send the authentication challenge
+            FillAuthChallenge(challenge);
+            rtt = System.currentTimeMillis();
+
+            if (!send(toByteArray(challenge))) {
+                CleanUp("sending authentication challenge");
+                return 0;
+            }
+
+            // Get the reply to the challenge
+            if (receive(buffer, 7) < 0) {
+                CleanUp("receiving authentication data");
+                return 0;
+            }
+
+            listArray(buffer, 7, "Response to challenge");
+
+            rtt = System.currentTimeMillis() - rtt;
+
+            // Check that the station correctly authenticated itself
+            if (!CheckAuthentication(PASSKEY, challenge[1], challenge[9], buffer[3], buffer[5])) {
+                logger.error("Failed authentication from " + client.getRemoteSocketAddress().toString());
+                client.close();
+                return 0;
+            }
+
+            mStationID = ((int) buffer[1] << 8) + (int) buffer[2];
+
+            if (mStationID == CLIMAPS_ID)
+                logger.warn("Climaps authenticated (RTT = " + rtt + " ms)");
+            else
+                logger.warn("Station " + mStationID + " (RTT = " + rtt + " ms, RSSI = " + rssi + " dBm)");
+
+            ProcessPackets();
+
+            client.close();
+
+            counter++;
+
         } catch (IOException ioe) {
             logger.warn("Error in Server: " + ioe);
         } finally {
@@ -149,9 +310,123 @@ public class SensorScopeServerListener {
                 logger.warn("can't close streams" + e.getMessage());
             }
         }
+        return 0;
     }
 
-    private void FillAuthChallenge(byte[] challenge) {
+    private void ProcessPackets() {
+
+        int rxIdx = 0;
+        int nbPkts = 0;
+        int pktLen = 0;
+
+        while (true) {
+            int pkt = mRxBuf[rxIdx + 1];
+            if (!ReceivePacket(pkt, rxIdx)) {
+                CleanUp("receiving packets");
+                return;
+            }
+
+            // This is a (dirty?) hack to mimic MMC card buffers, where the length includes the length byte itself
+            mRxBuf[rxIdx]++;
+
+            pktLen = mRxBuf[rxIdx] - 1;
+            rxIdx += pktLen + 1;
+
+            // '+++' means that the GPRS has disconnected
+            if (pktLen == 3 && mRxBuf[pkt + 0] == '+' && mRxBuf[pkt + 1] == '+' && mRxBuf[pkt + 2] == '+') {
+                if (mStationID == CLIMAPS_ID)
+                    logger.warn("Climaps has disconnected");
+                else
+                    logger.warn("Station " + mStationID + " has disconnected");
+                return;
+            }
+
+            // A synchronization byte resets the reception
+            if (pktLen == 1 && mRxBuf[pkt + 0] == BYTE_SYNC) {
+                rxIdx = 0;
+                nbPkts = 0;
+                continue;
+            }
+
+            // A data packet?
+            if (mRxBuf[pkt + 0] == PKT_TYPE_DATA) {
+                ++nbPkts;
+                continue;
+            }
+
+            // At this point, it must be a CRC (3 bytes long)
+            if (pktLen != 3 || mRxBuf[pkt + 0] != PKT_TYPE_CRC) {
+                mTxBuf[1] = BYTE_NACK;
+                logger.warn("Corrupted CRC packet received");
+            } else {
+                // So far so good, let's check the crc
+                int nextPktIdx = 0;
+                int crc = 0;
+                for (int i = 0; i < rxIdx - 3; ++i) {
+                    if (i == nextPktIdx) nextPktIdx += mRxBuf[i];
+                    else crc = Crc16Byte(crc, mRxBuf[i]);
+                }
+
+                if ((mRxBuf[pkt + 1] << 8 + mRxBuf[pkt + 2]) == crc) {
+                    if (nbPkts == 1) {
+                        if (mStationID == CLIMAPS_ID)
+                            logger.warn("Successfully received a data packet from Climaps");
+                        else
+                            logger.warn("Successfully received a data packet from station " + mStationID);
+                    } else {
+                        if (mStationID == CLIMAPS_ID)
+                            logger.warn("Successfully received " + nbPkts + " data packet from Climaps");
+                        else
+                            logger.warn("Successfully received " + nbPkts + "data packet from station " + mStationID);
+                    }
+
+
+                    LogData(ExtractData(mRxBuf, rxIdx - 4, BUFTYPE_GPRS));
+                    mTxBuf[1] = BYTE_ACK;
+                } else {
+                    mTxBuf[1] = BYTE_NACK;
+                    logger.error("Invalid CRC received");
+                }
+
+            }
+
+            // Once here, in any case, we must send back an ACK or a NACK
+            mTxBuf[0] = 1;
+
+            if (!send(mTxBuf, 2)) {
+                if (mTxBuf[1] == BYTE_ACK)
+                    CleanUp("sending back an ACK");
+                else
+                    CleanUp("sending back a NACK");
+                return;
+            }
+
+            // Done with the current batch of packets
+            rxIdx = 0;
+            nbPkts = 0;
+        }
+    }
+
+    private void LogData(byte[] bytes) {
+        // Write data to logger
+    }
+
+    private byte[] ExtractData(byte[] buffer, int len, byte type) {
+        return new byte[0];
+    }
+
+    private boolean CheckAuthentication(String passkey, int i, int i1, byte b, byte b1) {
+        return true;   //TODO: implement authentication checking method
+    }
+
+    private byte[] toByteArray(int[] challenge) {
+        byte[] _array = new byte[challenge.length];
+        for (int i = 0; i < challenge.length; i++)
+            _array[i] = (byte) challenge[i];
+        return _array;
+    }
+
+    private void FillAuthChallenge(int[] challenge) {
         long utc;
         int crc;
 
@@ -161,31 +436,31 @@ public class SensorScopeServerListener {
         Random randomGenerator = new Random();
 
         for (int i = 1; i < 17; ++i)
-            challenge[i] = (byte) (randomGenerator.nextInt() & 0xff);
+            challenge[i] = randomGenerator.nextInt() & 0xff;
 
         utc = System.currentTimeMillis() / 1000;
-        challenge[17] = (byte) ((utc >> 24) & 0xFF);
-        challenge[18] = (byte) ((utc >> 16) & 0xFF);
-        challenge[19] = (byte) ((utc >> 8) & 0xFF);
-        challenge[20] = (byte) (utc & 0xFF);
+        challenge[17] = (int) ((utc >> 24) & 0xFF);
+        challenge[18] = (int) ((utc >> 16) & 0xFF);
+        challenge[19] = (int) ((utc >> 8) & 0xFF);
+        challenge[20] = (int) (utc & 0xFF);
         challenge[21] = 0;
         challenge[22] = 0;
 
         // CRC
-        byte[] _challenge = new byte[22];
+        int[] _challenge = new int[22];
 
         System.arraycopy(challenge, 1, _challenge, 0, 22);
         listArray(challenge, 24, "challenge");
         listArray(_challenge, 22, "_challenge");
 
         crc = Crc16(_challenge, 22);
-        challenge[23] = (byte) ((crc >> 8) & 0xFF);
-        challenge[24] = (byte) (crc & 0xFF);
+        challenge[23] = (crc >> 8) & 0xFF;
+        challenge[24] = crc & 0xFF;
 
     }
 
 
-    int Crc16Byte(int crc, byte _byte) {
+    int Crc16Byte(int crc, int _byte) {
         crc = ((crc >> 8) & 0xFF) | (crc << 8);
         crc ^= _byte;
         crc ^= (crc & 0xFF) >> 4;
@@ -196,7 +471,7 @@ public class SensorScopeServerListener {
     }
 
 
-    int Crc16(byte[] buffer, int len) {
+    int Crc16(int[] buffer, int len) {
         int i;
         int crc = 0;
 
@@ -204,6 +479,15 @@ public class SensorScopeServerListener {
             crc = Crc16Byte(crc, buffer[i]);
 
         return crc;
+    }
+
+    void CleanUp(String when) {
+        logger.error("Error while " + when);
+        try {
+            client.close();
+        } catch (IOException e) {
+            logger.warn(e.getMessage(), e);
+        }
     }
 
     public static void main(java.lang.String[] args) {
@@ -215,7 +499,13 @@ public class SensorScopeServerListener {
         logger.warn("Server started on port: " + port);
         SensorScopeServerListener server = new SensorScopeServerListener();
         logger.warn("Entering server mode...");
+
+        //int[] challenge = new int[25];
+
+        //server.FillAuthChallenge(challenge);
+
         server.entry();
     }
+
 }
 
