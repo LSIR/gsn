@@ -15,7 +15,6 @@ public class SensorScopeServerListener {
 
     private static transient Logger logger = Logger.getLogger(SensorScopeServerListener.class);
 
-    public static final int PORT = 3000;
     private static final int MAX_BUFFER_SIZE = 2048;
     private static final String PASSKEY = "FD83EC5EA68E2A5B";
 
@@ -25,6 +24,7 @@ public class SensorScopeServerListener {
 
     byte[] mRxBuf;
     byte[] mTxBuf;
+    private static int port;
 
 
     public SensorScopeServerListener() {
@@ -51,7 +51,7 @@ public class SensorScopeServerListener {
             out.write(buffer);
             out.flush();
         } catch (IOException e) {
-            logger.warn("Exception\n"+e);
+            logger.warn("Exception\n" + e);
             success = false;
         }
         return success;
@@ -104,7 +104,7 @@ public class SensorScopeServerListener {
 
         try {
             // Create a server socket
-            serverSocket = new ServerSocket(PORT);
+            serverSocket = new ServerSocket(port);
 
             while (true) {
                 // Wait for a  request
@@ -208,6 +208,11 @@ public class SensorScopeServerListener {
 
     public static void main(java.lang.String[] args) {
         PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
+        String str_port = args[0];
+
+        port = Integer.parseInt(str_port);
+
+        logger.warn("Server started on port: " + port);
         SensorScopeServerListener server = new SensorScopeServerListener();
         logger.warn("Entering server mode...");
         server.entry();
