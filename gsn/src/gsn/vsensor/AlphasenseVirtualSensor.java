@@ -64,8 +64,8 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			short type = (Short) data.getData("MESSAGE_TYPE");
 		    
 		    String inputString = new String((String)data.getData("RAW_DATA"));
-		    if (inputString.length() != 140 && inputString.length() != 110) {
-		    	logger.warn("RAW_DATA has length " + inputString.length() + " instead of 140 or 110");
+		    if (inputString.length() != 140 && inputString.length() != 137 && inputString.length() != 110) {
+		    	logger.warn("RAW_DATA has length " + inputString.length() + " instead of 140, 137, 110");
 		    	return;
 		    }
 		    String delims = "[ ]+";
@@ -119,19 +119,23 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			    String ambientTemp = new String();
 			    String offsetComp = new String();
 			    String sensitivityComp = new String();
-			   
-			    for (int i = tokens.length-1; i >= 0; i--) {
-			      if (i >= 14 && i <= 17)
+			    
+			    int p = 0;
+			    if (inputString.length() == 137)
+			      p = 1;
+
+		    	for (int i = tokens.length-1; i >= 0; i--) {
+			      if (i >= 14-p && i <= 17-p)
 			        sensorCurrent = sensorCurrent.concat(tokens[i]);
-			      else if (i >= 18 && i <= 21)
+			      else if (i >= 18-p && i <= 21-p)
 			        sensorPpm1 = sensorPpm1.concat(tokens[i]);
-			      else if (i >= 22 && i <= 25)
+			      else if (i >= 22-p && i <= 25-p)
 			        sensorPpm2 = sensorPpm2.concat(tokens[i]);
-			      else if (i >= 30 && i <= 33)
+			      else if (i >= 30-p && i <= 33-p)
 			        ambientTemp = ambientTemp.concat(tokens[i]);
-			      else if (i >= 34 && i <= 37)
+			      else if (i >= 34-p && i <= 37-p)
 			        offsetComp = offsetComp.concat(tokens[i]);
-			      else if (i >= 38 && i <= 41)
+			      else if (i >= 38-p && i <= 41-p)
 			        sensitivityComp = sensitivityComp.concat(tokens[i]);
 			    }
 
