@@ -1,0 +1,33 @@
+<virtual-sensor name="OpenSense_Nabel_Duebendorf__mapped" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.NabelDataParser</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true"/>
+		    		<field name="NABEL_TIMESTAMP" type="BIGINT" unit="unixtime" />
+		    		<field name="OZONE_PPB" type="DOUBLE" unit="ppb" />
+		    		<field name="CO_PPM" type="DOUBLE" unit="ppm" />
+		    		<field name="RAW_DATA" type="VARCHAR(64)" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Nabel Duebendorf parsed data from OpenSense deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OpenSense_Binary__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where FILE_COMPLETE = 1</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
