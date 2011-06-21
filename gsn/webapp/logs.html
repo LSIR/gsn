@@ -287,9 +287,9 @@ $(document).ready(function() {
 				});
 				$("#deployment_"+depl.name).hide();
 			});
-			showDeployment(visible);
 			$("#corestation_navigation").show();
 			$("#starttext").html("<p>CoreStation syslog-ng data.</p>");
+			showDeployment(visible);
 		  	getLogs();
 		}
 	});
