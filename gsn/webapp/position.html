@@ -16,7 +16,7 @@
 		<script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
 		
 		<!-- Include Map engine-->
-		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAcCxhFM99SMIShXVUlt9hZRRGT91DJS6ifzq9ijoOaiWK5z_I1BRDP2R8dbyv6XV3PpLLr1UtST_64w" type="text/javascript"></script>
+		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAcCxhFM99SMIShXVUlt9hZRQoXGUTEdpbmrAyx2JlHCxqhxsghhQSegHWMdlkJ2KgyDZ4MV_erdujug" type="text/javascript"></script>
 		<script type="text/javascript" src="js/mapstraction.js"></script>
 		
 		<script type="text/javascript" src="js/constants.js"></script>
@@ -32,6 +32,9 @@
 	
 	var deployments = new Array();
 	var selectedDeploymentNr;
+	var tableEnding = "";
+	var fieldIdLat = "lat_raw_data";
+	var fieldIdLong = "long_raw_data";
 		
 function deployment(name) {
 	this.name = name;
@@ -76,6 +79,11 @@ $(document).ready(function() {
 			var arraySize = 0;
 			$("virtual-sensor",data).each(function(){
 				if ($(this).attr("name").indexOf("gps_nav") != -1) {
+					if ($(this).attr("name").indexOf("__mapped") != -1) {
+						tableEnding = "__mapped";
+						fieldIdLat = "latitude";
+						fieldIdLong = "longitude";
+					}
 			    var deploymentname = $(this).attr("name").split("_", 1)[0];
 			    if(deploymentname.length > 1) {
 						deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
@@ -140,7 +148,7 @@ function fetchTopologyInfo() {
 
 	$.ajax({
 		type: "GET",
-		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav__mapped&fields=device_id&fields=longitude&fields=latitude&critfield=device_id&neg=&critop==&critval=1&nb=1",
+		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=device_id&fields=" + fieldIdLong + "&fields=" + fieldIdLat + "&critfield=device_id&neg=&critop==&critval=1&nb=1",
 		    async: false,
 		    cache: false,
 		    timeout: 30000,
@@ -163,7 +171,7 @@ function fetchTopologyInfo() {
 					lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
 					longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
 		
-					GSN.map.updateMarker("ostest_gps_nav__mapped", dev_id, lati, longi);
+					GSN.map.updateMarker(deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding, dev_id, lati, longi);
 				}
 			})
 		}
@@ -171,7 +179,7 @@ function fetchTopologyInfo() {
 	
 	$.ajax({
 		type: "GET",
-		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav__mapped&fields=device_id&fields=longitude&fields=latitude&critfield=device_id&neg=&critop==&critval=2&nb=1",
+		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=device_id&fields=" + fieldIdLong + "&fields=" + fieldIdLat + "&critfield=device_id&neg=&critop==&critval=2&nb=1",
 		    async: false,
 		    cache: false,
 		    timeout: 30000,
@@ -194,7 +202,7 @@ function fetchTopologyInfo() {
 					lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
 					longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
 		
-					GSN.map.updateMarker("ostest_gps_nav__mapped", dev_id, lati, longi);
+					GSN.map.updateMarker(deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding, dev_id, lati, longi);
 				}
 			})
 			GSN.load();
