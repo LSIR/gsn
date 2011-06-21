@@ -34,7 +34,8 @@
 <!--//<![CDATA[
 
 var LOOK_N_DAYS_BACK = 5;
-var MAX_LOGS = 500;
+var MAX_LOGS_PER_REQUEST = 50;
+var MAX_LOGS_TOTAL = 1000;
 var UPDATE_INTERVAL = 2;
 
 var deployments = new Array();
@@ -53,6 +54,8 @@ function deployment(name) {
 function coreStation(fieldId) {
 	this.fieldId = fieldId;
 	this.selected = false;
+	this.firstTimestamp;
+	this.initialized = false;
 }
 
 function getFieldIds(deploymentId) {
@@ -75,19 +78,21 @@ function getFieldIds(deploymentId) {
 	return ids;
 }
 
-function getLastLogs(deploymentId, fieldId) {
+function getLastLogs(deploymentId, corestation) {
 	$.ajax({
 		type: "GET",
-		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=log_message&orderby=timestamp&critfield=" + fieldIdentifier + "&neg=&critop==&critval=" + fieldId + "&nb=" + MAX_LOGS,
+		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=log_message&orderby=timestamp&critfield=" + fieldIdentifier + "&neg=&critop==&critval=" + corestation.fieldId + "&nb=" + MAX_LOGS_PER_REQUEST,
         async: false,
         cache: false,
         timeout: 30000,
 		success: function(data){
 			var lastLogTime = "";
-			$($("line", data).get().reverse()).each(function(){
+			$($("line", data).get().reverse()).each(function(i){
 				if ($("field:eq(0)", this).text() != "timestamp") {
+					if (i == 0)
+						corestation.firstTimestamp = $("field:eq(0)", this).text();
 					lastLogTime = $("field:eq(0)", this).text();
-					$('.jspPane',"#corestation_" + deployments[deploymentId].name + "_" + fieldId).append(generateLogMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
+					$('.jspPane',"#corestation_" + deployments[deploymentId].name + "_" + corestation.fieldId).append(generateLogMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
 				}
 			});
 			deployments[deploymentId].lastLogTime = lastLogTime;
@@ -106,11 +111,36 @@ function fieldIdExists(depl, id) {
 	return exists;
 }
 
+function getMaxLogsRecursive(deplName, fieldId, lastTimestamp) {
+	var tmp = "";
+	if (lastTimestamp != "")
+		tmp = "&critJoin=and&critfield=timestamp&neg=&critop=<&critval=" + lastTimestamp;
+	$.ajax({
+		type: "GET",
+		url: "/data?vsName=" + deplName.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=log_message&orderby=timestamp&critfield=" + fieldIdentifier + "&neg=&critop==&critval=" + fieldId + "&nb=" + MAX_LOGS_PER_REQUEST + tmp,
+		async: false,
+		cache: false,
+		timeout: 30000,
+		success: function(data){
+			var lastLogTime = "";
+			$("line", data).each(function(){
+				if ($("field:eq(0)", this).text() != "timestamp") {
+					lastLogTime = $("field:eq(0)", this).text();
+					$('.jspPane',"#corestation_" + deplName + "_" + fieldId).prepend(generateLogMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
+				}
+			});
+			scrollPane.reinitialise();
+			if (lastLogTime != "" && $('.jspPane',"#corestation_" + deplName + "_" + fieldId).find("div").length < MAX_LOGS_TOTAL)
+				getMaxLogsRecursive(deplName, fieldId, lastLogTime);
+		}
+	});
+}
+
 function getLogs() {
 	var seldepl = selectedDeploymentNr;
 	var crit = "&nb=1";
 	if (deployments[seldepl].lastLogTime != "")
-		crit = "&critfield=timestamp&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=" + MAX_LOGS;
+		crit = "&critfield=timestamp&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=" + MAX_LOGS_PER_REQUEST;
 	$.ajax({
 		type: "GET",
 		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=" + fieldIdentifier + "&fields=log_message&orderby=timestamp" + crit,
@@ -128,7 +158,7 @@ function getLogs() {
 					
 					$($(container).children().get().reverse()).each(
 						function(i, elemLi) {
-							if(i >= MAX_LOGS)
+							if(i >= MAX_LOGS_TOTAL)
 								$(this).remove();
 						}
 					);
@@ -253,7 +283,7 @@ $(document).ready(function() {
 				});
 				
 				$.each(depl.coreStations, function(){
-				    getLastLogs(i, this.fieldId);
+				    getLastLogs(i, this);
 				});
 				$("#deployment_"+depl.name).hide();
 			});
@@ -266,14 +296,17 @@ $(document).ready(function() {
 });
 
 function showDeployment(id) {
+	var selCoreStation;
 	$.each(deployments, function() {
 		var depl = this;
 		$("#corestation_menu_"+depl.name).hide();
 		$("#deployment_"+depl.name).hide();
 		$("#deployment_menu_item_"+depl.name).removeClass("selected");
 		$.each(depl.coreStations, function() {
-			if ((depl.name == deployments[id].name) && this.selected)
+			if ((depl.name == deployments[id].name) && this.selected) {
 				scrollPane = $("#corestation_"+depl.name+"_"+this.fieldId).show().jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
+				selCoreStation = this;
+			}
 			else
 				$("#corestation_"+depl.name+"_"+this.fieldId).hide();
 		});
@@ -286,15 +319,22 @@ function showDeployment(id) {
 		$("#corestation_menu_"+deployments[id].name).show();
 		scrollPane.reinitialise();
 		scrollPane.scrollToBottom();
+		if (!selCoreStation.initialized) {
+			selCoreStation.initialized = true;
+			getMaxLogsRecursive(deployments[selectedDeploymentNr].name, selCoreStation.fieldId, selCoreStation.firstTimestamp);
+		}
 	}
 }
 
 function showCoreStation(fieldId) {
+	var selCoreStation;
 	$.each(deployments[selectedDeploymentNr].coreStations, function() {
 		$("#corestation_"+deployments[selectedDeploymentNr].name+"_"+this.fieldId).hide();
 		$("#corestation_menu_item_"+deployments[selectedDeploymentNr].name+"_"+this.fieldId).removeClass("selected");
-		if (this.fieldId == fieldId)
+		if (this.fieldId == fieldId) {
+			selCoreStation = this;
 			this.selected = true;
+		}
 		else
 			this.selected = false;
 	});
@@ -302,6 +342,11 @@ function showCoreStation(fieldId) {
 	$("#corestation_menu_item_"+deployments[selectedDeploymentNr].name+"_"+fieldId).addClass("selected");
 	scrollPane.reinitialise();
 	scrollPane.scrollToBottom();
+	
+	if (!selCoreStation.initialized) {
+		selCoreStation.initialized = true;
+		getMaxLogsRecursive(deployments[selectedDeploymentNr].name, fieldId, selCoreStation.firstTimestamp);
+	}
 }
 //]]>-->
 </script>
