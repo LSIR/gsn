@@ -49,6 +49,11 @@ function deployment(name) {
 	this.name = name;
 	this.coreStations = new Array();
 	this.lastLogTime = "";
+	this.dozerEventsExists = false;
+	this.dozerEventsSelected = false;
+	this.dozerEventsInitialized = false;
+	this.dozerEventsfirstTimestamp;
+	this.lastEventTime = "";
 }
 
 function coreStation(fieldId) {
@@ -58,7 +63,7 @@ function coreStation(fieldId) {
 	this.initialized = false;
 }
 
-function getFieldIds(deploymentId) {
+function getAvailableCoreStations(deploymentId) {
 	var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
 	var ids = new Array();
 	$.ajax({
@@ -78,6 +83,17 @@ function getFieldIds(deploymentId) {
 	return ids;
 }
 
+function fieldIdExists(depl, id) {
+	var exists = false;
+	$.each(depl.coreStations, function() {
+		if (id == this.fieldId) {
+			exists = true;
+			return false;
+		}
+	});
+	return exists;
+}
+
 function getLastLogs(deploymentId, corestation) {
 	$.ajax({
 		type: "GET",
@@ -92,7 +108,7 @@ function getLastLogs(deploymentId, corestation) {
 					if (i == 0)
 						corestation.firstTimestamp = $("field:eq(0)", this).text();
 					lastLogTime = $("field:eq(0)", this).text();
-					$('.jspPane',"#corestation_" + deployments[deploymentId].name + "_" + corestation.fieldId).append(generateLogMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
+					$('.jspPane',"#corestation_" + deployments[deploymentId].name + "_" + corestation.fieldId).append(generateSyslogNgMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
 				}
 			});
 			deployments[deploymentId].lastLogTime = lastLogTime;
@@ -100,15 +116,26 @@ function getLastLogs(deploymentId, corestation) {
 	});
 }
 
-function fieldIdExists(depl, id) {
-	var exists = false;
-	$.each(depl.coreStations, function() {
-		if (id == this.fieldId) {
-			exists = true;
-			return false;
+function getLastEvents(deployment) {
+	$.ajax({
+		type: "GET",
+		url: "/data?vsName=" + deployment.name.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=device_id&fields=event_id&fields=event_type&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST,
+        async: false,
+        cache: false,
+        timeout: 30000,
+		success: function(data){
+			var lastEventTime = "";
+			$($("line", data).get().reverse()).each(function(i){
+				if ($("field:eq(0)", this).text() != "event_timestamp") {
+					if (i == 0)
+						deployment.dozerEventsfirstTimestamp = $("field:eq(0)", this).text();
+					lastEventTime = $("field:eq(0)", this).text();
+					$('.jspPane',"#dozer_events_" + deployment.name).append(generateEventMessageDiv(lastEventTime, $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
+				}
+			});
+			deployment.lastEventTime = lastEventTime;
 		}
 	});
-	return exists;
 }
 
 function getMaxLogsRecursive(deplName, fieldId, lastTimestamp) {
@@ -126,7 +153,7 @@ function getMaxLogsRecursive(deplName, fieldId, lastTimestamp) {
 			$("line", data).each(function(){
 				if ($("field:eq(0)", this).text() != "timestamp") {
 					lastLogTime = $("field:eq(0)", this).text();
-					$('.jspPane',"#corestation_" + deplName + "_" + fieldId).prepend(generateLogMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
+					$('.jspPane',"#corestation_" + deplName + "_" + fieldId).prepend(generateSyslogNgMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
 				}
 			});
 			scrollPane.reinitialise();
@@ -136,25 +163,70 @@ function getMaxLogsRecursive(deplName, fieldId, lastTimestamp) {
 	});
 }
 
-function getLogs() {
-	var seldepl = selectedDeploymentNr;
-	var crit = "&nb=1";
-	if (deployments[seldepl].lastLogTime != "")
-		crit = "&critfield=timestamp&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=" + MAX_LOGS_PER_REQUEST;
+function getMaxEventsRecursive(deplName, lastTimestamp) {
+	var tmp = "";
+	if (lastTimestamp != "")
+		tmp = "&critJoin=and&critfield=event_timestamp&neg=&critop=<&critval=" + lastTimestamp;
 	$.ajax({
 		type: "GET",
-		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=timestamp&fields=" + fieldIdentifier + "&fields=log_message&orderby=timestamp" + crit,
+		url: "/data?vsName=" + deplName.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=device_id&fields=event_id&fields=event_type&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST + tmp,
+		async: false,
+		cache: false,
+		timeout: 30000,
 		success: function(data){
-			var lastLogTime = "";
+			var lastEventTime = "";
+			$("line", data).each(function(){
+				if ($("field:eq(0)", this).text() != "event_timestamp") {
+					lastEventTime = $("field:eq(0)", this).text();
+					$('.jspPane',"#dozer_events_" + deplName).prepend(generateEventMessageDiv(lastEventTime, $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
+				}
+			});
+			scrollPane.reinitialise();
+			if (lastEventTime != "" && $('.jspPane',"#dozer_events_" + deplName).find("div").length < MAX_LOGS_TOTAL)
+				getMaxEventsRecursive(deplName, lastEventTime);
+		}
+	});
+}
+
+function getLogs() {
+	var seldepl = selectedDeploymentNr;
+	var isEvents = deployments[seldepl].dozerEventsExists && deployments[seldepl].dozerEventsSelected;
+	var crit = "&nb=1";
+	var firstFieldIdentifier = "timestamp";
+	if (deployments[seldepl].lastLogTime != "")
+		crit = "&critfield=" + firstFieldIdentifier + "&neg=&critop=>&critval=" + deployments[seldepl].lastLogTime + "&nb=" + MAX_LOGS_TOTAL;	
+	var query = deployments[seldepl].name.toLowerCase() + "_syslogng" + tableEnding + "&fields=" + firstFieldIdentifier + "&fields=" + fieldIdentifier + "&fields=log_message&orderby=" + firstFieldIdentifier + crit;
+	
+	if (isEvents) {
+		firstFieldIdentifier = "event_timestamp";
+		if (deployments[seldepl].lastEventTime != "")
+			crit = "&critfield=" + firstFieldIdentifier + "&neg=&critop=>&critval=" + deployments[seldepl].lastEventTime + "&nb=" + MAX_LOGS_TOTAL;
+		
+		query = deployments[seldepl].name.toLowerCase() + "_dozer_eventlogger__mapped&fields=" + firstFieldIdentifier + "&fields=device_id&fields=event_id&fields=event_type&fields=event_value&orderby=" + firstFieldIdentifier + crit;
+	}
+	
+	$.ajax({
+		type: "GET",
+		url: "/data?vsName=" + query,
+		success: function(data){
+			var lastTime = "";
 			$($("line", data).get().reverse()).each(function(){
 				var l = $("field:eq(1)", this).text();
-				if ($("field:eq(0)", this).text() != "timestamp" && l.toLowerCase() != "null") {
-					if (!fieldIdExists(deployments[seldepl], $("field:eq(1)", this).text()))
-						addNewCoreStation(deployments[seldepl], l, true);
-					
-					var container = $('.jspPane',"#corestation_" + deployments[seldepl].name + "_" + parseInt(l));
-					lastLogTime = $("field:eq(0)", this).text();
-					container.append(generateLogMessageDiv(lastLogTime, $("field:eq(2)", this).text()));
+				if ($("field:eq(0)", this).text() != firstFieldIdentifier && l.toLowerCase() != "null") {
+					var container;
+					if (isEvents) {
+						container = $('.jspPane',"#dozer_events_" + deployments[seldepl].name);
+						lastTime = $("field:eq(0)", this).text();
+						container.append(generateEventMessageDiv(lastTime, $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
+					}
+					else {
+						if (!fieldIdExists(deployments[seldepl], $("field:eq(1)", this).text()))
+							addNewCoreStation(deployments[seldepl], l, true);
+						
+						container = $('.jspPane',"#corestation_" + deployments[seldepl].name + "_" + parseInt(l));
+						lastTime = $("field:eq(0)", this).text();
+						container.append(generateSyslogNgMessageDiv(lastTime, $("field:eq(2)", this).text()));
+					}
 					
 					$($(container).children().get().reverse()).each(
 						function(i, elemLi) {
@@ -164,22 +236,29 @@ function getLogs() {
 					);
 				}
 			});
-			if (lastLogTime != "") {
+			if (lastTime != "") {
 				scrollPane.reinitialise();
-				deployments[seldepl].lastLogTime = lastLogTime;
+				if (isEvents)
+					deployments[seldepl].lastEventTime = lastTime;
+				else
+					deployments[seldepl].lastLogTime = lastTime;
 			}
 			setTimeout("getLogs()",UPDATE_INTERVAL*1000);
 		}
 	});
 }
 
-function generateLogMessageDiv(timestamp, msg) {
+function generateSyslogNgMessageDiv(timestamp, msg) {
 	var color = "";
 	var spl = msg.split(" ", 5);
 	var message = msg.substring(msg.indexOf(spl[4])+spl[4].length+1, msg.length);
 	if (parseInt(spl[0].slice(1,spl[0].length-1))%8<=3)
 		color = ";color:red";
 	return "<div style=\"width: 10000px" + color + "\">" + (new Date(parseFloat(timestamp))).toString() + ": " + message + "</div>";
+}
+
+function generateEventMessageDiv(timestamp, deviceId, eventId, eventType, eventValue) {
+	return "<div style=\"width: 10000px\">" + (new Date(parseFloat(timestamp))).toString() + ": device id=" + deviceId + ", event id=" + eventId + ", event type=" + eventType + ", event value=" + eventValue + "</div>";
 }
 
 function addNewCoreStation(depl, id, show) {
@@ -233,8 +312,11 @@ $(document).ready(function() {
 			$("#gsn-name").show();
 			uptime.setTime($(gsn).attr("uptime"));
 			var arraySize = 0;
+			// iterate over all available virtual sensors
 			$("virtual-sensor",data).each(function(){
-				if ($(this).attr("name").indexOf("syslogng") != -1) {
+				// are there syslog-ng or eventlogger__mapped vs available?
+				if ($(this).attr("name").indexOf("syslogng") != -1 || $(this).attr("name").indexOf("_dozer_eventlogger__mapped") != -1) {
+					// private or public?
 					if ($(this).attr("name").indexOf("__mapped") != -1) {
 						tableEnding = "__mapped";
 						fieldIdentifier = "position";
@@ -243,15 +325,21 @@ $(document).ready(function() {
 				    if(deploymentname.length > 1) {
 						deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
 						if (deploymentname!='Statistics') {
-							var exists = false;
+							var depl;
 							$.each(deployments, function(){
 								if (this.name == deploymentname) {
-									exists = true;
+									depl = this;
 									return false;
 								}
 							});
-							if (!exists)
-						    	deployments.push(new deployment(deploymentname));
+							if (depl === undefined) {
+								depl = new deployment(deploymentname);
+						    	deployments.push(depl);
+							}
+
+							// does the deployment offer dozer event logger information?
+							if ($(this).attr("name").indexOf("_dozer_eventlogger__mapped") != -1)
+								depl.dozerEventsExists = true;
 						}
 				    }
 				}
@@ -275,16 +363,33 @@ $(document).ready(function() {
 			    $("#corestation_menu").append($.LI({
 			    "id":"corestation_menu_"+depl.name
 			    }));
-			    $("#corestation_menu_"+depl.name).append($.LI({
-			    }, $.A({},fieldIdentifier + ": ")));
 			    
-				$.each(getFieldIds(i), function(){
+			    if (depl.dozerEventsExists) {
+				    $("#corestation_menu_"+depl.name).append('<li style="padding:0 8px">DozerEvents:</li>');
+					$("#corestation_menu_"+depl.name).append($.LI({}, $.A({
+					"id":"dozer_events_menu_item_"+depl.name,
+					"href":"javascript:showDozerEvents("+i+")"
+					},"X")));
+					$("#corestation_menu_"+depl.name).append('<li style="width:50px">&nbsp;</li>');
+					// add div
+					$("#logscontainer").append("<div class=\"scroll-pane\" id=\"dozer_events_"+depl.name+"\"></div>");
+					$("#dozer_events_"+depl.name).hide();
+
+					scrollPane = $(".scroll-pane").jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
+			    }
+			    
+			    $("#corestation_menu_"+depl.name).append('<li style="padding:0 8px">' + fieldIdentifier + ':</li>');
+			    
+				$.each(getAvailableCoreStations(i), function(){
 					addNewCoreStation(depl, this.fieldId, false);
 				});
 				
 				$.each(depl.coreStations, function(){
 				    getLastLogs(i, this);
 				});
+				
+			    if (depl.dozerEventsExists)
+					getLastEvents(depl);
 				$("#deployment_"+depl.name).hide();
 			});
 			$("#corestation_navigation").show();
@@ -309,7 +414,13 @@ function showDeployment(id) {
 			else
 				$("#corestation_"+depl.name+"_"+this.fieldId).hide();
 		});
+		if (depl.dozerEventsExists)
+			$("#dozer_events_"+depl.name).hide();
 	});
+
+	if (selCoreStation === undefined)
+		scrollPane = $("#dozer_events_"+deployments[id].name).show().jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
+	
 	$("#deployment_"+deployments[id].name).show();
 	$("#deployment_menu_item_"+deployments[id].name).addClass("selected");
 	$.cookie("deployment" , deployments[id].name);
@@ -318,17 +429,28 @@ function showDeployment(id) {
 		$("#corestation_menu_"+deployments[id].name).show();
 		scrollPane.reinitialise();
 		scrollPane.scrollToBottom();
-		if (!selCoreStation.initialized) {
+		if (selCoreStation === undefined && !deployments[id].dozerEventsInitialized) {
+			$("#starttext").html('<p>Loading dozer event log data... <img src="style/ajax-loader.gif" /></p>');
+			deployments[id].dozerEventsInitialized = true;
+			getMaxEventsRecursive(deployments[id].name, deployments[id].dozerEventsfirstTimestamp);
+			$("#starttext").html("<p>Logging data.</p>");
+		}
+		else if (!(selCoreStation === undefined) && !selCoreStation.initialized) {
 			$("#starttext").html('<p>Loading syslog-ng data... <img src="style/ajax-loader.gif" /></p>');
 			selCoreStation.initialized = true;
-			getMaxLogsRecursive(deployments[selectedDeploymentNr].name, selCoreStation.fieldId, selCoreStation.firstTimestamp);
-			$("#starttext").html("<p>CoreStation syslog-ng data.</p>");
+			getMaxLogsRecursive(deployments[id].name, selCoreStation.fieldId, selCoreStation.firstTimestamp);
+			$("#starttext").html("<p>Logging data.</p>");
 		}
 	}
 }
 
 function showCoreStation(fieldId) {
 	var selCoreStation;
+	if (deployments[selectedDeploymentNr].dozerEventsExists) {
+		deployments[selectedDeploymentNr].dozerEventsSelected = false;
+		$("#dozer_events_"+deployments[selectedDeploymentNr].name).hide();
+		$("#dozer_events_menu_item_"+deployments[selectedDeploymentNr].name).removeClass("selected");
+	}
 	$.each(deployments[selectedDeploymentNr].coreStations, function() {
 		$("#corestation_"+deployments[selectedDeploymentNr].name+"_"+this.fieldId).hide();
 		$("#corestation_menu_item_"+deployments[selectedDeploymentNr].name+"_"+this.fieldId).removeClass("selected");
@@ -348,7 +470,27 @@ function showCoreStation(fieldId) {
 		$("#starttext").html('<p>Loading syslog-ng data... <img src="style/ajax-loader.gif" /></p>');
 		selCoreStation.initialized = true;
 		getMaxLogsRecursive(deployments[selectedDeploymentNr].name, fieldId, selCoreStation.firstTimestamp);
-		$("#starttext").html("<p>CoreStation syslog-ng data.</p>");
+		$("#starttext").html("<p>Logging data.</p>");
+	}
+}
+
+function showDozerEvents(id) {
+	deployments[id].dozerEventsSelected = true;
+	$.each(deployments[id].coreStations, function() {
+		$("#corestation_"+deployments[id].name+"_"+this.fieldId).hide();
+		$("#corestation_menu_item_"+deployments[id].name+"_"+this.fieldId).removeClass("selected");
+		this.selected = false;
+	});
+	scrollPane = $("#dozer_events_"+deployments[id].name).show().jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
+	$("#dozer_events_menu_item_"+deployments[id].name).addClass("selected");
+	scrollPane.reinitialise();
+	scrollPane.scrollToBottom();
+
+	if (!deployments[id].dozerEventsInitialized) {
+		$("#starttext").html('<p>Loading dozer event log data... <img src="style/ajax-loader.gif" /></p>');
+		deployments[id].dozerEventsInitialized = true;
+		getMaxEventsRecursive(deployments[id].name, deployments[id].dozerEventsfirstTimestamp);
+		$("#starttext").html("<p>Logging data.</p>");
 	}
 }
 //]]>-->

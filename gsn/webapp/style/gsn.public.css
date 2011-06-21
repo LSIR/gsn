@@ -1097,19 +1097,21 @@ white-space:nowrap;
 -moz-background-inline-policy:continuous;
 -moz-background-origin:padding;
 background:#5CA1E7 none repeat scroll 0 0;
-color:#9E9E9E;
 height:1.7em;
+font-size:0.8em;
+font-weight:bolder;
 line-height:1.7em;
 margin-top:2px;
 margin-left:2px;
 margin-right:2px;
-padding:0;
 border-top-width:0.1em;
 border-bottom-width:0.1em;
 border-left-width:0.1;
 border-right-width:0;
 border-style:solid;
 border-color:#5CA1E7;
+text-decoration:none;
+text-transform:uppercase;
 }
 
 #corestation_navigation #corestation_menu{
@@ -1121,11 +1123,7 @@ padding:0;
 background-color:inherit;
 color:#000000;
 display:block;
-font-size:0.8em;
-font-weight:bolder;
 padding:0 8px;
-text-decoration:none;
-text-transform:uppercase;
 }
 
 #corestation_navigation .selected {
