@@ -28,6 +28,10 @@ ETZ_Dozer_WXT520Prec.xml
 ETZ_Dozer_WXT520Sup.xml
 ETZ_Dozer_WXT520WindPth.xml
 ETZ_Dozer_WXT520Ident.xml
+ETZ_Dozer_Th3Ident.xml
+ETZ_Dozer_Th3Temp.xml
+ETZ_Dozer_EnviroScanIdent.xml
+ETZ_Dozer_EnviroScanData.xml
 ETZ_GPS_Logger.xml
 ETZ_GPS_RAW.xml
 ETZ_Schedule.xml
@@ -53,6 +57,6 @@ OSTest_Schedule.xml
 OSTest_Statistics.xml
 OSTest_SyslogNg.xml
 OSTest_Binary.xml
-Statistics_DataFlow.xml
+#Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
