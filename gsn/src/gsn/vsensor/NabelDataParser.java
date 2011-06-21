@@ -26,10 +26,16 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 	private long last_nabel_timestamp = 0;
 	
 	private static DataField[] dataField = {
+			new DataField("POSITION", "INTEGER"),
+			new DataField("DEVICE_ID", "INTEGER"),
+			new DataField("GENERATION_TIME", "BIGINT"),
+		
 			new DataField("NABEL_TIMESTAMP", "BIGINT"),
 			new DataField("OZONE_PPB", "DOUBLE"),
 			new DataField("CO_PPM", "DOUBLE"),
-			new DataField("RAW_DATA", "VARCHAR(64)")};
+			new DataField("RAW_DATA", "VARCHAR(64)"),
+			
+			new DataField("DATA_IMPORT_SOURCE", "SMALLINT")};
 	
 	@Override
 	public boolean initialize() {
@@ -94,9 +100,20 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 				// Use same time format as on the core station (UTC+1h)
 				long curr_nabel_timestamp = dt.getTime() - 3600 * 1000;
 				
+				// convert ozone and co cncentration strings into a double value
+				Double ozone, co;
+				if (tokens[1].length() == 0)
+					ozone = null;
+				else
+					ozone = Double.valueOf(tokens[1]);
+				if (tokens[2].length() == 0)
+					co = null;
+				else
+					co = Double.valueOf(tokens[2]);
+				
 				// Only push data to database if its timestamp is bigger than the one from the last entry
 				if (curr_nabel_timestamp > last_nabel_timestamp) {
-					StreamElement curr_data = new StreamElement(data, dataField, new Serializable[] {curr_nabel_timestamp, tokens[1], tokens[2], strLine});
+					StreamElement curr_data = new StreamElement(dataField, new Serializable[] {data.getData(dataField[0].getName()), data.getData(dataField[1].getName()), data.getData(dataField[2].getName()), curr_nabel_timestamp, ozone, co, strLine, data.getData(dataField[7].getName())});
 					last_nabel_timestamp = curr_nabel_timestamp;
 					super.dataAvailable(inputStreamName, curr_data);
 				}
