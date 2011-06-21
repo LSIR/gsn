@@ -750,7 +750,7 @@ var GSN = {
                     GSN.map.updateMarker($(vs).attr("name"),id,lat,lon);
                 }
             }
-			
+            
             //update the vsbox
             var vsd = $(".vsbox-"+$(vs).attr("name"), $(this.container))[0];
             if (typeof vsd == "undefined") return;
@@ -910,7 +910,7 @@ var GSN = {
                     field = $("field[name="+$(dd).attr("class")+"]",vs);
                     type = $(field).attr("type");
                     unit = $(field).attr("unit");
-                    value = $(field).text();
+                    value = $('<div/>').html($(field).text()).text();
                     if (unit==null || value=="null")
                         unit="";
                     else
