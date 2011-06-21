@@ -25,7 +25,7 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 	private String storage_directory = null;
 	private long last_nabel_timestamp = 0;
 	
-	private static DataField[] dataField = {			
+	private static DataField[] dataField = {
 			new DataField("NABEL_TIMESTAMP", "BIGINT"),
 			new DataField("OZONE_PPB", "DOUBLE"),
 			new DataField("CO_PPM", "DOUBLE"),
@@ -96,9 +96,9 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 				
 				// Only push data to database if its timestamp is bigger than the one from the last entry
 				if (curr_nabel_timestamp > last_nabel_timestamp) {
-					data = new StreamElement(data, dataField, new Serializable[] {curr_nabel_timestamp, tokens[1], tokens[2], strLine});
+					StreamElement curr_data = new StreamElement(data, dataField, new Serializable[] {curr_nabel_timestamp, tokens[1], tokens[2], strLine});
 					last_nabel_timestamp = curr_nabel_timestamp;
-					super.dataAvailable(inputStreamName, data);
+					super.dataAvailable(inputStreamName, curr_data);
 				}
 			}
 		}
