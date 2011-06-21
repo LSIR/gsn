@@ -179,7 +179,7 @@ var GSN = {
             GSN.vsName[arraySize] = name;
             arraySize++;
 			
-        //if ($("field[@name=latitude]",$(this)).text()!="")
+        //if ($("field[name=latitude]",$(this)).text()!="")
         //	$("#menu-"+vsname).addClass("gpsenabled");
         });
 		
@@ -232,7 +232,7 @@ var GSN = {
 		    else {
 			$("#vsmenu").append($.DIV({},$.A({
 			    "class":"rubric",
-			    "href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+" > a, ."+vsName[i][1]+".subrubric\"));",
+                            "href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+" > a:not(.subrubric), ."+vsName[i][1]+".subrubric\"));",
 			    "id":"menu-rubric-"+vsName[i][1]+""
 			},"  "+vsName[i][1])));
 			$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
@@ -344,7 +344,7 @@ var GSN = {
 		
         // Hide all the sensors in the side bar
         $(".sensorName").hide();
-        $(".subrubric").hide();
+        $(".subrubric:not(.subrubric>a)").hide();
 		
         // Drag and Drop Functionnality
         if(GSN.context == "data"){
@@ -616,7 +616,7 @@ var GSN = {
             type: "GET",
             url: "/gsn?name="+vsName,
             success: function(data){
-                $("virtual-sensor[@name="+vsName+"]",data).each(function(){
+                $("virtual-sensor[name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
                 });
             }
@@ -743,9 +743,9 @@ var GSN = {
 
             //when map is enable, update marker
             if (GSN.map.loaded){
-                var lat = $("field[@name=latitude]",vs).text();
-                var lon = $("field[@name=longitude]",vs).text();
-                var id = $("field[@name=node_id]",vs).text();
+                var lat = $("field[name=latitude]",vs).text();
+                var lon = $("field[name=longitude]",vs).text();
+                var id = $("field[name=node_id]",vs).text();
                 if (lat != "" && lon != "" && id != ""){
                     GSN.map.updateMarker($(vs).attr("name"),id,lat,lon);
                 }
@@ -907,7 +907,7 @@ var GSN = {
                 var dd,field,unit;
                 for (var i = 0; i<dds.size();i++){
                     dd = dds.get(i);
-                    field = $("field[@name="+$(dd).attr("class")+"]",vs);
+                    field = $("field[name="+$(dd).attr("class")+"]",vs);
                     type = $(field).attr("type");
                     unit = $(field).attr("unit");
                     value = $(field).text();
@@ -937,7 +937,7 @@ var GSN = {
                         }
                     }
                 }
-                value = $("field[@name=timed]",vs).text();
+                value = $("field[name=timed]",vs).text();
                 //if (value != "") value = GSN.util.printDate(value);
                 $("span.timed", vsd).empty().append(value);
                 return false;
