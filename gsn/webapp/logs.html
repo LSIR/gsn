@@ -207,7 +207,7 @@ function addNewCoreStation(depl, id, show) {
 }
 
 $(document).ready(function() {
-	$("#starttext").append($.P({},"Loading syslog-ng data..."));
+	$("#starttext").html('<p>Loading syslog-ng data... <img src="style/ajax-loader.gif" /></p>');
 	
 	$("#corestation_navigation").hide();
 	$.get('/menu.jsp', {selected: "logs"}, function(data) {
@@ -288,7 +288,6 @@ $(document).ready(function() {
 				$("#deployment_"+depl.name).hide();
 			});
 			$("#corestation_navigation").show();
-			$("#starttext").html("<p>CoreStation syslog-ng data.</p>");
 			showDeployment(visible);
 		  	getLogs();
 		}
@@ -320,8 +319,10 @@ function showDeployment(id) {
 		scrollPane.reinitialise();
 		scrollPane.scrollToBottom();
 		if (!selCoreStation.initialized) {
+			$("#starttext").html('<p>Loading syslog-ng data... <img src="style/ajax-loader.gif" /></p>');
 			selCoreStation.initialized = true;
 			getMaxLogsRecursive(deployments[selectedDeploymentNr].name, selCoreStation.fieldId, selCoreStation.firstTimestamp);
+			$("#starttext").html("<p>CoreStation syslog-ng data.</p>");
 		}
 	}
 }
@@ -344,8 +345,10 @@ function showCoreStation(fieldId) {
 	scrollPane.scrollToBottom();
 	
 	if (!selCoreStation.initialized) {
+		$("#starttext").html('<p>Loading syslog-ng data... <img src="style/ajax-loader.gif" /></p>');
 		selCoreStation.initialized = true;
 		getMaxLogsRecursive(deployments[selectedDeploymentNr].name, fieldId, selCoreStation.firstTimestamp);
+		$("#starttext").html("<p>CoreStation syslog-ng data.</p>");
 	}
 }
 //]]>-->
