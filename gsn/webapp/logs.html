@@ -35,8 +35,94 @@
 
 var LOOK_N_DAYS_BACK = 5;
 var MAX_LOGS_PER_REQUEST = 50;
-var MAX_LOGS_TOTAL = 1000;
+var MAX_LOGS_TOTAL = 100;
 var UPDATE_INTERVAL = 2;
+
+var EVENT_MSG = new Array(
+		 "","",
+		 "" /* not used EVENT_COMMAND_RECEIVED %s*/,
+		 "" /* not used EVENT_EVENT_Q_FULL %s */,
+		 "Node resetted, resetcounter is %s." /* EVENT_RESET %s*/,
+		 "" /* not used EVENT_WATCHDOG_RESET %s */,
+		 "","","","",
+		 "Dozer: Connected to parent %s." /* EVENT_CHILD_CONNECT %s */,
+		 "" /* not used EVENT_CHILD_DISCONNECT %s */,
+		 "" /* not used EVENT_CHILD_DISCONNECT_ROUTING_LOOP %s */,
+		 "Dozer: No beacon received, failed connection attempts: %s." /* EVENT_CHILD_NO_BEACON %s */,
+		 "Dozer: Could not upload data in this round, failed connection attempts: %s." /* EVENT_CHILD_NO_DATAUPLOAD %s */,
+		 "" /* not used EVENT_CHILD_RESET_OVERHEARTIME %s */,
+		 "Dozer: Found %s potential parents." /* EVENT_CHILD_FOUND_PARENTS %s */,
+		 "","","",
+		 "Dozer: Got connection from child %s." /* EVENT_PARENT_CONNECT %s */,
+		 "Dozer: Disconnected child %s." /* EVENT_PARENT_DISCONNECT %s */,
+		 "" /* not used EVENT_DOZER_WATCHDOG %s */,
+		 "","","","","","","",
+		 "" /* not used EVENT_BB_POWER_ON %s */,
+		 "Baseboard power off, shutdownrequest was %s." /* EVENT_BB_POWER_OFF %s */,
+		 "Received power switch command with value %s." /*EVENT_PSB_POWER %s */,
+		 "Baseboard: Set new schedule interval to %s seconds." /* EVENT_BB_NEWSCHEDULE %s */,
+		 "Baseboard: Set new servicewindow to %s seconds." /* EVENT_BB_NEWSERVICEWINDOW %s */,
+		 "" /* not used EVENT_BB_NEWSERVICEWINDOW_INVALID %s*/ ,
+		 "Baseboard: Set V12DC_EXT to %s." /* EVENT_BB_V12DC_EXT_SW %s */,
+		 "","","",
+		 "Received datasource config command %s." /*EVENT_DATACONFIG %s*/,
+		 "Wxt520 init failed with code %s." /*EVENT_WXT520_INIT_FAIL %s*/,
+		 "","","","","","","","",
+		 "" /* not used EVENT_ERROR_SD_MOUNT %s */,
+		 "" /* not used EVENT_ERROR_SD_GENERIC %s*/,
+		 "","","","","","","","",
+		 "" /* not used EVENT_ERROR_RADIO_GENERIC %s */,
+		 "SX1211: Radio pattern error %s." /* EVENT_ERROR_RADIO_PATTERN %s",
+		 "","","","","","","","",
+		 "" /* not used EVENT_AE_ARM_POWER_ON %s */,
+		 "" /* not used EVENT_AE_ARM_POWER_OFF %s */,
+		 "" /* not used EVENT_AE_ARM_RESET %s */,
+		 "" /* not used EVENT_AE_ARM_COMM_TIMEOUT %s */,
+		 "AE board: set new posttrigger to %s." /* EVENT_AE_POSTTRIGGER_SET %s */,
+		 "AE board: set new threshhold to %s." /* EVENT_AE_THRESHOLD_SET %s */ );
+		 
+		var EVENT_MSG_NULL = new Array(
+		 "","",
+		 "" /* not used EVENT_COMMAND_RECEIVED */,
+		 "Event queue is full, there could be dropped events." /* EVENT_EVENT_Q_FULL */,
+		 "" /* not used EVENT_RESET */,
+		 "Node started after watchdog reset." /* EVENT_WATCHDOG_RESET */,
+		 "","","","",
+		 "" /* not used EVENT_CHILD_CONNECT */,
+		 "Dozer: Disconnected from parent." /* EVENT_CHILD_DISCONNECT */,
+		 "Dozer: Disconnected due to routing loop." /* EVENT_CHILD_DISCONNECT_ROUTING_LOOP */,
+		 "" /* not used EVENT_CHILD_NO_BEACON */,
+		 "" /* not used EVENT_CHILD_NO_DATAUPLOAD */,
+		 "Dozer: Reset overhear time." /* EVENT_CHILD_RESET_OVERHEARTIME */,
+		 "" /* not used EVENT_CHILD_FOUND_PARENTS */,
+		 "","","",
+		 "" /* not used EVENT_PARENT_CONNECT */,
+		 "" /* not used EVENT_PARENT_DISCONNECT */,
+		 "Dozer: Watchdog triggered." /* EVENT_DOZER_WATCHDOG */,
+		 "","","","","","","",
+		 "Baseboard power on." /* EVENT_BB_POWER_ON */,
+		 "" /* not used EVENT_BB_POWER_OFF */,
+		 "" /* not used EVENT_PSB_POWER */,
+		 "Baseboard: Received invalid schedule interval." /* EVENT_BB_NEWSCHEDULE */,
+		 "Baseboard: Disabled servicewindow." /* EVENT_BB_NEWSERVICEWINDOW*/,
+		 "Baseboard: Received invalid servciewindow interval." /* EVENT_BB_NEWSERVICEWINDOW_INVALID */,
+		 "" /* not used EVENT_BB_V12DC_EXT_SW */,
+		 "","","",
+		 "" /* not used EVENT_DATACONFIG */,
+		 "" /* not used EVENT_WXT520_INIT_FAIL */,
+		 "","","","","","","","",
+		 "Error while mounting SD card." /* EVENT_ERROR_SD_MOUNT */,
+		 "Generic SD card error." /* EVENT_ERROR_SD_GENERIC */,
+		 "","","","","","","","",
+		 "" /* not used EVENT_ERROR_RADIO_GENERIC*/,
+		 "" /* not used EVENT_ERROR_RADIO_PATTERN*/,
+		 "","","","","","","","",
+		 "AE board: ARM power on." /* EVENT_AE_ARM_POWER_ON */,
+		 "AE board: ARM power off." /* EVENT_AE_ARM_POWER_OFF */,
+		 "AE board: ARM reset." /* EVENT_AE_ARM_RESET */,
+		 "AE board: Communication to ARM timed out." /* EVENT_AE_ARM_COMM_TIMEOUT */,
+		 "" /* not used EVENT_AE_POSTTRIGGER_SET */,
+		 "" /* not used EVENT_AE_THRESHOLD_SET */);
 
 var deployments = new Array();
 var selectedDeploymentNr;
@@ -119,7 +205,7 @@ function getLastLogs(deploymentId, corestation) {
 function getLastEvents(deployment) {
 	$.ajax({
 		type: "GET",
-		url: "/data?vsName=" + deployment.name.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=device_id&fields=event_id&fields=event_type&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST,
+		url: "/data?vsName=" + deployment.name.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST,
         async: false,
         cache: false,
         timeout: 30000,
@@ -169,7 +255,7 @@ function getMaxEventsRecursive(deplName, lastTimestamp) {
 		tmp = "&critJoin=and&critfield=event_timestamp&neg=&critop=<&critval=" + lastTimestamp;
 	$.ajax({
 		type: "GET",
-		url: "/data?vsName=" + deplName.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=device_id&fields=event_id&fields=event_type&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST + tmp,
+		url: "/data?vsName=" + deplName.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST + tmp,
 		async: false,
 		cache: false,
 		timeout: 30000,
@@ -202,7 +288,7 @@ function getLogs() {
 		if (deployments[seldepl].lastEventTime != "")
 			crit = "&critfield=" + firstFieldIdentifier + "&neg=&critop=>&critval=" + deployments[seldepl].lastEventTime + "&nb=" + MAX_LOGS_TOTAL;
 		
-		query = deployments[seldepl].name.toLowerCase() + "_dozer_eventlogger__mapped&fields=" + firstFieldIdentifier + "&fields=device_id&fields=event_id&fields=event_type&fields=event_value&orderby=" + firstFieldIdentifier + crit;
+		query = deployments[seldepl].name.toLowerCase() + "_dozer_eventlogger__mapped&fields=" + firstFieldIdentifier + "&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=" + firstFieldIdentifier + crit;
 	}
 	
 	$.ajax({
@@ -251,14 +337,25 @@ function getLogs() {
 function generateSyslogNgMessageDiv(timestamp, msg) {
 	var color = "";
 	var spl = msg.split(" ", 5);
-	var message = msg.substring(msg.indexOf(spl[4])+spl[4].length+1, msg.length);
+	var logMsg = (new Date(parseFloat(timestamp))).toLocaleString() + ": " + msg.substring(msg.indexOf(spl[4])+spl[4].length+1, msg.length);
 	if (parseInt(spl[0].slice(1,spl[0].length-1))%8<=3)
-		color = ";color:red";
-	return "<div style=\"width: 10000px" + color + "\">" + (new Date(parseFloat(timestamp))).toString() + ": " + message + "</div>";
+		color = "; color: red";
+	var display = "; display: none";
+	if (logMsg.indexOf(getSearchString()) != -1)
+		display = "; display: block";
+	return "<div style=\"width: 10000px" + display + color + "\">" + logMsg + "</div>";
 }
 
-function generateEventMessageDiv(timestamp, deviceId, eventId, eventType, eventValue) {
-	return "<div style=\"width: 10000px\">" + (new Date(parseFloat(timestamp))).toString() + ": device id=" + deviceId + ", event id=" + eventId + ", event type=" + eventType + ", event value=" + eventValue + "</div>";
+function generateEventMessageDiv(timestamp, position, deviceId, eventId, eventValue) {
+	var logMsg = (new Date(parseFloat(timestamp))).toLocaleString() + ": " + position + " (deviceId=" + deviceId + "): ";
+	if (eventValue.toLowerCase() == "null")
+		logMsg += EVENT_MSG_NULL[parseInt(eventId)];
+	else
+		logMsg += EVENT_MSG[parseInt(eventId)].replace('%s', eventValue);
+	var display = "; display: none";
+	if (logMsg.indexOf(getSearchString()) != -1)
+		display = "; display: block";
+	return "<div style=\"width: 10000px" + display + "\">" + logMsg + "</div>";
 }
 
 function addNewCoreStation(depl, id, show) {
@@ -285,6 +382,25 @@ function addNewCoreStation(depl, id, show) {
 	depl.coreStations.push(cs)
 }
 
+function filterLogs(searchString) {
+    // make only matched names visible
+    $(".jspPane").children().each(function() {
+		if ($(this).text().indexOf(searchString) != -1)
+			$(this).show();
+		else
+			$(this).hide();
+    });
+	scrollPane.reinitialise();
+}
+
+function getSearchString() {
+	var tmp = $("#logsearch").val();
+	if (tmp == "search logs")
+		return "";
+	else
+		return tmp;
+}
+
 $(document).ready(function() {
 	$("#starttext").html('<p>Loading syslog-ng data... <img src="style/ajax-loader.gif" /></p>');
 	
@@ -293,6 +409,49 @@ $(document).ready(function() {
 		$('#navigation').html(data);
 	}, 'html');
 	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+
+    //bind log search field
+	$("#logsearch").css("color", "#bbbbbb");
+    $("#logsearch").val("search logs");
+    $("#logsearch").focus(function() {
+      	this.select();
+    });
+    $("#logsearch_clear").click(function() {
+		$("#logsearch").css("color", "#bbbbbb");
+      	$("#logsearch").val("search logs");
+		$("#logsearch_clear").attr("src", "img/button_cancel_grey.png");
+		$("#logsearch_go").attr("src", "img/button_go_grey.png");
+      	filterLogs(getSearchString());
+    });
+    $("#logsearch_go").click(function() {
+		$("#logsearch_go").attr("src", "img/button_go_grey.png");
+      	filterLogs(getSearchString());
+    });
+    $("#logsearch").keyup(function(event) {
+		if ($("#logsearch").val() != "") {
+			$("#logsearch").css("color", "#000000");
+			$("#logsearch_clear").attr("src", "img/button_cancel.png");
+	    	if (13 != (event.keyCode || event.which))
+				$("#logsearch_go").attr("src", "img/button_go.png");
+		}
+		else {
+			$("#logsearch").css("color", "#bbbbbb");
+			$("#logsearch_clear").attr("src", "img/button_cancel_grey.png");
+		}
+    });
+    $("#logsearch").keypress(function(event) {
+		$("#logsearch").css("color", "#000000");
+    	if (13 == (event.keyCode || event.which)) {
+        	filterLogs(getSearchString());
+    		$("#logsearch_go").attr("src", "img/button_go_grey.png");
+    	}
+    });
+    $("#logsearch").blur(function(event) {
+		if ($("#logsearch").val() == "") {
+			$("#logsearch").css("color", "#bbbbbb");
+	      	$("#logsearch").val("search logs");
+		}
+    });
 	
 	// deployments
 	// load deployments
@@ -516,6 +675,9 @@ function showDozerEvents(id) {
 		<ul id="deployment_menu">
 		<li />
 		</ul>
+        <img id="logsearch_clear" style="float:right;margin:5px;" src="img/button_cancel_grey.png" alt="clear filter" />
+        <img id="logsearch_go" style="float:right;margin:5px;" src="img/button_go_grey.png" alt="clear filter" />
+		<input id="logsearch" title="Enter search string to filter log messages" style="float:right;width:180px;margin-top:4px;border-style:inset;border-width:1px; " type="text"/>
 		</div>
 		
 		<div id="corestation_navigation">
