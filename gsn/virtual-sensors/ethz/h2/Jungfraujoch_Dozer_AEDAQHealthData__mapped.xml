@@ -1,0 +1,47 @@
+<virtual-sensor name="Jungfraujoch_Dozer_AEDAQHealthData__mapped" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+		<init-params>
+            <param name="position_mapping" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_VCCCH1" type="INTEGER" />            
+            <field name="PAYLOAD_VCCCH2" type="INTEGER" />
+            <field name="PAYLOAD_VCCADC" type="INTEGER" />
+            <field name="PAYLOAD_REFADC" type="INTEGER" />
+            <field name="PAYLOAD_VCCOPA" type="INTEGER" />
+            <field name="PAYLOAD_VCC55V" type="INTEGER" />
+            <field name="PAYLOAD_I12V" type="INTEGER" />
+            <field name="PAYLOAD_I55VANALOG" type="INTEGER" />
+            <field name="PAYLOAD_I55VDIGITAL" type="INTEGER" />
+            <field name="PAYLOAD_SDEVENTSFREE" type="BIGINT" />
+            <field name="PAYLOAD_DAQPOWERSTATE" type="SMALLINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerAEDAQHealthDataMsg) from Jungfraujoch deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    	<stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from Jungfraujoch_Dozer_AEDAQHealthData</predicate>
+                    <predicate key="remote-contact-point">http://whymper.ethz.ch:22001/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>    
+    </streams>
+</virtual-sensor>
