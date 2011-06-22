@@ -417,7 +417,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from etz_dozer_aedaqhealthdata
+            from thur_dozer_aedaqhealthdata
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -429,7 +429,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from etz_dozer_aestatistics
+            from thur_dozer_aestatistics
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -441,7 +441,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from etz_dozer_aedata
+            from thur_dozer_aedata
           </predicate>
         </address>
         <query>select * from wrapper</query>
