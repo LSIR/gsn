@@ -158,6 +158,7 @@ public class dbsync {
 
         ResultSet rs = null;
         ResultSetMetaData rsmd = null;
+        PreparedStatement pstmt = null;
 
         try {
             connMaster = getMasterConnection();
@@ -180,14 +181,14 @@ public class dbsync {
             logger.info(sbCols.toString());
 
             long rowCount = 0;
-            String insertStatement = "INSERT INTO " + table + " (" + sbCols + ") VALUES("+sbValues+")";
-            PreparedStatement pstmt = connSlave.prepareStatement(insertStatement);
+            String insertStatement = "INSERT INTO " + table + " (" + sbCols + ") VALUES(" + sbValues + ")";
+            pstmt = connSlave.prepareStatement(insertStatement);
             logger.info(insertStatement);
             while (rs.next()) {
                 StringBuilder aRow = new StringBuilder();
                 for (int i = 2; i <= colCount; i++) {
                     Object o = rs.getObject(i);
-                    pstmt.setObject(i-1,o);
+                    pstmt.setObject(i - 1, o);
                     //aRow.append(o).append(", ");
                 }
                 //logger.info(pstmt.toString());
@@ -202,26 +203,8 @@ public class dbsync {
             logger.error(e.getMessage(), e);
         }
 
-        /*
-
-       try {
-   // Prepare a statement to insert a record
-   String sql = "INSERT INTO my_table (col_string) VALUES(?)";
-   PreparedStatement pstmt = connection.prepareStatement(sql);
-
-   // Insert 10 rows
-   for (int i=0; i<10; i++) {
-       // Set the value
-       pstmt.setString(1, "row "+i);
-
-       // Insert the row
-       pstmt.executeUpdate();
-   }
-} catch (SQLException e) {
-}
-        */
-
         try {
+            pstmt.close();
             rs.close();
             connMaster.close();
             connSlave.close();
