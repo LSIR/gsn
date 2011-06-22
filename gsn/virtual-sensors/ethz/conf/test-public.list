@@ -8,7 +8,6 @@ ETZ_Camera_pos2__scaled.xml
 ETZ_Camera_pos3__scaled.xml
 ETZ_Camera_pos22__scaled.xml
 ETZ_Camera_pos23__scaled.xml
-ETZ_CoreStationStatus_Software__conv.xml
 ETZ_CoreStationStatus_Hardware__conv.xml
 ETZ_CoreStationStatus_Static__mapped.xml
 ETZ_CoreStationStatus_Software__mapped.xml
@@ -21,7 +20,6 @@ ETZ_Dozer_AEDAQHealthData__conv.xml
 ETZ_Dozer_AEData__mapped.xml
 ETZ_Dozer_AEData__conv.xml
 ETZ_Dozer_AEStatistics__mapped.xml
-ETZ_Dozer_AEStatistics__conv.xml
 ETZ_Dozer_BaseDebug__mapped.xml
 ETZ_Dozer_BaseStatus__mapped.xml
 ETZ_Dozer_BaseStatus__conv.xml
@@ -51,6 +49,17 @@ ETZ_Dozer_WXT520Sup__mapped.xml
 ETZ_Dozer_WXT520WindPth__mapped.xml
 ETZ_Dozer_WXT520Ident__mapped.xml
 ETZ_Dozer_WXT520Ident__conv.xml
+ETZ_Dozer_Th3Ident__mapped.xml
+ETZ_Dozer_Th3Ident__conv.xml
+ETZ_Dozer_Th3Temp__mapped.xml
+ETZ_Dozer_Th3Temp__conv.xml
+ETZ_Dozer_EnviroScanIdent__mapped.xml
+ETZ_Dozer_EnviroScanIdent__conv.xml
+ETZ_Dozer_EnviroScanData__mapped.xml
+ETZ_Dozer_EnviroScanMoisture__conv.xml
+ETZ_Dozer_EnviroScanParametersA__conv.xml
+ETZ_Dozer_EnviroScanParametersB__conv.xml
+ETZ_Dozer_EnviroScanParametersC__conv.xml
 ETZ_GPS_Logger__mapped.xml
 ETZ_GPS_Logger__muxed__parsed.xml
 ETZ_GPS_Logger__status.xml
@@ -66,7 +75,6 @@ ETZ_VaisalaWXT520__muxed__mapped.xml
 OSTest_BackLogStatus_Static__mapped.xml
 OSTest_BackLogStatus_Revision__mapped.xml
 OSTest_BackLogStatus_Dynamic__mapped.xml
-OSTest_CoreStationStatus_Software__conv.xml
 OSTest_CoreStationStatus_Hardware__conv.xml
 OSTest_CoreStationStatus_Static__mapped.xml
 OSTest_CoreStationStatus_Software__mapped.xml
@@ -95,6 +103,6 @@ OSTest_SyslogNg__mapped.xml
 OSTest_SyslogNg__conv.xml
 OSTest_Binary__mapped.xml
 OSTest_Nabel_Duebendorf__mapped.xml
-Statistics_DataFlow.xml
+#Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml

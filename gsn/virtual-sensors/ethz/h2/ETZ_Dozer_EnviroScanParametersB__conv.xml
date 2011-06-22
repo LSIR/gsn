@@ -1,0 +1,42 @@
+<virtual-sensor name="ETZ_Dozer_EnviroScanParametersB__conv" priority="10" statistics="true" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="B1" type="VARCHAR(30)" />
+            <field name="B2" type="VARCHAR(30)" />
+            <field name="B3" type="VARCHAR(30)" />
+            <field name="B4" type="VARCHAR(30)" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerEnviroScanDataMsg) from ETZ deployment converted to parameter</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_EnviroScanData__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M1 / 1000000.0, 6) as CHAR(30)),NULL) as B1,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M2 / 1000000.0, 6) as CHAR(30)),NULL) as B2,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M3 / 1000000.0, 6) as CHAR(30)),NULL) as B3,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as B4
+                from wrapper where PAYLOAD_MEASUREMENT_TYPE=3</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
