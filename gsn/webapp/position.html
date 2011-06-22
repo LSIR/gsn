@@ -28,14 +28,43 @@
 	var mapProvider = null;
 	var topologyUpdateInfo;
 	
+	var LOOK_N_DAYS_BACK = 5;
 	var deployments = new Array();
 	var selectedDeploymentNr;
 	var tableEnding = "";
 	var fieldIdLat = "lat_raw_data";
 	var fieldIdLong = "long_raw_data";
+	var coreStationFieldId = "device_id";
 		
 function deployment(name) {
 	this.name = name;
+	this.coreStations = new Array();
+}
+
+function coreStation(id) {
+	this.id = id;
+	this.lati = 0;
+	this.longi = 0;
+}
+
+function getCoreStationIds(deploymentId) {
+	var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
+	var ids = new Array();
+	$.ajax({
+		type: "GET",
+		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=" + coreStationFieldId + "&orderby=timestamp&groupby=" + coreStationFieldId + "&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime(),
+        async: false,
+        cache: false,
+        timeout: 30000,
+		success: function(data){
+			$("line", data).each(function(){
+				var l = $("field", this).text();
+				if (l != coreStationFieldId && l.toLowerCase() != "null")
+					ids.push(new coreStation(l))
+			});
+		}
+	});
+	return ids;
 }
 
 function showDeployment(id) {
@@ -48,6 +77,12 @@ function showDeployment(id) {
 	$("#deployment_menu_item_"+deployments[id].name).addClass("selected");
 	$.cookie("deployment" , deployments[id].name);
 	selectedDeploymentNr = id;
+}
+
+function addNewCoreStation(depl, id) {
+	var cs = new coreStation(id);
+	
+	depl.coreStations.push(cs)
 }
 
 $(document).ready(function() {
@@ -81,6 +116,7 @@ $(document).ready(function() {
 						tableEnding = "__mapped";
 						fieldIdLat = "latitude";
 						fieldIdLong = "longitude";
+						coreStationFieldId = "position";
 					}
 			    var deploymentname = $(this).attr("name").split("_", 1)[0];
 			    if(deploymentname.length > 1) {
@@ -111,11 +147,15 @@ $(document).ready(function() {
 			$.each(deployments, function(i, depl) {
 			    // add tab
 			    $("#deployment_menu").append($.LI({}, $.A({
-				"id":"deployment_menu_item_"+depl.name,
-				"href":"javascript:showDeployment("+i+")"
+					"id":"deployment_menu_item_"+depl.name,
+					"href":"javascript:showDeployment("+i+")"
 			    },depl.name)));
+			    
+			  	$.each(getCoreStationIds(i), function(){
+						addNewCoreStation(depl, this.id);
+					});
 				
-				$("#deployment_"+depl.name).hide();
+					$("#deployment_"+depl.name).hide();
 			});
 			showDeployment(visible);
 		  
@@ -132,84 +172,59 @@ $(document).ready(function() {
 	
 	    GSN.load();
 	    GSN.map.toggleAllMarkers();
-	    topologyUpdateTimer = setTimeout("fetchTopologyInfo", 10000);
-	    fetchTopologyInfo();
+	    fetchGPSPositions();
 	    GSN.map.showAllMarkers();
 		  
 		}
 	});
 });
 
-function fetchTopologyInfo() {
+function fetchGPSPositions() {
 
 	var seldepl = selectedDeploymentNr;
+	
+	// get longitude and latitude for each core station of the selected deployment
+	$.each(deployments[seldepl].coreStations, function(i, l){
 
-	$.ajax({
-		type: "GET",
-		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=device_id&fields=" + fieldIdLong + "&fields=" + fieldIdLat + "&critfield=device_id&neg=&critop==&critval=1&nb=1",
-		    async: false,
-		    cache: false,
-		    timeout: 30000,
-		success: function(data){
-			var dev_id = "";
-			var lati;
-			var longi;
-			$("line", data).each(function(){
-				if ($("field:eq(0)", this).text() != "device_id") {
-					dev_id = $("field:eq(0)", this).text();
-					longi = $("field:eq(1)", this).text();
-					lati = $("field:eq(2)", this).text();
-					
-					var absdlat = Math.abs( Math.round(Math.round(lati/100) * 1000000.));
-					var absmlat = Math.abs( Math.round((lati - absdlat/10000) * 1000000.));
-		
-					var absdlon = Math.abs( Math.round(Math.round(longi/100) * 1000000.));
-					var absmlon = Math.abs( Math.round((longi - absdlon/10000) * 1000000.));
-		
-					lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
-					longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
-		
-					GSN.map.updateMarker(deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding, dev_id, lati, longi);
-				}
-			})
-		}
+		$.ajax({
+			type: "GET",
+			url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=" + coreStationFieldId + "&fields=" + fieldIdLong + "&fields=" + fieldIdLat + "&critfield=" + coreStationFieldId + "&neg=&critop==&critval=" + this.id + "&nb=1",
+			    async: false,
+			    cache: false,
+			    timeout: 30000,
+			success: function(data){
+				var dev_id = "";
+				var lati;
+				var longi;
+				$("line", data).each(function(){
+					if ($("field:eq(0)", this).text() != coreStationFieldId) {
+						dev_id = $("field:eq(0)", this).text();
+						longi = $("field:eq(1)", this).text();
+						lati = $("field:eq(2)", this).text();
+						
+						var absdlat = Math.abs( Math.round(Math.round(lati/100) * 1000000.));
+						var absmlat = Math.abs( Math.round((lati - absdlat/10000) * 1000000.));
+			
+						var absdlon = Math.abs( Math.round(Math.round(longi/100) * 1000000.));
+						var absmlon = Math.abs( Math.round((longi - absdlon/10000) * 1000000.));
+			
+						lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
+						longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
+						
+						// only add a new marker if the position is not identical with the last one
+						if (!(this.lati == lati && this.longi == longi)) {
+							GSN.map.updateMarker(deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding, dev_id, lati, longi);
+							this.lati = lati;
+							this.longi = longi;
+						}
+					}
+				})
+			}
+		});
 	});
 	
-	$.ajax({
-		type: "GET",
-		url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=device_id&fields=" + fieldIdLong + "&fields=" + fieldIdLat + "&critfield=device_id&neg=&critop==&critval=2&nb=1",
-		    async: false,
-		    cache: false,
-		    timeout: 30000,
-		success: function(data){
-			var dev_id = "";
-			var lati;
-			var longi;
-			$("line", data).each(function(){
-				if ($("field:eq(0)", this).text() != "device_id") {
-					dev_id = $("field:eq(0)", this).text();
-					longi = $("field:eq(1)", this).text();
-					lati = $("field:eq(2)", this).text();
-					
-					var absdlat = Math.abs( Math.round(Math.round(lati/100) * 1000000.));
-					var absmlat = Math.abs( Math.round((lati - absdlat/10000) * 1000000.));
-		
-					var absdlon = Math.abs( Math.round(Math.round(longi/100) * 1000000.));
-					var absmlon = Math.abs( Math.round((longi - absdlon/10000) * 1000000.));
-		
-					lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
-					longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
-		
-					GSN.map.updateMarker(deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding, dev_id, lati, longi);
-				}
-			})
-			GSN.load();
-			topologyUpdateTimer = setTimeout("fetchTopologyInfo()",10000);
-		},
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			topologyUpdateTimer = setTimeout("fetchTopologyInfo()",60000);
-		}
-	});
+	GSN.load();
+	topologyUpdateTimer = setTimeout("fetchGPSPositions()",30000);
 	
 };
 
