@@ -95,7 +95,7 @@ public class TestStreamExporterVirtualSensor extends TestCase {
       
       // configure datastream
       Vector < DataField > fieldTypes = new Vector < DataField >( );
-      Object [ ] data = null;
+      Object [ ] data = new Object[DataTypes.TYPE_SAMPLE_VALUES.length];
       
       for ( String type : DataTypes.TYPE_NAMES )
          fieldTypes.add( new DataField( type , type , type ) );
