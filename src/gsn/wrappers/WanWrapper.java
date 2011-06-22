@@ -114,8 +114,9 @@ public class WanWrapper extends AbstractWrapper {
       logger.error("invalide date format! "+data[0]);
       logger.error(e.getMessage(),e);
     }finally {
-      return se;
+      //
     }
+    return se;
   }
   
   public Double[] removeTimestampFromRow(DataField[] structure, String [] data) {

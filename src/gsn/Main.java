@@ -289,8 +289,9 @@ public final class Main {
 			logger.error ( e.getMessage ( ),e );
 			System.exit ( 1 );
 		}finally {
-			return toReturn;
+			//nop
 		}
+		return toReturn;
 	}
 
 	/**

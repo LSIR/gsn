@@ -191,8 +191,9 @@ public class SwissPegelWrapper extends AbstractWrapper {
 			logger.error("invalide date format! "+data[1]+" "+data[0]);
 			logger.error(e.getMessage(),e);
 		}finally {
-			return se;
+			//
 		}
+		return se;
 	}
 
 	public Double[] removeTimestampFromRow(String [] data) {
