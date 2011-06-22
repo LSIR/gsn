@@ -448,7 +448,9 @@ function filterLogs(searchString) {
 		else
 			$(this).hide();
     });
+	scrollPane.scrollTo(0,0);
 	scrollPane.reinitialise();
+	scrollPane.scrollToBottom();
 }
 
 function getSearchString() {
