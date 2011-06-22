@@ -76,6 +76,7 @@ Glaciers_Schedule__mapped.xml
 Glaciers_Statistics__mapped.xml
 Glaciers_SyslogNg__conv.xml
 Glaciers_SyslogNg__mapped.xml
+Glaciers_Topology__public.xml
 Jungfraujoch_BackLogStatus_Dynamic__mapped.xml
 Jungfraujoch_BackLogStatus_Revision__mapped.xml
 Jungfraujoch_BackLogStatus_Static__mapped.xml
