@@ -195,7 +195,7 @@ public class dbsync {
                 pstmt.executeUpdate();
                 rowCount++;
             }
-            logger.info("Rows: " + rowCount);
+            logger.info("Inserted " + rowCount + " rows.");
 
 
         } catch (Exception e) {
