@@ -94,6 +94,7 @@ public class SensorNode {
 
 	public void setSibNode() {
 		nodetype = NODE_TYPE_SIB;
+		iscorestation = false;
 	}
 	
 	public void setAccessNode() {
@@ -103,6 +104,7 @@ public class SensorNode {
 	
 	public void setPowerSwitch() {
 		nodetype = NODE_TYPE_POWERSWITCH;
+		iscorestation = false;
 	}
 	
 	public void setBBControl() {
@@ -111,7 +113,8 @@ public class SensorNode {
 	}
 	
 	public void setAENode() {
-		nodetype = NODE_TYPE_AE;	
+		nodetype = NODE_TYPE_AE;
+		iscorestation = false;
 	}	
 	
 	public String getVsys() {
