@@ -6,4 +6,6 @@
 "1","sysvoltage","0.0000634765625","sib"
 "2","sdivoltage","0.0043956043956","powerswitch"
 "2","sysvoltage","0.0009768009768","powerswitch"
+"3","sdivoltage","0.00483","AEBoard"
+"3","sysvoltage","0.00091","AEBoard"
 
