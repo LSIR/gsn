@@ -118,7 +118,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			generation_time = (Long)s;
 		}
 		if (node_id==null || timestamp==null || generation_time==null) {
-			logger.error("No node id specified, skipping stream element.");
+			logger.error("No node id specified, skipping stream element (stream "+inputStreamName+")");
 			return;
 		}
 		synchronized (nodes) {
