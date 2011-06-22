@@ -39,6 +39,7 @@ public class SensorNode {
 	public Integer flash_count;
 	public Integer uptime;
 	public Boolean corestation_running;
+	public Boolean iscorestation;
 	
 	public SensorNodeConfiguration configuration;
 	public SensorNodeConfiguration pendingConfiguration;
@@ -97,6 +98,7 @@ public class SensorNode {
 	
 	public void setAccessNode() {
 		nodetype = NODE_TYPE_ACCESS_NODE;
+		iscorestation = true;
 	}
 	
 	public void setPowerSwitch() {
@@ -105,6 +107,7 @@ public class SensorNode {
 	
 	public void setBBControl() {
 		nodetype = NODE_TYPE_BBCONTROL;
+		iscorestation = true;
 	}
 	
 	public void setAENode() {
@@ -300,6 +303,11 @@ public class SensorNode {
 		if (coordinate == null)
 			return null;
 		return new Double(coordinate.z).toString();
+	}
+
+	public void setCorestation() {
+		iscorestation = new Boolean(true);
+		corestation_running = true;
 	}
 
 }

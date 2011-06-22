@@ -79,6 +79,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		"powerswitch-p2-field",
 		"sdivoltage-field",
 		"ae-stream-name",
+		"corestation-statistics-stream-name",
 	};
 	
 	private static final String commandConfigurationParameter = "dozer-command-vs";
@@ -225,6 +226,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					node.corestation_running = new Boolean(false);
 			}
 			// do not count events to packets
+		}
+		else if (inputStreamName.startsWith(configuration[23])) {
+			// corestation statistics
+			node.setCorestation();
 		}
 		else {
 			node.packet_count++;
