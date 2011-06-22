@@ -30,6 +30,7 @@
             
             <param name="dozer-command-vs">ETZ_Dozer_Command</param>
             <param name="ae-stream-name">data18</param>
+            <param name="corestation-statistics-stream-name">data25</param>
         </init-params>
         <web-input>
             <command name="dataconfiguration">
@@ -544,5 +545,17 @@
       </source>
       <query> select * from source </query>
     </stream>
+    <stream name="data25">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select DEVICE_ID, GENERATION_TIME
+            from etz_statistics
+          </predicate>
+        </address>
+        <query>select DEVICE_ID as HEADER_ORIGINATORID, GENERATION_TIME as TIMESTAMP, GENERATION_TIME from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>    
     </streams>
 </virtual-sensor>

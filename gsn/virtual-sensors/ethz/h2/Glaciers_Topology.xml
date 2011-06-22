@@ -1,4 +1,4 @@
-<virtual-sensor name="Thur_Topology" priority="10" >
+<virtual-sensor name="Glaciers_Topology" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.TopologyVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -28,7 +28,7 @@
             <param name="evenlogger-id-field">EVENT_ID</param>
             <param name="evenlogger-value-field">EVENT_VALUE</param>
             
-            <!-- param name="dozer-command-vs">Thur_Dozer_Command</param -->
+            <!-- param name="dozer-command-vs">Glaciers_Dozer_Command</param -->
             <param name="ae-stream-name">data18</param>
             <param name="corestation-statistics-stream-name">data25</param>
         </init-params>
@@ -41,18 +41,18 @@
             <field name="DATA" type="BINARY"/>
         </output-structure>
     </processing-class>
-    <description>Sensornode Topology of Thur deployment</description>
+    <description>Sensornode Topology of Glaciers deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage history-size="1" />
     <streams>
     
-      <stream name="data0">
+      <!-- stream name="data0">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_adccomdiff
+            from glaciers_dozer_adccomdiff
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -64,7 +64,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_adcmux1
+            from glaciers_dozer_adcmux1
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -76,7 +76,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_adcmux2
+            from glaciers_dozer_adcmux2
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -88,7 +88,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_basedebug
+            from glaciers_dozer_basedebug
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -100,7 +100,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_basestatus
+            from glaciers_dozer_basestatus
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -112,7 +112,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_decagonmux
+            from glaciers_dozer_decagonmux
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -124,7 +124,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_digitaldcx
+            from glaciers_dozer_digitaldcx
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -136,7 +136,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_drift
+            from glaciers_dozer_drift
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -148,7 +148,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_eventlogger
+            from glaciers_dozer_eventlogger
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -160,7 +160,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_PARENTID, PAYLOAD_SYSVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY, PAYLOAD_SIBCURRENT, PAYLOAD_FLASHSTATUS, PAYLOAD_UPTIME, PAYLOAD_SDIVOLTAGE
-            from thur_dozer_nodehealth
+            from glaciers_dozer_nodehealth
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -172,31 +172,31 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_nodeinfo
+            from glaciers_dozer_nodeinfo
           </predicate>
         </address>
         <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
     </stream>
-    <!-- stream name="data11">
+    <stream name="data11">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_PORT1ON, PAYLOAD_PORT2ON
-            from thur_dozer_powerswitch
+            from glaciers_dozer_powerswitch
           </predicate>
         </address>
         <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
-    </stream -->
+    </stream>
     <stream name="data12">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_rssi
+            from glaciers_dozer_rssi
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -208,7 +208,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_statecounter
+            from glaciers_dozer_statecounter
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -220,7 +220,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from thur_dozer_rssi
+             select * from glaciers_dozer_rssi
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -234,7 +234,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from thur_dozer_rssi
+             select * from glaciers_dozer_rssi
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -248,7 +248,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from thur_dozer_rssi
+             select * from glaciers_dozer_rssi
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -262,7 +262,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from thur_dozer_rssi
+             select * from glaciers_dozer_rssi
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -276,7 +276,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from thur_dozer_rssi
+             select * from glaciers_dozer_rssi
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -290,7 +290,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from thur_dozer_rssi
+             select * from glaciers_dozer_rssi
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -304,7 +304,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-             select * from thur_dozer_rssi
+             select * from glaciers_dozer_rssi
            </predicate>
          </address>
          <query> select TIMESTAMP, GENERATION_TIME, HEADER_ORIGINATORID, 
@@ -319,7 +319,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Thur_Dozer_Eventlogger
+              select * from Glaciers_Dozer_Eventlogger
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME0 * 1000)) as GENERATION_TIME,
@@ -333,7 +333,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Thur_Dozer_Eventlogger
+              select * from Glaciers_Dozer_Eventlogger
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME1 * 1000)) as GENERATION_TIME,
@@ -347,7 +347,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Thur_Dozer_Eventlogger
+              select * from Glaciers_Dozer_Eventlogger
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME2 * 1000)) as GENERATION_TIME,
@@ -361,7 +361,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Thur_Dozer_Eventlogger
+              select * from Glaciers_Dozer_Eventlogger
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME3 * 1000)) as GENERATION_TIME,
@@ -375,7 +375,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Thur_Dozer_Eventlogger
+              select * from Glaciers_Dozer_Eventlogger
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME4 * 1000)) as GENERATION_TIME,
@@ -389,7 +389,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Thur_Dozer_Eventlogger
+              select * from Glaciers_Dozer_Eventlogger
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME5 * 1000)) as GENERATION_TIME,
@@ -403,7 +403,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-              select * from Thur_Dozer_Eventlogger
+              select * from Glaciers_Dozer_Eventlogger
            </predicate>
         </address>
         <query> select TIMESTAMP, HEADER_ORIGINATORID, (GENERATION_TIME - (PAYLOAD_EVENTLOG_TIME6 * 1000)) as GENERATION_TIME,
@@ -413,12 +413,12 @@
       </source>
       <query> select * from source </query>
      </stream>
-     <!-- stream name="data18">
+     <stream name="data18">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_aedaqhealthdata
+            from glaciers_dozer_aedaqhealthdata
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -430,7 +430,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_aestatistics
+            from glaciers_dozer_aestatistics
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -442,7 +442,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_aedata
+            from glaciers_dozer_aedata
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -454,7 +454,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_th3ident
+            from glaciers_dozer_th3ident
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -466,7 +466,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_th3temp
+            from glaciers_dozer_th3temp
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -478,7 +478,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_enviroscanident
+            from glaciers_dozer_enviroscanident
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -490,7 +490,7 @@
         <address wrapper="local">
           <predicate key="query">
             select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
-            from thur_dozer_enviroscandata
+            from glaciers_dozer_enviroscandata
           </predicate>
         </address>
         <query>select * from wrapper</query>
@@ -502,7 +502,7 @@
         <address wrapper="local">
           <predicate key="query">
             select DEVICE_ID, GENERATION_TIME
-            from thur_statistics
+            from glaciers_statistics
           </predicate>
         </address>
         <query>select DEVICE_ID as HEADER_ORIGINATORID, GENERATION_TIME as TIMESTAMP, GENERATION_TIME from wrapper</query>
