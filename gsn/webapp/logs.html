@@ -397,7 +397,7 @@ function generateSyslogNgMessageDiv(timestamp, msg) {
 
 function generateEventMessageDiv(timestamp, position, deviceId, eventId, eventValue) {
 	var id = parseInt(eventId);
-	var logMsg = (new Date(parseFloat(timestamp))).toLocaleString() + ": " + position + " (deviceId=" + deviceId + "): ";
+	var logMsg = (new Date(parseFloat(timestamp))).toLocaleString() + ": Position " + position + " (DeviceId " + deviceId + "): ";
 	if (eventValue.toLowerCase() == "null")
 		logMsg += EVENT_MSG_NULL[id];
 	else
