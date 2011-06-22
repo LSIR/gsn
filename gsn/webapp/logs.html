@@ -39,90 +39,133 @@ var MAX_LOGS_TOTAL = 100;
 var UPDATE_INTERVAL = 2;
 
 var EVENT_MSG = new Array(
-		 "","",
-		 "" /* not used EVENT_COMMAND_RECEIVED %s*/,
-		 "" /* not used EVENT_EVENT_Q_FULL %s */,
-		 "Node resetted, resetcounter is %s." /* EVENT_RESET %s*/,
-		 "" /* not used EVENT_WATCHDOG_RESET %s */,
-		 "","","","",
-		 "Dozer: Connected to parent %s." /* EVENT_CHILD_CONNECT %s */,
-		 "" /* not used EVENT_CHILD_DISCONNECT %s */,
-		 "" /* not used EVENT_CHILD_DISCONNECT_ROUTING_LOOP %s */,
-		 "Dozer: No beacon received, failed connection attempts: %s." /* EVENT_CHILD_NO_BEACON %s */,
-		 "Dozer: Could not upload data in this round, failed connection attempts: %s." /* EVENT_CHILD_NO_DATAUPLOAD %s */,
-		 "" /* not used EVENT_CHILD_RESET_OVERHEARTIME %s */,
-		 "Dozer: Found %s potential parents." /* EVENT_CHILD_FOUND_PARENTS %s */,
-		 "","","",
-		 "Dozer: Got connection from child %s." /* EVENT_PARENT_CONNECT %s */,
-		 "Dozer: Disconnected child %s." /* EVENT_PARENT_DISCONNECT %s */,
-		 "" /* not used EVENT_DOZER_WATCHDOG %s */,
-		 "","","","","","","",
-		 "" /* not used EVENT_BB_POWER_ON %s */,
-		 "Baseboard power off, shutdownrequest was %s." /* EVENT_BB_POWER_OFF %s */,
-		 "Received power switch command with value %s." /*EVENT_PSB_POWER %s */,
-		 "Baseboard: Set new schedule interval to %s seconds." /* EVENT_BB_NEWSCHEDULE %s */,
-		 "Baseboard: Set new servicewindow to %s seconds." /* EVENT_BB_NEWSERVICEWINDOW %s */,
-		 "" /* not used EVENT_BB_NEWSERVICEWINDOW_INVALID %s*/ ,
-		 "Baseboard: Set V12DC_EXT to %s." /* EVENT_BB_V12DC_EXT_SW %s */,
-		 "","","",
-		 "Received datasource config command %s." /*EVENT_DATACONFIG %s*/,
-		 "Wxt520 init failed with code %s." /*EVENT_WXT520_INIT_FAIL %s*/,
-		 "","","","","","","","",
-		 "" /* not used EVENT_ERROR_SD_MOUNT %s */,
-		 "" /* not used EVENT_ERROR_SD_GENERIC %s*/,
-		 "","","","","","","","",
-		 "" /* not used EVENT_ERROR_RADIO_GENERIC %s */,
-		 "SX1211: Radio pattern error %s." /* EVENT_ERROR_RADIO_PATTERN %s",
-		 "","","","","","","","",
-		 "" /* not used EVENT_AE_ARM_POWER_ON %s */,
-		 "" /* not used EVENT_AE_ARM_POWER_OFF %s */,
-		 "" /* not used EVENT_AE_ARM_RESET %s */,
-		 "" /* not used EVENT_AE_ARM_COMM_TIMEOUT %s */,
-		 "AE board: set new posttrigger to %s." /* EVENT_AE_POSTTRIGGER_SET %s */,
-		 "AE board: set new threshhold to %s." /* EVENT_AE_THRESHOLD_SET %s */ );
+	 "","",
+	 "" /* not used EVENT_COMMAND_RECEIVED %s*/,
+	 "" /* not used EVENT_EVENT_Q_FULL %s */,
+	 "Node resetted, resetcounter is %s." /* EVENT_RESET %s*/,
+	 "" /* not used EVENT_WATCHDOG_RESET %s */,
+	 "","","","",
+	 "Dozer: Connected to parent %s." /* EVENT_CHILD_CONNECT %s */,
+	 "" /* not used EVENT_CHILD_DISCONNECT %s */,
+	 "" /* not used EVENT_CHILD_DISCONNECT_ROUTING_LOOP %s */,
+	 "Dozer: No beacon received, failed connection attempts: %s." /* EVENT_CHILD_NO_BEACON %s */,
+	 "Dozer: Could not upload data in this round, failed connection attempts: %s." /* EVENT_CHILD_NO_DATAUPLOAD %s */,
+	 "" /* not used EVENT_CHILD_RESET_OVERHEARTIME %s */,
+	 "Dozer: Found %s potential parents." /* EVENT_CHILD_FOUND_PARENTS %s */,
+	 "","","",
+	 "Dozer: Got connection from child %s." /* EVENT_PARENT_CONNECT %s */,
+	 "Dozer: Disconnected child %s." /* EVENT_PARENT_DISCONNECT %s */,
+	 "" /* not used EVENT_DOZER_WATCHDOG %s */,
+	 "","","","","","","",
+	 "" /* not used EVENT_BB_POWER_ON %s */,
+	 "Baseboard power off, shutdownrequest was %s." /* EVENT_BB_POWER_OFF %s */,
+	 "Received power switch command with value %s." /*EVENT_PSB_POWER %s */,
+	 "Baseboard: Set new schedule interval to %s seconds." /* EVENT_BB_NEWSCHEDULE %s */,
+	 "Baseboard: Set new servicewindow to %s seconds." /* EVENT_BB_NEWSERVICEWINDOW %s */,
+	 "" /* not used EVENT_BB_NEWSERVICEWINDOW_INVALID %s*/ ,
+	 "Baseboard: Set V12DC_EXT to %s." /* EVENT_BB_V12DC_EXT_SW %s */,
+	 "","","",
+	 "Received datasource config command %s." /*EVENT_DATACONFIG %s*/,
+	 "Wxt520 init failed with code %s." /*EVENT_WXT520_INIT_FAIL %s*/,
+	 "","","","","","","","",
+	 "" /* not used EVENT_ERROR_SD_MOUNT %s */,
+	 "" /* not used EVENT_ERROR_SD_GENERIC %s*/,
+	 "","","","","","","","",
+	 "" /* not used EVENT_ERROR_RADIO_GENERIC %s */,
+	 "SX1211: Radio pattern error %s." /* EVENT_ERROR_RADIO_PATTERN %s",
+	 "","","","","","","","",
+	 "" /* not used EVENT_AE_ARM_POWER_ON %s */,
+	 "" /* not used EVENT_AE_ARM_POWER_OFF %s */,
+	 "" /* not used EVENT_AE_ARM_RESET %s */,
+	 "" /* not used EVENT_AE_ARM_COMM_TIMEOUT %s */,
+	 "AE board: set new posttrigger to %s." /* EVENT_AE_POSTTRIGGER_SET %s */,
+	 "AE board: set new threshhold to %s." /* EVENT_AE_THRESHOLD_SET %s */ );
 		 
-		var EVENT_MSG_NULL = new Array(
-		 "","",
-		 "" /* not used EVENT_COMMAND_RECEIVED */,
-		 "Event queue is full, there could be dropped events." /* EVENT_EVENT_Q_FULL */,
-		 "" /* not used EVENT_RESET */,
-		 "Node started after watchdog reset." /* EVENT_WATCHDOG_RESET */,
-		 "","","","",
-		 "" /* not used EVENT_CHILD_CONNECT */,
-		 "Dozer: Disconnected from parent." /* EVENT_CHILD_DISCONNECT */,
-		 "Dozer: Disconnected due to routing loop." /* EVENT_CHILD_DISCONNECT_ROUTING_LOOP */,
-		 "" /* not used EVENT_CHILD_NO_BEACON */,
-		 "" /* not used EVENT_CHILD_NO_DATAUPLOAD */,
-		 "Dozer: Reset overhear time." /* EVENT_CHILD_RESET_OVERHEARTIME */,
-		 "" /* not used EVENT_CHILD_FOUND_PARENTS */,
-		 "","","",
-		 "" /* not used EVENT_PARENT_CONNECT */,
-		 "" /* not used EVENT_PARENT_DISCONNECT */,
-		 "Dozer: Watchdog triggered." /* EVENT_DOZER_WATCHDOG */,
-		 "","","","","","","",
-		 "Baseboard power on." /* EVENT_BB_POWER_ON */,
-		 "" /* not used EVENT_BB_POWER_OFF */,
-		 "" /* not used EVENT_PSB_POWER */,
-		 "Baseboard: Received invalid schedule interval." /* EVENT_BB_NEWSCHEDULE */,
-		 "Baseboard: Disabled servicewindow." /* EVENT_BB_NEWSERVICEWINDOW*/,
-		 "Baseboard: Received invalid servciewindow interval." /* EVENT_BB_NEWSERVICEWINDOW_INVALID */,
-		 "" /* not used EVENT_BB_V12DC_EXT_SW */,
-		 "","","",
-		 "" /* not used EVENT_DATACONFIG */,
-		 "" /* not used EVENT_WXT520_INIT_FAIL */,
-		 "","","","","","","","",
-		 "Error while mounting SD card." /* EVENT_ERROR_SD_MOUNT */,
-		 "Generic SD card error." /* EVENT_ERROR_SD_GENERIC */,
-		 "","","","","","","","",
-		 "" /* not used EVENT_ERROR_RADIO_GENERIC*/,
-		 "" /* not used EVENT_ERROR_RADIO_PATTERN*/,
-		 "","","","","","","","",
-		 "AE board: ARM power on." /* EVENT_AE_ARM_POWER_ON */,
-		 "AE board: ARM power off." /* EVENT_AE_ARM_POWER_OFF */,
-		 "AE board: ARM reset." /* EVENT_AE_ARM_RESET */,
-		 "AE board: Communication to ARM timed out." /* EVENT_AE_ARM_COMM_TIMEOUT */,
-		 "" /* not used EVENT_AE_POSTTRIGGER_SET */,
-		 "" /* not used EVENT_AE_THRESHOLD_SET */);
+var EVENT_MSG_NULL = new Array(
+	 "","",
+	 "" /* not used EVENT_COMMAND_RECEIVED */,
+	 "Event queue is full, there could be dropped events." /* EVENT_EVENT_Q_FULL */,
+	 "" /* not used EVENT_RESET */,
+	 "Node started after watchdog reset." /* EVENT_WATCHDOG_RESET */,
+	 "","","","",
+	 "" /* not used EVENT_CHILD_CONNECT */,
+	 "Dozer: Disconnected from parent." /* EVENT_CHILD_DISCONNECT */,
+	 "Dozer: Disconnected due to routing loop." /* EVENT_CHILD_DISCONNECT_ROUTING_LOOP */,
+	 "" /* not used EVENT_CHILD_NO_BEACON */,
+	 "" /* not used EVENT_CHILD_NO_DATAUPLOAD */,
+	 "Dozer: Reset overhear time." /* EVENT_CHILD_RESET_OVERHEARTIME */,
+	 "" /* not used EVENT_CHILD_FOUND_PARENTS */,
+	 "","","",
+	 "" /* not used EVENT_PARENT_CONNECT */,
+	 "" /* not used EVENT_PARENT_DISCONNECT */,
+	 "Dozer: Watchdog triggered." /* EVENT_DOZER_WATCHDOG */,
+	 "","","","","","","",
+	 "Baseboard power on." /* EVENT_BB_POWER_ON */,
+	 "" /* not used EVENT_BB_POWER_OFF */,
+	 "" /* not used EVENT_PSB_POWER */,
+	 "Baseboard: Received invalid schedule interval." /* EVENT_BB_NEWSCHEDULE */,
+	 "Baseboard: Disabled servicewindow." /* EVENT_BB_NEWSERVICEWINDOW*/,
+	 "Baseboard: Received invalid servciewindow interval." /* EVENT_BB_NEWSERVICEWINDOW_INVALID */,
+	 "" /* not used EVENT_BB_V12DC_EXT_SW */,
+	 "","","",
+	 "" /* not used EVENT_DATACONFIG */,
+	 "" /* not used EVENT_WXT520_INIT_FAIL */,
+	 "","","","","","","","",
+	 "Error while mounting SD card." /* EVENT_ERROR_SD_MOUNT */,
+	 "Generic SD card error." /* EVENT_ERROR_SD_GENERIC */,
+	 "","","","","","","","",
+	 "" /* not used EVENT_ERROR_RADIO_GENERIC*/,
+	 "" /* not used EVENT_ERROR_RADIO_PATTERN*/,
+	 "","","","","","","","",
+	 "AE board: ARM power on." /* EVENT_AE_ARM_POWER_ON */,
+	 "AE board: ARM power off." /* EVENT_AE_ARM_POWER_OFF */,
+	 "AE board: ARM reset." /* EVENT_AE_ARM_RESET */,
+	 "AE board: Communication to ARM timed out." /* EVENT_AE_ARM_COMM_TIMEOUT */,
+	 "" /* not used EVENT_AE_POSTTRIGGER_SET */,
+	 "" /* not used EVENT_AE_THRESHOLD_SET */);
+		
+var EVENT_MSG_ERRORLEVELS = new Array(
+	 6,6,
+	 6 /* EVENT_COMMAND_RECEIVED */,
+	 4 /* EVENT_EVENT_Q_FULL */,
+	 4 /* EVENT_RESET */,
+	 3 /* EVENT_WATCHDOG_RESET */,
+	 6,6,6,6,
+	 6 /* EVENT_CHILD_CONNECT */,
+	 6 /* EVENT_CHILD_DISCONNECT */,
+	 6 /* EVENT_CHILD_DISCONNECT_ROUTING_LOOP */,
+	 6 /* EVENT_CHILD_NO_BEACON */,
+	 6 /* EVENT_CHILD_NO_DATAUPLOAD */,
+	 6 /* EVENT_CHILD_RESET_OVERHEARTIME */,
+	 6 /* EVENT_CHILD_FOUND_PARENTS */,
+	 6,6,6,
+	 6 /* EVENT_PARENT_CONNECT */,
+	 6 /* EVENT_PARENT_DISCONNECT */,
+	 3 /* EVENT_DOZER_WATCHDOG */,
+	 6,6,6,6,6,6,6,
+	 6 /* EVENT_BB_POWER_ON */,
+	 6 /* EVENT_BB_POWER_OFF */,
+	 6 /* EVENT_PSB_POWER */,
+	 6 /* EVENT_BB_NEWSCHEDULE */,
+	 6 /* EVENT_BB_NEWSERVICEWINDOW*/,
+	 4 /* EVENT_BB_NEWSERVICEWINDOW_INVALID */,
+	 6 /* EVENT_BB_V12DC_EXT_SW */,
+	 6,6,6,
+	 6 /* EVENT_DATACONFIG */,
+	 3 /* EVENT_WXT520_INIT_FAIL */,
+	 6,6,6,6,6,6,6,6,
+	 3 /* EVENT_ERROR_SD_MOUNT */,
+	 3 /* EVENT_ERROR_SD_GENERIC */,
+	 6,6,6,6,6,6,6,6,
+	 3 /* EVENT_ERROR_RADIO_GENERIC*/,
+	 3 /* EVENT_ERROR_RADIO_PATTERN*/,
+	 6,6,6,6,6,6,6,6,
+	 6 /* EVENT_AE_ARM_POWER_ON */,
+	 6 /* EVENT_AE_ARM_POWER_OFF */,
+	 6 /* EVENT_AE_ARM_RESET */,
+	 6 /* EVENT_AE_ARM_COMM_TIMEOUT */,
+	 6 /* EVENT_AE_POSTTRIGGER_SET */,
+	 6 /* EVENT_AE_THRESHOLD_SET */);
 
 var deployments = new Array();
 var selectedDeploymentNr;
@@ -335,27 +378,42 @@ function getLogs() {
 }
 
 function generateSyslogNgMessageDiv(timestamp, msg) {
-	var color = "";
 	var spl = msg.split(" ", 5);
 	var logMsg = (new Date(parseFloat(timestamp))).toLocaleString() + ": " + msg.substring(msg.indexOf(spl[4])+spl[4].length+1, msg.length);
-	if (parseInt(spl[0].slice(1,spl[0].length-1))%8<=3)
+	
+	var color = "";
+	var priority = parseInt(spl[0].slice(1,spl[0].length-1))%8;
+	if (priority == 4)
+		color = "; color: chocolate";
+	else if (priority <= 3)
 		color = "; color: red";
+	
 	var display = "; display: none";
 	if (logMsg.indexOf(getSearchString()) != -1)
 		display = "; display: block";
+	
 	return "<div style=\"width: 10000px" + display + color + "\">" + logMsg + "</div>";
 }
 
 function generateEventMessageDiv(timestamp, position, deviceId, eventId, eventValue) {
+	var id = parseInt(eventId);
 	var logMsg = (new Date(parseFloat(timestamp))).toLocaleString() + ": " + position + " (deviceId=" + deviceId + "): ";
 	if (eventValue.toLowerCase() == "null")
-		logMsg += EVENT_MSG_NULL[parseInt(eventId)];
+		logMsg += EVENT_MSG_NULL[id];
 	else
-		logMsg += EVENT_MSG[parseInt(eventId)].replace('%s', eventValue);
+		logMsg += EVENT_MSG[id].replace('%s', eventValue);
+	
+	var color = "";
+	if (EVENT_MSG_ERRORLEVELS[id] == 4)
+		color = "; color: chocolate";
+	else if (EVENT_MSG_ERRORLEVELS[id] <= 3)
+		color = "; color: red";
+	
 	var display = "; display: none";
 	if (logMsg.indexOf(getSearchString()) != -1)
 		display = "; display: block";
-	return "<div style=\"width: 10000px" + display + "\">" + logMsg + "</div>";
+	
+	return "<div style=\"width: 10000px" + display + color + "\">" + logMsg + "</div>";
 }
 
 function addNewCoreStation(depl, id, show) {
@@ -414,8 +472,42 @@ $(document).ready(function() {
 	$("#logsearch").css("color", "#bbbbbb");
     $("#logsearch").val("search logs");
     $("#logsearch").focus(function() {
-      	this.select();
+		$("#logsearch").css("color", "#000000");
+    	if ($("#logsearch").val() == "search logs")
+    		$("#logsearch").val("");
+    	else
+      		this.select();
     });
+    $("#logsearch").keyup(function(event) {
+		if ($("#logsearch").val() != "" && $("#logsearch").val() != "search logs") {
+			$("#logsearch").css("color", "#000000");
+			$("#logsearch_clear").attr("src", "img/button_cancel.png");
+	    	if (13 != (event.keyCode || event.which))
+				$("#logsearch_go").attr("src", "img/button_go.png");
+		}
+		else {
+			$("#logsearch_clear").attr("src", "img/button_cancel_grey.png");
+	    	if (13 == (event.keyCode || event.which))
+				$("#logsearch").css("color", "#bbbbbb");
+		}
+    });
+    $("#logsearch").keypress(function(event) {
+		$("#logsearch").css("color", "#000000");
+    	if (13 == (event.keyCode || event.which)) {
+        	filterLogs(getSearchString());
+    		$("#logsearch_go").attr("src", "img/button_go_grey.png");
+    		if ($("#logsearch").val() == "") {
+    	      	$("#logsearch").val("search logs");
+    		}
+    	}
+    });
+    $("#logsearch").blur(function(event) {
+		if ($("#logsearch").val() == "") {
+			$("#logsearch").css("color", "#bbbbbb");
+	      	$("#logsearch").val("search logs");
+		}
+    });
+    
     $("#logsearch_clear").click(function() {
 		$("#logsearch").css("color", "#bbbbbb");
       	$("#logsearch").val("search logs");
@@ -426,31 +518,6 @@ $(document).ready(function() {
     $("#logsearch_go").click(function() {
 		$("#logsearch_go").attr("src", "img/button_go_grey.png");
       	filterLogs(getSearchString());
-    });
-    $("#logsearch").keyup(function(event) {
-		if ($("#logsearch").val() != "") {
-			$("#logsearch").css("color", "#000000");
-			$("#logsearch_clear").attr("src", "img/button_cancel.png");
-	    	if (13 != (event.keyCode || event.which))
-				$("#logsearch_go").attr("src", "img/button_go.png");
-		}
-		else {
-			$("#logsearch").css("color", "#bbbbbb");
-			$("#logsearch_clear").attr("src", "img/button_cancel_grey.png");
-		}
-    });
-    $("#logsearch").keypress(function(event) {
-		$("#logsearch").css("color", "#000000");
-    	if (13 == (event.keyCode || event.which)) {
-        	filterLogs(getSearchString());
-    		$("#logsearch_go").attr("src", "img/button_go_grey.png");
-    	}
-    });
-    $("#logsearch").blur(function(event) {
-		if ($("#logsearch").val() == "") {
-			$("#logsearch").css("color", "#bbbbbb");
-	      	$("#logsearch").val("search logs");
-		}
     });
 	
 	// deployments
@@ -676,7 +743,7 @@ function showDozerEvents(id) {
 		<li />
 		</ul>
         <img id="logsearch_clear" style="float:right;margin:5px;" src="img/button_cancel_grey.png" alt="clear filter" />
-        <img id="logsearch_go" style="float:right;margin:5px;" src="img/button_go_grey.png" alt="clear filter" />
+        <img id="logsearch_go" style="float:right;margin-top:6px;margin-left:5px;" src="img/button_go_grey.png" alt="clear filter" />
 		<input id="logsearch" title="Enter search string to filter log messages" style="float:right;width:180px;margin-top:4px;border-style:inset;border-width:1px; " type="text"/>
 		</div>
 		
