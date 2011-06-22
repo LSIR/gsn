@@ -181,7 +181,7 @@ public class dbsync {
 
             long rowCount = 0;
             String insertStatement = "INSERT INTO " + table + " (" + sbCols + ") VALUES("+sbValues+")";
-            PreparedStatement pstmt = connMaster.prepareStatement(insertStatement);
+            PreparedStatement pstmt = connSlave.prepareStatement(insertStatement);
             logger.info(insertStatement);
             while (rs.next()) {
                 StringBuilder aRow = new StringBuilder();
