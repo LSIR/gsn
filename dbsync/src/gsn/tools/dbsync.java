@@ -142,17 +142,97 @@ public class dbsync {
     public static void listTimestamps() {
         logger.info("Table\tMaster\tSlave\tCount");
         for (int i = 0; i < tablesList.size(); i++) {
-            logger.info(tablesList.get(i) + "\t" + latestTimestampsMaster.get(i) + "\t" + latestTimestampsSlave.get(i) + "\t" +numberOfNewerTuples.get(i));
+            logger.info(tablesList.get(i) + "\t" + latestTimestampsMaster.get(i) + "\t" + latestTimestampsSlave.get(i) + "\t" + numberOfNewerTuples.get(i));
         }
     }
 
-    public static void syncTable(String table) {
+    public static void syncTable(String table, long latestTS) {
 
-        logger.info("Synchronizing table [ "+ table+" ]...");
+        logger.info("Synchronizing table [ " + table + " ]...");
+
+        String selectQuery = "select * from " + table + " where timed > " + latestTS;
+
+        Connection connMaster = null;
+        Connection connSlave = null;
+        logger.info(selectQuery);
+
+        ResultSet rs = null;
+        ResultSetMetaData rsmd = null;
+
+        try {
+            connMaster = getMasterConnection();
+            connSlave = getSlaveConnection();
+            rs = connMaster.createStatement().executeQuery(selectQuery);
+            rsmd = rs.getMetaData();
+            int colCount = rsmd.getColumnCount();
+
+            StringBuilder sbCols = new StringBuilder();
+            StringBuilder sbValues = new StringBuilder();
+            logger.info("cols: " + colCount);
+            for (int i = 2; i <= colCount; i++) {
+                sbCols.append(rsmd.getColumnName(i));
+                sbValues.append("? ");
+                if (i < colCount) {
+                    sbCols.append(", ");
+                    sbValues.append(", ");
+                }
+            }
+            logger.info(sbCols.toString());
+
+            long rowCount = 0;
+            String insertStatement = "INSERT INTO " + table + " (" + sbCols + ") VALUES("+sbValues+")";
+            PreparedStatement pstmt = connMaster.prepareStatement(insertStatement);
+            logger.info(insertStatement);
+            while (rs.next()) {
+                StringBuilder aRow = new StringBuilder();
+                for (int i = 2; i <= colCount; i++) {
+                    Object o = rs.getObject(i);
+                    pstmt.setObject(i-1,o);
+                    //aRow.append(o).append(", ");
+                }
+                //logger.info(pstmt.toString());
+                //logger.info(aRow.toString());
+                pstmt.executeUpdate();
+                rowCount++;
+            }
+            logger.info("Rows: " + rowCount);
 
 
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
-        logger.info("Table [ "+ table+" ] done.");
+        /*
+
+       try {
+   // Prepare a statement to insert a record
+   String sql = "INSERT INTO my_table (col_string) VALUES(?)";
+   PreparedStatement pstmt = connection.prepareStatement(sql);
+
+   // Insert 10 rows
+   for (int i=0; i<10; i++) {
+       // Set the value
+       pstmt.setString(1, "row "+i);
+
+       // Insert the row
+       pstmt.executeUpdate();
+   }
+} catch (SQLException e) {
+}
+        */
+
+        try {
+            rs.close();
+            connMaster.close();
+            connSlave.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        } catch (NullPointerException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+
+        logger.info("Table [ " + table + " ] done.");
 
     }
 
@@ -216,8 +296,8 @@ public class dbsync {
         listTimestamps();
 
         // Synchronizing all tables
-        for (int i =0; i<tablesList.size();i++) {
-            syncTable(tablesList.get(i));
+        for (int i = 0; i < tablesList.size(); i++) {
+            syncTable(tablesList.get(i), latestTimestampsSlave.get(i));
         }
 
 
