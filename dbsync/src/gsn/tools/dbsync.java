@@ -170,7 +170,7 @@ public class dbsync {
             StringBuilder sbCols = new StringBuilder();
             StringBuilder sbValues = new StringBuilder();
             logger.info("cols: " + colCount);
-            for (int i = 2; i <= colCount; i++) {
+            for (int i = 2; i <= colCount; i++) {        // skip pk
                 sbCols.append(rsmd.getColumnName(i));
                 sbValues.append("? ");
                 if (i < colCount) {
@@ -186,9 +186,9 @@ public class dbsync {
             logger.info(insertStatement);
             while (rs.next()) {
                 StringBuilder aRow = new StringBuilder();
-                for (int i = 2; i <= colCount; i++) {
+                for (int i = 2; i <= colCount; i++) {   // skip pk
                     Object o = rs.getObject(i);
-                    pstmt.setObject(i - 1, o);
+                    pstmt.setObject(i - 1, o);          // columns are shifted because of skipped pk
                     //aRow.append(o).append(", ");
                 }
                 //logger.info(pstmt.toString());
