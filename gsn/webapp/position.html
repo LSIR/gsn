@@ -158,22 +158,28 @@ $(document).ready(function() {
 					$("#deployment_"+depl.name).hide();
 			});
 			showDeployment(visible);
-		  
-		  $("#starttext").html("<p>CoreStation GPS position.</p>");
-		  
-		  mapProvider = DEFAULT_MAP_PROVIDER;
+			
+			$("#starttext").html("<p>CoreStation GPS position.</p>");
+			
+			mapProvider = DEFAULT_MAP_PROVIDER;
 			map = new Mapstraction('vsmap',mapProvider);
-	
-	    //bind every buttons to javascript functionality (only once)
-	    $("#refreshall_timeout").bind("change",GSN.updateallchange);
-	    $("#refreshall").bind("click",GSN.updateall);
-	    $("#toggleallmarkers").bind("click()",GSN.map.toggleAllMarkers);
-	    $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
-	
-	    GSN.load();
-	    GSN.map.toggleAllMarkers();
-	    fetchGPSPositions();
-	    GSN.map.showAllMarkers();
+			
+			map.addControls({
+				pan: true,
+				zoom: 'small',
+				map_type: true
+			});
+			
+			//bind every buttons to javascript functionality (only once)
+			$("#refreshall_timeout").bind("change",GSN.updateallchange);
+			$("#refreshall").bind("click",GSN.updateall);
+			$("#toggleallmarkers").bind("click()",GSN.map.toggleAllMarkers);
+			$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+			
+			GSN.load();
+			GSN.map.toggleAllMarkers();
+			fetchGPSPositions();
+			GSN.map.showAllMarkers();
 		  
 		}
 	});
