@@ -1094,7 +1094,7 @@ ul.subnav {
 	padding: 0;
 	display: none;
 	float: left;
-	width: 120px;
+	text-align: left;
 	border-top: 1px solid #69ac42;
 	border-left: 1px solid #69ac42;
 	border-right: 1px solid #69ac42;

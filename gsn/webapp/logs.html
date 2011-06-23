@@ -369,7 +369,10 @@ function getLogs() {
 						var id;
 						var str = $("field:eq(1)", this).text();
 						if (!identifierExists(deployments[sdid], str)) {
-							addNewLogContainer(sdid, str, "CoreStation Pos " + str);
+							if (isPublicGSN)
+								addNewLogContainer(sdid, str, "CoreStation Pos " + str);
+							else
+								addNewLogContainer(sdid, str, "CoreStation Id " + str);
 							id = this.containerId;
 						}
 						else {
@@ -611,7 +614,10 @@ $(document).ready(function() {
 			    	addNewLogContainer(i, "dozerevents", "Dozer Event");
 			    
 				$.each(getAvailableCoreStations(depl.name), function(){
-					addNewLogContainer(i, this, "CoreStation Pos " + this);
+					if (isPublicGSN)
+						addNewLogContainer(i, this, "CoreStation Pos " + this);
+					else
+						addNewLogContainer(i, this, "CoreStation Id " + this);
 					depl.identifiers.push(this);
 				});
 			});
