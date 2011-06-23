@@ -1043,7 +1043,7 @@ white-space:nowrap;
 -moz-background-clip:border;
 -moz-background-inline-policy:continuous;
 -moz-background-origin:padding;
-background:#5CA1E7 none repeat scroll 0 0;
+background:#84E75C none repeat scroll 0 0;
 color:#9E9E9E;
 height:2.2em;
 line-height:2.2em;
@@ -1095,9 +1095,9 @@ ul.subnav {
 	display: none;
 	float: left;
 	width: 120px;
-	border-top: 1px solid #2e5d12;
-	border-left: 1px solid #2e5d12;
-	border-right: 1px solid #2e5d12;
+	border-top: 1px solid #69ac42;
+	border-left: 1px solid #69ac42;
+	border-right: 1px solid #69ac42;
 }
 
 ul.subnav .selected {
@@ -1110,7 +1110,7 @@ text-decoration:none;
 }
 
 ul.subnav li{
-	border-bottom: 1px solid #2e5d12;
+	border-bottom: 1px solid #69ac42;
 	clear: both;
 	width: 100%;
 }
