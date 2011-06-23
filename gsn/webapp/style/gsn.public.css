@@ -893,7 +893,7 @@ div.full-page {
     font-weight: bold;
     font-size: 11px;
     color: black;
-    background-color: #5290CD;
+    background-color: #5CA1E7;
 }
 
 .drawer-handle {
@@ -1027,10 +1027,15 @@ div.full-page {
 }
 
 /* deployments */
+#deployment_navigation #deployment_menu{
+margin:0;
+padding:0;
+}
+
 #deployment_navigation #deployment_menu li {
 border-right:1px solid #FFFFFF;
 float:left;
-list-style-type:none;
+list-style:none;
 white-space:nowrap;
 }
 
@@ -1042,19 +1047,12 @@ background:#5CA1E7 none repeat scroll 0 0;
 color:#9E9E9E;
 height:2.2em;
 line-height:2.2em;
-margin:0;
-padding:0;
 border-top-width:0.1em;
 border-bottom-width:0.1em;
 border-left-width:0.1;
 border-right-width:0;
 border-style:solid;
 border-color:#5CA1E7;
-}
-
-#deployment_navigation #deployment_menu{
-margin:0;
-padding:0;
 }
 
 #deployment_navigation li a {
@@ -1084,49 +1082,25 @@ text-decoration:none;
 	text-decoration:none;
 }
 
-/* corestations */
-#corestation_navigation #corestation_menu li {
-border-right:1px solid #FFFFFF;
-float:left;
-list-style-type:none;
-white-space:nowrap;
+#deployment_menu li {
+position: relative; /*--Declare X and Y axis base for sub navigation--*/
 }
 
-#corestation_navigation {
--moz-background-clip:border;
--moz-background-inline-policy:continuous;
--moz-background-origin:padding;
-background:#5CA1E7 none repeat scroll 0 0;
-height:1.7em;
-font-size:0.8em;
-font-weight:bolder;
-line-height:1.7em;
-margin-top:2px;
-margin-left:2px;
-margin-right:2px;
-border-top-width:0.1em;
-border-bottom-width:0.1em;
-border-left-width:0.1;
-border-right-width:0;
-border-style:solid;
-border-color:#5CA1E7;
-text-decoration:none;
-text-transform:uppercase;
+ul.subnav {
+	position: absolute; /*--Important - Keeps subnav from affecting main navigation flow--*/
+	left: 0;
+	background:#5CA1E7 none repeat scroll 0 0;
+	margin: 0;
+	padding: 0;
+	display: none;
+	float: left;
+	width: 120px;
+	border-top: 1px solid #1c5896;
+	border-left: 1px solid #1c5896;
+	border-right: 1px solid #1c5896;
 }
 
-#corestation_navigation #corestation_menu{
-margin:0;
-padding:0;
-}
-
-#corestation_navigation li a {
-background-color:inherit;
-color:#000000;
-display:block;
-padding:0 8px;
-}
-
-#corestation_navigation .selected {
+ul.subnav .selected {
 -moz-background-clip:border;
 -moz-background-inline-policy:continuous;
 -moz-background-origin:padding;
@@ -1135,11 +1109,16 @@ color:#000000;
 text-decoration:none;
 }
 
-#corestation_navigation a:hover
-{
-	background:#b8caf7; /*#ff6f00;*/
-	color:#000000;
-	text-decoration:none;
+ul.subnav li{
+	border-bottom: 1px solid #1c5896;
+	clear: both;
+	width: 100%;
+}
+
+#logcontainers {
+	border:1px solid #5290CD;
+	text-align:left;
+	padding:5px;
 }
 
 #topologycontainer td {
