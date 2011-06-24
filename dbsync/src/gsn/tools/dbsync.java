@@ -25,6 +25,7 @@ public class dbsync {
     private static List<Long> latestTimestampsMaster = null;
     private static List<Long> latestTimestampsSlave = null;
     private static List<Long> numberOfNewerTuples = null;
+    private static String runningMode = null;
 
     static List<String> loadTablesList(String tablesListFileName) {
         List<String> tablesList = new Vector<String>();
@@ -220,7 +221,13 @@ public class dbsync {
     }
 
     public static void main(java.lang.String[] args) {
+
         PropertyConfigurator.configure("conf/log4j_dbsync.properties");
+
+        if (args.length>0) {
+            runningMode = args[0];
+            logger.info("Running mode :" + runningMode);
+        }
 
         Properties masterdb = new Properties();
         Properties slavedb = new Properties();
@@ -277,6 +284,10 @@ public class dbsync {
         }
 
         listTimestamps();
+
+        if (runningMode.compareTo("test") == 0) {
+            System.exit(0);
+        }
 
         // Synchronizing all tables
         for (int i = 0; i < tablesList.size(); i++) {
