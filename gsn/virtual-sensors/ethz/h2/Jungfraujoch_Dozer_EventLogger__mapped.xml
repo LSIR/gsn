@@ -12,7 +12,7 @@
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
-            <field name="EVENT_TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="EVENT_TIMESTAMP" type="BIGINT" unit="unixtime" index="true"/>
             <field name="EVENT_ID" type="SMALLINT" />
             <field name="EVENT_TYPE" type="INTEGER" />
             <field name="EVENT_VALUE" type="INTEGER" />

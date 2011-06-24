@@ -9,7 +9,7 @@
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
             
             <field name="LOG_MESSAGE" type="VARCHAR(4096)" />
             
