@@ -135,52 +135,60 @@ $(document).ready(function() {
 					}
 				}
 			});
-			// display
-			var visible = 0;
-			$.each(deployments, function(i, l){
-				if (this.name == $.cookie("deployment")) {
-					visible = i;
-					return false;
-				}
-			});
 			
-			$.each(deployments, function(i, depl) {
-			    // add tab
-			    $("#deployment_menu").append($.LI({}, $.A({
-					"id":"deployment_menu_item_"+depl.name,
-					"href":"javascript:showDeployment("+i+")"
-			    },depl.name)));
-			    
-			  	$.each(getCoreStationIds(i), function(){
-						addNewCoreStation(depl, this.id);
-					});
+			// check if there is any deployment with the required virtual sensor
+			if (deployments.length == 0) {
+				$("#starttext").html("<p>Warning: No deployment available with the required virtual sensor gps_nav.</p>");
+				$("#maindiv #mapdiv").hide();
+				$("#maindiv #deployment_navigation").hide();
+			}
+			else {
+				// display
+				var visible = 0;
+				$.each(deployments, function(i, l){
+					if (this.name == $.cookie("deployment")) {
+						visible = i;
+						return false;
+					}
+				});
 				
-					$("#deployment_"+depl.name).hide();
-			});
-			showDeployment(visible);
-			
-			$("#starttext").html("<p>CoreStation GPS position.</p>");
-			
-			mapProvider = DEFAULT_MAP_PROVIDER;
-			map = new Mapstraction('vsmap',mapProvider);
-			
-			map.addControls({
-				pan: true,
-				zoom: 'small',
-				map_type: true
-			});
-			
-			//bind every buttons to javascript functionality (only once)
-			$("#refreshall_timeout").bind("change",GSN.updateallchange);
-			$("#refreshall").bind("click",GSN.updateall);
-			$("#toggleallmarkers").bind("click()",GSN.map.toggleAllMarkers);
-			$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
-			
-			GSN.load();
-			GSN.map.toggleAllMarkers();
-			fetchGPSPositions();
-			GSN.map.showAllMarkers();
-		  
+				$.each(deployments, function(i, depl) {
+				    // add tab
+				    $("#deployment_menu").append($.LI({}, $.A({
+						"id":"deployment_menu_item_"+depl.name,
+						"href":"javascript:showDeployment("+i+")"
+				    },depl.name)));
+				    
+				  	$.each(getCoreStationIds(i), function(){
+							addNewCoreStation(depl, this.id);
+						});
+					
+						$("#deployment_"+depl.name).hide();
+				});
+				showDeployment(visible);
+				
+				$("#starttext").html("<p>Core stations' GPS position.</p>");
+				
+				mapProvider = DEFAULT_MAP_PROVIDER;
+				map = new Mapstraction('vsmap',mapProvider);
+				
+				map.addControls({
+					pan: true,
+					zoom: 'small',
+					map_type: true
+				});
+				
+				//bind every buttons to javascript functionality (only once)
+				$("#refreshall_timeout").bind("change",GSN.updateallchange);
+				$("#refreshall").bind("click",GSN.updateall);
+				$("#toggleallmarkers").bind("click()",GSN.map.toggleAllMarkers);
+				$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+				
+				GSN.load();
+				GSN.map.toggleAllMarkers();
+				fetchGPSPositions();
+				GSN.map.showAllMarkers();
+		  }
 		}
 	});
 });
@@ -283,6 +291,7 @@ function showDeployment(id) {
                   <p><a style="text-decoration:underline" href="javascript:GSN.map.showAllMarkers();">Auto-zoom and focus the map</a></p>
                   <div id="vsmap" style="width: 100%; height: 500px; position:relative;"></div>
                   <div id="vs4map"></div>
+                  
               </div>
 							
 						</div>
