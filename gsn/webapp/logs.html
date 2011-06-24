@@ -304,7 +304,7 @@ function getMaxLogsRecursive(logContainer, lastTimestamp) {
 				});
 				scrollPane.reinitialise();
 				if (lastEventTime != "" && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
-					getMaxEventsRecursive(logContainer, lastEventTime);
+					getMaxLogsRecursive(logContainer, lastEventTime);
 			}
 		});
 	}
@@ -652,29 +652,31 @@ function showLogs(deplId, logId) {
 		}
 	}
 	
-	if (logId != selectedLogContainerId) {
-		$("#logcontainer_"+selectedLogContainerId).hide();
-		$("#log_menu_item_"+selectedLogContainerId).removeClass("selected");
-
-		$("#logcontainer_"+logId).show();
-		$("#log_menu_item_"+logId).addClass("selected");
-	}
-	selectedLogContainerId = logId;
+	if (logId != -1) {
+		if (logId != selectedLogContainerId) {
+			$("#logcontainer_"+selectedLogContainerId).hide();
+			$("#log_menu_item_"+selectedLogContainerId).removeClass("selected");
 	
-	$("#logcontainer_title").text(logContainers[selectedLogContainerId].name + " log messages:");
-	var msg = "Shows " + logContainers[selectedLogContainerId].name + " log messages from " + deployments[selectedDeploymentId].name + " deployment.";
-	$("#logcontainers").attr("title", msg);
-
-	scrollPane = $("#logcontainer_"+logId).show().jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
-	scrollPane.reinitialise();
-	scrollPane.scrollToBottom();
+			$("#logcontainer_"+logId).show();
+			$("#log_menu_item_"+logId).addClass("selected");
+		}
+		selectedLogContainerId = logId;
+		
+		$("#logcontainer_title").text(logContainers[selectedLogContainerId].name + " log messages:");
+		var msg = "Shows " + logContainers[selectedLogContainerId].name + " log messages from " + deployments[selectedDeploymentId].name + " deployment.";
+		$("#logcontainers").attr("title", msg);
 	
-	if (!logContainers[selectedLogContainerId].initialized) {
-		$("#starttext").html('Loading ' + logContainers[selectedLogContainerId].name + ' log messages from ' + deployments[selectedDeploymentId].name + ' deployment... <img src="style/ajax-loader.gif" />');
-		logContainers[selectedLogContainerId].initialized = true;
-		getMaxLogsRecursive(logContainers[selectedLogContainerId], logContainers[selectedLogContainerId].firstTimestamp);
+		scrollPane = $("#logcontainer_"+logId).show().jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
+		scrollPane.reinitialise();
+		scrollPane.scrollToBottom();
+		
+		if (!logContainers[selectedLogContainerId].initialized) {
+			$("#starttext").html('Loading ' + logContainers[selectedLogContainerId].name + ' log messages from ' + deployments[selectedDeploymentId].name + ' deployment... <img src="style/ajax-loader.gif" />');
+			logContainers[selectedLogContainerId].initialized = true;
+			getMaxLogsRecursive(logContainers[selectedLogContainerId], logContainers[selectedLogContainerId].firstTimestamp);
+		}
+		$("#starttext").html(msg);
 	}
-	$("#starttext").html(msg);
 }
 
 //]]>-->
