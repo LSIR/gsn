@@ -25,7 +25,7 @@ public class dbsync {
     private static List<Long> latestTimestampsMaster = null;
     private static List<Long> latestTimestampsSlave = null;
     private static List<Long> numberOfNewerTuples = null;
-    private static String runningMode = null;
+    private static String runningMode = "";
 
     static List<String> loadTablesList(String tablesListFileName) {
         List<String> tablesList = new Vector<String>();
