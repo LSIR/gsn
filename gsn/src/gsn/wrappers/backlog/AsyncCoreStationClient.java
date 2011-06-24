@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -115,10 +116,7 @@ public class AsyncCoreStationClient extends Thread  {
 		    						socketToListenerList.remove(change.socket);
 			    					if (listener != null) {
 					    				listenerToSocketList.remove(listener);
-					    				if (logger.isDebugEnabled())
-					    					logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
-				    					Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
-				    					timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
+					    				timeReconnect(listener);
 			    					}
 		    					}
 	    					} catch (Exception e) {
@@ -304,23 +302,25 @@ public class AsyncCoreStationClient extends Thread  {
 			logger.debug("thread already running");
 		}
 		
+		SocketChannel socketChannel = SocketChannel.open();
+		socketChannel.configureBlocking(false);
+		logger.debug("trying to connect to core station: " + listener.getCoreStationName());
 		try {
-			SocketChannel socketChannel = SocketChannel.open();
-			socketChannel.configureBlocking(false);
-			logger.debug("trying to connect to core station: " + listener.getCoreStationName());
 			socketChannel.connect(new InetSocketAddress(listener.getInetAddress(), listener.getPort()));
-
-			synchronized(listenerToSocketList) {
-				socketToListenerList.put(socketChannel, listener);
-				listenerToSocketList.put(listener, socketChannel);
-			}
-			synchronized(changeRequests) {
-				changeRequests.add(new ChangeRequest(socketChannel, ChangeRequest.TYPE_REGISTER, SelectionKey.OP_CONNECT));
-			}
-			selector.wakeup();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+		} catch (UnknownHostException e) {
+			logger.warn("unknown host (" + e.getMessage() + ") trying to resolve it again in " + RECONNECT_TIMEOUT_SEC + " seconds");
+			timeReconnect(listener);
+			return;
 		}
+
+		synchronized(listenerToSocketList) {
+			socketToListenerList.put(socketChannel, listener);
+			listenerToSocketList.put(listener, socketChannel);
+		}
+		synchronized(changeRequests) {
+			changeRequests.add(new ChangeRequest(socketChannel, ChangeRequest.TYPE_REGISTER, SelectionKey.OP_CONNECT));
+		}
+		selector.wakeup();
 	}
 	
 	
@@ -536,6 +536,14 @@ public class AsyncCoreStationClient extends Thread  {
 		}
 		else
 			logger.warn("no socket for listener (" + listener.getCoreStationName() + ") in list");
+	}
+	
+	
+	private void timeReconnect(CoreStationListener listener) {
+		if (logger.isDebugEnabled())
+			logger.debug("trying to reconnect to " + listener.getCoreStationName() + " CoreStation in " + RECONNECT_TIMEOUT_SEC + " seconds");
+		Timer timer = new Timer("ReconnectTimer-" + listener.getCoreStationName());
+		timer.schedule(new ReconnectTimerTask(this, listener), RECONNECT_TIMEOUT_SEC*1000);
 	}
 }
 
