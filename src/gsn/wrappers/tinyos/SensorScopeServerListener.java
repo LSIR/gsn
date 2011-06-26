@@ -414,6 +414,7 @@ public class SensorScopeServerListener {
     }
 
     private void LogData(byte[] bytes) {
+        logger.warn("\n\n ***** LOG DATA ***** \n\n");
         listArray(bytes, bytes.length);
     }
 
