@@ -506,7 +506,10 @@ public class SensorScopeServerListener {
         SensorScopeServerListener server = new SensorScopeServerListener();
         logger.warn("Entering server mode...");
 
-        server.entry();
+        while (true) {
+            server.entry();
+            logger.warn("\n\n********************\n\n");
+        }
     }
 
 }
