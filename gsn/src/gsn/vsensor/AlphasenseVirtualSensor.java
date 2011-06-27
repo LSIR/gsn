@@ -123,6 +123,8 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			    int p = 0;
 			    if (inputString.length() == 137)
 			      p = 1;
+			    else if (inputString.length() == 134)
+			      p = 2;
 
 		    	for (int i = tokens.length-1; i >= 0; i--) {
 			      if (i >= 14-p && i <= 17-p)
