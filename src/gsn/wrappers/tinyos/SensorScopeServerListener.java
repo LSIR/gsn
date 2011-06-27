@@ -156,7 +156,7 @@ public class SensorScopeServerListener {
     private boolean ReceiveByte(byte b) {
         byte[] _oneByte = new byte[1];
         int n_bytes = receive(_oneByte, 1);
-        logger.info("Read => " + _oneByte);
+        logger.info("Read (" + n_bytes + ") => " + _oneByte[0]);
         if (n_bytes < 1)
             return false;
         else {
