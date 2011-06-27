@@ -45,6 +45,7 @@ class BackLogDBClass(Thread, Statistics):
     _removeTimeId
     _dblock
     _resend
+    _resendAmount
     _resendtimer
     _stopped
     '''
@@ -78,6 +79,7 @@ class BackLogDBClass(Thread, Statistics):
         # thread lock to coordinate access to the database
         self._dblock = Lock()
         self._resend = Event()
+        self._resendAmount = 0
         self._waitForAck = Event()
         self._ackLock = Lock()
         self._resentMsgIdentifier = [None, None]
@@ -258,6 +260,7 @@ class BackLogDBClass(Thread, Statistics):
         Resend all messages which are in the backlog database to GSN.
         '''
         self._isBusy = True
+        self._resendAmount = self.getCounterValue(self._dbNumberOfEntriesId)
         self._resend.set()
 
 
@@ -271,7 +274,7 @@ class BackLogDBClass(Thread, Statistics):
 
             timestamp = 0
             
-            resendCounter = self.getCounterValue(self._dbNumberOfEntriesId)
+            resendCounter = self._resendAmount
             if resendCounter > 0:
                 self._logger.info('trying to resend %d messages from backlog database' % (resendCounter,))
                 
@@ -279,7 +282,7 @@ class BackLogDBClass(Thread, Statistics):
                     if resendCounter <= 0:
                         self._logger.info('resend finished')
                         if resendCounter < 0:
-                            self._logger.error('resend counter dropped below zero')
+                            self.exception('resend counter dropped below zero')
                         self._backlogMain.schedulehandler.backlogResendFinished()
                         break
                     
@@ -298,7 +301,7 @@ class BackLogDBClass(Thread, Statistics):
                         break
                     
                     if not rows:
-                        self._logger.error('empty select request received -> resend finished')
+                        self._logger.warning('empty select request received -> resend finished')
                         self._backlogMain.schedulehandler.backlogResendFinished()
                         break
                     resendCounter -= len(rows)
