@@ -70,8 +70,6 @@ public class SensorMapIntegration implements VSensorStateChangeListener{
 			LoginToMSRSense.delete_sensor(userName, password, config);
 		} catch (RemoteException e) {
 			logger.error(e.getMessage(),e);
-		} catch (IOException e) {
-			logger.error(e.getMessage(),e);
 		}
 	}
 
