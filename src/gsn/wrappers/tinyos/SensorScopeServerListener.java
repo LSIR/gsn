@@ -100,7 +100,7 @@ public class SensorScopeServerListener {
 
     boolean ReceivePacket(int packet, int length) {
 
-        logger.warn("ReceivePacket(packet=" + packet + ",length=" + length + ")");
+        logger.info("ReceivePacket(packet=" + packet + ",length=" + length + ")");
 
 
         boolean escape = false;
@@ -112,6 +112,8 @@ public class SensorScopeServerListener {
 
             if (!ReceiveByte(_byte))
                 return false;
+
+            logger.info("byte => "+_byte);
 
             // Synchronization byte?
             if (_byte == BYTE_SYNC) {
@@ -169,56 +171,56 @@ public class SensorScopeServerListener {
 
     void listArray(byte[] a, int len) {
 
-        StringBuilder hex_sb = new StringBuilder();
+        //StringBuilder hex_sb = new StringBuilder();
         StringBuilder hex_sb_2 = new StringBuilder();
-        StringBuilder dec_sb = new StringBuilder();
+        //StringBuilder dec_sb = new StringBuilder();
         StringBuilder dec_sb_2 = new StringBuilder();
         for (int i = 0; (i < a.length && i < len); i++) {
-            hex_sb.append(String.format("%02x", a[i])).append(" ");
+            //hex_sb.append(String.format("%02x", a[i])).append(" ");
             hex_sb_2.append(String.format("%02x", a[i] & 0xff)).append(" ");
-            dec_sb.append(a[i]).append(" ");
+            //dec_sb.append(a[i]).append(" ");
             dec_sb_2.append(a[i] & 0xff).append(" ");
         }
 
-        hex_sb.append("(").append(String.format("%2d", len)).append(")");
+        //hex_sb.append("(").append(String.format("%2d", len)).append(")");
         hex_sb_2.append("(").append(String.format("%2d", len)).append(")");
-        dec_sb.append("(").append(String.format("%2d", len)).append(")");
+        //dec_sb.append("(").append(String.format("%2d", len)).append(")");
         dec_sb_2.append("(").append(String.format("%2d", len)).append(")");
 
-        logger.warn(hex_sb.toString());
-        logger.warn(hex_sb_2.toString());
-        logger.warn(dec_sb.toString());
-        logger.warn(dec_sb_2.toString());
+        //logger.warn(hex_sb.toString());
+        logger.info(hex_sb_2.toString());
+        //logger.warn(dec_sb.toString());
+        logger.info(dec_sb_2.toString());
 
     }
 
     void listArray(int[] a, int len, String header) {
-        logger.warn("* " + header + " *");
+        logger.info("* " + header + " *");
         listArray(a, len);
     }
 
     void listArray(int[] a, int len) {
 
-        StringBuilder hex_sb = new StringBuilder();
+        //StringBuilder hex_sb = new StringBuilder();
         StringBuilder hex_sb_2 = new StringBuilder();
-        StringBuilder dec_sb = new StringBuilder();
+        //StringBuilder dec_sb = new StringBuilder();
         StringBuilder dec_sb_2 = new StringBuilder();
         for (int i = 0; (i < a.length && i < len); i++) {
-            hex_sb.append(String.format("%02x", a[i])).append(" ");
+            //hex_sb.append(String.format("%02x", a[i])).append(" ");
             hex_sb_2.append(String.format("%02x", a[i] & 0xff)).append(" ");
-            dec_sb.append(a[i]).append(" ");
+            //dec_sb.append(a[i]).append(" ");
             dec_sb_2.append(a[i] & 0xff).append(" ");
         }
 
-        hex_sb.append("(").append(String.format("%2d", len)).append(")");
+        //hex_sb.append("(").append(String.format("%2d", len)).append(")");
         hex_sb_2.append("(").append(String.format("%2d", len)).append(")");
-        dec_sb.append("(").append(String.format("%2d", len)).append(")");
+        //dec_sb.append("(").append(String.format("%2d", len)).append(")");
         dec_sb_2.append("(").append(String.format("%2d", len)).append(")");
 
-        logger.warn(hex_sb.toString());
-        //logger.warn(hex_sb_2.toString());
-        logger.warn(dec_sb.toString());
-        //logger.warn(dec_sb_2.toString());
+        //logger.warn(hex_sb.toString());
+        logger.info(hex_sb_2.toString());
+        //logger.warn(dec_sb.toString());
+        logger.info(dec_sb_2.toString());
 
     }
 
@@ -244,10 +246,10 @@ public class SensorScopeServerListener {
             logger.warn("Server listening...");
             client = serverSocket.accept();
 
-            logger.warn("Connection from: " + client.getRemoteSocketAddress().toString());
+            logger.info("Connection from: " + client.getRemoteSocketAddress().toString());
 
             // Get rssi
-            logger.warn("Trying to receive RSSI...");
+            logger.info("Trying to receive RSSI...");
 
             int n_read = receive(buffer, 2);
 
@@ -264,7 +266,7 @@ public class SensorScopeServerListener {
             if (buffer_1 <= 31) rssi = -113 + (2 * buffer_1);
             else rssi = -255;
 
-            logger.warn("RSSI = " + rssi);
+            logger.info("RSSI = " + rssi);
 
             // Send the authentication challenge
             FillAuthChallenge(challenge);
@@ -295,9 +297,9 @@ public class SensorScopeServerListener {
             mStationID = ((int) buffer[1] << 8) + (int) buffer[2];
 
             if (mStationID == CLIMAPS_ID)
-                logger.warn("Climaps authenticated (RTT = " + rtt + " ms)");
+                logger.info("Climaps authenticated (RTT = " + rtt + " ms)");
             else
-                logger.warn("Station " + mStationID + " (RTT = " + rtt + " ms, RSSI = " + rssi + " dBm)");
+                logger.info("Station " + mStationID + " (RTT = " + rtt + " ms, RSSI = " + rssi + " dBm)");
 
             ProcessPackets();
 
@@ -319,14 +321,16 @@ public class SensorScopeServerListener {
 
     private void ProcessPackets() {
 
-        logger.warn("Processing packets");
+        logger.info("-- Processing packets --");
 
         int rxIdx = 0;
         int nbPkts = 0;
         int pktLen = 0;
 
         while (true) {
+
             int pkt = mRxBuf[rxIdx + 1];
+            logger.info("Trying to receive packets with pkt=" + pkt + " rxIdx=" + rxIdx);
             if (!ReceivePacket(pkt, rxIdx)) {
                 CleanUp("receiving packets");
                 return;
@@ -341,9 +345,9 @@ public class SensorScopeServerListener {
             // '+++' means that the GPRS has disconnected
             if (pktLen == 3 && mRxBuf[pkt + 0] == '+' && mRxBuf[pkt + 1] == '+' && mRxBuf[pkt + 2] == '+') {
                 if (mStationID == CLIMAPS_ID)
-                    logger.warn("Climaps has disconnected");
+                    logger.info("Climaps has disconnected");
                 else
-                    logger.warn("Station " + mStationID + " has disconnected");
+                    logger.info("Station " + mStationID + " has disconnected");
                 return;
             }
 
