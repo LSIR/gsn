@@ -164,7 +164,7 @@ public class SensorScopeServerListener {
         if (n_bytes < 1)
             return false;
         else {
-            b = _oneByte;
+            b[0] = _oneByte[0];
             return true;
         }
     }
