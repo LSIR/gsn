@@ -239,7 +239,7 @@ public class MyGroupManagementServlet extends HttpServlet
     }
     private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
     {
-        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
+        req.getSession().setAttribute("login.target", req.getRequestURL().toString());
         res.sendRedirect("/gsn/MyLoginHandlerServlet");
     }
 
