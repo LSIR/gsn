@@ -15,6 +15,8 @@ import STEVALDriver
 import numpy
 import time
 from threading import Event
+
+DEFAULT_BACKLOG = True
     
 # Query accelerometer to detect whether vehicle is moving or not
 class MotionDetectionPluginClass(AbstractPluginClass):
@@ -28,22 +30,24 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         self._std_x = 0
         self._std_y = 0
         self._std_z = 0
-        self._moving = -1
+        self._moving = 0
         self._data = ''
+        self._numPolls = 0
 
         self.info('Init MotionDetectionPlugin...')
         
-        self._stdThreshold = self.getOptionValue('std_threshold')
-        self._pollInterval = self.getOptionValue('poll_interval')
-        self._pollDuration = self.getOptionValue('poll_duration')
+        self._stdThreshold = float(self.getOptionValue('std_threshold'))
+        self._pollInterval = float(self.getOptionValue('poll_interval'))
+        self._pollDuration = float(self.getOptionValue('poll_duration'))
+        self._sendStatistic = int(self.getOptionValue('send_statistic'))
         self._deviceStr = self.getOptionValue('acc_device')
         
         if self._pollInterval <= self._pollDuration:
             self.warning('Bad configuration, poll interval is smaller equal than poll duration!')
-            self._pollInterval = self._pollDuration + 2
+            self._pollInterval = self._pollDuration + 5
         
         self.steval = STEVALDriver.STEVALDriver([self._deviceStr])
-        #steval._setSensor()
+        #self.steval._setSensor()
         
     def getMsgType(self):
         return BackLogMessage.MOTION_DETECTION_MESSAGE_TYPE 
@@ -54,41 +58,44 @@ class MotionDetectionPluginClass(AbstractPluginClass):
     def run(self):
         self.name = 'MotionDetectionPlugin-Thread'
         self.info('started')
+        t = time.time()
         
         while not self._stopped:
-            # TODO: is self.action('') blocking? if yes then call wait with minus execution time!
-            self._sleeper.wait(self._pollInterval)
+            self._sleeper.wait(self._pollInterval - (time.time() - t))
             if self._sleeper.isSet():
                 continue
+            t = time.time()
             self.action('')
         self.info('died')
 
     def action(self, parameters):
-                
-        startTime = time.time()
         
-        self.info('MotionDetectionPlugin started...')
+        self.steval._openDevice()
         self._data = ''
         setRes = self.steval._setSensor()
         if setRes == 1:
-            self.info('STEVAL: setSensor() success')
         
+            startTime = time.time()
             endTime =  startTime
             while (endTime - startTime) < self._pollDuration:
-                msg = str(steval._startDataAcquisitionDebug(150))
+                msg = str(self.steval._startDataAcquisitionDebug(150))
                 self._data += msg
-                steval._stopDataAcquisition()
+                self.steval._stopDataAcquisition()
                 endTime = time.time()
             
+            self.steval._closeDevice()
             self.detectMotion()
         else:
             self.error('setSensor() failed, can not get sensor readings')
-            self._moving = -1
         
+        self._numPolls = self._numPolls + 1
         # Send statistics
-        # TODO: no more than once per minute
-        dataPackage = [self._stdThreshold, self._pollInterval, self._pollDuration, self._std_x, self._std_y, self._std_z, self._moving]
-        self.processMsg(self.getTimeStamp(), dataPackage)
+        if self._numPolls == self._sendStatistic:
+            self._numPolls = 0
+            dataPackage = [self._stdThreshold, self._pollInterval, self._pollDuration, self._std_x, self._std_y, self._std_z, self._moving]
+            self._moving = 0
+            self.info(dataPackage)
+            self.processMsg(self.getTimeStamp(), dataPackage)
             
     def isBusy(self):
         return False
@@ -105,24 +112,23 @@ class MotionDetectionPluginClass(AbstractPluginClass):
 
     def detectMotion(self):
 
-        xData = parseData('x')
-        yData = parseData('y')
-        zData = parseData('z')
+        xData = self.parseData('x')
+        yData = self.parseData('y')
+        zData = self.parseData('z')
 
-        xStd = numpy.std(xData)
-        yStd = numpy.std(yData)
-        zStd = numpy.std(zData)
+        self._std_x = float(numpy.std(xData))
+        self._std_y = float(numpy.std(yData))
+        self._std_z = float(numpy.std(zData))
         
-        self.info('xStd is ' + str(xStd) + ' yStd is ' + str(yStd) + ' and zStd is ' + str(zStd));
+        self.info('xStd is ' + str(self._std_x) + ' yStd is ' + str(self._std_y) + ' and zStd is ' + str(self._std_z));
 
-        if xStd <= self._stdThreshold and yStd <= self._stdThreshold and zStd <= self._stdThreshold:
+        if self._std_x <= self._stdThreshold and self._std_y <= self._stdThreshold and self._std_z <= self._stdThreshold:
             self.info('Vehicle is not moving')
-            self._moving = 0
         else:
             self.info('Vehicle is moving')
-            self._moving = 1
+            self._moving = self._moving + 1
             
-    def parseData(axis):
+    def parseData(self, axis):
         axisData = []
   
         r = self._data.find(axis)

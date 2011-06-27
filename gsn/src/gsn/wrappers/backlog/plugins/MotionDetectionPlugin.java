@@ -41,10 +41,14 @@ public class MotionDetectionPlugin extends AbstractPlugin {
 
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
+		
 		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 
 		try {
-			if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[0], data[1], data[2], data[3], data[4], data[5], data[6]}) )
+			Serializable[] header = {timestamp, timestamp, deviceId};
+			data = checkAndCastData(data, 0, dataField, 3);
+			
+			if( dataProcessed(System.currentTimeMillis(), concat(header, data)) )
 				ackMessage(timestamp, super.priority);
 			else
 				logger.warn("The MotionDetection message with timestamp >" + timestamp + "< could not be stored in the database."); 

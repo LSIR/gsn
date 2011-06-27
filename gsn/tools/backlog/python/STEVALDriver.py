@@ -89,6 +89,9 @@ class STEVALDriver():
    
     def _startDataAcquisitionDebug(self, val):
         try:
+            while self._device.inWaiting() != 0:
+                self._device.flushInput()
+            
             self._device.write('*')
             self._device.write('d')
             self._device.write('e')
