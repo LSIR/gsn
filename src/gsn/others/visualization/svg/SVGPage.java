@@ -68,7 +68,7 @@ public class SVGPage {
       this.height = height;
    }
    
-   public SVGPage ( int width , int height , int borderWidthr ) throws IOException {
+   public SVGPage ( int width , int height , int borderWidth ) throws IOException {
       this.width = width;
       this.height = height;
       this.borderWidth = borderWidth;
