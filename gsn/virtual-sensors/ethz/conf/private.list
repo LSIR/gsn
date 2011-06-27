@@ -114,6 +114,7 @@ Matterhorn_Topology.xml
 #OpenSense_Statistics.xml
 #OpenSense_SyslogNg.xml
 #OpenSense_Binary.xml
+#OpenSense_MotionDetection.xml
 Thur_BackLogStatus_Dynamic.xml
 Thur_BackLogStatus_Revision.xml
 Thur_BackLogStatus_Static.xml

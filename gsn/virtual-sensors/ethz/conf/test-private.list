@@ -57,6 +57,7 @@ OSTest_Schedule.xml
 OSTest_Statistics.xml
 OSTest_SyslogNg.xml
 OSTest_Binary.xml
+OSTest_MotionDetection.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml

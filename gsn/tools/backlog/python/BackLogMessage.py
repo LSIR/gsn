@@ -87,6 +87,9 @@ STEVAL_MESSAGE_TYPE = 82
 # STEVAL Accelerometer 
 ALPHASENSE_MESSAGE_TYPE = 83
 
+# MOTION DETECTION 
+MOTION_DETECTION_MESSAGE_TYPE = 84
+
 # The maximum supported payload size (2^32-9bytes). This is due to
 # the sending mechanism. A sent message is defined by preceding
 # four bytes containing the message size. A message consists of

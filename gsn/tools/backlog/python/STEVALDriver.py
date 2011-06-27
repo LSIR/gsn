@@ -87,7 +87,7 @@ class STEVALDriver():
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read STEVAL-MKI004V1 sensor reading")
    
-    def _startDataAcquisitionDebug(self):
+    def _startDataAcquisitionDebug(self, val):
         try:
             self._device.write('*')
             self._device.write('d')
@@ -100,7 +100,7 @@ class STEVALDriver():
             tmpVal = ''
             c = 2 
             while c > 0:
-                d = self._device.read(20000)                
+                d = self._device.read(val)                
                 pos = d.find('x=')
                 if pos >= 0:
                     d = d[pos:]

@@ -137,6 +137,11 @@ public class BackLogMessage {
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.AlphasensePlugin AlphasensePlugin}. */
 	public static final byte ALPHASENSE_MESSAGE_TYPE = 83;
+
+	/** Motion detection with the accelerometer 
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.MotionDetectionPlugin MotionDetectionPlugin}. */
+	public static final byte MOTION_DETECTION_MESSAGE_TYPE = 84;
 	
 	
 	/* #                                                            #
