@@ -179,6 +179,7 @@ function deployment(name) {
 	this.identifiers = new Array();
 	this.lastLogTime = "";
 	this.lastEventTime = "";
+	this.topologyExists = false;
 	this.dozerEventsExists = false;
 }
 
@@ -205,24 +206,47 @@ function getFieldIdentifier() {
 		return "device_id";
 }
 
-function getAvailableCoreStations(deplName) {
-	var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
+function getAvailableCoreStations(depl) {
 	var deviceIds = new Array();
-	$.ajax({
-		type: "GET",
-		url: "/data?vsName=" + deplName.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=" + getFieldIdentifier() + "&orderby=timestamp&groupby=" + getFieldIdentifier() + "&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime(),
-        async: false,
-        cache: false,
-        timeout: 30000,
-		success: function(data){
-			$("line", data).each(function(){
-				var l = $("field", this).text();
-				if (l != getFieldIdentifier() && l.toLowerCase() != "null")
-					deviceIds.push(l)
-			});
-		}
-	});
-	return deviceIds;
+	if (depl.topologyExists) {
+		var tableEnding = "";
+		if (isPublicGSN)
+			tableEnding = "__public";
+		$.ajax({
+			type: "GET",
+	        url: "/field?vs="+depl.name.toLowerCase() + "_topology" + tableEnding + "&field=DATA&pk=latest",
+	        dataType: "xml",
+	        async: false,
+	        cache: false,
+	        timeout: 30000,
+			success: function(data){
+				$("sensornode[iscorestation=true]",data).each(function(){
+					if (isPublicGSN)
+						deviceIds.push(parseInt($(this).attr("position")));
+					else
+						deviceIds.push(parseInt($(this).attr("node_id")));
+				});
+			}
+		});
+	}
+	else {
+		var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
+		$.ajax({
+			type: "GET",
+			url: "/data?vsName=" + depl.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=" + getFieldIdentifier() + "&orderby=timestamp&groupby=" + getFieldIdentifier() + "&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime(),
+	        async: false,
+	        cache: false,
+	        timeout: 30000,
+			success: function(data){
+				$("line", data).each(function(){
+					var l = $("field", this).text();
+					if (l != getFieldIdentifier() && l.toLowerCase() != "null")
+						deviceIds.push(parseInt(l))
+				});
+			}
+		});
+	}
+	return deviceIds.sort();
 }
 
 function identifierExists(depl, id) {
@@ -556,7 +580,7 @@ $(document).ready(function() {
 			// iterate over all available virtual sensors
 			$("virtual-sensor",data).each(function(){
 				// are there syslog-ng or eventlogger__mapped vs available?
-				if ($(this).attr("name").indexOf("syslogng") != -1 || $(this).attr("name").indexOf("_dozer_eventlogger__mapped") != -1) {
+				if ($(this).attr("name").indexOf("syslogng") != -1 || $(this).attr("name").indexOf("topology") != -1 || $(this).attr("name").indexOf("_dozer_eventlogger__mapped") != -1) {
 					// private or public?
 					if ($(this).attr("name").indexOf("__mapped") != -1)
 						isPublicGSN = true;
@@ -580,6 +604,10 @@ $(document).ready(function() {
 							// does the deployment offer dozer event logger information?
 							if ($(this).attr("name").indexOf("_dozer_eventlogger__mapped") != -1)
 								depl.dozerEventsExists = true;
+
+							// does the deployment offer topology information?
+							if ($(this).attr("name").indexOf("topology") != -1)
+								depl.topologyExists = true;
 						}
 				    }
 				}
@@ -610,16 +638,16 @@ $(document).ready(function() {
 					$(this).find("ul.subnav").slideUp('slow');
 				});
 			    
-			    if (depl.dozerEventsExists)
-			    	addNewLogContainer(i, "dozerevents", "Dozer Event");
-			    
-				$.each(getAvailableCoreStations(depl.name), function(){
+				$.each(getAvailableCoreStations(depl), function(){
 					if (isPublicGSN)
 						addNewLogContainer(i, this, "CoreStation Pos " + this);
 					else
 						addNewLogContainer(i, this, "CoreStation Id " + this);
 					depl.identifiers.push(this);
 				});
+			    
+			    if (depl.dozerEventsExists)
+			    	addNewLogContainer(i, "dozerevents", "Dozer Event");
 			});
 			
 			$.each(logContainers, function(){
