@@ -115,7 +115,7 @@ public class SensorScopeServerListener {
             if (!ReceiveByte(_byte))
                 return false;
 
-            logger.info("byte => " + _byte);
+            logger.info("byte => " + _byte[0]);
 
             // Synchronization byte?
             if (_byte[0] == BYTE_SYNC) {
