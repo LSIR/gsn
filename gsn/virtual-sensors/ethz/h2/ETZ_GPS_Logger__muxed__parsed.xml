@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_Logger__muxed__parsed" priority="10" statistics="true" >
+<virtual-sensor name="ETZ_GPS_Logger__muxed__parsed" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.GPSLoggerDataParser</class-name>
         <unique-timestamps>false</unique-timestamps>

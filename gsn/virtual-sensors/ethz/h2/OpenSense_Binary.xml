@@ -1,4 +1,4 @@
-<virtual-sensor name="OpenSense_Binary" priority="10" statistics="true" >
+<virtual-sensor name="OpenSense_Binary" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>

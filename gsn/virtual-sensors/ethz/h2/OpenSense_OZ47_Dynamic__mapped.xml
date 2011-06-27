@@ -1,4 +1,4 @@
-<virtual-sensor name="OpenSense_OZ47_Dynamic__mapped" priority="10" statistics="true" >
+<virtual-sensor name="OpenSense_OZ47_Dynamic__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.OZ47VirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>

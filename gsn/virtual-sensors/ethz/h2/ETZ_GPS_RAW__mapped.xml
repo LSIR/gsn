@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_RAW__mapped" priority="10" statistics="true" >
+<virtual-sensor name="ETZ_GPS_RAW__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.GPSRawDemuxBridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>

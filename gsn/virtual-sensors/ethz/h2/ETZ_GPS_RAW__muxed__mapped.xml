@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_RAW__muxed__mapped" priority="10" statistics="true" >
+<virtual-sensor name="ETZ_GPS_RAW__muxed__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>

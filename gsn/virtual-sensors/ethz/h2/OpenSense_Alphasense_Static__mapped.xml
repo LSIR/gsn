@@ -1,4 +1,4 @@
-<virtual-sensor name="OpenSense_Alphasense_Static__mapped" priority="10" statistics="true" >
+<virtual-sensor name="OpenSense_Alphasense_Static__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.AlphasenseVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>

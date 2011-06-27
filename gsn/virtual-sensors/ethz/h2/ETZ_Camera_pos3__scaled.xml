@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Camera_pos3__scaled" priority="10" statistics="true" >
+<virtual-sensor name="ETZ_Camera_pos3__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
