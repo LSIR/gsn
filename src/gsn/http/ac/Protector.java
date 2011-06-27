@@ -30,7 +30,8 @@ public class Protector
 
     private static final byte[] keyValue =new byte[] { 'T', 'h', 'i', 's', 'I', 's', 'A', 'S', 'e', 'c', 'r', 'e', 't', 'K', 'e', 'y'};
 
-    public static String encrypt(String value) throws Exception
+    @SuppressWarnings("restriction")
+	public static String encrypt(String value) throws Exception
     {
         Key key = generateKey();
         String salt=getSalt();
@@ -48,7 +49,8 @@ public class Protector
         return eValue;
     }
 
-    public static String decrypt(String value) throws Exception
+    @SuppressWarnings("restriction")
+	public static String decrypt(String value) throws Exception
     {
         Key key = generateKey();
         String salt=getSalt();

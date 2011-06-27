@@ -191,7 +191,8 @@ public class RestStreamHanlder extends HttpServlet {
      * @param request
      * @return [username,password] or null if unable to retrieve these pieces of information.
      */
-    private String[] parseAuthorizationHeader(HttpServletRequest request) {
+    @SuppressWarnings("restriction")
+	private String[] parseAuthorizationHeader(HttpServletRequest request) {
         // Get username/password from the Authorization header
         String authHeader = request.getHeader("Authorization"); // form: BASIC d2VibWFzdGVyOnRyeTJndWVTUw
         if (authHeader != null) {

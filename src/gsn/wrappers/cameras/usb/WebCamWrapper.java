@@ -57,6 +57,7 @@ import org.apache.log4j.PropertyConfigurator;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
+@SuppressWarnings("restriction")
 public class WebCamWrapper extends AbstractWrapper implements ControllerListener {
    
    public static final String            PICTURE_KEY                  = "PICTURE";

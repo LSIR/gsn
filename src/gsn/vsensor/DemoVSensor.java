@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
+@SuppressWarnings("restriction")
 public class DemoVSensor extends AbstractVirtualSensor {
 
 	private static final transient Logger logger                  = Logger.getLogger( DemoVSensor.class );
