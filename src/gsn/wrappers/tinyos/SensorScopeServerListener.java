@@ -106,7 +106,9 @@ public class SensorScopeServerListener {
         boolean escape = false;
         boolean lengthOk = false;
         int idx = 0;
-        byte _byte = 0;
+        byte _byte[] = new byte[1];
+        _byte[0] = 0;
+
 
         while (true) {
 
@@ -116,7 +118,7 @@ public class SensorScopeServerListener {
             logger.info("byte => " + _byte);
 
             // Synchronization byte?
-            if (_byte == BYTE_SYNC) {
+            if (_byte[0] == BYTE_SYNC) {
                 length = 1;
                 mRxBuf[packet + 0] = BYTE_SYNC;    // packet[0] = BYTE_SYNC
                 return true;
@@ -124,19 +126,19 @@ public class SensorScopeServerListener {
 
             // Beware of escaped bytes
             if (escape) {
-                _byte ^= 0x20;
+                _byte[0] ^= 0x20;
                 escape = false;
-            } else if (_byte == BYTE_ESC) {
+            } else if (_byte[0] == BYTE_ESC) {
                 escape = true;
                 continue;
             }
 
             // First 'real' byte is the packet length
             if (lengthOk == false) {
-                length = _byte;
+                length = _byte[0];
                 lengthOk = true;
             } else {
-                mRxBuf[packet + idx++] = _byte; // packet[idx++] = byte;
+                mRxBuf[packet + idx++] = _byte[0]; // packet[idx++] = byte;
 
                 // The GPRS sends '+++' upon disconnection
                 if (mRxBuf[length] == '+' && mRxBuf[packet + 0] == '+' && mRxBuf[1] == '+') {
@@ -153,14 +155,14 @@ public class SensorScopeServerListener {
         }
     }
 
-    private boolean ReceiveByte(byte b) {
+    private boolean ReceiveByte(byte b[]) {
         byte[] _oneByte = new byte[1];
         int n_bytes = receive(_oneByte, 1);
         logger.info("Read (" + n_bytes + ") => " + _oneByte[0]);
         if (n_bytes < 1)
             return false;
         else {
-            b = _oneByte[0];
+            b = _oneByte;
             return true;
         }
     }
