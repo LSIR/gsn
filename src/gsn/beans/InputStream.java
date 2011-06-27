@@ -280,7 +280,7 @@ public class InputStream implements Serializable{
 				logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
 				logger.warn( e.getMessage( ) , e );
 			} catch ( final VirtualSensorInitializationFailedException e ) {
-				logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
+				logger.error( "The stream element can't deliver its data to the virtual sensor " //+ sensor.getVirtualSensorConfiguration( ).getName( ) //FIXME useless code as the sensor can only be null here
 						+ " because initialization of that virtual sensor failed" );
 				logger.error(e.getMessage(),e);
 			} finally {
