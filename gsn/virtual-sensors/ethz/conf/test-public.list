@@ -103,6 +103,8 @@ OSTest_SyslogNg__mapped.xml
 OSTest_SyslogNg__conv.xml
 OSTest_Binary__mapped.xml
 OSTest_Nabel_Duebendorf__mapped.xml
+OSTest_MotionDetection__muxed__mapped.xml
+OSTest_MotionDetection__mapped.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
