@@ -64,7 +64,9 @@ public class SensorScopeServerListener {
     int receive(byte[] buffer, int n) {
         logger.warn("Trying to read " + n + " bytes...");
         try {
-            return client.getInputStream().read(buffer, 0, n);
+            int nb_read = client.getInputStream().read(buffer, 0, n);
+            logger.info("Read (" + nb_read + ")");
+            return nb_read;
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
             return -1;
