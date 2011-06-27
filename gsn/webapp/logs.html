@@ -377,7 +377,7 @@ function getLogs() {
 						}
 						else {
 							$.each(logContainers, function() {
-								if (this.identifier == l) {
+								if (this.deplId == sdid && this.identifier == l) {
 									id = this.containerId;
 									return false;
 								}
