@@ -408,7 +408,7 @@ function getLogs() {
 							});
 						}
 						container = $('.jspPane',"#logcontainer_" + id);
-						lastTime = $("field:eq(0)", this).text();
+						deployments[id].lastLogTime = lastTime = $("field:eq(0)", this).text();
 						container.append(generateSyslogNgMessageDiv(lastTime, $("field:eq(2)", this).text()));
 					}
 					
@@ -424,8 +424,6 @@ function getLogs() {
 				scrollPane.reinitialise();
 				if (isEvents)
 					deployments[sdid].lastEventTime = lastTime;
-				else
-					deployments[sdid].lastLogTime = lastTime;
 			}
 			setTimeout("getLogs()",UPDATE_INTERVAL*1000);
 		}
