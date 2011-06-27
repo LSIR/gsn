@@ -222,9 +222,9 @@ function getAvailableCoreStations(depl) {
 			success: function(data){
 				$("sensornode[iscorestation=true]",data).each(function(){
 					if (isPublicGSN)
-						deviceIds.push(parseInt($(this).attr("position")));
+						deviceIds.push($(this).attr("position"));
 					else
-						deviceIds.push(parseInt($(this).attr("node_id")));
+						deviceIds.push($(this).attr("node_id"));
 				});
 			}
 		});
@@ -241,12 +241,12 @@ function getAvailableCoreStations(depl) {
 				$("line", data).each(function(){
 					var l = $("field", this).text();
 					if (l != getFieldIdentifier() && l.toLowerCase() != "null")
-						deviceIds.push(parseInt(l))
+						deviceIds.push(l)
 				});
 			}
 		});
 	}
-	return deviceIds.sort();
+	return deviceIds.sort(function(a,b){return a - b});
 }
 
 function identifierExists(depl, id) {
