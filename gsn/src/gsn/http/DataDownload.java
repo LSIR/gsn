@@ -1,6 +1,7 @@
 package gsn.http;
 
 import gsn.Main;
+import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
@@ -338,8 +339,12 @@ public class DataDownload extends HttpServlet {
                             } else {
                                 if (se.getData()[i] == null)
                                     respond.println("\t\t<field>Null</field>");
-                                else
-                                    respond.println("\t\t<field>" + encodeXML(se.getData()[i].toString()) + "</field>");
+                                else {
+                                	if (!fieldsLinked && se.getFieldTypes()[i] == DataTypes.BINARY)
+                                		respond.println("\t\t<field>" + encodeXML(new String((byte[])se.getData()[i])) + "</field>");
+                                	else
+                                		respond.println("\t\t<field>" + encodeXML(se.getData()[i].toString()) + "</field>");
+                                }
                             }
                         }
                         if (wantTimeStamp) {
