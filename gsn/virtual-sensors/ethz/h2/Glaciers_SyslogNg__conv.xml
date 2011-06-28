@@ -6,14 +6,18 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                    def spl = LOG_MESSAGE.split("\\s+", 6);
-                    PRIORITY = spl[0].substring(1, spl[0].length()-1).toShort();
-                    HOST = spl[4];
-                    spl = spl[5].split(":", 2);
-                    if ( spl.size() == 2) {
-                    	PROGRAM = spl[0];
-                    	MESSAGE = spl[1];
-                    } else { MESSAGE = spl[0]; }
+                	try {
+                    	def spl = new String(LOG_MESSAGE).split("\\s+", 6);
+                    	PRIORITY = spl[0].substring(1, spl[0].length()-1).toShort();
+                    	HOST = spl[4];
+                    	spl = spl[5].split(":", 2);
+                    	if ( spl.size() == 2) {
+                    		PROGRAM = spl[0];
+                    		MESSAGE = spl[1];
+                    	} else { MESSAGE = spl[0]; }
+					} catch(Throwable e){
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
                 ]]>
             </param>
         </init-params>

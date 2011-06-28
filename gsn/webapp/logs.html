@@ -286,7 +286,7 @@ function getLastLogs(logContainer) {
 	else {
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + deployment.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=timestamp&fields=log_message$fieldslinked=false&orderby=timestamp&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&nb=" + MAX_LOGS_PER_REQUEST,
+			url: "/data?vsName=" + deployment.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=timestamp&fields=log_message&fieldslinked=false&orderby=timestamp&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&nb=" + MAX_LOGS_PER_REQUEST,
 	        async: false,
 	        cache: false,
 	        timeout: 30000,
@@ -338,7 +338,7 @@ function getMaxLogsRecursive(logContainer, lastTimestamp) {
 			tmp = "&critJoin=and&critfield=timestamp&neg=&critop=<&critval=" + lastTimestamp;
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + deplName.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=timestamp&fields=log_message$fieldslinked=false&orderby=timestamp&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&nb=" + MAX_LOGS_PER_REQUEST + tmp,
+			url: "/data?vsName=" + deplName.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=timestamp&fields=log_message&fieldslinked=false&orderby=timestamp&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&nb=" + MAX_LOGS_PER_REQUEST + tmp,
 			async: false,
 			cache: false,
 			timeout: 30000,
@@ -365,7 +365,7 @@ function getLogs() {
 	var firstFieldIdentifier = "timestamp";
 	if (deployments[sdid].lastLogTime != "")
 		crit = "&critfield=" + firstFieldIdentifier + "&neg=&critop=>&critval=" + deployments[sdid].lastLogTime + "&nb=" + MAX_LOGS_TOTAL;	
-	var query = deployments[sdid].name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=" + firstFieldIdentifier + "&fields=" + getFieldIdentifier() + "&fields=log_message$fieldslinked=false&orderby=" + firstFieldIdentifier + crit;
+	var query = deployments[sdid].name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=" + firstFieldIdentifier + "&fields=" + getFieldIdentifier() + "&fields=log_message&fieldslinked=false&orderby=" + firstFieldIdentifier + crit;
 	
 	if (isEvents) {
 		firstFieldIdentifier = "event_timestamp";
