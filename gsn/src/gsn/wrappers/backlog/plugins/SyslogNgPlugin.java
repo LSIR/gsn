@@ -23,7 +23,7 @@ public class SyslogNgPlugin extends AbstractPlugin {
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
-			new DataField("LOG_MESSAGE", "VARCHAR(4096)")};
+			new DataField("LOG_MESSAGE", "BINARY")};
 
 	private final transient Logger logger = Logger.getLogger( SyslogNgPlugin.class );
 
@@ -46,7 +46,7 @@ public class SyslogNgPlugin extends AbstractPlugin {
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		try {
-			if( dataProcessed(System.currentTimeMillis(), concat(new Serializable[]{timestamp, toLong(data[0])*1000, deviceId}, checkAndCastData(data, 1, dataField, 3))) ) {
+			if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, toLong(data[0])*1000, deviceId, ((String)data[1]).getBytes()}) ) {
 				ackMessage(timestamp, super.priority);
 				return true;
 			} else {
