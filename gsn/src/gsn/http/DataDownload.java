@@ -45,6 +45,7 @@ public class DataDownload extends HttpServlet {
      * param-name: orderby can be used to order the output by a specified field. (default = timed)
      * param-name: groupby can point to one of the fields in the stream element. In case groupby=timed then the parameter groupbytimed points to the period for which data should be aggregated [in milliseconds].
      * param-name: nb give the maximum number of elements to be outputed (most recent values first).
+     * param-name: fieldslinked true if binary fields should be linked or false otherwise (default = true).
      * param-name:
      */
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, java.io.IOException {
@@ -69,6 +70,7 @@ public class DataDownload extends HttpServlet {
             boolean wantPk = false;
             boolean commonReq = true;
             boolean groupByTimed = false;
+            boolean fieldsLinked = true;
 
             String vsName = HttpRequestUtils.getStringParameter("vsName", null, req);
             if (vsName == null)
@@ -91,6 +93,9 @@ public class DataDownload extends HttpServlet {
                 //res.setContentType("text/html");
             } else {
                 res.setContentType("text/xml");
+            }
+            if (req.getParameter("fieldslinked") != null && req.getParameter("fieldslinked").equals("false")) {
+            	fieldsLinked = false;
             }
             if (req.getParameter("commonReq") != null && req.getParameter("commonReq").equals("false")) {
                 commonReq = false;
@@ -243,7 +248,7 @@ public class DataDownload extends HttpServlet {
 
                 logger.debug("generated_request_query: " + generated_request_query);
                 try {
-                    result = Main.getStorage(vsName).streamedExecuteQuery(generated_request_query, true);
+                    result = Main.getStorage(vsName).streamedExecuteQuery(generated_request_query, fieldsLinked);
                 } catch (SQLException e) {
                     logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
                     logger.error(e.getMessage(), e);
