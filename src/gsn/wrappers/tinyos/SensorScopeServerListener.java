@@ -426,9 +426,9 @@ public class SensorScopeServerListener {
         } catch (ArrayIndexOutOfBoundsException e) {
 
             logger.error(e.getMessage(), e);
-            logger.error("rxIdx " + rxIdx);
-            logger.error("nbPkts" + nbPkts);
-            logger.error("pktLen" + pktLen);
+            logger.error("rxIdx = " + rxIdx);
+            logger.error("nbPkts = " + nbPkts);
+            logger.error("pktLen = " + pktLen);
         }
     }
 
