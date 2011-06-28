@@ -11,52 +11,52 @@
           if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
 	    	
 					try {
-						if (UTC_RAW_DATA.size() != 0) {
+						if (UTC_RAW_DATA != null && UTC_RAW_DATA.size() != 0) {
 							UTC_POS_TIME = UTC_RAW_DATA.toDouble() as int;
 						}
 						else {
 							UTC_POS_TIME = null;
 						}
-						if (LAT_RAW_DATA.size() != 0) {
+						if (LAT_RAW_DATA != null && LAT_RAW_DATA.size() != 0) {
 							LATITUDE = LAT_RAW_DATA.toDouble();
 						}
 						else {
 							LATITUDE = null;
 						}
 						LAT_HEMISPHERE = LAT_N_RAW_DATA;
-						if (LONG_RAW_DATA.size() != 0) {
+						if (LONG_RAW_DATA != null && LONG_RAW_DATA.size() != 0) {
 							LONGITUDE = LONG_RAW_DATA.toDouble();
 						}
 						else {
 							LONGITUDE = null;
 						}
 						LONG_HEMISPHERE = LONG_N_RAW_DATA;
-						if (QUAL_RAW_DATA.size() != 0) {
+						if (QUAL_RAW_DATA != null && QUAL_RAW_DATA.size() != 0) {
 							QUALITY = QUAL_RAW_DATA.toInteger();
 						}
 						else {
 							QUALITY = null;
 						}
-						if (SAT_RAW_DATA.size() != 0) {
+						if (SAT_RAW_DATA != null && SAT_RAW_DATA.size() != 0) {
 							NR_SATELLITES = SAT_RAW_DATA.toInteger();
 						}
 						else {
 							NR_SATELLITES = null;
 						}
-						if (HDOP_RAW_DATA.size() != 0) {
+						if (HDOP_RAW_DATA != null && HDOP_RAW_DATA.size() != 0) {
 							HDOP = HDOP_RAW_DATA.toDouble();
 						}
 						else {
 							HDOP = null;
 						}
-						if (GEO_HEIGHT_RAW_DATA.size() != 0) {
+						if (GEO_HEIGHT_RAW_DATA != null && GEO_HEIGHT_RAW_DATA.size() != 0) {
 							GEOID_HEIGHT = GEO_HEIGHT_RAW_DATA.toDouble();
 						}
 						else {
 							GEOID_HEIGHT = null;
 						}
 						GEOID_HEIGHT_UNIT = GEO_HEIGHT_U_RAW_DATA;
-						if (GEO_SEP_RAW_DATA.size() != 0) {
+						if (GEO_SEP_RAW_DATA != null && GEO_SEP_RAW_DATA.size() != 0) {
 							GEOID_SEP = GEO_SEP_RAW_DATA.toDouble();
 						}
 						else {
