@@ -332,93 +332,103 @@ public class SensorScopeServerListener {
         int nbPkts = 0;
         int pktLen = 0;
 
-        while (true) {
+        try {
 
-            int pkt = mRxBuf[rxIdx + 1];
-            logger.info("Trying to receive packets with pkt=" + pkt + " rxIdx=" + rxIdx);
-            if (!ReceivePacket(pkt, rxIdx)) {
-                CleanUp("receiving packets");
-                return;
-            }
 
-            // This is a (dirty?) hack to mimic MMC card buffers, where the length includes the length byte itself
-            mRxBuf[rxIdx]++;
+            while (true) {
 
-            pktLen = mRxBuf[rxIdx] - 1;
-            rxIdx += pktLen + 1;
-
-            // '+++' means that the GPRS has disconnected
-            if (pktLen == 3 && mRxBuf[pkt + 0] == '+' && mRxBuf[pkt + 1] == '+' && mRxBuf[pkt + 2] == '+') {
-                if (mStationID == CLIMAPS_ID)
-                    logger.info("Climaps has disconnected");
-                else
-                    logger.info("Station " + mStationID + " has disconnected");
-                return;
-            }
-
-            // A synchronization byte resets the reception
-            if (pktLen == 1 && mRxBuf[pkt + 0] == BYTE_SYNC) {
-                rxIdx = 0;
-                nbPkts = 0;
-                continue;
-            }
-
-            // A data packet?
-            if (mRxBuf[pkt + 0] == PKT_TYPE_DATA) {
-                ++nbPkts;
-                continue;
-            }
-
-            // At this point, it must be a CRC (3 bytes long)
-            if (pktLen != 3 || mRxBuf[pkt + 0] != PKT_TYPE_CRC) {
-                mTxBuf[1] = BYTE_NACK;
-                logger.warn("Corrupted CRC packet received");
-            } else {
-                // So far so good, let's check the crc
-                int nextPktIdx = 0;
-                int crc = 0;
-                for (int i = 0; i < rxIdx - 3; ++i) {
-                    if (i == nextPktIdx) nextPktIdx += mRxBuf[i];
-                    else crc = Crc16Byte(crc, mRxBuf[i]);
+                int pkt = mRxBuf[rxIdx + 1];
+                logger.info("Trying to receive packets with pkt=" + pkt + " rxIdx=" + rxIdx);
+                if (!ReceivePacket(pkt, rxIdx)) {
+                    CleanUp("receiving packets");
+                    return;
                 }
 
-                if ((mRxBuf[pkt + 1] << 8 + mRxBuf[pkt + 2]) == crc) {
-                    if (nbPkts == 1) {
-                        if (mStationID == CLIMAPS_ID)
-                            logger.warn("Successfully received a data packet from Climaps");
-                        else
-                            logger.warn("Successfully received a data packet from station " + mStationID);
-                    } else {
-                        if (mStationID == CLIMAPS_ID)
-                            logger.warn("Successfully received " + nbPkts + " data packet from Climaps");
-                        else
-                            logger.warn("Successfully received " + nbPkts + "data packet from station " + mStationID);
+                // This is a (dirty?) hack to mimic MMC card buffers, where the length includes the length byte itself
+                mRxBuf[rxIdx]++;
+
+                pktLen = mRxBuf[rxIdx] - 1;
+                rxIdx += pktLen + 1;
+
+                // '+++' means that the GPRS has disconnected
+                if (pktLen == 3 && mRxBuf[pkt + 0] == '+' && mRxBuf[pkt + 1] == '+' && mRxBuf[pkt + 2] == '+') {
+                    if (mStationID == CLIMAPS_ID)
+                        logger.info("Climaps has disconnected");
+                    else
+                        logger.info("Station " + mStationID + " has disconnected");
+                    return;
+                }
+
+                // A synchronization byte resets the reception
+                if (pktLen == 1 && mRxBuf[pkt + 0] == BYTE_SYNC) {
+                    rxIdx = 0;
+                    nbPkts = 0;
+                    continue;
+                }
+
+                // A data packet?
+                if (mRxBuf[pkt + 0] == PKT_TYPE_DATA) {
+                    ++nbPkts;
+                    continue;
+                }
+
+                // At this point, it must be a CRC (3 bytes long)
+                if (pktLen != 3 || mRxBuf[pkt + 0] != PKT_TYPE_CRC) {
+                    mTxBuf[1] = BYTE_NACK;
+                    logger.warn("Corrupted CRC packet received");
+                } else {
+                    // So far so good, let's check the crc
+                    int nextPktIdx = 0;
+                    int crc = 0;
+                    for (int i = 0; i < rxIdx - 3; ++i) {
+                        if (i == nextPktIdx) nextPktIdx += mRxBuf[i];
+                        else crc = Crc16Byte(crc, mRxBuf[i]);
                     }
 
+                    if ((mRxBuf[pkt + 1] << 8 + mRxBuf[pkt + 2]) == crc) {
+                        if (nbPkts == 1) {
+                            if (mStationID == CLIMAPS_ID)
+                                logger.warn("Successfully received a data packet from Climaps");
+                            else
+                                logger.warn("Successfully received a data packet from station " + mStationID);
+                        } else {
+                            if (mStationID == CLIMAPS_ID)
+                                logger.warn("Successfully received " + nbPkts + " data packet from Climaps");
+                            else
+                                logger.warn("Successfully received " + nbPkts + "data packet from station " + mStationID);
+                        }
 
-                    LogData(ExtractData(mRxBuf, rxIdx - 4, BUFTYPE_GPRS));
-                    mTxBuf[1] = BYTE_ACK;
-                } else {
-                    mTxBuf[1] = BYTE_NACK;
-                    logger.error("Invalid CRC received");
+
+                        LogData(ExtractData(mRxBuf, rxIdx - 4, BUFTYPE_GPRS));
+                        mTxBuf[1] = BYTE_ACK;
+                    } else {
+                        mTxBuf[1] = BYTE_NACK;
+                        logger.error("Invalid CRC received");
+                    }
+
                 }
 
+                // Once here, in any case, we must send back an ACK or a NACK
+                mTxBuf[0] = 1;
+
+                if (!send(mTxBuf, 2)) {
+                    if (mTxBuf[1] == BYTE_ACK)
+                        CleanUp("sending back an ACK");
+                    else
+                        CleanUp("sending back a NACK");
+                    return;
+                }
+
+                // Done with the current batch of packets
+                rxIdx = 0;
+                nbPkts = 0;
             }
+        } catch (ArrayIndexOutOfBoundsException e) {
 
-            // Once here, in any case, we must send back an ACK or a NACK
-            mTxBuf[0] = 1;
-
-            if (!send(mTxBuf, 2)) {
-                if (mTxBuf[1] == BYTE_ACK)
-                    CleanUp("sending back an ACK");
-                else
-                    CleanUp("sending back a NACK");
-                return;
-            }
-
-            // Done with the current batch of packets
-            rxIdx = 0;
-            nbPkts = 0;
+            logger.error(e.getMessage(), e);
+            logger.error("rxIdx " + rxIdx);
+            logger.error("nbPkts" + nbPkts);
+            logger.error("pktLen" + pktLen);
         }
     }
 
