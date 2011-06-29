@@ -20,12 +20,13 @@ public class SensorScopeServerListener {
     private static final int RX_BUFFER_SIZE = 100000;
     public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
     private static final String DEFAULT_PACKETS_LOGFILE = "logs/packets.txt";
+    private static final int PLUS_SIGN = 43;
 
     int[] mRxBuf;
     byte[] mTxBuf;
     private static int port;
 
-    private SensorScopeBuffer receptionBuffer = new SensorScopeBuffer();
+    private SensorScopeBuffer rxBuffer = new SensorScopeBuffer();
 
     private int mStationID;
     private static final int CLIMAPS_ID = 0;
@@ -131,7 +132,7 @@ public class SensorScopeServerListener {
         UnsignedByte b = new UnsignedByte();
 
         // Reset buffer
-        receptionBuffer.reset();
+        rxBuffer.reset();
 
         while (true) {
 
@@ -139,7 +140,7 @@ public class SensorScopeServerListener {
                 return false;
 
 
-            receptionBuffer.add(b.getByte());
+            rxBuffer.add(b.getByte());
             dumpByte(b.getInt());
 
             //logger.debug("byte => " + b.toString());
@@ -171,9 +172,9 @@ public class SensorScopeServerListener {
                 mRxBuf[packet + idx++] = b.getInt(); // packet[idx++] = byte;
 
                 // The GPRS sends '+++' upon disconnection
-                if (mRxBuf[length] == 43 && mRxBuf[packet + 0] == 43 && mRxBuf[1] == 43) {
+                if (mRxBuf[length] == PLUS_SIGN && mRxBuf[packet + 0] == PLUS_SIGN && mRxBuf[1] == PLUS_SIGN) {
                     mRxBuf[length] = 3;
-                    mRxBuf[packet + 2] = 43;
+                    mRxBuf[packet + 2] = PLUS_SIGN;
 
                     return true;
                 }
@@ -186,7 +187,6 @@ public class SensorScopeServerListener {
             }
         }
     }
-
 
 
     private boolean ReceiveUnsignedByte(UnsignedByte b) {
@@ -363,7 +363,7 @@ public class SensorScopeServerListener {
                     return;
                 }
 
-                String strPacket = receptionBuffer.toString() +"\n";
+                String strPacket = rxBuffer.toString() + "\n";
                 dumpText(strPacket, "logs/buffers.txt");
 
                 pkt = aPacket.packet;
@@ -379,7 +379,11 @@ public class SensorScopeServerListener {
                 rxIdx += pktLen + 1;
 
                 // '+++' means that the GPRS has disconnected
-                if (pktLen == 3 && mRxBuf[pkt + 0] == '+' && mRxBuf[pkt + 1] == '+' && mRxBuf[pkt + 2] == '+') {
+                if (rxBuffer.getPacketSize() == 3
+                        && rxBuffer.get(1) == PLUS_SIGN
+                        && rxBuffer.get(2) == PLUS_SIGN
+                        && rxBuffer.get(3) == PLUS_SIGN) {
+
                     if (mStationID == CLIMAPS_ID)
                         logger.info("Climaps has disconnected");
                     else
@@ -388,15 +392,18 @@ public class SensorScopeServerListener {
                 }
 
                 // A synchronization byte resets the reception
-                if (pktLen == 1 && mRxBuf[pkt + 0] == BYTE_SYNC) {
+                if (rxBuffer.getSize() == 1 && rxBuffer.get(0) == BYTE_SYNC) {
+                    logger.info("***  BYTE_SNYC ***  should recet reception");
                     rxIdx = 0;
                     nbPkts = 0;
+                    //TODO: empty list of buffers, reset reception
                     continue;
                 }
 
                 // A data packet?
-                if (mRxBuf[pkt + 0] == PKT_TYPE_DATA) {
+                if (rxBuffer.get(0) == PKT_TYPE_DATA) {
                     ++nbPkts;
+                    logger.info("*** Data packet ***  now "+nbPkts + " packets");
                     continue;
                 }
 
@@ -584,24 +591,43 @@ public class SensorScopeServerListener {
         private int MAXIMUM_BUFFER_SIZE = 2048;
         private int[] buffer;
         private int size = 0;
+
         SensorScopeBuffer() {
             this.buffer = new int[MAXIMUM_BUFFER_SIZE];
         }
+
         public void reset() {
             this.size = 0;
         }
+
         public int[] getBuffer() {
             return this.buffer;
         }
+
+        public int get(int i) {
+            return this.buffer[i];
+        }
+
         public int add(int value) {
             this.buffer[this.size] = value;
             return ++size;
         }
+
         public String toString() {
             return Formatter.listArray(this.buffer, this.size);
         }
-    }
 
+        public int getPacketSize() {
+            if (size > 0)
+                return this.buffer[0];
+            else
+                return 0;
+        }
+
+        public int getSize() {
+            return size;
+        }
+    }
 
 }
 
