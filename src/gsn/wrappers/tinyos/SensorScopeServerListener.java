@@ -186,6 +186,21 @@ public class SensorScopeServerListener {
         listArray(a, len);
     }
 
+    void listArray(byte[] a, int from, int to) {
+        StringBuilder hex_sb_2 = new StringBuilder();
+        StringBuilder dec_sb_2 = new StringBuilder();
+        for (int i = from; (i <= to && i < a.length); i++) {
+            hex_sb_2.append(String.format("%02x", a[i] & 0xff)).append(" ");
+            dec_sb_2.append(a[i] & 0xff).append(" ");
+        }
+
+        hex_sb_2.append("(").append(String.format("%2d", to-from+1)).append(")");
+        dec_sb_2.append("(").append(String.format("%2d", to-from+1)).append(")");
+
+        logger.info(hex_sb_2.toString());
+        logger.info(dec_sb_2.toString());
+    }
+
     void listArray(byte[] a, int len) {
 
         //StringBuilder hex_sb = new StringBuilder();
@@ -361,12 +376,15 @@ public class SensorScopeServerListener {
                 rxIdx = aPacket.length;
 
                 logger.info("Now,  pkt=" + pkt + " rxIdx=" + rxIdx);
+                listArray(mRxBuf, pkt, rxIdx);
 
                 // This is a (dirty?) hack to mimic MMC card buffers, where the length includes the length byte itself
                 mRxBuf[rxIdx]++;
 
                 pktLen = mRxBuf[rxIdx] - 1;
                 rxIdx += pktLen + 1;
+
+                listArray(mRxBuf, pkt, rxIdx);
 
                 logger.info("Next, pkt=" + pkt + " rxIdx=" + rxIdx);
 
