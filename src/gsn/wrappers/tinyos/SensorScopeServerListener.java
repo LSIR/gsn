@@ -33,6 +33,7 @@ public class SensorScopeServerListener {
     private static int port;
 
     private List<UnsignedByte> RxBuffer = new ArrayList<UnsignedByte>();
+    private int[] RxBuffer2 = new int[MAX_BUFFER_SIZE];
 
     private int mStationID;
     private static final int CLIMAPS_ID = 0;
@@ -147,6 +148,7 @@ public class SensorScopeServerListener {
                 return false;
 
             RxBuffer.add(b);
+            RxBuffer2[idx] = b.getInt();
 
             dumpText(RxBuffer.get(RxBuffer.size()-1).getInt()+" ", "logs/packets2.txt");
             dumpByte(b.getInt());
@@ -373,6 +375,7 @@ public class SensorScopeServerListener {
                 }
 
                 dumpText(Formatter.listUnsignedByteList(RxBuffer), "logs/buffers.txt");
+                dumpText(Formatter.listArray(RxBuffer2,rxIdx), "logs/buffers.txt");
                 dumpText("\n", "logs/buffers.txt");
 
 
