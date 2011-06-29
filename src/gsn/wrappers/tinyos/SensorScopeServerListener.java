@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
+import java.util.Vector;
 
 public class SensorScopeServerListener {
 
@@ -27,6 +28,8 @@ public class SensorScopeServerListener {
     private static int port;
 
     private SensorScopeBuffer rxBuffer = new SensorScopeBuffer();
+
+    private Vector<SensorScopeBuffer> allBuffers = new Vector<SensorScopeBuffer>();
 
     private int mStationID;
     private static final int CLIMAPS_ID = 0;
@@ -344,6 +347,9 @@ public class SensorScopeServerListener {
 
         logger.info("-- Processing packets --");
 
+        // clearing buffers container
+        allBuffers.clear();
+
         int rxIdx = 0;
         int nbPkts = 0;
         int pktLen = 0;
@@ -398,13 +404,16 @@ public class SensorScopeServerListener {
                     rxIdx = 0;
                     nbPkts = 0;
                     //TODO: empty list of buffers, reset reception
+                    allBuffers.clear();
                     continue;
                 }
 
                 // A data packet?
                 if (rxBuffer.get(1) == PKT_TYPE_DATA) {
                     ++nbPkts;
-                    logger.info("*** Data packet ***  now " + nbPkts + " packets");
+                    allBuffers.add(rxBuffer);
+                    logger.info("*** Data packet ***  now " + nbPkts + " packets (" + allBuffers.size() + ")");
+
                     continue;
                 }
 
@@ -469,6 +478,10 @@ public class SensorScopeServerListener {
 
     private void ExtractData() {
         logger.info("\n\n ***** LOG DATA ***** \n\n");
+        logger.info(allBuffers.size() + " buffers to log");
+        for (int i = 0; i < allBuffers.size(); i++) {
+            logger.info(allBuffers.get(i));
+        }
     }
 
     private boolean CheckAuthentication(String passkey, int i, int i1, byte b, byte b1) {
