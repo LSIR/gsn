@@ -401,7 +401,7 @@ public class SensorScopeServerListener {
                 }
 
                 // A data packet?
-                if (rxBuffer.get(0) == PKT_TYPE_DATA) {
+                if (rxBuffer.get(1) == PKT_TYPE_DATA) {
                     ++nbPkts;
                     logger.info("*** Data packet ***  now "+nbPkts + " packets");
                     continue;
