@@ -411,7 +411,7 @@ public class SensorScopeServerListener {
                 // A data packet?
                 if (rxBuffer.get(1) == PKT_TYPE_DATA) {
                     ++nbPkts;
-                    allBuffers.add(rxBuffer);
+                    allBuffers.add(new SensorScopeBuffer(rxBuffer));
                     logger.info("*** Data packet ***  now " + nbPkts + " packets (" + allBuffers.size() + ")");
 
                     continue;
@@ -602,6 +602,13 @@ public class SensorScopeServerListener {
 
         SensorScopeBuffer() {
             this.buffer = new int[MAXIMUM_BUFFER_SIZE];
+        }
+
+        SensorScopeBuffer(SensorScopeBuffer aSensorScopeBuffer) {
+            this.buffer = new int[MAXIMUM_BUFFER_SIZE];
+            this.size = aSensorScopeBuffer.size;
+            for (int i=0;i<this.size;i++)
+                this.buffer[i] = aSensorScopeBuffer.buffer[i];
         }
 
         public void reset() {
