@@ -33,6 +33,8 @@ public class SensorScopeServerListener {
     private int[] RxBuffer2 = new int[MAX_BUFFER_SIZE];
     private int RxBuffer2Size = 0;
 
+    private SensorScopeBuffer receptionBuffer = new SensorScopeBuffer();
+
     private int mStationID;
     private static final int CLIMAPS_ID = 0;
     private static final byte BYTE_SYNC = 0x7E;
@@ -146,6 +148,9 @@ public class SensorScopeServerListener {
 
         resetRxBuffer2();
 
+        /////////////////////
+        receptionBuffer.reset();
+
         while (true) {
 
             if (!ReceiveUnsignedByte(b))
@@ -154,6 +159,8 @@ public class SensorScopeServerListener {
             RxBuffer.add(b);
 
             insertInBuffer(b.getInt());
+
+            receptionBuffer.add(b.getByte());
 
             dumpText(RxBuffer.get(RxBuffer.size() - 1).getInt() + " ", "logs/packets2.txt");
             dumpByte(b.getInt());
@@ -384,7 +391,7 @@ public class SensorScopeServerListener {
                     return;
                 }
 
-                String strPacket = Formatter.listArray(RxBuffer2, RxBuffer2Size-1)+"\n";
+                String strPacket = receptionBuffer.toString() +"\n";
                 dumpText(strPacket, "logs/buffers.txt");
 
                 pkt = aPacket.packet;
@@ -600,6 +607,28 @@ public class SensorScopeServerListener {
         public PacketInfo(int _packet, int _length) {
             this.packet = _packet;
             this.length = _length;
+        }
+    }
+
+    public class SensorScopeBuffer {
+        private int MAXIMUM_BUFFER_SIZE = 2048;
+        private int[] buffer;
+        private int size = 0;
+        SensorScopeBuffer() {
+            this.buffer = new int[MAXIMUM_BUFFER_SIZE];
+        }
+        public void reset() {
+            this.size = 0;
+        }
+        public int[] getBuffer() {
+            return this.buffer;
+        }
+        public int add(int value) {
+            this.buffer[this.size] = value;
+            return ++size;
+        }
+        public String toString() {
+            return Formatter.listArray(this.buffer, this.size);
         }
     }
 
