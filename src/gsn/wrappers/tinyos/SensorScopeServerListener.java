@@ -13,7 +13,6 @@ import java.util.Random;
 public class SensorScopeServerListener {
 
     private static transient Logger logger = Logger.getLogger(SensorScopeServerListener.class);
-    private static transient Logger packetslogger = Logger.getLogger("packets");
 
     private static final String PASSKEY = "FD83EC5EA68E2A5B";
 
@@ -121,9 +120,7 @@ public class SensorScopeServerListener {
         int packet = aPacket.packet;
         int length = aPacket.length;
 
-        logger.info("ReceivePacket(packet=" + packet + ",length=" + length + ")");
-        packetslogger.info("ReceivePacket(packet=" + packet + ",length=" + length + ")");
-
+        //logger.info("ReceivePacket(packet=" + packet + ",length=" + length + ")");
 
         boolean escape = false;
         boolean lengthOk = false;
@@ -146,8 +143,6 @@ public class SensorScopeServerListener {
             dumpByte(b.getInt());
 
             //logger.debug("byte => " + b.toString());
-
-            packetslogger.info(b.toString());
 
             // Synchronization byte?
             if (b.getByte() == BYTE_SYNC) {
@@ -467,8 +462,6 @@ public class SensorScopeServerListener {
 
     private void LogData(int[] bytes) {
         logger.warn("\n\n ***** LOG DATA ***** \n\n");
-        packetslogger.info("\n\n ***** LOG DATA ***** \n\n");
-
         logger.info(Formatter.listArray(bytes, bytes.length));
     }
 
