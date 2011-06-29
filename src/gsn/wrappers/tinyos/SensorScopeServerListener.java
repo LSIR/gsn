@@ -64,10 +64,10 @@ public class SensorScopeServerListener {
     }
 
     int receive(byte[] buffer, int n) {
-        logger.warn("Trying to read " + n + " bytes...");
+        //logger.debug("Trying to read " + n + " bytes...");
         try {
             int nb_read = client.getInputStream().read(buffer, 0, n);
-            logger.info("Read (" + nb_read + ")");
+            //logger.debug("Read (" + nb_read + ")");
             return nb_read;
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
@@ -145,7 +145,7 @@ public class SensorScopeServerListener {
             receptionBuffer.add(b.getByte());
             dumpByte(b.getInt());
 
-            logger.info("byte => " + b.toString());
+            //logger.debug("byte => " + b.toString());
 
             packetslogger.info(b.toString());
 
@@ -197,7 +197,7 @@ public class SensorScopeServerListener {
     private boolean ReceiveUnsignedByte(UnsignedByte b) {
         byte[] _oneByte = new byte[1];
         int n_bytes = receive(_oneByte, 1);
-        logger.info("Read (" + n_bytes + ") => " + b.toString());
+        //logger.debug("Read (" + n_bytes + ") => " + b.toString());
         if (n_bytes < 1)
             return false;
         else {
