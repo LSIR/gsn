@@ -408,7 +408,7 @@ public class SensorScopeServerListener {
                 }
 
                 // At this point, it must be a CRC (3 bytes long)
-                if (pktLen != 3 || mRxBuf[pkt + 0] != PKT_TYPE_CRC) {
+                if (rxBuffer.getPacketSize() != 3 || rxBuffer.get(1) != PKT_TYPE_CRC) {
                     mTxBuf[1] = BYTE_NACK;
                     logger.warn("Corrupted CRC packet received");
                 } else {
