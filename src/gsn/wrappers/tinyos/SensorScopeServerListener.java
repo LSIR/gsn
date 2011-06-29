@@ -3,6 +3,7 @@ package gsn.wrappers.tinyos;
 
 import com.izforge.izpack.util.CleanupClient;
 import gsn.Main;
+import gsn.utils.UnsignedByte;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -66,6 +67,21 @@ public class SensorScopeServerListener {
         logger.warn("Trying to read " + n + " bytes...");
         try {
             int nb_read = client.getInputStream().read(buffer, 0, n);
+            logger.info("Read (" + nb_read + ")");
+            return nb_read;
+        } catch (IOException e) {
+            logger.warn(e.getMessage(), e);
+            return -1;
+        }
+    }
+
+    int receive(UnsignedByte[] buffer, int n) {
+        logger.warn("Trying to read " + n + " bytes...");
+        byte[] byteBuffer= null;
+        try {
+            int nb_read = client.getInputStream().read(byteBuffer, 0, n);
+            for (int i=0; i<nb_read; i++)
+                buffer[i].setValue(byteBuffer[i]);
             logger.info("Read (" + nb_read + ")");
             return nb_read;
         } catch (IOException e) {
@@ -588,32 +604,8 @@ public class SensorScopeServerListener {
         }
     }
 
-    public class UnsignedByte {
-        private byte byteValue;
-        private int intValue;
-        public UnsignedByte() {
-            byteValue = 0;
-            intValue = 0;
-        }
-        public UnsignedByte(byte b) {
-            byteValue = b;
-            intValue = (int)b & 0xff;
-        }
-        public UnsignedByte(int i) {
-            i = i & 0xff;
-            byteValue = (byte)i;
-            intValue = i;
-        }
-        public int getInt() {
-            return intValue;
-        }
-        public int getByte() {
-            return byteValue;
-        }
-        public String toString() {
-            return "(b:"+getByte()+", i:"+getInt()+")";
-        }
-    }
+
+
 
 }
 
