@@ -11,6 +11,8 @@ import org.apache.log4j.PropertyConfigurator;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class SensorScopeServerListener {
@@ -24,10 +26,13 @@ public class SensorScopeServerListener {
     private static final int TX_BUFFER_SIZE = 10;
     private static final int RX_BUFFER_SIZE = 100000;
     public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
+    private static final String DEFAULT_PACKETS_LOGFILE = "logs/packets.txt";
 
     int[] mRxBuf;
     byte[] mTxBuf;
     private static int port;
+
+    private List<UnsignedByte> RxBuffer = new ArrayList<UnsignedByte>();
 
     private int mStationID;
     private static final int CLIMAPS_ID = 0;
@@ -133,11 +138,15 @@ public class SensorScopeServerListener {
 
         UnsignedByte b = new UnsignedByte();
 
+        // Reset buffer
+        RxBuffer.clear();
 
         while (true) {
 
             if (!ReceiveUnsignedByte(b))
                 return false;
+
+            RxBuffer.add(b);
 
             dumpByte(b.getInt());
 
@@ -172,9 +181,9 @@ public class SensorScopeServerListener {
                 mRxBuf[packet + idx++] = b.getInt(); // packet[idx++] = byte;
 
                 // The GPRS sends '+++' upon disconnection
-                if (mRxBuf[length] == '+' && mRxBuf[packet + 0] == '+' && mRxBuf[1] == '+') {
+                if (mRxBuf[length] == 43 && mRxBuf[packet + 0] == 43 && mRxBuf[1] == 43) {
                     mRxBuf[length] = 3;
-                    mRxBuf[packet + 2] = '+';
+                    mRxBuf[packet + 2] = 43;
 
                     return true;
                 }
@@ -212,10 +221,17 @@ public class SensorScopeServerListener {
         }
     }
 
-
     public void dumpByte(int value) {
+        dumpByte(value, DEFAULT_PACKETS_LOGFILE);
+    }
+
+    public void dumpText(String s) {
+        dumpText(s, DEFAULT_PACKETS_LOGFILE);
+    }
+
+    public void dumpByte(int value, String fileName) {
         try {
-            FileWriter fstream = new FileWriter("logs/packets.txt", true);
+            FileWriter fstream = new FileWriter(fileName, true);
             BufferedWriter out = new BufferedWriter(fstream);
             String s = value + " ";
             out.write(s);
@@ -225,9 +241,9 @@ public class SensorScopeServerListener {
         }
     }
 
-    public void dumpText(String s) {
+    public void dumpText(String s, String fileName) {
         try {
-            FileWriter fstream = new FileWriter("logs/packets.txt", true);
+            FileWriter fstream = new FileWriter(fileName, true);
             BufferedWriter out = new BufferedWriter(fstream);
             out.write(s);
             out.close();
@@ -353,6 +369,9 @@ public class SensorScopeServerListener {
                     CleanUp("receiving packets");
                     return;
                 }
+
+                dumpText(Formatter.listUnsignedByteList(RxBuffer), "logs/buffers.txt");
+                dumpText("\n", "logs/buffers.txt");
 
 
 
