@@ -4,6 +4,44 @@
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="position_mapping" />
+            <param name="scriptlet">
+                <![CDATA[
+                    if ( ! isdef('positionMap')) { positionMap = [:]; }
+                    if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+                ]]>
+            </param>
+            <param name="period">120000</param>
+            <param name="scriplet-periodic">
+                <![CDATA[
+                	// default alarm time after which an email is sent if no messages have been received
+                    def timeDifferenceOffsetDefault = 300000;
+                	// a list of alarm time per position
+                    def timeDifferenceOffsetPositionMap = [9999:600000];
+                    // the mail recipients
+                    def mailrecipients = ["osense@tik.ee.ethz.ch"];
+                    
+                    if ( isdef('positionMap')) {
+                    	def rmlist = [];
+                    	for (entry in positionMap) {
+                        	def timeDifference = System.currentTimeMillis() - entry.value;
+                        	def timeDifferenceOffset = timeDifferenceOffsetDefault;
+                        	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
+                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
+                        	}
+                        	if (timeDifference > timeDifferenceOffset) {
+                        		// Notify by email
+                        		def emailTitle = "[PermaSense-GSN] - WARNING: No more " + vsname + " data received from position " + entry.key;
+                        		def emailContent = "WARNING: No " + vsname + " data received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
+
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+                        		sendEmail(mailrecipients, emailTitle, emailContent);
+                        		rmlist.add(entry.key)
+                        	}
+                        }
+                        positionMap.keySet().removeAll( rmlist as Set );
+                    }
+                ]]>
+            </param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />

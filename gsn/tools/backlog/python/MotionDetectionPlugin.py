@@ -116,17 +116,21 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         yData = self.parseData('y')
         zData = self.parseData('z')
 
-        self._std_x = float(numpy.std(xData))
-        self._std_y = float(numpy.std(yData))
-        self._std_z = float(numpy.std(zData))
+        std_x = float(numpy.std(xData))
+        std_y = float(numpy.std(yData))
+        std_z = float(numpy.std(zData))
         
-        self.info('xStd is ' + str(self._std_x) + ' yStd is ' + str(self._std_y) + ' and zStd is ' + str(self._std_z));
+        self.info('xStd is ' + str(std_x) + ' yStd is ' + str(std_y) + ' and zStd is ' + str(std_z));
 
-        if self._std_x <= self._stdThreshold and self._std_y <= self._stdThreshold and self._std_z <= self._stdThreshold:
+        if std_x <= self._stdThreshold and std_y <= self._stdThreshold and std_z <= self._stdThreshold:
             self.info('Vehicle is not moving')
         else:
             self.info('Vehicle is moving')
             self._moving = self._moving + 1
+            # Store std values from the last motion detection
+            self._std_x = std_x
+            self._std_y = std_y
+            self._std_z = std_z
             
     def parseData(self, axis):
         axisData = []

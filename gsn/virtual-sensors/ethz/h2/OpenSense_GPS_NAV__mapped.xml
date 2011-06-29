@@ -5,54 +5,58 @@
     		<init-params>
             <param name="persistant">true</param>
 	    	<param name="scriptlet">
-				<![CDATA[
+	    	<![CDATA[
+	    		
+	    		if ( ! isdef('positionMap')) { positionMap = [:]; }
+          if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+	    	
 					try {
-						if (UTC_RAW_DATA.size() != 0) {
+						if (UTC_RAW_DATA != null && UTC_RAW_DATA.size() != 0) {
 							UTC_POS_TIME = UTC_RAW_DATA.toDouble() as int;
 						}
 						else {
 							UTC_POS_TIME = null;
 						}
-						if (LAT_RAW_DATA.size() != 0) {
+						if (LAT_RAW_DATA != null && LAT_RAW_DATA.size() != 0) {
 							LATITUDE = LAT_RAW_DATA.toDouble();
 						}
 						else {
 							LATITUDE = null;
 						}
 						LAT_HEMISPHERE = LAT_N_RAW_DATA;
-						if (LONG_RAW_DATA.size() != 0) {
+						if (LONG_RAW_DATA != null && LONG_RAW_DATA.size() != 0) {
 							LONGITUDE = LONG_RAW_DATA.toDouble();
 						}
 						else {
 							LONGITUDE = null;
 						}
 						LONG_HEMISPHERE = LONG_N_RAW_DATA;
-						if (QUAL_RAW_DATA.size() != 0) {
+						if (QUAL_RAW_DATA != null && QUAL_RAW_DATA.size() != 0) {
 							QUALITY = QUAL_RAW_DATA.toInteger();
 						}
 						else {
 							QUALITY = null;
 						}
-						if (SAT_RAW_DATA.size() != 0) {
+						if (SAT_RAW_DATA != null && SAT_RAW_DATA.size() != 0) {
 							NR_SATELLITES = SAT_RAW_DATA.toInteger();
 						}
 						else {
 							NR_SATELLITES = null;
 						}
-						if (HDOP_RAW_DATA.size() != 0) {
+						if (HDOP_RAW_DATA != null && HDOP_RAW_DATA.size() != 0) {
 							HDOP = HDOP_RAW_DATA.toDouble();
 						}
 						else {
 							HDOP = null;
 						}
-						if (GEO_HEIGHT_RAW_DATA.size() != 0) {
+						if (GEO_HEIGHT_RAW_DATA != null && GEO_HEIGHT_RAW_DATA.size() != 0) {
 							GEOID_HEIGHT = GEO_HEIGHT_RAW_DATA.toDouble();
 						}
 						else {
 							GEOID_HEIGHT = null;
 						}
 						GEOID_HEIGHT_UNIT = GEO_HEIGHT_U_RAW_DATA;
-						if (GEO_SEP_RAW_DATA.size() != 0) {
+						if (GEO_SEP_RAW_DATA != null && GEO_SEP_RAW_DATA.size() != 0) {
 							GEOID_SEP = GEO_SEP_RAW_DATA.toDouble();
 						}
 						else {
@@ -64,6 +68,38 @@
 					}
 				]]>
 	    	</param>
+	    	<param name="period">120000</param>
+        <param name="scriplet-periodic">
+            <![CDATA[
+            	// default alarm time after which an email is sent if no messages have been received
+                def timeDifferenceOffsetDefault = 300000;
+            	// a list of alarm time per position
+                def timeDifferenceOffsetPositionMap = [9999:600000];
+                // the mail recipients
+                def mailrecipients = ["osense@tik.ee.ethz.ch"];
+                
+                if ( isdef('positionMap')) {
+                	def rmlist = [];
+                	for (entry in positionMap) {
+                    	def timeDifference = System.currentTimeMillis() - entry.value;
+                    	def timeDifferenceOffset = timeDifferenceOffsetDefault;
+                    	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
+                    		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
+                    	}
+                    	if (timeDifference > timeDifferenceOffset) {
+                    		// Notify by email
+                    		def emailTitle = "[PermaSense-GSN] - WARNING: No more " + vsname + " data received from position " + entry.key;
+                    		def emailContent = "WARNING: No " + vsname + " data received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
+
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+                    		sendEmail(mailrecipients, emailTitle, emailContent);
+                    		rmlist.add(entry.key)
+                    	}
+                    }
+                    positionMap.keySet().removeAll( rmlist as Set );
+                }
+            ]]>
+        </param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
