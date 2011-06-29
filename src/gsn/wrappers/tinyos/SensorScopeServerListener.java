@@ -76,12 +76,11 @@ public class SensorScopeServerListener {
     }
 
     int receive(UnsignedByte[] buffer, int n) {
-        logger.warn("Trying to read " + n + " bytes...");
-        byte[] byteBuffer= null;
+        logger.warn("Trying to read " + n + " unsigned bytes...");
+        byte[] byteBuffer= new byte[buffer.length];
         try {
             int nb_read = client.getInputStream().read(byteBuffer, 0, n);
-            for (int i=0; i<nb_read; i++)
-                buffer[i].setValue(byteBuffer[i]);
+            buffer = UnsignedByte.ByteArray2UnsignedByteArray(byteBuffer);
             logger.info("Read (" + nb_read + ")");
             return nb_read;
         } catch (IOException e) {
