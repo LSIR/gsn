@@ -384,25 +384,20 @@ public class SensorScopeServerListener {
                     return;
                 }
 
-                //dumpText(Formatter.listUnsignedByteList(RxBuffer), "logs/buffers.txt");
-                dumpText(Formatter.listArray(RxBuffer2, RxBuffer2Size-1), "logs/buffers.txt");
-                dumpText("\n", "logs/buffers.txt");
-
+                String strPacket = Formatter.listArray(RxBuffer2, RxBuffer2Size-1)+"\n";
+                dumpText(strPacket, "logs/buffers.txt");
 
                 pkt = aPacket.packet;
                 rxIdx = aPacket.length;
 
                 logger.info("* RECEIVED PACKET *,  pkt=" + pkt + " rxIdx=" + rxIdx);
-                logger.info(Formatter.listArray(mRxBuf, pkt, rxIdx));
+                logger.info(strPacket);
 
                 // This is a (dirty?) hack to mimic MMC card buffers, where the length includes the length byte itself
                 mRxBuf[rxIdx]++;
 
                 pktLen = mRxBuf[rxIdx] - 1;
                 rxIdx += pktLen + 1;
-
-                logger.info("Next, pkt=" + pkt + " rxIdx=" + rxIdx);
-                logger.info(Formatter.listArray(mRxBuf, pkt, rxIdx));
 
                 // '+++' means that the GPRS has disconnected
                 if (pktLen == 3 && mRxBuf[pkt + 0] == '+' && mRxBuf[pkt + 1] == '+' && mRxBuf[pkt + 2] == '+') {
