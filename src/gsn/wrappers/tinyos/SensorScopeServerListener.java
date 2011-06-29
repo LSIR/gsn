@@ -104,6 +104,7 @@ public class SensorScopeServerListener {
 
     boolean send(byte[] buffer, int len) {
         boolean success = true;
+        logger.info("*** Sending data to client");
         try {
             OutputStream out = client.getOutputStream();
             out.write(buffer, 0, len);
