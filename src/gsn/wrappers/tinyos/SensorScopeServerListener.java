@@ -445,6 +445,7 @@ public class SensorScopeServerListener {
 
                         ExtractData();
                         mTxBuf[1] = BYTE_ACK;
+                        logger.info("Sending a BYTE_ACK to client");
                     } else {
                         mTxBuf[1] = BYTE_NACK;
                         logger.error("Invalid CRC received");
@@ -455,6 +456,7 @@ public class SensorScopeServerListener {
                 // Once here, in any case, we must send back an ACK or a NACK
                 mTxBuf[0] = 1;
 
+                logger.info("Going to send...");
                 if (!send(mTxBuf, 2)) {
                     if (mTxBuf[1] == BYTE_ACK)
                         CleanUp("sending back an ACK");
