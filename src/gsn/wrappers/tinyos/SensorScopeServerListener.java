@@ -164,7 +164,7 @@ public class SensorScopeServerListener {
 
             // First 'real' byte is the packet length
             if (lengthOk == false) {
-                length = b.getByte();
+                length = b.getInt();
                 aPacket.length = length;
                 lengthOk = true;
             } else {
@@ -190,7 +190,7 @@ public class SensorScopeServerListener {
     private boolean ReceiveUnsignedByte(UnsignedByte b) {
         byte[] _oneByte = new byte[1];
         int n_bytes = receive(_oneByte, 1);
-        logger.info("Read (" + n_bytes + ") => " + _oneByte[0]);
+        logger.info("Read (" + n_bytes + ") => " + b.toString());
         if (n_bytes < 1)
             return false;
         else {
