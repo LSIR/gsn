@@ -3,6 +3,7 @@ package gsn.wrappers.tinyos;
 
 import com.izforge.izpack.util.CleanupClient;
 import gsn.Main;
+import gsn.utils.Formatter;
 import gsn.utils.UnsignedByte;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -196,82 +197,6 @@ public class SensorScopeServerListener {
         }
     }
 
-    void listArray(byte[] a, int len, String header) {
-        logger.warn("* " + header + " *");
-        listArray(a, len);
-    }
-
-    void listArray(byte[] a, int from, int to) {
-        StringBuilder hex_sb_2 = new StringBuilder();
-        StringBuilder dec_sb_2 = new StringBuilder();
-        for (int i = from; (i <= to && i < a.length); i++) {
-            hex_sb_2.append(String.format("%02x", a[i] & 0xff)).append(" ");
-            dec_sb_2.append(a[i] & 0xff).append(" ");
-        }
-
-        hex_sb_2.append("(").append(String.format("%2d", to-from+1)).append(")");
-        dec_sb_2.append("(").append(String.format("%2d", to-from+1)).append(")");
-
-        logger.info(hex_sb_2.toString());
-        logger.info(dec_sb_2.toString());
-    }
-
-    void listArray(byte[] a, int len) {
-
-        //StringBuilder hex_sb = new StringBuilder();
-        StringBuilder hex_sb_2 = new StringBuilder();
-        //StringBuilder dec_sb = new StringBuilder();
-        StringBuilder dec_sb_2 = new StringBuilder();
-        for (int i = 0; (i < a.length && i < len); i++) {
-            //hex_sb.append(String.format("%02x", a[i])).append(" ");
-            hex_sb_2.append(String.format("%02x", a[i] & 0xff)).append(" ");
-            //dec_sb.append(a[i]).append(" ");
-            dec_sb_2.append(a[i] & 0xff).append(" ");
-        }
-
-        //hex_sb.append("(").append(String.format("%2d", len)).append(")");
-        hex_sb_2.append("(").append(String.format("%2d", len)).append(")");
-        //dec_sb.append("(").append(String.format("%2d", len)).append(")");
-        dec_sb_2.append("(").append(String.format("%2d", len)).append(")");
-
-        //logger.warn(hex_sb.toString());
-        logger.info(hex_sb_2.toString());
-        //logger.warn(dec_sb.toString());
-        logger.info(dec_sb_2.toString());
-
-    }
-
-    void listArray(int[] a, int len, String header) {
-        logger.info("* " + header + " *");
-        listArray(a, len);
-    }
-
-    void listArray(int[] a, int len) {
-
-        //StringBuilder hex_sb = new StringBuilder();
-        StringBuilder hex_sb_2 = new StringBuilder();
-        //StringBuilder dec_sb = new StringBuilder();
-        StringBuilder dec_sb_2 = new StringBuilder();
-        for (int i = 0; (i < a.length && i < len); i++) {
-            //hex_sb.append(String.format("%02x", a[i])).append(" ");
-            hex_sb_2.append(String.format("%02x", a[i] & 0xff)).append(" ");
-            //dec_sb.append(a[i]).append(" ");
-            dec_sb_2.append(a[i] & 0xff).append(" ");
-        }
-
-        //hex_sb.append("(").append(String.format("%2d", len)).append(")");
-        hex_sb_2.append("(").append(String.format("%2d", len)).append(")");
-        //dec_sb.append("(").append(String.format("%2d", len)).append(")");
-        dec_sb_2.append("(").append(String.format("%2d", len)).append(")");
-
-        //logger.warn(hex_sb.toString());
-        logger.info(hex_sb_2.toString());
-        //logger.warn(dec_sb.toString());
-        logger.info(dec_sb_2.toString());
-
-    }
-
-
     public int entry() {
 
         int rssi;
@@ -302,11 +227,11 @@ public class SensorScopeServerListener {
 
             if (n_read < 2) {
                 CleanUp("receiving RSSI");
-                listArray(buffer, n_read);
+                logger.info(Formatter.listArray(buffer, n_read));
                 return 0;
             }
 
-            listArray(buffer, n_read);
+            logger.info(Formatter.listArray(buffer, n_read));
 
             int buffer_1 = ((int) buffer[1] & 0xff);
 
@@ -330,7 +255,8 @@ public class SensorScopeServerListener {
                 return 0;
             }
 
-            listArray(buffer, 7, "Response to challenge");
+            logger.info("* Response to challenge *");
+            logger.info(Formatter.listArray(buffer, 7));
 
             rtt = System.currentTimeMillis() - rtt;
 
@@ -391,7 +317,7 @@ public class SensorScopeServerListener {
                 rxIdx = aPacket.length;
 
                 logger.info("Now,  pkt=" + pkt + " rxIdx=" + rxIdx);
-                listArray(mRxBuf, pkt, rxIdx);
+                logger.info(Formatter.listArray(mRxBuf, pkt, rxIdx));
 
                 // This is a (dirty?) hack to mimic MMC card buffers, where the length includes the length byte itself
                 mRxBuf[rxIdx]++;
@@ -399,7 +325,7 @@ public class SensorScopeServerListener {
                 pktLen = mRxBuf[rxIdx] - 1;
                 rxIdx += pktLen + 1;
 
-                listArray(mRxBuf, pkt, rxIdx);
+                logger.info(Formatter.listArray(mRxBuf, pkt, rxIdx));
 
                 logger.info("Next, pkt=" + pkt + " rxIdx=" + rxIdx);
 
@@ -488,7 +414,8 @@ public class SensorScopeServerListener {
     private void LogData(byte[] bytes) {
         logger.warn("\n\n ***** LOG DATA ***** \n\n");
         packetslogger.info("\n\n ***** LOG DATA ***** \n\n");
-        listArray(bytes, bytes.length);
+
+        logger.info(Formatter.listArray(bytes, bytes.length));
     }
 
     private byte[] ExtractData(byte[] buffer, int len, byte type) {
@@ -530,8 +457,10 @@ public class SensorScopeServerListener {
         int[] _challenge = new int[22];
 
         System.arraycopy(challenge, 1, _challenge, 0, 22);
-        listArray(challenge, 24, "challenge");
-        listArray(_challenge, 22, "_challenge");
+        logger.info("* challenge *");
+        logger.info(Formatter.listArray(challenge, 24));
+        logger.info("* _challenge *");
+        logger.info(Formatter.listArray(_challenge, 22));
 
         crc = Crc16(_challenge, 22);
         challenge[23] = (crc >> 8) & 0xFF;
