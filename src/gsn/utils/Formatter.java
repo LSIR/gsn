@@ -99,11 +99,9 @@ public class Formatter {
     public static String listUnsignedByteList(List<UnsignedByte> a, boolean hexFormat) {
         StringBuilder hex_sb_2 = new StringBuilder();
         StringBuilder dec_sb_2 = new StringBuilder();
-        Iterator iter = a.iterator();
-        while (iter.hasNext()) {
-            UnsignedByte ub = (UnsignedByte) iter.next();
-            hex_sb_2.append(String.format("%02x", ub.getByte())).append(" ");
-            dec_sb_2.append(ub.getInt()).append(" ");
+        for (int i=0;i<a.size();i++) {
+            hex_sb_2.append(String.format("%02x", a.get(i).getByte())).append(" ");
+            dec_sb_2.append(a.get(i).getInt()).append(" ");
         }
 
         hex_sb_2.append("(").append(String.format("%2d", a.size())).append(")");
