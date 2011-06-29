@@ -1,8 +1,5 @@
 package gsn.wrappers.tinyos;
 
-
-import com.izforge.izpack.util.CleanupClient;
-import gsn.Main;
 import gsn.utils.Formatter;
 import gsn.utils.UnsignedByte;
 import org.apache.log4j.Logger;
@@ -34,6 +31,7 @@ public class SensorScopeServerListener {
 
     private List<UnsignedByte> RxBuffer = new ArrayList<UnsignedByte>();
     private int[] RxBuffer2 = new int[MAX_BUFFER_SIZE];
+    private int RxBuffer2Size = 0;
 
     private int mStationID;
     private static final int CLIMAPS_ID = 0;
@@ -59,6 +57,10 @@ public class SensorScopeServerListener {
 
     Socket client = null;
     ServerSocket serverSocket = null;
+
+    void resetRxBuffer2() {
+        RxBuffer2Size = 0;
+    }
 
     int receive(byte[] buffer) {
         try {
@@ -142,15 +144,18 @@ public class SensorScopeServerListener {
         // Reset buffer
         RxBuffer.clear();
 
+        resetRxBuffer2();
+
         while (true) {
 
             if (!ReceiveUnsignedByte(b))
                 return false;
 
             RxBuffer.add(b);
-            RxBuffer2[idx] = b.getInt();
 
-            dumpText(RxBuffer.get(RxBuffer.size()-1).getInt()+" ", "logs/packets2.txt");
+            insertInBuffer(b.getInt());
+
+            dumpText(RxBuffer.get(RxBuffer.size() - 1).getInt() + " ", "logs/packets2.txt");
             dumpByte(b.getInt());
 
             logger.info("byte => " + b.toString());
@@ -198,6 +203,11 @@ public class SensorScopeServerListener {
                 }
             }
         }
+    }
+
+    private void insertInBuffer(int anInt) {
+        RxBuffer2[RxBuffer2Size] = anInt;
+        RxBuffer2Size++;
     }
 
     private boolean ReceiveUnsignedByte(UnsignedByte b) {
@@ -375,9 +385,8 @@ public class SensorScopeServerListener {
                 }
 
                 //dumpText(Formatter.listUnsignedByteList(RxBuffer), "logs/buffers.txt");
-                dumpText(Formatter.listArray(RxBuffer2,rxIdx), "logs/buffers.txt");
+                dumpText(Formatter.listArray(RxBuffer2, RxBuffer2Size), "logs/buffers.txt");
                 dumpText("\n", "logs/buffers.txt");
-
 
 
                 pkt = aPacket.packet;
