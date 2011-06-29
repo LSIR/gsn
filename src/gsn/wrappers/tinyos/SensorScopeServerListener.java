@@ -588,5 +588,32 @@ public class SensorScopeServerListener {
         }
     }
 
+    public class UnsignedByte {
+        private byte byteValue;
+        private int intValue;
+        public UnsignedByte() {
+            byteValue = 0;
+            intValue = 0;
+        }
+        public UnsignedByte(byte b) {
+            byteValue = b;
+            intValue = (int)b & 0xff;
+        }
+        public UnsignedByte(int i) {
+            i = i & 0xff;
+            byteValue = (byte)i;
+            intValue = i;
+        }
+        public int getInt() {
+            return intValue;
+        }
+        public int getByte() {
+            return byteValue;
+        }
+        public String toString() {
+            return "(b:"+getByte()+", i:"+getInt()+")";
+        }
+    }
+
 }
 
