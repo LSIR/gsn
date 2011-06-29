@@ -101,7 +101,10 @@ public class SensorScopeServerListener {
     }
 
 
-    boolean ReceivePacket(int packet, int length) {
+    boolean ReceivePacket(PacketInfo aPacket) {
+
+        int packet = aPacket.packet;
+        int length = aPacket.length;
 
         logger.info("ReceivePacket(packet=" + packet + ",length=" + length + ")");
         packetslogger.info("ReceivePacket(packet=" + packet + ",length=" + length + ")");
@@ -125,7 +128,9 @@ public class SensorScopeServerListener {
 
             // Synchronization byte?
             if (_byte[0] == BYTE_SYNC) {
+                mRxBuf[length] = 1;
                 length = 1;
+                aPacket.length = length;
                 mRxBuf[packet + 0] = BYTE_SYNC;    // packet[0] = BYTE_SYNC
                 return true;
             }
@@ -142,6 +147,7 @@ public class SensorScopeServerListener {
             // First 'real' byte is the packet length
             if (lengthOk == false) {
                 length = _byte[0];
+                aPacket.length = length;
                 lengthOk = true;
             } else {
                 mRxBuf[packet + idx++] = _byte[0]; // packet[idx++] = byte;
@@ -343,10 +349,16 @@ public class SensorScopeServerListener {
 
                 int pkt = mRxBuf[rxIdx + 1];
                 logger.info("Trying to receive packets with pkt=" + pkt + " rxIdx=" + rxIdx);
-                if (!ReceivePacket(pkt, rxIdx)) {
+                PacketInfo aPacket = new PacketInfo(pkt, rxIdx);
+                if (!ReceivePacket(aPacket)) {
                     CleanUp("receiving packets");
                     return;
                 }
+
+                pkt = aPacket.packet;
+                rxIdx = aPacket.length;
+
+                logger.info("Now, pkt=" + pkt + " rxIdx=" + rxIdx);
 
                 // This is a (dirty?) hack to mimic MMC card buffers, where the length includes the length byte itself
                 mRxBuf[rxIdx]++;
@@ -534,6 +546,23 @@ public class SensorScopeServerListener {
         while (true) {
             server.entry();
             logger.warn("\n\n********************\n\n");
+        }
+    }
+
+    /*
+   * Encapsulates information about a sensorscope packet within a buffer
+   * */
+    public class PacketInfo {
+        public int packet;
+        public int length;
+
+        public PacketInfo() {
+            packet = 0;
+            length = 0;
+        }
+        public PacketInfo(int _packet, int _length) {
+            this.packet = _packet;
+            this.length = _length;
         }
     }
 
