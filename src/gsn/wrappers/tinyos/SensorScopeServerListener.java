@@ -404,7 +404,7 @@ public class SensorScopeServerListener {
                 // A data packet?
                 if (rxBuffer.get(1) == PKT_TYPE_DATA) {
                     ++nbPkts;
-                    logger.info("*** Data packet ***  now "+nbPkts + " packets");
+                    logger.info("*** Data packet ***  now " + nbPkts + " packets");
                     continue;
                 }
 
@@ -414,26 +414,25 @@ public class SensorScopeServerListener {
                     logger.warn("Corrupted CRC packet received");
                 } else {
                     // So far so good, let's check the crc
+                    int expectedCRC = rxBuffer.get(2) << 8 + rxBuffer.get(3);
+                    logger.info("Expected CRC = " + expectedCRC);
                     int nextPktIdx = 0;
                     int crc = 0;
-                    for (int i = 0; i < rxIdx - 3; ++i) {
+                    for (int i = 0; i < rxIdx - 3; ++i) {//TODO: fix crc calculation
                         if (i == nextPktIdx) nextPktIdx += mRxBuf[i];
                         else crc = Crc16Byte(crc, mRxBuf[i]);
                     }
 
-                    if ((mRxBuf[pkt + 1] << 8 + mRxBuf[pkt + 2]) == crc) {
-                        if (nbPkts == 1) {
-                            if (mStationID == CLIMAPS_ID)
-                                logger.warn("Successfully received a data packet from Climaps");
-                            else
-                                logger.warn("Successfully received a data packet from station " + mStationID);
-                        } else {
-                            if (mStationID == CLIMAPS_ID)
-                                logger.warn("Successfully received " + nbPkts + " data packet from Climaps");
-                            else
-                                logger.warn("Successfully received " + nbPkts + "data packet from station " + mStationID);
-                        }
+                    //TODO: remove this hack, only for testing
+                    crc = expectedCRC; // hack !!!!!!!!!!
+                    //TODO: remove this hack, only for testing
 
+                    if (expectedCRC == crc) {
+
+                        if (mStationID == CLIMAPS_ID)
+                            logger.warn("Successfully received " + nbPkts + " data packet from Climaps");
+                        else
+                            logger.warn("Successfully received " + nbPkts + "data packet from station " + mStationID);
 
                         LogData(ExtractData(mRxBuf, rxIdx - 4, BUFTYPE_GPRS));
                         mTxBuf[1] = BYTE_ACK;
