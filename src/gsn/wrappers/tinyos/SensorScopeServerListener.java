@@ -181,7 +181,7 @@ public class SensorScopeServerListener {
 
                 // Do we have a complete packet?
                 if (idx == length) {
-                    logger.info("complete packet");
+                    //logger.debug("complete packet");
                     return true;
                 }
             }
@@ -363,8 +363,8 @@ public class SensorScopeServerListener {
                     return;
                 }
 
-                String strPacket = rxBuffer.toString() + "\n";
-                dumpText(strPacket, "logs/buffers.txt");
+                String strPacket = rxBuffer.toString();
+                dumpText(strPacket + "\n", "logs/buffers.txt");
 
                 pkt = aPacket.packet;
                 rxIdx = aPacket.length;
