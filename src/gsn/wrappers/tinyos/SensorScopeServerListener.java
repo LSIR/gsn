@@ -26,7 +26,7 @@ public class SensorScopeServerListener {
     private static final int RX_BUFFER_SIZE = 100000;
     public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
 
-    byte[] mRxBuf;
+    int[] mRxBuf;
     byte[] mTxBuf;
     private static int port;
 
@@ -47,7 +47,7 @@ public class SensorScopeServerListener {
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
         }
-        mRxBuf = new byte[RX_BUFFER_SIZE];
+        mRxBuf = new int[RX_BUFFER_SIZE];
         mTxBuf = new byte[TX_BUFFER_SIZE];
         logger.warn("Server initialized.");
     }
@@ -132,18 +132,20 @@ public class SensorScopeServerListener {
         byte _byte[] = new byte[1];
         _byte[0] = 0;
 
+        UnsignedByte b = new UnsignedByte();
+
 
         while (true) {
 
-            if (!ReceiveByte(_byte))
+            if (!ReceiveUnsignedByte(b))
                 return false;
 
-            logger.info("byte => " + _byte[0]);
+            logger.info("byte => " + b.toString());
 
-            packetslogger.info(_byte[0]);
+            packetslogger.info(b.toString());
 
             // Synchronization byte?
-            if (_byte[0] == BYTE_SYNC) {
+            if (b.getByte() == BYTE_SYNC) {
                 mRxBuf[length] = 1;
                 length = 1;
                 aPacket.length = length;
@@ -153,20 +155,20 @@ public class SensorScopeServerListener {
 
             // Beware of escaped bytes
             if (escape) {
-                _byte[0] ^= 0x20;
+                b.setValue(b.getByte() ^ 0x20);
                 escape = false;
-            } else if (_byte[0] == BYTE_ESC) {
+            } else if (b.getByte() == BYTE_ESC) {
                 escape = true;
                 continue;
             }
 
             // First 'real' byte is the packet length
             if (lengthOk == false) {
-                length = _byte[0];
+                length = b.getByte();
                 aPacket.length = length;
                 lengthOk = true;
             } else {
-                mRxBuf[packet + idx++] = _byte[0]; // packet[idx++] = byte;
+                mRxBuf[packet + idx++] = b.getInt(); // packet[idx++] = byte;
 
                 // The GPRS sends '+++' upon disconnection
                 if (mRxBuf[length] == '+' && mRxBuf[packet + 0] == '+' && mRxBuf[1] == '+') {
@@ -182,6 +184,18 @@ public class SensorScopeServerListener {
                     return true;
                 }
             }
+        }
+    }
+
+    private boolean ReceiveUnsignedByte(UnsignedByte b) {
+        byte[] _oneByte = new byte[1];
+        int n_bytes = receive(_oneByte, 1);
+        logger.info("Read (" + n_bytes + ") => " + _oneByte[0]);
+        if (n_bytes < 1)
+            return false;
+        else {
+            b.setValue(_oneByte[0]);
+            return true;
         }
     }
 
@@ -411,14 +425,14 @@ public class SensorScopeServerListener {
         }
     }
 
-    private void LogData(byte[] bytes) {
+    private void LogData(int[] bytes) {
         logger.warn("\n\n ***** LOG DATA ***** \n\n");
         packetslogger.info("\n\n ***** LOG DATA ***** \n\n");
 
         logger.info(Formatter.listArray(bytes, bytes.length));
     }
 
-    private byte[] ExtractData(byte[] buffer, int len, byte type) {
+    private int[] ExtractData(int[] buffer, int len, byte type) {
         return buffer;
     }
 
