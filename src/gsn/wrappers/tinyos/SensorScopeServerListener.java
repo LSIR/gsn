@@ -374,7 +374,7 @@ public class SensorScopeServerListener {
                     return;
                 }
 
-                dumpText(Formatter.listUnsignedByteList(RxBuffer), "logs/buffers.txt");
+                //dumpText(Formatter.listUnsignedByteList(RxBuffer), "logs/buffers.txt");
                 dumpText(Formatter.listArray(RxBuffer2,rxIdx), "logs/buffers.txt");
                 dumpText("\n", "logs/buffers.txt");
 
