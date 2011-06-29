@@ -8,8 +8,6 @@ import org.apache.log4j.PropertyConfigurator;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class SensorScopeServerListener {
@@ -17,7 +15,6 @@ public class SensorScopeServerListener {
     private static transient Logger logger = Logger.getLogger(SensorScopeServerListener.class);
     private static transient Logger packetslogger = Logger.getLogger("packets");
 
-    private static final int MAX_BUFFER_SIZE = 2048;
     private static final String PASSKEY = "FD83EC5EA68E2A5B";
 
     private static final int TX_BUFFER_SIZE = 10;
@@ -28,10 +25,6 @@ public class SensorScopeServerListener {
     int[] mRxBuf;
     byte[] mTxBuf;
     private static int port;
-
-    private List<UnsignedByte> RxBuffer = new ArrayList<UnsignedByte>();
-    private int[] RxBuffer2 = new int[MAX_BUFFER_SIZE];
-    private int RxBuffer2Size = 0;
 
     private SensorScopeBuffer receptionBuffer = new SensorScopeBuffer();
 
@@ -60,9 +53,6 @@ public class SensorScopeServerListener {
     Socket client = null;
     ServerSocket serverSocket = null;
 
-    void resetRxBuffer2() {
-        RxBuffer2Size = 0;
-    }
 
     int receive(byte[] buffer) {
         try {
@@ -144,11 +134,6 @@ public class SensorScopeServerListener {
         UnsignedByte b = new UnsignedByte();
 
         // Reset buffer
-        RxBuffer.clear();
-
-        resetRxBuffer2();
-
-        /////////////////////
         receptionBuffer.reset();
 
         while (true) {
@@ -156,13 +141,8 @@ public class SensorScopeServerListener {
             if (!ReceiveUnsignedByte(b))
                 return false;
 
-            RxBuffer.add(b);
-
-            insertInBuffer(b.getInt());
 
             receptionBuffer.add(b.getByte());
-
-            dumpText(RxBuffer.get(RxBuffer.size() - 1).getInt() + " ", "logs/packets2.txt");
             dumpByte(b.getInt());
 
             logger.info("byte => " + b.toString());
@@ -212,10 +192,7 @@ public class SensorScopeServerListener {
         }
     }
 
-    private void insertInBuffer(int anInt) {
-        RxBuffer2[RxBuffer2Size] = anInt;
-        RxBuffer2Size++;
-    }
+
 
     private boolean ReceiveUnsignedByte(UnsignedByte b) {
         byte[] _oneByte = new byte[1];
