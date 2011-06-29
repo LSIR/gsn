@@ -10,11 +10,11 @@ public class Formatter {
     }
 
     public static String listArray(int[] a, int len) {
-        return listArray(a, 0, len);
+        return listArray(a, 0, len-1);
     }
 
     public static String listArray(int[] a, int len, boolean hexFormat) {
-        return listArray(a, 0, len, hexFormat);
+        return listArray(a, 0, len-1, hexFormat);
     }
 
     public static String listArray(int[] a, int from, int to, boolean hexFormat) {
@@ -39,11 +39,11 @@ public class Formatter {
     }
 
     public static String listArray(byte[] a, int len) {
-        return listArray(a, 0, len);
+        return listArray(a, 0, len-1);
     }
 
     public static String listArray(byte[] a, int len, boolean hexFormat) {
-        return listArray(a, 0, len, hexFormat);
+        return listArray(a, 0, len-1, hexFormat);
     }
 
     public static String listArray(byte[] a, int from, int to, boolean hexFormat) {
@@ -68,11 +68,11 @@ public class Formatter {
     }
 
     public static String listArray(UnsignedByte[] a, int len) {
-        return listArray(a, 0, len);
+        return listArray(a, 0, len-1);
     }
 
     public static String listArray(UnsignedByte[] a, int len, boolean hexFormat) {
-        return listArray(a, 0, len, hexFormat);
+        return listArray(a, 0, len-1, hexFormat);
     }
 
     public static String listArray(UnsignedByte[] a, int from, int to, boolean hexFormat) {
