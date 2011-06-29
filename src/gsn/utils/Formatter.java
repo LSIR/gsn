@@ -2,19 +2,19 @@ package gsn.utils;
 
 public class Formatter {
 
-    String listArray(byte[] a, int from, int to) {
+    public static String listArray(byte[] a, int from, int to) {
         return listArray(a, from, to, false);
     }
 
-    String listArray(byte[] a, int len) {
+    public static String listArray(byte[] a, int len) {
         return listArray(a, 0, len);
     }
 
-    String listArray(byte[] a, int len, boolean hexFormat) {
+    public static String listArray(byte[] a, int len, boolean hexFormat) {
         return listArray(a, 0, len, hexFormat);
     }
 
-    String listArray(byte[] a, int from, int to, boolean hexFormat) {
+    public static String listArray(byte[] a, int from, int to, boolean hexFormat) {
         StringBuilder hex_sb_2 = new StringBuilder();
         StringBuilder dec_sb_2 = new StringBuilder();
         for (int i = from; (i <= to && i < a.length); i++) {
@@ -31,19 +31,19 @@ public class Formatter {
             return dec_sb_2.toString();
     }
 
-    String listArray(UnsignedByte[] a, int from, int to) {
+    public static String listArray(UnsignedByte[] a, int from, int to) {
         return listArray(a, from, to, false);
     }
 
-    String listArray(UnsignedByte[] a, int len) {
+    public static String listArray(UnsignedByte[] a, int len) {
         return listArray(a, 0, len);
     }
 
-    String listArray(UnsignedByte[] a, int len, boolean hexFormat) {
+    public static String listArray(UnsignedByte[] a, int len, boolean hexFormat) {
         return listArray(a, 0, len, hexFormat);
     }
 
-    String listArray(UnsignedByte[] a, int from, int to, boolean hexFormat) {
+    public static String listArray(UnsignedByte[] a, int from, int to, boolean hexFormat) {
         StringBuilder hex_sb_2 = new StringBuilder();
         StringBuilder dec_sb_2 = new StringBuilder();
         for (int i = from; (i <= to && i < a.length); i++) {
