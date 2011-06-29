@@ -466,6 +466,7 @@ public class SensorScopeServerListener {
                 // Done with the current batch of packets
                 rxIdx = 0;
                 nbPkts = 0;
+                return; //TODO: check if a return is needed. Without a return, looping again but always getting a reception error
             }
         } catch (ArrayIndexOutOfBoundsException e) {
 
