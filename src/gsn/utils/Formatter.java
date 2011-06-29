@@ -1,5 +1,8 @@
 package gsn.utils;
 
+import java.util.Iterator;
+import java.util.List;
+
 public class Formatter {
 
     public static String listArray(int[] a, int from, int to) {
@@ -82,6 +85,29 @@ public class Formatter {
 
         hex_sb_2.append("(").append(String.format("%2d", to - from + 1)).append(")");
         dec_sb_2.append("(").append(String.format("%2d", to - from + 1)).append(")");
+
+        if (hexFormat)
+            return hex_sb_2.toString();
+        else
+            return dec_sb_2.toString();
+    }
+
+    public static String listUnsignedByteList(List<UnsignedByte> a) {
+        return listUnsignedByteList(a, false);
+    }
+
+    public static String listUnsignedByteList(List<UnsignedByte> a, boolean hexFormat) {
+        StringBuilder hex_sb_2 = new StringBuilder();
+        StringBuilder dec_sb_2 = new StringBuilder();
+        Iterator iter = a.iterator();
+        while (iter.hasNext()) {
+            UnsignedByte ub = (UnsignedByte) iter.next();
+            hex_sb_2.append(String.format("%02x", ub.getByte())).append(" ");
+            dec_sb_2.append(ub.getInt()).append(" ");
+        }
+
+        hex_sb_2.append("(").append(String.format("%2d", a.size())).append(")");
+        dec_sb_2.append("(").append(String.format("%2d", a.size())).append(")");
 
         if (hexFormat)
             return hex_sb_2.toString();
