@@ -148,6 +148,7 @@ public class SensorScopeServerListener {
 
             RxBuffer.add(b);
 
+            dumpText(RxBuffer.get(RxBuffer.size()-1).toString()+" ", "logs/packets2.txt");
             dumpByte(b.getInt());
 
             logger.info("byte => " + b.toString());
@@ -361,6 +362,7 @@ public class SensorScopeServerListener {
             while (true) {
 
                 dumpText("\nCalling ReceivePacket()\n");
+                dumpText("\nCalling ReceivePacket()\n", "logs/packets2.txt");
 
                 int pkt = mRxBuf[rxIdx + 1];
                 logger.info("Trying to receive packets with pkt=" + pkt + " rxIdx=" + rxIdx);
