@@ -481,7 +481,7 @@ public class SensorScopeServerListener {
         logger.info("\n\n ***** LOG DATA ***** \n\n");
         logger.info(allBuffers.size() + " buffers to log");
         for (int i = 0; i < allBuffers.size(); i++) {
-            logger.info(allBuffers.get(i));
+            logger.info("[" + i + "] " + allBuffers.get(i));
         }
     }
 
@@ -608,7 +608,7 @@ public class SensorScopeServerListener {
         SensorScopeBuffer(SensorScopeBuffer aSensorScopeBuffer) {
             this.buffer = new int[MAXIMUM_BUFFER_SIZE];
             this.size = aSensorScopeBuffer.size;
-            for (int i=0;i<this.size;i++)
+            for (int i = 0; i < this.size; i++)
                 this.buffer[i] = aSensorScopeBuffer.buffer[i];
         }
 
