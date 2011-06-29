@@ -8,8 +8,7 @@ import gsn.utils.UnsignedByte;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
@@ -78,7 +77,7 @@ public class SensorScopeServerListener {
 
     int receive(UnsignedByte[] buffer, int n) {
         logger.warn("Trying to read " + n + " unsigned bytes...");
-        byte[] byteBuffer= new byte[buffer.length];
+        byte[] byteBuffer = new byte[buffer.length];
         try {
             int nb_read = client.getInputStream().read(byteBuffer, 0, n);
             buffer = UnsignedByte.ByteArray2UnsignedByteArray(byteBuffer);
@@ -140,6 +139,8 @@ public class SensorScopeServerListener {
             if (!ReceiveUnsignedByte(b))
                 return false;
 
+            dumpByte(b.getInt());
+
             logger.info("byte => " + b.toString());
 
             packetslogger.info(b.toString());
@@ -179,7 +180,7 @@ public class SensorScopeServerListener {
                 }
 
                 // Do we have a complete packet?
-                if (idx == length)   {
+                if (idx == length) {
                     logger.info("complete packet");
                     return true;
                 }
@@ -208,6 +209,30 @@ public class SensorScopeServerListener {
         else {
             b[0] = _oneByte[0];
             return true;
+        }
+    }
+
+
+    public void dumpByte(int value) {
+        try {
+            FileWriter fstream = new FileWriter("logs/packets.txt", true);
+            BufferedWriter out = new BufferedWriter(fstream);
+            String s = value + " ";
+            out.write(s);
+            out.close();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    public void dumpText(String s) {
+        try {
+            FileWriter fstream = new FileWriter("logs/packets.txt", true);
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write(s);
+            out.close();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -319,6 +344,8 @@ public class SensorScopeServerListener {
 
             while (true) {
 
+                dumpText("\nCalling ReceivePacket()\n");
+
                 int pkt = mRxBuf[rxIdx + 1];
                 logger.info("Trying to receive packets with pkt=" + pkt + " rxIdx=" + rxIdx);
                 PacketInfo aPacket = new PacketInfo(pkt, rxIdx);
@@ -326,6 +353,8 @@ public class SensorScopeServerListener {
                     CleanUp("receiving packets");
                     return;
                 }
+
+
 
                 pkt = aPacket.packet;
                 rxIdx = aPacket.length;
@@ -539,13 +568,12 @@ public class SensorScopeServerListener {
             packet = 0;
             length = 0;
         }
+
         public PacketInfo(int _packet, int _length) {
             this.packet = _packet;
             this.length = _length;
         }
     }
-
-
 
 
 }
