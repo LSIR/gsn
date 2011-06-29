@@ -161,8 +161,10 @@ public class SensorScopeServerListener {
                 }
 
                 // Do we have a complete packet?
-                if (idx == length)
+                if (idx == length)   {
+                    logger.info("complete packet");
                     return true;
+                }
             }
         }
     }
