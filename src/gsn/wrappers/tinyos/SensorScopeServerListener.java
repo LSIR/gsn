@@ -434,7 +434,7 @@ public class SensorScopeServerListener {
                         else
                             logger.warn("Successfully received " + nbPkts + "data packet from station " + mStationID);
 
-                        LogData(ExtractData(mRxBuf, rxIdx - 4, BUFTYPE_GPRS));
+                        ExtractData();
                         mTxBuf[1] = BYTE_ACK;
                     } else {
                         mTxBuf[1] = BYTE_NACK;
@@ -467,13 +467,8 @@ public class SensorScopeServerListener {
         }
     }
 
-    private void LogData(int[] bytes) {
-        logger.warn("\n\n ***** LOG DATA ***** \n\n");
-        logger.info(Formatter.listArray(bytes, bytes.length));
-    }
-
-    private int[] ExtractData(int[] buffer, int len, byte type) {
-        return buffer;
+    private void ExtractData() {
+        logger.info("\n\n ***** LOG DATA ***** \n\n");
     }
 
     private boolean CheckAuthentication(String passkey, int i, int i1, byte b, byte b1) {
