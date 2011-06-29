@@ -2,6 +2,35 @@ package gsn.utils;
 
 public class Formatter {
 
+    public static String listArray(int[] a, int from, int to) {
+        return listArray(a, from, to, false);
+    }
+
+    public static String listArray(int[] a, int len) {
+        return listArray(a, 0, len);
+    }
+
+    public static String listArray(int[] a, int len, boolean hexFormat) {
+        return listArray(a, 0, len, hexFormat);
+    }
+
+    public static String listArray(int[] a, int from, int to, boolean hexFormat) {
+        StringBuilder hex_sb_2 = new StringBuilder();
+        StringBuilder dec_sb_2 = new StringBuilder();
+        for (int i = from; (i <= to && i < a.length); i++) {
+            hex_sb_2.append(String.format("%02x", a[i] & 0xff)).append(" ");
+            dec_sb_2.append(a[i] & 0xff).append(" ");
+        }
+
+        hex_sb_2.append("(").append(String.format("%2d", to - from + 1)).append(")");
+        dec_sb_2.append("(").append(String.format("%2d", to - from + 1)).append(")");
+
+        if (hexFormat)
+            return hex_sb_2.toString();
+        else
+            return dec_sb_2.toString();
+    }
+
     public static String listArray(byte[] a, int from, int to) {
         return listArray(a, from, to, false);
     }
@@ -59,6 +88,5 @@ public class Formatter {
         else
             return dec_sb_2.toString();
     }
-
 
 }
