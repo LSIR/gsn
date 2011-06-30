@@ -960,7 +960,11 @@ public class SensorScopeServerListener {
 
                 logger.info("SENSOR => TS:" + timestamp + " , stationID:" + stationID + " , SID:" + sid + " , dupn:" + dupn + " , reading: " + Formatter.listArray(reading));
 
-                stillOtherReadingsInChunk = false; //TODO: stop condition
+                if (last_data_reading < currentChunkLength - 1) { // still other readings within chunk
+                    stillOtherReadingsInChunk = true;
+                    readingShift = last_data_reading + 1;
+                } else
+                    stillOtherReadingsInChunk = false; //TODO: stop condition
             }
 
             // end of reading within a chunk of data
@@ -985,74 +989,7 @@ public class SensorScopeServerListener {
 
             while (stillOtherReadingsInChunk) {
 
-                int ext = data[0 + readingShift] / 128;
-                int sid1 = data[0 + readingShift] % 128;
-                int sid = -1;
-                int dupn = 0;
 
-                if (logger.isDebugEnabled())
-                    logger.debug("ext:" + ext + " sid1:" + sid1);
-
-                int reading[];
-
-                if ((ext == 0) && (sid1 < 108)) { // no extension, no sid2
-
-                    reading = new int[2];
-                    reading[0] = data[1 + readingShift];
-                    reading[1] = data[2 + readingShift];
-                    last_data_reading = 2 + readingShift;
-                    sid = sid1;
-                    //logger.debug("SID=" + sid + " Reading=" + list_array(reading));
-
-                } else if ((ext == 1) && (sid1 < 108)) { // extension, but no sid2
-
-                    int data_dupn = data[1 + readingShift] / 16;
-                    int data_length = data[1 + readingShift] % 16;
-
-                    dupn = data_dupn;
-
-                    if (logger.isDebugEnabled())
-                        logger.debug("data_dupn=" + data_dupn + " data_length=" + data_length);
-
-                    reading = new int[data_length + 1];
-                    for (int i = 0; i < reading.length; i++)
-                        reading[i] = data[2 + i + readingShift]; // skip sid + dat_length
-                    last_data_reading = 1 + reading.length + readingShift;
-                    sid = sid1;
-                    //logger.debug("SID=" + sid + " Reading=" + list_array(reading));
-
-                } else if ((ext == 0) && (sid1 >= 108)) { // no extension, with sid2
-
-                    int sid2 = data[1];
-                    sid = (sid1 - 108) * 256 + sid2;
-                    reading = new int[2];
-                    reading[0] = data[2 + readingShift]; // shifted by 1, because of sid2
-                    reading[1] = data[3 + readingShift]; // shifted by 1, because of sid2
-                    last_data_reading = 3 + readingShift;
-
-                    //logger.debug("SID=" + sid + " Reading=" + list_array(reading));
-
-                } else {// (ext==1) && /sid1 >=108)
-
-                    int sid2 = data[1];
-                    sid = (sid1 - 108) * 256 + sid2;
-
-                    int data_dupn = data[2] / 16;
-                    int data_length = data[2] % 16;
-
-                    dupn = data_dupn;
-
-                    if (logger.isDebugEnabled())
-                        logger.debug("data_dupn=" + data_dupn + " data_length=" + data_length);
-
-                    // shift by 3
-                    reading = new int[data_length + 1];
-                    for (int i = 0; i < reading.length; i++)
-                        reading[i] = data[3 + i + readingShift];
-                    last_data_reading = 2 + reading.length + readingShift;
-
-                    //logger.debug("SID=" + sid + " Reading=" + list_array(reading));
-                }
 
                 // interpreting raw readings
 
