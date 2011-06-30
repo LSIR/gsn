@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DecimalFormat;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Vector;
 
@@ -46,6 +47,7 @@ public class SensorScopeServerListener {
     private static final int OFFSET_SOLAR_RAD_SP212 = 5 + (MAX_DUPN + 1) * 15;
     private static final int OFFSET_DECAGON_10HS_MV = 5 + (MAX_DUPN + 1) * 16;
     private static final int OFFSET_DECAGON_10HS_VWC = 5 + (MAX_DUPN + 1) * 17;
+    private static final String CONF_SENSORSCOPE_SERVER_PROPERTIES = "conf/sensorscope_server.properties";
 
     private DataField[] outputStructureCache = new DataField[]{
             new DataField("station_id", "int", "Station ID"),
@@ -364,6 +366,8 @@ public class SensorScopeServerListener {
             new DataField("timestamp", "bigint", "Timestamp")
     };
 
+    private static String csvFileName = null;
+
     private final int OUTPUT_STRUCTURE_SIZE = outputStructureCache.length;
 
     private double[] buf = new double[OUTPUT_STRUCTURE_SIZE];
@@ -399,11 +403,31 @@ public class SensorScopeServerListener {
         try {
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
+            logger.error("Couldn't create server socket");
+            logger.error(e.getMessage(), e);
+            System.exit(-1);
         }
+
+        Properties propertiesFile = new Properties();
+        try {
+            propertiesFile.load(new FileInputStream(CONF_SENSORSCOPE_SERVER_PROPERTIES));
+            csvFileName = propertiesFile.getProperty("csvfile");
+        } catch (IOException e) {
+            logger.error("Couldn't load configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
+            logger.error(e.getMessage(), e);
+            System.exit(-1);
+        }
+
+        if (csvFileName == null) {
+            logger.error("Output CSV file not specified in configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
+            System.exit(-1);
+        }
+
+        logger.info("CSV output file: " + csvFileName);
+
         mRxBuf = new int[RX_BUFFER_SIZE];
         mTxBuf = new byte[TX_BUFFER_SIZE];
-        logger.warn("Server initialized.");
+        logger.info("Server initialized.");
     }
 
     Socket client = null;
@@ -962,6 +986,10 @@ public class SensorScopeServerListener {
 
                     StreamElement aStreamElement = createSensor(timestamp, stationID, sid, dupn, reading);
 
+                    if (aStreamElement != null) {
+                        PublishStreamElement(aStreamElement);
+                    }
+
 
                     if (last_data_reading < currentChunkLength - 1) { // still other readings within chunk
                         stillOtherReadingsInChunk = true;
@@ -1021,6 +1049,19 @@ public class SensorScopeServerListener {
 
         }
         */
+    }
+
+    private void PublishStreamElement(StreamElement aStreamElement) {
+
+        try {
+            FileWriter fstream = new FileWriter(csvFileName, true);
+            BufferedWriter out = new BufferedWriter(fstream);
+            String s = aStreamElement.toString();
+            out.write(s);
+            out.close();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private StreamElement createSensor(long timestamp, int stationID, int sid, int dupn, int[] reading) {
@@ -1275,7 +1316,7 @@ public class SensorScopeServerListener {
 
                 aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp);
 
-                logger.info(aStreamElement);
+                //logger.info(aStreamElement);
 
                 // reset
                 for (int i = 1; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
