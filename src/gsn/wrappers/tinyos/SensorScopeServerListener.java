@@ -1319,29 +1319,6 @@ public class SensorScopeServerListener {
                 buf[i] = -1;
                 count[i] = 0;
             }
-
-            /*
-          if (last_timestamp != previous_timestamp) {
-
-              for (int i = 1; i < OUTPUT_STRUCTURE_SIZE - 1; i++) {// accumulated values
-                  if (count[i] > 0)
-                      buffer[i] = new Double(buf[i]);
-              }
-              previous_timestamp = last_timestamp;
-
-              aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp*1000);
-
-              //logger.info(aStreamElement);
-
-              // reset
-              for (int i = 1; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
-                  buffer[i] = null;
-                  buf[i] = -1;
-                  count[i] = 0;
-              }
-          }
-            */
-
         }
         return aStreamElement;
     }
@@ -1366,7 +1343,6 @@ public class SensorScopeServerListener {
             int[] dataPacket = currentPacket.getDataPacket();
 
             interpretPacket(dataPacket);
-
 
         }
     }
