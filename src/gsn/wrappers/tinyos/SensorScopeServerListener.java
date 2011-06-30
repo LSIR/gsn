@@ -1,6 +1,7 @@
 package gsn.wrappers.tinyos;
 
 import gsn.beans.DataField;
+import gsn.beans.StreamElement;
 import gsn.utils.Formatter;
 import gsn.utils.UnsignedByte;
 import org.apache.log4j.Logger;
@@ -755,8 +756,7 @@ public class SensorScopeServerListener {
                     logger.info("***  BYTE_SNYC ***  should recet reception");
                     rxIdx = 0;
                     nbPkts = 0;
-                    //TODO: empty list of buffers, reset reception
-                    allBuffers.clear();
+                    allBuffers.clear();//TODO: empty list of buffers, reset reception
                     continue;
                 }
 
@@ -960,6 +960,9 @@ public class SensorScopeServerListener {
 
                     logger.info("SENSOR => TS:" + timestamp + " , stationID:" + stationID + " , SID:" + sid + " , dupn:" + dupn + " , reading: " + Formatter.listArray(reading));
 
+                    StreamElement aStreamElement = createSensor(timestamp, stationID, sid, dupn, reading);
+
+
                     if (last_data_reading < currentChunkLength - 1) { // still other readings within chunk
                         stillOtherReadingsInChunk = true;
                         readingShift = last_data_reading + 1;
@@ -967,8 +970,8 @@ public class SensorScopeServerListener {
                         stillOtherReadingsInChunk = false; //TODO: check stop condition
 
                 } catch (IndexOutOfBoundsException e) {
-                    logger.error("Error while parsing current chunk with readingShift="+readingShift);
-                    logger.error("Chunk: "+Formatter.listArray(currentChunkData));
+                    logger.error("Error while parsing current chunk with readingShift=" + readingShift);
+                    logger.error("Chunk: " + Formatter.listArray(currentChunkData));
                     logger.error(e.getMessage(), e);
                     stillOtherReadingsInChunk = false;
                 }
@@ -997,272 +1000,7 @@ public class SensorScopeServerListener {
 
 
 
-                // interpreting raw readings
 
-                double sid1_int_batt_volt;
-                double sid1_ext_batt_volt;
-                double sid1_cpu_volt;
-                double sid1_cpu_temp;
-                double sid2_air_temp;
-                double sid2_air_humid;
-                double sid4_solar_rad;
-                double sid5_rain_meter;
-                double sid6_ground_temp;
-                double sid6_air_temp;
-                double sid7_soil_temp;
-                double sid7_soil_moisture;
-                double sid8_soil_water_potential;
-                double sid9_soil_temp;
-                double sid9_soil_moisture;
-                double sid9_soil_conduct;
-                double sid10_wind_direction;
-                double sid10_wind_speed;
-                double sid12_battery_board_voltage;
-                double sid19_decagon_10hs_mv;
-                double sid19_decagon_10hs_vwc;
-                double sid20_solar_rad_sp212;
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("SensorID:" + sid + " Dupn:" + dupn + " Reading:" + Formatter.listArray(reading, reading.length));
-                    logger.debug("TS:" + timestamp + " StationID:" + stationID + " SensorID:" + sid + " Dupn:" + dupn);
-                }
-
-                last_timestamp = timestamp * 1000;
-                buffer[0] = new Integer(stationID);
-                buf[0] = stationID;
-
-                for (int i = 1; i <= OUTPUT_STRUCTURE_SIZE - 2; i++)
-                    buffer[i] = null;
-                buffer[OUTPUT_STRUCTURE_SIZE - 1] = new Long(last_timestamp);
-                doPostStreamElement = true;
-
-                // extended sensors (when other sensors share the same bus)
-                // are supported up to dupn=MAX_DUPN (MAX_DUPN+1 sensors in total)
-                if (dupn > MAX_DUPN)
-                    doPostStreamElement = false;
-
-                if (dupn <= MAX_DUPN)
-
-                    switch (sid) {
-
-                        case 1:
-                            long raw_int_batt_volt = reading[0] * 16 + reading[1] / 16;
-                            long raw_ext_batt_volt = (reading[1] % 16) * 256 + reading[2];
-                            long raw_cpu_volt = reading[3] * 16 + reading[4] / 16;
-                            long raw_cpu_temp = (reading[4] % 16) * 256 + reading[5];
-                            sid1_int_batt_volt = raw_int_batt_volt * 2.4 * 2.5 / 4095;
-                            sid1_ext_batt_volt = raw_ext_batt_volt * 6.12 * 2.5 / 4095 + 0.242;
-                            sid1_cpu_volt = raw_cpu_volt * 3.0 / 4095;
-                            sid1_cpu_temp = (raw_cpu_temp * 1.5 / 4095 - 0.986) / 0.00355;
-                            logger.info("sid1_int_batt_volt: " + measure.format(sid1_int_batt_volt) +
-                                    " sid1_ext_batt_volt: " + measure.format(sid1_ext_batt_volt) +
-                                    " sid1_cpu_volt: " + measure.format(sid1_cpu_volt) +
-                                    " sid1_cpu_temp: " + measure.format(sid1_cpu_temp));
-                            buffer[1] = new Double(sid1_int_batt_volt);
-                            buf[1] = sid1_int_batt_volt;
-                            count[1]++;
-                            buffer[2] = new Double(sid1_ext_batt_volt);
-                            buf[2] = sid1_ext_batt_volt;
-                            count[2]++;
-                            buffer[3] = new Double(sid1_cpu_volt);
-                            buf[3] = sid1_cpu_volt;
-                            count[3]++;
-                            buffer[4] = new Double(sid1_cpu_temp);
-                            buf[4] = sid1_cpu_temp;
-                            count[4]++;
-                            break;
-
-                        case 2:
-                            long raw_airtemp = reading[0] * 64 + reading[1] / 4;
-                            long raw_airhumidity = reading[3] / 64 + reading[2] * 4 + (reading[1] % 4) * 1024;
-
-                            sid2_air_temp = raw_airtemp * 1.0 / 100 - 39.6;
-                            sid2_air_humid = (raw_airhumidity * 1.0 * 0.0405) - 4 - (raw_airhumidity * raw_airhumidity * 0.0000028) + ((raw_airhumidity * 0.00008) + 0.01) * (sid2_air_temp - 25);
-                            logger.info("sid2_air_temp: " + measure.format(sid2_air_temp) +
-                                    " sid2_air_humid: " + measure.format(sid2_air_humid));
-                            buffer[OFFSET_AIR_TEMP + dupn] = new Double(sid2_air_temp);
-                            buf[OFFSET_AIR_TEMP + dupn] = sid2_air_temp;
-                            count[OFFSET_AIR_TEMP + dupn]++;
-                            buffer[OFFSET_AIR_HUMID + dupn] = new Double(sid2_air_humid);
-                            buf[OFFSET_AIR_HUMID + dupn] = sid2_air_humid;
-                            count[OFFSET_AIR_HUMID + dupn]++;
-                            break;
-
-                        case 4:
-                            long raw_solar_rad = reading[0] * 256 + reading[1];
-                            sid4_solar_rad = raw_solar_rad * 2.5 * 1000 * 6 / (4095 * 1.67 * 5);
-                            logger.info("sid4_solar_rad: " + measure.format(sid4_solar_rad));
-                            buffer[OFFSET_SOLAR_RAD + dupn] = new Double(sid4_solar_rad);
-                            buf[OFFSET_SOLAR_RAD + dupn] = sid4_solar_rad;
-                            count[OFFSET_SOLAR_RAD + dupn]++;
-                            break;
-
-                        case 5:
-                            long raw_rain_meter = reading[0] * 256 + reading[1];
-                            sid5_rain_meter = raw_rain_meter * 0.254;
-                            logger.info("sid5_rain_meter: " + measure.format(sid5_rain_meter));
-                            buffer[OFFSET_RAIN_METER + dupn] = new Double(sid5_rain_meter);
-                            buf[OFFSET_RAIN_METER + dupn] = sid5_rain_meter;
-                            count[OFFSET_RAIN_METER + dupn]++;
-                            break;
-
-                        case 6:
-                            long raw_ground_temp = reading[0] * 256 + reading[1];
-                            long raw_air_temp = reading[2] * 256 + reading[3];
-                            sid6_ground_temp = raw_ground_temp / 16.0 - 273.15;
-                            sid6_air_temp = raw_air_temp / 16.0 - 273.15;
-                            buffer[OFFSET_GROUND_TEMP_TNX + dupn] = new Double(sid6_ground_temp);
-                            buf[OFFSET_GROUND_TEMP_TNX + dupn] = sid6_ground_temp;
-                            count[OFFSET_GROUND_TEMP_TNX + dupn]++;
-                            buffer[OFFSET_AIR_TEMP_TNX + dupn] = new Double(sid6_air_temp);
-                            buf[OFFSET_AIR_TEMP_TNX + dupn] = sid6_air_temp;
-                            count[OFFSET_AIR_TEMP_TNX + dupn]++;
-                            logger.info("sid6_ground_temp: " + measure.format(sid6_ground_temp) +
-                                    " sid6_air_temp: " + measure.format(sid6_air_temp));
-                            break;
-
-                        case 7:
-                            long raw_soil_temp = reading[0] * 256 + reading[1];
-                            long raw_soil_moisture = reading[2] * 256 + reading[3];
-                            sid7_soil_temp = (raw_soil_temp - 400.0) / 10.0;
-                            sid7_soil_moisture = (raw_soil_moisture * 0.00104 - 0.5) * 100;
-                            buffer[OFFSET_SOIL_TEMP_ECTM + dupn] = new Double(sid7_soil_temp);
-                            buf[OFFSET_SOIL_TEMP_ECTM + dupn] = sid7_soil_temp;
-                            count[OFFSET_SOIL_TEMP_ECTM + dupn]++;
-                            buffer[OFFSET_SOIL_MOISTURE_ECTM + dupn] = new Double(sid7_soil_moisture);
-                            buf[OFFSET_SOIL_MOISTURE_ECTM + dupn] = sid7_soil_moisture;
-                            count[OFFSET_SOIL_MOISTURE_ECTM + dupn]++;
-                            logger.info("sid7_soil_temp: " + measure.format(sid7_soil_temp) +
-                                    " sid7_soil_moisture: " + measure.format(sid7_soil_moisture));
-                            break;
-
-                        case 8:
-                            long raw_soil_water_potential = reading[0] * 256 + reading[1];
-                            sid8_soil_water_potential = raw_soil_water_potential;
-                            buffer[OFFSET_SOIL_WATER_POTENTIAL + dupn] = new Double(sid8_soil_water_potential);
-                            buf[OFFSET_SOIL_WATER_POTENTIAL + dupn] = sid8_soil_water_potential;
-                            count[OFFSET_SOIL_WATER_POTENTIAL + dupn]++;
-                            logger.info("sid8_soil_water_potential:" + measure.format(sid8_soil_water_potential));
-                            break;
-
-                        case 9:
-                            long raw_sid9_soil_temp = reading[0] * 256 + reading[1];
-                            long raw_sid9_soil_moisture = reading[2] * 256 + reading[3];
-                            long raw_sid9_soil_conduct = reading[4] * 256 + reading[5];
-                            if (raw_sid9_soil_temp <= 900)
-                                sid9_soil_temp = (raw_sid9_soil_temp - 400.0) / 10.0;
-                            else
-                                sid9_soil_temp = (900 + 5 * (raw_sid9_soil_temp - 900.0) - 400) / 10.0;
-                            sid9_soil_moisture = raw_sid9_soil_moisture / 50.0;
-                            if (raw_sid9_soil_conduct <= 700)
-                                sid9_soil_conduct = raw_sid9_soil_conduct / 100.0;
-                            else
-                                sid9_soil_conduct = (700 + 5.0 * (raw_sid9_soil_conduct - 700)) / 100.0;
-                            buffer[OFFSET_SOIL_TEMP_DECAGON + dupn] = new Double(sid9_soil_temp);
-                            buf[OFFSET_SOIL_TEMP_DECAGON + dupn] = sid9_soil_temp;
-                            count[OFFSET_SOIL_TEMP_DECAGON + dupn]++;
-                            buffer[OFFSET_SOIL_MOISTURE_DECAGON + dupn] = new Double(sid9_soil_moisture);
-                            buf[OFFSET_SOIL_MOISTURE_DECAGON + dupn] = sid9_soil_moisture;
-                            count[OFFSET_SOIL_MOISTURE_DECAGON + dupn]++;
-                            buffer[OFFSET_SOIL_CONDUCT_DECAGON + dupn] = new Double(sid9_soil_conduct);
-                            buf[OFFSET_SOIL_CONDUCT_DECAGON + dupn] = sid9_soil_conduct;
-                            count[OFFSET_SOIL_CONDUCT_DECAGON + dupn]++;
-                            logger.info("sid9_soil_temp: " + measure.format(sid9_soil_temp) +
-                                    " sid9_soil_moisture: " + measure.format(sid9_soil_moisture) +
-                                    " sid9_soil_conduct: " + measure.format(sid9_soil_conduct));
-                            break;
-
-                        case 10:
-                            int sign = reading[0] / 128;
-                            long raw_sid10_wind_direction = (reading[0] % 16) * 256 + reading[1];
-                            long raw_sid10_wind_speed = reading[2] * 256 + reading[3];
-                            if (sign == 0)
-                                sid10_wind_direction = java.lang.Math.acos(((raw_sid10_wind_direction * 2.0) / 4095.0) - 1) * 360.0 / (2 * java.lang.Math.PI);
-                            else
-                                sid10_wind_direction = 360 - java.lang.Math.acos((raw_sid10_wind_direction * 2.0) / 4095.0 - 1) * 360.0 / (2 * java.lang.Math.PI);
-                            sid10_wind_speed = raw_sid10_wind_speed * 3600.0 * 1.6093 / (600 * 1600 * 3.6);
-                            buffer[OFFSET_WIND_DIRECTION + dupn] = new Double(sid10_wind_direction);
-                            buf[OFFSET_WIND_DIRECTION + dupn] = sid10_wind_direction;
-                            count[OFFSET_WIND_DIRECTION + dupn]++;
-                            buffer[OFFSET_WIND_SPEED + dupn] = new Double(sid10_wind_speed);
-                            buf[OFFSET_WIND_SPEED + dupn] = sid10_wind_speed;
-                            count[OFFSET_WIND_SPEED + dupn]++;
-                            logger.info("sid10_wind_direction: " + measure.format(sid10_wind_direction) +
-                                    " sid10_wind_speed: " + measure.format(sid10_wind_speed));
-                            break;
-
-                        case 19:
-                            long decagon_10hs_raw = reading[0] * 256 + reading[1];
-
-                            sid19_decagon_10hs_mv = (decagon_10hs_raw * 2.5) / (4.095 * 2);
-                            sid19_decagon_10hs_vwc = (0.00000000297 * sid19_decagon_10hs_mv * sid19_decagon_10hs_mv * sid19_decagon_10hs_mv) - (0.00000737 * sid19_decagon_10hs_mv * sid19_decagon_10hs_mv) + (0.00669 * sid19_decagon_10hs_mv) - 1.92;
-
-                            buffer[OFFSET_DECAGON_10HS_MV + dupn] = new Double(sid19_decagon_10hs_mv);
-                            buf[OFFSET_DECAGON_10HS_MV + dupn] = sid19_decagon_10hs_mv;
-                            count[OFFSET_DECAGON_10HS_MV + dupn]++;
-                            buffer[OFFSET_DECAGON_10HS_VWC + dupn] = new Double(sid19_decagon_10hs_vwc);
-                            buf[OFFSET_DECAGON_10HS_VWC + dupn] = sid19_decagon_10hs_vwc;
-                            count[OFFSET_DECAGON_10HS_VWC + dupn]++;
-                            logger.info("sid19_decagon_10hs_mv: " + measure.format(sid19_decagon_10hs_mv) +
-                                    " sid19_decagon_10hs_vwc: " + measure.format(sid19_decagon_10hs_vwc));
-                            break;
-
-                        case 20:
-                            long solar_rad_sp212_raw = reading[0] * 256 + reading[1];
-
-                            sid20_solar_rad_sp212 = solar_rad_sp212_raw * 2.5 / 4.095 * 0.5;
-
-                            buffer[OFFSET_SOLAR_RAD_SP212 + dupn] = new Double(sid20_solar_rad_sp212);
-                            buf[OFFSET_SOLAR_RAD_SP212 + dupn] = sid20_solar_rad_sp212;
-                            count[OFFSET_SOLAR_RAD_SP212 + dupn]++;
-
-                            logger.info("sid20_solar_rad_sp212: " + measure.format(sid20_solar_rad_sp212));
-                            break;
-
-                        case 12:
-                            long battery_board_voltage_raw = reading[0] * 256 + reading[1];
-                            //TODO: verify packet size (1 or 2 bytes)
-
-                            sid12_battery_board_voltage = battery_board_voltage_raw * 6 * 2.5 / 4095;
-
-                            buffer[OFFSET_BATTERY_BOARD_VOLTAGE + dupn] = new Double(sid12_battery_board_voltage);
-                            buf[OFFSET_BATTERY_BOARD_VOLTAGE + dupn] = sid12_battery_board_voltage;
-                            count[OFFSET_BATTERY_BOARD_VOLTAGE + dupn]++;
-
-                            logger.info("sid12_battery_board_voltage: " + measure.format(sid12_battery_board_voltage));
-                            break;
-
-                        default:
-                            logger.debug("Unknown SID:" + sid);
-                            doPostStreamElement = false;
-                            break;
-
-                    } // switch
-
-                if (doPostStreamElement) {
-
-                    if (last_timestamp != previous_timestamp) {
-
-                        //logger.debug("");
-
-                        for (int i = 1; i < OUTPUT_STRUCTURE_SIZE - 1; i++) {// accumulated values
-                            if (count[i] > 0)
-                                buffer[i] = new Double(buf[i]);
-                        }
-                        previous_timestamp = last_timestamp;
-
-                        postStreamElement(last_timestamp, buffer);
-
-                        // reset
-                        for (int i = 1; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
-                            buffer[i] = null;
-                            buf[i] = -1;
-                            count[i] = 0;
-                        }
-                    }
-
-
-                }
 
                 if (logger.isDebugEnabled())
                     logger.debug("last_data_reading => " + last_data_reading + " [" + data[last_data_reading] + "]");
@@ -1283,6 +1021,273 @@ public class SensorScopeServerListener {
 
         }
         */
+    }
+
+    private StreamElement createSensor(long timestamp, int stationID, int sid, int dupn, int[] reading) {
+
+        StreamElement aStreamElement = null;
+        // interpreting raw readings
+
+        double sid1_int_batt_volt;
+        double sid1_ext_batt_volt;
+        double sid1_cpu_volt;
+        double sid1_cpu_temp;
+        double sid2_air_temp;
+        double sid2_air_humid;
+        double sid4_solar_rad;
+        double sid5_rain_meter;
+        double sid6_ground_temp;
+        double sid6_air_temp;
+        double sid7_soil_temp;
+        double sid7_soil_moisture;
+        double sid8_soil_water_potential;
+        double sid9_soil_temp;
+        double sid9_soil_moisture;
+        double sid9_soil_conduct;
+        double sid10_wind_direction;
+        double sid10_wind_speed;
+        double sid12_battery_board_voltage;
+        double sid19_decagon_10hs_mv;
+        double sid19_decagon_10hs_vwc;
+        double sid20_solar_rad_sp212;
+
+        last_timestamp = timestamp * 1000;
+        buffer[0] = new Integer(stationID);
+        buf[0] = stationID;
+
+        for (int i = 1; i <= OUTPUT_STRUCTURE_SIZE - 2; i++)
+            buffer[i] = null;
+        buffer[OUTPUT_STRUCTURE_SIZE - 1] = new Long(last_timestamp);
+        doPostStreamElement = true;
+
+        // extended sensors (when other sensors share the same bus)
+        // are supported up to dupn=MAX_DUPN (MAX_DUPN+1 sensors in total)
+        if (dupn > MAX_DUPN)
+            doPostStreamElement = false;
+
+        if (dupn <= MAX_DUPN)
+
+            switch (sid) {
+
+                case 1:
+                    long raw_int_batt_volt = reading[0] * 16 + reading[1] / 16;
+                    long raw_ext_batt_volt = (reading[1] % 16) * 256 + reading[2];
+                    long raw_cpu_volt = reading[3] * 16 + reading[4] / 16;
+                    long raw_cpu_temp = (reading[4] % 16) * 256 + reading[5];
+                    sid1_int_batt_volt = raw_int_batt_volt * 2.4 * 2.5 / 4095;
+                    sid1_ext_batt_volt = raw_ext_batt_volt * 6.12 * 2.5 / 4095 + 0.242;
+                    sid1_cpu_volt = raw_cpu_volt * 3.0 / 4095;
+                    sid1_cpu_temp = (raw_cpu_temp * 1.5 / 4095 - 0.986) / 0.00355;
+                    logger.info("sid1_int_batt_volt: " + measure.format(sid1_int_batt_volt) +
+                            " sid1_ext_batt_volt: " + measure.format(sid1_ext_batt_volt) +
+                            " sid1_cpu_volt: " + measure.format(sid1_cpu_volt) +
+                            " sid1_cpu_temp: " + measure.format(sid1_cpu_temp));
+                    buffer[1] = new Double(sid1_int_batt_volt);
+                    buf[1] = sid1_int_batt_volt;
+                    count[1]++;
+                    buffer[2] = new Double(sid1_ext_batt_volt);
+                    buf[2] = sid1_ext_batt_volt;
+                    count[2]++;
+                    buffer[3] = new Double(sid1_cpu_volt);
+                    buf[3] = sid1_cpu_volt;
+                    count[3]++;
+                    buffer[4] = new Double(sid1_cpu_temp);
+                    buf[4] = sid1_cpu_temp;
+                    count[4]++;
+                    break;
+
+                case 2:
+                    long raw_airtemp = reading[0] * 64 + reading[1] / 4;
+                    long raw_airhumidity = reading[3] / 64 + reading[2] * 4 + (reading[1] % 4) * 1024;
+
+                    sid2_air_temp = raw_airtemp * 1.0 / 100 - 39.6;
+                    sid2_air_humid = (raw_airhumidity * 1.0 * 0.0405) - 4 - (raw_airhumidity * raw_airhumidity * 0.0000028) + ((raw_airhumidity * 0.00008) + 0.01) * (sid2_air_temp - 25);
+                    logger.info("sid2_air_temp: " + measure.format(sid2_air_temp) +
+                            " sid2_air_humid: " + measure.format(sid2_air_humid));
+                    buffer[OFFSET_AIR_TEMP + dupn] = new Double(sid2_air_temp);
+                    buf[OFFSET_AIR_TEMP + dupn] = sid2_air_temp;
+                    count[OFFSET_AIR_TEMP + dupn]++;
+                    buffer[OFFSET_AIR_HUMID + dupn] = new Double(sid2_air_humid);
+                    buf[OFFSET_AIR_HUMID + dupn] = sid2_air_humid;
+                    count[OFFSET_AIR_HUMID + dupn]++;
+                    break;
+
+                case 4:
+                    long raw_solar_rad = reading[0] * 256 + reading[1];
+                    sid4_solar_rad = raw_solar_rad * 2.5 * 1000 * 6 / (4095 * 1.67 * 5);
+                    logger.info("sid4_solar_rad: " + measure.format(sid4_solar_rad));
+                    buffer[OFFSET_SOLAR_RAD + dupn] = new Double(sid4_solar_rad);
+                    buf[OFFSET_SOLAR_RAD + dupn] = sid4_solar_rad;
+                    count[OFFSET_SOLAR_RAD + dupn]++;
+                    break;
+
+                case 5:
+                    long raw_rain_meter = reading[0] * 256 + reading[1];
+                    sid5_rain_meter = raw_rain_meter * 0.254;
+                    logger.info("sid5_rain_meter: " + measure.format(sid5_rain_meter));
+                    buffer[OFFSET_RAIN_METER + dupn] = new Double(sid5_rain_meter);
+                    buf[OFFSET_RAIN_METER + dupn] = sid5_rain_meter;
+                    count[OFFSET_RAIN_METER + dupn]++;
+                    break;
+
+                case 6:
+                    long raw_ground_temp = reading[0] * 256 + reading[1];
+                    long raw_air_temp = reading[2] * 256 + reading[3];
+                    sid6_ground_temp = raw_ground_temp / 16.0 - 273.15;
+                    sid6_air_temp = raw_air_temp / 16.0 - 273.15;
+                    buffer[OFFSET_GROUND_TEMP_TNX + dupn] = new Double(sid6_ground_temp);
+                    buf[OFFSET_GROUND_TEMP_TNX + dupn] = sid6_ground_temp;
+                    count[OFFSET_GROUND_TEMP_TNX + dupn]++;
+                    buffer[OFFSET_AIR_TEMP_TNX + dupn] = new Double(sid6_air_temp);
+                    buf[OFFSET_AIR_TEMP_TNX + dupn] = sid6_air_temp;
+                    count[OFFSET_AIR_TEMP_TNX + dupn]++;
+                    logger.info("sid6_ground_temp: " + measure.format(sid6_ground_temp) +
+                            " sid6_air_temp: " + measure.format(sid6_air_temp));
+                    break;
+
+                case 7:
+                    long raw_soil_temp = reading[0] * 256 + reading[1];
+                    long raw_soil_moisture = reading[2] * 256 + reading[3];
+                    sid7_soil_temp = (raw_soil_temp - 400.0) / 10.0;
+                    sid7_soil_moisture = (raw_soil_moisture * 0.00104 - 0.5) * 100;
+                    buffer[OFFSET_SOIL_TEMP_ECTM + dupn] = new Double(sid7_soil_temp);
+                    buf[OFFSET_SOIL_TEMP_ECTM + dupn] = sid7_soil_temp;
+                    count[OFFSET_SOIL_TEMP_ECTM + dupn]++;
+                    buffer[OFFSET_SOIL_MOISTURE_ECTM + dupn] = new Double(sid7_soil_moisture);
+                    buf[OFFSET_SOIL_MOISTURE_ECTM + dupn] = sid7_soil_moisture;
+                    count[OFFSET_SOIL_MOISTURE_ECTM + dupn]++;
+                    logger.info("sid7_soil_temp: " + measure.format(sid7_soil_temp) +
+                            " sid7_soil_moisture: " + measure.format(sid7_soil_moisture));
+                    break;
+
+                case 8:
+                    long raw_soil_water_potential = reading[0] * 256 + reading[1];
+                    sid8_soil_water_potential = raw_soil_water_potential;
+                    buffer[OFFSET_SOIL_WATER_POTENTIAL + dupn] = new Double(sid8_soil_water_potential);
+                    buf[OFFSET_SOIL_WATER_POTENTIAL + dupn] = sid8_soil_water_potential;
+                    count[OFFSET_SOIL_WATER_POTENTIAL + dupn]++;
+                    logger.info("sid8_soil_water_potential:" + measure.format(sid8_soil_water_potential));
+                    break;
+
+                case 9:
+                    long raw_sid9_soil_temp = reading[0] * 256 + reading[1];
+                    long raw_sid9_soil_moisture = reading[2] * 256 + reading[3];
+                    long raw_sid9_soil_conduct = reading[4] * 256 + reading[5];
+                    if (raw_sid9_soil_temp <= 900)
+                        sid9_soil_temp = (raw_sid9_soil_temp - 400.0) / 10.0;
+                    else
+                        sid9_soil_temp = (900 + 5 * (raw_sid9_soil_temp - 900.0) - 400) / 10.0;
+                    sid9_soil_moisture = raw_sid9_soil_moisture / 50.0;
+                    if (raw_sid9_soil_conduct <= 700)
+                        sid9_soil_conduct = raw_sid9_soil_conduct / 100.0;
+                    else
+                        sid9_soil_conduct = (700 + 5.0 * (raw_sid9_soil_conduct - 700)) / 100.0;
+                    buffer[OFFSET_SOIL_TEMP_DECAGON + dupn] = new Double(sid9_soil_temp);
+                    buf[OFFSET_SOIL_TEMP_DECAGON + dupn] = sid9_soil_temp;
+                    count[OFFSET_SOIL_TEMP_DECAGON + dupn]++;
+                    buffer[OFFSET_SOIL_MOISTURE_DECAGON + dupn] = new Double(sid9_soil_moisture);
+                    buf[OFFSET_SOIL_MOISTURE_DECAGON + dupn] = sid9_soil_moisture;
+                    count[OFFSET_SOIL_MOISTURE_DECAGON + dupn]++;
+                    buffer[OFFSET_SOIL_CONDUCT_DECAGON + dupn] = new Double(sid9_soil_conduct);
+                    buf[OFFSET_SOIL_CONDUCT_DECAGON + dupn] = sid9_soil_conduct;
+                    count[OFFSET_SOIL_CONDUCT_DECAGON + dupn]++;
+                    logger.info("sid9_soil_temp: " + measure.format(sid9_soil_temp) +
+                            " sid9_soil_moisture: " + measure.format(sid9_soil_moisture) +
+                            " sid9_soil_conduct: " + measure.format(sid9_soil_conduct));
+                    break;
+
+                case 10:
+                    int sign = reading[0] / 128;
+                    long raw_sid10_wind_direction = (reading[0] % 16) * 256 + reading[1];
+                    long raw_sid10_wind_speed = reading[2] * 256 + reading[3];
+                    if (sign == 0)
+                        sid10_wind_direction = java.lang.Math.acos(((raw_sid10_wind_direction * 2.0) / 4095.0) - 1) * 360.0 / (2 * java.lang.Math.PI);
+                    else
+                        sid10_wind_direction = 360 - java.lang.Math.acos((raw_sid10_wind_direction * 2.0) / 4095.0 - 1) * 360.0 / (2 * java.lang.Math.PI);
+                    sid10_wind_speed = raw_sid10_wind_speed * 3600.0 * 1.6093 / (600 * 1600 * 3.6);
+                    buffer[OFFSET_WIND_DIRECTION + dupn] = new Double(sid10_wind_direction);
+                    buf[OFFSET_WIND_DIRECTION + dupn] = sid10_wind_direction;
+                    count[OFFSET_WIND_DIRECTION + dupn]++;
+                    buffer[OFFSET_WIND_SPEED + dupn] = new Double(sid10_wind_speed);
+                    buf[OFFSET_WIND_SPEED + dupn] = sid10_wind_speed;
+                    count[OFFSET_WIND_SPEED + dupn]++;
+                    logger.info("sid10_wind_direction: " + measure.format(sid10_wind_direction) +
+                            " sid10_wind_speed: " + measure.format(sid10_wind_speed));
+                    break;
+
+                case 19:
+                    long decagon_10hs_raw = reading[0] * 256 + reading[1];
+
+                    sid19_decagon_10hs_mv = (decagon_10hs_raw * 2.5) / (4.095 * 2);
+                    sid19_decagon_10hs_vwc = (0.00000000297 * sid19_decagon_10hs_mv * sid19_decagon_10hs_mv * sid19_decagon_10hs_mv) - (0.00000737 * sid19_decagon_10hs_mv * sid19_decagon_10hs_mv) + (0.00669 * sid19_decagon_10hs_mv) - 1.92;
+
+                    buffer[OFFSET_DECAGON_10HS_MV + dupn] = new Double(sid19_decagon_10hs_mv);
+                    buf[OFFSET_DECAGON_10HS_MV + dupn] = sid19_decagon_10hs_mv;
+                    count[OFFSET_DECAGON_10HS_MV + dupn]++;
+                    buffer[OFFSET_DECAGON_10HS_VWC + dupn] = new Double(sid19_decagon_10hs_vwc);
+                    buf[OFFSET_DECAGON_10HS_VWC + dupn] = sid19_decagon_10hs_vwc;
+                    count[OFFSET_DECAGON_10HS_VWC + dupn]++;
+                    logger.info("sid19_decagon_10hs_mv: " + measure.format(sid19_decagon_10hs_mv) +
+                            " sid19_decagon_10hs_vwc: " + measure.format(sid19_decagon_10hs_vwc));
+                    break;
+
+                case 20:
+                    long solar_rad_sp212_raw = reading[0] * 256 + reading[1];
+
+                    sid20_solar_rad_sp212 = solar_rad_sp212_raw * 2.5 / 4.095 * 0.5;
+
+                    buffer[OFFSET_SOLAR_RAD_SP212 + dupn] = new Double(sid20_solar_rad_sp212);
+                    buf[OFFSET_SOLAR_RAD_SP212 + dupn] = sid20_solar_rad_sp212;
+                    count[OFFSET_SOLAR_RAD_SP212 + dupn]++;
+
+                    logger.info("sid20_solar_rad_sp212: " + measure.format(sid20_solar_rad_sp212));
+                    break;
+
+                case 12:
+                    long battery_board_voltage_raw = reading[0] * 256 + reading[1];
+                    //TODO: verify packet size (1 or 2 bytes)
+
+                    sid12_battery_board_voltage = battery_board_voltage_raw * 6 * 2.5 / 4095;
+
+                    buffer[OFFSET_BATTERY_BOARD_VOLTAGE + dupn] = new Double(sid12_battery_board_voltage);
+                    buf[OFFSET_BATTERY_BOARD_VOLTAGE + dupn] = sid12_battery_board_voltage;
+                    count[OFFSET_BATTERY_BOARD_VOLTAGE + dupn]++;
+
+                    logger.info("sid12_battery_board_voltage: " + measure.format(sid12_battery_board_voltage));
+                    break;
+
+                default:
+                    logger.debug("Unknown SID:" + sid);
+                    doPostStreamElement = false;
+                    break;
+
+            } // switch
+
+        if (doPostStreamElement) {
+
+            if (last_timestamp != previous_timestamp) {
+
+                for (int i = 1; i < OUTPUT_STRUCTURE_SIZE - 1; i++) {// accumulated values
+                    if (count[i] > 0)
+                        buffer[i] = new Double(buf[i]);
+                }
+                previous_timestamp = last_timestamp;
+
+                aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp);
+
+                logger.info(aStreamElement);
+
+                // reset
+                for (int i = 1; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
+                    buffer[i] = null;
+                    buf[i] = -1;
+                    count[i] = 0;
+                }
+            }
+
+
+        }
+        return aStreamElement;
     }
 
     private void ExtractData() {
