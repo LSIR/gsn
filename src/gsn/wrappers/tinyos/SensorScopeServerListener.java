@@ -498,10 +498,10 @@ public class SensorScopeServerListener {
             return sensorListHead;
         }
              */
-            // END TODO
+            //TODO END
             int dataPacket[] = allBuffers.get(i).getDataPacket();
             logger.info(" ---> " + Formatter.listArray(dataPacket, dataPacket.length));
-            int stationID = ((dataPacket[1] & 0xff) << 8) + dataPacket[2];
+            int stationID = ((dataPacket[1] & 0xff) << 8) + (dataPacket[2] & 0xff);
             logger.info("stationID: " + stationID + "[ " + dataPacket[1] + " << 8 + " + dataPacket[2] + " ]");
             long timestamp = 0;
         }
