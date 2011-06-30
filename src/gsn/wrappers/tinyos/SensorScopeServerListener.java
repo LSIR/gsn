@@ -1055,10 +1055,11 @@ public class SensorScopeServerListener {
         */
     }
 
-    private void PublishBuffer(Serializable[] buffer, long timestamp) {
+    private void PublishBuffer(Serializable[] buffer, long timestamp, int stationID) {
 
         try {
-            FileWriter fstream = new FileWriter(csvFileName, true);
+            String stationFileName = "logs/" + stationID + ".csv";
+            FileWriter fstream = new FileWriter(stationFileName, true);
             BufferedWriter out = new BufferedWriter(fstream);
 
             StringBuilder sb = new StringBuilder();
@@ -1343,7 +1344,7 @@ public class SensorScopeServerListener {
 
             aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp * 1000);
 
-            PublishBuffer(buffer, timestamp*1000);
+            PublishBuffer(buffer, timestamp * 1000, stationID);
 
             // reset
             for (int i = 0; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
