@@ -501,6 +501,8 @@ public class SensorScopeServerListener {
             // END TODO
             int dataPacket[] = allBuffers.get(i).getDataPacket();
             logger.info(" ---> " + Formatter.listArray(dataPacket, dataPacket.length));
+            int stationID = dataPacket[1] * 256 + dataPacket[2];
+            logger.info("stationID: " + stationID);
         }
     }
 
@@ -663,7 +665,7 @@ public class SensorScopeServerListener {
             int dataPacketSize = this.size - 3;
             int[] dataPacket = new int[dataPacketSize];
             for (int i = 0; i < dataPacketSize; i++)
-                dataPacket[i] = this.buffer[i+3];
+                dataPacket[i] = this.buffer[i + 3];
             return dataPacket;
         }
 
