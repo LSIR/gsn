@@ -9,6 +9,7 @@ import org.apache.log4j.PropertyConfigurator;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.Vector;
 
@@ -366,12 +367,17 @@ public class SensorScopeServerListener {
 
     private double[] buf = new double[OUTPUT_STRUCTURE_SIZE];
     private Serializable[] buffer = new Serializable[OUTPUT_STRUCTURE_SIZE];
+    private int[] count = new int[OUTPUT_STRUCTURE_SIZE];
 
-
+    private long last_timestamp = -1;
+    private long previous_timestamp = -1;
+    private boolean doPostStreamElement;
 
     int[] mRxBuf;
     byte[] mTxBuf;
     private static int port;
+
+    DecimalFormat measure = new DecimalFormat("0.00");
 
     private SensorScopeBuffer rxBuffer = new SensorScopeBuffer();
 
@@ -854,8 +860,9 @@ public class SensorScopeServerListener {
             boolean stillOtherChunks = true;
             int currentChunk_begin = 3;
             int timestamp_offset = -1;
+            int dataPayLoadSize = dataPacket.length - 3;
 
-            /*
+
             while (stillOtherChunks) {
                 long timestamp = -1;
                 if (currentChunk == 0) {
@@ -979,7 +986,7 @@ public class SensorScopeServerListener {
                                 double sid20_solar_rad_sp212;
 
                                 if (logger.isDebugEnabled()) {
-                                    logger.debug("SensorID:" + sid + " Dupn:" + dupn + " Reading:" + list_array(reading));
+                                    logger.debug("SensorID:" + sid + " Dupn:" + dupn + " Reading:" + Formatter.listArray(reading, reading.length));
                                     logger.debug("TS:" + timestamp + " StationID:" + stationID + " SensorID:" + sid + " Dupn:" + dupn);
                                 }
 
@@ -1239,10 +1246,13 @@ public class SensorScopeServerListener {
 
             }
 
-            */
 
 
         }
+    }
+
+    private void postStreamElement(long last_timestamp, Serializable[] buffer) {
+        logger.info("*** postStreamElement ***");
     }
 
     private boolean CheckAuthentication(String passkey, int i, int i1, byte b, byte b1) {
