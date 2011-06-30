@@ -1059,13 +1059,13 @@ public class SensorScopeServerListener {
             BufferedWriter out = new BufferedWriter(fstream);
 
             StringBuilder sb = new StringBuilder();
-            for(int i=0;i<aStreamElement.getData().length;i++) {
-                if (aStreamElement.getData()[i]==null)
+            for (int i = 0; i < aStreamElement.getData().length; i++) {
+                if (aStreamElement.getData()[i] == null)
                     sb.append(",");
                 else
                     sb.append(aStreamElement.getData()[i]).append(",");
             }
-            sb.append(Helpers.convertTimeFromLongToIso(aStreamElement.getTimeStamp(),"yyyy-MM-dd HH:mm:ss.SSS"));
+            sb.append(Helpers.convertTimeFromLongToIso(aStreamElement.getTimeStamp(), "yyyy-MM-dd HH:mm:ss.SSS"));
             sb.append("\n");
             out.write(sb.toString());
             out.close();
@@ -1316,26 +1316,36 @@ public class SensorScopeServerListener {
 
         if (doPostStreamElement) {
 
-            if (last_timestamp != previous_timestamp) {
+            aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp * 1000);
 
-                for (int i = 1; i < OUTPUT_STRUCTURE_SIZE - 1; i++) {// accumulated values
-                    if (count[i] > 0)
-                        buffer[i] = new Double(buf[i]);
-                }
-                previous_timestamp = last_timestamp;
-
-                aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp*1000);
-
-                //logger.info(aStreamElement);
-
-                // reset
-                for (int i = 1; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
-                    buffer[i] = null;
-                    buf[i] = -1;
-                    count[i] = 0;
-                }
+            // reset
+            for (int i = 0; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
+                buffer[i] = null;
+                buf[i] = -1;
+                count[i] = 0;
             }
 
+            /*
+          if (last_timestamp != previous_timestamp) {
+
+              for (int i = 1; i < OUTPUT_STRUCTURE_SIZE - 1; i++) {// accumulated values
+                  if (count[i] > 0)
+                      buffer[i] = new Double(buf[i]);
+              }
+              previous_timestamp = last_timestamp;
+
+              aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp*1000);
+
+              //logger.info(aStreamElement);
+
+              // reset
+              for (int i = 1; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
+                  buffer[i] = null;
+                  buf[i] = -1;
+                  count[i] = 0;
+              }
+          }
+            */
 
         }
         return aStreamElement;
