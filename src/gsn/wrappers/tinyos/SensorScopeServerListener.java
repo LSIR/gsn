@@ -874,7 +874,6 @@ public class SensorScopeServerListener {
             logger.info("Chunk " + currentChunk + " : TS=" + timestamp + " , length = " + currentChunkLength + " , end = " + currentChunk_end);
             logger.info(Formatter.listArray(currentChunkData, currentChunkData.length));
 
-            //TODO: process chunk
             // starting to read within a chunk of data
             // input is currentChunkData[] array
 
@@ -965,12 +964,13 @@ public class SensorScopeServerListener {
                         stillOtherReadingsInChunk = true;
                         readingShift = last_data_reading + 1;
                     } else
-                        stillOtherReadingsInChunk = false; //TODO: stop condition
+                        stillOtherReadingsInChunk = false; //TODO: check stop condition
 
                 } catch (IndexOutOfBoundsException e) {
                     logger.error("Error while parsing current chunk with readingShift="+readingShift);
                     logger.error("Chunk: "+Formatter.listArray(currentChunkData));
                     logger.error(e.getMessage(), e);
+                    return;
                 }
             }
             // end of reading within current chunk of data
