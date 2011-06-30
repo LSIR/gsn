@@ -1056,8 +1056,13 @@ public class SensorScopeServerListener {
         try {
             FileWriter fstream = new FileWriter(csvFileName, true);
             BufferedWriter out = new BufferedWriter(fstream);
-            String s = aStreamElement.toString();
-            out.write(s);
+
+            StringBuilder sb = new StringBuilder();
+            for(int i=0;i<aStreamElement.getData().length;i++) {
+                sb.append(aStreamElement.getData()[i]).append(",");
+            }
+            sb.append(aStreamElement.getTimeStamp());
+            out.write(sb.toString());
             out.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
