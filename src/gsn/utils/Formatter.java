@@ -9,6 +9,10 @@ public class Formatter {
         return listArray(a, from, to, false);
     }
 
+    public static String listArray(int[] a) {
+        return listArray(a, 0, a.length-1);
+    }
+
     public static String listArray(int[] a, int len) {
         return listArray(a, 0, len-1);
     }
