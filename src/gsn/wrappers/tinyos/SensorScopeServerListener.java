@@ -405,14 +405,6 @@ public class SensorScopeServerListener {
     private static Map<Integer, Serializable[]> latestBufferForStation = new HashMap<Integer, Serializable[]>();
 
     public SensorScopeServerListener() {
-        // Create a server socket
-        try {
-            serverSocket = new ServerSocket(port);
-        } catch (IOException e) {
-            logger.error("Couldn't create server socket");
-            logger.error(e.getMessage(), e);
-            System.exit(-1);
-        }
 
         Properties propertiesFile = new Properties();
         try {
@@ -426,12 +418,35 @@ public class SensorScopeServerListener {
         csvFolderName = propertiesFile.getProperty("csvFolder", DEFAULT_FOLDER_FOR_CSV_FILES);
         nullString = propertiesFile.getProperty("nullString", DEFAULT_NULL_STRING);
 
+        String str_port = propertiesFile.getProperty("serverPort");
+
+        if (str_port == null) {
+            logger.error("Couldn't find serverPort value in configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
+            System.exit(-1);
+        }
+        try {
+            port = Integer.parseInt(str_port);
+        } catch (NumberFormatException e) {
+            logger.error("Incorrect value (" + str_port + ") for serverPort in configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
+            System.exit(-1);
+        }
+
         logger.info("CSV folder for CSV files: " + csvFolderName);
         logger.info("Null string: \"" + nullString + "\"");
 
         mRxBuf = new int[RX_BUFFER_SIZE];
         mTxBuf = new byte[TX_BUFFER_SIZE];
-        logger.info("Server initialized.");
+
+        // Create a server socket
+        try {
+            serverSocket = new ServerSocket(port);
+        } catch (IOException e) {
+            logger.error("Couldn't create server socket");
+            logger.error(e.getMessage(), e);
+            System.exit(-1);
+        }
+
+        logger.info("Server initialized on port " + port);
     }
 
     Socket client = null;
@@ -1347,10 +1362,6 @@ public class SensorScopeServerListener {
         }
     }
 
-    private void postStreamElement(long last_timestamp, Serializable[] buffer) {
-        logger.info("*** postStreamElement ***");
-    }
-
     private boolean CheckAuthentication(String passkey, int i, int i1, byte b, byte b1) {
         return true;   //TODO: implement authentication checking method
     }
@@ -1430,12 +1441,9 @@ public class SensorScopeServerListener {
 
     public static void main(java.lang.String[] args) {
         PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
-        String str_port = args[0];
 
-        port = Integer.parseInt(str_port);
-
-        logger.warn("Server started on port: " + port);
         SensorScopeServerListener server = new SensorScopeServerListener();
+
         logger.warn("Entering server mode...");
 
         while (true) {
