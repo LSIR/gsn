@@ -7,16 +7,13 @@ import gsn.utils.Helpers;
 import gsn.utils.UnsignedByte;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import sunw.io.*;
 
 import java.io.*;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DecimalFormat;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
 
 public class SensorScopeServerListener {
 
@@ -401,6 +398,9 @@ public class SensorScopeServerListener {
     private static final byte BYTE_ACK = 0x00;
     private static final byte BYTE_NACK = 0x01;
     private static final String NULL_STRING = "";
+
+    private static Map<Integer, Long> latestTimestampForStation = new HashMap<Integer, Long>();
+    private static Map<Integer, Serializable[]> latestBufferForStation = new HashMap<Integer, Serializable[]>();
 
     public SensorScopeServerListener() {
         // Create a server socket
@@ -1055,7 +1055,48 @@ public class SensorScopeServerListener {
         */
     }
 
+    Serializable[] mergeBuffers(Serializable[] olderBuffer, Serializable[] newerBuffer) {
+        Serializable[] newBuffer = olderBuffer.clone();
+        for (int i = 0; i < olderBuffer.length; i++) {
+            if (olderBuffer[i] == null && newerBuffer[i] != null)
+                newBuffer[i] = newerBuffer[i];
+        }
+        return newBuffer;
+    }
+
     private void PublishBuffer(Serializable[] buffer, long timestamp, int stationID) {
+
+        if (!latestTimestampForStation.containsKey(stationID)) { // first time we receive that stationID
+            logger.debug("first time we receive stationID=" + stationID);
+            latestTimestampForStation.put(stationID, timestamp);
+            latestBufferForStation.put(stationID, buffer.clone());
+        } else {
+            if (timestamp == latestTimestampForStation.get(stationID)) {
+                latestBufferForStation.put(stationID, mergeBuffers(latestBufferForStation.get(stationID), buffer));
+            } else {
+                latestTimestampForStation.put(stationID, timestamp);// update timestamp
+                latestBufferForStation.put(stationID, buffer.clone());// update buffer
+                try {
+                    String stationFileName = "logs/" + stationID + "_merged.csv";
+                    FileWriter fstream = new FileWriter(stationFileName, true);
+                    BufferedWriter out = new BufferedWriter(fstream);
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < buffer.length; i++) {
+                        if (buffer[i] == null)
+                            sb.append(NULL_STRING).append(",");
+                        else
+                            sb.append(buffer[i]).append(",");
+                    }
+                    sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
+                    sb.append("\n");
+                    out.write(sb.toString());
+                    out.close();
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }// Publish it
+            }
+        }
 
         try {
             String stationFileName = "logs/" + stationID + ".csv";
