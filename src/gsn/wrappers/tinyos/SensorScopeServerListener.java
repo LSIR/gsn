@@ -663,7 +663,7 @@ public class SensorScopeServerListener {
             int dataPacketSize = this.size - 3;
             int[] dataPacket = new int[dataPacketSize];
             for (int i = 0; i < dataPacketSize; i++)
-                dataPacket[i] = this.buffer[i];
+                dataPacket[i] = this.buffer[i+3];
             return dataPacket;
         }
 
