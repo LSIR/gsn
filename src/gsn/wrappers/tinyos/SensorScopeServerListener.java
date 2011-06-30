@@ -922,7 +922,7 @@ public class SensorScopeServerListener {
 
                     int sid2 = currentChunkData[1];
 
-                    logger.debug("sid2="+sid2);
+                    logger.debug("sid2=" + sid2);
 
                     sid = (sid1 - 108) * 256 + sid2;
 
@@ -937,7 +937,7 @@ public class SensorScopeServerListener {
 
                     int sid2 = currentChunkData[1];
 
-                    logger.debug("sid2="+sid2);
+                    logger.debug("sid2=" + sid2);
 
                     sid = (sid1 - 108) * 256 + sid2;
 
@@ -957,6 +957,8 @@ public class SensorScopeServerListener {
 
                     logger.debug("SID=" + sid + " Reading=" + Formatter.listArray(reading));
                 }
+
+                logger.info("SENSOR => TS:" + timestamp + " , stationID:" + stationID + " , SID:" + sid + " , dupn:" + dupn + " , reading: " + Formatter.listArray(reading));
 
                 stillOtherReadingsInChunk = false; //TODO: stop condition
             }
