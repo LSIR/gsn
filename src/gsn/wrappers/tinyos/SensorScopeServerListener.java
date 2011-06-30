@@ -872,7 +872,7 @@ public class SensorScopeServerListener {
 
             currentChunk_begin += timestamp_offset + 1 + currentChunkLength;
 
-            if (currentChunk_begin > dataPacketLength)
+            if (currentChunk_begin > dataPacketLength-1)
                 stillOtherChunks = false;
 
             currentChunk++;
