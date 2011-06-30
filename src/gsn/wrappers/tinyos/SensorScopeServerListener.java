@@ -832,29 +832,15 @@ public class SensorScopeServerListener {
         }
     }
 
-    private void ExtractData() {
-        logger.info("\n\n ***** LOG DATA ***** \n\n");
-        logger.info(allBuffers.size() + " buffers to log");
-        for (int currentBuffer = 0; currentBuffer < allBuffers.size(); currentBuffer++) {
-            SensorScopeBuffer currentPacket = allBuffers.get(currentBuffer);
-            logger.info("[" + currentBuffer + "] " + currentPacket);
-            if (currentPacket.get(1) != PKT_TYPE_DATA || currentPacket.get(2) != DATA_TYPE_SENSING) {
-                logger.info("[" + currentBuffer + "] SKIPPED (not data packet or not sensing) ");
-                continue; //skip it
-            }
-
-            if (currentPacket.get(0) == 0 || currentPacket.get(0) >= currentPacket.getSize()) {
-                logger.error("Corrupted packet found (invalid packet length)");
-                continue; // skip it
-                //TODO: check whether all packets should be skipped or just current one
-            }
-
-            int dataPacket[] = currentPacket.getDataPacket();
+    private void interpretPacket(int[] dataPacket) {
             logger.info(" ---> " + Formatter.listArray(dataPacket, dataPacket.length));
             int stationID = (dataPacket[1] << 8) + dataPacket[2];
             logger.info("stationID: " + stationID + "[ " + dataPacket[1] + " << 8 + " + dataPacket[2] + " ]");
             long referenceTimestamp = (dataPacket[3] << 24) + (dataPacket[4] << 16) + (dataPacket[5] << 8) + dataPacket[6]; //pkt[idx] << 24) + (pkt[idx+1] << 16) + (pkt[idx+2] << 8) + pkt[idx+3];
             logger.info("Reference timestamp: " + referenceTimestamp);
+
+            if (true)   //HACK
+                return;
 
             int currentChunk = 0;
             boolean stillOtherChunks = true;
@@ -1245,6 +1231,30 @@ public class SensorScopeServerListener {
                             } else stillOtherChunks = false;
 
             }
+    }
+
+    private void ExtractData() {
+        logger.info("\n\n ***** LOG DATA ***** \n\n");
+        logger.info(allBuffers.size() + " buffers to log");
+        for (int currentBuffer = 0; currentBuffer < allBuffers.size(); currentBuffer++) {
+            SensorScopeBuffer currentPacket = allBuffers.get(currentBuffer);
+            logger.info("[" + currentBuffer + "] " + currentPacket);
+            if (currentPacket.get(1) != PKT_TYPE_DATA || currentPacket.get(2) != DATA_TYPE_SENSING) {
+                logger.info("[" + currentBuffer + "] SKIPPED (not data packet or not sensing) ");
+                continue; //skip it
+            }
+
+            if (currentPacket.get(0) == 0 || currentPacket.get(0) >= currentPacket.getSize()) {
+                logger.error("Corrupted packet found (invalid packet length)");
+                continue; // skip it
+                //TODO: check whether all packets should be skipped or just current one
+            }
+
+            int[] dataPacket = currentPacket.getDataPacket();
+
+            interpretPacket(dataPacket);
+
+
 
 
 
