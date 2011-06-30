@@ -7,8 +7,10 @@ import gsn.utils.Helpers;
 import gsn.utils.UnsignedByte;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import sunw.io.*;
 
 import java.io.*;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DecimalFormat;
@@ -398,6 +400,7 @@ public class SensorScopeServerListener {
     private static final byte PKT_TYPE_CRC = 0x01;
     private static final byte BYTE_ACK = 0x00;
     private static final byte BYTE_NACK = 0x01;
+    private static final String NULL_STRING = "";
 
     public SensorScopeServerListener() {
         // Create a server socket
@@ -988,7 +991,7 @@ public class SensorScopeServerListener {
                     StreamElement aStreamElement = createSensor(timestamp, stationID, sid, dupn, reading);
 
                     if (aStreamElement != null) {
-                        PublishStreamElement(aStreamElement);
+                        //PublishStreamElement(aStreamElement);
                     }
 
 
@@ -1050,6 +1053,28 @@ public class SensorScopeServerListener {
 
         }
         */
+    }
+
+    private void PublishBuffer(Serializable[] buffer, long timestamp) {
+
+        try {
+            FileWriter fstream = new FileWriter(csvFileName, true);
+            BufferedWriter out = new BufferedWriter(fstream);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < buffer.length; i++) {
+                if (buffer[i] == null)
+                    sb.append(NULL_STRING).append(",");
+                else
+                    sb.append(buffer[i]).append(",");
+            }
+            sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
+            sb.append("\n");
+            out.write(sb.toString());
+            out.close();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private void PublishStreamElement(StreamElement aStreamElement) {
@@ -1317,6 +1342,8 @@ public class SensorScopeServerListener {
         if (doPostStreamElement) {
 
             aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp * 1000);
+
+            PublishBuffer(buffer, timestamp*1000);
 
             // reset
             for (int i = 0; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
