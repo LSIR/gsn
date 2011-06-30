@@ -501,9 +501,9 @@ public class SensorScopeServerListener {
             //TODO END
             int dataPacket[] = allBuffers.get(i).getDataPacket();
             logger.info(" ---> " + Formatter.listArray(dataPacket, dataPacket.length));
-            int stationID = ((dataPacket[1] & 0xff) << 8) + (dataPacket[2] & 0xff);
+            int stationID = (dataPacket[1] << 8) + dataPacket[2] ;
             logger.info("stationID: " + stationID + "[ " + dataPacket[1] + " << 8 + " + dataPacket[2] + " ]");
-            long referenceTimestamp = ((dataPacket[3] & 0xff) << 24) + ((dataPacket[4] & 0xff) << 16) + ((dataPacket[5] & 0xff) << 8) + (dataPacket[6] & 0xff); //pkt[idx] << 24) + (pkt[idx+1] << 16) + (pkt[idx+2] << 8) + pkt[idx+3];
+            long referenceTimestamp = (dataPacket[3]  << 24) + (dataPacket[4]  << 16) + (dataPacket[5] << 8) + dataPacket[6] ; //pkt[idx] << 24) + (pkt[idx+1] << 16) + (pkt[idx+2] << 8) + pkt[idx+3];
             logger.info("Reference timestamp: " + referenceTimestamp);
         }
     }
