@@ -392,7 +392,6 @@ public class SensorScopeServerListener {
     private static final byte PKT_TYPE_CRC = 0x01;
     private static final byte BYTE_ACK = 0x00;
     private static final byte BYTE_NACK = 0x01;
-    private static final byte BUFTYPE_GPRS = 0x00; // TODO: check exact value in sensor.h
 
     public SensorScopeServerListener() {
         // Create a server socket
@@ -862,8 +861,10 @@ public class SensorScopeServerListener {
 
             logger.info("currentChunk_begin:" + currentChunk_begin + " , currentChunkLength: " + currentChunkLength + " , currentChunk_end: " + currentChunk_end);
 
-            if (currentChunk_end > dataPacketLength)
+            if (currentChunk_end > dataPacketLength) {
                 logger.error("Error in packet. Chunk end is out of bounds");
+                return;
+            }
 
             int[] currentChunkData = new int[currentChunkLength];
             for (int j = 0; j < currentChunkLength; j++) {
