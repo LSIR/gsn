@@ -3,6 +3,7 @@ package gsn.wrappers.tinyos;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.utils.Formatter;
+import gsn.utils.Helpers;
 import gsn.utils.UnsignedByte;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -1061,7 +1062,8 @@ public class SensorScopeServerListener {
             for(int i=0;i<aStreamElement.getData().length;i++) {
                 sb.append(aStreamElement.getData()[i]).append(",");
             }
-            sb.append(aStreamElement.getTimeStamp());
+            sb.append(Helpers.convertTimeFromLongToIso(aStreamElement.getTimeStamp(),"yyyy-MM-dd HH:mm:ss.SSS"));
+            sb.append("\n");
             out.write(sb.toString());
             out.close();
         } catch (Exception e) {
