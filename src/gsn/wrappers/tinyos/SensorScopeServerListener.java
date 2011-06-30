@@ -1060,7 +1060,10 @@ public class SensorScopeServerListener {
 
             StringBuilder sb = new StringBuilder();
             for(int i=0;i<aStreamElement.getData().length;i++) {
-                sb.append(aStreamElement.getData()[i]).append(",");
+                if (aStreamElement.getData()[i]==null)
+                    sb.append(",");
+                else
+                    sb.append(aStreamElement.getData()[i]).append(",");
             }
             sb.append(Helpers.convertTimeFromLongToIso(aStreamElement.getTimeStamp(),"yyyy-MM-dd HH:mm:ss.SSS"));
             sb.append("\n");
@@ -1321,7 +1324,7 @@ public class SensorScopeServerListener {
                 }
                 previous_timestamp = last_timestamp;
 
-                aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp);
+                aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp*1000);
 
                 //logger.info(aStreamElement);
 
