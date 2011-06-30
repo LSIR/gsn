@@ -858,15 +858,15 @@ public class SensorScopeServerListener {
             }
 
             int currentChunkLength = dataPacket[currentChunk_begin + timestamp_offset];
-            int currentChunk_end = dataPacket[currentChunk_begin + timestamp_offset + currentChunkLength];
+            int currentChunk_end = currentChunk_begin + timestamp_offset + currentChunkLength;
 
-            int[] data = new int[currentChunkLength];
+            int[] currentChunkData = new int[currentChunkLength];
             for (int j = 0; j < currentChunkLength; j++) {
-                data[j] = dataPacket[currentChunk_begin + timestamp_offset + j];
+                currentChunkData[j] = dataPacket[currentChunk_begin + timestamp_offset + j];
             }
 
             logger.info("Chunk " + currentChunk + " : TS=" + timestamp + " , length = " + currentChunkLength + " , end = " + currentChunk_end);
-            logger.info(Formatter.listArray(data, data.length));
+            logger.info(Formatter.listArray(currentChunkData, currentChunkData.length));
 
             //TODO: process chunk
 
