@@ -1073,7 +1073,9 @@ public class SensorScopeServerListener {
         } else {
             if (timestamp == latestTimestampForStation.get(stationID)) {
                 latestBufferForStation.put(stationID, mergeBuffers(latestBufferForStation.get(stationID), buffer));
+                logger.debug("Merging buffers for stationID=" + stationID);
             } else {
+                logger.debug("Publishing data for stationID=" + stationID);
                 latestTimestampForStation.put(stationID, timestamp);// update timestamp
                 latestBufferForStation.put(stationID, buffer.clone());// update buffer
                 try {
