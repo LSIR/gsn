@@ -14,6 +14,8 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
@@ -21,6 +23,10 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	
 	private static final byte RAW_DATA_TYPE = 0;
 	private static final byte STATUS_TYPE = 1;
+
+	private static final String RAW_STATUS_FILE_TYPE = "raw-status";
+	private static final String EVENT_FILE_TYPE = "events";
+	private static final String CONFIG_FILE_TYPE = "configuration";
 	
 	private static final byte[] rawHeader = {(byte) 0xB5, 0x62, 0x02, 0x10};
 	private static final byte[] statusHeader = {0x6D, 0x74, 0x01, 0x01};
@@ -28,8 +34,9 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	private static final transient Logger logger = Logger.getLogger(GPSLoggerDataParser.class);
 
 	private String storage_directory = null;
+	private int file_type;
 	
-	private static DataField[] dataField = {
+	private static DataField[] rawStatusField = {
 			new DataField("POSITION", "INTEGER"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("TIMESTAMP", "BIGINT"),
@@ -46,6 +53,15 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("STATUS_INCL_Y", "SMALLINT"),
 			new DataField("RAW_DATA", "BINARY")};
 	
+	private static DataField[] eventField = {
+			new DataField("POSITION", "INTEGER"),
+			new DataField("GENERATION_TIME", "BIGINT"),
+			new DataField("TIMESTAMP", "BIGINT"),
+			new DataField("DEVICE_ID", "INTEGER"),
+
+			new DataField("EVENT_COUNT", "INTEGER"),
+			new DataField("EVENT", "VARCHAR(256)")};
+	
 	@Override
 	public boolean initialize() {
 		boolean ret = super.initialize();
@@ -53,136 +69,350 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		if (storage_directory != null) {
 			storage_directory = new File(storage_directory, deployment).getPath();
 		}
+		
+		String filetype = getVirtualSensorConfiguration().getMainClassInitialParams().get("file_type");
+		if (filetype != null) {
+			if (filetype.equalsIgnoreCase(RAW_STATUS_FILE_TYPE))
+				file_type = 1;
+			else if (filetype.equalsIgnoreCase(EVENT_FILE_TYPE))
+				file_type = 2;
+			else if (filetype.equalsIgnoreCase(CONFIG_FILE_TYPE))
+				file_type = 3;
+			else {
+				logger.error("file_type " + filetype + " not recognized");
+				return false;
+			}
+		}
+		else {
+			logger.error("file_type init parameter has to specified in virtual sensor xml file");
+			return false;
+		}
+		
 		return ret;
 	}
 	
 	
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
-		File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), (String) data.getData("relative_file"));
-		file = file.getAbsoluteFile();
-		
-		logger.info("new incoming file (" + file.getAbsolutePath() + ")");
-
-		short GPS_RAW_DATA_VERSION = 1;
-		int rawSampleCount = 1;
-		int rawIncorrectChecksumCount = 0;
-		int statusSampleCount = 1;
-		int statusIncorrectChecksumCount = 0;
-		try {
-			DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
+		String relativeFile = (String) data.getData("relative_file" + file_type);
+		if (relativeFile != null) {
+			File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), relativeFile);
+			file = file.getAbsoluteFile();
 			
-			int b = dis.readByte();
-			while (true) {
-				boolean readOn = false;
-				if (b == rawHeader[0]) {
-					b = dis.readByte();
-					if (b == rawHeader[1]) {
-						b = dis.readByte();
-						if (b == rawHeader[2]) {
-							b = dis.readByte();
-							if (b == rawHeader[3]) {
-								// gps logger raw data
-								byte [] rawPacket = getRawPacket(dis, rawHeader, file.getAbsolutePath());
-								if (checkChecksum(rawPacket)) {
-									long timestamp = getGPSRawTimestamp(rawPacket);
-									data = new StreamElement(dataField, new Serializable[]{
-											data.getData(dataField[0].getName()),
-											timestamp,
-											timestamp,
-											data.getData(dataField[3].getName()),
-											RAW_DATA_TYPE,
-											rawSampleCount,
-											GPS_RAW_DATA_VERSION,
-											(int)getUByte(rawPacket[12]),
-											null,
-											null,
-											null,
-											null,
-											null,
-											rawPacket});
+			logger.info("new incoming file (" + file.getAbsolutePath() + ")");
+	
+			switch (file_type) {
+				case 1:
+					short GPS_RAW_DATA_VERSION = 1;
+					int rawSampleCount = 1;
+					int rawIncorrectChecksumCount = 0;
+					int statusSampleCount = 1;
+					int statusIncorrectChecksumCount = 0;
+					try {
+						DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
+						
+						int b = dis.readByte();
+						while (true) {
+							boolean readOn = false;
+							if (b == rawHeader[0]) {
+								b = dis.readByte();
+								if (b == rawHeader[1]) {
+									b = dis.readByte();
+									if (b == rawHeader[2]) {
+										b = dis.readByte();
+										if (b == rawHeader[3]) {
+											// gps logger raw data
+											byte [] rawPacket = getRawPacket(dis, rawHeader, file.getAbsolutePath());
+											if (checkChecksum(rawPacket)) {
+												long timestamp = getGPSRawTimestamp(rawPacket);
+												data = new StreamElement(rawStatusField, new Serializable[]{
+														data.getData(rawStatusField[0].getName()),
+														timestamp,
+														timestamp,
+														data.getData(rawStatusField[3].getName()),
+														RAW_DATA_TYPE,
+														rawSampleCount,
+														GPS_RAW_DATA_VERSION,
+														(int)getUByte(rawPacket[12]),
+														null,
+														null,
+														null,
+														null,
+														null,
+														rawPacket});
+	
+												super.dataAvailable(inputStreamName, data);
+											}
+											else {
+												rawIncorrectChecksumCount++;
+												logger.warn("checksum for gps raw data sample " + rawSampleCount + " is not correct in " + file.getAbsolutePath());
+												dis.reset();
+											}
+											
+											rawSampleCount++;
+											if (rawSampleCount==Integer.MAX_VALUE)
+												rawSampleCount = 1;
+											
+											readOn = true;
+										}
+									}
+								}
+							}
+							else if (b == statusHeader[0]) {
+								b = dis.readByte();
+								if (b == statusHeader[1]) {
+									b = dis.readByte();
+									if (b == statusHeader[2]) {
+										b = dis.readByte();
+										if (b == statusHeader[3]) {
+											// gps logger status data
+											byte [] rawPacket = getRawPacket(dis, statusHeader, file.getAbsolutePath());
+											if (checkChecksum(rawPacket)) {
+												ByteBuffer buf = ByteBuffer.wrap(rawPacket);
+												buf.order(ByteOrder.LITTLE_ENDIAN);
+												buf.position(6);
+												long timestamp = getUInt(new byte[]{buf.get(),buf.get(),buf.get(),buf.get()})*1000L;
+												data = new StreamElement(rawStatusField, new Serializable[]{
+														data.getData(rawStatusField[0].getName()),
+														timestamp,
+														timestamp,
+														data.getData(rawStatusField[3].getName()),
+														STATUS_TYPE,
+														statusSampleCount,
+														null,
+														null,
+														getUShort(new byte[]{buf.get(),buf.get()}),
+														getUShort(new byte[]{buf.get(),buf.get()})/10,
+														(short)(buf.getShort()/10),
+														buf.getShort(),
+														buf.getShort(),
+														rawPacket});
+	
+												super.dataAvailable(inputStreamName, data);
+											}
+											else {
+												statusIncorrectChecksumCount++;
+												logger.warn("checksum for gps status data sample " + statusSampleCount + " is not correct in " + file.getAbsolutePath());
+												dis.reset();
+											}
+											
+											statusSampleCount++;
+											if (statusSampleCount==Integer.MAX_VALUE)
+												statusSampleCount = 1;
+											
+											readOn = true;
+										}
+									}
+								}
+							}
+							else
+								readOn = true;
+							
+							if (readOn)
+								b = dis.readByte();
+						}
+					} catch (EOFException e) {
+						logger.debug("end of file reached");
+					} catch (IOException e) {
+						logger.error(e.getMessage(), e);
+					}
+	
+					logger.info((rawSampleCount-1) + " raw samples and " + (statusSampleCount-1) + " status samples read");
+					if (rawIncorrectChecksumCount > 0)
+						logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data samples in " + file.getAbsolutePath());
+					if (statusIncorrectChecksumCount > 0)
+						logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data samples in " + file.getAbsolutePath());
+					break;
+				case 2:
+					int eventCount = 0;
+					int unknownEventCounter = 0;
+					long lastTimestamp = 0;
+					try {
+						DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
+	
+						byte[] tmp4b = new byte[4];
+						byte[] tmp2b = new byte[2];
+						Vector<String> noTimestampEvents = new Vector<String>();
+						boolean timestampReady = false;
+						while (true) {
+							if(dis.read(tmp4b) != 4)
+								break;
+							long timestamp = getUInt(tmp4b)*1000L;
 
-									super.dataAvailable(inputStreamName, data);
+							if(dis.read(tmp2b) != 2)
+								break;
+							int eventNr = getUShort(tmp2b);
+
+							if(dis.read(tmp2b) != 2)
+								break;
+							int eventData = getUShort(tmp2b);
+
+							String event = null;
+							if (eventNr == 0x0000) {
+								if (!noTimestampEvents.isEmpty()) {
+									int cnt = 1;
+									for(Iterator<String> it=noTimestampEvents.iterator(); it.hasNext(); ) {
+										String noTimestampEvent = it.next();
+										eventCount++;
+										data = new StreamElement(eventField, new Serializable[]{
+												data.getData(eventField[0].getName()),
+												lastTimestamp+cnt,
+												lastTimestamp+cnt,
+												data.getData(eventField[3].getName()),
+												eventCount,
+												noTimestampEvent});
+										
+										super.dataAvailable(inputStreamName, data);
+										cnt++;
+									}
+									noTimestampEvents.clear();
+								}
+								continue;
+							}
+							else {
+								switch (eventNr) {
+									case 0x0001:
+										timestampReady = false;
+										event = "firmware version " + eventData + " startup";
+										break;
+									case 0x0002:
+										event = "initialize persistent parameter with default values (parameter set version = " + eventData + ")";
+										break;
+									case 0x0003:
+										event = "sd card full";
+										break;
+									case 0x0004:
+										switch (eventData) {
+										case 0x0001:
+											event = "solar voltage measurement done";
+											break;
+										case 0x0002:
+											event = "humidity and temperature measurement done";
+											break;
+										case 0x0004:
+											event = "tilt x measurement done";
+											break;
+										case 0x0008:
+											event = "tilt y measurement done";
+											break;
+										default:
+											logger.warn("measurement done flag " + eventData + " unknown");
+											break;
+										}
+										break;
+									case 0x0005:
+										event = "enter STOP mode";
+										break;
+									case 0x0006:
+										event = "self-test started";
+										break;
+									case 0x0007:
+										switch (eventData) {
+										case 0x0000:
+											event = "self-test finished: measurement failed (test aborted)";
+											break;
+										case 0x0001:
+											event = "self-test finished: measurement ok, GPS failure";
+											break;
+										case 0x0002:
+											event = "self-test finished: measurement, GPS ok, SD-Card failure";
+											break;
+										case 0x0003:
+											event = "self-test finished: all tests ok so far, but measurement values out of expected range";
+											break;
+										case 0x0004:
+											event = "self-test finished: passed successfully";
+											break;
+										default:
+											logger.warn("self-test result data " + eventData + " unknown");
+											break;
+										}
+										break;
+									case 0x0008:
+										event = "the custom GPS configuration (string index " + eventData + ") failed";
+										break;
+									case 0x0009:
+										timestampReady = true;
+										event = "first valid GPS week received from GPS receiver (GPS week number = " + eventData + ")";
+										break;
+									case 0x000A:
+										event = "GPS message lost";
+										break;
+									case 0x000B:
+										event = "fatal GPS failure";
+										break;
+									case 0x000C:
+										event = "fatal measurement failure";
+										break;
+									case 0x1000:
+										event = "repeated last event " + eventData;
+										break;
+									default:
+										logger.warn("event number " + eventNr + " unknown");
+										break;
+								}
+		
+								if (event != null) {
+									if (timestampReady) {
+										eventCount++;
+										if (!noTimestampEvents.isEmpty()) {
+											int cnt = noTimestampEvents.size();
+											for(Iterator<String> it=noTimestampEvents.iterator(); it.hasNext(); ) {
+												String noTimeStampEvent = it.next();
+												data = new StreamElement(eventField, new Serializable[]{
+														data.getData(eventField[0].getName()),
+														timestamp-cnt,
+														timestamp-cnt,
+														data.getData(eventField[3].getName()),
+														eventCount,
+														noTimeStampEvent});
+
+												super.dataAvailable(inputStreamName, data);
+												cnt--;
+												eventCount++;
+											}
+											noTimestampEvents.clear();
+										}
+										
+										data = new StreamElement(eventField, new Serializable[]{
+												data.getData(eventField[0].getName()),
+												timestamp,
+												timestamp,
+												data.getData(eventField[3].getName()),
+												eventCount,
+												event});
+
+										super.dataAvailable(inputStreamName, data);
+										lastTimestamp = timestamp;
+										
+									}
+									else
+										noTimestampEvents.add(event);
 								}
 								else {
-									rawIncorrectChecksumCount++;
-									logger.warn("checksum for gps raw data sample " + rawSampleCount + " is not correct in " + file.getAbsolutePath());
-									dis.reset();
+									eventCount++;
+									unknownEventCounter++;
 								}
-								
-								rawSampleCount++;
-								if (rawSampleCount==Integer.MAX_VALUE)
-									rawSampleCount = 1;
-								
-								readOn = true;
 							}
 						}
+					} catch (EOFException e) {
+						logger.debug("end of file reached");
+					} catch (IOException e) {
+						logger.error(e.getMessage(), e);
 					}
-				}
-				else if (b == statusHeader[0]) {
-					b = dis.readByte();
-					if (b == statusHeader[1]) {
-						b = dis.readByte();
-						if (b == statusHeader[2]) {
-							b = dis.readByte();
-							if (b == statusHeader[3]) {
-								// gps logger status data
-								byte [] rawPacket = getRawPacket(dis, statusHeader, file.getAbsolutePath());
-								if (checkChecksum(rawPacket)) {
-									ByteBuffer buf = ByteBuffer.wrap(rawPacket);
-									buf.order(ByteOrder.LITTLE_ENDIAN);
-									buf.position(6);
-									long timestamp = getUInt(new byte[]{buf.get(),buf.get(),buf.get(),buf.get()})*1000L;
-									data = new StreamElement(dataField, new Serializable[]{
-											data.getData(dataField[0].getName()),
-											timestamp,
-											timestamp,
-											data.getData(dataField[3].getName()),
-											STATUS_TYPE,
-											statusSampleCount,
-											null,
-											null,
-											getUShort(new byte[]{buf.get(),buf.get()}),
-											getUShort(new byte[]{buf.get(),buf.get()})/10,
-											(short)(buf.getShort()/10),
-											buf.getShort(),
-											buf.getShort(),
-											rawPacket});
-
-									super.dataAvailable(inputStreamName, data);
-								}
-								else {
-									statusIncorrectChecksumCount++;
-									logger.warn("checksum for gps status data sample " + statusSampleCount + " is not correct in " + file.getAbsolutePath());
-									dis.reset();
-								}
-								
-								statusSampleCount++;
-								if (statusSampleCount==Integer.MAX_VALUE)
-									statusSampleCount = 1;
-								
-								readOn = true;
-							}
-						}
-					}
-				}
-				else
-					readOn = true;
-				
-				if (readOn)
-					b = dis.readByte();
+	
+					logger.info(eventCount + " events read");
+					if (unknownEventCounter > 0)
+						logger.warn(unknownEventCounter + " events have not been recognized");
+					break;
+				case 3:
+					logger.warn("configuration parsing not yet implemented");
+					break;
+				default:
+					logger.error("file_type unknown");
+					break;
 			}
-		} catch (EOFException e) {
-			logger.debug("end of file reached");
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
 		}
-
-		logger.info((rawSampleCount-1) + " raw samples and " + (statusSampleCount-1) + " status samples read");
-		if (rawIncorrectChecksumCount > 0)
-			logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data samples in " + file.getAbsolutePath());
-		if (statusIncorrectChecksumCount > 0)
-			logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data samples in " + file.getAbsolutePath());
 	}
 	
 	

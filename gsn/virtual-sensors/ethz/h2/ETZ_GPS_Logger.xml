@@ -3,19 +3,25 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
        	<web-input password="test">
-         	<command name="logger_file">
-				<field name="file" type="*binary">the gps logger file</field>
+         	<command name="files">
+				<field name="raw_status_file" type="*binary">file</field>
+				<field name="event_file" type="*binary">file</field>
+				<field name="config_file" type="*binary">file</field>
         	</command>
    		</web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-            <field name="RELATIVE_FILE" type="VARCHAR(255)"/>
-            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE" />
+            <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
+            <field name="RAW_STATUS_DATA" type="binary" data-path-field="RELATIVE_FILE1" />
+            <field name="RELATIVE_FILE2" type="VARCHAR(255)"/>
+            <field name="EVENT_DATA" type="binary" data-path-field="RELATIVE_FILE2" />
+            <field name="RELATIVE_FILE3" type="VARCHAR(255)"/>
+            <field name="CONFIGURATION_DATA" type="binary" data-path-field="RELATIVE_FILE3" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>GPS Logger files information from ETZ deployment</description>
+    <description>GPS Logger files from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
@@ -24,7 +30,8 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="file-getter">
                     <predicate key="subdirectory-name">gps-logger</predicate>
-                    <predicate key="filename-regex">^D_(\d+)_\d+_\d+\.dat$</predicate>
+                    <predicate key="filename-regex1">^D_(\d{6})_\d+_\d+\.dat$</predicate>
+                    <predicate key="filename-regex2">^E_(\d{6})_\d+_\d+\.log$</predicate>
                     <predicate key="deviceid-from-filename">true</predicate>
                 </address>
                 <query> select * from wrapper </query>

@@ -6,15 +6,18 @@
             <param name="position_mapping" />
         </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-            <field name="RELATIVE_FILE" type="VARCHAR(255)"/>
-            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE" />
+            <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
+            <field name="RAW_STATUS_DATA" type="binary" data-path-field="RELATIVE_FILE1" />
+            <field name="RELATIVE_FILE2" type="VARCHAR(255)"/>
+            <field name="EVENT_DATA" type="binary" data-path-field="RELATIVE_FILE2" />
+            <field name="RELATIVE_FILE3" type="VARCHAR(255)"/>
+            <field name="CONFIGURATION_DATA" type="binary" data-path-field="RELATIVE_FILE3" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>GPS Logger files information from ETZ deployment</description>
+    <description>GPS Logger files from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />

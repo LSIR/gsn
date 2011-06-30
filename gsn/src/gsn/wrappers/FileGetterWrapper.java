@@ -3,7 +3,9 @@ package gsn.wrappers;
 import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.TimeZone;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,16 +18,13 @@ import gsn.beans.DataField;
 
 public class FileGetterWrapper extends AbstractWrapper {
 	
-	private final static DataField[] outputStructure = new DataField[] {
-				new DataField("DEVICE_ID", "INTEGER"),
-				new DataField("GENERATION_TIME", "BIGINT"),
-				new DataField("RELATIVE_FILE", "VARCHAR(255)")};
+	private static DataField[] outputStructure;
 
 	private final transient Logger logger = Logger.getLogger( FileGetterWrapper.class );
 
 	private File deploymentBinaryDir = null;
 	private String subdirectoryName = null;
-	private Pattern filenamePattern = null;
+	private Pattern[] filenamePatternArray;
 	private boolean deviceIdFromFilename;
 	final static private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
 
@@ -72,17 +71,42 @@ public class FileGetterWrapper extends AbstractWrapper {
 	    	else
 	    		logger.info("created new storage directory >" + deploymentBinaryDir + "<");
 		}
-		
-		String regex = getActiveAddressBean().getPredicateValue("filename-regex");
-		if (regex != null) {
-			filenamePattern = Pattern.compile(regex);
-			logger.info("filename has to match regular expression: " + regex);
-			
-			deviceIdFromFilename = Boolean.parseBoolean(getActiveAddressBean().getPredicateValue("deviceid-from-filename"));
-			if (deviceIdFromFilename)
-				logger.info("device id will be extracted from filename using the first group from regular expresion: " + regex);
+
+		int size = -1;
+		for (int i=0; i<getActiveAddressBean().getVirtualSensorConfig().getWebinput().length; i++) {
+			if (getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getName().equalsIgnoreCase("files")) {
+				size = getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getParameters().length+2;
+				break;
+			}
 		}
-		else if (Boolean.parseBoolean(getActiveAddressBean().getPredicateValue("deviceid-from-filename"))) {
+		if (size == -1) {
+			logger.error("command name files has to be existing in the web-input section");
+			return false;
+		}
+		outputStructure = new DataField[size];
+		outputStructure[0] = new DataField("DEVICE_ID", "INTEGER");
+		outputStructure[1] = new DataField("GENERATION_TIME", "BIGINT");
+		filenamePatternArray = new Pattern [size-2];
+		boolean hasRegex = false;
+		for (int i=2; i<size; i++) {
+			String regex = getActiveAddressBean().getPredicateValue("filename-regex" + (i-1));
+			if (regex != null) {
+				hasRegex = true;
+				filenamePatternArray[i-2] = Pattern.compile(regex);
+				logger.info("RELATIVE_FILE" + (i-1) + " has to match regular expression: " + regex);
+				
+				deviceIdFromFilename = Boolean.parseBoolean(getActiveAddressBean().getPredicateValue("deviceid-from-filename"));
+				if (deviceIdFromFilename)
+					logger.info("device id will be extracted from RELATIVE_FILE" + (i-1) + " using the first group from regular expresion: " + regex);
+			}
+			else
+				filenamePatternArray[i-2] = null;
+			
+			outputStructure[i] = new DataField("RELATIVE_FILE" + (i-1), "VARCHAR(255)");
+		}
+		
+		
+		if (!hasRegex && Boolean.parseBoolean(getActiveAddressBean().getPredicateValue("deviceid-from-filename"))) {
 			logger.error("deviceid-from-filename predicate key can only be used together with filename-regex");
 			return false;
 		}
@@ -92,29 +116,42 @@ public class FileGetterWrapper extends AbstractWrapper {
 	
 	@Override
 	public boolean sendToWrapper ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
-		if( action.compareToIgnoreCase("logger_file") == 0 ) {
+		if( action.compareToIgnoreCase("files") == 0 ) {
 			try {
 				long gentime = System.currentTimeMillis();
 				String deviceid = null;
-				FileItem inputFileItem = null;
+				Vector<LoggerFile> inputFileItems = new Vector<LoggerFile>();
 				
 				for( int i=0; i<paramNames.length; i++ ) {
 					String tmp = paramNames[i];
 					if( tmp.compareToIgnoreCase("device_id") == 0 )
 						deviceid = (String) paramValues[i];
-					else if( tmp.compareToIgnoreCase("file") == 0 )
-						inputFileItem = (FileItem) paramValues[i];
+					else if( tmp.endsWith("_file") )
+						inputFileItems.add(new LoggerFile((FileItem) paramValues[i], tmp));
+					else
+						logger.warn("unknown upload field: " + tmp + " -> skip it");
 				}
 				
-				if (filenamePattern != null) {
-					Matcher m = filenamePattern.matcher(inputFileItem.getName());
-					if (!m.matches()) {
-						logger.error("filename " + inputFileItem.getName() + " does not match regular expression " + filenamePattern.toString());
-						return false;
+				FileItem lastFileItem = null;
+				
+				for (int i=0; i<inputFileItems.size(); i++) {
+					if (!inputFileItems.get(i).getFileItem().getName().isEmpty() && filenamePatternArray[i] != null) {
+						Matcher m = filenamePatternArray[i].matcher(inputFileItems.get(i).getFileItem().getName());
+						if (!m.matches()) {
+							logger.error("filename " + inputFileItems.get(i).getFileItem().getName() + " does not match regular expression " + filenamePatternArray[i].toString());
+							return false;
+						}
+		
+						if (deviceIdFromFilename) {
+							String id = m.group(1);
+							if (deviceid != null && deviceid.compareTo(id) != 0 && lastFileItem != null) {
+								logger.error("the device id extracted from " + lastFileItem.getName() + " and " + inputFileItems.get(i).getFileItem().getName() + " are not equal");
+								return false;
+							}
+							deviceid = id;
+							lastFileItem = inputFileItems.get(i).getFileItem();
+						}
 					}
-	
-					if (deviceIdFromFilename)
-						deviceid = m.group(1);
 				}
 				
 				if (deviceid.equals("")) {
@@ -144,25 +181,36 @@ public class FileGetterWrapper extends AbstractWrapper {
 			    		logger.info("created new storage directory >" + storageDir + "<");
 				}
 				
-				if (inputFileItem.getSize() <= 0) {
-					logger.warn("uploaded file is empty => skip it");
-					return false;
-				}
-					
-				int pos = inputFileItem.getName().lastIndexOf('.');
-				String suffix = "";
-				if (pos > 0 && pos < inputFileItem.getName().length() - 1)
-					suffix = inputFileItem.getName().substring(pos);
-				String filename = format.format(new java.util.Date(gentime))+suffix;
-				File outputFile = new File(storageDir, filename);
-				try {
-					inputFileItem.write(outputFile);
-				} catch (Exception e) {
-					logger.error(e.getMessage());
-					return false;
+				Serializable[] output = new Serializable[inputFileItems.size()+2];
+				output[0] = id;
+				output[1] = gentime;
+				int i = 2;
+				for (Iterator<LoggerFile> it = inputFileItems.iterator (); it.hasNext (); ) {
+					LoggerFile inputLoggerFile = it.next ();
+					if (inputLoggerFile.getFileItem().getSize() <= 0) {
+						if (!inputLoggerFile.getFileItem().getName().isEmpty())
+							logger.warn("uploaded file " + inputLoggerFile.getFileItem().getName() + " is empty => skip it");
+						output[i] = null;
+					}
+					else {
+						int pos = inputLoggerFile.getFileItem().getName().lastIndexOf('.');
+						String suffix = "";
+						if (pos > 0 && pos < inputLoggerFile.getFileItem().getName().length() - 1)
+							suffix = inputLoggerFile.getFileItem().getName().substring(pos);
+						String filename = inputLoggerFile.getPrefix()+"_"+format.format(new java.util.Date(gentime))+suffix;
+						File outputFile = new File(storageDir, filename);
+						try {
+							inputLoggerFile.getFileItem().write(outputFile);
+						} catch (Exception e) {
+							logger.error(e.getMessage());
+							return false;
+						}
+						output[i] = subdirectoryName + "/" + filename;
+					}
+					i++;
 				}
 				
-				return postStreamElement(new Serializable[]{id, gentime, subdirectoryName + "/" + filename});
+				return postStreamElement(output);
 			} catch(Exception e) {
 				logger.error(e.getMessage(), e);
 				return false;
@@ -187,4 +235,21 @@ public class FileGetterWrapper extends AbstractWrapper {
 		return "FileGetterWrapper";
 	}
 
+	class LoggerFile {
+		private FileItem file;
+		private String prefix;
+		
+		public LoggerFile(FileItem file, String prefix) {
+			this.file = file;
+			this.prefix = prefix;
+		}
+		
+		public String getPrefix() {
+			return prefix;
+		}
+		
+		public FileItem getFileItem() {
+			return file;
+		}
+	}
 }

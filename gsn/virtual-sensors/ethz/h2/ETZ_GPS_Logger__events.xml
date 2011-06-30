@@ -1,26 +1,21 @@
-<virtual-sensor name="ETZ_GPS_Logger__muxed__parsed" priority="10" >
+<virtual-sensor name="ETZ_GPS_Logger__events" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.GPSLoggerDataParser</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="file_type">events</param>
+        </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true"/>
-		    <field name="DATA_TYPE" type="TINYINT"/>
-		    <field name="SAMPLE_COUNT" type="INTEGER"/>
-            <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
-		    <field name="GPS_SATS" type="INTEGER"/>
-			<field name="STATUS_SOLAR" type="INTEGER" unit="mV"/>
-			<field name="STATUS_HUMIDITY" type="INTEGER" unit="%"/>
-			<field name="STATUS_TEMPERATURE" type="SMALLINT" unit="°C"/>
-			<field name="STATUS_INCL_X" type="SMALLINT"/>
-			<field name="STATUS_INCL_Y" type="SMALLINT"/>
-            <field name="RAW_DATA" type="binary"/>
+		    <field name="EVENT_COUNT" type="INTEGER"/>
+		    <field name="EVENT" type="VARCHAR(256)"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>GPS Logger parsed raw and status information from ETZ deployment</description>
+    <description>GPS Logger parsed event information from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
@@ -28,7 +23,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_Logger__mapped</predicate>
+                    <predicate key="query">select * from ETZ_GPS_Logger</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
