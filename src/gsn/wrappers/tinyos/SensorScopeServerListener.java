@@ -862,6 +862,9 @@ public class SensorScopeServerListener {
 
             logger.info("currentChunk_begin:" + currentChunk_begin + " , currentChunkLength: " + currentChunkLength + " , currentChunk_end: " + currentChunk_end);
 
+            if (currentChunk_end > dataPacketLength)
+                logger.error("Error in packet. Chunk end is out of bounds");
+
             int[] currentChunkData = new int[currentChunkLength];
             for (int j = 0; j < currentChunkLength; j++) {
                 currentChunkData[j] = dataPacket[currentChunk_begin + timestamp_offset + j + 1];
