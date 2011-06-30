@@ -484,26 +484,24 @@ public class SensorScopeServerListener {
         logger.info("\n\n ***** LOG DATA ***** \n\n");
         logger.info(allBuffers.size() + " buffers to log");
         for (int i = 0; i < allBuffers.size(); i++) {
-            logger.info("[" + i + "] " + allBuffers.get(i));
-            if (allBuffers.get(i).get(1) != PKT_TYPE_DATA || allBuffers.get(i).get(2) != DATA_TYPE_SENSING) {
+            SensorScopeBuffer currentPacket = allBuffers.get(i);
+            logger.info("[" + i + "] " + currentPacket);
+            if (currentPacket.get(1) != PKT_TYPE_DATA || currentPacket.get(2) != DATA_TYPE_SENSING) {
                 logger.info("[" + i + "] SKIPPED (not data packet or not sensing) ");
                 continue; //skip it
             }
 
-            //TODO: heck for integrity
-            /*
-            if(buffer[i] == 0 || i + pktlen + 1 >= len)
-        {
-            Logger::Error("Corrupted packet found (invalid packet length)");
-            return sensorListHead;
-        }
-             */
-            //TODO END
+            if (currentPacket.get(0) == 0 || currentPacket.get(0) >= currentPacket.getSize()) {
+                logger.error("Corrupted packet found (invalid packet length)");
+                continue; // skip it
+                //TODO: check whether all packets should be skipped or just current one
+            }
+
             int dataPacket[] = allBuffers.get(i).getDataPacket();
             logger.info(" ---> " + Formatter.listArray(dataPacket, dataPacket.length));
-            int stationID = (dataPacket[1] << 8) + dataPacket[2] ;
+            int stationID = (dataPacket[1] << 8) + dataPacket[2];
             logger.info("stationID: " + stationID + "[ " + dataPacket[1] + " << 8 + " + dataPacket[2] + " ]");
-            long referenceTimestamp = (dataPacket[3]  << 24) + (dataPacket[4]  << 16) + (dataPacket[5] << 8) + dataPacket[6] ; //pkt[idx] << 24) + (pkt[idx+1] << 16) + (pkt[idx+2] << 8) + pkt[idx+3];
+            long referenceTimestamp = (dataPacket[3] << 24) + (dataPacket[4] << 16) + (dataPacket[5] << 8) + dataPacket[6]; //pkt[idx] << 24) + (pkt[idx+1] << 16) + (pkt[idx+2] << 8) + pkt[idx+3];
             logger.info("Reference timestamp: " + referenceTimestamp);
         }
     }
