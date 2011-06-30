@@ -36,6 +36,7 @@ public class SensorScopeServerListener {
     private static final byte BYTE_SYNC = 0x7E;
     private static final byte BYTE_ESC = 0x7D;
     private static final byte PKT_TYPE_DATA = 0x00;
+    private static final byte DATA_TYPE_SENSING = 0x01;
     private static final byte PKT_TYPE_CRC = 0x01;
     private static final byte BYTE_ACK = 0x00;
     private static final byte BYTE_NACK = 0x01;
@@ -484,6 +485,22 @@ public class SensorScopeServerListener {
         logger.info(allBuffers.size() + " buffers to log");
         for (int i = 0; i < allBuffers.size(); i++) {
             logger.info("[" + i + "] " + allBuffers.get(i));
+            if (allBuffers.get(i).get(1) != PKT_TYPE_DATA || allBuffers.get(i).get(2) != DATA_TYPE_SENSING) {
+                logger.info("[" + i + "] SKIPPED (not data packet or not sensing) ");
+                continue; //skip it
+            }
+
+            //TODO: heck for integrity
+            /*
+            if(buffer[i] == 0 || i + pktlen + 1 >= len)
+        {
+            Logger::Error("Corrupted packet found (invalid packet length)");
+            return sensorListHead;
+        }
+             */
+            // END TODO
+            int dataPacket[] = allBuffers.get(i).getDataPacket();
+            logger.info(" ---> " + Formatter.listArray(dataPacket, dataPacket.length));
         }
     }
 
@@ -640,6 +657,14 @@ public class SensorScopeServerListener {
                 return this.buffer[0];
             else
                 return 0;
+        }
+
+        public int[] getDataPacket() {
+            int dataPacketSize = this.size - 3;
+            int[] dataPacket = new int[dataPacketSize];
+            for (int i = 0; i < dataPacketSize; i++)
+                dataPacket[i] = this.buffer[i];
+            return dataPacket;
         }
 
         public int getSize() {
