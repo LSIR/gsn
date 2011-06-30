@@ -970,7 +970,7 @@ public class SensorScopeServerListener {
                     logger.error("Error while parsing current chunk with readingShift="+readingShift);
                     logger.error("Chunk: "+Formatter.listArray(currentChunkData));
                     logger.error(e.getMessage(), e);
-                    return;
+                    stillOtherReadingsInChunk = false;
                 }
             }
             // end of reading within current chunk of data
