@@ -839,7 +839,7 @@ public class SensorScopeServerListener {
         long referenceTimestamp = (dataPacket[3] << 24) + (dataPacket[4] << 16) + (dataPacket[5] << 8) + dataPacket[6]; //pkt[idx] << 24) + (pkt[idx+1] << 16) + (pkt[idx+2] << 8) + pkt[idx+3];
         logger.info("Reference timestamp: " + referenceTimestamp);
 
-        int dataPacketLength = dataPacket.length ;
+        int dataPacketLength = dataPacket.length;
         int currentChunk = 0;
         boolean stillOtherChunks = true;
 
@@ -860,6 +860,8 @@ public class SensorScopeServerListener {
             int currentChunkLength = dataPacket[currentChunk_begin + timestamp_offset];
             int currentChunk_end = currentChunk_begin + timestamp_offset + currentChunkLength;
 
+            logger.info("currentChunk_begin:" + currentChunk_begin + "currentChunkLength: " + currentChunkLength + " , " + "currentChunk_end: " + currentChunk_end);
+
             int[] currentChunkData = new int[currentChunkLength];
             for (int j = 0; j < currentChunkLength; j++) {
                 currentChunkData[j] = dataPacket[currentChunk_begin + timestamp_offset + j];
@@ -872,7 +874,7 @@ public class SensorScopeServerListener {
 
             currentChunk_begin += timestamp_offset + 1 + currentChunkLength;
 
-            if (currentChunk_begin > dataPacketLength-1)
+            if (currentChunk_begin > dataPacketLength - 1)
                 stillOtherChunks = false;
 
             currentChunk++;
