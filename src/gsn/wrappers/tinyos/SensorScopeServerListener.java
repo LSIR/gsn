@@ -48,6 +48,7 @@ public class SensorScopeServerListener {
     private static final int OFFSET_DECAGON_10HS_MV = 5 + (MAX_DUPN + 1) * 16;
     private static final int OFFSET_DECAGON_10HS_VWC = 5 + (MAX_DUPN + 1) * 17;
     private static final String CONF_SENSORSCOPE_SERVER_PROPERTIES = "conf/sensorscope_server.properties";
+    private static final String DEFAULT_FOLDER_FOR_CSV_FILES = "logs";
 
     private DataField[] outputStructureCache = new DataField[]{
             new DataField("station_id", "int", "Station ID"),
@@ -366,7 +367,7 @@ public class SensorScopeServerListener {
             new DataField("timestamp", "bigint", "Timestamp")
     };
 
-    private static String csvFileName = null;
+    private static String csvFolderName = null;
 
     private final int OUTPUT_STRUCTURE_SIZE = outputStructureCache.length;
 
@@ -397,7 +398,8 @@ public class SensorScopeServerListener {
     private static final byte PKT_TYPE_CRC = 0x01;
     private static final byte BYTE_ACK = 0x00;
     private static final byte BYTE_NACK = 0x01;
-    private static final String NULL_STRING = "";
+    private static String DEFAULT_NULL_STRING = "null";
+    private static String nullString = DEFAULT_NULL_STRING;
 
     private static Map<Integer, Long> latestTimestampForStation = new HashMap<Integer, Long>();
     private static Map<Integer, Serializable[]> latestBufferForStation = new HashMap<Integer, Serializable[]>();
@@ -415,19 +417,17 @@ public class SensorScopeServerListener {
         Properties propertiesFile = new Properties();
         try {
             propertiesFile.load(new FileInputStream(CONF_SENSORSCOPE_SERVER_PROPERTIES));
-            csvFileName = propertiesFile.getProperty("csvfile");
         } catch (IOException e) {
             logger.error("Couldn't load configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
             logger.error(e.getMessage(), e);
             System.exit(-1);
         }
 
-        if (csvFileName == null) {
-            logger.error("Output CSV file not specified in configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
-            System.exit(-1);
-        }
+        csvFolderName = propertiesFile.getProperty("csvFolder", DEFAULT_FOLDER_FOR_CSV_FILES);
+        nullString = propertiesFile.getProperty("nullString", DEFAULT_NULL_STRING);
 
-        logger.info("CSV output file: " + csvFileName);
+        logger.info("CSV folder for CSV files: " + csvFolderName);
+        logger.info("Null string: \"" + nullString + "\"");
 
         mRxBuf = new int[RX_BUFFER_SIZE];
         mTxBuf = new byte[TX_BUFFER_SIZE];
@@ -988,7 +988,7 @@ public class SensorScopeServerListener {
 
                     logger.info("SENSOR => TS:" + timestamp + " , stationID:" + stationID + " , SID:" + sid + " , dupn:" + dupn + " , reading: " + Formatter.listArray(reading));
 
-                    StreamElement aStreamElement = createSensor(timestamp, stationID, sid, dupn, reading);
+                    StreamElement aStreamElement = publishSensor(timestamp, stationID, sid, dupn, reading);
 
                     if (aStreamElement != null) {
                         //PublishStreamElement(aStreamElement);
@@ -1019,40 +1019,6 @@ public class SensorScopeServerListener {
             currentChunk++;
 
         }
-
-        if (true)   //HACK
-            return;
-        /*
-        int dataPayLoadSize = dataPacket.length - 3;
-
-        while (stillOtherChunks) {
-
-
-            while (stillOtherReadingsInChunk) {
-
-
-
-
-
-                if (logger.isDebugEnabled())
-                    logger.debug("last_data_reading => " + last_data_reading + " [" + data[last_data_reading] + "]");
-
-                if (last_data_reading < CurrentChunkLength - 1) { // still other readings within chunk
-                    stillOtherReadingsInChunk = true;
-                    readingShift = last_data_reading + 1;
-                } else
-                    stillOtherReadingsInChunk = false;
-
-            } // while (stillOtherReadingsInChunk)
-
-            if (currentChunk_end < dataPayLoadSize + 10) { // still other chunks to process
-                stillOtherChunks = true;
-                currentChunk++;
-                currentChunk_begin = currentChunk_end + 1;
-            } else stillOtherChunks = false;
-
-        }
-        */
     }
 
     Serializable[] mergeBuffers(Serializable[] olderBuffer, Serializable[] newerBuffer) {
@@ -1065,7 +1031,6 @@ public class SensorScopeServerListener {
     }
 
     private void PublishBuffer(Serializable[] buffer, long timestamp, int stationID) {
-
         if (!latestTimestampForStation.containsKey(stationID)) { // first time we receive that stationID
             logger.debug("first time we receive stationID=" + stationID);
             latestTimestampForStation.put(stationID, timestamp);
@@ -1076,17 +1041,17 @@ public class SensorScopeServerListener {
                 logger.debug("Merging buffers for stationID=" + stationID);
             } else {
                 logger.debug("Publishing data for stationID=" + stationID);
-                latestTimestampForStation.put(stationID, timestamp);// update timestamp
-                latestBufferForStation.put(stationID, buffer.clone());// update buffer
-                try {
-                    String stationFileName = "logs/" + stationID + "_merged.csv";
+                latestTimestampForStation.put(stationID, timestamp); // update timestamp
+                latestBufferForStation.put(stationID, buffer.clone()); // update buffer
+                try {  // Publish it
+                    String stationFileName = csvFolderName + "/" + stationID + ".csv";
                     FileWriter fstream = new FileWriter(stationFileName, true);
                     BufferedWriter out = new BufferedWriter(fstream);
 
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < buffer.length; i++) {
                         if (buffer[i] == null)
-                            sb.append(NULL_STRING).append(",");
+                            sb.append(nullString).append(",");
                         else
                             sb.append(buffer[i]).append(",");
                     }
@@ -1096,54 +1061,13 @@ public class SensorScopeServerListener {
                     out.close();
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
-                }// Publish it
+                }
             }
-        }
-
-        try {
-            String stationFileName = "logs/" + stationID + ".csv";
-            FileWriter fstream = new FileWriter(stationFileName, true);
-            BufferedWriter out = new BufferedWriter(fstream);
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < buffer.length; i++) {
-                if (buffer[i] == null)
-                    sb.append(NULL_STRING).append(",");
-                else
-                    sb.append(buffer[i]).append(",");
-            }
-            sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
-            sb.append("\n");
-            out.write(sb.toString());
-            out.close();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
         }
     }
 
-    private void PublishStreamElement(StreamElement aStreamElement) {
 
-        try {
-            FileWriter fstream = new FileWriter(csvFileName, true);
-            BufferedWriter out = new BufferedWriter(fstream);
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < aStreamElement.getData().length; i++) {
-                if (aStreamElement.getData()[i] == null)
-                    sb.append(",");
-                else
-                    sb.append(aStreamElement.getData()[i]).append(",");
-            }
-            sb.append(Helpers.convertTimeFromLongToIso(aStreamElement.getTimeStamp(), "yyyy-MM-dd HH:mm:ss.SSS"));
-            sb.append("\n");
-            out.write(sb.toString());
-            out.close();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
-    private StreamElement createSensor(long timestamp, int stationID, int sid, int dupn, int[] reading) {
+    private StreamElement publishSensor(long timestamp, int stationID, int sid, int dupn, int[] reading) {
 
         StreamElement aStreamElement = null;
         // interpreting raw readings
