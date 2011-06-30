@@ -145,7 +145,7 @@ public class SensorScopeServerListener {
                 return false;
 
 
-            rxBuffer.add(b.getByte());
+            rxBuffer.add(b.getInt());
             dumpByte(b.getInt());
 
             //logger.debug("byte => " + b.toString());
