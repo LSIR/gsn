@@ -1070,7 +1070,7 @@ public class SensorScopeServerListener {
                         else
                             sb.append(buffer[i]).append(",");
                     }
-                    sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
+                    sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss"));
                     sb.append("\n");
                     out.write(sb.toString());
                     out.close();
