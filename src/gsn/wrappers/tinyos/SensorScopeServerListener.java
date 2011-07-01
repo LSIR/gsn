@@ -1055,27 +1055,31 @@ public class SensorScopeServerListener {
                 latestBufferForStation.put(stationID, mergeBuffers(latestBufferForStation.get(stationID), buffer));
                 logger.debug("Merging buffers for stationID=" + stationID);
             } else {
-                logger.debug("Publishing data for stationID=" + stationID);
-                latestTimestampForStation.put(stationID, timestamp); // update timestamp
-                latestBufferForStation.put(stationID, buffer.clone()); // update buffer
-                try {  // Publish it
-                    String stationFileName = csvFolderName + "/" + stationID + ".csv";
-                    FileWriter fstream = new FileWriter(stationFileName, true);
-                    BufferedWriter out = new BufferedWriter(fstream);
+                if ((timestamp > latestTimestampForStation.get(stationID))) {
+                    logger.debug("Publishing data for stationID=" + stationID);
+                    latestTimestampForStation.put(stationID, timestamp); // update timestamp
+                    latestBufferForStation.put(stationID, buffer.clone()); // update buffer
+                    try {  // Publish it
+                        String stationFileName = csvFolderName + "/" + stationID + ".csv";
+                        FileWriter fstream = new FileWriter(stationFileName, true);
+                        BufferedWriter out = new BufferedWriter(fstream);
 
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < buffer.length; i++) {
-                        if (buffer[i] == null)
-                            sb.append(nullString).append(",");
-                        else
-                            sb.append(buffer[i]).append(",");
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < buffer.length; i++) {
+                            if (buffer[i] == null)
+                                sb.append(nullString).append(",");
+                            else
+                                sb.append(buffer[i]).append(",");
+                        }
+                        sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss"));
+                        sb.append("\n");
+                        out.write(sb.toString());
+                        out.close();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
                     }
-                    sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss"));
-                    sb.append("\n");
-                    out.write(sb.toString());
-                    out.close();
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                } else {
+                    //TODO: received data from the past
                 }
             }
         }
