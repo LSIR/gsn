@@ -707,7 +707,7 @@ def main():
     fd.write(str(long(time.time()*1000)))
     fd.close()
     
-    if backlog.shutdown:
+    if backlog and  backlog.shutdown:
         print 'shutdown now'
         subprocess.Popen(['shutdown', '-h', 'now'])
 
