@@ -87,5 +87,17 @@
             </source>
             <query> select * from source </query>
         </stream>
+        
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">opensense-caa-etz-2.dyndns.biz:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.STEVALPlugin</predicate>
+                    <predicate key="status-data-type">dynamic_proc</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
     </streams>
 </virtual-sensor>
