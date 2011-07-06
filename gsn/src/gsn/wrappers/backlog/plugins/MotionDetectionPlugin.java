@@ -54,6 +54,7 @@ public class MotionDetectionPlugin extends AbstractPlugin {
 				logger.warn("The MotionDetection message with timestamp >" + timestamp + "< could not be stored in the database."); 
 		} catch (Exception e) {
 			logger.error("MotionDetection data could not be parsed: " + e.getMessage(), e);
+			ackMessage(timestamp, super.priority);
 			return true;
 		}
 		return true;
