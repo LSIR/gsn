@@ -1,0 +1,36 @@
+<virtual-sensor name="Jungfraujoch_Dozer_EnviroScanIdent__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="FIRMWAREVERSION" type="VARCHAR(3)"/>
+            <field name="SERIAL" type="CHAR(12)"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWxt520IdentMsg) from Jungfraujoch deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Jungfraujoch_Dozer_EnviroScanIdent__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                char(PAYLOAD_FIRMWAREVERSION0) || char(PAYLOAD_FIRMWAREVERSION1) || char(PAYLOAD_FIRMWAREVERSION2) as FIRMWAREVERSION,
+                char(PAYLOAD_SERIAL0) || char(PAYLOAD_SERIAL1) || char(PAYLOAD_SERIAL2) || char(PAYLOAD_SERIAL3) || char(PAYLOAD_SERIAL4) || char(PAYLOAD_SERIAL5) || char(PAYLOAD_SERIAL6) || char(PAYLOAD_SERIAL7) || char(PAYLOAD_SERIAL8) || char(PAYLOAD_SERIAL9) || char(PAYLOAD_SERIAL10) || char(PAYLOAD_SERIAL11) as SERIAL
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

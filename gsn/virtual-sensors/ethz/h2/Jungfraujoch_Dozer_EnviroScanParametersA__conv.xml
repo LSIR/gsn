@@ -1,0 +1,44 @@
+<virtual-sensor name="Jungfraujoch_Dozer_EnviroScanParametersA__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="A1" type="VARCHAR(30)" />
+            <field name="A2" type="VARCHAR(30)" />
+            <field name="A3" type="VARCHAR(30)" />
+            <field name="A4" type="VARCHAR(30)" />
+            <field name="A5" type="VARCHAR(30)" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerEnviroScanDataMsg) from Jungfraujoch deployment converted to parameter</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Jungfraujoch_Dozer_EnviroScanData__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M1!=-2147483647,cast(round(PAYLOAD_M1 / 1000000.0, 6) as CHAR(30)),NULL) as A1,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M2!=-2147483647,cast(round(PAYLOAD_M2 / 1000000.0, 6) as CHAR(30)),NULL) as A2,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M3!=-2147483647,cast(round(PAYLOAD_M3 / 1000000.0, 6) as CHAR(30)),NULL) as A3,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M4!=-2147483647,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as A4
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M5!=-2147483647,cast(round(PAYLOAD_M5 / 1000000.0, 6) as CHAR(30)),NULL) as A5                
+                from wrapper where PAYLOAD_MEASUREMENT_TYPE=2</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
