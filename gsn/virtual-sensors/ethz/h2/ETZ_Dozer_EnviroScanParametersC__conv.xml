@@ -31,11 +31,11 @@
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
-                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M1 / 1000000.0, 6) as CHAR(30)),NULL) as C1,
-                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M2 / 1000000.0, 6) as CHAR(30)),NULL) as C2,
-                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M3 / 1000000.0, 6) as CHAR(30)),NULL) as C3,
-                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as C4,
-                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M5 / 1000000.0, 6) as CHAR(30)),NULL) as C5
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M1!=-2147483647,cast(round(PAYLOAD_M1 / 1000000.0, 6) as CHAR(30)),NULL) as C1,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M2!=-2147483647,cast(round(PAYLOAD_M2 / 1000000.0, 6) as CHAR(30)),NULL) as C2,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M3!=-2147483647,cast(round(PAYLOAD_M3 / 1000000.0, 6) as CHAR(30)),NULL) as C3,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M4!=-2147483647,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as C4,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M5!=-2147483647,cast(round(PAYLOAD_M5 / 1000000.0, 6) as CHAR(30)),NULL) as C5
                 from wrapper where PAYLOAD_MEASUREMENT_TYPE=4</query>
             </source>
             <query> select * from source </query>
