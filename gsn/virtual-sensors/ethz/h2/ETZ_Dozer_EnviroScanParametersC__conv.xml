@@ -16,6 +16,7 @@
             <field name="C2" type="VARCHAR(30)" />
             <field name="C3" type="VARCHAR(30)" />
             <field name="C4" type="VARCHAR(30)" />
+            <field name="C5" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerEnviroScanDataMsg) from ETZ deployment converted to parameter</description>
@@ -33,7 +34,8 @@
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M1 / 1000000.0, 6) as CHAR(30)),NULL) as C1,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M2 / 1000000.0, 6) as CHAR(30)),NULL) as C2,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M3 / 1000000.0, 6) as CHAR(30)),NULL) as C3,
-                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as C4
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as C4,
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M5 / 1000000.0, 6) as CHAR(30)),NULL) as C5
                 from wrapper where PAYLOAD_MEASUREMENT_TYPE=4</query>
             </source>
             <query> select * from source </query>

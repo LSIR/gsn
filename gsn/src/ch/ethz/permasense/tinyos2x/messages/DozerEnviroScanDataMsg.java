@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerEnviroScanDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 26;
+    public static final int DEFAULT_MESSAGE_SIZE = 30;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 184;
 
-    /** Create a new DozerEnviroScanDataMsg of size 26. */
+    /** Create a new DozerEnviroScanDataMsg of size 30. */
     public DozerEnviroScanDataMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -118,6 +118,9 @@ public class DozerEnviroScanDataMsg extends ch.ethz.permasense.tinyos2x.messages
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.m4=0x"+Long.toHexString(get_payload_m4())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.m5=0x"+Long.toHexString(get_payload_m5())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -817,6 +820,69 @@ public class DozerEnviroScanDataMsg extends ch.ethz.permasense.tinyos2x.messages
      * Return the size, in bits, of the field 'payload.m4'
      */
     public static int sizeBits_payload_m4() {
+        return 32;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.m5
+    //   Field type: int
+    //   Offset (bits): 208
+    //   Size (bits): 32
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.m5' is signed (false).
+     */
+    public static boolean isSigned_payload_m5() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.m5' is an array (false).
+     */
+    public static boolean isArray_payload_m5() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.m5'
+     */
+    public static int offset_payload_m5() {
+        return (208 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.m5'
+     */
+    public static int offsetBits_payload_m5() {
+        return 208;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.m5'
+     */
+    public int get_payload_m5() {
+        return (int)getSIntBEElement(offsetBits_payload_m5(), 32);
+    }
+
+    /**
+     * Set the value of the field 'payload.m5'
+     */
+    public void set_payload_m5(int value) {
+        setSIntBEElement(offsetBits_payload_m5(), 32, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.m5'
+     */
+    public static int size_payload_m5() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.m5'
+     */
+    public static int sizeBits_payload_m5() {
         return 32;
     }
 

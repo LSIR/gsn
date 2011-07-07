@@ -16,6 +16,7 @@
             <field name="A2" type="VARCHAR(30)" />
             <field name="A3" type="VARCHAR(30)" />
             <field name="A4" type="VARCHAR(30)" />
+            <field name="A5" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerEnviroScanDataMsg) from ETZ deployment converted to parameter</description>
@@ -34,6 +35,7 @@
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M2 / 1000000.0, 6) as CHAR(30)),NULL) as A2,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M3 / 1000000.0, 6) as CHAR(30)),NULL) as A3,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as A4
+                casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as A5                
                 from wrapper where PAYLOAD_MEASUREMENT_TYPE=2</query>
             </source>
             <query> select * from source </query>
