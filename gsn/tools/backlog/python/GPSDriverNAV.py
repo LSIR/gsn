@@ -30,8 +30,6 @@ class GPSDriverNAV():
         self._logger = logging.getLogger(self.__class__.__name__)
 
         self._logger.info('Init GPS Driver...')
-	
-    	self._messageId = struct.pack('2B',0x01,0x06)
         
     	# serial port timeout
     	self._serialTimeout = 1
@@ -60,107 +58,39 @@ class GPSDriverNAV():
     # _read(self): returns a GPS message according to configuration
     ##########################################################################################
     '''
-    def _read(self,msgId):
-	if (msgId == ""):
-	    msgId = self._messageId
-	return self._readNav(msgId)
-
-    '''
-    #########################################################################
-    #PRIVATE FUNCTIONS
-    #########################################################################
-    '''
-                                                   
-    '''	
-    #########################################################################
-    #_readNav(): reads GPGGA data
-    #########################################################################
-    '''	
-    def _readNav(self,msgId):
+    def _read(self):
         
         try:
             self._device.open()
-            while self._device.inWaiting() != 0:
+            t = time.time()
+            #self._device.read(self._device.inWaiting())
+            while time.time() - t < 0.2: #self._device.inWaiting() != 0:
                 self._device.flushInput()
             self._logger.info("readGpsMessage: input buffer flushed")
-        
-            success = False
-            timeout = 5
-            while timeout and not success:
-                timeout -= 1
-                a = ''
-                while (timeout and a != "$"):
-                    a = self._serialAccess(1,'r')
-                    if a == False:
-                        timeout -= 1
-                if (a == "$"):
-                    while (timeout and a != "GP"):
-                        a = self._serialAccess(2,'r')
-                        if a == False:
-                            timeout -= 1
-                    while (timeout and a != "GG"):
-                        a = self._serialAccess(2,'r')
-                        if a == False:
-                            timeout -= 1
-                    while (timeout and a != "A,"):
-                        a = self._serialAccess(2,'r')
-                        if a == False:
-                            timeout -= 1
-                    a = self._serialAccess(100,'r')
-                    if a == False:
-                        timeout -= 1
-                        success = False
-                        break
-                    b = a.split('\r')[0]
-                    b = b.split(',')
-                    header = ["$GPGGA", "0xF0 0x00"] 
-                    payload = b 
-                    success = True
-                    break
-                else:
-                    success = False
-            self._device.close()
-            if (success):
-                return (header[0], header[1], payload) #ID, class, payload
+            pos = -1
+            
+            while pos == -1 and time.time() - t < 5:
+                msg = self._device.read(self._device.inWaiting())
+                
+                pos = msg.find('GPGGA')
+                while msg.find('GPGGA',pos+1) != -1:
+                    pos = msg.find('GPGGA',pos+1)
+                
+            #self._device.close()
+            
+            if pos != -1:
+                data = msg[pos:msg.find('\n',pos+1)]
+                data = data.strip()
+                data = data.split(',')
+            
+                return data
             else:
-                self._logger.debug("readGpsMessage: returned nothing!")
-                return False
+                self._logger.debug("readGpsMessage: no GPGGA data!")
+                return 0
         
         except Exception as e:
             self._logger.error( "serialAccess Exception" + str(e))
-            self._logger.error("Could not execute readNav")
+            self._logger.error("Could not execute _read")
             self._device.close()
-            return False
+            return 0
         
-
-    '''
-    ##########################################################################################
-    serialAccess()
-    	mode = w: data is written
-	mode = r: data specifies number of bytes to read
-	this is the ONLY function that opens serial port and reads/writes from/to serial
-	keep port open only as long as necessary
-
-	time the function to determine sleep time
-	imperative to clean up properly using cleanUp
-	
-	return TRUE or data if success, FALSE otherwise
-    ##########################################################################################
-    '''
-    def _serialAccess(self,data,mode):
-        d = False
-        fd = None
-        try:
-            if (mode == 'w'):
-                self._device.write(data)
-                return True
-            elif (mode == 'r'):
-                d = self._device.read(data)
-                return d
-            else:
-                self._logger.error("serialAccess: Wrong mode specified")
-                return False
-        except Exception as e:
-            self._logger.error( "serialAccess Exception" + str(e))
-            self._logger.error("Could not access gps device!")
-            return False

@@ -57,7 +57,7 @@ class GPSPluginNAVClass(AbstractPluginClass):
         self.info('GPSPluginNAV started...')
         
         # Read GPS message
-        gpsMsg = self.gps._read("")
+        gpsMsg = self.gps._read()
         # Parse message
         dataPackage = self._parseNavMsg(gpsMsg)
         self.processMsg(self.getTimeStamp(), dataPackage)
@@ -69,10 +69,10 @@ class GPSPluginNAVClass(AbstractPluginClass):
         self.info('stopped')
 
     def _parseNavMsg(self, msg):
-        if (msg):
+        if msg != 0:
             dataPackage = [NAV_TYPE]
-            for i in range(0, len(msg[2])):
-                dataPackage += [msg[2][i]]
+            for i in range(1, len(msg)):
+                dataPackage += [msg[i]]
 
             self.info(dataPackage)
             return dataPackage

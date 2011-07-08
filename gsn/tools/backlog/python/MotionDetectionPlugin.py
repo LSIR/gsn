@@ -27,9 +27,9 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         
         self._sleeper = Event()
         self._stopped = False
-        self._std_x = double(0)
-        self._std_y = double(0)
-        self._std_z = double(0)
+        self._std_x = float(0)
+        self._std_y = float(0)
+        self._std_z = float(0)
         self._moving = 0
         self._data = ''
         self._numPolls = 0
