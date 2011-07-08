@@ -7,8 +7,12 @@
 	    	<param name="scriptlet">
 	    	<![CDATA[
 	    		
+	    		newStation = 0;
 	    		if ( ! isdef('positionMap')) { positionMap = [:]; }
-          if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+          if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
+          	if (positionMap.get(POSITION) == null) { newStation = 1; }
+          	positionMap.put(POSITION, System.currentTimeMillis());
+          }
 	    	
 					try {
 						if (UTC_RAW_DATA != null && UTC_RAW_DATA.size() != 0) {
@@ -94,6 +98,14 @@
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                     		sendEmail(mailrecipients, emailTitle, emailContent);
                     		rmlist.add(entry.key)
+                    	}
+                    	else if (newStation == 1) {
+                    		newStation = 0;
+                    		def emailTitle = "[PermaSense-GSN-Test] - Started receiving " + vsname + " data from position " + entry.key;
+                    		def emailContent = "Started receiving " + vsname + " data from device with position " + entry.key + ".";
+
+												org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+                    		sendEmail(mailrecipients, emailTitle, emailContent);
                     	}
                     }
                     positionMap.keySet().removeAll( rmlist as Set );
