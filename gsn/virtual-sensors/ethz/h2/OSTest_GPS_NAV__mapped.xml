@@ -7,10 +7,10 @@
 	    	<param name="scriptlet">
 	    	<![CDATA[
 	    		
-	    		newStation = 0;
+	    		newStation = 1;
 	    		if ( ! isdef('positionMap')) { positionMap = [:]; }
           if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
-          	if (positionMap.get(POSITION) == null) { newStation = 1; }
+          	//if (positionMap.get(POSITION) == null) { newStation = 1; }
           	positionMap.put(POSITION, System.currentTimeMillis());
           }
 	    	
@@ -95,21 +95,21 @@
                     		def emailTitle = "[PermaSense-GSN-Test] - WARNING: No more " + vsname + " data received from position " + entry.key;
                     		def emailContent = "WARNING: No " + vsname + " data received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
 
-						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
-                    		sendEmail(mailrecipients, emailTitle, emailContent);
-                    		rmlist.add(entry.key)
-                    	}
-                    	else if (newStation == 1) {
-                    		newStation = 0;
-                    		def emailTitle = "[PermaSense-GSN-Test] - Started receiving " + vsname + " data from position " + entry.key;
-                    		def emailContent = "Started receiving " + vsname + " data from device with position " + entry.key + ".";
-
 												org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                     		sendEmail(mailrecipients, emailTitle, emailContent);
+                    		rmlist.add(entry.key)
                     	}
                     }
                     positionMap.keySet().removeAll( rmlist as Set );
                 }
+                if (newStation == 1) {
+	            		newStation = 0;
+	            		def emailTitle = "[PermaSense-GSN-Test] - Started receiving " + vsname + " data from position " + POSITION;
+	            		def emailContent = "Started receiving " + vsname + " data from device with position " + POSITION + ".";
+	
+									org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+	            		sendEmail(mailrecipients, emailTitle, emailContent);
+	            	}
             ]]>
         </param>
         </init-params>
