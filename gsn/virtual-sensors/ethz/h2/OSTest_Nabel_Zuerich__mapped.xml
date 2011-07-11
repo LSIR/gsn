@@ -1,9 +1,9 @@
-<virtual-sensor name="OpenSense_Nabel_Duebendorf__mapped" priority="10" >
+<virtual-sensor name="OSTest_Nabel_Zuerich__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.NabelDataParser</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="message_type">due</param>
+            <param name="message_type">zue</param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
@@ -16,15 +16,15 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>Nabel Duebendorf parsed data from OpenSense deployment</description>
+    <description>Nabel Zuerich parsed data from OSTest deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from OpenSense_Binary__mapped</predicate>
+                    <predicate key="query">select * from OSTest_Binary__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper where FILE_COMPLETE = 1</query>

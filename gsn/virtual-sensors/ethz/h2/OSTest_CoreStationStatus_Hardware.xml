@@ -41,7 +41,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-caa-due-001.dyndns.biz:9003</predicate>
+                    <predicate key="remote-connection">opensense-due-001-gsm.dyndns.biz:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                     <predicate key="status-data-type">hardware</predicate>
                 </address>
@@ -54,7 +54,7 @@
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-caa-tram-001.dyndns.biz:9003</predicate>
+                    <predicate key="remote-connection">opensense-tram-001-gsm.dyndns.biz:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CoreStationStatusPlugin</predicate>
                     <predicate key="status-data-type">hardware</predicate>
                 </address>
