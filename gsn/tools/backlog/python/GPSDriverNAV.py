@@ -76,7 +76,7 @@ class GPSDriverNAV():
                 while msg.find('GPGGA',pos+1) != -1:
                     pos = msg.find('GPGGA',pos+1)
                 
-            #self._device.close()
+            self._device.close()
             
             if pos != -1:
                 data = msg[pos:msg.find('\n',pos+1)]

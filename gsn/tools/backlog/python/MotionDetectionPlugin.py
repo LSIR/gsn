@@ -83,11 +83,11 @@ class MotionDetectionPluginClass(AbstractPluginClass):
                 self.steval._stopDataAcquisition()
                 endTime = time.time()
             
-            self.steval._closeDevice()
             self.detectMotion()
         else:
             self.error('setSensor() failed, can not get sensor readings')
         
+        self.steval._closeDevice()
         self._numPolls = self._numPolls + 1
         # Send statistics
         if self._numPolls == self._sendStatistic:

@@ -94,6 +94,7 @@ class AlphasenseDriver():
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read Alphasense sensor reading")
+            self._device.close()
             
     def _getCalibData(self):
         
@@ -131,6 +132,7 @@ class AlphasenseDriver():
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read Alphasense sensor reading")
+            self._device.close()
             
     def _getSensitivityData(self):
         
@@ -168,4 +170,5 @@ class AlphasenseDriver():
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read Alphasense sensor reading")
-    
+            self._device.close()
+            

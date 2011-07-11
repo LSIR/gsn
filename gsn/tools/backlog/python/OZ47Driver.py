@@ -92,8 +92,9 @@ class OZ47Driver():
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read OZ-47 sensor reading")
-    
-    def _setAuto(self):   
+            self._device.close()
+            
+    def _setAuto(self):
         msg = '{S}'                                                                       
                                                                 
         try:
@@ -115,6 +116,7 @@ class OZ47Driver():
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read OZ-47 sensor reading")
+            self._device.close()
 
     def _setgTimer(self):
         msg = '{W0?3<05821>}'        #0?0:00C30:}'   #59<21
@@ -138,7 +140,7 @@ class OZ47Driver():
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read OZ-47 sensor reading")
-
+            self._device.close()
 
     '''
     ##########################################################################################
@@ -170,6 +172,7 @@ class OZ47Driver():
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read OZ-47 sensor reading")
+            self._device.close()
             
     '''
     ##########################################################################################
@@ -200,7 +203,8 @@ class OZ47Driver():
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read OZ-47 sensor reading")   
+            self._logger.error("Could not read OZ-47 sensor reading")
+            self._device.close()
             
     '''
     ##########################################################################################
@@ -230,7 +234,7 @@ class OZ47Driver():
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read OZ-47 sensor reading")
-            
+            self._device.close()
             
     def _erasePage(self, pageValue):   
         msg = '{X' + pageValue + '}'
@@ -253,5 +257,6 @@ class OZ47Driver():
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read OZ-47 sensor reading")                         
+            self._logger.error("Could not read OZ-47 sensor reading")
+            self._device.close()                       
      
