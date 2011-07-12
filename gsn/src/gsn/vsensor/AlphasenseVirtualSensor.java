@@ -65,7 +65,7 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 		    
 		    String inputString = new String((String)data.getData("RAW_DATA"));
 		    if (inputString.length() != 140 && inputString.length() != 137 && inputString.length() != 134 && inputString.length() != 110) {
-		    	logger.warn("RAW_DATA has length " + inputString.length() + " instead of 140, 137, 134, 110");
+		    	logger.warn("RAW_DATA has wrong length " + inputString.length());
 		    	return;
 		    }
 		    String delims = "[ ]+";
@@ -125,6 +125,8 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			      p = 1;
 			    else if (inputString.length() == 134)
 			      p = 2;
+			    else if (inputString.length() == 131)
+				  p = 3;
 
 		    	for (int i = tokens.length-1; i >= 0; i--) {
 			      if (i >= 14-p && i <= 17-p)
