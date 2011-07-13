@@ -38,17 +38,35 @@ public class GridDataServlet extends HttpServlet {
         String ycol = HttpRequestUtils.getStringParameter("ycol", null, request);
         String timeformat = HttpRequestUtils.getStringParameter("timeformat", null, request);
         String view = HttpRequestUtils.getStringParameter("view", null, request); // files or stream
+        String debug = HttpRequestUtils.getStringParameter("debug", "false", request); // show debug information or not
 
-        response.getWriter().write("sensor: " + sensor + "\n");
-        response.getWriter().write("from: " + from + "\n");
-        response.getWriter().write("to: " + to + "\n");
-        response.getWriter().write("xcol: " + to + "\n");
-        response.getWriter().write("ycol: " + to + "\n");
-        response.getWriter().write("timeformat: " + to + "\n");
-        response.getWriter().write("view: " + to + "\n");
+        String timeBounds = (from != null && to != null) ? " where timed >= " + from + " and timed <= " + to : "";
 
-        response.getWriter().write(executeQuery("select * from " + sensor));
+        logger.warn("from: " + from);
+        logger.warn("to:" + to);
+        logger.warn("from != null && to != null =>" + from != null && to != null);
+        logger.warn("timeBounds: \"" + timeBounds + "\"");
 
+        String query = "select * from " + sensor + timeBounds;
+
+        StringBuilder debugInformation = new StringBuilder();
+
+        if (debug.equalsIgnoreCase("true")) {
+            debugInformation.append("# sensor: " + sensor + "\n")
+                    .append("# from: " + from + "\n")
+                    .append("# to: " + to + "\n")
+                    .append("# xcol: " + to + "\n")
+                    .append("# ycol: " + to + "\n")
+                    .append("# timeformat: " + to + "\n")
+                    .append("# view: " + to + "\n")
+                    .append("# Query: " + query + "\n");
+
+            response.getWriter().write(debugInformation.toString());
+            response.getWriter().flush();
+        }
+
+
+        response.getWriter().write(executeQuery(query));
 
         /*
         for (String vsName : sensors) {
@@ -112,8 +130,7 @@ public class GridDataServlet extends HttpServlet {
                 }
                 sb.append("\n");
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
             Main.getDefaultStorage().close(connection);
@@ -150,8 +167,7 @@ public class GridDataServlet extends HttpServlet {
 
         } catch (IOException e) {
             logger.warn(e);
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             logger.warn(e);
         }
 
@@ -186,7 +202,7 @@ public class GridDataServlet extends HttpServlet {
         byte[] buf = new byte[1024];
 
         try {
-            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(folder+"/"+outFilename));
+            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(folder + "/" + outFilename));
 
             for (int i = 0; i < filenames.length; i++) {
                 FileInputStream fileInputStream = new FileInputStream(filenames[i]);
