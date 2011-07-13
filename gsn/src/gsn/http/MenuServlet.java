@@ -21,11 +21,11 @@ public class MenuServlet extends HttpServlet {
         out.println("<li" + ("data".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"data.html#data\">data</a></li>");
         out.println("<li" + ("topology".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"topology.html#topology\">network topology</a></li>");
         out.println("<li" + ("logs".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"logs.html#logs\">logs</a></li>");
-        out.println("<li" + ("systemhealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"systemhealth.html#systemhealth\">system</a></li>");
-        out.println("<li" + ("nodehealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"nodehealth.html#nodehealth\">node health</a></li>");
-        out.println("<li" + ("basehealth".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"basehealth.html#basehealth\">base health</a></li>");
+        out.println("<li" + ("backend".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"backend.html#backend\">backend</a></li>");
+        out.println("<li" + ("sensornetwork".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"sensornetwork.html#sensornetwork\">sensor network</a></li>");
+        out.println("<li" + ("science".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"science.html#science\">science</a></li>");
         out.println("<li" + ("weather".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"weather.html#weather\">on-site weather</a></li>");
-        out.println("<li" + ("map".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"map.html#map\">map</a></li>");
+        //out.println("<li" + ("map".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"map.html#map\">map</a></li>");
         //out.println("<li" + ("fullmap".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"fullmap.html#fullmap\">fullmap</a></li>");
         out.println("<li" + ("position".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"position.html#position\">position</a></li>");
         if (Main.getContainerConfig().isAcEnabled()) {
