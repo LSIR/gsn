@@ -21,6 +21,13 @@ import org.apache.log4j.Logger;
 public class NabelDataParser extends BridgeVirtualSensorPermasense {
 
 	private static final transient Logger logger = Logger.getLogger(NabelDataParser.class);
+	
+	private static String MESSAGE_TYPE_STR = "message_type";
+
+	private static String DUE_NAMING_STR = "due";
+	private static String ZUE_NAMING_STR  = "zue";
+	private static int DUE_NAMING = 1;
+	private static int ZUE_NAMING = 2;
 
 	private String storage_directory = null;
 	private long last_nabel_timestamp = 0;
@@ -29,17 +36,35 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("POSITION", "INTEGER"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			new DataField("GENERATION_TIME", "BIGINT"),
-		
-			new DataField("NABEL_TIMESTAMP", "BIGINT"),
+
 			new DataField("OZONE_PPB", "DOUBLE"),
 			new DataField("CO_PPM", "DOUBLE"),
+			new DataField("NO2_PPM", "DOUBLE"),
 			new DataField("RAW_DATA", "VARCHAR(64)"),
 			
 			new DataField("DATA_IMPORT_SOURCE", "SMALLINT")};
 	
+	private int messageType = -1;
+	
 	@Override
 	public boolean initialize() {
+		
+		String type = getVirtualSensorConfiguration().getMainClassInitialParams().get(MESSAGE_TYPE_STR);
+		if (type == null) {
+			logger.error(MESSAGE_TYPE_STR + " has to be specified");
+			return false;
+		}
+		if (type.equalsIgnoreCase(DUE_NAMING_STR))
+			messageType = DUE_NAMING;
+		else if (type.equalsIgnoreCase(ZUE_NAMING_STR))
+			messageType = ZUE_NAMING;
+		else {
+			logger.error(MESSAGE_TYPE_STR + " has to be " + DUE_NAMING_STR + " or " + ZUE_NAMING_STR);
+			return false;
+		}
+		
 		boolean ret = super.initialize();
+		
 		storage_directory = getVirtualSensorConfiguration().getStorage().getStorageDirectory();
 		if (storage_directory != null) {
 			storage_directory = new File(storage_directory, deployment).getPath();
@@ -68,14 +93,7 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 		return ret;
 	}
 	
-	
-	@Override
-	public void dataAvailable(String inputStreamName, StreamElement data) {
-		File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), (String) data.getData("relative_file"));
-		file = file.getAbsoluteFile();
-		
-		logger.info("new incoming file (" + file.getAbsolutePath() + ")");
-		
+	private void parseData(File file, String inputStreamName, StreamElement data) {
 		try
 		{
 			// define date format and set time zone used by NABEL
@@ -101,7 +119,7 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 				long curr_nabel_timestamp = dt.getTime() - 3600 * 1000;
 				
 				// convert ozone and co cncentration strings into a double value
-				Double ozone, co;
+				Double ozone, co, no2;
 				if (tokens[1].length() == 0)
 					ozone = null;
 				else
@@ -111,9 +129,11 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 				else
 					co = Double.valueOf(tokens[2]);
 				
+				no2 = null;
+				
 				// Only push data to database if its timestamp is bigger than the one from the last entry
 				if (curr_nabel_timestamp > last_nabel_timestamp) {
-					StreamElement curr_data = new StreamElement(dataField, new Serializable[] {data.getData(dataField[0].getName()), data.getData(dataField[1].getName()), data.getData(dataField[2].getName()), curr_nabel_timestamp, ozone, co, strLine, data.getData(dataField[7].getName())});
+					StreamElement curr_data = new StreamElement(dataField, new Serializable[] {data.getData(dataField[0].getName()), data.getData(dataField[1].getName()), curr_nabel_timestamp, ozone, co, no2, strLine, data.getData(dataField[7].getName())});
 					last_nabel_timestamp = curr_nabel_timestamp;
 					super.dataAvailable(inputStreamName, curr_data);
 				}
@@ -122,6 +142,23 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 		catch(Exception e)
 		{
 			logger.error(e.getMessage(), e);
+		}
+		
+	}
+	
+	
+	@Override
+	public void dataAvailable(String inputStreamName, StreamElement data) {
+		File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), (String) data.getData("relative_file"));
+		file = file.getAbsoluteFile();
+		
+		logger.info("new incoming file (" + file.getAbsolutePath() + ")");
+		
+		if (messageType == DUE_NAMING && file.getAbsolutePath().toLowerCase().contains("due")) {
+			parseData(file, inputStreamName, data);
+		}
+		else if (messageType == ZUE_NAMING && file.getAbsolutePath().toLowerCase().contains("zue")) {
+			parseData(file, inputStreamName, data);
 		}
 	}
 }

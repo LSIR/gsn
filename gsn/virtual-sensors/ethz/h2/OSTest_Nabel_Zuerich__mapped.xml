@@ -12,6 +12,7 @@
 		    		<field name="NABEL_TIMESTAMP" type="BIGINT" unit="unixtime" />
 		    		<field name="OZONE_PPB" type="DOUBLE" unit="ppb" />
 		    		<field name="CO_PPM" type="DOUBLE" unit="ppm" />
+		    		<field name="NO2_PPM" type="DOUBLE" unit="ppm" />
 		    		<field name="RAW_DATA" type="VARCHAR(64)" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
