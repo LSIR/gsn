@@ -9,7 +9,6 @@
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-		    		<field name="NABEL_TIMESTAMP" type="BIGINT" unit="unixtime" />
 		    		<field name="OZONE_PPB" type="DOUBLE" unit="ppb" />
 		    		<field name="CO_PPM" type="DOUBLE" unit="ppm" />
 		    		<field name="NO2_PPM" type="DOUBLE" unit="ppm" />
