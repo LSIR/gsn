@@ -39,7 +39,7 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 
 			new DataField("OZONE_PPB", "DOUBLE"),
 			new DataField("CO_PPM", "DOUBLE"),
-			new DataField("NO2_PPM", "DOUBLE"),
+			new DataField("NO2_PPB", "DOUBLE"),
 			new DataField("RAW_DATA", "VARCHAR(64)"),
 			
 			new DataField("DATA_IMPORT_SOURCE", "SMALLINT")};
