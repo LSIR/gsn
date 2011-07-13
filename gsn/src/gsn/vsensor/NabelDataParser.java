@@ -76,12 +76,12 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 		try {
 			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
 			StringBuilder query = new StringBuilder();
-			query.append("select nabel_timestamp from ").append(getVirtualSensorConfiguration().getName()).append(" order by nabel_timestamp desc limit 1");
+			query.append("select generation_time from ").append(getVirtualSensorConfiguration().getName()).append(" order by generation_time desc limit 1");
 			rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
 			
 			if (rs.next()) {
 				// get nabel_timestamp
-				last_nabel_timestamp = rs.getLong("nabel_timestamp");
+				last_nabel_timestamp = rs.getLong("generation_time");
 			} else {
 				last_nabel_timestamp = 0;
 				logger.warn("no last nabel_timestamp available in the database");
@@ -128,9 +128,11 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 					co = null;
 				else
 					co = Double.valueOf(tokens[2]);
-				
-				no2 = null;
-				
+				if (tokens[3].length() == 0)
+					no2 = null;
+				else
+					no2 = Double.valueOf(tokens[3]);
+					
 				// Only push data to database if its timestamp is bigger than the one from the last entry
 				if (curr_nabel_timestamp > last_nabel_timestamp) {
 					StreamElement curr_data = new StreamElement(dataField, new Serializable[] {data.getData(dataField[0].getName()), data.getData(dataField[1].getName()), curr_nabel_timestamp, ozone, co, no2, strLine, data.getData(dataField[7].getName())});
