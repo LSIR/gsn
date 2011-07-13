@@ -39,6 +39,7 @@ class ECVQEK3Driver():
 
         try:
             self._device = serial.Serial(self._deviceStr, 9600, timeout=self._serialTimeout)
+            self._device.close()
             self._logger.debug("Successfully opened " + str(self._device))
         except Exception as e:
             self._logger.info("serial access exception " + str(e))

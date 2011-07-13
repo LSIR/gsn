@@ -42,6 +42,7 @@ class GPSDriverNAV():
 
         try:
             self._device = serial.Serial(self._deviceStr, 19200, timeout=self._serialTimeout)
+            self._device.close()
             self._logger.info("Successfully opened " + str(self._device))
         except Exception as e:
             self._logger.error("serialAccess Exception" + str(e))

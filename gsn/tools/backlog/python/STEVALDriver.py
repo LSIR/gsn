@@ -41,6 +41,7 @@ class STEVALDriver():
         
         try:
             self._device = serial.Serial(self._deviceStr, 115200, timeout=self._serialTimeout)
+            self._device.close()
             self._logger.info("Device Init Successful" + str(self._device))
         except Exception as e:
             self._logger.error("serial access exception " + str(e))

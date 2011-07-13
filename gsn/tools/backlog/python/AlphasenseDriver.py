@@ -34,10 +34,8 @@ class AlphasenseDriver():
         
         if (config[0] != None):
             self._deviceStr = config[0]
-            self._device = self._deviceStr
         else:
             self._deviceStr = '/dev/usb/alphasense'
-            self._device = self._deviceStr
         
         try:
             self._device = serial.Serial(self._deviceStr, 1200, timeout=self._serialTimeout)
