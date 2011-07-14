@@ -1072,12 +1072,11 @@ public class SensorScopeServerListener {
     * */
     private void CheckQueueSizeForStation(int stationID) {
         int queueSize = stationsBuffer.get(stationID).size();
-        Long[] timestamps = (Long[])stationsBuffer.get(stationID).keySet().toArray();
-        // search for oldest timestamp (smaller value)
+         // search for oldest timestamp (smaller value)
         Long oldestTimestamp = Long.MAX_VALUE;
-        for(int i=0;i<timestamps.length;i++) {
-            if (timestamps[i]<oldestTimestamp)
-                oldestTimestamp = timestamps[i];
+        for (Long timestamp: stationsBuffer.get(stationID).keySet()) {
+            if (timestamp<oldestTimestamp)
+                oldestTimestamp = timestamp;
         }
         Serializable[] _buffer = stationsBuffer.get(stationID).get(oldestTimestamp);
         if (queueSize > 10) {
