@@ -3,16 +3,19 @@ package gsn.vsensor;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Vector;
@@ -62,6 +65,30 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("EVENT_COUNT", "INTEGER"),
 			new DataField("EVENT", "VARCHAR(256)")};
 	
+	private static DataField[] configField = {
+			new DataField("POSITION", "INTEGER"),
+			new DataField("GENERATION_TIME", "BIGINT"),
+			new DataField("TIMESTAMP", "BIGINT"),
+			new DataField("DEVICE_ID", "INTEGER"),
+			
+			new DataField("START_DATE", "BIGINT"),
+			new DataField("END_DATE", "BIGINT"),
+			new DataField("UPLOADER", "VARCHAR(64)"),
+			new DataField("PROTOCOL", "VARCHAR(8)"),
+			new DataField("FIRMWARE", "SMALLINT"),
+			new DataField("SERIAL", "INTEGER"),
+			new DataField("LOW_POWER_CYCLE_TIME", "INTEGER"),
+			new DataField("LOW_POWER_ACTIVE_TIME", "INTEGER"),
+			new DataField("LOW_POWER_MEASUREMENT", "INTEGER"),
+			new DataField("ENTRY_VOLTAGE", "INTEGER"),
+			new DataField("EXIT_VOLTAGE", "INTEGER"),
+			new DataField("LOGGING_RATE", "INTEGER"),
+			new DataField("CONFIG_USED", "INTEGER"),
+			new DataField("CONFIG_TOTAL", "INTEGER"),
+			new DataField("CONFIG_STRING", "BINARY"),
+			new DataField("ANGLE", "VARCHAR(16)"),
+			new DataField("ANTENNA_SERIAL", "VARCHAR(32)")};
+	
 	@Override
 	public boolean initialize() {
 		boolean ret = super.initialize();
@@ -109,7 +136,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					int statusSampleCount = 1;
 					int statusIncorrectChecksumCount = 0;
 					try {
-						DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
+						DataInputStream dis = new DataInputStream(new FileInputStream(fixFile(file)));
 						
 						int b = dis.readByte();
 						while (true) {
@@ -228,7 +255,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					int unknownEventCounter = 0;
 					long lastTimestamp = 0;
 					try {
-						DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
+						DataInputStream dis = new DataInputStream(new FileInputStream(fixFile(file)));
 	
 						byte[] tmp4b = new byte[4];
 						byte[] tmp2b = new byte[2];
@@ -406,7 +433,70 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 						logger.warn(unknownEventCounter + " events have not been recognized");
 					break;
 				case 3:
-					logger.warn("configuration parsing not yet implemented");
+					try {
+						BufferedReader bufr = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(file))));
+						
+						Serializable [] out = new Serializable[configField.length];
+						out[0] = data.getData(rawStatusField[0].getName());
+						out[3] = data.getData(rawStatusField[3].getName());
+						
+						String line;
+						while ((line = bufr.readLine()) != null) {
+							String [] spl = line.split("=", 2);
+							if (spl.length == 2) {
+								String param = spl[0].trim().toLowerCase();
+								String value = spl[1].trim();
+								if (param.equals("startdate")) {
+									try {
+										out[1] = out[2] = out[4] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
+									} catch (ParseException e) {
+										logger.error(e.getMessage());
+									}
+								} else if (param.equals("enddate")) {
+									try {
+										out[5] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
+									} catch (ParseException e) {
+										logger.error(e.getMessage());
+									}
+								} else if (param.equals("uploader")) {
+									out[6] = value;
+								} else if (param.equals("protocol")) {
+									out[7] = Short.parseShort(value);
+								} else if (param.equals("firmware")) {
+									out[8] = Integer.parseInt(value);
+								} else if (param.equals("serial")) {
+									out[9] = Integer.parseInt(value);
+								} else if (param.equals("lowpowercycletime")) {
+									out[10] = Integer.parseInt(value);
+								} else if (param.equals("lowpoweractivetime")) {
+									out[11] = Integer.parseInt(value);
+								} else if (param.equals("lowpowermeasurement")) {
+									out[12] = Integer.parseInt(value);
+								} else if (param.equals("entryvoltage")) {
+									out[13] = Integer.parseInt(value);
+								} else if (param.equals("exitvoltage")) {
+									out[14] = Integer.parseInt(value);
+								} else if (param.equals("loggingrate")) {
+									out[15] = Integer.parseInt(value);
+								} else if (param.equals("configused")) {
+									out[16] = Integer.parseInt(value);
+								} else if (param.equals("configtotal")) {
+									out[17] = Integer.parseInt(value);
+								} else if (param.equals("confstring")) {
+									out[18] = value.getBytes();
+								} else if (param.equals("angle")) {
+									out[19] = value;
+								} else if (param.equals("antenna_serial")) {
+									out[20] = value;
+								}
+							}
+						}
+						data = new StreamElement(configField, out);
+
+						super.dataAvailable(inputStreamName, data);
+					} catch (IOException e) {
+						logger.error(e.getMessage(), e);
+					}
 					break;
 				default:
 					logger.error("file_type unknown");
