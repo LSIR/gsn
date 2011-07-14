@@ -5,8 +5,8 @@
        	<web-input password="test">
          	<command name="files">
 				<field name="raw_status_file" type="*binary">file</field>
-				<field name="event_file" type="*binary">file</field>
 				<field name="config_file" type="*binary">file</field>
+				<field name="event_file" type="*binary">file</field>
         	</command>
    		</web-input>
         <output-structure>
@@ -31,7 +31,8 @@
                 <address wrapper="file-getter">
                     <predicate key="subdirectory-name">gps-logger</predicate>
                     <predicate key="filename-regex1">^D_(\d{6})_\d+_\d+\.dat$</predicate>
-                    <predicate key="filename-regex2">^E_(\d{6})_\d+_\d+\.log$</predicate>
+                    <predicate key="filename-regex2">^C_(\d{6})_\d+_\d+\.log$</predicate>
+                    <predicate key="filename-regex3">^E_(\d{6})_\d+_\d+\.log$</predicate>
                     <predicate key="deviceid-from-filename">true</predicate>
                 </address>
                 <query> select * from wrapper </query>

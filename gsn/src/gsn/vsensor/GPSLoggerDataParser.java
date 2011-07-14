@@ -28,8 +28,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	private static final byte STATUS_TYPE = 1;
 
 	private static final String RAW_STATUS_FILE_TYPE = "raw-status";
-	private static final String EVENT_FILE_TYPE = "events";
 	private static final String CONFIG_FILE_TYPE = "configuration";
+	private static final String EVENT_FILE_TYPE = "events";
 	
 	private static final byte[] rawHeader = {(byte) 0xB5, 0x62, 0x02, 0x10};
 	private static final byte[] statusHeader = {0x6D, 0x74, 0x01, 0x01};
@@ -101,9 +101,9 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		if (filetype != null) {
 			if (filetype.equalsIgnoreCase(RAW_STATUS_FILE_TYPE))
 				file_type = 1;
-			else if (filetype.equalsIgnoreCase(EVENT_FILE_TYPE))
-				file_type = 2;
 			else if (filetype.equalsIgnoreCase(CONFIG_FILE_TYPE))
+				file_type = 2;
+			else if (filetype.equalsIgnoreCase(EVENT_FILE_TYPE))
 				file_type = 3;
 			else {
 				logger.error("file_type " + filetype + " not recognized");
@@ -461,9 +461,9 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								} else if (param.equals("uploader")) {
 									out[6] = value;
 								} else if (param.equals("protocol")) {
-									out[7] = Short.parseShort(value);
+									out[7] = value;
 								} else if (param.equals("firmware")) {
-									out[8] = Integer.parseInt(value);
+									out[8] = Short.parseShort(value);
 								} else if (param.equals("serial")) {
 									out[9] = Integer.parseInt(value);
 								} else if (param.equals("lowpowercycletime")) {
