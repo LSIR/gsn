@@ -839,7 +839,7 @@ var GSN = {
                                     value = '<span>' + GSN.util.resumelongsentences(answer) + '</span>';
                                 }
                             });
-                        } else if (type.indexOf("binary") != -1){
+                        } else if (type.search("[bB][iI][nN][aA][rR][yY]") != -1){
                             value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
                         } else {
                             value = value + unit;
@@ -856,7 +856,7 @@ var GSN = {
                             type=type.substr(1);
                         }
 
-                        if (type.split(":")[0].indexOf("binary") != -1){
+                        if (type.split(":")[0].search("[bB][iI][nN][aA][rR][yY]") != -1){
                             value = '<input type="file" name="'+cmd+";"+name+'"/>';
                         } else if (type.split(":")[0].indexOf("select") != -1){
                             var options = type.split(":")[1].split("|");
@@ -930,7 +930,7 @@ var GSN = {
                                     $("span",dd).text(GSN.util.resumelongsentences(answer));
                                 }
                             });
-                        } else if (type.indexOf("binary") != -1){
+                        } else if (type.search("[bB][iI][nN][aA][rR][yY]") != -1){
                             $("a",dd).attr("href",value);
                         } else {
                             $(dd).empty().append(value + unit);
