@@ -18,7 +18,7 @@ import gsn.beans.DataField;
 
 public class FileGetterWrapper extends AbstractWrapper {
 	
-	private static DataField[] outputStructure;
+	private DataField[] outputStructure;
 
 	private final transient Logger logger = Logger.getLogger( FileGetterWrapper.class );
 

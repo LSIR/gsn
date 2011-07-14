@@ -5,96 +5,185 @@ import gsn.beans.DataField;
 import gsn.wrappers.AbstractWrapper;
 
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 
 public class HttpGetWrapper extends AbstractWrapper {
    
-   private int                      DEFAULT_RATE       = 2000;
-   
-   private static int               threadCounter      = 0;
-   
-   private final transient Logger   logger             = Logger.getLogger( HttpGetWrapper.class );
-   
-   private String                   urlPath;
-   
-   private HttpURLConnection httpURLConnection;
-   
-   private URL url;
-   
-  private AddressBean              addressBean;
-   
-   private String                   inputRate;
-   
-   private int                      rate;
-   
-   private transient final DataField [] outputStructure = new  DataField [] { new DataField( "data" , "binary:image/jpeg" , "JPEG image from the remote networked camera." ) };
-   
-  
-   /**
-    * From XML file it needs the followings :
-    * <ul>
-    * <li>url</li> The full url for retriving the binary data.
-    * <li>rate</li> The interval in msec for updating/asking for new information.
-    * <li>mime</li> Type of the binary data.
-    * </ul>
-    */
-   public boolean initialize (  ) {
-      this.addressBean =getActiveAddressBean( );
-      urlPath = this.addressBean.getPredicateValue( "url" );
-      try {
-		url = new URL(urlPath);
-	} catch (MalformedURLException e) {
-		logger.error("Loading the http wrapper failed : "+e.getMessage(),e);
-		return false;
+	private int						DEFAULT_RATE		= 2000;
+
+	private final transient Logger	logger				= Logger.getLogger( HttpGetWrapper.class );
+
+	private URL						url;
+	private int						rate;
+	private File					directory			= null;
+	private String					subdirectory		= null;
+	private Integer					deviceId			= null;
+
+	private static int				threadCounter		= 0;
+	final static private SimpleDateFormat format		= new SimpleDateFormat("yyyy-MM-dd_HHmmss");
+
+	private DataField []			outputStructure;
+
+
+	/**
+	* From XML file it needs the followings :
+	* <ul>
+	* <li>url</li> The full url for retriving the binary data.
+	* <li>rate</li> The interval in msec for updating/asking for new information.
+	* </ul>
+	*/
+	public boolean initialize (  ) {
+		AddressBean addressBean =getActiveAddressBean( );
+		String urlPath = addressBean.getPredicateValue( "url" );
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		try {
+			url = new URL(urlPath);
+		} catch (MalformedURLException e) {
+			logger.error("Loading the http wrapper failed : "+e.getMessage(),e);
+			return false;
+		}
+		
+		subdirectory = getActiveAddressBean().getPredicateValue("subdirectory-name");
+		if (subdirectory != null) {
+			String rootBinaryDir;
+			
+			try {
+				rootBinaryDir = getActiveAddressBean().getVirtualSensorConfig().getStorage().getStorageDirectory();
+			} catch (NullPointerException e){
+				logger.error("if subdirectory-name is specified the storage-directory has to be specified as well");
+				return false;
+			}
+			
+			File f = new File(rootBinaryDir);
+			if (!f.isDirectory()) {
+				logger.error(rootBinaryDir + " is not a directory");
+				return false;
+			}
+			
+			if (!f.canWrite()) {
+				logger.error(rootBinaryDir + " is not writable");
+				return false;
+			}
+	
+			if (logger.isDebugEnabled()) {
+				logger.debug("binary root directory: " + rootBinaryDir);
+			}
+
+			String id = getActiveAddressBean().getPredicateValue("device-id");
+			if (id != null) {
+				try {
+					deviceId = Integer.parseInt(id);
+				} catch (NumberFormatException e) {
+					logger.error("device id >" + id + "< is not an integer");
+					return false;
+				}
+				
+				if (deviceId < 0 || deviceId > 65535) {
+					logger.error("device id >" + id + "< has to be between 0 and 65535");
+					return false;
+				}
+
+				directory = new File(new File(new File(rootBinaryDir, getActiveAddressBean().getVirtualSensorName().split("_")[0].toLowerCase()), id), subdirectory);
+			}
+			else
+				directory = new File(new File(rootBinaryDir, getActiveAddressBean().getVirtualSensorName().split("_")[0].toLowerCase()), subdirectory);
+			
+			if (!directory.exists()) {
+		    	if (!directory.mkdirs()) {
+		    		logger.error("could not mkdir >" + directory + "<");
+		    		return false;
+				}
+		    	else
+		    		logger.info("created new storage directory >" + directory + "<");
+			}
+			
+			if (deviceId == null)
+				outputStructure = new DataField [] {
+					new DataField("GENERATION_TIME", "BIGINT"),
+					new DataField("RELATIVE_FILE", "VARCHAR(255)")};
+			else
+				outputStructure = new DataField [] {
+					new DataField("DEVICE_ID", "INTEGER"),
+					new DataField("GENERATION_TIME", "BIGINT"),
+					new DataField("RELATIVE_FILE", "VARCHAR(255)")};
+			
+			logger.info("binaries will be stored in >" + directory + "<");
+		}
+		else {
+			outputStructure = new DataField [] {
+				new DataField("GENERATION_TIME", "BIGINT"),
+				new DataField( "DATA" , "binary:image/jpeg")};
+			
+			logger.info("binaries will be stored in database");
+		}
+		
+		String inputRate = addressBean.getPredicateValue( "rate" );
+		if ( inputRate == null || inputRate.trim( ).length( ) == 0 )
+			rate = DEFAULT_RATE;
+		else
+			rate = Integer.parseInt( inputRate );
+ 
+		setName( "HttpReceiver-Thread" + ( ++threadCounter ) );
+		if ( logger.isDebugEnabled( ) ) logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
+		return true;
 	}
-      inputRate = this.addressBean.getPredicateValue( "rate" );
-      if ( inputRate == null || inputRate.trim( ).length( ) == 0 ) rate = DEFAULT_RATE;
-      else
-         rate = Integer.parseInt( inputRate );
-      setName( "HttpReceiver-Thread" + ( ++threadCounter ) );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
-      return true;
-   }
-   
-   public void run ( ) {
-	   ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream(1024*20);
-	   byte[] buffer = new byte[16*1024];
-	   BufferedInputStream content;
-      while ( isActive( ) ) {
-    	 try {
-            Thread.sleep( rate );
-			httpURLConnection = (HttpURLConnection) url.openConnection();
-		    httpURLConnection.connect();
-			if ( httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_ACCEPTED ) continue;
-		    content = new BufferedInputStream(httpURLConnection.getInputStream(),4096);
-		    arrayOutputStream.reset();
-		    int readIndex = -1;
-		    while ( (readIndex= content.read(buffer))!=-1)
-		    	arrayOutputStream.write(buffer, 0, readIndex);
-		    postStreamElement(  arrayOutputStream.toByteArray());
-         } catch ( InterruptedException e ) {
-            logger.error( e.getMessage( ) , e );
-         }catch (IOException e) {
-		    logger.error( e.getMessage( ) , e );
-	     }
-      }
-   }
-   public String getWrapperName() {
-    return "Http Receiver";
-}
-   
-   public void dispose (  ) {
-      threadCounter--;
-   }
-   
-   public  DataField[] getOutputFormat ( ) {
-      return outputStructure;
-   }
-   
+
+	public void run ( ) {
+		ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream(1024*20);
+		byte[] buffer = new byte[16*1024];
+		BufferedInputStream content;
+		while ( isActive( ) ) {
+			try {
+				Thread.sleep( rate );
+				long timestamp = System.currentTimeMillis();
+				HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+				httpURLConnection.connect();
+				if ( httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_ACCEPTED ) continue;
+				content = new BufferedInputStream(httpURLConnection.getInputStream(),4096);
+				arrayOutputStream.reset();
+				int readIndex = -1;
+				while ( (readIndex= content.read(buffer))!=-1)
+					arrayOutputStream.write(buffer, 0, readIndex);
+				
+				if (directory != null ) {
+					String filename = format.format(new java.util.Date(timestamp))+".jpg";
+					arrayOutputStream.writeTo(new FileOutputStream (new File(directory, filename)));
+					if (deviceId == null)
+						postStreamElement(new Serializable[]{timestamp, subdirectory+"/"+filename});
+					else
+						postStreamElement(new Serializable[]{deviceId, timestamp, subdirectory+"/"+filename});
+				}
+				else
+					postStreamElement(new Serializable[]{timestamp, arrayOutputStream.toByteArray()});
+			} catch ( InterruptedException e ) {
+				logger.error( e.getMessage( ) , e );
+			}catch (IOException e) {
+				logger.error( e.getMessage( ) , e );
+			}
+		}
+	}
+	
+	public String getWrapperName() {
+		return "Http Receiver";
+	}
+
+	public void dispose (  ) {
+		threadCounter--;
+	}
+
+	public  DataField[] getOutputFormat ( ) {
+		return outputStructure;
+	}
 }
