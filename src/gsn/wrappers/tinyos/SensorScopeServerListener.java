@@ -403,6 +403,8 @@ public class SensorScopeServerListener {
 
     private static Map<Integer, Long> latestTimestampForStation = new HashMap<Integer, Long>();
     private static Map<Integer, Serializable[]> latestBufferForStation = new HashMap<Integer, Serializable[]>();
+    private static Map<Integer, Map<Long, Serializable[]>> stationsBuffer = new HashMap<Integer, Map<Long, Serializable[]>>();
+
 
     public SensorScopeServerListener() {
 
@@ -1045,6 +1047,64 @@ public class SensorScopeServerListener {
         return newBuffer;
     }
 
+
+    private void PublishBufferWithHistory(Serializable[] buffer, long timestamp, int stationID) {
+        if (stationsBuffer.containsKey(stationID)) {
+            AddToBuffer(stationID, timestamp, buffer);
+        } else {
+            stationsBuffer.put(stationID, new HashMap<Long, Serializable[]>()); // create buffer for station stationID
+            stationsBuffer.get(stationID).put(timestamp, buffer); // add packet for station stationID
+        }
+    }
+
+    private void AddToBuffer(int stationID, long timestamp, Serializable[] buffer) {
+        if (stationsBuffer.get(stationID).containsKey(timestamp)) { // timestamp already present
+            stationsBuffer.get(stationID).put(timestamp, mergeBuffers(stationsBuffer.get(stationID).get(timestamp), buffer)); // merge new buffer with previous
+        } else {
+            stationsBuffer.get(stationID).put(timestamp, buffer);
+        }
+        CheckQueueSizeForStation(stationID);
+    }
+
+    /*
+    * Keeps only 10 values in the queue
+    * Removes oldest value if queue is has more than 10 elements
+    * */
+    private void CheckQueueSizeForStation(int stationID) {
+        int queueSize = stationsBuffer.get(stationID).size();
+        Long[] timestamps = (Long[])stationsBuffer.get(stationID).keySet().toArray();
+        // search for oldest timestamp (smaller value)
+        Long oldestTimestamp = Long.MAX_VALUE;
+        for(int i=0;i<timestamps.length;i++) {
+            if (timestamps[i]<oldestTimestamp)
+                oldestTimestamp = timestamps[i];
+        }
+        Serializable[] _buffer = stationsBuffer.get(stationID).get(oldestTimestamp);
+        if (queueSize > 10) {
+                try {  // Publish one element
+                        String stationFileName = csvFolderName + "/" + stationID + "_all.csv";
+                        FileWriter fstream = new FileWriter(stationFileName, true);
+                        BufferedWriter out = new BufferedWriter(fstream);
+
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < _buffer.length; i++) {
+                            if (_buffer[i] == null)
+                                sb.append(nullString).append(",");
+                            else
+                                sb.append(buffer[i]).append(",");
+                        }
+                        sb.append(Helpers.convertTimeFromLongToIso(oldestTimestamp, "yyyy-MM-dd HH:mm:ss"));
+                        sb.append("\n");
+                        out.write(sb.toString());
+                        out.close();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                    }
+        }
+        stationsBuffer.get(stationID).remove(oldestTimestamp); // Remove one element
+    }
+
+
     private void PublishBuffer(Serializable[] buffer, long timestamp, int stationID) {
         if (!latestTimestampForStation.containsKey(stationID)) { // first time we receive that stationID
             logger.debug("first time we receive stationID=" + stationID);
@@ -1331,6 +1391,7 @@ public class SensorScopeServerListener {
             aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp * 1000);
 
             PublishBuffer(buffer, timestamp * 1000, stationID);
+            PublishBufferWithHistory(buffer, timestamp * 1000, stationID);
 
             // reset
             for (int i = 0; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
