@@ -125,11 +125,11 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		if (relativeFile != null) {
 			File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), relativeFile);
 			file = file.getAbsoluteFile();
-			
-			logger.info("new incoming file (" + file.getAbsolutePath() + ")");
 	
 			switch (file_type) {
 				case 1:
+					logger.info("new incoming " + RAW_STATUS_FILE_TYPE + " file (" + file.getAbsolutePath() + ")");
+					
 					short GPS_RAW_DATA_VERSION = 1;
 					int rawSampleCount = 1;
 					int rawIncorrectChecksumCount = 0;
@@ -251,6 +251,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 						logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data samples in " + file.getAbsolutePath());
 					break;
 				case 2:
+					logger.info("new incoming " + CONFIG_FILE_TYPE + " file (" + file.getAbsolutePath() + ")");
+					
 					try {
 						BufferedReader bufr = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(file))));
 						
@@ -317,6 +319,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					}
 					break;
 				case 3:
+					logger.info("new incoming " + EVENT_FILE_TYPE + " file (" + file.getAbsolutePath() + ")");
+					
 					int eventCount = 0;
 					int unknownEventCounter = 0;
 					long lastTimestamp = 0;
@@ -507,7 +511,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	
 	
 	private byte[] getRawPacket(DataInputStream dis, byte[] header, String filename) throws IOException, EOFException {
-		dis.mark(65538);
+		dis.mark(66000);
 		byte [] length = new byte [2];
 		dis.read(length);
 		byte [] rest = new byte [((length[0]&0xFF) | ((length[1]&0xFF) << 8)) + 2];
