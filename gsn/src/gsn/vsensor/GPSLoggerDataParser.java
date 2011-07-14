@@ -3,6 +3,7 @@ package gsn.vsensor;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -136,7 +137,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					int statusSampleCount = 1;
 					int statusIncorrectChecksumCount = 0;
 					try {
-						DataInputStream dis = new DataInputStream(new FileInputStream(fixFile(file)));
+						DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
 						
 						int b = dis.readByte();
 						while (true) {
