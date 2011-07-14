@@ -1091,7 +1091,7 @@ public class SensorScopeServerListener {
                     if (_buffer[i] == null)
                         sb.append(nullString).append(",");
                     else
-                        sb.append(buffer[i]).append(",");
+                        sb.append(_buffer[i]).append(",");
                 }
                 sb.append(Helpers.convertTimeFromLongToIso(oldestTimestamp, "yyyy-MM-dd HH:mm:ss"));
                 sb.append("\n");
