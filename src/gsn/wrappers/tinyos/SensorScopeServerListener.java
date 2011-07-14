@@ -1038,30 +1038,30 @@ public class SensorScopeServerListener {
         }
     }
 
-    Serializable[] mergeBuffers(Serializable[] olderBuffer, Serializable[] newerBuffer) {
-        Serializable[] newBuffer = olderBuffer.clone();
-        for (int i = 0; i < olderBuffer.length; i++) {
-            if (olderBuffer[i] == null && newerBuffer[i] != null)
-                newBuffer[i] = newerBuffer[i];
+    Serializable[] mergePackets(Serializable[] olderPacket, Serializable[] newerPacket) {
+        Serializable[] mergedPacket = olderPacket.clone();
+        for (int i = 0; i < olderPacket.length; i++) {
+            if (olderPacket[i] == null && newerPacket[i] != null)
+                mergedPacket[i] = newerPacket[i];
         }
-        return newBuffer;
+        return mergedPacket;
     }
 
 
-    private void PublishBufferWithHistory(Serializable[] buffer, long timestamp, int stationID) {
+    private void PublishPacketWithHistory(Serializable[] packet, long timestamp, int stationID) {
         if (stationsBuffer.containsKey(stationID)) {
-            AddToBuffer(stationID, timestamp, buffer);
+            AddToStationBuffer(stationID, timestamp, packet);
         } else {
             stationsBuffer.put(stationID, new HashMap<Long, Serializable[]>()); // create buffer for station stationID
-            stationsBuffer.get(stationID).put(timestamp, buffer); // add packet for station stationID
+            stationsBuffer.get(stationID).put(timestamp, packet); // add packet for station stationID
         }
     }
 
-    private void AddToBuffer(int stationID, long timestamp, Serializable[] buffer) {
+    private void AddToStationBuffer(int stationID, long timestamp, Serializable[] packet) {
         if (stationsBuffer.get(stationID).containsKey(timestamp)) { // timestamp already present
-            stationsBuffer.get(stationID).put(timestamp, mergeBuffers(stationsBuffer.get(stationID).get(timestamp), buffer)); // merge new buffer with previous
+            stationsBuffer.get(stationID).put(timestamp, mergePackets(stationsBuffer.get(stationID).get(timestamp), packet)); // merge new buffer with previous
         } else {
-            stationsBuffer.get(stationID).put(timestamp, buffer);
+            stationsBuffer.get(stationID).put(timestamp, packet);
         }
         CheckQueueSizeForStation(stationID);
     }
@@ -1106,31 +1106,31 @@ public class SensorScopeServerListener {
     }
 
 
-    private void PublishBuffer(Serializable[] buffer, long timestamp, int stationID) {
+    private void PublishBuffer(Serializable[] packet, long timestamp, int stationID) {
         if (!latestTimestampForStation.containsKey(stationID)) { // first time we receive that stationID
             logger.debug("first time we receive stationID=" + stationID);
             latestTimestampForStation.put(stationID, timestamp);
-            latestBufferForStation.put(stationID, buffer.clone());
+            latestBufferForStation.put(stationID, packet.clone());
         } else {
             if (timestamp == latestTimestampForStation.get(stationID)) {
-                latestBufferForStation.put(stationID, mergeBuffers(latestBufferForStation.get(stationID), buffer));
+                latestBufferForStation.put(stationID, mergePackets(latestBufferForStation.get(stationID), packet));
                 logger.debug("Merging buffers for stationID=" + stationID);
             } else {
                 if ((timestamp > latestTimestampForStation.get(stationID))) {
                     logger.debug("Publishing data for stationID=" + stationID);
                     latestTimestampForStation.put(stationID, timestamp); // update timestamp
-                    latestBufferForStation.put(stationID, buffer.clone()); // update buffer
+                    latestBufferForStation.put(stationID, packet.clone()); // update buffer
                     try {  // Publish it
                         String stationFileName = csvFolderName + "/" + stationID + ".csv";
                         FileWriter fstream = new FileWriter(stationFileName, true);
                         BufferedWriter out = new BufferedWriter(fstream);
 
                         StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < buffer.length; i++) {
-                            if (buffer[i] == null)
+                        for (int i = 0; i < packet.length; i++) {
+                            if (packet[i] == null)
                                 sb.append(nullString).append(",");
                             else
-                                sb.append(buffer[i]).append(",");
+                                sb.append(packet[i]).append(",");
                         }
                         sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss"));
                         sb.append("\n");
@@ -1392,7 +1392,7 @@ public class SensorScopeServerListener {
             aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp * 1000);
 
             PublishBuffer(buffer, timestamp * 1000, stationID);
-            PublishBufferWithHistory(buffer, timestamp * 1000, stationID);
+            PublishPacketWithHistory(buffer, timestamp * 1000, stationID);
 
             // reset
             for (int i = 0; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
