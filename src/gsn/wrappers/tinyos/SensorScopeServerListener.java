@@ -1072,35 +1072,37 @@ public class SensorScopeServerListener {
     * */
     private void CheckQueueSizeForStation(int stationID) {
         int queueSize = stationsBuffer.get(stationID).size();
-         // search for oldest timestamp (smaller value)
+        logger.info("Queue [" + stationID + "] = " + queueSize);
+        // search for oldest timestamp (smaller value)
         Long oldestTimestamp = Long.MAX_VALUE;
-        for (Long timestamp: stationsBuffer.get(stationID).keySet()) {
-            if (timestamp<oldestTimestamp)
+        for (Long timestamp : stationsBuffer.get(stationID).keySet()) {
+            if (timestamp < oldestTimestamp)
                 oldestTimestamp = timestamp;
         }
         Serializable[] _buffer = stationsBuffer.get(stationID).get(oldestTimestamp);
         if (queueSize > 10) {
-                try {  // Publish one element
-                        String stationFileName = csvFolderName + "/" + stationID + "_all.csv";
-                        FileWriter fstream = new FileWriter(stationFileName, true);
-                        BufferedWriter out = new BufferedWriter(fstream);
+            try {  // Publish one element
+                String stationFileName = csvFolderName + "/" + stationID + "_all.csv";
+                FileWriter fstream = new FileWriter(stationFileName, true);
+                BufferedWriter out = new BufferedWriter(fstream);
 
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < _buffer.length; i++) {
-                            if (_buffer[i] == null)
-                                sb.append(nullString).append(",");
-                            else
-                                sb.append(buffer[i]).append(",");
-                        }
-                        sb.append(Helpers.convertTimeFromLongToIso(oldestTimestamp, "yyyy-MM-dd HH:mm:ss"));
-                        sb.append("\n");
-                        out.write(sb.toString());
-                        out.close();
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                    }
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < _buffer.length; i++) {
+                    if (_buffer[i] == null)
+                        sb.append(nullString).append(",");
+                    else
+                        sb.append(buffer[i]).append(",");
+                }
+                sb.append(Helpers.convertTimeFromLongToIso(oldestTimestamp, "yyyy-MM-dd HH:mm:ss"));
+                sb.append("\n");
+                out.write(sb.toString());
+                out.close();
+                stationsBuffer.get(stationID).remove(oldestTimestamp); // Remove one element
+                logger.info("Queue [" + stationID + "] = " + queueSize + " after publishing");
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
-        stationsBuffer.get(stationID).remove(oldestTimestamp); // Remove one element
     }
 
 
