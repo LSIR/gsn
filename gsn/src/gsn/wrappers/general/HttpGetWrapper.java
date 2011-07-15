@@ -165,7 +165,6 @@ public class HttpGetWrapper extends AbstractWrapper {
 		BufferedInputStream content;
 		while ( isActive( ) ) {
 			try {
-				Thread.sleep( rate );
 				long timestamp = System.currentTimeMillis();
 				HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 				httpURLConnection.connect();
@@ -187,6 +186,7 @@ public class HttpGetWrapper extends AbstractWrapper {
 				}
 				else
 					postStreamElement(new Serializable[]{timestamp, size, arrayOutputStream.toByteArray()});
+				Thread.sleep( rate );
 			} catch ( InterruptedException e ) {
 				logger.error( e.getMessage( ) , e );
 			}catch (IOException e) {
