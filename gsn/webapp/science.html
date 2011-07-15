@@ -32,7 +32,80 @@ $(document).ready(function() {
 
     // plot configuration
     GsnPlots.setConfig([
-      {"vsensor":"dozer_th3temp__conv", "field":["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"], "title":"Temperatures", "select":"sensornode[position=6]"},
+      // test
+      {"vsensor":"dozer_th3temp__conv",
+       "field":["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
+       "title":"Temperatures",
+       "select":"sensornode[position=6]"},
+      // matterhorn
+      {"vsensor":"sensorrod1",
+       "field":["sr_t1","sr_t2","sr_t3","sr_t4"],
+       "title":"Sensorrod Temperatures",
+       "select":"sensornode[position=10]"},
+      {"vsensor":"crackmeter__ccnn",
+       "field":["ccnn_dx0"],
+       "title":"Crackmeter",
+       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=22]"},
+      {"vsensor":"crackmeter__ccnn",
+       "field":["ccnn_dx1"],
+       "title":"Crackmeter",
+       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=22]"},
+      {"vsensor":"crackmeter__ccct",
+       "field":["ccct_dx0"],
+       "title":"Crackmeter",
+       "select":"sensornode[position=9]"},
+      {"vsensor":"crackmeter__ccct",
+       "field":["ccct_dx2"],
+       "title":"Crackmeter",
+       "select":"sensornode[position=9]"},
+      {"vsensor":"crackmeter__ctct",
+       "field":["ctct_dx1"],
+       "title":"Crackmeter",
+       "select":"sensornode[position=6]"},
+      {"vsensor":"crackmeter__ctct",
+       "field":["ctct_dx2"],
+       "title":"Crackmeter",
+       "select":"sensornode[position=6]"},
+      {"vsensor":"crackmeter__nctt",
+       "field":["nctt_dx1"],
+       "title":"Crackmeter",
+       "select":"sensornode[position=1],sensornode[position=2],sensornode[position=3],sensornode[position=4]"},
+      {"vsensor":"crackmeter__nctc",
+       "field":["nctc_dx1"],
+       "title":"Crackmeter Position 8",
+       "select":"sensornode[position=8]"},
+      {"vsensor":"crackmeter__nctc",
+       "field":["nctc_dx2"],
+       "title":"Crackmeter Position 8",
+       "select":"sensornode[position=8]"},
+      {"vsensor":"crackmeter__nctt",
+       "field":["nctt_dx1", "nctt_t1", "nctt_t2",],
+       "title":"Crackmeter Temperature Position 2",
+       "select":"sensornode[position=2]"},
+
+
+      // thur
+      {"vsensor":"dozer_decagonmux__conv",
+       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
+       "title":"Decagon Conductivity", 
+       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=1],"},
+      {"vsensor":"dozer_decagonmux__conv",
+       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
+       "title":"Decagon Conductivity", 
+       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=2],"},
+      {"vsensor":"dozer_decagonmux__conv",
+       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
+       "title":"Decagon Conductivity", 
+       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=3],"},
+      {"vsensor":"dozer_decagonmux__conv",
+       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
+       "title":"Decagon Conductivity", 
+       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=4],"},
+      {"vsensor":"dozer_decagonmux__conv",
+       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
+       "title":"Decagon Conductivity", 
+       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=5],"},
+
     ]);
 
 
@@ -101,7 +174,7 @@ function showPlots(id) {
 	<div id="separator">
 		<div id="starttext">
 			<p>
-				A collection of sensor network specific plots related to the PermaSense Deployments.
+				A collection of scientific plots related to the PermaSense Deployments.
 			</p>
 		</div>
 	</div>
