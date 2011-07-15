@@ -1,0 +1,31 @@
+<virtual-sensor name="Grabengufer_Camera_Gugla" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="SIZE" type="INTEGER" unit="bytes" />
+            <field name="RELATIVE_FILE" type="VARCHAR(255)"/>
+            <field name="DATA" type="BINARY" data-path-field="RELATIVE_FILE"/>
+        </output-structure>
+    </processing-class>
+    <description>Camera Gugla from the Grabengufer deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam7/current.jpg</predicate>
+                    <predicate key="rate">900000</predicate>
+                    <predicate key="subdirectory-name">gugla</predicate>
+                    <predicate key="device-id">5</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
