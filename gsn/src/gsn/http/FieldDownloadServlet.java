@@ -4,18 +4,14 @@ import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
-import gsn.beans.InputStream;
 import gsn.beans.VSensorConfig;
 
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -112,7 +108,15 @@ public class FieldDownloadServlet extends HttpServlet {
 						byte[] buffer = new byte[1024];
 						int bytesRead;
 						logger.debug("open file specified in "+filename);
-						FileInputStream is= new FileInputStream(new StringBuilder(Mappings.getVSensorConfig(vsName).getStorage().getStorageDirectory()).append("/").append(vsName.substring(0, vsName.indexOf("_"))).append("/").append(rs.getString("DEVICE_ID")).append("/").append(rs.getString(filename)).toString());
+						StringBuilder sb = new StringBuilder(Mappings.getVSensorConfig(vsName).getStorage().getStorageDirectory());
+						sb.append("/").append(vsName.substring(0, vsName.indexOf("_"))).append("/");
+						try {
+							sb.append(rs.getString("DEVICE_ID")).append("/");
+						} catch (SQLException e) {
+							logger.debug(e.getMessage());
+						}
+						sb.append(rs.getString(filename));
+						FileInputStream is= new FileInputStream(sb.toString());
 						while ((bytesRead=is.read(buffer)) != -1) {
 							res.getOutputStream( ).write(buffer, 0, bytesRead);
 					    }						
