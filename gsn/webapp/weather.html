@@ -6,7 +6,7 @@
 	<title>GSN</title>
 	
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
-	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
@@ -15,6 +15,15 @@
 	<script type="text/javascript" src="js/constants.js"></script>
 	<script type="text/javascript" src="js/functions.js"></script>
         <script type="text/javascript" src="js/uptime.js"></script>
+        <!-- Visualization -->
+        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/sensorviz.css" />
+        <link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
+        <!--[if IE]><script src="http://whymper.ethz.ch:24001/excanvas.js"></script><![endif]-->
+        <script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/sensorviz.js'></script>
+        <script type='text/javascript' src='js/gsnplots.js'></script>
+
 <script type="text/javascript">
 <!--//<![CDATA[
 
@@ -54,11 +63,33 @@ function nextUpdate()
 $(document).ready(function() {
 	$.get('/menu.jsp', {selected: "weather"}, function(data) {
 	  $('#navigation').html(data);
-	});
+	}, 'html');
         $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
         
         $("#nextUpdate").text(nextUpdateVal);
         setTimeout("nextUpdate()",1000);
+
+        // plot configuration
+        GsnPlots.setConfig([
+          // corestation
+          {"vsensor":"vaisalawxt520__mapped", "field":["relative_humidity"], "title":"Humidity", "select":"sensornode[position]"},
+          {"vsensor":"vaisalawxt520__mapped", "field":["air_temperature","internal_temperature"], "title":"Temperature", "select":"sensornode[position]"},
+          {"vsensor":"vaisalawxt520__mapped", "field":["air_pressure"], "title":"Air Pressure", "select":"sensornode[position]"},
+          {"vsensor":"vaisalawxt520__mapped", "field":["rain_accumulation"], "title":"Rain", "select":"sensornode[position]"},
+          {"vsensor":"vaisalawxt520__mapped", "field":["hail_accumulation"], "title":"Hail", "select":"sensornode[position]"},
+          {"vsensor":"vaisalawxt520__mapped", "field":["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], "title":"Wind Direction", "select":"sensornode[position]"},
+          {"vsensor":"vaisalawxt520__mapped", "field":["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], "title":"Wind Speed", "select":"sensornode[position]"},
+          // sensornode
+
+          {"vsensor":"dozer_wxt520windpth__conv", "field":["relative_humidity"], "title":"Humidity", "select":"sensornode[position]"},
+          {"vsensor":"dozer_wxt520windpth__conv", "field":["air_temperature","internal_temperature"], "title":"Temperature", "select":"sensornode[position]"},
+          {"vsensor":"dozer_wxt520windpth__conv", "field":["air_pressure"], "title":"Air Pressure", "select":"sensornode[position]"},
+          {"vsensor":"dozer_wxt520prec__conv", "field":["rain_accumulation"], "title":"Rain", "select":"sensornode[position]"},
+          {"vsensor":"dozer_wxt520prec__conv", "field":["hail_accumulation"], "title":"Hail", "select":"sensornode[position]"},
+          {"vsensor":"dozer_wxt520windpth__conv", "field":["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], "title":"Wind Direction", "select":"sensornode[position]"},
+          {"vsensor":"dozer_wxt520windpth__conv", "field":["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], "title":"Wind Speed", "select":"sensornode[position]"},
+
+        ]);
 
         // deployments
         // load deployments
@@ -96,63 +127,68 @@ $(document).ready(function() {
                         }
                     }
                 });
-                // display
-                var visible;
-                if ($.inArray($.cookie("deployment"), deployments)>-1)
-                  visible = $.cookie("deployment");
-                else
-                  visible = deployments[0];
-                for (var i in deployments) {
-                    // add tab
-                    $("#deployment_menu").append($.LI({}, $.A({
-                      "id":"deployment_menu_item_"+deployments[i],
-                      "href":"javascript:showTopology("+i+")"
-                    },deployments[i])));
-                    if ($("#weather_"+deployments[i]).length == 0) {
-                      // add div
-                      $("#weathercontainer").append(
-                        $.DIV({
-                            "id":"weather_"+deployments[i]
-                              }, 
-			$.DIV({
-			     "class":"scaledimages nodate"
-			     })));
-                    }
-		    deployment_cameras[i].sort();
-		    var webcam_div = $("#weather_"+deployments[i]+" .scaledimages").get(0);
-		    $(deployment_cameras[i]).each(function() {
-		      if ($(webcam_div).attr("class").indexOf("nodate")>0)
-			$(webcam_div).append('<div style="float:left;position:relative;margin:2px;padding:0;width:300px;height:250px">'
-					  +'<a href="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest">'
-					  +'<img src="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"></a></div>');
-		      else
-			$(webcam_div).append('<div style="float:left;position:relative;margin:2px;padding:0;width:300px;height:250px">'
-					  +'<div style="position:absolute;bottom:0px;width:171px;height:12px;background:url(field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest);background-position: -63px top;margin:0;padding:0">'
-					  +'</div><a href="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest">'
-					  +'<img src="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"></a></div>');
-		    });
-                    if (deployments[i]!=visible) {
-                      $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
-                      $("#weather_"+deployments[i]).hide();
-                    }
-                    else {
-                      $("#deployment_menu_item_"+deployments[i]).addClass("selected");
-                      $("#weather_"+deployments[i]).show();
-                    }
-                }
+                GsnPlots.initPlots(data, function(){addDeployments();});
               }
         });
 });
 
-function showTopology(id) {
-  for (var i in deployments) {
-      $("#weather_"+deployments[i]).hide();
-      $("#deployment_menu_item_"+deployments[i]).removeClass("selected");
+function addDeployments() {
+  // add deployment tabs and container
+  var visible=-1;
+  var d = GsnPlots.getDeployments();
+  $(d).each(function() {
+    if ($.cookie("deployment")==this)
+      visible = this;
+  });
+  if (visible==-1) {
+      visible = d[0];
   }
-  $("#weather_"+deployments[id]).show();
-  $("#deployment_menu_item_"+deployments[id]).addClass("selected");
-  $.cookie("deployment" , deployments[id]);
+  $(d).each(function() {
+    $('#deployment_menu').append('<li><a href="javascript:showPlots(\''+this+'\')" id="deployment_menu_item_'+this+'">'+this+'</a></li>');
+    if ($("#weather_"+this).length == 0) {
+      // add div
+      $("#weathercontainer").append(
+        $.DIV({
+          "id":"weather_"+this
+        }, 
+        $.DIV({
+          "class":"scaledimages nodate"
+      })));
+    }
+    $('#weather_'+this).append('<div id="plot_'+this+'"></div>');
+    $('#plot_'+this).hide();
+  });
+  for (i=0;i<deployment_cameras.length;i++) {
+    deployment_cameras[i].sort();
+    var webcam_div = $("#weather_"+deployments[i]+" .scaledimages").get(0);
+    $(deployment_cameras[i]).each(function() {
+      if ($(webcam_div).attr("class").indexOf("nodate")>0)
+        $(webcam_div).append('<div style="float:left;position:relative;margin:2px;padding:0;width:300px;height:250px">'
+                            +'<a href="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest">'
+                            +'<img src="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"></a></div>');
+      else
+        $(webcam_div).append('<div style="float:left;position:relative;margin:2px;padding:0;width:300px;height:250px">'
+                            +'<div style="position:absolute;bottom:0px;width:171px;height:12px;background:url(field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest);background-position: -63px top;margin:0;padding:0">'
+                            +'</div><a href="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest">'
+                            +'<img src="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"></a></div>');
+    });
+  }
+  showPlots(visible);
 }
+
+function showPlots(id) {
+  $(GsnPlots.getDeployments()).each(function() {
+      $("#plot_"+this).empty().hide();
+      $("#weather_"+this).hide();
+      $("#deployment_menu_item_"+this).removeClass("selected");
+  });
+  $("#plot_"+id).show();
+  $("#weather_"+id).show();
+  $("#deployment_menu_item_"+id).addClass("selected");
+  // add graphs
+  GsnPlots.addPlots($("#plot_"+id), id)
+  $.cookie("deployment" , id);
+}       
 
 //]]> -->
 </script>

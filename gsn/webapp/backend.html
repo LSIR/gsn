@@ -13,12 +13,13 @@
         <script type="text/javascript" src="js/uptime.js"></script>
 
         <!-- Visualization -->
-        <link rel="stylesheet" type="text/css" href="http://tik41x:23001/sensorviz.css" />
+        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/sensorviz.css" />
         <link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
-        <!--[if IE]><script src="http://tik41x:23001/excanvas.js"></script><![endif]-->
+        <!--[if IE]><script src="http://whymper.ethz.ch:24001/excanvas.js"></script><![endif]-->
         <script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
-        <script type='text/javascript' src='http://tik41x:23001/dygraph-combined.js'></script>
-        <script type='text/javascript' src='js/viz/sensorviz.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/sensorviz.js'></script>
+        <script type='text/javascript' src='js/gsnplots.js'></script>
 
 <script type="text/javascript">
 <!--//<![CDATA[
@@ -29,8 +30,13 @@ $(document).ready(function() {
     }, 'html');
     $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
-    // deployments
-    // load deployments
+    // plot configuration
+    GsnPlots.setConfigStatistics([
+      {"vsensor":"gsn", "field":["thread_blocked_cnt","thread_new_cnt"], "title":"GSN cnt", "select":""},
+      {"vsensor":"mysql", "field":"select_cnt", "title":"select_cnt", "select":""},
+
+    ]);
+    
     $.ajax({
       type: "GET",
       url: "/gsn?structure",
@@ -46,12 +52,41 @@ $(document).ready(function() {
         }
         $("#gsn-name").show();
         uptime.setTime($(gsn).attr("uptime"));
+        GsnPlots.initPlots(data, function(){addDeployments();});
       }
     });
-    
-    $('#plotscontainer').append('<div>TODO: put gsn and mysql statistics plots here</div>');
 });
 
+function addDeployments() {
+  // add deployment tabs and container
+  var visible=-1;
+  var d = GsnPlots.getDeployments();
+  $(d).each(function() {
+    if ($.cookie("deployment")==this)
+      visible = this;
+  });
+  if (visible==-1) {
+      visible = d[0];
+  }
+  $(d).each(function() {
+    $('#deployment_menu').append('<li><a href="javascript:showPlots(\''+this+'\')" id="deployment_menu_item_'+this+'">'+this+'</a></li>');
+    $('#plotscontainer').append('<div id="plot_'+this+'"></div>');
+    $('#plot_'+this).hide();
+  });
+  showPlots(visible);
+}
+
+function showPlots(id) {
+  $(GsnPlots.getDeployments()).each(function() {
+      $("#plot_"+this).empty().hide();
+      $("#deployment_menu_item_"+this).removeClass("selected");
+  });
+  $("#plot_"+id).show();
+  $("#deployment_menu_item_"+id).addClass("selected");
+  // add graphs
+  GsnPlots.addPlots($("#plot_"+id), id)
+  $.cookie("deployment" , id);
+}	
 //]]>-->
 </script>
 </head>
@@ -67,13 +102,20 @@ $(document).ready(function() {
 	<div id="separator">
 		<div id="starttext">
 			<p>
-				A collection of gsn backend and mysql specific plots.
+				A collection of sensor network specific plots related to the PermaSense Deployments.
 			</p>
 		</div>
 	</div>
 
 	<div id="maindiv">
+		<div id="deployment_navigation">
+		<ul id="deployment_menu">
+		<li />
+		</ul>
+		</div>	
+		
 		<div id="plotscontainer" style="margin-top:5px"></div>
+		
 	</div>
 	<div class="separator">
 		<div id="footer">

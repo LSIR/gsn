@@ -13,27 +13,16 @@
         <script type="text/javascript" src="js/uptime.js"></script>
 
         <!-- Visualization -->
-        <link rel="stylesheet" type="text/css" href="http://tik41x:23001/sensorviz.css" />
+        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/sensorviz.css" />
         <link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
-        <!--[if IE]><script src="http://tik41x:23001/excanvas.js"></script><![endif]-->
+        <!--[if IE]><script src="http://whymper.ethz.ch:24001/excanvas.js"></script><![endif]-->
         <script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
-        <script type='text/javascript' src='http://tik41x:23001/dygraph-combined.js'></script>
-        <script type='text/javascript' src='js/viz/sensorviz.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/sensorviz.js'></script>
+        <script type='text/javascript' src='js/gsnplots.js'></script>
 
 <script type="text/javascript">
 <!--//<![CDATA[
-
-var deployments = new Array();
-
-function getDeployment(name) {
-  var d=-1;
-  for (i=0;i<deployments.length;i++)
-    if (deployments[i].name==name) {
-      d=deployments[i];
-      break;
-    }
-  return d;
-}
 
 $(document).ready(function() {
     $.get('/menu.jsp', {selected: "science"}, function(data) {
@@ -41,8 +30,12 @@ $(document).ready(function() {
     }, 'html');
     $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
-    // deployments
-    // load deployments
+    // plot configuration
+    GsnPlots.setConfig([
+      {"vsensor":"dozer_th3temp__conv", "field":["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"], "title":"Temperatures", "select":"sensornode[position=6]"},
+    ]);
+
+
     $.ajax({
       type: "GET",
       url: "/gsn?structure",
@@ -58,105 +51,39 @@ $(document).ready(function() {
         }
         $("#gsn-name").show();
         uptime.setTime($(gsn).attr("uptime"));
-        var visible=-1;
-        if (getDeployment($.cookie("deployment"))>-1)
-          visible = $.cookie("deployment");
-        $("virtual-sensor",data).each(function(){
-          var deploymentname = $(this).attr("name").split("_", 1)[0];
-          if(deploymentname.length > 1 && deploymentname!='statistics') {
-            deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
-            if (getDeployment(deploymentname)<0) {
-              deployments.push(new Object({"name":deploymentname, "graphconfig":[]}));
-              // add deployment tabs and container
-              $('#deployment_menu').append('<li><a href="javascript:showPlots(\''+deploymentname+'\')" id="deployment_menu_item_'+deploymentname+'">'+deploymentname+'</a></li>');
-              $('#plotscontainer').append('<div id="plot_'+deploymentname+'">'+deploymentname+'</div>');
-              $('#plot_'+deploymentname).hide();
-              if (deployments.length==1 & visible==-1) {
-                visible = deploymentname;
-              }
-            }
-            var thisdeployment = getDeployment(deploymentname);
-            // find out about available node ids/positions
-            if($(this).attr("name").match(/.*_topology__public$/)) {
-              var topology_vs = $(this).attr("name");
-              var fields = ["sysvoltage", "sdivoltage", "temperature", "humidity"];
-              // fetch node ids (second ajax call)
-              $.ajax({
-                type: "GET",
-                url: "/field?vs="+topology_vs+"&field=DATA&pk=latest",
-                dataType: "xml",
-              // ajax SUCCESS ***********************************
-                success: function(data){
-                /* test visualization  ---v */
-                var positions = new Array();
-                $("sensornode[position]",data).each(function() {
-                  positions.push($(this).attr("position").valueOf());
-                });
-                positions.sort(function(a,b){return a - b});
-                // for each field, plot data
-                $(fields).each(function() {
-                  var field = this;
-                  var config = {
-                    "graph": {
-                      "div": "g_"+this.valueOf(),
-                      "type": "dygraph",
-                      "width": 800,
-                      "height": 350,
-                      "showForm": true
-                    },
-                    "appUrl": "http://tik41x:23001/sensorviz?",
-                    "signals": {
-                      "y1": []
-                    },
-                  };
-                  // add nodes to plot
-                  $(positions).each(function() {
-                    var signal = {
-                      "displayName":"Position "+this,
-                      "gsnUrl": "tik51x:22001",
-                      "virtualSensor": "etz_dozer_nodehealth__conv",
-                      "position": this,
-                      "field": field,
-                      "scaling": 1.0,
-                      "visible": true
-                    };
-                    config.signals.y1.push(signal);
-                  });
-                  thisdeployment.graphconfig.push({"config":config, "field":field, "title":field});
-                });
-                if (visible==deploymentname)
-                  showPlots(deploymentname);
-                /*
-                  $("#plotscontainer").append("<div id=\"g_"+field+"\"/>");
-                  var g = new FrontendCreator(config);
-                */
-                },
-              // ajax ERROR ***********************************
-                error : function(XMLHttpRequest, textStatus, errorThrown) {
-                  // TODO
-                },
-                complete: function(jqXHR, textStatus) {
-                }
-              });
-            }
-          }
-        }); // end VS loop
+        GsnPlots.initPlots(data, function(){addDeployments();});
       }
-    }); // end of first ajax call
+    });
 });
 
+function addDeployments() {
+  // add deployment tabs and container
+  var visible=-1;
+  var d = GsnPlots.getDeployments();
+  $(d).each(function() {
+    if ($.cookie("deployment")==this)
+      visible = this;
+  });
+  if (visible==-1) {
+      visible = d[0];
+  }
+  $(d).each(function() {
+    $('#deployment_menu').append('<li><a href="javascript:showPlots(\''+this+'\')" id="deployment_menu_item_'+this+'">'+this+'</a></li>');
+    $('#plotscontainer').append('<div id="plot_'+this+'"></div>');
+    $('#plot_'+this).hide();
+  });
+  showPlots(visible);
+}
+
 function showPlots(id) {
-  $(deployments).each(function() {
-      $("#plot_"+this.name).empty().hide();
-      $("#deployment_menu_item_"+this.name).removeClass("selected");
+  $(GsnPlots.getDeployments()).each(function() {
+      $("#plot_"+this).empty().hide();
+      $("#deployment_menu_item_"+this).removeClass("selected");
   });
   $("#plot_"+id).show();
   $("#deployment_menu_item_"+id).addClass("selected");
   // add graphs
-  $(getDeployment(id).graphconfig).each(function() {
-    $("#plot_"+id).append('<div id="g_'+this.field+'"/>');
-    var g = new FrontendCreator(this.config);
-  });
+  GsnPlots.addPlots($("#plot_"+id), id)
   $.cookie("deployment" , id);
 }	
 //]]>-->
@@ -174,7 +101,7 @@ function showPlots(id) {
 	<div id="separator">
 		<div id="starttext">
 			<p>
-				A collection of scientific plots related to the PermaSense Deployments.
+				A collection of sensor network specific plots related to the PermaSense Deployments.
 			</p>
 		</div>
 	</div>
