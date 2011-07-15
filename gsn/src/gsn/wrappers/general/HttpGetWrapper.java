@@ -5,6 +5,7 @@ import gsn.beans.DataField;
 import gsn.wrappers.AbstractWrapper;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,9 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 
 public class HttpGetWrapper extends AbstractWrapper {
@@ -112,11 +111,13 @@ public class HttpGetWrapper extends AbstractWrapper {
 			if (deviceId == null)
 				outputStructure = new DataField [] {
 					new DataField("GENERATION_TIME", "BIGINT"),
+					new DataField("SIZE", "INTEGER"),
 					new DataField("RELATIVE_FILE", "VARCHAR(255)")};
 			else
 				outputStructure = new DataField [] {
 					new DataField("DEVICE_ID", "INTEGER"),
 					new DataField("GENERATION_TIME", "BIGINT"),
+					new DataField("SIZE", "INTEGER"),
 					new DataField("RELATIVE_FILE", "VARCHAR(255)")};
 			
 			logger.info("binaries will be stored in >" + directory + "<");
@@ -124,7 +125,8 @@ public class HttpGetWrapper extends AbstractWrapper {
 		else {
 			outputStructure = new DataField [] {
 				new DataField("GENERATION_TIME", "BIGINT"),
-				new DataField( "DATA" , "binary:image/jpeg")};
+				new DataField("SIZE", "INTEGER"),
+				new DataField("DATA", "binary:image/jpeg")};
 			
 			logger.info("binaries will be stored in database");
 		}
@@ -157,16 +159,17 @@ public class HttpGetWrapper extends AbstractWrapper {
 				while ( (readIndex= content.read(buffer))!=-1)
 					arrayOutputStream.write(buffer, 0, readIndex);
 				
+				int size = arrayOutputStream.size();
 				if (directory != null ) {
 					String filename = format.format(new java.util.Date(timestamp))+".jpg";
 					arrayOutputStream.writeTo(new FileOutputStream (new File(directory, filename)));
 					if (deviceId == null)
-						postStreamElement(new Serializable[]{timestamp, subdirectory+"/"+filename});
+						postStreamElement(new Serializable[]{timestamp, size, subdirectory+"/"+filename});
 					else
-						postStreamElement(new Serializable[]{deviceId, timestamp, subdirectory+"/"+filename});
+						postStreamElement(new Serializable[]{deviceId, timestamp, size, subdirectory+"/"+filename});
 				}
 				else
-					postStreamElement(new Serializable[]{timestamp, arrayOutputStream.toByteArray()});
+					postStreamElement(new Serializable[]{timestamp, size, arrayOutputStream.toByteArray()});
 			} catch ( InterruptedException e ) {
 				logger.error( e.getMessage( ) , e );
 			}catch (IOException e) {
