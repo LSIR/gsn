@@ -14,7 +14,10 @@ var GsnPlots = {
     // array of {"vsensor", "field", "title", "select"},
     var a = document.createElement('a');
     a.href="/";
-    GsnPlots.gsnserver = a.host;
+    if (a.host.match(/tik41x.*:22001/))
+      GsnPlots.gsnserver = "data.permasense.ch";
+    else
+      GsnPlots.gsnserver = a.host;
   },
   
   setConfigStatistics : function (config) {
