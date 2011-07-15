@@ -1105,7 +1105,10 @@ public class SensorScopeServerListener {
         }
     }
 
-
+    /*
+    * Publish buffer
+    * Merges packets for similar timestamps but doesn't handle timestamps older than latest
+    * */
     private void PublishBuffer(Serializable[] packet, long timestamp, int stationID) {
         if (!latestTimestampForStation.containsKey(stationID)) { // first time we receive that stationID
             logger.debug("first time we receive stationID=" + stationID);
@@ -1146,11 +1149,39 @@ public class SensorScopeServerListener {
         }
     }
 
+   /*
+   * Publish buffer
+   * Doesn't merge buffers for similar timestamps
+   */
+    private void PublishBufferNoMerge(Serializable[] packet, long timestamp, int stationID) {
+        logger.debug("Publishing data for stationID=" + stationID);
+        try {
+            String stationFileName = csvFolderName + "/" + stationID + "_nomerge.csv";
+            FileWriter fstream = new FileWriter(stationFileName, true);
+            BufferedWriter out = new BufferedWriter(fstream);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < packet.length; i++) {
+                if (packet[i] == null)
+                    sb.append(nullString).append(",");
+                else
+                    sb.append(packet[i]).append(",");
+            }
+            sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss"));
+            sb.append("\n");
+            out.write(sb.toString());
+            out.close();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+    }
+
 
     private StreamElement publishSensor(long timestamp, int stationID, int sid, int dupn, int[] reading) {
 
         StreamElement aStreamElement = null;
-        // interpreting raw readings
+// interpreting raw readings
 
         double sid1_int_batt_volt;
         double sid1_ext_batt_volt;
@@ -1184,8 +1215,8 @@ public class SensorScopeServerListener {
         buffer[OUTPUT_STRUCTURE_SIZE - 1] = new Long(last_timestamp);
         doPostStreamElement = true;
 
-        // extended sensors (when other sensors share the same bus)
-        // are supported up to dupn=MAX_DUPN (MAX_DUPN+1 sensors in total)
+// extended sensors (when other sensors share the same bus)
+// are supported up to dupn=MAX_DUPN (MAX_DUPN+1 sensors in total)
         if (dupn > MAX_DUPN)
             doPostStreamElement = false;
 
@@ -1369,7 +1400,7 @@ public class SensorScopeServerListener {
 
                 case 12:
                     long battery_board_voltage_raw = reading[0] * 256 + reading[1];
-                    //TODO: verify packet size (1 or 2 bytes)
+//TODO: verify packet size (1 or 2 bytes)
 
                     sid12_battery_board_voltage = battery_board_voltage_raw * 6 * 2.5 / 4095;
 
@@ -1393,8 +1424,9 @@ public class SensorScopeServerListener {
 
             PublishBuffer(buffer, timestamp * 1000, stationID);
             PublishPacketWithHistory(buffer, timestamp * 1000, stationID);
+            PublishBufferNoMerge(buffer, timestamp * 1000, stationID);
 
-            // reset
+// reset
             for (int i = 0; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
                 buffer[i] = null;
                 buf[i] = -1;
@@ -1418,7 +1450,7 @@ public class SensorScopeServerListener {
             if (currentPacket.get(0) == 0 || currentPacket.get(0) >= currentPacket.getSize()) {
                 logger.error("Corrupted packet found (invalid packet length)");
                 continue; // skip it
-                //TODO: check whether all packets should be skipped or just current one
+//TODO: check whether all packets should be skipped or just current one
             }
 
             int[] dataPacket = currentPacket.getDataPacket();
@@ -1443,7 +1475,7 @@ public class SensorScopeServerListener {
         long utc;
         int crc;
 
-        // Packet size
+// Packet size
         challenge[0] = 24;
 
         Random randomGenerator = new Random();
@@ -1459,7 +1491,7 @@ public class SensorScopeServerListener {
         challenge[21] = 0;
         challenge[22] = 0;
 
-        // CRC
+// CRC
         int[] _challenge = new int[22];
 
         System.arraycopy(challenge, 1, _challenge, 0, 22);
