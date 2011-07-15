@@ -1,6 +1,7 @@
 var uptime = { 
 
   s : 0,
+  visible : false,
 
   update : function(){
     uptime.s = uptime.s+1000;
@@ -13,7 +14,8 @@ var uptime = {
       out = out + Math.floor(((uptime.s % 86400000) % 3600000 )/ 60000)+"m ";
     out = out + Math.floor((((uptime.s % 86400000) % 3600000 ) % 60000)/1000)+"s";
 
-    $("#gsn-uptime").text(out);
+    if (this.visible)
+       $("#gsn-uptime").text(out);
     setTimeout("uptime.update()",1000); 
   },
 
@@ -24,6 +26,7 @@ var uptime = {
 
 };
 
-$(function() {
+$(document).ready(function() {
   $("#footer").append("<div style=\"position:relative\"><div id=\"gsn-uptime\" style=\"position:absolute; bottom:-25px; right:0px; text-align:right\"></div></div>");
+  uptime.visible = true;
 });

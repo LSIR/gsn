@@ -6,7 +6,7 @@
 	<title>GSN</title>
 	
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
-	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
 	<script type="text/javascript" src="js/jquery-tooltip.js"></script>
@@ -38,7 +38,7 @@ $(document).ready(function() {
 	});
     $.get('/menu.jsp', {selected: "index"}, function(data) {
         $('#navigation').html(data);
-    });
+    }, 'html');
 
         //bind vs search field
         $("#vssearch").val("");
