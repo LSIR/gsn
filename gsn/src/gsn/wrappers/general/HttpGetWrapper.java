@@ -10,8 +10,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -41,12 +43,27 @@ public class HttpGetWrapper extends AbstractWrapper {
 	* <ul>
 	* <li>url</li> The full url for retriving the binary data.
 	* <li>rate</li> The interval in msec for updating/asking for new information.
+	* <li>username</li> The username to be used for http authentication (optional).
+	* <li>password</li> The password to be used for http authentication (optional).
+	* <li>subdirectory-name</li> The subdirectory name the data should be stored in filesystem (optional).
+	* <li>device-id</li> The device id of the data producer (optional).
 	* </ul>
 	*/
 	public boolean initialize (  ) {
 		AddressBean addressBean =getActiveAddressBean( );
 		String urlPath = addressBean.getPredicateValue( "url" );
 		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		final String username = getActiveAddressBean().getPredicateValue("username");
+		final String password;
+		if (username != null) {
+			password = getActiveAddressBean().getPredicateValue("password");
+			if (password != null)
+				Authenticator.setDefault(new Authenticator() { protected PasswordAuthentication getPasswordAuthentication() { return new PasswordAuthentication(username, password.toCharArray()); } });
+			else
+				logger.warn("password is not set for username '" + username + "' -> trying to connect without authentication");
+		}
+		
 		try {
 			url = new URL(urlPath);
 		} catch (MalformedURLException e) {
