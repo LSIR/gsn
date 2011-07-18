@@ -1047,7 +1047,11 @@ public class SensorScopeServerListener {
         return mergedPacket;
     }
 
-
+    /*
+    * Publish buffer
+    * Merges packets for similar timestamps including timestamps older than latest,
+    * uses a buffer of size 10 to store history (moving window of size 10 and step 1)
+    * */
     private void PublishPacketWithHistory(Serializable[] packet, long timestamp, int stationID) {
         if (stationsBuffer.containsKey(stationID)) {
             AddToStationBuffer(stationID, timestamp, packet);
@@ -1069,6 +1073,7 @@ public class SensorScopeServerListener {
     /*
     * Keeps only 10 values in the queue
     * Removes oldest value if queue is has more than 10 elements
+    * (moving window of size 10 and step 1)
     * */
     private void CheckQueueSizeForStation(int stationID) {
         int queueSize = stationsBuffer.get(stationID).size();
@@ -1082,7 +1087,7 @@ public class SensorScopeServerListener {
         Serializable[] _buffer = stationsBuffer.get(stationID).get(oldestTimestamp);
         if (queueSize > 10) {
             try {  // Publish one element
-                String stationFileName = csvFolderName + "/" + stationID + "_all.csv";
+                String stationFileName = csvFolderName + "/" + stationID + ".csv";
                 FileWriter fstream = new FileWriter(stationFileName, true);
                 BufferedWriter out = new BufferedWriter(fstream);
 
@@ -1124,7 +1129,7 @@ public class SensorScopeServerListener {
                     latestTimestampForStation.put(stationID, timestamp); // update timestamp
                     latestBufferForStation.put(stationID, packet.clone()); // update buffer
                     try {  // Publish it
-                        String stationFileName = csvFolderName + "/" + stationID + ".csv";
+                        String stationFileName = csvFolderName + "/" + stationID + "_nopast.csv";
                         FileWriter fstream = new FileWriter(stationFileName, true);
                         BufferedWriter out = new BufferedWriter(fstream);
 
@@ -1422,9 +1427,9 @@ public class SensorScopeServerListener {
 
             aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp * 1000);
 
-            PublishBuffer(buffer, timestamp * 1000, stationID);
-            PublishPacketWithHistory(buffer, timestamp * 1000, stationID);
-            PublishBufferNoMerge(buffer, timestamp * 1000, stationID);
+            //PublishBuffer(buffer, timestamp * 1000, stationID);
+            PublishPacketWithHistory(buffer, timestamp * 1000, stationID);     // moving window of size 10, step 1
+            //PublishBufferNoMerge(buffer, timestamp * 1000, stationID);
 
 // reset
             for (int i = 0; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
