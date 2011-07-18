@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_RAW__muxed__mapped" priority="10" >
+<virtual-sensor name="ETZ_GPS_RAW__binary" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -10,10 +10,13 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
             <field name="GPS_RAW_DATA" type="binary"/>
+            
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
@@ -39,7 +42,7 @@
                     <predicate key="query">select * from ETZ_GPS_Logger__muxed__parsed</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+                <query> select timed, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
             </source>
             <query> select * from source </query>
         </stream>

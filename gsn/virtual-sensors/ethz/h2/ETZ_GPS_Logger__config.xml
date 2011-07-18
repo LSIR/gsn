@@ -6,27 +6,32 @@
             <param name="file_type">configuration</param>
         </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" />
-            <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+			<field name="POSITION" type="INTEGER" />
+			<field name="DEVICE_ID" type="INTEGER" />
+			<field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
 			
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			<field name="START_DATE" type="BIGINT" unit="unixtime" />
 			<field name="END_DATE" type="BIGINT" unit="unixtime" />
 			<field name="UPLOADER" type="VARCHAR(64)" />
 			<field name="PROTOCOL" type="VARCHAR(8)" />
 			<field name="FIRMWARE" type="SMALLINT" />
-			<field name="SERIAL" type="INTEGER" />
-			<field name="LOW_POWER_CYCLE_TIME" type="INTEGER" unit="min" />
-			<field name="LOW_POWER_ACTIVE_TIME" type="INTEGER" unit="min" />
-			<field name="LOW_POWER_MEASUREMENT" type="INTEGER" />
+			<field name="MANUAL_POSITION" type="INTEGER" />
+			<field name="LOW_POWER_CYCLE_TIME" type="SMALLINT" unit="min" />
+			<field name="LOW_POWER_ACTIVE_TIME" type="SMALLINT" unit="min" />
+			<field name="LOW_POWER_MEASUREMENT" type="SMALLINT" />
 			<field name="ENTRY_VOLTAGE" type="INTEGER" unit="mV" />
 			<field name="EXIT_VOLTAGE" type="INTEGER" unit="mV" />
 			<field name="LOGGING_RATE" type="INTEGER" unit="ms" />
-			<field name="CONFIG_USED" type="INTEGER" />
-			<field name="CONFIG_TOTAL" type="INTEGER" />
+			<field name="CONFIG_USED" type="SMALLINT" />
+			<field name="CONFIG_TOTAL" type="SMALLINT" />
 			<field name="CONFIG_STRING" type="BINARY" />
-			<field name="ANGLE" type="VARCHAR(16)" />
+			<field name="MAST_ORIENTATION_START" type="SMALLINT" />
+			<field name="MAST_ORIENTATION_END" type="SMALLINT" />
+			<field name="DATA_PAGES" type="SMALLINT" />
+			<field name="EVENT_PAGES" type="SMALLINT" />
+			<field name="HIGH_POWER_MEASUREMENT" type="SMALLINT" />
 			<field name="ANTENNA_SERIAL" type="VARCHAR(32)" />
 			
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />

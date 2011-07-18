@@ -46,6 +46,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
+			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
 			new DataField("DATA_TYPE", "TINYINT"),
 			new DataField("SAMPLE_COUNT", "INTEGER"),
 			new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
@@ -63,6 +64,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
+			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
 			new DataField("EVENT_COUNT", "INTEGER"),
 			new DataField("EVENT", "VARCHAR(256)")};
 	
@@ -72,22 +74,28 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			
+			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
 			new DataField("START_DATE", "BIGINT"),
 			new DataField("END_DATE", "BIGINT"),
 			new DataField("UPLOADER", "VARCHAR(64)"),
 			new DataField("PROTOCOL", "VARCHAR(8)"),
+			new DataField("SOFTWARE_VERSION", "VARCHAR(8)"),
 			new DataField("FIRMWARE", "SMALLINT"),
-			new DataField("SERIAL", "INTEGER"),
-			new DataField("LOW_POWER_CYCLE_TIME", "INTEGER"),
-			new DataField("LOW_POWER_ACTIVE_TIME", "INTEGER"),
-			new DataField("LOW_POWER_MEASUREMENT", "INTEGER"),
+			new DataField("MANUAL_POSITION", "INTEGER"),
+			new DataField("LOW_POWER_CYCLE_TIME", "SMALLINT"),
+			new DataField("LOW_POWER_ACTIVE_TIME", "SMALLINT"),
+			new DataField("LOW_POWER_MEASUREMENT", "SMALLINT"),
 			new DataField("ENTRY_VOLTAGE", "INTEGER"),
 			new DataField("EXIT_VOLTAGE", "INTEGER"),
 			new DataField("LOGGING_RATE", "INTEGER"),
-			new DataField("CONFIG_USED", "INTEGER"),
-			new DataField("CONFIG_TOTAL", "INTEGER"),
+			new DataField("CONFIG_USED", "SMALLINT"),
+			new DataField("CONFIG_TOTAL", "SMALLINT"),
 			new DataField("CONFIG_STRING", "BINARY"),
-			new DataField("ANGLE", "VARCHAR(16)"),
+			new DataField("MAST_ORIENTATION_START", "SMALLINT"),
+			new DataField("MAST_ORIENTATION_END", "SMALLINT"),
+			new DataField("DATA_PAGES", "SMALLINT"),
+			new DataField("EVENT_PAGES", "SMALLINT"),
+			new DataField("HIGH_POWER_MEASUREMENT", "SMALLINT"),
 			new DataField("ANTENNA_SERIAL", "VARCHAR(32)")};
 	
 	@Override
@@ -158,6 +166,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 														timestamp,
 														timestamp,
 														data.getData(rawStatusField[3].getName()),
+														data.getData(rawStatusField[4].getName()),
 														RAW_DATA_TYPE,
 														rawSampleCount,
 														GPS_RAW_DATA_VERSION,
@@ -205,6 +214,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 														timestamp,
 														timestamp,
 														data.getData(rawStatusField[3].getName()),
+														data.getData(rawStatusField[4].getName()),
 														STATUS_TYPE,
 														statusSampleCount,
 														null,
@@ -258,57 +268,90 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 						BufferedReader bufr = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(file))));
 						
 						Serializable [] out = new Serializable[configField.length];
-						out[0] = data.getData(rawStatusField[0].getName());
-						out[3] = data.getData(rawStatusField[3].getName());
+						out[0] = data.getData(configField[0].getName());
+						out[3] = data.getData(configField[3].getName());
+						out[4] = data.getData(configField[4].getName());
 						
 						String line;
+						int pos = -1;
 						while ((line = bufr.readLine()) != null) {
 							String [] spl = line.split("=", 2);
 							if (spl.length == 2) {
 								String param = spl[0].trim().toLowerCase();
 								String value = spl[1].trim();
-								if (param.equals("startdate")) {
-									try {
-										out[1] = out[2] = out[4] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
-									} catch (ParseException e) {
-										logger.error(e.getMessage());
+								try {
+									if (param.equals("start_date")) {
+										try {
+											out[1] = out[2] = out[5] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
+										} catch (ParseException e) {
+											logger.error(e.getMessage());
+										}
+									} else if (param.equals("end_date")) {
+										try {
+											out[6] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
+										} catch (ParseException e) {
+											logger.error(e.getMessage());
+										}
+									} else if (param.equals("uploader")) {
+										out[7] = value;
+									} else if (param.equals("protocol")) {
+										out[8] = value;
+									} else if (param.equals("software_version")) {
+										out[9] = value;
+									} else if (param.equals("firmware")) {
+										pos = 10;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("position")) {
+										pos = 11;
+										out[pos] = Integer.parseInt(value);
+									} else if (param.equals("low_power_cycle_time")) {
+										pos = 12;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("low_power_active_time")) {
+										pos = 13;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("low_power_measurement")) {
+										pos = 14;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("entry_voltage")) {
+										pos = 15;
+										out[pos] = Integer.parseInt(value);
+									} else if (param.equals("exit_voltage")) {
+										pos = 16;
+										out[pos] = Integer.parseInt(value);
+									} else if (param.equals("logging_rate")) {
+										pos = 17;
+										out[pos] = Integer.parseInt(value);
+									} else if (param.equals("config_used")) {
+										pos = 18;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("config_total")) {
+										pos = 19;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("config_string")) {
+										pos = 20;
+										out[pos] = value.getBytes();
+									} else if (param.equals("mast_orientation_start")) {
+										pos = 21;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("mast_orientation_end")) {
+										pos = 22;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("data_pages")) {
+										pos = 23;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("event_pages")) {
+										pos = 24;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("high_power_measurement")) {
+										pos = 25;
+										out[pos] = Short.parseShort(value);
+									} else if (param.equals("antenna_serial")) {
+										out[26] = value;
 									}
-								} else if (param.equals("enddate")) {
-									try {
-										out[5] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
-									} catch (ParseException e) {
-										logger.error(e.getMessage());
-									}
-								} else if (param.equals("uploader")) {
-									out[6] = value;
-								} else if (param.equals("protocol")) {
-									out[7] = value;
-								} else if (param.equals("firmware")) {
-									out[8] = Short.parseShort(value);
-								} else if (param.equals("serial")) {
-									out[9] = Integer.parseInt(value);
-								} else if (param.equals("lowpowercycletime")) {
-									out[10] = Integer.parseInt(value);
-								} else if (param.equals("lowpoweractivetime")) {
-									out[11] = Integer.parseInt(value);
-								} else if (param.equals("lowpowermeasurement")) {
-									out[12] = Integer.parseInt(value);
-								} else if (param.equals("entryvoltage")) {
-									out[13] = Integer.parseInt(value);
-								} else if (param.equals("exitvoltage")) {
-									out[14] = Integer.parseInt(value);
-								} else if (param.equals("loggingrate")) {
-									out[15] = Integer.parseInt(value);
-								} else if (param.equals("configused")) {
-									out[16] = Integer.parseInt(value);
-								} else if (param.equals("configtotal")) {
-									out[17] = Integer.parseInt(value);
-								} else if (param.equals("confstring")) {
-									out[18] = value.getBytes();
-								} else if (param.equals("angle")) {
-									out[19] = value;
-								} else if (param.equals("antenna_serial")) {
-									out[20] = value;
+								} catch (NumberFormatException e) {
+									logger.error(e.getMessage());
+									out[pos] = null;
 								}
 							}
 						}
@@ -324,7 +367,6 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					
 					int eventCount = 0;
 					int unknownEventCounter = 0;
-					long lastTimestamp = 0;
 					try {
 						DataInputStream dis = new DataInputStream(new FileInputStream(fixFile(file)));
 	
@@ -346,151 +388,131 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							int eventData = getUShort(tmp2b);
 
 							String event = null;
-							if (eventNr == 0x0000) {
-								if (!noTimestampEvents.isEmpty()) {
-									int cnt = 1;
-									for(Iterator<String> it=noTimestampEvents.iterator(); it.hasNext(); ) {
-										String noTimestampEvent = it.next();
-										eventCount++;
-										data = new StreamElement(eventField, new Serializable[]{
-												data.getData(eventField[0].getName()),
-												lastTimestamp+cnt,
-												lastTimestamp+cnt,
-												data.getData(eventField[3].getName()),
-												eventCount,
-												noTimestampEvent});
-										
-										super.dataAvailable(inputStreamName, data);
-										cnt++;
-									}
-									noTimestampEvents.clear();
-								}
-								continue;
-							}
-							else {
-								switch (eventNr) {
+							switch (eventNr) {
+								case 0x0000:
+									logger.warn("event number 0x0000 received with event data " + eventData);
+									continue;
+								case 0x0001:
+									timestampReady = false;
+									event = "firmware version " + eventData + " startup";
+									break;
+								case 0x0002:
+									event = "initialize persistent parameter with default values (parameter set version = " + eventData + ")";
+									break;
+								case 0x0003:
+									event = "sd card full";
+									break;
+								case 0x0004:
+									switch (eventData) {
 									case 0x0001:
-										timestampReady = false;
-										event = "firmware version " + eventData + " startup";
+										event = "solar voltage measurement done";
 										break;
 									case 0x0002:
-										event = "initialize persistent parameter with default values (parameter set version = " + eventData + ")";
-										break;
-									case 0x0003:
-										event = "sd card full";
+										event = "humidity and temperature measurement done";
 										break;
 									case 0x0004:
-										switch (eventData) {
-										case 0x0001:
-											event = "solar voltage measurement done";
-											break;
-										case 0x0002:
-											event = "humidity and temperature measurement done";
-											break;
-										case 0x0004:
-											event = "tilt x measurement done";
-											break;
-										case 0x0008:
-											event = "tilt y measurement done";
-											break;
-										default:
-											logger.warn("measurement done flag " + eventData + " unknown");
-											break;
-										}
-										break;
-									case 0x0005:
-										event = "enter STOP mode";
-										break;
-									case 0x0006:
-										event = "self-test started";
-										break;
-									case 0x0007:
-										switch (eventData) {
-										case 0x0000:
-											event = "self-test finished: measurement failed (test aborted)";
-											break;
-										case 0x0001:
-											event = "self-test finished: measurement ok, GPS failure";
-											break;
-										case 0x0002:
-											event = "self-test finished: measurement, GPS ok, SD-Card failure";
-											break;
-										case 0x0003:
-											event = "self-test finished: all tests ok so far, but measurement values out of expected range";
-											break;
-										case 0x0004:
-											event = "self-test finished: passed successfully";
-											break;
-										default:
-											logger.warn("self-test result data " + eventData + " unknown");
-											break;
-										}
+										event = "tilt x measurement done";
 										break;
 									case 0x0008:
-										event = "the custom GPS configuration (string index " + eventData + ") failed";
-										break;
-									case 0x0009:
-										timestampReady = true;
-										event = "first valid GPS week received from GPS receiver (GPS week number = " + eventData + ")";
-										break;
-									case 0x000A:
-										event = "GPS message lost";
-										break;
-									case 0x000B:
-										event = "fatal GPS failure";
-										break;
-									case 0x000C:
-										event = "fatal measurement failure";
-										break;
-									case 0x1000:
-										event = "repeated last event " + eventData;
+										event = "tilt y measurement done";
 										break;
 									default:
-										logger.warn("event number " + eventNr + " unknown");
+										logger.warn("measurement done flag " + eventData + " unknown");
 										break;
-								}
-		
-								if (event != null) {
-									if (timestampReady) {
-										eventCount++;
-										if (!noTimestampEvents.isEmpty()) {
-											int cnt = noTimestampEvents.size();
-											for(Iterator<String> it=noTimestampEvents.iterator(); it.hasNext(); ) {
-												String noTimeStampEvent = it.next();
-												data = new StreamElement(eventField, new Serializable[]{
-														data.getData(eventField[0].getName()),
-														timestamp-cnt,
-														timestamp-cnt,
-														data.getData(eventField[3].getName()),
-														eventCount,
-														noTimeStampEvent});
-
-												super.dataAvailable(inputStreamName, data);
-												cnt--;
-												eventCount++;
-											}
-											noTimestampEvents.clear();
-										}
-										
-										data = new StreamElement(eventField, new Serializable[]{
-												data.getData(eventField[0].getName()),
-												timestamp,
-												timestamp,
-												data.getData(eventField[3].getName()),
-												eventCount,
-												event});
-
-										super.dataAvailable(inputStreamName, data);
-										lastTimestamp = timestamp;
-										
 									}
-									else
-										noTimestampEvents.add(event);
-								}
-								else {
+									break;
+								case 0x0005:
+									event = "enter STOP mode";
+									break;
+								case 0x0006:
+									event = "self-test started";
+									break;
+								case 0x0007:
+									switch (eventData) {
+									case 0x0000:
+										event = "self-test finished: measurement failed (test aborted)";
+										break;
+									case 0x0001:
+										event = "self-test finished: measurement ok, GPS failure";
+										break;
+									case 0x0002:
+										event = "self-test finished: measurement, GPS ok, SD-Card failure";
+										break;
+									case 0x0003:
+										event = "self-test finished: all tests ok so far, but measurement values out of expected range";
+										break;
+									case 0x0004:
+										event = "self-test finished: passed successfully";
+										break;
+									default:
+										logger.warn("self-test result data " + eventData + " unknown");
+										break;
+									}
+									break;
+								case 0x0008:
+									event = "the custom GPS configuration (string index " + eventData + ") failed";
+									break;
+								case 0x0009:
+									timestampReady = true;
+									event = "first valid GPS week received from GPS receiver (GPS week number = " + eventData + ")";
+									break;
+								case 0x000A:
+									event = "GPS message lost";
+									break;
+								case 0x000B:
+									event = "fatal GPS failure";
+									break;
+								case 0x000C:
+									event = "fatal measurement failure";
+									break;
+								case 0x1000:
+									event = "repeated last event " + eventData;
+									break;
+								default:
+									logger.warn("event number " + eventNr + " unknown");
+									break;
+							}
+		
+							if (event != null) {
+								if (timestampReady) {
 									eventCount++;
-									unknownEventCounter++;
+									if (!noTimestampEvents.isEmpty()) {
+										int cnt = noTimestampEvents.size();
+										for(Iterator<String> it=noTimestampEvents.iterator(); it.hasNext(); ) {
+											String noTimeStampEvent = it.next();
+											data = new StreamElement(eventField, new Serializable[]{
+													data.getData(eventField[0].getName()),
+													timestamp-cnt,
+													timestamp-cnt,
+													data.getData(eventField[3].getName()),
+													eventCount,
+													noTimeStampEvent});
+
+											super.dataAvailable(inputStreamName, data);
+											cnt--;
+											eventCount++;
+										}
+										noTimestampEvents.clear();
+									}
+									
+									data = new StreamElement(eventField, new Serializable[]{
+											data.getData(eventField[0].getName()),
+											timestamp,
+											timestamp,
+											data.getData(eventField[3].getName()),
+											data.getData(eventField[4].getName()),
+											eventCount,
+											event});
+
+									super.dataAvailable(inputStreamName, data);
+									
 								}
+								else
+									noTimestampEvents.add(event);
+							}
+							else {
+								eventCount++;
+								unknownEventCounter++;
 							}
 						}
 					} catch (EOFException e) {

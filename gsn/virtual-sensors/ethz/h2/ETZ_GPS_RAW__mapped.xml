@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_RAW__mapped" priority="10" >
+<virtual-sensor name="ETZ_GPS_RAW" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.GPSRawDemuxBridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -7,6 +7,8 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
@@ -19,6 +21,7 @@
             <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
             <field name="SIGNAL_STRENGTH" type="SMALLINT" />
             <field name="LLI" type="SMALLINT" />
+            
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>

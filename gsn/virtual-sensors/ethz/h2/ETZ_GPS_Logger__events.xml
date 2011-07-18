@@ -10,8 +10,11 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true"/>
+            
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 		    <field name="EVENT_COUNT" type="INTEGER"/>
 		    <field name="EVENT" type="VARCHAR(256)"/>
+		    
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>

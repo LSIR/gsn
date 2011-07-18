@@ -75,7 +75,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 		int size = -1;
 		for (int i=0; i<getActiveAddressBean().getVirtualSensorConfig().getWebinput().length; i++) {
 			if (getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getName().equalsIgnoreCase("files")) {
-				size = getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getParameters().length+2;
+				size = getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getParameters().length*2+2;
 				break;
 			}
 		}
@@ -206,6 +206,8 @@ public class FileGetterWrapper extends AbstractWrapper {
 							return false;
 						}
 						output[i] = subdirectoryName + "/" + filename;
+						i++;
+						output[i] = outputFile.length();
 					}
 					i++;
 				}
