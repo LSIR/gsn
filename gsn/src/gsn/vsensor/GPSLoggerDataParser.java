@@ -375,7 +375,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 						byte[] tmp2b = new byte[2];
 						Vector<String> noTimestampEvents = new Vector<String>();
 						boolean timestampReady = false;
-						while (true) {
+						boolean loop = true;
+						while (loop) {
 							if(dis.read(tmp4b) != 4)
 								break;
 							long timestamp = getUInt(tmp4b)*1000L;
@@ -391,7 +392,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							String event = null;
 							switch (eventNr) {
 								case 0x0000:
-									logger.warn("event number 0x0000 received with event data " + eventData);
+									loop = false;
 									continue;
 								case 0x0001:
 									timestampReady = false;
