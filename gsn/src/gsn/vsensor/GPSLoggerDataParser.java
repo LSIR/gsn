@@ -486,6 +486,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 													timestamp-cnt,
 													timestamp-cnt,
 													data.getData(eventField[3].getName()),
+													data.getData(eventField[4].getName()),
 													eventCount,
 													noTimeStampEvent});
 
