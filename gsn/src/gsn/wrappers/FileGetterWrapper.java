@@ -191,7 +191,9 @@ public class FileGetterWrapper extends AbstractWrapper {
 					if (inputLoggerFile.getFileItem().getSize() <= 0) {
 						if (!inputLoggerFile.getFileItem().getName().isEmpty())
 							logger.warn("uploaded file " + inputLoggerFile.getFileItem().getName() + " is empty => skip it");
-						output[i] = null;
+						output[i++] = null;
+						output[i++] = null;
+						
 					}
 					else {
 						int pos = inputLoggerFile.getFileItem().getName().lastIndexOf('.');
@@ -206,11 +208,9 @@ public class FileGetterWrapper extends AbstractWrapper {
 							logger.error(e.getMessage());
 							return false;
 						}
-						output[i] = subdirectoryName + "/" + filename;
-						i++;
-						output[i] = outputFile.length();
+						output[i++] = subdirectoryName + "/" + filename;
+						output[i++] = outputFile.length();
 					}
-					i++;
 				}
 				
 				return postStreamElement(output);
