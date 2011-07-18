@@ -14,7 +14,7 @@
 			<field name="HUMIDITY" type="INTEGER" unit="%"/>
 			<field name="TEMPERATURE" type="SMALLINT" unit="°C"/>
 			<field name="INCLINOMETER_X" type="SMALLINT"/>
-			<field name="INCLINOMETER_Y>" type="SMALLINT"/>
+			<field name="INCLINOMETER_Y" type="SMALLINT"/>
             <field name="RAW_DATA" type="BINARY"/>
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
