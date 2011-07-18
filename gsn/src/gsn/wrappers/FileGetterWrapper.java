@@ -75,7 +75,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 		int size = -1;
 		for (int i=0; i<getActiveAddressBean().getVirtualSensorConfig().getWebinput().length; i++) {
 			if (getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getName().equalsIgnoreCase("files")) {
-				size = getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getParameters().length*2+2;
+				size = getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getParameters().length;
 				break;
 			}
 		}
@@ -83,26 +83,27 @@ public class FileGetterWrapper extends AbstractWrapper {
 			logger.error("command name files has to be existing in the web-input section");
 			return false;
 		}
-		outputStructure = new DataField[size];
+		outputStructure = new DataField[(size*2)+2];
 		outputStructure[0] = new DataField("DEVICE_ID", "INTEGER");
 		outputStructure[1] = new DataField("GENERATION_TIME", "BIGINT");
-		filenamePatternArray = new Pattern [size-2];
+		filenamePatternArray = new Pattern [size];
 		boolean hasRegex = false;
-		for (int i=2; i<size; i++) {
-			String regex = getActiveAddressBean().getPredicateValue("filename-regex" + (i-1));
+		for (int i=0; i<size; i++) {
+			String regex = getActiveAddressBean().getPredicateValue("filename-regex" + (i+1));
 			if (regex != null) {
 				hasRegex = true;
-				filenamePatternArray[i-2] = Pattern.compile(regex);
-				logger.info("RELATIVE_FILE" + (i-1) + " has to match regular expression: " + regex);
+				filenamePatternArray[i] = Pattern.compile(regex);
+				logger.info("RELATIVE_FILE" + (i+1) + " has to match regular expression: " + regex);
 				
 				deviceIdFromFilename = Boolean.parseBoolean(getActiveAddressBean().getPredicateValue("deviceid-from-filename"));
 				if (deviceIdFromFilename)
-					logger.info("device id will be extracted from RELATIVE_FILE" + (i-1) + " using the first group from regular expresion: " + regex);
+					logger.info("device id will be extracted from RELATIVE_FILE" + (i+1) + " using the first group from regular expresion: " + regex);
 			}
 			else
-				filenamePatternArray[i-2] = null;
+				filenamePatternArray[i] = null;
 			
-			outputStructure[i] = new DataField("RELATIVE_FILE" + (i-1), "VARCHAR(255)");
+			outputStructure[(i*2)+2] = new DataField("RELATIVE_FILE" + (i+1), "VARCHAR(255)");
+			outputStructure[(i*2)+3] = new DataField("SIZE_FILE" + (i+1), "BIGINT");
 		}
 		
 		
@@ -181,7 +182,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 			    		logger.info("created new storage directory >" + storageDir + "<");
 				}
 				
-				Serializable[] output = new Serializable[inputFileItems.size()+2];
+				Serializable[] output = new Serializable[inputFileItems.size()*2+2];
 				output[0] = id;
 				output[1] = gentime;
 				int i = 2;

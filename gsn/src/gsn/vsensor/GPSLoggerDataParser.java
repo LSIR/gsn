@@ -79,7 +79,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("END_DATE", "BIGINT"),
 			new DataField("UPLOADER", "VARCHAR(64)"),
 			new DataField("PROTOCOL", "VARCHAR(8)"),
-			new DataField("SOFTWARE_VERSION", "VARCHAR(8)"),
+			new DataField("SOFTWARE_VERSION", "INTEGER"),
 			new DataField("FIRMWARE", "SMALLINT"),
 			new DataField("MANUAL_POSITION", "INTEGER"),
 			new DataField("LOW_POWER_CYCLE_TIME", "SMALLINT"),
@@ -297,7 +297,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 									} else if (param.equals("protocol")) {
 										out[8] = value;
 									} else if (param.equals("software_version")) {
-										out[9] = value;
+										pos = 9;
+										out[pos] = Integer.parseInt(value);
 									} else if (param.equals("firmware")) {
 										pos = 10;
 										out[pos] = Short.parseShort(value);

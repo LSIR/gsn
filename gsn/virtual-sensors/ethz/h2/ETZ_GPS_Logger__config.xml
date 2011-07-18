@@ -16,6 +16,7 @@
 			<field name="END_DATE" type="BIGINT" unit="unixtime" />
 			<field name="UPLOADER" type="VARCHAR(64)" />
 			<field name="PROTOCOL" type="VARCHAR(8)" />
+			<field name="SOFTWARE_VERSION" type="INTEGER" />
 			<field name="FIRMWARE" type="SMALLINT" />
 			<field name="MANUAL_POSITION" type="INTEGER" />
 			<field name="LOW_POWER_CYCLE_TIME" type="SMALLINT" unit="min" />
