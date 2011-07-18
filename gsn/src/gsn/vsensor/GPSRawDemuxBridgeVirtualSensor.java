@@ -18,6 +18,7 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 						new DataField("GENERATION_TIME", "BIGINT"),
 						new DataField("DEVICE_ID", "INTEGER"),
 						new DataField("POSITION", "INTEGER"),
+						new DataField("SENSOR_TYPE", "VARCHAR(16)"),
 						new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
 					    new DataField("GPS_SAMPLE_COUNT", "INTEGER"),
 					    new DataField("GPS_SATS", "INTEGER"),
@@ -43,18 +44,20 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 		serialized_data[2] = data.getData(dataField[2].getName());
 		// position
 		serialized_data[3] = data.getData(dataField[3].getName());
-		// gps data version
+		// sensor type
 		serialized_data[4] = data.getData(dataField[4].getName());
+		// gps data version
+		serialized_data[5] = data.getData(dataField[4].getName());
 
 		Short version = (Short)data.getData("gps_raw_data_version");
 		if (version == null)
 			logger.error("gps_raw_data_version data should not be NULL");
 		else if (version == 1) {
 			// gps sample count
-			serialized_data[5] = data.getData(dataField[5].getName());
+			serialized_data[6] = data.getData(dataField[5].getName());
 			// gps sats
 			Integer sats = (Integer) data.getData("GPS_SATS");
-			serialized_data[6] = sats;
+			serialized_data[7] = sats;
 			
 			ByteBuffer bbuffer = ByteBuffer.wrap((byte[]) data.getData("gps_raw_data"));
 			bbuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -63,9 +66,9 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 				// skip header and payload length
 				bbuffer.position(bbuffer.position()+6);
 				// get GPS time
-				serialized_data[7] = bbuffer.getInt();
+				serialized_data[8] = bbuffer.getInt();
 				// get GPS week
-				serialized_data[8] = bbuffer.getShort();
+				serialized_data[9] = bbuffer.getShort();
 
 				// get number of satellites
 				int s = (int) bbuffer.get() & 0xFF;
@@ -74,19 +77,19 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 				if (sats.compareTo(s) == 0) {
 					for (int i=0; i<s; i++) {
 						// get Carrier Phase
-						serialized_data[9] = bbuffer.getDouble();
-						// get Pseudorange
 						serialized_data[10] = bbuffer.getDouble();
+						// get Pseudorange
+						serialized_data[11] = bbuffer.getDouble();
 						// get Doppler
-						serialized_data[11] = (double)bbuffer.getFloat();
+						serialized_data[12] = (double)bbuffer.getFloat();
 						// get SV nbr
-						serialized_data[12] = (short) ((int)bbuffer.get() & 0xFF);
+						serialized_data[13] = (short) ((int)bbuffer.get() & 0xFF);
 						// get Quality
-						serialized_data[13] = (short) bbuffer.get();
-						// get C/No
 						serialized_data[14] = (short) bbuffer.get();
+						// get C/No
+						serialized_data[15] = (short) bbuffer.get();
 						// get LLI
-						serialized_data[15] = (short) ((int)bbuffer.get() & 0xFF);
+						serialized_data[16] = (short) ((int)bbuffer.get() & 0xFF);
 
 						data = new StreamElement(dataField, serialized_data, data.getTimeStamp());
 						super.dataAvailable(inputStreamName, data);

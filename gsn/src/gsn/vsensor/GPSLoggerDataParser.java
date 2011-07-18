@@ -51,11 +51,11 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("SAMPLE_COUNT", "INTEGER"),
 			new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
 			new DataField("GPS_SATS", "INTEGER"),
-			new DataField("STATUS_SOLAR", "INTEGER"),
+			new DataField("STATUS_V12DC_IN", "INTEGER"),
 			new DataField("STATUS_HUMIDITY", "INTEGER"),
 			new DataField("STATUS_TEMPERATURE", "SMALLINT"),
-			new DataField("STATUS_INCL_X", "SMALLINT"),
-			new DataField("STATUS_INCL_Y", "SMALLINT"),
+			new DataField("STATUS_INCLINOMETER_X", "SMALLINT"),
+			new DataField("STATUS_INCLINOMETER_Y", "SMALLINT"),
 			new DataField("RAW_DATA", "BINARY")};
 	
 	private static DataField[] eventField = {
