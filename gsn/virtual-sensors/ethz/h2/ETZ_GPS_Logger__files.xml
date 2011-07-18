@@ -2,13 +2,6 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-       	<web-input password="test">
-         	<command name="files">
-				<field name="raw_status_file" type="*binary">file</field>
-				<field name="config_file" type="*binary">file</field>
-				<field name="event_file" type="*binary">file</field>
-        	</command>
-   		</web-input>
         <init-params>
             <param name="persistant">true</param>
             <param name="scriptlet">
@@ -17,6 +10,13 @@
                 ]]>
             </param>
         </init-params>
+       	<web-input password="test">
+         	<command name="files">
+				<field name="raw_status_file" type="*binary">file</field>
+				<field name="config_file" type="*binary">file</field>
+				<field name="event_file" type="*binary">file</field>
+        	</command>
+   		</web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
