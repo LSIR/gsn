@@ -70,6 +70,9 @@ class AlphasensePluginClass(AbstractPluginClass):
 
         self.info('Alphasense reading done')
 
+    def remoteAction(self, parameters):
+        self.action(parameters)
+
     def stop(self):
         self._stopped = True
         self.info('stopped')

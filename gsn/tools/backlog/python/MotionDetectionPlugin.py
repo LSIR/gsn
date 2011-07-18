@@ -106,8 +106,6 @@ class MotionDetectionPluginClass(AbstractPluginClass):
     def stop(self):
         self._stopped = True
         self._sleeper.set()
-        self.steval._unsetSensor()
-        self.steval._closeDevice()
         self.info('stopped')
 
     def detectMotion(self):
@@ -124,6 +122,10 @@ class MotionDetectionPluginClass(AbstractPluginClass):
 
         if std_x <= self._stdThreshold and std_y <= self._stdThreshold and std_z <= self._stdThreshold:
             self.info('Vehicle is not moving')
+            # Execute action function of the specified plugins
+            pluginList = [BackLogMessage.OZ47_MESSAGE_TYPE, BackLogMessage.GPS_NAV_MESSAGE_TYPE, BackLogMessage.ALPHASENSE_MESSAGE_TYPE]
+            num = self.runPluginRemoteAction(pluginList, None)
+            self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
         else:
             self.info('Vehicle is moving')
             self._moving = self._moving + 1

@@ -129,6 +129,9 @@ class OZ47Plugin1Class(AbstractPluginClass):
         else:
             self.warning ('OZ47 read failed')
 
+    def remoteAction(self, parameters):
+        self.action(parameters)
+
     def stop(self):
         self._stopped = True
         self.info('stopped')

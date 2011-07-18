@@ -74,6 +74,7 @@ class AbstractPluginClass(Thread, Statistics):
             self._maxruntime = int(value)
             
         self._procMsg = self._backlogMain.gsnpeer.processMsg
+        self._runPluginRemoteAction = self._backlogMain.runPluginRemoteAction
             
         self.info('backlog: %s' % (self._backlog,))
         self.info('priority: %d' % (self._priority,))
@@ -483,4 +484,17 @@ class AbstractPluginClass(Thread, Statistics):
         '''
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug(msg)
+            
+    def runPluginRemoteAction(self, pluginMsgTypes, parameters):
+        '''
+        Remotely executes the remoteAction function of the plugins in the list
+        '''
+
+        return self._runPluginRemoteAction(pluginMsgTypes, parameters)
+        
+    def remoteAction(self, parameters):
+        '''
+        This function can be remotely called by any other plugin
+        '''
+        pass
         

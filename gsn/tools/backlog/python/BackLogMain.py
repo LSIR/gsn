@@ -659,8 +659,35 @@ class BackLogMainClass(Thread, Statistics):
         Returns the number of errors occurred since the last program start
         '''
         return self.getCounterValue(self._errorCounterId)
-
-
+    
+    def pluginRemoteAction(self, pluginclassname, parameters):
+        if self._backlogStopped:
+            return
+        
+        pluginactive = False
+        plugin = self.plugins.get(pluginclassname)
+        if plugin != None:
+            thread.start_new_thread(plugin.remoteAction, (parameters,))
+            pluginactive = True
+        
+        return
+    
+    def runPluginRemoteAction(self, pluginMsgTypes, parameters):
+        '''
+        Remotely executes the remoteAction function of the plugins in the list
+        '''        
+        num_started = 0
+        
+        for plugin_name, plugin in self.plugins.items():
+            try:
+                if plugin.getMsgType() in pluginMsgTypes:
+                    self.pluginRemoteAction(plugin_name, parameters)
+                    num_started = num_started + 1
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
+        
+        return num_started
 
 def main():
     parser = optparse.OptionParser('usage: %prog [options]')

@@ -13,12 +13,6 @@ backlog imports
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
 
-'''
-stdlib imports
-'''
-import struct
-import copy
-import time
 import GPSDriverNAV
 '''
 defines
@@ -63,6 +57,9 @@ class GPSPluginNAVClass(AbstractPluginClass):
         self.processMsg(self.getTimeStamp(), dataPackage)
         
         self.info('GPS reading done')
+        
+    def remoteAction(self, parameters):
+        self.action(parameters)
 
     def stop(self):
         self._stopped = True
