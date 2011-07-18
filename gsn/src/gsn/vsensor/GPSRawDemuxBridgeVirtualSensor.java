@@ -47,7 +47,7 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 		// sensor type
 		serialized_data[4] = data.getData(dataField[4].getName());
 		// gps data version
-		serialized_data[5] = data.getData(dataField[4].getName());
+		serialized_data[5] = data.getData(dataField[5].getName());
 
 		Short version = (Short)data.getData("gps_raw_data_version");
 		if (version == null)
