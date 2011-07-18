@@ -21,11 +21,7 @@
     </processing-class>
     <description>show status information of the CoreStations from the Jungfraujoch deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense Jungfraujoch deployment</predicate>
-        <predicate key="LATITUDE">46.547451</predicate>
-        <predicate key="LONGITUDE">7.982092</predicate>
-    </addressing>
+    <addressing />
     <storage />
     <streams>
         <stream name="data1">

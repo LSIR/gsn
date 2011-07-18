@@ -13,11 +13,7 @@
     </processing-class>
     <description>camera pictures from position 11 at Dirruhorn deployment showing REFDGPSposition as thumbnail</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense Dirruhorn deployment</predicate>
-        <predicate key="LATITUDE">46.121808</predicate>
-        <predicate key="LONGITUDE">7.821777</predicate>
-    </addressing>
+    <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
     <streams>
         <stream name="data">

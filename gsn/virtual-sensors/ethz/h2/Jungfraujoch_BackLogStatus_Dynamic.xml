@@ -75,11 +75,7 @@
     </processing-class>
     <description>show dynamic status information of the BackLogs and send commands to the Jungfraujoch deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense Jungfraujoch deployment</predicate>
-        <predicate key="LATITUDE">46.547451</predicate>
-        <predicate key="LONGITUDE">7.982092</predicate>
-    </addressing>
+    <addressing />
     <storage />
     <streams>
 	<stream name="data1">

@@ -148,11 +148,7 @@
     </processing-class>
     <description>dynamic status information of BackLog from ETZ deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense ETZ test deployment</predicate>
-        <predicate key="LATITUDE">47.377326</predicate>
-        <predicate key="LONGITUDE">8.552935</predicate>
-    </addressing>
+    <addressing />
     <storage />
     <streams>
         <stream name="data">

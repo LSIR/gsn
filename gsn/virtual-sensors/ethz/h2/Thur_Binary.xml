@@ -25,11 +25,7 @@
     </processing-class>
     <description>binaries from the Thur deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense Thur deployment</predicate>
-        <predicate key="LATITUDE">47.589889</predicate>
-        <predicate key="LONGITUDE">8.773874</predicate>
-    </addressing>
+    <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
     <streams>
         <stream name="data1">

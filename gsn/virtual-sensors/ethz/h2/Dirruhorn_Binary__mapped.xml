@@ -65,11 +65,7 @@
     </processing-class>
     <description>binaries from the Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense Dirruhorn deployment</predicate>
-        <predicate key="LATITUDE">46.121808</predicate>
-        <predicate key="LONGITUDE">7.821777</predicate>
-    </addressing>
+    <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
     <streams>
         <stream name="data">

@@ -24,11 +24,7 @@
     </processing-class>
     <description>show static status information of the BackLogs and send commands to the Thur deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense Thur deployment</predicate>
-        <predicate key="LATITUDE">47.589889</predicate>
-        <predicate key="LONGITUDE">8.773874</predicate>
-    </addressing>
+    <addressing />
     <storage />
     <streams>
         <stream name="data1">

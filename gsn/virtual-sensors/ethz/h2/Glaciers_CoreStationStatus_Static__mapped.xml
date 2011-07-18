@@ -25,11 +25,7 @@
     </processing-class>
     <description>CoreStation static status from Glaciers deployment</description>
     <life-cycle pool-size="10" />
-    <addressing>
-        <predicate key="type">PermaSense Glaciers deployment</predicate>
-        <predicate key="LATITUDE">46.590199</predicate>
-        <predicate key="LONGITUDE">8.377573</predicate>
-    </addressing>
+    <addressing />
     <storage />
     <streams>
         <stream name="data">
