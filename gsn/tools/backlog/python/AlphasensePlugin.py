@@ -42,14 +42,14 @@ class AlphasensePluginClass(AbstractPluginClass):
         self._deviceStr = self.getOptionValue('alphasense_device')
         self.alphasense = AlphasenseDriver.AlphasenseDriver([self._deviceStr])
                 
-        msgCalib = self.alphasense._getCalibData()
+        #msgCalib = self.alphasense._getCalibData()
         #msgSens = self.alphasense._getSensitivityData()
         
-        dataPackage = [STATIC_CALIB_SENS_DATA]
-        dataPackage += [msgCalib]
+        #dataPackage = [STATIC_CALIB_SENS_DATA]
+        #dataPackage += [msgCalib]
         #dataPackage += [msgSens]
 
-        self.processMsg(self.getTimeStamp(), dataPackage)
+        #self.processMsg(self.getTimeStamp(), dataPackage)
         
     def getMsgType(self):
         return BackLogMessage.ALPHASENSE_MESSAGE_TYPE
