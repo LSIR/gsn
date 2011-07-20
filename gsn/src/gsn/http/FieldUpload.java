@@ -64,7 +64,7 @@ public class FieldUpload extends HttpServlet {
 			try {
 				// Parse the request
 				items = upload.parseRequest(req);
-			
+				logger.info(items.toString());
 				//building xml data out of the input
 				String cmd = "";
 				String vsname = "";
@@ -74,13 +74,18 @@ public class FieldUpload extends HttpServlet {
 				    if (item.getFieldName().equals("vsname")){
 				    	//define which cmd block is sent
 				    	vsname = item.getString();
+				    	logger.info("vsname " + vsname);
 				    } else if (item.getFieldName().equals("cmd")){
 				    	//define which cmd block is sent
 				    	cmd = item.getString();
+				    	logger.info("cmd " + cmd);
 				    } else if (item.getFieldName().split(";")[0].equals(cmd)) {
 				    	//only for the defined cmd
+				    	
 			    	    paramNames.add(item.getFieldName().split(";")[1]);
+			    	    logger.info("FieldName " + item.getFieldName());
 			    	    if (item.isFormField()) {
+			    	    	
 					    	paramValues.add(item.getString());
 			    	    } else {
 			    	    	paramValues.add(item);
