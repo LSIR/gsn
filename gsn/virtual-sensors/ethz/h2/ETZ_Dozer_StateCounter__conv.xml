@@ -14,7 +14,10 @@
             <field name="MCUACTIVE" type="VARCHAR(30)" unit="ms" />
             <field name="RADIOTX" type="VARCHAR(30)" unit="ms" />
             <field name="RADIORX" type="VARCHAR(30)" unit="ms" />
-            <field name="PAYLOAD_TRANSMISSIONFAILURES" type="INTEGER" />
+            <field name="MCUACTIVE_DUTYCYCLE" type="VARCHAR(30)" unit="%" />
+            <field name="RADIOTX_DUTYCYCLE" type="VARCHAR(30)" unit="%" />
+            <field name="RADIORX_DUTYCYCLE" type="VARCHAR(30)" unit="%" />
+            <field name="PAYLOAD_TRANSMISSIONFAILURES" type="INTEGER" />            
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
@@ -34,6 +37,9 @@
                 cast(round(PAYLOAD_MCUACTIVE * 1000.0 / 32768.0, 1) as CHAR(30)) as MCUACTIVE,
                 cast(round(PAYLOAD_RADIOTX * 1000.0 / 32768.0, 1) as CHAR(30)) as RADIOTX,
                 cast(round(PAYLOAD_RADIORX * 1000.0 / 32768.0, 1) as CHAR(30)) as RADIORX, 
+                cast(round(PAYLOAD_MCUACTIVE * 100.0 / PAYLOAD_PERIOD, 5) as CHAR(30)) as MCUACTIVE_DUTYCYCLE,
+                cast(round(PAYLOAD_RADIOTX * 100.0 / PAYLOAD_PERIOD, 5) as CHAR(30)) as RADIOTX_DUTYCYCLE, 
+                cast(round(PAYLOAD_RADIORX * 100.0 / PAYLOAD_PERIOD, 5) as CHAR(30)) as RADIORX_DUTYCYCLE,                 
                 PAYLOAD_TRANSMISSIONFAILURES, DATA_IMPORT_SOURCE 
                 from wrapper </query>
             </source>
