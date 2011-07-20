@@ -733,7 +733,29 @@ var GSN = {
             $(this.container).prepend($("."+vsdiv, $(this.container)));
             $("."+vsdiv, $(this.container)).fadeIn("slow");
         }
-		
+	,
+        formatTimeInterval: function(intervalInSeconds) {
+          var ret = "";
+          var milliseconds = (Math.floor(intervalInSeconds * 1000)) % 1000;
+          var seconds = Math.floor(intervalInSeconds) % 60;
+          var minutes = Math.floor (intervalInSeconds / 60) % 60;
+          var hours = Math.floor(intervalInSeconds / 3600) % 24; 
+          var days = Math.floor(intervalInSeconds / 86400);
+          var millisecondsstring = milliseconds>0?" "+milliseconds+"ms":"";
+          if(days > 0)
+            ret = days+"d "+hours+"h "+minutes+"m "+seconds+"s";
+          else if(hours > 0)
+            ret = hours+"h "+minutes+"m "+seconds+"s";
+          else if(minutes > 0)
+            ret = minutes+"m "+seconds+"s"+millisecondsstring;
+          else if (seconds > 0)
+            ret = seconds+"s"+millisecondsstring;
+          else if (milliseconds > 0)
+            ret = millisecondsstring;
+          else
+            ret = seconds+"s";
+          return ret;
+        }
 		
         /**
 		* Update and show all the data of the vsbox
@@ -841,6 +863,10 @@ var GSN = {
                             });
                         } else if (type.search("[bB][iI][nN][aA][rR][yY]") != -1){
                             value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
+                        } else if (unit==" s"){
+                            value = GSN.vsbox.formatTimeInterval(value);
+                        } else if (unit==" ms"){
+                            value = GSN.vsbox.formatTimeInterval(value / 1000);
                         } else {
                             value = value + unit;
                         }
@@ -932,6 +958,10 @@ var GSN = {
                             });
                         } else if (type.search("[bB][iI][nN][aA][rR][yY]") != -1){
                             $("a",dd).attr("href",value);
+                        } else if (unit==" s"){
+                          $(dd).empty().append(GSN.vsbox.formatTimeInterval(value));
+                        } else if (unit==" ms"){
+                          $(dd).empty().append(GSN.vsbox.formatTimeInterval(value / 1000));
                         } else {
                             $(dd).empty().append(value + unit);
                         }
