@@ -9,10 +9,10 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="PAYLOAD_UPTIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_UPTIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_QUEUESIZE" type="SMALLINT" />
             <field name="PAYLOAD_PACKETSSENT" type="INTEGER" />
             <field name="PAYLOAD_PACKETSRECEIVED" type="INTEGER" />

@@ -12,7 +12,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-            <field name="UPTIME" type="INTEGER" unit="relatime" />
+            <field name="UPTIME" type="INTEGER" unit="s" />
             <field name="ERROR_COUNTER" type="INTEGER" />
             <field name="EXCEPTION_COUNTER" type="INTEGER" />
             
@@ -64,8 +64,8 @@
             <field name="VOLUNTARY_CTXT_SWITCHES" type="INTEGER" />
             <field name="NONVOLUNTARY_CTXT_SWITCHES" type="INTEGER" />
 			
-            <field name="RUSAGE_UTIME" type="DOUBLE" unit="relatime" />
-            <field name="RUSAGE_STIME" type="DOUBLE" unit="relatime" />
+            <field name="RUSAGE_UTIME" type="DOUBLE" unit="s" />
+            <field name="RUSAGE_STIME" type="DOUBLE" unit="s" />
             <field name="RUSAGE_MINFLT" type="INTEGER" />
             <field name="RUSAGE_MAJFLT" type="INTEGER" />
             <field name="RUSAGE_NVCSW" type="INTEGER" />

@@ -27,7 +27,7 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="VCCCH1" type="INTEGER" unit="mV"/>            
             <field name="VCCCH2" type="INTEGER" unit="mV"/>
             <field name="VCCADC" type="INTEGER" unit="mV"/>

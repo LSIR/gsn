@@ -12,7 +12,7 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" unit="relatime"/>
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_RSSI_ID0" type="INTEGER" />
             <field name="PAYLOAD_RSSI_ID1" type="INTEGER" />
             <field name="PAYLOAD_RSSI_ID2" type="INTEGER" />

@@ -199,8 +199,8 @@
             <field name="STAT_PROCS_THREADS_CREATED" type="INTEGER" />
             <field name="STAT_PROCS_BLOCKED" type="INTEGER" />
 
-            <field name="UPTIME" type="DOUBLE" unit="relatime" />
-            <field name="IDLETIME" type="DOUBLE" unit="relatime" />
+            <field name="UPTIME" type="DOUBLE" unit="s" />
+            <field name="IDLETIME" type="DOUBLE" unit="s" />
         </output-structure>
     </processing-class>
     <description>CoreStation software status from Jungfraujoch deployment</description>
