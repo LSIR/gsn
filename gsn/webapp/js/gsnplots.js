@@ -173,7 +173,7 @@ var GsnPlots = {
   divid : 0,
   
   _addPlotsAddGraph: function(htmlelement, plot) {
-    $(htmlelement).append('<p>'+plot.meta.title+'</p><div id="plot_'+GsnPlots.divid+'"/>');
+    $(htmlelement).append('<div><h2>'+plot.meta.title+'</h2><div id="plot_'+GsnPlots.divid+'"/></div>');
     plot.config.graph.div='plot_'+(GsnPlots.divid++);
     var g = new FrontendCreator(plot.config);
   }
