@@ -60,8 +60,8 @@ Dirruhorn_Statistics__mapped.xml
 Dirruhorn_SyslogNg__conv.xml
 Dirruhorn_SyslogNg__mapped.xml
 Dirruhorn_Topology__public.xml
-Dirruhorn_VaisalaWXT520__mapped.xml
-Dirruhorn_VaisalaWXT520__muxed__mapped.xml
+#Dirruhorn_VaisalaWXT520__mapped.xml
+#Dirruhorn_VaisalaWXT520__muxed__mapped.xml
 Glaciers_BackLogStatus_Dynamic__mapped.xml
 Glaciers_BackLogStatus_Revision__mapped.xml
 Glaciers_BackLogStatus_Static__mapped.xml
