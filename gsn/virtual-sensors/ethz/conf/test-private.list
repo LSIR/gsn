@@ -61,3 +61,4 @@ OSTest_MotionDetection.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
+Statistics_Sensorviz.xml

@@ -1,0 +1,26 @@
+<virtual-sensor name="Statistics_Sensorviz" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="DATA" type="BINARY"/>
+        </output-structure>
+    </processing-class>
+    <description>Sensorviz cache statistics</description>
+    <life-cycle pool-size="10" />
+    <addressing/>
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://whymper.ee.ethz.ch:24001/sensorviz?stats</predicate>
+                    <predicate key="rate">30000</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

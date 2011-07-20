@@ -1,0 +1,71 @@
+<virtual-sensor name="Statistics_Sensorviz__parsed" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	def logger = org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class);
+                	
+					try {
+                		for (entry in (new String(DATA, "UTF-8")).toString().split(",")) {
+                			def spl = entry.split("=");
+                			if (spl[0].toLowerCase() == "uptime")
+                				UPTIME = spl[1].toInteger() / 1000 as int;
+                			else if (spl[0].toLowerCase() == "requests")
+                				REQUESTS = spl[1].toInteger();
+                			else if (spl[0].toLowerCase() == "cachefilesize")
+                				CACHE_FILE_SIZE = spl[1].toLong();
+                			else if (spl[0].toLowerCase() == "seensignals")
+                				SEEN_SIGNALS = spl[1].toInteger();
+                			else if (spl[0].toLowerCase() == "cacheentries")
+                				CACHE_ENTRIES = spl[1].toInteger();
+                			else if (spl[0].toLowerCase() == "cacherequests")
+                				CACHE_REQUESTS = spl[1].toInteger();
+                			else if (spl[0].toLowerCase() == "cachehits")
+                				CACHE_HITS = spl[1].toInteger();
+                			else if (spl[0].toLowerCase() == "cachemisses")
+                				CACHE_MISSES = spl[1].toInteger();
+                			else
+                				logger.warn("unknown variable: " + entry + " -> skip it");
+                		}
+					} catch(Throwable e) {
+						logger.error(e);
+                	}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            
+            <field name="UPTIME" type="INTEGER" unit="relatime" />
+            <field name="REQUESTS" type="INTEGER" />
+            <field name="CACHE_FILE_SIZE" type="BIGINT" unit="bytes" />
+            <field name="SEEN_SIGNALS" type="INTEGER" />
+            <field name="CACHE_ENTRIES" type="INTEGER" />
+            <field name="CACHE_REQUESTS" type="INTEGER" />
+            <field name="CACHE_HITS" type="INTEGER" />
+            <field name="CACHE_MISSES" type="INTEGER" />
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Sensorviz cache statistics parsed</description>
+    <life-cycle pool-size="10" />
+    <addressing/>
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Statistics_Sensorviz__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

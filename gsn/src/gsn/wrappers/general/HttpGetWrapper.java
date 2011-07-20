@@ -71,6 +71,22 @@ public class HttpGetWrapper extends AbstractWrapper {
 			return false;
 		}
 		
+		String id = getActiveAddressBean().getPredicateValue("device-id");
+		if (id != null) {
+			try {
+				deviceId = Integer.parseInt(id);
+			} catch (NumberFormatException e) {
+				logger.error("device id >" + id + "< is not an integer");
+				return false;
+			}
+			
+			if (deviceId < 0 || deviceId > 65535) {
+				logger.error("device id >" + id + "< has to be between 0 and 65535");
+				return false;
+			}
+		}
+
+		
 		subdirectory = getActiveAddressBean().getPredicateValue("subdirectory-name");
 		if (subdirectory != null) {
 			String rootBinaryDir;
@@ -97,22 +113,8 @@ public class HttpGetWrapper extends AbstractWrapper {
 				logger.debug("binary root directory: " + rootBinaryDir);
 			}
 
-			String id = getActiveAddressBean().getPredicateValue("device-id");
-			if (id != null) {
-				try {
-					deviceId = Integer.parseInt(id);
-				} catch (NumberFormatException e) {
-					logger.error("device id >" + id + "< is not an integer");
-					return false;
-				}
-				
-				if (deviceId < 0 || deviceId > 65535) {
-					logger.error("device id >" + id + "< has to be between 0 and 65535");
-					return false;
-				}
-
+			if (deviceId != null)
 				directory = new File(new File(new File(rootBinaryDir, getActiveAddressBean().getVirtualSensorName().split("_")[0].toLowerCase()), id), subdirectory);
-			}
 			else
 				directory = new File(new File(rootBinaryDir, getActiveAddressBean().getVirtualSensorName().split("_")[0].toLowerCase()), subdirectory);
 			
@@ -140,10 +142,17 @@ public class HttpGetWrapper extends AbstractWrapper {
 			logger.info("binaries will be stored in >" + directory + "<");
 		}
 		else {
-			outputStructure = new DataField [] {
-				new DataField("GENERATION_TIME", "BIGINT"),
-				new DataField("SIZE", "INTEGER"),
-				new DataField("DATA", "binary:image/jpeg")};
+			if (deviceId == null)
+				outputStructure = new DataField [] {
+					new DataField("GENERATION_TIME", "BIGINT"),
+					new DataField("SIZE", "INTEGER"),
+					new DataField("DATA", "binary:image/jpeg")};
+			else
+				outputStructure = new DataField [] {
+					new DataField("DEVICE_ID", "INTEGER"),
+					new DataField("GENERATION_TIME", "BIGINT"),
+					new DataField("SIZE", "INTEGER"),
+					new DataField("DATA", "binary:image/jpeg")};
 			
 			logger.info("binaries will be stored in database");
 		}
@@ -184,8 +193,12 @@ public class HttpGetWrapper extends AbstractWrapper {
 					else
 						postStreamElement(new Serializable[]{deviceId, timestamp, size, subdirectory+"/"+filename});
 				}
-				else
-					postStreamElement(new Serializable[]{timestamp, size, arrayOutputStream.toByteArray()});
+				else {
+					if (deviceId == null)
+						postStreamElement(new Serializable[]{timestamp, size, arrayOutputStream.toByteArray()});
+					else
+						postStreamElement(new Serializable[]{deviceId, timestamp, size, arrayOutputStream.toByteArray()});
+				}
 				Thread.sleep( rate );
 			} catch ( InterruptedException e ) {
 				logger.error( e.getMessage( ) , e );
