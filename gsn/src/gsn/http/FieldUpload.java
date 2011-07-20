@@ -83,11 +83,12 @@ public class FieldUpload extends HttpServlet {
 				    	//only for the defined cmd
 				    	
 			    	    paramNames.add(item.getFieldName().split(";")[1]);
-			    	    logger.info("FieldName " + item.getFieldName());
+			    	    
 			    	    if (item.isFormField()) {
-			    	    	
+			    	    	logger.info("FORMFIELD FieldName " + item.getFieldName());
 					    	paramValues.add(item.getString());
 			    	    } else {
+			    	    	logger.info("NOT FORMFIELD FieldName " + item.getFieldName());
 			    	    	paramValues.add(item);
 			    	    }
 				    }
