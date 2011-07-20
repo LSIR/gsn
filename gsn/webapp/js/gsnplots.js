@@ -46,6 +46,7 @@ var GsnPlots = {
         }
         var thisdeployment = GsnPlots.getDeployment(deploymentname);
         var vsname = $(this).attr("name");
+        var vs = this;
         // find out about available node ids/positions
         if(vsname.match(/.*_topology__public$/)) {
           thisdeployment.topology_vs = $(this).attr("name");$
@@ -66,6 +67,14 @@ var GsnPlots = {
                 "y1": []
               },
              };
+             this.unit=Array();
+             var meta = this;
+             $("field", vs).each(function() {
+               var fieldpos = $.inArray($(this).attr("name"), meta.field);
+               if (fieldpos>-1) {
+                 meta.unit[fieldpos]=$(this).attr("unit");
+               }
+             });
              thisdeployment.graphconfig.push({"config":graphconfig, "meta":this});
            }
         }); 
@@ -110,8 +119,9 @@ var GsnPlots = {
           if (GsnPlots.showstatistics==true) {
             var vsensor = d.name.toLowerCase()+"_"+this.meta.vsensor;
             var graphsignals = this.config.signals.y1;
-            $(this.meta.field).each(function() {
-              graphsignals.push({
+            var meta = this.meta;
+            $(this.meta.field).each(function(index, value) {
+              var signal = {
                 "displayName": this,
                 "gsnUrl": GsnPlots.gsnserver,
                 "virtualSensor": vsensor,
@@ -119,7 +129,10 @@ var GsnPlots = {
                 "scaling": 1.0,
                 "visible": true,
                 "timeline":"timed"
-              });
+              };
+              if (typeof meta.unit[index] == "string")
+                signal.unit = meta.unit[index];
+              graphsignals.push(signal);              
             });
           }
           else {
@@ -133,8 +146,8 @@ var GsnPlots = {
             // add nodes to plot
             $(positions).each(function() {
               var p = this;
-              $(graphconfig.meta.field).each(function() {
-                graphconfig.config.signals.y1.push({
+              $(graphconfig.meta.field).each(function(index, value) {
+                var signal = {
                   "displayName":"Position "+p +" "+this,
                   "gsnUrl": GsnPlots.gsnserver,
                   "virtualSensor": d.name.toLowerCase()+"_"+graphconfig.meta.vsensor,
@@ -143,7 +156,10 @@ var GsnPlots = {
                   "scaling": 1.0,
                   "visible": true,
                   "timeline":"generation_time"
-                });
+                };
+                if (typeof graphconfig.meta.unit[index] == "string")
+                  signal.unit = graphconfig.meta.unit[index];
+                graphconfig.config.signals.y1.push(signal);
               });
             }); 
           }
