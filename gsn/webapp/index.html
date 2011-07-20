@@ -40,19 +40,51 @@ $(document).ready(function() {
         $('#navigation').html(data);
     }, 'html');
 
-        //bind vs search field
-        $("#vssearch").val("");
-        $("#vssearch").bind("focus",function() {
-          this.select();
-        });
-        $("#vssearch_clear").bind("click",function() {
-          $("#vssearch").val("");
-          GSN.util.filterVs($("#vssearch").val());
-        });
-
-        $("#vssearch").bind("keyup",function() {
-          GSN.util.filterVs($("#vssearch").val());
-        });
+    //bind vs search field
+	$("#vssearch").css("color", "#bbbbbb");
+    $("#vssearch").val("search vs");
+    $("#vssearch").focus(function() {
+		$("#vssearch").css("color", "#000000");
+    	if ($("#vssearch").val() == "search vs")
+    		$("#vssearch").val("");
+    	else
+      		this.select();
+    });
+    $("#vssearch").keyup(function(event) {
+		if ($("#vssearch").val() != "" && $("#vssearch").val() != "search vs") {
+        	GSN.util.filterVs($("#vssearch").val());
+			$("#vssearch").css("color", "#000000");
+			$("#vssearch_clear").attr("src", "img/button_cancel.png");
+		}
+		else {
+			$("#vssearch_clear").attr("src", "img/button_cancel_grey.png");
+	    	if (13 == (event.keyCode || event.which))
+				$("#vssearch").css("color", "#bbbbbb");
+		}
+    });
+    $("#vssearch").keypress(function(event) {
+		$("#vssearch").css("color", "#000000");
+    	if (13 == (event.keyCode || event.which)) {
+        	GSN.util.filterVs($("#vssearch").val());
+    		$("#vssearch_go").attr("src", "img/button_go_grey.png");
+    		if ($("#vssearch").val() == "") {
+    	      	$("#vssearch").val("search vs");
+    		}
+    	}
+    });
+    $("#vssearch").blur(function(event) {
+		if ($("#vssearch").val() == "") {
+			$("#vssearch").css("color", "#bbbbbb");
+	      	$("#vssearch").val("search vs");
+		}
+    });
+    
+    $("#vssearch_clear").click(function() {
+		$("#vssearch").css("color", "#bbbbbb");
+      	$("#vssearch").val("search vs");
+		$("#vssearch_clear").attr("src", "img/button_cancel_grey.png");
+      	GSN.util.filterVs($("#vssearch").val());
+    });
 });	
 //]]>-->
 </script>
