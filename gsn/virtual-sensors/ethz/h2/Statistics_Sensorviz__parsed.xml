@@ -37,7 +37,6 @@
             </param>
         </init-params>
         <output-structure>
-            <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             
             <field name="UPTIME" type="INTEGER" unit="relatime" />
