@@ -1,4 +1,4 @@
-<virtual-sensor name="Misc_Camera_3__scaled" priority="10" >
+<virtual-sensor name="Dirruhorn_Camera_Dirru_Geisstriftbach__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -11,15 +11,15 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>Camera 3 as thumbnail</description>
+    <description>Geisstriftbach Camera from Dirruhorn as thumbnail</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" history-size="1"/>
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from Misc_Camera_3__mapped</predicate>
+                    <predicate key="query">select * from Dirruhorn_Camera_Dirru_Geisstriftbach__mapped</predicate>
                 </address>
                 <query> select * from wrapper</query>
             </source>

@@ -1,12 +1,8 @@
-<virtual-sensor name="Grabengufer_Camera_Miesboden__mapped" priority="10" >
+<virtual-sensor name="Matterhorn_Camera_KMH_Radarcam" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="position_mapping" />
-        </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="SIZE" type="INTEGER" unit="bytes" />
@@ -14,17 +10,20 @@
             <field name="DATA" type="BINARY" data-path-field="RELATIVE_FILE"/>
         </output-structure>
     </processing-class>
-    <description>Camera Miesboden from the Grabengufer deployment</description>
+    <description>Radar Camera from Klein Matterhorn</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
     <streams>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
-                    <predicate key="query">select * from Grabengufer_Camera_Miesboden</predicate>
-                    <predicate key="remote-contact-point">http://whymper.ee.ethz.ch:23001/streaming/</predicate>
-                    <predicate key="start-time">continue</predicate>
+                <address wrapper="http-get">
+                    <predicate key="url">http://radar-kmh-cam01.ethz.ch/cgi-bin/image.jpg</predicate>
+                    <predicate key="username">admin</predicate>
+                    <predicate key="password">meinsm</predicate>
+                    <predicate key="rate">900000</predicate>
+                    <predicate key="subdirectory-name">kmh-radar</predicate>
+                    <predicate key="device-id">6010</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
