@@ -434,7 +434,8 @@ function getLogs() {
 
 function generateSyslogNgMessageDiv(timestamp, msg) {
 	var spl = msg.split(" ", 5);
-	var logMsg = (new Date(parseFloat(timestamp))).toLocaleString() + ": " + msg.substring(msg.indexOf(spl[4])+spl[4].length+1, msg.length);
+	var d = new Date(parseFloat(timestamp));
+	var logMsg = generateDateString(new Date(parseFloat(timestamp))) + ": " + msg.substring(msg.indexOf(spl[4])+spl[4].length+1, msg.length);
 	
 	var color = "";
 	var priority = parseInt(spl[0].slice(1,spl[0].length-1))%8;
@@ -452,7 +453,7 @@ function generateSyslogNgMessageDiv(timestamp, msg) {
 
 function generateEventMessageDiv(timestamp, position, deviceId, eventId, eventValue) {
 	var id = parseInt(eventId);
-	var logMsg = (new Date(parseFloat(timestamp))).toLocaleString() + ": Position " + position + " (DeviceId " + deviceId + "): ";
+	var logMsg = generateDateString(new Date(parseFloat(timestamp))) + ": Position " + position + " (DeviceId " + deviceId + "): ";
 	if (eventValue.toLowerCase() == "null")
 		logMsg += EVENT_MSG_NULL[id];
 	else
@@ -470,6 +471,24 @@ function generateEventMessageDiv(timestamp, position, deviceId, eventId, eventVa
 	
 	return "<div style=\"width: 10000px" + display + color + "\">" + logMsg + "</div>";
 }
+
+function generateDateString(d) {
+	var day = d.getDate();
+	if (day < 10) day = "0" + day;
+	var month = d.getMonth();
+	if (month < 10) month = "0" + month;
+	var hours = d.getHours();
+	if (hours < 10) hours = "0" + hours;
+	var min = d.getMinutes();
+	if (min < 10) min = "0" + min;
+	var sec = d.getSeconds();
+	if (sec < 10) sec = "0" + sec;
+	var ms = d.getMilliseconds();
+	if (ms < 10) ms = "00" + ms;
+	else if (ms < 100) ms = "0" + ms;
+	return day + "." + month + "." + d.getFullYear() + " " + hours + ":" + min + ":" + sec + "," + ms;
+}
+	
 
 function addNewLogContainer(deplId, identifier, menuString) {
 	$("#log_menu_"+deplId).append('<li style="border-right:0px solid #000000"><a id="log_menu_item_' + logContainers.length + '" href="javascript:showLogs('+deplId+','+logContainers.length+')">' + menuString + '</a></li>');
