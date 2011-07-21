@@ -14,7 +14,10 @@
                     	if (spl.size() == 2 && spl[0].find(" ") == null) {
                     		PROGRAM = spl[0];
                     		MESSAGE = spl[1].getBytes("UTF-8");
-                    	} else { MESSAGE = spl[0].getBytes("UTF-8"); }
+                    	} else {
+                    		PROGRAM = null; 
+                    		MESSAGE = spl[0].getBytes("UTF-8");
+                    	}
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
