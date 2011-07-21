@@ -58,7 +58,7 @@ var GsnPlots = {
              var graphconfig = {
               "graph": {
                 "type": "dygraph",
-                "width": 800,
+                "width": 940,
                 "height": 350,
                 "showForm": true
               },
