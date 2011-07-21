@@ -243,7 +243,7 @@ public class BackLogMessage {
 		
 		if (bbuffer.hasRemaining()) {
 			int format_len = bbuffer.getInt();
-			String format = new String(arraybuffer, bbuffer.position(), format_len);
+			String format = new String(arraybuffer, bbuffer.position(), format_len, "UTF-8");
 			bbuffer.position(bbuffer.position()+format_len);
 	
 			payload = new Serializable [format.length()];
@@ -280,7 +280,7 @@ public class BackLogMessage {
 					break;
 				case 's':
 					int len = bbuffer.getInt();
-					payload[payloadIndex] = new String(arraybuffer, bbuffer.position(), len);
+					payload[payloadIndex] = new String(arraybuffer, bbuffer.position(), len, "UTF-8");
 					bbuffer.position(bbuffer.position()+len);
 					break;
 				case 'X':
