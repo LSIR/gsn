@@ -394,10 +394,10 @@ function getLogs() {
 						var str = $("field:eq(1)", this).text();
 						if (!identifierExists(deployments[sdid], str)) {
 							if (isPublicGSN)
-								addNewLogContainer(sdid, str, "CoreStation Pos " + str);
+								id = addNewLogContainer(sdid, str, "CoreStation Pos " + str);
 							else
-								addNewLogContainer(sdid, str, "CoreStation Id " + str);
-							id = this.containerId;
+								id = addNewLogContainer(sdid, str, "CoreStation Id " + str);
+							deployments[sdid].identifiers.push(str);
 						}
 						else {
 							$.each(logContainers, function() {
@@ -491,10 +491,12 @@ function generateDateString(d) {
 	
 
 function addNewLogContainer(deplId, identifier, menuString) {
-	$("#log_menu_"+deplId).append('<li style="border-right:0px solid #000000"><a id="log_menu_item_' + logContainers.length + '" href="javascript:showLogs('+deplId+','+logContainers.length+')">' + menuString + '</a></li>');
-	$("#logcontainers").append("<div class=\"scroll-pane\" id=\"logcontainer_"+logContainers.length+"\"></div>");
+	var containerId = logContainers.length;
+	$("#log_menu_"+deplId).append('<li style="border-right:0px solid #000000"><a id="log_menu_item_' + containerId + '" href="javascript:showLogs('+deplId+','+containerId+')">' + menuString + '</a></li>');
+	$("#logcontainers").append("<div class=\"scroll-pane\" id=\"logcontainer_"+containerId+"\"></div>");
 	scrollPane = $(".scroll-pane").jScrollPane({showArrows:true,stickToBottom:true,horizontalGutter:10}).data('jsp');
-	logContainers.push(new logContainer(menuString, deplId, logContainers.length, identifier));
+	logContainers.push(new logContainer(menuString, deplId, containerId, identifier));
+	return containerId;
 }
 
 function filterLogs(searchString) {
