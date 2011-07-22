@@ -2,13 +2,7 @@ Dirruhorn_BackLogStatus_Dynamic.xml
 Dirruhorn_BackLogStatus_Revision.xml
 Dirruhorn_BackLogStatus_Static.xml
 Dirruhorn_Binary.xml
-Dirruhorn_Camera_Dirru_Geisstriftbach.xml
-Dirruhorn_Camera_Findelengletscher.xml
-Dirruhorn_Camera_Grabengufer_Grosshaupt.xml
-Dirruhorn_Camera_Grabengufer_Miesboden.xml
-Dirruhorn_Camera_Grabengufer_Top.xml
-Dirruhorn_Camera_Grosse_Grabe.xml
-Dirruhorn_Camera_Gugla_Bielzigji.xml
+Dirruhorn_Binary_Http.xml
 Dirruhorn_CoreStationStatus_Hardware.xml
 Dirruhorn_CoreStationStatus_Software.xml
 Dirruhorn_CoreStationStatus_Static.xml
@@ -78,7 +72,7 @@ Matterhorn_BackLogStatus_Dynamic.xml
 Matterhorn_BackLogStatus_Revision.xml
 Matterhorn_BackLogStatus_Static.xml
 Matterhorn_Binary.xml
-Matterhorn_Camera_KMH_Radarcam.xml
+Matterhorn_Binary_Http.xml
 Matterhorn_CoreStationStatus_Hardware.xml
 Matterhorn_CoreStationStatus_Software.xml
 Matterhorn_CoreStationStatus_Static.xml

@@ -19,9 +19,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from Dirruhorn_Camera_Grabengufer_Top__mapped</predicate>
+                    <predicate key="query">select * from Dirruhorn_Binary_Http__mapped</predicate>
                 </address>
-                <query> select * from wrapper</query>
+                <query> select * from wrapper where position = 48</query>
             </source>
             <query> select * from source </query>
         </stream>
