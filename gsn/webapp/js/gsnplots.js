@@ -100,6 +100,7 @@ var GsnPlots = {
     else {
       if (d.topology == false && GsnPlots.showstatistics!=true) {
         // fetch topology
+         if (d.topology_vs)
          $.ajax({
            type: "GET",
            url: "/field?vs="+d.topology_vs+"&field=DATA&pk=latest",
@@ -113,6 +114,8 @@ var GsnPlots = {
              d.topology="";
            }
          });
+         else 
+           d.topology="";
       }
       else {
         $(d.graphconfig).each(function() {
