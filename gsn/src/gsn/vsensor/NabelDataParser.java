@@ -154,13 +154,13 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 		File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), (String) data.getData("relative_file"));
 		file = file.getAbsoluteFile();
 		
-		logger.info("new incoming file (" + file.getAbsolutePath() + ")");
-		
 		if (messageType == DUE_NAMING && file.getAbsolutePath().toLowerCase().contains("due")) {
 			parseData(file, inputStreamName, data);
+			logger.info("new incoming file (" + file.getAbsolutePath() + ")");
 		}
 		else if (messageType == ZUE_NAMING && file.getAbsolutePath().toLowerCase().contains("zue")) {
 			parseData(file, inputStreamName, data);
+			logger.info("new incoming file (" + file.getAbsolutePath() + ")");
 		}
 	}
 }
