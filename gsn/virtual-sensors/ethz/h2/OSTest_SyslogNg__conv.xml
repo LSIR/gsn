@@ -38,7 +38,7 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>converted CoreStation hardware status from OSTest deployment</description>
+    <description>parsed syslog-ng messages from OSTest deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />

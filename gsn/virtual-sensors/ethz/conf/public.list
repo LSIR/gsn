@@ -215,13 +215,10 @@ Matterhorn_Topology__public.xml
 #OpenSense_BackLogStatus_Static__mapped.xml
 #OpenSense_BackLogStatus_Revision__mapped.xml
 #OpenSense_BackLogStatus_Dynamic__mapped.xml
-#OpenSense_CoreStationStatus_Software__conv.xml
 #OpenSense_CoreStationStatus_Hardware__conv.xml
 #OpenSense_CoreStationStatus_Static__mapped.xml
 #OpenSense_CoreStationStatus_Software__mapped.xml
 #OpenSense_CoreStationStatus_Hardware__mapped.xml
-#OpenSense_ECVQEK3__mapped.xml
-#OpenSense_ECVQEK3__muxed__mapped.xml
 #OpenSense_GPS_NAV__mapped.xml
 #OpenSense_GPS_NAV__muxed__mapped.xml
 #OpenSense_OZ47_Dynamic__mapped.xml

@@ -10,7 +10,7 @@
 						DURATION = DURATION.toDouble();
 						TIME_OF_DATA = (TIME_OF_DATA.toDouble()*1000) as long;
 					}catch(Throwable e){
-						org.apache.log4j.Logger.getLogger(gsn.vsensor.BridgeVirtualSensorPermasense.class).error(e);
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
 				]]>
 	    	</param>

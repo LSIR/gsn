@@ -85,7 +85,7 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>STEVAL sensor reading from the OpenSense deployment</description>
+    <description>STEVAL sensor reading from the OSTest deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
