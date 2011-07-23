@@ -142,7 +142,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 			int num = 0;
 			while(rs.next()) {
         if (rs.getInt("resistance_1") == 0)
-          continue
+          continue;
         ozone_sensor += rs.getInt("resistance_1") * Math.exp(kT * (rs.getDouble("temperature") - 25));
 				num++;
 			}
