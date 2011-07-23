@@ -123,8 +123,10 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 		Double ozone_sensor = 0.0;
 		
 		// No calibration if there is no NABEL data
-		if (ozone_rel == null)
+		if (ozone_rel == null) {
+			logger.warn("no reliable ozone measurement at time " + time);
 			return;
+    }
 		
 		// Get sensor readings from the Duebendorf node which were measured at the same time (last 10 minutes) as the NABEL measurement
 		// Get latest bin values
@@ -146,9 +148,10 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
         ozone_sensor += rs.getInt("resistance_1") * Math.exp(kT * (rs.getDouble("temperature") - 25));
 				num++;
 			}
-			if (num == 0)
+			if (num == 0) {
 				logger.warn("no sensor readings for the reliable measurement at time " + time);
 				return;
+      }
 			else
 				ozone_sensor /= num;
 			
