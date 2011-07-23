@@ -134,17 +134,15 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 		try {
 			StringBuilder query = new StringBuilder();
 			if (getVirtualSensorConfiguration().getName().contains("ostest_"))
-				query.append("select resistance_1, temperature from ostest_oz47_dynamic__mapped where generation_time >= ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2");
+				query.append("select resistance_1, temperature from ostest_oz47_dynamic__mapped where generation_time > ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2 and resistance_1 > 0");
 			else
-				query.append("select resistance_1, temperature from opensense_oz47_dynamic__mapped where generation_time >= ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2");
+				query.append("select resistance_1, temperature from opensense_oz47_dynamic__mapped where generation_time > ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2 and resistance_1 > 0");
 			
 			rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
 			
 			// TODO: Clean sensor readings before using them to adjust calibration curve!
 			int num = 0;
 			while(rs.next()) {
-        if (rs.getInt("resistance_1") == 0)
-          continue;
         ozone_sensor += rs.getInt("resistance_1") * Math.exp(kT * (rs.getDouble("temperature") - 25));
 				num++;
 			}
