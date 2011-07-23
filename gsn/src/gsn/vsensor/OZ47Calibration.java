@@ -31,6 +31,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 	private static double kT = 0.0199999995529652;
 	
 	private ArrayList<Double>[] bins = new ArrayList[NUM_BINS];
+	private Connection conn = null;
 	
 	private static DataField[] dataField = {
 			new DataField("POSITION", "INTEGER"),
@@ -81,7 +82,6 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 			bins[i] = new ArrayList<Double>();
 		
 		// Get latest bin values
-		Connection conn = null;
 		ResultSet rs = null;
 		try {
 			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
@@ -128,25 +128,26 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 		
 		// Get sensor readings from the Duebendorf node which were measured at the same time (last 10 minutes) as the NABEL measurement
 		// Get latest bin values
-		Connection conn = null;
 		ResultSet rs = null;
 		try {
-			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
 			StringBuilder query = new StringBuilder();
-			if (getVirtualSensorConfiguration().getName().contains("ostest"))
-				query.append("select resistance_1, temperature from ostest_oz47_dynamic__mapped where generation_time >= ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1");
+			if (getVirtualSensorConfiguration().getName().contains("ostest_"))
+				query.append("select resistance_1, temperature from ostest_oz47_dynamic__mapped where generation_time >= ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2");
 			else
-				query.append("select resistance_1, temperature from opensense_oz47_dynamic__mapped where generation_time >= ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1");
+				query.append("select resistance_1, temperature from opensense_oz47_dynamic__mapped where generation_time >= ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2");
 			
 			rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
 			
 			// TODO: Clean sensor readings before using them to adjust calibration curve!
 			int num = 0;
-			while(rs.next()) {				
-				ozone_sensor += rs.getDouble("resistance_1") * Math.exp(kT * (rs.getDouble("temperature") - 25));
+			while(rs.next()) {
+        if (rs.getInt("resistance_1") == 0)
+          continue
+        ozone_sensor += rs.getInt("resistance_1") * Math.exp(kT * (rs.getDouble("temperature") - 25));
 				num++;
 			}
 			if (num == 0)
+				logger.warn("no sensor readings for the reliable measurement at time " + time);
 				return;
 			else
 				ozone_sensor /= num;
