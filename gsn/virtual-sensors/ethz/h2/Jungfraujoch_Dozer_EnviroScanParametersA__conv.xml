@@ -34,7 +34,7 @@
                 casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M1!=-2147483647,cast(round(PAYLOAD_M1 / 1000000.0, 6) as CHAR(30)),NULL) as A1,
                 casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M2!=-2147483647,cast(round(PAYLOAD_M2 / 1000000.0, 6) as CHAR(30)),NULL) as A2,
                 casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M3!=-2147483647,cast(round(PAYLOAD_M3 / 1000000.0, 6) as CHAR(30)),NULL) as A3,
-                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M4!=-2147483647,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as A4
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M4!=-2147483647,cast(round(PAYLOAD_M4 / 1000000.0, 6) as CHAR(30)),NULL) as A4,
                 casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_M5!=-2147483647,cast(round(PAYLOAD_M5 / 1000000.0, 6) as CHAR(30)),NULL) as A5                
                 from wrapper where PAYLOAD_MEASUREMENT_TYPE=2</query>
             </source>
