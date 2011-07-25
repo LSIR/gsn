@@ -73,6 +73,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 				bins[2].add(rs.getDouble("bin_2_rel_val")); bins[2].add(rs.getDouble("bin_2_sensor_val"));
 				bins[3].add(rs.getDouble("bin_3_rel_val")); bins[3].add(rs.getDouble("bin_3_sensor_val"));
 				bins[4].add(rs.getDouble("bin_4_rel_val")); bins[4].add(rs.getDouble("bin_4_sensor_val"));
+				logger.warn("current calibration in DB: ("+bins[0].get(0)+","+bins[0].get(1)+")"+"("+bins[1].get(0)+","+bins[1].get(1)+")"+"("+bins[2].get(0)+","+bins[2].get(1)+")"+"("+bins[3].get(0)+","+bins[3].get(1)+")"+"("+bins[4].get(0)+","+bins[4].get(1)+")");
 			} else {
 				// use default values
 				bins[0].add(15.6320); bins[0].add(275.6500);
@@ -103,7 +104,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 		if (ozone_rel == null) {
 			logger.warn("no reliable ozone measurement at time " + time);
 			return;
-    }
+		}
 		
 		// Get sensor readings from the Duebendorf node which were measured at the same time (last 10 minutes) as the NABEL measurement
 		// Get latest bin values
@@ -120,13 +121,13 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 			// TODO: Clean sensor readings before using them to adjust calibration curve!
 			int num = 0;
 			while(rs.next()) {
-        ozone_sensor += rs.getInt("resistance_1") * Math.exp(kT * (rs.getDouble("temperature") - 25));
+				ozone_sensor += rs.getInt("resistance_1") * Math.exp(kT * (rs.getDouble("temperature") - 25));
 				num++;
 			}
 			if (num == 0) {
 				logger.warn("no sensor readings for the reliable measurement at time " + time);
 				return;
-      }
+			}
 			else
 				ozone_sensor /= num;
 			
@@ -137,7 +138,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 			}
 			
 			// Adjust bin data with the new values and calculate new calibration curve
-			if (bins[bin_index].get(0) != null) {
+			if (bins[bin_index].get(0) != null && bins[bin_index].get(0) != 0.0) {
 				bins[bin_index].set(0, (1-ADJUSTMENT_WEIGHT)*bins[bin_index].get(0) + ADJUSTMENT_WEIGHT*ozone_rel);
 				bins[bin_index].set(1, (1-ADJUSTMENT_WEIGHT)*bins[bin_index].get(1) + ADJUSTMENT_WEIGHT*ozone_sensor);
 			}
@@ -164,7 +165,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 
 	    s = NUM_BINS;
 	    for(int i=0; i < NUM_BINS; i++){
-	        if (bins[i].get(0) == null) {
+	        if (bins[i].get(0) == null || bins[i].get(0) == 0.0) {
 	          s = s-1;          
 	          continue;
 	        }
