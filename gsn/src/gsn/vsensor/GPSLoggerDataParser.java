@@ -663,7 +663,9 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		
 		public void shutdown() {
 			stop = true;
-			queue.notifyAll();
+			synchronized(queue) {
+				queue.notifyAll();
+			}
 		}
 		
 		private class FileItem {
