@@ -18,13 +18,6 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 
 	private static final transient Logger logger = Logger.getLogger(OZ47Calibration.class);
 	
-	private static String MESSAGE_TYPE_STR = "message_type";
-
-	private static String DUE_NAMING_STR = "due";
-	private static String ZUE_NAMING_STR  = "zue";
-	private static int DUE_NAMING = 1;
-	private static int ZUE_NAMING = 2;
-
 	private static double ADJUSTMENT_WEIGHT = 0.35;
 	private static double BIN_SIZE = 28;
 	private static int NUM_BINS = 5;
@@ -57,24 +50,8 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 			
 			new DataField("DATA_IMPORT_SOURCE", "SMALLINT")};
 	
-	private int messageType = -1;
-	
 	@Override
 	public boolean initialize() {
-		
-		String type = getVirtualSensorConfiguration().getMainClassInitialParams().get(MESSAGE_TYPE_STR);
-		if (type == null) {
-			logger.error(MESSAGE_TYPE_STR + " has to be specified");
-			return false;
-		}
-		if (type.equalsIgnoreCase(DUE_NAMING_STR))
-			messageType = DUE_NAMING;
-		else if (type.equalsIgnoreCase(ZUE_NAMING_STR))
-			messageType = ZUE_NAMING;
-		else {
-			logger.error(MESSAGE_TYPE_STR + " has to be " + DUE_NAMING_STR + " or " + ZUE_NAMING_STR);
-			return false;
-		}
 		
 		boolean ret = super.initialize();
 		
