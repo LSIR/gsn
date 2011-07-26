@@ -24,6 +24,11 @@
 <script type="text/javascript">
 <!--//<![CDATA[
 
+// OpenSense plots
+var nabelDueConfig
+var nabelZueConfig
+var ozoneConfig
+                                                                                                     
 $(document).ready(function() {
     $.get('/menu.jsp', {selected: "science"}, function(data) {
       $('#navigation').html(data);
@@ -108,7 +113,6 @@ $(document).ready(function() {
 
     ]);
 
-
     $.ajax({
       type: "GET",
       url: "/gsn?structure",
@@ -144,7 +148,11 @@ function addDeployments() {
     $('#deployment_menu').append('<li><a href="javascript:showPlots(\''+this+'\')" id="deployment_menu_item_'+this+'">'+this+'</a></li>');
     $('#plotscontainer').append('<div id="plot_'+this+'"></div>');
     $('#plot_'+this).hide();
+    if (this == "Ostest" || this == "Opensense") {
+        initOpenSensePlots(this);
+    }
   });
+
   showPlots(visible);
 }
 
@@ -156,9 +164,173 @@ function showPlots(id) {
   $("#plot_"+id).show();
   $("#deployment_menu_item_"+id).addClass("selected");
   // add graphs
-  GsnPlots.addPlots($("#plot_"+id), id)
+  if (id == "Ostest" || id == "Opensense") {
+      var divid = 0;
+      $('#plot_'+id).append('<div><h2>'+nabelDueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
+      nabelDueConfig.graph.div = 'plot_' + divid++;
+      var g1 = new FrontendCreator(nabelDueConfig);
+
+      $('#plot_'+id).append('<div><h2>'+nabelZueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
+      nabelZueConfig.graph.div = 'plot_' + divid++;
+      var g2 = new FrontendCreator(nabelZueConfig);
+
+      $('#plot_'+id).append('<div><h2>'+ozoneConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
+      ozoneConfig.graph.div = 'plot_' + divid;
+      var g3 = new FrontendCreator(ozoneConfig);
+  }
+  else {
+      GsnPlots.addPlots($("#plot_"+id), id)
+  }
   $.cookie("deployment" , id);
-}	
+  
+}
+
+function initOpenSensePlots(id) {
+
+  nabelDueConfig = {                                                                                                     
+        "graph": {                                                                                                       
+	"div": "",                                                                                             
+	"type": "dygraph",                                                                                           
+	"width": 800,                                                                                                
+	"height": 350,
+	"showForm": true,                                                                                             
+	"title": "Air Pollution NABEL Duebendorf"
+    },
+    "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
+
+    "signals": {                                                                                                     
+	"y1": [                                                                                                      
+	{
+	    "displayName": "Ozone (PPB)",                                                   
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
+	    "field": "ozone_ppb",
+	    "deviceId": 100,                                                                                         
+	    "scaling": 1.0,
+	    "visible": true,                                                                                         
+	    "timeline":"generation_time"                                                                             
+	},
+	{                                                                                                            
+	    "displayName": "CO (PPM)",                                                      
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
+	    "field": "co_ppm",                                                                                       
+	    "deviceId": 100,
+	    "scaling": 1.0,                                                                                          
+	    "visible": false,                                                                                        
+	    "timeline":"generation_time"
+	},                                                                                                           
+	{
+	    "displayName": "NO2 (PPB)",                                                     
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
+	    "field": "no2_ppb",                                                                                      
+	    "deviceId": 100,                                                                                         
+	    "scaling": 1.0,                                                                                          
+	    "visible": false,                                                                                        
+	    "timeline":"generation_time"                                                                             
+	}                                                                                                            
+	]                                                                                                            
+    }                                                                                                                
+  };
+
+  nabelZueConfig = {                                                                                                     
+        "graph": {                                                                                                       
+	"div": "",                                                                                             
+	"type": "dygraph",                                                                                           
+	"width": 800,                                                                                                
+	"height": 350,
+	"showForm": true,                                                                                             
+	"title": "Air Pollution NABEL Zuerich"
+    },
+    "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
+
+    "signals": {                                                                                                     
+	"y1": [                                                                                                      
+	{
+	    "displayName": "Ozone (PPB)",                                                   
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
+	    "field": "ozone_ppb",
+	    "deviceId": 100,                                                                                         
+	    "scaling": 1.0,
+	    "visible": true,                                                                                         
+	    "timeline":"generation_time"                                                                             
+	},
+	{                                                                                                            
+	    "displayName": "CO (PPM)",                                                      
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
+	    "field": "co_ppm",                                                                                       
+	    "deviceId": 100,
+	    "scaling": 1.0,                                                                                          
+	    "visible": false,                                                                                        
+	    "timeline":"generation_time"
+	},                                                                                                           
+	{
+	    "displayName": "NO2 (PPB)",                                                     
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
+	    "field": "no2_ppb",                                                                                      
+	    "deviceId": 100,                                                                                         
+	    "scaling": 1.0,                                                                                          
+	    "visible": false,                                                                                        
+	    "timeline":"generation_time"                                                                             
+	}                                                                                                            
+	]                                                                                                            
+    }                                                                                                                
+  };
+
+  ozoneConfig = {                                                                                                     
+        "graph": {                                                                                                       
+	"div": "",                                                                                             
+	"type": "dygraph",                                                                                           
+	"width": 800,                                                                                                
+	"height": 350,
+	"showForm": true,                                                                                             
+	"title": "Ozone Concentration Duebendorf"
+    },
+    "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
+
+    "signals": {                                                                                                     
+	"y1": [                                                                                                      
+	{
+	    "displayName": "Ozone NABEL (PPB)",                                                   
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
+	    "field": "ozone_ppb",
+	    "deviceId": 100,                                                                                         
+	    "scaling": 1.0,
+	    "visible": true,                                                                                         
+	    "timeline":"generation_time"                                                                             
+	},
+	{                                                                                                            
+	    "displayName": "Ozone Factory Cal. (PPM)",                                                      
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_oz47_dynamic__mapped",                                                      
+	    "field": "ozone_sensor_1",                                                                                       
+	    "deviceId": 1,
+	    "scaling": 1.0,                                                                                          
+	    "visible": false,                                                                                        
+	    "timeline":"generation_time"
+	},
+        {                                                                                                            
+	    "displayName": "Ozone Instant Cal. (PPM)",                                                      
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_oz47_concentration",                                                      
+	    "field": "ozone_ppb",                                                                                       
+	    "deviceId": 1,
+	    "scaling": 1.0,                                                                                          
+	    "visible": false,                                                                                        
+	    "timeline":"generation_time"
+	}                                                                                                           
+	]                                                                                                            
+    }                                                                                                                
+  };
+
+
+}
+	
 //]]>-->
 </script>
 </head>
