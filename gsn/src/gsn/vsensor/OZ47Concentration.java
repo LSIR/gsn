@@ -63,9 +63,9 @@ public class OZ47Concentration extends BridgeVirtualSensorPermasense {
 			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
 			StringBuilder query = new StringBuilder();
 			if (getVirtualSensorConfiguration().getName().contains("ostest_"))
-				query.append("select calib_param_0, calib_param_1 from ostest_oz47_calibration_due where generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2 order by generation_time desc limit 1");
+				query.append("select calib_param_0, calib_param_1 from ostest_oz47_calibration_due where generation_time <= ").append(time).append(" and position = 1 order by generation_time desc limit 1");
 			else
-				query.append("select calib_param_0, calib_param_1 from opensense_oz47_calibration_due where generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2 order by generation_time desc limit 1");
+				query.append("select calib_param_0, calib_param_1 from opensense_oz47_calibration_due where generation_time <= ").append(time).append(" and position = 1 order by generation_time desc limit 1");
 			
 			rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
 			
