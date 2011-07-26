@@ -550,7 +550,7 @@
         <address wrapper="local">
           <predicate key="query">
             select DEVICE_ID, GENERATION_TIME
-            from matterhorn_statistics
+            from matterhorn_statistics WHERE connected = 1
           </predicate>
         </address>
         <query>select DEVICE_ID as HEADER_ORIGINATORID, GENERATION_TIME as TIMESTAMP, GENERATION_TIME from wrapper</query>
