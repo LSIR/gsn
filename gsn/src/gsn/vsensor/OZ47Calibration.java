@@ -24,7 +24,6 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 	private static double kT = 0.0199999995529652;
 	
 	private ArrayList<Double>[] bins = new ArrayList[NUM_BINS];
-	private Connection conn = null;
 	
 	private static DataField[] dataField = {
 			new DataField("POSITION", "INTEGER"),
@@ -59,6 +58,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 			bins[i] = new ArrayList<Double>();
 		
 		// Get latest bin values
+		Connection conn = null;
 		ResultSet rs = null;
 		try {
 			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
@@ -73,7 +73,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 				bins[2].add(rs.getDouble("bin_2_rel_val")); bins[2].add(rs.getDouble("bin_2_sensor_val"));
 				bins[3].add(rs.getDouble("bin_3_rel_val")); bins[3].add(rs.getDouble("bin_3_sensor_val"));
 				bins[4].add(rs.getDouble("bin_4_rel_val")); bins[4].add(rs.getDouble("bin_4_sensor_val"));
-				logger.warn("current calibration in DB: ("+bins[0].get(0)+","+bins[0].get(1)+")"+"("+bins[1].get(0)+","+bins[1].get(1)+")"+"("+bins[2].get(0)+","+bins[2].get(1)+")"+"("+bins[3].get(0)+","+bins[3].get(1)+")"+"("+bins[4].get(0)+","+bins[4].get(1)+")");
+				logger.info("current calibration in DB: ("+bins[0].get(0)+","+bins[0].get(1)+")"+"("+bins[1].get(0)+","+bins[1].get(1)+")"+"("+bins[2].get(0)+","+bins[2].get(1)+")"+"("+bins[3].get(0)+","+bins[3].get(1)+")"+"("+bins[4].get(0)+","+bins[4].get(1)+")");
 			} else {
 				// use default values
 				bins[0].add(15.6320); bins[0].add(275.6500);
@@ -84,6 +84,8 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 
 				logger.warn("no calibration data in the database, use default");
 			}
+			conn.close();
+			rs.close();
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -108,8 +110,10 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 		
 		// Get sensor readings from the Duebendorf node which were measured at the same time (last 10 minutes) as the NABEL measurement
 		// Get latest bin values
+		Connection conn = null;
 		ResultSet rs = null;
 		try {
+			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
 			StringBuilder query = new StringBuilder();
 			if (getVirtualSensorConfiguration().getName().contains("ostest_"))
 				query.append("select resistance_1, temperature from ostest_oz47_dynamic__mapped where generation_time > ").append(time-10*60*1000).append(" and generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2 and resistance_1 > 0");
@@ -124,6 +128,8 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 				ozone_sensor += rs.getInt("resistance_1") * Math.exp(kT * (rs.getDouble("temperature") - 25));
 				num++;
 			}
+			rs.close();
+			conn.close();
 			if (num == 0) {
 				logger.warn("no sensor readings for the reliable measurement at time " + time);
 				return;

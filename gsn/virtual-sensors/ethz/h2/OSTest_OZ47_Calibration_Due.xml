@@ -35,10 +35,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select GENERATION_TIME, OZONE_PPB from OSTest_Nabel_Duebendorf__mapped where GENERATION_TIME >= 1307450736517 and OZONE_PPB is not NULL</predicate>
+                    <predicate key="query">select * from OSTest_Nabel_Duebendorf__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper</query>
+                <query> select GENERATION_TIME, OZONE_PPB from wrapper where GENERATION_TIME >= 1307450736517 and OZONE_PPB is not NULL</query>
             </source>
             <query> select * from source </query>
         </stream>
