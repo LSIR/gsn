@@ -94,9 +94,9 @@ public class DataEnumerator implements DataEnumeratorIF {
 		Vector < String > fieldNames = new Vector < String >( );
 		Vector < Byte > fieldTypes = new Vector < Byte >( );
 		try {
-			this.resultSet = preparedStatement.executeQuery( );
 			this.preparedStatement = preparedStatement;
 			this.connection = preparedStatement.getConnection();
+			this.resultSet = preparedStatement.executeQuery( );
 			hasNext = resultSet.next( );
 			// Initializing the fieldNames and fieldTypes.
 			// Also setting the values for <code> hasTimedFieldInResultSet</code>
