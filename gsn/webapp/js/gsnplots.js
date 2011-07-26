@@ -39,7 +39,7 @@ var GsnPlots = {
     GsnPlots.readycallback = readycallback;
     $("virtual-sensor",gsnstructure).each(function(){
       var deploymentname = $(this).attr("name").split("_", 1)[0];
-      if(deploymentname.length > 1 && (GsnPlots.showstatistics || deploymentname!='statistics')) {
+      if(deploymentname.length > 1 && (GsnPlots.showstatistics && deploymentname=='statistics' || !GsnPlots.showstatistics && deploymentname!='statistics')) {
         deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
         if (GsnPlots.getDeployment(deploymentname)<0) {
           GsnPlots.deployments.push(new Object({"name":deploymentname, "graphconfig":[], "topology":false}));
