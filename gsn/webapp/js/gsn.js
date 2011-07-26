@@ -193,7 +193,7 @@ var GSN = {
         // Creation of the sidebar menu with categories
         var vsName = GSN.vsName;
         var previousCategoryName, mainCategoryName;
-	var subgrouped = false;
+        var subgrouped = false;
         for(var i=0;i<vsName.length;++i){
             if(vsName[i][1] != previousCategoryName && vsName[i][1] != "others"){
                 // Append Group to menu if different from category others
@@ -208,43 +208,43 @@ var GSN = {
                         'src':'../img/group.png'
                     }));
 
-		    previousCategoryName = vsName[i][1];
-		    // New category start with 0 sensors associated
-		    GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],0);
+                    previousCategoryName = vsName[i][1];
+                    // New category start with 0 sensors associated
+                    GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],0);
                 }
                 else{
-		    if(vsName[i][1].indexOf(mainCategoryName) == 0 && vsName[i][1] != previousCategoryName) {
-			$("#vsmenu").append($.DIV({
-			    "class":mainCategoryName + " subrubric",
+                	if(vsName[i][1].indexOf(mainCategoryName) == 0 && vsName[i][1] != previousCategoryName) {
+                		$("#vsmenu").append($.DIV({
+                			"class":mainCategoryName + " subrubric",
                             "id":"rubricmenu-"+vsName[i][1]
-			},$.A({
-			    "class":"subrubric",
-			    "href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+"> a\"));",
-			    "id":"menu-rubric-"+vsName[i][1]+""
-			},"  "+vsName[i][1].substr(mainCategoryName.length+1))));
-			$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
-			    'src':'../img/group.png'
-			}));
+                		},$.A({
+                			"class":"subrubric",
+                			"href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+"> a\"));",
+                			"id":"menu-rubric-"+vsName[i][1]+""
+                		},"  "+vsName[i][1].substr(mainCategoryName.length+1))));
+                		$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
+                			'src':'../img/group.png'
+                		}));
 
-			subgrouped = true;
-			previousCategoryName = vsName[i][1];
-		    }
-		    else {
-			$("#vsmenu").append($.DIV({},$.A({
-			    "class":"rubric",
+                		subgrouped = true;
+                		previousCategoryName = vsName[i][1];
+                	}
+                	else {
+                		$("#vsmenu").append($.DIV({},$.A({
+                			"class":"rubric",
                             "href":"javascript:GSN.util.toggle($(\"."+vsName[i][1]+" > a:not(.subrubric), ."+vsName[i][1]+".subrubric\"));",
-			    "id":"menu-rubric-"+vsName[i][1]+""
-			},"  "+vsName[i][1])));
-			$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
-			    'src':'../img/group.png'
-			}));
+                            "id":"menu-rubric-"+vsName[i][1]+""
+                		},"  "+vsName[i][1])));
+                		$("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
+                			'src':'../img/group.png'
+                		}));
 
-			previousCategoryName = vsName[i][1];
-			mainCategoryName = vsName[i][1];
-			subgrouped = false;
-			// New category start with 0 sensors associated
-			GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],0);
-		    }
+                		previousCategoryName = vsName[i][1];
+                		mainCategoryName = vsName[i][1];
+                		subgrouped = false;
+                		// New category start with 0 sensors associated
+                		GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],0);
+                	}
                 }
             }
             if(vsName[i][1] != "others"){
@@ -258,43 +258,43 @@ var GSN = {
                     },vsName[i][0])));
                 }
                 else{
-		    if(subgrouped){
-			$("#rubricmenu-"+previousCategoryName).append($.DIV(
-			{
-			    "class":vsName[i][1]
-			},$.A({
-			    "class":"sensorName",
-			    "href":"javascript:GSN.menu('"+vsName[i][0]+"');",
-			    "id":"menu-"+vsName[i][0]+""
-			},vsName[i][0].substr(vsName[i][1].length+1))));
-		    }
-		    else {
-			$("#vsmenu").append($.DIV({
-			    "class":vsName[i][1]
-			},$.A({
-			    "class":"sensorName",
-			    "href":"javascript:GSN.menu('"+vsName[i][0]+"');",
-			    "id":"menu-"+vsName[i][0]+""
-			},vsName[i][0].substr(vsName[i][1].length+1))));
-		    }
+                	if(subgrouped){
+                		$("#rubricmenu-"+previousCategoryName).append($.DIV(
+                				{
+                					"class":vsName[i][1]
+                				},$.A({
+                					"class":"sensorName",
+                					"href":"javascript:GSN.menu('"+vsName[i][0]+"');",
+                					"id":"menu-"+vsName[i][0]+""
+                				},vsName[i][0].substr(vsName[i][1].length+1))));
+                	}
+                	else {
+                		$("#vsmenu").append($.DIV({
+                			"class":vsName[i][1]
+                		},$.A({
+                			"class":"sensorName",
+                			"href":"javascript:GSN.menu('"+vsName[i][0]+"');",
+                			"id":"menu-"+vsName[i][0]+""
+                		},vsName[i][0].substr(vsName[i][1].length+1))));
+                	}
                 }
 
 		
-		if(vsName[i][1].indexOf(mainCategoryName) == 0)
-		    // increment the number of sensors associated to the rubric
-		    GSN.numSensorAssociatedWithCategory.setItem(mainCategoryName,GSN.numSensorAssociatedWithCategory.getItem(mainCategoryName)+1);
-		else
-		    // increment the number of sensors associated to the rubric
-		    GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);
+                if(vsName[i][1].indexOf(mainCategoryName) == 0)
+                	// increment the number of sensors associated to the rubric
+                	GSN.numSensorAssociatedWithCategory.setItem(mainCategoryName,GSN.numSensorAssociatedWithCategory.getItem(mainCategoryName)+1);
+                else
+                	// increment the number of sensors associated to the rubric
+                	GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);
             }
-        }// End for
-		
-		
-        // Append Group Others to menu
-        var othersRubricSensorPresent=false;
-        for(var i=0;i<vsName.length;++i){
-            if(vsName[i][1] == "others") othersRubricSensorPresent = true;
-        }
+    	}// End for
+	
+	
+    	// Append Group Others to menu
+    	var othersRubricSensorPresent=false;
+    	for(var i=0;i<vsName.length;++i){
+    		if(vsName[i][1] == "others") othersRubricSensorPresent = true;
+    	}
 		
         if(othersRubricSensorPresent){
             if(GSN.context == "data"){
@@ -2196,20 +2196,17 @@ var GSN = {
         regroupByUnderscore: function(vsName){
             var vsNameUnderscore;
 
-	    vsName.sort();
+    	    vsName.sort();
             vsNameUnderscore = new Array(vsName.length);
-            var re = new RegExp("([^_])_([^_]|__)*$");
-
+            var re = new RegExp("^([^_]+_[^_]+|[^_]+)_(.+__[^_]+|[^_]+){1}$");
             for(var i=0;i<vsName.length;++i) {
                 vsNameUnderscore[i] = new Array();
-		vsNameUnderscore[i][0] = vsName[i];
-                var group = vsName[i].replace(re, function(str, p1, offset, s) {
-                  return p1;
-                });
-                if (group.length==0)
-                  vsNameUnderscore[i][1] = "others";
+                vsNameUnderscore[i][0] = vsName[i];
+                var group = re.exec(vsName[i]);
+                if (group == null)
+                	vsNameUnderscore[i][1] = "others";
                 else
-                  vsNameUnderscore[i][1] = group;
+                	vsNameUnderscore[i][1] = group[1];
             }            
             vsNameUnderscore.sort(GSN.util.sort2Dimensional);
             return vsNameUnderscore;
