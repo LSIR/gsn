@@ -17,7 +17,6 @@ public class OZ47Concentration extends BridgeVirtualSensorPermasense {
 	private static final transient Logger logger = Logger.getLogger(OZ47Concentration.class);
 	
 	private static double kT = 0.0199999995529652;
-	private Connection conn = null;
 	private double[] defaultParam = new double[2];
 	
 	private static DataField[] dataField = {
@@ -40,13 +39,6 @@ public class OZ47Concentration extends BridgeVirtualSensorPermasense {
 		defaultParam[0] = -5.809267002965658;
 		defaultParam[1] = 0.07945008689940476;
 		
-		try {
-			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
-			
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
-		
 		return ret;
 	}
 	
@@ -65,8 +57,10 @@ public class OZ47Concentration extends BridgeVirtualSensorPermasense {
     }
 		
 		// Get calibration parameters
+		Connection conn = null;
 		ResultSet rs = null;
 		try {
+			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
 			StringBuilder query = new StringBuilder();
 			if (getVirtualSensorConfiguration().getName().contains("ostest_"))
 				query.append("select calib_param_0, calib_param_1 from ostest_oz47_calibration_due where generation_time <= ").append(time).append(" and position = 1 and sensor_id = 2 order by generation_time desc limit 1");
@@ -85,6 +79,8 @@ public class OZ47Concentration extends BridgeVirtualSensorPermasense {
 			  ozone_calib = defaultParam[0] + defaultParam[1] * resistance * Math.exp(kT * (temp - 25));
 			  curr_data = new StreamElement(dataField, new Serializable[] {data.getData("POSITION"), data.getData("DEVICE_ID"), data.getData("GENERATION_TIME"), ozone_calib, defaultParam[0], defaultParam[1], data.getData("DATA_IMPORT_SOURCE")});
 			}
+			rs.close();
+			conn.close();
 			
 			super.dataAvailable(inputStreamName, curr_data);
 			

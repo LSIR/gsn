@@ -86,6 +86,8 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 				last_nabel_timestamp = 0;
 				logger.warn("no last nabel_timestamp available in the database");
 			}
+			rs.close();
+			conn.close();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
