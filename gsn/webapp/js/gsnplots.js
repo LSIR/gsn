@@ -62,6 +62,7 @@ var GsnPlots = {
                 "height": 350,
                 "showForm": true
               },
+              "inittimerange": 2592000000,
               "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",
               "signals": {
                 "y1": []
