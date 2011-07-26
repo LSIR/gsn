@@ -876,12 +876,12 @@ div.full-page {
 }
 
 .ui-accordion {
-    height: 600px;
+    height: 735px;
     border: 1px solid #54a742;
 }
 
 .ui-accordion-content {
-    height: 500px;
+    height: 600px;
     overflow: auto;
 }
 
@@ -910,41 +910,6 @@ div.full-page {
 
 .ui-tabs-panel,.ui-accordion-content {
     padding: 2px 2px;
-}
-
-.ui-tabs-hide {
-    display: none;
-}
-
-.ui-tabs-nav {
-    display: block;
-    width: auto;
-    height: 20px;
-    border-bottom: 1px solid #54a742;
-    padding: 0;
-}
-
-.ui-tabs-nav-item {
-    list-style: none;
-    float: left;
-}
-
-.ui-tabs-nav-item a {
-    border: 1px solid #54a742;
-    border-bottom: none;
-    text-align: center;
-    display: block;
-    width: 100px;
-    height: 16px;
-    padding: 2px;
-    margin-right: 4px;
-    font-weight: bold;
-    background-color: #90df89;
-    color:#222222;
-}
-
-.ui-tabs-selected a {
-    background-color: #77d07a;
 }
 
 .clear-both {

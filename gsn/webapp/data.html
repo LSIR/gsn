@@ -5,17 +5,20 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
         <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
-        <link rel="stylesheet" href="style/ui.datepicker.css" type="text/css" media="screen,projection" />
         <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
 
         <script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-core-1.5.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-accordion-1.5.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-tabs-1.5.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-datepicker-1.5.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.flot.pack.js"></script>
         <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
         <script type="text/javascript" src="js/uptime.js"></script>
+
+        <!-- Visualization -->
+        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/sensorviz.css" />
+        <link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
+        <!--[if IE]><script src="http://whymper.ethz.ch:24001/excanvas.js"></script><![endif]-->
+        <script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/sensorviz.js'></script>
+
         <script type="text/javascript">
 	    <!--//<![CDATA[
             /* XML object loaded from the REQUEST_LIST_OF_VIRTUAL_SENSORS GSN request */
@@ -23,6 +26,8 @@
             /* Mapping from virtual sensor name to list of fields name */
             var virtual_sensor_to_fields = new Object()
             var field_to_virtual_sensor = new Object()
+
+            var plotdata = new Object();
             $(function(){
                 function csv_to_json(tag,callback,format){
                     callback = callback || function(){};
@@ -37,8 +42,8 @@
                         var timestamp_idx = -1;
                         var vs_name='';
                         var keys =[];
-                        var nb_elements = 0;
-                        var datasets = [];
+                        var vs = [];
+                        var datasets = new Object();
                         for (var line_no=0;line_no<lines.length;line_no++){
                             var line = $.trim(lines[line_no]);
                             if (line.length == 0)
@@ -47,6 +52,7 @@
                             if(line[0]=='#'){
                                 if (line.indexOf("##vsname:") >= 0){ //comment lines
                                     vs_name = line.substring(9,line.length);
+                                    vs.push(vs_name);
                                     keys=[];
                                     headers=[];
                                 }
@@ -83,91 +89,161 @@
                                         } else {
                                             datasets[key].data.push([timestamp,d]);
                                         }
-                                        nb_elements++;
                                     }
                                 }
                             }
                         }
                         $('#time_format').val(old_value);
-                        callback(datasets,nb_elements);
+                        callback(datasets, vs, keys);
+                    });
+                }
+
+                function csv_to_dygraph(tag,callback,format){
+                    callback = callback || function(){};
+                    var old_value = $('#time_format').val();
+                    $('#download_format').val('csv');
+                    format = format || 'unix';
+                    $('#time_format').val(format);
+                    prepare_form_for_submission(tag);
+                    $.post('/multidata', tag.parents('form').serializeArray(), function(response, text_status, request){
+                        var lines = response.split("\n");
+                        var headers = [];
+                        var timestamp_idx = -1;
+                        var vs_name='';
+                        var keys =[];
+                        var vs = [];
+                        var datasets = [];
+                        var allkeys = [];
+                        var previous_cols = 0;
+                        var mintime = -1;
+                        var maxtime = -1;
+                        var maxdata = 50000;
+                        for (var line_no=0;line_no<lines.length;line_no++){
+                            var line = $.trim(lines[line_no]);
+                            if (line.length == 0)
+                                continue;
+
+                            if(line[0]=='#'){
+                                if (line.indexOf("##vsname:") >= 0){ //comment lines
+                                    vs_name = line.substring(9,line.length);
+                                    vs.push(vs_name);
+                                    previous_cols = keys.length;
+                                    keys=[];
+                                    headers=[];
+                                }
+                                if (line[0]== '#' && line[1]!= '#') { //Header
+                                    headers = line.split(',');
+                                    for (var i=0;i<headers.length;i++){
+                                        headers[i] = headers[i].replace("#","");
+                                        if (headers[i]==$('#timeline').val()) {
+                                            timestamp_idx=i;
+                                        } else {
+                                            lbl = vs_name+' ('+headers[i]+')';
+                                            keys.push(lbl);
+                                            allkeys.push(lbl);
+                                        }
+                                    }
+                                    // add null values to existing datasets
+                                    for(var i=0;i<datasets.length;i++) {
+                                      for(var j=0;j<keys.length;j++)
+                                        datasets[i].push(undefined);
+                                    }
+                                }
+                            }else { // data line, at this stage we should have a header varialbe already set
+                                maxdata-=headers.length;
+                                if (maxdata < 0) {
+                                  break;
+                                }               
+                                var data = line.split(',');
+                                var timestamp = parseInt(data[timestamp_idx]);
+                                
+                                if (mintime>-1) {
+                                  mintime = Math.min(mintime, timestamp);
+                                  maxtime = Math.max(maxtime, timestamp);
+                                }
+                                else {
+                                  mintime = timestamp;
+                                  maxtime = timestamp;
+                                }
+                                var row=[timestamp];
+                                for(var j=0;j<previous_cols;j++)
+                                  row.push(undefined);
+                                for (i=0;i<headers.length;i++){
+                                    if(i != timestamp_idx ){
+                                        var key;
+                                        if (i>timestamp_idx)
+                                          key = keys[i-1];
+                                        else
+                                          key = keys[i];
+                                        var d;
+                                        if (data[i]=='null')
+                                          d=data[i];
+                                        else
+                                          d=parseFloat(data[i]);
+                                        row.push(d);
+                                    }
+                                }
+                                datasets.push(row);
+                            }
+                        }
+                        $(".gsn_chart").empty();
+                        if (maxdata < 0) {
+                          $(".gsn_chart").append("<div id='plotwarning' style='border:2px solid yellow;background-color:#FFFFCC'>Warning: Datapoint number exceeded maximum. Excess data is truncated. Use aggregate functions to watch a longer timeline.<br>"+
+                                                 "<form>"+
+                                                 "<select id='_agg_function' name='_agg_function'><option value='-1'>No Aggregation</option><option value='avg' selected='selected'>AVG</option><option value='max'>MAX</option><option value='min'>MIN</option></select><input id='_agg_period' name='_agg_period' size='5' type='text' value='2' /><select id='_agg_unit' name='_agg_unit'><option value='3600000'>Hours</option><option value='60000'>Minutes</option><option value='1000'>Seconds</option><option value='1'>Milli Seconds</option></select>"+
+                                                 "<input type='button' value='use aggregation'>"+
+                                                 "</form></div>");
+                        }
+                        $("input[type=button]", "#plotwarning").bind('click', function(){ 
+                          // copy values to original form
+                          $('#agg_function').val($('#_agg_function').val()); $('#agg_function').removeAttr('disabled');
+                          $('#agg_period').val($('#_agg_period').val()); $('#agg_period').removeAttr('disabled');
+                          $('#agg_unit').val($('#_agg_unit').val()); $('#agg_unit').removeAttr('disabled');
+                          // remove this message
+                          $(this).unbind('click');
+                          $("#plotwarning").remove();
+                          // reload plot
+                          startplot();                         
+                        });
+                        $('#time_format').val(old_value);
+                        plotdata.labels = allkeys;
+                        plotdata.labels.unshift("timeline");
+                        plotdata.datasets = datasets;
+                        plotdata.mintime = mintime;
+                        plotdata.maxtime = maxtime;
+                        callback(allkeys);
                     });
                 }
 
                 /******************************************************/
-                /*                  CHARTING PART                      */
-                /******************************************************/
-                function drawChart(datasets, nbElements){
-                    var full_dataset = datasets;
-                    var selected_datasets = [];
-                    var plot;
-                    var i = 0;
-                    var options = {
-                        legend: { show: false },
-                        lines: { show: true },
-                        points: { show: false },
-                        selection: { mode: "xy" },
-                        xaxis: {mode: "time",timeformat: "%H:%M:%S<br>%y/%m/%d"}
+                /*                  CHARTING PART DYGRAPH             */
+                /******************************************************/                
+                function drawChartDy(labels){
+                  // element to paint in
+                  $(".gsn_chart").append("<div id='dygraph' style=''></div>");
+                    var graphconfig = {
+                      "graph": {
+                      "div" : "dygraph",
+                      "type": "dygraph",
+                      "width": 900,
+                      "height": 350,
+                      "showForm": true
+                      },
+                      "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",
+                      "signals": {
+                        "y1": []
+                      },
+                      loaddata : function(fullReload, signals, start, end, callback) { updatePlot(fullReload, signals, start, end, callback); }
                     };
-
-                    for (var d in datasets){
-                        selected_datasets.push(full_dataset[d]);
-                        full_dataset[d].color=i++;    // hard-code color indices to prevent them from shifting colors dynamically
-                    }
-
-                    function plotAccordingToChoices() {
-                        if (selected_datasets.length > 0){
-                            plot.setData(selected_datasets);
-                            plot.setupGrid();
-                            plot.draw();
-                        }
-                    }
-                    plot = $.plot($(".gsn_chart"), [], options);
-
-                    var overview = $.plot($(".overview"), selected_datasets, {
-                        lines: { show: true, lineWidth: 1 },
-                        legend: { show: true, container: $(".overviewLegend") },
-                        grid: { color: "#999" },
-                        shadowSize: 0,
-                        xaxis: {ticks: [], mode: "time" },
-                        yaxis: {ticks: [] },
-                        selection: { mode: "xy" }
-                    });
-
-                    // now connect the two
-
-                    $(".gsn_chart").bind("plotselected", function (event, ranges) {
-                        // do the zooming
-
-                        $(".gsn_chart").empty();
-                        plot = $.plot($(".gsn_chart"), selected_datasets,
-
-                        $.extend(true, {}, options, {
-                            xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
-                            yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
-                        }));
-                        // don't fire event on the overview to prevent eternal loop
-                        overview.setSelection(ranges, true);
-                    });
-
-                    $(".overview").bind("plotselected", function (event, ranges) {
-                        plot.setSelection(ranges);
-                    });
-                    $(".legendColorBox").click(function(){
-                        if ($('.miniature').find('.legendColorBox').not('.no-img').length <2 && !$(this).hasClass('no-img'))
-                            return;
-                        $(this).toggleClass('no-img');
-                        selected_datasets = [];
-                        $('.miniature').find('.legendColorBox').not('.no-img').each(function(){
-                            legend = $(this).next('.legendLabel').text();
-                            for(var idx in full_dataset){
-                                if (full_dataset[idx].label == legend){
-                                    selected_datasets.push(full_dataset[idx]);
-                                }
-                            }
-                        });
-                        plotAccordingToChoices();
-                    });
-                    plotAccordingToChoices();
+                    $(labels).each(function(index) {if (index>0) graphconfig.signals.y1.push({
+                      "displayName":this,
+                      "gsnUrl": "",
+                      "virtualSensor": "",
+                      "field": this,
+                      "scaling": 1.0,
+                      "visible": this.match(/\(aggregation_interval\)/)?false:true
+                    });});
+                    new FrontendCreator(graphconfig);
                 }
 
                 function getSortedKeys(obj){
@@ -319,25 +395,6 @@
                     });
                 }
 
-
-                function submit_form(tag,options,callback){
-                    /* THIS IS A HELPER METHOD BUT NOT REALLY USED ANYWHRER ... */
-                    options = options || [];
-                    callback = callback || function(){};
-                    prepare_form_for_submission(tag);
-
-                    var to_send = tag.parents('form').serializeArray();
-                    //  alert(to_send);
-                    for (var format_key in options){
-                        for(var idx in to_send){
-                            //alert(to_send[idx] );
-                            if (to_send[idx].name==format_key){
-                                to_send[idx].value=options[format_key];
-                            }
-                        }
-                    }
-                }
-
                 function customRange(input) {
                     return {minDate: (input.id == "datepicker_to" ? $("#datepicker_from").datepicker("getDate") : null),
                         maxDate: (input.id == "datepicker_from" ? $("#datepicker_to").datepicker("getDate") : null)};
@@ -392,7 +449,7 @@
                     $('#agg_unit').attr('disabled',$(this).val() == '-1');
                 });
 
-                $("#datepicker_from, #datepicker_to").datepicker({beforeShow: customRange, prevText: "", nextText: "", firstDay: 1, showOn: "both", buttonImage: "/style/calendar.png", buttonImageOnly: true, dateFormat: "dd/mm/yy 00:00:00" });
+                $("#datepicker_from, #datepicker_to").datepicker({beforeShow: customRange, prevText: "", nextText: "", firstDay: 1, showOn: "both",  buttonImage: "/style/calendar.png", buttonImageOnly: true, dateFormat: "dd/mm/yy 00:00:00" });
 
                 $('.download_btn_csv').click(function(){
                     $('#download_format').val('csv');
@@ -421,15 +478,56 @@
                     return true;
                 });
 
+                function updatePlot(fullReload, signals, start, end, callback/*(fullReload, data)*/) {
+                  // data format: csv
+                  // labels
+                  // # min(unixtime), max(unixtime)
+                  // # ERROR: <error message>
+                  var ux_start = start?start.getTime():plotdata.mintime;
+                  var ux_end = end?end.getTime():plotdata.maxtime;
+                  var visibles = [0];
+                  $(signals.y1).each(function(index){      
+                    if (this.visible==true)
+                      visibles.push(index+1);
+                  });
+                  var csv = "";
+                  $(visibles).each(function(index){csv+=(index==0?"":",")+plotdata.labels[this];})
+                  csv += "\n# "+plotdata.mintime + ","+plotdata.maxtime+"\n";
+                  if (visibles.length==1) {
+                    csv+="# ERROR: No data selected.\n";
+                  }
+                  else {
+                    $(plotdata.datasets).each(function() {
+                      var row=this;
+                      if (row[0]>=ux_start && row[0]<=ux_end) {
+                        var timestamp = new Date(row[0]);
+                        $(visibles).each(function(index){
+                          if (index==0)
+                            csv+=timestamp.getFullYear()+"/"+(timestamp.getMonth()+1)+"/"+timestamp.getDate()+" "+timestamp.getHours()+":"+timestamp.getMinutes()+":" +timestamp.getSeconds();
+                          else
+                            csv+=','+row[index];
+                        });
+                        csv+="\n";
+                      }
+                    });
+                  }
+                  callback(fullReload, csv);
+                }
 
+                function startplot() {
+                    plotdata = new Object();
+                    $(".gsn_chart").empty().append("<div style='border:2px solid yellow;background-color:#FFFFCC'>Loading data.. <img src='style/ajax-loader.gif' width='16' height='16' alt='loading'></div>");
+                    csv_to_dygraph($(".plot"),drawChartDy);
+                }
 
                 $(".plot").click(function(){
-                    datasets={};
-                    csv_to_json($(this),drawChart);
+                  startplot();
                 });
 
                 $(".grid").click(function(){
                     function drawGrid(datasets){
+                        $("#gridContainer").empty();
+                        $("#sensorSelect").show();
                         $("#sensorSelect").empty();
                         $("#sensorSelect").unbind('change');
                         $("#sensorSelect").append('<option value="">Select a Virtual Sensor</option>');
@@ -480,6 +578,8 @@
                             });
                         });
                     }
+                    $("#sensorSelect").hide();
+                    $("#gridContainer").empty().append("<div style='border:2px solid yellow;background-color:#FFFFCC'>Loading data.. <img src='style/ajax-loader.gif' width='16' height='16' alt='loading'></div>");
                     csv_to_json($(this), drawGrid, 'iso');
                 });
 
@@ -488,7 +588,7 @@
                     clearStyle: true
                 });
 
-                $('.tabs ul').tabs();
+                $('.tabs').tabs();
 
                 $('.ui-default-state').hover(
                 function(){$(this).addClass('ui-hover-state');},
@@ -556,12 +656,12 @@
                                 </div>
                                 <div class="ui-accordion-group">
                                     <h3 class="ui-accordion-header"><a href="#">Results</a></h3>
-                                    <div class="ui-accordion-content">
+                                    <div class="ui-accordion-content" style="padding:0">
                                         <div class="tabs">
                                             <ul>
-                                                <li class="ui-tabs-nav-item"><a href="#fragment-1-1">Download</a></li>
-                                                <li class="ui-tabs-nav-item"><a class="plot" href="#fragment-1-2">Plot</a></li>
-                                                <li class="ui-tabs-nav-item"><a class="grid" href="#fragment-1-3"><span>Table</span></a></li>
+                                                <li><a href="#fragment-1-1">Download</a></li>
+                                                <li><a class="plot" href="#fragment-1-2">Plot</a></li>
+                                                <li><a class="grid" href="#fragment-1-3"><span>Table</span></a></li>
                                             </ul>
                                             <div id="fragment-1-1">
                                                 <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
@@ -575,12 +675,7 @@
                                             <div id="fragment-1-2">
                                                 <div class="chart_box">
                                                     <div id="vs_selector" class="dlg_selector" title="Output Selector">
-                                                        <div class="miniature">
-                                                            <div class="overview" ></div>
-                                                            <p class="overviewLegend" ></p>
-                                                        </div>
                                                         <div class="gsn_chart" > </div>
-                                                        <div class="clear-both"></div>
                                                     </div>
                                                 </div>
                                             </div>
