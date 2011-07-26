@@ -2205,11 +2205,11 @@ var GSN = {
                 vsNameUnderscore[i][0] = vsName[i];
                 vsNameUnderscore[i][1] = "others";
                 var group = re1.exec(vsName[i]);
-                if (group == null) {
+                if (group == null)
                 	group = re2.exec(vsName[i]);
                 if(group != null)
                 	vsNameUnderscore[i][1] = group[1];
-            }            
+            }
             vsNameUnderscore.sort(GSN.util.sort2Dimensional);
             return vsNameUnderscore;
         }
