@@ -2198,14 +2198,16 @@ var GSN = {
 
     	    vsName.sort();
             vsNameUnderscore = new Array(vsName.length);
-            var re = new RegExp("^([^_]+_[^_]+|[^_]+)_(.+__[^_]+|[^_]+){1}$");
+            var re1 = new RegExp("^([^_]+)_[^_]+(__[^_]+)*$");
+            var re2 = new RegExp("^([^_]+_[^_]+)_.+$");
             for(var i=0;i<vsName.length;++i) {
                 vsNameUnderscore[i] = new Array();
                 vsNameUnderscore[i][0] = vsName[i];
-                var group = re.exec(vsName[i]);
-                if (group == null)
-                	vsNameUnderscore[i][1] = "others";
-                else
+                vsNameUnderscore[i][1] = "others";
+                var group = re1.exec(vsName[i]);
+                if (group == null) {
+                	group = re2.exec(vsName[i]);
+                if(group != null)
                 	vsNameUnderscore[i][1] = group[1];
             }            
             vsNameUnderscore.sort(GSN.util.sort2Dimensional);
