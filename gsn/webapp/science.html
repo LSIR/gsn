@@ -27,7 +27,8 @@
 // OpenSense plots
 var nabelDueConfig
 var nabelZueConfig
-var ozoneConfig
+var ozoneDueConfig
+var ozoneZueConfig
                                                                                                      
 $(document).ready(function() {
     $.get('/menu.jsp', {selected: "science"}, function(data) {
@@ -166,6 +167,15 @@ function showPlots(id) {
   // add graphs
   if (id == "Ostest" || id == "Opensense") {
       var divid = 0;
+
+      $('#plot_'+id).append('<div><h2>'+ozoneDueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
+      ozoneDueConfig.graph.div = 'plot_' + divid++;
+      var g3 = new FrontendCreator(ozoneDueConfig);
+
+      $('#plot_'+id).append('<div><h2>'+ozoneZueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
+      ozoneZueConfig.graph.div = 'plot_' + divid++;
+      var g4 = new FrontendCreator(ozoneZueConfig);
+      
       $('#plot_'+id).append('<div><h2>'+nabelDueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
       nabelDueConfig.graph.div = 'plot_' + divid++;
       var g1 = new FrontendCreator(nabelDueConfig);
@@ -174,9 +184,7 @@ function showPlots(id) {
       nabelZueConfig.graph.div = 'plot_' + divid++;
       var g2 = new FrontendCreator(nabelZueConfig);
 
-      $('#plot_'+id).append('<div><h2>'+ozoneConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
-      ozoneConfig.graph.div = 'plot_' + divid;
-      var g3 = new FrontendCreator(ozoneConfig);
+
   }
   else {
       GsnPlots.addPlots($("#plot_"+id), id)
@@ -201,7 +209,7 @@ function initOpenSensePlots(id) {
     "signals": {                                                                                                     
 	"y1": [                                                                                                      
 	{
-	    "displayName": "Ozone (PPB)",                                                   
+	    "displayName": "O3 (PPB)",                                                   
 	    "gsnUrl": "tik51x:22001",                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
 	    "field": "ozone_ppb",
@@ -248,7 +256,7 @@ function initOpenSensePlots(id) {
     "signals": {                                                                                                     
 	"y1": [                                                                                                      
 	{
-	    "displayName": "Ozone (PPB)",                                                   
+	    "displayName": "O3 (PPB)",                                                   
 	    "gsnUrl": "tik51x:22001",                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
 	    "field": "ozone_ppb",
@@ -281,23 +289,23 @@ function initOpenSensePlots(id) {
     }                                                                                                                
   };
 
-  ozoneConfig = {                                                                                                     
+  ozoneDueConfig = {                                                                                                     
         "graph": {                                                                                                       
 	"div": "",                                                                                             
 	"type": "dygraph",                                                                                           
 	"width": 800,                                                                                                
 	"height": 350,
 	"showForm": true,                                                                                             
-	"title": "Ozone Concentration Duebendorf"
+	"title": "Ozone Concentration Duebendorf: NABEL vs. Gas Sensor"
     },
     "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
 
     "signals": {                                                                                                     
 	"y1": [                                                                                                      
 	{
-	    "displayName": "Ozone NABEL (PPB)",                                                   
+	    "displayName": "NABEL (PPB)",                                                   
 	    "gsnUrl": "tik51x:22001",                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
+	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
 	    "field": "ozone_ppb",
 	    "deviceId": 100,                                                                                         
 	    "scaling": 1.0,
@@ -305,7 +313,7 @@ function initOpenSensePlots(id) {
 	    "timeline":"generation_time"                                                                             
 	},
 	{                                                                                                            
-	    "displayName": "Ozone Factory Cal. (PPM)",                                                      
+	    "displayName": "Sensor Factory Cal. (PPB)",                                                      
 	    "gsnUrl": "tik51x:22001",                                                                                
 	    "virtualSensor": id.toLowerCase()+"_oz47_dynamic__mapped",                                                      
 	    "field": "ozone_sensor_1",                                                                                       
@@ -315,7 +323,7 @@ function initOpenSensePlots(id) {
 	    "timeline":"generation_time"
 	},
         {                                                                                                            
-	    "displayName": "Ozone Instant Cal. (PPM)",                                                      
+	    "displayName": "Sensor Instant Cal. (PPB)",                                                      
 	    "gsnUrl": "tik51x:22001",                                                                                
 	    "virtualSensor": id.toLowerCase()+"_oz47_concentration",                                                      
 	    "field": "ozone_ppb",                                                                                       
@@ -328,7 +336,42 @@ function initOpenSensePlots(id) {
     }                                                                                                                
   };
 
+  ozoneZueConfig = {                                                                                                     
+        "graph": {                                                                                                       
+	"div": "",                                                                                             
+	"type": "dygraph",                                                                                           
+	"width": 800,                                                                                                
+	"height": 350,
+	"showForm": true,                                                                                             
+	"title": "Ozone Concentration Zuerich: NABEL vs. Gas Sensor"
+    },
+    "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
 
+    "signals": {                                                                                                     
+	"y1": [                                                                                                      
+	{
+	    "displayName": "NABEL (PPB)",                                                   
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
+	    "field": "ozone_ppb",
+	    "deviceId": 100,                                                                                         
+	    "scaling": 1.0,
+	    "visible": true,                                                                                         
+	    "timeline":"generation_time"                                                                             
+	},
+	{                                                                                                            
+	    "displayName": "Sensor Factory Cal. (PPB)",                                                      
+	    "gsnUrl": "tik51x:22001",                                                                                
+	    "virtualSensor": id.toLowerCase()+"_oz47_dynamic__mapped",                                                      
+	    "field": "ozone_sensor_1",                                                                                       
+	    "deviceId": 3,
+	    "scaling": 1.0,                                                                                          
+	    "visible": false,                                                                                        
+	    "timeline":"generation_time"
+	}
+	]                                                                                                            
+    }                                                                                                                
+  };
 }
 	
 //]]>-->
