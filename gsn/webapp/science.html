@@ -195,6 +195,11 @@ function showPlots(id) {
 
 function initOpenSensePlots(id) {
 
+  var gsnUrl;
+  var a = document.createElement('a');
+  a.href="/";
+  gsnUrl = a.host;
+
   nabelDueConfig = {                                                                                                     
         "graph": {                                                                                                       
 	"div": "",                                                                                             
@@ -210,7 +215,7 @@ function initOpenSensePlots(id) {
 	"y1": [                                                                                                      
 	{
 	    "displayName": "O3 (PPB)",                                                   
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
 	    "field": "ozone_ppb",
 	    "deviceId": 100,                                                                                         
@@ -220,7 +225,7 @@ function initOpenSensePlots(id) {
 	},
 	{                                                                                                            
 	    "displayName": "CO (PPM)",                                                      
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
 	    "field": "co_ppm",                                                                                       
 	    "deviceId": 100,
@@ -230,7 +235,7 @@ function initOpenSensePlots(id) {
 	},                                                                                                           
 	{
 	    "displayName": "NO2 (PPB)",                                                     
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
 	    "field": "no2_ppb",                                                                                      
 	    "deviceId": 100,                                                                                         
@@ -257,7 +262,7 @@ function initOpenSensePlots(id) {
 	"y1": [                                                                                                      
 	{
 	    "displayName": "O3 (PPB)",                                                   
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
 	    "field": "ozone_ppb",
 	    "deviceId": 100,                                                                                         
@@ -267,7 +272,7 @@ function initOpenSensePlots(id) {
 	},
 	{                                                                                                            
 	    "displayName": "CO (PPM)",                                                      
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
 	    "field": "co_ppm",                                                                                       
 	    "deviceId": 100,
@@ -277,7 +282,7 @@ function initOpenSensePlots(id) {
 	},                                                                                                           
 	{
 	    "displayName": "NO2 (PPB)",                                                     
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
 	    "field": "no2_ppb",                                                                                      
 	    "deviceId": 100,                                                                                         
@@ -304,7 +309,7 @@ function initOpenSensePlots(id) {
 	"y1": [                                                                                                      
 	{
 	    "displayName": "NABEL (PPB)",                                                   
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
 	    "field": "ozone_ppb",
 	    "deviceId": 100,                                                                                         
@@ -314,7 +319,7 @@ function initOpenSensePlots(id) {
 	},
 	{                                                                                                            
 	    "displayName": "Sensor Factory Cal. (PPB)",                                                      
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_oz47_dynamic__mapped",                                                      
 	    "field": "ozone_sensor_1",                                                                                       
 	    "deviceId": 1,
@@ -324,7 +329,7 @@ function initOpenSensePlots(id) {
 	},
         {                                                                                                            
 	    "displayName": "Sensor Instant Cal. (PPB)",                                                      
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_oz47_concentration",                                                      
 	    "field": "ozone_ppb",                                                                                       
 	    "deviceId": 1,
@@ -351,7 +356,7 @@ function initOpenSensePlots(id) {
 	"y1": [                                                                                                      
 	{
 	    "displayName": "NABEL (PPB)",                                                   
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
 	    "field": "ozone_ppb",
 	    "deviceId": 100,                                                                                         
@@ -361,7 +366,7 @@ function initOpenSensePlots(id) {
 	},
 	{                                                                                                            
 	    "displayName": "Sensor Factory Cal. (PPB)",                                                      
-	    "gsnUrl": "tik51x:22001",                                                                                
+	    "gsnUrl": gsnUrl,                                                                                
 	    "virtualSensor": id.toLowerCase()+"_oz47_dynamic__mapped",                                                      
 	    "field": "ozone_sensor_1",                                                                                       
 	    "deviceId": 3,
