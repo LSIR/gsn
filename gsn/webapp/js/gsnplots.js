@@ -152,8 +152,8 @@ var GsnPlots = {
               var p = this;
               $(graphconfig.meta.field).each(function(index, value) {
                 var signal = {
-                  //"displayName":"Position "+p +" "+this,
-                  "displayName": this,
+                  "displayName":"Position "+p +" "+this,
+                  //"displayName": this,
                   "gsnUrl": GsnPlots.gsnserver,
                   "virtualSensor": d.name.toLowerCase()+"_"+graphconfig.meta.vsensor,
                   "position": p,
