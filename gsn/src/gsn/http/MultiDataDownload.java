@@ -141,7 +141,12 @@ public class MultiDataDownload extends HttpServlet {
 			logger.error(e.getMessage());
 			res.sendError(WebConstants.ERROR_INVALID_VSNAME, e.getMessage());
 			return;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			res.sendError(WebConstants.UNSUPPORTED_REQUEST_ERROR, e.getMessage());
+			return;
 		}
+		
 	}
 
     public ArrayList<String> checkAccessControl (User user, QueriesBuilder qbuilder) {
