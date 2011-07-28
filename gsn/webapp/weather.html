@@ -71,23 +71,13 @@ $(document).ready(function() {
 
         // plot configuration
         GsnPlots.setConfig([
-          // corestation
-          {"vsensor":"vaisalawxt520__mapped", "field":["relative_humidity"], "title":"Humidity", "select":"sensornode[position][iscorestation=true]"},
-          {"vsensor":"vaisalawxt520__mapped", "field":["air_temperature","internal_temperature"], "title":"Temperature", "select":"sensornode[position][iscorestation=true]"},
-          {"vsensor":"vaisalawxt520__mapped", "field":["air_pressure"], "title":"Air Pressure", "select":"sensornode[position][iscorestation=true]"},
-          {"vsensor":"vaisalawxt520__mapped", "field":["rain_accumulation"], "title":"Rain", "select":"sensornode[position][iscorestation=true]"},
-          {"vsensor":"vaisalawxt520__mapped", "field":["hail_accumulation"], "title":"Hail", "select":"sensornode[position][iscorestation=true]"},
-          {"vsensor":"vaisalawxt520__mapped", "field":["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], "title":"Wind Direction", "select":"sensornode[position][iscorestation=true]"},
-          {"vsensor":"vaisalawxt520__mapped", "field":["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], "title":"Wind Speed", "select":"sensornode[position][iscorestation=true]"},
-          // sensornode
-
-          {"vsensor":"dozer_wxt520windpth__conv", "field":["relative_humidity"], "title":"Humidity", "select":"sensornode[position=25],sensornode[position=13]"},
-          {"vsensor":"dozer_wxt520windpth__conv", "field":["air_temperature","internal_temperature"], "title":"Temperature", "select":"sensornode[position=25],sensornode[position=13]"},
-          {"vsensor":"dozer_wxt520windpth__conv", "field":["air_pressure"], "title":"Air Pressure", "select":"sensornode[position=25],sensornode[position=13]"},
-          {"vsensor":"dozer_wxt520prec__conv", "field":["rain_accumulation"], "title":"Rain", "select":"sensornode[position=25],sensornode[position=13]"},
-          {"vsensor":"dozer_wxt520prec__conv", "field":["hail_accumulation"], "title":"Hail", "select":"sensornode[position=25],sensornode[position=13]"},
-          {"vsensor":"dozer_wxt520windpth__conv", "field":["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], "title":"Wind Direction", "select":"sensornode[position=25],sensornode[position=13]"},
-          {"vsensor":"dozer_wxt520windpth__conv", "field":["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], "title":"Wind Speed", "select":"sensornode[position=25],sensornode[position=13]"},
+          {"vsensor":"dozer_wxt520windpth", "field":["relative_humidity"], "title":"Humidity", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"dozer_wxt520windpth", "field":["air_temperature","internal_temperature"], "title":"Temperature", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"dozer_wxt520windpth", "field":["air_pressure"], "title":"Air Pressure", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"dozer_wxt520prec", "field":["rain_accumulation"], "title":"Rain", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"dozer_wxt520prec", "field":["hail_accumulation"], "title":"Hail", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"dozer_wxt520windpth", "field":["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], "title":"Wind Direction", "select":"sensornode[position=25],sensornode[position=13],sensornode[position][iscorestation=true]"},
+          {"vsensor":"dozer_wxt520windpth", "field":["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], "title":"Wind Speed", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
 
         ]);
 
