@@ -71,13 +71,13 @@ $(document).ready(function() {
 
         // plot configuration
         GsnPlots.setConfig([
-          {"vsensor":"dozer_wxt520windpth", "field":["relative_humidity"], "title":"Humidity", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
-          {"vsensor":"dozer_wxt520windpth", "field":["air_temperature","internal_temperature"], "title":"Temperature", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
-          {"vsensor":"dozer_wxt520windpth", "field":["air_pressure"], "title":"Air Pressure", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
-          {"vsensor":"dozer_wxt520prec", "field":["rain_accumulation"], "title":"Rain", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
-          {"vsensor":"dozer_wxt520prec", "field":["hail_accumulation"], "title":"Hail", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
-          {"vsensor":"dozer_wxt520windpth", "field":["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], "title":"Wind Direction", "select":"sensornode[position=25],sensornode[position=13],sensornode[position][iscorestation=true]"},
-          {"vsensor":"dozer_wxt520windpth", "field":["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], "title":"Wind Speed", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"vaisalawxt520windpth", "field":["relative_humidity"], "title":"Humidity", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"vaisalawxt520windpth", "field":["air_temperature","internal_temperature"], "title":"Temperature", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"vaisalawxt520windpth", "field":["air_pressure"], "title":"Air Pressure", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"vaisalawxt520prec", "field":["rain_accumulation"], "title":"Rain", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"vaisalawxt520prec", "field":["hail_accumulation"], "title":"Hail", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
+          {"vsensor":"vaisalawxt520windpth", "field":["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], "title":"Wind Direction", "select":"sensornode[position=25],sensornode[position=13],sensornode[position][iscorestation=true]"},
+          {"vsensor":"vaisalawxt520windpth", "field":["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], "title":"Wind Speed", "select":"sensornode[position=25],sensornode[position=13],sensornode[position=7],sensornode[position][iscorestation=true]"},
 
         ]);
 
@@ -274,6 +274,7 @@ function showPlots(id) {
                 </div>
                 <div class="scaledimages">
                 </div>
+                <div style="clear:both"></div>
                 </div>
 
                 <div id="weather_Jungfraujoch" style="display:none">
@@ -328,7 +329,7 @@ function showPlots(id) {
                         <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/069141.png" alt="Weather forecast Randa"/>
                 </p>
                 <div class="scaledimages">
-                </div><br>
+                </div><div style="clear:both"></div>
                 </div>
 
                 <div id="weather_Glaciers" style="display:none">
