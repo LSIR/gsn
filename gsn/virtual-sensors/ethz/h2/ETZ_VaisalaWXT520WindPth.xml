@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Dozer_WXT520WindPth__conv" priority="10" >
+<virtual-sensor name="Etz_VaisalaWXT520WindPth" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -7,11 +7,6 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="HEADER_SEQNR" type="INTEGER" />
-            <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
-            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
-            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
             <field name="WIND_DIRECTION_MINIMUM" type="VARCHAR(30)" unit="°"/>
             <field name="WIND_DIRECTION_AVERAGE" type="VARCHAR(30)" unit="°"/>
             <field name="WIND_DIRECTION_MAXIMUM" type="VARCHAR(30)" unit="°"/>
@@ -24,18 +19,18 @@
             <field name="AIR_PRESSURE" type="VARCHAR(30)" unit="hPa"/>
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerWxt520WindPthMsg) from ETZ deployment converted</description>
+    <description>show weather sensor values of Vaisala WXT520 at the Etz deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from ETZ_Dozer_WXT520WindPth__mapped</predicate>
+                    <predicate key="query"> select * from Etz_Dozer_WXT520WindPth__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DN as CHAR(30)),NULL) as WIND_DIRECTION_MINIMUM,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DM as CHAR(30)),NULL) as WIND_DIRECTION_AVERAGE,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(PAYLOAD_WU_DX as CHAR(30)),NULL) as WIND_DIRECTION_MAXIMUM,
@@ -50,5 +45,19 @@
             </source>
             <query> select * from source </query>
         </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Etz_VaisalaWXT520__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select
+                  timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP,
+                  WIND_DIRECTION_MINIMUM,WIND_DIRECTION_AVERAGE,WIND_DIRECTION_MAXIMUM,WIND_SPEED_MINIMUM,WIND_SPEED_AVERAGE,WIND_SPEED_MAXIMUM,AIR_TEMPERATURE,INTERNAL_TEMPERATURE,RELATIVE_HUMIDITY,AIR_PRESSURE
+                  from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        
     </streams>
 </virtual-sensor>

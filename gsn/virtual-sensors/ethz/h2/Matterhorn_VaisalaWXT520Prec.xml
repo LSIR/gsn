@@ -1,4 +1,4 @@
-<virtual-sensor name="Matterhorn_Dozer_WXT520Prec__conv" priority="10" >
+<virtual-sensor name="Matterhorn_VaisalaWXT520Prec" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -7,11 +7,6 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="HEADER_SEQNR" type="INTEGER" />
-            <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
-            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
-            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
             <field name="RAIN_ACCUMULATION" type="VARCHAR(30)" unit="mm"/>
             <field name="RAIN_DURATION" type="VARCHAR(30)" unit="s"/>
             <field name="RAIN_INTENSITY" type="VARCHAR(30)" unit="mm/h"/>
@@ -22,18 +17,18 @@
             <field name="HAIL_PEAK_INTENSITY" type="VARCHAR(30)" unit="hits/cm²h"/>
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerWxt520PrecMsg) from Matterhorn deployment converted</description>
+    <description>show weather sensor values of Vaisala WXT520 at the Matterhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query"> select * from Matterhorn_Dozer_WXT520Prec__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_RC / 100.0, 2) as CHAR(30)),NULL) as RAIN_ACCUMULATION,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_RD / 1.0, 2) as CHAR(30)),NULL) as RAIN_DURATION,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_RI / 100.0, 2) as CHAR(30)),NULL) as RAIN_INTENSITY,
@@ -43,6 +38,19 @@
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_RP / 100.0, 2) as CHAR(30)),NULL) as RAIN_PEAK_INTENSITY,
                 casewhen(PAYLOAD_SAMPLE_VALID=1,cast(round(PAYLOAD_RU_HP / 10.0, 2) as CHAR(30)),NULL) as HAIL_PEAK_INTENSITY
                 from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_VaisalaWXT520__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select
+                  timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP,
+                  RAIN_ACCUMULATION,RAIN_DURATION,RAIN_INTENSITY,HAIL_ACCUMULATION,HAIL_DURATION,HAIL_INTENSITY,RAIN_PEAK_INTENSITY,HAIL_PEAK_INTENSITY
+                  from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
