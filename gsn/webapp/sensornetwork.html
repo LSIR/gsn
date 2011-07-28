@@ -42,6 +42,7 @@ $(document).ready(function() {
       {"vsensor":"dozer_statecounter__conv", "field":"mcuactive_dutycycle", "title":"Dozer MCU Active", "select":"sensornode[position]"},
       {"vsensor":"dozer_statecounter__conv", "field":"radiotx_dutycycle", "title":"Dozer Radio TX", "select":"sensornode[position]"},
       {"vsensor":"dozer_statecounter__conv", "field":"radiorx_dutycycle", "title":"Dozer Radio RX", "select":"sensornode[position]"},
+      {"vsensor":"dozer_powerswitch__mapped", "field":["payload_port1on","payload_port2on"], "title":"Powerswitch Portstate", "select":"sensornodep[nodetype=2][position]"},
       {"vsensor":"binary__mapped", "field":["file_queue_length","file_queue_size"], "title":"Binary Queue", "select":"sensornode[position][iscorestation='true']"},
       {"vsensor":"binary__mapped", "field":["file_size","transmitted"], "title":"Binary Files", "select":"sensornode[position][iscorestation='true']"},
       {"vsensor":"binary__mapped", "field":["transmission_time_eff","transmission_time_tot"], "title":"Binary Transmission Time", "select":"sensornode[position][iscorestation='true']"},
