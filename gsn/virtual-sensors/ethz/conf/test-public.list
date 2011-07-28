@@ -41,14 +41,14 @@ ETZ_Dozer_Rssi__mapped.xml
 ETZ_Dozer_Rssi__muxed__mapped.xml
 ETZ_Dozer_StateCounter__conv.xml
 ETZ_Dozer_StateCounter__mapped.xml
-ETZ_Dozer_WXT520Prec__conv.xml
-ETZ_Dozer_WXT520Sup__conv.xml
-ETZ_Dozer_WXT520WindPth__conv.xml
 ETZ_Dozer_WXT520Prec__mapped.xml
 ETZ_Dozer_WXT520Sup__mapped.xml
 ETZ_Dozer_WXT520WindPth__mapped.xml
 ETZ_Dozer_WXT520Ident__mapped.xml
 ETZ_Dozer_WXT520Ident__conv.xml
+ETZ_VaisalaWXT520Prec.xml
+ETZ_VaisalaWXT520Sup.xml
+ETZ_VaisalaWXT520WindPth.xml
 ETZ_Dozer_Th3Ident__mapped.xml
 ETZ_Dozer_Th3Ident__conv.xml
 ETZ_Dozer_Th3Temp__mapped.xml
