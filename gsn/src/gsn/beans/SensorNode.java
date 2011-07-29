@@ -53,7 +53,7 @@ public class SensorNode {
 	private LinkedList<Double> voltageHistory = new LinkedList<Double>();
 	private DecimalFormat df = new DecimalFormat("0.00");
 	
-	public Coordinate coordinate = new Coordinate();
+	public Coordinate coordinate = null;
 	
 	public SensorNode() {
 		links = new ArrayList<Link>();

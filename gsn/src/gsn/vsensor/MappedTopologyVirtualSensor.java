@@ -53,9 +53,10 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 							node_ids.remove(n.node_id);
 							if (now - n.timestamp < MAPPING_UPDATE_TIMEOUT_MS) {
 								n.position = DataMapping.getPosition(deployment, n.node_id.intValue(), new Timestamp(n.generation_time));
-								if (n.position != null)
+								if (n.position != null) {
 									n.coordinate = DataMapping.getCoordinate(deployment, n.position.intValue());
-								cachedmappings.put(n.node_id, new MappingEntry(n.position, n.coordinate));
+									cachedmappings.put(n.node_id, new MappingEntry(n.position, n.coordinate));
+								}
 							}
 							else {
 								// use cached mapping
