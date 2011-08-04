@@ -22,10 +22,10 @@
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_FieldSelector">
-                <xs:attribute name="vsname" type="xs:string" use="required"/>
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="fieldNames" nillable="true" type="xs:string"/>
                 </xs:sequence>
+                <xs:attribute name="vsname" type="xs:string" use="required"/>
             </xs:complexType>
             <xs:simpleType name="GSNWebService_DetailsType">
                 <xs:restriction base="xs:string">
@@ -37,20 +37,20 @@
                 </xs:restriction>
             </xs:simpleType>
             <xs:complexType name="GSNWebService_QueryResult">
-                <xs:attribute name="hasNext" type="xs:boolean" use="required"/>
-                <xs:attribute name="vsname" type="xs:string" use="required"/>
-                <xs:attribute name="sid" type="xs:string" use="required"/>
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="format" nillable="false" type="ax21:GSNWebService_StreamElement"/>
                     <xs:element minOccurs="0" maxOccurs="unbounded" name="streamElements" nillable="false" type="ax21:GSNWebService_StreamElement"/>
                     <xs:element minOccurs="0" maxOccurs="1" name="executedQuery" nillable="false" type="xs:string"/>
                 </xs:sequence>
+                <xs:attribute name="hasNext" type="xs:boolean" use="required"/>
+                <xs:attribute name="vsname" type="xs:string" use="required"/>
+                <xs:attribute name="sid" type="xs:string" use="required"/>
             </xs:complexType>
             <xs:complexType name="GSNWebService_StreamElement">
-                <xs:attribute name="timed" type="xs:string" use="optional"/>
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="unbounded" name="field" nillable="false" type="ax21:GSNWebService_DataField"/>
                 </xs:sequence>
+                <xs:attribute name="timed" type="xs:string" use="optional"/>
             </xs:complexType>
             <xs:complexType name="GSNWebService_DataField">
                 <xs:simpleContent>
@@ -62,7 +62,6 @@
                 </xs:simpleContent>
             </xs:complexType>
             <xs:complexType name="GSNWebService_VirtualSensorDetails">
-                <xs:attribute name="vsname" type="xs:string" use="required"/>
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="addressing" nillable="false" type="ax21:GSNWebService_ConfAddressing"/>
                     <xs:element minOccurs="0" maxOccurs="1" name="info" nillable="false" type="ax21:GSNWebService_ConfInfo"/>
@@ -70,6 +69,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="processor" nillable="false" type="ax21:GSNWebService_ConfProcessor"/>
                     <xs:element minOccurs="0" maxOccurs="1" name="wrapper" nillable="false" type="ax21:GSNWebService_ConfWrapper"/>
                 </xs:sequence>
+                <xs:attribute name="vsname" type="xs:string" use="required"/>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfAddressing">
                 <xs:sequence>
@@ -97,10 +97,10 @@
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfProcessor">
-                <xs:attribute use="required" name="className" type="xs:string"/>
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="initParams" nillable="false" type="ax21:GSNWebService_ConfPredicate"/>
                 </xs:sequence>
+                <xs:attribute use="required" name="className" type="xs:string"/>
             </xs:complexType>
             <xs:complexType name="GSNWebService_ConfWrapper">
                 <xs:sequence>
@@ -165,11 +165,11 @@
             </xs:element>
             <xs:element name="getLatestMultiData">
                 <xs:complexType>
-                    <xs:attribute name="timeFormat" use="optional" type="xs:string"/>
                     <xs:sequence>
                         <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="fieldSelector" nillable="false" type="ax22:GSNWebService_FieldSelector"/>
                     </xs:sequence>
+                    <xs:attribute name="timeFormat" use="optional" type="xs:string"/>
                 </xs:complexType>
             </xs:element>
             <xs:element name="getLatestMultiDataResponse">
@@ -181,16 +181,16 @@
             </xs:element>
             <xs:element name="getMultiData">
                 <xs:complexType>
-                    <xs:attribute name="from" use="optional" type="xs:long"/>
-                    <xs:attribute name="to" use="optional" type="xs:long"/>
-                    <xs:attribute name="nb" use="optional" type="xs:int"/>
-                    <xs:attribute name="timeFormat" use="optional" type="xs:string"/>
                     <xs:sequence>
                         <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="fieldSelector" nillable="false" type="ax22:GSNWebService_FieldSelector"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="conditions" nillable="false" type="ax24:StandardCriterion"/>
                         <xs:element minOccurs="0" maxOccurs="1" name="aggregation" nillable="false" type="ax24:AggregationCriterion"/>
                     </xs:sequence>
+                    <xs:attribute name="from" use="optional" type="xs:long"/>
+                    <xs:attribute name="to" use="optional" type="xs:long"/>
+                    <xs:attribute name="nb" use="optional" type="xs:int"/>
+                    <xs:attribute name="timeFormat" use="optional" type="xs:string"/>
                 </xs:complexType>
             </xs:element>
             <xs:element name="getMultiDataResponse">
@@ -202,10 +202,10 @@
             </xs:element>
             <xs:element name="getNextData">
                 <xs:complexType>
-                    <xs:attribute name="sid" use="required" type="xs:string"/>
                     <xs:sequence>
                         <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                     </xs:sequence>
+                    <xs:attribute name="sid" use="required" type="xs:string"/>f
                 </xs:complexType>
             </xs:element>
             <xs:element name="getNextDataResponse">
@@ -261,11 +261,11 @@
             </xs:element>
             <xs:element name="createVirtualSensor">
                 <xs:complexType>
-                    <xs:attribute name="vsname" use="required" type="xs:string"/>
                     <xs:sequence>
                         <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element minOccurs="1" maxOccurs="1" name="descriptionFileContent" nillable="false" type="xs:string"/>
                     </xs:sequence>
+                    <xs:attribute name="vsname" use="required" type="xs:string"/>
                 </xs:complexType>
             </xs:element>
             <xs:element name="createVirtualSensorResponse">
@@ -277,10 +277,10 @@
             </xs:element>
             <xs:element name="deleteVirtualSensor">
                 <xs:complexType>
-                    <xs:attribute name="vsname" use="required" type="xs:string"/>
                     <xs:sequence>
                         <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                     </xs:sequence>
+                    <xs:attribute name="vsname" use="required" type="xs:string"/>
                 </xs:complexType>
             </xs:element>
             <xs:element name="deleteVirtualSensorResponse">
@@ -292,13 +292,13 @@
             </xs:element>
             <xs:element name="registerQuery">
                 <xs:complexType>
-                    <xs:attribute name="queryName" use="required" type="xs:string"/>
-                    <xs:attribute name="query" use="required" type="xs:string"/>
                     <xs:sequence>
                         <xs:element maxOccurs="1" minOccurs="0" name="acDetails" nillable="false" type="ax22:GSNWebService_ACDetails"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="outputStructure" nillable="false" type="ax22:GSNWebService_DataField"/>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="vsnames" nillable="false" type="xs:string"/>
                     </xs:sequence>
+                    <xs:attribute name="queryName" use="required" type="xs:string"/>
+                    <xs:attribute name="query" use="required" type="xs:string"/>
                 </xs:complexType>
             </xs:element>
             <xs:element name="registerQueryResponse">
