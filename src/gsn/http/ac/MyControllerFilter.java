@@ -22,10 +22,12 @@ public class MyControllerFilter implements Filter {
 
     private FilterConfig config = null;
     private static transient Logger logger = Logger.getLogger(MyControllerFilter.class);
-    private boolean logging = false; // basic logging for requests, TODO: make as config parameter in webapp config
+    private boolean logging = false;
 
     public void init(FilterConfig config) throws ServletException {
         this.config = config;
+        if (config.getInitParameter("logIPs").equalsIgnoreCase("true"))
+            logging = true;
     }
 
     public void destroy() {
