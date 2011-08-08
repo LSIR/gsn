@@ -26,8 +26,9 @@ public class MyControllerFilter implements Filter {
 
     public void init(FilterConfig config) throws ServletException {
         this.config = config;
-        if (config.getInitParameter("logIPs").equalsIgnoreCase("true"))
-            logging = true;
+        if (config.getInitParameter("logIPs") != null)
+            if (config.getInitParameter("logIPs").equalsIgnoreCase("true"))
+                logging = true;
     }
 
     public void destroy() {
