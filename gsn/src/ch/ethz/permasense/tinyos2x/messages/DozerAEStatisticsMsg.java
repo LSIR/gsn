@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerAEStatisticsMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 13;
+    public static final int DEFAULT_MESSAGE_SIZE = 17;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 196;
 
-    /** Create a new DozerAEStatisticsMsg of size 13. */
+    /** Create a new DozerAEStatisticsMsg of size 17. */
     public DozerAEStatisticsMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -106,6 +106,15 @@ public class DozerAEStatisticsMsg extends ch.ethz.permasense.tinyos2x.messages.D
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.stored=0x"+Long.toHexString(get_payload_stored())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.bufferunderflows=0x"+Long.toHexString(get_payload_bufferunderflows())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.noisefloor_ch1=0x"+Long.toHexString(get_payload_noisefloor_ch1())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.noisefloor_ch2=0x"+Long.toHexString(get_payload_noisefloor_ch2())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -551,6 +560,195 @@ public class DozerAEStatisticsMsg extends ch.ethz.permasense.tinyos2x.messages.D
      */
     public static int sizeBits_payload_stored() {
         return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.bufferunderflows
+    //   Field type: int
+    //   Offset (bits): 104
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.bufferunderflows' is signed (false).
+     */
+    public static boolean isSigned_payload_bufferunderflows() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.bufferunderflows' is an array (false).
+     */
+    public static boolean isArray_payload_bufferunderflows() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.bufferunderflows'
+     */
+    public static int offset_payload_bufferunderflows() {
+        return (104 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.bufferunderflows'
+     */
+    public static int offsetBits_payload_bufferunderflows() {
+        return 104;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.bufferunderflows'
+     */
+    public int get_payload_bufferunderflows() {
+        return (int)getUIntBEElement(offsetBits_payload_bufferunderflows(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.bufferunderflows'
+     */
+    public void set_payload_bufferunderflows(int value) {
+        setUIntBEElement(offsetBits_payload_bufferunderflows(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.bufferunderflows'
+     */
+    public static int size_payload_bufferunderflows() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.bufferunderflows'
+     */
+    public static int sizeBits_payload_bufferunderflows() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.noisefloor_ch1
+    //   Field type: short
+    //   Offset (bits): 120
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.noisefloor_ch1' is signed (false).
+     */
+    public static boolean isSigned_payload_noisefloor_ch1() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.noisefloor_ch1' is an array (false).
+     */
+    public static boolean isArray_payload_noisefloor_ch1() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.noisefloor_ch1'
+     */
+    public static int offset_payload_noisefloor_ch1() {
+        return (120 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.noisefloor_ch1'
+     */
+    public static int offsetBits_payload_noisefloor_ch1() {
+        return 120;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.noisefloor_ch1'
+     */
+    public short get_payload_noisefloor_ch1() {
+        return (short)getUIntBEElement(offsetBits_payload_noisefloor_ch1(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.noisefloor_ch1'
+     */
+    public void set_payload_noisefloor_ch1(short value) {
+        setUIntBEElement(offsetBits_payload_noisefloor_ch1(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.noisefloor_ch1'
+     */
+    public static int size_payload_noisefloor_ch1() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.noisefloor_ch1'
+     */
+    public static int sizeBits_payload_noisefloor_ch1() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.noisefloor_ch2
+    //   Field type: short
+    //   Offset (bits): 128
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.noisefloor_ch2' is signed (false).
+     */
+    public static boolean isSigned_payload_noisefloor_ch2() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.noisefloor_ch2' is an array (false).
+     */
+    public static boolean isArray_payload_noisefloor_ch2() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.noisefloor_ch2'
+     */
+    public static int offset_payload_noisefloor_ch2() {
+        return (128 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.noisefloor_ch2'
+     */
+    public static int offsetBits_payload_noisefloor_ch2() {
+        return 128;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.noisefloor_ch2'
+     */
+    public short get_payload_noisefloor_ch2() {
+        return (short)getUIntBEElement(offsetBits_payload_noisefloor_ch2(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.noisefloor_ch2'
+     */
+    public void set_payload_noisefloor_ch2(short value) {
+        setUIntBEElement(offsetBits_payload_noisefloor_ch2(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.noisefloor_ch2'
+     */
+    public static int size_payload_noisefloor_ch2() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.noisefloor_ch2'
+     */
+    public static int sizeBits_payload_noisefloor_ch2() {
+        return 8;
     }
 
 }
