@@ -11,6 +11,7 @@ import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
 import gsn.http.ac.UserUtils;
+import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -19,10 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 
 public class DynamicGeoDataServlet extends HttpServlet {
@@ -34,7 +32,9 @@ public class DynamicGeoDataServlet extends HttpServlet {
     private static final String SEPARATOR = ",";
     private static final String NEWLINE = "\n";
 
-    private static List<SensorGeoReading> sensorReadingsList = new Vector<SensorGeoReading>();
+    private List<SensorGeoReading> sensorReadingsList = new Vector<SensorGeoReading>();
+    private HashMap<String, SensorGeoReading> sensorReadingsHash = new HashMap<String, SensorGeoReading>();
+    private boolean debugMode = false;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
@@ -49,6 +49,12 @@ public class DynamicGeoDataServlet extends HttpServlet {
         String query = HttpRequestUtils.getStringParameter("query", "value", request);
         String username = HttpRequestUtils.getStringParameter("username", null, request);
         String password = HttpRequestUtils.getStringParameter("password", null, request);
+        String debugModeStr = HttpRequestUtils.getStringParameter("debug", "false", request);
+
+        if (debugModeStr.equalsIgnoreCase("true"))
+            debugMode = true;
+        else
+            debugMode = false;
 
         List<String> allowedSensors = new Vector<String>();
 
@@ -81,35 +87,35 @@ public class DynamicGeoDataServlet extends HttpServlet {
                     .append(allowedSensors.get(i))
                     .append(" where timed = ( select max(timed) from ")
                     .append(allowedSensors.get(i))
-                    .append(" )")
-            //.append(timed)
-            ;
+                    .append(" )");
             if (i < allowedSensors.size() - 1)
                 sqlQueryStr.append("\n union \n");
         }
 
 
-        sb.append("env = " + env)
-                .append("\n")
-                .append("field = " + field)
-                .append("\n")
-                .append("timed = " + timed)
-                .append("\n")
-                .append("query = " + query)
-                .append("\n")
-                .append("all_sensors = " + sensorsToString(allowedSensors))
-                .append("\n")
-                .append(sqlQueryStr)
-                .append("\n##############\n")
-                .append(executeQuery(sqlQueryStr.toString(), field));
+        if (debugMode)
+            sb.append("env = " + env)
+                    .append("\ndebug = " + debugMode)
+                    .append("\n")
+                    .append("field = " + field)
+                    .append("\n")
+                    .append("timed = " + timed)
+                    .append("\n")
+                    .append("query = " + query)
+                    .append("\n")
+                    .append("all_sensors = " + sensorsToString(allowedSensors))
+                    .append("\n")
+                    .append(sqlQueryStr)
+                    .append("\n##############\n")
+                    .append(executeQuery(sqlQueryStr.toString(), field));
         logger.warn(sb.toString());
 
         buildGeoIndex();
 
-        String sensorsWithinEnvelope = "";
+        List<String> sensorsWithinEnvelope = new ArrayList<String>();
 
         try {
-            sensorsWithinEnvelope = sensorsToString(getListOfSensorsWithinEnvelope(env));
+            sensorsWithinEnvelope = getListOfSensorsWithinEnvelope(env);
         } catch (ParseException e) {
             logger.warn(e.getMessage(), e);
             response.getWriter().write("ERROR: cannot create geographic index");
@@ -117,8 +123,16 @@ public class DynamicGeoDataServlet extends HttpServlet {
         }
 
         response.getWriter().write(sb.toString());
-        response.getWriter().write("\n\n");
-        response.getWriter().write(sensorsWithinEnvelope);
+        if (debugMode) {
+            response.getWriter().write("\nSensors within envelope: ");
+            response.getWriter().write(sensorsToString(sensorsWithinEnvelope));
+            response.getWriter().write("\n");
+        }
+
+        for (String aSensor : sensorsWithinEnvelope) {
+            response.getWriter().write(sensorReadingsHash.get(aSensor).toString() + "\n");
+        }
+
     }
 
     public List<String> getAllSensors() {
@@ -198,6 +212,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
 
                 SensorGeoReading sensorReadings = new SensorGeoReading(sensorName, coordinates, timeStamp, value, fieldName);
                 sensorReadingsList.add(sensorReadings);
+                sensorReadingsHash.put(sensorName, sensorReadings);
 
                 //String
                 logger.warn(sensorReadings);
@@ -229,7 +244,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
    * Builds geographic geoIndex from list of sensors currently loaded in the system
    * */
 
-    public static void buildGeoIndex() {
+    public void buildGeoIndex() {
 
         geoIndex = new STRtree();
         //geometryFactory = new GeometryFactory();
@@ -241,7 +256,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
         geoIndex.build();
     }
 
-    public static List<String> getListOfSensorsWithinEnvelope(String envelope) throws ParseException {
+    public List<String> getListOfSensorsWithinEnvelope(String envelope) throws ParseException {
         Geometry geom = new WKTReader().read(envelope);
         List listEnvelope = geoIndex.query(geom.getEnvelopeInternal());
         List<String> sensors = new ArrayList<String>();
@@ -254,7 +269,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
     /*
     * Searches for the list of sensors which are located at the given point (comma separated)
     * */
-    public static String searchForSensors_String(Point p) {
+    public String searchForSensors_String(Point p) {
         StringBuilder s = new StringBuilder("");
         for (int i = 0; i < sensorReadingsList.size(); i++) {
             if (sensorReadingsList.get(i).coordinates == p) {
