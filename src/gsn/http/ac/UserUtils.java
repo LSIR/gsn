@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 
 public class UserUtils {
@@ -74,5 +75,20 @@ public class UserUtils {
             result = result && userHasAccessToVirtualSensor(reqUsername, reqPassword, iterator.next());
         }
         return result;
+    }
+
+    /*
+    * Checks the list of virtual sensors
+    * and returns only the ones for which the user has access
+    * */
+    public static List<String> getAllowedVirtualSensorsForUser(String reqUsername, String reqPassword, List<String> sensors) {
+        List<String> allowedSensors = new Vector<String>();
+
+        for (int i = 0; i < sensors.size(); i++) {
+            if (userHasAccessToVirtualSensor(reqUsername,reqPassword, sensors.get(i)))
+                allowedSensors.add(sensors.get(i));
+        }
+
+        return allowedSensors;
     }
 }
