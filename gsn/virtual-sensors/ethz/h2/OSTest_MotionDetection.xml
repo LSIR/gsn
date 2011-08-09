@@ -18,7 +18,7 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>detect vehicle's motion from the OSTest deployment</description>
+    <description>detect vehicles motion from the OSTest deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />

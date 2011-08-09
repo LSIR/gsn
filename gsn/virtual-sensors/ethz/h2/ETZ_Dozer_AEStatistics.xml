@@ -12,6 +12,9 @@
             <field name="PAYLOAD_MEASURED" type="INTEGER" />            
             <field name="PAYLOAD_PARAMETRIZED" type="INTEGER" />
             <field name="PAYLOAD_STORED" type="INTEGER" />
+            <field name="PAYLOAD_BUFFERUNDERFLOWS" type="INTEGER" />
+            <field name="PAYLOAD_NOISEFLOOR_CH1" type="SMALLINT" />
+            <field name="PAYLOAD_NOISEFLOOR_CH2" type="SMALLINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
@@ -90,6 +93,17 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data8">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
                 </address>
