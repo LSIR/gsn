@@ -78,36 +78,58 @@ public class DynamicGeoDataServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder();
 
         StringBuilder sqlQueryStr = new StringBuilder();
-        for (int i = 0; i < allowedSensors.size(); i++) {
-            sqlQueryStr.append("select '" + allowedSensors.get(i) + "'")
-                    .append(" as name, timed, from_unixtime(timed/1000), ")
-                    .append(field)
-                    .append(", latitude, longitude, altitude ")
-                    .append(" from ")
-                    .append(allowedSensors.get(i))
-                    .append(" where timed = ( select max(timed) from ")
-                    .append(allowedSensors.get(i))
-                    .append(" )");
-            if (i < allowedSensors.size() - 1)
-                sqlQueryStr.append("\n union \n");
+
+        if (timed.equalsIgnoreCase("latest")) {
+
+            for (int i = 0; i < allowedSensors.size(); i++) {
+                sqlQueryStr.append("select '" + allowedSensors.get(i) + "'")
+                        .append(" as name, timed, from_unixtime(timed/1000), ")
+                        .append(field)
+                        .append(", latitude, longitude, altitude ")
+                        .append(" from ")
+                        .append(allowedSensors.get(i))
+                        .append(" where timed = ( select max(timed) from ")
+                        .append(allowedSensors.get(i))
+                        .append(" )");
+                if (i < allowedSensors.size() - 1)
+                    sqlQueryStr.append("\n union \n");
+            }
+
+        } else { // timed explicitly specified
+            for (int i = 0; i < allowedSensors.size(); i++) {
+                sqlQueryStr.append("select '" + allowedSensors.get(i) + "'")
+                        .append(" as name, timed, from_unixtime(timed/1000), ")
+                        .append(field)
+                        .append(", latitude, longitude, altitude ")
+                        .append(" from ")
+                        .append(allowedSensors.get(i))
+                        .append(" where timed = ")
+                        .append(timed);
+                if (i < allowedSensors.size() - 1)
+                    sqlQueryStr.append("\n union \n");
+            }
         }
 
 
+        sb.append("env = " + env)
+                .append("\ndebug = " + debugMode)
+                .append("\n")
+                .append("field = " + field)
+                .append("\n")
+                .append("timed = " + timed)
+                .append("\n")
+                .append("query = " + query)
+                .append("\n")
+                .append("all_sensors = " + sensorsToString(allowedSensors))
+                .append("\n")
+                .append(sqlQueryStr)
+                .append("\n##############\n")
+                .append(executeQuery(sqlQueryStr.toString(), field));
+
+
         if (debugMode)
-            sb.append("env = " + env)
-                    .append("\ndebug = " + debugMode)
-                    .append("\n")
-                    .append("field = " + field)
-                    .append("\n")
-                    .append("timed = " + timed)
-                    .append("\n")
-                    .append("query = " + query)
-                    .append("\n")
-                    .append("all_sensors = " + sensorsToString(allowedSensors))
-                    .append("\n")
-                    .append(sqlQueryStr)
-                    .append("\n##############\n")
-                    .append(executeQuery(sqlQueryStr.toString(), field));
+            response.getWriter().write(sb.toString());
+
         logger.warn(sb.toString());
 
         buildGeoIndex();
@@ -122,7 +144,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
             return;
         }
 
-        response.getWriter().write(sb.toString());
+
         if (debugMode) {
             response.getWriter().write("\nSensors within envelope: ");
             response.getWriter().write(sensorsToString(sensorsWithinEnvelope));
