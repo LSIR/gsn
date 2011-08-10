@@ -13,6 +13,8 @@ import gsn.beans.VSensorConfig;
 import gsn.http.ac.UserUtils;
 import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -52,6 +54,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
         String username = HttpRequestUtils.getStringParameter("username", null, request);
         String password = HttpRequestUtils.getStringParameter("password", null, request);
         String debugModeStr = HttpRequestUtils.getStringParameter("debug", "false", request);
+        String format = HttpRequestUtils.getStringParameter("format", "csv", request);
 
         if (debugModeStr.equalsIgnoreCase("true"))
             debugMode = true;
@@ -153,22 +156,57 @@ public class DynamicGeoDataServlet extends HttpServlet {
         }
 
         //response.getWriter().write(formatter("default", field));
-        response.getWriter().write(formatter("csv", field));
-
-
+        response.getWriter().write(formatter(format, field));
     }
 
     public String formatter(String format, String field) {
         StringBuilder sb = new StringBuilder();
-        if (format.equalsIgnoreCase("csv")) {
-            sb.append("# name, lat, lon, timed, " + field + "\n");
+        if (format.equalsIgnoreCase("json")) {
+            JSONArray sensorsReadings = new JSONArray();
             for (String aSensor : sensorsWithinEnvelope) {
-                sb.append(sensorReadingsHash.get(aSensor).sensorName + ", " + sensorReadingsHash.get(aSensor).coordinates.getY() + ", " + sensorReadingsHash.get(aSensor).coordinates.getX() + ", "+sensorReadingsHash.get(aSensor).timestamp + ", " + +sensorReadingsHash.get(aSensor).value + "\n");
+                JSONObject aSensorReading = new JSONObject();
+                aSensorReading.put("name", sensorReadingsHash.get(aSensor).sensorName);
+                aSensorReading.put("latitude", sensorReadingsHash.get(aSensor).coordinates.getY());
+                aSensorReading.put("longitude", sensorReadingsHash.get(aSensor).coordinates.getX());
+                aSensorReading.put("timed", sensorReadingsHash.get(aSensor).timestamp);
+                aSensorReading.put(field, sensorReadingsHash.get(aSensor).value);
+                sensorsReadings.add(aSensorReading);
             }
+            return sensorsReadings.toJSONString();
+        } else if (format.equalsIgnoreCase("xml")) {
+            sb.append("<geodata>\n");
+            for (String aSensor : sensorsWithinEnvelope) {
+                sb.append("\t<sensor name=\"")
+                        .append(sensorReadingsHash.get(aSensor).sensorName)
+                        .append("\" latitude=\"")
+                        .append(sensorReadingsHash.get(aSensor).coordinates.getY())
+                        .append("\" longitude=\"")
+                        .append(sensorReadingsHash.get(aSensor).coordinates.getX())
+                        .append(" timed=\"")
+                        .append(sensorReadingsHash.get(aSensor).timestamp)
+                        .append(" field=\"")
+                        .append(field)
+                        .append("\">")
+                        .append(sensorReadingsHash.get(aSensor).value)
+                        .append("</sensor>\n");
+            }
+            sb.append("</geodata>");
             return sb.toString();
-        } else { //default
+        } else if (format.equalsIgnoreCase("native")) {
             for (String aSensor : sensorsWithinEnvelope) {
                 sb.append(sensorReadingsHash.get(aSensor).toString() + "\n");
+            }
+            return sb.toString();
+        } else if (format.equalsIgnoreCase("csv")) {
+            sb.append("# name, latitude, longitude, timed, " + field + "\n");
+            for (String aSensor : sensorsWithinEnvelope) {
+                sb.append(sensorReadingsHash.get(aSensor).sensorName + ", " + sensorReadingsHash.get(aSensor).coordinates.getY() + ", " + sensorReadingsHash.get(aSensor).coordinates.getX() + ", " + sensorReadingsHash.get(aSensor).timestamp + ", " + +sensorReadingsHash.get(aSensor).value + "\n");
+            }
+            return sb.toString();
+        } else { //default is CSV
+            sb.append("# name, latitude, longitude, timed, " + field + "\n");
+            for (String aSensor : sensorsWithinEnvelope) {
+                sb.append(sensorReadingsHash.get(aSensor).sensorName + ", " + sensorReadingsHash.get(aSensor).coordinates.getY() + ", " + sensorReadingsHash.get(aSensor).coordinates.getX() + ", " + sensorReadingsHash.get(aSensor).timestamp + ", " + +sensorReadingsHash.get(aSensor).value + "\n");
             }
             return sb.toString();
         }
