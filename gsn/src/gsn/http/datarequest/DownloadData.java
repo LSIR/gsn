@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -204,7 +203,7 @@ public class DownloadData extends AbstractDataRequest {
         if (wantTimed) {
         	if (!firstel)
         		respond.print(cvsDelimiter);       
-        	respond.print(qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
+        	respond.print(qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
         }
         respond.println();
     }
@@ -228,7 +227,7 @@ public class DownloadData extends AbstractDataRequest {
             respond.println("\t\t\t<field>" + se.getData()[i] + "</field>");
         }
         if (wantTimed)
-            respond.println("\t\t\t<field>" + (qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
+            respond.println("\t\t\t<field>" + (qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
         respond.println("\t\t</tuple>");
     }
     
@@ -248,12 +247,6 @@ public class DownloadData extends AbstractDataRequest {
         }
     }
 
-
-    private long timestampInUTC(long timestamp) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timestamp);
-        return cal.getTimeInMillis() + cal.getTimeZone().getOffset(cal.getTimeInMillis());
-    }
 
     public AllowedOutputType getOt() {
         return ot;
