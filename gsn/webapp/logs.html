@@ -475,7 +475,7 @@ function generateEventMessageDiv(timestamp, position, deviceId, eventId, eventVa
 function generateDateString(d) {
 	var day = d.getDate();
 	if (day < 10) day = "0" + day;
-	var month = d.getMonth();
+	var month = d.getMonth()+1;
 	if (month < 10) month = "0" + month;
 	var hours = d.getHours();
 	if (hours < 10) hours = "0" + hours;
