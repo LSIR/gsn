@@ -34,6 +34,8 @@ public class DynamicGeoDataServlet extends HttpServlet {
 
     private List<SensorGeoReading> sensorReadingsList = new Vector<SensorGeoReading>();
     private HashMap<String, SensorGeoReading> sensorReadingsHash = new HashMap<String, SensorGeoReading>();
+    private List<String> sensorsWithinEnvelope = new ArrayList<String>();
+
     private boolean debugMode = false;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -134,7 +136,6 @@ public class DynamicGeoDataServlet extends HttpServlet {
 
         buildGeoIndex();
 
-        List<String> sensorsWithinEnvelope = new ArrayList<String>();
 
         try {
             sensorsWithinEnvelope = getListOfSensorsWithinEnvelope(env);
@@ -151,10 +152,26 @@ public class DynamicGeoDataServlet extends HttpServlet {
             response.getWriter().write("\n");
         }
 
-        for (String aSensor : sensorsWithinEnvelope) {
-            response.getWriter().write(sensorReadingsHash.get(aSensor).toString() + "\n");
-        }
+        //response.getWriter().write(formatter("default", field));
+        response.getWriter().write(formatter("csv", field));
 
+
+    }
+
+    public String formatter(String format, String field) {
+        StringBuilder sb = new StringBuilder();
+        if (format.equalsIgnoreCase("csv")) {
+            sb.append("# name, lat, lon, timed, " + field + "\n");
+            for (String aSensor : sensorsWithinEnvelope) {
+                sb.append(sensorReadingsHash.get(aSensor).sensorName + ", " + sensorReadingsHash.get(aSensor).coordinates.getY() + ", " + sensorReadingsHash.get(aSensor).coordinates.getX() + ", "+sensorReadingsHash.get(aSensor).timestamp + ", " + +sensorReadingsHash.get(aSensor).value + "\n");
+            }
+            return sb.toString();
+        } else { //default
+            for (String aSensor : sensorsWithinEnvelope) {
+                sb.append(sensorReadingsHash.get(aSensor).toString() + "\n");
+            }
+            return sb.toString();
+        }
     }
 
     public List<String> getAllSensors() {
