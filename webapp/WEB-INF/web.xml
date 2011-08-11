@@ -3,8 +3,8 @@
 
 <web-app>
     <display-name>GSN Server</display-name>
-<!--
-     *******************************************************************************
+<!-- 
+     *******************************************************************************     
       WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] ; there is
       another part down in this file which has to be uncommented to have the axis working.
      ******************************************************************************* -->
@@ -17,10 +17,10 @@
     </servlet>
  -->
 
-<!-- *******************************************************************************
+<!-- *******************************************************************************     
       GSN's Main Servlets, Must be enabled for any kind of HTTP based access
      ******************************************************************************* -->
-
+    
 	<!-- GSN START -->
 	<servlet>
         <servlet-name>ControllerServlet</servlet-name>
@@ -53,11 +53,18 @@
         <servlet-class>gsn.http.rest.RestStreamHanlder</servlet-class>
     </servlet>
 
-        <servlet>
+    <servlet>
         <servlet-name>GeoData</servlet-name>
         <display-name>Sensor Data with Geo Location</display-name>
         <servlet-class>gsn.http.GeoDataServlet</servlet-class>
     </servlet>
+
+    <servlet>
+            <servlet-name>DynamicGeoData</servlet-name>
+            <display-name>Dynamic Sensor Data with Geo Location</display-name>
+            <servlet-class>gsn.http.DynamicGeoDataServlet</servlet-class>
+    </servlet>
+
 
     <servlet>
         <servlet-name>MenuServlet</servlet-name>
@@ -225,9 +232,9 @@
 
 
 
-
+   
 	<!-- mapping for GSN -->
-
+	
 	<servlet-mapping>
         <servlet-name>ControllerServlet</servlet-name>
         <url-pattern>/gsn</url-pattern>
@@ -256,7 +263,10 @@
         <servlet-name>GeoData</servlet-name>
         <url-pattern>/geodata</url-pattern>
     </servlet-mapping>
-
+    <servlet-mapping>
+        <servlet-name>DynamicGeoData</servlet-name>
+        <url-pattern>/dynamicgeodata</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>GridDataServlet</servlet-name>
         <url-pattern>/griddata</url-pattern>
@@ -398,14 +408,14 @@
      </servlet-mapping>
 
 
-
+     
 
 
 	<!-- GSN END -->
-
-	<!--
-     *******************************************************************************
-      WEB SERVICES CALL MAPPING [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ]
+	
+	<!-- 
+     *******************************************************************************     
+      WEB SERVICES CALL MAPPING [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] 
      ******************************************************************************* -->
 <!--     <servlet-mapping>
         <servlet-name>AxisServlet</servlet-name>
@@ -453,7 +463,7 @@
             <url-pattern>/menu.jsp</url-pattern>
         </web-resource-collection>
     </security-constraint>
-
+ 
     <!-- Filter for accesscontrol package -->
 
 
@@ -477,25 +487,25 @@
        <url-pattern>/griddata</url-pattern>
    </filter-mapping>
 
-
-
+      
+     
     <mime-mapping>
         <extension>inc</extension>
         <mime-type>text/plain</mime-type>
     </mime-mapping>
 
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
+   <welcome-file-list>
+      <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>LoginHandlerServlet</web-resource-name>
-            <url-pattern>/gsn/loginhandlerservlet</url-pattern>
-        </web-resource-collection>
-        <user-data-constraint>
-            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
+   <security-constraint>
+   <web-resource-collection>
+     <web-resource-name>LoginHandlerServlet</web-resource-name>
+     <url-pattern>/gsn/loginhandlerservlet</url-pattern>
+   </web-resource-collection>
+   <user-data-constraint>
+     <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+   </user-data-constraint>
+ </security-constraint>
 
 </web-app>
