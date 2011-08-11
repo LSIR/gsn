@@ -49,7 +49,7 @@ public class SensorNodeConfiguration {
 	
 	public SensorNodeConfiguration(SensorNodeConfiguration config, Integer node_type) {
 		update(config.getConfiguration1(), node_type);
-		update(config.getConfiguration2(), node_type);
+		update((short)(config.getConfiguration2() + DATASOURCES2_FLAG), node_type);
 		update(config.powerswitch_p1, config.powerswitch_p2);
 		timestamp = config.timestamp;
 	}
@@ -168,8 +168,7 @@ public class SensorNodeConfiguration {
 	public Short getConfiguration2() {
 		return (short) (
 			(th3 == null || !th3 ? 0: 1 << INDEX_TH3) + 
-			(enviroscan == null || !enviroscan ? 0: 1 << INDEX_ENVIROSCAN) +
-			DATASOURCES2_FLAG
+			(enviroscan == null || !enviroscan ? 0: 1 << INDEX_ENVIROSCAN)
 		);
 	}
 	
