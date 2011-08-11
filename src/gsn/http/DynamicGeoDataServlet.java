@@ -11,7 +11,6 @@ import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
 import gsn.http.ac.UserUtils;
-import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -88,7 +87,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
 
             for (int i = 0; i < allowedSensors.size(); i++) {
                 sqlQueryStr.append("select '" + allowedSensors.get(i) + "'")
-                        .append(" as name, timed, from_unixtime(timed/1000), ")
+                        .append(" as name, timed, ")
                         .append(field)
                         .append(", latitude, longitude, altitude ")
                         .append(" from ")
@@ -103,7 +102,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
         } else { // timed explicitly specified
             for (int i = 0; i < allowedSensors.size(); i++) {
                 sqlQueryStr.append("select '" + allowedSensors.get(i) + "'")
-                        .append(" as name, timed, from_unixtime(timed/1000), ")
+                        .append(" as name, timed, ")
                         .append(field)
                         .append(", latitude, longitude, altitude ")
                         .append(" from ")
@@ -128,7 +127,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
                 .append("all_sensors = " + sensorsToString(allowedSensors))
                 .append("\n")
                 .append(sqlQueryStr)
-                .append("\n##############\n")
+                .append("\n# -------\n")
                 .append(executeQuery(sqlQueryStr.toString(), field));
 
 
