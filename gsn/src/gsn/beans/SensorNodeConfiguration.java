@@ -14,10 +14,13 @@ public class SensorNodeConfiguration {
 	public Boolean decagonmux = null;
 	public Boolean powerswitch = null;	// from powerswitch packet
 	public Boolean vaisala_wxt520 = null;
+	public Boolean th3 = null;
+	public Boolean enviroscan = null;
 	public Boolean powerswitch_p1 = null;
 	public Boolean powerswitch_p2 = null;
 	public Long timestamp;
 	
+	//data sources 1
 	private final static int INDEX_INFO = 0;
 	private final static int INDEX_HEALTH = 1;
 	private final static int INDEX_ADCMUX = 2;
@@ -30,16 +33,23 @@ public class SensorNodeConfiguration {
 	private final static int INDEX_DECAGONMUX = 9;
 	private final static int INDEX_POWERSWITCH = 9;
 	private final static int INDEX_VAISALA_WXT520 = 10;
+	//data sources 2
+	private final static int INDEX_TH3 = 0;
+	private final static int INDEX_ENVIROSCAN = 1;
+
 	
 	private final static int INDEX_POWERSWITCH_P1 = 0;
 	private final static int INDEX_POWERSWITCH_P2 = 1;
+	
+	private final static int DATASOURCES2_FLAG = 0x800;
 	
 	public SensorNodeConfiguration() {
 		timestamp = System.currentTimeMillis();
 	}
 	
 	public SensorNodeConfiguration(SensorNodeConfiguration config, Integer node_type) {
-		update(config.getConfiguration(), node_type);
+		update(config.getConfiguration1(), node_type);
+		update(config.getConfiguration2(), node_type);
 		update(config.powerswitch_p1, config.powerswitch_p2);
 		timestamp = config.timestamp;
 	}
@@ -58,20 +68,26 @@ public class SensorNodeConfiguration {
 	}
 
 	public void update(Short config, Integer node_type) {
-		info = (config & (1 << INDEX_INFO)) > 0;
-		health = (config & (1 << INDEX_HEALTH)) > 0;
-		adcmux = (config & (1 << INDEX_ADCMUX)) > 0;
-		adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0;
-		dcx = (config & (1 << INDEX_DCX)) > 0;
-		drift = (config & (1 << INDEX_DRIFT)) > 0;
-		events = (config & (1 << INDEX_EVENTS)) > 0;
-		rssi = (config & (1 << INDEX_RSSI)) > 0;
-		statecounter = (config & (1 << INDEX_STATECOUNTER)) > 0;
-		if (node_type == SensorNode.NODE_TYPE_SIB)
-			decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
-		else if (node_type == SensorNode.NODE_TYPE_POWERSWITCH)
-			powerswitch= (config & (1 << INDEX_POWERSWITCH)) > 0;
-		vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
+		if ((config & DATASOURCES2_FLAG) == 0) {
+			info = (config & (1 << INDEX_INFO)) > 0;
+			health = (config & (1 << INDEX_HEALTH)) > 0;
+			adcmux = (config & (1 << INDEX_ADCMUX)) > 0;
+			adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0;
+			dcx = (config & (1 << INDEX_DCX)) > 0;
+			drift = (config & (1 << INDEX_DRIFT)) > 0;
+			events = (config & (1 << INDEX_EVENTS)) > 0;
+			rssi = (config & (1 << INDEX_RSSI)) > 0;
+			statecounter = (config & (1 << INDEX_STATECOUNTER)) > 0;
+			if (node_type == SensorNode.NODE_TYPE_SIB)
+				decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
+			else if (node_type == SensorNode.NODE_TYPE_POWERSWITCH)
+				powerswitch= (config & (1 << INDEX_POWERSWITCH)) > 0;
+			vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
+		}
+		else {
+			th3 = (config & (1 << INDEX_TH3)) > 0;
+			enviroscan = (config & (1 << INDEX_ENVIROSCAN)) > 0;
+		}
 		timestamp = System.currentTimeMillis();
 	}
 	
@@ -90,7 +106,7 @@ public class SensorNodeConfiguration {
 		powerswitch_p2=null;
 	}
 	
-	public boolean hasDataConfig() {
+	public boolean hasDataConfig1() {
 		return
 			info!=null && 
 			health!=null &&
@@ -106,7 +122,13 @@ public class SensorNodeConfiguration {
 			vaisala_wxt520!=null;
 	}
 	
-	public void removeDataConfig() {
+	public boolean hasDataConfig2() {
+		return
+			th3!=null && 
+			enviroscan!=null;
+	}
+	
+	public void removeDataConfig1() {
 		info=null; 
 		health=null;
 		adcmux=null;
@@ -121,7 +143,12 @@ public class SensorNodeConfiguration {
 		vaisala_wxt520=null;
 	}
 	
-	public Short getConfiguration() {
+	public void removeDataConfig2() {
+		th3=null; 
+		enviroscan=null;
+	}
+	
+	public Short getConfiguration1() {
 		return (short) (
 			(info == null || !info ? 0: 1 << INDEX_INFO) + 
 			(health == null || !health ? 0: 1 << INDEX_HEALTH) +
@@ -135,6 +162,14 @@ public class SensorNodeConfiguration {
 			(decagonmux == null || !decagonmux ? 0: 1 << INDEX_DECAGONMUX) +
 			(powerswitch == null || !powerswitch ? 0: 1 << INDEX_POWERSWITCH) +
 			(vaisala_wxt520 == null || !vaisala_wxt520 ? 0: 1 << INDEX_VAISALA_WXT520)
+		);
+	}
+	
+	public Short getConfiguration2() {
+		return (short) (
+			(th3 == null || !th3 ? 0: 1 << INDEX_TH3) + 
+			(enviroscan == null || !enviroscan ? 0: 1 << INDEX_ENVIROSCAN) +
+			DATASOURCES2_FLAG
 		);
 	}
 	
@@ -168,7 +203,9 @@ public class SensorNodeConfiguration {
 				bothNullOrEqual(sc.powerswitch, this.powerswitch) &&
 				bothNullOrEqual(sc.powerswitch_p1, this.powerswitch_p1) &&
 				bothNullOrEqual(sc.powerswitch_p2, this.powerswitch_p2) &&
-				bothNullOrEqual(sc.vaisala_wxt520, this.vaisala_wxt520);
+				bothNullOrEqual(sc.vaisala_wxt520, this.vaisala_wxt520) &&
+				bothNullOrEqual(sc.th3, this.th3) &&
+				bothNullOrEqual(sc.enviroscan, this.enviroscan);
 		}
 		else
 			return false;
@@ -190,6 +227,8 @@ public class SensorNodeConfiguration {
 			"\npowerswitch_p1: "+powerswitch_p1+
 			"\npowerswitch_p2: "+powerswitch_p2+
 			"\nvaisala_wxt520: "+vaisala_wxt520+
+			"\nth3: "+th3+
+			"\nenviroscan: "+enviroscan+
 			"\ntimestamp:"+timestamp;
 	}
 

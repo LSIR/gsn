@@ -45,7 +45,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	private static final short EVENT_BB_POWER_OFF = 31;
 	private static final short EVENT_BB_POWER_ON = 30;
 	public static final short DATA_CONTROL_CMD = 1;
-	public static final short NEW_DATA_CONTROL_CMD = 3;
+	public static final short DATA_CONTROL_CMD1 = 3;
+	public static final short DATA_CONTROL_CMD2 = 4;
 	public static final short GUMSTIX_CTRL_CMD = 14;
 	public static final short DATA_CONTROL_NETWORK_FLAG = 0x400;
 	public static final short DATA_CONTROL_SENSOR_FLAG = 0x800;
@@ -190,9 +191,11 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				else
 					node.configuration.update(event_value, node.nodetype);
 				if (node.pendingConfiguration!=null) {
-					if (node.pendingConfiguration.hasDataConfig() && node.configuration.getConfiguration().equals(node.pendingConfiguration.getConfiguration()))
-						node.pendingConfiguration.removeDataConfig();
-					if (!node.pendingConfiguration.hasDataConfig() && !node.pendingConfiguration.hasPortConfig())
+					if (node.pendingConfiguration.hasDataConfig1() && node.configuration.getConfiguration1().equals(node.pendingConfiguration.getConfiguration1()))
+						node.pendingConfiguration.removeDataConfig1();
+					if (node.pendingConfiguration.hasDataConfig2() && node.configuration.getConfiguration2().equals(node.pendingConfiguration.getConfiguration2()))
+						node.pendingConfiguration.removeDataConfig2();
+					if (!node.pendingConfiguration.hasDataConfig1() && !node.pendingConfiguration.hasDataConfig2() && !node.pendingConfiguration.hasPortConfig())
 						node.pendingConfiguration=null;
 				}
 				notifyscheduler=true;
@@ -208,12 +211,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						node.pendingConfiguration.removePortConfig();
 						logger.debug("remove port config");
 					}
-					if (!node.pendingConfiguration.hasDataConfig() && !node.pendingConfiguration.hasPortConfig()) {
+					if (!node.pendingConfiguration.hasDataConfig1() && !node.pendingConfiguration.hasDataConfig2() && !node.pendingConfiguration.hasPortConfig())
 						node.pendingConfiguration=null;
-						logger.debug("remove pending");
-					}
-					else
-						logger.debug("config still pending: "+node.pendingConfiguration.hasDataConfig()+" "+node.pendingConfiguration.hasPortConfig());
 				}
 				notifyscheduler=true;
 				node_type = new Integer(node.nodetype);
@@ -265,7 +264,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						if (node.pendingConfiguration.hasPortConfig() && node.pendingConfiguration.powerswitch_p1.equals(p1) && node.pendingConfiguration.powerswitch_p2.equals(p2)) {
 							node.pendingConfiguration.removePortConfig();
 						}
-						if (!node.pendingConfiguration.hasDataConfig() && !node.pendingConfiguration.hasPortConfig())
+						if (!node.pendingConfiguration.hasDataConfig1() && !node.pendingConfiguration.hasDataConfig2() && !node.pendingConfiguration.hasPortConfig())
 							node.pendingConfiguration=null;
 					}
 					notifyscheduler=true;
@@ -402,10 +401,21 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	}
 	
 	private void addToQueue(Integer node_id, Integer nodetype, SensorNodeConfiguration c, List<SensorNode> queue) {
-		if (c.hasDataConfig()) {
-			logger.debug("add data config to queue for node "+node_id);
+		// for each configuration packet add one item to queue
+		if (c.hasDataConfig1()) {
+			logger.debug("add data config 1 to queue for node "+node_id);
 			SensorNode newnode = new SensorNode(node_id);
 			newnode.pendingConfiguration = new SensorNodeConfiguration(c, nodetype);
+			newnode.pendingConfiguration.removeDataConfig2();
+			newnode.pendingConfiguration.removePortConfig();
+			newnode.pendingConfiguration.timestamp = System.currentTimeMillis();
+			queue.add(newnode);
+		}
+		if (c.hasDataConfig2()) {
+			logger.debug("add data config 2 to queue for node "+node_id);
+			SensorNode newnode = new SensorNode(node_id);
+			newnode.pendingConfiguration = new SensorNodeConfiguration(c, nodetype);
+			newnode.pendingConfiguration.removeDataConfig1();
 			newnode.pendingConfiguration.removePortConfig();
 			newnode.pendingConfiguration.timestamp = System.currentTimeMillis();
 			queue.add(newnode);
@@ -414,7 +424,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			logger.debug("add port config to queue for node "+node_id);
 			SensorNode newnode = new SensorNode(node_id);
 			newnode.pendingConfiguration = new SensorNodeConfiguration(c, nodetype);
-			newnode.pendingConfiguration.removeDataConfig();
+			newnode.pendingConfiguration.removeDataConfig1();
+			newnode.pendingConfiguration.removeDataConfig2();
 			newnode.pendingConfiguration.timestamp = System.currentTimeMillis();
 			queue.add(newnode);
 		}
@@ -470,17 +481,21 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 							cn.pendingConfiguration = new SensorNodeConfiguration(
 									n.configuration,
 									cn.nodetype);
-							logger.debug("old config "+ cn.configuration + " "+cn.configuration.getConfiguration());
-							logger.debug("new config "+ cn.pendingConfiguration + " "+cn.pendingConfiguration.getConfiguration());
-							if (cn.pendingConfiguration.hasDataConfig() && cn.pendingConfiguration.getConfiguration().equals(cn.configuration.getConfiguration())) {
-								cn.pendingConfiguration.removeDataConfig();
+							logger.debug("old config "+ cn.configuration + " "+cn.configuration.getConfiguration1() + " "+cn.configuration.getConfiguration2());
+							logger.debug("new config "+ cn.pendingConfiguration + " "+cn.pendingConfiguration.getConfiguration1() + " "+cn.pendingConfiguration.getConfiguration2());
+							if (cn.pendingConfiguration.hasDataConfig1() && cn.pendingConfiguration.getConfiguration1().equals(cn.configuration.getConfiguration1())) {
+								cn.pendingConfiguration.removeDataConfig1();
+								logger.debug("same data config");
+							}
+							if (cn.pendingConfiguration.hasDataConfig2() && cn.pendingConfiguration.getConfiguration2().equals(cn.configuration.getConfiguration2())) {
+								cn.pendingConfiguration.removeDataConfig2();
 								logger.debug("same data config");
 							}
 							if (cn.pendingConfiguration.hasPortConfig() && cn.pendingConfiguration.getPortConfiguration().equals(cn.configuration.getPortConfiguration())) {
 								cn.pendingConfiguration.removePortConfig();
 								logger.debug("same port config");
 							}
-							if (!cn.pendingConfiguration.hasPortConfig() && !cn.pendingConfiguration.hasDataConfig())
+							if (!cn.pendingConfiguration.hasPortConfig() && !cn.pendingConfiguration.hasDataConfig1() && !cn.pendingConfiguration.hasDataConfig2())
 								cn.pendingConfiguration=null;
 							if (cn.pendingConfiguration!=null) {
 								// add to queue
@@ -578,12 +593,15 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						(byte[])s), "UTF-8");
 					for (SensorNode n: lastTopology.sensornodes) {
 						if (n.node_id !=null && n.timestamp != null && n.generation_time != null) {
+							// remove pending configurations that are already done
 							if (n.configuration!=null && n.pendingConfiguration!=null) {
-								if (n.pendingConfiguration.hasDataConfig() && n.pendingConfiguration.getConfiguration().equals(n.configuration.getConfiguration()))
-									n.pendingConfiguration.removeDataConfig();
+								if (n.pendingConfiguration.hasDataConfig1() && n.pendingConfiguration.getConfiguration1().equals(n.configuration.getConfiguration1()))
+									n.pendingConfiguration.removeDataConfig1();
+								if (n.pendingConfiguration.hasDataConfig2() && n.pendingConfiguration.getConfiguration2().equals(n.configuration.getConfiguration2()))
+									n.pendingConfiguration.removeDataConfig2();
 								if (n.pendingConfiguration.hasPortConfig() && n.pendingConfiguration.getPortConfiguration().equals(n.configuration.getPortConfiguration()))
 									n.pendingConfiguration.removePortConfig();
-								if (!n.pendingConfiguration.hasPortConfig() && !n.pendingConfiguration.hasDataConfig())
+								if (!n.pendingConfiguration.hasPortConfig() && !n.pendingConfiguration.hasDataConfig1() && !n.pendingConfiguration.hasDataConfig2())
 									n.pendingConfiguration=null;
 								if (n.pendingConfiguration!=null) {
 									// add to queue
@@ -620,6 +638,11 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	
 	class CommandScheduler extends Thread {
 
+		private final static short CONFIG_NONE = 0;
+		private final static short CONFIG_DATA1 = 1;
+		private final static short CONFIG_DATA2 = 2;
+		private final static short CONFIG_PORT = 3;
+
 		private volatile boolean running=false;
 		private List<SensorNode> queue;
 		private List<SensorNode> newqueue;
@@ -628,7 +651,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		private boolean rescheduled;
 		private boolean configurationdone;
 		private TopologyVirtualSensor tvs;
-		private boolean isDataConfig;
+		private short configType = CONFIG_NONE;
+		
 		
 		public CommandScheduler(String CommandVSName, TopologyVirtualSensor tvs) {
 			this.CommandVSName = CommandVSName;
@@ -653,16 +677,32 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			}
 		}
 		
-		private void sendDataConfigCommand(Integer destination, SensorNodeConfiguration config) {
+		private void sendDataConfig1Command(Integer destination, SensorNodeConfiguration config) {
 			AbstractVirtualSensor vs;
 			String[] fieldnames = {"destination","cmd","arg","repetitioncnt"};
-			Serializable[] values =  {destination.toString(), Short.toString(DATA_CONTROL_CMD), config==null?"0":(Short.toString((short)(config.getConfiguration() + DATA_CONTROL_NETWORK_FLAG + DATA_CONTROL_SENSOR_FLAG))), Short.toString(REPETITION_COUNT)};
+			Serializable[] values =  {destination.toString(), Short.toString(DATA_CONTROL_CMD), config==null?"0":(Short.toString((short)(config.getConfiguration1() + DATA_CONTROL_NETWORK_FLAG + DATA_CONTROL_SENSOR_FLAG))), Short.toString(REPETITION_COUNT)};
 			// old or new config command ?
 			if (config != null && config.vaisala_wxt520) {
-				values[1]=Short.toString(NEW_DATA_CONTROL_CMD);
-				values[2]= config==null?"0":(Short.toString((short)(config.getConfiguration() + DATA_CONTROL_WRITE_FLAG)));
+				values[1]=Short.toString(DATA_CONTROL_CMD1);
+				values[2]= config==null?"0":(Short.toString((short)(config.getConfiguration1() + DATA_CONTROL_WRITE_FLAG)));
 			}
-			logger.debug(CommandVSName+"< dest: "+destination +" data config: "+(config==null?"null":config.getConfiguration()));
+			logger.debug(CommandVSName+"< dest: "+destination +" data config: "+(config==null?"null":config.getConfiguration1()));
+			try {
+				vs = Mappings.getVSensorInstanceByVSName(CommandVSName).borrowVS();
+				logger.debug("send command via "+vs.getVirtualSensorConfiguration().getName());
+				vs.dataFromWeb("tosmsg", fieldnames, values);
+				Mappings.getVSensorInstanceByVSName(CommandVSName).returnVS(vs);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e);
+			}
+		}
+		
+		private void sendDataConfig2Command(Integer destination, SensorNodeConfiguration config) {
+			AbstractVirtualSensor vs;
+			String[] fieldnames = {"destination","cmd","arg","repetitioncnt"};
+			Serializable[] values =  {destination.toString(), Short.toString(DATA_CONTROL_CMD2), config==null?"0":(Short.toString((short)(config.getConfiguration2() + DATA_CONTROL_WRITE_FLAG))), Short.toString(REPETITION_COUNT)};
+			logger.debug(CommandVSName+"< dest: "+destination +" data config: "+(config==null?"null":config.getConfiguration2()));
 			try {
 				vs = Mappings.getVSensorInstanceByVSName(CommandVSName).borrowVS();
 				logger.debug("send command via "+vs.getVirtualSensorConfiguration().getName());
@@ -696,8 +736,13 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				if (currentNode!=null && node_id.equals(currentNode.node_id)) {
 					logger.debug("received configuration update from current node ["+node_id+"]");
 					SensorNodeConfiguration testconfig = new SensorNodeConfiguration(event_value, node_type);
-					if (isDataConfig && currentNode.pendingConfiguration.getConfiguration().equals(testconfig.getConfiguration())) {
-						logger.debug("data configuration done");
+					if (configType==CONFIG_DATA1 && currentNode.pendingConfiguration.getConfiguration1().equals(testconfig.getConfiguration1())) {
+						logger.debug("data configuration1 done");
+						configurationdone = true;
+						this.notify();	
+					}
+					else if (configType==CONFIG_DATA2 && currentNode.pendingConfiguration.getConfiguration2().equals(testconfig.getConfiguration2())) {
+						logger.debug("data configuration2 done");
 						configurationdone = true;
 						this.notify();	
 					}
@@ -706,13 +751,24 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					logger.debug("not current node "+(currentNode==null?"null":currentNode.node_id));
 					for (Iterator<SensorNode> i=queue.iterator();i.hasNext();){
 						SensorNode n = i.next();
-						if (n.node_id.equals(node_id) && n.pendingConfiguration.hasDataConfig()) {
+						if (n.node_id.equals(node_id)) {
 							SensorNodeConfiguration testconfig = new SensorNodeConfiguration(event_value, node_type);
-							if (n.pendingConfiguration.getConfiguration().equals(testconfig.getConfiguration())) {
-								n.pendingConfiguration.removeDataConfig();
-								if (!n.pendingConfiguration.hasPortConfig()) {
-									logger.debug("remove pending config for node "+node_id);
-									i.remove();
+							if (n.pendingConfiguration.hasDataConfig1()) {
+								if (n.pendingConfiguration.getConfiguration1().equals(testconfig.getConfiguration1())) {
+									n.pendingConfiguration.removeDataConfig1();
+									if (!n.pendingConfiguration.hasPortConfig() && !n.pendingConfiguration.hasDataConfig2()) {
+										logger.debug("remove pending config for node "+node_id);
+										i.remove();
+									}
+								}
+							}
+							if (n.pendingConfiguration.hasDataConfig2()) {
+								if (n.pendingConfiguration.getConfiguration2().equals(testconfig.getConfiguration2())) {
+									n.pendingConfiguration.removeDataConfig2();
+									if (!n.pendingConfiguration.hasPortConfig() && !n.pendingConfiguration.hasDataConfig1()) {
+										logger.debug("remove pending config for node "+node_id);
+										i.remove();
+									}
 								}
 							}
 						}
@@ -727,7 +783,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				if (currentNode!=null && node_id.equals(currentNode.node_id)) {
 					logger.debug("received configuration update from current node ["+node_id+"]");
 					SensorNodeConfiguration testconfig = new SensorNodeConfiguration(p1, p2);
-					if (!isDataConfig && currentNode.pendingConfiguration.getPortConfiguration().equals(testconfig.getPortConfiguration())) {
+					if (configType==CONFIG_PORT && currentNode.pendingConfiguration.getPortConfiguration().equals(testconfig.getPortConfiguration())) {
 						logger.debug("port configuration done");
 						configurationdone = true;
 						this.notify();	
@@ -741,7 +797,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 							SensorNodeConfiguration testconfig = new SensorNodeConfiguration(p1, p2);
 							if (n.pendingConfiguration.getPortConfiguration().equals(testconfig.getPortConfiguration())) {
 								n.pendingConfiguration.removePortConfig();
-								if (!n.pendingConfiguration.hasDataConfig()) {
+								if (!n.pendingConfiguration.hasDataConfig1() && !n.pendingConfiguration.hasDataConfig2()) {
 									logger.debug("remove pending config for node "+node_id);
 									i.remove();
 								}
@@ -793,16 +849,21 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 							// send command
 							if (currentNode.node_id.equals(BROADCAST_ADDR)) {
 								logger.debug("send query to "+currentNode.node_id);
-								sendDataConfigCommand(currentNode.node_id, null);
+								sendDataConfig1Command(currentNode.node_id, null);
 							}
-							else if (currentNode.pendingConfiguration.hasDataConfig()) {
-								logger.debug("send data configuration to "+currentNode.node_id);
-								isDataConfig = true;
-								sendDataConfigCommand(currentNode.node_id, currentNode.pendingConfiguration);
+							else if (currentNode.pendingConfiguration.hasDataConfig1()) {
+								logger.debug("send data 1 configuration to "+currentNode.node_id);
+								configType = CONFIG_DATA1;
+								sendDataConfig1Command(currentNode.node_id, currentNode.pendingConfiguration);
+							}
+							else if (currentNode.pendingConfiguration.hasDataConfig2()) {
+								logger.debug("send data 2 configuration to "+currentNode.node_id);
+								configType = CONFIG_DATA2;
+								sendDataConfig2Command(currentNode.node_id, currentNode.pendingConfiguration);
 							}
 							else {
 								logger.debug("send port configuration to "+currentNode.node_id);
-								isDataConfig = false;
+								configType = CONFIG_PORT;
 								sendPortConfigCommand(currentNode.node_id, currentNode.pendingConfiguration);
 							}
 							timeout = NODE_CONFIGURE_TIMEOUT;

@@ -56,6 +56,8 @@
 	<value name="powerswitch_p1" field="powerswitch_p1" style="attribute" usage="optional"/>
 	<value name="powerswitch_p2" field="powerswitch_p2" style="attribute" usage="optional"/>
 	<value name="vaisala_wxt520" field="vaisala_wxt520" style="attribute" usage="optional"/>
+	<value name="th3" field="th3" style="attribute" usage="optional"/>
+	<value name="enviroscan" field="enviroscan" style="attribute" usage="optional"/>
 	<value name="timestamp" field="timestamp" style="attribute" usage="optional"/>
    </mapping>
    
