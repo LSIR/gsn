@@ -33,8 +33,9 @@ var STANDBY_TIMEOUT_MS = 300000;
 var rssi_dist = 25;
 var topologyUpdateTimer;
 var unmarkTimer;
-var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520", "powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
+var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520", "th3","enviroscan", "powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
 var healthitems=new Array("packet_count", "vsys", "vsdi", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
+var nodetypes = Array("SIB", "Corestation (Access Node)", "Powerswitch",  "Corestation (Dutycycled)",  "AE Node" );
 
 var GSN = {
   /**
@@ -167,14 +168,12 @@ function PacketRate() {
             $(this).removeClass("changing");
           // change if not equal
           if ($("input:first",this).data("enabled")=="true" && !$("input:first", this).attr("checked")) {
-            $("input:first", this).attr("checked", "true");
-            $("input:first", this).attr("name", "checked");
+            $("input:first", this).attr("checked", "checked");
             if (apply)
               $(this).addClass("changing");
           }
           else if ($("input:first",this).data("enabled")=="false" && $("input:first", this).attr("checked")) {
-            $("input:first", this).attr("checked", "");
-            $("input:first", this).attr("name", "none");
+            $("input:first", this).removeAttr("checked");
             if (apply)
               $(this).addClass("changing");
           }
@@ -316,19 +315,13 @@ function PacketRate() {
       if (index < 0) {
         table.append("<tr class=\"disabled\">"+
           "<td style=\"display:none\">"+($(this).attr("position")?$(this).attr("position"):"")+"</td><td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
-          "<td></td><td></td><td></td><td></td><td></td></tr>");
+          "<td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
         if (isConfigurable)
         $("tr:last", table).bind("click",function() {
           if (!$(this).hasClass("disabled"))
             return;
           $("input",this).each(function(){
             $(this).removeAttr("disabled");
-            $(this).bind("change", function() {
-              if ($(this).attr("checked"))
-                $(this).attr("name", "checked");
-              else
-                $(this).attr("name", "none");
-            });
           });
           $(this).removeClass("disabled");
           if ($(".configtab input", "#topology_"+current_deployment.name).length==0) {
@@ -357,7 +350,7 @@ function PacketRate() {
                     case 8: //  .. and event packets
                       c = c + " "+configitems[index-2]+"=\"true\"";
                       break;
-                    case 16: break;
+                    case 18: break;
                     default:
                       if ($(this).children().length > 0)
                         c = c + " "+configitems[index-2]+"=\"" + ($("input:first", this).attr("checked")?"true":"false")+"\"";
@@ -418,7 +411,7 @@ function PacketRate() {
             switch (index) {
             case 0:
             case 1: break;
-            case 16:
+            case 18:
               $(this).text(formatTime($(data).attr(configitems[index-2])));
               break;
             default:
@@ -438,8 +431,10 @@ function PacketRate() {
                     $(this).addClass("changing");
                   else
                     $(this).removeClass("changing");
-                  $("input:first", this).attr("checked", $(data).attr(configitems[index-2])=="true"?"checked":"");
-                  $("input:first", this).attr("name", $(data).attr(configitems[index-2])=="true"?"checked":"none");
+                  if ($(data).attr(configitems[index-2])=="true")
+                    $("input:first", this).attr("checked", "checked");
+                  else
+                    $("input:first", this).removeAttr("checked");
                 }
                 else {// compare to current status
                   if ($("input:first", this).attr("checked") && $(data).attr(configitems[index-2])=="true" ||
@@ -569,8 +564,13 @@ $(document).ready(function() {
           "href":"javascript:showTopology("+i+")"
           },deployments[i])));
         // add div
-        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\"class=\"statusbar\"></div><div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
+        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
+            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
+            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
+            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
             "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
+        //$("#topology_"+deployments[i]+" .nodeinfo").show();
+        $("#topology_"+deployments[i]+" .nodeinfo img").bind("click", function() { $(this).parent().parent().hide();});
         if (deployments[i]!=visible)
           $("#topology_"+deployments[i]).hide();
         else
@@ -637,14 +637,22 @@ $(document).ready(function() {
             .fillStyle(function(d) {
               var now=new Date().getTime();
               if (now - d.timestamp > STANDBY_TIMEOUT_MS)
-                return "#ffa0a0";
+                return d.selected?"#ffd0d0":"#ffa0a0";
               else if (now - d.timestamp > ACTIVE_TIMEOUT_MS)
-                return "#a0c0a0";
+                return d.selected?"#d0e0d0":"#a0c0a0";
               else
-                return "#a0ffa0";
+                return d.selected?"#d0fff0":"#a0ffa0";
             })
             .strokeStyle(function() {return this.fillStyle().darker()})
-            .lineWidth(function(d) { return d.nodetype==1?5:(d.corestation_running=="true"?5:1); }); /*
+            .lineWidth(function(d) { return d.nodetype==1?5:(d.corestation_running=="true"?5:1); })
+            .event("mouseover", function(d) {d.selected = true;this.render()})
+            .event("mouseout", function(d) {d.selected = false;this.render()})
+            .event("click", function(d) {
+                var nodeinfo = $("#topology_"+current_deployment.name+" .nodeinfo");
+                nodeinfo.find(".title").empty().append("Node ID: "+d.node_id);
+                nodeinfo.find(".infocontainer").empty().append("Type: "+nodetypes[d.nodetype]+ (d.nodetype==3?(" "+d.corestation_running):""));
+                nodeinfo.show();
+              }); /*
             .event("mousedown", pv.Behavior.drag())
             .event("drag", deployment_data[deployment_data.length-1].force);*/
         deployment_data[deployment_data.length-1].force
@@ -717,8 +725,10 @@ $(document).ready(function() {
             "<th class=\"header\">events</th>"+
             "<th class=\"header\">rssi</th>"+
             "<th class=\"header\">statecounter</th>"+
-            "<th class=\"header\">decagonmux</th>"+
+            "<th class=\"header\">decagon</th>"+
             "<th class=\"header\">vaisala</th>"+
+            "<th class=\"header\">th3</th>"+
+            "<th class=\"header\">enviroscan</th>"+
             "<th class=\"header\">powerswitch</th>"+
             "<th class=\"header\">p1</th>"+
             "<th class=\"header\">p2</th>"+
@@ -743,7 +753,9 @@ $(document).ready(function() {
               12: { sorter: 'checkbox' },
               13: { sorter: 'checkbox' },
               14: { sorter: 'checkbox' },
-              15: { sorter: 'checkbox' }
+              15: { sorter: 'checkbox' },
+              16: { sorter: 'checkbox' },
+              17: { sorter: 'checkbox' }
             } 
         });
         // add status bar
