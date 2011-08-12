@@ -314,7 +314,7 @@ public class SensorNode {
 	}
 
 	public boolean isDozerSink() {
-		return node_id >= 1024;
+		return node_id <= 1024;
 	}
 
 }
