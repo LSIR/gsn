@@ -313,4 +313,8 @@ public class SensorNode {
 		corestation_running = true;
 	}
 
+	public boolean isDozerSink() {
+		return node_id >= 1024;
+	}
+
 }

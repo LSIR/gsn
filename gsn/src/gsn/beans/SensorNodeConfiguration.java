@@ -18,6 +18,11 @@ public class SensorNodeConfiguration {
 	public Boolean enviroscan = null;
 	public Boolean powerswitch_p1 = null;
 	public Boolean powerswitch_p2 = null;
+	
+	public static final int QUERY_TYPE_OLD = 1;
+	public static final int QUERY_TYPE_1 = 3;
+	public static final int QUERY_TYPE_2 = 4;
+	public Integer querytype = null;
 	public Long timestamp;
 	
 	//data sources 1
@@ -51,6 +56,7 @@ public class SensorNodeConfiguration {
 		update(config.getConfiguration1(), node_type);
 		update((short)(config.getConfiguration2() + DATASOURCES2_FLAG), node_type);
 		update(config.powerswitch_p1, config.powerswitch_p2);
+		querytype = config.querytype;
 		timestamp = config.timestamp;
 	}
 
@@ -65,6 +71,10 @@ public class SensorNodeConfiguration {
 
 	public SensorNodeConfiguration(Boolean p1, Boolean p2) {
 		update(p1, p2);
+	}
+	
+	public SensorNodeConfiguration(Integer querytype) {
+		this.querytype = querytype;
 	}
 
 	public void update(Short config, Integer node_type) {
@@ -179,6 +189,10 @@ public class SensorNodeConfiguration {
 		);
 	}
 	
+	public boolean isQuery() {
+		return querytype != null;
+	}
+	
 	private static boolean bothNullOrEqual(Object x, Object y) {
 		  return ( x == null ? y == null : x.equals(y) );
 	}
@@ -204,7 +218,8 @@ public class SensorNodeConfiguration {
 				bothNullOrEqual(sc.powerswitch_p2, this.powerswitch_p2) &&
 				bothNullOrEqual(sc.vaisala_wxt520, this.vaisala_wxt520) &&
 				bothNullOrEqual(sc.th3, this.th3) &&
-				bothNullOrEqual(sc.enviroscan, this.enviroscan);
+				bothNullOrEqual(sc.enviroscan, this.enviroscan) &&
+				bothNullOrEqual(sc.querytype, this.querytype);
 		}
 		else
 			return false;
@@ -228,6 +243,7 @@ public class SensorNodeConfiguration {
 			"\nvaisala_wxt520: "+vaisala_wxt520+
 			"\nth3: "+th3+
 			"\nenviroscan: "+enviroscan+
+			"\nisquery: "+querytype+
 			"\ntimestamp:"+timestamp;
 	}
 

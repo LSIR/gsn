@@ -39,7 +39,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	private static final long NODE_TIMEOUT = 7 * 24 * 3600000; // time until a node and its history is removed
 	private static final long NODE_CONFIGURABLE_TIME = 5 * 60000; // time until a node is not configurable anymore
 	private static final long NODE_CONFIGURE_TIMEOUT = 6 * 60000; // time to wait until configuration is resent
-	private static final long NODE_CONFIGURE_NEXT_TRY_TIMEOUT = 30000; // time to wait until next configuration enry is tried
+	private static final long NODE_CONFIGURE_NEXT_TRY_TIMEOUT = 30000; // time to wait until next configuration entry is tried
+	private static final long NODE_CONFIGURE_CHECK_TIMEOUT = 2 * 3600; // time to wait between config checks
 	private static final short EVENT_DATACONFIG = 40;
 	private static final short EVENT_PSB_POWER = 32;
 	private static final short EVENT_BB_POWER_OFF = 31;
@@ -408,6 +409,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			newnode.pendingConfiguration = new SensorNodeConfiguration(c, nodetype);
 			newnode.pendingConfiguration.removeDataConfig2();
 			newnode.pendingConfiguration.removePortConfig();
+			newnode.pendingConfiguration.querytype = null;
 			newnode.pendingConfiguration.timestamp = System.currentTimeMillis();
 			queue.add(newnode);
 		}
@@ -417,6 +419,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			newnode.pendingConfiguration = new SensorNodeConfiguration(c, nodetype);
 			newnode.pendingConfiguration.removeDataConfig1();
 			newnode.pendingConfiguration.removePortConfig();
+			newnode.pendingConfiguration.querytype = null;
 			newnode.pendingConfiguration.timestamp = System.currentTimeMillis();
 			queue.add(newnode);
 		}
@@ -426,8 +429,19 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			newnode.pendingConfiguration = new SensorNodeConfiguration(c, nodetype);
 			newnode.pendingConfiguration.removeDataConfig1();
 			newnode.pendingConfiguration.removeDataConfig2();
+			newnode.pendingConfiguration.querytype = null;
 			newnode.pendingConfiguration.timestamp = System.currentTimeMillis();
 			queue.add(newnode);
+		}
+		if (c.isQuery()) {
+			logger.debug("add query to queue for node "+node_id);
+			SensorNode newnode = new SensorNode(node_id);
+			newnode.pendingConfiguration = new SensorNodeConfiguration(c, nodetype);
+			newnode.pendingConfiguration.removeDataConfig1();
+			newnode.pendingConfiguration.removeDataConfig2();
+			newnode.pendingConfiguration.removePortConfig();
+			newnode.pendingConfiguration.timestamp = System.currentTimeMillis();
+			queue.add(newnode);			
 		}
 	}
 	
@@ -636,6 +650,35 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		}
 	}
 	
+	protected void queryUnconfiguredNodes() {
+		boolean broadcastquery = false;
+		ArrayList<SensorNode> configurationQueue = new ArrayList<SensorNode>();
+		synchronized (nodes) {			
+			for (SensorNode n: nodes.values()) {
+				if (n.node_id !=null && n.timestamp != null && n.generation_time != null) {
+					if ((n.configuration == null) && (System.currentTimeMillis() - n.generation_time < NODE_CONFIGURABLE_TIME)) {
+						if (n.isDozerSink()) {
+							logger.info("query acces node "+n.node_id+" for configuration.");
+							addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_OLD), configurationQueue);
+							addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_1), configurationQueue);
+							addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_2), configurationQueue);
+						}
+						else if (!broadcastquery) {
+							logger.info("broadcast query for configuration.");
+							broadcastquery = true;
+							addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_OLD), configurationQueue);
+							addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_1), configurationQueue);
+							addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_2), configurationQueue);
+						}
+					}
+				}
+			}
+		}
+		if (configurationQueue.size()>0 && scheduler!=null) {
+			scheduler.reschedule(configurationQueue);
+		}
+	}
+	
 	class CommandScheduler extends Thread {
 
 		private final static short CONFIG_NONE = 0;
@@ -674,6 +717,22 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			synchronized (this) {
 				rescheduled = true;
 				this.notify();
+			}
+		}
+		
+		private void sendDataConfigQueryCommand(Integer destination, SensorNodeConfiguration config) {
+			AbstractVirtualSensor vs;
+			String[] fieldnames = {"destination","cmd","arg","repetitioncnt"};
+			Serializable[] values =  {destination.toString(), Integer.toString(config.querytype), "0", Short.toString(REPETITION_COUNT)};
+			logger.debug(CommandVSName+"< dest: "+destination +" data query config: "+config.querytype);
+			try {
+				vs = Mappings.getVSensorInstanceByVSName(CommandVSName).borrowVS();
+				logger.debug("send command via "+vs.getVirtualSensorConfiguration().getName());
+				vs.dataFromWeb("tosmsg", fieldnames, values);
+				Mappings.getVSensorInstanceByVSName(CommandVSName).returnVS(vs);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 		
@@ -817,7 +876,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					while (running) {
 						if (queue.size()==0) {
 							logger.debug("suspend scheduler");
-							this.wait();
+							this.wait(NODE_CONFIGURE_CHECK_TIMEOUT);
 						}
 						logger.debug("unsuspend scheduler");
 						if (rescheduled) {
@@ -828,6 +887,11 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 							break;
 						// node online?
 						logger.debug("queue has "+queue.size()+" entries");
+						if (queue.size()==0) {
+							logger.debug("check for online nodes that returned no configuration information.");
+							tvs.queryUnconfiguredNodes();
+							continue;
+						}
 						for (Iterator<SensorNode> i = queue.iterator();i.hasNext();) {
 							SensorNode n=i.next();
 							if (n.node_id.equals(BROADCAST_ADDR)) {
@@ -847,9 +911,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 							queue.remove(currentNode);
 							queue.add(currentNode);
 							// send command
-							if (currentNode.node_id.equals(BROADCAST_ADDR)) {
+							if (currentNode.pendingConfiguration.isQuery()) {
 								logger.debug("send query to "+currentNode.node_id);
-								sendDataConfig1Command(currentNode.node_id, null);
+								sendDataConfigQueryCommand(currentNode.node_id, currentNode.pendingConfiguration);
+								configurationdone = true;
 							}
 							else if (currentNode.pendingConfiguration.hasDataConfig1()) {
 								logger.debug("send data 1 configuration to "+currentNode.node_id);
