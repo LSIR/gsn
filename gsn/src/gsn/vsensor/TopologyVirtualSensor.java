@@ -40,7 +40,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	private static final long NODE_CONFIGURABLE_TIME = 5 * 60000; // time until a node is not configurable anymore
 	private static final long NODE_CONFIGURE_TIMEOUT = 6 * 60000; // time to wait until configuration is resent
 	private static final long NODE_CONFIGURE_NEXT_TRY_TIMEOUT = 30000; // time to wait until next configuration entry is tried
-	private static final long NODE_CONFIGURE_CHECK_TIMEOUT = 2 * 3600; // time to wait between config checks
+	private static final long NODE_CONFIGURE_CHECK_TIMEOUT = 2 * 3600000; // time to wait between config checks
 	private static final short EVENT_DATACONFIG = 40;
 	private static final short EVENT_PSB_POWER = 32;
 	private static final short EVENT_BB_POWER_OFF = 31;
@@ -641,23 +641,38 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	
 	protected void queryUnconfiguredNodes() {
 		boolean broadcastquery = false;
+		boolean dosinglequery = false;
 		ArrayList<SensorNode> configurationQueue = new ArrayList<SensorNode>();
 		synchronized (nodes) {			
+			// count online nodes with unknown configuration
+			int toconfigure = 0;
+			int online = 0;
 			for (SensorNode n: nodes.values()) {
-				if (n.node_id !=null && n.timestamp != null && n.generation_time != null) {
-					if ((n.configuration == null) && (System.currentTimeMillis() - n.generation_time < NODE_CONFIGURABLE_TIME)) {
-						if (n.isDozerSink()) {
-							logger.info("query acces node "+n.node_id+" for configuration.");
-							addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_OLD), configurationQueue);
-							addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_1), configurationQueue);
-							addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_2), configurationQueue);
-						}
-						else if (!broadcastquery) {
-							logger.info("broadcast query for configuration.");
-							broadcastquery = true;
-							addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_OLD), configurationQueue);
-							addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_1), configurationQueue);
-							addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_2), configurationQueue);
+				if (n.node_id !=null && n.timestamp != null && n.generation_time != null && (System.currentTimeMillis() - n.generation_time < NODE_CONFIGURABLE_TIME)) {
+					online++;
+					if ((n.configuration == null || !n.configuration.hasDataConfig1()) && !n.isDozerSink())
+						toconfigure++;
+				}
+			}
+			dosinglequery = (double)toconfigure < 0.75 * (double)online; // do configuration query with broadcast if there are more than 75% unknown
+			if (toconfigure > 0) {
+				logger.info("There are "+toconfigure+" unknown configurations (number of online nodes: "+online+")");
+				for (SensorNode n: nodes.values()) {
+					if (n.node_id !=null && n.timestamp != null && n.generation_time != null) {
+						if ((n.configuration == null || !n.configuration.hasDataConfig1()) && (System.currentTimeMillis() - n.generation_time < NODE_CONFIGURABLE_TIME)) {
+							if (n.isDozerSink() || dosinglequery) {
+								logger.info("query node "+n.node_id+" for configuration.");
+								addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_OLD), configurationQueue);
+								addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_1), configurationQueue);
+								addToQueue(n.node_id, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_2), configurationQueue);
+							}
+							else if (!broadcastquery) {
+								logger.info("broadcast query for configuration.");
+								broadcastquery = true;
+								addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_OLD), configurationQueue);
+								addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_1), configurationQueue);
+								addToQueue(BROADCAST_ADDR, n.nodetype, new SensorNodeConfiguration(SensorNodeConfiguration.QUERY_TYPE_2), configurationQueue);
+							}
 						}
 					}
 				}
