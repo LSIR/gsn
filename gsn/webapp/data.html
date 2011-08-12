@@ -502,10 +502,10 @@
                       if (row[0]>=ux_start && row[0]<=ux_end) {
                         var timestamp = new Date(row[0]);
                         $(visibles).each(function(index){
-                          if (index==0)
+                          if (this==0)
                             csv+=timestamp.getFullYear()+"/"+(timestamp.getMonth()+1)+"/"+timestamp.getDate()+" "+timestamp.getHours()+":"+timestamp.getMinutes()+":" +timestamp.getSeconds();
                           else
-                            csv+=','+row[index];
+                            csv+=','+row[this];
                         });
                         csv+="\n";
                       }
