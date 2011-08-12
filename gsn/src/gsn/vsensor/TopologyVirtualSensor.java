@@ -467,17 +467,6 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				synchronized (nodes) {
 					// remove all pending configurations
 					// are there any missing configurations ?
-					boolean queryNetwork = false;
-					for (SensorNode n: nodes.values()) {
-						n.pendingConfiguration=null;
-						if (n.configuration==null && (System.currentTimeMillis() - n.generation_time < NODE_CONFIGURABLE_TIME) && !n.isAccessNode())
-							queryNetwork=true;
-					}
-					if (queryNetwork) {
-						logger.debug("enqueue query network command");
-						SensorNode newnode = new SensorNode(BROADCAST_ADDR);
-						configurationQueue.add(newnode);
-					}
 					for (SensorNode n: parsedconfiguration.sensornodes) {
 						// compare with current configuration
 						SensorNode cn = nodes.get(n.node_id);
@@ -709,7 +698,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			newqueue = new ArrayList<SensorNode>();
 			for (Iterator<SensorNode> i=network.iterator();i.hasNext();) {
 				SensorNode n = i.next();
-				if (n.pendingConfiguration != null || n.node_id.equals(BROADCAST_ADDR)) {
+				if (n.pendingConfiguration != null) {
 					newqueue.add(n);
 				}
 			}
@@ -898,13 +887,9 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						}
 						for (Iterator<SensorNode> i = queue.iterator();i.hasNext();) {
 							SensorNode n=i.next();
-							if (n.node_id.equals(BROADCAST_ADDR)) {
+							configurationdone = false;
+							if (tvs.isOnline(n.node_id) || n.node_id.equals(BROADCAST_ADDR)) {
 								currentNode = n;
-								configurationdone = true;
-							}
-							else if (tvs.isOnline(n.node_id)) {
-								currentNode = n;
-								configurationdone = false;
 								break;
 							}
 							else {
