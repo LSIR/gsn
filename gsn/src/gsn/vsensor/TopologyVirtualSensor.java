@@ -570,7 +570,6 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			commandConfigurationValue = commandConfigurationValue.toLowerCase();
 			logger.debug("start command scheduler");
 			scheduler = new CommandScheduler(commandConfigurationValue, this);
-			scheduler.start();
 			configurable = true;
 		}
 		nodes = new Hashtable<Integer, SensorNode>();
@@ -627,9 +626,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	    else {
 	    	logger.info("no old network status found.");
 	    }
-
-		if (configurationQueue.size()>0 && scheduler!=null) {
-			scheduler.reschedule(configurationQueue);
+	    if (scheduler!=null) {
+	    	scheduler.start();
+	    	if (configurationQueue.size()>0)
+	    		scheduler.reschedule(configurationQueue);
 		}	    
 		return true;
 	}
