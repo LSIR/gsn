@@ -256,8 +256,9 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					p2 = ((Byte)s == 1);
 				if (p1!=null && p2!=null) {
 					if (node.configuration==null)
-						node.configuration=new SensorNodeConfiguration();
-					node.configuration.update(p1, p2);
+						node.configuration=new SensorNodeConfiguration(p1, p2);
+					else
+						node.configuration.update(p1, p2);
 					logger.debug("received port info: "+p1+" "+p2);
 					if (node.pendingConfiguration!=null) {
 						if (node.pendingConfiguration.hasPortConfig())

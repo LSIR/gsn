@@ -25,6 +25,8 @@ public class SensorNodeConfiguration {
 	public Integer querytype = null;
 	public Long timestamp;
 	
+	private Integer nodetype = SensorNode.NODE_TYPE_SIB;
+	
 	//data sources 1
 	private final static int INDEX_INFO = 0;
 	private final static int INDEX_HEALTH = 1;
@@ -48,28 +50,32 @@ public class SensorNodeConfiguration {
 	
 	private final static int DATASOURCES2_FLAG = 0x800;
 	
-	public SensorNodeConfiguration() {
+	/*public SensorNodeConfiguration() {
 		timestamp = System.currentTimeMillis();
-	}
+	}*/
 	
 	public SensorNodeConfiguration(SensorNodeConfiguration config, Integer node_type) {
-		update(config.getConfiguration1(), node_type);
-		update((short)(config.getConfiguration2() + DATASOURCES2_FLAG), node_type);
+		nodetype = node_type;
+		update(config.getConfiguration1());
+		update((short)(config.getConfiguration2() + DATASOURCES2_FLAG));
 		update(config.powerswitch_p1, config.powerswitch_p2);
 		querytype = config.querytype;
 		timestamp = config.timestamp;
 	}
 
 	public SensorNodeConfiguration(Short config, Integer node_type, Long timestamp) {
-		update(config, node_type);
+		nodetype = node_type;
+		update(config);
 		this.timestamp = timestamp;
 	}
 	
 	public SensorNodeConfiguration(Short config, Integer node_type) {
-		update(config, node_type);
+		nodetype = node_type;
+		update(config);
 	}
 
 	public SensorNodeConfiguration(Boolean p1, Boolean p2) {
+		nodetype = SensorNode.NODE_TYPE_POWERSWITCH;
 		update(p1, p2);
 	}
 	
@@ -78,30 +84,42 @@ public class SensorNodeConfiguration {
 	}
 
 	public void update(Short config, Integer node_type) {
+		if (node_type!=null)
+			nodetype = node_type;
+		update(config);
+	}
+	
+	public void update(Short config) {
 		if ((config & DATASOURCES2_FLAG) == 0) {
 			info = (config & (1 << INDEX_INFO)) > 0;
 			health = (config & (1 << INDEX_HEALTH)) > 0;
-			adcmux = (config & (1 << INDEX_ADCMUX)) > 0;
-			adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0;
-			dcx = (config & (1 << INDEX_DCX)) > 0;
 			drift = (config & (1 << INDEX_DRIFT)) > 0;
 			events = (config & (1 << INDEX_EVENTS)) > 0;
 			rssi = (config & (1 << INDEX_RSSI)) > 0;
 			statecounter = (config & (1 << INDEX_STATECOUNTER)) > 0;
-			if (node_type == SensorNode.NODE_TYPE_SIB)
+			if (nodetype == SensorNode.NODE_TYPE_SIB) {
+				adcmux = (config & (1 << INDEX_ADCMUX)) > 0;
+				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0;
+				dcx = (config & (1 << INDEX_DCX)) > 0;
 				decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
-			else if (node_type == SensorNode.NODE_TYPE_POWERSWITCH)
+				vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
+			}
+			else if (nodetype == SensorNode.NODE_TYPE_POWERSWITCH)
 				powerswitch= (config & (1 << INDEX_POWERSWITCH)) > 0;
-			vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
+			else if (nodetype == SensorNode.NODE_TYPE_AE)
+				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0; // ae data
 		}
 		else {
-			th3 = (config & (1 << INDEX_TH3)) > 0;
-			enviroscan = (config & (1 << INDEX_ENVIROSCAN)) > 0;
+			if (nodetype == SensorNode.NODE_TYPE_SIB) {
+				th3 = (config & (1 << INDEX_TH3)) > 0;
+				enviroscan = (config & (1 << INDEX_ENVIROSCAN)) > 0;
+			}
 		}
 		timestamp = System.currentTimeMillis();
 	}
 	
 	public void update(Boolean p1, Boolean p2) {
+		nodetype = SensorNode.NODE_TYPE_POWERSWITCH;
 		powerswitch_p1 = p1;
 		powerswitch_p2 = p2;
 		timestamp = System.currentTimeMillis();
@@ -117,19 +135,29 @@ public class SensorNodeConfiguration {
 	}
 	
 	public boolean hasDataConfig1() {
-		return
+		boolean hasconfig =
 			info!=null && 
 			health!=null &&
-			adcmux!=null &&
-			adccomdiff!=null &&
-			dcx!=null &&
 			drift!=null &&
 			events!=null &&
 			rssi!=null &&
-			statecounter!=null &&
-			(decagonmux!=null ||
-			powerswitch!=null) &&
-			vaisala_wxt520!=null;
+			statecounter!=null;	
+		switch (nodetype) {
+		case SensorNode.NODE_TYPE_SIB:
+			return hasconfig &&
+			adcmux!=null &&
+			adccomdiff!=null &&
+			dcx!=null &&
+			decagonmux!=null;
+		case SensorNode.NODE_TYPE_POWERSWITCH:
+			return hasconfig &&
+			powerswitch!=null;
+		case SensorNode.NODE_TYPE_AE:
+			return hasconfig &&
+			adccomdiff!=null;
+		default:
+			return hasconfig;
+		}
 	}
 	
 	public boolean hasDataConfig2() {
