@@ -25,7 +25,7 @@ public class SensorNodeConfiguration {
 	public Integer querytype = null;
 	public Long timestamp;
 	
-	private Integer nodetype = SensorNode.NODE_TYPE_UNKNOWN;
+	private Integer nodetype = null;
 	
 	//data sources 1
 	private final static int INDEX_INFO = 0;
@@ -100,20 +100,20 @@ public class SensorNodeConfiguration {
 			events = (config & (1 << INDEX_EVENTS)) > 0;
 			rssi = (config & (1 << INDEX_RSSI)) > 0;
 			statecounter = (config & (1 << INDEX_STATECOUNTER)) > 0;
-			if (nodetype == SensorNode.NODE_TYPE_SIB) {
+			if (getNodeType() == SensorNode.NODE_TYPE_SIB) {
 				adcmux = (config & (1 << INDEX_ADCMUX)) > 0;
 				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0;
 				dcx = (config & (1 << INDEX_DCX)) > 0;
 				decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
 				vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
 			}
-			else if (nodetype == SensorNode.NODE_TYPE_POWERSWITCH)
+			else if (getNodeType() == SensorNode.NODE_TYPE_POWERSWITCH)
 				powerswitch= (config & (1 << INDEX_POWERSWITCH)) > 0;
-			else if (nodetype == SensorNode.NODE_TYPE_AE)
+			else if (getNodeType() == SensorNode.NODE_TYPE_AE)
 				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0; // ae data
 		}
 		else {
-			if (nodetype == SensorNode.NODE_TYPE_SIB) {
+			if (getNodeType() == SensorNode.NODE_TYPE_SIB) {
 				th3 = (config & (1 << INDEX_TH3)) > 0;
 				enviroscan = (config & (1 << INDEX_ENVIROSCAN)) > 0;
 			}
@@ -145,7 +145,7 @@ public class SensorNodeConfiguration {
 			events!=null &&
 			rssi!=null &&
 			statecounter!=null;	
-		switch (nodetype) {
+		switch (getNodeType()) {
 		case SensorNode.NODE_TYPE_SIB:
 			return hasconfig &&
 			adcmux!=null &&
@@ -276,6 +276,10 @@ public class SensorNodeConfiguration {
 			"\nenviroscan: "+enviroscan+
 			"\nisquery: "+querytype+
 			"\ntimestamp:"+timestamp;
+	}
+	
+	private Integer getNodeType() {
+		return nodetype!=null?nodetype:SensorNode.NODE_TYPE_UNKNOWN;
 	}
 
 }
