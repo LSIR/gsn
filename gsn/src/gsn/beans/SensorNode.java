@@ -14,11 +14,12 @@ public class SensorNode {
 	
 	private final transient Logger logger = Logger.getLogger( this.getClass() );
 	
-	static final int NODE_TYPE_SIB = 0;
-	static final int NODE_TYPE_ACCESS_NODE = 1;
-	static final int NODE_TYPE_POWERSWITCH = 2;
-	static final int NODE_TYPE_BBCONTROL = 3;
-	static final int NODE_TYPE_AE = 4;
+	public static final int NODE_TYPE_SIB = 0;
+	public static final int NODE_TYPE_ACCESS_NODE = 1;
+	public static final int NODE_TYPE_POWERSWITCH = 2;
+	public static final int NODE_TYPE_BBCONTROL = 3;
+	public static final int NODE_TYPE_AE = 4;
+	public static final Integer NODE_TYPE_UNKNOWN = -1;
 	
 	static final int VOLTAGE_HISTORY_SIZE = 60; // ~ 2h 
 	

@@ -25,7 +25,7 @@ public class SensorNodeConfiguration {
 	public Integer querytype = null;
 	public Long timestamp;
 	
-	private Integer nodetype = SensorNode.NODE_TYPE_SIB;
+	private Integer nodetype = SensorNode.NODE_TYPE_UNKNOWN;
 	
 	//data sources 1
 	private final static int INDEX_INFO = 0;
@@ -55,7 +55,8 @@ public class SensorNodeConfiguration {
 	}*/
 	
 	public SensorNodeConfiguration(SensorNodeConfiguration config, Integer node_type) {
-		nodetype = node_type;
+		if (node_type != null)
+			nodetype = node_type;
 		update(config.getConfiguration1());
 		update((short)(config.getConfiguration2() + DATASOURCES2_FLAG));
 		update(config.powerswitch_p1, config.powerswitch_p2);
@@ -64,13 +65,15 @@ public class SensorNodeConfiguration {
 	}
 
 	public SensorNodeConfiguration(Short config, Integer node_type, Long timestamp) {
-		nodetype = node_type;
+		if (node_type != null)
+			nodetype = node_type;
 		update(config);
 		this.timestamp = timestamp;
 	}
 	
 	public SensorNodeConfiguration(Short config, Integer node_type) {
-		nodetype = node_type;
+		if (node_type != null)
+			nodetype = node_type;
 		update(config);
 	}
 
