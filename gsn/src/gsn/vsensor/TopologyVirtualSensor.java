@@ -2,6 +2,7 @@
 package gsn.vsensor;
 
 import java.io.ByteArrayInputStream;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -961,7 +962,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					}
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				PrintStream ps = new PrintStream(baos);
+				e.printStackTrace(ps);
+				logger.debug(baos.toString());
 				logger.error(e);
 			}	
 			logger.debug("command scheduler ended");
