@@ -882,6 +882,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					if (queue.size()==0) {
 						logger.debug("check for online nodes that returned no configuration information.");
 						tvs.queryUnconfiguredNodes();
+						if (rescheduled) {
+							rescheduled = false;
+							queue = newqueue;							
+						}
 					}
 					while (running) {
 						if (queue.size()==0) {
