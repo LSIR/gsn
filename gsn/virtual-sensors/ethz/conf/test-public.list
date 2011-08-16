@@ -113,5 +113,5 @@ OSTest_OZ47_Concentration.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
-Statistics_Sensorviz__mapped.xml
-Statistics_Sensorviz__parsed.xml
+#Statistics_Sensorviz__mapped.xml
+#Statistics_Sensorviz__parsed.xml
