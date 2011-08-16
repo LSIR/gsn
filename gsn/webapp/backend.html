@@ -87,7 +87,7 @@ $(document).ready(function() {
 function addDeployments() {
   // add deployment tabs and container
   var visible=-1;
-  var d = GsnPlots.getDeployments();
+  var d = GsnPlots.getDeployments("Statistics");
   $(d).each(function() {
     if ($.cookie("deployment")==this)
       visible = this;
@@ -104,7 +104,7 @@ function addDeployments() {
 }
 
 function showPlots(id) {
-  $(GsnPlots.getDeployments()).each(function() {
+  $(GsnPlots.getDeployments("Statistics")).each(function() {
       $("#plot_"+this).empty().hide();
       $("#deployment_menu_item_"+this).removeClass("selected");
   });

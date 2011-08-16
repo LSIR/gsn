@@ -83,11 +83,15 @@ var GsnPlots = {
     GsnPlots.readycallback();
   },
     
-  getDeployments: function() {
+  getDeployments: function(rincl, rexcl) {
+    if (!rincl && !rexcl)
+      rincl=".*";
     var d = Array();
     $(GsnPlots.deployments).each(function() {
-      if (this.graphconfig.length > 0)
-        d.push(this.name);
+      if (this.name.match(rincl)) {
+        if (!rexcl || !this.name.match(rexcl))
+          d.push(this.name);
+      }
     });
     return d;
   },
