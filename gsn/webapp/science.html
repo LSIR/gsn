@@ -29,6 +29,8 @@ var nabelDueConfig
 var nabelZueConfig
 var ozoneDueConfig
 var ozoneZueConfig
+var coZueConfig
+var no2DueConfig
                                                                                                      
 $(document).ready(function() {
     $.get('/menu.jsp', {selected: "science"}, function(data) {
@@ -39,80 +41,191 @@ $(document).ready(function() {
     // plot configuration
     GsnPlots.setConfig([
       // test
-      {"vsensor":"dozer_th3temp__conv",
-       "field":["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
-       "title":"Temperatures",
-       "select":"sensornode[position=6]"},
+      {  title:"Temperatures",
+         signals: [{
+          vsensor:".*_dozer_th3temp__conv",
+          field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
+          /*select:"sensornode[position=6]",*/ position:[6]
+        }],      
+      },
+
+      // opensense
+      { title:"Air Pollution NABEL Duebendorf",
+        signals: [{
+          vsensor:".*_nabel_duebendorf__mapped",
+          field:["ozone_ppb","co_ppm","no2_ppb"],
+          deviceId: [100]
+        }]       
+      },
+      { title:"Air Pollution NABEL Zuerich",
+        signals: [{
+          vsensor:".*_nabel_zuerich__mapped",
+          field:["ozone_ppb","co_ppm","no2_ppb"],
+          deviceId: [100]
+        }]
+      },
+      { title:"Ozone Concentration Duebendorf: NABEL vs. Gas Sensor",
+        signals: [{
+          vsensor:".*_nabel_duebendorf__mapped",
+          field:["ozone_ppb"],
+          deviceId: [100]
+        },{
+          vsensor:".*_oz47_dynamic__mapped",
+          field:["ozone_sensor_1"],
+          deviceId: [1]
+        },{
+          vsensor:".*_oz47_concentration",
+          field:["ozone_ppb"],
+          deviceId: [1]
+        }]
+      },
+      { title:"Ozone Concentration Zuerich: NABEL vs. Gas Sensor",
+        signals: [{
+          vsensor:".*_nabel_zuerich__mapped",
+          field:["ozone_ppb"],
+          deviceId: [100]
+        },{
+          vsensor:".*_oz47_dynamic__mapped",
+          field:["ozone_sensor_1"],
+          deviceId: [3]
+        }]
+      },
+      { title:"Carbon Monoxide Concentration Zuerich: NABEL vs. Gas Sensor",
+        signals: [{
+          vsensor:".*_nabel_zuerich__mapped",
+          field:["co_ppm"],
+          deviceId: [100]
+        },{
+          vsensor:".*_alphasense_dynamic__mapped",
+          field:["sensor_ppm_1"],
+          deviceId: [3]
+        }]
+      },
+      { title:"Nitrogen Dioxide Concentration Duebendorf: NABEL vs. Gas Sensor",
+        signals: [{
+          vsensor:".*_nabel_duebendorf__mapped",
+          field:["no2_ppb"],
+          deviceId: [100]
+        },{
+          vsensor:".*_alphasense_dynamic__mapped",
+          field:["sensor_ppm_1"],
+          deviceId: [1]
+        }]
+      },
+
       // matterhorn
-      {"vsensor":"sensorrod1",
-       "field":["sr_t1","sr_t2","sr_t3","sr_t4"],
-       "title":"Sensorrod Temperatures",
-       "select":"sensornode[position=10]"},
-      {"vsensor":"crackmeter__ccnn",
-       "field":["ccnn_dx0"],
-       "title":"Crackmeter",
-       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=22]"},
-      {"vsensor":"crackmeter__ccnn",
-       "field":["ccnn_dx1"],
-       "title":"Crackmeter",
-       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=22]"},
-      {"vsensor":"crackmeter__ccct",
-       "field":["ccct_dx0"],
-       "title":"Crackmeter",
-       "select":"sensornode[position=9]"},
-      {"vsensor":"crackmeter__ccct",
-       "field":["ccct_dx2"],
-       "title":"Crackmeter",
-       "select":"sensornode[position=9]"},
-      {"vsensor":"crackmeter__ctct",
-       "field":["ctct_dx1"],
-       "title":"Crackmeter",
-       "select":"sensornode[position=6]"},
-      {"vsensor":"crackmeter__ctct",
-       "field":["ctct_dx2"],
-       "title":"Crackmeter",
-       "select":"sensornode[position=6]"},
-      {"vsensor":"crackmeter__nctt",
-       "field":["nctt_dx1"],
-       "title":"Crackmeter",
-       "select":"sensornode[position=1],sensornode[position=2],sensornode[position=3],sensornode[position=4]"},
-      {"vsensor":"crackmeter__nctc",
-       "field":["nctc_dx1"],
-       "title":"Crackmeter Position 8",
-       "select":"sensornode[position=8]"},
-      {"vsensor":"crackmeter__nctc",
-       "field":["nctc_dx2"],
-       "title":"Crackmeter Position 8",
-       "select":"sensornode[position=8]"},
-      {"vsensor":"crackmeter__nctt",
-       "field":["nctt_dx1", "nctt_t1", "nctt_t2",],
-       "title":"Crackmeter Temperature Position 2",
-       "select":"sensornode[position=2]"},
-
-
-      // thur
-      {"vsensor":"dozer_decagonmux__conv",
-       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
-       "title":"Decagon Conductivity", 
-       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=1],"},
-      {"vsensor":"dozer_decagonmux__conv",
-       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
-       "title":"Decagon Conductivity", 
-       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=2],"},
-      {"vsensor":"dozer_decagonmux__conv",
-       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
-       "title":"Decagon Conductivity", 
-       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=3],"},
-      {"vsensor":"dozer_decagonmux__conv",
-       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
-       "title":"Decagon Conductivity", 
-       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=4],"},
-      {"vsensor":"dozer_decagonmux__conv",
-       "field":["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4",], 
-       "title":"Decagon Conductivity", 
-       "select":"sensornode[position=20],sensornode[position=21],sensornode[position=5],"},
-
+      { title:"Sensorrod Temperatures Position 8",
+        signals: [{
+          vsensor:"matterhorn_sensorrod1",
+          field:["sr_t1","sr_t2","sr_t3","sr_t4"],
+          select:"sensornode[position=8]"
+        }]
+      },
+      { title:"Sensorrod Temperatures Position 10",
+        signals: [{
+          vsensor:"matterhorn_sensorrod1",
+          field:["sr_t1","sr_t2","sr_t3","sr_t4"],
+          select:"sensornode[position=10]"
+        }]
+      },
+      { title:"Sensorrod Temperatures Position 11",
+        signals: [{
+          vsensor:"matterhorn_sensorrod1",
+          field:["sr_t1","sr_t2","sr_t3","sr_t4"],
+          select:"sensornode[position=11]"
+        }]
+      },
+      { title:"Sensorrod Temperatures Position 12",
+        signals: [{
+          vsensor:"matterhorn_sensorrod1",
+          field:["sr_t1","sr_t2","sr_t3","sr_t4"],
+          select:"sensornode[position=12]"
+        }]
+      },
+      { title:"Crackmeter",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__ccnn",
+          field:["ccnn_dx0"],
+          select:"sensornode[position=20],sensornode[position=21],sensornode[position=22]"
+        },{
+          vsensor:"matterhorn_crackmeter__ccct",
+          field:["ccct_dx0"],
+          select:"sensornode[position=9]" 
+        },{
+          vsensor:"matterhorn_crackmeter__tctc",
+          field:["ctct_dx1"],
+          select:"sensornode[position=6]" 
+        },{
+          vsensor:"matterhorn_crackmeter__nctt",
+          field:["nctt_dx1"],
+          select:"sensornode[position=1],sensornode[position=2],sensornode[position=3],sensornode[position=4]" 
+        },{
+          vsensor:"matterhorn_crackmeter__nctc",
+          field:["nctc_dx1"],
+          select:"sensornode[position=8]" 
+        }]
+      },
+      { title:"Crackmeter",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__ccnn",
+          field:["ccnn_dx1"],
+          select:"sensornode[position=20],sensornode[position=21],sensornode[position=22]"
+        },{
+          vsensor:"matterhorn_crackmeter__ccct",
+          field:["ccct_dx2"],
+          select:"sensornode[position=9]" 
+        },{
+          vsensor:"matterhorn_crackmeter__tctc",
+          field:["ctct_dx2"],
+          select:"sensornode[position=6]" 
+        },{
+          vsensor:"matterhorn_crackmeter__nctc",
+          field:["nctc_dx2"],
+          select:"sensornode[position=8]" 
+        }]
+      },
+      { title:"Crackmeter",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__nctt",
+          field:["nctt_dx1","nctt_t1","nctt_t2"],
+          select:"sensornode[position=2]"
+        }]
+      },
+      // jungfraujoch      
+      { title:"Thermistorchain",
+        signals: [{
+          vsensor:"jungfraujoch_thermistorchain1",
+          field:["tc_t1","tc_t2","tc_t3","tc_t4","tc_t5"],
+          select:"sensornode[position=8],sensornode[position=10]"
+        },{
+          vsensor:"jungfraujoch_thermistorchain2",
+          field:["tc_t6","tc_t7","tc_t8"],
+          select:"sensornode[position=8],sensornode[position=10]"
+        }
+        ]
+      }
+      
     ]);
+
+    // jungfraujoch      
+    $([1, 2, 3, 4, 5, 7, 9]).each(function() {
+      GsnPlots.setConfig([
+        { title:"Sensor Rod Temperatures Position "+ this, 
+          signals:[{ vsensor :"jungfraujoch_sensorrod1",
+                     field:["sr_t1","sr_t2","sr_t3","sr_t4"], 
+                     select:"sensornode[position="+(this)+"]"}]
+        }]);
+    });
+
+    // Thur
+    $(["Decagon Conductivity (Position 1, River)","Decagon Conductivity (Position 2, R074)","Decagon Conductivity (Position 3, R073)","Decagon Conductivity (Position 4, R042)","Decagon Conductivity (Position 5, R071)"]).each(function(index) {
+      GsnPlots.setConfig([
+        { title:this, 
+          signals:[{ vsensor :"thur_dozer_decagonmux__conv",
+                     field:["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4"], 
+                     select:"sensornode[position="+(index+1)+"]"}]
+        }]);
+    });
 
     $.ajax({
       type: "GET",
@@ -149,9 +262,6 @@ function addDeployments() {
     $('#deployment_menu').append('<li><a href="javascript:showPlots(\''+this+'\')" id="deployment_menu_item_'+this+'">'+this+'</a></li>');
     $('#plotscontainer').append('<div id="plot_'+this+'"></div>');
     $('#plot_'+this).hide();
-    if (this == "Ostest" || this == "Opensense") {
-        initOpenSensePlots(this);
-    }
   });
 
   showPlots(visible);
@@ -165,6 +275,7 @@ function showPlots(id) {
   $("#plot_"+id).show();
   $("#deployment_menu_item_"+id).addClass("selected");
   // add graphs
+/*
   if (id == "Ostest" || id == "Opensense") {
       var divid = 0;
 
@@ -175,6 +286,14 @@ function showPlots(id) {
       $('#plot_'+id).append('<div><h2>'+ozoneZueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
       ozoneZueConfig.graph.div = 'plot_' + divid++;
       var g4 = new FrontendCreator(ozoneZueConfig);
+
+      $('#plot_'+id).append('<div><h2>'+coZueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
+      coZueConfig.graph.div = 'plot_' + divid++;
+      var g5 = new FrontendCreator(coZueConfig);
+
+      $('#plot_'+id).append('<div><h2>'+no2DueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
+      no2DueConfig.graph.div = 'plot_' + divid++;
+      var g6 = new FrontendCreator(no2DueConfig);
       
       $('#plot_'+id).append('<div><h2>'+nabelDueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
       nabelDueConfig.graph.div = 'plot_' + divid++;
@@ -186,198 +305,13 @@ function showPlots(id) {
 
 
   }
-  else {
+  else {*/
       GsnPlots.addPlots($("#plot_"+id), id)
-  }
+  //}
   $.cookie("deployment" , id);
   
 }
 
-function initOpenSensePlots(id) {
-
-  var gsnUrl;
-  var a = document.createElement('a');
-  a.href="/";
-  gsnUrl = a.host;
-
-  nabelDueConfig = {                                                                                                     
-        "graph": {                                                                                                       
-	"div": "",                                                                                             
-	"type": "dygraph",                                                                                           
-	"width": 800,                                                                                                
-	"height": 350,
-	"showForm": true,                                                                                             
-	"title": "Air Pollution NABEL Duebendorf"
-    },
-    "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
-
-    "signals": {                                                                                                     
-	"y1": [                                                                                                      
-	{
-	    "displayName": "O3 (PPB)",                                                   
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
-	    "field": "ozone_ppb",
-	    "deviceId": 100,                                                                                         
-	    "scaling": 1.0,
-	    "visible": true,                                                                                         
-	    "timeline":"generation_time"                                                                             
-	},
-	{                                                                                                            
-	    "displayName": "CO (PPM)",                                                      
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
-	    "field": "co_ppm",                                                                                       
-	    "deviceId": 100,
-	    "scaling": 1.0,                                                                                          
-	    "visible": false,                                                                                        
-	    "timeline":"generation_time"
-	},                                                                                                           
-	{
-	    "displayName": "NO2 (PPB)",                                                     
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
-	    "field": "no2_ppb",                                                                                      
-	    "deviceId": 100,                                                                                         
-	    "scaling": 1.0,                                                                                          
-	    "visible": false,                                                                                        
-	    "timeline":"generation_time"                                                                             
-	}                                                                                                            
-	]                                                                                                            
-    }                                                                                                                
-  };
-
-  nabelZueConfig = {                                                                                                     
-        "graph": {                                                                                                       
-	"div": "",                                                                                             
-	"type": "dygraph",                                                                                           
-	"width": 800,                                                                                                
-	"height": 350,
-	"showForm": true,                                                                                             
-	"title": "Air Pollution NABEL Zuerich"
-    },
-    "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
-
-    "signals": {                                                                                                     
-	"y1": [                                                                                                      
-	{
-	    "displayName": "O3 (PPB)",                                                   
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
-	    "field": "ozone_ppb",
-	    "deviceId": 100,                                                                                         
-	    "scaling": 1.0,
-	    "visible": true,                                                                                         
-	    "timeline":"generation_time"                                                                             
-	},
-	{                                                                                                            
-	    "displayName": "CO (PPM)",                                                      
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
-	    "field": "co_ppm",                                                                                       
-	    "deviceId": 100,
-	    "scaling": 1.0,                                                                                          
-	    "visible": false,                                                                                        
-	    "timeline":"generation_time"
-	},                                                                                                           
-	{
-	    "displayName": "NO2 (PPB)",                                                     
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
-	    "field": "no2_ppb",                                                                                      
-	    "deviceId": 100,                                                                                         
-	    "scaling": 1.0,                                                                                          
-	    "visible": false,                                                                                        
-	    "timeline":"generation_time"                                                                             
-	}                                                                                                            
-	]                                                                                                            
-    }                                                                                                                
-  };
-
-  ozoneDueConfig = {                                                                                                     
-        "graph": {                                                                                                       
-	"div": "",                                                                                             
-	"type": "dygraph",                                                                                           
-	"width": 800,                                                                                                
-	"height": 350,
-	"showForm": true,                                                                                             
-	"title": "Ozone Concentration Duebendorf: NABEL vs. Gas Sensor"
-    },
-    "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
-
-    "signals": {                                                                                                     
-	"y1": [                                                                                                      
-	{
-	    "displayName": "NABEL (PPB)",                                                   
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_duebendorf__mapped",                                                      
-	    "field": "ozone_ppb",
-	    "deviceId": 100,                                                                                         
-	    "scaling": 1.0,
-	    "visible": true,                                                                                         
-	    "timeline":"generation_time"                                                                             
-	},
-	{                                                                                                            
-	    "displayName": "Sensor Factory Cal. (PPB)",                                                      
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_oz47_dynamic__mapped",                                                      
-	    "field": "ozone_sensor_1",                                                                                       
-	    "deviceId": 1,
-	    "scaling": 1.0,                                                                                          
-	    "visible": false,                                                                                        
-	    "timeline":"generation_time"
-	},
-        {                                                                                                            
-	    "displayName": "Sensor Instant Cal. (PPB)",                                                      
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_oz47_concentration",                                                      
-	    "field": "ozone_ppb",                                                                                       
-	    "deviceId": 1,
-	    "scaling": 1.0,                                                                                          
-	    "visible": false,                                                                                        
-	    "timeline":"generation_time"
-	}                                                                                                           
-	]                                                                                                            
-    }                                                                                                                
-  };
-
-  ozoneZueConfig = {                                                                                                     
-        "graph": {                                                                                                       
-	"div": "",                                                                                             
-	"type": "dygraph",                                                                                           
-	"width": 800,                                                                                                
-	"height": 350,
-	"showForm": true,                                                                                             
-	"title": "Ozone Concentration Zuerich: NABEL vs. Gas Sensor"
-    },
-    "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",                                                             
-
-    "signals": {                                                                                                     
-	"y1": [                                                                                                      
-	{
-	    "displayName": "NABEL (PPB)",                                                   
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_nabel_zuerich__mapped",                                                      
-	    "field": "ozone_ppb",
-	    "deviceId": 100,                                                                                         
-	    "scaling": 1.0,
-	    "visible": true,                                                                                         
-	    "timeline":"generation_time"                                                                             
-	},
-	{                                                                                                            
-	    "displayName": "Sensor Factory Cal. (PPB)",                                                      
-	    "gsnUrl": gsnUrl,                                                                                
-	    "virtualSensor": id.toLowerCase()+"_oz47_dynamic__mapped",                                                      
-	    "field": "ozone_sensor_1",                                                                                       
-	    "deviceId": 3,
-	    "scaling": 1.0,                                                                                          
-	    "visible": false,                                                                                        
-	    "timeline":"generation_time"
-	}
-	]                                                                                                            
-    }                                                                                                                
-  };
-}
 	
 //]]>-->
 </script>

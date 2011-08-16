@@ -1,30 +1,26 @@
 var GsnPlots = {
 
-  config: false,
+  config: [],
   deployments: new Array(),
   gsnserver: "",
-  showstatistics : false,
   setConfig : function (config) {
-    GsnPlots.config = config;
-    $(GsnPlots.config).each(function () {
-      if (this.field.constructor != Array) {
-        this.field = [this.field];
-      }
+    $(config).each(function () {
+      $(this.signals).each(function() {
+        if (this.field.constructor != Array) {
+          this.field = [this.field];
+        }
+      });
     });
-    // array of {"vsensor", "field", "title", "select"},
+    // array of { signals [{vsensor, field[], select, position, deviceId}], "title"},
     var a = document.createElement('a');
     a.href="/";
     if (a.host.match(/tik41x.*:22001/))
       GsnPlots.gsnserver = "data.permasense.ch";
     else
       GsnPlots.gsnserver = a.host;
+    GsnPlots.config = GsnPlots.config.concat(config);
   },
-  
-  setConfigStatistics : function (config) {
-    GsnPlots.showstatistics = true;
-    GsnPlots.setConfig(config);
-  },
-  
+    
   getDeployment: function (name) {
     var d=-1;
     for (i=0;i<GsnPlots.deployments.length;i++)
@@ -35,14 +31,26 @@ var GsnPlots = {
     return d;
   },
   
+  getGraphConfigItem: function(graphconfig, index) {
+    var item;
+    $(graphconfig).each(function(){
+      if (this.index == index)
+        item = this;
+    });
+    if (item)
+      return item;
+    graphconfig.push({index:index ,signals: []});
+    return graphconfig[graphconfig.length-1];
+  },
+  
   initPlots: function(gsnstructure, readycallback) {
     GsnPlots.readycallback = readycallback;
     $("virtual-sensor",gsnstructure).each(function(){
       var deploymentname = $(this).attr("name").split("_", 1)[0];
-      if(deploymentname.length > 1 && (GsnPlots.showstatistics && deploymentname=='statistics' || !GsnPlots.showstatistics && deploymentname!='statistics')) {
+      if(deploymentname.length > 1) {
         deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
-        if (GsnPlots.getDeployment(deploymentname)<0) {
-          GsnPlots.deployments.push(new Object({"name":deploymentname, "graphconfig":[], "topology":false}));
+        if (GsnPlots.getDeployment(deploymentname) < 0) {
+          GsnPlots.deployments.push(new Object({"name":deploymentname, "graphconfig":[], "topology":""}));
         }
         var thisdeployment = GsnPlots.getDeployment(deploymentname);
         var vsname = $(this).attr("name");
@@ -52,33 +60,24 @@ var GsnPlots = {
           thisdeployment.topology_vs = $(this).attr("name");$
         }
         // match configured plot vs
-        $(GsnPlots.config).each( function() {
-           if (thisdeployment.name.toLowerCase()+"_"+this.vsensor == vsname) {
-             // add graphconfig
-             var graphconfig = {
-              "graph": {
-                "type": "dygraph",
-                "width": 940,
-                "height": 350,
-                "showForm": true
-              },
-              "inittimerange": 2592000000,
-              "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",
-              "signals": {
-                "y1": []
-              },
-             };
-             this.unit=Array();
-             var meta = this;
-             $("field", vs).each(function() {
-               var fieldpos = $.inArray($(this).attr("name"), meta.field);
-               if (fieldpos>-1) {
-                 meta.unit[fieldpos]=$(this).attr("unit");
-               }
-             });
-             thisdeployment.graphconfig.push({"config":graphconfig, "meta":this});
-           }
-        }); 
+        $(GsnPlots.config).each( function(index) {
+          $(this.signals).each(function() {
+            if (vsname.match(this.vsensor)) {
+              // create config if not available
+              var graphconfigitem = GsnPlots.getGraphConfigItem(thisdeployment.graphconfig, index);
+              // add vs
+              var unit=Array();
+              var field = this.field;
+              $("field", vs).each(function() {
+                var fieldpos = $.inArray($(this).attr("name"), field);
+                if (fieldpos>-1) {
+                  unit[fieldpos]=$(this).attr("unit");
+                }
+              });
+              graphconfigitem.signals.push({vs: vsname, field:this.field, unit:unit, select:this.select, position:this.position, deviceId:this.deviceId, timeline: this.timeline});
+            } 
+          });
+        });
       }
     });
     GsnPlots.readycallback();
@@ -87,7 +86,8 @@ var GsnPlots = {
   getDeployments: function() {
     var d = Array();
     $(GsnPlots.deployments).each(function() {
-      d.push(this.name);
+      if (this.graphconfig.length > 0)
+        d.push(this.name);
     });
     return d;
   },
@@ -99,9 +99,8 @@ var GsnPlots = {
       htmlelement.html("<p>No data available.</p>"); 
     }
     else {
-      if (d.topology == false && GsnPlots.showstatistics!=true) {
+      if (d.topology == false && d.topology_vs) {
         // fetch topology
-         if (d.topology_vs)
          $.ajax({
            type: "GET",
            url: "/field?vs="+d.topology_vs+"&field=DATA&pk=latest",
@@ -115,62 +114,158 @@ var GsnPlots = {
              d.topology="";
            }
          });
-         else 
-           d.topology="";
       }
-      else {
+      else {/*
+        // add master timeslider
+        var sliderwidth = 400;
+        var sliderdiv = document.createElement('div');
+        $(sliderdiv).css({'position':'fixed', 'bottom':'0px'});
+        // Div for showing selected time span
+        GsnPlots.sliderInfo = document.createElement('div');
+        $(GsnPlots.sliderInfo).css({ 'width':'350px', 'height':'20px', 'position':'relative', 'top':'-18px', 'left':(sliderwidth-350)+'px', 'fontSize':'8pt', 'textAlign':'right'});
+        sliderdiv.appendChild(GsnPlots.sliderInfo);
+        // timeslider
+        /*MasterTimeSlider.prototype = new TimeSlider;
+        MasterTimeSlider.setMaxRange = function (start, end) {
+          if (!this.fullDataMin)
+            this.fullDataMin = start;
+          this.fullDataMin = Math.min(this.fullDataMin, start);
+          if (!this.fullDataMax)
+            this.fullDataMax = end;
+          this.fullDataMax = Math.max(this.fullDataMax, end);
+          if (this.fullDataRange < this.minRangeDefault * 10)
+            this.minRange = this.fullDataRange / 10;
+          else
+            this.minRange = this.minRangeDefault;
+        }
+        
+        GsnPlots.mastertimeslider = new MasterTimeSlider({
+           changedCallback : function(mindate, maxdate) {
+             GsnPlots._masterChangedCallback(mindate, maxdate);
+           },
+           width : sliderwidth,
+           infoHtmlElement: GsnPlots.sliderInfo
+        });
+        sliderdiv.appendChild(GsnPlots.mastertimeslider.getHtmlElement());
+        $('body').append(sliderdiv);
+        */
+        d.graphconfig.sort(function(a,b){return a.index - b.index});
+        // add plots
         $(d.graphconfig).each(function() {
-          if (GsnPlots.showstatistics==true) {
-            var vsensor = d.name.toLowerCase()+"_"+this.meta.vsensor;
-            var graphsignals = this.config.signals.y1;
-            var meta = this.meta;
-            $(this.meta.field).each(function(index, value) {
-              var signal = {
-                "displayName": this,
-                "gsnUrl": GsnPlots.gsnserver,
-                "virtualSensor": vsensor,
-                "field": this,
-                "scaling": 1.0,
-                "visible": true,
-                "timeline":"timed"
-              };
-              if (typeof meta.unit[index] == "string")
-                signal.unit = meta.unit[index];
-              graphsignals.push(signal);              
-            });
-          }
-          else {
-            this.config.signals.y1 = [];
-            var positions = new Array();
-            $(this.meta.select,d.topology).each(function() {
-              positions.push($(this).attr("position").valueOf());
-            });
-            positions.sort(function(a,b){return a - b});
-            var graphconfig = this;
-            // add nodes to plot
-            $(positions).each(function() {
-              var p = this;
-              $(graphconfig.meta.field).each(function(index, value) {
+          // this.config.masterslider = GsnPlots.mastertimeslider;
+          var vizconfig = {
+              "graph": {
+                "type": "dygraph",
+                "width": 940,
+                "height": 350,
+                "showForm": true
+              },
+              "inittimerange": 2592000000,
+              "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",
+              "signals": {
+                "y1": []
+              },
+          };
+          $(this.signals).each(function() {
+          // switch following cases:
+          // 1) no selection criteria (missing select, position, deviceId)
+          // 2) selection by topology properites (select)
+          // 3) selection by position
+          // 4) selection by deviceId            
+            var thissignal=this;
+            if (!this.select && !this.position && !this.deviceId) {                            
+              $(this.field).each(function(index, value) {
                 var signal = {
-                  "displayName":"Position "+p +" "+this,
-                  //"displayName": " "+this,
+                  "displayName": this,
                   "gsnUrl": GsnPlots.gsnserver,
-                  "virtualSensor": d.name.toLowerCase()+"_"+graphconfig.meta.vsensor,
-                  "position": p,
+                  "virtualSensor": thissignal.vs,
                   "field": this,
                   "scaling": 1.0,
                   "visible": true,
-                  "timeline":"generation_time"
+                  "timeline": thissignal.timeline?thissignal.timeline:"generation_time"
                 };
-                if (typeof graphconfig.meta.unit[index] == "string")
-                  signal.unit = graphconfig.meta.unit[index];
-                graphconfig.config.signals.y1.push(signal);
+                if (typeof thissignal.unit[index] == "string")
+                  signal.unit = thissignal.unit[index];
+                vizconfig.signals.y1.push(signal);      
               });
-            }); 
-          }
-          // add div and graph
-          if (this.config.signals.y1.length>0)
-            GsnPlots._addPlotsAddGraph(htmlelement, this);
+            }
+            
+            else if (this.select && this.select.length > 0) {
+              var positions = new Array();
+              $(thissignal.select,d.topology).each(function() {
+                positions.push($(this).attr("position").valueOf());
+              });
+              positions.sort(function(a,b){return a - b});
+              // add nodes to plot
+              $(positions).each(function() {
+                var p = this;
+                $(thissignal.field).each(function(index, value) {
+                  var signal = {
+                    "displayName":"Position "+p +" "+this,
+                    "gsnUrl": GsnPlots.gsnserver,
+                    "virtualSensor": thissignal.vs,
+                    "position": p,
+                    "field": this,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "timeline": thissignal.timeline?thissignal.timeline:"generation_time"
+                  };
+                  if (typeof thissignal.unit[index] == "string")
+                    signal.unit = thissignal.unit[index];
+                  vizconfig.signals.y1.push(signal);      
+                });
+              });              
+            }
+            
+            else if (this.position && this.position.length > 0) {
+              // add nodes to plot
+              $(this.position).each(function() {
+                var p = this;
+                $(thissignal.field).each(function(index, value) {
+                  var signal = {
+                    "displayName":"Position "+p +" "+this,
+                    "gsnUrl": GsnPlots.gsnserver,
+                    "virtualSensor": thissignal.vs,
+                    "position": p,
+                    "field": this,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "timeline": thissignal.timeline?thissignal.timeline:"generation_time"
+                  };
+                  if (typeof thissignal.unit[index] == "string")
+                    signal.unit = thissignal.unit[index];
+                  vizconfig.signals.y1.push(signal);      
+                });
+              });              
+            }
+           
+            else if (this.deviceId && this.deviceId.length > 0) {
+              // add nodes to plot
+              $(this.deviceId).each(function() {
+                var id = this;
+                $(thissignal.field).each(function(index, value) {
+                  var signal = {
+                    "displayName":"Device "+id +" "+this,
+                    "gsnUrl": GsnPlots.gsnserver,
+                    "virtualSensor": thissignal.vs,
+                    "deviceId": id,
+                    "field": this,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "timeline": thissignal.timeline?thissignal.timeline:"generation_time"
+                  };
+                  if (typeof thissignal.unit[index] == "string")
+                    signal.unit = thissignal.unit[index];
+                  vizconfig.signals.y1.push(signal);      
+                });
+              });              
+            }
+
+          });
+          
+          // finally add to html
+          if (vizconfig.signals.y1.length>0)
+            GsnPlots._addPlotsAddGraph(htmlelement, vizconfig, GsnPlots.config[this.index].title);
         });
       }
     }
@@ -178,10 +273,13 @@ var GsnPlots = {
   
   divid : 0,
   
-  _addPlotsAddGraph: function(htmlelement, plot) {
-    $(htmlelement).append('<div><h2>'+plot.meta.title+'</h2><div id="plot_'+GsnPlots.divid+'"/></div>');
-    plot.config.graph.div='plot_'+(GsnPlots.divid++);
-    var g = new FrontendCreator(plot.config);
+  _addPlotsAddGraph: function(htmlelement, plot, title) {
+    $(htmlelement).append('<div><h2>'+title+'</h2><div id="plot_'+GsnPlots.divid+'"/></div>');
+    plot.graph.div='plot_'+(GsnPlots.divid++);
+    var g = new FrontendCreator(plot);
+  },
+  
+  _masterChangedCallback: function() {
   }
   
 };

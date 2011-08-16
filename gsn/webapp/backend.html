@@ -31,12 +31,37 @@ $(document).ready(function() {
     $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
     // plot configuration
-    GsnPlots.setConfigStatistics([
-      {"vsensor":"gsn", "field":["thread_blocked_cnt","thread_new_cnt","thread_runnable_cnt","thread_terminated_cnt","thread_timed_waiting_cnt","thread_waiting_cnt","thread_total_cnt","thread_deadlocked_cnt"], "title":"GSN cnt", "select":""},
-      {"vsensor":"gsn", "field":["uptime"], "title":"GSN uptime", "select":""},
-      {"vsensor":"gsn", "field":["memory_heap_used","memory_nonheap_used"], "title":"GSN memory usage", "select":""},
-      {"vsensor":"mysql", "field":["select_cnt","insert_cnt","delete_cnt","others_cnt","fetch_cnt"], "title":"MySQL select cnt", "select":""},
-      {"vsensor":"mysql", "field":["select_max","select_avg","insert_max","insert_avg","delete_max","delete_avg","others_max","others_avg","fetch_max","fetch_avg"], "title":"MySQL max avg", "select":""},
+    GsnPlots.setConfig([
+      { title:"GSN cnt",
+        signals: [
+        { vsensor:"statistics_gsn",
+          field:["thread_blocked_cnt","thread_new_cnt","thread_runnable_cnt","thread_terminated_cnt","thread_timed_waiting_cnt","thread_waiting_cnt","thread_total_cnt","thread_deadlocked_cnt"],
+          timeline:"timed"}]
+      },
+      { title:"GSN uptime",
+        signals: [
+        { vsensor:"statistics_gsn",
+          field:["uptime"],
+          timeline:"timed"}]
+      },
+      { title:"GSN memory usage",
+        signals: [
+        { vsensor:"statistics_gsn",
+          field:["memory_heap_used","memory_nonheap_used"],
+          timeline:"timed"}]
+      },
+      { title:"MySQL select cnt",
+        signals: [
+        { vsensor:"statistics_mysql",
+          field:["select_cnt","insert_cnt","delete_cnt","others_cnt","fetch_cnt"],
+          timeline:"timed"}]
+      },
+      { title:"MySQL max avg",
+        signals: [
+        { vsensor:"statistics_mysql",
+          field:["select_max","select_avg","insert_max","insert_avg","delete_max","delete_avg","others_max","others_avg","fetch_max","fetch_avg"],
+          timeline:"timed"}]
+      }
     ]);
     
     $.ajax({
