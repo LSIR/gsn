@@ -161,19 +161,18 @@ public class MySQLStorageManager extends StorageManager {
 
     @Override
     public StringBuilder getStatementRemoveUselessDataCountBased(String virtualSensorName, long storageSize) {
-        return new StringBuilder()
-                .append("delete from ")
-                .append(virtualSensorName)
-                .append(" where ")
-                .append(virtualSensorName)
-                .append(".timed <= ( SELECT * FROM ( SELECT timed FROM ")
-                .append(virtualSensorName)
-                .append(" group by ")
-                .append(virtualSensorName)
-                .append(".timed ORDER BY ")
-                .append(virtualSensorName)
-                .append(".timed DESC LIMIT 1 offset ")
-                .append(storageSize).append("  ) AS TMP)");
+    	return new StringBuilder()
+        	.append("delete from ")
+        	.append(virtualSensorName)
+        	.append(" where ")
+            .append(virtualSensorName)
+            .append(".timed <= (select TMP3.t from (select TMP1.timed t,count(TMP1.timed) c from (select timed from ")
+            .append(virtualSensorName)
+            .append(" group by timed) TMP1, (select timed from ")
+            .append(virtualSensorName)
+            .append(" group by timed) TMP2 where TMP1.timed < TMP2.timed group by TMP1.timed having c=")
+            .append(storageSize)
+            .append(") TMP3)");
     }
 
     //
