@@ -31,8 +31,6 @@ class TOSPluginClass(AbstractPluginClass):
     
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
-        # register all possible AM types except AM_CONTROLCOMMAND and AM_BEACONCOMMAND
-        self.registerTOSListener([TOSTypes.AM_CONTROLCOMMAND ,TOSTypes.AM_BEACONCOMMAND], True)
         
         self._plugstop = False
         self._ready = False
@@ -40,6 +38,9 @@ class TOSPluginClass(AbstractPluginClass):
         self._QueueClosedEvent = Event()
     
     def run(self):
+        # register all possible AM types except AM_CONTROLCOMMAND and AM_BEACONCOMMAND
+        self.registerTOSListener([TOSTypes.AM_CONTROLCOMMAND ,TOSTypes.AM_BEACONCOMMAND], True)
+        
         self.name = 'TOSPlugin-Thread'
         # open accessnode queue, just in case if we closed it before...
         while not self._sendOpenQueueCommand() and not self._plugstop:
