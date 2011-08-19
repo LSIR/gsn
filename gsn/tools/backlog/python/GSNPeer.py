@@ -106,8 +106,6 @@ class GSNPeerClass(Thread, Statistics):
     def run(self):
         self._logger.info('started')
         
-        self._storeMsg = self._backlogMain.backlog.storeMsg
-        
         self._pingwatchdog.start()
         self._pingtimer.start()
         
@@ -273,7 +271,7 @@ class GSNPeerClass(Thread, Statistics):
         
         if backlog:
             # back log the message
-            ret = self._storeMsg(timestamp, msgType, msg.getMessage())
+            ret = self._backlogMain.backlog.storeMsg(timestamp, msgType, msg.getMessage())
             
         # if not blocked send the message to the GSN backend
         if not self._gsnqueuelimitreached:
