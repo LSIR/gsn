@@ -17,7 +17,7 @@
                 	// default alarm time after which an email is sent if no messages have been received
                     def timeDifferenceOffsetDefault = 300000;
                 	// a list of alarm time per position
-                    def timeDifferenceOffsetPositionMap = [5:43200000,7:43200000,12:43200000];
+                    def timeDifferenceOffsetPositionMap = [5:43200000,7:43200000,12:43200000,41:43200000];
                     // the mail recipients
                     def mailrecipients = ["gsn-notification@tik.ee.ethz.ch"];
                     
