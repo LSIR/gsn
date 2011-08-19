@@ -5,7 +5,7 @@
 "4","2010-12-15 12:00:00+01:00","2011-08-11 14:07:00+02:00","0","access node gps"
 "5","2011-08-11 14:07:00+02:00","9999-01-01 00:00:00","0","access node gps"
 "1","2011-01-12 00:00:00+02:00","9999-01-01 00:00:00","8","access node randa hut"
-"6","2011-08-17 15:37:21+02:00","9999-01-01 00:00:00","39","access node gps Grabengufer Top Ridge"
+"6","2011-08-17 13:37:21+02:00","9999-01-01 00:00:00","39","access node gps Grabengufer Top Ridge"
 
 # sensor node mapping
 # position 1
@@ -20,7 +20,7 @@
 # position 5
 "9999","2011-03-08 12:00:00+02:00","2011-05-02 11:50:00+02:00","5","Mid Dirru Rockglacier, DI5"
 "9998","2011-05-02 11:55:00+02:00","2011-08-11 17:01:43+02:00","5","Mid Dirru Rockglacier, DI5"
-"8000","2011-08-16 20:58:52+02:00","9999-01-01 00:00:00","5","Mid Dirru Rockglacier, DI5"
+"8000","2011-08-16 18:58:52+02:00","9999-01-01 00:00:00","5","Mid Dirru Rockglacier, DI5"
 # position 7
 "7006","2010-12-15 12:00:00+02:00","2011-03-09 12:00:00+02:00","7","GPS Logger Bottom Dirru Rockglacier"
 "6666","2011-03-09 12:00:00+02:00","9999-01-01 00:00:00","7","GPS Logger Bottom Dirru Rockglacier"
@@ -81,19 +81,19 @@
 # position 36
 "2065","2011-05-17 15:00:00+02:00","9999-01-01 00:00:00","36","Gugla Open Fracture Top"
 # position 37
-"2045","2011-05-18 20:00:00+02:00","2011-08-17 12:00:00+02:00","37","Breithorn Ridge Relay"
+"2045","2011-05-18 20:00:00+02:00","2011-08-17 10:00:00+02:00","37","Breithorn Ridge Relay"
 # position 38
 "2049","2011-05-25 13:45:00+02:00","9999-01-01 00:00:00","38","Randa Hut direction Grabengufer"
 #position 40
-"2076","2011-08-18 16:11:34+02:00","9999-01-01 00:00:00","40","Grabengufer Top Middle Blockglacier"
+"2076","2011-08-18 14:11:34+02:00","9999-01-01 00:00:00","40","Grabengufer Top Middle Blockglacier"
 #position 41
-"8001","2011-08-18 13:28:19+02:00","9999-01-01 00:00:00","41","Grabengufer Top Bottom Edge Blockglacier"
+"8001","2011-08-18 11:28:19+02:00","9999-01-01 00:00:00","41","Grabengufer Top Bottom Edge Blockglacier"
 #position 42
-"2092","2011-08-17 18:47:30+02:00","9999-01-01 00:00:00","42","Weather station near Dirru Base Station"
+"2092","2011-08-17 16:47:30+02:00","9999-01-01 00:00:00","42","Weather station near Dirru Base Station"
 #position 46
-"2045","2011-08-17 14:00:00+02:00","9999-01-01 00:00:00","46","Breithorn Ridge Relay"
+"2045","2011-08-17 12:00:00+02:00","9999-01-01 00:00:00","46","Breithorn Ridge Relay"
 #position 58
-"2016","2011-08-17 11:07:10+02:00","9999-01-01 00:00:00","58","Grabengufer PowerBox"
+"2016","2011-08-17 09:07:10+02:00","9999-01-01 00:00:00","58","Grabengufer PowerBox"
 
 # gps logger change
 "1035","2011-07-02 00:00:00+02:00","9999-01-01 00:00:00","14","GPS Reference @ position 0"
