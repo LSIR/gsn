@@ -173,6 +173,13 @@ $(document).ready(function() {
           select:"sensornode[position][iscorestation='true']"
         }]
       },
+      { title:"BackLog Python VM",
+          signals: [{
+              vsensor:".*_backlogstatus_dynamic__mapped",
+              field:["vm_size","vm_data","threads"],
+              select:"sensornode[position][iscorestation='true']"
+          }]
+        },
       { title:"CoreStation Uptime",
         signals: [{
           vsensor:".*_corestationstatus_software__mapped",
@@ -184,6 +191,20 @@ $(document).ready(function() {
         signals: [{
           vsensor:".*_corestationstatus_software__mapped",
           field:["loadavg_1_min","loadavg_5_min","loadavg_15_min"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"CoreStation Stat",
+        signals: [{
+          vsensor:".*_corestationstatus_software__mapped",
+          field:["stat_procs_in_user_mode","stat_procs_in_kernel_mode","stat_procs_io_wait","stat_context_switches","stat_procs_threads_created"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"CoreStation Sockstat",
+        signals: [{
+          vsensor:".*_corestationstatus_software__mapped",
+          field:["sockstat_used_sockets","sockstat_tcp_in_use","sockstat_udp_in_use"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },
