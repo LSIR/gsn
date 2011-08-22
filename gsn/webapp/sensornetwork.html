@@ -117,27 +117,6 @@ $(document).ready(function() {
           select:"sensornode[nodetype=2][position]"
         }]
       },
-      { title:"Binary Queue",
-        signals: [{
-          vsensor:".*_binary__mapped",
-          field:["file_queue_length","file_queue_size"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"Binary Files",
-        signals: [{
-          vsensor:".*_binary__mapped",
-          field:["file_size","transmitted"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"Binary Transmission Time",
-        signals: [{
-          vsensor:".*_binary__mapped",
-          field:["transmission_time_eff","transmission_time_tot"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
       { title:"BackLog Uptime",
         signals: [{
           vsensor:".*_backlogstatus_dynamic__mapped",
@@ -145,17 +124,17 @@ $(document).ready(function() {
           select:"sensornode[position][iscorestation='true']"
         }]
       },
-      { title:"BackLog-GSN Connection Losses",
-        signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
-          field:["gsn_connection_losses"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
       { title:"BackLog Error/Exception Counters",
         signals: [{
           vsensor:".*_backlogstatus_dynamic__mapped",
           field:["error_counter","exception_counter"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"BackLog Database",
+          signals: [{
+          vsensor:".*_backlogstatus_dynamic__mapped",
+          field:["db_entries","db_size"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },
@@ -170,6 +149,13 @@ $(document).ready(function() {
         signals: [{
           vsensor:".*_backlogstatus_dynamic__mapped",
           field:["db_remove_time_min","db_remove_time_mean","db_remove_time_max"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"BackLog-GSN Connection Losses",
+        signals: [{
+          vsensor:".*_backlogstatus_dynamic__mapped",
+          field:["gsn_connection_losses"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },
@@ -240,6 +226,27 @@ $(document).ready(function() {
         signals: [{
           vsensor:".*_corestationstatus_hardware__mapped",
           field:["v12dc_in","i_v12dc_in"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"Binary Queue",
+          signals: [{
+          vsensor:".*_binary__mapped",
+          field:["file_queue_length","file_queue_size"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"Binary Files",
+        signals: [{
+          vsensor:".*_binary__mapped",
+          field:["file_size","transmitted"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"Binary Transmission Time",
+        signals: [{
+          vsensor:".*_binary__mapped",
+          field:["transmission_time_eff","transmission_time_tot"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },
