@@ -199,11 +199,13 @@ public class HttpGetWrapper extends AbstractWrapper {
 					else
 						postStreamElement(new Serializable[]{deviceId, timestamp, size, arrayOutputStream.toByteArray()});
 				}
+			} catch (IOException e) {
+				logger.error( e.getMessage( ) + " (host=" + url.getHost() + ")" , e );
+			}
+			try {
 				Thread.sleep( rate );
 			} catch ( InterruptedException e ) {
 				logger.error( e.getMessage( ) , e );
-			}catch (IOException e) {
-				logger.error( e.getMessage( ) + " (host=" + url.getHost() + ")" , e );
 			}
 		}
 	}
