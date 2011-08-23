@@ -39,7 +39,7 @@
         <output-structure>
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             
-            <field name="UPTIME" type="INTEGER" unit="relatime" />
+            <field name="UPTIME" type="INTEGER" unit="s" />
             <field name="REQUESTS" type="INTEGER" />
             <field name="CACHE_FILE_SIZE" type="BIGINT" unit="bytes" />
             <field name="SEEN_SIGNALS" type="INTEGER" />
