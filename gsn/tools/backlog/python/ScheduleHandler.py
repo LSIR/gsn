@@ -50,7 +50,7 @@ GSN_TYPE_NEW_SCHEDULE = 2
 GSN_TYPE_GET_SCHEDULE = 3
 
 # ping and watchdog timing
-PING_INTERVAL_SEC = 30
+PING_INTERVAL_SEC = 60
 WATCHDOG_TIMEOUT_SEC = 300
 
 # Schedule file format
@@ -86,18 +86,19 @@ class ScheduleHandlerClass(Thread, Statistics):
     data/instance attributes:
     _backlogMain
     _connectionEvent
-    _scheduleEvent
+    _newScheduleEvent
     _scheduleLock
-    _stopEvent
-    _allJobsFinishedEvent
-    _resendFinishEvent
-    _waitForGSNFinishEvent
+    _waitForNextJob
+    _allJobsFinished
+    _resendFinished
+    _waitForGSNFinished
     _schedule
     _newSchedule
     _duty_cycle_mode
     _service_wakeup_disabled
     _max_next_schedule_wait_delta
     _max_job_runtime_min
+    _shutdownThread
     _pingThread
     _config
     _beacon
@@ -105,10 +106,11 @@ class ScheduleHandlerClass(Thread, Statistics):
     _logger
     _scheduleHandlerStop
     _tosMessageLock
-    _tosMessageAckEvent
+    _tosMessageAckReceived
     _tosSentCmd
     _tosLastReceivedCmd
     _tosNodeState
+    _tosOnline
     '''
     
     def __init__(self, parent, dutycyclemode, options):
@@ -195,22 +197,31 @@ class ScheduleHandlerClass(Thread, Statistics):
             
             self._max_next_schedule_wait_delta = timedelta(minutes=int(max_next_schedule_wait_minutes))
         
+        try:
             self._backlogMain.registerTOSListener(self, [TOSTypes.AM_CONTROLCOMMAND, TOSTypes.AM_BEACONCOMMAND])
+            self._tosOnline = True
+        except Exception, e:
+            self._tosOnline = False
+            if self._duty_cycle_mode:
+                raise e
+            else:
+                self._logger.warning(str(e))
         
         self._connectionEvent = Event()
-        self._scheduleEvent = Event()
+        self._newScheduleEvent = Event()
         self._scheduleLock = Lock()
-        self._stopEvent = Event()
-        self._allJobsFinishedEvent = Event()
-        self._allJobsFinishedEvent.set()
-        self._resendFinishEvent = Event()
-        self._waitForGSNFinishEvent = Event()
+        self._waitForNextJob = Event()
+        self._allJobsFinished = Event()
+        self._allJobsFinished.set()
+        self._resendFinished = Event()
+        self._waitForGSNFinished = Event()
         self._tosMessageLock = Lock()
-        self._tosMessageAckEvent = Event()
+        self._tosMessageAckReceived = Event()
         self._tosSentCmd = None
         self._tosLastReceivedCmd = None
         self._tosNodeState = None
         
+        self._shutdownThread = None
         self._schedule = None
         self._newSchedule = False
         self._scheduleHandlerStop = False
@@ -220,7 +231,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._pluginScheduleCounterId = self.createCounter()
         self._scriptScheduleCounterId = self.createCounter()
         self._scheduleCreationTime = None
-            
+        
         if self._duty_cycle_mode:
             self._pingThread = TOSPingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
         
@@ -258,7 +269,6 @@ class ScheduleHandlerClass(Thread, Statistics):
         
     def run(self):
         self._logger.info('started')
-        stop = False
         
         if self._duty_cycle_mode:
             self._pingThread.start()
@@ -266,6 +276,8 @@ class ScheduleHandlerClass(Thread, Statistics):
             if self._scheduleHandlerStop:
                 self._logger.info('died')
                 return
+        else:
+            self.tosMsgSend(TOSTypes.CONTROL_CMD_RESET_WATCHDOG, 0)
                 
           
         if self._schedule and self._duty_cycle_mode:  
@@ -295,14 +307,10 @@ class ScheduleHandlerClass(Thread, Statistics):
         else:
             self.waitForGSN()
         
-        if self._duty_cycle_mode:
-            lookback = True
-        else:
-            lookback = False
+        lookback = True
         service_time = timedelta()
-        self._newSchedule = False
-        self._stopEvent.clear()
-        while not stop and not self._scheduleHandlerStop:
+        self._waitForNextJob.clear()
+        while not self._scheduleHandlerStop:
             dtnow = datetime.utcnow()
             
             nextschedules = None
@@ -312,7 +320,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                 nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback)
                 for e in error:
                     self.error('error while parsing the schedule file: %s' % (e,))
-                self._scheduleEvent.clear()
+                self._newScheduleEvent.clear()
                 lookback = False
                 self._scheduleLock.release()
                 
@@ -320,11 +328,15 @@ class ScheduleHandlerClass(Thread, Statistics):
             if not nextschedules:
                 if self._duty_cycle_mode and not self._beacon:
                     self._logger.warning('no schedule or empty schedule available -> shutdown')
-                    stop = self._shutdown()
+                    if self._shutdownThread:
+                        self._shutdownThread.stop()
+                    self._shutdownThread = ShutdownThread(self)
+                    self._shutdownThread.start()
+                    break
                 else:
                     self._logger.info('no schedule or empty schedule available -> waiting for a schedule')
-                    self._scheduleEvent.clear()
-                    self._scheduleEvent.wait()
+                    self._newScheduleEvent.clear()
+                    self._newScheduleEvent.wait()
                     continue
             
             for nextdt, pluginclassname, commandstring, runtimemax in nextschedules:
@@ -332,60 +344,44 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._logger.debug('(%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax))
                 dtnow = datetime.utcnow()
                 timediff = nextdt - dtnow
+                
+                
                 if self._duty_cycle_mode and not self._beacon:
                     if self._service_wakeup_disabled and not self._servicewindow:
                         service_time = timedelta()
                     else:
                         service_time = self._serviceTime()
-                    if nextdt <= dtnow:
-                        if self._logger.isEnabledFor(logging.DEBUG):
-                            self._logger.debug('executing >%s %s< now' % (pluginclassname, commandstring))
-                    elif timediff < self._max_next_schedule_wait_delta or timediff < service_time:
-                        if pluginclassname:
-                            self._logger.info('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
-                        else:
-                            self._logger.info('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
-                        self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
-                        if self._scheduleHandlerStop:
-                            break
-                        if self._stopEvent.isSet():
-                            self._stopEvent.clear()
-                            if self._newSchedule:
-                                self._newSchedule = False
-                            break
-                    else:
+                        
+                    if timediff > self._max_next_schedule_wait_delta and timediff > service_time:
+                        if self._shutdownThread:
+                            self._shutdownThread.stop()
                         if service_time <= self._max_next_schedule_wait_delta:
                             self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self.getOptionValue('max_next_schedule_wait_minutes'),))
                         else:
                             self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes')),))
-                        
-                        self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
-                        if self._scheduleHandlerStop:
-                            self._logger.info('died')
-                            return
-                        if not self._beacon:
-                            stop = True
-                        break
-                else:
-                    if nextdt > dtnow:
-                        if pluginclassname:
-                            if self._beacon:
-                                self._logger.info('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
-                            else:
-                                if self._logger.isEnabledFor(logging.DEBUG):
-                                    self._logger.debug('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                        self._shutdownThread = ShutdownThread(self)
+                        self._shutdownThread.start()
+                    
+                if nextdt > dtnow:
+                    if pluginclassname:
+                        if self._duty_cycle_mode:
+                            self._logger.info('executing >%s.action("%s")< in %f seconds if not shutdown before' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                         else:
-                            if self._beacon:
-                                self._logger.info('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
-                            else:
-                                if self._logger.isEnabledFor(logging.DEBUG):
-                                    self._logger.debug('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
-                        self._stopEvent.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
-                        if (self._scheduleHandlerStop or self._newSchedule) or (self._duty_cycle_mode and not self._beacon):
-                            if self._newSchedule:
-                                self._newSchedule = False
-                            self._stopEvent.clear()
-                            break
+                            if self._logger.isEnabledFor(logging.DEBUG):
+                                self._logger.debug('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                    else:
+                        if self._duty_cycle_mode:
+                            self._logger.info('executing >%s< in %f seconds if not shutdown before' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                        else:
+                            if self._logger.isEnabledFor(logging.DEBUG):
+                                self._logger.debug('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                    self._waitForNextJob.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
+                    if self._waitForNextJob.isSet():
+                        self._waitForNextJob.clear()
+                        if self._newSchedule:
+                            lookback = True
+                            self._newSchedule = False
+                        break
                 
                 if pluginclassname:
                     if self._duty_cycle_mode:
@@ -412,10 +408,6 @@ class ScheduleHandlerClass(Thread, Statistics):
                     else:
                         self._backlogMain.jobsobserver.observeJob(job, commandstring, False, runtimemax)
                         self.counterAction(self._scriptScheduleCounterId)
-                    
-            if stop and self._duty_cycle_mode and not self._scheduleHandlerStop and not self._beacon:
-                stop = self._shutdown(service_time)
-                    
             
         if self._duty_cycle_mode:
             self._pingThread.join()
@@ -434,15 +426,15 @@ class ScheduleHandlerClass(Thread, Statistics):
         
         # if GSN is connected try to get a new schedule for a while
         if self._backlogMain.gsnpeer.isConnected():
-            if not self._scheduleEvent.isSet():
+            if not self._newScheduleEvent.isSet():
                 timeout = 0
                 self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self.getOptionValue('max_gsn_get_schedule_wait_minutes'),))
                 while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
-                    self._scheduleEvent.wait(3)
+                    self._newScheduleEvent.wait(3)
                     if self._scheduleHandlerStop:
                         return
-                    if self._scheduleEvent.isSet():
-                        self._scheduleEvent.clear()
+                    if self._newScheduleEvent.isSet():
+                        self._newScheduleEvent.clear()
                         break
                     self._logger.debug('request schedule from gsn')
                     if self._schedule:
@@ -455,9 +447,9 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._logger.warning('gsn has not answered on any schedule request')
         else:
             self._logger.warning('gsn has not connected')
-            self._resendFinishEvent.set()
+            self._resendFinished.set()
             
-        self._waitForGSNFinishEvent.set()
+        self._waitForGSNFinished.set()
             
             
     def getStatus(self):
@@ -475,14 +467,19 @@ class ScheduleHandlerClass(Thread, Statistics):
     
     def stop(self):
         self._scheduleHandlerStop = True
-        self._waitForGSNFinishEvent.set()
+        if self._shutdownThread:
+            self._shutdownThread.stop()
+        self._waitForGSNFinished.set()
         self._connectionEvent.set()
-        self._scheduleEvent.set()
-        self._allJobsFinishedEvent.set()
-        self._resendFinishEvent.set()
-        self._stopEvent.set()
+        self._newScheduleEvent.set()
+        self._allJobsFinished.set()
+        self._resendFinished.set()
+        self._waitForNextJob.set()
+        
         if self._duty_cycle_mode:
             self._pingThread.stop()
+            
+        if self._tosOnline:
             self._backlogMain.deregisterTOSListener(self)
             
         self._logger.info('stopped')
@@ -493,15 +490,15 @@ class ScheduleHandlerClass(Thread, Statistics):
             self._logger.info('all jobs finished')
         else:
             self._logger.debug('all jobs finished')
-        self._allJobsFinishedEvent.set()
+        self._allJobsFinished.set()
         
         
     def newJobStarted(self):
-        self._allJobsFinishedEvent.clear()
+        self._allJobsFinished.clear()
         
         
     def backlogResendFinished(self):
-        self._resendFinishEvent.set()
+        self._resendFinished.set()
     
     
     def getMsgType(self):
@@ -552,9 +549,11 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._logger.info('using locally stored schedule file')
                     
             self._newSchedule = True
-            self._stopEvent.set()
+            self._waitForNextJob.set()
+            if self._shutdownThread:
+                self._shutdownThread.stop()
             
-        self._scheduleEvent.set()
+        self._newScheduleEvent.set()
             
             
     def tosMsgReceived(self, timestamp, packet):
@@ -574,12 +573,16 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._servicewindow = True
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_BEACON) == TOSTypes.CONTROL_WAKEUP_TYPE_BEACON:
                     self._beacon = True
-                    self._backlogMain.beaconSet()
+                    if self._shutdownThread:
+                        self._shutdownThread.stop()
+                    if self._duty_cycle_mode:
+                        self._backlogMain.beaconSet()
                     s += 'BEACON '
                 elif self._beacon:
                     self._beacon = False
-                    self._stopEvent.set()
-                    self._backlogMain.beaconCleared()
+                    if self._duty_cycle_mode:
+                        self._waitForNextJob.set()
+                        self._backlogMain.beaconCleared()
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT) == TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT:
                     s += 'NODE_REBOOT'
                 if s:
@@ -605,7 +608,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                 self._logger.debug('TOS packet acknowledge received')
                 self._tosSentCmd = None
                 self._tosLastReceivedCmd = response['command'];
-                self._tosMessageAckEvent.set()
+                self._tosMessageAckReceived.set()
             elif self._tosSentCmd != None:
                 if self._tosLastReceivedCmd == response['command']:
                     self._logger.debug('TOS packet acknowledge already received')
@@ -623,28 +626,31 @@ class ScheduleHandlerClass(Thread, Statistics):
         @param cmd: the 1 Byte Command Code
         @param argument: the 4 byte argument for the command
         '''
-        self._tosMessageLock.acquire()
-        resendCounter = 1
-        self._tosSentCmd = cmd
-        while True:
-            if self._logger.isEnabledFor(logging.DEBUG):
-                self._logger.debug('snd (cmd=%s, argument=%s)' % (cmd, argument))
-            self._backlogMain._tospeer.sendTOSMsg(tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, [cmd, argument]), TOSTypes.AM_CONTROLCOMMAND, 1)
-            self._tosMessageAckEvent.wait(3)
-            if self._scheduleHandlerStop:
-                break
-            elif self._tosMessageAckEvent.isSet():
-                self._tosMessageAckEvent.clear()
-                break
-            else:
-                if resendCounter == 5:
-                    self.error('no answer for TOS command (%s) received from TOS node' % (self._tosSentCmd,))
-                    self._tosMessageLock.release()
-                    return False
-                self._logger.info('resend command (%s) to TOS node' % (self._tosSentCmd,))
-                resendCounter += 1
-        self._tosMessageLock.release()
-        return True
+        if self._tosOnline:
+            self._tosMessageLock.acquire()
+            resendCounter = 1
+            self._tosSentCmd = cmd
+            while True:
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.debug('snd (cmd=%s, argument=%s)' % (cmd, argument))
+                self._backlogMain._tospeer.sendTOSMsg(tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, [cmd, argument]), TOSTypes.AM_CONTROLCOMMAND, 1)
+                self._tosMessageAckReceived.wait(3)
+                if self._scheduleHandlerStop:
+                    break
+                elif self._tosMessageAckReceived.isSet():
+                    self._tosMessageAckReceived.clear()
+                    break
+                else:
+                    if resendCounter == 5:
+                        self.error('no answer for TOS command (%s) received from TOS node' % (self._tosSentCmd,))
+                        self._tosMessageLock.release()
+                        return False
+                    self._logger.info('resend command (%s) to TOS node' % (self._tosSentCmd,))
+                    resendCounter += 1
+            self._tosMessageLock.release()
+            return True
+        else:
+            return False
         
         
     def exception(self, exception):
@@ -687,123 +693,131 @@ class ScheduleHandlerClass(Thread, Statistics):
                 self.error('could not schedule the next duty wake-up for >%s<' % (schedule_name,))
             
 
-    def _shutdown(self, sleepdelta=timedelta()):
-        self._logger.debug('entering shutdown function')
-        if self._duty_cycle_mode:
-            now = datetime.utcnow()
-            if now + sleepdelta > now:
-                waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + sleepdelta.microseconds/1000000.0
-                self._logger.info('waiting %f minutes for service windows to finish' % (waitfor/60.0,))
-                self._stopEvent.wait(waitfor)
-                if self._scheduleHandlerStop:
-                    return True
-                if self._scheduleEvent.isSet():
-                    self._scheduleEvent.clear()
-                    return False
-            
-            # wait for jobs to finish
-            maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
-            if not self._allJobsFinishedEvent.isSet() and maxruntime:
-                if maxruntime != -1:
-                    self._logger.info('waiting for all active jobs to finish for a maximum of %f seconds' % (maxruntime,))
-                    self._allJobsFinishedEvent.wait(5+maxruntime)
-                else:
-                    self._logger.info('waiting for all active jobs to finish indefinitely')
-                    self._allJobsFinishedEvent.wait()
-                if self._scheduleHandlerStop:
-                    return True
-                if self._scheduleEvent.isSet():
-                    self._scheduleEvent.clear()
-                    return False
-                if not self._allJobsFinishedEvent.isSet():
-                    self._backlogMain.incrementErrorCounter()
-                    self.error('not all jobs have been killed (should not happen)')
-                    
-            if not self._waitForGSNFinishEvent.isSet():
-                self._logger.info('waiting for GSN')
-                self._waitForGSNFinishEvent.wait()
-                    
-            # wait for backlog to finish resend data
-            max_wait = int(self.getOptionValue('max_db_resend_runtime'))*60.0
-            if not self._resendFinishEvent.isSet() and max_wait > self._backlogMain.getUptime():
-                self._logger.info('waiting for database resend process to finish for a maximum of %f seconds' % (max_wait-self._backlogMain.getUptime(),))
-                self._resendFinishEvent.wait(max_wait-self._backlogMain.getUptime())
-                if self._scheduleHandlerStop:
-                    return True
-                if self._scheduleEvent.isSet():
-                    self._scheduleEvent.clear()
-                    return False
-                if not self._resendFinishEvent.isSet():
-                    self._logger.warning('backlog database is not finish with resending')
-                    
-            if self._schedule:
-                dtnow = datetime.utcnow()
-                nextschedules, error = self._schedule.getNextSchedules(dtnow)
-                if  nextschedules and nextschedules[0][0] - dtnow < self._max_next_schedule_wait_delta:
-                    self._logger.info('next schedule is coming soon => wait for it')
-                    return False
+class ShutdownThread(Thread):
+    
+    def __init__(self, parent, sleepdelta=timedelta()):
+        Thread.__init__(self, name='%s-Thread' % (self.__class__.__name__,))
+        self._logger = logging.getLogger(self.__class__.__name__)
+        self._scheduleHandler = parent
+        self._sleepdelta = sleepdelta
+        self._stopShutdown = Event()
+        self._shutdownThreadStop = False
+        
+        
+    def run(self):
+        self._logger.info('starting shutdown thread')
+        now = datetime.utcnow()
+        if now + self._sleepdelta > now:
+            waitfor = self._sleepdelta.seconds + self._sleepdelta.days * 86400 + self._sleepdelta.microseconds/1000000.0
+            self._logger.info('waiting %f minutes for service window to finish' % (waitfor/60.0,))
+            self._stopShutdown.wait(waitfor)
+            if self._shutdownThreadStop:
+                return
+            else:
+                self._logger.info('service window finished')
+        
+        # wait for jobs to finish
+        maxruntime = self._scheduleHandler._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
+        if not self._scheduleHandler._allJobsFinished.isSet() and maxruntime:
+            if maxruntime != -1:
+                self._logger.info('waiting for all active jobs to finish for a maximum of %f seconds' % (maxruntime,))
+                self._scheduleHandler._allJobsFinished.wait(5+maxruntime)
+            else:
+                self._logger.info('waiting for all active jobs to finish indefinitely')
+                self._scheduleHandler._allJobsFinished.wait()
+            if self._shutdownThreadStop:
+                return
+            if not self._scheduleHandler._allJobsFinished.isSet():
+                self.error('not all jobs have been killed (should not happen)')
+                
+        if not self._scheduleHandler._waitForGSNFinished.isSet():
+            self._logger.info('waiting for GSN')
+            self._scheduleHandler._waitForGSNFinished.wait()
+                
+        # wait for backlog to finish resend data
+        max_wait = int(self._scheduleHandler.getOptionValue('max_db_resend_runtime'))*60.0
+        if not self._scheduleHandler._resendFinished.isSet() and max_wait > self._scheduleHandler._backlogMain.getUptime():
+            self._logger.info('waiting for database resend process to finish for a maximum of %f seconds' % (max_wait-self._scheduleHandler._backlogMain.getUptime(),))
+            self._scheduleHandler._resendFinished.wait(max_wait-self._scheduleHandler._backlogMain.getUptime())
+            if self._shutdownThreadStop:
+                return
+            if not self._scheduleHandler._resendFinished.isSet():
+                self._logger.warning('backlog database is not finish with resending')
+            else:
+                self._logger.warning('backlog database finished resending')
+                
+        if self._scheduleHandler._schedule:
+            dtnow = datetime.utcnow()
+            nextschedules, error = self._scheduleHandler._schedule.getNextSchedules(dtnow)
+            if nextschedules and nextschedules[0][0] - dtnow < self._scheduleHandler._max_next_schedule_wait_delta:
+                self._logger.info('next schedule is coming soon => wait for it')
+                return
 
-            # Synchronize Service Wakeup Time
-            time_delta = self._getNextServiceWindowRange()[0] - datetime.utcnow()
-            time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
-            if time_to_service < 0-int(self.getOptionValue('approximate_startup_seconds')):
-                time_to_service += 86400
-            if not self._service_wakeup_disabled:
-                self._logger.info('next service window is in %f minutes' % (time_to_service/60.0,))
-            if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, time_to_service):
-                if not self._service_wakeup_disabled:
-                    self._logger.info('successfully scheduled the next service window wake-up (that\'s in %d seconds)' % (time_to_service,))
-            else:
-                self.error('could not schedule the next service window wake-up')
-            if self._service_wakeup_disabled:
-                if self.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, 0xffffffff):
-                    self._logger.info('successfully disabled service window wake-up')
-                else:
-                    self.error('could not disable service window wake-up')
-    
-            # Schedule next duty wake-up
-            if self._schedule:
-                td = timedelta(seconds=int(self.getOptionValue('approximate_startup_seconds')))
-                nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
-                for e in error:
-                    self.error('error while parsing the schedule file: %s' % (e,))
-                if nextschedule:
-                    nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
-                    self._logger.info('schedule next duty wake-up')
-                    self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
-                    
-            # last time to check if a new schedule has been sent from GSN
-            if self._scheduleHandlerStop:
-                return True
-            if self._scheduleEvent.isSet():
-                self._scheduleEvent.clear()
-                return False
-                    
-            # last possible moment to check if a beacon has been sent to the node
-            # (if so, we do not want to shutdown)
-            self._logger.info('get node wake-up states')
-            self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
-            if self._scheduleHandlerStop:
-                return True
-            if self._beacon:
-                return False
-                    
-            # Tell TinyNode to shut us down in X seconds
-            self._pingThread.stop()
-            shutdown_offset = int(self.getOptionValue('hard_shutdown_offset_minutes'))*60
-            if self.tosMsgSend(TOSTypes.CONTROL_CMD_SHUTDOWN, shutdown_offset):
-                self._logger.info('we\'re going to do a hard shut down in %s seconds ...' % (shutdown_offset,))
-            else:
-                self.error('could not communicate the hard shut down time with the TOS node')
-    
-            self._backlogMain.shutdown = True
-            parentpid = os.getpid()
-            self._logger.info('sending myself (pid=%d) SIGINT' % (parentpid,))
-            os.kill(parentpid, signal.SIGINT)
-            return True
+        # Synchronize Service Wakeup Time
+        time_delta = self._scheduleHandler._getNextServiceWindowRange()[0] - datetime.utcnow()
+        time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self._scheduleHandler.getOptionValue('approximate_startup_seconds'))
+        if time_to_service < 0-int(self._scheduleHandler.getOptionValue('approximate_startup_seconds')):
+            time_to_service += 86400
+        if not self._scheduleHandler._service_wakeup_disabled:
+            self._logger.info('next service window is in %f minutes' % (time_to_service/60.0,))
+        if self._scheduleHandler.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, time_to_service):
+            if not self._scheduleHandler._service_wakeup_disabled:
+                self._logger.info('successfully scheduled the next service window wake-up (that\'s in %d seconds)' % (time_to_service,))
         else:
-            self.error('shutdown called even if we are not in shutdown mode')
-            return False
+            self.error('could not schedule the next service window wake-up')
+        if self._scheduleHandler._service_wakeup_disabled:
+            if self._scheduleHandler.tosMsgSend(TOSTypes.CONTROL_CMD_SERVICE_WINDOW, 0xffffffff):
+                self._logger.info('successfully disabled service window wake-up')
+            else:
+                self.error('could not disable service window wake-up')
+        if self._shutdownThreadStop:
+            return
+
+        # Schedule next duty wake-up
+        if self._scheduleHandler._schedule:
+            td = timedelta(seconds=int(self._scheduleHandler.getOptionValue('approximate_startup_seconds')))
+            nextschedule, error = self._scheduleHandler._schedule.getNextSchedules(datetime.utcnow() + td)
+            for e in error:
+                self.error('error while parsing the schedule file: %s' % (e,))
+            if nextschedule:
+                nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
+                self._logger.info('schedule next duty wake-up')
+                self._scheduleHandler._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
+            if self._shutdownThreadStop:
+                return
+                
+        # last possible moment to check if a beacon has been sent to the node
+        # (if so, we do not want to shutdown)
+        self._logger.info('get node wake-up states')
+        self._scheduleHandler.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
+        if self._shutdownThreadStop:
+            return
+             
+        # point of no return!   
+        # Tell TinyNode to shut us down in X seconds
+        self._scheduleHandler._pingThread.stop()
+        shutdown_offset = int(self._scheduleHandler.getOptionValue('hard_shutdown_offset_minutes'))*60
+        if self._scheduleHandler.tosMsgSend(TOSTypes.CONTROL_CMD_SHUTDOWN, shutdown_offset):
+            self._logger.info('we\'re going to do a hard shut down in %s seconds ...' % (shutdown_offset,))
+        else:
+            self.error('could not communicate the hard shut down time with the TOS node')
+
+        self._scheduleHandler._backlogMain.shutdown = True
+        parentpid = os.getpid()
+        self._logger.info('sending myself._scheduleHandler (pid=%d) SIGINT' % (parentpid,))
+        os.kill(parentpid, signal.SIGINT)
+
+
+    def stop(self):
+        if not self._shutdownThreadStop:
+            self._shutdownThreadStop = True
+            self._stopShutdown.set()
+            self._logger.info('stop shutdown')
+        
+        
+    def error(self, msg):
+        self._scheduleHandler._backlogMain.incrementErrorCounter()
+        self._logger.error(msg)
         
         
         
