@@ -34,6 +34,7 @@ public class HttpGetWrapper extends AbstractWrapper {
 
 	private static int				threadCounter		= 0;
 	final static private SimpleDateFormat format		= new SimpleDateFormat("yyyy-MM-dd_HHmmss");
+	private SimpleDateFormat folderdatetimefm			= new SimpleDateFormat("yyyy-MM-dd");
 
 	private DataField []			outputStructure;
 
@@ -46,6 +47,7 @@ public class HttpGetWrapper extends AbstractWrapper {
 	* <li>username</li> The username to be used for http authentication (optional).
 	* <li>password</li> The password to be used for http authentication (optional).
 	* <li>subdirectory-name</li> The subdirectory name the data should be stored in filesystem (optional).
+	* <li>folder-datetime-format</li>datetime format (see SimpleDateFormat) the data should be subdivided in (default=yyyy-MM-dd) (optional).
 	* <li>device-id</li> The device id of the data producer (optional).
 	* </ul>
 	*/
@@ -162,6 +164,16 @@ public class HttpGetWrapper extends AbstractWrapper {
 			rate = DEFAULT_RATE;
 		else
 			rate = Integer.parseInt( inputRate );
+		
+		String format = addressBean.getPredicateValue("folder-datetime-format");
+		if (format != null) {
+			try {
+				folderdatetimefm = new SimpleDateFormat(format);
+			} catch (Exception e) {
+				logger.error(e.getMessage() + ": using default format 'yyyy-MM-dd'");
+			}
+		}
+		folderdatetimefm.setTimeZone(TimeZone.getTimeZone("UTC"));
  
 		setName( "HttpReceiver-Thread" + ( ++threadCounter ) );
 		if ( logger.isDebugEnabled( ) ) logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
@@ -186,12 +198,17 @@ public class HttpGetWrapper extends AbstractWrapper {
 				
 				int size = arrayOutputStream.size();
 				if (directory != null ) {
-					String filename = format.format(new java.util.Date(timestamp))+".jpg";
-					arrayOutputStream.writeTo(new FileOutputStream (new File(directory, filename)));
+					String datedir = folderdatetimefm.format(new java.util.Date(timestamp));
+				    File f = new File(directory+"/"+datedir);
+				    if (!f.exists())
+				    	f.mkdirs();
+				    String name = datedir + "/" + format.format(new java.util.Date(timestamp))+".jpg";
+				    
+					arrayOutputStream.writeTo(new FileOutputStream (new File(directory, name)));
 					if (deviceId == null)
-						postStreamElement(new Serializable[]{timestamp, size, subdirectory+"/"+filename});
+						postStreamElement(new Serializable[]{timestamp, size, subdirectory+"/"+name});
 					else
-						postStreamElement(new Serializable[]{deviceId, timestamp, size, subdirectory+"/"+filename});
+						postStreamElement(new Serializable[]{deviceId, timestamp, size, subdirectory+"/"+name});
 				}
 				else {
 					if (deviceId == null)
