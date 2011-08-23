@@ -276,6 +276,8 @@ class BackLogMainClass(Thread, Statistics):
         self.backlog.start()
         self.gsnpeer.start()
         self.jobsobserver.start()
+        if self._tospeer and not self._tospeer.isAlive():
+            self._tospeer.start()
         self.schedulehandler.start()
 
         for plugin_name, plugin in self.plugins.items():
@@ -339,7 +341,8 @@ class BackLogMainClass(Thread, Statistics):
                 self._logger.info('tos_version: %s' % (self._tos_version,))
                 try:
                     self._tospeer = TOSPeerClass(self, self._tos_address, self._tos_version)
-                    self._tospeer.start()
+                    if self.isAlive():
+                        self._tospeer.start()
                     self._logger.info('TOSPeerClass instantiated')
                 except Exception, e:
                     self._tosPeerLock.release()

@@ -121,6 +121,8 @@ class TOSPeerClass(Thread, Statistics):
         
             
     def sendTOSMsg(self, packet, amId, timeout=None, blocking=True, maxretries = None):
+        if not self.isAlive():
+            raise Exception("TOSPeer is not alive")
         return self._toswriter.addMsg(packet, amId, timeout, blocking, maxretries)
             
             

@@ -278,8 +278,9 @@ class ScheduleHandlerClass(Thread, Statistics):
                 return
         else:
             self.tosMsgSend(TOSTypes.CONTROL_CMD_RESET_WATCHDOG, 0)
-                
-          
+            self._tosOnline = False
+            self._backlogMain.deregisterTOSListener(self)
+        
         if self._schedule and self._duty_cycle_mode:  
             # Schedule duty wake-up after this session, for safety reasons.
             # (The scheduled time here could be in this session if schedules are following
@@ -633,7 +634,12 @@ class ScheduleHandlerClass(Thread, Statistics):
             while True:
                 if self._logger.isEnabledFor(logging.DEBUG):
                     self._logger.debug('snd (cmd=%s, argument=%s)' % (cmd, argument))
-                self._backlogMain._tospeer.sendTOSMsg(tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, [cmd, argument]), TOSTypes.AM_CONTROLCOMMAND, 1)
+                try:
+                    self._backlogMain._tospeer.sendTOSMsg(tos.Packet(TOSTypes.CONTROL_CMD_STRUCTURE, [cmd, argument]), TOSTypes.AM_CONTROLCOMMAND, 1)
+                except Exception, e:
+                    self.exception(e)
+                    return False
+                    
                 self._tosMessageAckReceived.wait(3)
                 if self._scheduleHandlerStop:
                     break
