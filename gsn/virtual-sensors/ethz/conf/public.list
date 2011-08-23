@@ -246,6 +246,10 @@ Matterhorn_Topology__public.xml
 #OpenSense_MotionDetection__mapped.xml
 #OpenSense_OZ47_Calibration_Due.xml
 #OpenSense_OZ47_Concentration.xml
+Statistics_GSN.xml
+Statistics_MySQL.xml
+Statistics_Sensorviz__mapped.xml
+Statistics_Sensorviz__parsed.xml
 Thur_BackLogStatus_Dynamic__mapped.xml
 Thur_BackLogStatus_Revision__mapped.xml
 Thur_BackLogStatus_Static__mapped.xml
@@ -282,5 +286,3 @@ Thur_Statistics__mapped.xml
 Thur_SyslogNg__conv.xml
 Thur_SyslogNg__mapped.xml
 Thur_Topology__public.xml
-Statistics_GSN.xml
-Statistics_MySQL.xml
