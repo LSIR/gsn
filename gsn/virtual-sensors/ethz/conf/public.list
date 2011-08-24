@@ -61,8 +61,13 @@ Dirruhorn_Dozer_WXT520WindPth__mapped.xml
 Dirruhorn_VaisalaWXT520WindPth.xml
 Dirruhorn_VaisalaWXT520Sup.xml
 Dirruhorn_VaisalaWXT520Prec.xml
+Dirruhorn_GPS_Logger__config.xml
+Dirruhorn_GPS_Logger__data__mapped.xml
+Dirruhorn_GPS_Logger__events.xml
+Dirruhorn_GPS_Logger__files__mapped.xml
+Dirruhorn_GPS_Logger__status.xml
+Dirruhorn_GPS_RAW__binary.xml
 Dirruhorn_GPS_RAW__mapped.xml
-Dirruhorn_GPS_RAW__muxed__mapped.xml
 Dirruhorn_Schedule__mapped.xml
 Dirruhorn_Statistics__mapped.xml
 Dirruhorn_SyslogNg__conv.xml
