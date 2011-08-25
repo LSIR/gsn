@@ -1,4 +1,7 @@
 "DEVICE_ID","BEGIN","END","POSITION","COMMENT"
 
 # power control node mapping
-"5000","2011-05-04 00:00:00+02:00","9999-01-01 00:00:00","0","cam01 rhone glacier"
+"5000","2011-05-04 00:00:00+02:00","2011-08-25 17:13:59+02:00","0","cam01 rhone glacier"
+
+# new Dozer image
+"8","2011-08-25 17:14:00+02:00","9999-01-01 00:00:00","0","cam01 rhone glacier"

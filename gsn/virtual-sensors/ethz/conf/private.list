@@ -39,6 +39,14 @@ Glaciers_Binary.xml
 Glaciers_CoreStationStatus_Hardware.xml
 Glaciers_CoreStationStatus_Software.xml
 Glaciers_CoreStationStatus_Static.xml
+Gaciers_Dozer_BaseDebug.xml
+Gaciers_Dozer_BaseStatus.xml
+Gaciers_Dozer_Command.xml
+Gaciers_Dozer_Drift.xml
+Gaciers_Dozer_EventLogger.xml
+Gaciers_Dozer_NodeHealth.xml
+Gaciers_Dozer_Rssi.xml
+Gaciers_Dozer_StateCounter.xml
 Glaciers_Schedule.xml
 Glaciers_Statistics.xml
 Glaciers_SyslogNg.xml
