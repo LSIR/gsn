@@ -23,14 +23,6 @@
 
 <script type="text/javascript">
 <!--//<![CDATA[
-
-// OpenSense plots
-var nabelDueConfig
-var nabelZueConfig
-var ozoneDueConfig
-var ozoneZueConfig
-var coZueConfig
-var no2DueConfig
                                                                                                      
 $(document).ready(function() {
     $.get('/menu.jsp', {selected: "science"}, function(data) {
@@ -46,6 +38,20 @@ $(document).ready(function() {
           vsensor:".*_dozer_th3temp__conv",
           field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
           /*select:"sensornode[position=6]",*/ position:[6]
+        }],      
+      },
+      {  title:"AE events",
+         signals: [{
+          vsensor:".*_dozer_aedata__conv",
+          field:["length","risetime","amplitude_db","count","energy"],
+          select:"sensornode[nodetype=4]"
+        }],      
+      },
+      {  title:"AE Statistics",
+         signals: [{
+          vsensor:".*_dozer_aestatistics__mapped",
+          field:["payload_measured","payload_parametrized","payload_stored","payload_bufferunderflows","payload_noisefloor_ch1","payload_noisefloor_ch2"],
+          select:"sensornode[nodetype=4]"
         }],      
       },
 
@@ -275,44 +281,10 @@ function showPlots(id) {
   $("#plot_"+id).show();
   $("#deployment_menu_item_"+id).addClass("selected");
   // add graphs
-/*
-  if (id == "Ostest" || id == "Opensense") {
-      var divid = 0;
-
-      $('#plot_'+id).append('<div><h2>'+ozoneDueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
-      ozoneDueConfig.graph.div = 'plot_' + divid++;
-      var g3 = new FrontendCreator(ozoneDueConfig);
-
-      $('#plot_'+id).append('<div><h2>'+ozoneZueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
-      ozoneZueConfig.graph.div = 'plot_' + divid++;
-      var g4 = new FrontendCreator(ozoneZueConfig);
-
-      $('#plot_'+id).append('<div><h2>'+coZueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
-      coZueConfig.graph.div = 'plot_' + divid++;
-      var g5 = new FrontendCreator(coZueConfig);
-
-      $('#plot_'+id).append('<div><h2>'+no2DueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
-      no2DueConfig.graph.div = 'plot_' + divid++;
-      var g6 = new FrontendCreator(no2DueConfig);
-      
-      $('#plot_'+id).append('<div><h2>'+nabelDueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
-      nabelDueConfig.graph.div = 'plot_' + divid++;
-      var g1 = new FrontendCreator(nabelDueConfig);
-
-      $('#plot_'+id).append('<div><h2>'+nabelZueConfig.graph.title+'</h2><div id="plot_'+divid+'"/></div>');
-      nabelZueConfig.graph.div = 'plot_' + divid++;
-      var g2 = new FrontendCreator(nabelZueConfig);
-
-
-  }
-  else {*/
-      GsnPlots.addPlots($("#plot_"+id), id)
-  //}
-  $.cookie("deployment" , id);
-  
+  GsnPlots.addPlots($("#plot_"+id), id)
+  $.cookie("deployment" , id);  
 }
 
-	
 //]]>-->
 </script>
 </head>
