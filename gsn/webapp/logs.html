@@ -263,10 +263,11 @@ function identifierExists(depl, id) {
 
 function getLastLogs(logContainer) {
 	var deployment = deployments[logContainer.deplId];
+	var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
 	if (logContainer.identifier === "dozerevents") {
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + deployment.name.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST,
+			url: "/data?vsName=" + deployment.name.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=event_timestamp&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime() + "&nb=" + MAX_LOGS_PER_REQUEST,
 	        async: false,
 	        cache: false,
 	        timeout: 30000,
@@ -287,7 +288,7 @@ function getLastLogs(logContainer) {
 	else {
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + deployment.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=timestamp&fields=log_message&fieldslinked=false&orderby=timestamp&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&nb=" + MAX_LOGS_PER_REQUEST,
+			url: "/data?vsName=" + deployment.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=timestamp&fields=log_message&fieldslinked=false&orderby=timestamp&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&critJoin=and&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime() + "&nb=" + MAX_LOGS_PER_REQUEST,
 	        async: false,
 	        cache: false,
 	        timeout: 30000,
