@@ -12,6 +12,9 @@
             <field name="PAYLOAD_MEASURED" type="INTEGER" />            
             <field name="PAYLOAD_PARAMETRIZED" type="INTEGER" />
             <field name="PAYLOAD_STORED" type="INTEGER" />
+            <field name="PAYLOAD_BUFFERUNDERFLOWS" type="INTEGER" />
+            <field name="PAYLOAD_NOISEFLOOR_CH1" type="SMALLINT" />
+            <field name="PAYLOAD_NOISEFLOOR_CH2" type="SMALLINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
