@@ -2,22 +2,25 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-		<init-params>
-            <param name="persistant">true</param>
-	    	<param name="scriptlet">
-				<![CDATA[
-		   			if (PAYLOAD_THRESHOLDCHANNEL != null) { CHANNEL = ((PAYLOAD_THRESHOLDCHANNEL % 2) + 1) as short };
-	            	SERIAL = PAYLOAD_SERIAL;
-		    		if (PAYLOAD_STARTSAMPLE != null) { STARTSAMPLE = 2 * PAYLOAD_STARTSAMPLE };
-		    		if (PAYLOAD_LENGTH != null) { LENGTH = 2 * PAYLOAD_LENGTH };
-		    		if (PAYLOAD_RISETIME != null) { RISETIME = 2 * PAYLOAD_RISETIME };
-		    		if (PAYLOAD_AMPLITUDE != null) { AMPLITUDE = (4.5 * PAYLOAD_AMPLITUDE / 65536.0) as float };
-		    		COUNT = PAYLOAD_COUNT;
-		    		if (PAYLOAD_ENERGY != null) { ENERGY = (PAYLOAD_ENERGY * 20.25 / 8388608.0) as float };
-		    		POSTTRIGGER = PAYLOAD_POSTTRIGGER;
-		    		if (PAYLOAD_THRESHOLDCHANNEL != null) { THRESHOLD = Math.floor(PAYLOAD_THRESHOLDCHANNEL / 2) as short };
-				]]>
-	    	</param>
+        <init-params>
+          <param name="persistant">true</param>
+          <param name="scriptlet">
+          <![CDATA[
+            if (PAYLOAD_THRESHOLDCHANNEL != null) { CHANNEL = ((PAYLOAD_THRESHOLDCHANNEL % 2) + 1) as short };
+            SERIAL = PAYLOAD_SERIAL;
+            if (PAYLOAD_STARTSAMPLE != null) { STARTSAMPLE = 2 * PAYLOAD_STARTSAMPLE };
+            if (PAYLOAD_LENGTH != null) { LENGTH = 2 * PAYLOAD_LENGTH };
+            if (PAYLOAD_RISETIME != null) { RISETIME = 2 * PAYLOAD_RISETIME };
+            if (PAYLOAD_AMPLITUDE != null) { 
+              AMPLITUDE = (4.5 * PAYLOAD_AMPLITUDE / 65536.0) as float;
+              AMPLITUDE_DB = (20 * Math.log(AMPLITUDE / 0.0001)/Math.log(10)) as float;
+            }
+            COUNT = PAYLOAD_COUNT;
+            if (PAYLOAD_ENERGY != null) { ENERGY = (PAYLOAD_ENERGY * 20.25 / 8388608.0) as float };
+            POSTTRIGGER = PAYLOAD_POSTTRIGGER;
+            if (PAYLOAD_THRESHOLDCHANNEL != null) { THRESHOLD = Math.floor(PAYLOAD_THRESHOLDCHANNEL / 2) as short };
+          ]]>
+          </param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
@@ -33,10 +36,11 @@
             <field name="LENGTH" type="INTEGER" unit="µs" />
             <field name="RISETIME" type="INTEGER" unit="µs"/>
             <field name="AMPLITUDE" type="DOUBLE" unit="V"/>
+            <field name="AMPLITUDE_DB" type="DOUBLE" unit="dB"/>
             <field name="COUNT" type="INTEGER" />
             <field name="ENERGY" type="DOUBLE" unit="V²"/>
             <field name="POSTTRIGGER" type="INTEGER" />
-	    	<field name="THRESHOLD" type="SMALLINT" unit="dB"/>
+            <field name="THRESHOLD" type="SMALLINT" unit="dB"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
