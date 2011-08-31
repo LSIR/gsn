@@ -747,7 +747,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			String[] fieldnames = {"destination","cmd","arg","repetitioncnt"};
 			Serializable[] values =  {destination.toString(), Short.toString(DATA_CONTROL_CMD), config==null?"0":(Short.toString((short)(config.getConfiguration1() + DATA_CONTROL_NETWORK_FLAG + DATA_CONTROL_SENSOR_FLAG))), Short.toString(REPETITION_COUNT)};
 			// old or new config command ?
-			if (config != null && config.vaisala_wxt520) {
+			if (config != null && config.vaisala_wxt520!=null && config.vaisala_wxt520==true) {
 				values[1]=Short.toString(DATA_CONTROL_CMD1);
 				values[2]= config==null?"0":(Short.toString((short)(config.getConfiguration1() + DATA_CONTROL_WRITE_FLAG)));
 			}
