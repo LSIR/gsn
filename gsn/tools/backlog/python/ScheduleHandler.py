@@ -26,7 +26,6 @@ if SUBPROCESS_BUG_BYPASS:
 else:
     import subprocess
     
-import Queue
 import logging
 import thread
 from datetime import datetime, timedelta
