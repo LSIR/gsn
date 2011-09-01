@@ -1,0 +1,31 @@
+<virtual-sensor name="OSTest_OstLuft_Schimmelstrasse" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="OZONE_PPB" type="DOUBLE" unit="ppb" />
+            <field name="CO_PPM" type="DOUBLE" unit="ppm" />
+            <field name="NO2_PPB" type="DOUBLE" unit="ppb" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>OstLuft Schimmelstrasse measurements from OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="ostluft-http-get">
+                    <predicate key="url">http://www.ostluft.ch/index.php?id=datenabfragen&amp;%20%20%20%20tx_ostluft_pi6_method=storeKanalConfiguration&amp;%20%20%20%20tx_ostluft_pi6[type]=html&amp;%20%20%20%20tx_ostluft_pi6[windgrafik]=0&amp;%20%20%20%20tx_ostluft_pi6[windgrafik_zeitfenster]=0&amp;%20%20%20%20tx_ostluft_pi6[zeitmodus]=absolute&amp;%20%20%20%20startzeit=STARTTIME&amp;%20%20%20%20endzeit=ENDTIME&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][kanal_id]=10d90daf-2908-4433-ac0d-1587ba616e30&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][server_id]=1&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][messstation]=Z\\u00fcrich,%20Schimmelstrasse&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][messstation_id]=89de8700-3b79-4dfc-afc4-b0f02c969fc7&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][messgroesse]=Ozon&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][messgroesse_id]=0e9b81d7-e20d-483a-adb1-21ab4cbd0e75&amp;%20%20%ei20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][zeitfenster]=Halbstundenwert&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][messstellengruppe]=&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][messtellengruppe_id]=03ca89c7-616b-4ede-b317-5eccd3e86e5c&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][messstelle]=Z\\u00fcrich%20Schimmelstrasse&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][messstelle_id]=4453f48e-0fbe-4074-9db3-dc7102b29d07&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][kanalgruppe_id]=f2f31523-989d-43cf-9f29-b23e6236f261&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][einheit]=\\u00b5g\\/m3&amp;%20%20%20%20kanal[10d90daf-2908-4433-ac0d-1587ba616e30][einheit_id]=08c6391b-3fa6-4aca-8323-7b53bda973b2&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][kanal_id]=a2f67344-d577-45d9-8b30-92ceebf2ee20&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][server_id]=1&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][messstation]=Z\\u00fcrich,%20Schimmelstrasse&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][messstation_id]=89de8700-3b79-4dfc-afc4-b0f02c969fc7&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][messgroesse]=Kohlenmonoxid&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][messgroesse_id]=d5f79d4f-c5e8-439e-909b-2bba18393d0c&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][zeitfenster]=Halbstundenwert&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][messstellengruppe]=&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][messtellengruppe_id]=03ca89c7-616b-4ede-b317-5eccd3e86e5c&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][messstelle]=Z\\u00fcrich%20Schimmelstrasse&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][messstelle_id]=4453f48e-0fbe-4074-9db3-dc7102b29d07&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][kanalgruppe_id]=db6bb25e-2e28-4042-9efc-8ebd29a2bcf6&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][einheit]=mg\\/m3&amp;%20%20%20%20kanal[a2f67344-d577-45d9-8b30-92ceebf2ee20][einheit_id]=91a44475-0a7f-4bbc-93c5-91db55a01fbb&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][kanal_id]=de7fa1b3-fc74-441a-b9d8-b373b45173f2&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][server_id]=1&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][messstation]=Z\\u00fcrich,%20Schimmelstrasse&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][messstation_id]=89de8700-3b79-4dfc-afc4-b0f02c969fc7&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][messgroesse]=Stickstoffdioxid&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][messgroesse_id]=e82c8d06-fa33-4655-b27a-98dc7c4e0458&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][zeitfenster]=Halbstundenwert&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][messstellengruppe]=&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][messtellengruppe_id]=03ca89c7-616b-4ede-b317-5eccd3e86e5c&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][messstelle]=Z\\u00fcrich%20Schimmelstrasse&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][messstelle_id]=4453f48e-0fbe-4074-9db3-dc7102b29d07&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][kanalgruppe_id]=611007f9-cd2c-4652-a463-ca65288de883&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][einheit]=\\u00b5g\\/m3&amp;kanal[de7fa1b3-fc74-441a-b9d8-b373b45173f2][einheit_id]=08c6391b-3fa6-4aca-8323-7b53bda973b2</predicate>
+                    <predicate key="rate">3600000</predicate>
+                    <predicate key="device-id">101</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -110,6 +110,9 @@ OSTest_MotionDetection__muxed__mapped.xml
 OSTest_MotionDetection__mapped.xml
 OSTest_OZ47_Calibration_Due.xml
 OSTest_OZ47_Concentration.xml
+OSTest_OstLuft_Schimmelstrasse.xml
+#OSTest_OstLuft_Schwamendingen.xml
+OSTest_OstLuft_Stampfenbachstrasse.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml

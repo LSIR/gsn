@@ -1,0 +1,31 @@
+<virtual-sensor name="OSTest_OstLuft_Schwamendingen" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="OZONE_PPB" type="DOUBLE" unit="ppb" />
+            <field name="CO_PPM" type="DOUBLE" unit="ppm" />
+            <field name="NO2_PPB" type="DOUBLE" unit="ppb" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>OstLuft Schwamendingen measurements from OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="ostluft-http-get">
+                    <predicate key="url">http://www.ostluft.ch/index.php?id=datenabfragen&amp;tx_ostluft_pi6_method=storeKanalConfiguration&amp;tx_ostluft_pi6[type]=html&amp;tx_ostluft_pi6[windgrafik]=0&amp;tx_ostluft_pi6[windgrafik_zeitfenster]=0&amp;tx_ostluft_pi6[zeitmodus]=absolute&amp;startzeit=STARTTIME&amp;endzeit=ENDTIME&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][kanal_id]=ed6c342d-2ceb-4459-ba91-b987d760a554&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][server_id]=1&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][messstation]=Z\\u00fcrich,%20Schwamendingen&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][messstation_id]=3d578860-4477-4990-8822-ffe8a3e81875&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][messgroesse]=Ozon&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][messgroesse_id]=0e9b81d7-e20d-483a-adb1-21ab4cbd0e75&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][zeitfenster]=Halbstundenwert&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][messstellengruppe]=&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][messtellengruppe_id]=c9e6fc89-4aee-48b7-988b-14b722656f6d&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][messstelle]=Z\\u00fcrich%20Schwamendingen&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][messstelle_id]=175c6894-9b78-4981-9fad-de6b7d9be472&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][kanalgruppe_id]=d3790533-5ad3-4381-9f26-b9563d96010a&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][einheit]=\\u00b5g\\/m3&amp;kanal[ed6c342d-2ceb-4459-ba91-b987d760a554][einheit_id]=08c6391b-3fa6-4aca-8323-7b53bda973b2&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][kanal_id]=39950997-5906-4dd3-b0df-c4450cacc1b6&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][server_id]=1&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][messstation]=Z\\u00fcrich,%20Schwamendingen&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][messstation_id]=3d578860-4477-4990-8822-ffe8a3e81875&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][messgroesse]=Kohlenmonoxid&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][messgroesse_id]=d5f79d4f-c5e8-439e-909b-2bba18393d0c&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][zeitfenster]=Halbstundenwert&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][messstellengruppe]=&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][messtellengruppe_id]=c9e6fc89-4aee-48b7-988b-14b722656f6d&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][messstelle]=Z\\u00fcrich%20Schwamendingen&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][messstelle_id]=175c6894-9b78-4981-9fad-de6b7d9be472&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][kanalgruppe_id]=af602089-0beb-4918-b881-e9e7a8dce4ed&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][einheit]=mg\\/m3&amp;kanal[39950997-5906-4dd3-b0df-c4450cacc1b6][einheit_id]=91a44475-0a7f-4bbc-93c5-91db55a01fbb&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][kanal_id]=f6cee4c4-c0af-4ebc-bafd-459f652da486&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][server_id]=1&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][messstation]=Z\\u00fcrich,%20Schwamendingen&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][messstation_id]=3d578860-4477-4990-8822-ffe8a3e81875&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][messgroesse]=Stickstoffdioxid&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][messgroesse_id]=e82c8d06-fa33-4655-b27a-98dc7c4e0458&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][zeitfenster]=Halbstundenwert&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][messstellengruppe]=&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][messtellengruppe_id]=c9e6fc89-4aee-48b7-988b-14b722656f6d&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][messstelle]=Z\\u00fcrich%20Schwamendingen&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][messstelle_id]=175c6894-9b78-4981-9fad-de6b7d9be472&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][kanalgruppe_id]=50591ae5-d143-43b7-80a9-221772e2a973&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][einheit]=\\u00b5g\\/m3&amp;kanal[f6cee4c4-c0af-4ebc-bafd-459f652da486][einheit_id]=08c6391b-3fa6-4aca-8323-7b53bda973b2</predicate>
+                    <predicate key="rate">3600000</predicate>
+                    <predicate key="device-id">103</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

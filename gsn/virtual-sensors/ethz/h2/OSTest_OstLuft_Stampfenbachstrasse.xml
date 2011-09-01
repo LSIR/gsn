@@ -1,0 +1,31 @@
+<virtual-sensor name="OSTest_OstLuft_Stampfenbachstrasse" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="OZONE_PPB" type="DOUBLE" unit="ppb" />
+            <field name="CO_PPM" type="DOUBLE" unit="ppm" />
+            <field name="NO2_PPB" type="DOUBLE" unit="ppb" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>OstLuft Stampfenbachstrasse measurements from OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="ostluft-http-get">
+                    <predicate key="url">http://www.ostluft.ch/index.php?id=datenabfragen&amp;tx_ostluft_pi6_method=storeKanalConfiguration&amp;tx_ostluft_pi6[type]=html&amp;tx_ostluft_pi6[windgrafik]=0&amp;tx_ostluft_pi6[windgrafik_zeitfenster]=0&amp;tx_ostluft_pi6[zeitmodus]=absolute&amp;startzeit=STARTTIME&amp;endzeit=ENDTIME&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][kanal_id]=bd77008a-8d9d-4b61-9229-4f597c6bc486&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][server_id]=1&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][messstation]=Z\\u00fcrich,%20Stampfenbachstrasse&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][messstation_id]=3d935e51-0968-44af-8225-5af419301e01&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][messgroesse]=Ozon&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][messgroesse_id]=0e9b81d7-e20d-483a-adb1-21ab4cbd0e75&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][zeitfenster]=Halbstundenwert&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][messstellengruppe]=&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][messtellengruppe_id]=fe7054fc-df73-436e-b185-0833d585fb32&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][messstelle]=Z\\u00fcrich%20Stampfenbachstrasse&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][messstelle_id]=0181e7c9-a4eb-4d8a-ad86-ff8a33410ee3&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][kanalgruppe_id]=3824f04e-3770-4d32-b491-a65f63402afd&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][einheit]=\\u00b5g\\/m3&amp;kanal[bd77008a-8d9d-4b61-9229-4f597c6bc486][einheit_id]=08c6391b-3fa6-4aca-8323-7b53bda973b2&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][kanal_id]=3dfb2fb3-10ff-469e-80aa-432dcc6897f7&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][server_id]=1&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][messstation]=Z\\u00fcrich,%20Stampfenbachstrasse&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][messstation_id]=3d935e51-0968-44af-8225-5af419301e01&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][messgroesse]=Kohlenmonoxid&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][messgroesse_id]=d5f79d4f-c5e8-439e-909b-2bba18393d0c&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][zeitfenster]=Halbstundenwert&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][messstellengruppe]=&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][messtellengruppe_id]=fe7054fc-df73-436e-b185-0833d585fb32&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][messstelle]=Z\\u00fcrich%20Stampfenbachstrasse&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][messstelle_id]=0181e7c9-a4eb-4d8a-ad86-ff8a33410ee3&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][kanalgruppe_id]=cb22a1c6-3132-4d27-b35a-82554da8a859&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][einheit]=mg\\/m3&amp;kanal[3dfb2fb3-10ff-469e-80aa-432dcc6897f7][einheit_id]=91a44475-0a7f-4bbc-93c5-91db55a01fbb&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][kanal_id]=b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][server_id]=1&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][messstation]=Z\\u00fcrich,%20Stampfenbachstrasse&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][messstation_id]=3d935e51-0968-44af-8225-5af419301e01&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][messgroesse]=Stickstoffdioxid&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][messgroesse_id]=e82c8d06-fa33-4655-b27a-98dc7c4e0458&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][zeitfenster]=Halbstundenwert&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][zeitfenster_id]=20ecc4c2-7726-4d62-b745-f575bac33d3c&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][messstellengruppe]=&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][messtellengruppe_id]=fe7054fc-df73-436e-b185-0833d585fb32&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][messstelle]=Z\\u00fcrich%20Stampfenbachstrasse&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][messstelle_id]=0181e7c9-a4eb-4d8a-ad86-ff8a33410ee3&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][kanalgruppe_id]=149064fd-6031-4c1d-ad5e-3c6e5203b97f&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][einheit]=\\u00b5g\\/m3&amp;kanal[b6b83575-d7f8-4a89-9a1f-d0f0133f1f4d][einheit_id]=08c6391b-3fa6-4aca-8323-7b53bda973b2</predicate>
+                    <predicate key="rate">3600000</predicate>
+                    <predicate key="device-id">102</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
