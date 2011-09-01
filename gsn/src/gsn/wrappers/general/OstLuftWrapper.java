@@ -13,6 +13,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.Vector;
 import java.util.Date;
 import java.io.BufferedReader;
@@ -54,6 +55,8 @@ public class OstLuftWrapper extends AbstractWrapper {
 	public boolean initialize (  ) {
 		AddressBean addressBean =getActiveAddressBean( );
 		urlPath = addressBean.getPredicateValue( "url" );
+		
+		formatTable.setTimeZone( TimeZone.getTimeZone( "cest" ) );
 		
 		String id = getActiveAddressBean().getPredicateValue("device-id");
 		if (id != null) {
@@ -112,8 +115,8 @@ public class OstLuftWrapper extends AbstractWrapper {
         logger.error(e.getMessage(), e);
       }
       
-      // start at the latest db entry + 30min
-      String starttime = format.format(new java.util.Date(last_db_timestamp+1800000));
+      // start at the latest db entry - 60min
+      String starttime = format.format(new java.util.Date(last_db_timestamp-3600000));
       String endtime = format.format(new java.util.Date(System.currentTimeMillis()));
       
       // Replace strings
@@ -152,7 +155,8 @@ public class OstLuftWrapper extends AbstractWrapper {
               if (contents.get(i).size() != 4) continue;
               
               Date newDate = formatTable.parse((String) contents.get(i).get(0));
-              if (newDate.getTime() <= last_db_timestamp) continue;
+              // Go from cest (UTC+2h) to time format on the core station (UTC+1h)
+              if (newDate.getTime() - 3600000 <= last_db_timestamp) continue;
               
               Double ozone = null;
               Double co = null;
@@ -173,7 +177,7 @@ public class OstLuftWrapper extends AbstractWrapper {
               
               // Only post stream if one of the values are not null
               if (ozone != null || co != null || no2 != null)
-                postStreamElement(new Serializable[]{deviceId, newDate.getTime(), ozone, co, no2});
+                postStreamElement(new Serializable[]{deviceId, newDate.getTime() - 3600000, ozone, co, no2});
               
             } catch (java.text.ParseException e){
               logger.error("Format parse exception: " + e.getMessage());
