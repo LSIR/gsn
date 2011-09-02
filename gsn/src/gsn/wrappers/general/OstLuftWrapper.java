@@ -123,7 +123,7 @@ public class OstLuftWrapper extends AbstractWrapper {
       String currUrlPath = urlPath;
       currUrlPath = currUrlPath.replace("STARTTIME", starttime);
       currUrlPath = currUrlPath.replace("ENDTIME", endtime);
-      logger.info("get ostluft data from " + starttime + " to " + endtime);
+      logger.debug("get ostluft data from " + starttime + " to " + endtime);
       
       try {
         url = new URL(currUrlPath);
