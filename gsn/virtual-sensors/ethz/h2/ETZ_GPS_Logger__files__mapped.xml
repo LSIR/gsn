@@ -2,11 +2,7 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <init-params>
-            <param name="position_mapping" />
-        </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />

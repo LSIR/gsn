@@ -3,6 +3,7 @@
         <class-name>gsn.vsensor.GPSLoggerDataParser</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
+            <param name="position_mapping" />
             <param name="file_type">events</param>
         </init-params>
         <output-structure>
@@ -27,7 +28,6 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">select * from ETZ_GPS_Logger__files__mapped</predicate>
-                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
