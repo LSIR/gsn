@@ -60,6 +60,9 @@ Jungfraujoch_CoreStationStatus_Static.xml
 Jungfraujoch_Dozer_AdcComDiff.xml
 Jungfraujoch_Dozer_AdcMux1.xml
 Jungfraujoch_Dozer_AdcMux2.xml
+Jungfraujoch_Dozer_AEDAQHealthData.xml
+Jungfraujoch_Dozer_AEData.xml
+Jungfraujoch_Dozer_AEStatistics.xml
 Jungfraujoch_Dozer_BaseDebug.xml
 Jungfraujoch_Dozer_BaseStatus.xml
 Jungfraujoch_Dozer_Command.xml
