@@ -76,6 +76,10 @@ Jungfraujoch_Dozer_StateCounter.xml
 Jungfraujoch_Dozer_AEDAQHealthData.xml
 Jungfraujoch_Dozer_AEData.xml
 Jungfraujoch_Dozer_AEStatistics.xml
+Jungfraujoch_Dozer_Th3Ident.xml
+Jungfraujoch_Dozer_Th3Temp.xml
+Jungfraujoch_Dozer_EnviroScanData.xml
+Jungfraujoch_Dozer_EnviroScanIdent.xml
 Jungfraujoch_Schedule.xml
 Jungfraujoch_Statistics.xml
 Jungfraujoch_SyslogNg.xml
