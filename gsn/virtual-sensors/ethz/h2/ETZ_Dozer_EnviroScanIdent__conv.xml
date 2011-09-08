@@ -14,7 +14,7 @@
             <field name="SERIAL" type="CHAR(12)"/>
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerWxt520IdentMsg) from ETZ deployment converted</description>
+    <description>Dozer messages (DozerEnviroScanIdentMsg) from ETZ deployment converted</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
