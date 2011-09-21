@@ -87,15 +87,15 @@ public class CamZillaPlugin extends AbstractPlugin {
 			}
 
 			String str = "";
-			if (sx.trim() != "" && sy.trim() != "")
+			if (!sx.trim().isEmpty() && !sy.trim().isEmpty())
 				str = "start("+sx+","+sy+") ";
-			if (px.trim() != "" && py.trim() != "")
+			if (!px.trim().isEmpty() && !py.trim().isEmpty())
 				str += "pictures("+px+","+py+") ";
-			if (rx.trim() != "" && ry.trim() != "")
+			if (!rx.trim().isEmpty() && !ry.trim().isEmpty())
 				str += "rotation("+rx+","+ry+") ";
-			if (d.trim() != "")
+			if (!d.trim().isEmpty())
 				str += "delay("+d+") ";
-			if (g.trim() != "")
+			if (!g.trim().isEmpty())
 				str += "gphoto2("+g+")";
 			
 			logger.info("uploading panorama picture task >" + str + "<");
