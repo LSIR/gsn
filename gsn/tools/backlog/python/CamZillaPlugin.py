@@ -125,7 +125,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
     
     
     def msgReceived(self, data):
-        self.action(data)
+        self.action(data[0])
        
         
     def run(self):
@@ -167,14 +167,14 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                             self._delay.wait(parsedTask[6])
                         try:
                             self.info('taking picture number %d/%d at position (%d,%d)' % (pic,parsedTask[2]*parsedTask[3],x,y))
-                            self._takePicture(parsedTask[7])
+                            com = self._takePicture(parsedTask[7])
                             pic += 1
                         except Exception, e:
                             self.exception(str(e))
                     if self._plugStop:
                         break
                 
-                self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask)
+                self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [com])
                          
                 
                 if not self._plugStop:
@@ -208,7 +208,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         
         
     def _parseTask(self, task):
-        params = task.split(' ')
+        params = task.strip().split(' ')
         ret = [None]*8
         for param in params:
             param = param.lower()
@@ -272,8 +272,12 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             sets.append('--set-config %s' % (setting.strip(),))
         
         command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet'] + sets + ['--capture-image']
-        self.debug('taking picture >%s<' % (str(command),))
+        ret = ''
+        for entry in command:
+            ret += entry + ' '
+        self.debug('taking picture >%s<' % (ret,))
         self._execGphoto2(command)
+        return ret.strip()
         
         
     def _downloadPictures(self, datestring):
