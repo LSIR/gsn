@@ -424,7 +424,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		if (value == null)
 			return null;
 		else if (value instanceof Byte)
-			return new Long((Byte)value & 0xFF);
+			return new Long((Byte)value);
 		else if (value instanceof Short)
 			return new Long((Short)value);
 		else if (value instanceof Integer)
@@ -440,7 +440,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		if (value == null)
 			return null;
 		else if (value instanceof Byte)
-			return new Integer((Byte)value & 0xFF);
+			return new Integer((Byte)value);
 		else if (value instanceof Short)
 			return new Integer((Short)value);
 		else if (value instanceof Integer)
@@ -454,7 +454,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		if (value == null)
 			return null;
 		else if (value instanceof Byte)
-			return (new Integer(((Byte)value & 0xFF))).shortValue();
+			return new Short((Byte)value);
 		else if (value instanceof Short)
 			return (Short) value;
 		else
