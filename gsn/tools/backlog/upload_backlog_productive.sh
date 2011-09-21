@@ -50,4 +50,12 @@ echo "to permasense-mh-cam01:"
 scp $* root@permasense-mh-cam01:$BACKLOG_PYTHON_DIR
 
 echo ""
+echo "to permasense-gg-bs01:"
+scp $* root@permasense-gg-bs01:$BACKLOG_PYTHON_DIR
+
+echo ""
+echo "to permasense-gg-gps01:"
+scp $* root@permasense-gg-gps01:$BACKLOG_PYTHON_DIR
+
+echo ""
 echo "finished uploading"

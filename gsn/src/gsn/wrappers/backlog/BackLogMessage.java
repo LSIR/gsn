@@ -142,6 +142,11 @@ public class BackLogMessage {
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.MotionDetectionPlugin MotionDetectionPlugin}. */
 	public static final byte MOTION_DETECTION_MESSAGE_TYPE = 84;
+
+	/** CamZilla
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.CamZillaPlugin CamZillaPlugin}. */
+	public static final byte CAMZILLA_MESSAGE_TYPE = 90;
 	
 	
 	/* #                                                            #

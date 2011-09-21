@@ -1,10 +1,11 @@
 ETZ_BackLogStatus_Static.xml
 ETZ_BackLogStatus_Revision.xml
 ETZ_BackLogStatus_Dynamic.xml
+ETZ_Binary.xml
+ETZ_CamZilla.xml
 ETZ_CoreStationStatus_Static.xml
 ETZ_CoreStationStatus_Software.xml
 ETZ_CoreStationStatus_Hardware.xml
-ETZ_Binary.xml
 ETZ_Dozer_AdcComDiff.xml
 ETZ_Dozer_AdcMux1.xml
 ETZ_Dozer_AdcMux2.xml

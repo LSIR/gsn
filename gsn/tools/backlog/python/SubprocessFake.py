@@ -83,6 +83,9 @@ class Popen(Thread):
 
         if shell:
             args = '/bin/sh -c %s' % (args,)
+            
+        if cwd:
+            args = 'cd %s; %s' % (cwd,args)
 
         try:
             os.makedirs(SUBPROCESS_FAKE_FOLDER_NEW)

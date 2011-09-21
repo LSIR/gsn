@@ -228,7 +228,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 						logger.debug("Upload command sent (resend backlogged data)");
 				}
 				else {
-					logger.warn("Upload command (resend backlogged data)");
+					logger.warn("Upload command (resend backlogged data) could not be sent");
 					return false;
 				}
 			} catch (IOException e) {

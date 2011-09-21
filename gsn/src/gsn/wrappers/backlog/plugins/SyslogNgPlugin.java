@@ -8,11 +8,7 @@ import gsn.beans.DataField;
 
 
 /**
- * This plugin offers the functionality to send commands to the Backlog Python program
- * on the deployment side. It also listens for incoming BackLogStatus messages.
- * <p>
- * Any new command pointed directly to the Backlog Python program should be implemented
- * in this class.
+ * This plugin listens for incoming SyslogNg messages.
  * 
  * @author Tonio Gsell
  */

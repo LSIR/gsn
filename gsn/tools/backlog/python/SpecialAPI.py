@@ -340,6 +340,8 @@ DEFAULT_LINK_FOLDER = '/etc/gpio/'
 
 WLAN_GPIO_LINK_PREFIX = 'wlan_power'
 PHOTOCAM_GPIO_LINK_PREFIX = 'photocam_power'
+USB2_GPIO_LINK_PREFIX = 'usb2'
+USB3_GPIO_LINK_PREFIX = 'usb3'
 
 GPIO_RESET_ON_CLEAR_SUFFIX = 'reset_on_clear'
 GPIO_RESET_ON_SET_SUFFIX = 'reset_on_set'
@@ -358,6 +360,15 @@ class PowerControl:
     '''
     data/instance attributes:
     _linkfolder
+    _usb2GPIOOnOnSet
+    _usb2GPIOLink
+    _usb2GPIOLock
+    _usb3GPIOOnOnSet
+    _usb3GPIOLink
+    _usb3GPIOLock
+    _photocamGPIOOnOnSet
+    _photocamGPIOLink
+    _photocamGPIOLock
     _wlanGPIOLink
     _wlanGPIOLock
     _wlanGPIOOnOnSet
@@ -384,6 +395,10 @@ class PowerControl:
         self._wlanGPIOLock = Lock()
         self._photocamGPIOLink = ''
         self._photocamGPIOLock = Lock()
+        self._usb2GPIOLink = ''
+        self._usb2GPIOLock = Lock()
+        self._usb3GPIOLink = ''
+        self._usb3GPIOLock = Lock()
         
         for file in os.listdir(linkFolder):
             if file.startswith(WLAN_GPIO_LINK_PREFIX):
@@ -402,9 +417,153 @@ class PowerControl:
                     self._photocamGPIOOnOnSet = False
                 else:
                     raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+            elif file.startswith(USB2_GPIO_LINK_PREFIX):
+                self._usb2GPIOLink = os.path.join(linkFolder, file)
+                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                    self._usb2GPIOOnOnSet = True
+                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                    self._usb2GPIOOnOnSet = False
+                else:
+                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+            elif file.startswith(USB3_GPIO_LINK_PREFIX):
+                self._usb3GPIOLink = os.path.join(linkFolder, file)
+                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                    self._usb3GPIOOnOnSet = True
+                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                    self._usb3GPIOOnOnSet = False
+                else:
+                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
         
         if self._backlogMain.duty_cycle_mode:
             self._backlogMain.registerTOSListener(self, [TOSTypes.AM_BEACONCOMMAND])
+                
+    
+    
+    def usb2On(self):
+        '''
+        Turns the USB2 port power on
+        
+        @raise Exception: if no USB2 GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._usb2GPIOLink:
+            self._logger.info('turning USB2 port on')
+            self._usb2GPIOLock.acquire()
+            if self._usb2GPIOOnOnSet:
+                self._gpioLinkAction(self._usb2GPIOLink, True)
+            else:
+                self._gpioLinkAction(self._usb2GPIOLink, False)
+            self._usb2GPIOLock.release()
+        else:
+            raise Exception('USB2 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        
+    
+    
+    def usb2Off(self):
+        '''
+        Turns the USB2 port power off.
+        
+        @raise Exception: if no USB2 GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._usb2GPIOLink:
+            self._logger.warning('turning USB2 port off')
+            self._usb2GPIOLock.acquire()
+            if self._usb2GPIOOnOnSet:
+                self._gpioLinkAction(self._usb2GPIOLink, False)
+            else:
+                self._gpioLinkAction(self._usb2GPIOLink, True)
+            self._usb2GPIOLock.release()
+        else:
+            raise Exception('USB2 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+    
+    
+    def getUsb2Status(self):
+        '''
+        Returns True if the USB2 port is on otherwise False
+        
+        @return: True if the USB2 port is on otherwise False
+        
+        @raise Exception: if no USB2 GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._usb2GPIOLink:
+            self._usb2GPIOLock.acquire()
+            stat = self._getGPIOStatus(self._usb2GPIOLink).rsplit(None, 1)[1]
+            self._usb2GPIOLock.release()
+            if (self._usb2GPIOOnOnSet and stat == 'set') or (not self._usb2GPIOOnOnSet and stat == 'clear'):
+                return True
+            else:
+                return False
+        else:
+            raise Exception('USB2 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+                
+    
+    
+    def usb3On(self):
+        '''
+        Turns the USB3 port power on
+        
+        @raise Exception: if no USB3 GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._usb3GPIOLink:
+            self._logger.info('turning USB3 port on')
+            self._usb3GPIOLock.acquire()
+            if self._usb3GPIOOnOnSet:
+                self._gpioLinkAction(self._usb3GPIOLink, True)
+            else:
+                self._gpioLinkAction(self._usb3GPIOLink, False)
+            self._usb3GPIOLock.release()
+        else:
+            raise Exception('USB3 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        
+    
+    
+    def usb3Off(self):
+        '''
+        Turns the USB3 port power off.
+        
+        @raise Exception: if no USB3 GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._usb3GPIOLink:
+            self._logger.warning('turning USB3 port off')
+            self._usb3GPIOLock.acquire()
+            if self._usb3GPIOOnOnSet:
+                self._gpioLinkAction(self._usb3GPIOLink, False)
+            else:
+                self._gpioLinkAction(self._usb3GPIOLink, True)
+            self._usb3GPIOLock.release()
+        else:
+            raise Exception('USB3 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+    
+    
+    def getUsb3Status(self):
+        '''
+        Returns True if the USB3 port is on otherwise False
+        
+        @return: True if the USB3 port is on otherwise False
+        
+        @raise Exception: if no USB3 GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._usb3GPIOLink:
+            self._usb3GPIOLock.acquire()
+            stat = self._getGPIOStatus(self._usb3GPIOLink).rsplit(None, 1)[1]
+            self._usb3GPIOLock.release()
+            if (self._usb3GPIOOnOnSet and stat == 'set') or (not self._usb3GPIOOnOnSet and stat == 'clear'):
+                return True
+            else:
+                return False
+        else:
+            raise Exception('USB3 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
                 
     
     
@@ -569,9 +728,9 @@ class PowerControl:
         '''
         file = open(link, 'w')
         if set:
-            file.write('set')
+            file.write('out set')
         else:
-            file.write('clear')
+            file.write('out clear')
         file.close()
         
         

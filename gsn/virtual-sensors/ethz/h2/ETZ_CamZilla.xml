@@ -1,0 +1,51 @@
+<virtual-sensor name="ETZ_CamZilla" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <web-input password="test">
+            <command name="panorama_picture">
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+                <field name="start_x" type="*text" defaultvalue="0">Lower-left horizontal starting point</field>
+                <field name="start_y" type="*text" defaultvalue="0">Lower-left vertical starting point</field>
+                <field name="pictures_x" type="*text" defaultvalue="1">Number of pictures taken horizontally</field>
+                <field name="pictures_y" type="*text" defaultvalue="1">Number of pictures taken vertically</field>
+                <field name="rotation_x" type="*text" defaultvalue="">Horizontal rotation in degrees between pictures</field>
+                <field name="rotation_y" type="*text" defaultvalue="">Vertical rotation in degrees between pictures</field>
+                <field name="delay" type="*text" defaultvalue="0">Delay between rotation and picture taking</field>
+                <field name="gphoto2_config" type="*text" defaultvalue="">Comma separated configurations for gphoto2</field>
+            </command>
+        </web-input>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
+            
+            <field name="START_X" type="SMALLINT" />
+            <field name="START_Y" type="SMALLINT" />
+            <field name="PICTURES_X" type="SMALLINT" />
+            <field name="PICTURES_Y" type="SMALLINT" />
+            <field name="ROTATION_X" type="SMALLINT" />
+            <field name="ROTATION_Y" type="SMALLINT" />
+            <field name="DELAY" type="SMALLINT" />
+            <field name="GPHOTO2_CONFIG" type="BINARY" />
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Show CamZilla information of the CoreStations from the ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

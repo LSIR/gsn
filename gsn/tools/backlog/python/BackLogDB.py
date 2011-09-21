@@ -18,6 +18,7 @@ from SpecialAPI import Statistics
 
 RESEND_BUNCH_SIZE = 10
 MAX_WAIT_FOR_ACK = 30.0
+MAX_DB_ENTRIES_FOR_VACUUM = 10000
 
 
 class BackLogDBClass(Thread, Statistics):
@@ -97,10 +98,6 @@ class BackLogDBClass(Thread, Statistics):
             if self._cur.fetchone()[0] != 'ok':
                 raise sqlite3.Error('failed database integrity check')
             
-            self._logger.info('vacuum database')
-            
-            self._con.execute('VACUUM')
-            
             self._con.execute('PRAGMA synchronous = OFF')
             
             self._con.execute('CREATE table IF NOT EXISTS backlogmsg (timestamp INTEGER PRIMARY KEY ON CONFLICT REPLACE, type INTEGER, message BLOB)')
@@ -111,6 +108,12 @@ class BackLogDBClass(Thread, Statistics):
             self._dbNumberOfEntriesId = self.createCounter(initCounterValue=self._cur.fetchone()[0])
             self._dblock.release()
             self._logger.info(str(self.getCounterValue(self._dbNumberOfEntriesId)) + ' entries in database')
+            
+            if self.getCounterValue(self._dbNumberOfEntriesId) < MAX_DB_ENTRIES_FOR_VACUUM:
+                self._logger.info('vacuum database')
+                self._con.execute('VACUUM')
+            else:
+                self._logger.info('too many entries in database -> skip vacuum')
             
             if self.getCounterValue(self._dbNumberOfEntriesId) > 0:
                 self._isBusy = True
