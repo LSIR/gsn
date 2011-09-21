@@ -66,26 +66,40 @@ public class CamZillaPlugin extends AbstractPlugin {
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if( action.compareToIgnoreCase("panorama_picture") == 0 ) {
-			Serializable[] task = new Serializable[8];
+			String sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", g = "";
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("start_x") == 0 )
-					task[0] = Short.parseShort((String) paramValues[i]);
+					sx = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("start_y") == 0 )
-					task[1] = Short.parseShort((String) paramValues[i]);
+					sy = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("pictures_x") == 0 )
-					task[2] = Short.parseShort((String) paramValues[i]);
+					px = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("pictures_y") == 0 )
-					task[3] = Short.parseShort((String) paramValues[i]);
+					py = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("rotation_x") == 0 )
-					task[4] = Short.parseShort((String) paramValues[i]);
+					rx = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("rotation_y") == 0 )
-					task[5] = Short.parseShort((String) paramValues[i]);
+					ry = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("delay") == 0 )
-					task[6] = Short.parseShort((String) paramValues[i]);
+					d = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("gphoto2_config") == 0 )
-					task[7] = (String) paramValues[i];
+					g = (String) paramValues[i];
 			}
+
+			String str = "";
+			if (sx.trim() != "" && sy.trim() != "")
+				str = "start("+sx+","+sy+")";
+			if (px.trim() != "" && py.trim() != "")
+				str += "pictures("+px+","+py+")";
+			if (rx.trim() != "" && ry.trim() != "")
+				str += "rotation("+rx+","+ry+")";
+			if (d.trim() != "")
+				str += "delay("+d+")";
+			if (g.trim() != "")
+				str += "gphoto2("+g+")";
 			
+			logger.info("uploading panorama picture task >" + str + "<");
+			Serializable[] task = {str};
 			try {
 				if( sendRemote(System.currentTimeMillis(), task, super.priority) ) {
 					if (logger.isDebugEnabled())
