@@ -88,13 +88,13 @@ public class CamZillaPlugin extends AbstractPlugin {
 
 			String str = "";
 			if (sx.trim() != "" && sy.trim() != "")
-				str = "start("+sx+","+sy+")";
+				str = "start("+sx+","+sy+") ";
 			if (px.trim() != "" && py.trim() != "")
-				str += "pictures("+px+","+py+")";
+				str += "pictures("+px+","+py+") ";
 			if (rx.trim() != "" && ry.trim() != "")
-				str += "rotation("+rx+","+ry+")";
+				str += "rotation("+rx+","+ry+") ";
 			if (d.trim() != "")
-				str += "delay("+d+")";
+				str += "delay("+d+") ";
 			if (g.trim() != "")
 				str += "gphoto2("+g+")";
 			
