@@ -178,7 +178,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                          
                 
                 if not self._plugStop:
-                    self._downloadPictures(now.strftime('%Y%m%d_%H%M%S'))
+                    self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
                 
                 # turn the photo camera off
                 self.photoCamOff()
