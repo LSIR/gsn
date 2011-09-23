@@ -16,6 +16,11 @@ import org.apache.log4j.Logger;
  */
 public class CamZillaPlugin extends AbstractPlugin {
 	
+	private static final short MESSAGE_TYPE_TASK = 0;
+	private static final short MESSAGE_TYPE_MODE = 1;
+	private static final short MESSAGE_TYPE_CAL = 2;
+	private static final short MESSAGE_TYPE_POWER = 3;
+	
 	private static DataField[] dataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
 			new DataField("GENERATION_TIME", "BIGINT"),
@@ -65,6 +70,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 	
 	@Override
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+		Serializable[] command = null;
 		if( action.compareToIgnoreCase("panorama_picture") == 0 ) {
 			String sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", g = "";
 			for (int i = 0 ; i < paramNames.length ; i++) {
@@ -99,19 +105,51 @@ public class CamZillaPlugin extends AbstractPlugin {
 				str += "gphoto2("+g+")";
 			
 			logger.info("uploading panorama picture task >" + str + "<");
-			Serializable[] task = {str};
-			try {
-				if( sendRemote(System.currentTimeMillis(), task, super.priority) ) {
-					if (logger.isDebugEnabled())
-						logger.debug("Panorama picture task sent to CoreStation");
-				}
-				else {
-					logger.warn("Panorama picture task could not be sent to CoreStation");
-					return false;
-				}
-			} catch (IOException e) {
-				logger.warn(e.getMessage());
+			command = new Serializable[] {MESSAGE_TYPE_TASK, str};
+		}
+		else if ( action.compareToIgnoreCase("operating_mode") == 0 ) {
+			short mode = 0;
+			for (int i = 0 ; i < paramNames.length ; i++) {
+				if( paramNames[i].compareToIgnoreCase("mode") == 0 )
+					mode = 1;
 			}
+			if (mode == 0)
+				logger.info("uploading automatic mode command");
+			else
+				logger.info("uploading manual mode command");
+			command = new Serializable[] {MESSAGE_TYPE_MODE, mode};
+		}
+		else if ( action.compareToIgnoreCase("calibration") == 0 ) {
+			logger.info("uploading calibration command");
+			command = new Serializable[] {MESSAGE_TYPE_CAL};
+		}
+		else if ( action.compareToIgnoreCase("power_settings") == 0 ) {
+			short power = 0;
+			for (int i = 0 ; i < paramNames.length ; i++) {
+				if( paramNames[i].compareToIgnoreCase("camera") == 0 )
+					power = 1;
+			}
+			if (power == 0)
+				logger.info("uploading camera power off command");
+			else
+				logger.info("uploading camera power on command");
+			command = new Serializable[] {MESSAGE_TYPE_POWER, power};
+		}
+		else {
+			logger.warn("unrecognized action >" + action + "<");
+		}
+		
+		try {
+			if( sendRemote(System.currentTimeMillis(), command, super.priority) ) {
+				if (logger.isDebugEnabled())
+					logger.debug("Panorama picture task sent to CoreStation");
+			}
+			else {
+				logger.warn("Panorama picture task could not be sent to CoreStation");
+				return false;
+			}
+		} catch (IOException e) {
+			logger.warn(e.getMessage());
 		}
 		
 		return true;

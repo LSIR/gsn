@@ -37,6 +37,11 @@ PICTUREFOLDER = '/media/card/backlog/binaryplugin/camera1/'
 POSTFIX='.%C'
 DEFAULT_GPHOTO2_SETTINGS = ['/main/settings/capturetarget=1','/main/imgsettings/imagequality=3','/main/imgsettings/imagesize=0']
 
+MESSAGE_TYPE_TASK = 0
+MESSAGE_TYPE_MODE = 1
+MESSAGE_TYPE_CAL = 2
+MESSAGE_TYPE_POWER = 3
+
 class CamZillaPluginClass(AbstractPluginClass, PowerControl):
     '''
     This plugin offers the functionality to control the CamZilla robot.
@@ -125,7 +130,34 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
     
     
     def msgReceived(self, data):
-        self.action(data[0])
+        if data[0] == MESSAGE_TYPE_TASK:
+            self.info('new task message received from GSN >%s<' % (data[1]))
+            self.action(data[1])
+        elif data[0] == MESSAGE_TYPE_MODE:
+            if data[1] == 0:
+                self.info('mode message received from GSN >joystick off<')
+                self._write("j=off")
+            elif data[1] == 1:
+                self.info('mode message received from GSN >joystick on<')
+                self._write("j=on")
+            else:
+                self.error('unknown mode message received from GSN')
+        elif data[0] == MESSAGE_TYPE_CAL:
+            self.info('calibration message received from GSN')
+            self._initRobot()
+        elif data[0] == MESSAGE_TYPE_POWER:
+            if data[1] == 0:
+                self.info('power message received from GSN >turn camera power off<')
+                self.photoCamOff()
+                self.usb3Off()
+            elif data[1] == 1:
+                self.info('power message received from GSN >turn camera power on<')
+                self.photoCamOn()
+                self.usb3On()
+            else:
+                self.error('unknown power message received from GSN')
+        else:
+            self.error('unknown message type received from GSN')
        
         
     def run(self):
@@ -157,28 +189,31 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                 now = time.time()
                 self.info('executing command: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
                 pic = 1
-                for y in range(parsedTask[1], parsedTask[1]+(parsedTask[3]*parsedTask[5]), parsedTask[5]):
-                    self._write('y=%d' % (int(round(y*self._yRotationToPulse)),))
-                    for x in range(parsedTask[0], parsedTask[0]+(parsedTask[2]*parsedTask[4]), parsedTask[4]):
-                        self._write('x=%d' % (int(round(x*self._xRotationToPulse)),))
+                try:
+                    for y in range(parsedTask[1], parsedTask[1]+(parsedTask[3]*parsedTask[5]), parsedTask[5]):
+                        self._write('y=%d' % (int(round(y*self._yRotationToPulse)),))
+                        for x in range(parsedTask[0], parsedTask[0]+(parsedTask[2]*parsedTask[4]), parsedTask[4]):
+                            self._write('x=%d' % (int(round(x*self._xRotationToPulse)),))
+                            if self._plugStop:
+                                break
+                            if parsedTask[6] > 0:
+                                self._delay.wait(parsedTask[6])
+                            try:
+                                self.info('taking picture number %d/%d at position (%d,%d)' % (pic,parsedTask[2]*parsedTask[3],x,y))
+                                com = self._takePicture(parsedTask[7])
+                                pic += 1
+                            except Exception, e:
+                                self.exception(str(e))
                         if self._plugStop:
                             break
-                        if parsedTask[6] > 0:
-                            self._delay.wait(parsedTask[6])
-                        try:
-                            self.info('taking picture number %d/%d at position (%d,%d)' % (pic,parsedTask[2]*parsedTask[3],x,y))
-                            com = self._takePicture(parsedTask[7])
-                            pic += 1
-                        except Exception, e:
-                            self.exception(str(e))
-                    if self._plugStop:
-                        break
-                
-                self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [com])
+                    
+                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [com])
                          
                 
-                if not self._plugStop:
-                    self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                    if not self._plugStop:
+                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                except TypeError, e:
+                    self.warning(e.__str__())
                 
                 # turn the photo camera off
                 self.photoCamOff()

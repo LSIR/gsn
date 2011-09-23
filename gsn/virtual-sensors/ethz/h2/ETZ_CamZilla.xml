@@ -5,14 +5,25 @@
         <web-input password="test">
             <command name="panorama_picture">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
-                <field name="start_x" type="*text" defaultvalue="0">Lower-left horizontal starting point</field>
-                <field name="start_y" type="*text" defaultvalue="0">Lower-left vertical starting point</field>
-                <field name="pictures_x" type="*text" defaultvalue="1">Number of pictures taken horizontally</field>
-                <field name="pictures_y" type="*text" defaultvalue="1">Number of pictures taken vertically</field>
-                <field name="rotation_x" type="*text" defaultvalue="">Horizontal rotation in degrees between pictures</field>
-                <field name="rotation_y" type="*text" defaultvalue="">Vertical rotation in degrees between pictures</field>
-                <field name="delay" type="*text" defaultvalue="0">Delay between rotation and picture taking</field>
-                <field name="gphoto2_config" type="*text" defaultvalue="">Comma separated configurations for gphoto2</field>
+                <field name="start_x" type="text" defaultvalue="0">Lower-left horizontal starting point</field>
+                <field name="start_y" type="text" defaultvalue="0">Lower-left vertical starting point</field>
+                <field name="pictures_x" type="text" defaultvalue="1">Number of pictures taken horizontally</field>
+                <field name="pictures_y" type="text" defaultvalue="1">Number of pictures taken vertically</field>
+                <field name="rotation_x" type="text" defaultvalue="">Horizontal rotation in degrees between pictures</field>
+                <field name="rotation_y" type="text" defaultvalue="">Vertical rotation in degrees between pictures</field>
+                <field name="delay" type="text" defaultvalue="0">Delay between rotation and picture taking</field>
+                <field name="gphoto2_config" type="text" defaultvalue="">Comma separated configurations for gphoto2</field>
+            </command>
+            <command name="operating_mode">
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+                <field name="mode" type="*checkbox:manual">select if manual mode (joystick on) should be set</field>
+            </command>
+            <command name="calibration">
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+            </command>
+            <command name="power_settings">
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+                <field name="camera" type="*checkbox:power">select if camera power should be turned on</field>
             </command>
         </web-input>
         <output-structure>
