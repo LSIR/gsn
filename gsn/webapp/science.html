@@ -35,9 +35,9 @@ $(document).ready(function() {
       // test
       {  title:"Temperatures",
          signals: [{
-          vsensor:".*_dozer_th3temp__conv",
+          vsensor:"etz_dozer_th3temp__conv",
           field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
-          /*select:"sensornode[position=6]",*/ position:[6]
+          select:"sensornode[position]:has(configuration[th3=true])"
         }],      
       },
       {  title:"AE events",
@@ -209,6 +209,20 @@ $(document).ready(function() {
           select:"sensornode[position=8],sensornode[position=10]"
         }
         ]
+      },
+      {  title:"Temperatures Pos 22",
+         signals: [{
+          vsensor:"jungfraujoch_dozer_th3temp__conv",
+          field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
+          select:"sensornode[position=22]"
+        }],      
+      },
+      {  title:"Temperatures Pos 25",
+         signals: [{
+          vsensor:"jungfraujoch_dozer_th3temp__conv",
+          field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
+          select:"sensornode[position=25]"
+        }],      
       },
       // dirruhorn
       { title:"GPS Measurement Quality",

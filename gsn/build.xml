@@ -3,9 +3,9 @@
     <property name="safe-storage-port" value="25700"/>
     <property name="safe-storage-controller-port" value="25712"/>
     <property name="gsn-controller-port" value="22932"/>
-    <property name="max-servlets" value="20"/>
-    <property name="max-db-connections" value="12"/>
-    <property name="max-sliding-db-connections" value="8"/>
+    <property name="max-servlets" value="32"/>
+    <property name="max-db-connections" value="24"/>
+    <property name="max-sliding-db-connections" value="24"/>
     <property name="remote-keep-alive-period" value="30000"/>
     <property name="aes-enc-salt" value="this is a simple clear salt"/>
 
@@ -34,7 +34,7 @@
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
         <property name="reports" value="reports"/>
-        <property name="maxMemoryUsage" value="1024m"/>
+        <property name="maxMemoryUsage" value="2048m"/>
         <property name="jar.file" value="gsn-core.jar"/>
         <!--  Enable the following line when you want to use Java Media Framework.
               You should unarchive the complete archive provide by sun and fix the
@@ -130,6 +130,7 @@
             <jvmarg value="-Dsun.net.inetaddr.ttl=0"/>
             <jvmarg value="-Dsun.net.inetaddr.negative.ttl=0"/>
             <jvmarg value="-Dcom.sun.media.jai.disableMediaLib=true"/>
+	    <jvmarg value="-XX:MaxPermSize=128m"/>
         </java>
     </target>
 
