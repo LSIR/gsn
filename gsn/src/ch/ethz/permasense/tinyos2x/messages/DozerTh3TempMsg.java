@@ -510,7 +510,7 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.t1
-    //   Field type: int
+    //   Field type: short
     //   Offset (bits): 72
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
@@ -544,17 +544,17 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.t1'
+     * Return the value (as a short) of the field 'payload.t1'
      */
-    public int get_payload_t1() {
-        return (int)getUIntBEElement(offsetBits_payload_t1(), 16);
+    public short get_payload_t1() {
+        return (short)getSIntBEElement(offsetBits_payload_t1(), 16);
     }
 
     /**
      * Set the value of the field 'payload.t1'
      */
-    public void set_payload_t1(int value) {
-        setUIntBEElement(offsetBits_payload_t1(), 16, value);
+    public void set_payload_t1(short value) {
+        setSIntBEElement(offsetBits_payload_t1(), 16, value);
     }
 
     /**
@@ -573,7 +573,7 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.t2
-    //   Field type: int
+    //   Field type: short
     //   Offset (bits): 88
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
@@ -607,17 +607,17 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.t2'
+     * Return the value (as a short) of the field 'payload.t2'
      */
-    public int get_payload_t2() {
-        return (int)getUIntBEElement(offsetBits_payload_t2(), 16);
+    public short get_payload_t2() {
+        return (short)getSIntBEElement(offsetBits_payload_t2(), 16);
     }
 
     /**
      * Set the value of the field 'payload.t2'
      */
-    public void set_payload_t2(int value) {
-        setUIntBEElement(offsetBits_payload_t2(), 16, value);
+    public void set_payload_t2(short value) {
+        setSIntBEElement(offsetBits_payload_t2(), 16, value);
     }
 
     /**
@@ -636,7 +636,7 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.t3
-    //   Field type: int
+    //   Field type: short
     //   Offset (bits): 104
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
@@ -670,17 +670,17 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.t3'
+     * Return the value (as a short) of the field 'payload.t3'
      */
-    public int get_payload_t3() {
-        return (int)getUIntBEElement(offsetBits_payload_t3(), 16);
+    public short get_payload_t3() {
+        return (short)getSIntBEElement(offsetBits_payload_t3(), 16);
     }
 
     /**
      * Set the value of the field 'payload.t3'
      */
-    public void set_payload_t3(int value) {
-        setUIntBEElement(offsetBits_payload_t3(), 16, value);
+    public void set_payload_t3(short value) {
+        setSIntBEElement(offsetBits_payload_t3(), 16, value);
     }
 
     /**
@@ -699,7 +699,7 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.t4
-    //   Field type: int
+    //   Field type: short
     //   Offset (bits): 120
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
@@ -733,17 +733,17 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.t4'
+     * Return the value (as a short) of the field 'payload.t4'
      */
-    public int get_payload_t4() {
-        return (int)getUIntBEElement(offsetBits_payload_t4(), 16);
+    public short get_payload_t4() {
+        return (short)getSIntBEElement(offsetBits_payload_t4(), 16);
     }
 
     /**
      * Set the value of the field 'payload.t4'
      */
-    public void set_payload_t4(int value) {
-        setUIntBEElement(offsetBits_payload_t4(), 16, value);
+    public void set_payload_t4(short value) {
+        setSIntBEElement(offsetBits_payload_t4(), 16, value);
     }
 
     /**
@@ -762,7 +762,7 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.t5
-    //   Field type: int
+    //   Field type: short
     //   Offset (bits): 136
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
@@ -796,17 +796,17 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.t5'
+     * Return the value (as a short) of the field 'payload.t5'
      */
-    public int get_payload_t5() {
-        return (int)getUIntBEElement(offsetBits_payload_t5(), 16);
+    public short get_payload_t5() {
+        return (short)getSIntBEElement(offsetBits_payload_t5(), 16);
     }
 
     /**
      * Set the value of the field 'payload.t5'
      */
-    public void set_payload_t5(int value) {
-        setUIntBEElement(offsetBits_payload_t5(), 16, value);
+    public void set_payload_t5(short value) {
+        setSIntBEElement(offsetBits_payload_t5(), 16, value);
     }
 
     /**
@@ -825,7 +825,7 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.t6
-    //   Field type: int
+    //   Field type: short
     //   Offset (bits): 152
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
@@ -859,17 +859,17 @@ public class DozerTh3TempMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.t6'
+     * Return the value (as a short) of the field 'payload.t6'
      */
-    public int get_payload_t6() {
-        return (int)getUIntBEElement(offsetBits_payload_t6(), 16);
+    public short get_payload_t6() {
+        return (short)getSIntBEElement(offsetBits_payload_t6(), 16);
     }
 
     /**
      * Set the value of the field 'payload.t6'
      */
-    public void set_payload_t6(int value) {
-        setUIntBEElement(offsetBits_payload_t6(), 16, value);
+    public void set_payload_t6(short value) {
+        setSIntBEElement(offsetBits_payload_t6(), 16, value);
     }
 
     /**
