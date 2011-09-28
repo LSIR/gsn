@@ -35,7 +35,7 @@ DEFAULT_BACKLOG = True
 GPHOTO2 = '/usr/bin/gphoto2'
 PICTUREFOLDER = '/media/card/backlog/binaryplugin/camera1/'
 POSTFIX='.%C'
-DEFAULT_GPHOTO2_SETTINGS = ['/main/settings/capturetarget=1','/main/imgsettings/imagequality=3','/main/imgsettings/imagesize=0']
+DEFAULT_GPHOTO2_SETTINGS = ['/main/settings/capturetarget=1','/main/imgsettings/imagequality=0','/main/imgsettings/imagesize=2']
 
 MESSAGE_TYPE_TASK = 0
 MESSAGE_TYPE_MODE = 1
@@ -66,8 +66,14 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         self._isBusy = True
         
-        device = self.getOptionValue('device_name')
-        if device is None:
+        self._taskqueue = Queue.Queue()
+        self._delay = Event()
+        self._writeLock = Lock()
+        self._manualControl = True
+        self._plugStop = False
+        
+        self._device = self.getOptionValue('device_name')
+        if self._device is None:
             raise TypeError('no device_name specified')
         
         value = self.getOptionValue('max_horizontal_rotation')
@@ -83,13 +89,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             self._yMaxRotation = int(value)
             
         self.info('maximum possible robot rotation in degrees: x=%d, y=%d' % (self._xMaxRotation,self._yMaxRotation))
-        self.info('connecting to device %s' % (device,))
-        
-        try:
-            self._serial = serial.Serial(device)
-        except serial.SerialException, e:
-            raise TypeError('could not initialize serial source: %s' % (e,))
-        self.info(self._serial.readline())
+        self.info('connecting to device %s' % (self._device,))
         
         if not os.path.isdir(PICTUREFOLDER):
             self.warning('picture folder >%s< is not a directory -> creating it' % (PICTUREFOLDER,))
@@ -110,11 +110,14 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         else:
             self.info('photo camera is turned off')
         
-        self._taskqueue = Queue.Queue()
-        self._delay = Event()
-        self._writeLock = Lock()
-        self._manualControl = True
-        self._plugStop = False
+        value = self.getOptionValue('power_save_mode')
+        self._powerSaveMode = False
+        if value != None and int(value) == 1:
+            self.info('power save mode is turned on')
+            self._powerSaveMode = True
+        else:
+            self.info('power save mode is turned off')
+            self._initCamAndRobot()
     
     
     def getMsgType(self):
@@ -134,26 +137,32 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             self.info('new task message received from GSN >%s<' % (data[1]))
             self.action(data[1])
         elif data[0] == MESSAGE_TYPE_MODE:
-            if data[1] == 0:
-                self.info('mode message received from GSN >joystick off<')
-                self._write("j=off")
-            elif data[1] == 1:
-                self.info('mode message received from GSN >joystick on<')
-                self._write("j=on")
+            if not self._powerSaveMode:
+                if data[1] == 0:
+                    self.info('mode message received from GSN >joystick off<')
+                    self._write("j=off")
+                elif data[1] == 1:
+                    self.info('mode message received from GSN >joystick on<')
+                    self._write("j=on")
+                else:
+                    self.error('unknown mode message received from GSN')
             else:
-                self.error('unknown mode message received from GSN')
+                self.info('mode message received from GSN but in power save mode -> do nothing')
         elif data[0] == MESSAGE_TYPE_CAL:
-            self.info('calibration message received from GSN')
-            self._initRobot()
+            if self._powerSaveMode:
+                self.info('calibration message received from GSN but in power save mode -> do nothing')
+            else:
+                self.info('calibration message received from GSN -> calibrate robot')
+                self._calibrateRobot()
         elif data[0] == MESSAGE_TYPE_POWER:
             if data[1] == 0:
-                self.info('power message received from GSN >turn camera power off<')
-                self.photoCamOff()
-                self.usb3Off()
+                if self._turnPowerOff():
+                    self.info('power message received from GSN >turn robot and camera power off<')
+                else:
+                    self.info('power message received from GSN but not in power save mode -> do not turn power off')
             elif data[1] == 1:
                 self.info('power message received from GSN >turn camera power on<')
-                self.photoCamOn()
-                self.usb3On()
+                self._turnPowerOn()
             else:
                 self.error('unknown power message received from GSN')
         else:
@@ -164,7 +173,8 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         self.name = 'CamZillaPlugin-Thread'
         self.info('started')
         
-        self._initRobot()
+        if not self._powerSaveMode:
+            self._calibrateRobot()
 
         while not self._plugStop:
             if self._taskqueue.empty():
@@ -181,10 +191,9 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             try:
                 parsedTask = self._parseTask(task)
                 
-                # turn the USB3 port on
-                self.usb3On()
-                # turn the photo camera on
-                self.photoCamOn()
+                if self._powerSaveMode:
+                    self._initCamAndRobot()
+                    self._calibrateRobot()
                 
                 now = time.time()
                 self.info('executing command: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
@@ -206,19 +215,15 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                                 self.exception(str(e))
                         if self._plugStop:
                             break
-                    
+                except Exception, e:
+                    self.warning(e.__str__())
+                else:
                     self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [com])
-                         
                 
                     if not self._plugStop:
                         self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
-                except TypeError, e:
-                    self.warning(e.__str__())
                 
-                # turn the photo camera off
-                self.photoCamOff()
-                # turn the USB3 port off
-                self.usb3Off()
+                self._turnPowerOff()
                 
             except Exception, e:
                 self.exception(str(e))
@@ -236,10 +241,11 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
     
     
     def stop(self):
-        self._write('j=on')
         self._isBusy = False
         self._plugStop = True
         self._taskqueue.put('end')
+        self._powerSaveMode = True
+        self._turnPowerOff()
         
         
     def _parseTask(self, task):
@@ -330,9 +336,47 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         if output[1]:
             self.error(output[1])
         return ret
+    
+    
+    def _turnPowerOn(self):
+        # turn the USB2 port on
+        self.usb2On()
+        # turn the USB3 port on
+        self.usb3On()
+        # turn the photo camera on
+        self.photoCamOn()
+    
+    
+    def _turnPowerOff(self):
+        if self._powerSaveMode:
+            if self._serial:
+                self._serial.close()
+            # turn the USB2 port off
+            self.usb2Off()
+            # turn the USB3 port off
+            self.usb3Off()
+            # turn the photo camera off
+            self.photoCamOff()
+            return True
+        else:
+            return False
         
     
-    def _initRobot(self):
+    def _initCamAndRobot(self):
+        self.info('wait for robot to power on')
+        self._turnPowerOn()
+        while not os.path.exists(self._device):
+            self._delay.wait(0.5)
+        self.info('robot ready')
+            
+        try:
+            self._serial = serial.Serial(self._device)
+        except serial.SerialException, e:
+            raise TypeError('could not initialize serial source: %s' % (e,))
+        self.info(self._serial.readline())
+        
+        
+    def _calibrateRobot(self):
         self._write("j=off")
         cal = self._write("cal")
         self._xRotationToPulse = cal[0] / (self._xMaxRotation / 2.0)
