@@ -246,11 +246,12 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                     except Exception, e:
                         self.warning(e.__str__())
                     else:
-                        self.info('command finished successfully')
+                        self.info('all pictures taken successfully')
                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [com])
                     
                         if not self._plugStop:
                             self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                            self.info('command finished successfully')
                     
                     if self._powerSaveMode:
                         self._shutdownRobotAndCam()
@@ -355,6 +356,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         
         
     def _downloadPictures(self, datestring):
+        self.info('downloading all pictures from photo camera')
         self._execGphoto2([GPHOTO2, '--port="usb:"', '--quiet', '--get-all-files', '--filename=' + datestring + '-%03n.%C', '--recurse', '--delete-all-files'], PICTUREFOLDER)
         
         
@@ -366,9 +368,9 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             self.info(output[0])
         elif not output[1]:
             #TODO: error
-            self.warning('%s has not generated any output' % (GPHOTO2,))
+            self.error('%s has not generated any output' % (GPHOTO2,))
         if output[1]:
-            self.error(output[1])
+            self.warning(output[1])
         return ret
     
     
