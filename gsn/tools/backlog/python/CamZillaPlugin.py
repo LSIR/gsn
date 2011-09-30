@@ -185,10 +185,10 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                 
             if data[2] == 0:
                 self.info('turn heater off')
-                self.ext2Off()
+                self.ext3Off()
             elif data[2] == 1:
                 self.info('turn heater on')
-                self.ext2On()
+                self.ext3On()
             else:
                 self.error('unknown heater message received from GSN')
         else:
@@ -246,6 +246,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                     except Exception, e:
                         self.warning(e.__str__())
                     else:
+                        self.info('command finished successfully')
                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [com])
                     
                         if not self._plugStop:
@@ -364,7 +365,8 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         if output[0]:
             self.info(output[0])
         elif not output[1]:
-            self.error('%s has not generated any output' % (GPHOTO2,))
+            #TODO: error
+            self.warning('%s has not generated any output' % (GPHOTO2,))
         if output[1]:
             self.error(output[1])
         return ret
@@ -526,7 +528,7 @@ if __name__ == '__main__':
                       help='Vertical rotation in degrees between pictures', metavar='INT')
     parser.add_option('-d', '--delay', type='int', dest='delay', default=0,
                       help='Delay between rotation and picture taking', metavar='INT')
-    parser.add_option('-g', '--gphoto2', type='string', dest='gphoto2', default='/main/settings/capturetarget=1,/main/imgsettings/imagequality=3,/main/imgsettings/imagesize=0',
+    parser.add_option('-g', '--gphoto2', type='string', dest='gphoto2', default='/main/settings/capturetarget=1,/main/imgsettings/imagequality=0,/main/imgsettings/imagesize=2',
                       help='Comma separated configurations for gphoto2', metavar='CONFIGS')
     
     (opt, args) = parser.parse_args()
