@@ -124,16 +124,27 @@ public class CamZillaPlugin extends AbstractPlugin {
 			command = new Serializable[] {MESSAGE_TYPE_CAL};
 		}
 		else if ( action.compareToIgnoreCase("power_settings") == 0 ) {
-			short power = 0;
+			short camRobot = 0;
+			short heater = 0;
 			for (int i = 0 ; i < paramNames.length ; i++) {
-				if( paramNames[i].compareToIgnoreCase("camera") == 0 )
-					power = 1;
+				if( paramNames[i].compareToIgnoreCase("robot_and_camera") == 0 )
+					camRobot = 1;
+				if( paramNames[i].compareToIgnoreCase("heater") == 0 )
+					heater = 1;
 			}
-			if (power == 0)
-				logger.info("uploading camera power off command");
-			else
-				logger.info("uploading camera power on command");
-			command = new Serializable[] {MESSAGE_TYPE_POWER, power};
+			if (heater == 0) {
+				if (camRobot == 0)
+					logger.info("uploading: robot and camera power off / heater off");
+				else
+					logger.info("uploading robot and camera power on / heater off");
+			}
+			else {
+				if (camRobot == 0)
+					logger.info("uploading robot and camera power off / heater on");
+				else
+					logger.info("uploading robot and camera power on / heater on");
+			}
+			command = new Serializable[] {MESSAGE_TYPE_POWER, camRobot, heater};
 		}
 		else {
 			logger.warn("unrecognized action >" + action + "<");

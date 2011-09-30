@@ -339,7 +339,9 @@ import TOSTypes
 DEFAULT_LINK_FOLDER = '/etc/gpio/'
 
 WLAN_GPIO_LINK_PREFIX = 'wlan_power'
-PHOTOCAM_GPIO_LINK_PREFIX = 'photocam_power'
+EXT1_GPIO_LINK_PREFIX = 'ext1_power'
+EXT2_GPIO_LINK_PREFIX = 'ext2_power'
+EXT3_GPIO_LINK_PREFIX = 'ext3_power'
 USB2_GPIO_LINK_PREFIX = 'usb2'
 USB3_GPIO_LINK_PREFIX = 'usb3'
 
@@ -366,9 +368,15 @@ class PowerControl:
     _usb3GPIOOnOnSet
     _usb3GPIOLink
     _usb3GPIOLock
-    _photocamGPIOOnOnSet
-    _photocamGPIOLink
-    _photocamGPIOLock
+    _ext1GPIOOnOnSet
+    _ext1GPIOLink
+    _ext1GPIOLock
+    _ext2GPIOOnOnSet
+    _ext2GPIOLink
+    _ext2GPIOLock
+    _ext3GPIOOnOnSet
+    _ext3GPIOLink
+    _ext3GPIOLock
     _wlanGPIOLink
     _wlanGPIOLock
     _wlanGPIOOnOnSet
@@ -393,8 +401,12 @@ class PowerControl:
         
         self._wlanGPIOLink = ''
         self._wlanGPIOLock = Lock()
-        self._photocamGPIOLink = ''
-        self._photocamGPIOLock = Lock()
+        self._ext1GPIOLink = ''
+        self._ext1GPIOLock = Lock()
+        self._ext2GPIOLink = ''
+        self._ext2GPIOLock = Lock()
+        self._ext3GPIOLink = ''
+        self._ext3GPIOLock = Lock()
         self._usb2GPIOLink = ''
         self._usb2GPIOLock = Lock()
         self._usb3GPIOLink = ''
@@ -409,12 +421,28 @@ class PowerControl:
                     self._wlanGPIOOnOnSet = False
                 else:
                     raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-            elif file.startswith(PHOTOCAM_GPIO_LINK_PREFIX):
-                self._photocamGPIOLink = os.path.join(linkFolder, file)
+            elif file.startswith(EXT1_GPIO_LINK_PREFIX):
+                self._ext1GPIOLink = os.path.join(linkFolder, file)
                 if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                    self._photocamGPIOOnOnSet = True
+                    self._ext1GPIOOnOnSet = True
                 elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                    self._photocamGPIOOnOnSet = False
+                    self._ext1GPIOOnOnSet = False
+                else:
+                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+            elif file.startswith(EXT2_GPIO_LINK_PREFIX):
+                self._ext2GPIOLink = os.path.join(linkFolder, file)
+                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                    self._ext2GPIOOnOnSet = True
+                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                    self._ext2GPIOOnOnSet = False
+                else:
+                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+            elif file.startswith(EXT3_GPIO_LINK_PREFIX):
+                self._ext3GPIOLink = os.path.join(linkFolder, file)
+                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                    self._ext3GPIOOnOnSet = True
+                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                    self._ext3GPIOOnOnSet = False
                 else:
                     raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
             elif file.startswith(USB2_GPIO_LINK_PREFIX):
@@ -567,67 +595,195 @@ class PowerControl:
                 
     
     
-    def photoCamOn(self):
+    def ext1On(self):
         '''
-        Turns the photo camera power on
+        Turns the ext1 port power on
         
-        @raise Exception: if no photo camera GPIO link file exists
+        @raise Exception: if no ext1 port GPIO link file exists
         '''
         if not self._linkfolder:
             raise Exception('link folder does not exist')
-        if self._photocamGPIOLink:
-            self._logger.info('turning photo camera on')
-            self._photocamGPIOLock.acquire()
-            if self._photocamGPIOOnOnSet:
-                self._gpioLinkAction(self._photocamGPIOLink, True)
+        if self._ext1GPIOLink:
+            self._logger.info('turning ext1 port on')
+            self._ext1GPIOLock.acquire()
+            if self._ext1GPIOOnOnSet:
+                self._gpioLinkAction(self._ext1GPIOLink, True)
             else:
-                self._gpioLinkAction(self._photocamGPIOLink, False)
-            self._photocamGPIOLock.release()
+                self._gpioLinkAction(self._ext1GPIOLink, False)
+            self._ext1GPIOLock.release()
         else:
-            raise Exception('photo camera GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+            raise Exception('ext1 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
         
     
     
-    def photoCamOff(self):
+    def ext1Off(self):
         '''
-        Turns the photo camera power off.
+        Turns the ext1 port power off.
         
-        @raise Exception: if no photo camera GPIO link file exists
+        @raise Exception: if no ext1 port GPIO link file exists
         '''
         if not self._linkfolder:
             raise Exception('link folder does not exist')
-        if self._photocamGPIOLink:
-            self._logger.warning('turning photo camera off')
-            self._photocamGPIOLock.acquire()
-            if self._photocamGPIOOnOnSet:
-                self._gpioLinkAction(self._photocamGPIOLink, False)
+        if self._ext1GPIOLink:
+            self._logger.warning('turning ext1 port off')
+            self._ext1GPIOLock.acquire()
+            if self._ext1GPIOOnOnSet:
+                self._gpioLinkAction(self._ext1GPIOLink, False)
             else:
-                self._gpioLinkAction(self._photocamGPIOLink, True)
-            self._photocamGPIOLock.release()
+                self._gpioLinkAction(self._ext1GPIOLink, True)
+            self._ext1GPIOLock.release()
         else:
-            raise Exception('photo camera GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+            raise Exception('ext1 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
     
     
-    def getPhotoCamStatus(self):
+    def getExt1Status(self):
         '''
-        Returns True if the photo camera is on otherwise False
+        Returns True if the ext1 port is on otherwise False
         
-        @return: True if the photo camera is on otherwise False
+        @return: True if the ext1 port is on otherwise False
         
-        @raise Exception: if no photo camera GPIO link file exists
+        @raise Exception: if no ext1 port GPIO link file exists
         '''
         if not self._linkfolder:
             raise Exception('link folder does not exist')
-        if self._photocamGPIOLink:
-            self._photocamGPIOLock.acquire()
-            stat = self._getGPIOStatus(self._photocamGPIOLink).rsplit(None, 1)[1]
-            self._photocamGPIOLock.release()
-            if (self._photocamGPIOOnOnSet and stat == 'set') or (not self._photocamGPIOOnOnSet and stat == 'clear'):
+        if self._ext1GPIOLink:
+            self._ext1GPIOLock.acquire()
+            stat = self._getGPIOStatus(self._ext1GPIOLink).rsplit(None, 1)[1]
+            self._ext1GPIOLock.release()
+            if (self._ext1GPIOOnOnSet and stat == 'set') or (not self._ext1GPIOOnOnSet and stat == 'clear'):
                 return True
             else:
                 return False
         else:
-            raise Exception('photo camera GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+            raise Exception('ext1 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+                
+    
+    
+    def ext2On(self):
+        '''
+        Turns the ext2 port power on
+        
+        @raise Exception: if no ext2 port GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._ext2GPIOLink:
+            self._logger.info('turning ext2 port on')
+            self._ext2GPIOLock.acquire()
+            if self._ext2GPIOOnOnSet:
+                self._gpioLinkAction(self._ext2GPIOLink, True)
+            else:
+                self._gpioLinkAction(self._ext2GPIOLink, False)
+            self._ext2GPIOLock.release()
+        else:
+            raise Exception('ext2 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        
+    
+    
+    def ext2Off(self):
+        '''
+        Turns the ext2 port power off.
+        
+        @raise Exception: if no ext2 port GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._ext2GPIOLink:
+            self._logger.warning('turning ext2 port off')
+            self._ext2GPIOLock.acquire()
+            if self._ext2GPIOOnOnSet:
+                self._gpioLinkAction(self._ext2GPIOLink, False)
+            else:
+                self._gpioLinkAction(self._ext2GPIOLink, True)
+            self._ext2GPIOLock.release()
+        else:
+            raise Exception('ext2 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+    
+    
+    def getExt2Status(self):
+        '''
+        Returns True if the ext2 port is on otherwise False
+        
+        @return: True if the ext2 port is on otherwise False
+        
+        @raise Exception: if no ext2 port GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._ext2GPIOLink:
+            self._ext2GPIOLock.acquire()
+            stat = self._getGPIOStatus(self._ext2GPIOLink).rsplit(None, 1)[1]
+            self._ext2GPIOLock.release()
+            if (self._ext2GPIOOnOnSet and stat == 'set') or (not self._ext2GPIOOnOnSet and stat == 'clear'):
+                return True
+            else:
+                return False
+        else:
+            raise Exception('ext2 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+                
+    
+    
+    def ext3On(self):
+        '''
+        Turns the ext3 port power on
+        
+        @raise Exception: if no ext3 port GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._ext3GPIOLink:
+            self._logger.info('turning ext3 port on')
+            self._ext3GPIOLock.acquire()
+            if self._ext3GPIOOnOnSet:
+                self._gpioLinkAction(self._ext3GPIOLink, True)
+            else:
+                self._gpioLinkAction(self._ext3GPIOLink, False)
+            self._ext3GPIOLock.release()
+        else:
+            raise Exception('ext3 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        
+    
+    
+    def ext3Off(self):
+        '''
+        Turns the ext3 port power off.
+        
+        @raise Exception: if no ext3 port GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._ext3GPIOLink:
+            self._logger.warning('turning ext3 port off')
+            self._ext3GPIOLock.acquire()
+            if self._ext3GPIOOnOnSet:
+                self._gpioLinkAction(self._ext3GPIOLink, False)
+            else:
+                self._gpioLinkAction(self._ext3GPIOLink, True)
+            self._ext3GPIOLock.release()
+        else:
+            raise Exception('ext3 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+    
+    
+    def getExt3Status(self):
+        '''
+        Returns True if the ext3 port is on otherwise False
+        
+        @return: True if the ext3 port is on otherwise False
+        
+        @raise Exception: if no ext3 port GPIO link file exists
+        '''
+        if not self._linkfolder:
+            raise Exception('link folder does not exist')
+        if self._ext3GPIOLink:
+            self._ext3GPIOLock.acquire()
+            stat = self._getGPIOStatus(self._ext3GPIOLink).rsplit(None, 1)[1]
+            self._ext3GPIOLock.release()
+            if (self._ext3GPIOOnOnSet and stat == 'set') or (not self._ext3GPIOOnOnSet and stat == 'clear'):
+                return True
+            else:
+                return False
+        else:
+            raise Exception('ext3 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
                 
     
     

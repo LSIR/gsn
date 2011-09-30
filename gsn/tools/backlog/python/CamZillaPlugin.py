@@ -12,6 +12,7 @@ import logging
 import Queue
 import os
 import time
+import thread
 from threading import Thread, Event, Lock
 
 from ScheduleHandler import SUBPROCESS_BUG_BYPASS
@@ -66,14 +67,16 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         self._isBusy = True
         
+        self._serial = serial.Serial()
         self._taskqueue = Queue.Queue()
         self._delay = Event()
         self._writeLock = Lock()
         self._manualControl = True
         self._plugStop = False
+        self._power = False
         
-        self._device = self.getOptionValue('device_name')
-        if self._device is None:
+        device = self.getOptionValue('device_name')
+        if device is None:
             raise TypeError('no device_name specified')
         
         value = self.getOptionValue('max_horizontal_rotation')
@@ -89,7 +92,8 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             self._yMaxRotation = int(value)
             
         self.info('maximum possible robot rotation in degrees: x=%d, y=%d' % (self._xMaxRotation,self._yMaxRotation))
-        self.info('connecting to device %s' % (self._device,))
+        self.info('using device %s' % (device,))
+        self._serial.setPort(device)
         
         if not os.path.isdir(PICTUREFOLDER):
             self.warning('picture folder >%s< is not a directory -> creating it' % (PICTUREFOLDER,))
@@ -105,10 +109,10 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         else:
             self.info('USB3 port is turned off')
         
-        if self.getPhotoCamStatus():
-            self.info('photo camera is turned on')
+        if self.getExt1Status():
+            self.info('robot and photo camera is turned on')
         else:
-            self.info('photo camera is turned off')
+            self.info('robot and photo camera is turned off')
         
         value = self.getOptionValue('power_save_mode')
         self._powerSaveMode = False
@@ -117,7 +121,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             self._powerSaveMode = True
         else:
             self.info('power save mode is turned off')
-            self._initCamAndRobot()
+            self._startupRobotAndCam()
     
     
     def getMsgType(self):
@@ -133,38 +137,60 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
     
     
     def msgReceived(self, data):
+        try:
+            thread.start_new_thread(self._parseMsg, (data,))
+        except Exception, e:
+            self.exception(e)
+            
+            
+    def _parseMsg(self, data):
         if data[0] == MESSAGE_TYPE_TASK:
             self.info('new task message received from GSN >%s<' % (data[1]))
             self.action(data[1])
         elif data[0] == MESSAGE_TYPE_MODE:
-            if not self._powerSaveMode:
-                if data[1] == 0:
-                    self.info('mode message received from GSN >joystick off<')
-                    self._write("j=off")
-                elif data[1] == 1:
-                    self.info('mode message received from GSN >joystick on<')
-                    self._write("j=on")
+            if self._power:
+                if not self._powerSaveMode:
+                    if data[1] == 0:
+                        self.info('mode message received from GSN >joystick off<')
+                        self._write("j=off")
+                    elif data[1] == 1:
+                        self.info('mode message received from GSN >joystick on<')
+                        self._write("j=on")
+                    else:
+                        self.error('unknown mode message received from GSN')
                 else:
-                    self.error('unknown mode message received from GSN')
+                    self.info('mode message received from GSN but in power save mode -> do nothing')
             else:
-                self.info('mode message received from GSN but in power save mode -> do nothing')
+                self.info('mode message received from GSN but robot not powered -> do nothing')
         elif data[0] == MESSAGE_TYPE_CAL:
             if self._powerSaveMode:
                 self.info('calibration message received from GSN but in power save mode -> do nothing')
             else:
-                self.info('calibration message received from GSN -> calibrate robot')
+                if self._power:
+                    self.info('calibration message received from GSN -> calibrate robot')
                 self._calibrateRobot()
         elif data[0] == MESSAGE_TYPE_POWER:
+            self.info('power message received from GSN')
             if data[1] == 0:
-                if self._turnPowerOff():
-                    self.info('power message received from GSN >turn robot and camera power off<')
-                else:
-                    self.info('power message received from GSN but not in power save mode -> do not turn power off')
+                self.info('turn robot and camera off')
+                self._shutdownRobotAndCam()
             elif data[1] == 1:
-                self.info('power message received from GSN >turn camera power on<')
-                self._turnPowerOn()
+                self.info('turn robot and camera on')
+                try:
+                    self._startupRobotAndCam()
+                except TypeError, e:
+                    self.error(str(e))
             else:
-                self.error('unknown power message received from GSN')
+                self.error('unknown robot and camera message received from GSN')
+                
+            if data[2] == 0:
+                self.info('turn heater off')
+                self.ext2Off()
+            elif data[2] == 1:
+                self.info('turn heater on')
+                self.ext2On()
+            else:
+                self.error('unknown heater message received from GSN')
         else:
             self.error('unknown message type received from GSN')
        
@@ -192,38 +218,43 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                 parsedTask = self._parseTask(task)
                 
                 if self._powerSaveMode:
-                    self._initCamAndRobot()
+                    self._startupRobotAndCam()
                     self._calibrateRobot()
                 
                 now = time.time()
                 self.info('executing command: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
-                pic = 1
-                try:
-                    for y in range(parsedTask[1], parsedTask[1]+(parsedTask[3]*parsedTask[5]), parsedTask[5]):
-                        self._write('y=%d' % (int(round(y*self._yRotationToPulse)),))
-                        for x in range(parsedTask[0], parsedTask[0]+(parsedTask[2]*parsedTask[4]), parsedTask[4]):
-                            self._write('x=%d' % (int(round(x*self._xRotationToPulse)),))
+                
+                if self._power:
+                    pic = 1
+                    try:
+                        for y in range(parsedTask[1], parsedTask[1]+(parsedTask[3]*parsedTask[5]), parsedTask[5]):
+                            self._write('y=%d' % (int(round(y*self._yRotationToPulse)),))
+                            for x in range(parsedTask[0], parsedTask[0]+(parsedTask[2]*parsedTask[4]), parsedTask[4]):
+                                self._write('x=%d' % (int(round(x*self._xRotationToPulse)),))
+                                if self._plugStop:
+                                    break
+                                if parsedTask[6] > 0:
+                                    self._delay.wait(parsedTask[6])
+                                try:
+                                    self.info('taking picture number %d/%d at position (%d,%d)' % (pic,parsedTask[2]*parsedTask[3],x,y))
+                                    com = self._takePicture(parsedTask[7])
+                                    pic += 1
+                                except Exception, e:
+                                    self.exception(str(e))
                             if self._plugStop:
                                 break
-                            if parsedTask[6] > 0:
-                                self._delay.wait(parsedTask[6])
-                            try:
-                                self.info('taking picture number %d/%d at position (%d,%d)' % (pic,parsedTask[2]*parsedTask[3],x,y))
-                                com = self._takePicture(parsedTask[7])
-                                pic += 1
-                            except Exception, e:
-                                self.exception(str(e))
-                        if self._plugStop:
-                            break
-                except Exception, e:
-                    self.warning(e.__str__())
+                    except Exception, e:
+                        self.warning(e.__str__())
+                    else:
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [com])
+                    
+                        if not self._plugStop:
+                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                    
+                    if self._powerSaveMode:
+                        self._shutdownRobotAndCam()
                 else:
-                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [com])
-                
-                    if not self._plugStop:
-                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
-                
-                self._turnPowerOff()
+                    self.error('robot is not powered -> can not execute command')
                 
             except Exception, e:
                 self.exception(str(e))
@@ -244,8 +275,9 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         self._isBusy = False
         self._plugStop = True
         self._taskqueue.put('end')
+        self._delay.set()
         self._powerSaveMode = True
-        self._turnPowerOff()
+        self._shutdownRobotAndCam()
         
         
     def _parseTask(self, task):
@@ -338,49 +370,55 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         return ret
     
     
-    def _turnPowerOn(self):
-        # turn the USB2 port on
-        self.usb2On()
-        # turn the USB3 port on
-        self.usb3On()
-        # turn the photo camera on
-        self.photoCamOn()
-    
-    
-    def _turnPowerOff(self):
-        if self._powerSaveMode:
-            if self._serial:
+    def _shutdownRobotAndCam(self):
+        if self._power:
+            if self._serial.isOpen():
                 self._serial.close()
+            self._power = False
             # turn the USB2 port off
             self.usb2Off()
             # turn the USB3 port off
             self.usb3Off()
-            # turn the photo camera off
-            self.photoCamOff()
-            return True
-        else:
-            return False
+            # turn the robot and photo camera off
+            self.ext1Off()
         
     
-    def _initCamAndRobot(self):
-        self.info('wait for robot to power on')
-        self._turnPowerOn()
-        while not os.path.exists(self._device):
-            self._delay.wait(0.5)
-        self.info('robot ready')
+    def _startupRobotAndCam(self):
+        if not self._power:
+            self.info('wait for robot to startup')
+            # turn the USB2 port on
+            self.usb2On()
+            # turn the USB3 port on
+            self.usb3On()
+            # turn the robot and photo camera on
+            self.ext1On()
+            self._power = True
             
-        try:
-            self._serial = serial.Serial(self._device)
-        except serial.SerialException, e:
-            raise TypeError('could not initialize serial source: %s' % (e,))
-        self.info(self._serial.readline())
+            if not self._serial or not self._serial.isOpen():
+                cnt = 0
+                while not self._plugStop:
+                    try:
+                        self._serial.open()
+                    except serial.SerialException, e:
+                        if cnt == 5:
+                            raise TypeError('could not initialize serial source: %s' % (e,))
+                    else:
+                        self.info(self._serial.readline())
+                        break
+                    self._delay.wait(0.5)
+                    cnt += 1
+                    
+            self.info('robot ready')
         
         
     def _calibrateRobot(self):
-        self._write("j=off")
-        cal = self._write("cal")
-        self._xRotationToPulse = cal[0] / (self._xMaxRotation / 2.0)
-        self._yRotationToPulse = cal[1] / (self._yMaxRotation / 2.0)
+        if self._power:
+            self._write("j=off")
+            cal = self._write("cal")
+            self._xRotationToPulse = cal[0] / (self._xMaxRotation / 2.0)
+            self._yRotationToPulse = cal[1] / (self._yMaxRotation / 2.0)
+        else:
+            self.error('robot not powered -> can not calibrate')
         
         
         

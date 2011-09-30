@@ -23,7 +23,8 @@
             </command>
             <command name="power_settings">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
-                <field name="camera" type="*checkbox:power">select if camera power should be turned on</field>
+                <field name="robot_and_camera" type="*checkbox:power">select if robot and camera power should be turned on</field>
+                <field name="heater" type="*checkbox:power">select if heater should be turned on</field>
             </command>
         </web-input>
         <output-structure>
