@@ -56,20 +56,7 @@ $(document).ready(function() {
       },
 
       // opensense
-      { title:"Air Pollution NABEL Zuerich",
-        signals: [{
-          vsensor:".*_nabel_zuerich__mapped",
-          field:["ozone_ppb","co_ppm","no2_ppb"],
-          deviceId: [100]
-        }]
-      },
-      { title:"Air Pollution NABEL Duebendorf",
-        signals: [{
-          vsensor:".*_nabel_duebendorf__mapped",
-          field:["ozone_ppb","co_ppm","no2_ppb"],
-          deviceId: [100]
-        }]       
-      },
+      
       //{ title:"Ozone Concentration Duebendorf: NABEL vs. Gas Sensor",
       //  signals: [{
       //    vsensor:".*_nabel_duebendorf__mapped",
@@ -110,6 +97,20 @@ $(document).ready(function() {
       //    deviceId: [1]
       //  }]
       //},
+      { title:"Air Pollution NABEL Zuerich",
+        signals: [{
+          vsensor:".*_nabel_zuerich__mapped",
+          field:["ozone_ppb","co_ppm","no2_ppb"],
+          deviceId: [100]
+        }]
+      },
+      { title:"Air Pollution NABEL Duebendorf",
+        signals: [{
+          vsensor:".*_nabel_duebendorf__mapped",
+          field:["ozone_ppb","co_ppm","no2_ppb"],
+          deviceId: [100]
+        }]       
+      },
 
       // matterhorn
       { title:"Sensorrod Temperatures Position 8",
