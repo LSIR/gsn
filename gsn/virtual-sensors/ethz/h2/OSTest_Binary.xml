@@ -28,15 +28,6 @@
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
     <streams>
-        <stream name="data1">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">flocklab-server01:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BinaryPlugin</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
+        
     </streams>
 </virtual-sensor>
