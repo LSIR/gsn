@@ -56,13 +56,6 @@ $(document).ready(function() {
       },
 
       // opensense
-      { title:"Air Pollution NABEL Duebendorf",
-        signals: [{
-          vsensor:".*_nabel_duebendorf__mapped",
-          field:["ozone_ppb","co_ppm","no2_ppb"],
-          deviceId: [100]
-        }]       
-      },
       { title:"Air Pollution NABEL Zuerich",
         signals: [{
           vsensor:".*_nabel_zuerich__mapped",
@@ -70,54 +63,53 @@ $(document).ready(function() {
           deviceId: [100]
         }]
       },
-      { title:"Ozone Concentration Duebendorf: NABEL vs. Gas Sensor",
+      { title:"Air Pollution NABEL Duebendorf",
         signals: [{
           vsensor:".*_nabel_duebendorf__mapped",
-          field:["ozone_ppb"],
+          field:["ozone_ppb","co_ppm","no2_ppb"],
           deviceId: [100]
-        },{
-          vsensor:".*_oz47_dynamic__mapped",
-          field:["ozone_sensor_1"],
-          deviceId: [1]
-        },{
-          vsensor:".*_oz47_concentration",
-          field:["ozone_ppb"],
-          deviceId: [1]
-        }]
+        }]       
       },
-      { title:"Ozone Concentration Zuerich: NABEL vs. Gas Sensor",
+      //{ title:"Ozone Concentration Duebendorf: NABEL vs. Gas Sensor",
+      //  signals: [{
+      //    vsensor:".*_nabel_duebendorf__mapped",
+      //    field:["ozone_ppb"],
+      //    deviceId: [100]
+      //  },{
+      //    vsensor:".*_oz47_dynamic__mapped",
+      //    field:["ozone_sensor_1"],
+      //    deviceId: [1]
+      //  },{
+      //    vsensor:".*_oz47_concentration",
+      //    field:["ozone_ppb"],
+      //    deviceId: [1]
+      //  }]
+      //},
+      { title:"Ozone Concentration: Tram 1",
         signals: [{
-          vsensor:".*_nabel_zuerich__mapped",
-          field:["ozone_ppb"],
-          deviceId: [100]
-        },{
           vsensor:".*_oz47_dynamic__mapped",
           field:["ozone_sensor_1"],
           deviceId: [3]
         }]
       },
-      { title:"Carbon Monoxide Concentration Zuerich: NABEL vs. Gas Sensor",
+      { title:"Carbon Monoxide Concentration: Tram 1",
         signals: [{
-          vsensor:".*_nabel_zuerich__mapped",
-          field:["co_ppm"],
-          deviceId: [100]
-        },{
           vsensor:".*_alphasense_dynamic__mapped",
           field:["sensor_ppm_1"],
           deviceId: [3]
         }]
       },
-      { title:"Nitrogen Dioxide Concentration Duebendorf: NABEL vs. Gas Sensor",
-        signals: [{
-          vsensor:".*_nabel_duebendorf__mapped",
-          field:["no2_ppb"],
-          deviceId: [100]
-        },{
-          vsensor:".*_alphasense_dynamic__mapped",
-          field:["sensor_ppm_1"],
-          deviceId: [1]
-        }]
-      },
+      //{ title:"Nitrogen Dioxide Concentration Duebendorf: NABEL vs. Gas Sensor",
+      //  signals: [{
+      //    vsensor:".*_nabel_duebendorf__mapped",
+      //    field:["no2_ppb"],
+      //    deviceId: [100]
+      //  },{
+      //    vsensor:".*_alphasense_dynamic__mapped",
+      //    field:["sensor_ppm_1"],
+      //    deviceId: [1]
+      //  }]
+      //},
 
       // matterhorn
       { title:"Sensorrod Temperatures Position 8",
