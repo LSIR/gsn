@@ -107,7 +107,7 @@
       </source>
       <query> select * from source </query>
     </stream>
-    <!-- stream name="data5">
+    <stream name="data5">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
@@ -118,7 +118,7 @@
         <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
-    </stream -->
+    </stream>
     <stream name="data6">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
@@ -179,7 +179,7 @@
       </source>
       <query> select * from source </query>
     </stream>
-    <!-- stream name="data11">
+    <stream name="data11">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
@@ -190,7 +190,7 @@
         <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
-    </stream -->
+    </stream>
     <stream name="data12">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
@@ -449,7 +449,7 @@
       </source>
       <query> select * from source </query>
     </stream>
-    <!-- stream name="data21">
+    <stream name="data21">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
@@ -496,7 +496,7 @@
         <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
-    </stream -->
+    </stream>
     <stream name="data25">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
