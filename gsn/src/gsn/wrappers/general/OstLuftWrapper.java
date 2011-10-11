@@ -105,9 +105,9 @@ public class OstLuftWrapper extends AbstractWrapper {
           // get latest timestamp
           last_db_timestamp = rs.getLong("generation_time");
         } else {
-          // Set it to minimum date (01.08.2011 00:00)
-          last_db_timestamp = 1312149600000L;
-          logger.warn("no timestamp available in the database, start with 01.08.2011 00:00");
+          // Set it to 48h before
+          last_db_timestamp = System.currentTimeMillis()-48*3600000;
+          logger.warn("no timestamp available in the database, start with " + format.format(new java.util.Date(last_db_timestamp-3600000)));
         }
         rs.close();
         conn.close();
