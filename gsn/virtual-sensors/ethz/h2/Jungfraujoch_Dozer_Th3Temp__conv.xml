@@ -32,12 +32,12 @@
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
-                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T1!=-9989,cast(round(PAYLOAD_T1 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_5CM,
-                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T2!=-9989,cast(round(PAYLOAD_T2 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_10CM,
-                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T3!=-9989,cast(round(PAYLOAD_T3 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_20CM,
-                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T4!=-9989,cast(round(PAYLOAD_T4 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_30CM,
-                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T5!=-9989,cast(round(PAYLOAD_T5 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_50CM,
-                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T6!=-9989,cast(round(PAYLOAD_T6 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_100CM
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T1&gt;-9989,cast(round(PAYLOAD_T1 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_5CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T2&gt;-9989,cast(round(PAYLOAD_T2 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_10CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T3&gt;-9989,cast(round(PAYLOAD_T3 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_20CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T4&gt;-9989,cast(round(PAYLOAD_T4 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_30CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T5&gt;-9989,cast(round(PAYLOAD_T5 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_50CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T6&gt;-9989,cast(round(PAYLOAD_T6 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_100CM
                 from wrapper </query>
             </source>
             <query> select * from source </query>
