@@ -1156,6 +1156,16 @@ var GSN = {
         showAllMarkers: function(){
             map.autoCenterAndZoom();
         }
+        
+        
+        /**
+    * Check that the zoom factor is not below the minimum of 13
+    */
+        ,
+        checkZoomFactor: function(){
+            var z = map.getZoom();
+            if(z > 13) map.setZoom(13);
+        }
     }
 	
 	
