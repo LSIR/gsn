@@ -59,7 +59,7 @@ class ECVQEK3PluginClass(AbstractPluginClass):
                 
         if readSuccessFlag == 1:
             dataPackage = [msg]
-            #dataPackage += [parameters]
+            dataPackage += [parameters]
             self.processMsg(self.getTimeStamp(), dataPackage)
             self.info('ECVQEK3 reading done')
         else:
