@@ -15,7 +15,8 @@ public class OZ47Plugin extends AbstractPlugin {
 		  new DataField("DEVICE_ID", "INTEGER"),
 		  new DataField("MESSAGE_TYPE", "SMALLINT"),
 		  new DataField("SENSOR_ID", "SMALLINT"),
-		  new DataField("RAW_DATA", "VARCHAR(256)")};
+		  new DataField("RAW_DATA", "VARCHAR(256)"),
+		  new DataField("MEASUREMENT_ID", "BIGINT")};
 
 	private final transient Logger logger = Logger.getLogger( OZ47Plugin.class );
 
@@ -38,14 +39,17 @@ public class OZ47Plugin extends AbstractPlugin {
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 		
-		if (data.length != 3) {
+		if (data.length < 3 || data.length > 4) {
 			logger.error("The message with timestamp >" + timestamp + "< seems unparsable.(length: " + data.length + ")");
 			ackMessage(timestamp, super.priority);
 			return true;
 		}
 
 		try {
-			if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, toShort(data[0]), toShort(data[2]), data[1]}) )
+		  long measurement_id = -1;
+		  if (data.length == 4) measurement_id = toLong(data[3]);
+
+			if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, toShort(data[0]), toShort(data[2]), data[1], measurement_id}) )
 				ackMessage(timestamp, super.priority);
 			else
 				logger.warn("The OZ47 readings message with timestamp >" + timestamp + "< could not be stored in the database."); 

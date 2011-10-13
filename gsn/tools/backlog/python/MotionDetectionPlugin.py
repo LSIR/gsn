@@ -124,7 +124,7 @@ class MotionDetectionPluginClass(AbstractPluginClass):
             self.info('Vehicle is not moving')
             # Execute action function of the specified plugins
             pluginList = [BackLogMessage.OZ47_MESSAGE_TYPE, BackLogMessage.GPS_NAV_MESSAGE_TYPE, BackLogMessage.ALPHASENSE_MESSAGE_TYPE]
-            num = self.runPluginRemoteAction(pluginList, None)
+            num = self.runPluginRemoteAction(pluginList, self.getTimeStamp())
             self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
         else:
             self.info('Vehicle is moving')

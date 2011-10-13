@@ -116,7 +116,8 @@ class OZ47Plugin1Class(AbstractPluginClass):
             dataPackage = [READINGS_NAMING]
             dataPackage += [msg]
             dataPackage += [SENSOR_ID]
-
+            dataPackage += [parameters]
+            
             self.processMsg(self.getTimeStamp(), dataPackage)
             '''
             Code to read the statistics after StatisticsOffset value from backlog.cfg file

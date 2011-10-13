@@ -23,7 +23,8 @@ public class GPSNAVPlugin extends AbstractPlugin {
 						new DataField("GEO_HEIGHT_RAW_DATA", "VARCHAR(32)"),
 						new DataField("GEO_HEIGHT_U_RAW_DATA", "VARCHAR(32)"),
 						new DataField("GEO_SEP_RAW_DATA", "VARCHAR(32)"),
-						new DataField("GEO_SEP_U_RAW_DATA", "VARCHAR(32)")};
+						new DataField("GEO_SEP_U_RAW_DATA", "VARCHAR(32)"),
+						new DataField("MEASUREMENT_ID", "BIGINT")};
 
 	private final transient Logger logger = Logger.getLogger( GPSNAVPlugin.class );
 
@@ -46,20 +47,23 @@ public class GPSNAVPlugin extends AbstractPlugin {
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 
-		if (data.length != 15) {
+		if (data.length < 15 || data.length > 16) {
 			logger.warn("The message with timestamp >" + timestamp + "< seems unparsable.");
-			
-			if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, null, null, null, null, null, null, null, null, null, null, null, null}) )
-				ackMessage(timestamp, super.priority);
-			else
-				logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+			ackMessage(timestamp, super.priority);
 		}
 		else {
-
-			if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12]}) )
-				ackMessage(timestamp, super.priority);
-			else
-				logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+		  if (data.length == 15) {
+		    if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], -1}) )
+		      ackMessage(timestamp, super.priority);
+		    else
+		      logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+		  }
+		  else if (data.length == 16) {
+        if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[15]}) )
+          ackMessage(timestamp, super.priority);
+        else
+          logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+      }
 		}
 		
 		return true;

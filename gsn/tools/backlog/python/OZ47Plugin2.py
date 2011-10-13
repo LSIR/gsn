@@ -116,6 +116,7 @@ class OZ47Plugin2Class(AbstractPluginClass):
             dataPackage = [READINGS_NAMING]
             dataPackage += [msg]
             dataPackage += [SENSOR_ID]
+            dataPackage += [parameters]
 
             self.processMsg(self.getTimeStamp(), dataPackage)
             '''

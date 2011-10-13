@@ -21,12 +21,13 @@ public class OZ47VirtualSensor extends BridgeVirtualSensorPermasense {
 
 
 	private static DataField[] dynamicDataField = {	
-            			new DataField("OZONE_SENSOR_1", "INTEGER"),
+	          new DataField("OZONE_SENSOR_1", "INTEGER"),
 						new DataField("OZONE_SENSOR_2", "INTEGER"),
 						new DataField("RESISTANCE_1", "INTEGER"),
 						new DataField("RESISTANCE_2", "INTEGER"),
 						new DataField("TEMPERATURE", "DOUBLE"),
-						new DataField("HUMIDITY", "INTEGER")
+						new DataField("HUMIDITY", "INTEGER"),
+						new DataField("MEASUREMENT_ID", "BIGINT")
   };
   
   private static DataField[] staticDataField = {
@@ -143,8 +144,8 @@ public class OZ47VirtualSensor extends BridgeVirtualSensorPermasense {
 				int _t= Integer.parseInt(str.substring(12,15),16);
 				double t = _t/10-40;
 				int h= Integer.parseInt(str.substring(15,17),16);
-	
-				data = new StreamElement(data, dynamicDataField, new Serializable[] {s1, s2, r1, r2, t, h});
+				
+				data = new StreamElement(data, dynamicDataField, new Serializable[] {s1, s2, r1, r2, t, h, data.getData("MEASUREMENT_ID")});
 				super.dataAvailable(inputStreamName, data);
 			}
 			

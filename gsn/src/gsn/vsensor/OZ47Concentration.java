@@ -29,6 +29,7 @@ public class OZ47Concentration extends BridgeVirtualSensorPermasense {
 			new DataField("CALIB_PARAM_0", "DOUBLE"),
 			new DataField("CALIB_PARAM_1", "DOUBLE"),
 			
+			new DataField("MEASUREMENT_ID", "BIGINT"),
 			new DataField("DATA_IMPORT_SOURCE", "SMALLINT")};
 	
 	@Override
@@ -72,12 +73,12 @@ public class OZ47Concentration extends BridgeVirtualSensorPermasense {
 			StreamElement curr_data;
 			if(rs.next()) {
         ozone_calib = rs.getDouble("calib_param_0") + rs.getDouble("calib_param_1") * resistance * Math.exp(kT * (temp - 25));
-			  curr_data = new StreamElement(dataField, new Serializable[] {data.getData("POSITION"), data.getData("DEVICE_ID"), data.getData("GENERATION_TIME"), ozone_calib, rs.getDouble("calib_param_0"), rs.getDouble("calib_param_1"), data.getData("DATA_IMPORT_SOURCE")});
+			  curr_data = new StreamElement(dataField, new Serializable[] {data.getData("POSITION"), data.getData("DEVICE_ID"), data.getData("GENERATION_TIME"), ozone_calib, rs.getDouble("calib_param_0"), rs.getDouble("calib_param_1"), data.getData("MEASUREMENT_ID"), data.getData("DATA_IMPORT_SOURCE")});
 			}
 			else {
 			  logger.warn("no calibration found, using default parameters (time=" + time + ")");
 			  ozone_calib = defaultParam[0] + defaultParam[1] * resistance * Math.exp(kT * (temp - 25));
-			  curr_data = new StreamElement(dataField, new Serializable[] {data.getData("POSITION"), data.getData("DEVICE_ID"), data.getData("GENERATION_TIME"), ozone_calib, defaultParam[0], defaultParam[1], data.getData("DATA_IMPORT_SOURCE")});
+			  curr_data = new StreamElement(dataField, new Serializable[] {data.getData("POSITION"), data.getData("DEVICE_ID"), data.getData("GENERATION_TIME"), ozone_calib, defaultParam[0], defaultParam[1], data.getData("MEASUREMENT_ID"), data.getData("DATA_IMPORT_SOURCE")});
 			}
 			rs.close();
 			conn.close();

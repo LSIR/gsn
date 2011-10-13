@@ -54,6 +54,7 @@ class GPSPluginNAVClass(AbstractPluginClass):
         gpsMsg = self.gps._read()
         # Parse message
         dataPackage = self._parseNavMsg(gpsMsg)
+        dataPackage += [parameters]
         self.processMsg(self.getTimeStamp(), dataPackage)
         
         self.info('GPS reading done')

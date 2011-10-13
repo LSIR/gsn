@@ -65,6 +65,7 @@ class AlphasensePluginClass(AbstractPluginClass):
         
         dataPackage = [DYNAMIC_SENSOR_READING]
         dataPackage += [msg]
+        dataPackage += [parameters]
 
         self.processMsg(self.getTimeStamp(), dataPackage)
 

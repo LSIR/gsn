@@ -26,7 +26,8 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 						new DataField("SENSOR_PPM_2", "DOUBLE"),
 						new DataField("AMBIENT_TEMP", "DOUBLE"),
 						new DataField("OFFSET_COMP", "DOUBLE"),
-						new DataField("SENSITIVITY_COMP", "DOUBLE")
+						new DataField("SENSITIVITY_COMP", "DOUBLE"),
+						new DataField("MEASUREMENT_ID", "BIGINT")
 	};
   
 	private static DataField[] staticDataField = {
@@ -171,7 +172,7 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 			    if (Float.isNaN(_sensitivityComp))
 			    	_sensitivityComp = null;
 			    
-			    data = new StreamElement(data, dynamicDataField, new Serializable[] {_sensorCurrent, _sensorPpm1, _sensorPpm2, _ambientTemp, _offsetComp, _sensitivityComp});
+			    data = new StreamElement(data, dynamicDataField, new Serializable[] {_sensorCurrent, _sensorPpm1, _sensorPpm2, _ambientTemp, _offsetComp, _sensitivityComp, data.getData("MEASUREMENT_ID")});
 			    super.dataAvailable(inputStreamName, data);
 			}
 			

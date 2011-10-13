@@ -12,6 +12,7 @@
 		    		<field name="CALIB_PARAM_0" type="DOUBLE" />
 		    		<field name="CALIB_PARAM_1" type="DOUBLE" />
 		    		
+		    		<field name="MEASUREMENT_ID" type="BIGINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
