@@ -36,6 +36,9 @@ class ECVQEK3PluginClass(AbstractPluginClass):
 
     def isBusy(self):
         return False
+    
+    def remoteAction(self, parameters):
+        self.action(parameters)
 
     def action(self, parameters):
 
@@ -55,7 +58,9 @@ class ECVQEK3PluginClass(AbstractPluginClass):
                 countRead += 1
                 
         if readSuccessFlag == 1:
-            self.processMsg(self.getTimeStamp(), [msg])
+            dataPackage = [msg]
+            #dataPackage += [parameters]
+            self.processMsg(self.getTimeStamp(), dataPackage)
             self.info('ECVQEK3 reading done')
         else:
             self.error('ECVQEK3 reading failed')

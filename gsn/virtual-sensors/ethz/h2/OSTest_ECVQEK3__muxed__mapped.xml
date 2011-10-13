@@ -11,6 +11,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="RAW_DATA" type="VARCHAR(256)" />
+            <field name="MEASUREMENT_ID" type="BIGINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
