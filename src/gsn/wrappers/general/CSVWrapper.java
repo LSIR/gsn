@@ -71,10 +71,10 @@ public class CSVWrapper extends AbstractWrapper {
                     .append(addressBean.getWrapper())
                     .append("_")
                     .append(new File(dataFile).getName());
-			if (! handler.initialize(dataFile.trim(), csvFields, csvFormats, csvSeparator.toCharArray()[0], csvStringQuote.toCharArray()[0], skipFirstXLine, nullValues,timezone,checkPointFile.toString())) 
+			if (! handler.initialize(dataFile.trim(), csvFields, csvFormats, csvSeparator.toCharArray()[0], csvStringQuote.toCharArray()[0], skipFirstXLine, nullValues,timezone,checkPointFile.toString()))
 				return false;
 		}catch (Exception e) {
-			logger.error("Loading the csv-wrapper failed:" +e.getMessage(),e);  
+			logger.error("Loading the csv-wrapper failed:" +e.getMessage(),e);
 			return false;
 		}
 
@@ -108,8 +108,8 @@ public class CSVWrapper extends AbstractWrapper {
 						handler.updateCheckPointFile(streamElement.getTimeStamp());
 					}
 				}
-				if (output==null || output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.
-					Thread.sleep(samplingPeriodInMsc);
+				//if (output==null || output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.
+				Thread.sleep(samplingPeriodInMsc);
 			}catch (Exception e) {
 				if (preivousError!=null && preivousError.getMessage().equals(e.getMessage()))
 					continue;
