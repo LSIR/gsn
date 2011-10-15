@@ -1728,6 +1728,41 @@ Mapstraction.prototype.setCenter = function(point) {
   }
 };
 
+/**
+ * activateTransitLayer activates the publi transport layer.
+ * Only google support at the moment.
+ */
+Mapstraction.prototype.activateTransitLayer = function() {
+
+  if(this.loaded[this.api] === false) {
+    return;
+  }
+
+  var map = this.maps[this.api];
+
+  switch (this.api) {
+    case 'google':
+  
+      map.addControl(new GOverviewMapControl());
+      //Create new Tile Layer
+      var gTileUrlTemplate = 'http://mt1.google.com/vt/lyrs=m@121,transit&hl=en&x={X}&y={Y}&z={Z}';
+      var tileLayerOverlay = new GTileLayerOverlay(
+        new GTileLayer(null, null, null, {
+          tileUrlTemplate: gTileUrlTemplate,
+          isPng:true,
+          opacity:0.8
+        })
+      );
+      map.addOverlay(tileLayerOverlay);
+
+      break;
+    default:
+      if(this.debug) {
+        alert(this.api + ' not supported by Mapstraction.activateTransitLayer');			
+      }
+  }
+  return;
+};
 
 /**
  * setZoom sets the zoom level for the map

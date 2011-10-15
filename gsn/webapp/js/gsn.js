@@ -1166,6 +1166,15 @@ var GSN = {
             var z = map.getZoom();
             if(z > 13) map.setZoom(13);
         }
+        
+
+        /**
+    * Activate public transport layer.
+    */
+        ,
+        activateTransitLayer: function(){
+            map.activateTransitLayer();
+        }
     }
 	
 	
