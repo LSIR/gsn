@@ -13,7 +13,8 @@
 					 def a_1 = 0.026868;
 					 def kT = 0.0199999995529652;
 					
-					 OZONE_PPB = OZONE_SENSOR_1 * Math.exp(kT * (TEMPERATURE-25));
+					 def res = RESISTANCE_1 * Math.exp(kT * (TEMPERATURE-25));
+					 OZONE_PPB = a_0 + a_1*res;
 					 
 					}catch(Throwable e){
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
