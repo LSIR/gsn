@@ -284,6 +284,7 @@ OpenSense_MotionDetection__mapped.xml
 OpenSense_OstLuft_Schimmelstrasse.xml
 #OpenSense_OstLuft_Schwamendingen.xml
 OpenSense_OstLuft_Stampfenbachstrasse.xml
+OpenSense_OZ47_Init_Calibration.xml
 Statistics_GSN.xml
 Statistics_MySQL.xml
 Statistics_Sensorviz__mapped.xml
