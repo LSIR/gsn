@@ -26,7 +26,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <field name="OZONE_PPB" type="INTEGER" unit="ppb"/>
+            <field name="OZONE_PPB" type="DOUBLE" unit="ppb"/>
             <field name="SENSOR_ID" type="INTEGER"/>
             <field name="MEASUREMENT_ID" type="BIGINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
