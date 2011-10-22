@@ -27,7 +27,7 @@
                     <predicate key="query">select * from OSTest_Binary__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where FILE_COMPLETE = 1</query>
+                <query> select * from wrapper where FILE_COMPLETE = 1 and DEVICE_ID = 100</query>
             </source>
             <query> select * from source </query>
         </stream>

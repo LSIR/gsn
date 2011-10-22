@@ -115,6 +115,7 @@ OSTest_OstLuft_Schimmelstrasse.xml
 #OSTest_OstLuft_Schwamendingen.xml
 OSTest_OstLuft_Stampfenbachstrasse.xml
 OSTest_OZ47_Init_Calibration.xml
+OSTest_MiniDiSC__mapped.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml

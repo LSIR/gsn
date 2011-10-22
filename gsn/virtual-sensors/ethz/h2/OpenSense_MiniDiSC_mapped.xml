@@ -1,0 +1,42 @@
+<virtual-sensor name="OpenSense_MiniDiSC__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.MinidiscDataParser</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            
+		    		<field name="VALID" type="DOUBLE" />
+            <field name="NUMBER" type="DOUBLE" unit="particle/cm^3" />
+            <field name="DIAM" type="DOUBLE" unit="nm" />
+            <field name="LDSA" type="DOUBLE" unit="um^2/cm^3" />
+            <field name="DIFFUSION" type="DOUBLE" unit="fA" />
+            <field name="FILTER" type="DOUBLE" unit="fA" />
+            <field name="UCOR" type="DOUBLE" unit="kV" />
+            <field name="FLOW" type="DOUBLE" unit="l/m" />
+            <field name="TEMP" type="DOUBLE" unit="C" />
+            <field name="LAT" type="DOUBLE" />
+            <field name="LON" type="DOUBLE" />
+            <field name="RAW_DATA" type="VARCHAR(256)" />
+		    		
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>MiniDisc parsed data from OpenSense deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OpenSense_Binary__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where FILE_COMPLETE = 1 and DEVICE_ID = 2006</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
