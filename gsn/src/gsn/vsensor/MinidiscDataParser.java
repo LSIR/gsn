@@ -106,8 +106,8 @@ public class MinidiscDataParser extends BridgeVirtualSensorPermasense {
 				}
 				
 				dt = df.parse(tokens[0]);
-				// Use same time format as on the core station (UTC+1h)
-				long curr_timestamp = dt.getTime() + 3600 * 1000;
+				// Get GMT/UTC ticks
+				long curr_timestamp = dt.getTime();
 				
 				// convert strings to double values
 				Double[] readings = new Double[11];
