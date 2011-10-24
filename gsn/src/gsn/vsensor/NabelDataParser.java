@@ -100,7 +100,7 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 		{
 			// define date format and set time zone used by NABEL
 			SimpleDateFormat df = new SimpleDateFormat( "dd.MM.yy HH:mm" );
-      df.setTimeZone( TimeZone.getTimeZone( "cet" ) );
+      df.setTimeZone( TimeZone.getTimeZone( "CET" ) );
 		
 			//create BufferedReader to read csv file
 			BufferedReader br = new BufferedReader( new FileReader(file.getAbsolutePath()));
@@ -120,7 +120,7 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
         // Get GMT/UTC ticks
 				long curr_nabel_timestamp = dt.getTime();
 				
-				// convert ozone and co cncentration strings into a double value
+				// convert ozone and co concentration strings into a double value
 				Double ozone, co, no2;
 				if (tokens[1].length() == 0)
 					ozone = null;

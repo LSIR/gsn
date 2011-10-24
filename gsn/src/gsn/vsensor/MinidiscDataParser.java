@@ -86,7 +86,7 @@ public class MinidiscDataParser extends BridgeVirtualSensorPermasense {
 		{
 			// define date format and set time zone used by the MiniDiSC
 			SimpleDateFormat df = new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss z" );
-		  df.setTimeZone( TimeZone.getTimeZone( "utc" ) );
+		  df.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
 		
 			//create BufferedReader to read csv file
 			BufferedReader br = new BufferedReader( new FileReader(file.getAbsolutePath()));
