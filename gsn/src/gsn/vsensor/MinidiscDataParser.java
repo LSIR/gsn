@@ -99,7 +99,11 @@ public class MinidiscDataParser extends BridgeVirtualSensorPermasense {
 			//read comma separated file line by line
 			while( (strLine = br.readLine()) != null)
 			{
-				String[] tokens = strLine.split(";",-1);
+				String[] tokens = strLine.split(",",-1);
+				if (tokens.length != 12) {
+				  logger.error("line has " + tokens.length + " instead of 12 elements");
+				  continue;
+				}
 				
 				dt = df.parse(tokens[0]);
 				// Use same time format as on the core station (UTC+1h)
