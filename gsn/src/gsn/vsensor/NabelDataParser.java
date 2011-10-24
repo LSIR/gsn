@@ -100,7 +100,7 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 		{
 			// define date format and set time zone used by NABEL
 			SimpleDateFormat df = new SimpleDateFormat( "dd.MM.yy HH:mm" );
-      df.setTimeZone( TimeZone.getTimeZone( "CET" ) );
+      df.setTimeZone( TimeZone.getTimeZone( "Etc/GMT-1" ) );
 		
 			//create BufferedReader to read csv file
 			BufferedReader br = new BufferedReader( new FileReader(file.getAbsolutePath()));
