@@ -57,46 +57,27 @@ $(document).ready(function() {
 
       // opensense
       
-      //{ title:"Ozone Concentration Duebendorf: NABEL vs. Gas Sensor",
-      //  signals: [{
-      //    vsensor:".*_nabel_duebendorf__mapped",
-      //    field:["ozone_ppb"],
-      //    deviceId: [100]
-      //  },{
-      //    vsensor:".*_oz47_dynamic__mapped",
-      //    field:["ozone_sensor_1"],
-      //    deviceId: [1]
-      //  },{
-      //    vsensor:".*_oz47_concentration",
-      //    field:["ozone_ppb"],
-      //    deviceId: [1]
-      //  }]
-      //},
-      { title:"Ozone Concentration: Tram 1",
+      { title:"Ozone Concentration [ppb]: Tram 1",
         signals: [{
           vsensor:".*_oz47_init_calibration",
           field:["ozone_ppb"],
           deviceId: [3]
         }]
       },
-      { title:"Carbon Monoxide Concentration: Tram 1",
+      { title:"Carbon Monoxide Concentration [ppm]: Tram 1",
         signals: [{
           vsensor:".*_alphasense_dynamic__mapped",
           field:["sensor_ppm_1"],
           deviceId: [3]
         }]
       },
-      //{ title:"Nitrogen Dioxide Concentration Duebendorf: NABEL vs. Gas Sensor",
-      //  signals: [{
-      //    vsensor:".*_nabel_duebendorf__mapped",
-      //    field:["no2_ppb"],
-      //    deviceId: [100]
-      //  },{
-      //    vsensor:".*_alphasense_dynamic__mapped",
-      //    field:["sensor_ppm_1"],
-      //    deviceId: [1]
-      //  }]
-      //},
+      { title:"Particulate Matter [particle/cm^3]: Tram 1",
+        signals: [{
+          vsensor:".*_minidisc__mapped",
+          field:["number"],
+          deviceId: [2006]
+        }]
+      },
       { title:"Air Pollution NABEL Zuerich",
         signals: [{
           vsensor:".*_nabel_zuerich__mapped",
@@ -109,6 +90,20 @@ $(document).ready(function() {
           vsensor:".*_nabel_duebendorf__mapped",
           field:["ozone_ppb","co_ppm","no2_ppb"],
           deviceId: [100]
+        }]       
+      },
+      { title:"Air Pollution OstLuft Schimmelstrasse",
+        signals: [{
+          vsensor:".*_ostluft_schimmelstrasse",
+          field:["ozone_ppb","co_ppm","no2_ppb"],
+          deviceId: [101]
+        }]       
+      },
+      { title:"Air Pollution OstLuft Stampfenbachstrasse",
+        signals: [{
+          vsensor:".*_ostluft_stampfenbachstrasse",
+          field:["ozone_ppb","co_ppm","no2_ppb"],
+          deviceId: [102]
         }]       
       },
 
