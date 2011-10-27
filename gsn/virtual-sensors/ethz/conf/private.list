@@ -123,7 +123,6 @@ OpenSense_CoreStationStatus_Hardware.xml
 OpenSense_GPS_NAV.xml
 OpenSense_OZ47.xml
 OpenSense_Alphasense.xml
-#OpenSense_STEVAL_Dynamic_Proc.xml
 #OpenSense_STEVAL_Dynamic_Raw.xml
 #OpenSense_STEVAL_Static.xml
 #OpenSense_STEVAL_Dynamic_RawProc.xml
@@ -132,6 +131,8 @@ OpenSense_Statistics.xml
 #OpenSense_SyslogNg.xml
 OpenSense_Binary.xml
 OpenSense_MotionDetection.xml
+OpenSense_STEVAL_Dynamic_Proc.xml
+OpenSense_STEVAL_Static.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
 Statistics_Sensorviz.xml
