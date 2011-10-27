@@ -125,10 +125,14 @@ class STEVALPluginClass(AbstractPluginClass):
                 dataPackage = [DYNAMIC_RAW_PROC_DATA]
             
             self.dataProcessing(self._outputOpt, dataPackage)
+            dataPackage += [parameters]
             self.processMsg(self.getTimeStamp(), dataPackage)
             if self._outputOpt == PROC_OPT:
                 self.info(dataPackage)
             
+
+    def remoteAction(self, parameters):
+        self.action(parameters)
 
     def stop(self):
         self._stopped = True

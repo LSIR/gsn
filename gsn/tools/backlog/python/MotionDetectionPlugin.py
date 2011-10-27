@@ -128,6 +128,11 @@ class MotionDetectionPluginClass(AbstractPluginClass):
             self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
         else:
             self.info('Vehicle is moving')
+            # Execute action function of the specified plugins
+            pluginListMoving = [BackLogMessage.STEVAL_MESSAGE_TYPE]
+            num = self.runPluginRemoteAction(pluginList, self.getTimeStamp())
+            self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
+            
             self._moving = self._moving + 1
             # Store std values from the last motion detection
             self._std_x = std_x
