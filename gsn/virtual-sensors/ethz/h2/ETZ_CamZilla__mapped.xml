@@ -18,7 +18,7 @@
             <field name="ROTATION_X" type="SMALLINT" />
             <field name="ROTATION_Y" type="SMALLINT" />
             <field name="DELAY" type="SMALLINT" />
-            <field name="GPHOTO2_COMMAND" type="BINARY" />
+            <field name="GPHOTO2_CONFIG" type="BINARY" />
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>

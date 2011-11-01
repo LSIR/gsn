@@ -33,7 +33,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 			new DataField("ROTATION_X", "SMALLINT"),
 			new DataField("ROTATION_Y", "SMALLINT"),
 			new DataField("DELAY", "SMALLINT"),
-			new DataField("GPHOTO2_COMMAND", "BINARY")};
+			new DataField("GPHOTO2_CONFIG", "BINARY")};
 
 	private final transient Logger logger = Logger.getLogger( CamZillaPlugin.class );
 
