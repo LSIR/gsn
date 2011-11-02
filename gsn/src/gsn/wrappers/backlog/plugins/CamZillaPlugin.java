@@ -112,7 +112,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 		}
 		else if ( action.compareToIgnoreCase("picture_now") == 0 ) {
 			logger.info("uploading picture now command");
-			String str = "";
+			String str = null;
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("gphoto2_config") == 0 )
 					str = (String) paramValues[i];

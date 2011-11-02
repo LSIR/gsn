@@ -204,7 +204,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                         self._calibrateRobot()
                     
                     now = time.time()
-                    self.info('executing command: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
+                    self.info('executing panorama picture task: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
                 
                     if self._power:
                         pic = 1
@@ -233,7 +233,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                         
                             if not self._plugStop:
                                 self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
-                                self.info('command finished successfully')
+                                self.info('panorama picture task finished successfully')
                         
                         if self._powerSaveMode:
                             self._shutdownRobotAndCam()
@@ -242,11 +242,13 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                 elif task[0] == PICTURE_TASK:
                     self.info('picture now task received -> taking picture in current robot position now')
                     now = time.time()
-                    gphoto2conf = task[1].split(',')
-                    if not gphoto2conf:
+                    if task[1]:
+                        gphoto2conf = task[1].split(',')
+                    else:
                         gphoto2conf = []
                     config = self._takePicture(gphoto2conf)
                     self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                    self.info('picture now task finished successfully')
                 elif task[0] == MODE_TASK:
                     if self._power:
                         if not self._powerSaveMode:
