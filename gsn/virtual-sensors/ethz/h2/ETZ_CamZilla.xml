@@ -14,6 +14,10 @@
                 <field name="delay" type="text" defaultvalue="0">Delay between rotation and picture taking</field>
                 <field name="gphoto2_config" type="text" defaultvalue="">Comma separated configurations for gphoto2</field>
             </command>
+            <command name="picture_now">
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+                <field name="gphoto2_config" type="text" defaultvalue="">Comma separated configurations for gphoto2</field>
+            </command>
             <command name="operating_mode">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
                 <field name="mode" type="*checkbox:manual">select if manual mode (joystick on) should be set</field>

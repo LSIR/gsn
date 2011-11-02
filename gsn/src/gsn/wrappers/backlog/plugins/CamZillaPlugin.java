@@ -16,10 +16,13 @@ import org.apache.log4j.Logger;
  */
 public class CamZillaPlugin extends AbstractPlugin {
 	
-	private static final short MESSAGE_TYPE_TASK = 0;
-	private static final short MESSAGE_TYPE_MODE = 1;
-	private static final short MESSAGE_TYPE_CAL = 2;
-	private static final short MESSAGE_TYPE_POWER = 3;
+	private static final short TASK_MESSAGE = 0;
+	private static final short POWER_MESSAGE = 1;
+
+	private static final short PANORAMA_TASK = 0;
+	private static final short PICTURE_TASK = 1;
+	private static final short MODE_TASK = 2;
+	private static final short CALIBRATION_TASK = 3;
 	
 	private static DataField[] dataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
@@ -105,7 +108,11 @@ public class CamZillaPlugin extends AbstractPlugin {
 				str += "gphoto2("+g+")";
 			
 			logger.info("uploading panorama picture task >" + str + "<");
-			command = new Serializable[] {MESSAGE_TYPE_TASK, str};
+			command = new Serializable[] {TASK_MESSAGE, PANORAMA_TASK, str};
+		}
+		else if ( action.compareToIgnoreCase("picture_now") == 0 ) {
+			logger.info("uploading picture now command");
+			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK};
 		}
 		else if ( action.compareToIgnoreCase("operating_mode") == 0 ) {
 			short mode = 0;
@@ -117,11 +124,16 @@ public class CamZillaPlugin extends AbstractPlugin {
 				logger.info("uploading automatic mode command");
 			else
 				logger.info("uploading manual mode command");
-			command = new Serializable[] {MESSAGE_TYPE_MODE, mode};
+			command = new Serializable[] {TASK_MESSAGE, MODE_TASK, mode};
 		}
 		else if ( action.compareToIgnoreCase("calibration") == 0 ) {
 			logger.info("uploading calibration command");
-			command = new Serializable[] {MESSAGE_TYPE_CAL};
+			String str = "";
+			for (int i = 0 ; i < paramNames.length ; i++) {
+				if( paramNames[i].compareToIgnoreCase("gphoto2_config") == 0 )
+					str = (String) paramValues[i];
+			}
+			command = new Serializable[] {TASK_MESSAGE, CALIBRATION_TASK, str};
 		}
 		else if ( action.compareToIgnoreCase("power_settings") == 0 ) {
 			short camRobot = 0;
@@ -144,7 +156,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 				else
 					logger.info("uploading robot and camera power on / heater on");
 			}
-			command = new Serializable[] {MESSAGE_TYPE_POWER, camRobot, heater};
+			command = new Serializable[] {POWER_MESSAGE, camRobot, heater};
 		}
 		else {
 			logger.warn("unrecognized action >" + action + "<");

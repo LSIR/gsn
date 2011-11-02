@@ -38,10 +38,13 @@ PICTUREFOLDER = '/media/card/backlog/binaryplugin/camera1/'
 POSTFIX='.%C'
 DEFAULT_GPHOTO2_SETTINGS = ['/main/settings/capturetarget=1','/main/imgsettings/imagequality=0','/main/imgsettings/imagesize=2']
 
-MESSAGE_TYPE_TASK = 0
-MESSAGE_TYPE_MODE = 1
-MESSAGE_TYPE_CAL = 2
-MESSAGE_TYPE_POWER = 3
+TASK_MESSAGE = 0
+POWER_MESSAGE = 1
+
+PANORAMA_TASK = 0
+PICTURE_TASK = 1
+MODE_TASK = 2
+CALIBRATION_TASK = 3
 
 class CamZillaPluginClass(AbstractPluginClass, PowerControl):
     '''
@@ -144,32 +147,10 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             
             
     def _parseMsg(self, data):
-        if data[0] == MESSAGE_TYPE_TASK:
-            self.info('new task message received from GSN >%s<' % (data[1]))
-            self.action(data[1])
-        elif data[0] == MESSAGE_TYPE_MODE:
-            if self._power:
-                if not self._powerSaveMode:
-                    if data[1] == 0:
-                        self.info('mode message received from GSN >joystick off<')
-                        self._write("j=off")
-                    elif data[1] == 1:
-                        self.info('mode message received from GSN >joystick on<')
-                        self._write("j=on")
-                    else:
-                        self.error('unknown mode message received from GSN')
-                else:
-                    self.info('mode message received from GSN but in power save mode -> do nothing')
-            else:
-                self.info('mode message received from GSN but robot not powered -> do nothing')
-        elif data[0] == MESSAGE_TYPE_CAL:
-            if self._powerSaveMode:
-                self.info('calibration message received from GSN but in power save mode -> do nothing')
-            else:
-                if self._power:
-                    self.info('calibration message received from GSN -> calibrate robot')
-                self._calibrateRobot()
-        elif data[0] == MESSAGE_TYPE_POWER:
+        if data[0] == TASK_MESSAGE:
+            self.info('new task message received from GSN')
+            self.action(data[1:])
+        elif data[0] == POWER_MESSAGE:
             self.info('power message received from GSN')
             if data[1] == 0:
                 self.info('turn robot and camera off')
@@ -215,49 +196,80 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                 break
             
             try:
-                parsedTask = self._parseTask(task)
-                
-                if self._powerSaveMode:
-                    self._startupRobotAndCam()
-                    self._calibrateRobot()
-                
-                now = time.time()
-                self.info('executing command: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
-                
-                if self._power:
-                    pic = 1
-                    try:
-                        for y in range(parsedTask[1], parsedTask[1]+(parsedTask[3]*parsedTask[5]), parsedTask[5]):
-                            self._write('y=%d' % (int(round(y*self._yRotationToPulse)),))
-                            for x in range(parsedTask[0], parsedTask[0]+(parsedTask[2]*parsedTask[4]), parsedTask[4]):
-                                self._write('x=%d' % (int(round(x*self._xRotationToPulse)),))
-                                if self._plugStop:
-                                    break
-                                if parsedTask[6] > 0:
-                                    self._delay.wait(parsedTask[6])
-                                try:
-                                    self.info('taking picture number %d/%d at position (%d,%d)' % (pic,parsedTask[2]*parsedTask[3],x,y))
-                                    config = self._takePicture(parsedTask[7])
-                                    pic += 1
-                                except Exception, e:
-                                    self.exception(str(e))
-                            if self._plugStop:
-                                break
-                    except Exception, e:
-                        self.warning(e.__str__())
-                    else:
-                        self.info('all pictures taken successfully')
-                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [config])
-                    
-                        if not self._plugStop:
-                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
-                            self.info('command finished successfully')
+                if task[0] == PANORAMA_TASK:
+                    parsedTask = self._parseTask(task)
                     
                     if self._powerSaveMode:
-                        self._shutdownRobotAndCam()
-                else:
-                    self.error('robot is not powered -> can not execute command')
+                        self._startupRobotAndCam()
+                        self._calibrateRobot()
+                    
+                    now = time.time()
+                    self.info('executing command: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
                 
+                    if self._power:
+                        pic = 1
+                        try:
+                            for y in range(parsedTask[1], parsedTask[1]+(parsedTask[3]*parsedTask[5]), parsedTask[5]):
+                                self._write('y=%d' % (int(round(y*self._yRotationToPulse)),))
+                                for x in range(parsedTask[0], parsedTask[0]+(parsedTask[2]*parsedTask[4]), parsedTask[4]):
+                                    self._write('x=%d' % (int(round(x*self._xRotationToPulse)),))
+                                    if self._plugStop:
+                                        break
+                                    if parsedTask[6] > 0:
+                                        self._delay.wait(parsedTask[6])
+                                    try:
+                                        self.info('taking picture number %d/%d at position (%d,%d)' % (pic,parsedTask[2]*parsedTask[3],x,y))
+                                        config = self._takePicture(parsedTask[7])
+                                        pic += 1
+                                    except Exception, e:
+                                        self.exception(str(e))
+                                if self._plugStop:
+                                    break
+                        except Exception, e:
+                            self.warning(e.__str__())
+                        else:
+                            self.info('all pictures taken successfully')
+                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [config])
+                        
+                            if not self._plugStop:
+                                self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                                self.info('command finished successfully')
+                        
+                        if self._powerSaveMode:
+                            self._shutdownRobotAndCam()
+                    else:
+                        self.error('robot is not powered -> can not execute command')
+                elif task[0] == PICTURE_TASK:
+                    self.info('picture now task received -> taking picture in current robot position now')
+                    now = time.time()
+                    gphoto2conf = task[1].split(',')
+                    if not gphoto2conf:
+                        gphoto2conf = []
+                    config = self._takePicture(gphoto2conf)
+                    self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                elif task[0] == MODE_TASK:
+                    if self._power:
+                        if not self._powerSaveMode:
+                            if task[1] == 0:
+                                self.info('mode task received from GSN >joystick off<')
+                                self._write("j=off")
+                            elif task[1] == 1:
+                                self.info('mode task received from GSN >joystick on<')
+                                self._write("j=on")
+                            else:
+                                self.error('unknown mode task received from GSN')
+                        else:
+                            self.info('mode task received from GSN but in power save mode -> do nothing')
+                    else:
+                        self.info('mode task received from GSN but robot not powered -> do nothing')
+                elif task[0] == CALIBRATION_TASK:
+                    if self._powerSaveMode:
+                        self.info('calibration task received from GSN but in power save mode -> do nothing')
+                    else:
+                        if self._power:
+                            self.info('calibration task received from GSN -> calibrate robot')
+                        self._calibrateRobot()
+                        
             except Exception, e:
                 self.exception(str(e))
                 
@@ -270,7 +282,10 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
 
 
     def action(self, parameters):
-        self._taskqueue.put(parameters)
+        if isinstance(parameters, str):
+            self._taskqueue.put([PANORAMA_TASK, parameters])
+        else:
+            self._taskqueue.put(parameters)
     
     
     def stop(self):
