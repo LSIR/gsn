@@ -112,7 +112,12 @@ public class CamZillaPlugin extends AbstractPlugin {
 		}
 		else if ( action.compareToIgnoreCase("picture_now") == 0 ) {
 			logger.info("uploading picture now command");
-			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK};
+			String str = "";
+			for (int i = 0 ; i < paramNames.length ; i++) {
+				if( paramNames[i].compareToIgnoreCase("gphoto2_config") == 0 )
+					str = (String) paramValues[i];
+			}
+			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK, str};
 		}
 		else if ( action.compareToIgnoreCase("operating_mode") == 0 ) {
 			short mode = 0;
@@ -128,12 +133,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 		}
 		else if ( action.compareToIgnoreCase("calibration") == 0 ) {
 			logger.info("uploading calibration command");
-			String str = "";
-			for (int i = 0 ; i < paramNames.length ; i++) {
-				if( paramNames[i].compareToIgnoreCase("gphoto2_config") == 0 )
-					str = (String) paramValues[i];
-			}
-			command = new Serializable[] {TASK_MESSAGE, CALIBRATION_TASK, str};
+			command = new Serializable[] {TASK_MESSAGE, CALIBRATION_TASK};
 		}
 		else if ( action.compareToIgnoreCase("power_settings") == 0 ) {
 			short camRobot = 0;

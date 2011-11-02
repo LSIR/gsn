@@ -197,7 +197,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             
             try:
                 if task[0] == PANORAMA_TASK:
-                    parsedTask = self._parseTask(task)
+                    parsedTask = self._parseTask(task[1])
                     
                     if self._powerSaveMode:
                         self._startupRobotAndCam()
