@@ -18,6 +18,11 @@
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
                 <field name="gphoto2_config" type="text" defaultvalue="">Comma separated configurations for gphoto2</field>
             </command>
+            <command name="positioning">
+                <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+                <field name="x" type="text" defaultvalue="0">horizontal position in degrees</field>
+                <field name="y" type="text" defaultvalue="0">vertical position in degrees</field>
+            </command>
             <command name="operating_mode">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
                 <field name="mode" type="*checkbox:manual">select if manual mode (joystick on) should be set</field>
@@ -36,8 +41,12 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
             
-            <field name="START_X" type="SMALLINT" />
-            <field name="START_Y" type="SMALLINT" />
+            <field name="COMMAND" type="VARCHAR(127)" />
+            <field name="INFO" type="VARCHAR(255)" />
+            <field name="X" type="VARCHAR(8)" />
+            <field name="Y" type="VARCHAR(8)" />
+            <field name="START_X" type="VARCHAR(8)" />
+            <field name="START_Y" type="VARCHAR(8)" />
             <field name="PICTURES_X" type="SMALLINT" />
             <field name="PICTURES_Y" type="SMALLINT" />
             <field name="ROTATION_X" type="SMALLINT" />

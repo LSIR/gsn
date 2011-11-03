@@ -4,6 +4,7 @@ import gsn.beans.DataField;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
 
@@ -21,16 +22,21 @@ public class CamZillaPlugin extends AbstractPlugin {
 
 	private static final short PANORAMA_TASK = 0;
 	private static final short PICTURE_TASK = 1;
-	private static final short MODE_TASK = 2;
-	private static final short CALIBRATION_TASK = 3;
+	private static final short POSITIONING_TASK = 2;
+	private static final short MODE_TASK = 3;
+	private static final short CALIBRATION_TASK = 4;
 	
 	private static DataField[] dataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
-			new DataField("START_X", "SMALLINT"),
-			new DataField("START_Y", "SMALLINT"),
+			new DataField("COMMAND", "VARCHAR(127)"),
+			new DataField("INFO", "VARCHAR(255)"),
+			new DataField("X", "VARCHAR(8)"),
+			new DataField("Y", "VARCHAR(8)"),
+			new DataField("START_X", "VARCHAR(8)"),
+			new DataField("START_Y", "VARCHAR(8)"),
 			new DataField("PICTURES_X", "SMALLINT"),
 			new DataField("PICTURES_Y", "SMALLINT"),
 			new DataField("ROTATION_X", "SMALLINT"),
@@ -58,7 +64,8 @@ public class CamZillaPlugin extends AbstractPlugin {
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		try {
-			if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, toLong(data[0]), deviceId, toShort(data[1]), toShort(data[2]), toShort(data[3]), toShort(data[4]), toShort(data[5]), toShort(data[6]), toShort(data[7]), ((String)data[8]).getBytes("UTF-8")}) ) {
+			DecimalFormat df = new DecimalFormat( "0.0" );
+			if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, toLong(data[0]), deviceId, (String)data[1], (String)data[2], df.format((Double)data[3]), df.format((Double)data[4]), df.format((Double)data[5]), df.format((Double)data[6]), toShort(data[7]), toShort(data[8]), toShort(data[9]), toShort(data[10]), toShort(data[11]), ((String)data[12]).getBytes("UTF-8")}) ) {
 				ackMessage(timestamp, super.priority);
 				return true;
 			} else {
@@ -118,6 +125,18 @@ public class CamZillaPlugin extends AbstractPlugin {
 					str = (String) paramValues[i];
 			}
 			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK, str};
+		}
+		else if ( action.compareToIgnoreCase("positioning") == 0 ) {
+			double x = 0, y = 0;
+			for (int i = 0 ; i < paramNames.length ; i++) {
+				if( paramNames[i].compareToIgnoreCase("x") == 0 )
+					x = new Double((String)paramValues[i]);
+				else if( paramNames[i].compareToIgnoreCase("y") == 0 )
+					y = new Double((String)paramValues[i]);
+			}
+			
+			logger.info("uploading positioning task (x=" + x + ",y=" + y + ")");
+			command = new Serializable[] {TASK_MESSAGE, POSITIONING_TASK, x, y};
 		}
 		else if ( action.compareToIgnoreCase("operating_mode") == 0 ) {
 			short mode = 0;

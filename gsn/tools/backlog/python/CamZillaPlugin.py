@@ -43,8 +43,9 @@ POWER_MESSAGE = 1
 
 PANORAMA_TASK = 0
 PICTURE_TASK = 1
-MODE_TASK = 2
-CALIBRATION_TASK = 3
+POSITIONING_TASK = 2
+MODE_TASK = 3
+CALIBRATION_TASK = 4
 
 class CamZillaPluginClass(AbstractPluginClass, PowerControl):
     '''
@@ -144,36 +145,6 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             thread.start_new_thread(self._parseMsg, (data,))
         except Exception, e:
             self.exception(e)
-            
-            
-    def _parseMsg(self, data):
-        if data[0] == TASK_MESSAGE:
-            self.info('new task message received from GSN')
-            self.action(data[1:])
-        elif data[0] == POWER_MESSAGE:
-            self.info('power message received from GSN')
-            if data[1] == 0:
-                self.info('turn robot and camera off')
-                self._shutdownRobotAndCam()
-            elif data[1] == 1:
-                self.info('turn robot and camera on')
-                try:
-                    self._startupRobotAndCam()
-                except TypeError, e:
-                    self.error(str(e))
-            else:
-                self.error('unknown robot and camera message received from GSN')
-                
-            if data[2] == 0:
-                self.info('turn heater off')
-                self.ext3Off()
-            elif data[2] == 1:
-                self.info('turn heater on')
-                self.ext3On()
-            else:
-                self.error('unknown heater message received from GSN')
-        else:
-            self.error('unknown message type received from GSN')
        
         
     def run(self):
@@ -210,9 +181,9 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                         pic = 1
                         try:
                             for y in range(parsedTask[1], parsedTask[1]+(parsedTask[3]*parsedTask[5]), parsedTask[5]):
-                                self._write('y=%d' % (int(round(y*self._yRotationToPulse)),))
+                                self._position(y=y)
                                 for x in range(parsedTask[0], parsedTask[0]+(parsedTask[2]*parsedTask[4]), parsedTask[4]):
-                                    self._write('x=%d' % (int(round(x*self._xRotationToPulse)),))
+                                    self._position(x=x)
                                     if self._plugStop:
                                         break
                                     if parsedTask[6] > 0:
@@ -220,6 +191,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                                     try:
                                         self.info('taking picture number %d/%d at position (%d,%d)' % (pic,parsedTask[2]*parsedTask[3],x,y))
                                         config = self._takePicture(parsedTask[7])
+                                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d' % (pic,parsedTask[2]*parsedTask[3]), x, y] + parsedTask[:-1] + [config])
                                         pic += 1
                                     except Exception, e:
                                         self.exception(str(e))
@@ -229,10 +201,10 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                             self.warning(e.__str__())
                         else:
                             self.info('all pictures taken successfully')
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + parsedTask[:-1] + [config])
                         
                             if not self._plugStop:
                                 self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
                                 self.info('panorama picture task finished successfully')
                         
                         if self._powerSaveMode:
@@ -248,16 +220,24 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                         gphoto2conf = []
                     config = self._takePicture(gphoto2conf)
                     self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', None, self._x, self._y] + [None]*7 + [gphoto2conf])
                     self.info('picture now task finished successfully')
+                elif task[0] == POSITIONING_TASK:
+                    self.info('positioning task received (x=%f,y=%f)' % (task[1], task[2]))
+                    self._position(x=task[1], y=task[2])
+                    self.info('positioning task finished successfully')
                 elif task[0] == MODE_TASK:
                     if self._power:
+                        now = time.time()
                         if not self._powerSaveMode:
                             if task[1] == 0:
                                 self.info('mode task received from GSN >joystick off<')
                                 self._write("j=off")
+                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['mode', 'joystick turned off', self._x, self._y] + [None]*8)
                             elif task[1] == 1:
                                 self.info('mode task received from GSN >joystick on<')
                                 self._write("j=on")
+                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['mode', 'joystick turned on', self._x, self._y] + [None]*8)
                             else:
                                 self.error('unknown mode task received from GSN')
                         else:
@@ -268,9 +248,11 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                     if self._powerSaveMode:
                         self.info('calibration task received from GSN but in power save mode -> do nothing')
                     else:
+                        now = time.time()
                         if self._power:
                             self.info('calibration task received from GSN -> calibrate robot')
                         self._calibrateRobot()
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['calibration', None, self._x, self._y] + [None]*8)
                         
             except Exception, e:
                 self.exception(str(e))
@@ -297,6 +279,58 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         self._delay.set()
         self._powerSaveMode = True
         self._shutdownRobotAndCam()
+            
+            
+    def _parseMsg(self, data):
+        if data[0] == TASK_MESSAGE:
+            self.info('new task message received from GSN')
+            self.action(data[1:])
+        elif data[0] == POWER_MESSAGE:
+            self.info('power message received from GSN')
+            power = None
+            if data[1] == 0:
+                self.info('turn robot and camera off')
+                if self._shutdownRobotAndCam():
+                    power = False
+            elif data[1] == 1:
+                self.info('turn robot and camera on')
+                try:
+                    if self._startupRobotAndCam():
+                        power = True
+                except TypeError, e:
+                    self.error(str(e))
+            else:
+                self.error('unknown robot and camera message received from GSN')
+                
+            heater = None
+            if data[2] == 0:
+                self.info('turn heater off')
+                self.ext3Off()
+                heater = False
+            elif data[2] == 1:
+                self.info('turn heater on')
+                self.ext3On()
+                heater = True
+            else:
+                self.error('unknown heater message received from GSN')
+                
+            str = ''
+            if heater == True:
+                if power == True:
+                    str = 'CamZilla robot has been turned on and '
+                elif power == False:
+                    str = 'CamZilla robot has been turned off and '
+                str += 'heater is turned on'
+            else:
+                if power == True:
+                    str = 'CamZilla robot has been turned on and '
+                elif power == False:
+                    str = 'CamZilla robot has been turned off and '
+                str += 'heater is turned off'
+                
+            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['power', str, self._x, self._y] + [None]*8)
+        else:
+            self.error('unknown message type received from GSN')
         
         
     def _parseTask(self, task):
@@ -306,8 +340,8 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             param = param.lower()
             if param.startswith('start'):
                 startX, startY = param[6:-1].split(',')
-                ret[0] = int(startX)
-                ret[1] = int(startY)
+                ret[0] = float(startX)
+                ret[1] = float(startY)
             elif param.startswith('pictures'):
                 picsX, picsY = param[9:-1].split(',')
                 ret[2] = int(picsX)
@@ -406,6 +440,8 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             self.usb3Off()
             # turn the robot and photo camera off
             self.ext1Off()
+            return True
+        return False
         
     
     def _startupRobotAndCam(self):
@@ -434,6 +470,8 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                     cnt += 1
                     
             self.info('robot ready')
+            return True
+        return False
         
         
     def _calibrateRobot(self):
@@ -444,6 +482,15 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             self._yRotationToPulse = cal[1] / (self._yMaxRotation / 2.0)
         else:
             self.error('robot not powered -> can not calibrate')
+            
+            
+    def _position(self, x=None, y=None):
+        if x is not None:
+            self._write('x=%d' % (int(round(x*self._xRotationToPulse)),))
+            self._x = x
+        if y is not None:
+            self._write('y=%d' % (int(round(y*self._yRotationToPulse)),))
+            self._y = y
         
         
         

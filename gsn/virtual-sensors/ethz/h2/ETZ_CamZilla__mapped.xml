@@ -11,8 +11,12 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-            <field name="START_X" type="SMALLINT" />
-            <field name="START_Y" type="SMALLINT" />
+            <field name="COMMAND" type="VARCHAR(127)" />
+            <field name="INFO" type="VARCHAR(255)" />
+            <field name="X" type="VARCHAR(8)" />
+            <field name="Y" type="VARCHAR(8)" />
+            <field name="START_X" type="VARCHAR(8)" />
+            <field name="START_Y" type="VARCHAR(8)" />
             <field name="PICTURES_X" type="SMALLINT" />
             <field name="PICTURES_Y" type="SMALLINT" />
             <field name="ROTATION_X" type="SMALLINT" />
