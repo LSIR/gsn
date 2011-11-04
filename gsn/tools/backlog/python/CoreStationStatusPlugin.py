@@ -28,9 +28,6 @@ STATIC_TYPE = 1
 HW_TYPE = 2
 SW_TYPE = 3
 
-RTC_USR = '/sys/class/i2c-adapter/i2c-0/0-006f/usr'
-CALIB_FILE = '/etc/i_sense.cal'
-
 class CoreStationStatusPluginClass(AbstractPluginClass):
     '''
     This plugin sends status information from the CoreStation to GSN.
@@ -39,26 +36,15 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
     '''
 
     '''
-    _calibrated
-    _conf_calibrate
     _ain4_cal
     _ain9_cal
     _timer
     '''
 
     def __init__(self, parent, config):
-        AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
-            
-        self._conf_calibrate = False
-        value = self.getOptionValue('calibrate')
-        if value != None and int(value) == 1:
-            self._conf_calibrate = True
+        AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG, needPowerControl=True)
             
         self._initFinish = False
-    
-        self._calibrated = False
-        self._ain4_cal = None
-        self._ain9_cal = None
         
         self._timer = None
         
@@ -72,10 +58,10 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             self._interval = float(value)
         
         value = self.getOptionValue('old_board')
-        self._oldBoard = False
+        oldboard = False
         if value != None and int(value) == 1:
             self.info('an old CoreBoard is used')
-            self._oldBoard = True
+            oldboard = True
         
         self.info('interval: %s' % (self._interval,))
         
@@ -115,7 +101,6 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         self._checkUptime()
         
         self._checkLM92Temp()
-        self._initAD77x8()
         
         self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
         self._initFinish = True
@@ -1337,70 +1322,6 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         return ret
         
         
-    def _initAD77x8(self):
-        self._ad77x8 = True
-        p = subprocess.Popen(['modprobe', 'ad77x8'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self.info('wait for modprobe ad77x8 to finish')
-        ret = p.wait()
-        output = p.communicate()
-        if output[0]:
-            if output[1]:
-                self.info('modprobe ad77x8: (STDOUT=%s STDERR=%s)' % (output[0], output[1]))
-            else:
-                self.info('modprobe ad77x8: (STDOUT=%s)' % (output[0],))
-        elif output[1]:
-                self.info('modprobe ad77x8: (STDERR=%s)' % (output[1],))
-                
-        if ret != 0:
-            self.warning('module ad77x8 is not available (modprobe ad77x8 returned with code %d)' % (ret,))
-            self._ad77x8 = False
-        else:
-            self.info('modprobe ad77x8 finished successfully')
-        
-        if self._ad77x8 and not self._calibrated and os.path.isfile(CALIB_FILE) and self._conf_calibrate:
-            # get the calibration data with channel offsets
-            try:
-                fcalib = None
-                frtc = None
-                fcalib = open(CALIB_FILE, 'r')
-                seed = fcalib.readline().split('=')[1].split('\n')[0]
-                frtc = open(RTC_USR, 'r')
-                seed_rtc = frtc.read(6)
-                frtc.close()
-                frtc = None
-                
-                if seed_rtc != '0x0000' and seed == seed_rtc:
-                    for line in fcalib:
-                        if line.split('=')[0] == 'avg_ain4':
-                            self._ain4_cal = float(line.split('=')[1].split()[0])
-                        if line.split('=')[0] == 'avg_ain9':
-                            self._ain9_cal = float(line.split('=')[1].split()[0])
-                    fcalib.close()
-                    if self._ain4_cal and self._ain9_cal:
-                        self._calibrated = True
-            except Exception, e:
-                self.warning(e.__str__())
-                if fcalib:
-                    fcalib.close()
-                if frtc:
-                    frtc.close()
-                    
-            fc = open('/proc/ad77x8/config', 'w')
-            fc.write('format mV')
-            fc.flush()                
-            fc.write('chopping on')
-            fc.flush()
-            fc.write('negbuf on')
-            fc.flush()
-            fc.write('sf 13')
-            fc.flush()
-            fc.write('range 7')
-            fc.flush()
-            fc.write('calibrate')
-            fc.flush()
-            fc.close()
-        
-        
     def _getAD77x8(self):
         '''
             [ad77x8_1 (int),
@@ -1416,95 +1337,19 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         '''
         ret = [None]*10
         
-        if self._ad77x8:
-            try:
-                fc = open('/proc/ad77x8/config', 'w')
-                fc.write('format mV')
-                fc.flush()                
-                fc.write('chopping on')
-                fc.flush()
-                fc.write('negbuf on')
-                fc.flush()
-                fc.write('sf 13')
-                fc.flush()
-                fc.write('range 7')
-                fc.flush()
-                fc.close()
-                
-                f1 = open('/proc/ad77x8/ain1', 'r')
-                f2 = open('/proc/ad77x8/ain2', 'r')
-                f3 = open('/proc/ad77x8/ain3', 'r')
-                f4 = open('/proc/ad77x8/ain4', 'r')
-                f5 = open('/proc/ad77x8/ain5', 'r')
-                f6 = open('/proc/ad77x8/ain6', 'r')
-                f7 = open('/proc/ad77x8/ain7', 'r')
-                f8 = open('/proc/ad77x8/ain8', 'r')
-                f9 = open('/proc/ad77x8/ain9', 'r')
-                f10 = open('/proc/ad77x8/ain10', 'r')
-            
-                ad77x8_1 = f1.read()
-                ad77x8_2 = f2.read()
-                ad77x8_3 = f3.read()
-                ad77x8_4 = f4.read()
-                ad77x8_5 = f5.read()
-                ad77x8_6 = f6.read()
-                ad77x8_7 = f7.read()
-                ad77x8_8 = f8.read()
-                ad77x8_9 = f9.read()
-                ad77x8_10 = f10.read()
-                
-                f1.close()
-                f2.close()
-                f3.close()
-                f4.close()
-                f5.close()
-                f6.close()
-                f7.close()
-                f8.close()
-                f9.close()
-                f10.close()
-    
-                ad77x8_1 = float(ad77x8_1.split()[0])
-                ad77x8_2 = float(ad77x8_2.split()[0])
-                ad77x8_3 = float(ad77x8_3.split()[0])
-                ad77x8_4 = float(ad77x8_4.split()[0])
-                ad77x8_5 = float(ad77x8_5.split()[0])
-                ad77x8_6 = float(ad77x8_6.split()[0])
-                ad77x8_7 = float(ad77x8_7.split()[0])
-                ad77x8_8 = float(ad77x8_8.split()[0])
-                ad77x8_9 = float(ad77x8_9.split()[0])
-                ad77x8_10 = float(ad77x8_10.split()[0])
-    
-                if self._calibrated and self._conf_calibrate:
-                    ad77x8_6 = ad77x8_6 - 0.3
-                    ad77x8_4 = ad77x8_4 - self._ain4_cal
-                    ad77x8_9 = ad77x8_9 - self._ain9_cal
-                if ad77x8_4 < 0:
-                    ad77x8_4 = 0
-                if ad77x8_6 < 0:
-                    ad77x8_6 = 0
-                if ad77x8_9 < 0:
-                    ad77x8_9 = 0
-    
-                ad77x8_1 = int(round(ad77x8_1 * 23 / 3.0))
-                ad77x8_2 = int(round(ad77x8_2 * 23 / 3.0))
-                ad77x8_3 = int(round(ad77x8_3 * 23 / 3.0))
-                if self._oldBoard:
-                    ad77x8_4 = int(round(ad77x8_4 * 20000))
-                else:
-                    ad77x8_4 = int(round(ad77x8_4 * 10000))
-                ad77x8_5 = int(round(ad77x8_5 * 23 / 3.0))
-                ad77x8_6 = int(round(ad77x8_6 * 2000))
-                ad77x8_7 = int(round(ad77x8_7 * 151 / 51.0))
-                ad77x8_8 = int(round(ad77x8_8 * 2))
-                ad77x8_9 = int(round(ad77x8_9 * 200 / 3.0))
-                ad77x8_10 = int(round(ad77x8_10 * 2))
-                if not self._calibrated and self._conf_calibrate:
-                    ad77x8_9 = None
-                    
-                ret = [ad77x8_1, ad77x8_2, ad77x8_3, ad77x8_4, ad77x8_5, ad77x8_6, ad77x8_7, ad77x8_8, ad77x8_9, ad77x8_10]
-            except Exception, e:
-                self.warning(e.__str__())
+        try:
+            ret = [self.getPowerControlObject().getVExt2(),
+                   self.getPowerControlObject().getVExt1(),
+                   self.getPowerControlObject().getVExt3(),
+                   self.getPowerControlObject().getIV12DcExt(),
+                   self.getPowerControlObject().getV12DcIn(),
+                   self.getPowerControlObject().getIV12DcIn(),
+                   self.getPowerControlObject().getVcc50(),
+                   self.getPowerControlObject().getVccNode(),
+                   self.getPowerControlObject().getIVccNode(),
+                   self.getPowerControlObject().getVcc42()]
+        except Exception, e:
+            self.warning(e.__str__())
             
         return ret
 

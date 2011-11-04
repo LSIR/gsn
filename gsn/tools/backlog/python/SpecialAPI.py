@@ -10,8 +10,20 @@ __source__      = "$URL$"
 import os
 import uuid
 import logging
+import time
 from datetime import datetime, timedelta
 from threading import Lock
+
+
+# as soon as the subprocess.Popen() bug has been fixed the functionality related
+# to this variable should be removed
+SUBPROCESS_BUG_BYPASS = True
+
+if SUBPROCESS_BUG_BYPASS:
+    import SubprocessFake
+    subprocess = SubprocessFake
+else:
+    import subprocess
 
 MIN_RING_BUFFER_CLEAR_INTERVAL_SEC = 5
 
@@ -385,12 +397,13 @@ class PowerControl:
 #    make this class a singleton
     __shared_state = {}
 
-    def __init__(self, backlogMain, linkFolder=DEFAULT_LINK_FOLDER):
+    def __init__(self, backlogMain, oldBoard=False, linkFolder=DEFAULT_LINK_FOLDER):
         self.__dict__ = self.__shared_state
         
         self._logger = logging.getLogger(self.__class__.__name__)
         
         self._backlogMain = backlogMain
+        self._oldBoard = oldBoard
         
         self._linkfolder = None
         if not os.path.isdir(linkFolder):
@@ -461,9 +474,126 @@ class PowerControl:
                     self._usb3GPIOOnOnSet = False
                 else:
                     raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+                
+    
+        self._ad77x8Values = [None]*10
+        self._ad77x8Timer = None
+        self._ad77x8 = False
+        
+        self._initAD77x8()
         
         if self._backlogMain.duty_cycle_mode:
             self._backlogMain.registerTOSListener(self, [TOSTypes.AM_BEACONCOMMAND])
+            
+            
+            
+    def getVExt1(self):
+        '''
+        Returns V_EXT1 in millivolt.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[1]
+            
+            
+            
+    def getVExt2(self):
+        '''
+        Returns V_EXT2 in millivolt.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[0]
+            
+            
+            
+    def getVExt3(self):
+        '''
+        Returns V_EXT3 in millivolt.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[2]
+            
+            
+            
+    def getIV12DcExt(self):
+        '''
+        Returns I_V12DC_EXT in microampere.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[3]
+            
+            
+            
+    def getV12DcIn(self):
+        '''
+        Returns V12DC_IN in millivolt.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[4]
+            
+            
+            
+    def getIV12DcIn(self):
+        '''
+        Returns I_V12DC_IN in microampere.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[5]
+            
+            
+            
+    def getVcc50(self):
+        '''
+        Returns VCC_5_0 in millivolt.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[6]
+            
+            
+            
+    def getVccNode(self):
+        '''
+        Returns VCC_NODE in millivolt.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[7]
+            
+            
+            
+    def getIVccNode(self):
+        '''
+        Returns I_VCC_NODE in microampere.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[8]
+            
+            
+            
+    def getVcc42(self):
+        '''
+        Returns VCC_4_2 in millivolt.
+        
+        @raise Exception: if module ad77x8 is not available
+        '''
+        self._readAD77x8()
+        return self._ad77x8Values[9]
                 
     
     
@@ -876,6 +1006,116 @@ class PowerControl:
     def stop(self):
         if self._backlogMain.duty_cycle_mode:
             self._backlogMain.deregisterTOSListener(self)
+        
+        
+    def _initAD77x8(self):
+        p = subprocess.Popen(['modprobe', 'ad77x8'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self._logger.info('wait for modprobe ad77x8 to finish')
+        ret = p.wait()
+        output = p.communicate()
+        if output[0]:
+            if output[1]:
+                self._logger.info('modprobe ad77x8: (STDOUT=%s STDERR=%s)' % (output[0], output[1]))
+            else:
+                self._logger.info('modprobe ad77x8: (STDOUT=%s)' % (output[0],))
+        elif output[1]:
+                self._logger.info('modprobe ad77x8: (STDERR=%s)' % (output[1],))
+                
+        if ret != 0:
+            self._logger.warning('module ad77x8 is not available (modprobe ad77x8 returned with code %d)' % (ret,))
+        else:
+            self._logger.info('modprobe ad77x8 finished successfully')
+            self._ad77x8 = True
+        
+        
+    def _readAD77x8(self):
+        if self._ad77x8:
+            if self._ad77x8Timer is None or self._ad77x8Timer < time.time()-1:
+                try:
+                    fc = open('/proc/ad77x8/config', 'w')
+                    fc.write('format mV')
+                    fc.flush()                
+                    fc.write('chopping on')
+                    fc.flush()
+                    fc.write('negbuf on')
+                    fc.flush()
+                    fc.write('sf 13')
+                    fc.flush()
+                    fc.write('range 7')
+                    fc.flush()
+                    fc.close()
+                    
+                    f1 = open('/proc/ad77x8/ain1', 'r')
+                    f2 = open('/proc/ad77x8/ain2', 'r')
+                    f3 = open('/proc/ad77x8/ain3', 'r')
+                    f4 = open('/proc/ad77x8/ain4', 'r')
+                    f5 = open('/proc/ad77x8/ain5', 'r')
+                    f6 = open('/proc/ad77x8/ain6', 'r')
+                    f7 = open('/proc/ad77x8/ain7', 'r')
+                    f8 = open('/proc/ad77x8/ain8', 'r')
+                    f9 = open('/proc/ad77x8/ain9', 'r')
+                    f10 = open('/proc/ad77x8/ain10', 'r')
+                
+                    ad77x8_1 = f1.read()
+                    ad77x8_2 = f2.read()
+                    ad77x8_3 = f3.read()
+                    ad77x8_4 = f4.read()
+                    ad77x8_5 = f5.read()
+                    ad77x8_6 = f6.read()
+                    ad77x8_7 = f7.read()
+                    ad77x8_8 = f8.read()
+                    ad77x8_9 = f9.read()
+                    ad77x8_10 = f10.read()
+                    
+                    f1.close()
+                    f2.close()
+                    f3.close()
+                    f4.close()
+                    f5.close()
+                    f6.close()
+                    f7.close()
+                    f8.close()
+                    f9.close()
+                    f10.close()
+        
+                    ad77x8_1 = float(ad77x8_1.split()[0])
+                    ad77x8_2 = float(ad77x8_2.split()[0])
+                    ad77x8_3 = float(ad77x8_3.split()[0])
+                    ad77x8_4 = float(ad77x8_4.split()[0])
+                    ad77x8_5 = float(ad77x8_5.split()[0])
+                    ad77x8_6 = float(ad77x8_6.split()[0])
+                    ad77x8_7 = float(ad77x8_7.split()[0])
+                    ad77x8_8 = float(ad77x8_8.split()[0])
+                    ad77x8_9 = float(ad77x8_9.split()[0])
+                    ad77x8_10 = float(ad77x8_10.split()[0])
+        
+                    if ad77x8_4 < 0:
+                        ad77x8_4 = 0
+                    if ad77x8_6 < 0:
+                        ad77x8_6 = 0
+                    if ad77x8_9 < 0:
+                        ad77x8_9 = 0
+        
+                    ad77x8_1 = int(round(ad77x8_1 * 23 / 3.0))
+                    ad77x8_2 = int(round(ad77x8_2 * 23 / 3.0))
+                    ad77x8_3 = int(round(ad77x8_3 * 23 / 3.0))
+                    if self._oldBoard:
+                        ad77x8_4 = int(round(ad77x8_4 * 20000))
+                    else:
+                        ad77x8_4 = int(round(ad77x8_4 * 10000))
+                    ad77x8_5 = int(round(ad77x8_5 * 23 / 3.0))
+                    ad77x8_6 = int(round(ad77x8_6 * 2000))
+                    ad77x8_7 = int(round(ad77x8_7 * 151 / 51.0))
+                    ad77x8_8 = int(round(ad77x8_8 * 2))
+                    ad77x8_9 = int(round(ad77x8_9 * 200 / 3.0))
+                    ad77x8_10 = int(round(ad77x8_10 * 2))
+                        
+                    self._ad77x8Values = [ad77x8_1, ad77x8_2, ad77x8_3, ad77x8_4, ad77x8_5, ad77x8_6, ad77x8_7, ad77x8_8, ad77x8_9, ad77x8_10]
+                    self._ad77x8Timer = time.time()
+                except Exception, e:
+                    self._logger.warning(e.__str__())
+        else:
+            raise Exception('module ad77x8 is not available')
     
     
     def _gpioLinkAction(self, link, set):

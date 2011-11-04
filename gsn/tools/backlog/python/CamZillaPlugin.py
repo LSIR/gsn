@@ -24,7 +24,6 @@ else:
 
 import BackLogMessage
 from AbstractPlugin import AbstractPluginClass
-from SpecialAPI import PowerControl
 
 try: 
     import serial
@@ -47,7 +46,7 @@ POSITIONING_TASK = 2
 MODE_TASK = 3
 CALIBRATION_TASK = 4
 
-class CamZillaPluginClass(AbstractPluginClass, PowerControl):
+class CamZillaPluginClass(AbstractPluginClass):
     '''
     This plugin offers the functionality to control the CamZilla robot.
     '''
@@ -67,8 +66,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
     '''
     
     def __init__(self, parent, config):
-        PowerControl.__init__(self, parent)
-        AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
+        AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG, needPowerControl=True)
         self._isBusy = True
         
         self._serial = serial.Serial()
@@ -110,12 +108,12 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         if not os.access(GPHOTO2, os.X_OK):
             raise TypeError('%s can not be executed' % (GPHOTO2,))
         
-        if self.getUsb3Status():
+        if self.getPowerControlObject().getUsb3Status():
             self.info('USB3 port is turned on')
         else:
             self.info('USB3 port is turned off')
         
-        if self.getExt1Status():
+        if self.getPowerControlObject().getExt1Status():
             self.info('robot and photo camera is turned on')
         else:
             self.info('robot and photo camera is turned off')
@@ -340,11 +338,11 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
             heater = None
             if data[2] == 0:
                 self.info('turn heater off')
-                self.ext3Off()
+                self.getPowerControlObject().ext3Off()
                 heater = False
             elif data[2] == 1:
                 self.info('turn heater on')
-                self.ext3On()
+                self.getPowerControlObject().ext3On()
                 heater = True
             else:
                 self.error('unknown heater message received from GSN')
@@ -473,11 +471,11 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                 self._serial.close()
             self._power = False
             # turn the USB2 port off
-            self.usb2Off()
+            self.getPowerControlObject().usb2Off()
             # turn the USB3 port off
-            self.usb3Off()
+            self.getPowerControlObject().usb3Off()
             # turn the robot and photo camera off
-            self.ext1Off()
+            self.getPowerControlObject().ext1Off()
             return True
         return False
         
@@ -486,11 +484,11 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         if not self._power:
             self.info('wait for robot to startup')
             # turn the USB2 port on
-            self.usb2On()
+            self.getPowerControlObject().usb2On()
             # turn the USB3 port on
-            self.usb3On()
+            self.getPowerControlObject().usb3On()
             # turn the robot and photo camera on
-            self.ext1On()
+            self.getPowerControlObject().ext1On()
             self._power = True
             
             if not self._serial or not self._serial.isOpen():
