@@ -78,6 +78,8 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
         self._manualControl = True
         self._plugStop = False
         self._power = False
+        self._x = None
+        self._y = None
         
         device = self.getOptionValue('device_name')
         if device is None:
@@ -180,9 +182,11 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                     if self._power:
                         pic = 1
                         try:
-                            for y in range(parsedTask[1], parsedTask[1]+(parsedTask[3]*parsedTask[5]), parsedTask[5]):
+                            y = parsedTask[1]
+                            while y < parsedTask[1]+(parsedTask[3]*parsedTask[5]):
                                 self._position(y=y)
-                                for x in range(parsedTask[0], parsedTask[0]+(parsedTask[2]*parsedTask[4]), parsedTask[4]):
+                                x = parsedTask[0]
+                                while x < parsedTask[0]+(parsedTask[2]*parsedTask[4]):
                                     self._position(x=x)
                                     if self._plugStop:
                                         break
@@ -195,8 +199,10 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                                         pic += 1
                                     except Exception, e:
                                         self.exception(str(e))
+                                    x += parsedTask[4]
                                 if self._plugStop:
                                     break
+                                y += parsedTask[3]
                         except Exception, e:
                             self.warning(e.__str__())
                         else:
@@ -220,7 +226,7 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                         gphoto2conf = []
                     config = self._takePicture(gphoto2conf)
                     self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
-                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', None, self._x, self._y] + [None]*7 + [gphoto2conf])
+                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', None, self._x, self._y] + [None]*7 + [task[1]])
                     self.info('picture now task finished successfully')
                 elif task[0] == POSITIONING_TASK:
                     self.info('positioning task received (x=%f,y=%f)' % (task[1], task[2]))
@@ -348,33 +354,33 @@ class CamZillaPluginClass(AbstractPluginClass, PowerControl):
                 ret[3] = int(picsY)
             elif param.startswith('rotation'):
                 rotationX, rotationY = param[9:-1].split(',')
-                ret[4] = int(rotationX)
-                ret[5] = int(rotationY)
+                ret[4] = float(rotationX)
+                ret[5] = float(rotationY)
             elif param.startswith('delay'):
                 ret[6] = int(param[6:-1])
             elif param.startswith('gphoto2'):
                 ret[7] = param[8:-1].split(',')
             else:
                 self.error('unrecognized parameter >%s< in task >%s<' % (param,task))
-        if not ret[0]:
-            ret[0] = 0
-        if not ret[1]:
-            ret[1] = 0
-        if not ret[2]:
+        if ret[0] is None:
+            ret[0] = 0.0
+        if ret[1] is None:
+            ret[1] = 0.0
+        if ret[2] is None:
             ret[2] = 1
-        if not ret[3]:
+        if ret[3] is None:
             ret[3] = 1
-        if not ret[4] and ret[2] > 1:
+        if ret[4] is None and ret[2] > 1:
             raise TypeError('x-rotation has to be specified if more than one picture has to be taken in x-direction')
-        if not ret[5] and ret[3] > 1:
+        if ret[5] is None and ret[3] > 1:
             raise TypeError('y-rotation has to be specified if more than one picture has to be taken in y-direction')
-        if not ret[4]:
-            ret[4] = 1
-        if not ret[5]:
-            ret[5] = 1
-        if not ret[6]:
+        if ret[4] is None:
+            ret[4] = 1.0
+        if ret[5] is None:
+            ret[5] = 1.0
+        if ret[6] is None:
             ret[6] = 0
-        if not ret[7]:
+        if ret[7] is None:
             ret[7] = []
         return ret
         

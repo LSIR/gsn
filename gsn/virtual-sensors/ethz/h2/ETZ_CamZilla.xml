@@ -49,8 +49,8 @@
             <field name="START_Y" type="VARCHAR(8)" />
             <field name="PICTURES_X" type="SMALLINT" />
             <field name="PICTURES_Y" type="SMALLINT" />
-            <field name="ROTATION_X" type="SMALLINT" />
-            <field name="ROTATION_Y" type="SMALLINT" />
+            <field name="ROTATION_X" type="VARCHAR(8)" />
+            <field name="ROTATION_Y" type="VARCHAR(8)" />
             <field name="DELAY" type="SMALLINT" />
             <field name="GPHOTO2_CONFIG" type="BINARY" />
             

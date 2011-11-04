@@ -39,8 +39,8 @@ public class CamZillaPlugin extends AbstractPlugin {
 			new DataField("START_Y", "VARCHAR(8)"),
 			new DataField("PICTURES_X", "SMALLINT"),
 			new DataField("PICTURES_Y", "SMALLINT"),
-			new DataField("ROTATION_X", "SMALLINT"),
-			new DataField("ROTATION_Y", "SMALLINT"),
+			new DataField("ROTATION_X", "VARCHAR(8)"),
+			new DataField("ROTATION_Y", "VARCHAR(8)"),
 			new DataField("DELAY", "SMALLINT"),
 			new DataField("GPHOTO2_CONFIG", "BINARY")};
 
@@ -65,7 +65,24 @@ public class CamZillaPlugin extends AbstractPlugin {
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		try {
 			DecimalFormat df = new DecimalFormat( "0.0" );
-			if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, toLong(data[0]), deviceId, (String)data[1], (String)data[2], df.format((Double)data[3]), df.format((Double)data[4]), df.format((Double)data[5]), df.format((Double)data[6]), toShort(data[7]), toShort(data[8]), toShort(data[9]), toShort(data[10]), toShort(data[11]), ((String)data[12]).getBytes("UTF-8")}) ) {
+			String x = null, y = null, start_x = null, start_y = null, rotation_x = null, rotation_y = null;
+			byte[] gphoto2conf = null;
+			if (data[3] != null)
+				x = df.format((Double)data[3]);
+			if (data[4] != null)
+				y = df.format((Double)data[4]);
+			if (data[5] != null)
+				start_x = df.format((Double)data[5]);
+			if (data[6] != null)
+				start_y = df.format((Double)data[6]);
+			if (data[9] != null)
+				rotation_x = df.format((Double)data[9]);
+			if (data[10] != null)
+				rotation_y = df.format((Double)data[10]);
+			if (data[12] != null)
+				gphoto2conf = ((String)data[12]).getBytes("UTF-8");
+			
+			if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, toLong(data[0]), deviceId, (String)data[1], (String)data[2], x, y, start_x, start_y, toShort(data[7]), toShort(data[8]), rotation_x, rotation_y, toShort(data[11]), gphoto2conf}) ) {
 				ackMessage(timestamp, super.priority);
 				return true;
 			} else {
