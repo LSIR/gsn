@@ -29,6 +29,9 @@ public abstract class StorageManager {
         pool = DataSources.getDataSource(new DBConnectionInfo(databaseDriver,databaseURL,username,password));
         pool.setMaxActive(maxDBConnections);
         pool.setMaxIdle(maxDBConnections);
+
+        pool.setRemoveAbandoned(true);    // removing unused connections, used to clean after poorly written code
+        pool.setRemoveAbandonedTimeout(300);    // 5 minutes
         //
         Connection con = null;
         try {
