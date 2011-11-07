@@ -474,8 +474,8 @@ class PowerControl:
                     self._usb3GPIOOnOnSet = False
                 else:
                     raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-                
-    
+            
+        self._ad77x8Lock = Lock()
         self._ad77x8Values = [None]*10
         self._ad77x8Timer = None
         self._ad77x8 = False
@@ -1030,6 +1030,7 @@ class PowerControl:
         
     def _readAD77x8(self):
         if self._ad77x8:
+            self._ad77x8Lock.acquire()
             if self._ad77x8Timer is None or self._ad77x8Timer < time.time()-1:
                 try:
                     fc = open('/proc/ad77x8/config', 'w')
@@ -1114,6 +1115,7 @@ class PowerControl:
                     self._ad77x8Timer = time.time()
                 except Exception, e:
                     self._logger.warning(e.__str__())
+            self._ad77x8Lock.release()
         else:
             raise Exception('module ad77x8 is not available')
     

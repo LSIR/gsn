@@ -247,6 +247,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                             self._position(x=task[1], y=task[2])
                         except Exception, e:
                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', 'not finished successfully (%s)' % (e.__str__(),), self._x, self._y] + [None]*8)
+                            self.error(e.__str__())
                         else:
                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', 'finished successfully', self._x, self._y] + [None]*8)
                             self.info('positioning task finished successfully')
