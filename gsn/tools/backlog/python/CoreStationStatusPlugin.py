@@ -57,12 +57,6 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         else:
             self._interval = float(value)
         
-        value = self.getOptionValue('old_board')
-        oldboard = False
-        if value != None and int(value) == 1:
-            self.info('an old CoreBoard is used')
-            oldboard = True
-        
         self.info('interval: %s' % (self._interval,))
         
     

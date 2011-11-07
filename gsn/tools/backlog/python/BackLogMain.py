@@ -111,6 +111,7 @@ class BackLogMainClass(Thread, Statistics):
         backlog_db_resend_hr = None
         folder_to_check_size = None
         folder_min_free_mb = None
+        oldboard = None
 
         try:
             # readout options from config
@@ -133,6 +134,9 @@ class BackLogMainClass(Thread, Statistics):
                     folder_to_check_size = value
                 elif name == 'folder_min_free_mb':
                     folder_min_free_mb = int(value)
+                elif name == 'old_board':
+                    oldboard = int(value)
+                    
         except ConfigParser.NoSectionError:
             raise TypeError('no [options] section specified in %s' % (config_file,))
                 
@@ -191,6 +195,14 @@ class BackLogMainClass(Thread, Statistics):
         else:
             self._logger.info('not running in duty-cycle mode')
             self.duty_cycle_mode = False
+        
+        if oldboard is None or oldboard == 0:
+            oldboard = False
+        elif oldboard == 1:
+            self._logger.info('an old CoreBoard is used')
+            oldboard = True
+        else:
+            raise TypeError('old_board has to be set to 1 or 0 in config file')
 
         # get schedule section from config files
         try:
@@ -220,12 +232,8 @@ class BackLogMainClass(Thread, Statistics):
         self._msgtypetoplugin = {self.schedulehandler.getMsgType(): [self.schedulehandler]}
         
         self.powerControl = None
-        try:
-            self.powerControl = PowerControl(self)
-        except:
-            pass
-        else:
-            self._logger.info('loaded PowerControl class')
+        self.powerControl = PowerControl(self, oldboard)
+        self._logger.info('loaded PowerControl class')
 
         # get plugins section from config files
         try:

@@ -407,10 +407,9 @@ class PowerControl:
         
         self._linkfolder = None
         if not os.path.isdir(linkFolder):
-            self._logger.warning('linkFolder >%s< is not an existing folder => power control API can not be used' % (linkFolder,))
-            raise
-        
-        self._linkfolder = linkFolder
+            self._logger.warning('linkFolder >%s< is not an existing folder => hardware can not be powered by BackLog' % (linkFolder,))
+        else:
+            self._linkfolder = linkFolder
         
         self._wlanGPIOLink = ''
         self._wlanGPIOLock = Lock()
@@ -425,55 +424,56 @@ class PowerControl:
         self._usb3GPIOLink = ''
         self._usb3GPIOLock = Lock()
         
-        for file in os.listdir(linkFolder):
-            if file.startswith(WLAN_GPIO_LINK_PREFIX):
-                self._wlanGPIOLink = os.path.join(linkFolder, file)
-                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                    self._wlanGPIOOnOnSet = True
-                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                    self._wlanGPIOOnOnSet = False
-                else:
-                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-            elif file.startswith(EXT1_GPIO_LINK_PREFIX):
-                self._ext1GPIOLink = os.path.join(linkFolder, file)
-                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                    self._ext1GPIOOnOnSet = True
-                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                    self._ext1GPIOOnOnSet = False
-                else:
-                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-            elif file.startswith(EXT2_GPIO_LINK_PREFIX):
-                self._ext2GPIOLink = os.path.join(linkFolder, file)
-                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                    self._ext2GPIOOnOnSet = True
-                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                    self._ext2GPIOOnOnSet = False
-                else:
-                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-            elif file.startswith(EXT3_GPIO_LINK_PREFIX):
-                self._ext3GPIOLink = os.path.join(linkFolder, file)
-                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                    self._ext3GPIOOnOnSet = True
-                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                    self._ext3GPIOOnOnSet = False
-                else:
-                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-            elif file.startswith(USB2_GPIO_LINK_PREFIX):
-                self._usb2GPIOLink = os.path.join(linkFolder, file)
-                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                    self._usb2GPIOOnOnSet = True
-                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                    self._usb2GPIOOnOnSet = False
-                else:
-                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-            elif file.startswith(USB3_GPIO_LINK_PREFIX):
-                self._usb3GPIOLink = os.path.join(linkFolder, file)
-                if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                    self._usb3GPIOOnOnSet = True
-                elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                    self._usb3GPIOOnOnSet = False
-                else:
-                    raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+        if self._linkfolder:
+            for file in os.listdir(linkFolder):
+                if file.startswith(WLAN_GPIO_LINK_PREFIX):
+                    self._wlanGPIOLink = os.path.join(linkFolder, file)
+                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                        self._wlanGPIOOnOnSet = True
+                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                        self._wlanGPIOOnOnSet = False
+                    else:
+                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+                elif file.startswith(EXT1_GPIO_LINK_PREFIX):
+                    self._ext1GPIOLink = os.path.join(linkFolder, file)
+                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                        self._ext1GPIOOnOnSet = True
+                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                        self._ext1GPIOOnOnSet = False
+                    else:
+                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+                elif file.startswith(EXT2_GPIO_LINK_PREFIX):
+                    self._ext2GPIOLink = os.path.join(linkFolder, file)
+                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                        self._ext2GPIOOnOnSet = True
+                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                        self._ext2GPIOOnOnSet = False
+                    else:
+                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+                elif file.startswith(EXT3_GPIO_LINK_PREFIX):
+                    self._ext3GPIOLink = os.path.join(linkFolder, file)
+                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                        self._ext3GPIOOnOnSet = True
+                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                        self._ext3GPIOOnOnSet = False
+                    else:
+                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+                elif file.startswith(USB2_GPIO_LINK_PREFIX):
+                    self._usb2GPIOLink = os.path.join(linkFolder, file)
+                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                        self._usb2GPIOOnOnSet = True
+                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                        self._usb2GPIOOnOnSet = False
+                    else:
+                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+                elif file.startswith(USB3_GPIO_LINK_PREFIX):
+                    self._usb3GPIOLink = os.path.join(linkFolder, file)
+                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
+                        self._usb3GPIOOnOnSet = True
+                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
+                        self._usb3GPIOOnOnSet = False
+                    else:
+                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
             
         self._ad77x8Lock = Lock()
         self._ad77x8Values = [None]*10
