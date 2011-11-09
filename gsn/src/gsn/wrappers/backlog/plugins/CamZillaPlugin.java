@@ -241,7 +241,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 		
 		if (aperture.equalsIgnoreCase("auto")) {
 			if (shutter.equalsIgnoreCase("auto"))
-				ret += "/main/capturesettings/expprogram=P,";
+				ret += "/main/capturesettings/expprogram=P";
 			else
 				ret += "/main/capturesettings/expprogram=S,/main/capturesettings/shutterspeed=" + shutter;
 		}
