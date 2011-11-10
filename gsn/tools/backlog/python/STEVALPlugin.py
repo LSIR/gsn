@@ -56,13 +56,14 @@ class STEVALPluginClass(AbstractPluginClass):
         self._threshold_local_extrema = self.getOptionValue('STEVAL_MKIxx_threshold_local_extrema')
         self._log_path = self.getOptionValue('STEVAL_MKIxx_log_path')
         self._log_save_flag = self.getOptionValue('STEVAL_MKIxx_log_save_flag')
+        self._duration = self.getOptionValue('STEVAL_MKIxx_duration')
         
         self.steval._openDevice()
         self._deviceNum = self.steval._getDevName();
         self._firmwareNum = self.steval._getVerNumber();
-        self.steval._unsetSensor()
+        self.steval._setSensor()
         self.steval._closeDevice()
-        self.info('STEVAL: unsetSensor() success')
+        self.info('STEVAL: init steval success')
         dataPackage = [STATIC_DATA]
         dataPackage += [self._deviceNum]
         dataPackage += [self._firmwareNum]
@@ -90,7 +91,7 @@ class STEVALPluginClass(AbstractPluginClass):
             fHdl = open (dataFile, 'w' )
             start = time.time()
             end = start
-            while (end - start) < 20:
+            while (end - start) < self._duration:
                 t0 = time.time()
                 msg = str(self.steval._startDataAcquisitionDebug(20000))
                 t1 = time.time()
@@ -99,8 +100,8 @@ class STEVALPluginClass(AbstractPluginClass):
                 fHdl.write (msg)
             fHdl.close ()
             self.steval._stopDataAcquisition()
-            self.steval._unsetSensor()
-            self.steval._closeDevice()
+            #self.steval._unsetSensor()
+            #self.steval._closeDevice()
             self.info("STEVAL: Data read -- message length = " + str(len(msg)))
             readFlag = 1;
             timeFile = self._log_path
@@ -116,6 +117,7 @@ class STEVALPluginClass(AbstractPluginClass):
         else:
             self.warning ('STEVAL read failed')
         
+        self.steval._closeDevice()
         if readFlag == 1:
             if self._outputOpt == RAW_OPT:
                 dataPackage = [DYNAMIC_RAW_DATA]
@@ -136,8 +138,9 @@ class STEVALPluginClass(AbstractPluginClass):
 
     def stop(self):
         self._stopped = True
-        self.steval._unsetSensor()
+        #self.steval._unsetSensor()
         self.info('stopped')
+        self.steval._closeDevice()
         
         
         
@@ -180,6 +183,8 @@ class STEVALPluginClass(AbstractPluginClass):
         return buffer
     
     def compute_fft_and_l2(self, buffer):
+        if len(buffer) == 0:
+            return []
         fft = numpy.fft.rfft(buffer,len(buffer))
         re = numpy.real(fft)
         im = numpy.imag(fft)
