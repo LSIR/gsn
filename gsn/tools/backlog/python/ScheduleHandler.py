@@ -276,9 +276,10 @@ class ScheduleHandlerClass(Thread, Statistics):
                 self._logger.info('died')
                 return
         else:
-            self.tosMsgSend(TOSTypes.CONTROL_CMD_RESET_WATCHDOG, 0)
-            self._tosOnline = False
-            self._backlogMain.deregisterTOSListener(self)
+            if self._tosOnline:
+                self.tosMsgSend(TOSTypes.CONTROL_CMD_RESET_WATCHDOG, 0)
+                self._tosOnline = False
+                self._backlogMain.deregisterTOSListener(self)
         
         if self._schedule and self._duty_cycle_mode:  
             # Schedule duty wake-up after this session, for safety reasons.

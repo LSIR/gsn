@@ -35,7 +35,7 @@ DEFAULT_BACKLOG = True
 GPHOTO2 = '/usr/bin/gphoto2'
 PICTUREFOLDER = '/media/card/backlog/binaryplugin/camera1/'
 POSTFIX='.%C'
-DEFAULT_GPHOTO2_SETTINGS = ['/main/settings/capturetarget=1','/main/imgsettings/imagequality=0','/main/imgsettings/imagesize=2']
+DEFAULT_GPHOTO2_SETTINGS = ['/main/settings/capturetarget=0','/main/imgsettings/imagequality=0','/main/imgsettings/imagesize=2']
 
 TASK_MESSAGE = 0
 POWER_MESSAGE = 1
@@ -54,6 +54,12 @@ class CamZillaPluginClass(AbstractPluginClass):
     '''
     data/instance attributes:
     _manualControl
+    _x
+    _y
+    _parkX
+    _parkY
+    _power
+    _calibrated
     _delay
     _writeLock
     _pulsesPerDegree
@@ -76,6 +82,8 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._calibrated = False
         self._x = None
         self._y = None
+        self._parkX = 0
+        self._parkY = 0
         
         device = self.getOptionValue('device_name')
         if device is None:
@@ -86,6 +94,14 @@ class CamZillaPluginClass(AbstractPluginClass):
             raise TypeError('no pulses_per_degree value specified')
         else:
             self._pulsesPerDegree = float(value)
+        
+        value = self.getOptionValue('park_position')
+        if value is None:
+            self.warning('no park_position value specified')
+        else:
+            str = value.strip().split('/')
+            self._parkX = float(str[0])
+            self._parkY = float(str[1])
             
         self.info('encoder pulses per degree: %f' % (self._pulsesPerDegree,))
         self.info('using device %s' % (device,))
@@ -160,6 +176,7 @@ class CamZillaPluginClass(AbstractPluginClass):
             
             try:
                 now = time.time()
+                datestr = time.strftime('%Y%m%d_%H%M%S', time.gmtime(now))
                 if task[0] == PANORAMA_TASK:
                     parsedTask = self._parseTask(task[1])
                     
@@ -185,14 +202,14 @@ class CamZillaPluginClass(AbstractPluginClass):
                                         self._delay.wait(parsedTask[6])
 
                                     self.info('taking picture number %d/%d at position (%f,%f)' % (pic,parsedTask[2]*parsedTask[3],x,y))
-                                    config = self._takePicture(parsedTask[7])
-                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d' % (pic,parsedTask[2]*parsedTask[3]), x, y] + parsedTask[:-1] + [config])
+                                    config = self._takePicture(parsedTask[7], datestr)
+                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken successfully' % (pic,parsedTask[2]*parsedTask[3]), x, y] + parsedTask[:-1] + [config])
                                     pic += 1
 
                                     x += parsedTask[4]
                                 if self._plugStop:
                                     break
-                                y += parsedTask[3]
+                                y += parsedTask[5]
                         except Exception, e:
                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not finish task successfully (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
                             self.error(e.__str__())
@@ -201,7 +218,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                         
                             if not self._plugStop:
                                 try:
-                                    self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                                    self._downloadPictures(datestr)
                                 except Exception, e:
                                     self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
                                     self.error(e.__str__())
@@ -210,6 +227,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                                     self.info('panorama picture task finished successfully')
                         
                         if self._powerSaveMode:
+                            self._parkRobot()
                             self._shutdownRobotAndCam()
                     else:
                         self.error('robot is not powered -> can not execute command')
@@ -226,7 +244,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                     else:
                         gphoto2conf = []
                     try:
-                        config = self._takePicture(gphoto2conf)
+                        config = self._takePicture(gphoto2conf, datestr)
                     except Exception, e:
                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not take picture now (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
                         self.error(e.__str__())
@@ -241,6 +259,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                             self.info('picture now task finished successfully')
                         
                     if self._powerSaveMode:
+                        self._parkRobot()
                         self._shutdownRobotAndCam()
                 elif task[0] == POSITIONING_TASK:
                     self.info('positioning task received (x=%f,y=%f)' % (task[1], task[2]))
@@ -300,6 +319,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._plugStop = True
         self._taskqueue.put('end')
         self._delay.set()
+        self._parkRobot()
         self._shutdownRobotAndCam()
             
             
@@ -347,22 +367,22 @@ class CamZillaPluginClass(AbstractPluginClass):
         params = task.strip().split(' ')
         ret = [None]*8
         for param in params:
-            param = param.lower()
-            if param.startswith('start'):
+            p = param.lower()
+            if p.startswith('start'):
                 startX, startY = param[6:-1].split(',')
                 ret[0] = float(startX)
                 ret[1] = float(startY)
-            elif param.startswith('pictures'):
+            elif p.startswith('pictures'):
                 picsX, picsY = param[9:-1].split(',')
                 ret[2] = int(picsX)
                 ret[3] = int(picsY)
-            elif param.startswith('rotation'):
+            elif p.startswith('rotation'):
                 rotationX, rotationY = param[9:-1].split(',')
                 ret[4] = float(rotationX)
                 ret[5] = float(rotationY)
-            elif param.startswith('delay'):
+            elif p.startswith('delay'):
                 ret[6] = int(param[6:-1])
-            elif param.startswith('gphoto2'):
+            elif p.startswith('gphoto2'):
                 ret[7] = param[8:-1].split(',')
             else:
                 self.error('unrecognized parameter >%s< in task >%s<' % (param,task))
@@ -390,7 +410,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         
         
-    def _takePicture(self, settings):
+    def _takePicture(self, settings, datestring):
         configlist = []
         
         for default in DEFAULT_GPHOTO2_SETTINGS:
@@ -411,12 +431,12 @@ class CamZillaPluginClass(AbstractPluginClass):
         if ret:
             ret = ret[:-2]
         
-        command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet'] + sets + ['--capture-image']
+        command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet'] + sets + ['--filename=' + datestring + '-%03n.%C', '--capture-image-and-download']
         com = ''
         for entry in command:
             com += entry + ' '
         self.debug('taking picture >%s<' % (com,))
-        self._execGphoto2(command)
+        self._execGphoto2(command, PICTUREFOLDER)
         return ret.strip()
         
         
@@ -440,6 +460,10 @@ class CamZillaPluginClass(AbstractPluginClass):
                     self.error(output[1])
             else:
                 raise Exception('camera has no more power -> gphoto2 could not execute command')
+            
+            
+    def _parkRobot(self):
+        self._position(self._parkX, self._parkY)
     
     
     def _shutdownRobotAndCam(self):
@@ -504,10 +528,10 @@ class CamZillaPluginClass(AbstractPluginClass):
             
             
     def _position(self, x=None, y=None):
-        if x is not None:
+        if x is not None and x != self._x:
             self._write('x=%d' % (int(round(x*self._pulsesPerDegree)),))
             self._x = x
-        if y is not None:
+        if y is not None and y != self._y:
             self._write('y=%d' % (int(round(y*self._pulsesPerDegree)),))
             self._y = y
         

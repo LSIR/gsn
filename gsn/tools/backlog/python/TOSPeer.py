@@ -54,6 +54,8 @@ class TOSPeerClass(Thread, Statistics):
                     serial = tos1x.getSource(address)
                     serial.setTimeout(5)
                     self._serialsource = tos1x.AM(serial)
+                else:
+                    raise TypeError('TinyOS version unknown: %s' % (version,))
             except Exception, e:
                 raise TypeError('could not initialize serial source: %s' % (e,))
         else:
