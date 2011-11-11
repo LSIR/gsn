@@ -271,9 +271,9 @@ public class CamZillaPlugin extends AbstractPlugin {
 			ret += ",/main/imgsettings/autoiso=1,/main/imgsettings/iso=" + iso;
 		
 		if (bracketing.equalsIgnoreCase("none"))
-			ret += ",/main/capturesettings/bracketing=1,/main/capturesettings/burstnumber=1";
+			ret += ",/main/capturesettings/bracketing=1,/main/capturesettings/burstinterval=0";
 		else
-			ret += ",/main/capturesettings/bracketing=0,/main/capturesettings/bracketset=" + bracketing + ",/main/capturesettings/burstnumber=9";
+			ret += ",/main/capturesettings/bracketing=0,/main/capturesettings/bracketset=" + bracketing + ",/main/capturesettings/burstinterval=8";
 		
 		if (!optional.isEmpty())
 			ret += "," + optional;
