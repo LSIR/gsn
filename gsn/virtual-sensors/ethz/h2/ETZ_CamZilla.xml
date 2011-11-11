@@ -19,8 +19,7 @@
                 <field name="iso" type="select:auto|100,0|125,1|160,2|200,3|250,4|320,5|400,6|500,7|640,8|800,9|1000,10|1250,11|1600,12|2000,13|2500,14|3200,15|4000,16|5000,17|6400,18">select ISO</field>
                 <field name="white_balance" type="select:auto,0|Daylight,1|Fluorescent,2|Tungsten,3|Flash,4|Cloudy,5|Shade,6">select whitebalance</field>
                 <field name="bracketing" type="select:none|AE,1|WB,3|ADL,4">select bracketing</field>
-                <field name="bracketing_shots" type="select:none|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20">select number of shots taken for bracketing</field>
-                <field name="bracketing_step" type="select:none|1/3,0|1/2,1|1,2">select increment for bracketing</field>
+                <field name="bracketing_shots" type="select:none,3|+3F,0|-3F,1|-2F,2|3F,4|5F,5|7F,6|9F,7">select number of bracketing shots</field>
                 <field name="gphoto2_config" type="text" defaultvalue="">Comma separated configurations for gphoto2</field>
             </command>
             <command name="picture_now">
@@ -32,8 +31,7 @@
                 <field name="iso" type="select:auto|100,0|125,1|160,2|200,3|250,4|320,5|400,6|500,7|640,8|800,9|1000,10|1250,11|1600,12|2000,13|2500,14|3200,15|4000,16|5000,17|6400,18">select ISO</field>
                 <field name="whitebalance" type="select:auto,0|Daylight,1|Fluorescent,2|Tungsten,3|Flash,4|Cloudy,5|Shade,6">select whitebalance</field>
                 <field name="bracketing" type="select:none|AE,1|WB,3|ADL,4">select bracketing</field>
-                <field name="bracketing_shots" type="select:none|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20">select number of shots taken for bracketing</field>
-                <field name="bracketing_step" type="select:none|1/3,0|1/2,1|1,2">select increment for bracketing</field>
+                <field name="bracketing_shots" type="select:none,3|+3F,0|-3F,1|-2F,2|3F,4|5F,5|7F,6|9F,7">select number of bracketing shots</field>
                 <field name="gphoto2_config" type="text" defaultvalue="">Comma separated configurations for gphoto2</field>
             </command>
             <command name="positioning">

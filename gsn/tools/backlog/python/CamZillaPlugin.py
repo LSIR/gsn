@@ -35,7 +35,7 @@ DEFAULT_BACKLOG = True
 GPHOTO2 = '/usr/bin/gphoto2'
 PICTUREFOLDER = '/media/card/backlog/binaryplugin/camera1/'
 POSTFIX='.%C'
-DEFAULT_GPHOTO2_SETTINGS = ['/main/settings/capturetarget=0','/main/imgsettings/imagequality=0','/main/imgsettings/imagesize=2']
+DEFAULT_GPHOTO2_SETTINGS = ['/main/settings/capturetarget=1','/main/capturesettings/evstep=0']
 
 TASK_MESSAGE = 0
 POWER_MESSAGE = 1
@@ -178,6 +178,11 @@ class CamZillaPluginClass(AbstractPluginClass):
                 now = time.time()
                 datestr = time.strftime('%Y%m%d_%H%M%S', time.gmtime(now))
                 if task[0] == PANORAMA_TASK:
+                    try:
+                        self._downloadPictures(datestr + '-%03n-unknown.%C')
+                    except Exception, e:
+                        self.error(e.__str__())
+                        
                     parsedTask = self._parseTask(task[1])
                     
                     if self._powerSaveMode:
@@ -191,10 +196,11 @@ class CamZillaPluginClass(AbstractPluginClass):
                         pic = 1
                         try:
                             y = parsedTask[1]
-                            while y < parsedTask[1]+(parsedTask[3]*parsedTask[5]):
+                            while y < parsedTask[1]+(parsedTask[3]*parsedTask[5]) and not self._plugStop:
                                 self._position(y=y)
                                 x = parsedTask[0]
-                                while x < parsedTask[0]+(parsedTask[2]*parsedTask[4]):
+                                
+                                while x < parsedTask[0]+(parsedTask[2]*parsedTask[4]) and not self._plugStop:
                                     self._position(x=x)
                                     if self._plugStop:
                                         break
@@ -203,12 +209,14 @@ class CamZillaPluginClass(AbstractPluginClass):
 
                                     self.info('taking picture number %d/%d at position (%f,%f)' % (pic,parsedTask[2]*parsedTask[3],x,y))
                                     config = self._takePicture(parsedTask[7], datestr)
+                                    if self._plugStop:
+                                        break
+                                    self._downloadPictures(datestr + '-%03n-%dx%dy.%C' % (int(round(self._x*10)), int(round(self._y*10))))
                                     self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken successfully' % (pic,parsedTask[2]*parsedTask[3]), x, y] + parsedTask[:-1] + [config])
                                     pic += 1
 
                                     x += parsedTask[4]
-                                if self._plugStop:
-                                    break
+                                    
                                 y += parsedTask[5]
                         except Exception, e:
                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not finish task successfully (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
@@ -217,14 +225,8 @@ class CamZillaPluginClass(AbstractPluginClass):
                             self.info('all pictures taken successfully')
                         
                             if not self._plugStop:
-                                try:
-                                    self._downloadPictures(datestr)
-                                except Exception, e:
-                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
-                                    self.error(e.__str__())
-                                else:
-                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
-                                    self.info('panorama picture task finished successfully')
+                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
+                                self.info('panorama picture task finished successfully')
                         
                         if self._powerSaveMode:
                             self._parkRobot()
@@ -250,7 +252,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                         self.error(e.__str__())
                     else:
                         try:
-                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)))
+                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now) + '-%03n-%dx%dy.%C' % (int(round(self._x*10)), int(round(self._y*10)))))
                         except Exception, e:
                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
                             self.error(e.__str__())
@@ -431,18 +433,18 @@ class CamZillaPluginClass(AbstractPluginClass):
         if ret:
             ret = ret[:-2]
         
-        command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet'] + sets + ['--filename=' + datestring + '-%03n.%C', '--capture-image-and-download']
+        command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet'] + sets + ['--filename=' + datestring + '-%03n.%C', '--capture-image']
         com = ''
         for entry in command:
             com += entry + ' '
-        self.debug('taking picture >%s<' % (com,))
+        self.info('taking picture >%s<' % (com,))
         self._execGphoto2(command, PICTUREFOLDER)
         return ret.strip()
         
         
-    def _downloadPictures(self, datestring):
+    def _downloadPictures(self, filename):
         self.info('downloading all pictures from photo camera')
-        self._execGphoto2([GPHOTO2, '--port="usb:"', '--quiet', '--get-all-files', '--filename=' + datestring + '-%03n.%C', '--recurse', '--delete-all-files'], PICTUREFOLDER)
+        self._execGphoto2([GPHOTO2, '--port="usb:"', '--quiet', '--get-all-files', '--filename=' + filename, '--recurse', '--delete-all-files'], PICTUREFOLDER)
         
         
     def _execGphoto2(self, params, cwd=None):

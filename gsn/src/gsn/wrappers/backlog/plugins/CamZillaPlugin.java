@@ -99,7 +99,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		Serializable[] command = null;
 		if( action.compareToIgnoreCase("panorama_picture") == 0 ) {
-			String sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", bracketing = "", shots = "", step = "", opt = "";
+			String sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", bracketing = "", shots = "", opt = "";
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("start_x") == 0 )
 					sx = (String) paramValues[i];
@@ -131,8 +131,6 @@ public class CamZillaPlugin extends AbstractPlugin {
 					bracketing = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("bracketing_shots") == 0 )
 					shots = (String) paramValues[i];
-				else if( paramNames[i].compareToIgnoreCase("bracketing_step") == 0 )
-					step = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("gphoto2_config") == 0 )
 					opt = (String) paramValues[i];
 			}
@@ -147,13 +145,13 @@ public class CamZillaPlugin extends AbstractPlugin {
 			if (!d.trim().isEmpty())
 				str += "delay("+d+") ";
 
-			str += "gphoto2("+getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, bracketing, shots, step, opt)+")";
+			str += "gphoto2("+getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, bracketing, shots, opt)+")";
 			
 			logger.info("uploading panorama picture task >" + str + "<");
 			command = new Serializable[] {TASK_MESSAGE, PANORAMA_TASK, str};
 		}
 		else if ( action.compareToIgnoreCase("picture_now") == 0 ) {
-			String str, imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", bracketing = "", shots = "", step = "", opt = "";
+			String str, imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", bracketing = "", shots = "", opt = "";
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("image_quality") == 0 )
 					imgquality = (String) paramValues[i];
@@ -171,13 +169,11 @@ public class CamZillaPlugin extends AbstractPlugin {
 					bracketing = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("bracketing_shots") == 0 )
 					shots = (String) paramValues[i];
-				else if( paramNames[i].compareToIgnoreCase("bracketing_step") == 0 )
-					step = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("gphoto2_config") == 0 )
 					opt = (String) paramValues[i];
 			}
 
-			str = getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, bracketing, shots, step, opt);
+			str = getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, bracketing, shots, opt);
 			logger.info("uploading picture now task >" + str + "<");
 			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK, str};
 		}
@@ -253,7 +249,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 	}
 	
 	
-	private String getD300sConfig(String imagequality, String imagesize, String aperture, String shutter, String iso, String whitebalance, String bracketing, String shots, String step, String optional) {
+	private String getD300sConfig(String imagequality, String imagesize, String aperture, String shutter, String iso, String whitebalance, String bracketing, String shots, String optional) {
 		String ret = "/main/imgsettings/imagequality=" + imagequality + ",/main/imgsettings/imagesize=" + imagesize + ",/main/imgsettings/whitebalance=" + whitebalance;
 		
 		if (aperture.equalsIgnoreCase("auto")) {
@@ -275,13 +271,11 @@ public class CamZillaPlugin extends AbstractPlugin {
 			ret += ",/main/imgsettings/autoiso=Off,/main/imgsettings/iso=" + iso;
 		
 		if (bracketing.equalsIgnoreCase("none"))
-			ret += ",/main/capturesettings/bracketing=Off";
+			ret += ",/main/capturesettings/bracketing=Off,/main/capturesettings/burstnumber=1";
 		else
-			ret += ",/main/capturesettings/bracketing=On,/main/capturesettings/bracketset=" + bracketing;
-		if (!shots.equalsIgnoreCase("none"))
-			ret += ",/main/capturesettings/burstnumber=" + shots;
-		if (!step.equalsIgnoreCase("none"))
-			ret += ",/main/capturesettings/evstep=" + step;
+			ret += ",/main/capturesettings/bracketing=On,/main/capturesettings/bracketset=" + bracketing + ",/main/capturesettings/burstnumber=9";
+		
+		ret += ",/main/other/d0c2=" + shots;
 		
 		if (!optional.isEmpty())
 			ret += "," + optional;

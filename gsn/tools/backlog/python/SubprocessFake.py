@@ -200,7 +200,9 @@ class Popen(Thread):
                 self.stdout = stdout.encode()
             if stderr:
                 self.stderr = stderr.encode()
-            if ret != None:
+            if ret is None:
+                self.returncode = 1
+            else:
                 self.returncode = int(ret)
             self.stdLock.release()
             
