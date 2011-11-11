@@ -176,12 +176,14 @@ class CamZillaPluginClass(AbstractPluginClass):
             
             try:
                 now = time.time()
-                datestr = time.strftime('%Y%m%d_%H%M%S', time.gmtime(now))
                 if task[0] == PANORAMA_TASK:
                     try:
-                        self._downloadPictures(datestr + '-%03n-unknown.%C')
+                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '-%03n-unknown.%C')
                     except Exception, e:
                         self.error(e.__str__())
+                        
+                    now = time.time()
+                    datestr = time.strftime('%Y%m%d_%H%M%S', time.gmtime(now))
                         
                     parsedTask = self._parseTask(task[1])
                     
@@ -211,7 +213,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                                     config = self._takePicture(parsedTask[7], datestr)
                                     if self._plugStop:
                                         break
-                                    self._downloadPictures(datestr + '-%03n-%dx%dy.%C' % (int(round(self._x*10)), int(round(self._y*10))))
+                                    self._downloadPictures(datestr + '-%s-%dx%dy.%s' % ('%03n', int(round(self._x*10)), int(round(self._y*10)), '%C'))
                                     self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken successfully' % (pic,parsedTask[2]*parsedTask[3]), x, y] + parsedTask[:-1] + [config])
                                     pic += 1
 
@@ -235,6 +237,14 @@ class CamZillaPluginClass(AbstractPluginClass):
                         self.error('robot is not powered -> can not execute command')
                 elif task[0] == PICTURE_TASK:
                     self.info('picture now task received -> taking picture in current robot position now')
+                    
+                    try:
+                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '-%03n-unknown.%C')
+                    except Exception, e:
+                        self.error(e.__str__())
+                        
+                    now = time.time()
+                    datestr = time.strftime('%Y%m%d_%H%M%S', time.gmtime(now))
     
                     if self._powerSaveMode:
                         self._startupRobotAndCam()
@@ -252,7 +262,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                         self.error(e.__str__())
                     else:
                         try:
-                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now) + '-%03n-%dx%dy.%C' % (int(round(self._x*10)), int(round(self._y*10)))))
+                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now) + '-%s-%dx%dy.%s' % ('%03n', int(round(self._x*10)), int(round(self._y*10)), '%C')))
                         except Exception, e:
                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
                             self.error(e.__str__())
@@ -423,13 +433,13 @@ class CamZillaPluginClass(AbstractPluginClass):
                     notavailable = False
                     break
             if notavailable:
-                settings.append(default)
+                settings.insert(0, default)
         
         sets = []
         ret = ''
         for setting in settings:
             ret += setting + ', '
-            sets.append('--set-config %s' % (setting.strip(),))
+            sets.append('--set-config-index %s' % (setting.strip(),))
         if ret:
             ret = ret[:-2]
         
