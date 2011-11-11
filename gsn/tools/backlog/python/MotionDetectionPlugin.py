@@ -31,7 +31,7 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         self._std_y = float(0)
         self._std_z = float(0)
         self._moving = 0
-        self._data = ''
+        self._data = [[],[],[]]
         self._numPolls = 0
 
         self.info('Init MotionDetectionPlugin...')
@@ -71,21 +71,8 @@ class MotionDetectionPluginClass(AbstractPluginClass):
     def action(self, parameters):
 
         self.steval._openDevice()
-        self._data = ''
-        setRes = self.steval._setSensor()
-        if setRes == 1:
-
-            startTime = time.time()
-            endTime =  startTime
-            while (endTime - startTime) < self._pollDuration:
-                msg = str(self.steval._startDataAcquisitionDebug(150))
-                self._data += msg
-                self.steval._stopDataAcquisition()
-                endTime = time.time()
-
-            self.detectMotion()
-        else:
-            self.error('setSensor() failed, can not get sensor readings')
+        self._data = self.steval._startDataAcquisition(self._pollDuration)
+        self.detectMotion()
 
         self.steval._closeDevice()
         self._numPolls = self._numPolls + 1
@@ -110,20 +97,17 @@ class MotionDetectionPluginClass(AbstractPluginClass):
 
     def detectMotion(self):
 
-        xData = self.parseData('x')
-        yData = self.parseData('y')
-        zData = self.parseData('z')
-
-        std_x = float(numpy.std(xData))
-        std_y = float(numpy.std(yData))
-        std_z = float(numpy.std(zData))
+        std_x = float(numpy.std(self._data[0]))
+        std_y = float(numpy.std(self._data[1]))
+        std_z = float(numpy.std(self._data[2]))
 
         self.info('xStd is ' + str(std_x) + ' yStd is ' + str(std_y) + ' and zStd is ' + str(std_z));
 
         if std_x <= self._stdThreshold and std_y <= self._stdThreshold and std_z <= self._stdThreshold:
             self.info('Vehicle is not moving')
             # Execute action function of the specified plugins
-            pluginList = [BackLogMessage.OZ47_MESSAGE_TYPE, BackLogMessage.GPS_NAV_MESSAGE_TYPE, BackLogMessage.ALPHASENSE_MESSAGE_TYPE]
+            #pluginList = [BackLogMessage.OZ47_MESSAGE_TYPE, BackLogMessage.GPS_NAV_MESSAGE_TYPE, BackLogMessage.ALPHASENSE_MESSAGE_TYPE]
+            pluginList = [BackLogMessage.GPS_NAV_MESSAGE_TYPE]
             num = self.runPluginRemoteAction(pluginList, self.getTimeStamp())
             self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
         else:
@@ -138,13 +122,3 @@ class MotionDetectionPluginClass(AbstractPluginClass):
             self._std_x = std_x
             self._std_y = std_y
             self._std_z = std_z
-
-    def parseData(self, axis):
-        axisData = []
-
-        r = self._data.find(axis)
-        while r != -1:
-            axisData.append(int(self._data[r+2:r+8]))
-            r = self._data.find(axis, r+1)
-
-        return axisData

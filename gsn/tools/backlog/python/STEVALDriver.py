@@ -23,14 +23,7 @@ class STEVALDriver():
 
     def __init__(self,config):
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._logger.info("Init %s" % self.__class__.__name__)
-        #self._logger.info('Init STEVAL-MKI004V1 Driver...')
-        
-        # serial port timeout
-        self._serialTimeout = 1
-        
-        # retries to read message from sensor
-        self._readCount = 5
+        self._logger.info('Init STEVAL-MKI004V1 Driver...')
         
         if (config[0] != None):
             self._deviceStr = config[0]
@@ -40,12 +33,12 @@ class STEVALDriver():
             self._device = self._deviceStr
         
         try:
-            self._device = serial.Serial(self._deviceStr, 115200, timeout=self._serialTimeout)
+            self._device = serial.Serial(self._deviceStr, 115200, timeout=1)
             self._device.close()
-            self._logger.info("Device Init Successful" + str(self._device))
+            self._logger.info("Device Init Successful for " + str(self._device))
         except Exception as e:
             self._logger.error("serial access exception " + str(e))
-            self._logger.error("Could not access STEVAL-MKI004V1 device " + self._deviceStr)
+            self._logger.error("Could not initialize STEVAL-MKI004V1 device " + self._deviceStr)
             self._device = 0
             return
 
@@ -58,7 +51,8 @@ class STEVALDriver():
     def _openDevice(self):
         try:
             self._device.open()
-            self._device.flush()
+            self._setSensor()
+            #self._device.flush()
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
@@ -66,30 +60,17 @@ class STEVALDriver():
             
     def _closeDevice(self):
         try:
-            self._device.flush()
+            #self._device.flush()
             self._device.close()
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not close device STEVAL-MKI004V1")
             
-                    
-    def _startDataAcquisition(self):
-        try:
-            self._device.write('*')
-            self._device.write('s')
-            self._device.write('t')
-            self._device.write('a')
-            self._device.write('r')
-            self._device.write('t')
-            self._device.write('\r')
-            
-        except Exception as e:
-            self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read STEVAL-MKI004V1 sensor reading")
    
-    def _startDataAcquisitionDebug(self, val):
+    def _startDataAcquisition(self, deltaTime):
         try:
+            self._stopDataAcquisition()
             while self._device.inWaiting() != 0:
                 self._device.flushInput()
             
@@ -100,40 +81,36 @@ class STEVALDriver():
             self._device.write('u')
             self._device.write('g')
             self._device.write('\r')
+            
+            self._logger.info('start get data for ' + str(deltaTime) + ' seconds')
+            
+            
+            startTime = time.time()
+            endTime = startTime
             d = ''
-            tmpVal = ''
-            c = 2 
-            while c > 0:
-                d = self._device.read(val)                
-                pos = d.find('x=')
-                if pos >= 0:
-                    d = d[pos:]
-                    idx = 0
-                    l = d.find('\n')
-                    newL = len(str(d))
-                    i = idx
-                    while (i < newL):
-                        i += 1
-                    while idx < (newL) and (idx + l) < (newL):
-                        total = idx + l
-                        if total < len(str(d)):
-                                          
-                            if len(tmpVal) == 0:
-                                tmpVal = d[idx:total]
-                                idx = total + 1
-                            else:
-                                tmp = d[idx]
-                                tmpVal = tmpVal + d[idx:total]
-                                i = idx
-                                idx = total + 1
-                        else:
-                            break
-                    c -= 1                
-            return tmpVal
+            while (endTime - startTime) < deltaTime:
+                d += self._device.read(128)
+                endTime = time.time()
+            self._logger.info('got all data')
+                
+            self._stopDataAcquisition()
+            
+            d = d[d.find('x'):]
+            lines = d.split('\r\n')
+
+            i = 0
+            data = [[],[],[]]
+            while i < len(lines) and len(lines[i]) == 31:
+                data[0].append(int(lines[i][2:8]))
+                data[1].append(int(lines[i][13:19]))
+                data[2].append(int(lines[i][25:31]))
+                i = i + 1
+                         
+            return data
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read STEVAL-MKI004V1 sensor reading")
+            self._logger.error("Could not finish data acquisition on STEVAL-MKI004V1")
 
     def _stopDataAcquisition(self):
         try:
@@ -143,11 +120,11 @@ class STEVALDriver():
             self._device.write('o')
             self._device.write('p')
             self._device.write('\r')
-            time.sleep(0.3)
+            #time.sleep(0.3)
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read STEVAL-MKI004V1 sensor reading")
+            self._logger.error("Could not stop data acquisition of STEVAL-MKI004V1")
                          
     def _setSensor(self):   
         try:
@@ -161,68 +138,52 @@ class STEVALDriver():
         
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read STEVAL-MKI004V1 sensor reading")
-
-    def _unsetSensor(self):   
-        try:
-            self._device.write('*')
-            self._device.write('Z')
-            self._device.write('o')
-            self._device.write('n')
-            self._device.write('\r')
-  
-        except Exception as e:
-            self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read STEVAL-MKI004V1 sensor reading")
+            self._logger.error("Could not write *Zoff to STEVAL-MKI004V1")
 
 
     def _getDevName(self):   
         try:
+            self._stopDataAcquisition()
+            while self._device.inWaiting() != 0:
+                self._device.flushInput()
+            
             self._device.write('*')
             self._device.write('d')
             self._device.write('e')
             self._device.write('v')
             self._device.write('\r')
-            d = ''
-            c = self._readCount
-            while d == '' and c > 0:
-                d = self._device.read(12)
-		if d.find('3LV') >= 0:
-		    break
-		else:
-                    c -= 1
+            d = self._device.read(self._device.inWaiting())
+
             if d == '':
                 self._logger.warning("No answer from the STEVAL-MKI004V1 device to *dev request")
             else:
-                self._logger.info("Read STEVAL-MKI004V1 device: " + d)
+                self._logger.info("STEVAL-MKI004V1 device name: " + d)
             return d.strip()
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read STEVAL-MKI004V1 sensor reading")
+            self._logger.error("Could not get device name from STEVAL-MKI004V1")
             
     def _getVerNumber(self):   
         try:
+            self._stopDataAcquisition()
+            while self._device.inWaiting() != 0:
+                self._device.flushInput()
+            
             self._device.write('*')
             self._device.write('v')
             self._device.write('e')
             self._device.write('r')
             self._device.write('\r')
-            d = ''
-            c = self._readCount
-            while d == '' and c > 0:
-                d = self._device.read(12)
-                if d.find('LVD') >= 0:
-                    break
-                else:
-                    c -= 1
+            d = self._device.read(self._device.inWaiting())
+
             if d == '':
                 self._logger.warning("No answer from the STEVAL-MKI004V1 device to *ver request")
             else:
-                self._logger.info("Read STEVAL-MKI004V1 device: " + d)
+                self._logger.info("STEVAL-MKI004V1 version number: " + d)
             return d.strip()
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
-            self._logger.error("Could not read STEVAL-MKI004V1 sensor reading")
+            self._logger.error("Could not get version number from STEVAL-MKI004V1")
     

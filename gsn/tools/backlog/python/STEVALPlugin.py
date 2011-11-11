@@ -93,7 +93,7 @@ class STEVALPluginClass(AbstractPluginClass):
             end = start
             while (end - start) < self._duration:
                 t0 = time.time()
-                msg = str(self.steval._startDataAcquisitionDebug(20000))
+                msg = str(self.steval._startDataAcquisition(20000))
                 t1 = time.time()
                 diff += (t1-t0)
                 end = t1
