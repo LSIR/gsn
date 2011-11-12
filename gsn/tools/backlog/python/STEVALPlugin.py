@@ -139,11 +139,12 @@ class STEVALPluginClass(AbstractPluginClass):
     def compute_fft_and_l2(self, buffer):
         if len(buffer) == 0:
             return []
-            
+        
         for i in range(len(buffer)): 
-            buffer[i] = buffer[i]*g_range/adc_factor
-            
+            buffer[i] = buffer[i]*float(g_range)/float(adc_factor)
+          
         fft = numpy.fft.rfft(buffer,len(buffer))
+        
         re = numpy.real(fft)
         im = numpy.imag(fft)
         l2array = []
@@ -172,7 +173,7 @@ class STEVALPluginClass(AbstractPluginClass):
     def dataProcessing(self, dataPackage):
          
         # packet creation for GSN        
-        if option == RAW_OPT:
+        if self._outputOpt == RAW_OPT:
             dataPackage += [self._duration]
             dataPackage += [time.time()]
             dataPackage += [str(self._data[0])]
@@ -187,7 +188,7 @@ class STEVALPluginClass(AbstractPluginClass):
             xOut = self.dataSelection(xData)
             yOut = self.dataSelection(yData)
             zOut = self.dataSelection(zData)
-            if option == PROC_OPT:
+            if self._outputOpt == PROC_OPT:
                 dataPackage += [self._duration]
                 dataPackage += [time.time()]
                 
@@ -201,7 +202,7 @@ class STEVALPluginClass(AbstractPluginClass):
                     for j in range(0,2):
                         dataPackage += [float(zOut[i][j])]
             
-            else: # option == RAW_PROC_OPT :
+            else: # self._outputOpt == RAW_PROC_OPT :
                 dataPackage += [self._duration]
                 dataPackage += [time.time()]
                 dataPackage += [str(self._data[0])]

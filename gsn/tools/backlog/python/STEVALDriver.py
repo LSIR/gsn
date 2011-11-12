@@ -82,15 +82,12 @@ class STEVALDriver():
             
             self._logger.info('start get data for ' + str(deltaTime) + ' seconds')
             
-            
             startTime = time.time()
-            endTime = startTime
             d = ''
-            while (endTime - startTime) < deltaTime:
+            while (time.time() - startTime) < float(deltaTime):
                 d += self._device.read(128)
-                endTime = time.time()
-            self._logger.info('got all data')
                 
+            self._logger.info('got all data')
             self._stopDataAcquisition()
             
             d = d[d.find('x'):]
@@ -150,12 +147,12 @@ class STEVALDriver():
             self._device.write('e')
             self._device.write('v')
             self._device.write('\r')
-            d = self._device.read(self._device.inWaiting())
+            d = self._device.read(11)
 
             if d == '':
                 self._logger.warning("No answer from the STEVAL-MKI004V1 device to *dev request")
             else:
-                self._logger.info("STEVAL-MKI004V1 device name: " + d)
+                self._logger.info("STEVAL-MKI004V1 device name: " + d.strip())
             return d.strip()
 
         except Exception as e:
@@ -173,12 +170,12 @@ class STEVALDriver():
             self._device.write('e')
             self._device.write('r')
             self._device.write('\r')
-            d = self._device.read(self._device.inWaiting())
+            d = self._device.read(11)
 
             if d == '':
                 self._logger.warning("No answer from the STEVAL-MKI004V1 device to *ver request")
             else:
-                self._logger.info("STEVAL-MKI004V1 version number: " + d)
+                self._logger.info("STEVAL-MKI004V1 version number: " + d.strip())
             return d.strip()
 
         except Exception as e:
