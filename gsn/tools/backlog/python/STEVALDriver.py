@@ -52,7 +52,6 @@ class STEVALDriver():
         try:
             self._device.open()
             self._setSensor()
-            #self._device.flush()
 
         except Exception as e:
             self._logger.error("serial access exception: " + str(e))
@@ -60,7 +59,6 @@ class STEVALDriver():
             
     def _closeDevice(self):
         try:
-            #self._device.flush()
             self._device.close()
 
         except Exception as e:

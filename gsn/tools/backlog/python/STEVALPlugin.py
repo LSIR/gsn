@@ -14,9 +14,7 @@ from AbstractPlugin import AbstractPluginClass
 import STEVALDriver
 import math
 import numpy
-import sys
 import time
-import os
 from numpy import *
 
 DEFAULT_BACKLOG = True
@@ -47,6 +45,7 @@ class STEVALPluginClass(AbstractPluginClass):
         self._timer = None
         self._stopped = False
         self._interval = None
+        self._data = [[],[],[]]
 
         self.info('Init STEVALPlugin...')
         
@@ -54,14 +53,11 @@ class STEVALPluginClass(AbstractPluginClass):
         self.steval = STEVALDriver.STEVALDriver([self._deviceStr])
         self._outputOpt = self.getOptionValue('STEVAL_MKIxx_outputOpt')
         self._threshold_local_extrema = self.getOptionValue('STEVAL_MKIxx_threshold_local_extrema')
-        self._log_path = self.getOptionValue('STEVAL_MKIxx_log_path')
-        self._log_save_flag = self.getOptionValue('STEVAL_MKIxx_log_save_flag')
         self._duration = self.getOptionValue('STEVAL_MKIxx_duration')
         
         self.steval._openDevice()
         self._deviceNum = self.steval._getDevName();
         self._firmwareNum = self.steval._getVerNumber();
-        self.steval._setSensor()
         self.steval._closeDevice()
         self.info('STEVAL: init steval success')
         dataPackage = [STATIC_DATA]
@@ -76,61 +72,25 @@ class STEVALPluginClass(AbstractPluginClass):
         return False
 
     def action(self, parameters):
-        self.steval._openDevice()
-        self.info('STEVALPlugin started...')
-        ret = self.steval._setSensor()
-        if ret == 1:
-            self.info('STEVAL: setSensor() success')
-            setValue = 1
-        readFlag = 0
-        diff = 0
-        dataFile = self._log_path
-        dataFile += '/data.txt'
-        if setValue == 1:
-            msg = ''
-            fHdl = open (dataFile, 'w' )
-            start = time.time()
-            end = start
-            while (end - start) < self._duration:
-                t0 = time.time()
-                msg = str(self.steval._startDataAcquisition(20000))
-                t1 = time.time()
-                diff += (t1-t0)
-                end = t1
-                fHdl.write (msg)
-            fHdl.close ()
-            self.steval._stopDataAcquisition()
-            #self.steval._unsetSensor()
-            #self.steval._closeDevice()
-            self.info("STEVAL: Data read -- message length = " + str(len(msg)))
-            readFlag = 1;
-            timeFile = self._log_path
-            timeFile +='/time.txt'            
-            tFile = open(timeFile,'w')
-            tFile.write(str(diff))
-            tFile.write('\n')
-            tFile.write(str(start))
-            tFile.write('\n')
-            tFile.close()
-            
-            self.info('STEVAL reading done')
-        else:
-            self.warning ('STEVAL read failed')
+        self.info('STEVALPlugin action...')
         
-        self.steval._closeDevice()
-        if readFlag == 1:
-            if self._outputOpt == RAW_OPT:
-                dataPackage = [DYNAMIC_RAW_DATA]
-            elif self._outputOpt == PROC_OPT:
-                dataPackage = [DYNAMIC_PROC_DATA]
-            else:
-                dataPackage = [DYNAMIC_RAW_PROC_DATA]
-            
-            self.dataProcessing(self._outputOpt, dataPackage)
-            dataPackage += [parameters]
-            self.processMsg(self.getTimeStamp(), dataPackage)
-            if self._outputOpt == PROC_OPT:
-                self.info(dataPackage)
+        self.steval._openDevice()
+        self._data = self.steval._startDataAcquisition(self._duration)
+        
+        self.info("STEVAL: Data read done -- data points per axes: " + str(len(self._data[0])))
+        
+        if self._outputOpt == RAW_OPT:
+            dataPackage = [DYNAMIC_RAW_DATA]
+        elif self._outputOpt == PROC_OPT:
+            dataPackage = [DYNAMIC_PROC_DATA]
+        else:
+            dataPackage = [DYNAMIC_RAW_PROC_DATA]
+        
+        self.dataProcessing(dataPackage)
+        dataPackage += [parameters]
+        self.processMsg(self.getTimeStamp(), dataPackage)
+        if self._outputOpt == PROC_OPT:
+            self.info(dataPackage)
             
 
     def remoteAction(self, parameters):
@@ -138,18 +98,12 @@ class STEVALPluginClass(AbstractPluginClass):
 
     def stop(self):
         self._stopped = True
-        #self.steval._unsetSensor()
-        self.info('stopped')
         self.steval._closeDevice()
-        
-        
-        
+        self.info('STEVALPlugin stopped')
         
     '''
     Helper function
     '''
-    
-    
     def compute_local_extremas(self, buffer, threshold):
         lmin = lmax = update = 0
         i = 1
@@ -185,6 +139,10 @@ class STEVALPluginClass(AbstractPluginClass):
     def compute_fft_and_l2(self, buffer):
         if len(buffer) == 0:
             return []
+            
+        for i in range(len(buffer)): 
+            buffer[i] = buffer[i]*g_range/adc_factor
+            
         fft = numpy.fft.rfft(buffer,len(buffer))
         re = numpy.real(fft)
         im = numpy.imag(fft)
@@ -193,72 +151,16 @@ class STEVALPluginClass(AbstractPluginClass):
             l2array.append(math.sqrt(re[i]**2 + im[i]**2))
         return l2array
     
-    def io_read_data(self, filename):
-        buffer = []
-        file = open(filename, 'r')
-        while 1:
-            line = file.readline()
-            if not line:
-                break
-            val = float(line)
-            buffer.append((val*g_range)/adc_factor)
-        file.close()
-        return buffer
-    
-    def generate_fftresult(self,filename):
-        array = self.io_read_data(filename)
-        freqs = [x * float(sampling_rate)/float(len(array)/2) for x in range(0, len(array)/2)]
-        arrayFFT = self.compute_fft_and_l2(array)
-        param = self._threshold_local_extrema 
-        arrayLE = self.compute_local_extremas(arrayFFT, param)
+    def generate_fftresult(self, axis):
+        arrayFFT = self.compute_fft_and_l2(self._data[axis])
+        arrayLE = self.compute_local_extremas(arrayFFT, self._threshold_local_extrema)
         return arrayLE
-    
-    def generate_axisFile(self, source, destination, character, offset):
-        sourceFile = open(source,'r')
-        destinationFile = open(destination,'w')
-        
-        sourceFile.seek(0, 0);
-        sourceFile.seek(offset);
-        ch = sourceFile.read(1)
-        arrayId = 0
-        flag = 0
-        if character == ch:
-            throw_ch = sourceFile.read(1)
-            while(arrayId == 0):
-                num = 0
-                sign_ch = sourceFile.read(1)
-                if sign_ch == "":
-                    arrayId = 1
-                    break
-                else:
-                    if sign_ch == '+':
-                        sign_val = 1
-                    else:
-                        sign_val = -1
-                    i = 0
-                    while i < 5:
-                        multip =  math.pow(10,(4-i))
-                        tmp = sourceFile.read(1)
-                        i = i+1
-                        if len(tmp) > 0:
-                            tmp_val = ord(tmp)
-                            ch = (tmp_val - 48) * multip
-                            num = num + ch
-        
-                    if(sign_val*num < 65538):
-                        destinationFile.write(str(int(sign_val*num)))
-                        destinationFile.write('\n')
-                    lastPos = sourceFile.tell()
-                    sourceFile.seek(lastPos+32)
-        
-        destinationFile.close()
-        sourceFile.close()
-        
+            
     def dataSelection(self, array):
         max = numpy.zeros((selection_points,2))
         freq_ar = [x * float(sampling_rate)/float(len(array)) for x in range(0, len(array))]
         count = 0
-        a=numpy.array(array)
+        a = numpy.array(array)
         while count < selection_points:
             maxindex = a.argmax()
             max[count][0] = a[maxindex]
@@ -267,59 +169,28 @@ class STEVALPluginClass(AbstractPluginClass):
             count = count+1
         return max
 
-    
-    def dataProcessing(self, option, dataPackage):
-        dataFile = self._log_path
-        dataFile += '/data.txt'
-        xFile = self._log_path
-        xFile += '/x.txt'
-        self.generate_axisFile(dataFile, xFile, 'x', 0)
-        yFile = self._log_path
-        yFile += '/y.txt'
-        self.generate_axisFile(dataFile, yFile, 'y', 13)
-        zFile = self._log_path
-        zFile += '/z.txt'        
-        self.generate_axisFile(dataFile, zFile, 'z', 26)
+    def dataProcessing(self, dataPackage):
          
-        ## packet creation for GSN
-        tFile = self._log_path
-        tFile +='/time.txt'        
-        timeFile = open(tFile,'r')
-        duration = timeFile.readline()
-        duration = duration.rstrip('\n')
-        startTime = timeFile.readline()
-        startTime = startTime.rstrip('\n')
-        
+        # packet creation for GSN        
         if option == RAW_OPT:
-            dataPackage += [duration]
-            dataPackage += [startTime]
-            fp = open(xFile,'r')
-            tmp_msg = fp.read()
-            fp.close()
-            len1 = len(tmp_msg)
-            dataPackage += [tmp_msg.replace("\n",",")]
-            fp = open(yFile,'r')
-            tmp_msg = fp.read()
-            fp.close()
-            len1 = len(tmp_msg)
-            dataPackage += [tmp_msg.replace("\n",",")]
-            fp = open(zFile,'r')
-            tmp_msg = fp.read()
-            fp.close()
-            len1 = len(tmp_msg)
-            dataPackage += [tmp_msg.replace("\n",",")]            
+            dataPackage += [self._duration]
+            dataPackage += [time.time()]
+            dataPackage += [str(self._data[0])]
+            dataPackage += [str(self._data[1])]
+            dataPackage += [str(self._data[2])]
             
         else:
-            xData = self.generate_fftresult(xFile)
-            yData = self.generate_fftresult(yFile)
-            zData = self.generate_fftresult(zFile)
+            xData = self.generate_fftresult(0)
+            yData = self.generate_fftresult(1)
+            zData = self.generate_fftresult(2)
             
             xOut = self.dataSelection(xData)
             yOut = self.dataSelection(yData)
             zOut = self.dataSelection(zData)
             if option == PROC_OPT:
-                dataPackage += [duration]
-                dataPackage += [startTime]
+                dataPackage += [self._duration]
+                dataPackage += [time.time()]
+                
                 for i in range(0,selection_points):
                     for j in range(0,2):
                         dataPackage += [float(xOut[i][j])]
@@ -331,23 +202,12 @@ class STEVALPluginClass(AbstractPluginClass):
                         dataPackage += [float(zOut[i][j])]
             
             else: # option == RAW_PROC_OPT :
-                dataPackage += [duration]
-                dataPackage += [startTime]
-                fp = open(xFile,'r')
-                tmp_msg = fp.read()
-                fp.close()
-                len1 = len(tmp_msg)
-                dataPackage += [tmp_msg.replace("\n",",")]
-                fp = open(yFile,'r')
-                tmp_msg = fp.read()
-                fp.close()
-                len1 = len(tmp_msg)
-                dataPackage += [tmp_msg.replace("\n",",")]
-                fp = open(zFile,'r')
-                tmp_msg = fp.read()
-                fp.close()
-                len1 = len(tmp_msg)
-                dataPackage += [tmp_msg.replace("\n",",")]
+                dataPackage += [self._duration]
+                dataPackage += [time.time()]
+                dataPackage += [str(self._data[0])]
+                dataPackage += [str(self._data[1])]
+                dataPackage += [str(self._data[2])]
+                
                 for i in range(0,selection_points):
                     for j in range(0,2):
                         dataPackage += [float(xOut[i][j])]
@@ -358,32 +218,3 @@ class STEVALPluginClass(AbstractPluginClass):
                     for j in range(0,2):
                         dataPackage += [float(zOut[i][j])]
             
-            if self._log_save_flag == "TRUE":
-                destTime = tFile
-                destTime +='.'
-                destTime += startTime
-                os.rename(tFile,destTime)
-                
-                dest = xFile
-                dest += '.'
-                dest += startTime
-                os.rename(xFile,dest)
-                dest = yFile
-                dest += '.'
-                dest += startTime
-                os.rename(yFile,dest)
-                dest = zFile
-                dest += '.'
-                dest += startTime
-                os.rename(zFile,dest)
-            else:
-                os.remove(tFile)
-                os.remove(xFile)
-                os.remove(yFile)
-                os.remove(zFile)
-            os.remove(dataFile)
-        #return msg        
-
-    
-
-        
