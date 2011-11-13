@@ -53,7 +53,7 @@ class STEVALPluginClass(AbstractPluginClass):
         self.steval = STEVALDriver.STEVALDriver([self._deviceStr])
         self._outputOpt = self.getOptionValue('STEVAL_MKIxx_outputOpt')
         self._threshold_local_extrema = self.getOptionValue('STEVAL_MKIxx_threshold_local_extrema')
-        self._duration = self.getOptionValue('STEVAL_MKIxx_duration')
+        self._duration = float(self.getOptionValue('STEVAL_MKIxx_duration'))
         
         self.steval._openDevice()
         self._deviceNum = self.steval._getDevName();

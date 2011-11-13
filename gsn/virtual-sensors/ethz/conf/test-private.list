@@ -50,14 +50,14 @@ OSTest_ECVQEK3.xml
 OSTest_GPS_NAV.xml
 OSTest_OZ47.xml
 OSTest_Alphasense.xml
-#OSTest_STEVAL_Dynamic_Raw.xml
-#OSTest_STEVAL_Dynamic_RawProc.xml
 OSTest_Schedule.xml
 OSTest_Statistics.xml
 OSTest_SyslogNg.xml
 OSTest_Binary.xml
 OSTest_MotionDetection.xml
 OSTest_STEVAL_Dynamic_Proc.xml
+OSTest_STEVAL_Dynamic_Raw.xml
+OSTest_STEVAL_Dynamic_RawProc.xml
 OSTest_STEVAL_Static.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml

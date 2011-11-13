@@ -6,8 +6,8 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
-            <field name="DURATION" type="VARCHAR(32)" />
-            <field name="TIME_OF_DATA" type="VARCHAR(32)" />
+            <field name="DURATION" type="DOUBLE" />
+            <field name="TIME_OF_DATA" type="DOUBLE" />
             <field name="X_DATA" type="VARCHAR(8192)" />
             <field name="Y_DATA" type="VARCHAR(8192)" />
             <field name="Z_DATA" type="VARCHAR(8192)" />

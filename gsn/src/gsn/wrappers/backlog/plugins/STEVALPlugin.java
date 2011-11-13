@@ -30,8 +30,8 @@ public class STEVALPlugin extends AbstractPlugin {
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			
-			new DataField("DURATION", "VARCHAR(32)"),
-	    new DataField("TIME_OF_DATA", "VARCHAR(32)"),
+			new DataField("DURATION", "DOUBLE"),
+	    new DataField("TIME_OF_DATA", "DOUBLE"),
 	    new DataField("X_DATA", "VARCHAR(8192)"),
 	    new DataField("Y_DATA", "VARCHAR(8192)"),
 	    new DataField("Z_DATA", "VARCHAR(8192)"),
@@ -42,8 +42,8 @@ public class STEVALPlugin extends AbstractPlugin {
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			
-			new DataField("DURATION", "VARCHAR(32)"),
-      new DataField("TIME_OF_DATA", "VARCHAR(32)"),
+			new DataField("DURATION", "DOUBLE"),
+      new DataField("TIME_OF_DATA", "DOUBLE"),
       new DataField("Xp_DATA1", "DOUBLE"),
       new DataField("Xp_FREQ1", "DOUBLE"),
       new DataField("Xp_DATA2", "DOUBLE"),
@@ -111,8 +111,8 @@ public class STEVALPlugin extends AbstractPlugin {
 		new DataField("GENERATION_TIME", "BIGINT"),
 		new DataField("DEVICE_ID", "INTEGER"),
 		
-		new DataField("DURATION", "VARCHAR(32)"),
-    new DataField("TIME_OF_DATA", "VARCHAR(32)"),
+		new DataField("DURATION", "DOUBLE"),
+    new DataField("TIME_OF_DATA", "DOUBLE"),
     new DataField("X_DATA", "VARCHAR(8192)"),
     new DataField("Y_DATA", "VARCHAR(8192)"),
     new DataField("Z_DATA", "VARCHAR(8192)"),
