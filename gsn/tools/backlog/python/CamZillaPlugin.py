@@ -92,6 +92,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._y = None
         self._parkX = 0
         self._parkY = 0
+        self._autofocus = None
         
         device = self.getOptionValue('device_name')
         if device is None:
@@ -107,9 +108,9 @@ class CamZillaPluginClass(AbstractPluginClass):
         if value is None:
             self.warning('no park_position value specified')
         else:
-            str = value.strip().split('/')
-            self._parkX = float(str[0])
-            self._parkY = float(str[1])
+            s = value.strip().split('/')
+            self._parkX = float(s[0])
+            self._parkY = float(s[1])
             
         self.info('encoder pulses per degree: %f' % (self._pulsesPerDegree,))
         self.info('using device %s' % (device,))
@@ -170,9 +171,9 @@ class CamZillaPluginClass(AbstractPluginClass):
         if not self._powerSaveMode and not self._calibrated:
             self._calibrateRobot()
             
-        if not self._plugStop:
+        if not self._plugStop and not self._powerSaveMode:
             try:
-                self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(time.time())) + '_unknown_pic%03n.%C')
+                self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(time.time())) + '_pic%03n_unknown.%C')
             except Exception, e:
                 self.error(e.__str__())
 
@@ -191,19 +192,19 @@ class CamZillaPluginClass(AbstractPluginClass):
             try:
                 now = time.time()
                 if task[0] == PANORAMA_TASK:
+                    if self._powerSaveMode:
+                        self._startupRobotAndCam()
+                        if not self._calibrated:
+                            self._calibrateRobot()
+                            
                     try:
-                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_unknown_pic%03n.%C')
+                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%03n_unknown.%C')
                     except Exception, e:
                         self.error(e.__str__())
                         
                     now = time.time()
                         
                     parsedTask = self._parseTask(task[1])
-                    
-                    if self._powerSaveMode:
-                        self._startupRobotAndCam()
-                        if not self._calibrated:
-                            self._calibrateRobot()
                     
                     self.info('executing panorama picture task: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
                     
@@ -242,10 +243,10 @@ class CamZillaPluginClass(AbstractPluginClass):
                                         s += ' (reached y limit)'
                                         
                                     if bracketing:
-                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_%dx_%dy_%s.%s' % (int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
+                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy_%s.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
                                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
                                     else:
-                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_%dx_%dy.%s' % (int(round(self._x*10)), int(round(self._y*10)), '%C'))
+                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), '%C'))
                                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
                                     pic += 1
 
@@ -262,51 +263,52 @@ class CamZillaPluginClass(AbstractPluginClass):
                                 self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
                                 self.info('panorama picture task finished successfully')
                         
-                        if self._powerSaveMode:
+                        if self._powerSaveMode and not self._plugStop:
                             self._parkRobot()
                             self._shutdownRobotAndCam()
                     else:
                         self.error('robot is not powered -> can not execute command')
                 elif task[0] == PICTURE_TASK:
                     self.info('picture now task received -> taking picture(s) in current robot position (x=%f,y=%f)' % (self._x, self._y))
+    
+                    if self._powerSaveMode and not self._plugStop:
+                        self._startupRobotAndCam()
                     
                     try:
-                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_unknown_pic%03n.%C')
+                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%03n_unknown.%C')
                     except Exception, e:
                         self.error(e.__str__())
                         
                     now = time.time()
-    
-                    if self._powerSaveMode:
-                        self._startupRobotAndCam()
-                        if not self._calibrated:
-                            self._calibrateRobot()
                         
                     if task[1]:
                         gphoto2conf = task[1].split(',')
                     else:
                         gphoto2conf = []
-                    try:
-                        config, bracketing = self._configureCamera(gphoto2conf)
-                        self.info('taking picture(s) now')
-                        self._takePicture()
-                    except Exception, e:
-                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not take picture now (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
-                        self.error(e.__str__())
-                    else:
+                    
+                    if not self._plugStop:
                         try:
-                            if bracketing:
-                                self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_%dx_%dy_%s.%s' % (int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
-                            else:
-                                self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_%dx_%dy.%s' % (int(round(self._x*10)), int(round(self._y*10)), '%C'))
+                            config, bracketing = self._configureCamera(gphoto2conf)
+                            self.info('taking picture(s) now')
+                            self._takePicture()
                         except Exception, e:
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
+                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not take picture now (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
                             self.error(e.__str__())
                         else:
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'finished successfully', self._x, self._y] + [None]*7 + [config])
-                            self.info('picture now task finished successfully')
+                            if not self._plugStop:
+                                try:
+                                    if bracketing:
+                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic001_%dx_%dy_%s.%s' % (int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
+                                    else:
+                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic001_%dx_%dy.%s' % (int(round(self._x*10)), int(round(self._y*10)), '%C'))
+                                except Exception, e:
+                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
+                                    self.error(e.__str__())
+                                else:
+                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'finished successfully', self._x, self._y] + [None]*7 + [config])
+                                    self.info('picture now task finished successfully')
                         
-                    if self._powerSaveMode:
+                    if self._powerSaveMode and not self._plugStop:
                         self._parkRobot()
                         self._shutdownRobotAndCam()
                 elif task[0] == POSITIONING_TASK:
@@ -370,11 +372,11 @@ class CamZillaPluginClass(AbstractPluginClass):
     
     
     def stop(self):
+        self._parkRobot()
         self._isBusy = False
         self._plugStop = True
         self._taskqueue.put('end')
         self._delay.set()
-        self._parkRobot()
         self._shutdownRobotAndCam()
             
             
@@ -481,10 +483,11 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         sets = []
         ret = '/main/settings/capturetarget=1'
+        self._autofocus = None
         for setting in settings:
             ret += ', ' + setting
             if setting.find('/main/actions/autofocusdrive') != -1:
-                sets.append('--set-config %s' % (setting.strip(),))
+                self._autofocus = '--set-config %s' % (setting.strip(),)
             elif setting.find('/main/actions/manualfocusdrive') != -1:
                 self._setFocus(setting)
             else:
@@ -499,12 +502,15 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         
     def _takePicture(self):
-        command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--set-config-index /main/settings/capturetarget=1', '--capture-image']
+        if self._autofocus:
+            command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--set-config-index /main/settings/capturetarget=1', self._autofocus, '--capture-image']
+        else:
+            command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--set-config-index /main/settings/capturetarget=1', '--capture-image']
         self._execGphoto2(command)
         
         
     def _setFocus(self, focus):
-        command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--capture-preview', '--set-config %s' % (focus,)]
+        command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--capture-preview', '--set-config /main/actions/manualfocusdrive=32767', '--set-config %s' % (focus,)]
         self._execGphoto2(command)
         
         
@@ -531,7 +537,8 @@ class CamZillaPluginClass(AbstractPluginClass):
             
             
     def _parkRobot(self):
-        self._position(self._parkX, self._parkY)
+        if self._power:
+            self._position(self._parkX, self._parkY)
     
     
     def _shutdownRobotAndCam(self):
@@ -581,8 +588,8 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         
     def _calibrateRobot(self):
+        now = self.getTimeStamp()
         if self._power:
-            now = self.getTimeStamp()
             self._write("j=off")
             cal = self._write("cal")
             self._calibrated = True
