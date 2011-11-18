@@ -128,7 +128,7 @@ OpenSense_Alphasense.xml
 #OpenSense_STEVAL_Dynamic_RawProc.xml
 OpenSense_Schedule.xml
 OpenSense_Statistics.xml
-#OpenSense_SyslogNg.xml
+OpenSense_SyslogNg.xml
 OpenSense_Binary.xml
 OpenSense_MotionDetection.xml
 OpenSense_STEVAL_Dynamic_Proc.xml
