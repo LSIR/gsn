@@ -27,11 +27,11 @@ import org.apache.log4j.Logger;
 public class BackLogMessageMultiplexer extends Thread implements CoreStationListener {
 
 	/** Ping request interval in seconds. */
-	public static final int PING_INTERVAL_SEC = 10;
+	public static final int PING_INTERVAL_SEC = 30;
 	/** Time in seconds in which at least one ping acknowledge
 	    message should have been received. If no acknowledge has
 	    been received, the connection is considered broken. */
-	public static final int PING_ACK_CHECK_INTERVAL_SEC = 60;
+	public static final int PING_ACK_CHECK_INTERVAL_SEC = 300;
 	
 	public static final int PLUGIN_MESSAGE_QUEUE_SIZE = 1000;
 	public static final int PLUGIN_MESSAGE_QUEUE_WARN = 800;

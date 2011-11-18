@@ -18,12 +18,12 @@ import BackLogMessage
 from SpecialAPI import Statistics
 
 # Ping request interval in seconds.
-PING_INTERVAL_SEC = 10.0
+PING_INTERVAL_SEC = 30.0
 
 # Time in seconds in which at least one ping acknowledge
 # message should have been received. If no acknowledge has
 # been received, the connection is considered broken.
-PING_ACK_CHECK_INTERVAL_SEC = 60.0
+PING_ACK_CHECK_INTERVAL_SEC = 300.0
 
 SEND_QUEUE_SIZE = 100
 
