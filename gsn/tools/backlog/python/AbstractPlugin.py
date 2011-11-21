@@ -9,6 +9,7 @@ __source__      = "$URL$"
 
 import logging
 import time
+import inspect
 from threading import Thread
 
 from SpecialAPI import Statistics
@@ -33,6 +34,7 @@ class AbstractPluginClass(Thread, Statistics):
     data/instance attributes:
     _logger
     _backlogMain
+    _pluginName
     _config
     _backlog
     _priority
@@ -75,6 +77,7 @@ class AbstractPluginClass(Thread, Statistics):
             
         self._procMsg = self._backlogMain.gsnpeer.processMsg
         self._runPluginRemoteAction = self._backlogMain.runPluginRemoteAction
+        self._pluginName = inspect.stack()[1][0].f_locals['self'].__class__.__name__[:-5]
             
         self.info('backlog: %s' % (self._backlog,))
         self.info('priority: %d' % (self._priority,))
@@ -389,6 +392,7 @@ class AbstractPluginClass(Thread, Statistics):
         '''
         return self._backlogMain.getErrorCounter()
     
+    
     def getDeviceId(self):
         '''
         Returns the device id.
@@ -397,12 +401,14 @@ class AbstractPluginClass(Thread, Statistics):
         '''
         return self._backlogMain.device_id
         
+        
     def beaconSet(self):
         '''
         This function will be called if the tiny node received a
         beacon set message. (duty-cycle mode)
         '''
         pass
+        
         
     def beaconCleared(self):
         '''
@@ -423,6 +429,7 @@ class AbstractPluginClass(Thread, Statistics):
         '''
         return True
     
+    
     def getPowerControlObject(self):
         '''
         Returns the singleton PowerControl object or None if not
@@ -436,6 +443,42 @@ class AbstractPluginClass(Thread, Statistics):
                   enabled in init.
         '''
         return self._powerControl
+    
+    
+    def setSchedule(self, schedule, merge=True):
+        '''
+        This function can be used to set a new schedule for this plugin
+        in the ScheduleHandler. The schedule has to be in the proper
+        crontab-like format as explained in the BackLog documentation.
+        The newly set schedule for this plugin will be merged into the
+        global one and replace all existing lines concerning this
+        plugin (default).
+        
+        @param schedule: The crontab-like schedule as explained in the
+                          BackLog documentation.
+        @param merge:    If set to True (default), the new schedule will
+                          be merged into the global one and replace all 
+                          existing lines concerning this plugin. Otherwise
+                          the whole schedule will be replaced by the new
+                          one.
+        
+        @return: True if the new schedule is up and running, otherwise
+                  return False.
+        '''
+        return self._backlogMain.schedulehandler.setSchedule(self._pluginName, schedule, merge)
+    
+    
+    def scheduleEvent(self, origin, schedule):
+        '''
+        This function will be called if a new/changed schedule has
+        been set and is now active.
+        
+        @param origin:   The name of the origin this new/changed schedule
+                          has been initiated from. This may be 'GSN' or the
+                          producing Plugin class name.
+        @param schedule: The whole schedule as a string.
+        '''
+        pass
 
     
     def exception(self, exception):
@@ -485,12 +528,14 @@ class AbstractPluginClass(Thread, Statistics):
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug(msg)
             
+            
     def runPluginRemoteAction(self, pluginMsgTypes, parameters):
         '''
         Remotely executes the remoteAction function of the plugins in the list
         '''
 
         return self._runPluginRemoteAction(pluginMsgTypes, parameters)
+        
         
     def remoteAction(self, parameters):
         '''

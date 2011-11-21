@@ -44,8 +44,8 @@ MESSAGE_PRIORITY = 5
 
 # The GSN packet types
 GSN_TYPE_NO_SCHEDULE_AVAILABLE = 0
-GSN_TYPE_SCHEDULE_SAME = 1
-GSN_TYPE_NEW_SCHEDULE = 2
+GSN_TYPE_NO_NEW_SCHEDULE = 1
+GSN_TYPE_SCHEDULE = 2
 GSN_TYPE_GET_SCHEDULE = 3
 
 # ping and watchdog timing
@@ -121,14 +121,14 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._duty_cycle_mode = dutycyclemode
         self._config = options
         
-        max_gsn_connect_wait_minutes = self.getOptionValue('max_gsn_connect_wait_minutes')
+        max_gsn_connect_wait_minutes = self._getOptionValue('max_gsn_connect_wait_minutes')
         if max_gsn_connect_wait_minutes is None:
             raise TypeError('max_gsn_connect_wait_minutes not specified in config file')
         elif not max_gsn_connect_wait_minutes.isdigit():
             raise TypeError('max_gsn_connect_wait_minutes has to be an integer')
         self._logger.info('max_gsn_connect_wait_minutes: %s' % (max_gsn_connect_wait_minutes,))
         
-        max_gsn_get_schedule_wait_minutes = self.getOptionValue('max_gsn_get_schedule_wait_minutes')
+        max_gsn_get_schedule_wait_minutes = self._getOptionValue('max_gsn_get_schedule_wait_minutes')
         if max_gsn_get_schedule_wait_minutes is None:
             raise TypeError('max_gsn_get_schedule_wait_minutes not specified in config file')
         elif not max_gsn_get_schedule_wait_minutes.isdigit():
@@ -136,7 +136,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._logger.info('max_gsn_get_schedule_wait_minutes: %s' % (max_gsn_get_schedule_wait_minutes,))
         
         if dutycyclemode:
-            service_wakeup_schedule = self.getOptionValue('service_wakeup_schedule')
+            service_wakeup_schedule = self._getOptionValue('service_wakeup_schedule')
             if service_wakeup_schedule is None:
                 raise TypeError('service_wakeup_schedule not specified in config file')
             try:
@@ -148,7 +148,7 @@ class ScheduleHandlerClass(Thread, Statistics):
             self._logger.info('service_wakeup_schedule: %s' % (service_wakeup_schedule,))
                 
             
-            service_wakeup_minutes = self.getOptionValue('service_wakeup_minutes')
+            service_wakeup_minutes = self._getOptionValue('service_wakeup_minutes')
             if service_wakeup_minutes is None:
                 raise TypeError('service_wakeup_minutes not specified in config file')
             elif not service_wakeup_minutes.isdigit():
@@ -156,7 +156,7 @@ class ScheduleHandlerClass(Thread, Statistics):
             self._logger.info('service_wakeup_minutes: %s' % (service_wakeup_minutes,))
             
             self._service_wakeup_disabled = False
-            service_wakeup_disable = self.getOptionValue('service_wakeup_disable')
+            service_wakeup_disable = self._getOptionValue('service_wakeup_disable')
             if service_wakeup_disable == None or int(service_wakeup_disable) == 0:
                 self._logger.info('service window is enabled')
             elif int(service_wakeup_disable) != 1 and int(service_wakeup_disable) != 0:
@@ -166,28 +166,28 @@ class ScheduleHandlerClass(Thread, Statistics):
                 self._logger.warning('service window is disabled')
                 self._service_wakeup_disabled = True
             
-            max_next_schedule_wait_minutes = self.getOptionValue('max_next_schedule_wait_minutes')
+            max_next_schedule_wait_minutes = self._getOptionValue('max_next_schedule_wait_minutes')
             if max_next_schedule_wait_minutes is None:
                 raise TypeError('max_next_schedule_wait_minutes not specified in config file')
             elif not max_next_schedule_wait_minutes.isdigit():
                 raise TypeError('max_next_schedule_wait_minutes has to be an integer')
             self._logger.info('max_next_schedule_wait_minutes: %s' % (max_next_schedule_wait_minutes,))
             
-            hard_shutdown_offset_minutes = self.getOptionValue('hard_shutdown_offset_minutes')
+            hard_shutdown_offset_minutes = self._getOptionValue('hard_shutdown_offset_minutes')
             if hard_shutdown_offset_minutes is None:
                 raise TypeError('hard_shutdown_offset_minutes not specified in config file')
             elif not hard_shutdown_offset_minutes.isdigit():
                 raise TypeError('hard_shutdown_offset_minutes has to be an integer')
             self._logger.info('hard_shutdown_offset_minutes: %s' % (hard_shutdown_offset_minutes,))
             
-            approximate_startup_seconds = self.getOptionValue('approximate_startup_seconds')
+            approximate_startup_seconds = self._getOptionValue('approximate_startup_seconds')
             if approximate_startup_seconds is None:
                 raise TypeError('approximate_startup_seconds not specified in config file')
             elif not approximate_startup_seconds.isdigit():
                 raise TypeError('approximate_startup_seconds has to be an integer')
             self._logger.info('approximate_startup_seconds: %s' % (approximate_startup_seconds,))
             
-            max_db_resend_runtime = self.getOptionValue('max_db_resend_runtime')
+            max_db_resend_runtime = self._getOptionValue('max_db_resend_runtime')
             if max_db_resend_runtime is None:
                 raise TypeError('max_db_resend_runtime not specified in config file')
             elif not max_db_resend_runtime.isdigit():
@@ -234,10 +234,10 @@ class ScheduleHandlerClass(Thread, Statistics):
         if self._duty_cycle_mode:
             self._pingThread = TOSPingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
         
-        if os.path.isfile('%s.parsed' % (self.getOptionValue('schedule_file'),)):
+        if os.path.isfile('%s.parsed' % (self._getOptionValue('schedule_file'),)):
             try:
                 # Try to load the parsed schedule
-                parsed_schedule_file = open('%s.parsed' % (self.getOptionValue('schedule_file'),), 'r')
+                parsed_schedule_file = open('%s.parsed' % (self._getOptionValue('schedule_file'),), 'r')
                 self._schedule = pickle.load(parsed_schedule_file)
                 parsed_schedule_file.close()
                 self._scheduleCreationTime = self._schedule.getCreationTime()
@@ -245,24 +245,18 @@ class ScheduleHandlerClass(Thread, Statistics):
                 self.exception(str(e))
         else:
             self._logger.info('there is no local schedule file available')
-        
-
-    def getOptionValue(self, key):
-        for entry in self._config:
-            entry_key = entry[0]
-            entry_value = entry[1]
-            if key == entry_key:
-                return entry_value
-        return None
+            
+            
+    def setSchedule(self, pluginname, schedule, merge):
+        self._logger.info('new schedule from %s received' % (pluginname,))
+        creationtime = int(time.time()*1000)
+        return self._setSchedule(pluginname, creationtime, schedule, merge)
     
     
     def connectionToGSNestablished(self):
         self._logger.debug('connection established')
         self._logger.debug('request schedule from gsn')
-        if self._schedule:
-            self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
-        else:
-            self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+        self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
         self._connectionEvent.set()
         
         
@@ -286,11 +280,11 @@ class ScheduleHandlerClass(Thread, Statistics):
             # (The scheduled time here could be in this session if schedules are following
             # each other in short intervals. In this case it could be possible, that
             # we have to wait for the next service window in case of an unexpected shutdown.)
-            min = int(self.getOptionValue('max_gsn_connect_wait_minutes'))
-            min += int(self.getOptionValue('max_gsn_get_schedule_wait_minutes'))
-            min += int(self.getOptionValue('max_next_schedule_wait_minutes'))
-            min += int(self.getOptionValue('hard_shutdown_offset_minutes'))
-            sec = int(self.getOptionValue('approximate_startup_seconds'))
+            min = int(self._getOptionValue('max_gsn_connect_wait_minutes'))
+            min += int(self._getOptionValue('max_gsn_get_schedule_wait_minutes'))
+            min += int(self._getOptionValue('max_next_schedule_wait_minutes'))
+            min += int(self._getOptionValue('hard_shutdown_offset_minutes'))
+            sec = int(self._getOptionValue('approximate_startup_seconds'))
             maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
             if maxruntime and maxruntime != -1:
                 sec += maxruntime
@@ -304,9 +298,9 @@ class ScheduleHandlerClass(Thread, Statistics):
                 self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
                 
         if self._schedule:
-            thread.start_new_thread(self.waitForGSN, (None,))
+            thread.start_new_thread(self._waitForGSN, (None,))
         else:
-            self.waitForGSN()
+            self._waitForGSN()
         
         lookback = True
         service_time = timedelta()
@@ -357,9 +351,9 @@ class ScheduleHandlerClass(Thread, Statistics):
                         if self._shutdownThread:
                             self._shutdownThread.stop()
                         if service_time <= self._max_next_schedule_wait_delta:
-                            self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self.getOptionValue('max_next_schedule_wait_minutes'),))
+                            self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self._getOptionValue('max_next_schedule_wait_minutes'),))
                         else:
-                            self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self.getOptionValue('max_next_schedule_wait_minutes')),))
+                            self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self._getOptionValue('max_next_schedule_wait_minutes')),))
                         self._shutdownThread = ShutdownThread(self)
                         self._shutdownThread.start()
                     
@@ -414,43 +408,6 @@ class ScheduleHandlerClass(Thread, Statistics):
             self._pingThread.join()
                 
         self._logger.info('died')
-        
-        
-    def waitForGSN(self, param=None):
-        # wait some time for GSN to connect
-        if not self._backlogMain.gsnpeer.isConnected():
-            self._logger.info('waiting for gsn to connect for a maximum of %s minutes' % (self.getOptionValue('max_gsn_connect_wait_minutes'),))
-            self._connectionEvent.wait((int(self.getOptionValue('max_gsn_connect_wait_minutes')) * 60))
-            self._connectionEvent.clear()
-            if self._scheduleHandlerStop:
-                return
-        
-        # if GSN is connected try to get a new schedule for a while
-        if self._backlogMain.gsnpeer.isConnected():
-            if not self._newScheduleEvent.isSet():
-                timeout = 0
-                self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self.getOptionValue('max_gsn_get_schedule_wait_minutes'),))
-                while timeout < (int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
-                    self._newScheduleEvent.wait(3)
-                    if self._scheduleHandlerStop:
-                        return
-                    if self._newScheduleEvent.isSet():
-                        self._newScheduleEvent.clear()
-                        break
-                    self._logger.debug('request schedule from gsn')
-                    if self._schedule:
-                        self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
-                    else:
-                        self._backlogMain.gsnpeer.processMsg(self.getMsgType(), int(time.time()*1000), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
-                    timeout += 3
-                
-                if timeout >= int(self.getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
-                    self._logger.warning('gsn has not answered on any schedule request')
-        else:
-            self._logger.warning('gsn has not connected')
-            self._resendFinished.set()
-            
-        self._waitForGSNFinished.set()
             
             
     def getStatus(self):
@@ -515,44 +472,11 @@ class ScheduleHandlerClass(Thread, Statistics):
         pktType = data[0]
         if pktType == GSN_TYPE_NO_SCHEDULE_AVAILABLE:
             self._logger.info('GSN has no schedule available')
-        elif pktType == GSN_TYPE_SCHEDULE_SAME:
-            self._logger.info('no new schedule from GSN')
-        elif pktType == GSN_TYPE_NEW_SCHEDULE:
+        elif pktType == GSN_TYPE_NO_NEW_SCHEDULE:
+            self._logger.info('no newer schedule from GSN')
+        elif pktType == GSN_TYPE_SCHEDULE:
             self._logger.info('new schedule from GSN received')
-            # Get the schedule creation time
-            creationtime = data[1]
-            if self._logger.isEnabledFor(logging.DEBUG):
-                self._logger.debug('creation time: ' + str(creationtime))
-            # Get the schedule
-            schedule = data[2]
-            try:
-                sc = ScheduleCron(creationtime, fake_tab=schedule)
-                self._scheduleLock.acquire()   
-                self._schedule = sc
-                self._scheduleLock.release()
-                    
-                self._logger.info('updated internal schedule with the one received from GSN.')
-               
-                # Write schedule to disk (the plaintext one for debugging and the parsed one for better performance)
-                schedule_file = open(self.getOptionValue('schedule_file'), 'w')
-                schedule_file.write(schedule)
-                schedule_file.close()
-            
-                compiled_schedule_file = open('%s.parsed' % (self.getOptionValue('schedule_file'),), 'w')
-                pickle.dump(self._schedule, compiled_schedule_file)
-                compiled_schedule_file.close()
-
-                self._scheduleCreationTime = creationtime
-                self._logger.info('updated %s and %s.parsed with the current schedule' % (schedule_file.name, schedule_file.name))
-            except Exception, e:
-                self.exception('received schedule can not be used: %s' % (e,))
-                if self._schedule:
-                    self._logger.info('using locally stored schedule file')
-                    
-            self._newSchedule = True
-            self._waitForNextJob.set()
-            if self._shutdownThread:
-                self._shutdownThread.stop()
+            self._setSchedule('GSN', data[1], data[2], False)
             
         self._newScheduleEvent.set()
             
@@ -669,6 +593,131 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._logger.error(msg)
         
         
+    def ackReceived(self, timestamp):
+        pass
+        
+        
+    def _setSchedule(self, origin, creationtime, schedule, merge):
+        # Get the schedule creation time
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug('creation time: ' + str(creationtime) + ' and origin: ' + origin)
+
+        oldschedule = self._schedule
+        try:
+            if merge and self._schedule:
+                sc = ScheduleCron(creationtime, fake_tab=self._mergeSchedule(origin, schedule, self._schedule.getScheduleList()))
+            else:
+                sc = ScheduleCron(creationtime, fake_tab=schedule)
+            self._scheduleLock.acquire()   
+            self._schedule = sc
+            self._scheduleLock.release()
+           
+            # Write schedule to disk (the plaintext one for debugging and the parsed one for better performance)
+            schedule_file = open(self._getOptionValue('schedule_file'), 'w')
+            schedule_file.write(schedule)
+            schedule_file.close()
+        
+            compiled_schedule_file = open('%s.parsed' % (self._getOptionValue('schedule_file'),), 'w')
+            pickle.dump(self._schedule, compiled_schedule_file)
+            compiled_schedule_file.close()
+
+            self._scheduleCreationTime = creationtime
+        except Exception, e:
+            self.error('received schedule can not be used: %s' % (e.__str__(),))
+            if oldschedule:
+                self._schedule = oldschedule
+                self._logger.warning('reusing previous schedule')
+            return False
+        else:
+            self._logger.info('updated internal schedule with the new one.')
+            if origin == 'GSN':
+                s = 'GSN'
+            else:
+                s = 'CoreStation (%s)' % (origin,)
+            self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_SCHEDULE, s, self._schedule.getScheduleString()], MESSAGE_PRIORITY, True)
+            self._backlogMain.newScheduleSet(origin, self._schedule.getScheduleString())
+            self._newSchedule = True
+            self._waitForNextJob.set()
+            if self._shutdownThread:
+                self._shutdownThread.stop()
+            return True
+        
+        
+    def _mergeSchedule(self, plugin, newSchedule, existingScheduleList):
+        # parse new schedule and check for correctness
+        sc = ScheduleCron(0, fake_tab=newSchedule)
+        
+        # check the new schedule for its change rights
+        for newsc in sc.getScheduleList():
+            if newsc[0] == SCHEDULE_TYPE_PLUGIN and newsc[1] != plugin:
+                raise TypeError('%s is not allowed to change the schedule for %s' % (plugin, newsc[1]))
+        
+        # create merged schedule
+        mergedSchedule = ''
+        for oldsc in existingScheduleList:
+            if oldsc[0] == SCHEDULE_TYPE_SCRIPT:
+                new = False
+                for newsc in sc.getScheduleList():
+                    if newsc[0] == SCHEDULE_TYPE_SCRIPT:
+                        if oldsc[1] == newsc[1]:
+                            new = True
+                            mergedSchedule += newsc[2] + '\n'
+                if not new:
+                    mergedSchedule += oldsc[2] + '\n'
+            elif oldsc[1] != plugin:
+                mergedSchedule += oldsc[2] + '\n'
+        
+        for newsc in sc.getScheduleList():
+            if newsc[0] == SCHEDULE_TYPE_PLUGIN:
+                mergedSchedule += newsc[2] + '\n'
+                
+        return mergedSchedule
+           
+        
+        
+    def _waitForGSN(self, param=None):
+        # wait some time for GSN to connect
+        if not self._backlogMain.gsnpeer.isConnected():
+            self._logger.info('waiting for gsn to connect for a maximum of %s minutes' % (self._getOptionValue('max_gsn_connect_wait_minutes'),))
+            self._connectionEvent.wait((int(self._getOptionValue('max_gsn_connect_wait_minutes')) * 60))
+            self._connectionEvent.clear()
+            if self._scheduleHandlerStop:
+                return
+        
+        # if GSN is connected try to get a new schedule for a while
+        if self._backlogMain.gsnpeer.isConnected():
+            if not self._newScheduleEvent.isSet():
+                timeout = 0
+                self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self._getOptionValue('max_gsn_get_schedule_wait_minutes'),))
+                while timeout < (int(self._getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
+                    self._newScheduleEvent.wait(30)
+                    if self._scheduleHandlerStop:
+                        return
+                    if self._newScheduleEvent.isSet():
+                        self._newScheduleEvent.clear()
+                        break
+                    self._logger.debug('request schedule from gsn')
+                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+                    timeout += 30
+                
+                if timeout >= int(self._getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
+                    self._logger.warning('gsn has not answered on any schedule request')
+        else:
+            self._logger.warning('gsn has not connected')
+            self._resendFinished.set()
+            
+        self._waitForGSNFinished.set()
+        
+
+    def _getOptionValue(self, key):
+        for entry in self._config:
+            entry_key = entry[0]
+            entry_value = entry[1]
+            if key == entry_key:
+                return entry_value
+        return None
+        
+        
     def _serviceTime(self):
         now = datetime.utcnow()
         start, end = self._getNextServiceWindowRange()
@@ -679,8 +728,8 @@ class ScheduleHandlerClass(Thread, Statistics):
     
     
     def _getNextServiceWindowRange(self):
-        wakeup_minutes = timedelta(minutes=int(self.getOptionValue('service_wakeup_minutes')))
-        hour, minute = self.getOptionValue('service_wakeup_schedule').split(':')
+        wakeup_minutes = timedelta(minutes=int(self._getOptionValue('service_wakeup_minutes')))
+        hour, minute = self._getOptionValue('service_wakeup_schedule').split(':')
         now = datetime.utcnow()
         service_time = datetime(now.year, now.month, now.day, int(hour), int(minute))
         if (service_time + wakeup_minutes) < now:
@@ -692,7 +741,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         
     def _scheduleNextDutyWakeup(self, time_delta, schedule_name):
         if self._duty_cycle_mode:
-            time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self.getOptionValue('approximate_startup_seconds'))
+            time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self._getOptionValue('approximate_startup_seconds'))
             if self.tosMsgSend(TOSTypes.CONTROL_CMD_NEXT_WAKEUP, time_to_wakeup):
                 self._logger.info('successfully scheduled the next duty wake-up for >%s< (that\'s in %d seconds)' % (schedule_name, time_to_wakeup))
             else:
@@ -741,7 +790,7 @@ class ShutdownThread(Thread):
             self._scheduleHandler._waitForGSNFinished.wait()
                 
         # wait for backlog to finish resend data
-        max_wait = int(self._scheduleHandler.getOptionValue('max_db_resend_runtime'))*60.0
+        max_wait = int(self._scheduleHandler._getOptionValue('max_db_resend_runtime'))*60.0
         if not self._scheduleHandler._resendFinished.isSet() and max_wait > self._scheduleHandler._backlogMain.getUptime():
             self._logger.info('waiting for database resend process to finish for a maximum of %f seconds' % (max_wait-self._scheduleHandler._backlogMain.getUptime(),))
             self._scheduleHandler._resendFinished.wait(max_wait-self._scheduleHandler._backlogMain.getUptime())
@@ -761,8 +810,8 @@ class ShutdownThread(Thread):
 
         # Synchronize Service Wakeup Time
         time_delta = self._scheduleHandler._getNextServiceWindowRange()[0] - datetime.utcnow()
-        time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self._scheduleHandler.getOptionValue('approximate_startup_seconds'))
-        if time_to_service < 0-int(self._scheduleHandler.getOptionValue('approximate_startup_seconds')):
+        time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self._scheduleHandler._getOptionValue('approximate_startup_seconds'))
+        if time_to_service < 0-int(self._scheduleHandler._getOptionValue('approximate_startup_seconds')):
             time_to_service += 86400
         if not self._scheduleHandler._service_wakeup_disabled:
             self._logger.info('next service window is in %f minutes' % (time_to_service/60.0,))
@@ -781,7 +830,7 @@ class ShutdownThread(Thread):
 
         # Schedule next duty wake-up
         if self._scheduleHandler._schedule:
-            td = timedelta(seconds=int(self._scheduleHandler.getOptionValue('approximate_startup_seconds')))
+            td = timedelta(seconds=int(self._scheduleHandler._getOptionValue('approximate_startup_seconds')))
             nextschedule, error = self._scheduleHandler._schedule.getNextSchedules(datetime.utcnow() + td)
             for e in error:
                 self.error('error while parsing the schedule file: %s' % (e,))
@@ -802,7 +851,7 @@ class ShutdownThread(Thread):
         # point of no return!   
         # Tell TinyNode to shut us down in X seconds
         self._scheduleHandler._pingThread.stop()
-        shutdown_offset = int(self._scheduleHandler.getOptionValue('hard_shutdown_offset_minutes'))*60
+        shutdown_offset = int(self._scheduleHandler._getOptionValue('hard_shutdown_offset_minutes'))*60
         if self._scheduleHandler.tosMsgSend(TOSTypes.CONTROL_CMD_SHUTDOWN, shutdown_offset):
             self._logger.info('we\'re going to do a hard shut down in %s seconds ...' % (shutdown_offset,))
         else:
@@ -860,13 +909,23 @@ class ScheduleCron(CronTab):
     
     def __init__(self, creation_time, user=None, fake_tab=None):
         CronTab.__init__(self, user, fake_tab)
+        self._schedule_string = fake_tab
         self._creation_time = creation_time
+        self._schedules = []
         for schedule in self.crons:
-            self._scheduleSanityCheck(schedule)
+            self._schedules.append(self._scheduleSanityCheck(schedule))
             
             
     def getCreationTime(self):
         return self._creation_time
+            
+            
+    def getScheduleString(self):
+        return self._schedule_string
+    
+    
+    def getScheduleList(self):
+        return self._schedules
         
     
     def getNextSchedules(self, date_time, look_backward=False):
@@ -1013,6 +1072,7 @@ class ScheduleCron(CronTab):
     
     
     def _scheduleSanityCheck(self, schedule):
+        ret = [None]*3
         try:
             self._scheduleSanityCheckHelper(schedule.minute(), 0, 59)
             self._scheduleSanityCheckHelper(schedule.hour(), 0, 23)
@@ -1021,6 +1081,33 @@ class ScheduleCron(CronTab):
             self._scheduleSanityCheckHelper(schedule.dom(), 1, 31)
         except ValueError, e:
             raise ValueError(str(e) + ' in >' + str(schedule) + '<')
+        
+        commandstring = str(schedule.command).strip()
+        
+        backwardmin, commandstring = self._getSpecialParameter(commandstring, BACKWARD_TOLERANCE_NAME)
+        runtimemax, commandstring = self._getSpecialParameter(commandstring, MAX_RUNTIME_NAME)
+        
+        splited = commandstring.split(None, 1)
+        type = splited[0]
+        try:
+            commandstring = splited[1].strip()
+        except IndexError:
+            raise ValueError('PLUGIN or SCRIPT definition is missing in the current schedule >%s<' % (schedule,))
+        
+        pluginclassname = ''
+        if type.lower() == SCHEDULE_TYPE_PLUGIN:
+            splited = commandstring.split(None, 1)
+            pluginclassname = splited[0].strip()
+            ret[0] = SCHEDULE_TYPE_PLUGIN
+            ret[1] = pluginclassname
+        elif type.lower() == SCHEDULE_TYPE_SCRIPT:
+            ret[0] = SCHEDULE_TYPE_SCRIPT
+            ret[1] = commandstring
+        else:
+            raise ValueError('PLUGIN or SCRIPT definition is missing in the current schedule >%s<' % (schedule,))
+        ret[2] = schedule.render().encode('utf8')
+        
+        return ret
         
         
     def _scheduleSanityCheckHelper(self, cronslice, min, max):

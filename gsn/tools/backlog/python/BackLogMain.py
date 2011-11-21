@@ -587,6 +587,10 @@ class BackLogMainClass(Thread, Statistics):
             self.incrementExceptionCounter()
             self._logger.exception(e)
         self.backlog.pauseResending()
+        
+        
+    def newScheduleSet(self, origin, schedule):
+        [plugin.scheduleEvent(origin, schedule) for plugin in self.plugins.values()]
     
     
     def wlanNeeded(self):

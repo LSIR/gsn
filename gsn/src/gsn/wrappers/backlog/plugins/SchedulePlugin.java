@@ -2,6 +2,7 @@ package gsn.wrappers.backlog.plugins;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 
@@ -34,9 +35,9 @@ import gsn.beans.DataField;
  */
 public class SchedulePlugin extends AbstractPlugin {
 	
-	private static final byte TYPE_NO_SCHEDULE_AVAILABLE = 0;
-	private static final byte TYPE_SCHEDULE_SAME = 1;
-	private static final byte TYPE_NEW_SCHEDULE = 2;
+	private static final byte TYPE_NO_SCHEDULE = 0;
+	private static final byte TYPE_NO_NEW_SCHEDULE = 1;
+	private static final byte TYPE_SCHEDULE = 2;
 	private static final byte GSN_TYPE_GET_SCHEDULE = 3;
 
 	private final transient Logger logger = Logger.getLogger( SchedulePlugin.class );
@@ -44,6 +45,7 @@ public class SchedulePlugin extends AbstractPlugin {
 	private DataField[] dataField = {new DataField("DEVICE_ID", "INTEGER"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("TRANSMISSION_TIME", "BIGINT"),
+			new DataField("GENERATED_BY", "VARCHAR(256)"),
 			new DataField("SCHEDULE", "binary")};
 
 	@Override
@@ -67,68 +69,86 @@ public class SchedulePlugin extends AbstractPlugin {
 			Connection conn = null;
 			ResultSet rs = null;
 			try {
+				Serializable [] reply;
 				// get the newest schedule from the SQL database
 				conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
 				StringBuilder query = new StringBuilder();
-				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" order by timed desc limit 1");
+				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" and transmission_time is null order by timed desc limit 1");
 				rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
 				
+				byte[] schedule = null;
+				long timestamp_gsn = 0;
 				if (rs.next()) {
-					// get the creation time of the newest schedule
-					long creationtime = rs.getLong("generation_time");
-					long transmissiontime = rs.getLong("transmission_time");
-					Integer id = rs.getInt("device_id");
-					byte[] schedule = rs.getBytes("schedule");
-					Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
-
-					if (logger.isDebugEnabled())
-						logger.debug("creation time: " + creationtime);
-					if (timestamp ==  creationtime) {
-						// if the schedule on the deployment has the same creation
-						// time as the newest one in the database, we do not have
-						// to resend it
-						if (logger.isDebugEnabled())
-							logger.debug("no new schedule available");
-						Serializable [] pkt = {TYPE_SCHEDULE_SAME};
-						try {
-							sendRemote(System.currentTimeMillis(), pkt, super.priority);
-						} catch (IOException e) {
-							logger.warn(e.getMessage());
-						}
-					}
-					else {
-						// send the new schedule to the deployment
-						if (logger.isDebugEnabled())
-							logger.debug("send new schedule (" + new String(schedule) + ")");
+					query = new StringBuilder();
+					schedule = rs.getBytes("schedule");
+					timestamp_gsn = rs.getLong("generation_time");
+					query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" and generation_time = ").append(rs.getLong("generation_time")).append(" and transmission_time is not null order by timed desc limit 1");
+					ResultSet result = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+					if (result.next())
+						schedule = null;
+				}
+				
+				if (schedule == null) {
+					query = new StringBuilder();
+					query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" order by timed desc limit 1");
+					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+					
+					if (rs.next()) {
+						// get the creation time of the newest schedule
+						timestamp_gsn = rs.getLong("generation_time");
+						schedule = rs.getBytes("schedule");
+						Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
 	
-						Serializable [] pkt = {TYPE_NEW_SCHEDULE, creationtime, schedule};
-						try {
-							sendRemote(System.currentTimeMillis(), pkt, super.priority);
-							
-							if (transmissiontime == 0) {
-								long time = System.currentTimeMillis();
-								Serializable[] out = {id, creationtime, time, schedule};
-								dataProcessed(time, out);
-							}
-						} catch (IOException e) {
-							logger.warn(e.getMessage());
+						if (timestamp_gsn <= timestamp) {
+							// if the schedule on the deployment has the same or a newer
+							// creation time as the newest one in the database, we do not have
+							// to resend anything
+							if (logger.isDebugEnabled())
+								logger.debug("no newer schedule available");
+							reply = new Serializable [] {TYPE_NO_NEW_SCHEDULE};
 						}
-					}
-				} else {
-					try {
+						else {
+							// send the new schedule to the deployment
+							if (logger.isDebugEnabled())
+								logger.debug("send new schedule (" + new String(schedule) + ")");
+	
+							reply = new Serializable [] {TYPE_SCHEDULE, timestamp_gsn, schedule};
+						}
+					} else {
 						// we do not have any schedule available in the database
-						Serializable [] pkt = {TYPE_NO_SCHEDULE_AVAILABLE};
-						sendRemote(System.currentTimeMillis(), pkt, super.priority);
+						reply = new Serializable []  {TYPE_NO_SCHEDULE};
 						logger.warn("schedule request received but no schedule available in database");
-					} catch (IOException e) {
-						logger.warn(e.getMessage());
 					}
+				}
+				else {
+					// a manually uploaded schedule has not yet been transmitted -> transmit it to the CoreStation
+					if (logger.isDebugEnabled())
+						logger.debug("send manually uploaded schedule (" + new String(schedule) + ")");
+					reply = new Serializable [] {TYPE_SCHEDULE, timestamp_gsn, schedule};
+				}
+				
+				try {
+					sendRemote(System.currentTimeMillis(), reply, super.priority);
+				} catch (IOException e) {
+					logger.warn(e.getMessage());
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			} finally {
 				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
 				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
+			}
+			return true;
+		} else if (((Byte)data[0]) == TYPE_SCHEDULE) {
+			long time = System.currentTimeMillis();
+			try {
+				if(dataProcessed(time, new Serializable[] {deviceId, timestamp, time, (String)data[1], ((String)data[2]).getBytes("UTF-8")}))
+					ackMessage(timestamp, super.priority);
+				else
+					return false;
+			} catch (UnsupportedEncodingException e) {
+				logger.error(e.getMessage(), e);
+				return false;
 			}
 			return true;
 		}
@@ -153,26 +173,15 @@ public class SchedulePlugin extends AbstractPlugin {
 					id = Integer.parseInt((String)paramValues[i]);
 				}
 			}
+
+			dataProcessed(time, new Serializable[] {id, time, null, "GSN", schedule});
+			logger.info("Received manually uploaded schedule.");
 			
-			Serializable [] pkt = {TYPE_NEW_SCHEDULE, time, schedule};
-			boolean sent = false;
 			// and try to send it to the deployment
 			try {
-				sent = sendRemote(System.currentTimeMillis(), pkt, super.priority);
+				sendRemote(System.currentTimeMillis(), new Serializable [] {TYPE_SCHEDULE, time, schedule}, super.priority);
 			} catch (IOException e) {
 				logger.warn(e.getMessage());
-			}
-			if (sent) {
-				Serializable[] data = {id, time, time, schedule};
-				dataProcessed(time, data);
-
-				logger.info("Received schedule which has been directly transmitted");
-			}
-			else {
-				Serializable[] data = {id, time, null, schedule};
-				dataProcessed(time, data);
-
-				logger.info("Received schedule and will transmit it the next time it is requested.");
 			}
 
 			return true;
