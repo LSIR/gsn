@@ -446,7 +446,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		else if (value instanceof Integer)
 			return (Integer) value;
 		else
-			throw new Exception("value can not be cast to Integer.");
+			throw new Exception("value (type=" + value.getClass().getName() + ", value=" + value + ") can not be cast to Integer.");
 	}
 	
 	
