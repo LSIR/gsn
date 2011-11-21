@@ -386,26 +386,31 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		
 		Serializable [] ret = new Serializable [data.length-dataoffset];
 		for (int i=dataoffset; i<data.length; i++) {
-			int type = datafields[i-dataoffset+datafieldoffset].getDataTypeID();
-			switch (type) {
-			case DataTypes.INTEGER:
-				ret[i-dataoffset] = toInteger(data[i]);
-				break;
-			case DataTypes.BIGINT:
-				ret[i-dataoffset] = toLong(data[i]);
-				break;
-			case DataTypes.SMALLINT:
-				ret[i-dataoffset] = toShort(data[i]);
-				break;
-			case DataTypes.TINYINT:
-				ret[i-dataoffset] = toShort(data[i]);
-				break;
-			case DataTypes.DOUBLE:
-				ret[i-dataoffset] = (Double)data[i];
-				break;
-			default:
-				ret[i-dataoffset] = data[i];
-				break;
+			try {
+				int type = datafields[i-dataoffset+datafieldoffset].getDataTypeID();
+				switch (type) {
+				case DataTypes.INTEGER:
+					ret[i-dataoffset] = toInteger(data[i]);
+					break;
+				case DataTypes.BIGINT:
+					ret[i-dataoffset] = toLong(data[i]);
+					break;
+				case DataTypes.SMALLINT:
+					ret[i-dataoffset] = toShort(data[i]);
+					break;
+				case DataTypes.TINYINT:
+					ret[i-dataoffset] = toShort(data[i]);
+					break;
+				case DataTypes.DOUBLE:
+					ret[i-dataoffset] = (Double)data[i];
+					break;
+				default:
+					ret[i-dataoffset] = data[i];
+					break;
+				}
+			}
+			catch (Exception e) {
+				throw new Exception("at index " + i + ": " + e.getMessage());
 			}
 		}
 		
