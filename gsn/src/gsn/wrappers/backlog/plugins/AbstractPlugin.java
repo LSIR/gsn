@@ -410,7 +410,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 				}
 			}
 			catch (Exception e) {
-				throw new Exception("at index " + i + ": " + e.getMessage());
+				throw new Exception("field " + datafields[i-dataoffset+datafieldoffset].getName() + ": " + e.getMessage());
 			}
 		}
 		
