@@ -256,7 +256,10 @@ class ScheduleHandlerClass(Thread, Statistics):
     def connectionToGSNestablished(self):
         self._logger.debug('connection established')
         self._logger.debug('request schedule from gsn')
-        self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+        if self._schedule:
+            self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+        else:
+            self._backlogMain.gsnpeer.processMsg(self.getMsgType(), 0, [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
         self._connectionEvent.set()
         
         
@@ -697,7 +700,10 @@ class ScheduleHandlerClass(Thread, Statistics):
                         self._newScheduleEvent.clear()
                         break
                     self._logger.debug('request schedule from gsn')
-                    self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+                    if self._schedule:
+                        self._backlogMain.gsnpeer.processMsg(self.getMsgType(), self._schedule.getCreationTime(), [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
+                    else:
+                        self._backlogMain.gsnpeer.processMsg(self.getMsgType(), 0, [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
                     timeout += 30
                 
                 if timeout >= int(self._getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
