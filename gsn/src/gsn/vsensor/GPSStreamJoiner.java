@@ -94,7 +94,7 @@ public class GPSStreamJoiner extends BridgeVirtualSensorPermasense {
 		try {
 		  
 		  // TODO: Check that elements exist!
-		  int dev_id = (Integer)data.getData("DEVIDE_ID");
+		  int dev_id = (Integer)data.getData("DEVICE_ID");
 		  long m_id = (Long)data.getData("MEASUREMENT_ID");
 		  
 		  ArrayList<StreamElement> checkBuffer;
@@ -114,7 +114,7 @@ public class GPSStreamJoiner extends BridgeVirtualSensorPermasense {
       
       // Check buffer for the appropriate measurement and device id
       for (int i = 0; i < checkBuffer.size(); i++) {
-        if ((Integer)checkBuffer.get(i).getData("DEVIDE_ID") == dev_id && (Long)checkBuffer.get(i).getData("MEASUREMENT_ID") == m_id) {
+        if ((Integer)checkBuffer.get(i).getData("DEVICE_ID") == dev_id && (Long)checkBuffer.get(i).getData("MEASUREMENT_ID") == m_id) {
           // Remove entry from the buffer and push data to db
           StreamElement bufData = checkBuffer.get(i);
           checkBuffer.remove(i);
