@@ -76,6 +76,7 @@ class STEVALPluginClass(AbstractPluginClass):
         
         self.steval._openDevice()
         self._data = self.steval._startDataAcquisition(self._duration)
+        self.steval._closeDevice()
         
         self.info("STEVAL: Data read done -- data points per axes: " + str(len(self._data[0])))
         
