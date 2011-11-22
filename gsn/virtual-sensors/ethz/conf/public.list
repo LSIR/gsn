@@ -290,6 +290,7 @@ OpenSense_STEVAL_Static__muxed__mapped.xml
 OpenSense_STEVAL_Static__mapped.xml
 OpenSense_STEVAL_Dynamic_Proc__muxed__mapped.xml
 OpenSense_STEVAL_Dynamic_Proc__mapped.xml
+OpenSense_OZ47_Init_Calibration_GPS.xml
 Statistics_GSN.xml
 Statistics_MySQL.xml
 Statistics_Sensorviz__mapped.xml

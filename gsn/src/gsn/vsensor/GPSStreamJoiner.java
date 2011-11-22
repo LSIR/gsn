@@ -90,7 +90,6 @@ public class GPSStreamJoiner extends BridgeVirtualSensorPermasense {
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		try {
 		  
-		  // TODO: Check that elements exist!
 		  int dev_id = (Integer)data.getData("DEVICE_ID");
 		  long m_id = (Long)data.getData("MEASUREMENT_ID");
 		  
@@ -124,6 +123,11 @@ public class GPSStreamJoiner extends BridgeVirtualSensorPermasense {
             data = new StreamElement(data, accGpsDataField, new Serializable[] {bufData.getData("DURATION"), bufData.getData("TIME_OF_DATA"), data.getData("UTC_POS_TIME"), data.getData("LATITUDE"), data.getData("LONGITUDE"), data.getData("QUALITY"), data.getData("NR_SATELLITES"), data.getData("HDOP"), data.getData("GEOID_HEIGHT")});
           else if (inputStreamName.equalsIgnoreCase("SENSOR") && joinType == ACC_WITH_GPS_NAMING)
             data = new StreamElement(data, accGpsDataField, new Serializable[] {data.getData("DURATION"), data.getData("TIME_OF_DATA"), bufData.getData("UTC_POS_TIME"), bufData.getData("LATITUDE"), bufData.getData("LONGITUDE"), bufData.getData("QUALITY"), bufData.getData("NR_SATELLITES"), bufData.getData("HDOP"), bufData.getData("GEOID_HEIGHT")});
+          
+          else if (inputStreamName.equalsIgnoreCase("GPS") && joinType == CO_WITH_GPS_NAMING)
+            data = new StreamElement(data, coGpsDataField, new Serializable[] {bufData.getData("SENSOR_CURRENT"), bufData.getData("SENSOR_PPM"), bufData.getData("AMBIENT_TEMP"), bufData.getData("SENSITIVITY_COMP"), data.getData("UTC_POS_TIME"), data.getData("LATITUDE"), data.getData("LONGITUDE"), data.getData("QUALITY"), data.getData("NR_SATELLITES"), data.getData("HDOP"), data.getData("GEOID_HEIGHT")});
+          else if (inputStreamName.equalsIgnoreCase("SENSOR") && joinType == CO_WITH_GPS_NAMING)
+            data = new StreamElement(data, coGpsDataField, new Serializable[] {data.getData("SENSOR_CURRENT"), data.getData("SENSOR_PPM"), data.getData("AMBIENT_TEMP"), data.getData("SENSITIVITY_COMP"), bufData.getData("UTC_POS_TIME"), bufData.getData("LATITUDE"), bufData.getData("LONGITUDE"), bufData.getData("QUALITY"), bufData.getData("NR_SATELLITES"), bufData.getData("HDOP"), bufData.getData("GEOID_HEIGHT")});
           else {
             logger.error("No match for inputStreamName " + inputStreamName + " and joinType " + joinType);
           }
