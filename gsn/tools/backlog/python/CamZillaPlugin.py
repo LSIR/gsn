@@ -88,8 +88,8 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._plugStop = False
         self._power = False
         self._calibrated = False
-        self._x = None
-        self._y = None
+        self._x = 0
+        self._y = 0
         self._parkX = 0
         self._parkY = 0
         self._autofocus = None
@@ -109,8 +109,8 @@ class CamZillaPluginClass(AbstractPluginClass):
             self.warning('no park_position value specified')
         else:
             s = value.strip().split('/')
-            self._parkX = float(s[0])
-            self._parkY = float(s[1])
+            self._x = self._parkX = float(s[0])
+            self._y = self._parkY = float(s[1])
             
         self.info('encoder pulses per degree: %f' % (self._pulsesPerDegree,))
         self.info('using device %s' % (device,))
@@ -203,71 +203,72 @@ class CamZillaPluginClass(AbstractPluginClass):
                         self.error(e.__str__())
                         
                     now = time.time()
-                        
-                    parsedTask = self._parseTask(task[1])
                     
-                    self.info('executing panorama picture task: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
-                    
-                    if self._power:
-                        pic = 1
-                        try:
-                            config, bracketing = self._configureCamera(parsedTask[7])
-                            y = parsedTask[1]
-                            while y < parsedTask[1]+(parsedTask[3]*parsedTask[5]) and not self._plugStop:
-                                ret = self._position(y=y)
-                                yLimit = ret[3]
-                                x = parsedTask[0]
-                                
-                                while x < parsedTask[0]+(parsedTask[2]*parsedTask[4]) and not self._plugStop:
-                                    ret = self._position(x=x)
-                                    xLimit = ret[3]
-                                    if self._plugStop:
-                                        break
-                                    if parsedTask[6] > 0:
-                                        self._delay.wait(parsedTask[6])
-
-                                    if bracketing:
-                                        self.info('taking pictures number %d-%d/%d at position (%f,%f)' % (1+(pic-1)*3,3+(pic-1)*3,parsedTask[2]*parsedTask[3]*3,self._x,self._y))
-                                    else:
-                                        self.info('taking picture number %d/%d at position (%f,%f)' % (pic,parsedTask[2]*parsedTask[3],self._x,self._y))
-                                    self._takePicture()
-                                    if self._plugStop:
-                                        break
-                                    
-                                    s = 'successfully'
-                                    if (xLimit is True and yLimit is True):
-                                        s += ' (reached x and y limit)'
-                                    elif (xLimit is True and yLimit is False):
-                                        s += ' (reached x limit)'
-                                    elif (xLimit is False and yLimit is True):
-                                        s += ' (reached y limit)'
-                                        
-                                    if bracketing:
-                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy_%s.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
-                                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
-                                    else:
-                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), '%C'))
-                                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
-                                    pic += 1
-
-                                    x += parsedTask[4]
-                                    
-                                y += parsedTask[5]
-                        except Exception, e:
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not finish task successfully (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
-                            self.error(e.__str__())
-                        else:
-                            self.info('all pictures taken successfully')
-                        
-                            if not self._plugStop:
-                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
-                                self.info('panorama picture task finished successfully')
-                        
-                        if self._powerSaveMode and not self._plugStop:
-                            self._parkRobot()
-                            self._shutdownRobotAndCam()
+                    try:
+                        parsedTask = self._parseTask(task[1])
+                    except Exception, e:
+                        self.error(e.__str__())
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not execute task: %s' % (e.__str__(),)])
                     else:
-                        self.error('robot is not powered -> can not execute command')
+                        self.info('executing panorama picture task: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
+                        
+                        if self._power:
+                            pic = 1
+                            try:
+                                config, bracketing = self._configureCamera(parsedTask[7])
+                                y = parsedTask[1]
+                                while y < parsedTask[1]+(parsedTask[3]*parsedTask[5]) and not self._plugStop:
+                                    ret = self._position(y=y)
+                                    yLimit = ret[3]
+                                    x = parsedTask[0]
+                                    
+                                    while x < parsedTask[0]+(parsedTask[2]*parsedTask[4]) and not self._plugStop:
+                                        ret = self._position(x=x)
+                                        xLimit = ret[3]
+                                        if self._plugStop:
+                                            break
+                                        if parsedTask[6] > 0:
+                                            self._delay.wait(parsedTask[6])
+    
+                                        if bracketing:
+                                            self.info('taking pictures number %d-%d/%d at position (%f,%f)' % (1+(pic-1)*3,3+(pic-1)*3,parsedTask[2]*parsedTask[3]*3,self._x,self._y))
+                                        else:
+                                            self.info('taking picture number %d/%d at position (%f,%f)' % (pic,parsedTask[2]*parsedTask[3],self._x,self._y))
+                                        self._takePicture()
+                                        if self._plugStop:
+                                            break
+                                        
+                                        s = 'successfully'
+                                        if (xLimit is True and yLimit is True):
+                                            s += ' (reached x and y limit)'
+                                        elif (xLimit is True and yLimit is False):
+                                            s += ' (reached x limit)'
+                                        elif (xLimit is False and yLimit is True):
+                                            s += ' (reached y limit)'
+                                            
+                                        if bracketing:
+                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy_%s.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
+                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
+                                        else:
+                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), '%C'))
+                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
+                                        pic += 1
+    
+                                        x += parsedTask[4]
+                                        
+                                    y += parsedTask[5]
+                            except Exception, e:
+                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not finish task successfully (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
+                                self.error(e.__str__())
+                            else:
+                                self.info('all pictures taken successfully')
+                            
+                                if not self._plugStop:
+                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
+                                    self.info('panorama picture task finished successfully')
+                        else:
+                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'CamZilla is not powered -> turn power on first'])
+                            self.error('CamZilla is not powered -> turn power on first')
                 elif task[0] == PICTURE_TASK:
                     self.info('picture now task received -> taking picture(s) in current robot position (x=%f,y=%f)' % (self._x, self._y))
     
@@ -307,10 +308,6 @@ class CamZillaPluginClass(AbstractPluginClass):
                                 else:
                                     self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'finished successfully', self._x, self._y] + [None]*7 + [config])
                                     self.info('picture now task finished successfully')
-                        
-                    if self._powerSaveMode and not self._plugStop:
-                        self._parkRobot()
-                        self._shutdownRobotAndCam()
                 elif task[0] == POSITIONING_TASK:
                     self.info('positioning task received (x=%f,y=%f)' % (task[1], task[2]))
                     if self._power:
@@ -331,7 +328,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                             self.info('positioning task %s' % (s,))
                     else:
                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', 'CamZilla is not powered -> turn power on first', self._x, self._y] + [None]*8)
-                        self.error('CamZilla has no power -> turn power on first')
+                        self.error('CamZilla is not powered -> turn power on first')
                 elif task[0] == MODE_TASK:
                     if self._power:
                         if task[1] == 0:
@@ -347,11 +344,15 @@ class CamZillaPluginClass(AbstractPluginClass):
                             self.error('unknown mode task received from GSN')
                     else:
                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['mode', 'CamZilla is not powered -> turn power on first', self._x, self._y] + [None]*8)
-                        self.error('mode task received from GSN but robot not powered -> do nothing')
+                        self.error('CamZilla is not powered -> turn power on first')
                 elif task[0] == CALIBRATION_TASK:
                     if self._power:
                         self.info('calibration task received from GSN -> calibrate robot')
                     self._calibrateRobot()
+                        
+                if self._powerSaveMode and self._taskqueue.empty() and not self._plugStop:
+                    self._parkRobot()
+                    self._shutdownRobotAndCam()
                         
             except Exception, e:
                 self.exception(str(e))
