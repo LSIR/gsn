@@ -15,7 +15,11 @@ echo "uploading $*"
 
 echo ""
 echo "to permasense-etzg-bs01:"
-scp $* root@permasense-etzg-bs01:/media/card/backlog/python2.6/
+scp $* root@permasense-etzg-bs01:$BACKLOG_PYTHON_DIR
+
+echo ""
+echo "to permasense-etz-bs03:"
+scp $* root@permasense-etz-bs03:$BACKLOG_PYTHON_DIR
 
 echo ""
 echo "to permasense-etzl-bs01:"
@@ -50,8 +54,12 @@ echo "to permasense-etz-cam01:"
 scp $* root@permasense-etz-cam01:$BACKLOG_PYTHON_DIR
 
 echo ""
-echo "to pc-5225:"
-scp $* tgsell@pc-5225:/home/tgsell/backlog/python/
+echo "to opensense-tram-bs02:"
+scp $* root@opensense-tram-bs02:$BACKLOG_PYTHON_DIR
+
+echo ""
+echo "to root@opensense-due-bs01:"
+scp $* root@opensense-caa-due-1.dyndns.biz:$BACKLOG_PYTHON_DIR
 
 echo ""
 echo "finished uploading"
