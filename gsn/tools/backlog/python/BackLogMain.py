@@ -13,7 +13,6 @@ import re
 import sys
 import signal
 import hashlib
-import ConfigParser
 import optparse
 import time
 import logging
@@ -22,6 +21,7 @@ import thread
 from threading import Thread, Lock, Event
 
 from SpecialAPI import Statistics, PowerControl
+from ConfigurationHandler import ConfigurationHandlerClass
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
@@ -38,7 +38,7 @@ else:
 DEFAULT_CONFIG_FILE = '/etc/backlog.cfg'
 DEFAULT_PLUGINS = [('BackLogStatusPlugin',1)]
 DEFAULT_OPTION_GSN_PORT = 9003
-DEFAULT_OPTION_BACKLOG_DB = '/tmp/backlog.db'
+DEFAULT_OPTION_BACKLOG_DB = '/media/card/backlog/backlog.db'
 DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
 DEFAULT_TOS_VERSION = 2
 DEFAULT_BACKLOG_DB_RESEND = 12
@@ -59,6 +59,7 @@ class BackLogMainClass(Thread, Statistics):
     _logger
     _uptimeId
     _last_clean_shutdown
+    confighandler
     jobsobserver
     schedulehandler
     powerControl
@@ -87,6 +88,9 @@ class BackLogMainClass(Thread, Statistics):
 
         self._logger = logging.getLogger(self.__class__.__name__)
         
+        self.confighandler = ConfigurationHandlerClass(self, config_file, DEFAULT_OPTION_BACKLOG_DB, DEFAULT_BACKLOG_DB_RESEND)
+        self._msgtypetoplugin = {self.confighandler.getMsgType(): [self.confighandler]}
+        
         self._backlogStopped = False
         self.shutdown = False
 
@@ -94,74 +98,14 @@ class BackLogMainClass(Thread, Statistics):
         self._exceptionCounterId = self.createCounter()
         self._errorCounterId = self.createCounter()
         self._stopEvent = Event()
-
-        # read config file for other options
-        self._config = ConfigParser.SafeConfigParser()
-        self._config.optionxform = str # case sensitive
-        self._config.read(config_file)
-
-        # set default options
-        gsn_port = DEFAULT_OPTION_GSN_PORT
-        backlog_db = DEFAULT_OPTION_BACKLOG_DB
         
-        self.device_id = None
-        tos_address = None
-        tos_version = None
-        dutycyclemode = None
-        backlog_db_resend_hr = None
-        folder_to_check_size = None
-        folder_min_free_mb = None
-        oldboard = None
-
-        try:
-            # readout options from config
-            for name, value in self._config.items('options'):
-                if name == 'gsn_port':
-                    gsn_port = int(value)
-                elif name == 'backlog_db':
-                    backlog_db = value
-                elif name == 'backlog_db_resend_hr':
-                    backlog_db_resend_hr = int(value)
-                elif name == 'device_id':
-                    self.device_id = int(value)
-                elif name == 'tos_source_addr':
-                    tos_address = value
-                elif name == 'tos_version':
-                    tos_version = int(value)
-                elif name == 'duty_cycle_mode':
-                    dutycyclemode = int(value)
-                elif name == 'folder_to_check_size':
-                    folder_to_check_size = value
-                elif name == 'folder_min_free_mb':
-                    folder_min_free_mb = int(value)
-                elif name == 'old_board':
-                    oldboard = int(value)
-                    
-        except ConfigParser.NoSectionError:
-            raise TypeError('no [options] section specified in %s' % (config_file,))
+        self.device_id = self.confighandler.getParsedConfig()['device_id']
                 
-        if self.device_id == None:
-            raise TypeError('device_id has to be specified in the configuration file')
-        if self.device_id >= 65535 or self.device_id < 0:
-            raise TypeError('device_id has to be in the range of 0 and 65534 (both inclusive)')
-                
-        if not folder_to_check_size:
-            raise TypeError('folder_to_check_size has to be specified in the configuration file')
-        else:
-            if os.path.isdir(folder_to_check_size):
-                self._folder_to_check_size = folder_to_check_size
-                self._logger.info('folder_to_check_size: %s' % (folder_to_check_size,))
-            else:
-                raise TypeError('folder_to_check_size has to be an existing directory')
-                
-        if not folder_min_free_mb:
-            raise TypeError('folder_min_free_mb has to be specified in the configuration file')
-        else:
-            if folder_min_free_mb > 0:
-                self._folder_min_free_mb = folder_min_free_mb
-                self._logger.info('folder_min_free_mb: %s' % (folder_min_free_mb,))
-            else:
-                raise TypeError('folder_min_free_mb has to be a positive number')
+        self._folder_to_check_size = self.confighandler.getParsedConfig()['folder_to_check_size']
+        self._logger.info('folder_to_check_size: %s' % (self._folder_to_check_size,))
+             
+        self._folder_min_free_mb = self.confighandler.getParsedConfig()['folder_min_free_mb']
+        self._logger.info('folder_min_free_mb: %s' % (self._folder_min_free_mb,))
             
         if not self.checkFolderUsage():
             raise Exception('Not enough space left on %s (%f<%f)' % (self._folder_to_check_size, self.getFolderAvailableMb(), self._folder_min_free_mb))
@@ -170,45 +114,25 @@ class BackLogMainClass(Thread, Statistics):
         
         # printout options
         self._logger.info('device_id: %s' % (self.device_id,))
-        self._logger.info('gsn_port: %s' % (gsn_port,))
-        self._logger.info('backlog_db: %s' % (backlog_db,))
+        self._logger.info('gsn_port: %s' % (self.confighandler.getParsedConfig()['gsn_port'],))
+        self._logger.info('backlog_db: %s' % (self.confighandler.getParsedConfig()['backlog_db'],))
         
         # create the backlog root directory if inexistent
-        if not os.path.exists(os.path.dirname(backlog_db)):
-            os.makedirs(os.path.dirname(backlog_db))
+        if not os.path.exists(os.path.dirname(self.confighandler.getParsedConfig()['backlog_db'])):
+            os.makedirs(os.path.dirname(self.confighandler.getParsedConfig()['backlog_db']))
         # and change working directory
-        os.chdir(os.path.dirname(backlog_db))
+        os.chdir(os.path.dirname(self.confighandler.getParsedConfig()['backlog_db']))
                 
-        if backlog_db_resend_hr == None:
-            backlog_db_resend_hr = DEFAULT_BACKLOG_DB_RESEND
-            self._logger.info('backlog_db_resend_hr is not set using default value: %s' % (backlog_db_resend_hr,))
-        else:
-            self._logger.info('backlog_db_resend_hr: %s' % (backlog_db_resend_hr,))
+        self._logger.info('backlog_db_resend_hr: %s' % (self.confighandler.getParsedConfig()['backlog_db_resend_hr'],))
         
-        if dutycyclemode is None:
-            raise TypeError('duty_cycle_mode has to be specified in the configuration file')
-        elif dutycyclemode != 1 and dutycyclemode != 0:
-            raise TypeError('duty_cycle_mode has to be set to 1 or 0 in config file')
-        elif dutycyclemode == 1:
+        self.duty_cycle_mode = self.confighandler.getParsedConfig()['duty_cycle_mode']
+        if self.duty_cycle_mode:
             self._logger.info('running in duty-cycle mode')
-            self.duty_cycle_mode = True
         else:
             self._logger.info('not running in duty-cycle mode')
-            self.duty_cycle_mode = False
         
-        if oldboard is None or oldboard == 0:
-            oldboard = False
-        elif oldboard == 1:
+        if self.confighandler.getParsedConfig()['oldboard'] == 1:
             self._logger.info('an old CoreBoard is used')
-            oldboard = True
-        else:
-            raise TypeError('old_board has to be set to 1 or 0 in config file')
-
-        # get schedule section from config files
-        try:
-            config_schedule = self._config.items('schedule')
-        except ConfigParser.NoSectionError:
-            raise TypeError('no [schedule] section specified in %s' % (config_file,))
         
         # check for proper shutdown
         self._last_clean_shutdown = None
@@ -218,26 +142,26 @@ class BackLogMainClass(Thread, Statistics):
             fd.close()
         
         self._tospeer = None
-        self._tos_address = tos_address
-        self._tos_version = tos_version
+        self._tos_address = self.confighandler.getParsedConfig()['tos_address']
+        self._tos_version = self.confighandler.getParsedConfig()['tos_version']
         self._tosPeerLock = Lock()
         self._tosListeners = {}
         
-        self.gsnpeer = GSNPeerClass(self, self.device_id, gsn_port)
+        self.gsnpeer = GSNPeerClass(self, self.device_id, self.confighandler.getParsedConfig()['gsn_port'])
         self._logger.info('loaded GSNPeerClass')
-        self.backlog = BackLogDBClass(self, backlog_db, backlog_db_resend_hr)
+        self.backlog = BackLogDBClass(self, self.confighandler.getParsedConfig()['backlog_db'], self.confighandler.getParsedConfig()['backlog_db_resend_hr'])
         self._logger.info('loaded BackLogDBClass')
             
-        self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, config_schedule)
-        self._msgtypetoplugin = {self.schedulehandler.getMsgType(): [self.schedulehandler]}
+        self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, self.confighandler.getParsedConfig()['config_schedule'])
+        self._msgtypetoplugin.update({self.schedulehandler.getMsgType(): [self.schedulehandler]})
         
         self.powerControl = None
-        self.powerControl = PowerControl(self, oldboard)
+        self.powerControl = PowerControl(self, self.confighandler.getParsedConfig()['oldboard'])
         self._logger.info('loaded PowerControl class')
 
         # get plugins section from config files
         try:
-            config_plugins = self._config.items('plugins')
+            config_plugins = self.confighandler.getParsedConfig()['config'].items('plugins')
         except ConfigParser.NoSectionError:
             self._logger.warning('no [plugins] section specified in %s' % (config_file,))
             config_plugins = DEFAULT_PLUGINS
@@ -251,7 +175,7 @@ class BackLogMainClass(Thread, Statistics):
                 module = __import__(module_name)
                 pluginclass = getattr(module, module_name + 'Class')
                 try:
-                    config_plugins_options = dict(self._config.items(module_name + '_options'))
+                    config_plugins_options = dict(self.confighandler.getParsedConfig()['config'].items(module_name + '_options'))
                 except ConfigParser.NoSectionError:
                     self._logger.warning('no [%s_options] section specified in %s' % (module_name, config_file,))
                     config_plugins_options = {}
@@ -287,6 +211,7 @@ class BackLogMainClass(Thread, Statistics):
         if self._tospeer and not self._tospeer.isAlive():
             self._tospeer.start()
         self.schedulehandler.start()
+        self.confighandler.start()
 
         for plugin_name, plugin in self.plugins.items():
             self._logger.info('starting %s' % (plugin_name,))
@@ -317,6 +242,7 @@ class BackLogMainClass(Thread, Statistics):
 
     def stop(self):
         self._backlogStopped = True
+        self.confighandler.stop()
         if self.powerControl:
             self.powerControl.stop()
         self.schedulehandler.stop()
@@ -455,7 +381,7 @@ class BackLogMainClass(Thread, Statistics):
                 module = __import__(pluginclassname)
                 pluginclass = getattr(module, '%sClass' % (pluginclassname,))
                 try:
-                    config_plugins_options = dict(self._config.items('%s_options' % (pluginclassname,)))
+                    config_plugins_options = dict(self.confighandler.getParsedConfig()['config'].items('%s_options' % (pluginclassname,)))
                 except ConfigParser.NoSectionError:
                     self._logger.warning('no [%s_options] section specified in configuration file' % (pluginclassname,))
                     config_plugins_options = {}
@@ -703,6 +629,7 @@ class BackLogMainClass(Thread, Statistics):
                 self._logger.exception(e)
         
         return num_started
+    
 
 def main():
     parser = optparse.OptionParser('usage: %prog [options]')
@@ -712,42 +639,53 @@ def main():
     
     (options, args) = parser.parse_args()
     
-        # config file?
+    # config file?
     if not os.path.isfile(options.config_file):
         print 'config file (%s) not found' % (options.config_file,)
         sys.exit(1)
-
+    config_file = os.path.abspath(options.config_file)
+    
     # read config file for logging options
     try:
-        logging.config.fileConfig(options.config_file)
+        logging.config.fileConfig(config_file)
         logging.logProcesses = 0
     except ConfigParser.NoSectionError, e:
         print e.__str__()
         
     logger = logging.getLogger('BackLogMain.main')
+
+    loop = True
+    while loop:
+            
+        backlog = None
+        try:
+            backlog = BackLogMainClass(config_file)
+            backlog.start()
+            signal.pause()
+        except KeyboardInterrupt:
+            logger.warning('KeyboardInterrupt')
+            if backlog and backlog.isAlive():
+                backlog.stop()
+                backlog.join()
+        except Exception, e:
+            logger.error(e)
+            if backlog and backlog.isAlive():
+                backlog.stop()
+            logging.shutdown()
+            sys.exit(1)
         
-    backlog = None
-    try:
-        backlog = BackLogMainClass(options.config_file)
-        backlog.start()
-        signal.pause()
-    except KeyboardInterrupt:
-        logger.warning('KeyboardInterrupt')
-        if backlog and backlog.isAlive():
-            backlog.stop()
-            backlog.join()
-    except Exception, e:
-        logger.error(e)
-        if backlog and backlog.isAlive():
-            backlog.stop()
+        if backlog:
+            loop = backlog.confighandler.restart()
+            if loop:
+                logger.warning('restarting BackLog now')
+        else:
+            loop = False
+            
         logging.shutdown()
-        sys.exit(1)
         
-    logging.shutdown()
-    
-    fd = open(SHUTDOWN_CHECK_FILE, 'w')
-    fd.write(str(long(time.time()*1000)))
-    fd.close()
+        fd = open(SHUTDOWN_CHECK_FILE, 'w')
+        fd.write(str(long(time.time()*1000)))
+        fd.close()
     
     if backlog and  backlog.shutdown:
         print 'shutdown now'

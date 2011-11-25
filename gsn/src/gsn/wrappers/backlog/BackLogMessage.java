@@ -103,6 +103,11 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.SchedulePlugin SchedulePlugin}. */
 	public static final byte SCHEDULE_MESSAGE_TYPE = 50;
 
+	/** The Configuration message type. This message type is used to
+     *  send/receive Configuration data.
+	 *  {@link gsn.wrappers.backlog.plugins.BackLogConfigPlugin BackLogConfigPlugin}. */
+	public static final byte CONFIG_MESSAGE_TYPE = 51;
+
 	/** The GPS message type. This message type is used to
      *  send/receive GPS data.
 	 *  {@link gsn.wrappers.backlog.plugins.GPSPlugin GPSPlugin}. */

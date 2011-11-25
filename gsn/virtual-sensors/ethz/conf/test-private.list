@@ -1,3 +1,4 @@
+ETZ_BackLogConfig.xml
 ETZ_BackLogStatus_Static.xml
 ETZ_BackLogStatus_Revision.xml
 ETZ_BackLogStatus_Dynamic.xml
@@ -40,6 +41,7 @@ ETZ_Statistics.xml
 ETZ_SyslogNg.xml
 ETZ_Topology.xml
 ETZ_VaisalaWXT520.xml
+OSTest_BackLogConfig.xml
 OSTest_BackLogStatus_Static.xml
 OSTest_BackLogStatus_Revision.xml
 OSTest_BackLogStatus_Dynamic.xml

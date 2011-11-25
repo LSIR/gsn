@@ -1,3 +1,4 @@
+ETZ_BackLogConfig__mapped.xml
 ETZ_BackLogStatus_Static__mapped.xml
 ETZ_BackLogStatus_Revision__mapped.xml
 ETZ_BackLogStatus_Dynamic__mapped.xml
@@ -75,6 +76,7 @@ ETZ_SyslogNg__conv.xml
 ETZ_Topology__public.xml
 ETZ_VaisalaWXT520__mapped.xml
 ETZ_VaisalaWXT520__muxed__mapped.xml
+OSTest_BackLogConfig__mapped.xml
 OSTest_BackLogStatus_Static__mapped.xml
 OSTest_BackLogStatus_Revision__mapped.xml
 OSTest_BackLogStatus_Dynamic__mapped.xml

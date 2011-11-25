@@ -31,9 +31,9 @@ import thread
 from datetime import datetime, timedelta
 from threading import Event, Lock, Thread
 
-import BackLogMessage
 import tos
 import TOSTypes
+from BackLogMessage import SCHEDULE_MESSAGE_TYPE
 from crontab import CronTab
 from SpecialAPI import Statistics
 
@@ -58,6 +58,10 @@ SCHEDULE_TYPE_SCRIPT = 'script'
 BACKWARD_TOLERANCE_NAME = 'backward_tolerance_minutes'
 MAX_RUNTIME_NAME = 'max_runtime_minutes'
 ############################################
+
+class Callable:
+    def __init__(self, anycallable):
+        self.__call__ = anycallable
 
 
 class ScheduleHandlerClass(Thread, Statistics):
@@ -120,81 +124,28 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._backlogMain = parent
         self._duty_cycle_mode = dutycyclemode
         self._config = options
-        
-        max_gsn_connect_wait_minutes = self._getOptionValue('max_gsn_connect_wait_minutes')
-        if max_gsn_connect_wait_minutes is None:
-            raise TypeError('max_gsn_connect_wait_minutes not specified in config file')
-        elif not max_gsn_connect_wait_minutes.isdigit():
-            raise TypeError('max_gsn_connect_wait_minutes has to be an integer')
-        self._logger.info('max_gsn_connect_wait_minutes: %s' % (max_gsn_connect_wait_minutes,))
-        
-        max_gsn_get_schedule_wait_minutes = self._getOptionValue('max_gsn_get_schedule_wait_minutes')
-        if max_gsn_get_schedule_wait_minutes is None:
-            raise TypeError('max_gsn_get_schedule_wait_minutes not specified in config file')
-        elif not max_gsn_get_schedule_wait_minutes.isdigit():
-            raise TypeError('max_gsn_get_schedule_wait_minutes has to be an integer')
-        self._logger.info('max_gsn_get_schedule_wait_minutes: %s' % (max_gsn_get_schedule_wait_minutes,))
+
+        self._logger.info('max_gsn_connect_wait_minutes: %s' % (self._getOptionValue('max_gsn_connect_wait_minutes', self._config),))
+        self._logger.info('max_gsn_get_schedule_wait_minutes: %s' % (self._getOptionValue('max_gsn_get_schedule_wait_minutes', self._config),))
         
         if dutycyclemode:
-            service_wakeup_schedule = self._getOptionValue('service_wakeup_schedule')
-            if service_wakeup_schedule is None:
-                raise TypeError('service_wakeup_schedule not specified in config file')
-            try:
-                hour, minute = service_wakeup_schedule.split(':')
-                hour = int(hour)
-                minute = int(minute)
-            except:
-                raise TypeError('service_wakeup_schedule is not in the format HOUR:MINUTE')
-            self._logger.info('service_wakeup_schedule: %s' % (service_wakeup_schedule,))
-                
-            
-            service_wakeup_minutes = self._getOptionValue('service_wakeup_minutes')
-            if service_wakeup_minutes is None:
-                raise TypeError('service_wakeup_minutes not specified in config file')
-            elif not service_wakeup_minutes.isdigit():
-                raise TypeError('service_wakeup_minutes has to be an integer')
-            self._logger.info('service_wakeup_minutes: %s' % (service_wakeup_minutes,))
+            self._logger.info('service_wakeup_schedule: %s' % (self._getOptionValue('service_wakeup_schedule', self._config),))
+            self._logger.info('service_wakeup_minutes: %s' % (self._getOptionValue('service_wakeup_minutes', self._config),))
             
             self._service_wakeup_disabled = False
-            service_wakeup_disable = self._getOptionValue('service_wakeup_disable')
+            service_wakeup_disable = self._getOptionValue('service_wakeup_disable', self._config)
             if service_wakeup_disable == None or int(service_wakeup_disable) == 0:
                 self._logger.info('service window is enabled')
-            elif int(service_wakeup_disable) != 1 and int(service_wakeup_disable) != 0:
-                self._backlogMain.incrementErrorCounter()
-                self._logger.error('service_wakeup_disable has to be set to 1 or 0 in config file => service window will be enabled')
             else:
                 self._logger.warning('service window is disabled')
                 self._service_wakeup_disabled = True
+
+            self._logger.info('max_next_schedule_wait_minutes: %s' % (self._getOptionValue('max_next_schedule_wait_minutes', self._config),))
+            self._logger.info('hard_shutdown_offset_minutes: %s' % (self._getOptionValue('hard_shutdown_offset_minutes', self._config),))
+            self._logger.info('approximate_startup_seconds: %s' % (self._getOptionValue('approximate_startup_seconds', self._config),))
+            self._logger.info('max_db_resend_runtime: %s' % (self._getOptionValue('max_db_resend_runtime', self._config),))
             
-            max_next_schedule_wait_minutes = self._getOptionValue('max_next_schedule_wait_minutes')
-            if max_next_schedule_wait_minutes is None:
-                raise TypeError('max_next_schedule_wait_minutes not specified in config file')
-            elif not max_next_schedule_wait_minutes.isdigit():
-                raise TypeError('max_next_schedule_wait_minutes has to be an integer')
-            self._logger.info('max_next_schedule_wait_minutes: %s' % (max_next_schedule_wait_minutes,))
-            
-            hard_shutdown_offset_minutes = self._getOptionValue('hard_shutdown_offset_minutes')
-            if hard_shutdown_offset_minutes is None:
-                raise TypeError('hard_shutdown_offset_minutes not specified in config file')
-            elif not hard_shutdown_offset_minutes.isdigit():
-                raise TypeError('hard_shutdown_offset_minutes has to be an integer')
-            self._logger.info('hard_shutdown_offset_minutes: %s' % (hard_shutdown_offset_minutes,))
-            
-            approximate_startup_seconds = self._getOptionValue('approximate_startup_seconds')
-            if approximate_startup_seconds is None:
-                raise TypeError('approximate_startup_seconds not specified in config file')
-            elif not approximate_startup_seconds.isdigit():
-                raise TypeError('approximate_startup_seconds has to be an integer')
-            self._logger.info('approximate_startup_seconds: %s' % (approximate_startup_seconds,))
-            
-            max_db_resend_runtime = self._getOptionValue('max_db_resend_runtime')
-            if max_db_resend_runtime is None:
-                raise TypeError('max_db_resend_runtime not specified in config file')
-            elif not max_db_resend_runtime.isdigit():
-                raise TypeError('max_db_resend_runtime has to be an integer')
-            self._logger.info('max_db_resend_runtime: %s' % (max_db_resend_runtime,))
-            
-            self._max_next_schedule_wait_delta = timedelta(minutes=int(max_next_schedule_wait_minutes))
+            self._max_next_schedule_wait_delta = timedelta(minutes=int(self._getOptionValue('max_next_schedule_wait_minutes', self._config)))
         
         try:
             self._backlogMain.registerTOSListener(self, [TOSTypes.AM_CONTROLCOMMAND, TOSTypes.AM_BEACONCOMMAND])
@@ -234,10 +185,10 @@ class ScheduleHandlerClass(Thread, Statistics):
         if self._duty_cycle_mode:
             self._pingThread = TOSPingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
         
-        if os.path.isfile('%s.parsed' % (self._getOptionValue('schedule_file'),)):
+        if os.path.isfile('%s.parsed' % (self._getOptionValue('schedule_file', self._config),)):
             try:
                 # Try to load the parsed schedule
-                parsed_schedule_file = open('%s.parsed' % (self._getOptionValue('schedule_file'),), 'r')
+                parsed_schedule_file = open('%s.parsed' % (self._getOptionValue('schedule_file', self._config),), 'r')
                 self._schedule = pickle.load(parsed_schedule_file)
                 parsed_schedule_file.close()
                 self._scheduleCreationTime = self._schedule.getCreationTime()
@@ -245,6 +196,66 @@ class ScheduleHandlerClass(Thread, Statistics):
                 self.exception(str(e))
         else:
             self._logger.info('there is no local schedule file available')
+            
+            
+    def checkConfig(dutycyclemode, config):
+        max_gsn_connect_wait_minutes = ScheduleHandlerClass._getOptionValue('max_gsn_connect_wait_minutes', config)
+        if max_gsn_connect_wait_minutes is None:
+            raise TypeError('max_gsn_connect_wait_minutes not specified in config file')
+        elif not max_gsn_connect_wait_minutes.isdigit() or int(max_gsn_connect_wait_minutes) < 0:
+            raise TypeError('max_gsn_connect_wait_minutes has to be a positive integer')
+        
+        max_gsn_get_schedule_wait_minutes = ScheduleHandlerClass._getOptionValue('max_gsn_get_schedule_wait_minutes', config)
+        if max_gsn_get_schedule_wait_minutes is None:
+            raise TypeError('max_gsn_get_schedule_wait_minutes not specified in config file')
+        elif not max_gsn_get_schedule_wait_minutes.isdigit() or int(max_gsn_connect_wait_minutes) < 0:
+            raise TypeError('max_gsn_get_schedule_wait_minutes has to be a positive integer')
+        
+        if dutycyclemode:
+            service_wakeup_schedule = ScheduleHandlerClass._getOptionValue('service_wakeup_schedule', config)
+            if service_wakeup_schedule is None:
+                raise TypeError('service_wakeup_schedule not specified in config file')
+            try:
+                hour, minute = service_wakeup_schedule.split(':')
+                hour = int(hour)
+                minute = int(minute)
+            except:
+                raise TypeError('service_wakeup_schedule is not in the format HOUR:MINUTE')
+            
+            service_wakeup_minutes = ScheduleHandlerClass._getOptionValue('service_wakeup_minutes', config)
+            if service_wakeup_minutes is None:
+                raise TypeError('service_wakeup_minutes not specified in config file')
+            elif not service_wakeup_minutes.isdigit() or int(service_wakeup_minutes) < 0:
+                raise TypeError('service_wakeup_minutes has to be a positive integer')
+            
+            service_wakeup_disable = ScheduleHandlerClass._getOptionValue('service_wakeup_disable', config)
+            if service_wakeup_disable is not None and int(service_wakeup_disable) != 0 and int(service_wakeup_disable) != 1:
+                raise TypeError('service_wakeup_disable has to be set to 1 or 0 in config file')
+            
+            max_next_schedule_wait_minutes = ScheduleHandlerClass._getOptionValue('max_next_schedule_wait_minutes', config)
+            if max_next_schedule_wait_minutes is None:
+                raise TypeError('max_next_schedule_wait_minutes not specified in config file')
+            elif not max_next_schedule_wait_minutes.isdigit() or int(max_next_schedule_wait_minutes) < 0:
+                raise TypeError('max_next_schedule_wait_minutes has to be a positive integer')
+            
+            hard_shutdown_offset_minutes = ScheduleHandlerClass._getOptionValue('hard_shutdown_offset_minutes', config)
+            if hard_shutdown_offset_minutes is None:
+                raise TypeError('hard_shutdown_offset_minutes not specified in config file')
+            elif not hard_shutdown_offset_minutes.isdigit() or int(hard_shutdown_offset_minutes) < 0:
+                raise TypeError('hard_shutdown_offset_minutes has to be a positive integer')
+            
+            approximate_startup_seconds = ScheduleHandlerClass._getOptionValue('approximate_startup_seconds', config)
+            if approximate_startup_seconds is None:
+                raise TypeError('approximate_startup_seconds not specified in config file')
+            elif not approximate_startup_seconds.isdigit() or int(approximate_startup_seconds) < 0:
+                raise TypeError('approximate_startup_seconds has to be a positive integer')
+            
+            max_db_resend_runtime = ScheduleHandlerClass._getOptionValue('max_db_resend_runtime', config)
+            if max_db_resend_runtime is None:
+                raise TypeError('max_db_resend_runtime not specified in config file')
+            elif not max_db_resend_runtime.isdigit() or int(max_db_resend_runtime) < 0:
+                raise TypeError('max_db_resend_runtime has to be a positive integer')
+    checkConfig = Callable(checkConfig)
             
             
     def setSchedule(self, pluginname, schedule, merge):
@@ -283,11 +294,11 @@ class ScheduleHandlerClass(Thread, Statistics):
             # (The scheduled time here could be in this session if schedules are following
             # each other in short intervals. In this case it could be possible, that
             # we have to wait for the next service window in case of an unexpected shutdown.)
-            min = int(self._getOptionValue('max_gsn_connect_wait_minutes'))
-            min += int(self._getOptionValue('max_gsn_get_schedule_wait_minutes'))
-            min += int(self._getOptionValue('max_next_schedule_wait_minutes'))
-            min += int(self._getOptionValue('hard_shutdown_offset_minutes'))
-            sec = int(self._getOptionValue('approximate_startup_seconds'))
+            min = int(self._getOptionValue('max_gsn_connect_wait_minutes', self._config))
+            min += int(self._getOptionValue('max_gsn_get_schedule_wait_minutes', self._config))
+            min += int(self._getOptionValue('max_next_schedule_wait_minutes', self._config))
+            min += int(self._getOptionValue('hard_shutdown_offset_minutes', self._config))
+            sec = int(self._getOptionValue('approximate_startup_seconds', self._config))
             maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
             if maxruntime and maxruntime != -1:
                 sec += maxruntime
@@ -354,7 +365,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                         if self._shutdownThread:
                             self._shutdownThread.stop()
                         if service_time <= self._max_next_schedule_wait_delta:
-                            self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self._getOptionValue('max_next_schedule_wait_minutes'),))
+                            self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self._getOptionValue('max_next_schedule_wait_minutes', self._config),))
                         else:
                             self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self._getOptionValue('max_next_schedule_wait_minutes')),))
                         self._shutdownThread = ShutdownThread(self)
@@ -463,7 +474,7 @@ class ScheduleHandlerClass(Thread, Statistics):
     
     
     def getMsgType(self):
-        return BackLogMessage.SCHEDULE_MESSAGE_TYPE
+        return SCHEDULE_MESSAGE_TYPE
 
 
     def msgReceived(self, data):
@@ -616,11 +627,11 @@ class ScheduleHandlerClass(Thread, Statistics):
             self._scheduleLock.release()
            
             # Write schedule to disk (the plaintext one for debugging and the parsed one for better performance)
-            schedule_file = open(self._getOptionValue('schedule_file'), 'w')
+            schedule_file = open(self._getOptionValue('schedule_file', self._config), 'w')
             schedule_file.write(schedule)
             schedule_file.close()
         
-            compiled_schedule_file = open('%s.parsed' % (self._getOptionValue('schedule_file'),), 'w')
+            compiled_schedule_file = open('%s.parsed' % (self._getOptionValue('schedule_file', self._config),), 'w')
             pickle.dump(self._schedule, compiled_schedule_file)
             compiled_schedule_file.close()
 
@@ -681,8 +692,8 @@ class ScheduleHandlerClass(Thread, Statistics):
     def _waitForGSN(self, param=None):
         # wait some time for GSN to connect
         if not self._backlogMain.gsnpeer.isConnected():
-            self._logger.info('waiting for gsn to connect for a maximum of %s minutes' % (self._getOptionValue('max_gsn_connect_wait_minutes'),))
-            self._connectionEvent.wait((int(self._getOptionValue('max_gsn_connect_wait_minutes')) * 60))
+            self._logger.info('waiting for gsn to connect for a maximum of %s minutes' % (self._getOptionValue('max_gsn_connect_wait_minutes', self._config),))
+            self._connectionEvent.wait((int(self._getOptionValue('max_gsn_connect_wait_minutes', self._config)) * 60))
             self._connectionEvent.clear()
             if self._scheduleHandlerStop:
                 return
@@ -691,8 +702,8 @@ class ScheduleHandlerClass(Thread, Statistics):
         if self._backlogMain.gsnpeer.isConnected():
             if not self._newScheduleEvent.isSet():
                 timeout = 0
-                self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self._getOptionValue('max_gsn_get_schedule_wait_minutes'),))
-                while timeout < (int(self._getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60):
+                self._logger.info('waiting for gsn to answer a schedule request for a maximum of %s minutes' % (self._getOptionValue('max_gsn_get_schedule_wait_minutes', self._config),))
+                while timeout < (int(self._getOptionValue('max_gsn_get_schedule_wait_minutes', self._config)) * 60):
                     self._newScheduleEvent.wait(30)
                     if self._scheduleHandlerStop:
                         return
@@ -706,7 +717,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                         self._backlogMain.gsnpeer.processMsg(self.getMsgType(), 0, [GSN_TYPE_GET_SCHEDULE], MESSAGE_PRIORITY, False)
                     timeout += 30
                 
-                if timeout >= int(self._getOptionValue('max_gsn_get_schedule_wait_minutes')) * 60:
+                if timeout >= int(self._getOptionValue('max_gsn_get_schedule_wait_minutes', self._config)) * 60:
                     self._logger.warning('gsn has not answered on any schedule request')
         else:
             self._logger.warning('gsn has not connected')
@@ -715,13 +726,14 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._waitForGSNFinished.set()
         
 
-    def _getOptionValue(self, key):
-        for entry in self._config:
+    def _getOptionValue(key, config):
+        for entry in config:
             entry_key = entry[0]
             entry_value = entry[1]
             if key == entry_key:
                 return entry_value
         return None
+    _getOptionValue = Callable(_getOptionValue)
         
         
     def _serviceTime(self):
@@ -734,8 +746,8 @@ class ScheduleHandlerClass(Thread, Statistics):
     
     
     def _getNextServiceWindowRange(self):
-        wakeup_minutes = timedelta(minutes=int(self._getOptionValue('service_wakeup_minutes')))
-        hour, minute = self._getOptionValue('service_wakeup_schedule').split(':')
+        wakeup_minutes = timedelta(minutes=int(self._getOptionValue('service_wakeup_minutes', self._config)))
+        hour, minute = self._getOptionValue('service_wakeup_schedule', self._config).split(':')
         now = datetime.utcnow()
         service_time = datetime(now.year, now.month, now.day, int(hour), int(minute))
         if (service_time + wakeup_minutes) < now:
@@ -747,7 +759,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         
     def _scheduleNextDutyWakeup(self, time_delta, schedule_name):
         if self._duty_cycle_mode:
-            time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self._getOptionValue('approximate_startup_seconds'))
+            time_to_wakeup = time_delta.seconds + time_delta.days * 86400 - int(self._getOptionValue('approximate_startup_seconds', self._config))
             if self.tosMsgSend(TOSTypes.CONTROL_CMD_NEXT_WAKEUP, time_to_wakeup):
                 self._logger.info('successfully scheduled the next duty wake-up for >%s< (that\'s in %d seconds)' % (schedule_name, time_to_wakeup))
             else:

@@ -66,6 +66,9 @@ VAISALA_WXT520_MESSAGE_TYPE = 40
 # The Schedule message type.
 SCHEDULE_MESSAGE_TYPE = 50
 
+# The Configuration message type.
+CONFIG_MESSAGE_TYPE = 51
+
 # The GPS message type.
 GPS_MESSAGE_TYPE = 60
 
