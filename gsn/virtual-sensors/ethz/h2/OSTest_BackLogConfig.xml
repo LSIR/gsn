@@ -3,7 +3,7 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
        	<web-input password="test">
-         	<command name="schedule_command">
+         	<command name="config_command">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
 				<field name="configuration" type="*binary:1mb">configuration</field>
         	</command>
