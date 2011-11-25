@@ -808,7 +808,7 @@ class ShutdownThread(Thread):
             self._scheduleHandler._waitForGSNFinished.wait()
                 
         # wait for backlog to finish resend data
-        max_wait = int(self._scheduleHandler._getOptionValue('max_db_resend_runtime'))*60.0
+        max_wait = int(self._scheduleHandler._getOptionValue('max_db_resend_runtime', self._scheduleHandler._config))*60.0
         if not self._scheduleHandler._resendFinished.isSet() and max_wait > self._scheduleHandler._backlogMain.getUptime():
             self._logger.info('waiting for database resend process to finish for a maximum of %f seconds' % (max_wait-self._scheduleHandler._backlogMain.getUptime(),))
             self._scheduleHandler._resendFinished.wait(max_wait-self._scheduleHandler._backlogMain.getUptime())
@@ -828,8 +828,8 @@ class ShutdownThread(Thread):
 
         # Synchronize Service Wakeup Time
         time_delta = self._scheduleHandler._getNextServiceWindowRange()[0] - datetime.utcnow()
-        time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self._scheduleHandler._getOptionValue('approximate_startup_seconds'))
-        if time_to_service < 0-int(self._scheduleHandler._getOptionValue('approximate_startup_seconds')):
+        time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self._scheduleHandler._getOptionValue('approximate_startup_seconds', self._scheduleHandler._config))
+        if time_to_service < 0-int(self._scheduleHandler._getOptionValue('approximate_startup_seconds', self._scheduleHandler._config)):
             time_to_service += 86400
         if not self._scheduleHandler._service_wakeup_disabled:
             self._logger.info('next service window is in %f minutes' % (time_to_service/60.0,))
@@ -848,7 +848,7 @@ class ShutdownThread(Thread):
 
         # Schedule next duty wake-up
         if self._scheduleHandler._schedule:
-            td = timedelta(seconds=int(self._scheduleHandler._getOptionValue('approximate_startup_seconds')))
+            td = timedelta(seconds=int(self._scheduleHandler._getOptionValue('approximate_startup_seconds', self._scheduleHandler._config)))
             nextschedule, error = self._scheduleHandler._schedule.getNextSchedules(datetime.utcnow() + td)
             for e in error:
                 self.error('error while parsing the schedule file: %s' % (e,))
@@ -869,7 +869,7 @@ class ShutdownThread(Thread):
         # point of no return!   
         # Tell TinyNode to shut us down in X seconds
         self._scheduleHandler._pingThread.stop()
-        shutdown_offset = int(self._scheduleHandler._getOptionValue('hard_shutdown_offset_minutes'))*60
+        shutdown_offset = int(self._scheduleHandler._getOptionValue('hard_shutdown_offset_minutes', self._scheduleHandler._config))*60
         if self._scheduleHandler.tosMsgSend(TOSTypes.CONTROL_CMD_SHUTDOWN, shutdown_offset):
             self._logger.info('we\'re going to do a hard shut down in %s seconds ...' % (shutdown_offset,))
         else:
