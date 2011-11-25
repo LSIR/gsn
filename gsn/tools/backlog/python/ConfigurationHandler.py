@@ -210,7 +210,7 @@ class ConfigurationHandlerClass():
                 baudrate = spl[1]
             except Exception:
                 raise TypeError('tos_address has to be in the form serial@DEVICE:BAUDRATE')
-            if not os.path.isfile(device):
+            if not os.path.exists(device):
                 raise TypeError('device >%s< specified in tos_address >%s< does not exist' % (device, tos_address))
             if not baudrate.isdigit():
                 raise TypeError('baudrate >%s< specified in tos_address >%s< has to be an integer' % (baudrate, tos_address))
