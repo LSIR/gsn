@@ -81,6 +81,8 @@ class GPSDriver():
     		self._device = config[0]
     	if (config[1] != None): # The measurement interval in seconds
     		self._interval = config[1]
+        if (config[3]):
+            self.pmEnable = True
 
     	#in case we can't find a device on given port
     	self.retries = 10
@@ -413,29 +415,29 @@ class GPSDriver():
                 change=True
             self._logger.debug("Done setting message type...")       
     
-            ###################################
-            #set the measurement rate
-            ##################################
-            self._logger.debug("Setting rate...")
-            newrate=struct.pack('3H', self._interval*1000, 0x01,0x01)
-            rate = False
-            while (not rate):
-                rate = self._pollGpsMessage(self._rateMessageId)
-            if rate[3] != newrate:
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug('Rate changed from %d to %d' % (struct.unpack('3H',rate[3])[0], self._interval*1000))
-                cnt=0
-                ACK=0
-                while not ACK and cnt<=3:
-                    self._write(self._rateMessageId, newrate)
-                    ACK=self._readRaw(self._ACK)
-                    #self._logger.info(ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
-                    self._runEv.wait(1)
-                change=True
-            self._logger.debug("Done setting rate.")
+        ###################################
+        #set the measurement rate
+        ##################################
+        self._logger.debug("Setting rate...")
+        newrate=struct.pack('3H', self._interval*1000, 0x01,0x01)
+        rate = False
+        while (not rate):
+            rate = self._pollGpsMessage(self._rateMessageId)
+        if rate[3] != newrate:
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('Rate changed from %d to %d' % (struct.unpack('3H',rate[3])[0], self._interval*1000))
+            cnt=0
+            ACK=0
+            while not ACK and cnt<=3:
+                self._write(self._rateMessageId, newrate)
+                ACK=self._readRaw(self._ACK)
+                #self._logger.info(ACK)
+                cnt=cnt+1
+                if cnt==3:
+                    self._logger.info('New configuration could not be sent!')
+                self._runEv.wait(1)
+            change=True
+        self._logger.debug("Done setting rate.")
     
     	##################################################
     	#Set mode
@@ -468,40 +470,45 @@ class GPSDriver():
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug('Done setting %s on USB...' % (self._mode,))
     
-            self._logger.debug("WARNING! NOT setting Powermode!!")
-    	'''
-    	self._logger.debug("Setting Powermode...")
-            newPowerMode=struct.pack('2B',0,1)
-            if self._pollGpsMessage(self._rxmMessageId)[2]!= newPowerMode:
-                self._logger.debug('PowerMode changed')
-                cnt=0
-                ACK=0
-                while not ACK and cnt<3:
-                    self._write(self._rxmMessageId,newPowerMode)
-                    ACK=self._readRaw(self._ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
-                    self._runEv.wait(1)
-                change=True
-            
-            newPSM=struct.pack('24B',0,0x3C,0,0,0x10,0,0,0,0x88,0x13,0,0,0xE8,0x03,0,0,0,0,0,0,0,0,0,0)
-            if self._pollGpsMessage(self._pmMessageId)[2]!=newPSM:
-                self._logger.debug('Power Save Mode settings changed')
-                cnt=0
-                ACK=0
-                while not ACK and cnt<=3:
-                    self._write(self._pmMessageId,newPSM)
-                    ACK=self._readRaw(self._ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
-                    self._runEv.wait(1)
-                change=True
-    
-    	self._logger.debug("Done setting Powermode")
-    	'''
+            #self._logger.debug("WARNING! NOT setting Powermode!!")
     	
+    	self._logger.debug("Setting Powermode...")
+        
+        #newPSM=struct.pack('24B',0,0x3C,0,0,0x10,0,0,0,0x88,0x13,0,0,0xE8,0x03,0,0,0,0,0,0,0,0,0,0)
+        newPSM=struct.pack('24B', 0x00, 0x3C, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0xB8, 0x0B, 0x00, 
+                           0x00, 0xD0, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00 )
+        oldPSM = self._pollGpsMessage(self._pmMessageId)
+        self._logger.debug(oldPSM)
+        if oldPSM[2]!=newPSM:
+            self._logger.debug('Power Save Mode settings changed')
+            cnt=0
+            ACK=0
+            while not ACK and cnt<=3:
+                self._write(self._pmMessageId,newPSM)
+                ACK=self._readRaw(self._ACK)
+                cnt=cnt+1
+                if cnt==3:
+                    self._logger.info('New configuration could not be sent!')
+                self._runEv.wait(1)
+            change=True
+    	
+    	if (self.pmEnable):
+    	    newPowerMode=struct.pack('2B',0,4)
+        else:
+            newPowerMode = struct.pack('2B',0,0)
+        if self._pollGpsMessage(self._rxmMessageId)[2]!= newPowerMode:
+            self._logger.debug('PowerMode changed')
+            cnt=0
+            ACK=0
+            while not ACK and cnt<3:
+                self._write(self._rxmMessageId,newPowerMode)
+                ACK=self._readRaw(self._ACK)
+                cnt=cnt+1
+                if cnt==3:
+                    self._logger.info('New configuration could not be sent!')
+                self._runEv.wait(1)
+            change=True
+        self._logger.debug("Done setting Powermode")    
         #Save configuration on Flash memory of LEA-6T
     	self._logger.debug("Saving changes (if any) to flash")
         if change==True:

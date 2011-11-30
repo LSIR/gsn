@@ -67,6 +67,8 @@ class GPSPluginClass(AbstractPluginClass):
         self._mode = self.getOptionValue('gps_mode')
         # The GPS loggin Mode (binary or ascii)
         self._logMode = self.getOptionValue('gps_log_mode')
+        #power save mode
+        self._pmEnable = self.getOptionValue('gps_power_save_mode')
 
         if (self._logMode == "ascii"):
             RAW_DATA_VERSION = 0
@@ -138,7 +140,7 @@ class GPSPluginClass(AbstractPluginClass):
     ##########################################################################################
     '''
     def runPlugin(self,param):
-        self.gps = GPSDriver.GPSDriver([self._deviceStr, self._interval,self._mode])
+        self.gps = GPSDriver.GPSDriver([self._deviceStr, self._interval,self._mode, self._pmEnable])
         # scheduling my death...
         self._endTime = time.time() + self._measTime
         
