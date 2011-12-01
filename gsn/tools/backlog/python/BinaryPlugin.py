@@ -86,7 +86,6 @@ class BinaryPluginClass(AbstractPluginClass):
     _filedequelock
     _filedeque
     _msgqueue
-    _minruntime
     _isBusy
     _rootdir
     _filedescriptor
@@ -103,17 +102,6 @@ class BinaryPluginClass(AbstractPluginClass):
         self._rootdir = self.getOptionValue('rootdir')
         
         watches = self.getOptionValues('watch')
-        
-        minimum_runtime = self.getOptionValue('minimum_runtime')
-        if minimum_runtime and self.isDutyCycleMode():
-            self._minruntime = True
-            self._isBusy = True
-            self._minruntimetimer = Timer(float(minimum_runtime) * 60, self.checkMinRuntimeTimerAction)
-            self._minruntimetimer.start()
-            self.info('minimum runtime: %s minutes' % (minimum_runtime,))
-        else:
-            self._minruntime = False
-            self._isBusy = False
             
         chunk_resend_timeout = self.getOptionValue('chunk_resend_timeout')
         if chunk_resend_timeout:
@@ -215,7 +203,8 @@ class BinaryPluginClass(AbstractPluginClass):
         if filetime:
             self.info('files to be transmitted: %d' % (len(filetime),))
             
-        if self._filedeque or self.getMaxRuntime():
+        self._isBusy = False
+        if self._filedeque and self.getMaxRuntime():
             self._isBusy = True
                 
         self._filedescriptor = None
@@ -241,8 +230,7 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
-        if not self._minruntime:
-            self._isBusy = False
+        self._isBusy = False
         if self._filedescriptor:
             if os.path.exists(self._filedescriptor.name):
                 self._filedequelock.acquire()
@@ -330,6 +318,10 @@ class BinaryPluginClass(AbstractPluginClass):
             except Exception, e:
                 self._backlogMain.incrementExceptionCounter()
                 self._logger.exception(str(e))
+                
+        if self._filedescriptor and not self._filedescriptor.closed:
+            os.chmod(self._filedescriptor.name, 0744)
+            self._filedescriptor.close()
             
         self._logger.info('died')
 
@@ -362,8 +354,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 except IndexError:
                     self.debug('file FIFO is empty waiting for next file to arrive')
                     self._readyfornewbinary = True
-                    if not self._minruntime:
-                        self._isBusy = False
+                    self._isBusy = False
                     return
                     
                 filename = fileobj[0]
@@ -408,18 +399,19 @@ class BinaryPluginClass(AbstractPluginClass):
 
             break
             
-        self._binaryWriter.resetResendCounter()
+        if not self._plugStop:
+            self._binaryWriter.resetResendCounter()
+                
+            packet = [INIT_PACKET, self._getFileQueueSize(), len(self._filedeque), watch[2], long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
+            packet.append(filenamenoprefix)
+            packet.append(watch[3])
             
-        packet = [INIT_PACKET, self._getFileQueueSize(), len(self._filedeque), watch[2], long(os.stat(filename).st_mtime * 1000), filelen, watch[1]]
-        packet.append(filenamenoprefix)
-        packet.append(watch[3])
+            self.debug('sending initial binary packet for %s from watch directory >%s<, storage type: >%d<, device id >%d and time date format >%s<' % (self._filedescriptor.name, watch[0], watch[1], watch[2], watch[3]))
         
-        self.debug('sending initial binary packet for %s from watch directory >%s<, storage type: >%d<, device id >%d and time date format >%s<' % (self._filedescriptor.name, watch[0], watch[1], watch[2], watch[3]))
-    
-        self._packetCRC = None
-        self._emptyQueue()
-        
-        self._binaryWriter.sendMessage(packet)
+            self._packetCRC = None
+            self._emptyQueue()
+            
+            self._binaryWriter.sendMessage(packet)
         
         
     def _reopenFile(self, downloaded, gsnCRC, filenamenoprefix):
@@ -517,18 +509,6 @@ class BinaryPluginClass(AbstractPluginClass):
         self._filedequelock.release()
         return counter
         
-        
-    def checkMinRuntimeTimerAction(self):
-        self._minruntime = False
-        if self._readyfornewbinary:
-            self._isBusy = False
-            self.info('minimum runtime is over and there is no file to be transmitted -> stop')
-        elif not self.isGSNConnected():
-            self._isBusy = False
-            self.info('minimum runtime is over and there are still files to be transmitted but GSN is not connected -> stop')
-        else:
-            self.info('minimum runtime is over and there are still files to be transmitted -> keep running')
-        
          
     def isBusy(self):
         return self._isBusy
@@ -536,30 +516,21 @@ class BinaryPluginClass(AbstractPluginClass):
         
     def needsWLAN(self):
         return self._isBusy
-    
-    
-    def stopIfNotInDutyCycle(self):
-        return False
         
         
     def beaconCleared(self):
-        if (self._readyfornewbinary or not self.isGSNConnected()) and not self._minruntime:
+        if self._readyfornewbinary or not self.isGSNConnected():
             self._isBusy = False
     
     
     def stop(self):
         self._isBusy = False
         self._plugStop = True
-        if self._minruntime:
-            self._minruntimetimer.cancel()
         self._notifier.stop()
         self._binaryWriter.stop()
         self._filedequelock.acquire()
         self._filedeque.clear()
         self._filedequelock.release()
-        if self._filedescriptor and not self._filedescriptor.closed:
-            os.chmod(self._filedescriptor.name, 0744)
-            self._filedescriptor.close()
         self._msgqueue.put('end')
         self.info('stopped')
 

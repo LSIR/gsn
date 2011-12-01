@@ -190,7 +190,6 @@ class BackLogMainClass(Thread, Statistics):
                     self._msgtypetoplugin.update({plugin.getMsgType(): plugs})
                 
                 self.plugins.update({module_name: plugin})
-                self.jobsobserver.observeJob(plugin, module_name, True, plugin.getMaxRuntime())
                 self._logger.info('loaded plugin %s' % (module_name,))
             except Exception, e:
                 self._logger.error('could not load plugin %s: %s' % (module_name, e))
@@ -217,25 +216,32 @@ class BackLogMainClass(Thread, Statistics):
             self._logger.info('starting %s' % (plugin_name,))
             try:
                 plugin.start()
+                self.jobsobserver.observeJob(plugin, plugin_name, True, plugin.getMaxRuntime(), plugin.getMinRuntime())
             except Exception, e:
                 self.incrementExceptionCounter()
                 self._logger.exception(e)
             
         self._stopEvent.wait()
         
-        for plugin in self.plugins.values():
+        for plugin_name, plugin in self.plugins.items():
             try:
                 plugin.join()
+                self._logger.info('%s joined' % (plugin_name,))
             except Exception, e:
                 self.incrementExceptionCounter()
                 self._logger.exception(e)
         
         self.jobsobserver.join()
+        self._logger.info('JobsObserverClass joined')
         self.schedulehandler.join()
+        self._logger.info('ScheduleHandlerClass joined')
         if self._tospeer:
             self._tospeer.join()
+            self._logger.info('TOSPeerClass joined')
         self.backlog.join()
+        self._logger.info('BackLogDBClass joined')
         self.gsnpeer.join()
+        self._logger.info('GSNPeerClass joined')
         
         self._logger.info('died')
 
@@ -363,17 +369,18 @@ class BackLogMainClass(Thread, Statistics):
             return [None]*3
     
     
-    def pluginAction(self, pluginclassname, parameters, runtimemax):
+    def pluginAction(self, pluginclassname, parameters, runtimemax, runtimemin):
         if self._backlogStopped:
             return None
         
         pluginactive = False
         plugin = self.plugins.get(pluginclassname)
         if plugin != None:
-            if runtimemax:
-                self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
-            else:
-                self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
+            if runtimemax is None:
+                runtimemax = plugin.getMaxRuntime()
+            if runtimemin is None:
+                runtimemin = plugin.getMinRuntime()
+            self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax, runtimemin)
             thread.start_new_thread(plugin.action, (parameters,))
             pluginactive = True
         else:
@@ -396,10 +403,11 @@ class BackLogMainClass(Thread, Statistics):
                     self._msgtypetoplugin.update({plugin.getMsgType(): plugs})
                     
                 self.plugins.update({pluginclassname: plugin})
-                if runtimemax:
-                    self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax)
-                else:
-                    self.jobsobserver.observeJob(plugin, pluginclassname, True, plugin.getMaxRuntime())
+                if runtimemax is None:
+                    runtimemax = plugin.getMaxRuntime()
+                if runtimemin is None:
+                    runtimemin = plugin.getMinRuntime()
+                self.jobsobserver.observeJob(plugin, pluginclassname, True, runtimemax, runtimemin)
                 self._logger.info('loaded plugin %s' % (pluginclassname))
             except Exception, e:
                 raise Exception('could not load plugin %s: %s' % (pluginclassname, e))
@@ -412,32 +420,28 @@ class BackLogMainClass(Thread, Statistics):
         return plugin
         
         
-    def pluginStop(self, pluginclassname, stopAnyway=False):
+    def pluginStop(self, pluginclassname):
         plugin = self.plugins.get(pluginclassname)
         if plugin != None:
-            if ((self.schedulehandler._beacon or not self.schedulehandler._duty_cycle_mode) and not plugin.stopIfNotInDutyCycle() and not stopAnyway):
-                self._logger.info('%s should not be stopped if not in duty-cycle mode (or beacon) => keep running' % (pluginclassname,))
-                return False
-            else:
-                # update message type to plugin dict
-                plugs = self._msgtypetoplugin.get(plugin.getMsgType())
-                for index, p in enumerate(plugs):
-                    if p == plugin:
-                        del plugs[index]
-                        if not plugs:
-                            del self._msgtypetoplugin[plugin.getMsgType()]
-                        else:
-                            self._msgtypetoplugin.update({plugin.getMsgType(): plugs})
-                        break
-                    
-                try:
-                    plugin.stop()
-                except Exception, e:
-                    self.incrementExceptionCounter()
-                    self._logger.exception(e)
-                    
-                del self.plugins[pluginclassname]
-                return True
+            # update message type to plugin dict
+            plugs = self._msgtypetoplugin.get(plugin.getMsgType())
+            for index, p in enumerate(plugs):
+                if p == plugin:
+                    del plugs[index]
+                    if not plugs:
+                        del self._msgtypetoplugin[plugin.getMsgType()]
+                    else:
+                        self._msgtypetoplugin.update({plugin.getMsgType(): plugs})
+                    break
+                
+            try:
+                plugin.stop()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
+                
+            del self.plugins[pluginclassname]
+            return True
         else:
             self._logger.warning('there is no plugin named %s to be stopped' % (pluginclassname, ))
             return False

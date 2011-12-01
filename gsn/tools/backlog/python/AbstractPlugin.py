@@ -13,6 +13,8 @@ import inspect
 from threading import Thread
 
 from SpecialAPI import Statistics
+from JobsObserver import DEFAULT_RUNTIME_MODE, RUNTIME_MODE_STOP_ALLWAYS, RUNTIME_MODE_STOP_DC_ALLWAYS, RUNTIME_MODE_STOP_LAST, RUNTIME_MODE_STOP_DC_LAST, RUNTIME_MODE_NO_OBSERVE
+
 
 class AbstractPluginClass(Thread, Statistics):
     '''
@@ -39,6 +41,7 @@ class AbstractPluginClass(Thread, Statistics):
     _backlog
     _priority
     _maxruntime
+    _minruntime
     _powerControl
     '''
 
@@ -74,6 +77,24 @@ class AbstractPluginClass(Thread, Statistics):
             self._maxruntime = None
         else:
             self._maxruntime = int(value)
+        
+        value = self.getOptionValue('min_runtime')
+        if value is None:
+            self._minruntime = None
+        else:
+            self._minruntime = int(value)
+        
+        value = self.getOptionValue('runtime_mode')
+        if value is None:
+            self._runtimemode = DEFAULT_RUNTIME_MODE
+        else:
+            value = int(value)
+            if value == RUNTIME_MODE_STOP_ALLWAYS or value == RUNTIME_MODE_STOP_DC_ALLWAYS or \
+               value == RUNTIME_MODE_STOP_LAST or value == RUNTIME_MODE_STOP_DC_LAST or \
+               value == RUNTIME_MODE_NO_OBSERVE:
+                self._runtimemode = value
+            else:
+                raise TypeError('runtime_mode is set to an unknown value in the configuration file')
             
         self._procMsg = self._backlogMain.gsnpeer.processMsg
         self._runPluginRemoteAction = self._backlogMain.runPluginRemoteAction
@@ -81,8 +102,14 @@ class AbstractPluginClass(Thread, Statistics):
             
         self.info('backlog: %s' % (self._backlog,))
         self.info('priority: %d' % (self._priority,))
+        self.info('runtime_mode: %s' % (self._runtimemode,))
+        if self._minruntime is not None:
+            self.info('min_runtime: %s' % (self._minruntime,))
         if self._maxruntime:
             self.info('max_runtime: %s' % (self._maxruntime,))
+            if self._minruntime > self._maxruntime:
+                raise TypeError('min_runtime has to be smaller than max_runtime')
+                
         
 
     def getOptionValue(self, key):
@@ -373,6 +400,28 @@ class AbstractPluginClass(Thread, Statistics):
                  None if inexistent.
         '''
         return self._maxruntime
+    
+    
+    def getMinRuntime(self):
+        '''
+        Returns the 'min_runtime' value set in the configuration file or
+        None if inexistent.
+        
+        @return: 'min_runtime' value set in the configuration file or
+                 None if inexistent.
+        '''
+        return self._minruntime
+    
+    
+    def getRuntimeMode(self):
+        '''
+        Returns the 'runtime_mode' value set in the configuration file or
+        None if inexistent.
+        
+        @return: 'runtime_mode' value set in the configuration file or
+                 None if inexistent.
+        '''
+        return self._runtimemode
 
 
     def getExceptionCounter(self):
@@ -416,18 +465,6 @@ class AbstractPluginClass(Thread, Statistics):
         beacon clear message. (duty-cycle mode)
         '''
         pass
-    
-    def stopIfNotInDutyCycle(self):
-        '''
-        This function can be overwritten by a plugin if it wants a
-        special treatment for its stopping behavior if we are not
-        in duty-cycle mode.
-        
-        @return: True if this plugin can be stopped by the scheduler if
-                  we are NOT in duty-cycle mode (or beacon mode), otherwise
-                  return False.
-        '''
-        return True
     
     
     def getPowerControlObject(self):

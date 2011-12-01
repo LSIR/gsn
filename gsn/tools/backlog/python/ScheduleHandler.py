@@ -57,6 +57,7 @@ SCHEDULE_TYPE_PLUGIN = 'plugin'
 SCHEDULE_TYPE_SCRIPT = 'script'
 BACKWARD_TOLERANCE_NAME = 'backward_tolerance_minutes'
 MAX_RUNTIME_NAME = 'max_runtime_minutes'
+MIN_RUNTIME_NAME = 'min_runtime_minutes'
 ############################################
 
 class Callable:
@@ -300,7 +301,7 @@ class ScheduleHandlerClass(Thread, Statistics):
             min += int(self._getOptionValue('hard_shutdown_offset_minutes', self._config))
             sec = int(self._getOptionValue('approximate_startup_seconds', self._config))
             maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
-            if maxruntime and maxruntime != -1:
+            if maxruntime is not None:
                 sec += maxruntime
             td = timedelta(minutes=min, seconds=sec)
             nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
@@ -308,7 +309,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                 for e in error:
                     self.error('error while parsing the schedule file: %s' % (e,))
             if nextschedule:
-                nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
+                nextdt, pluginclassname, commandstring, runtimemax, runtimemin = nextschedule[0]
                 self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
                 
         if self._schedule:
@@ -348,9 +349,9 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._newScheduleEvent.wait()
                     continue
             
-            for nextdt, pluginclassname, commandstring, runtimemax in nextschedules:
+            for nextdt, pluginclassname, commandstring, runtimemax, runtimemin in nextschedules:
                 if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug('(%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax))
+                    self._logger.debug('(%s,%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax, runtimemin))
                 dtnow = datetime.utcnow()
                 timediff = nextdt - dtnow
                 
@@ -399,7 +400,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                         if self._logger.isEnabledFor(logging.DEBUG):
                             self._logger.debug('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
                     try:
-                        self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax)
+                        self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax, runtimemin)
                     except Exception, e:
                         self.error('error in scheduled plugin >%s %s<: %s' % (pluginclassname, commandstring, e))
                     else:
@@ -853,7 +854,7 @@ class ShutdownThread(Thread):
             for e in error:
                 self.error('error while parsing the schedule file: %s' % (e,))
             if nextschedule:
-                nextdt, pluginclassname, commandstring, runtimemax = nextschedule[0]
+                nextdt, pluginclassname, commandstring, runtimemax, runtimemin = nextschedule[0]
                 self._logger.info('schedule next duty wake-up')
                 self._scheduleHandler._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
             if self._shutdownThreadStop:
@@ -953,11 +954,13 @@ class ScheduleCron(CronTab):
         error = []
         for schedule in self.crons:
             runtimemax = None
+            runtimemin = None
             commandstring = str(schedule.command).strip()
             
             try:
                 backwardmin, commandstring = self._getSpecialParameter(commandstring, BACKWARD_TOLERANCE_NAME)
                 runtimemax, commandstring = self._getSpecialParameter(commandstring, MAX_RUNTIME_NAME)
+                runtimemin, commandstring = self._getSpecialParameter(commandstring, MIN_RUNTIME_NAME)
             except TypeError, e:
                 error.append(e)
             
@@ -984,14 +987,14 @@ class ScheduleCron(CronTab):
                 td = timedelta(minutes=backwardmin)
                 nextdt = self._getNextSchedule(date_time - td, schedule)
                 if nextdt < now:
-                    backward_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
+                    backward_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
                 
             nextdt = self._getNextSchedule(date_time, schedule)
             if not future_schedules or nextdt < future_schedules[0][0]:
                 future_schedules = []
-                future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
+                future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
             elif nextdt == future_schedules[0][0]:
-                future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax))
+                future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
             
         return ((backward_schedules + future_schedules), error)
 
@@ -1104,6 +1107,7 @@ class ScheduleCron(CronTab):
         
         backwardmin, commandstring = self._getSpecialParameter(commandstring, BACKWARD_TOLERANCE_NAME)
         runtimemax, commandstring = self._getSpecialParameter(commandstring, MAX_RUNTIME_NAME)
+        runtimemin, commandstring = self._getSpecialParameter(commandstring, MIN_RUNTIME_NAME)
         
         splited = commandstring.split(None, 1)
         type = splited[0]
