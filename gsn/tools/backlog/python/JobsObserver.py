@@ -69,7 +69,9 @@ class JobsObserverClass(Thread, Statistics):
                     log_beacon_mode.clear()
                 
                 allFinished = True
-                for index, joblistentry in enumerate(self._jobList):
+                index = len(self._jobList)
+                for joblistentry in reversed(self._jobList):
+                    index -= 1
                     isPlugin, job, job_name, runtime_end, min_runtime = joblistentry
                     if isPlugin:
                         if job.isBusy():
@@ -146,7 +148,9 @@ class JobsObserverClass(Thread, Statistics):
                             
                 if allFinished:
                     self._dutyModeDependentLogging('all observed jobs finished -> stopping the rest')
-                    for index, joblistentry in enumerate(self._jobList):
+                    index = len(self._jobList)
+                    for joblistentry in reversed(self._jobList):
+                        index -= 1
                         isPlugin, job, job_name, runtime_end, min_runtime = joblistentry
                         if isPlugin:
                             self._dutyModeDependentLogging('stopping plugin (%s)' % (job_name,))
@@ -183,7 +187,7 @@ class JobsObserverClass(Thread, Statistics):
                 runtime_end = now+timedelta(minutes=max_runtime_minutes)
             if isPlugin:
                 mode = job.getRuntimeMode()
-                if max_runtime_minutes is not None or mode == RUNTIME_MODE_STOP_ALLWAYS or RUNTIME_MODE_STOP_LAST or \
+                if max_runtime_minutes is not None or mode == RUNTIME_MODE_STOP_ALLWAYS or mode == RUNTIME_MODE_STOP_LAST or \
                    ((mode == RUNTIME_MODE_STOP_DC_ALLWAYS or mode == RUNTIME_MODE_STOP_DC_LAST) and self._backlogMain.duty_cycle_mode):
                     jobexists = False
                     for index, joblistentry in enumerate(self._jobList):

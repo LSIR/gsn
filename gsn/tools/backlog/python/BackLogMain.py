@@ -248,11 +248,31 @@ class BackLogMainClass(Thread, Statistics):
 
     def stop(self):
         self._backlogStopped = True
-        self.confighandler.stop()
+        
+        try:
+            self.confighandler.stop()
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
+            
         if self.powerControl:
-            self.powerControl.stop()
-        self.schedulehandler.stop()
-        self.jobsobserver.stop()
+            try:
+                self.powerControl.stop()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
+                
+        try:
+            self.schedulehandler.stop()
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
+            
+        try:
+            self.jobsobserver.stop()
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
         
         for plugin in self.plugins.values():
             try:
@@ -264,9 +284,23 @@ class BackLogMainClass(Thread, Statistics):
         self._stopEvent.set()
 
         if self._tospeer:
-            self._tospeer.stop()
-        self.backlog.stop()
-        self.gsnpeer.stop()
+            try:
+                self._tospeer.stop()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
+                
+        try:
+            self.backlog.stop()
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
+            
+        try:
+            self.gsnpeer.stop()
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
         
         self._logger.info('stopped')
         
@@ -330,8 +364,12 @@ class BackLogMainClass(Thread, Statistics):
         if not self._tosListeners:
             self._logger.info('no more TOS listeners around -> stop TOSPeer')
             self._tosPeerLock.acquire()
-            self._tospeer.stop()
-            self._tospeer.join()
+            try:
+                self._tospeer.stop()
+                self._tospeer.join()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
             self._tospeer = None
             self._tosPeerLock.release()
         

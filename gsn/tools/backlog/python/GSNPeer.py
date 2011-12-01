@@ -126,10 +126,10 @@ class GSNPeerClass(Thread, Statistics):
 
 
     def stop(self):
+        self._gsnPeerStop = True
         self._pingwatchdog.stop()
         self._pingtimer.stop()
         self._gsnlistener.stop()
-        self._gsnPeerStop = True
         self._serversocket.shutdown(socket.SHUT_RDWR)
         self._serversocket.close()
         self._logger.info('stopped')
