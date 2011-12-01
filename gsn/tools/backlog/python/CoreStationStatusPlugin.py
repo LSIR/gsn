@@ -56,8 +56,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             self._interval = None
         else:
             self._interval = float(value)
-        
-        self.info('interval: %s' % (self._interval,))
+            self.info('interval: %s' % (self._interval,))
         
     
     def getMsgType(self):
