@@ -288,7 +288,13 @@ class ConfigChangedProcessing(ProcessEvent):
             if self._logger.isEnabledFor(logging.DEBUG):
                 self._logger.debug('%s changed' % (event.pathname,))
             
-            self._configHandler._restartBackLog()
+            config_file = open(event.pathname, 'r')
+            config_string = config_file.read()
+            config_file.close()
+            if self._configHandler._compareConfigs(config_string) is not None:
+                self._configHandler._restartBackLog()
+            else:
+                self._logger.info('configuration written without any change -> do nothing')
         except Exception, e:
             self._configHandler._backlogMain.incrementExceptionCounter()
             self._logger.exception(str(e))
