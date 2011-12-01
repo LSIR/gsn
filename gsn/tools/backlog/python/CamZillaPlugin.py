@@ -169,7 +169,10 @@ class CamZillaPluginClass(AbstractPluginClass):
         self.info('started')
         
         if not self._powerSaveMode and not self._calibrated:
-            self._calibrateRobot()
+            try:
+                self._calibrateRobot()
+            except Exception, e:
+                self.exception(e)
             
         if not self._plugStop and not self._powerSaveMode:
             try:
@@ -196,79 +199,78 @@ class CamZillaPluginClass(AbstractPluginClass):
                         self._startupRobotAndCam()
                         if not self._calibrated:
                             self._calibrateRobot()
-                            
-                    try:
-                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%03n_unknown.%C')
-                    except Exception, e:
-                        self.error(e.__str__())
-                        
-                    now = time.time()
                     
-                    try:
-                        parsedTask = self._parseTask(task[1])
-                    except Exception, e:
-                        self.error(e.__str__())
-                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not execute task: %s' % (e.__str__(),)])
-                    else:
-                        self.info('executing panorama picture task: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
-                        
-                        if self._power:
-                            pic = 1
-                            try:
-                                config, bracketing = self._configureCamera(parsedTask[7])
-                                y = parsedTask[1]
-                                while y < parsedTask[1]+(parsedTask[3]*parsedTask[5]) and not self._plugStop:
-                                    ret = self._position(y=y)
-                                    yLimit = ret[3]
-                                    x = parsedTask[0]
-                                    
-                                    while x < parsedTask[0]+(parsedTask[2]*parsedTask[4]) and not self._plugStop:
-                                        ret = self._position(x=x)
-                                        xLimit = ret[3]
-                                        if self._plugStop:
-                                            break
-                                        if parsedTask[6] > 0:
-                                            self._delay.wait(parsedTask[6])
-    
-                                        if bracketing:
-                                            self.info('taking pictures number %d-%d/%d at position (%f,%f)' % (1+(pic-1)*3,3+(pic-1)*3,parsedTask[2]*parsedTask[3]*3,self._x,self._y))
-                                        else:
-                                            self.info('taking picture number %d/%d at position (%f,%f)' % (pic,parsedTask[2]*parsedTask[3],self._x,self._y))
-                                        self._takePicture()
-                                        if self._plugStop:
-                                            break
-                                        
-                                        s = 'successfully'
-                                        if (xLimit is True and yLimit is True):
-                                            s += ' (reached x and y limit)'
-                                        elif (xLimit is True and yLimit is False):
-                                            s += ' (reached x limit)'
-                                        elif (xLimit is False and yLimit is True):
-                                            s += ' (reached y limit)'
-                                            
-                                        if bracketing:
-                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy_%s.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
-                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
-                                        else:
-                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), '%C'))
-                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
-                                        pic += 1
-    
-                                        x += parsedTask[4]
-                                        
-                                    y += parsedTask[5]
-                            except Exception, e:
-                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not finish task successfully (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
-                                self.error(e.__str__())
-                            else:
-                                self.info('all pictures taken successfully')
+                    if not self._plugStop:
+                        try:
+                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%03n_unknown.%C')
+                        except Exception, e:
+                            self.error(e.__str__())
+                    
+                        if not self._plugStop:
+                            now = time.time()
                             
+                            try:
+                                parsedTask = self._parseTask(task[1])
+                            except Exception, e:
                                 if not self._plugStop:
-                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
-                                    self.info('panorama picture task finished successfully')
-                        else:
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'CamZilla is not powered -> turn power on first'])
-                            self.error('CamZilla is not powered -> turn power on first')
+                                    self.error(e.__str__())
+                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not execute task: %s' % (e.__str__(),)])
+                            else:
+                                self.info('executing panorama picture task: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedTask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7])))
+                                
+                                if self._power:
+                                    pic = 1
+                                    try:
+                                        config, bracketing = self._configureCamera(parsedTask[7])
+                                        y = parsedTask[1]
+                                        while y < parsedTask[1]+(parsedTask[3]*parsedTask[5]) and not self._plugStop:
+                                            ret = self._position(y=y)
+                                            yLimit = ret[3]
+                                            x = parsedTask[0]
+                                            
+                                            while x < parsedTask[0]+(parsedTask[2]*parsedTask[4]) and not self._plugStop:
+                                                ret = self._position(x=x)
+                                                xLimit = ret[3]
+                                                if parsedTask[6] > 0:
+                                                    self._delay.wait(parsedTask[6])
+                                                if not self._plugStop:
+                                                    if bracketing:
+                                                        self.info('taking pictures number %d-%d/%d at position (%f,%f)' % (1+(pic-1)*3,3+(pic-1)*3,parsedTask[2]*parsedTask[3]*3,self._x,self._y))
+                                                    else:
+                                                        self.info('taking picture number %d/%d at position (%f,%f)' % (pic,parsedTask[2]*parsedTask[3],self._x,self._y))
+                                                    self._takePicture()
+                                                    if not self._plugStop:
+                                                        s = 'successfully'
+                                                        if (xLimit is True and yLimit is True):
+                                                            s += ' (reached x and y limit)'
+                                                        elif (xLimit is True and yLimit is False):
+                                                            s += ' (reached x limit)'
+                                                        elif (xLimit is False and yLimit is True):
+                                                            s += ' (reached y limit)'
+                                                            
+                                                        if bracketing:
+                                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy_%s.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
+                                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
+                                                        else:
+                                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), '%C'))
+                                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
+                                                        pic += 1
+                    
+                                                        x += parsedTask[4]
+                                                
+                                            y += parsedTask[5]
+                                    except Exception, e:
+                                        if not self._plugStop:
+                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not finish task successfully (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
+                                            self.error(e.__str__())
+                                    else:
+                                        if not self._plugStop:
+                                            self.info('all pictures taken successfully')
+                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
+                                            self.info('panorama picture task finished successfully')
+                                else:
+                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'CamZilla is not powered -> turn power on first'])
+                                    self.error('CamZilla is not powered -> turn power on first')
                 elif task[0] == PICTURE_TASK:
                     self.info('picture now task received -> taking picture(s) in current robot position (x=%f,y=%f)' % (self._x, self._y))
     
@@ -280,52 +282,58 @@ class CamZillaPluginClass(AbstractPluginClass):
                     except Exception, e:
                         self.error(e.__str__())
                         
-                    now = time.time()
-                        
-                    if task[1]:
-                        gphoto2conf = task[1].split(',')
-                    else:
-                        gphoto2conf = []
-                    
                     if not self._plugStop:
-                        try:
-                            config, bracketing = self._configureCamera(gphoto2conf)
-                            self.info('taking picture(s) now')
-                            self._takePicture()
-                        except Exception, e:
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not take picture now (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
-                            self.error(e.__str__())
+                        now = time.time()
+                            
+                        if task[1]:
+                            gphoto2conf = task[1].split(',')
                         else:
-                            if not self._plugStop:
-                                try:
-                                    if bracketing:
-                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic001_%dx_%dy_%s.%s' % (int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
-                                    else:
-                                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic001_%dx_%dy.%s' % (int(round(self._x*10)), int(round(self._y*10)), '%C'))
-                                except Exception, e:
-                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
+                            gphoto2conf = []
+                        
+                        if not self._plugStop:
+                            try:
+                                config, bracketing = self._configureCamera(gphoto2conf)
+                                self.info('taking picture(s) now')
+                                self._takePicture()
+                            except Exception, e:
+                                if not self._plugStop:
+                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not take picture now (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
                                     self.error(e.__str__())
-                                else:
-                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'finished successfully', self._x, self._y] + [None]*7 + [config])
-                                    self.info('picture now task finished successfully')
+                            else:
+                                if not self._plugStop:
+                                    try:
+                                        if bracketing:
+                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic001_%dx_%dy_%s.%s' % (int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
+                                        else:
+                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic001_%dx_%dy.%s' % (int(round(self._x*10)), int(round(self._y*10)), '%C'))
+                                    except Exception, e:
+                                        if not self._plugStop:
+                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*7 + [config])
+                                            self.error(e.__str__())
+                                    else:
+                                        if not self._plugStop:
+                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'finished successfully', self._x, self._y] + [None]*7 + [config])
+                                            self.info('picture now task finished successfully')
                 elif task[0] == POSITIONING_TASK:
                     self.info('positioning task received (x=%f,y=%f)' % (task[1], task[2]))
                     if self._power:
                         try:
                             pos = self._position(x=task[1], y=task[2])
                         except Exception, e:
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', 'not finished successfully (%s)' % (e.__str__(),), self._x, self._y] + [None]*8)
-                            self.error(e.__str__())
+                            if not self._plugStop:
+                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', 'not finished successfully (%s)' % (e.__str__(),), self._x, self._y] + [None]*8)
+                                self.error(e.__str__())
                         else:
-                            s = 'finished successfully'
-                            if (pos[2] is True and pos[3] is True):
-                                s += ' (reached x and y limit)'
-                            elif (pos[2] is True and pos[3] is False):
-                                s += ' (reached x limit)'
-                            elif (pos[2] is False and pos[3] is True):
-                                s += ' (reached y limit)'
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', s, self._x, self._y] + [None]*8)
-                            self.info('positioning task %s' % (s,))
+                            if not self._plugStop:
+                                s = 'finished successfully'
+                                if (pos[2] is True and pos[3] is True):
+                                    s += ' (reached x and y limit)'
+                                elif (pos[2] is True and pos[3] is False):
+                                    s += ' (reached x limit)'
+                                elif (pos[2] is False and pos[3] is True):
+                                    s += ' (reached y limit)'
+                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', s, self._x, self._y] + [None]*8)
+                                self.info('positioning task %s' % (s,))
                     else:
                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', 'CamZilla is not powered -> turn power on first', self._x, self._y] + [None]*8)
                         self.error('CamZilla is not powered -> turn power on first')
@@ -373,11 +381,12 @@ class CamZillaPluginClass(AbstractPluginClass):
     
     
     def stop(self):
-        self._parkRobot()
         self._isBusy = False
         self._plugStop = True
-        self._taskqueue.put('end')
         self._delay.set()
+        self._taskqueue.put('end')
+        self.join()
+        self._parkRobot()
         self._shutdownRobotAndCam()
             
             
@@ -578,7 +587,12 @@ class CamZillaPluginClass(AbstractPluginClass):
                         if cnt == 5:
                             raise TypeError('could not initialize serial source: %s' % (e,))
                     else:
-                        self.info(self._serial.readline())
+                        ans = self._serial.readline()
+                        i = ans.rfind('Joystick')
+                        if i != -1:
+                            self.info(ans[i:])
+                        else:
+                            self.exception('unexpected output received from arduino')
                         break
                     self._delay.wait(0.5)
                     cnt += 1
@@ -622,62 +636,63 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         
     def _write(self, com):
-        if not self._plugStop:
-            try:
-                self._writeLock.acquire()
-                self.debug('servo control write: %s' % (com,))
-                if com == 'j=on' or com == 'j=off':
-                    self._serial.write(com + "\n")
-                    ans = self._serial.readline().strip()
-                    self.debug('servo control answer: j=..: %s' % (ans,))
-                    if com != ans:
-                        raise Exception('return value (%s) does not match command (%s)' % (ans, com))
-                    self._manualControl = (com == 'j=on')
-                elif self._manualControl:
-                    raise Exception('manual joystick control is turned on -> command (%s) will not be executed' % (com,))
-                elif com == 'cal':
-                    self._serial.write(com + "\n")
-                    cal1 = self._serial.readline().strip()
-                    if cal1 == 'j=on':
-                        self._manualControl = True
-                        raise Exception('manual joystick control has been turned on -> no more commands will be sent to CamZilla until joystick control has been turned off')
-                    elif cal1 == '!cal':
-                        raise Exception('could not calibrate')
-                    self.debug('servo control answer: cal(1): %s' % (cal1))
-                    cal2 = self._serial.readline().strip()
-                    self.debug('servo control answer: cal(2): %s' % (cal2))
-                    cal1 = cal1[5:-1].split(',')
-                    cal2 = cal2.split('=')[1].split('/')
-                    return (int(cal1[0]), int(cal1[1]), int(cal2[0]), int(cal2[1]))
-                elif com.startswith('x=') or com.startswith('y='):
-                    self._serial.write(com + "\n")
-                    ans = self._serial.readline().strip()
-                    self.debug('servo control answer: x=..: %s' % (ans,))
-                    if ans == '!cal':
-                        raise Exception('not yet calibrated')
-                    elif ans.startswith('x/y='):
-                        spl = ans.split('=')[1].split('/')
-                        xLimit = yLimit = False
-                        if (spl[0].endswith('L')):
-                            spl[0] = spl[0][:-1]
-                            xLimit = True
-                        if (spl[1].endswith('L')):
-                            spl[1] = spl[1][:-1]
-                            yLimit = True
-                        return (int(spl[0]), int(spl[1]), xLimit, yLimit)
-                    elif ans == 'j=on':
-                        self._manualControl = True
-                        raise Exception('manual joystick control has been turned on -> no more commands will be sent to CamZilla until joystick control has been turned off')
-                    else:
-                        raise Exception('unknown return value for command (%s): %s' % (com, ans))
+        try:
+            self._writeLock.acquire()
+            self.debug('servo control write: %s' % (com,))
+            if com == 'j=on' or com == 'j=off':
+                self._serial.write(com + "\n")
+                ans = self._serial.readline().strip()
+                self.debug('servo control answer: j=..: %s' % (ans,))
+                if com != ans:
+                    raise Exception('return value (%s) does not match command (%s)' % (ans, com))
+                self._manualControl = (com == 'j=on')
+            elif self._manualControl:
+                raise Exception('manual joystick control is turned on -> command (%s) will not be executed' % (com,))
+            elif com == 'cal':
+                self._serial.write(com + "\n")
+                cal1 = self._serial.readline().strip()
+                self.debug('servo control answer: cal(1): %s' % (cal1))
+                if cal1 == 'j=on':
+                    self._manualControl = True
+                    raise Exception('manual joystick control has been turned on -> no more commands will be sent to CamZilla until joystick control has been turned off')
+                elif cal1 == '!cal':
+                    raise Exception('could not calibrate')
+                elif cal1.lower().find('emergency') != -1:
+                    raise Exception('could not calibrate (answer: %s)' % (cal1))
+                cal2 = self._serial.readline().strip()
+                self.debug('servo control answer: cal(2): %s' % (cal2))
+                cal1 = cal1[5:-1].split(',')
+                cal2 = cal2.split('=')[1].split('/')
+                return (int(cal1[0]), int(cal1[1]), int(cal2[0]), int(cal2[1]))
+            elif com.startswith('x=') or com.startswith('y='):
+                self._serial.write(com + "\n")
+                ans = self._serial.readline().strip()
+                self.debug('servo control answer: x=..: %s' % (ans,))
+                if ans == '!cal':
+                    raise Exception('not yet calibrated')
+                elif ans.startswith('x/y='):
+                    spl = ans.split('=')[1].split('/')
+                    xLimit = yLimit = False
+                    if (spl[0].endswith('L')):
+                        spl[0] = spl[0][:-1]
+                        xLimit = True
+                    if (spl[1].endswith('L')):
+                        spl[1] = spl[1][:-1]
+                        yLimit = True
+                    return (int(spl[0]), int(spl[1]), xLimit, yLimit)
+                elif ans == 'j=on':
+                    self._manualControl = True
+                    raise Exception('manual joystick control has been turned on -> no more commands will be sent to CamZilla until joystick control has been turned off')
+                elif ans.lower().find('emergency') != -1:
+                    raise Exception(ans)
                 else:
-                    raise TypeError('command (%s) unknown' % (com,))
-            except Exception, e:
-                raise e
-            finally:
-                self._writeLock.release()
-        else:
-            self.warning('plugin has been stopped -> command will not be executed')
+                    raise Exception('unknown return value for command (%s): %s' % (com, ans))
+            else:
+                raise TypeError('command (%s) unknown' % (com,))
+        except Exception, e:
+            raise e
+        finally:
+            self._writeLock.release()
             
     
 

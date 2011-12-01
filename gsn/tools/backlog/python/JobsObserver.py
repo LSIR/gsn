@@ -103,7 +103,7 @@ class JobsObserverClass(Thread, Statistics):
                             else:
                                 allFinished = False
                                 if self._logger.isEnabledFor(logging.DEBUG):
-                                    self._logger.debug('plugin (%s) has not yet reached min_runtime -> keep running' % (job_name,))
+                                    self._logger.debug('plugin (%s) has not yet reached min_runtime %s more seconds to go -> keep running' % (job_name, min_runtime-datetime.utcnow()))
                     else:
                         ret = job.poll()
                         if ret == None:
@@ -174,7 +174,7 @@ class JobsObserverClass(Thread, Statistics):
         
         
         
-    def observeJob(self, job, job_name, isPlugin, max_runtime_minutes, min_runtime_minutes):
+    def observeJob(self, job, job_name, isPlugin, max_runtime_minutes, min_runtime_minutes=None):
         if not self._jobsObserverStop:
             self._lock.acquire()
             if min_runtime_minutes is None:
