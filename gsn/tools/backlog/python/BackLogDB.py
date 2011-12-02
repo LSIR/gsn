@@ -340,6 +340,8 @@ class BackLogDBClass(Thread, Statistics):
                         self._logger.debug('resent message (%d,%d,%d) has not been acknowledged whithin %f seconds' % (msgType, timestamp, len(message), MAX_WAIT_FOR_ACK))
                     if not self._backlogMain.gsnpeer.isConnected() or self._stopped:
                         break
+            else:
+                self._backlogMain.schedulehandler.backlogResendFinished()
 
             self._isBusy = False
             self._resend.clear()
