@@ -115,6 +115,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         self.info('encoder pulses per degree: %f' % (self._pulsesPerDegree,))
         self.info('using device %s' % (device,))
         self._serial.setPort(device)
+        self._serial.setTimeout(5)
         
         if not os.path.isdir(PICTUREFOLDER):
             self.warning('picture folder >%s< is not a directory -> creating it' % (PICTUREFOLDER,))
@@ -579,26 +580,30 @@ class CamZillaPluginClass(AbstractPluginClass):
             self._power = True
             
             if not self._serial or not self._serial.isOpen():
-                cnt = 0
+                connect_cnt = 0
                 while not self._plugStop:
                     try:
                         self._serial.open()
                     except serial.SerialException, e:
-                        if cnt == 5:
+                        if connect_cnt == 5:
                             raise TypeError('could not initialize serial source: %s' % (e,))
                     else:
-                        ans = self._serial.readline()
-                        i = ans.rfind('Joystick')
-                        if i != -1:
-                            self.info(ans[i:])
-                        else:
-                            self.exception('unexpected output received from arduino')
-                        break
+                        ans_cnt = 0
+                        while not self._plugStop:
+                            ans = self._serial.readline()
+                            i = ans.rfind('Joystick')
+                            if i != -1:
+                                self.info(ans[i:])
+                                self.info('robot ready')
+                                return True
+                            else:
+                                self.warning('unexpected output received from arduino -> try again')
+                            if ans_cnt >= 3:
+                                raise TypeError('Arduino did not startup properly')
+                            ans_cnt += 1
                     self._delay.wait(0.5)
-                    cnt += 1
+                    connect_cnt += 1
                     
-            self.info('robot ready')
-            return True
         return False
         
         
