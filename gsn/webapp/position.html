@@ -1,303 +1,304 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
-<head> 
-		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
-		<title>GSN</title> 
-		
-		<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" /> 
-		<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
-		<script type="text/javascript" src="js/jquery-dom.js"></script> 
-		<script type="text/javascript" src="js/jquery.history.js"></script> 
-		<script type="text/javascript" src="js/jquery-tooltip.js"></script> 
-		<script type="text/javascript" src="js/jquery.cookie.js"></script>
-		
-		<!-- Include Map engine-->
-		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAcCxhFM99SMIShXVUlt9hZRSjsCGEsmaiCSQsgat2cHjtdY5LPxRFBI0tTgRKlfiK2rwnvIoURPNYxA" type="text/javascript"></script>
-		<script type="text/javascript" src="js/mapstraction.js"></script>
-		
-		<script type="text/javascript" src="js/constants.js"></script>
-		<script type="text/javascript" src="js/functions.js"></script>
-		<script type="text/javascript" src="js/gsn.js"></script>
-		<script type="text/javascript" src="js/uptime.js"></script>
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <title>GSN</title>
+        
+        <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+        
+        <script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-dom.js"></script> 
+        <script type="text/javascript" src="js/jquery.history.js"></script> 
+        <script type="text/javascript" src="js/jquery-tooltip.js"></script> 
+        <script type="text/javascript" src="js/jquery.cookie.js"></script>
+        
+        <script type="text/javascript" src="js/constants.js"></script>
+        <script type="text/javascript" src="js/functions.js"></script>
+        <script type="text/javascript" src="js/gsn.js"></script>
+        <script type="text/javascript" src="js/uptime.js"></script>
+        
+        <link rel="stylesheet" type="text/css" href="http://pc-10022.ethz.ch:24001/sensorviz.css" />
+        <link rel="stylesheet" type="text/css" href="http://pc-10022.ethz.ch:24001/jquery-ui-1.8.14.custom.css" />
+        <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+        <!--script type='text/javascript' src='http://pc-10022.ethz.ch:24001/jquery-1.6.2.min.js'></script-->
+        <script type='text/javascript' src='http://pc-10022.ethz.ch:24001/jquery-ui-1.8.14.custom.min.js'></script>
+        <script type='text/javascript' src='http://pc-10022.ethz.ch:24001/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://pc-10022.ethz.ch:24001/sensorviz.js'></script>
+      
 
 <script type="text/javascript">
 <!--//<![CDATA[
-		
-	var mapProvider = null;
-	var topologyUpdateInfo;
-	
-	var LOOK_N_DAYS_BACK = 5;
-	var deployments = new Array();
-	var selectedDeploymentNr;
-	var tableEnding = "";
-	var fieldIdLat = "lat_raw_data";
-	var fieldIdLong = "long_raw_data";
-	var coreStationFieldId = "device_id";
-		
+
+var g1Config = null;
+
+var topologyUpdateInfo;
+var LOOK_N_DAYS_BACK = 5;
+var deployments = new Array();
+var selectedDeploymentNr;
+var tableEnding = "";
+var fieldIdLat = "lat_raw_data";
+var fieldIdLong = "long_raw_data";
+var coreStationFieldId = "device_id";
+
+var aggMap;
+    
 function deployment(name) {
-	this.name = name;
-	this.coreStations = new Array();
+  this.name = name;
+  this.coreStations = new Array();
 }
 
 function coreStation(id) {
-	this.id = id;
-	this.lati = 0;
-	this.longi = 0;
+  this.id = id;
+  this.lati = 0;
+  this.longi = 0;
 }
 
 function getCoreStationIds(deploymentId) {
-	var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
-	var ids = new Array();
-	$.ajax({
-		type: "GET",
-		url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=" + coreStationFieldId + "&orderby=timestamp&groupby=" + coreStationFieldId + "&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime(),
+  var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
+  var ids = new Array();
+  $.ajax({
+    type: "GET",
+    url: "/data?vsName=" + deployments[deploymentId].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=" + coreStationFieldId + "&orderby=timestamp&groupby=" + coreStationFieldId + "&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime(),
         async: false,
         cache: false,
         timeout: 30000,
-		success: function(data){
-			$("line", data).each(function(){
-				var l = $("field", this).text();
-				if (l != coreStationFieldId && l.toLowerCase() != "null")
-					ids.push(new coreStation(l))
-			});
-		}
-	});
-	return ids;
+    success: function(data){
+      $("line", data).each(function(){
+        var l = $("field", this).text();
+        if (l != coreStationFieldId && l.toLowerCase() != "null")
+          ids.push(new coreStation(l))
+      });
+    }
+  });
+  return ids;
 }
 
 function showDeployment(id) {
-	$.each(deployments, function() {
-		var depl = this;
-		$("#deployment_"+depl.name).hide();
-		$("#deployment_menu_item_"+depl.name).removeClass("selected");
-	});
-	$("#deployment_"+deployments[id].name).show();
-	$("#deployment_menu_item_"+deployments[id].name).addClass("selected");
-	$.cookie("deployment" , deployments[id].name);
-	selectedDeploymentNr = id;
+  $.each(deployments, function() {
+    var depl = this;
+    $("#deployment_"+depl.name).hide();
+    $("#deployment_menu_item_"+depl.name).removeClass("selected");
+  });
+  $("#deployment_"+deployments[id].name).show();
+  $("#deployment_menu_item_"+deployments[id].name).addClass("selected");
+  $.cookie("deployment" , deployments[id].name);
+  selectedDeploymentNr = id;
 }
 
 function addNewCoreStation(depl, id) {
-	var cs = new coreStation(id);
-	
-	depl.coreStations.push(cs)
+  var cs = new coreStation(id);
+  
+  depl.coreStations.push(cs)
 }
 
 $(document).ready(function() {
 
-	$.get('/menu.jsp', {selected: "position"}, function(data) {
-		$('#navigation').html(data);
-	}, 'html');
-	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
-		
-	// deployments
-	// load deployments
-	$.ajax({
-		type: "GET",
-		url: "/gsn?structure",
-		success: function(data){
-			if ($(document).attr("title")=="GSN") {
-			    var gsn = $("gsn",data);
-			    $(document).attr("title",$(gsn).attr("name"));
-			    $("#gsn-name").empty().append($(gsn).attr("name"));
-			    $("#gsn-desc").empty().append($(gsn).attr("description"));
-			    $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
-			    var gsnname = $(gsn).attr("name").replace(/.*::\s*GSN\s*-\s*/, "").replace(/\s/g,"").toLowerCase();
-			    $('head', document).append('<link rel="shortcut icon" href="/img/favicon/permasense-'+gsnname+'.ico"><link rel="icon" href="/img/favicon/permasense-'+gsnname+'.ico">');
-			}
-			$("#gsn-name").show();
-			uptime.setTime($(gsn).attr("uptime"));
-			var arraySize = 0;
-			$("virtual-sensor",data).each(function(){
-				if ($(this).attr("name").indexOf("gps_nav") != -1) {
-					if ($(this).attr("name").indexOf("__mapped") != -1) {
-						tableEnding = "__mapped";
-						fieldIdLat = "latitude";
-						fieldIdLong = "longitude";
-						coreStationFieldId = "position";
-					}
-			    var deploymentname = $(this).attr("name").split("_", 1)[0];
-			    if(deploymentname.length > 1) {
-						deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
-						if (deploymentname!='Statistics') {
-							var exists = false;
-							$.each(deployments, function(){
-								if (this.name == deploymentname) {
-									exists = true;
-									return false;
-								}
-							});
-							if (!exists)
-						  	deployments.push(new deployment(deploymentname));
-						}
-					}
-				}
-			});
-			
-			// check if there is any deployment with the required virtual sensor
-			if (deployments.length == 0) {
-				$("#starttext").html("<p>Warning: No deployment available with the required virtual sensor gps_nav.</p>");
-				$("#maindiv #mapdiv").hide();
-				$("#maindiv #deployment_navigation").hide();
-			}
-			else {
-				// display
-				var visible = 0;
-				$.each(deployments, function(i, l){
-					if (this.name == $.cookie("deployment")) {
-						visible = i;
-						return false;
-					}
-				});
-				
-				$.each(deployments, function(i, depl) {
-				    // add tab
-				    $("#deployment_menu").append($.LI({}, $.A({
-						"id":"deployment_menu_item_"+depl.name,
-						"href":"javascript:showDeployment("+i+")"
-				    },depl.name)));
-				    
-				  	$.each(getCoreStationIds(i), function(){
-							addNewCoreStation(depl, this.id);
-						});
-					
-						$("#deployment_"+depl.name).hide();
-				});
-				showDeployment(visible);
-				
-				$("#starttext").html("<p>Core stations' GPS position.</p>");
-				
-				mapProvider = DEFAULT_MAP_PROVIDER;
-				map = new Mapstraction('vsmap',mapProvider);
-				
-				map.addControls({
-					pan: true,
-					zoom: 'small',
-					map_type: true
-				});
-				
-				//bind every buttons to javascript functionality (only once)
-				$("#refreshall_timeout").bind("change",GSN.updateallchange);
-				$("#refreshall").bind("click",GSN.updateall);
-				$("#toggleallmarkers").bind("click()",GSN.map.toggleAllMarkers);
-				$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
-				
-				GSN.load();
-				GSN.map.toggleAllMarkers();
-				fetchGPSPositions();
-				GSN.map.showAllMarkers();
-				GSN.map.checkZoomFactor();
-				GSN.map.activateTransitLayer();
-		  }
-		}
-	});
+  $.get('/menu.jsp', {selected: "position"}, function(data) {
+    $('#navigation').html(data);
+  }, 'html');
+  $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+    
+  // deployments
+  // load deployments
+  $.ajax({
+    type: "GET",
+    url: "/gsn?structure",
+    success: function(data){
+      if ($(document).attr("title")=="GSN") {
+          var gsn = $("gsn",data);
+          $(document).attr("title",$(gsn).attr("name"));
+          $("#gsn-name").empty().append($(gsn).attr("name"));
+          $("#gsn-desc").empty().append($(gsn).attr("description"));
+          $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+          var gsnname = $(gsn).attr("name").replace(/.*::\s*GSN\s*-\s*/, "").replace(/\s/g,"").toLowerCase();
+          $('head', document).append('<link rel="shortcut icon" href="/img/favicon/permasense-'+gsnname+'.ico"><link rel="icon" href="/img/favicon/permasense-'+gsnname+'.ico">');
+      }
+      $("#gsn-name").show();
+      uptime.setTime($(gsn).attr("uptime"));
+      var arraySize = 0;
+      $("virtual-sensor",data).each(function(){
+        if ($(this).attr("name").indexOf("gps_nav") != -1) {
+          if ($(this).attr("name").indexOf("__mapped") != -1) {
+            tableEnding = "__mapped";
+            fieldIdLat = "latitude";
+            fieldIdLong = "longitude";
+            coreStationFieldId = "position";
+          }
+          var deploymentname = $(this).attr("name").split("_", 1)[0];
+          if(deploymentname.length > 1) {
+            deploymentname = deploymentname.substring(0, 1).toUpperCase() + deploymentname.substring(1, deploymentname.length).toLowerCase();
+            if (deploymentname!='Statistics') {
+              var exists = false;
+              $.each(deployments, function(){
+                if (this.name == deploymentname) {
+                  exists = true;
+                  return false;
+                }
+              });
+              if (!exists)
+                deployments.push(new deployment(deploymentname));
+            }
+          }
+        }
+      });
+      
+      // check if there is any deployment with the required virtual sensor
+      if (deployments.length == 0) {
+        $("#starttext").html("<p>Warning: No deployment available with the required virtual sensor gps_nav.</p>");
+        $("#maindiv #mapdiv").hide();
+        $("#maindiv #deployment_navigation").hide();
+      }
+      else {
+        // display
+        var visible = 0;
+        $.each(deployments, function(i, l){
+          if (this.name == $.cookie("deployment")) {
+            visible = i;
+            return false;
+          }
+        });
+        
+        $.each(deployments, function(i, depl) {
+            // add tab
+            $("#deployment_menu").append($.LI({}, $.A({
+            "id":"deployment_menu_item_"+depl.name,
+            "href":"javascript:showDeployment("+i+")"
+            },depl.name)));
+            
+            $.each(getCoreStationIds(i), function(){
+              addNewCoreStation(depl, this.id);
+            });
+          
+            $("#deployment_"+depl.name).hide();
+        });
+        showDeployment(visible);
+        
+        $("#starttext").html("<p>Sensorviz</p>");
+        
+        g1Config = {
+          "graph": {
+              "div": "g1_div",
+              "type": "dygraph",
+              "width": 600,
+              "height": 250,
+              "showForm": false
+          },
+          "appUrl": "http://pc-10022.ethz.ch:24001/sensorviz?",
+          "signals": {
+              "y1": [
+              {
+                  "displayName": "GPS nr_satellites",
+                  "gsnUrl": "tik51x.ethz.ch:22001",
+                  "virtualSensor": "ostest_gps_nav__mapped",
+                  "field": "nr_satellites",
+                  "deviceId": 3,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 6.0, 7.0 ]
+              },
+              {
+                  "displayName": "GPS nr_satellites",
+                  "gsnUrl": "tik51x.ethz.ch:22001",
+                  "virtualSensor": "ostest_gps_nav__mapped",
+                  "field": "nr_satellites",
+                  "deviceId": 4,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 6.0, 7.0 ]
+              }
+              ]
+          }
+        };
+    
+        aggMap = new AggregationMap(g1Config, document.getElementById("map_canvas"));
+        
+        fetchGPSPositions();
+        
+      }
+    }
+  });
 });
 
 function fetchGPSPositions() {
 
-	var seldepl = selectedDeploymentNr;
-	
-	// get longitude and latitude for each core station of the selected deployment
-	$.each(deployments[seldepl].coreStations, function(i, l){
+  var seldepl = selectedDeploymentNr;
+  
+  // get longitude and latitude for each core station of the selected deployment
+  $.each(deployments[seldepl].coreStations, function(i, l){
 
-		$.ajax({
-			type: "GET",
-			url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=" + coreStationFieldId + "&fields=" + fieldIdLong + "&fields=" + fieldIdLat + "&critfield=" + coreStationFieldId + "&neg=&critop==&critval=" + this.id + "&nb=1",
-			    async: false,
-			    cache: false,
-			    timeout: 30000,
-			success: function(data){
-				var dev_id = "";
-				var lati;
-				var longi;
-				$("line", data).each(function(){
-					if ($("field:eq(0)", this).text() != coreStationFieldId) {
-						dev_id = $("field:eq(0)", this).text();
-						longi = $("field:eq(1)", this).text();
-						lati = $("field:eq(2)", this).text();
-						
-						var absdlat = Math.abs( Math.round(Math.round(lati/100) * 1000000.));
-						var absmlat = Math.abs( Math.round((lati - absdlat/10000) * 1000000.));
-			
-						var absdlon = Math.abs( Math.round(Math.round(longi/100) * 1000000.));
-						var absmlon = Math.abs( Math.round((longi - absdlon/10000) * 1000000.));
-			
-						lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
-						longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
-						
-						// only add a new marker if the position is not identical with the last one
-						if (!(this.lati == lati && this.longi == longi)) {
-							GSN.map.updateMarker(deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding, dev_id, lati, longi);
-							this.lati = lati;
-							this.longi = longi;
-						}
-					}
-				})
-			}
-		});
-	});
-	
-	GSN.load();
-	topologyUpdateTimer = setTimeout("fetchGPSPositions()",30000);
-	
+    $.ajax({
+      type: "GET",
+      url: "/data?vsName=" + deployments[seldepl].name.toLowerCase() + "_gps_nav" + tableEnding + "&fields=" + coreStationFieldId + "&fields=" + fieldIdLong + "&fields=" + fieldIdLat + "&critfield=" + coreStationFieldId + "&neg=&critop==&critval=" + this.id + "&nb=1",
+          async: false,
+          cache: false,
+          timeout: 30000,
+      success: function(data){
+        var dev_id = "";
+        var lati;
+        var longi;
+        $("line", data).each(function(){
+          if ($("field:eq(0)", this).text() != coreStationFieldId) {
+            dev_id = $("field:eq(0)", this).text();
+            longi = $("field:eq(1)", this).text();
+            lati = $("field:eq(2)", this).text();
+            
+            var absdlat = Math.abs( Math.round(Math.round(lati/100) * 1000000.));
+            var absmlat = Math.abs( Math.round((lati - absdlat/10000) * 1000000.));
+      
+            var absdlon = Math.abs( Math.round(Math.round(longi/100) * 1000000.));
+            var absmlon = Math.abs( Math.round((longi - absdlon/10000) * 1000000.));
+      
+            lati = Math.round(absdlat + (absmlat/60.) ) * 1/1000000;
+            longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
+            
+            // only add a new marker if the position is not identical with the last one
+            if (!(this.lati == lati && this.longi == longi)) {
+
+              var myLatlng = new google.maps.LatLng(lati, longi);
+              var marker = new google.maps.Marker({position: myLatlng, map: aggMap.map, title:"Device: "+dev_id});
+              
+              this.lati = lati;
+              this.longi = longi;
+            }
+          }
+        })
+      }
+    });
+  });
+  
+  topologyUpdateTimer = setTimeout("fetchGPSPositions()",30000);
+  
 };
 
-function showDeployment(id) {
-	$.each(deployments, function() {
-		var depl = this;
-		$("#deployment_"+depl.name).hide();
-		$("#deployment_menu_item_"+depl.name).removeClass("selected");
-	});
-	$("#deployment_"+deployments[id].name).show();
-	$("#deployment_menu_item_"+deployments[id].name).addClass("selected");
-	$.cookie("deployment" , deployments[id].name);
-	selectedDeploymentNr = id;
-}
-
 //]]>-->
-        </script>
+</script>
+</head>
+<body>  
 
+<div id="container">
+	<div id="header">
+		<h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
+	</div>
+	<div id="navigation">
+	</div>
+	
+	<div id="separator">
+		<div id="starttext"> </div>
+	</div>
 
-
-
-    </head>
-    <body onunload="">
-    
-
-        <div id="container">
-            <div id="header">
-                <h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
-            </div>
-            
-            
-            <div id="navigation">
-            </div>
-            
-            <div id="separator">
-							<div id="starttext" />
-						</div>
-						
-						<div id="maindiv">
-
-							<div id="deployment_navigation">
-							<ul id="deployment_menu">
-							<li />
-							</ul>
-							</div>
-							
-							<!-- map part -->
-              <div id="mapdiv">
-
-                  <p><a style="text-decoration:underline" href="javascript:GSN.map.showAllMarkers();">Auto-zoom and focus the map</a></p>
-                  <div id="vsmap" style="width: 100%; height: 500px; position:relative;"></div>
-                  <div id="vs4map"></div>
-                  
-              </div>
-							
-						</div>
-            
+	<div id="maindiv">
+		<div id="deployment_navigation">
+		<ul id="deployment_menu">
+		<li />
+		</ul>
+		</div>
+		
+		<p></p>
+		<div id="map_canvas" style="width:100%; height:500px"></div>
+		
+	</div>
+	
 	<div class="separator">
 		<div id="footer">
 		      <table width="100%">
@@ -309,7 +310,7 @@ function showDeployment(id) {
 		</div>
 	</div>
 </div>
-<script type="text/javascript">
+<!-- script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
@@ -317,6 +318,6 @@ document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.
 var pageTracker = _gat._getTracker("UA-5632004-2");
 pageTracker._initData();
 pageTracker._trackPageview();
-</script>
+</script -->
 </body>
 </html>
