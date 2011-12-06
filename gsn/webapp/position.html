@@ -176,6 +176,7 @@ $(document).ready(function() {
         
         $("#starttext").html("<p>Sensed data and current position of the sensors.</p>");
         
+        var loc = window.location;
         g1Config = {
           "graph": {
               "div": "g1_div",
@@ -189,8 +190,8 @@ $(document).ready(function() {
               "y1": [
               {
                   "displayName": "GPS nr_satellites",
-                  "gsnUrl": "tik51x.ethz.ch:22001",
-                  "virtualSensor": "ostest_gps_nav__mapped",
+                  "gsnUrl": window.location.host,
+                  "virtualSensor": deployments[visible].name.toLowerCase() + "_gps_nav__mapped",
                   "field": "nr_satellites",
                   "deviceId": 3,
                   "scaling": 1.0,
@@ -200,7 +201,7 @@ $(document).ready(function() {
               //{
               //    "displayName": "GPS nr_satellites",
               //    "gsnUrl": "tik51x.ethz.ch:22001",
-              //    "virtualSensor": "ostest_gps_nav__mapped",
+              //    "virtualSensor": deployments[visible].name.toLowerCase() + "_gps_nav__mapped",
               //    "field": "nr_satellites",
               //    "deviceId": 4,
               //    "scaling": 1.0,
