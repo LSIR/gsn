@@ -174,7 +174,7 @@ $(document).ready(function() {
         });
         showDeployment(visible);
         
-        $("#starttext").html("<p>Sensorviz</p>");
+        $("#starttext").html("<p>Sensed data and current position of the sensors.</p>");
         
         g1Config = {
           "graph": {
@@ -196,17 +196,17 @@ $(document).ready(function() {
                   "scaling": 1.0,
                   "visible": true,
                   "thresholds": [ 6.0, 7.0 ]
-              },
-              {
-                  "displayName": "GPS nr_satellites",
-                  "gsnUrl": "tik51x.ethz.ch:22001",
-                  "virtualSensor": "ostest_gps_nav__mapped",
-                  "field": "nr_satellites",
-                  "deviceId": 4,
-                  "scaling": 1.0,
-                  "visible": true,
-                  "thresholds": [ 6.0, 7.0 ]
-              }
+              }//,
+              //{
+              //    "displayName": "GPS nr_satellites",
+              //    "gsnUrl": "tik51x.ethz.ch:22001",
+              //    "virtualSensor": "ostest_gps_nav__mapped",
+              //    "field": "nr_satellites",
+              //    "deviceId": 4,
+              //    "scaling": 1.0,
+              //    "visible": true,
+              //    "thresholds": [ 6.0, 7.0 ]
+              //}
               ]
           }
         };
