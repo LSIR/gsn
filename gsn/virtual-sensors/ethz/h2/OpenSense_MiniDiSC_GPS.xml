@@ -40,7 +40,7 @@
                     <predicate key="query">select * from OpenSense_MiniDiSC__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where LAT != 0 and LON != 0</query>
+                <query> select * from wrapper where LAT != 0 and LON != 0 and NUMBER != 0</query>
             </source>
             <query> select * from source </query>
         </stream>
