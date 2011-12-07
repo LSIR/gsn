@@ -209,6 +209,16 @@ $(document).ready(function() {
                     "thresholds": [ 18.0, 8.0 ]
               },
               {
+                    "displayName": "CO [ppm]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_alphasense_co_gps",
+                    "field": "sensor_ppm",
+                    "deviceId": 3,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 1.5, 1.0 ]
+              },
+              {
                   "displayName": "GPS Satellites [#]",
                   "gsnUrl": window.location.host,
                   "virtualSensor": deployments[visible].name.toLowerCase() + "_gps_nav__mapped",
