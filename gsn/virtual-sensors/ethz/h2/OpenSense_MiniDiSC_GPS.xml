@@ -1,0 +1,48 @@
+<virtual-sensor name="OpenSense_MiniDiSC_GPS" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                  try {
+                    def lati = LAT as int;
+                    LATITUDE = (((LAT-lati)*60) as double) + lati*100;
+                    
+                    def longi = LON as int;
+                    LONGITUDE = (((LON-longi)*60) as double) + longi*100;
+                    
+                  }catch(Throwable e){
+                    org.apache.log4j.Logger.getLogger(gsn.vsensor.BridgeVirtualSensorPermasense.class).error(e);
+                  }
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="NUMBER" type="DOUBLE" unit="particle/cm^3" />
+            <field name="LATITUDE" type="DOUBLE" />
+            <field name="LONGITUDE" type="DOUBLE" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>MiniDisc parsed data from OpenSense deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OpenSense_MiniDiSC__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where LAT != 0 and LON != 0</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
