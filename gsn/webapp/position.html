@@ -189,7 +189,27 @@ $(document).ready(function() {
           "signals": {
               "y1": [
               {
-                  "displayName": "GPS nr_satellites",
+                  "displayName": "Particulate matter [#]",
+                  "gsnUrl": window.location.host,
+                  "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_gps",
+                  "field": "number",
+                  "deviceId": 2006,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 10000.0, 5000.0 ]
+              },
+              {
+                    "displayName": "Ozone [ppb]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_init_calibration_gps",
+                    "field": "ozone_ppb",
+                    "deviceId": 3,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 18.0, 8.0 ]
+              },
+              {
+                  "displayName": "GPS Satellites [#]",
                   "gsnUrl": window.location.host,
                   "virtualSensor": deployments[visible].name.toLowerCase() + "_gps_nav__mapped",
                   "field": "nr_satellites",
@@ -197,16 +217,6 @@ $(document).ready(function() {
                   "scaling": 1.0,
                   "visible": true,
                   "thresholds": [ 6.0, 7.0 ]
-              },
-              {
-                  "displayName": "Particulate matter",
-                  "gsnUrl": window.location.host,
-                  "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_gps",
-                  "field": "number",
-                  "deviceId": 2006,
-                  "scaling": 1.0,
-                  "visible": true,
-                  "thresholds": [ 5000.0, 10000.0 ]
               }
               //{
               //    "displayName": "GPS nr_satellites",
