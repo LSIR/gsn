@@ -197,7 +197,18 @@ $(document).ready(function() {
                   "scaling": 1.0,
                   "visible": true,
                   "thresholds": [ 6.0, 7.0 ]
-              }//,
+              },
+              "y2": [
+              {
+                  "displayName": "Particulate matter",
+                  "gsnUrl": window.location.host,
+                  "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_gps",
+                  "field": "number",
+                  "deviceId": 2006,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 5000.0, 10000.0 ]
+              }
               //{
               //    "displayName": "GPS nr_satellites",
               //    "gsnUrl": "tik51x.ethz.ch:22001",
