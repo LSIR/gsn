@@ -140,10 +140,14 @@ public class MyControllerFilter implements Filter {
                             res.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified resource.");
                             return;
                         }
-                    } else {
-
-                        res.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified resource.");
-                        return;
+                    } else { // if resource is public and no password was provided
+                        if (!DataSource.isVSManaged(reqVirtualSensorName)) {
+                            chain.doFilter(request, response);
+                            return;
+                        } else {
+                            res.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified resource.");
+                            return;
+                        }
                     }
                 }
 
