@@ -569,6 +569,9 @@ class CamZillaPluginClass(AbstractPluginClass):
             self.getPowerControlObject().ext1Off()
             self._calibrated = False
             return True
+        
+        self.getPowerControlObject().ext3Off()
+        
         return False
         
     
