@@ -92,6 +92,7 @@ class ConfigurationHandlerClass():
             try:
                 tmp_file = tempfile.NamedTemporaryFile()
                 tmp_file.write(data[0])
+                tmp_file.flush()
                 self._checkConfig(tmp_file.name)
         
                 # Write configuration file to disk
