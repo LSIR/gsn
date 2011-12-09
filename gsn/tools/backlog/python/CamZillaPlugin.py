@@ -115,7 +115,6 @@ class CamZillaPluginClass(AbstractPluginClass):
         self.info('encoder pulses per degree: %f' % (self._pulsesPerDegree,))
         self.info('using device %s' % (device,))
         self._serial.setPort(device)
-        self._serial.setTimeout(5)
         
         if not os.path.isdir(PICTUREFOLDER):
             self.warning('picture folder >%s< is not a directory -> creating it' % (PICTUREFOLDER,))
@@ -358,13 +357,18 @@ class CamZillaPluginClass(AbstractPluginClass):
                     if self._power:
                         self.info('calibration task received from GSN -> calibrate robot')
                     self._calibrateRobot()
-                        
-                if self._powerSaveMode and self._taskqueue.empty() and not self._plugStop:
-                    self._parkRobot()
-                    self._shutdownRobotAndCam()
-                        
             except Exception, e:
                 self.exception(str(e))
+                        
+            if self._powerSaveMode and self._taskqueue.empty() and not self._plugStop:
+                try:
+                    self._parkRobot()
+                except Exception, e:
+                    self.exception(str(e))
+                try:
+                    self._shutdownRobotAndCam()
+                except Exception, e:
+                    self.exception(str(e))
                 
             try:
                 self._taskqueue.task_done()
