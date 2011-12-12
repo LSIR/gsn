@@ -27,7 +27,12 @@ public class GPSStreamJoiner extends BridgeVirtualSensorPermasense {
 	private ArrayList<StreamElement> gpsBuffer = new ArrayList<StreamElement>();
 
 	private static DataField[] ozoneGpsDataField = {	
-    new DataField("OZONE_PPB", "DOUBLE"),
+    new DataField("OZONE_PPB_1", "DOUBLE"),
+    new DataField("OZONE_PPB_2", "DOUBLE"),
+    new DataField("RESISTANCE_1", "INTEGER"),
+    new DataField("RESISTANCE_2", "INTEGER"),
+    new DataField("TEMPERATURE", "DOUBLE"),
+    new DataField("HUMIDITY", "INTEGER"),
     new DataField("UTC_POS_TIME", "INTEGER"),
     new DataField("LATITUDE", "DOUBLE"),
     new DataField("LONGITUDE", "DOUBLE"),
@@ -116,9 +121,9 @@ public class GPSStreamJoiner extends BridgeVirtualSensorPermasense {
           checkBuffer.remove(i);
           
           if (inputStreamName.equalsIgnoreCase("GPS") && joinType == OZONE_WITH_GPS_NAMING)
-            data = new StreamElement(data, ozoneGpsDataField, new Serializable[] {bufData.getData("OZONE_PPB"), data.getData("UTC_POS_TIME"), data.getData("LATITUDE"), data.getData("LONGITUDE"), data.getData("QUALITY"), data.getData("NR_SATELLITES"), data.getData("HDOP"), data.getData("GEOID_HEIGHT")});
+            data = new StreamElement(data, ozoneGpsDataField, new Serializable[] {bufData.getData("OZONE_SENSOR_1"), bufData.getData("OZONE_SENSOR_2"), bufData.getData("RESISTANCE_1"), bufData.getData("RESISTANCE_2"), bufData.getData("TEMPERATURE"), bufData.getData("HUMIDITY"), data.getData("UTC_POS_TIME"), data.getData("LATITUDE"), data.getData("LONGITUDE"), data.getData("QUALITY"), data.getData("NR_SATELLITES"), data.getData("HDOP"), data.getData("GEOID_HEIGHT")});
           else if (inputStreamName.equalsIgnoreCase("SENSOR") && joinType == OZONE_WITH_GPS_NAMING)
-            data = new StreamElement(data, ozoneGpsDataField, new Serializable[] {data.getData("OZONE_PPB"), bufData.getData("UTC_POS_TIME"), bufData.getData("LATITUDE"), bufData.getData("LONGITUDE"), bufData.getData("QUALITY"), bufData.getData("NR_SATELLITES"), bufData.getData("HDOP"), bufData.getData("GEOID_HEIGHT")});
+            data = new StreamElement(data, ozoneGpsDataField, new Serializable[] {data.getData("OZONE_SENSOR_1"), data.getData("OZONE_SENSOR_2"), data.getData("RESISTANCE_1"), data.getData("RESISTANCE_2"), data.getData("TEMPERATURE"), data.getData("HUMIDITY"), bufData.getData("UTC_POS_TIME"), bufData.getData("LATITUDE"), bufData.getData("LONGITUDE"), bufData.getData("QUALITY"), bufData.getData("NR_SATELLITES"), bufData.getData("HDOP"), bufData.getData("GEOID_HEIGHT")});
           else if (inputStreamName.equalsIgnoreCase("GPS") && joinType == ACC_WITH_GPS_NAMING)
             data = new StreamElement(data, accGpsDataField, new Serializable[] {bufData.getData("DURATION"), bufData.getData("TIME_OF_DATA"), data.getData("UTC_POS_TIME"), data.getData("LATITUDE"), data.getData("LONGITUDE"), data.getData("QUALITY"), data.getData("NR_SATELLITES"), data.getData("HDOP"), data.getData("GEOID_HEIGHT")});
           else if (inputStreamName.equalsIgnoreCase("SENSOR") && joinType == ACC_WITH_GPS_NAMING)
