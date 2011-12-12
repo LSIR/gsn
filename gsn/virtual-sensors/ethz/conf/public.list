@@ -282,13 +282,11 @@ OpenSense_MotionDetection__mapped.xml
 OpenSense_OstLuft_Schimmelstrasse.xml
 #OpenSense_OstLuft_Schwamendingen.xml
 OpenSense_OstLuft_Stampfenbachstrasse.xml
-#OpenSense_OZ47_Init_Calibration.xml
 OpenSense_MiniDiSC__mapped.xml
 #OpenSense_STEVAL_Static__muxed__mapped.xml
 #OpenSense_STEVAL_Static__mapped.xml
 #OpenSense_STEVAL_Dynamic_Proc__muxed__mapped.xml
 #OpenSense_STEVAL_Dynamic_Proc__mapped.xml
-#OpenSense_OZ47_Init_Calibration_GPS.xml
 OpenSense_Alphasense_CO_GPS.xml
 OpenSense_MiniDiSC_GPS.xml
 OpenSense_OZ47_Uncalibrated.xml
