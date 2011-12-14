@@ -198,7 +198,7 @@ $(document).ready(function() {
                   "visible": true,
                   "thresholds": [ 25000.0, 20000.0 ]
               },
-              {
+              /*{
                     "displayName": "Ozone [ppb]",
                     "gsnUrl": window.location.host,
                     "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_instant_calibrated",
@@ -207,7 +207,7 @@ $(document).ready(function() {
                     "scaling": 1.0,
                     "visible": true,
                     "thresholds": [ 18.0, 8.0 ]
-              },
+              },*/
               {
                     "displayName": "CO [ppm]",
                     "gsnUrl": window.location.host,
@@ -228,16 +228,6 @@ $(document).ready(function() {
                   "visible": true,
                   "thresholds": [ 6.0, 7.0 ]
               }
-              //{
-              //    "displayName": "GPS nr_satellites",
-              //    "gsnUrl": "tik51x.ethz.ch:22001",
-              //    "virtualSensor": deployments[visible].name.toLowerCase() + "_gps_nav__mapped",
-              //    "field": "nr_satellites",
-              //    "deviceId": 4,
-              //    "scaling": 1.0,
-              //    "visible": true,
-              //    "thresholds": [ 6.0, 7.0 ]
-              //}
               ]
           }
         };
