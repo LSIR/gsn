@@ -198,6 +198,16 @@ $(document).ready(function() {
                   "visible": true,
                   "thresholds": [ 25000.0, 20000.0 ]
               },
+              {
+                    "displayName": "Ozone [ppb]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_init_calibration_gps",
+                    "field": "ozone_ppb",
+                    "deviceId": 3,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 18.0, 8.0 ]
+              },
               /*{
                     "displayName": "Ozone [ppb]",
                     "gsnUrl": window.location.host,
