@@ -291,6 +291,8 @@ OpenSense_Alphasense_CO_GPS.xml
 OpenSense_MiniDiSC_GPS.xml
 OpenSense_OZ47_Uncalibrated.xml
 OpenSense_OZ47_Only_Init_Calibrated.xml
+OpenSense_OZ47_Param_Instant_Cal.xml
+OpenSense_OZ47_Instant_Calibrated.xml
 Statistics_GSN.xml
 Statistics_MySQL.xml
 Statistics_Sensorviz__mapped.xml

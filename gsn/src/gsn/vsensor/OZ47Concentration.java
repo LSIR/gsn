@@ -51,8 +51,8 @@ public class OZ47Concentration extends BridgeVirtualSensorPermasense {
 		Integer resistance = (Integer)data.getData("RESISTANCE_1");
 		Double temp = (Double)data.getData("TEMPERATURE");
 		double ozone_calib;
-		// No calibration if there is no NABEL data
-		if (resistance == 0) {
+		// No calibration if there is no sensor data
+		if (resistance.intValue() == 0) {
 			logger.warn("measured resistance is zero, no final calibration applied (time=" + time + ")");
 			return;
     }
