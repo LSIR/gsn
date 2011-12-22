@@ -77,12 +77,12 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         self.steval._closeDevice()
         self._numPolls = self._numPolls + 1
         # Send statistics
-        if self._numPolls == self._sendStatistic:
-            self._numPolls = 0
-            dataPackage = [self._stdThreshold, self._pollInterval, self._pollDuration, self._std_x, self._std_y, self._std_z, self._moving]
-            self._moving = 0
-            self.info(dataPackage)
-            self.processMsg(self.getTimeStamp(), dataPackage)
+        #if self._numPolls == self._sendStatistic:
+        #    self._numPolls = 0
+        #    dataPackage = [self._stdThreshold, self._pollInterval, self._pollDuration, self._std_x, self._std_y, self._std_z, self._moving]
+        #    self._moving = 0
+        #    self.info(dataPackage)
+        #    self.processMsg(self.getTimeStamp(), dataPackage)
 
     def isBusy(self):
         return False
@@ -106,18 +106,18 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         if std_x <= self._stdThreshold and std_y <= self._stdThreshold and std_z <= self._stdThreshold:
             self.info('Vehicle is not moving')
             # Execute action function of the specified plugins
-            #pluginList = [BackLogMessage.OZ47_MESSAGE_TYPE, BackLogMessage.GPS_NAV_MESSAGE_TYPE, BackLogMessage.ALPHASENSE_MESSAGE_TYPE]
-            pluginList = [BackLogMessage.GPS_NAV_MESSAGE_TYPE]
+            pluginList = [BackLogMessage.OZ47_MESSAGE_TYPE, BackLogMessage.GPS_NAV_MESSAGE_TYPE, BackLogMessage.ALPHASENSE_MESSAGE_TYPE]
+            #pluginList = [BackLogMessage.GPS_NAV_MESSAGE_TYPE]
             num = self.runPluginRemoteAction(pluginList, self.getTimeStamp())
             self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
         else:
             self.info('Vehicle is moving')
             # Execute action function of the specified plugins
-            #pluginListMoving = [BackLogMessage.STEVAL_MESSAGE_TYPE]
-            #num = self.runPluginRemoteAction(pluginListMoving, self.getTimeStamp())
-            #self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginListMoving)) + ' plugins')
+            pluginListMoving = [BackLogMessage.STEVAL_MESSAGE_TYPE]
+            num = self.runPluginRemoteAction(pluginListMoving, self.getTimeStamp())
+            self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginListMoving)) + ' plugins')
 
-            self._moving = self._moving + 1
+            #self._moving = self._moving + 1
             # Store std values from the last motion detection
             self._std_x = std_x
             self._std_y = std_y
