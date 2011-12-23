@@ -50,9 +50,9 @@
             <param name="scriplet-periodic">
                 <![CDATA[
                 	// default alarm time after which an email is sent if no messages have been received
-                    def timeDifferenceOffsetDefault = 300000;
+                    def timeDifferenceOffsetDefault = 86400000;
                 	// a list of alarm time per position
-                    def timeDifferenceOffsetPositionMap = [19:86400000];
+                    def timeDifferenceOffsetPositionMap = [:];
                     // the mail recipients
                     def mailrecipients = ["gsn-notification@tik.ee.ethz.ch"];
                     
