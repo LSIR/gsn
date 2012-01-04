@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Dozer_AEStatistics" priority="10" >
+<virtual-sensor name="ETZ_Dozer_AEStatisticsOld" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -9,20 +9,16 @@
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
-            <field name="PAYLOAD_CH1_MEASURED" type="INTEGER" />            
-            <field name="PAYLOAD_CH1_PARAMETRIZED" type="INTEGER" />
-            <field name="PAYLOAD_CH1_STORED" type="INTEGER" />
-            <field name="PAYLOAD_CH1_BUFFERUNDERFLOWS" type="INTEGER" />
-            <field name="PAYLOAD_CH1_NOISEFLOOR" unit="dB" type="SMALLINT" />
-            <field name="PAYLOAD_CH2_MEASURED" type="INTEGER" />            
-            <field name="PAYLOAD_CH2_PARAMETRIZED" type="INTEGER" />
-            <field name="PAYLOAD_CH2_STORED" type="INTEGER" />
-            <field name="PAYLOAD_CH2_BUFFERUNDERFLOWS" type="INTEGER" />
-            <field name="PAYLOAD_CH2_NOISEFLOOR" unit="dB" type="SMALLINT" />
+            <field name="PAYLOAD_MEASURED" type="INTEGER" />            
+            <field name="PAYLOAD_PARAMETRIZED" type="INTEGER" />
+            <field name="PAYLOAD_STORED" type="INTEGER" />
+            <field name="PAYLOAD_BUFFERUNDERFLOWS" type="INTEGER" />
+            <field name="PAYLOAD_NOISEFLOOR_CH1" unit="dB" type="SMALLINT" />
+            <field name="PAYLOAD_NOISEFLOOR_CH2" unit="dB" type="SMALLINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerAEStatisticsMsg) from ETZ deployment</description>
+    <description>Dozer messages (DozerAEStatisticsOldMsg) from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -32,7 +28,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -43,7 +39,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -54,7 +50,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -65,7 +61,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -76,7 +72,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -87,7 +83,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -98,7 +94,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -109,7 +105,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -120,7 +116,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">pc-5225.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -132,7 +128,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -144,7 +140,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -155,7 +151,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps05.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -167,7 +163,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -179,7 +175,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-uz3g-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -191,7 +187,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -203,7 +199,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsMsg</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

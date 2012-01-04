@@ -13,6 +13,7 @@ ETZ_Dozer_AdcMux2.xml
 ETZ_Dozer_AEDAQHealthData.xml
 ETZ_Dozer_AEData.xml
 ETZ_Dozer_AEStatistics.xml
+ETZ_Dozer_AEStatisticsOld.xml
 ETZ_Dozer_BaseDebug.xml
 ETZ_Dozer_BaseStatus.xml
 ETZ_Dozer_Command.xml
@@ -64,4 +65,4 @@ OSTest_STEVAL_Static.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
-Statistics_Sensorviz.xml
+#Statistics_Sensorviz.xml
