@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerAEStatisticsMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 17;
+    public static final int DEFAULT_MESSAGE_SIZE = 25;
 
     /** The Active Message type associated with this message. */
-    public static final int AM_TYPE = 196;
+    public static final int AM_TYPE = 198;
 
-    /** Create a new DozerAEStatisticsMsg of size 17. */
+    /** Create a new DozerAEStatisticsMsg of size 25. */
     public DozerAEStatisticsMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -99,22 +99,34 @@ public class DozerAEStatisticsMsg extends ch.ethz.permasense.tinyos2x.messages.D
         s += "  [header.aTime.high=0x"+Long.toHexString(get_header_aTime_high())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.measured=0x"+Long.toHexString(get_payload_measured())+"]\n";
+        s += "  [payload.ch1_measured=0x"+Long.toHexString(get_payload_ch1_measured())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.parametrized=0x"+Long.toHexString(get_payload_parametrized())+"]\n";
+        s += "  [payload.ch1_parametrized=0x"+Long.toHexString(get_payload_ch1_parametrized())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.stored=0x"+Long.toHexString(get_payload_stored())+"]\n";
+        s += "  [payload.ch1_stored=0x"+Long.toHexString(get_payload_ch1_stored())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.bufferunderflows=0x"+Long.toHexString(get_payload_bufferunderflows())+"]\n";
+        s += "  [payload.ch1_bufferunderflows=0x"+Long.toHexString(get_payload_ch1_bufferunderflows())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.noisefloor_ch1=0x"+Long.toHexString(get_payload_noisefloor_ch1())+"]\n";
+        s += "  [payload.ch1_noisefloor=0x"+Long.toHexString(get_payload_ch1_noisefloor())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.noisefloor_ch2=0x"+Long.toHexString(get_payload_noisefloor_ch2())+"]\n";
+        s += "  [payload.ch2_measured=0x"+Long.toHexString(get_payload_ch2_measured())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.ch2_parametrized=0x"+Long.toHexString(get_payload_ch2_parametrized())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.ch2_stored=0x"+Long.toHexString(get_payload_ch2_stored())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.ch2_bufferunderflows=0x"+Long.toHexString(get_payload_ch2_bufferunderflows())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.ch2_noisefloor=0x"+Long.toHexString(get_payload_ch2_noisefloor())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -374,380 +386,632 @@ public class DozerAEStatisticsMsg extends ch.ethz.permasense.tinyos2x.messages.D
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.measured
+    // Accessor methods for field: payload.ch1_measured
     //   Field type: int
     //   Offset (bits): 56
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.measured' is signed (false).
+     * Return whether the field 'payload.ch1_measured' is signed (false).
      */
-    public static boolean isSigned_payload_measured() {
+    public static boolean isSigned_payload_ch1_measured() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.measured' is an array (false).
+     * Return whether the field 'payload.ch1_measured' is an array (false).
      */
-    public static boolean isArray_payload_measured() {
+    public static boolean isArray_payload_ch1_measured() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.measured'
+     * Return the offset (in bytes) of the field 'payload.ch1_measured'
      */
-    public static int offset_payload_measured() {
+    public static int offset_payload_ch1_measured() {
         return (56 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.measured'
+     * Return the offset (in bits) of the field 'payload.ch1_measured'
      */
-    public static int offsetBits_payload_measured() {
+    public static int offsetBits_payload_ch1_measured() {
         return 56;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.measured'
+     * Return the value (as a int) of the field 'payload.ch1_measured'
      */
-    public int get_payload_measured() {
-        return (int)getUIntBEElement(offsetBits_payload_measured(), 16);
+    public int get_payload_ch1_measured() {
+        return (int)getUIntBEElement(offsetBits_payload_ch1_measured(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.measured'
+     * Set the value of the field 'payload.ch1_measured'
      */
-    public void set_payload_measured(int value) {
-        setUIntBEElement(offsetBits_payload_measured(), 16, value);
+    public void set_payload_ch1_measured(int value) {
+        setUIntBEElement(offsetBits_payload_ch1_measured(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.measured'
+     * Return the size, in bytes, of the field 'payload.ch1_measured'
      */
-    public static int size_payload_measured() {
+    public static int size_payload_ch1_measured() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.measured'
+     * Return the size, in bits, of the field 'payload.ch1_measured'
      */
-    public static int sizeBits_payload_measured() {
+    public static int sizeBits_payload_ch1_measured() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.parametrized
+    // Accessor methods for field: payload.ch1_parametrized
     //   Field type: int
     //   Offset (bits): 72
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.parametrized' is signed (false).
+     * Return whether the field 'payload.ch1_parametrized' is signed (false).
      */
-    public static boolean isSigned_payload_parametrized() {
+    public static boolean isSigned_payload_ch1_parametrized() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.parametrized' is an array (false).
+     * Return whether the field 'payload.ch1_parametrized' is an array (false).
      */
-    public static boolean isArray_payload_parametrized() {
+    public static boolean isArray_payload_ch1_parametrized() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.parametrized'
+     * Return the offset (in bytes) of the field 'payload.ch1_parametrized'
      */
-    public static int offset_payload_parametrized() {
+    public static int offset_payload_ch1_parametrized() {
         return (72 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.parametrized'
+     * Return the offset (in bits) of the field 'payload.ch1_parametrized'
      */
-    public static int offsetBits_payload_parametrized() {
+    public static int offsetBits_payload_ch1_parametrized() {
         return 72;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.parametrized'
+     * Return the value (as a int) of the field 'payload.ch1_parametrized'
      */
-    public int get_payload_parametrized() {
-        return (int)getUIntBEElement(offsetBits_payload_parametrized(), 16);
+    public int get_payload_ch1_parametrized() {
+        return (int)getUIntBEElement(offsetBits_payload_ch1_parametrized(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.parametrized'
+     * Set the value of the field 'payload.ch1_parametrized'
      */
-    public void set_payload_parametrized(int value) {
-        setUIntBEElement(offsetBits_payload_parametrized(), 16, value);
+    public void set_payload_ch1_parametrized(int value) {
+        setUIntBEElement(offsetBits_payload_ch1_parametrized(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.parametrized'
+     * Return the size, in bytes, of the field 'payload.ch1_parametrized'
      */
-    public static int size_payload_parametrized() {
+    public static int size_payload_ch1_parametrized() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.parametrized'
+     * Return the size, in bits, of the field 'payload.ch1_parametrized'
      */
-    public static int sizeBits_payload_parametrized() {
+    public static int sizeBits_payload_ch1_parametrized() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.stored
+    // Accessor methods for field: payload.ch1_stored
     //   Field type: int
     //   Offset (bits): 88
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.stored' is signed (false).
+     * Return whether the field 'payload.ch1_stored' is signed (false).
      */
-    public static boolean isSigned_payload_stored() {
+    public static boolean isSigned_payload_ch1_stored() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.stored' is an array (false).
+     * Return whether the field 'payload.ch1_stored' is an array (false).
      */
-    public static boolean isArray_payload_stored() {
+    public static boolean isArray_payload_ch1_stored() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.stored'
+     * Return the offset (in bytes) of the field 'payload.ch1_stored'
      */
-    public static int offset_payload_stored() {
+    public static int offset_payload_ch1_stored() {
         return (88 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.stored'
+     * Return the offset (in bits) of the field 'payload.ch1_stored'
      */
-    public static int offsetBits_payload_stored() {
+    public static int offsetBits_payload_ch1_stored() {
         return 88;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.stored'
+     * Return the value (as a int) of the field 'payload.ch1_stored'
      */
-    public int get_payload_stored() {
-        return (int)getUIntBEElement(offsetBits_payload_stored(), 16);
+    public int get_payload_ch1_stored() {
+        return (int)getUIntBEElement(offsetBits_payload_ch1_stored(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.stored'
+     * Set the value of the field 'payload.ch1_stored'
      */
-    public void set_payload_stored(int value) {
-        setUIntBEElement(offsetBits_payload_stored(), 16, value);
+    public void set_payload_ch1_stored(int value) {
+        setUIntBEElement(offsetBits_payload_ch1_stored(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.stored'
+     * Return the size, in bytes, of the field 'payload.ch1_stored'
      */
-    public static int size_payload_stored() {
+    public static int size_payload_ch1_stored() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.stored'
+     * Return the size, in bits, of the field 'payload.ch1_stored'
      */
-    public static int sizeBits_payload_stored() {
+    public static int sizeBits_payload_ch1_stored() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.bufferunderflows
+    // Accessor methods for field: payload.ch1_bufferunderflows
     //   Field type: int
     //   Offset (bits): 104
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.bufferunderflows' is signed (false).
+     * Return whether the field 'payload.ch1_bufferunderflows' is signed (false).
      */
-    public static boolean isSigned_payload_bufferunderflows() {
+    public static boolean isSigned_payload_ch1_bufferunderflows() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.bufferunderflows' is an array (false).
+     * Return whether the field 'payload.ch1_bufferunderflows' is an array (false).
      */
-    public static boolean isArray_payload_bufferunderflows() {
+    public static boolean isArray_payload_ch1_bufferunderflows() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.bufferunderflows'
+     * Return the offset (in bytes) of the field 'payload.ch1_bufferunderflows'
      */
-    public static int offset_payload_bufferunderflows() {
+    public static int offset_payload_ch1_bufferunderflows() {
         return (104 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.bufferunderflows'
+     * Return the offset (in bits) of the field 'payload.ch1_bufferunderflows'
      */
-    public static int offsetBits_payload_bufferunderflows() {
+    public static int offsetBits_payload_ch1_bufferunderflows() {
         return 104;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.bufferunderflows'
+     * Return the value (as a int) of the field 'payload.ch1_bufferunderflows'
      */
-    public int get_payload_bufferunderflows() {
-        return (int)getUIntBEElement(offsetBits_payload_bufferunderflows(), 16);
+    public int get_payload_ch1_bufferunderflows() {
+        return (int)getUIntBEElement(offsetBits_payload_ch1_bufferunderflows(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.bufferunderflows'
+     * Set the value of the field 'payload.ch1_bufferunderflows'
      */
-    public void set_payload_bufferunderflows(int value) {
-        setUIntBEElement(offsetBits_payload_bufferunderflows(), 16, value);
+    public void set_payload_ch1_bufferunderflows(int value) {
+        setUIntBEElement(offsetBits_payload_ch1_bufferunderflows(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.bufferunderflows'
+     * Return the size, in bytes, of the field 'payload.ch1_bufferunderflows'
      */
-    public static int size_payload_bufferunderflows() {
+    public static int size_payload_ch1_bufferunderflows() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.bufferunderflows'
+     * Return the size, in bits, of the field 'payload.ch1_bufferunderflows'
      */
-    public static int sizeBits_payload_bufferunderflows() {
+    public static int sizeBits_payload_ch1_bufferunderflows() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.noisefloor_ch1
+    // Accessor methods for field: payload.ch1_noisefloor
     //   Field type: short
     //   Offset (bits): 120
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.noisefloor_ch1' is signed (false).
+     * Return whether the field 'payload.ch1_noisefloor' is signed (false).
      */
-    public static boolean isSigned_payload_noisefloor_ch1() {
+    public static boolean isSigned_payload_ch1_noisefloor() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.noisefloor_ch1' is an array (false).
+     * Return whether the field 'payload.ch1_noisefloor' is an array (false).
      */
-    public static boolean isArray_payload_noisefloor_ch1() {
+    public static boolean isArray_payload_ch1_noisefloor() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.noisefloor_ch1'
+     * Return the offset (in bytes) of the field 'payload.ch1_noisefloor'
      */
-    public static int offset_payload_noisefloor_ch1() {
+    public static int offset_payload_ch1_noisefloor() {
         return (120 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.noisefloor_ch1'
+     * Return the offset (in bits) of the field 'payload.ch1_noisefloor'
      */
-    public static int offsetBits_payload_noisefloor_ch1() {
+    public static int offsetBits_payload_ch1_noisefloor() {
         return 120;
     }
 
     /**
-     * Return the value (as a short) of the field 'payload.noisefloor_ch1'
+     * Return the value (as a short) of the field 'payload.ch1_noisefloor'
      */
-    public short get_payload_noisefloor_ch1() {
-        return (short)getUIntBEElement(offsetBits_payload_noisefloor_ch1(), 8);
+    public short get_payload_ch1_noisefloor() {
+        return (short)getUIntBEElement(offsetBits_payload_ch1_noisefloor(), 8);
     }
 
     /**
-     * Set the value of the field 'payload.noisefloor_ch1'
+     * Set the value of the field 'payload.ch1_noisefloor'
      */
-    public void set_payload_noisefloor_ch1(short value) {
-        setUIntBEElement(offsetBits_payload_noisefloor_ch1(), 8, value);
+    public void set_payload_ch1_noisefloor(short value) {
+        setUIntBEElement(offsetBits_payload_ch1_noisefloor(), 8, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.noisefloor_ch1'
+     * Return the size, in bytes, of the field 'payload.ch1_noisefloor'
      */
-    public static int size_payload_noisefloor_ch1() {
+    public static int size_payload_ch1_noisefloor() {
         return (8 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.noisefloor_ch1'
+     * Return the size, in bits, of the field 'payload.ch1_noisefloor'
      */
-    public static int sizeBits_payload_noisefloor_ch1() {
+    public static int sizeBits_payload_ch1_noisefloor() {
         return 8;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.noisefloor_ch2
-    //   Field type: short
+    // Accessor methods for field: payload.ch2_measured
+    //   Field type: int
     //   Offset (bits): 128
-    //   Size (bits): 8
+    //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.noisefloor_ch2' is signed (false).
+     * Return whether the field 'payload.ch2_measured' is signed (false).
      */
-    public static boolean isSigned_payload_noisefloor_ch2() {
+    public static boolean isSigned_payload_ch2_measured() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.noisefloor_ch2' is an array (false).
+     * Return whether the field 'payload.ch2_measured' is an array (false).
      */
-    public static boolean isArray_payload_noisefloor_ch2() {
+    public static boolean isArray_payload_ch2_measured() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.noisefloor_ch2'
+     * Return the offset (in bytes) of the field 'payload.ch2_measured'
      */
-    public static int offset_payload_noisefloor_ch2() {
+    public static int offset_payload_ch2_measured() {
         return (128 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.noisefloor_ch2'
+     * Return the offset (in bits) of the field 'payload.ch2_measured'
      */
-    public static int offsetBits_payload_noisefloor_ch2() {
+    public static int offsetBits_payload_ch2_measured() {
         return 128;
     }
 
     /**
-     * Return the value (as a short) of the field 'payload.noisefloor_ch2'
+     * Return the value (as a int) of the field 'payload.ch2_measured'
      */
-    public short get_payload_noisefloor_ch2() {
-        return (short)getUIntBEElement(offsetBits_payload_noisefloor_ch2(), 8);
+    public int get_payload_ch2_measured() {
+        return (int)getUIntBEElement(offsetBits_payload_ch2_measured(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.noisefloor_ch2'
+     * Set the value of the field 'payload.ch2_measured'
      */
-    public void set_payload_noisefloor_ch2(short value) {
-        setUIntBEElement(offsetBits_payload_noisefloor_ch2(), 8, value);
+    public void set_payload_ch2_measured(int value) {
+        setUIntBEElement(offsetBits_payload_ch2_measured(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.noisefloor_ch2'
+     * Return the size, in bytes, of the field 'payload.ch2_measured'
      */
-    public static int size_payload_noisefloor_ch2() {
+    public static int size_payload_ch2_measured() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.ch2_measured'
+     */
+    public static int sizeBits_payload_ch2_measured() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.ch2_parametrized
+    //   Field type: int
+    //   Offset (bits): 144
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.ch2_parametrized' is signed (false).
+     */
+    public static boolean isSigned_payload_ch2_parametrized() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.ch2_parametrized' is an array (false).
+     */
+    public static boolean isArray_payload_ch2_parametrized() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.ch2_parametrized'
+     */
+    public static int offset_payload_ch2_parametrized() {
+        return (144 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.ch2_parametrized'
+     */
+    public static int offsetBits_payload_ch2_parametrized() {
+        return 144;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.ch2_parametrized'
+     */
+    public int get_payload_ch2_parametrized() {
+        return (int)getUIntBEElement(offsetBits_payload_ch2_parametrized(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.ch2_parametrized'
+     */
+    public void set_payload_ch2_parametrized(int value) {
+        setUIntBEElement(offsetBits_payload_ch2_parametrized(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.ch2_parametrized'
+     */
+    public static int size_payload_ch2_parametrized() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.ch2_parametrized'
+     */
+    public static int sizeBits_payload_ch2_parametrized() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.ch2_stored
+    //   Field type: int
+    //   Offset (bits): 160
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.ch2_stored' is signed (false).
+     */
+    public static boolean isSigned_payload_ch2_stored() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.ch2_stored' is an array (false).
+     */
+    public static boolean isArray_payload_ch2_stored() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.ch2_stored'
+     */
+    public static int offset_payload_ch2_stored() {
+        return (160 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.ch2_stored'
+     */
+    public static int offsetBits_payload_ch2_stored() {
+        return 160;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.ch2_stored'
+     */
+    public int get_payload_ch2_stored() {
+        return (int)getUIntBEElement(offsetBits_payload_ch2_stored(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.ch2_stored'
+     */
+    public void set_payload_ch2_stored(int value) {
+        setUIntBEElement(offsetBits_payload_ch2_stored(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.ch2_stored'
+     */
+    public static int size_payload_ch2_stored() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.ch2_stored'
+     */
+    public static int sizeBits_payload_ch2_stored() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.ch2_bufferunderflows
+    //   Field type: int
+    //   Offset (bits): 176
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.ch2_bufferunderflows' is signed (false).
+     */
+    public static boolean isSigned_payload_ch2_bufferunderflows() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.ch2_bufferunderflows' is an array (false).
+     */
+    public static boolean isArray_payload_ch2_bufferunderflows() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.ch2_bufferunderflows'
+     */
+    public static int offset_payload_ch2_bufferunderflows() {
+        return (176 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.ch2_bufferunderflows'
+     */
+    public static int offsetBits_payload_ch2_bufferunderflows() {
+        return 176;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.ch2_bufferunderflows'
+     */
+    public int get_payload_ch2_bufferunderflows() {
+        return (int)getUIntBEElement(offsetBits_payload_ch2_bufferunderflows(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.ch2_bufferunderflows'
+     */
+    public void set_payload_ch2_bufferunderflows(int value) {
+        setUIntBEElement(offsetBits_payload_ch2_bufferunderflows(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.ch2_bufferunderflows'
+     */
+    public static int size_payload_ch2_bufferunderflows() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.ch2_bufferunderflows'
+     */
+    public static int sizeBits_payload_ch2_bufferunderflows() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.ch2_noisefloor
+    //   Field type: short
+    //   Offset (bits): 192
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.ch2_noisefloor' is signed (false).
+     */
+    public static boolean isSigned_payload_ch2_noisefloor() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.ch2_noisefloor' is an array (false).
+     */
+    public static boolean isArray_payload_ch2_noisefloor() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.ch2_noisefloor'
+     */
+    public static int offset_payload_ch2_noisefloor() {
+        return (192 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.ch2_noisefloor'
+     */
+    public static int offsetBits_payload_ch2_noisefloor() {
+        return 192;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.ch2_noisefloor'
+     */
+    public short get_payload_ch2_noisefloor() {
+        return (short)getUIntBEElement(offsetBits_payload_ch2_noisefloor(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.ch2_noisefloor'
+     */
+    public void set_payload_ch2_noisefloor(short value) {
+        setUIntBEElement(offsetBits_payload_ch2_noisefloor(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.ch2_noisefloor'
+     */
+    public static int size_payload_ch2_noisefloor() {
         return (8 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.noisefloor_ch2'
+     * Return the size, in bits, of the field 'payload.ch2_noisefloor'
      */
-    public static int sizeBits_payload_noisefloor_ch2() {
+    public static int sizeBits_payload_ch2_noisefloor() {
         return 8;
     }
 
