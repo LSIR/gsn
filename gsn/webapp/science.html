@@ -50,7 +50,8 @@ $(document).ready(function() {
       {  title:"AE Statistics",
          signals: [{
           vsensor:".*_dozer_aestatistics__mapped",
-          field:["payload_measured","payload_parametrized","payload_stored","payload_bufferunderflows","payload_noisefloor_ch1","payload_noisefloor_ch2"],
+          field:["payload_ch1_measured","payload_ch1_parametrized","payload_ch1_stored","payload_ch1_bufferunderflows","payload_ch1_noisefloor",
+                 "payload_ch2_measured","payload_ch2_parametrized","payload_ch2_stored","payload_ch2_bufferunderflows","payload_ch2_noisefloor"],
           select:"sensornode[nodetype=4]"
         }],      
       },
