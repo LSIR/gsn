@@ -79,6 +79,7 @@ Jungfraujoch_Dozer_Rssi.xml
 Jungfraujoch_Dozer_StateCounter.xml
 Jungfraujoch_Dozer_Th3Ident.xml
 Jungfraujoch_Dozer_Th3Temp.xml
+Jungfraujoch_Dozer_DecagonMux.xml
 Jungfraujoch_Schedule.xml
 Jungfraujoch_Statistics.xml
 Jungfraujoch_SyslogNg.xml
@@ -87,7 +88,7 @@ Matterhorn_BackLogStatus_Dynamic.xml
 Matterhorn_BackLogStatus_Revision.xml
 Matterhorn_BackLogStatus_Static.xml
 Matterhorn_Binary.xml
-Matterhorn_Binary_Http.xml
+#Matterhorn_Binary_Http.xml
 Matterhorn_CoreStationStatus_Hardware.xml
 Matterhorn_CoreStationStatus_Software.xml
 Matterhorn_CoreStationStatus_Static.xml
