@@ -31,23 +31,26 @@ $(document).ready(function() {
     $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
     // plot configuration
+
     GsnPlots.setConfig([
-      // test
-      {  title:"Temperatures",
+
+      // Jungfraujoch
+
+      {  title:"Temperatures TH3",
          signals: [{
           vsensor:"etz_dozer_th3temp__conv",
           field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
           select:"sensornode[position]:has(configuration[th3=true])"
         }],      
       },
-      {  title:"AE events",
+      {  title:"Acoustic Emission Events",
          signals: [{
           vsensor:".*_dozer_aedata__conv",
           field:["length","risetime","amplitude_db","count","energy"],
           select:"sensornode[nodetype=4]"
         }],      
       },
-      {  title:"AE Statistics",
+      {  title:"Acoustic Emission Statistics",
          signals: [{
           vsensor:".*_dozer_aestatistics__mapped",
           field:["payload_ch1_measured","payload_ch1_parametrized","payload_ch1_stored","payload_ch1_bufferunderflows","payload_ch1_noisefloor",
@@ -109,6 +112,7 @@ $(document).ready(function() {
       },
 
       // matterhorn
+
       { title:"Sensorrod Temperatures Position 8",
         signals: [{
           vsensor:"matterhorn_sensorrod1",
@@ -186,48 +190,63 @@ $(document).ready(function() {
           select:"sensornode[position=2]"
         }]
       },
-      // jungfraujoch      
-      { title:"Thermistorchain",
+
+      // Jungfraujoch
+
+      { title:"Temperatures Thermistorchain Position 8",
         signals: [{
           vsensor:"jungfraujoch_thermistorchain1",
           field:["tc_t1","tc_t2","tc_t3","tc_t4","tc_t5"],
-          select:"sensornode[position=8],sensornode[position=10]"
+          select:"sensornode[position=8]"
         },{
           vsensor:"jungfraujoch_thermistorchain2",
           field:["tc_t6","tc_t7","tc_t8"],
-          select:"sensornode[position=8],sensornode[position=10]"
-        }
-        ]
+          select:"sensornode[position=8]"
+        }]
       },
-      {  title:"Temperatures Pos 22",
-         signals: [{
-          vsensor:"jungfraujoch_dozer_th3temp__conv",
-          field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
-          select:"sensornode[position=22]"
-        }],      
+      { title:"Temperatures Thermistorchain Position 10",
+        signals: [{
+          vsensor:"jungfraujoch_thermistorchain1",
+          field:["tc_t1","tc_t2","tc_t3","tc_t4","tc_t5"],
+          select:"sensornode[position=10]"
+        },{
+          vsensor:"jungfraujoch_thermistorchain2",
+          field:["tc_t6","tc_t7","tc_t8"],
+          select:"sensornode[position=10]"
+        }]
+
       },
-      {  title:"Temperatures Pos 25",
-         signals: [{
-          vsensor:"jungfraujoch_dozer_th3temp__conv",
-          field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
-          select:"sensornode[position=25]"
-        }],      
-      },
-      {  title:"Moisture Pos 19",
+      {  title:"Moistures Enviroscan Position 19",
          signals: [{
           vsensor:"jungfraujoch_dozer_enviroscanmoisture__conv",
           field:["moisture1","moisture2","moisture3","moisture4","moisture5"],
           select:"sensornode[position=19]"
         }],      
       },
-      {  title:"Moisture Pos 24",
+      {  title:"Temperatures TH3 Position 22",
+         signals: [{
+          vsensor:"jungfraujoch_dozer_th3temp__conv",
+          field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
+          select:"sensornode[position=22]"
+        }],
+      },
+      {  title:"Moistures Enviroscan Position 24",
          signals: [{
           vsensor:"jungfraujoch_dozer_enviroscanmoisture__conv",
           field:["moisture1","moisture2","moisture3"],
           select:"sensornode[position=24]"
         }],      
       },
-      // dirruhorn
+      {  title:"Temperatures TH3 Position 25",
+         signals: [{
+          vsensor:"jungfraujoch_dozer_th3temp__conv",
+          field:["temperature_5cm","temperature_10cm","temperature_20cm","temperature_30cm","temperature_50cm","temperature_100cm"],
+          select:"sensornode[position=25]"
+        }],
+      },
+
+      // Dirruhorn
+
       { title:"GPS Measurement Quality",
           signals: [{
           vsensor:"dirruhorn_gps_raw__mapped",
@@ -252,17 +271,18 @@ $(document).ready(function() {
       
     ]);
 
-    // jungfraujoch      
-    $([1, 2, 3, 4, 5, 7, 9]).each(function() {
+      // Jungfraujoch
+
+    $([1, 2, 3, 4, 5, 6, 7, 9]).each(function() {
       GsnPlots.setConfig([
-        { title:"Sensor Rod Temperatures Position "+ this, 
+        { title:"Temperatures Sensor Rod Position "+ this,
           signals:[{ vsensor :"jungfraujoch_sensorrod1",
-                     field:["sr_t1","sr_t2","sr_t3","sr_t4"], 
+                     field:["sr_t1","sr_t2","sr_t3","sr_t4"],
                      select:"sensornode[position="+(this)+"]"}]
         }]);
     });
-
     // Thur
+
     $(["Decagon Conductivity (Position 1, River)","Decagon Conductivity (Position 2, R074)","Decagon Conductivity (Position 3, R073)","Decagon Conductivity (Position 4, R042)","Decagon Conductivity (Position 5, R071)"]).each(function(index) {
       GsnPlots.setConfig([
         { title:this, 
