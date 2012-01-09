@@ -57,7 +57,9 @@ class STEVALPluginClass(AbstractPluginClass):
         
         self.steval._openDevice()
         self._deviceNum = self.steval._getDevName();
+        self._deviceNum = self._deviceNum[0:7];
         self._firmwareNum = self.steval._getVerNumber();
+        self._firmwareNum = self._firmwareNum[0:7];
         self.steval._closeDevice()
         self.info('STEVAL: init steval success')
         dataPackage = [STATIC_DATA]
