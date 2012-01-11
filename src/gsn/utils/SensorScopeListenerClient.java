@@ -1,10 +1,16 @@
 package gsn.utils;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import java.net.*;
 import java.util.*;
 
 public class SensorScopeListenerClient extends Thread
 {
+    public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
+    private static transient Logger logger = Logger.getLogger(SensorScopeListenerClient.class);
+
     private static final byte BYTE_SYNC = 0x7E;
     private static final byte BYTE_ESC  = 0x7D;
 
@@ -18,6 +24,7 @@ public class SensorScopeListenerClient extends Thread
 
     public SensorScopeListenerClient(Socket socket)
     {
+        PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
         mSocket = socket;
 
         start();
