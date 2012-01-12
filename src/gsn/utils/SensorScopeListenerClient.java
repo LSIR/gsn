@@ -136,10 +136,10 @@ public class SensorScopeListenerClient extends Thread
                 if(b >= 0) bytes[i] = b;
                 else       bytes[i] = 256 + b;
 
-                System.out.print(String.format("%02X ", bytes[i]));
+                logger.info(String.format("%02X ", bytes[i]));
             }
 
-            System.out.println();
+            //System.out.println();
 
             int     id     = (bytes[3] << 8) + bytes[4];
             int     idx    = 5;
@@ -209,12 +209,12 @@ public class SensorScopeListenerClient extends Thread
                         }
                     }
 
-                    System.out.print("Station " + id + ": SID = " + sid + ", dupn = " + dupn + ", len = " + size + ", data = ");
+                    logger.info("Station " + id + ": SID = " + sid + ", dupn = " + dupn + ", len = " + size + ", data = ");
 
                     for(int i=0; i<size; ++i)
-                        System.out.print(String.format("%02X ", bytes[idx++]));
+                        logger.info(String.format("%02X ", bytes[idx++]));
 
-                    System.out.println();
+                    //System.out.println();
 
                     nbBytes += size;
                 }
@@ -233,13 +233,13 @@ public class SensorScopeListenerClient extends Thread
 
             if(packet == null)
             {
-                System.out.println("Error: null packet");
+                logger.error("Error: null packet");
                 return;
             }
 
             if(packet.length == 3 && packet[0] == '+' && packet[1] == '+' && packet[2] == '+')
             {
-                System.out.println("Disconnection");
+                logger.info("Disconnection");
                 return;
             }
 
@@ -251,7 +251,7 @@ public class SensorScopeListenerClient extends Thread
 
             if(packet[0] == PACKET_DATA)
             {
-                System.out.println("Got a data packet");
+                logger.info("Got a data packet");
                 allPackets.add(packet);
                 continue;
             }
@@ -261,11 +261,11 @@ public class SensorScopeListenerClient extends Thread
                 ack[0] = 1;
                 ack[1] = BYTE_NACK;
 
-                System.out.println("Error: Expected CRC but got something else");
+                logger.error("Error: Expected CRC but got something else");
             }
             else
             {
-                System.out.println("Got a CRC");
+                logger.info("Got a CRC");
 
                 ack[0] = 1;
                 ack[1] = BYTE_ACK;
@@ -278,7 +278,7 @@ public class SensorScopeListenerClient extends Thread
 
             if(!write(ack))
             {
-                System.out.println("Error: Could not send ACK");
+                logger.error("Error: Could not send ACK");
                 return;
             }
         }
@@ -302,14 +302,14 @@ public class SensorScopeListenerClient extends Thread
 
     public void run()
     {
-        System.out.println("New connection from " + mSocket.getInetAddress());
+        logger.info("New connection from " + mSocket.getInetAddress());
 
         // RSSI
         byte[] rssi = read(2);
 
         if(rssi == null)
         {
-            System.out.println("Error: Could not receive RSSI");
+            logger.error("Error: Could not receive RSSI");
             return;
         }
 
@@ -337,7 +337,7 @@ public class SensorScopeListenerClient extends Thread
 
         if(!write(challenge))
         {
-            System.out.println("Error: Could not send challenge");
+            logger.error("Error: Could not send challenge");
             return;
         }
 
@@ -346,7 +346,7 @@ public class SensorScopeListenerClient extends Thread
 
         if(authReply == null)
         {
-            System.out.println("Error: Could not receive the reply to the challenge");
+            logger.error("Error: Could not receive the reply to the challenge");
             return;
         }
 
