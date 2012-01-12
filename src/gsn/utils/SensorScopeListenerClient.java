@@ -171,6 +171,7 @@ public class SensorScopeListenerClient extends Thread {
             int idx = 5;
             boolean fullTS = true;
 
+            long base_timestamp = -1;
             long timestamp = -1;
 
             while (true) {
@@ -178,16 +179,18 @@ public class SensorScopeListenerClient extends Thread {
                     break;
 
                 if (fullTS) {
-                    timestamp = bytes[idx] * 16777216 + bytes[idx + 1] * 65536 + bytes[idx + 2] * 256 + bytes[idx + 3];
-                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(timestamp * 1000));
-                    logger.info("base timestamp = " + timestamp + " ( " + date + " )");
+                    base_timestamp = bytes[idx] * 16777216 + bytes[idx + 1] * 65536 + bytes[idx + 2] * 256 + bytes[idx + 3];
+                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(base_timestamp * 1000));
+                    logger.info("base timestamp = " + base_timestamp + " ( " + date + " )");
                     idx += 4;
                     fullTS = false;
+                    timestamp = base_timestamp;
                 } else {
                     int timeshift = bytes[idx];  //TODO: verify
-                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date((timestamp + timeshift) * 1000));
+                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date((base_timestamp + timeshift) * 1000));
                     logger.info("time shift = " + timeshift + " ( " + date + " )");
                     ++idx;
+                    timestamp = base_timestamp + timeshift * 60000;
                 }
 
                 int len = bytes[idx++];
@@ -230,6 +233,9 @@ public class SensorScopeListenerClient extends Thread {
                             ++nbBytes;
                         }
                     }
+
+                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(timestamp * 1000));
+                    logger.info("timestamp = " + timestamp + " ( " + date + " )");
 
                     logger.info("Station " + id + ": SID = " + sid + ", dupn = " + dupn + ", len = " + size + ", data = ");
 
