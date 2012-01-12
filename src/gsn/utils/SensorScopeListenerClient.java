@@ -3,12 +3,20 @@ package gsn.utils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.*;
 import java.util.*;
 
 public class SensorScopeListenerClient extends Thread {
     public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
+    private static final String CONF_SENSORSCOPE_SERVER_PROPERTIES = "conf/sensorscope_server.properties";
+    private static final String DEFAULT_FOLDER_FOR_CSV_FILES = "logs";
     private static transient Logger logger = Logger.getLogger(SensorScopeListenerClient.class);
+
+    private static String csvFolderName = null;
+    private static String DEFAULT_NULL_STRING = "null";
+    private static String nullString = DEFAULT_NULL_STRING;
 
     private static final byte BYTE_SYNC = 0x7E;
     private static final byte BYTE_ESC = 0x7D;
@@ -42,11 +50,25 @@ public class SensorScopeListenerClient extends Thread {
     private static final int OFFSET_DECAGON_10HS_MV = 5 + (MAX_DUPN + 1) * 16;
     private static final int OFFSET_DECAGON_10HS_VWC = 5 + (MAX_DUPN + 1) * 17;
 
+    public static void config() {
+        Properties propertiesFile = new Properties();
+        try {
+            propertiesFile.load(new FileInputStream(CONF_SENSORSCOPE_SERVER_PROPERTIES));
+        } catch (IOException e) {
+            logger.error("Couldn't load configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
+            logger.error(e.getMessage(), e);
+            System.exit(-1);
+        }
+
+        csvFolderName = propertiesFile.getProperty("csvFolder", DEFAULT_FOLDER_FOR_CSV_FILES);
+        nullString = propertiesFile.getProperty("nullString", DEFAULT_NULL_STRING);
+
+    }
 
     public SensorScopeListenerClient(Socket socket) {
         PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
         mSocket = socket;
-
+        config();
         start();
     }
 
@@ -149,11 +171,15 @@ public class SensorScopeListenerClient extends Thread {
             int idx = 5;
             boolean fullTS = true;
 
+            long timestamp = -1;
+
             while (true) {
                 if (idx >= bytes.length)
                     break;
 
                 if (fullTS) {
+                    timestamp = bytes[idx] * 16777216 + bytes[idx + 1] * 65536 + bytes[idx + 2] * 256 + bytes[idx + 3];
+                    logger.info("base timestamp = " + timestamp);
                     idx += 4;
                     fullTS = false;
                 } else
@@ -255,7 +281,7 @@ public class SensorScopeListenerClient extends Thread {
                 ack[1] = BYTE_ACK;
 
                 for (byte[] pkt : allPackets) {
-                    processPacket(pkt);
+                    //processPacket(pkt);
                     printPacket(pkt);
                 }
 

@@ -13,7 +13,7 @@ public class SensorScopeListener {
     private static final String CONF_SENSORSCOPE_SERVER_PROPERTIES = "conf/sensorscope_server.properties";
     private static final String DEFAULT_FOLDER_FOR_CSV_FILES = "logs";
 
-    private static transient Logger logger = Logger.getLogger(SensorScopeListenerTest.class);
+    private static transient Logger logger = Logger.getLogger(SensorScopeListener.class);
     private static String csvFolderName = null;
     private static String DEFAULT_NULL_STRING = "null";
     private static String nullString = DEFAULT_NULL_STRING;
