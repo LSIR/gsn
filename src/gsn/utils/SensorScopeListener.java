@@ -1,4 +1,5 @@
 package gsn.utils;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.*;
@@ -7,8 +8,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-public class SensorScopeListener
-{
+public class SensorScopeListener {
     public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
     private static final String CONF_SENSORSCOPE_SERVER_PROPERTIES = "conf/sensorscope_server.properties";
     private static final String DEFAULT_FOLDER_FOR_CSV_FILES = "logs";
@@ -19,32 +19,26 @@ public class SensorScopeListener
     private static String nullString = DEFAULT_NULL_STRING;
     private static int port;
 
-    public SensorScopeListener(int port)
-    {
+    public SensorScopeListener(int port) {
         ServerSocket server;
 
-        try
-        {
+        logger.info("Starting server on port " + port);
+
+        try {
             server = new ServerSocket(port);
 
-            while(true)
-            {
-                try
-                {
+            while (true) {
+                try {
                     Socket socket = server.accept();
 
-                    if(socket != null)
+                    if (socket != null)
                         new SensorScopeListenerClient(socket);
-                }
-                catch(Exception e)
-                {
-                    System.out.println("Error while accepting a new client: " + e);
+                } catch (Exception e) {
+                    logger.error("Error while accepting a new client: " + e);
                 }
             }
-        }
-        catch(Exception e)
-        {
-            System.out.println("Could not create the server: " + e);
+        } catch (Exception e) {
+            logger.error("Could not create the server: " + e);
         }
     }
 
@@ -75,11 +69,10 @@ public class SensorScopeListener
         }
     }
 
-    public static void main(String args[])
-    {
+    public static void main(String args[]) {
         config();
         PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
-        new SensorScopeListenerTest(port);
+        new SensorScopeListener(port);
     }
 }
 
