@@ -77,7 +77,7 @@
                     <!--predicate key="remote-contact-point">http://whymper.ethz.ch:23001/streaming/</predicate-->
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where DEVICE_ID = 300</query>
             </source>
             <query> select * from source </query>
         </stream>
