@@ -179,11 +179,16 @@ public class SensorScopeListenerClient extends Thread {
 
                 if (fullTS) {
                     timestamp = bytes[idx] * 16777216 + bytes[idx + 1] * 65536 + bytes[idx + 2] * 256 + bytes[idx + 3];
-                    logger.info("base timestamp = " + timestamp);
+                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(timestamp * 1000));
+                    logger.info("base timestamp = " + timestamp + " ( " + date + " )");
                     idx += 4;
                     fullTS = false;
-                } else
+                } else {
+                    int timeshift = bytes[idx];  //TODO: verify
+                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date((timestamp + timeshift) * 1000));
+                    logger.info("time shift = " + timeshift + " ( " + date + " )");
                     ++idx;
+                }
 
                 int len = bytes[idx++];
                 int nbBytes = 0;
