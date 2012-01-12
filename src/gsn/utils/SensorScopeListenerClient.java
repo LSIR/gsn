@@ -187,7 +187,7 @@ public class SensorScopeListenerClient extends Thread {
                     timestamp = base_timestamp;
                 } else {
                     int timeshift = bytes[idx];  //TODO: verify
-                    timestamp = base_timestamp + timeshift * 1000;
+                    timestamp = base_timestamp + timeshift;
                     String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date((timestamp) * 1000));
                     logger.info("time shift = + " + timeshift + " => " + timestamp + " ( " + date + " )");
                     ++idx;
