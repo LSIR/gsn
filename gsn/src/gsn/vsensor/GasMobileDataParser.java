@@ -80,7 +80,7 @@ public class GasMobileDataParser extends BridgeVirtualSensorPermasense {
 				Integer[] readingsInt = new Integer[2];
 				int ind_i = 0;
 				for (int i = 1+delta; i < 8+delta; i++) {
-					if (i == 2 || i == 4) {
+					if (i == 2+delta || i == 4+delta) {
 						if (tokens[i].length() == 0)
 					    readingsInt[ind_i] = null;
 					  else
@@ -92,6 +92,7 @@ public class GasMobileDataParser extends BridgeVirtualSensorPermasense {
 					    readingsDouble[ind_d] = null;
 					  else
 					    readingsDouble[ind_d] = Double.valueOf(tokens[i]);
+					  ind_d++;
 					}
 				}
 				
