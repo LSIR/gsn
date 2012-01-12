@@ -65,7 +65,7 @@ public class GasMobileDataParser extends BridgeVirtualSensorPermasense {
 				  continue;
 				}
 				int delta = 0;
-				if (tokens.length != 9)
+				if (tokens.length == 9)
 				  delta = 1;
 				  
 				Long timestamp;
