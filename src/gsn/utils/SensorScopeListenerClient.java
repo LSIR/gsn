@@ -240,10 +240,16 @@ public class SensorScopeListenerClient extends Thread {
 
                     logger.info("Station " + id + ": SID = " + sid + ", dupn = " + dupn + ", len = " + size + ", data = ");
 
+                    int chunk[] = new int[size];
+
                     sb = new StringBuilder();
-                    for (int i = 0; i < size; ++i)
-                        sb.append(String.format("%02X ", bytes[idx++]));
+                    for (int i = 0; i < size; ++i) {
+                        chunk[i] = bytes[idx++];
+                        sb.append(String.format("%02X ", chunk[i]));
+                    }
                     logger.info(sb.toString());
+
+                    createStreamElement(timestamp, id, sid, dupn, size, chunk);
 
                     //System.out.println();
 
@@ -251,6 +257,10 @@ public class SensorScopeListenerClient extends Thread {
                 }
             }
         }
+    }
+
+    private void createStreamElement(long timestamp, int id, int sid, int dupn, int size, int[] chunk) {
+
     }
 
     private void getPackets() {
