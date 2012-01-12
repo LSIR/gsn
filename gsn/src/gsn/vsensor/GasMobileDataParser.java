@@ -1,6 +1,5 @@
 package gsn.vsensor;
 
-import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 
@@ -9,12 +8,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.io.BufferedReader;
 import java.io.FileReader;
-
-import java.util.TimeZone;
-import java.util.Date;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.text.SimpleDateFormat;
 
 import org.apache.log4j.Logger;
 
@@ -67,11 +60,14 @@ public class GasMobileDataParser extends BridgeVirtualSensorPermasense {
 			while( (strLine = br.readLine()) != null)
 			{
 				String[] tokens = strLine.split(",",-1);
-				if (tokens.length != 8) {
-				  logger.warn("Line skipped. Line to be parsed has " + tokens.length + " instead of 8 elements");
+				if (tokens.length != 8 && tokens.length != 9) {
+				  logger.warn("Line <" + strLine + "> skipped. Line to be parsed has " + tokens.length + " instead of 8 or 9 elements");
 				  continue;
 				}
-				
+				int delta = 0;
+				if (tokens.length != 9)
+				  delta = 1;
+				  
 				Long timestamp;
 				if (tokens[0].length() == 0)
 					timestamp = null;
@@ -83,7 +79,7 @@ public class GasMobileDataParser extends BridgeVirtualSensorPermasense {
 				int ind_d = 0;
 				Integer[] readingsInt = new Integer[2];
 				int ind_i = 0;
-				for (int i = 1; i < 8; i++) {
+				for (int i = 1+delta; i < 8+delta; i++) {
 					if (i == 2 || i == 4) {
 						if (tokens[i].length() == 0)
 					    readingsInt[ind_i] = null;
