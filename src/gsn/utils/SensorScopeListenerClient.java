@@ -6,32 +6,51 @@ import org.apache.log4j.PropertyConfigurator;
 import java.net.*;
 import java.util.*;
 
-public class SensorScopeListenerClient extends Thread
-{
+public class SensorScopeListenerClient extends Thread {
     public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
     private static transient Logger logger = Logger.getLogger(SensorScopeListenerClient.class);
 
     private static final byte BYTE_SYNC = 0x7E;
-    private static final byte BYTE_ESC  = 0x7D;
+    private static final byte BYTE_ESC = 0x7D;
 
-    private static final byte BYTE_ACK  = 0x00;
+    private static final byte BYTE_ACK = 0x00;
     private static final byte BYTE_NACK = 0x01;
 
     private static final byte PACKET_DATA = 0x00;
-    private static final byte PACKET_CRC  = 0x01;
+    private static final byte PACKET_CRC = 0x01;
 
     private Socket mSocket;
 
-    public SensorScopeListenerClient(Socket socket)
-    {
+    private static final int MAX_DUPN = 15; // maximum DUPN value = maximum number of extended sensors supported -1
+
+    private static final int OFFSET_AIR_TEMP = 5 + (MAX_DUPN + 1) * 0;
+    private static final int OFFSET_AIR_HUMID = 5 + (MAX_DUPN + 1) * 1;
+    private static final int OFFSET_SOLAR_RAD = 5 + (MAX_DUPN + 1) * 2;
+    private static final int OFFSET_RAIN_METER = 5 + (MAX_DUPN + 1) * 3;
+    private static final int OFFSET_GROUND_TEMP_TNX = 5 + (MAX_DUPN + 1) * 4;
+    private static final int OFFSET_AIR_TEMP_TNX = 5 + (MAX_DUPN + 1) * 5;
+    private static final int OFFSET_SOIL_TEMP_ECTM = 5 + (MAX_DUPN + 1) * 6;
+    private static final int OFFSET_SOIL_MOISTURE_ECTM = 5 + (MAX_DUPN + 1) * 7;
+    private static final int OFFSET_SOIL_WATER_POTENTIAL = 5 + (MAX_DUPN + 1) * 8;
+    private static final int OFFSET_SOIL_TEMP_DECAGON = 5 + (MAX_DUPN + 1) * 9;
+    private static final int OFFSET_SOIL_MOISTURE_DECAGON = 5 + (MAX_DUPN + 1) * 10;
+    private static final int OFFSET_SOIL_CONDUCT_DECAGON = 5 + (MAX_DUPN + 1) * 11;
+    private static final int OFFSET_WIND_DIRECTION = 5 + (MAX_DUPN + 1) * 12;
+    private static final int OFFSET_WIND_SPEED = 5 + (MAX_DUPN + 1) * 13;
+    private static final int OFFSET_BATTERY_BOARD_VOLTAGE = 5 + (MAX_DUPN + 1) * 14;
+    private static final int OFFSET_SOLAR_RAD_SP212 = 5 + (MAX_DUPN + 1) * 15;
+    private static final int OFFSET_DECAGON_10HS_MV = 5 + (MAX_DUPN + 1) * 16;
+    private static final int OFFSET_DECAGON_10HS_VWC = 5 + (MAX_DUPN + 1) * 17;
+
+
+    public SensorScopeListenerClient(Socket socket) {
         PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
         mSocket = socket;
 
         start();
     }
 
-    int crc16Byte(int crc, int b)
-    {
+    int crc16Byte(int crc, int b) {
         crc = ((crc >> 8) & 0xFF) | (crc << 8);
         crc ^= b;
         crc ^= (crc & 0xFF) >> 4;
@@ -41,73 +60,59 @@ public class SensorScopeListenerClient extends Thread
         return crc;
     }
 
-    int crc16(byte[] buffer, int offset, int len)
-    {
+    int crc16(byte[] buffer, int offset, int len) {
         int i;
         int crc = 0;
 
-        for(i=offset; i<offset+len; ++i)
+        for (i = offset; i < offset + len; ++i)
             crc = crc16Byte(crc, (int) buffer[i]);
 
         return crc;
     }
 
-    private byte[] read(int len)
-    {
+    private byte[] read(int len) {
         byte data[] = new byte[len];
 
-        try
-        {
+        try {
             mSocket.getInputStream().read(data);
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 
         return data;
     }
 
-    private byte[] readPacket()
-    {
-        int     idx    = 0;
-        int     len    = 0;
-        byte[]  data   = null;
-        byte[]  b      = null;
+    private byte[] readPacket() {
+        int idx = 0;
+        int len = 0;
+        byte[] data = null;
+        byte[] b = null;
         boolean escape = false;
 
-        while(true)
-        {
+        while (true) {
             b = read(1);
 
-            if(b == null)
+            if (b == null)
                 return null;
 
-            if(b[0] == BYTE_SYNC)
+            if (b[0] == BYTE_SYNC)
                 return b;
 
-            if(escape)
-            {
-                b[0]   ^= 0x20;
-                escape  = false;
-            }
-            else if(b[0] == BYTE_ESC)
-            {
+            if (escape) {
+                b[0] ^= 0x20;
+                escape = false;
+            } else if (b[0] == BYTE_ESC) {
                 escape = true;
                 continue;
             }
 
-            if(data == null)
-            {
-                len  = b[0];
+            if (data == null) {
+                len = b[0];
                 data = new byte[len];
-            }
-            else
-            {
+            } else {
                 data[idx++] = b[0];
 
-                if(len == '+' && data[0] == '+' && data[1] == '+')
-                {
+                if (len == '+' && data[0] == '+' && data[1] == '+') {
                     data = new byte[3];
 
                     data[0] = '+';
@@ -117,72 +122,63 @@ public class SensorScopeListenerClient extends Thread
                     return data;
                 }
 
-                if(idx == len)
+                if (idx == len)
                     return data;
             }
         }
     }
 
-    private void printPacket(byte[] pkt)
-    {
-        if(pkt[1] == 1)
-        {
+    private void printPacket(byte[] pkt) {
+        if (pkt[1] == 1) {
             int bytes[] = new int[pkt.length];
 
-            for(int i=0; i<pkt.length; ++i)
-            {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < pkt.length; ++i) {
                 byte b = pkt[i];
 
-                if(b >= 0) bytes[i] = b;
-                else       bytes[i] = 256 + b;
+                if (b >= 0) bytes[i] = b;
+                else bytes[i] = 256 + b;
 
-                logger.info(String.format("%02X ", bytes[i]));
+                sb.append(String.format("%02X ", bytes[i]));
+
             }
-
+            logger.info(sb.toString());
             //System.out.println();
 
-            int     id     = (bytes[3] << 8) + bytes[4];
-            int     idx    = 5;
+            int id = (bytes[3] << 8) + bytes[4];
+            int idx = 5;
             boolean fullTS = true;
 
-            while(true)
-            {
-                if(idx >= bytes.length)
+            while (true) {
+                if (idx >= bytes.length)
                     break;
 
-                if(fullTS)
-                {
-                    idx    += 4;
-                    fullTS  = false;
-                }
-                else
+                if (fullTS) {
+                    idx += 4;
+                    fullTS = false;
+                } else
                     ++idx;
 
-                int len     = bytes[idx++];
+                int len = bytes[idx++];
                 int nbBytes = 0;
 
-                while(true)
-                {
-                    if(nbBytes >= len)
+                while (true) {
+                    if (nbBytes >= len)
                         break;
 
-                    int sid  = bytes[idx];
+                    int sid = bytes[idx];
                     int dupn = 0;
                     int size = 2;
 
-                    if(sid >= 128)
-                    {
+                    if (sid >= 128) {
                         sid -= 128;
 
-                        if(sid >= 108)
-                        {
-                            idx     += 2;
+                        if (sid >= 108) {
+                            idx += 2;
                             nbBytes += 2;
 
-                            sid = (sid - 108) * 256 + bytes[idx-1];
-                        }
-                        else
-                        {
+                            sid = (sid - 108) * 256 + bytes[idx - 1];
+                        } else {
                             ++nbBytes;
                             ++idx;
                         }
@@ -192,18 +188,13 @@ public class SensorScopeListenerClient extends Thread
 
                         ++idx;
                         ++nbBytes;
-                    }
-                    else
-                    {
-                        if(sid >= 108)
-                        {
-                            idx     += 2;
+                    } else {
+                        if (sid >= 108) {
+                            idx += 2;
                             nbBytes += 2;
 
-                            sid  = (sid - 108) * 256 + bytes[idx-1];
-                        }
-                        else
-                        {
+                            sid = (sid - 108) * 256 + bytes[idx - 1];
+                        } else {
                             ++idx;
                             ++nbBytes;
                         }
@@ -211,8 +202,10 @@ public class SensorScopeListenerClient extends Thread
 
                     logger.info("Station " + id + ": SID = " + sid + ", dupn = " + dupn + ", len = " + size + ", data = ");
 
-                    for(int i=0; i<size; ++i)
-                        logger.info(String.format("%02X ", bytes[idx++]));
+                    sb = new StringBuilder();
+                    for (int i = 0; i < size; ++i)
+                        sb.append(String.format("%02X ", bytes[idx++]));
+                    logger.info(sb.toString());
 
                     //System.out.println();
 
@@ -222,77 +215,65 @@ public class SensorScopeListenerClient extends Thread
         }
     }
 
-    private void getPackets()
-    {
-        byte[]            ack        = new byte[2];
+    private void getPackets() {
+        byte[] ack = new byte[2];
         ArrayList<byte[]> allPackets = new ArrayList<byte[]>();
 
-        while(true)
-        {
+        while (true) {
             byte[] packet = readPacket();
 
-            if(packet == null)
-            {
+            if (packet == null) {
                 logger.error("Error: null packet");
                 return;
             }
 
-            if(packet.length == 3 && packet[0] == '+' && packet[1] == '+' && packet[2] == '+')
-            {
+            if (packet.length == 3 && packet[0] == '+' && packet[1] == '+' && packet[2] == '+') {
                 logger.info("Disconnection");
                 return;
             }
 
-            if(packet.length == 1 && packet[0] == BYTE_SYNC)
-            {
+            if (packet.length == 1 && packet[0] == BYTE_SYNC) {
                 allPackets.clear();
                 continue;
             }
 
-            if(packet[0] == PACKET_DATA)
-            {
+            if (packet[0] == PACKET_DATA) {
                 logger.info("Got a data packet");
                 allPackets.add(packet);
                 continue;
             }
 
-            if(packet[0] != PACKET_CRC)
-            {
+            if (packet[0] != PACKET_CRC) {
                 ack[0] = 1;
                 ack[1] = BYTE_NACK;
 
                 logger.error("Error: Expected CRC but got something else");
-            }
-            else
-            {
+            } else {
                 logger.info("Got a CRC");
 
                 ack[0] = 1;
                 ack[1] = BYTE_ACK;
 
-                for(byte[] pkt: allPackets)
+                for (byte[] pkt : allPackets) {
+                    processPacket(pkt);
                     printPacket(pkt);
+                }
 
                 allPackets.clear();
             }
 
-            if(!write(ack))
-            {
+            if (!write(ack)) {
                 logger.error("Error: Could not send ACK");
                 return;
             }
         }
     }
 
-    private boolean write(byte data[])
-    {
-        try
-        {
+    private boolean write(byte data[]) {
+        try {
             mSocket.getOutputStream().write(data);
             mSocket.getOutputStream().flush();
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             return false;
         }
 
@@ -300,27 +281,25 @@ public class SensorScopeListenerClient extends Thread
     }
 
 
-    public void run()
-    {
+    public void run() {
         logger.info("New connection from " + mSocket.getInetAddress());
 
         // RSSI
         byte[] rssi = read(2);
 
-        if(rssi == null)
-        {
+        if (rssi == null) {
             logger.error("Error: Could not receive RSSI");
             return;
         }
 
         // Auth challenge
-        long   utc       = System.currentTimeMillis() / 1000;
+        long utc = System.currentTimeMillis() / 1000;
         byte[] challenge = new byte[25];
-        Random random    = new Random();
+        Random random = new Random();
 
         challenge[0] = 24;
 
-        for(int i=1; i<17; ++i)
+        for (int i = 1; i < 17; ++i)
             challenge[i] = (byte) (random.nextInt() & 0xFF);
 
         challenge[17] = (byte) ((utc >> 24) & 0xFF);
@@ -335,8 +314,7 @@ public class SensorScopeListenerClient extends Thread
         challenge[23] = (byte) ((crc >> 8) & 0xFF);
         challenge[24] = (byte) (crc & 0xFF);
 
-        if(!write(challenge))
-        {
+        if (!write(challenge)) {
             logger.error("Error: Could not send challenge");
             return;
         }
@@ -344,13 +322,16 @@ public class SensorScopeListenerClient extends Thread
         // Reply to challenge
         byte[] authReply = read(7);
 
-        if(authReply == null)
-        {
+        if (authReply == null) {
             logger.error("Error: Could not receive the reply to the challenge");
             return;
         }
 
         // Process packets
         getPackets();
+    }
+
+    private void processPacket(byte[] pkt) {
+
     }
 }
