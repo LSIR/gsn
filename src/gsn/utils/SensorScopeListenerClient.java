@@ -940,7 +940,7 @@ public class SensorScopeListenerClient extends Thread {
 
         if (doPostStreamElement) {
 
-            aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp);
+            aStreamElement = new StreamElement(outputStructureCache, buffer, (Long)timestamp);
 
             PublishPacketWithHistory(buffer, timestamp, sid);
         }
