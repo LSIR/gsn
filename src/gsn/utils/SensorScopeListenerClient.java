@@ -575,7 +575,7 @@ public class SensorScopeListenerClient extends Thread {
                     }
                     logger.info(sb.toString());
 
-                    createStreamElement(timestamp, id, sid, dupn, size, chunk);
+                    createStreamElement(timestamp * 1000, id, sid, dupn, size, chunk);
 
                     //System.out.println();
 
@@ -940,7 +940,7 @@ public class SensorScopeListenerClient extends Thread {
 
         if (doPostStreamElement) {
 
-            aStreamElement = new StreamElement(outputStructureCache, buffer, (Long)timestamp);
+            aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp);
 
             PublishPacketWithHistory(buffer, timestamp, id);
         }
