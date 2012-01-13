@@ -740,7 +740,7 @@ public class SensorScopeListenerClient extends Thread {
 
         for (int i = 1; i <= OUTPUT_STRUCTURE_SIZE - 2; i++)
             buffer[i] = null;
-        buffer[OUTPUT_STRUCTURE_SIZE - 1] = -1;
+        buffer[OUTPUT_STRUCTURE_SIZE - 1] = timestamp;
 
         switch (sid) {
 
