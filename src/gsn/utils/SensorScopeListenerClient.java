@@ -765,8 +765,8 @@ public class SensorScopeListenerClient extends Thread {
 
                 sid2_air_temp = raw_airtemp * 1.0 / 100 - 39.6;
                 sid2_air_humid = (raw_airhumidity * 1.0 * 0.0405) - 4 - (raw_airhumidity * raw_airhumidity * 0.0000028) + ((raw_airhumidity * 0.00008) + 0.01) * (sid2_air_temp - 25);
-                logger.info("sid2_air_temp: " + measure.format(sid2_air_temp) +
-                        " sid2_air_humid: " + measure.format(sid2_air_humid));
+                logger.info("sid2_air_temp_" + dupn + ": " + measure.format(sid2_air_temp) +
+                        " sid2_air_humid_" + dupn + ": " + measure.format(sid2_air_humid));
                 buffer[OFFSET_AIR_TEMP + dupn] = new Double(sid2_air_temp);
                 buf[OFFSET_AIR_TEMP + dupn] = sid2_air_temp;
                 count[OFFSET_AIR_TEMP + dupn]++;
@@ -778,7 +778,7 @@ public class SensorScopeListenerClient extends Thread {
             case 4:
                 long raw_solar_rad = chunk[0] * 256 + chunk[1];
                 sid4_solar_rad = raw_solar_rad * 2.5 * 1000 * 6 / (4095 * 1.67 * 5);
-                logger.info("sid4_solar_rad: " + measure.format(sid4_solar_rad));
+                logger.info("sid4_solar_rad_" + dupn + ": " + measure.format(sid4_solar_rad));
                 buffer[OFFSET_SOLAR_RAD + dupn] = new Double(sid4_solar_rad);
                 buf[OFFSET_SOLAR_RAD + dupn] = sid4_solar_rad;
                 count[OFFSET_SOLAR_RAD + dupn]++;
@@ -787,7 +787,7 @@ public class SensorScopeListenerClient extends Thread {
             case 5:
                 long raw_rain_meter = chunk[0] * 256 + chunk[1];
                 sid5_rain_meter = raw_rain_meter * 0.254;
-                logger.info("sid5_rain_meter: " + measure.format(sid5_rain_meter));
+                logger.info("sid5_rain_meter_" + dupn + ": " + measure.format(sid5_rain_meter));
                 buffer[OFFSET_RAIN_METER + dupn] = new Double(sid5_rain_meter);
                 buf[OFFSET_RAIN_METER + dupn] = sid5_rain_meter;
                 count[OFFSET_RAIN_METER + dupn]++;
@@ -804,8 +804,8 @@ public class SensorScopeListenerClient extends Thread {
                 buffer[OFFSET_AIR_TEMP_TNX + dupn] = new Double(sid6_air_temp);
                 buf[OFFSET_AIR_TEMP_TNX + dupn] = sid6_air_temp;
                 count[OFFSET_AIR_TEMP_TNX + dupn]++;
-                logger.info("sid6_ground_temp: " + measure.format(sid6_ground_temp) +
-                        " sid6_air_temp: " + measure.format(sid6_air_temp));
+                logger.info("sid6_ground_temp_" + dupn + ": " + measure.format(sid6_ground_temp) +
+                        " sid6_air_temp_" + dupn + ": " + measure.format(sid6_air_temp));
                 break;
 
             case 7:
@@ -819,8 +819,8 @@ public class SensorScopeListenerClient extends Thread {
                 buffer[OFFSET_SOIL_MOISTURE_ECTM + dupn] = new Double(sid7_soil_moisture);
                 buf[OFFSET_SOIL_MOISTURE_ECTM + dupn] = sid7_soil_moisture;
                 count[OFFSET_SOIL_MOISTURE_ECTM + dupn]++;
-                logger.info("sid7_soil_temp: " + measure.format(sid7_soil_temp) +
-                        " sid7_soil_moisture: " + measure.format(sid7_soil_moisture));
+                logger.info("sid7_soil_temp_" + dupn + ": " + measure.format(sid7_soil_temp) +
+                        " sid7_soil_moisture_" + dupn + ": " + measure.format(sid7_soil_moisture));
                 break;
 
             case 8:
@@ -829,7 +829,7 @@ public class SensorScopeListenerClient extends Thread {
                 buffer[OFFSET_SOIL_WATER_POTENTIAL + dupn] = new Double(sid8_soil_water_potential);
                 buf[OFFSET_SOIL_WATER_POTENTIAL + dupn] = sid8_soil_water_potential;
                 count[OFFSET_SOIL_WATER_POTENTIAL + dupn]++;
-                logger.info("sid8_soil_water_potential:" + measure.format(sid8_soil_water_potential));
+                logger.info("sid8_soil_water_potential_" + dupn + ":" + measure.format(sid8_soil_water_potential));
                 break;
 
             case 9:
@@ -854,9 +854,9 @@ public class SensorScopeListenerClient extends Thread {
                 buffer[OFFSET_SOIL_CONDUCT_DECAGON + dupn] = new Double(sid9_soil_conduct);
                 buf[OFFSET_SOIL_CONDUCT_DECAGON + dupn] = sid9_soil_conduct;
                 count[OFFSET_SOIL_CONDUCT_DECAGON + dupn]++;
-                logger.info("sid9_soil_temp: " + measure.format(sid9_soil_temp) +
-                        " sid9_soil_moisture: " + measure.format(sid9_soil_moisture) +
-                        " sid9_soil_conduct: " + measure.format(sid9_soil_conduct));
+                logger.info("sid9_soil_temp_" + dupn + ": " + measure.format(sid9_soil_temp) +
+                        " sid9_soil_moisture_" + dupn + ": " + measure.format(sid9_soil_moisture) +
+                        " sid9_soil_conduct_" + dupn + ": " + measure.format(sid9_soil_conduct));
                 break;
 
             case 10:
@@ -874,8 +874,8 @@ public class SensorScopeListenerClient extends Thread {
                 buffer[OFFSET_WIND_SPEED + dupn] = new Double(sid10_wind_speed);
                 buf[OFFSET_WIND_SPEED + dupn] = sid10_wind_speed;
                 count[OFFSET_WIND_SPEED + dupn]++;
-                logger.info("sid10_wind_direction: " + measure.format(sid10_wind_direction) +
-                        " sid10_wind_speed: " + measure.format(sid10_wind_speed));
+                logger.info("sid10_wind_direction_" + dupn + ": " + measure.format(sid10_wind_direction) +
+                        " sid10_wind_speed_" + dupn + ": " + measure.format(sid10_wind_speed));
                 break;
 
             case 19:
@@ -890,8 +890,8 @@ public class SensorScopeListenerClient extends Thread {
                 buffer[OFFSET_DECAGON_10HS_VWC + dupn] = new Double(sid19_decagon_10hs_vwc);
                 buf[OFFSET_DECAGON_10HS_VWC + dupn] = sid19_decagon_10hs_vwc;
                 count[OFFSET_DECAGON_10HS_VWC + dupn]++;
-                logger.info("sid19_decagon_10hs_mv: " + measure.format(sid19_decagon_10hs_mv) +
-                        " sid19_decagon_10hs_vwc: " + measure.format(sid19_decagon_10hs_vwc));
+                logger.info("sid19_decagon_10hs_mv_" + dupn + ": " + measure.format(sid19_decagon_10hs_mv) +
+                        " sid19_decagon_10hs_vwc_" + dupn + ": " + measure.format(sid19_decagon_10hs_vwc));
                 break;
 
             case 20:
@@ -903,7 +903,7 @@ public class SensorScopeListenerClient extends Thread {
                 buf[OFFSET_SOLAR_RAD_SP212 + dupn] = sid20_solar_rad_sp212;
                 count[OFFSET_SOLAR_RAD_SP212 + dupn]++;
 
-                logger.info("sid20_solar_rad_sp212: " + measure.format(sid20_solar_rad_sp212));
+                logger.info("sid20_solar_rad_sp212_" + dupn + ": " + measure.format(sid20_solar_rad_sp212));
                 break;
 
             case 12:
