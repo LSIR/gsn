@@ -186,6 +186,7 @@ $(document).ready(function() {
               "showForm": false
           },
           "appUrl": "http://pc-10022.ethz.ch:24001/sensorviz?",
+          "imageUrl": "http://pc-10022.ethz.ch:24001/images/",
           "signals": {
               "y1": [
               {
@@ -227,6 +228,16 @@ $(document).ready(function() {
                   "scaling": 1.0,
                   "visible": true,
                   "thresholds": [ 6.0, 7.0 ]
+              },
+              {
+                  "displayName": "GasMobile Ozone [ppb]",
+                  "gsnUrl": window.location.host,
+                  "virtualSensor": deployments[visible].name.toLowerCase() + "_gasmobile_ozone_uncalibrated",
+                  "field": "ozone_ppb",
+                  "deviceId": 300,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 17.0, 15.0 ]
               }
               ]
           }
