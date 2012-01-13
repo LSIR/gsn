@@ -735,8 +735,8 @@ public class SensorScopeListenerClient extends Thread {
         double[] buf = new double[OUTPUT_STRUCTURE_SIZE];
         int[] count = new int[OUTPUT_STRUCTURE_SIZE];
 
-        buffer[0] = new Integer(sid);
-        buf[0] = sid;
+        buffer[0] = new Integer(id);
+        buf[0] = id;
 
         for (int i = 1; i <= OUTPUT_STRUCTURE_SIZE - 2; i++)
             buffer[i] = null;
@@ -942,7 +942,7 @@ public class SensorScopeListenerClient extends Thread {
 
             aStreamElement = new StreamElement(outputStructureCache, buffer, (Long)timestamp);
 
-            PublishPacketWithHistory(buffer, timestamp, sid);
+            PublishPacketWithHistory(buffer, timestamp, id);
         }
     }
 
