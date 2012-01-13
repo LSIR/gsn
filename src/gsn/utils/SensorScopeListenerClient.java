@@ -1,17 +1,20 @@
 package gsn.utils;
 
 import gsn.beans.DataField;
+import gsn.beans.StreamElement;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.net.*;
 import java.text.DecimalFormat;
 import java.util.*;
 
 public class SensorScopeListenerClient extends Thread {
+
+    private static Map<Integer, Long> latestTimestampForStation = new HashMap<Integer, Long>();
+    private static Map<Integer, Serializable[]> latestBufferForStation = new HashMap<Integer, Serializable[]>();
+    private static Map<Integer, Map<Long, Serializable[]>> stationsBuffer = new HashMap<Integer, Map<Long, Serializable[]>>();
 
     private DataField[] outputStructureCache = new DataField[]{
             new DataField("station_id", "int", "Station ID"),
@@ -701,6 +704,8 @@ public class SensorScopeListenerClient extends Thread {
 
         DecimalFormat measure = new DecimalFormat("0.00");
 
+        StreamElement aStreamElement = null;
+
         boolean doPostStreamElement = true;
 
         double sid1_int_batt_volt;
@@ -729,6 +734,13 @@ public class SensorScopeListenerClient extends Thread {
         Serializable[] buffer = new Serializable[OUTPUT_STRUCTURE_SIZE];
         double[] buf = new double[OUTPUT_STRUCTURE_SIZE];
         int[] count = new int[OUTPUT_STRUCTURE_SIZE];
+
+        buffer[0] = new Integer(sid);
+        buf[0] = sid;
+
+        for (int i = 1; i <= OUTPUT_STRUCTURE_SIZE - 2; i++)
+            buffer[i] = null;
+        buffer[OUTPUT_STRUCTURE_SIZE - 1] = -1;
 
         switch (sid) {
 
@@ -925,5 +937,84 @@ public class SensorScopeListenerClient extends Thread {
                 break;
 
         }
+
+        if (doPostStreamElement) {
+
+            aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp);
+
+            PublishPacketWithHistory(buffer, timestamp, sid);
+        }
+    }
+
+    /*
+   * Publish buffer
+   * Merges packets for similar timestamps including timestamps older than latest,
+   * uses a buffer of size 10 to store history (moving window of size 10 and step 1)
+   * */
+    private void PublishPacketWithHistory(Serializable[] packet, long timestamp, int stationID) {
+        if (stationsBuffer.containsKey(stationID)) {
+            AddToStationBuffer(stationID, timestamp, packet);
+        } else {
+            stationsBuffer.put(stationID, new HashMap<Long, Serializable[]>()); // create buffer for station stationID
+            stationsBuffer.get(stationID).put(timestamp, packet); // add packet for station stationID
+        }
+    }
+
+    private void AddToStationBuffer(int stationID, long timestamp, Serializable[] packet) {
+        if (stationsBuffer.get(stationID).containsKey(timestamp)) { // timestamp already present
+            stationsBuffer.get(stationID).put(timestamp, mergePackets(stationsBuffer.get(stationID).get(timestamp), packet)); // merge new buffer with previous
+        } else {
+            stationsBuffer.get(stationID).put(timestamp, packet);
+        }
+        CheckQueueSizeForStation(stationID);
+    }
+
+    /*
+    * Keeps only 10 values in the queue
+    * Removes oldest value if queue is has more than 10 elements
+    * (moving window of size 10 and step 1)
+    * */
+    private void CheckQueueSizeForStation(int stationID) {
+        int queueSize = stationsBuffer.get(stationID).size();
+        logger.info("Queue [" + stationID + "] = " + queueSize);
+        // search for oldest timestamp (smaller value)
+        Long oldestTimestamp = Long.MAX_VALUE;
+        for (Long timestamp : stationsBuffer.get(stationID).keySet()) {
+            if (timestamp < oldestTimestamp)
+                oldestTimestamp = timestamp;
+        }
+        Serializable[] _buffer = stationsBuffer.get(stationID).get(oldestTimestamp);
+        if (queueSize > 10) {
+            try {  // Publish one element
+                String stationFileName = csvFolderName + "/" + stationID + ".csv";
+                FileWriter fstream = new FileWriter(stationFileName, true);
+                BufferedWriter out = new BufferedWriter(fstream);
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < _buffer.length; i++) {
+                    if (_buffer[i] == null)
+                        sb.append(nullString).append(",");
+                    else
+                        sb.append(_buffer[i]).append(",");
+                }
+                sb.append(Helpers.convertTimeFromLongToIso(oldestTimestamp, "yyyy-MM-dd HH:mm:ss"));
+                sb.append("\n");
+                out.write(sb.toString());
+                out.close();
+                stationsBuffer.get(stationID).remove(oldestTimestamp); // Remove one element
+                logger.info("Queue [" + stationID + "] = " + queueSize + " after publishing");
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    Serializable[] mergePackets(Serializable[] olderPacket, Serializable[] newerPacket) {
+        Serializable[] mergedPacket = olderPacket.clone();
+        for (int i = 0; i < olderPacket.length; i++) {
+            if (olderPacket[i] == null && newerPacket[i] != null)
+                mergedPacket[i] = newerPacket[i];
+        }
+        return mergedPacket;
     }
 }
