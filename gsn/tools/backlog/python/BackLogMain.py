@@ -27,6 +27,7 @@ from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
 from JobsObserver import JobsObserverClass
 from ScheduleHandler import ScheduleHandlerClass, SUBPROCESS_BUG_BYPASS
+from ConfigParser import NoSectionError
 
 
 if SUBPROCESS_BUG_BYPASS:
@@ -162,7 +163,7 @@ class BackLogMainClass(Thread, Statistics):
         # get plugins section from config files
         try:
             config_plugins = self.confighandler.getParsedConfig()['config'].items('plugins')
-        except ConfigParser.NoSectionError:
+        except NoSectionError:
             self._logger.warning('no [plugins] section specified in %s' % (config_file,))
             config_plugins = DEFAULT_PLUGINS
             self._logger.warning('use default plugins: %s' % (config_plugins,))
@@ -176,7 +177,7 @@ class BackLogMainClass(Thread, Statistics):
                 pluginclass = getattr(module, module_name + 'Class')
                 try:
                     config_plugins_options = dict(self.confighandler.getParsedConfig()['config'].items(module_name + '_options'))
-                except ConfigParser.NoSectionError:
+                except NoSectionError:
                     self._logger.warning('no [%s_options] section specified in %s' % (module_name, config_file,))
                     config_plugins_options = {}
                 plugin = pluginclass(self, config_plugins_options)
@@ -427,7 +428,7 @@ class BackLogMainClass(Thread, Statistics):
                 pluginclass = getattr(module, '%sClass' % (pluginclassname,))
                 try:
                     config_plugins_options = dict(self.confighandler.getParsedConfig()['config'].items('%s_options' % (pluginclassname,)))
-                except ConfigParser.NoSectionError:
+                except NoSectionError:
                     self._logger.warning('no [%s_options] section specified in configuration file' % (pluginclassname,))
                     config_plugins_options = {}
                 plugin = pluginclass(self, config_plugins_options)
@@ -691,7 +692,7 @@ def main():
     try:
         logging.config.fileConfig(config_file)
         logging.logProcesses = 0
-    except ConfigParser.NoSectionError, e:
+    except NoSectionError, e:
         print e.__str__()
         
     logger = logging.getLogger('BackLogMain.main')
