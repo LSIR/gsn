@@ -125,6 +125,9 @@ public class GasMobileDataParser extends BridgeVirtualSensorPermasense {
 		File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), (String) data.getData("relative_file"));
 		file = file.getAbsoluteFile();
 		
+		if (file.getAbsolutePath().indexOf("meas") == -1)
+			return;
+		
 		parseData(file, inputStreamName, data);
 		logger.debug("parsed new incoming file (" + file.getAbsolutePath() + ")");
 	}
