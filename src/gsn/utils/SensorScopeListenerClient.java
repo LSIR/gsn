@@ -1001,6 +1001,7 @@ public class SensorScopeListenerClient extends Thread {
                 sb.append("\n");
                 out.write(sb.toString());
                 out.close();
+                fstream.close();
                 stationsBuffer.get(stationID).remove(oldestTimestamp); // Remove one element
                 logger.info("Queue [" + stationID + "] = " + queueSize + " after publishing");
             } catch (Exception e) {
