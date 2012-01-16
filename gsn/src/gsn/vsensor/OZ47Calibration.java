@@ -271,7 +271,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 	  if (lat >= 4723.1396-0.1 && lon >= 832.3892-0.1 && lat <= 4723.1396+0.1 && lon <= 832.4892+0.1)
 	    return RefStations.STAMPFENBACHSTR;
 	  else if (lat >= 4722.275-0.1 && lon >= 831.4106-0.1 && lat <= 4722.275+0.1 && lon <= 831.4106+0.1)
-      return RefStations.STAMPFENBACHSTR;
+      return RefStations.SCHIMMELSTR;
 	  else
 	    return RefStations.NONE;
 	}
