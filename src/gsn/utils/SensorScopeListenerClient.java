@@ -953,6 +953,28 @@ public class SensorScopeListenerClient extends Thread {
                 logger.info("sid142_snow_height: " + measure.format(sid142_snow_height));
                 break;
 
+            case 135: // NO2, CO, CO2
+                long raw_1 = chunk[0] * 256 + chunk[1];
+                long raw_2 = chunk[2] * 256 + chunk[3];
+
+                Double sid135_no2 = null;
+                Double sid135_co = null;
+                Double sid135_co2 = null;
+
+                if (1556 <= raw_1 && raw_1 <= 1720) {
+                    sid135_no2 = raw_2 * 2.5 / 4095.0 / 0.05;
+                    logger.info("sid135_no2: " + measure.format(sid135_no2));
+                } else if (2293 <= raw_1 && raw_1 <= 2620) {
+                    sid135_co = raw_2 * 2.5 / 4095.0 / 0.1;
+                    logger.info("sid135_co: " + measure.format(sid135_co));
+                } else if (3112 <= raw_1 && raw_1 <= 3439) {
+                    sid135_co2 = raw_2 * 2.5 / 4095.0 / 0.00125;
+                    logger.info("sid135_co2: " + measure.format(sid135_co2));
+                }
+
+                //TODO: add to buffers
+                break;
+
             default:
                 logger.debug("Unknown SID:" + sid);
                 doPostStreamElement = false;
