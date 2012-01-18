@@ -933,8 +933,7 @@ public class SensorScopeListenerClient extends Thread {
                 break;
 
             case 12:
-                long battery_board_voltage_raw = chunk[0] * 256 + chunk[1];
-                //TODO: verify packet size (1 or 2 bytes)
+                long battery_board_voltage_raw = chunk[0] * 16 + chunk[1];
 
                 sid12_battery_board_voltage = battery_board_voltage_raw * 6 * 2.5 / 4095;
 
