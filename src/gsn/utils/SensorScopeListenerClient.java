@@ -977,6 +977,24 @@ public class SensorScopeListenerClient extends Thread {
 
                 break;
 
+            case 138: // dendrometer
+                long dendrometer_raw = chunk[0] * 65536 + chunk[1] * 256 + chunk[0];
+
+                long dendrometer_count = (chunk[0] >> 2) & 63;
+                long distance = dendrometer_raw & 0x03FFFF;
+
+                Double sid138_dendrometer = null;
+
+                if (dendrometer_count == 0)
+                    sid138_dendrometer = -1.0;
+                else
+                    sid138_dendrometer = (4095.0 - (distance / dendrometer_count)) * 20000.0 / 4095.0;
+
+                //TODO: add to buffers
+
+                logger.info("sid138_dendrometer: " + measure.format(sid138_dendrometer));
+                break;
+
             case 92: // latitude
                 long latitude_raw = chunk[0] * 256 + chunk[1];
                 double sid92_latitude = toDeg(latitude_raw);
