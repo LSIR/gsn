@@ -41,6 +41,14 @@ $(document).ready(function() {
           deviceId: [3]
         }]
       },
+      // OpenSense Backlog num. entries
+      { title:"BackLog DB [# of entries]: Tram 1",
+        signals: [{
+          vsensor:".*_backlogstatus_dynamic__mapped",
+          field:["db_entries"],
+          deviceId: [3]
+        }]
+      },
     
       // Dozer Health
       { title:"Dozer System Voltage",
