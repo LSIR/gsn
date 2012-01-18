@@ -963,16 +963,36 @@ public class SensorScopeListenerClient extends Thread {
 
                 if (1556 <= raw_1 && raw_1 <= 1720) {
                     sid135_no2 = raw_2 * 2.5 / 4095.0 / 0.05;
+                    //TODO: add to buffers
                     logger.info("sid135_no2: " + measure.format(sid135_no2));
                 } else if (2293 <= raw_1 && raw_1 <= 2620) {
                     sid135_co = raw_2 * 2.5 / 4095.0 / 0.1;
+                    //TODO: add to buffers
                     logger.info("sid135_co: " + measure.format(sid135_co));
                 } else if (3112 <= raw_1 && raw_1 <= 3439) {
                     sid135_co2 = raw_2 * 2.5 / 4095.0 / 0.00125;
+                    //TODO: add to buffers
                     logger.info("sid135_co2: " + measure.format(sid135_co2));
                 }
 
+                break;
+
+            case 92: // latitude
+                long latitude_raw = chunk[0] * 256 + chunk[1];
+                double sid92_latitude = toDeg(latitude_raw);
+
                 //TODO: add to buffers
+
+                logger.info("sid92_latitude: " + measure.format(sid92_latitude));
+                break;
+
+            case 93: // longitude
+                long longitude_raw = chunk[0] * 256 + chunk[1];
+                double sid93_longitude = toDeg(longitude_raw);
+
+                //TODO: add to buffers
+
+                logger.info("sid93_longitude: " + measure.format(sid93_longitude));
                 break;
 
             default:
@@ -988,6 +1008,21 @@ public class SensorScopeListenerClient extends Thread {
 
             PublishPacketWithHistory(buffer, timestamp, id);
         }
+    }
+
+    // Convert the given raw value to degrees
+    double toDeg(long raw) {
+        long sign = (raw >> 28) & 1;
+        long deg = (raw >> 20) & 255;
+        long mn = (raw >> 14) & 63;
+        long mn2 = raw & 16383;
+
+        double double_deg = deg + (mn + mn2 / 10000.0) / 60.0;
+
+        if (sign == 1)
+            double_deg = -double_deg;
+
+        return double_deg;
     }
 
     /*
