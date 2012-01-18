@@ -944,6 +944,15 @@ public class SensorScopeListenerClient extends Thread {
                 logger.info("sid12_battery_board_voltage: " + measure.format(sid12_battery_board_voltage));
                 break;
 
+            case 142: // Maxbotix snow height
+                long snow_height_raw = chunk[0] * 256 + chunk[1];
+                double sid142_snow_height = ((snow_height_raw * 2.5) / 4095.0) * ((10.0 + 3.3) / 10.0) * (1024.0 / 3.3);
+
+                //TODO: add to buffers
+
+                logger.info("sid142_snow_height: " + measure.format(sid142_snow_height));
+                break;
+
             default:
                 logger.debug("Unknown SID:" + sid);
                 doPostStreamElement = false;
