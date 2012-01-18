@@ -121,6 +121,7 @@ OSTest_MiniDiSC__mapped.xml
 OSTest_STEVAL_Dynamic_Proc_GPS.xml
 OSTest_MiniDiSC_GPS.xml
 OSTest_GasMobile_Ozone_Uncalibrated.xml
+OSTest_Data_Latency.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
