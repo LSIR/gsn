@@ -698,6 +698,12 @@ public class SensorScopeListenerClient extends Thread {
 
         // Process packets
         getPackets();
+
+        try {
+            mSocket.close();
+        } catch (IOException e) {
+            logger.error("Error while closing socket: " + e);
+        }
     }
 
     private void createStreamElement(long timestamp, int id, int sid, int dupn, int size, int[] chunk) {
