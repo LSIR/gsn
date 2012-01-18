@@ -378,8 +378,10 @@ public class SensorScopeListenerClient extends Thread {
 
     public static void config() {
         Properties propertiesFile = new Properties();
+        FileInputStream fs = null;
         try {
-            propertiesFile.load(new FileInputStream(CONF_SENSORSCOPE_SERVER_PROPERTIES));
+            fs = new FileInputStream(CONF_SENSORSCOPE_SERVER_PROPERTIES);
+            propertiesFile.load(fs);
         } catch (IOException e) {
             logger.error("Couldn't load configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
             logger.error(e.getMessage(), e);
@@ -388,6 +390,12 @@ public class SensorScopeListenerClient extends Thread {
 
         csvFolderName = propertiesFile.getProperty("csvFolder", DEFAULT_FOLDER_FOR_CSV_FILES);
         nullString = propertiesFile.getProperty("nullString", DEFAULT_NULL_STRING);
+
+        try {
+            fs.close();
+        } catch (IOException e) {
+            logger.error("Couldn't close file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
+        }
 
     }
 
