@@ -36,7 +36,7 @@ $(document).ready(function() {
       // OpenSense Data Latency
       { title:"Data Latency [ms]: Tram 1",
         signals: [{
-          vsensor:".*_data_latency",
+          vsensor:"opensense_data_latency",
           field:["latency"],
           deviceId: [3]
         }]
@@ -44,7 +44,7 @@ $(document).ready(function() {
       // OpenSense Backlog num. entries
       { title:"BackLog DB [# of entries]: Tram 1",
         signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
+          vsensor:"opensense_backlogstatus_dynamic__mapped",
           field:["db_entries"],
           deviceId: [3]
         }]
