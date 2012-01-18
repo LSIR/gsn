@@ -32,6 +32,16 @@ $(document).ready(function() {
 
     // plot configuration
     GsnPlots.setConfig([
+      
+      // OpenSense Data Latency
+      { title:"Data Latency [ms]: Tram 1",
+        signals: [{
+          vsensor:".*_data_latency",
+          field:["latency"],
+          deviceId: [3]
+        }]
+      },
+    
       // Dozer Health
       { title:"Dozer System Voltage",
         signals: [{
