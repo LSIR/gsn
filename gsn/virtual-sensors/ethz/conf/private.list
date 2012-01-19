@@ -1,8 +1,10 @@
+Dirruhorn_BackLogConfig.xml
 Dirruhorn_BackLogStatus_Dynamic.xml
 Dirruhorn_BackLogStatus_Revision.xml
 Dirruhorn_BackLogStatus_Static.xml
 Dirruhorn_Binary.xml
 Dirruhorn_Binary_Http.xml
+Dirruhorn_CamZilla.xml
 Dirruhorn_CoreStationStatus_Hardware.xml
 Dirruhorn_CoreStationStatus_Software.xml
 Dirruhorn_CoreStationStatus_Static.xml
@@ -32,6 +34,7 @@ Dirruhorn_Statistics.xml
 Dirruhorn_SyslogNg.xml
 #Dirruhorn_VaisalaWXT520.xml
 Dirruhorn_Topology.xml
+Glaciers_BackLogConfig.xml
 Glaciers_BackLogStatus_Dynamic.xml
 Glaciers_BackLogStatus_Revision.xml
 Glaciers_BackLogStatus_Static.xml
@@ -51,6 +54,7 @@ Glaciers_Schedule.xml
 Glaciers_Statistics.xml
 Glaciers_SyslogNg.xml
 Glaciers_Topology.xml
+Jungfraujoch_BackLogConfig.xml
 Jungfraujoch_BackLogStatus_Dynamic.xml
 Jungfraujoch_BackLogStatus_Revision.xml
 Jungfraujoch_BackLogStatus_Static.xml
@@ -84,6 +88,7 @@ Jungfraujoch_Schedule.xml
 Jungfraujoch_Statistics.xml
 Jungfraujoch_SyslogNg.xml
 Jungfraujoch_Topology.xml
+Matterhorn_BackLogConfig.xml
 Matterhorn_BackLogStatus_Dynamic.xml
 Matterhorn_BackLogStatus_Revision.xml
 Matterhorn_BackLogStatus_Static.xml
@@ -115,9 +120,10 @@ Matterhorn_Statistics.xml
 Matterhorn_SyslogNg.xml
 Matterhorn_VaisalaWXT520.xml
 Matterhorn_Topology.xml
-OpenSense_BackLogStatus_Static.xml
-OpenSense_BackLogStatus_Revision.xml
+OpenSense_BackLogConfig.xml
 OpenSense_BackLogStatus_Dynamic.xml
+OpenSense_BackLogStatus_Revision.xml
+OpenSense_BackLogStatus_Static.xml
 OpenSense_CoreStationStatus_Static.xml
 OpenSense_CoreStationStatus_Software.xml
 OpenSense_CoreStationStatus_Hardware.xml
@@ -134,6 +140,7 @@ OpenSense_STEVAL_Static.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
 Statistics_Sensorviz.xml
+Thur_BackLogConfig.xml
 Thur_BackLogStatus_Dynamic.xml
 Thur_BackLogStatus_Revision.xml
 Thur_BackLogStatus_Static.xml

@@ -12,6 +12,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TRANSMISSION_TIME" type="BIGINT" unit="unixtime" />
+			<field name="GENERATED_BY" type="VARCHAR(256)" />
             <field name="SCHEDULE" type="binary" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
        	</output-structure>
@@ -25,17 +26,6 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-jj-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-
-        <stream name="data2">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-caa-jj-2.dyndns.biz:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.SchedulePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>

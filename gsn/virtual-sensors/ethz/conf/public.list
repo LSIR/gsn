@@ -1,3 +1,4 @@
+Dirruhorn_BackLogConfig__mapped.xml
 Dirruhorn_BackLogStatus_Dynamic__mapped.xml
 Dirruhorn_BackLogStatus_Revision__mapped.xml
 Dirruhorn_BackLogStatus_Static__mapped.xml
@@ -27,6 +28,7 @@ Dirruhorn_Camera_pos11_RandaBig__scaled.xml
 Dirruhorn_Camera_pos11_WeisshornBig__scaled.xml
 Dirruhorn_Camera_pos11_Position5__scaled.xml
 Dirruhorn_Camera_pos8__scaled.xml
+Dirruhorn_CamZilla__mapped.xml
 Dirruhorn_CoreStationStatus_Hardware__conv.xml
 Dirruhorn_CoreStationStatus_Hardware__mapped.xml
 Dirruhorn_CoreStationStatus_Software__mapped.xml
@@ -75,6 +77,7 @@ Dirruhorn_SyslogNg__mapped.xml
 Dirruhorn_Topology__public.xml
 #Dirruhorn_VaisalaWXT520__mapped.xml
 #Dirruhorn_VaisalaWXT520__muxed__mapped.xml
+Glaciers_BackLogConfig__mapped.xml
 Glaciers_BackLogStatus_Dynamic__mapped.xml
 Glaciers_BackLogStatus_Revision__mapped.xml
 Glaciers_BackLogStatus_Static__mapped.xml
@@ -105,6 +108,7 @@ Glaciers_Statistics__mapped.xml
 Glaciers_SyslogNg__conv.xml
 Glaciers_SyslogNg__mapped.xml
 Glaciers_Topology__public.xml
+Jungfraujoch_BackLogConfig__mapped.xml
 Jungfraujoch_BackLogStatus_Dynamic__mapped.xml
 Jungfraujoch_BackLogStatus_Revision__mapped.xml
 Jungfraujoch_BackLogStatus_Static__mapped.xml
@@ -163,6 +167,7 @@ Jungfraujoch_Thermistorchain1.xml
 Jungfraujoch_Thermistorchain2.xml
 #Jungfraujoch_Thermistorchain.xml
 Jungfraujoch_Topology__public.xml
+Matterhorn_BackLogConfig__mapped.xml
 Matterhorn_BackLogStatus_Dynamic__mapped.xml
 Matterhorn_BackLogStatus_Revision__mapped.xml
 Matterhorn_BackLogStatus_Static__mapped.xml
@@ -247,9 +252,10 @@ Matterhorn_VaisalaWXT520__mapped.xml
 Matterhorn_VaisalaWXT520__muxed__mapped.xml
 Matterhorn_Waterpressure.xml
 Matterhorn_Topology__public.xml
-OpenSense_BackLogStatus_Static__mapped.xml
-OpenSense_BackLogStatus_Revision__mapped.xml
+OpenSense_BackLogConfig__mapped.xml
 OpenSense_BackLogStatus_Dynamic__mapped.xml
+OpenSense_BackLogStatus_Revision__mapped.xml
+OpenSense_BackLogStatus_Static__mapped.xml
 OpenSense_CoreStationStatus_Hardware__conv.xml
 OpenSense_CoreStationStatus_Static__mapped.xml
 OpenSense_CoreStationStatus_Software__mapped.xml
@@ -291,6 +297,7 @@ Statistics_GSN.xml
 Statistics_MySQL.xml
 Statistics_Sensorviz__mapped.xml
 Statistics_Sensorviz__parsed.xml
+Thur_BackLogConfig__mapped.xml
 Thur_BackLogStatus_Dynamic__mapped.xml
 Thur_BackLogStatus_Revision__mapped.xml
 Thur_BackLogStatus_Static__mapped.xml
