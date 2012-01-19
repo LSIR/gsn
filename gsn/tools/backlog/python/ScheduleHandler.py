@@ -521,6 +521,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                 elif self._beacon:
                     self._beacon = False
                     if self._duty_cycle_mode:
+                        self._newScheduleEvent.set()
                         self._waitForNextJob.set()
                         self._backlogMain.beaconCleared()
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT) == TOSTypes.CONTROL_WAKEUP_TYPE_NODE_REBOOT:
