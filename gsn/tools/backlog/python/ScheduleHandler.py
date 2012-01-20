@@ -368,7 +368,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                         if service_time <= self._max_next_schedule_wait_delta:
                             self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self._getOptionValue('max_next_schedule_wait_minutes', self._config),))
                         else:
-                            self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self._getOptionValue('max_next_schedule_wait_minutes')),))
+                            self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self._getOptionValue('max_next_schedule_wait_minutes', self._config)),))
                         self._shutdownThread = ShutdownThread(self)
                         self._shutdownThread.start()
                     
