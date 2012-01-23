@@ -932,6 +932,17 @@ public class SensorScopeListenerClient extends Thread {
                 logger.info("sid20_solar_rad_sp212_" + dupn + ": " + measure.format(sid20_solar_rad_sp212));
                 break;
 
+            case 21:
+                long raw_decagon_airtemp = chunk[0] * 64 + chunk[1] / 4;
+                long raw_decagon_airhumidity = chunk[3] / 64 + chunk[2] * 4 + (chunk[1] % 4) * 1024;
+
+                double sid21_decagon_air_temp = raw_decagon_airtemp * 1.0 / 100 - 39.6;
+                double sid21_decagon_air_humid = (raw_decagon_airhumidity * 1.0 * 0.0405) - 4 - (raw_decagon_airhumidity * raw_decagon_airhumidity * 0.0000028) + ((raw_decagon_airhumidity * 0.00008) + 0.01) * (sid21_decagon_air_temp - 25);
+
+                logger.info("sid21_decagon_air_temp_" + dupn + ": " + measure.format(sid21_decagon_air_temp));
+                logger.info("sid21_decagon_air_humid_" + dupn + ": " + measure.format(sid21_decagon_air_humid));
+                break;
+
             case 12:
                 long battery_board_voltage_raw = chunk[0] * 16 + chunk[1];
 
