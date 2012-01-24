@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -34,6 +35,9 @@ public class CSVWrapper extends AbstractWrapper {
 
     private String dataFile;
 
+    boolean useCounterForCheckPoint = false;
+    long processedLineCounter = 0; // counts lines processed when checkpoint use counter to track changes (instead of timestamp, by default)
+
     public boolean initialize() {
         setName("CSVWrapper-Thread" + (++threadCounter));
         AddressBean addressBean = getActiveAddressBean();
@@ -48,7 +52,12 @@ public class CSVWrapper extends AbstractWrapper {
         int skipFirstXLine = addressBean.getPredicateValueAsInt("skip-first-lines", 0);
         String timezone = addressBean.getPredicateValueWithDefault("timezone", handler.LOCAL_TIMEZONE_ID);
         String nullValues = addressBean.getPredicateValueWithDefault("bad-values", "");
+        String strUseCounterForCheckPoint = addressBean.getPredicateValueWithDefault("use-counter-for-check-point", "false");
         samplingPeriodInMsc = addressBean.getPredicateValueAsInt("sampling", 10000);
+
+        /*
+        DEBUG_INFO(dataFile);
+        */
 
         if (csvSeparator != null && csvSeparator.length() != 1) {
             logger.warn("The provided CSV separator:>" + csvSeparator + "< should only have  1 character, thus ignored and instead \",\" is used.");
@@ -59,7 +68,12 @@ public class CSVWrapper extends AbstractWrapper {
             logger.warn("The provided CSV quote:>" + csvSeparator + "< should only have 1 character, thus ignored and instead '\"' is used.");
             csvStringQuote = "\"";
         }
+
         try {
+            if (strUseCounterForCheckPoint.equalsIgnoreCase("true")) {
+                useCounterForCheckPoint = true;
+                logger.warn("Using counter-based check points");
+            }
             //String checkPointFile = new File(checkPointDir).getAbsolutePath()+"/"+(new File(dataFile).getName())+"-"+addressBean.hashCode();
             StringBuilder checkPointFile = new StringBuilder()
                     .append(new File(checkPointDir).getAbsolutePath())
@@ -73,6 +87,17 @@ public class CSVWrapper extends AbstractWrapper {
                     .append(new File(dataFile).getName());
             if (!handler.initialize(dataFile.trim(), csvFields, csvFormats, csvSeparator.toCharArray()[0], csvStringQuote.toCharArray()[0], skipFirstXLine, nullValues, timezone, checkPointFile.toString()))
                 return false;
+
+            String val = FileUtils.readFileToString(new File(checkPointFile.toString()), "UTF-8");
+            long lastItem = 0;
+            if (val != null && val.trim().length() > 0)
+                lastItem = Long.parseLong(val.trim());
+            logger.warn("Latest item: "+lastItem);
+
+            if (useCounterForCheckPoint) {
+                processedLineCounter = lastItem;
+            }
+
         } catch (Exception e) {
             logger.error("Loading the csv-wrapper failed:" + e.getMessage(), e);
             return false;
@@ -84,6 +109,7 @@ public class CSVWrapper extends AbstractWrapper {
 
         return true;
     }
+
 
     public void run() {
         Exception preivousError = null;
@@ -99,16 +125,29 @@ public class CSVWrapper extends AbstractWrapper {
             if (chkPointFile.isFile())
                 lastModifiedCheckPoint = chkPointFile.lastModified();
             FileReader reader = null;
+
+            /*
+            DEBUG_INFO("* Entry *");
+            DEBUG_INFO(list("lastModified", lastModified));
+            DEBUG_INFO(list("lastModifiedCheckPoint", lastModifiedCheckPoint));
+            */
+
             try {
                 ArrayList<TreeMap<String, Serializable>> output = null;
-                if (preivousError == null || (preivousError != null && (lastModified != previousModTime || lastModifiedCheckPoint != previousCheckModTime))) {
+                if (preivousError == null || (preivousError != null && ((lastModified != previousModTime || lastModifiedCheckPoint != previousCheckModTime) || useCounterForCheckPoint))) {
 
                     reader = new FileReader(handler.getDataFile());
                     output = handler.work(reader, checkPointDir);
                     for (TreeMap<String, Serializable> se : output) {
                         StreamElement streamElement = new StreamElement(se, getOutputFormat());
+                        processedLineCounter++;
+                        //logger.warn(se);
                         boolean insertionSuccess = postStreamElement(streamElement);
-                        handler.updateCheckPointFile(streamElement.getTimeStamp());
+
+                        if (!useCounterForCheckPoint)
+                            handler.updateCheckPointFile(streamElement.getTimeStamp()); // write latest processed timestamp
+                        else
+                            handler.updateCheckPointFile(processedLineCounter); // write latest processed line number
                     }
                 }
                 //if (output==null || output.size()==0) //More intelligent sleeping, being more proactive once the wrapper receives huge files.
@@ -128,6 +167,9 @@ public class CSVWrapper extends AbstractWrapper {
                         logger.debug(e.getMessage(), e);
                     }
             }
+            /*
+            DEBUG_INFO("* Exit *");
+            */
         }
     }
 
@@ -142,5 +184,24 @@ public class CSVWrapper extends AbstractWrapper {
     public void dispose() {
         threadCounter--;
     }
+
+ /*
+   * Convenient function used for debugging
+   * */
+    public void DEBUG_INFO(String s) {
+
+        String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss,SSS").format(new java.util.Date(System.currentTimeMillis()));
+        s = "[" + date + "] " + s + "\n";
+        try {
+            FileUtils.writeStringToFile(new File("DEBUG_INFO_" + threadCounter + ".txt"), s, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    String list(String name, long value) {
+        return name + " = " + value + " (" + new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss,SSS").format(new java.util.Date(value)) + ")";
+    }
+
 
 }
