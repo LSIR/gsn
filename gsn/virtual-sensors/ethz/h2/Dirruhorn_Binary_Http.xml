@@ -113,17 +113,5 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data9">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="http-get">
-                    <predicate key="url">http://permasense-rd-cam03/snapshot.cgi</predicate>
-                    <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">webcam2</predicate>
-                    <predicate key="device-id">1</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
     </streams>
 </virtual-sensor>
