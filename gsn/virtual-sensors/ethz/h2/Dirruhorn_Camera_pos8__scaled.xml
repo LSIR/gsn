@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_Camera_pos8_MX60__scaled" priority="10" >
+<virtual-sensor name="Dirruhorn_Camera_pos8__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -11,7 +11,7 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>USB camera pictures of the Outpack MX60 displays from position 8 at Dirruhorn deployment as thumbnail</description>
+    <description>USB camera pictures from position 8 at Dirruhorn deployment as thumbnail</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>

@@ -105,7 +105,7 @@
                     <predicate key="url">http://permasense-rd-cam01/record/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam2</predicate>
-                    <predicate key="device-id">5011</predicate>
+                    <predicate key="device-id">6010</predicate>
                     <predicate key="username">USERNAME</predicate>
                     <predicate key="password">PASSWORD</predicate>
                 </address>
