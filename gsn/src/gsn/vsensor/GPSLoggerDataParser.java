@@ -259,6 +259,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					File file = fileItem.getFile();
 					String inputStreamName = fileItem.getInputStreamName();
 					StreamElement data = fileItem.getData();
+					long timed = data.getTimeStamp();
 
 					switch (file_type) {
 						case 1:
@@ -301,7 +302,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																null,
 																null,
 																null,
-																rawPacket});
+																rawPacket}, timed++);
 			
 														newStreamElement(inputStreamName, data);
 													}
@@ -349,7 +350,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																(short)(buf.getShort()/10),
 																buf.getShort(),
 																buf.getShort(),
-																rawPacket});
+																rawPacket}, timed++);
 			
 														newStreamElement(inputStreamName, data);
 													}
@@ -481,7 +482,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 										}
 									}
 								}
-								data = new StreamElement(configField, out);
+								data = new StreamElement(configField, out, timed++);
 
 								newStreamElement(inputStreamName, data);
 							} catch (IOException e) {
@@ -614,7 +615,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 															data.getData(eventField[3].getName()),
 															data.getData(eventField[4].getName()),
 															eventCount,
-															noTimeStampEvent});
+															noTimeStampEvent}, timed++);
 
 													newStreamElement(inputStreamName, data);
 													cnt--;
@@ -630,7 +631,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 													data.getData(eventField[3].getName()),
 													data.getData(eventField[4].getName()),
 													eventCount,
-													event});
+													event}, timed++);
 
 											newStreamElement(inputStreamName, data);
 											
