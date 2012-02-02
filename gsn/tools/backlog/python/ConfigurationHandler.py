@@ -55,7 +55,7 @@ class ConfigurationHandlerClass():
         self._config_file = config_file
         wm = WatchManager()
         self._notifier = ThreadedNotifier(wm, ConfigChangedProcessing(self))
-        wm.add_watch(config_file, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'])
+        wm.add_watch(config_file, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'] | EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_MOVED_TO'])
         
         self._main_config = self._checkConfig(config_file)
         

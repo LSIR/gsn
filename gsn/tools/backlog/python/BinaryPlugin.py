@@ -175,7 +175,7 @@ class BinaryPluginClass(AbstractPluginClass):
                 os.makedirs(pathname)
                 
             # tell the watch manager which folders to watch for newly written files
-            wm.add_watch(pathname, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'])
+            wm.add_watch(pathname, EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_CLOSE_WRITE'] | EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_MOVED_TO'])
             self.info('enable close-after-write notification for path %s' % (pathname,))
             
             files = os.listdir(pathname)
