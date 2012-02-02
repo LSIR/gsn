@@ -288,7 +288,7 @@ public abstract class AbstractWrapper extends Thread {
 		Connection conn = null;
 		try {
             if (isOutOfOrder(se)) {
-				logger.warn(getWrapperName() + ": Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
+				logger.warn(getActiveAddressBean().getVirtualSensorName() + "[source=" + getActiveAddressBean().getInputStreamName() + "]: Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
 				return false;
 			}
 			conn = Main.getWindowStorage().getConnection();
