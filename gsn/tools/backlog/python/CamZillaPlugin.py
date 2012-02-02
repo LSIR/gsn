@@ -11,6 +11,7 @@ __source__      = "$URL$"
 import logging
 import Queue
 import os
+import shutil
 import time
 import thread
 from threading import Thread, Event, Lock
@@ -33,7 +34,7 @@ except ImportError, e:
 
 DEFAULT_BACKLOG = True
 GPHOTO2 = '/usr/bin/gphoto2'
-PICTUREFOLDER = '/media/card/backlog/binaryplugin/camera1/'
+TMPPICTUREFOLDER = '/media/card/backlog/binaryplugin/tmp/'
 POSTFIX='.%C'
 DEFAULT_GPHOTO2_SETTINGS = ['/main/capturesettings/evstep=0',
                             '/main/imgsettings/imagequality=0',
@@ -115,10 +116,6 @@ class CamZillaPluginClass(AbstractPluginClass):
         self.info('encoder pulses per degree: %f' % (self._pulsesPerDegree,))
         self.info('using device %s' % (device,))
         self._serial.setPort(device)
-        
-        if not os.path.isdir(PICTUREFOLDER):
-            self.warning('picture folder >%s< is not a directory -> creating it' % (PICTUREFOLDER,))
-            os.makedirs(PICTUREFOLDER)
             
         if not os.path.exists(GPHOTO2):
             raise TypeError('%s does not exist' % (GPHOTO2,))
@@ -134,6 +131,13 @@ class CamZillaPluginClass(AbstractPluginClass):
             self.info('robot and photo camera is turned on')
         else:
             self.info('robot and photo camera is turned off')
+        
+        self._pictureFolder = self.getOptionValue('picture_folder')
+        if self._pictureFolder is None:
+            raise TypeError('no picture_folder specified')
+        if not os.path.isdir(self._pictureFolder):
+            self.warning('picture folder >%s< is not a directory -> creating it' % (self._pictureFolder,))
+            os.makedirs(self._pictureFolder)
         
         value = self.getOptionValue('power_save_mode')
         self._powerSaveMode = False
@@ -512,7 +516,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         if ret.find('bracketing=0') != -1:
             bracketing = True
         command = [GPHOTO2, '--port="usb:"', '--quiet'] + sets
-        self._execGphoto2(command)
+        self._execCommand(command)
         return ret.strip(), bracketing
         
         
@@ -521,20 +525,25 @@ class CamZillaPluginClass(AbstractPluginClass):
             command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--set-config-index /main/settings/capturetarget=1', self._autofocus, '--capture-image']
         else:
             command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--set-config-index /main/settings/capturetarget=1', '--capture-image']
-        self._execGphoto2(command)
+        self._execCommand(command)
         
         
     def _setFocus(self, focus):
         command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--capture-preview', '--set-config /main/actions/manualfocusdrive=32767', '--set-config %s' % (focus,)]
-        self._execGphoto2(command)
+        self._execCommand(command)
         
         
     def _downloadPictures(self, filename):
         self.info('downloading all pictures from photo camera')
-        self._execGphoto2([GPHOTO2, '--port="usb:"', '--quiet', '--get-all-files', '--filename=' + filename, '--recurse', '--delete-all-files'], PICTUREFOLDER)
+        if not os.path.isdir(TMPPICTUREFOLDER):
+            os.makedirs(TMPPICTUREFOLDER)
+        self._execCommand([GPHOTO2, '--port="usb:"', '--quiet', '--get-all-files', '--filename=' + filename, '--recurse', '--delete-all-files'], TMPPICTUREFOLDER)
+        for filename in os.listdir(TMPPICTUREFOLDER):
+            shutil.move(os.path.join(TMPPICTUREFOLDER, filename), self._pictureFolder)
+        os.rmdir(TMPPICTUREFOLDER)
         
         
-    def _execGphoto2(self, params, cwd=None):
+    def _execCommand(self, params, cwd=None):
         p = subprocess.Popen(params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
         ret = p.wait()
         output = p.communicate()
