@@ -41,8 +41,8 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 		serialized_data[0] = data.getData(dataField[0].getName());
 		// generation_time
 		serialized_data[1] = data.getData(dataField[1].getName());
-		// original_timed
-		serialized_data[2] = data.getData(dataField[2].getName());
+		// gsn_timestamp
+		long gsn_timestamp = (Long) data.getData(dataField[2].getName());
 		// device_id
 		serialized_data[3] = data.getData(dataField[3].getName());
 		// position
@@ -79,6 +79,9 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 				bbuffer.position(bbuffer.position()+1);
 				if (sats.compareTo(s) == 0) {
 					for (int i=0; i<s; i++) {
+						// set gsn_timestamp
+						serialized_data[2] = gsn_timestamp;
+						gsn_timestamp++;
 						// get Carrier Phase
 						serialized_data[11] = bbuffer.getDouble();
 						// get Pseudorange
