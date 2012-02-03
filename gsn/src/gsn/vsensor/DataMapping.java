@@ -171,7 +171,7 @@ public class DataMapping {
 		try {
 			synchronized (deployments) {
 				if (!deployments.containsKey(deployment)) {
-					logger.error(vsName+"["+inputStreamName+"]: Position mapping data not available for deployment "+deployment);
+					logger.error(vsName+"[source="+inputStreamName+"]: Position mapping data not available for deployment "+deployment);
 					return null;
 				}
 				PreparedStatement position_query = deployments.get(deployment).position_query;
@@ -184,13 +184,13 @@ public class DataMapping {
 						res = null;
 				}
 				if (res==null)
-					logger.warn(vsName+"["+inputStreamName+"]: No position mapping available for deployment "+deployment+" device-id "+device_id+" and generation_time="+generation_time);
+					logger.warn(vsName+"[source="+inputStreamName+"]: No position mapping available for deployment "+deployment+" device-id "+device_id+" and generation_time="+generation_time);
 			}
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
 		}
 		if (logger.isDebugEnabled())
-			logger.debug(vsName+"["+inputStreamName+"]: getPosition: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+			logger.debug(vsName+"[source="+inputStreamName+"]: getPosition: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		return res;
 	}
 	
@@ -200,7 +200,7 @@ public class DataMapping {
 		try {
 			synchronized (deployments) {
 				if (!deployments.containsKey(deployment)) {
-					logger.error(vsName+"["+inputStreamName+"]: Geographic coordinate mapping data not available for deployment "+deployment);
+					logger.error(vsName+"[source="+inputStreamName+"]: Geographic coordinate mapping data not available for deployment "+deployment);
 					return null;
 				}
 				PreparedStatement coordinate_query = deployments.get(deployment).coordinate_query;
@@ -212,13 +212,13 @@ public class DataMapping {
 						res = null;
 				}
 				if (res==null)
-					logger.warn(vsName+"["+inputStreamName+"]: No coordinate mapping available for deployment "+deployment+" position "+position);
+					logger.warn(vsName+"[source="+inputStreamName+"]: No coordinate mapping available for deployment "+deployment+" position "+position);
 			}
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
 		}
 		if (logger.isDebugEnabled())
-			logger.debug(vsName+"["+inputStreamName+"]: getCoordinate: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+			logger.debug(vsName+"[source="+inputStreamName+"]: getCoordinate: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		return res;
 	}
 
@@ -232,7 +232,7 @@ public class DataMapping {
 		try {
 			synchronized (deployments) {
 				if (!deployments.containsKey(deployment)) {
-					logger.error(vsName+"["+inputStreamName+"]: Sensor mapping data not available for deployment "+deployment);
+					logger.error(vsName+"[source="+inputStreamName+"]: Sensor mapping data not available for deployment "+deployment);
 					return null;
 				}
 				PreparedStatement sensortype_query = deployments.get(deployment).sensortype_query;
@@ -261,7 +261,7 @@ public class DataMapping {
 			logger.warn(e.getMessage(), e);
 		}
 		if (logger.isDebugEnabled())
-			logger.debug(vsName+"["+inputStreamName+"]: getSensortype: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+			logger.debug(vsName+"[source="+inputStreamName+"]: getSensortype: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		return res;
 	}
 	
@@ -274,7 +274,7 @@ public class DataMapping {
 		try {
 			synchronized (deployments) {
 				if (!deployments.containsKey(deployment)) {
-					logger.error(vsName+"["+inputStreamName+"]: Sensor conversion mapping data not available for deployment "+deployment);
+					logger.error(vsName+"[source="+inputStreamName+"]: Sensor conversion mapping data not available for deployment "+deployment);
 					return null;
 				}
 				PreparedStatement conversion_query = deployments.get(deployment).conversion_query;
@@ -292,7 +292,7 @@ public class DataMapping {
 							input = rs.getString(3);
 							value = rs.getString(4);
 							// physical_signal, conversion, input, value
-							logger.debug(vsName+"["+inputStreamName+"]: physical_signal:" + physical + " conversion:" + conversion +
+							logger.debug(vsName+"[source="+inputStreamName+"]: physical_signal:" + physical + " conversion:" + conversion +
 									" input:" + input + " value:" + value);
 
 							try {
@@ -310,10 +310,10 @@ public class DataMapping {
 								logger.error(e.getMessage(), e);
 							}
 						} else {
-							logger.debug(vsName+"["+inputStreamName+"]: no conversion found for >" + s + "< (" + s.substring("payload_".length()) + ")");
+							logger.debug(vsName+"[source="+inputStreamName+"]: no conversion found for >" + s + "< (" + s.substring("payload_".length()) + ")");
 						}
 					} else {
-						logger.debug(vsName+"["+inputStreamName+"]: ignoring >" + s + "<");
+						logger.debug(vsName+"[source="+inputStreamName+"]: ignoring >" + s + "<");
 					}
 				}
 			}
@@ -327,7 +327,7 @@ public class DataMapping {
 			logger.warn(e.getMessage(), e);
 		}
 		if (logger.isDebugEnabled())
-			logger.debug(vsName+"["+inputStreamName+"]: conversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+			logger.debug(vsName+"[source="+inputStreamName+"]: conversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		return data;
 	}
 	
