@@ -184,7 +184,7 @@ public class DataMapping {
 						res = null;
 				}
 				if (res==null)
-					logger.warn(vsName+"["+inputStreamName+"]: No position mapping available for deployment "+deployment+" device-id "+device_id);
+					logger.warn(vsName+"["+inputStreamName+"]: No position mapping available for deployment "+deployment+" device-id "+device_id+" and generation_time="+generation_time);
 			}
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
