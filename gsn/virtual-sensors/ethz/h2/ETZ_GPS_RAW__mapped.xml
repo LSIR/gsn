@@ -7,6 +7,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
             
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>

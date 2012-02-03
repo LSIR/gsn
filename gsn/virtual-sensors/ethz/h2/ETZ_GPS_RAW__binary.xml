@@ -10,6 +10,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
             
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
@@ -32,7 +33,7 @@
                     <predicate key="remote-contact-point">http://whymper.ethz.ch:23001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -42,7 +43,7 @@
                     <predicate key="query">select * from ETZ_GPS_Logger__data__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
             </source>
             <query> select * from source </query>
         </stream>
