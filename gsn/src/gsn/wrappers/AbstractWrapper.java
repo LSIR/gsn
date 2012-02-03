@@ -320,7 +320,7 @@ public abstract class AbstractWrapper extends Thread {
 					lastInOrderTimestamp = Long.MIN_VALUE; // Table is empty
 				}
 			}
-            return (se.getTimeStamp() <= lastInOrderTimestamp);
+            return (se.getTimeStamp() < lastInOrderTimestamp);
 		} finally {
 			Main.getWindowStorage().close(rs);
 			Main.getWindowStorage().close(conn);
