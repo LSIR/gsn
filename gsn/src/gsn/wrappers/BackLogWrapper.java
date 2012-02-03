@@ -324,10 +324,4 @@ public class BackLogWrapper extends AbstractWrapper {
 		}
         threadCounter--;
 	}
-	
-	
-	@Override
-   	public boolean isTimeStampUnique() {
-   		return false;
-   	}
 }

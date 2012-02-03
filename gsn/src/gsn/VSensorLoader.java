@@ -412,7 +412,7 @@ public class VSensorLoader extends Thread {
 			try {
 				logger.debug("Wrapper name: "+wrapper.getWrapperName()+ " -- view name "+ wrapper.getDBAliasInStr());
 				if (!Main.getWindowStorage().tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
-					Main.getWindowStorage().executeCreateTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ),wrapper.isTimeStampUnique() );
+					Main.getWindowStorage().executeCreateTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ),addressBean.getVirtualSensorConfig().getIsTimeStampUnique() );
 			} catch ( SQLException e ) {
 				logger.error ( e.getMessage ( ) , e );
 				return null;

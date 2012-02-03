@@ -374,11 +374,6 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 		return activeBackLogWrapper.getBLMessageMultiplexer().getDeviceID();
 	}
 	
-
-	public boolean isTimeStampUnique() {
-	  return activeBackLogWrapper.isTimeStampUnique();
-	}
-	
 	
 	protected static Serializable[] checkAndCastData(Serializable[] data, int dataoffset, DataField[] datafields, int datafieldoffset) throws Exception {
 		if (data.length-dataoffset != datafields.length-datafieldoffset)

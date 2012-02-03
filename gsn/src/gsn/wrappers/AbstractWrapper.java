@@ -452,17 +452,6 @@ public abstract class AbstractWrapper extends Thread {
 		this.usingRemoteTimestamp = usingRemoteTimestamp;
 	}
 
-	/**
-	 * Returns true if the wrapper can produce multiple different data items
-	 * [stream elements] with the same timestamp. If this is true, then all the
-	 * stream elements with the same timestamp will be accepted. If this method
-	 * returns false (default value), duplicates override each other and the
-	 * latest received duplicate is the one which is going to be persisted.
-	 */
-	public boolean isTimeStampUnique() {
-		return true;
-	}
-
 	public boolean manualDataInsertion(StreamElement se) {
 		throw new RuntimeException(
 				"Manual data insertion is not supported by this wrapper");
