@@ -93,25 +93,28 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 		String s;
 		if (position_mapping && data.getData("device_id") != null) {
 			if (data.getData("generation_time") != null) {
-				Integer position = DataMapping.getPosition(deployment, ((Integer) data.getData("device_id")).intValue(),
-						new Timestamp(((Long) data.getData("generation_time")).longValue()));
+				Integer position = DataMapping.getPosition(((Integer) data.getData("device_id")).intValue(),
+						new Timestamp(((Long) data.getData("generation_time")).longValue()),
+						deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 				data = new StreamElement(data, 
 						new String[]{"position"}, 
 						new Byte[]{DataTypes.INTEGER}, 
 						new Serializable[]{position});
+				
 			}
 		}
 		if (sensortype_mapping && 
 				data.getData("position") != null &&	data.getData("generation_time") != null) {
-			Serializable[] sensortype = DataMapping.getSensorType(deployment, ((Integer) data.getData("position")).intValue(), 
-					new Timestamp(((Long) data.getData("generation_time")).longValue()));
+			Serializable[] sensortype = DataMapping.getSensorType(((Integer) data.getData("position")).intValue(), 
+					new Timestamp(((Long) data.getData("generation_time")).longValue()),
+					deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 			data = new StreamElement(data, 
 					new String[]{"sensortype", "sensortype_serialid"}, 
 					new Byte[]{DataTypes.VARCHAR, DataTypes.BIGINT},
 					sensortype);
 		}
 		if (sensorvalue_conversion && data.getData("position") != null &&	data.getData("generation_time") != null) {
-			data = DataMapping.getConvertedValues(deployment, data);
+			data = DataMapping.getConvertedValues(data, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 		}
 
 		for (Enumeration<String> elem = jpeg_scaled.elements() ; elem.hasMoreElements() ; ) {
