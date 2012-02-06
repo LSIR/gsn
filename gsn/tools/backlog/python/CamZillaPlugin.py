@@ -408,13 +408,13 @@ class CamZillaPluginClass(AbstractPluginClass):
             self.info('power message received from GSN')
             if data[1] == 0:
                 self.info('turn robot and camera off')
-                str = 'Camera and robot are turned off'
+                log_str = 'Camera and robot are turned off'
                 self._shutdownRobotAndCam()
             elif data[1] == 1:
                 self.info('turn robot and camera on')
                 try:
                     self._startupRobotAndCam()
-                    str = 'Camera and robot are turned on'
+                    log_str = 'Camera and robot are turned on'
                 except TypeError, e:
                     self.error(str(e))
             else:
@@ -423,18 +423,18 @@ class CamZillaPluginClass(AbstractPluginClass):
             heater = None
             if data[2] == 0:
                 self.info('turn heater off')
-                str += ' and heater is turned off'
+                log_str += ' and heater is turned off'
                 self.getPowerControlObject().ext3Off()
                 heater = False
             elif data[2] == 1:
                 self.info('turn heater on')
-                str += ' and heater is turned on'
+                log_str += ' and heater is turned on'
                 self.getPowerControlObject().ext3On()
                 heater = True
             else:
                 self.error('unknown heater message received from GSN')
                 
-            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['power', str, self._x, self._y] + [None]*8)
+            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['power', log_str, self._x, self._y] + [None]*8)
         else:
             self.error('unknown message type received from GSN')
         
