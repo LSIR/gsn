@@ -79,10 +79,10 @@ public class CamZillaPlugin extends AbstractPlugin {
 				rotation_x = df.format((Double)data[9]);
 			if (data[10] != null)
 				rotation_y = df.format((Double)data[10]);
-			if (data[12] != null)
-				gphoto2conf = ((String)data[12]).getBytes("UTF-8");
+			if (data[13] != null)
+				gphoto2conf = ((String)data[13]).getBytes("UTF-8");
 			
-			if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, toLong(data[0]), deviceId, (String)data[1], (String)data[2], x, y, start_x, start_y, toShort(data[7]), toShort(data[8]), rotation_x, rotation_y, toShort(data[11]), gphoto2conf}) ) {
+			if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, toLong(data[0]), deviceId, (String)data[1], (String)data[2], x, y, start_x, start_y, toShort(data[7]), toShort(data[8]), rotation_x, rotation_y, toShort(data[11]), toShort(data[12]), gphoto2conf}) ) {
 				ackMessage(timestamp, super.priority);
 				return true;
 			} else {
@@ -99,7 +99,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		Serializable[] command = null;
 		if( action.compareToIgnoreCase("panorama_picture") == 0 ) {
-			String sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
+			String sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", b = "0", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("start_x") == 0 )
 					sx = (String) paramValues[i];
@@ -115,6 +115,8 @@ public class CamZillaPlugin extends AbstractPlugin {
 					ry = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("delay") == 0 )
 					d = (String) paramValues[i];
+				else if( paramNames[i].compareToIgnoreCase("batch_download") == 0 )
+					b = "1";
 				else if( paramNames[i].compareToIgnoreCase("image_quality") == 0 )
 					imgquality = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("image_size") == 0 )
@@ -148,6 +150,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 				str += "rotation("+rx+","+ry+") ";
 			if (!d.trim().isEmpty())
 				str += "delay("+d+") ";
+			str += "batch("+b+") ";
 
 			str += "gphoto2("+getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, compensation, bracketing, autofocus, focus, opt)+")";
 			

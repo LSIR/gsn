@@ -22,6 +22,7 @@
             <field name="ROTATION_X" type="VARCHAR(8)" />
             <field name="ROTATION_Y" type="VARCHAR(8)" />
             <field name="DELAY" type="SMALLINT" />
+            <field name="BATCH_DOWNLOAD" type="SMALLINT" />
             <field name="GPHOTO2_CONFIG" type="BINARY" />
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
