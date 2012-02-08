@@ -41,6 +41,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 			new DataField("PICTURES_Y", "SMALLINT"),
 			new DataField("ROTATION_X", "VARCHAR(8)"),
 			new DataField("ROTATION_Y", "VARCHAR(8)"),
+			new DataField("BATCH_DOWNLOAD", "SMALLINT"),
 			new DataField("DELAY", "SMALLINT"),
 			new DataField("GPHOTO2_CONFIG", "BINARY")};
 
