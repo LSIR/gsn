@@ -593,7 +593,7 @@ class CamZillaPluginClass(AbstractPluginClass):
             os.makedirs(TMPPICTUREFOLDER)
         if os.listdir(TMPPICTUREFOLDER):
             self.warning('there are still files in the temporary directory -> move them to %s' % (self._pictureFolder,))
-            for file in os.listdir(TMPPICTUREFOLDER):
+            for file in sorted(os.listdir(TMPPICTUREFOLDER)):
                 shutil.move(os.path.join(TMPPICTUREFOLDER, file), self._pictureFolder)
         if isinstance(filename, str):
             self._execCommand([GPHOTO2, '--port="usb:"', '--quiet', '--get-all-files', '--filename=' + filename, '--recurse', '--delete-all-files'], TMPPICTUREFOLDER)
@@ -605,7 +605,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                 os.rename(os.path.join(TMPPICTUREFOLDER, file), os.path.join(TMPPICTUREFOLDER, '%s%s' % (filename[index], os.path.splitext(file)[1])))
         else:
             raise Exception('downloadPictures function has to be used with String or List parameter')
-        for file in os.listdir(TMPPICTUREFOLDER):
+        for file in sorted(os.listdir(TMPPICTUREFOLDER)):
             shutil.move(os.path.join(TMPPICTUREFOLDER, file), self._pictureFolder)
         os.rmdir(TMPPICTUREFOLDER)
         
