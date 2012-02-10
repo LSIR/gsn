@@ -71,20 +71,20 @@ $(document).ready(function() {
 
         // plot configuration
         GsnPlots.setConfig([
-          { title:"Humidity",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position][iscorestation=true]"}]
-          },{ title:"Temperature",
+          { title:"Temperature",
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_temperature","internal_temperature"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["air_temperature","internal_temperature"], select:"sensornode[position][iscorestation=true]"}]
+          },{ title:"Wind Speed",
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position][iscorestation=true]"}]
+          },{ title:"Wind Direction",
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position][iscorestation=true]"}]
+          },{ title:"Humidity",
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position][iscorestation=true]"}]
           },{ title:"Air Pressure",
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position][iscorestation=true]"}]
           },{ title:"Rain",
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position][iscorestation=true]"}]
           },{ title:"Hail",
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position][iscorestation=true]"}]
-          },{ title:"Wind Direction",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position][iscorestation=true]"}]
-          },{ title:"Wind Speed",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position][iscorestation=true]"}]
           },
         ]);
 
@@ -221,86 +221,50 @@ function showPlots(id) {
                 
                 <div id="weather_Matterhorn" style="display:none">
                 <table width="100%">
-                        <tr>
-                        <td>
-                                <b>Live Webcam:</b><br/><br/>
-                                
+                        <tr><td>
+                                <b>Webcam Matterhorn</b><br/>
                                 <table><tr><td><img src="http://zermatt.ch/html/bergbahnen/webcams/matterhorn2.jpg" alt="Matterhorn"/></td></tr></table>
                         </td>
                         <td valign="top">
-                                <b>Weather-Info </b><br/>
-                                
+                                <b>Weather-Info</b><br/>
                                 <table><tr><td>Kleines Matterhorn</td><td>Solvay</td></tr>
                                        <tr><td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067471.png" alt="Weather Klein Matterhorn"/></td>
                                            <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069730.png" alt="Weather Klein Matterhorn"/></td>
-                                        </tr>
-                                </table>
-                        </td>
-                        </tr>
+                                        </tr></table>
+                        </td></tr>
                 </table>
                 <p style="text-align:center;margin-top:30px;">
-                        <b>Forecast Zermatt</b><br/><br/>
+                        <b>Forecast Zermatt</b><br/>
                         <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067480.png" alt="Weather Forecast Zermatt"/>
                 </p>
                 <p style="text-align:center;margin-top:30px;">
-                        <b>Forecast Klein Matterhorn</b><br/><br/>
+                        <b>Forecast Klein Matterhorn</b><br/>
                         <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067471.png" alt="Weather Forecast Klein Matterhorn"/>
                 </p>
-                <div> style="margin-top:30px;">
-                        <b>Measured values from Zermatt Weatherstation (&copy; MeteoSchweiz)</b><br /><br />
-                
-                        <table width="100%">
-                
-                                <tr>
-                                        <td><b>Temperature (mean):</b></td>
-                                </tr>
-                                <tr>
-                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.temp.ZER.gif" alt="Weather Measurements Zermatt"/></td>
-                                </tr>
-                                <tr>
-                                        <td><b>Minutes of Sunshine:</b></td>
-                                </tr>
-                                <tr>
-                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.son.ZER.gif" alt="Weather Measurements Zermatt"/></td>
-                                        
-                                </tr>
-                                <tr>
-                                        <td><b>Precipitation:</b></td>
-                                </tr>
-                                <tr>
-                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.reg.ZER.gif" alt="Weather Measurements Zermatt"/></td>
-                                </tr>
-                                <tr>
-                                        <td><b>Windspeed (peak and mean) [km/h]:</b></td>
-                                </tr>
-                                <tr>
-                                        <td><img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter.StationData.win.ZER.gif" alt="Weather Measurements Zermatt"/></td>                                        
-                                </tr>
-                        </table>
-                
+                <div> <p style="margin-top:30px;">
+                        <b>PermaSense Webcams</b><br/>
                 </div>
                 <div class="scaledimages">
                 </div>
                 <div style="clear:both"></div>
+                <div> <p style="margin-top:30px;">
+                        <b>PermaSense Weather Station Matterhorn Hoernligrat</b><br/>
+                </div>
                 </div>
 
                 <div id="weather_Jungfraujoch" style="display:none">
                 <table width="100%">
-                        <tr>
-                        <td>
+                        <tr><td>
                                 <table><tr><td><img src="http://www.swisspanorama.com/assets/images/jungfraujoch.jpg" alt="Webcam Jungfraujoch"/>
                                                <img src="http://www.swisspanorama.com/assets/images/maennlichen.jpg" alt="Webcam Jungfraujoch"/></td></tr></table>
                         </td>
-                        <td>
-                                <table>
+                        <td><table>
                                         <tr><td>Jungfraujoch</td><td>Konkordiahuette</td></tr>
-                                        <tr>
-                                                <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067300.png" alt="Weather Jungfraujoch"/></td>
-                                                <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069710.png" alt="Weather Konkordiah&uuml;tte"/></td>
+                                        <tr><td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067300.png" alt="Weather Jungfraujoch"/></td>
+                                            <td><img src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069710.png" alt="Weather Konkordiah&uuml;tte"/></td>
                                         </tr>
                                 </table>
-                        </td>
-                        </tr>
+                        </td></tr>
         
                 </table>
                 <p style="text-align:center;margin-top:30px;">
@@ -324,19 +288,32 @@ function showPlots(id) {
                 </div>
 
                 <div id="weather_Dirruhorn" style="display:none">
-                <table style="margin-left:55px">
-                     <tr><td>Weather-Info Randa</td><td>Heliport Air Zermatt</td></tr>
-                     <tr>
-                         <td><img style="margin-top:10px" src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069141.png" alt="Weather Randa"/></td>
-                         <td><a href="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1"><img style="margin-top:21px" src="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1" width="400" height="327" alt="Webcam Zermatt direction north"/></a></td>
-                     </tr>
-                </table>
+                <table width="100%">
+                     <tr><td>
+                             <b>Heliport Air Zermatt</b><br/>
+                             <table><tr><td><a href="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1"><img style="margin-top:21px" src="http://www.air-zermatt.ch/air_zermatt_2007/content/webcam_grossansicht.php?e_11_7_getimage=1" width="400" height="327" alt="Webcam Zermatt direction north"/></a></td></tr></table>
+                         </td>
+                         <td valign="top">
+                                 <b>Weather-Info</b><br/>
+                         <table><tr><td>Randa</td><td>Zermatt</td><td>Gornergrat</td></tr>
+                         <tr><td><img style="margin-top:10px" src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/069141.png" alt="Weather Randa"/></td>
+                             <td><img style="margin-top:10px" src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067480.png" alt="Weather Zermatt"/></td>
+                             <td><img style="margin-top:10px" src="http://wetterstationen.meteomedia.de/messnetz/wettergrafik/067490.png" alt="Weather Gornergrat"/></td>
+                         </tr></table>
+                     </td></tr>
+                </table> 
                 <p style="text-align:center;margin-top:30px;">
-                        <b>Forecast Randa</b><br/><br/>
-                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/069141.png" alt="Weather forecast Randa"/>
+                        <b>Forecast Randa</b><br/>
+                        <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/069141.png" alt="Weather Forecast Randa"/>
                 </p>
+                <div> <p style="margin-top:30px;">
+                        <b>PermaSense Webcams</b><br/>
+                </div>
                 <div class="scaledimages">
                 </div><div style="clear:both"></div>
+                <div> <p style="margin-top:30px;">
+                        <b>PermaSense Weather Station Dirruhorn Gruengarten (Position 13) & Grabengufer (Position 42)</b><br/> 
+                </div>
                 </div>
 
                 <div id="weather_Glaciers" style="display:none">
@@ -359,11 +336,11 @@ function showPlots(id) {
 		<br/>
 
 		<p style="text-align:center;margin-top:30px;">
-			<b>Precipitation Radar:</b><br/><br/>
+			<b>Precipitation Radar</b><br/>
 			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/aktuelles_wetter/radarbild.Par.0005.Data.img_1.gif" alt="Precipitation Radar Switzerland"/>
 		</p>
 		<p style="text-align:center;margin-top:30px;">
-			<b>Precipitation Forecast:</b><br/><br/>
+			<b>Precipitation Forecast</b><br/>
 			<img src="http://www.meteoschweiz.admin.ch/web/de/wetter/modelle/Vorhersagen.Par.0002.DownloadFile.ext.tmp/gross.gif" alt="Precipitation Forecast Switzerland"/>
 		</p>
 	</div>
