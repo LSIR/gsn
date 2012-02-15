@@ -18,7 +18,7 @@ public class ECVQEK3Plugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( ECVQEK3Plugin.class );
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.ECVQEK3_MESSAGE_TYPE;
 	}
 

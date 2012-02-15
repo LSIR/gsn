@@ -21,7 +21,7 @@ public class OZ47Plugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( OZ47Plugin.class );
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.OZ47_MESSAGE_TYPE;
 	}
 

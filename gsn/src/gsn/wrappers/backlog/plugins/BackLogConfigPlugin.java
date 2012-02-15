@@ -38,7 +38,7 @@ public class BackLogConfigPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.CONFIG_MESSAGE_TYPE;
 	}
 

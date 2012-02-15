@@ -81,7 +81,7 @@ public class GPSPlugin extends AbstractPlugin {
 	}
 	
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return BackLogMessage.GPS_MESSAGE_TYPE;
 	}
 

@@ -20,7 +20,7 @@ public class AlphasensePlugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( AlphasensePlugin.class );
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.ALPHASENSE_MESSAGE_TYPE;
 	}
 

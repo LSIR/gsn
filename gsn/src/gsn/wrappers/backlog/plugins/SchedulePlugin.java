@@ -49,7 +49,7 @@ public class SchedulePlugin extends AbstractPlugin {
 			new DataField("SCHEDULE", "binary")};
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.SCHEDULE_MESSAGE_TYPE;
 	}
 

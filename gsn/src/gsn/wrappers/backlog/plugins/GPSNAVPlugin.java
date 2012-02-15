@@ -29,7 +29,7 @@ public class GPSNAVPlugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( GPSNAVPlugin.class );
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.GPS_NAV_MESSAGE_TYPE;
 	}
 

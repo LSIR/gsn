@@ -152,7 +152,7 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.BACKLOG_STATUS_MESSAGE_TYPE;
 	}
 

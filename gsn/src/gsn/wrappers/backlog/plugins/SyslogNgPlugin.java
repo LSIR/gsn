@@ -24,7 +24,7 @@ public class SyslogNgPlugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( SyslogNgPlugin.class );
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.SYSLOG_NG_MESSAGE_TYPE;
 	}
 

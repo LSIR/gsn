@@ -70,88 +70,93 @@ public class BackLogMessage {
 	/** The backlog command message type. This message type is used to
 	 *  send/receive backlog command messages by the
 	 *  {@link gsn.wrappers.backlog.plugins.BackLogStatusPlugin BackLogStatusPlugin}. */
-	public static final byte BACKLOG_STATUS_MESSAGE_TYPE = 10;
+	public static final short BACKLOG_STATUS_MESSAGE_TYPE = 10;
 
 	/** The CoreStation status message type. This message type is used to
      *  receive CoreStation status messages by the
 	 *  {@link gsn.wrappers.backlog.plugins.CoreStationStatusPlugin CoreStationStatusPlugin}. */
-	public static final byte CORESTATION_STATUS_MESSAGE_TYPE = 11;
+	public static final short CORESTATION_STATUS_MESSAGE_TYPE = 11;
 
 	/** The syslog-ng message type. This message type is used to
      *  receive syslog-ng log messages by the
 	 *  {@link gsn.wrappers.backlog.plugins.SyslogNgPlugin SyslogNgPlugin}. */
-	public static final byte SYSLOG_NG_MESSAGE_TYPE = 12;
+	public static final short SYSLOG_NG_MESSAGE_TYPE = 12;
 
 	/** The TOS message type. This message type is used to
 	 *  send/receive TOS messages by the
 	 *  {@link gsn.wrappers.backlog.plugins.MigMessagePlugin MigMessagePlugin}. */
-	public static final byte TOS_MESSAGE_TYPE = 20;
-	public static final byte TOS1x_MESSAGE_TYPE = 21;
+	public static final short TOS_MESSAGE_TYPE = 20;
+	public static final short TOS1x_MESSAGE_TYPE = 21;
 
 	/** The binary message type. This message type is used to
      *  receive any binary data by the
 	 *  {@link gsn.wrappers.backlog.plugins.BinaryPlugin BinaryPlugin}. */
-	public static final byte BINARY_MESSAGE_TYPE = 30;
+	public static final short BINARY_MESSAGE_TYPE = 30;
 
 	/** The Vaisala WXT520 message type. This message type is used to
      *  receive Vaisala WXT520 weather station data.
 	 *  {@link gsn.wrappers.backlog.plugins.BinaryBridgePlugin BinaryBridgePlugin}. */
-	public static final byte VAISALA_WXT520_MESSAGE_TYPE = 40;
+	public static final short VAISALA_WXT520_MESSAGE_TYPE = 40;
 
 	/** The Schedule message type. This message type is used to
      *  send/receive Schedule data.
 	 *  {@link gsn.wrappers.backlog.plugins.SchedulePlugin SchedulePlugin}. */
-	public static final byte SCHEDULE_MESSAGE_TYPE = 50;
+	public static final short SCHEDULE_MESSAGE_TYPE = 50;
 
 	/** The Configuration message type. This message type is used to
      *  send/receive Configuration data.
 	 *  {@link gsn.wrappers.backlog.plugins.BackLogConfigPlugin BackLogConfigPlugin}. */
-	public static final byte CONFIG_MESSAGE_TYPE = 51;
+	public static final short CONFIG_MESSAGE_TYPE = 51;
 
 	/** The GPS message type. This message type is used to
      *  send/receive GPS data.
 	 *  {@link gsn.wrappers.backlog.plugins.GPSPlugin GPSPlugin}. */
-	public static final byte GPS_MESSAGE_TYPE = 60;
+	public static final short GPS_MESSAGE_TYPE = 60;
 	
 	/** The GPS NAV message type. This message type is used to
      *  send/receive GPS data.
 	 *  {@link gsn.wrappers.backlog.plugins.GPSNAVPlugin GPSNAVPlugin}. */
-	public static final byte GPS_NAV_MESSAGE_TYPE = 61;
+	public static final short GPS_NAV_MESSAGE_TYPE = 61;
 	
 	/** PowerManager 
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.PowerManagerPlugin PowerManagerPlugin}. */
-	public static final byte POWERMANAGER_MESSAGE_TYPE = 70;
+	public static final short POWERMANAGER_MESSAGE_TYPE = 70;
 
 	/** MiCS-OZ-47 Ozone Sensor 
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.OZ47Plugin OZ47Plugin}. */
-	public static final byte OZ47_MESSAGE_TYPE = 80;
+	public static final short OZ47_MESSAGE_TYPE = 80;
 
 	/** ECVQ-EK3 Gas Sensor 
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.ECVQEK3Plugin ECVQEK3Plugin}. */
-	public static final byte ECVQEK3_MESSAGE_TYPE = 81;
+	public static final short ECVQEK3_MESSAGE_TYPE = 81;
 	
 	/** STEVAL Accelerometer 
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.STEVALPlugin STEVALPlugin}. */
-	public static final byte STEVAL_MESSAGE_TYPE = 82;
+	public static final short STEVAL_MESSAGE_TYPE = 82;
 	
 	/** Alphasense Gas Sensor 
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.AlphasensePlugin AlphasensePlugin}. */
-	public static final byte ALPHASENSE_MESSAGE_TYPE = 83;
+	public static final short ALPHASENSE_MESSAGE_TYPE = 83;
 
 	/** Motion detection with the accelerometer 
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.MotionDetectionPlugin MotionDetectionPlugin}. */
-	public static final byte MOTION_DETECTION_MESSAGE_TYPE = 84;
+	public static final short MOTION_DETECTION_MESSAGE_TYPE = 84;
 
 	/** CamZilla
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.CamZillaPlugin CamZillaPlugin}. */
-	public static final byte CAMZILLA_MESSAGE_TYPE = 90;
+	public static final short CAMZILLA_MESSAGE_TYPE = 90;
+
+	/** Sampler 6712
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.Sampler6712Plugin Sampler6712Plugin}. */
+	public static final short SAMPLER_6712_MESSAGE_TYPE = 100;
 	
 	
 	/* #                                                            #
@@ -164,19 +169,19 @@ public class BackLogMessage {
 	
 	/** The acknowledge message type. This message type is used to
 	 *  acknowledge data messages. */
-	public static final byte ACK_MESSAGE_TYPE = 1;
+	public static final short ACK_MESSAGE_TYPE = 1;
 	/** The ping message type. This message type is used to
 	 *  ping a deployment, thus, requesting a PING_ACK_MESSAGE_TYPE. */
-	public static final byte PING_MESSAGE_TYPE = 2;
+	public static final short PING_MESSAGE_TYPE = 2;
 	/** The ping acknowledge message type. This message type is used to
 	 *  acknowledge a ping request. */
-	public static final byte PING_ACK_MESSAGE_TYPE = 3;
+	public static final short PING_ACK_MESSAGE_TYPE = 3;
 	/** The message queue full message type. This message type is used
 	 *  to control the message flow. */
-	public static final byte MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE = 4;
+	public static final short MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE = 4;
 	/** The message queue ready message type. This message type is used
 	 *  to control the message flow. */
-	public static final byte MESSAGE_QUEUE_READY_MESSAGE_TYPE = 5;
+	public static final short MESSAGE_QUEUE_READY_MESSAGE_TYPE = 5;
 	
 
 	/** 
@@ -187,15 +192,18 @@ public class BackLogMessage {
 	private Serializable[] payload = {};
 	private byte [] payloadBin = null;
 	private long timestamp = 0;
-	private byte type = 0;
+	private short type = 0;
 	
 	
 	/** 
 	 * Class constructor specifying the message type.
 	 * 
 	 * @param type of the message
+	 * @throws IOException 
 	 */
-	public BackLogMessage(byte type) {
+	public BackLogMessage(short type) throws IOException {
+		if (type < 0 || type > 255)
+			throw new IOException("BackLog message type has to be in range 0 to 255");
 		this.type = type;
 	}
 	
@@ -206,8 +214,11 @@ public class BackLogMessage {
 	 * 
 	 * @param type of the message
 	 * @param timestamp in milliseconds
+	 * @throws IOException 
 	 */
-	public BackLogMessage(byte type, long timestamp) {
+	public BackLogMessage(short type, long timestamp) throws IOException {
+		if (type < 0 || type > 255)
+			throw new IOException("BackLog message type has to be in range 0 to 255");
 		this.type = type;
 		this.timestamp = timestamp;
 	}
@@ -223,9 +234,11 @@ public class BackLogMessage {
 	 * 
 	 * @throws IOException if the payload is too big
 	 */
-	public BackLogMessage(byte type, long timestamp, Serializable[] payload) throws IOException, NullPointerException {
+	public BackLogMessage(short type, long timestamp, Serializable[] payload) throws IOException, NullPointerException {
 		if( payload == null )
 			throw new NullPointerException("The payload should not be null");
+		if (type < 0 || type > 255)
+			throw new IOException("BackLog message type has to be in range 0 to 255");
 		
 		checkPayload(payload);
 		
@@ -248,7 +261,9 @@ public class BackLogMessage {
 		bbuffer.order(ByteOrder.LITTLE_ENDIAN);
 		byte [] arraybuffer = bbuffer.array();
 		
-		type = bbuffer.get();
+		type = (short) (bbuffer.get() & 0xFF);
+		if (type < 0 || type > 255)
+			throw new IOException("BackLog message type is not in range 0 to 255 -> drop message");
 		timestamp = bbuffer.getLong();
 		
 		if (bbuffer.hasRemaining()) {
@@ -382,7 +397,7 @@ public class BackLogMessage {
 				}
 			}
 	
-			outbuffer.put(type);
+			outbuffer.put((byte)type);
 			outbuffer.putLong(timestamp);
 			if (format != "") {
 				outbuffer.putInt(format.length());
@@ -410,7 +425,7 @@ public class BackLogMessage {
 	 * 
 	 * @return the type of the message
 	 */
-	public byte getType() {
+	public short getType() {
 		return type;
 	}
 	
@@ -419,8 +434,11 @@ public class BackLogMessage {
 	 * Set the message type.
 	 * 
 	 * @param type of the message
+	 * @throws Exception 
 	 */
-	public void setType(byte type) {
+	public void setType(short type) throws IOException {
+		if (type < 0 || type > 255)
+			throw new IOException("BackLog message type has to be in range 0 to 255");
 		this.type = type;
 	}
 	

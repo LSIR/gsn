@@ -25,7 +25,7 @@ public class MotionDetectionPlugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( MotionDetectionPlugin.class );
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.MOTION_DETECTION_MESSAGE_TYPE;
 	}
 

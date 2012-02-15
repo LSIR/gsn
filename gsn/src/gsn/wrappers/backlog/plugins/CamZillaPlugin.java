@@ -48,7 +48,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( CamZillaPlugin.class );
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.CAMZILLA_MESSAGE_TYPE;
 	}
 

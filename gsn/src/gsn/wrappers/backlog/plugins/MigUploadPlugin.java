@@ -65,7 +65,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.TOS_MESSAGE_TYPE;
 	}
 

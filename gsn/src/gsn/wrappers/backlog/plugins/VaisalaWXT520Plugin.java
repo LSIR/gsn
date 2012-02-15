@@ -20,7 +20,7 @@ public class VaisalaWXT520Plugin extends AbstractPlugin {
 	private final transient Logger logger = Logger.getLogger( VaisalaWXT520Plugin.class );
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.VAISALA_WXT520_MESSAGE_TYPE;
 	}
 

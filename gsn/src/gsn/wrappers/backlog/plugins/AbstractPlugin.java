@@ -179,7 +179,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * <p>
 	 * @return the message type
 	 */
-	public abstract byte getMessageType();
+	public abstract short getMessageType();
 
 
 	/**

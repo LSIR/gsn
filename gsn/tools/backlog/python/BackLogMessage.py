@@ -96,6 +96,9 @@ MOTION_DETECTION_MESSAGE_TYPE = 84
 # CamZillaPlugin
 CAMZILLA_MESSAGE_TYPE = 90
 
+# Sampler 6712
+SAMPLER_6712_MESSAGE_TYPE = 100
+
 # The maximum supported payload size (2^32-9bytes). This is due to
 # the sending mechanism. A sent message is defined by preceding
 # four bytes containing the message size. A message consists of
@@ -156,6 +159,8 @@ class BackLogMessageClass:
         @raise ValueError: if something is wrong with the payload.
         '''
         
+        if type < 0 or type > 255:
+            raise TypeError('BackLog message type has to be in range 0 to 255')
         self._type = type
         self._timestamp = timestamp
         try:
@@ -190,6 +195,8 @@ class BackLogMessageClass:
         
         try:
             self._type = struct.unpack('<B', bytes[0])[0]
+            if self._type < 0 or self._type > 255:
+                raise TypeError('BackLog message type has to be in range 0 to 255')
             self._timestamp = struct.unpack('<q', bytes[1:9])[0]
         except Exception, e:
             raise TypeError('cannot unpack message: %s' % (e,))

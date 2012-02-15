@@ -432,8 +432,13 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		while (en.hasMoreElements()) {
 			BackLogMessageListener temp = en.nextElement();
 			// send the message to the listener
-			if (temp.messageRecv(coreStationDeviceId, message) == true)
-				ReceiverCount++;
+			try {
+				if (temp.messageRecv(coreStationDeviceId, message) == true)
+					ReceiverCount++;
+			}
+			catch (Exception e) {
+				logger.error("Could not process message with type " + message.getType() + ": " + e.getMessage());
+			}
 		}
 		if (ReceiverCount == 0)
 			logger.warn("Received message with type " + message.getType() + ", but none of the registered listeners did process it. Skip message.");
@@ -745,7 +750,11 @@ class PluginMessageHandler extends Thread {
 	public void dispose() {
 		logger.info("dispose thread");
 		dispose = true;
-		plugMsgQueue.offer(new BackLogMessage((byte)'a'));
+		try {
+			plugMsgQueue.offer(new BackLogMessage((short) 0));
+		} catch (IOException e) {
+			logger.error(e);
+		}
 	}
 }
 

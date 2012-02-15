@@ -10,7 +10,6 @@ __source__      = "$URL$"
 import serial
 import Queue
 from threading import Event
-from AbstractPlugin import AbstractPluginClass
 import logging
 import struct
 import thread
@@ -18,6 +17,9 @@ import re
 import time
 import os
 import pickle
+
+import BackLogMessage
+from AbstractPlugin import AbstractPluginClass
 
 
 DEFAULT_BACKLOG = True
@@ -272,7 +274,7 @@ class Sampler6712PluginClass(AbstractPluginClass):
         
         
     def getMsgType(self):
-        return 128
+        return BackLogMessage.SAMPLER_6712_MESSAGE_TYPE
     
             
     def msgReceived(self, data):

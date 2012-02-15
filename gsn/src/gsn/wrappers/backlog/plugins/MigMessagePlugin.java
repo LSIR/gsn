@@ -232,7 +232,7 @@ public class MigMessagePlugin extends AbstractPlugin
 
 	
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		if (parameters.getTinyosVersion() == MigMessageParameters.TINYOS_VERSION_1)
 			return gsn.wrappers.backlog.BackLogMessage.TOS1x_MESSAGE_TYPE;
 		else

@@ -255,7 +255,7 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.CORESTATION_STATUS_MESSAGE_TYPE;
 	}
 

@@ -223,7 +223,7 @@ public class STEVALPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public byte getMessageType() {
+	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.STEVAL_MESSAGE_TYPE;
 	}
 

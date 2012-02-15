@@ -131,8 +131,8 @@ public class Sampler6712Plugin extends AbstractPlugin {
 	}	
 	
 	@Override
-	public byte getMessageType() {
-		return (byte)128; //gsn.wrappers.backlog.BackLogMessage.CAMZILLA_MESSAGE_TYPE;
+	public short getMessageType() {
+		return gsn.wrappers.backlog.BackLogMessage.SAMPLER_6712_MESSAGE_TYPE;
 	}
 
 	@Override

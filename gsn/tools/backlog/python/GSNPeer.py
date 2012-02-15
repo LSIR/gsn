@@ -173,43 +173,47 @@ class GSNPeerClass(Thread, Statistics):
         
         
     def pktReceived(self, pkt):
-        # convert the packet to a BackLogMessage
-        msg = BackLogMessage.BackLogMessageClass()
-        msg.setMessage(pkt)
-        # get the message type
-        msgType = msg.getType()
-        
-        if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug('rcv (%d,%d,%d)' % (msgType, msg.getTimestamp(), len(pkt)))
-        
-        # is it an answer to a ping?
-        if msgType == BackLogMessage.PING_ACK_MESSAGE_TYPE:
-            self.counterAction(self._pingAckInCounterId)
-            self._pingwatchdog.reset()
-        # or is it a ping request
-        elif msgType == BackLogMessage.PING_MESSAGE_TYPE:
-            self.counterAction(self._pingInCounterId)
-            # answer with a ping ack
-            self.pingAck(msg.getTimestamp())
-        elif msgType == BackLogMessage.ACK_MESSAGE_TYPE:
-            self.counterAction(self._msgAckInCounterId)
-            # if it is an acknowledge, tell BackLogMain to have received one
-            self._backlogMain.ackReceived(msg.getTimestamp(), msg.getData()[0])
-        elif msgType == BackLogMessage.MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE:
-            if not self._gsnqueuelimitreached:
-                self._gsnqueuelimitreached = True
-                self._backlogMain.backlog.pauseResending()
-                self._logger.info('GSN message queue reached its limit => stop sending messages')
-        elif msgType == BackLogMessage.MESSAGE_QUEUE_READY_MESSAGE_TYPE:
-            if self._gsnqueuelimitreached:
-                self._gsnqueuelimitreached = False
-                # let BackLogMain know that GSN successfully connected
-                self._backlogMain.backlog.resend()
-                self._backlogMain.backlog.resumeResending()
-                self._logger.info('GSN message queue is ready => send messages')
-        else:
-            self.counterAction(self._msgInCounterId)
-            self._backlogMain.gsnMsgReceived(msgType, msg)
+        try:
+            # convert the packet to a BackLogMessage
+            msg = BackLogMessage.BackLogMessageClass()
+            msg.setMessage(pkt)
+            # get the message type
+            msgType = msg.getType()
+            
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('rcv (%d,%d,%d)' % (msgType, msg.getTimestamp(), len(pkt)))
+            
+            # is it an answer to a ping?
+            if msgType == BackLogMessage.PING_ACK_MESSAGE_TYPE:
+                self.counterAction(self._pingAckInCounterId)
+                self._pingwatchdog.reset()
+            # or is it a ping request
+            elif msgType == BackLogMessage.PING_MESSAGE_TYPE:
+                self.counterAction(self._pingInCounterId)
+                # answer with a ping ack
+                self.pingAck(msg.getTimestamp())
+            elif msgType == BackLogMessage.ACK_MESSAGE_TYPE:
+                self.counterAction(self._msgAckInCounterId)
+                # if it is an acknowledge, tell BackLogMain to have received one
+                self._backlogMain.ackReceived(msg.getTimestamp(), msg.getData()[0])
+            elif msgType == BackLogMessage.MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE:
+                if not self._gsnqueuelimitreached:
+                    self._gsnqueuelimitreached = True
+                    self._backlogMain.backlog.pauseResending()
+                    self._logger.info('GSN message queue reached its limit => stop sending messages')
+            elif msgType == BackLogMessage.MESSAGE_QUEUE_READY_MESSAGE_TYPE:
+                if self._gsnqueuelimitreached:
+                    self._gsnqueuelimitreached = False
+                    # let BackLogMain know that GSN successfully connected
+                    self._backlogMain.backlog.resend()
+                    self._backlogMain.backlog.resumeResending()
+                    self._logger.info('GSN message queue is ready => send messages')
+            else:
+                self.counterAction(self._msgInCounterId)
+                self._backlogMain.gsnMsgReceived(msgType, msg)
+        except Exception, e:
+            self._logger.exception('Can not process received message: %s' % (str(e),), e)
+            self._backlogMain.incrementExceptionCounter()
 
 
     def disconnect(self):
