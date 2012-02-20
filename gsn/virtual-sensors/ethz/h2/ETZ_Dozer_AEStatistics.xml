@@ -221,7 +221,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper</query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -232,7 +232,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -243,7 +243,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -254,7 +254,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -265,7 +265,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -276,7 +276,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -287,7 +287,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -298,7 +298,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -309,7 +309,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -321,7 +321,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -333,7 +333,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -344,7 +344,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -356,7 +356,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -368,7 +368,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -380,7 +380,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -392,7 +392,7 @@
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerAEStatisticsOldMsg</predicate>
                 </address>
-                <query> select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS_CH1 as PAYLOAD_CH1_BUFFERUNDERFLOWS,PAYLOAD_BUFFERUNDERFLOWS_CH2 as PAYLOAD_CH2_BUFFERUNDERFLOWS from wrapper </query>
+                <query>select DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR,HEADER_ORIGINATORID,HEADER_ATIME,PAYLOAD_MEASURED,PAYLOAD_PARAMETRIZED,PAYLOAD_STORED,PAYLOAD_BUFFERUNDERFLOWS,PAYLOAD_NOISEFLOOR_CH1 as PAYLOAD_CH1_NOISEFLOOR,PAYLOAD_NOISEFLOOR_CH2 as PAYLOAD_CH2_NOISEFLOOR from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
