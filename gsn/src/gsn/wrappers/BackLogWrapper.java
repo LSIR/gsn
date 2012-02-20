@@ -243,7 +243,7 @@ public class BackLogWrapper extends AbstractWrapper {
 	 * @throws OperationNotSupportedException 
 	 */
 	@Override
-	public boolean sendToWrapper ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
+	public boolean sendToWrapper ( String action , String [ ] paramNames , Serializable [ ] paramValues ) throws OperationNotSupportedException {
 		Integer id = 65535;
 		for (int i = 0 ; i < paramNames.length ; i++) {
 			if ( paramNames[i].compareToIgnoreCase("core_station") == 0 ) {

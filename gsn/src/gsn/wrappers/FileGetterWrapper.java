@@ -116,7 +116,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 	}
 	
 	@Override
-	public boolean sendToWrapper ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
+	public boolean sendToWrapper ( String action , String [ ] paramNames , Serializable [ ] paramValues ) throws OperationNotSupportedException {
 		if( action.compareToIgnoreCase("files") == 0 ) {
 			try {
 				long gentime = System.currentTimeMillis();

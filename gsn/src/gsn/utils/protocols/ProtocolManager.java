@@ -2,6 +2,7 @@ package gsn.utils.protocols;
 
 import gsn.wrappers.AbstractWrapper;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Timer;
@@ -76,7 +77,7 @@ public class ProtocolManager {
 					try {
 						if(logger.isDebugEnabled())
 							logger.debug("Built query, it looks like: " + new String(queryBytes));
-						outputWrapper.sendToWrapper(null,null,new Object[] {queryBytes});
+						outputWrapper.sendToWrapper(null,null,new Serializable[] {queryBytes});
 						lastExecutedQuery = query;
 						lastParams = params;
 						answer = queryBytes;

@@ -134,7 +134,7 @@ public abstract class AbstractWrapper extends Thread {
 	 */
 
 	public boolean sendToWrapper(String action, String[] paramNames,
-			Object[] paramValues) throws OperationNotSupportedException {
+			Serializable[] paramValues) throws OperationNotSupportedException {
 		throw new OperationNotSupportedException(
 				"This wrapper doesn't support sending data back to the source.");
 	}
