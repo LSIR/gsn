@@ -95,6 +95,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         
         self._checkLM92Temp()
         self._checkExtStatus()
+        self._checkUsbStatus()
         
         self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
         self._initFinish = True
