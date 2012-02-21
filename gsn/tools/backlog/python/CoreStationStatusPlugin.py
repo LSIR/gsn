@@ -93,6 +93,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         self._checkStat()
         self._checkUptime()
         
+        self._checkAD77x8()
         self._checkLM92Temp()
         self._checkExtStatus()
         self._checkUsbStatus()
