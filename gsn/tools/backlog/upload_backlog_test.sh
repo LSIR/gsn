@@ -14,8 +14,12 @@ done
 echo "uploading $*"
 
 echo ""
-echo "to permasense-etzg-bs01:"
-scp $* root@permasense-etzg-bs01:$BACKLOG_PYTHON_DIR
+echo "to permasense-etz-bs01:"
+scp $* root@permasense-etz-bs01:$BACKLOG_PYTHON_DIR
+
+echo ""
+echo "to permasense-etz-bs02:"
+scp $* root@permasense-etz-bs02:$BACKLOG_PYTHON_DIR
 
 echo ""
 echo "to permasense-etz-bs03:"

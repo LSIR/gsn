@@ -45,6 +45,12 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			new DataField("DEVICE_ID", "INTEGER"),
 			
 			new DataField("LM92_TEMP", "INTEGER"),
+			new DataField("USB1_ON", "TINYINT"),
+			new DataField("USB2_ON", "TINYINT"),
+			new DataField("USB3_ON", "TINYINT"),
+			new DataField("EXT1_ON", "TINYINT"),
+			new DataField("EXT2_ON", "TINYINT"),
+			new DataField("EXT3_ON", "TINYINT"),
 			new DataField("V_EXT2", "INTEGER"),
 			new DataField("V_EXT1", "INTEGER"),
 			new DataField("V_EXT3", "INTEGER"),

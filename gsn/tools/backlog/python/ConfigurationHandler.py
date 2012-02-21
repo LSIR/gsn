@@ -26,7 +26,7 @@ from BackLogMessage import CONFIG_MESSAGE_TYPE
 
 MESSAGE_PRIORITY = 5
 
-CONFIG_HASH_FILE = '/media/card/backlog/.backlog_config_hash'
+DEFAULT_CONFIG_HASH_FILE = '/media/card/backlog/.backlog_config_hash'
 ############################################
 
 
@@ -44,12 +44,13 @@ class ConfigurationHandlerClass():
     _restart
     '''
     
-    def __init__(self, parent, config_file, backlog_db=None, backlog_db_resend_hr=None):
+    def __init__(self, parent, config_file, backlog_db=None, backlog_db_resend_hr=None, shutdown_check_file=None):
         self._logger = logging.getLogger(self.__class__.__name__)
         
         self._backlogMain = parent
         self._backlog_db_default = backlog_db
         self._backlog_db_resend_hr_default = backlog_db_resend_hr
+        self._shutdown_check_file_default = shutdown_check_file
         self._restart = False
                 
         self._config_file = config_file
@@ -123,18 +124,18 @@ class ConfigurationHandlerClass():
         md5 = hashlib.md5()
         md5.update(config_string)
         newhash = md5.digest()
-        if os.path.isfile(CONFIG_HASH_FILE):
-            hash_file = open(CONFIG_HASH_FILE, 'rb')
+        if os.path.isfile(self._config_hash_file):
+            hash_file = open(self._config_hash_file, 'rb')
             oldhash = hash_file.read()
             hash_file.close()
             
         if write_hash:
-            hash_file = open(CONFIG_HASH_FILE, 'wb')
+            hash_file = open(self._config_hash_file, 'wb')
             hash_file.write(newhash)
             hash_file.close()
         
         if newhash != oldhash:
-            return int(os.stat(CONFIG_HASH_FILE).st_mtime*1000)
+            return int(os.stat(self._config_hash_file).st_mtime*1000)
         else:
             return None
         
@@ -152,13 +153,16 @@ class ConfigurationHandlerClass():
         gsn_port = None
         backlog_db = self._backlog_db_default
         backlog_db_resend_hr = self._backlog_db_resend_hr_default
+        shutdownCheckFile = self._shutdown_check_file_default
+        configHashFile = DEFAULT_CONFIG_HASH_FILE
         device_id = None
         tos_address = None
         tos_version = None
         dutycyclemode = None
         folder_to_check_size = None
         folder_min_free_mb = None
-        oldboard = None
+        wlanport = None
+        platformVersion = None
 
         try:
             # readout options from config
@@ -182,8 +186,14 @@ class ConfigurationHandlerClass():
                         folder_to_check_size = value
                     elif name == 'folder_min_free_mb':
                         folder_min_free_mb = int(value)
-                    elif name == 'old_board':
-                        oldboard = int(value)
+                    elif name == 'wlan_port':
+                        wlanport = int(value)
+                    elif name == 'shutdown_check_file':
+                        shutdownCheckFile = value
+                    elif name == 'config_hash_file':
+                        configHashFile = value
+                    elif name == 'platform':
+                        platformVersion = int(value)
         except ConfigParser.NoSectionError:
             raise TypeError('no [options] section specified in %s' % (config_file,))
         
@@ -243,15 +253,26 @@ class ConfigurationHandlerClass():
                 raise TypeError('folder_min_free_mb has to be a positive number')
         ret.update(folder_min_free_mb=folder_min_free_mb)
         
-        if oldboard is not None:
-            if oldboard == 0:
-                ret.update(oldboard=False)
-            elif oldboard == 1:
-                ret.update(oldboard=True)
+        if wlanport is not None:
+            if wlanport >= 1 and wlanport <= 3:
+                ret.update(wlan_port=wlanport)
             else:
-                raise TypeError('old_board has to be set to 1 or 0 in config file')
+                raise TypeError('wlan_port has to be set to 1, 2 or 3 in config file')
         else:
-            ret.update(oldboard=False)
+            ret.update(wlan_port=None)
+        
+        if not os.path.isdir(os.path.dirname(shutdownCheckFile)):
+            raise TypeError('the folder %s for the shutdown_check_file does not exist' % (os.path.dirname(shutdownCheckFile),))
+        ret.update(shutdown_check_file=shutdownCheckFile)
+        
+        if not os.path.isdir(os.path.dirname(configHashFile)):
+            raise TypeError('the folder %s for the config_hash_file does not exist' % (os.path.dirname(configHashFile),))
+        self._config_hash_file = configHashFile
+        
+        if platformVersion is None or platformVersion == 1 or platformVersion == 2:
+            ret.update(platform=platformVersion)
+        else:
+            raise TypeError('platform has to be set to 1 or 2')
         
         # get schedule section from config files
         try:

@@ -394,7 +394,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 					ret[i-dataoffset] = toShort(data[i]);
 					break;
 				case DataTypes.TINYINT:
-					ret[i-dataoffset] = toShort(data[i]);
+					ret[i-dataoffset] = (Byte)data[i];
 					break;
 				case DataTypes.DOUBLE:
 					ret[i-dataoffset] = (Double)data[i];

@@ -94,6 +94,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         self._checkUptime()
         
         self._checkLM92Temp()
+        self._checkExtStatus()
         
         self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
         self._initFinish = True
@@ -142,6 +143,8 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             hw_data_list = [HW_TYPE]
             hw_timestamp = self.getTimeStamp()
             hw_data_list += self._getLM92Temp()
+            hw_data_list += self._getUsbStatus()
+            hw_data_list += self._getExtStatus()
             hw_data_list += self._getAD77x8()
             
             sw_data_list = [SW_TYPE]
@@ -1315,6 +1318,16 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         return ret
         
         
+    def _checkAD77x8(self):
+        self._ad77x8Available = False
+        try:
+            self.getPowerControlObject().getVExt1()
+        except Exception, e:
+            self.warning(e.__str__())
+        else:
+            self._ad77x8Available = True
+        
+        
     def _getAD77x8(self):
         '''
             [ad77x8_1 (int),
@@ -1330,19 +1343,110 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         '''
         ret = [None]*10
         
+        if self._ad77x8Available:
+            try:
+                ret = [self.getPowerControlObject().getVExt2(),
+                       self.getPowerControlObject().getVExt1(),
+                       self.getPowerControlObject().getVExt3(),
+                       self.getPowerControlObject().getIV12DcExt(),
+                       self.getPowerControlObject().getV12DcIn(),
+                       self.getPowerControlObject().getIV12DcIn(),
+                       self.getPowerControlObject().getVcc50(),
+                       self.getPowerControlObject().getVccNode(),
+                       self.getPowerControlObject().getIVccNode(),
+                       self.getPowerControlObject().getVcc42()]
+            except Exception, e:
+                self.warning(e.__str__())
+            
+        return ret
+        
+        
+    def _checkExtStatus(self):
+        self._extPortAvailable = [False]*3
         try:
-            ret = [self.getPowerControlObject().getVExt2(),
-                   self.getPowerControlObject().getVExt1(),
-                   self.getPowerControlObject().getVExt3(),
-                   self.getPowerControlObject().getIV12DcExt(),
-                   self.getPowerControlObject().getV12DcIn(),
-                   self.getPowerControlObject().getIV12DcIn(),
-                   self.getPowerControlObject().getVcc50(),
-                   self.getPowerControlObject().getVccNode(),
-                   self.getPowerControlObject().getIVccNode(),
-                   self.getPowerControlObject().getVcc42()]
+            self.getPowerControlObject().getExt1Status()
         except Exception, e:
             self.warning(e.__str__())
+        else:
+            self._extPortAvailable[0] = True
+        try:
+            self.getPowerControlObject().getExt2Status()
+        except Exception, e:
+            self.warning(e.__str__())
+        else:
+            self._extPortAvailable[1] = True
+        try:
+            self.getPowerControlObject().getExt3Status()
+        except Exception, e:
+            self.warning(e.__str__())
+        else:
+            self._extPortAvailable[2] = True
+        
+        
+    def _getExtStatus(self):
+        '''
+            [ext1 (boolean),
+             ext2 (boolean),
+             ext3 (boolean)]
+        '''
+        ret = [None]*3
+        
+        try:
+            if self._extPortAvailable[0]:
+                if self.getPowerControlObject().getExt1Status():
+                    ret[0] = 1
+                else:
+                    ret[0] = 0
+            if self._extPortAvailable[1]:
+                if self.getPowerControlObject().getExt2Status():
+                    ret[1] = 1
+                else:
+                    ret[1] = 0
+            if self._extPortAvailable[2]:
+                if self.getPowerControlObject().getExt3Status():
+                    ret[2] = 1
+                else:
+                    ret[2] = 0
+        except Exception, e:
+            self.warning(e.__str__())
+            
+        return ret
+        
+        
+    def _checkUsbStatus(self):
+        self._usbAvailable = False
+        try:
+            self.getPowerControlObject().getUsb1Status()
+        except Exception, e:
+            self.warning(e.__str__())
+        else:
+            self._usbAvailable = True
+        
+        
+    def _getUsbStatus(self):
+        '''
+            [usb1 (boolean),
+             usb2 (boolean),
+             usb3 (boolean)]
+        '''
+        ret = [None]*3
+        
+        if self._usbAvailable:
+            try:
+                if self.getPowerControlObject().getUsb1Status():
+                    ret[0] = 1
+                else:
+                    ret[0] = 0
+                if self.getPowerControlObject().getUsb2Status():
+                    ret[1] = 1
+                else:
+                    ret[1] = 0
+                if self.getPowerControlObject().getUsb3Status():
+                    ret[2] = 1
+                else:
+                    ret[2] = 0
+            except Exception, e:
+                self.warning(e.__str__())
             
         return ret
 

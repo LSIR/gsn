@@ -43,9 +43,11 @@ DEFAULT_OPTION_BACKLOG_DB = '/media/card/backlog/backlog.db'
 DEFAULT_OPTION_BACKLOG_RESEND_SLEEP = 0.1
 DEFAULT_TOS_VERSION = 2
 DEFAULT_BACKLOG_DB_RESEND = 12
+DEFAULT_SHUTDOWN_CHECK_FILE = '/media/card/backlog/.backlog_shutdown'
 
-SHUTDOWN_CHECK_FILE = '/media/card/backlog/.backlog_shutdown'
 BACKLOG_PYTHON_DIRECTORY = '/usr/lib/python2.6/backlog/'
+BASEBOARD_R1_PATH = '/sys/devices/platform/baseboard_old/'
+BASEBOARD_R2_PATH = '/sys/devices/platform/baseboard/'
 
 class BackLogMainClass(Thread, Statistics):
     '''
@@ -89,7 +91,7 @@ class BackLogMainClass(Thread, Statistics):
 
         self._logger = logging.getLogger(self.__class__.__name__)
         
-        self.confighandler = ConfigurationHandlerClass(self, config_file, DEFAULT_OPTION_BACKLOG_DB, DEFAULT_BACKLOG_DB_RESEND)
+        self.confighandler = ConfigurationHandlerClass(self, config_file, DEFAULT_OPTION_BACKLOG_DB, DEFAULT_BACKLOG_DB_RESEND, DEFAULT_SHUTDOWN_CHECK_FILE)
         self._msgtypetoplugin = {self.confighandler.getMsgType(): [self.confighandler]}
         
         self._backlogStopped = False
@@ -132,14 +134,32 @@ class BackLogMainClass(Thread, Statistics):
         else:
             self._logger.info('not running in duty-cycle mode')
         
-        if self.confighandler.getParsedConfig()['oldboard'] == 1:
-            self._logger.info('an old CoreBoard is used')
+        if os.path.isdir(BASEBOARD_R1_PATH):
+            platform = 1
+            self._logger.info('BackLog is running on an old BaseBoardv2 r1.0 platform')
+        elif os.path.isdir(BASEBOARD_R2_PATH):
+            platform = 2
+            self._logger.info('BackLog is running on a BaseBoardv2 r2.0 platform')
+        else:
+            platform = self.confighandler.getParsedConfig()['platform']
+            if platform == 1:
+                self._logger.info('BackLog is running on an old BaseBoardv2 r1.0 platform')
+            elif platform == 2:
+                self._logger.info('BackLog is running on a BaseBoardv2 r2.0 platform')
+            else:
+                self._logger.warning('BackLog is running on a unknown platform')
         
         # check for proper shutdown
         self._last_clean_shutdown = None
-        if os.path.exists(SHUTDOWN_CHECK_FILE):
-            fd = open(SHUTDOWN_CHECK_FILE, 'r')
-            self._last_clean_shutdown = long(fd.readline())
+        if os.path.exists(self.confighandler.getParsedConfig()['shutdown_check_file']):
+            fd = open(self.confighandler.getParsedConfig()['shutdown_check_file'], 'r')
+            try:
+                self._last_clean_shutdown = long(fd.readline())
+            except Exception, e:
+                self._logger.error('could not check %s: %s' % (self.confighandler.getParsedConfig()['shutdown_check_file'], str(e)))
+                fd.close()
+                os.remove(self.confighandler.getParsedConfig()['shutdown_check_file'])
+                self._last_clean_shutdown = None
             fd.close()
         
         self._tospeer = None
@@ -157,7 +177,7 @@ class BackLogMainClass(Thread, Statistics):
         self._msgtypetoplugin.update({self.schedulehandler.getMsgType(): [self.schedulehandler]})
         
         self.powerControl = None
-        self.powerControl = PowerControl(self, self.confighandler.getParsedConfig()['oldboard'])
+        self.powerControl = PowerControl(self, self.confighandler.getParsedConfig()['wlan_port'], platform)
         self._logger.info('loaded PowerControl class')
 
         # get plugins section from config files
@@ -726,7 +746,7 @@ def main():
             
         logging.shutdown()
         
-        fd = open(SHUTDOWN_CHECK_FILE, 'w')
+        fd = open(backlog.confighandler.getParsedConfig()['shutdown_check_file'], 'w')
         fd.write(str(long(time.time()*1000)))
         fd.close()
     

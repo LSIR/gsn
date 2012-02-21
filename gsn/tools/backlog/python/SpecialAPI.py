@@ -11,6 +11,7 @@ import os
 import uuid
 import logging
 import time
+import ConfigParser
 from datetime import datetime, timedelta
 from threading import Lock
 
@@ -347,20 +348,9 @@ class Statistics:
 import tos
 import TOSTypes
 
-
-DEFAULT_LINK_FOLDER = '/etc/gpio/'
-
-WLAN_GPIO_LINK_PREFIX = 'wlan_power'
-EXT1_GPIO_LINK_PREFIX = 'ext1_power'
-EXT2_GPIO_LINK_PREFIX = 'ext2_power'
-EXT3_GPIO_LINK_PREFIX = 'ext3_power'
-USB2_GPIO_LINK_PREFIX = 'usb2'
-USB3_GPIO_LINK_PREFIX = 'usb3'
-
-GPIO_RESET_ON_CLEAR_SUFFIX = 'reset_on_clear'
-GPIO_RESET_ON_SET_SUFFIX = 'reset_on_set'
-GPIO_ON_ON_SET_SUFFIX = 'on_on_set'
-GPIO_OFF_ON_SET_SUFFIX = 'off_on_set'
+EXT_GPIO_MAP = {1:"/proc/gpio/GPIO65", 2:"/proc/gpio/GPIO58", 3:"/proc/gpio/GPIO29"}
+USB_GPIO_MAP = {1:"/proc/gpio/GPIO72", 2:"/proc/gpio/GPIO66", 3:"/proc/gpio/GPIO73"}
+EXT_CONFIG_FILE = "/etc/platform/bb_extpwr.conf"
 
 
 class PowerControl:
@@ -373,114 +363,61 @@ class PowerControl:
 
     '''
     data/instance attributes:
-    _linkfolder
-    _usb2GPIOOnOnSet
-    _usb2GPIOLink
-    _usb2GPIOLock
-    _usb3GPIOOnOnSet
-    _usb3GPIOLink
-    _usb3GPIOLock
-    _ext1GPIOOnOnSet
-    _ext1GPIOLink
-    _ext1GPIOLock
-    _ext2GPIOOnOnSet
-    _ext2GPIOLink
-    _ext2GPIOLock
-    _ext3GPIOOnOnSet
-    _ext3GPIOLink
-    _ext3GPIOLock
-    _wlanGPIOLink
-    _wlanGPIOLock
-    _wlanGPIOOnOnSet
+    _logger
+    _backlogMain
+    _platform
+    _extDefaultMap
+    _ad77x8Lock
+    _ad77x8Values
+    _ad77x8Timer
+    _ad77x8
+    
     '''
     
 #    make this class a singleton
     __shared_state = {}
 
-    def __init__(self, backlogMain, oldBoard=False, linkFolder=DEFAULT_LINK_FOLDER):
+    def __init__(self, backlogMain, wlanPort, platform):
         self.__dict__ = self.__shared_state
         
         self._logger = logging.getLogger(self.__class__.__name__)
         
         self._backlogMain = backlogMain
-        self._oldBoard = oldBoard
+        self._platform = platform
         
-        self._linkfolder = None
-        if not os.path.isdir(linkFolder):
-            self._logger.warning('linkFolder >%s< is not an existing folder => hardware can not be powered by BackLog' % (linkFolder,))
-        else:
-            self._linkfolder = linkFolder
+        self._wlanPort = wlanPort
+        self._extDefaultMap = {1:None, 2:None, 3:None}
         
-        self._wlanGPIOLink = ''
-        self._wlanGPIOLock = Lock()
-        self._ext1GPIOLink = ''
-        self._ext1GPIOLock = Lock()
-        self._ext2GPIOLink = ''
-        self._ext2GPIOLock = Lock()
-        self._ext3GPIOLink = ''
-        self._ext3GPIOLock = Lock()
-        self._usb2GPIOLink = ''
-        self._usb2GPIOLock = Lock()
-        self._usb3GPIOLink = ''
-        self._usb3GPIOLock = Lock()
-        
-        if self._linkfolder:
-            for file in os.listdir(linkFolder):
-                if file.startswith(WLAN_GPIO_LINK_PREFIX):
-                    self._wlanGPIOLink = os.path.join(linkFolder, file)
-                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                        self._wlanGPIOOnOnSet = True
-                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                        self._wlanGPIOOnOnSet = False
-                    else:
-                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-                elif file.startswith(EXT1_GPIO_LINK_PREFIX):
-                    self._ext1GPIOLink = os.path.join(linkFolder, file)
-                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                        self._ext1GPIOOnOnSet = True
-                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                        self._ext1GPIOOnOnSet = False
-                    else:
-                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-                elif file.startswith(EXT2_GPIO_LINK_PREFIX):
-                    self._ext2GPIOLink = os.path.join(linkFolder, file)
-                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                        self._ext2GPIOOnOnSet = True
-                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                        self._ext2GPIOOnOnSet = False
-                    else:
-                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-                elif file.startswith(EXT3_GPIO_LINK_PREFIX):
-                    self._ext3GPIOLink = os.path.join(linkFolder, file)
-                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                        self._ext3GPIOOnOnSet = True
-                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                        self._ext3GPIOOnOnSet = False
-                    else:
-                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-                elif file.startswith(USB2_GPIO_LINK_PREFIX):
-                    self._usb2GPIOLink = os.path.join(linkFolder, file)
-                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                        self._usb2GPIOOnOnSet = True
-                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                        self._usb2GPIOOnOnSet = False
-                    else:
-                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
-                elif file.startswith(USB3_GPIO_LINK_PREFIX):
-                    self._usb3GPIOLink = os.path.join(linkFolder, file)
-                    if file.endswith(GPIO_ON_ON_SET_SUFFIX):
-                        self._usb3GPIOOnOnSet = True
-                    elif file.endswith(GPIO_OFF_ON_SET_SUFFIX):
-                        self._usb3GPIOOnOnSet = False
-                    else:
-                        raise Exception('file >%s< does not end with a proper suffix' % (os.path.join(linkFolder, file),))
+        if platform == 1:
+            self._extDefaultMap = {1:False, 2:False, 3:False}
+        elif platform == 2:
+            try:
+                # Parse ext port config file
+                config = ConfigParser.ConfigParser()
+                config.read(EXT_CONFIG_FILE)
+                for i in range(1,4):
+                    try:
+                        val = config.get("EXT%i" % i, "default")
+                        if val == 'on':
+                            self._extDefaultMap[i] = True
+                        elif val == 'off':
+                            self._extDefaultMap[i] = False
+                        else:
+                            raise Exception("default has to be 'on' or 'off'")
+                    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+                        pass
+            except Exception, e:
+                raise Exception("Could not parse config file %s: %s" % (EXT_CONFIG_FILE, str(e)))
             
         self._ad77x8Lock = Lock()
         self._ad77x8Values = [None]*10
         self._ad77x8Timer = None
         self._ad77x8 = False
         
-        self._initAD77x8()
+        if platform is not None:
+            self._initAD77x8()
+        else:
+            self._logger.info('unknown platform -> not initializing AD77x8')
         
         if self._backlogMain.duty_cycle_mode:
             self._backlogMain.registerTOSListener(self, [TOSTypes.AM_BEACONCOMMAND])
@@ -597,24 +534,44 @@ class PowerControl:
                 
     
     
+    def usb1On(self):
+        '''
+        Turns the USB1 port power on
+        
+        @raise Exception: if USB1 port is not properly configured
+        '''
+        self._setUsbStatus(1, True)
+        
+    
+    
+    def usb1Off(self):
+        '''
+        Turns the USB1 port power off.
+        
+        @raise Exception: if USB1 port is not properly configured
+        '''
+        self._setUsbStatus(1, False)
+    
+    
+    def getUsb1Status(self):
+        '''
+        Returns True if the USB1 port is on otherwise False
+        
+        @return: True if the USB1 port is on otherwise False
+        
+        @raise Exception: if USB1 port is not properly configured
+        '''
+        return self._getUsbSatus(1)
+                
+    
+    
     def usb2On(self):
         '''
         Turns the USB2 port power on
         
-        @raise Exception: if no USB2 GPIO link file exists
+        @raise Exception: if USB2 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._usb2GPIOLink:
-            self._logger.info('turning USB2 port on')
-            self._usb2GPIOLock.acquire()
-            if self._usb2GPIOOnOnSet:
-                self._gpioLinkAction(self._usb2GPIOLink, True)
-            else:
-                self._gpioLinkAction(self._usb2GPIOLink, False)
-            self._usb2GPIOLock.release()
-        else:
-            raise Exception('USB2 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setUsbStatus(2, True)
         
     
     
@@ -622,20 +579,9 @@ class PowerControl:
         '''
         Turns the USB2 port power off.
         
-        @raise Exception: if no USB2 GPIO link file exists
+        @raise Exception: if USB2 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._usb2GPIOLink:
-            self._logger.warning('turning USB2 port off')
-            self._usb2GPIOLock.acquire()
-            if self._usb2GPIOOnOnSet:
-                self._gpioLinkAction(self._usb2GPIOLink, False)
-            else:
-                self._gpioLinkAction(self._usb2GPIOLink, True)
-            self._usb2GPIOLock.release()
-        else:
-            raise Exception('USB2 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setUsbStatus(2, False)
     
     
     def getUsb2Status(self):
@@ -644,20 +590,9 @@ class PowerControl:
         
         @return: True if the USB2 port is on otherwise False
         
-        @raise Exception: if no USB2 GPIO link file exists
+        @raise Exception: if USB2 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._usb2GPIOLink:
-            self._usb2GPIOLock.acquire()
-            stat = self._getGPIOStatus(self._usb2GPIOLink).rsplit(None, 1)[1]
-            self._usb2GPIOLock.release()
-            if (self._usb2GPIOOnOnSet and stat == 'set') or (not self._usb2GPIOOnOnSet and stat == 'clear'):
-                return True
-            else:
-                return False
-        else:
-            raise Exception('USB2 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        return self._getUsbSatus(2)
                 
     
     
@@ -665,20 +600,9 @@ class PowerControl:
         '''
         Turns the USB3 port power on
         
-        @raise Exception: if no USB3 GPIO link file exists
+        @raise Exception: if USB3 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._usb3GPIOLink:
-            self._logger.info('turning USB3 port on')
-            self._usb3GPIOLock.acquire()
-            if self._usb3GPIOOnOnSet:
-                self._gpioLinkAction(self._usb3GPIOLink, True)
-            else:
-                self._gpioLinkAction(self._usb3GPIOLink, False)
-            self._usb3GPIOLock.release()
-        else:
-            raise Exception('USB3 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setUsbStatus(3, True)
         
     
     
@@ -686,20 +610,9 @@ class PowerControl:
         '''
         Turns the USB3 port power off.
         
-        @raise Exception: if no USB3 GPIO link file exists
+        @raise Exception: if USB3 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._usb3GPIOLink:
-            self._logger.warning('turning USB3 port off')
-            self._usb3GPIOLock.acquire()
-            if self._usb3GPIOOnOnSet:
-                self._gpioLinkAction(self._usb3GPIOLink, False)
-            else:
-                self._gpioLinkAction(self._usb3GPIOLink, True)
-            self._usb3GPIOLock.release()
-        else:
-            raise Exception('USB3 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setUsbStatus(3, False)
     
     
     def getUsb3Status(self):
@@ -708,20 +621,9 @@ class PowerControl:
         
         @return: True if the USB3 port is on otherwise False
         
-        @raise Exception: if no USB3 GPIO link file exists
+        @raise Exception: if USB3 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._usb3GPIOLink:
-            self._usb3GPIOLock.acquire()
-            stat = self._getGPIOStatus(self._usb3GPIOLink).rsplit(None, 1)[1]
-            self._usb3GPIOLock.release()
-            if (self._usb3GPIOOnOnSet and stat == 'set') or (not self._usb3GPIOOnOnSet and stat == 'clear'):
-                return True
-            else:
-                return False
-        else:
-            raise Exception('USB3 GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        return self._getUsbSatus(3)
                 
     
     
@@ -729,20 +631,9 @@ class PowerControl:
         '''
         Turns the ext1 port power on
         
-        @raise Exception: if no ext1 port GPIO link file exists
+        @raise Exception: if ext1 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext1GPIOLink:
-            self._logger.info('turning ext1 port on')
-            self._ext1GPIOLock.acquire()
-            if self._ext1GPIOOnOnSet:
-                self._gpioLinkAction(self._ext1GPIOLink, True)
-            else:
-                self._gpioLinkAction(self._ext1GPIOLink, False)
-            self._ext1GPIOLock.release()
-        else:
-            raise Exception('ext1 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setExtStatus(1, True)
         
     
     
@@ -750,20 +641,9 @@ class PowerControl:
         '''
         Turns the ext1 port power off.
         
-        @raise Exception: if no ext1 port GPIO link file exists
+        @raise Exception: if ext1 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext1GPIOLink:
-            self._logger.warning('turning ext1 port off')
-            self._ext1GPIOLock.acquire()
-            if self._ext1GPIOOnOnSet:
-                self._gpioLinkAction(self._ext1GPIOLink, False)
-            else:
-                self._gpioLinkAction(self._ext1GPIOLink, True)
-            self._ext1GPIOLock.release()
-        else:
-            raise Exception('ext1 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setExtStatus(1, False)
     
     
     def getExt1Status(self):
@@ -772,20 +652,9 @@ class PowerControl:
         
         @return: True if the ext1 port is on otherwise False
         
-        @raise Exception: if no ext1 port GPIO link file exists
+        @raise Exception: if ext1 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext1GPIOLink:
-            self._ext1GPIOLock.acquire()
-            stat = self._getGPIOStatus(self._ext1GPIOLink).rsplit(None, 1)[1]
-            self._ext1GPIOLock.release()
-            if (self._ext1GPIOOnOnSet and stat == 'set') or (not self._ext1GPIOOnOnSet and stat == 'clear'):
-                return True
-            else:
-                return False
-        else:
-            raise Exception('ext1 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        return self._getExtStatus(1)
                 
     
     
@@ -793,20 +662,9 @@ class PowerControl:
         '''
         Turns the ext2 port power on
         
-        @raise Exception: if no ext2 port GPIO link file exists
+        @raise Exception: if ext2 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext2GPIOLink:
-            self._logger.info('turning ext2 port on')
-            self._ext2GPIOLock.acquire()
-            if self._ext2GPIOOnOnSet:
-                self._gpioLinkAction(self._ext2GPIOLink, True)
-            else:
-                self._gpioLinkAction(self._ext2GPIOLink, False)
-            self._ext2GPIOLock.release()
-        else:
-            raise Exception('ext2 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setExtStatus(2, True)
         
     
     
@@ -814,20 +672,9 @@ class PowerControl:
         '''
         Turns the ext2 port power off.
         
-        @raise Exception: if no ext2 port GPIO link file exists
+        @raise Exception: if ext2 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext2GPIOLink:
-            self._logger.warning('turning ext2 port off')
-            self._ext2GPIOLock.acquire()
-            if self._ext2GPIOOnOnSet:
-                self._gpioLinkAction(self._ext2GPIOLink, False)
-            else:
-                self._gpioLinkAction(self._ext2GPIOLink, True)
-            self._ext2GPIOLock.release()
-        else:
-            raise Exception('ext2 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setExtStatus(2, False)
     
     
     def getExt2Status(self):
@@ -836,20 +683,9 @@ class PowerControl:
         
         @return: True if the ext2 port is on otherwise False
         
-        @raise Exception: if no ext2 port GPIO link file exists
+        @raise Exception: if ext2 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext2GPIOLink:
-            self._ext2GPIOLock.acquire()
-            stat = self._getGPIOStatus(self._ext2GPIOLink).rsplit(None, 1)[1]
-            self._ext2GPIOLock.release()
-            if (self._ext2GPIOOnOnSet and stat == 'set') or (not self._ext2GPIOOnOnSet and stat == 'clear'):
-                return True
-            else:
-                return False
-        else:
-            raise Exception('ext2 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        return self._getExtStatus(2)
                 
     
     
@@ -857,20 +693,9 @@ class PowerControl:
         '''
         Turns the ext3 port power on
         
-        @raise Exception: if no ext3 port GPIO link file exists
+        @raise Exception: if ext3 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext3GPIOLink:
-            self._logger.info('turning ext3 port on')
-            self._ext3GPIOLock.acquire()
-            if self._ext3GPIOOnOnSet:
-                self._gpioLinkAction(self._ext3GPIOLink, True)
-            else:
-                self._gpioLinkAction(self._ext3GPIOLink, False)
-            self._ext3GPIOLock.release()
-        else:
-            raise Exception('ext3 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setExtStatus(3, True)
         
     
     
@@ -878,20 +703,9 @@ class PowerControl:
         '''
         Turns the ext3 port power off.
         
-        @raise Exception: if no ext3 port GPIO link file exists
+        @raise Exception: if ext3 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext3GPIOLink:
-            self._logger.warning('turning ext3 port off')
-            self._ext3GPIOLock.acquire()
-            if self._ext3GPIOOnOnSet:
-                self._gpioLinkAction(self._ext3GPIOLink, False)
-            else:
-                self._gpioLinkAction(self._ext3GPIOLink, True)
-            self._ext3GPIOLock.release()
-        else:
-            raise Exception('ext3 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        self._setExtStatus(3, False)
     
     
     def getExt3Status(self):
@@ -900,20 +714,9 @@ class PowerControl:
         
         @return: True if the ext3 port is on otherwise False
         
-        @raise Exception: if no ext3 port GPIO link file exists
+        @raise Exception: if ext3 port is not properly configured
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._ext3GPIOLink:
-            self._ext3GPIOLock.acquire()
-            stat = self._getGPIOStatus(self._ext3GPIOLink).rsplit(None, 1)[1]
-            self._ext3GPIOLock.release()
-            if (self._ext3GPIOOnOnSet and stat == 'set') or (not self._ext3GPIOOnOnSet and stat == 'clear'):
-                return True
-            else:
-                return False
-        else:
-            raise Exception('ext3 port GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        return self._getExtStatus(3)
                 
     
     
@@ -921,20 +724,11 @@ class PowerControl:
         '''
         Turns the wlan on
         
-        @raise Exception: if no wlan GPIO link file exists
+        @raise Exception: if ext# port linked to WLAN is not properly configured or wlan port mapping is not specified
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._wlanGPIOLink:
-            self._logger.info('turning wlan on')
-            self._wlanGPIOLock.acquire()
-            if self._wlanGPIOOnOnSet:
-                self._gpioLinkAction(self._wlanGPIOLink, True)
-            else:
-                self._gpioLinkAction(self._wlanGPIOLink, False)
-            self._wlanGPIOLock.release()
-        else:
-            raise Exception('Wlan GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        if self._wlanPort is None:
+            raise Exception('wlan port mapping has not been specified in the configuration file')
+        self._setExtStatus(self._wlanPort, True)
         
     
     
@@ -944,26 +738,11 @@ class PowerControl:
         
         @return: True if wlan has been switched off otherwise False
         
-        @raise Exception: if no wlan GPIO link file exists
+        @raise Exception: if ext# port linked to WLAN is not properly configured or wlan port mapping is not specified
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if not self._backlogMain.duty_cycle_mode:
-            raise Exception('wlan can only be turned off in duty-cycle mode')
-        if self._wlanGPIOLink:
-            if self._backlogMain.wlanNeeded():
-                return False
-            else:
-                self._logger.warning('turning wlan off')
-                self._wlanGPIOLock.acquire()
-                if self._wlanGPIOOnOnSet:
-                    self._gpioLinkAction(self._wlanGPIOLink, False)
-                else:
-                    self._gpioLinkAction(self._wlanGPIOLink, True)
-                self._wlanGPIOLock.release()
-                return True
-        else:
-            raise Exception('Wlan GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        if self._wlanPort is None:
+            raise Exception('wlan port mapping has not been specified in the configuration file')
+        self._setExtStatus(self._wlanPort, False)
     
     
     def getWlanStatus(self):
@@ -972,20 +751,11 @@ class PowerControl:
         
         @return: True if the wlan is on otherwise False
         
-        @raise Exception: if no wlan GPIO link file exists
+        @raise Exception: if ext# port linked to WLAN is not properly configured or wlan port mapping is not specified
         '''
-        if not self._linkfolder:
-            raise Exception('link folder does not exist')
-        if self._wlanGPIOLink:
-            self._wlanGPIOLock.acquire()
-            stat = self._getGPIOStatus(self._wlanGPIOLink).rsplit(None, 1)[1]
-            self._wlanGPIOLock.release()
-            if (self._wlanGPIOOnOnSet and stat == 'set') or (not self._wlanGPIOOnOnSet and stat == 'clear'):
-                return True
-            else:
-                return False
-        else:
-            raise Exception('Wlan GPIO link file is inexistent in >%s<' % (self._linkfolder,))
+        if self._wlanPort is None:
+            raise Exception('wlan port mapping has not been specified in the configuration file')
+        return self._getExtStatus(self._wlanPort)
             
             
     def tosMsgReceived(self, timestamp, payload):
@@ -1100,7 +870,7 @@ class PowerControl:
                     ad77x8_1 = int(round(ad77x8_1 * 23 / 3.0))
                     ad77x8_2 = int(round(ad77x8_2 * 23 / 3.0))
                     ad77x8_3 = int(round(ad77x8_3 * 23 / 3.0))
-                    if self._oldBoard:
+                    if self._platform == 1:
                         ad77x8_4 = int(round(ad77x8_4 * 20000))
                     else:
                         ad77x8_4 = int(round(ad77x8_4 * 10000))
@@ -1118,27 +888,80 @@ class PowerControl:
             self._ad77x8Lock.release()
         else:
             raise Exception('module ad77x8 is not available')
-    
-    
-    def _gpioLinkAction(self, link, set):
-        '''
-        This function should not be used directly!
-        '''
-        file = open(link, 'w')
-        if set:
-            file.write('out set')
+        
+        
+    def _getExtStatus(self, extNumber):
+        if self._platform is not None:
+            if self._extDefaultMap[extNumber] is not None:
+                file = open(EXT_GPIO_MAP[extNumber], "r")
+                gpio = file.read()
+                file.close()
+                if self._extDefaultMap[extNumber]:
+                    if gpio.find('set') == -1:
+                        return True
+                    else:
+                        return False
+                else:
+                    if gpio.find('set') == -1:
+                        return False
+                    else:
+                        return True
+            else:
+                raise Exception('ext%d is not configured in %s -> can not get EXT status' % (extNumber, EXT_CONFIG_FILE))
         else:
-            file.write('out clear')
-        file.close()
+            raise Exception('unknown platform -> can not get EXT status')
         
         
-    def _getGPIOStatus(self, link):
-        '''
-        This function should not be used directly!
-        '''
-        file = open(link, 'r')
-        stat = file.read()
-        file.close()
-        return stat
+    def _setExtStatus(self, extNumber, status):
+        if self._platform is not None:
+            if self._extDefaultMap[extNumber] is not None:
+                file = open(EXT_GPIO_MAP[extNumber], 'w')
+                if self._extDefaultMap[extNumber]:
+                    file.write('out set')
+                else:
+                    file.write('out clear')
+                file.close()
+            else:
+                raise Exception('ext%d is not configured in %s -> can not set EXT status' % (extNumber, EXT_CONFIG_FILE))
+        else:
+            raise Exception('unknown platform -> can not get EXT status')
         
+        
+    def _getUsbSatus(self, usbNumber):
+        if self._platform is not None:
+            file = open(USB_GPIO_MAP[usbNumber], 'r')
+            gpio = file.read()
+            file.close()
+            if usbNumber == 1 and self._platform == 2:
+                if gpio.find('set') == -1:
+                    return True
+                else:
+                    return False
+            else:
+                if gpio.find('set') == -1:
+                    return False
+                else:
+                    return True
+        else:
+            raise Exception('unknown platform -> can not get USB status')
+        
+        
+    def _setUsbStatus(self, usbNumber, status):
+        if self._platform is not None:
+            if usbNumber == 1 and self._platform == 2:
+                if status:
+                    value = 'clear'
+                else:
+                    value = 'set'
+            else:
+                if status:
+                    value = 'set'
+                else:
+                    value = 'clear'
+                
+            file = open(USB_GPIO_MAP[usb], 'w')
+            file.write('out ' + value)
+            file.close()
+        else:
+            raise Exception('unknown platform -> can not get USB status')
     
