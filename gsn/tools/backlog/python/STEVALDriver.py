@@ -97,8 +97,10 @@ class STEVALDriver():
             data = [[],[],[]]
             while i < len(lines) and len(lines[i]) == 31:
                 data[0].append(int(lines[i][2:8]))
-                data[1].append(int(lines[i][13:19]))
-                data[2].append(int(lines[i][25:31]))
+                #data[1].append(int(lines[i][13:19]))
+                data[1].append(int(lines[i][15:21]))
+                #data[2].append(int(lines[i][25:31]))
+                data[2].append(int(lines[i][28:34]))
                 i = i + 1
                          
             return data
