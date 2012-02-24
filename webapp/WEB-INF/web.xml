@@ -230,6 +230,12 @@
        <servlet-class>gsn.http.GridDataServlet</servlet-class>
    </servlet>
 
+   <servlet>
+       <servlet-name>RestServlet</servlet-name>
+       <display-name>RestServlet</display-name>
+       <servlet-class>gsn.http.restapi.RestServlet</servlet-class>
+   </servlet>
+
 
 
    
@@ -270,6 +276,10 @@
     <servlet-mapping>
         <servlet-name>GridDataServlet</servlet-name>
         <url-pattern>/griddata</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+    	<servlet-name>RestServlet</servlet-name>
+    	<url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
 
 
