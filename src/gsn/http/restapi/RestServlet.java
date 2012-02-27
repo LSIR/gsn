@@ -36,11 +36,11 @@ public class RestServlet extends HttpServlet {
                 restResponse = getRequestHandler.getSensors();
                 break;
             case REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD:
-                String field = parseURI(request.getRequestURI())[3];
-                String str_sensor = request.getParameter("sensor");
+                String sensor = parseURI(request.getRequestURI())[3];
+                String field = parseURI(request.getRequestURI())[4];
                 String str_from = request.getParameter("from");
                 String str_to = request.getParameter("to");
-                restResponse = getRequestHandler.getMeasurementsForSensorField(str_sensor, field, str_from, str_to);
+                restResponse = getRequestHandler.getMeasurementsForSensorField(sensor, field, str_from, str_to);
                 break;
             default:
                 restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Cannot interpret request.");
@@ -84,7 +84,7 @@ public class RestServlet extends HttpServlet {
         logger.warn(parsedURI[1]);
         if (parsedURI.length == 3 && parsedURI[2].equalsIgnoreCase("sensors"))
             return REQUEST_GET_ALL_SENSORS;
-        if (parsedURI.length == 4 && parsedURI[2].equalsIgnoreCase("sensors"))
+        if (parsedURI.length == 5 && parsedURI[2].equalsIgnoreCase("sensors"))
             return REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD;
 
         return REQUEST_UNKNOWN;
