@@ -25,6 +25,8 @@ public class RestServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        GetRequestHandler getRequestHandler = new GetRequestHandler();
+
         response.getWriter().write("REST GET"
                 + "\n"
                 + "URI : "
@@ -39,6 +41,15 @@ public class RestServlet extends HttpServlet {
             for (int i = 0; i < request.getParameterValues(parameterName).length; i++)
                 response.getWriter().write(request.getParameterValues(parameterName)[i] + "\n");
         }
+
+        response.getWriter().write(getRequestHandler.getSensors().getResponse());
+
+        String str_sensor = request.getParameter("sensor");
+        String str_field = request.getParameter("field");
+        String str_from = request.getParameter("from");
+        String str_to = request.getParameter("to");
+
+        response.getWriter().write(getRequestHandler.getMeasurementsForSensorField(str_sensor,str_field,str_from,str_to).getResponse());
 
     }
 

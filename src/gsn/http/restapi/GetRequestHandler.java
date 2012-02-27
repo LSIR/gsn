@@ -1,10 +1,17 @@
 package gsn.http.restapi;
 
+import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
 
-import java.util.Iterator;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
+import gsn.utils.Helpers;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -12,6 +19,8 @@ import org.apache.commons.collections.KeyValue;
 
 public class GetRequestHandler {
 
+    private static transient Logger logger = Logger.getLogger(GetRequestHandler.class);
+    private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 
     public RestResponse getSensors() {
@@ -19,12 +28,12 @@ public class GetRequestHandler {
 
         restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
         restResponse.setResponse(getSensorsInfoAsJSON());
-        restResponse.setType("application/json");
+        restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
 
         return restResponse;
     }
 
-public String getSensorsInfoAsJSON() {
+    public String getSensorsInfoAsJSON() {
 
         JSONArray sensorsInfo = new JSONArray();
 
@@ -97,9 +106,94 @@ public String getSensorsInfoAsJSON() {
         return restResponse;
     }
 
-    public RestResponse getMeasurementsForSensorField() {
+    public RestResponse getMeasurementsForSensorField(String sensor, String field, String from, String to) {
+
         RestResponse restResponse = new RestResponse();
+
+        Vector<Double> stream = new Vector<Double>();
+        Vector<Long> timestamps = new Vector<Long>();
+
+        boolean errorFlag = false;
+
+        long fromAsLong = 0;
+        long toAsLong = 0;
+        try {
+            fromAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(from).getTime();
+            toAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(to).getTime();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            errorFlag = true;
+        }
+
+        if (errorFlag) {
+            restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Malformed date for from or to field.");
+            return (restResponse);
+        }
+
+        errorFlag = !getData(sensor, field, fromAsLong, toAsLong, stream, timestamps);
+
+        if (errorFlag) {
+            restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Error in request.");
+            return (restResponse);
+        }
+
+        JSONObject jsonResponse = new JSONObject();
+        jsonResponse.put("sensor", sensor);
+        jsonResponse.put("field", field);
+        jsonResponse.put("from", from);
+        jsonResponse.put("to", to);
+        JSONArray streamArray = new JSONArray();
+        JSONArray timestampsArray = new JSONArray();
+        for (int i = 0; i < stream.size(); i++) {
+            streamArray.add(stream.get(i));
+            timestampsArray.add(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i))));
+        }
+        jsonResponse.put("timestamps", timestampsArray);
+        jsonResponse.put("values", streamArray);
+        restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
+        restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
+        restResponse.setResponse(jsonResponse.toJSONString());
 
         return restResponse;
     }
+
+    public boolean getData(String sensor, String field, long from, long to, Vector<Double> stream, Vector<Long> timestamps) {
+        Connection conn = null;
+        ResultSet resultSet = null;
+
+        boolean result = true;
+
+        try {
+            conn = Main.getDefaultStorage().getConnection();
+            StringBuilder query = new StringBuilder("select timed, ")
+                    .append(field)
+                    .append(" from ")
+                    .append(sensor)
+                    .append(" where timed >= ")
+                    .append(from)
+                    .append(" and timed<=")
+                    .append(to);
+
+            resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
+
+            while (resultSet.next()) {
+                //int ncols = resultSet.getMetaData().getColumnCount();
+                long timestamp = resultSet.getLong(1);
+                double value = resultSet.getDouble(2);
+                //logger.warn(ncols + " cols, value: " + value + " ts: " + timestamp);
+                stream.add(value);
+                timestamps.add(timestamp);
+            }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            result = false;
+        } finally {
+            Main.getStorage(sensor).close(resultSet);
+            Main.getStorage(sensor).close(conn);
+        }
+
+        return result;
+    }
+
 }
