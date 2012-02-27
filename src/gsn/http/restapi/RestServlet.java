@@ -23,34 +23,32 @@ public class RestServlet extends HttpServlet {
     private static final int REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD = 2;
     private static final int REQUEST_GET_GEO_DATA_FOR_SENSOR = 3;
 
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         GetRequestHandler getRequestHandler = new GetRequestHandler();
 
-        response.getWriter().write("REST GET"
-                + "\n"
-                + "URI : "
-                + formatURI(request.getRequestURI())
-                + "\n"
-        );
+        //response.getWriter().write(debugRequest(request, response));
+        RestResponse restResponse;
 
-        List<String> requestParameterNames = Collections.list((Enumeration<String>) request.getParameterNames());
-
-        for (String parameterName : requestParameterNames) {
-            response.getWriter().write(parameterName + " : ");
-            for (int i = 0; i < request.getParameterValues(parameterName).length; i++)
-                response.getWriter().write(request.getParameterValues(parameterName)[i] + "\n");
+        switch (determineRequest(request.getRequestURI())) {
+            case REQUEST_GET_ALL_SENSORS:
+                restResponse = getRequestHandler.getSensors();
+                break;
+            case REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD:
+                String field = parseURI(request.getRequestURI())[3];
+                String str_sensor = request.getParameter("sensor");
+                String str_from = request.getParameter("from");
+                String str_to = request.getParameter("to");
+                restResponse = getRequestHandler.getMeasurementsForSensorField(str_sensor, field, str_from, str_to);
+                break;
+            default:
+                restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Cannot interpret request.");
+                break;
         }
-
-        response.getWriter().write(getRequestHandler.getSensors().getResponse());
-
-        String str_sensor = request.getParameter("sensor");
-        String str_field = request.getParameter("field");
-        String str_from = request.getParameter("from");
-        String str_to = request.getParameter("to");
-
-        response.getWriter().write(getRequestHandler.getMeasurementsForSensorField(str_sensor,str_field,str_from,str_to).getResponse());
-
+        response.setContentType(restResponse.getType());
+        response.setStatus(restResponse.getHttpStatus());
+        response.getWriter().write(restResponse.getResponse());
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -71,7 +69,7 @@ public class RestServlet extends HttpServlet {
         for (int i = 0; i < parsedURI.length; i++) {
             for (int j = 1; j <= i; j++)
                 sb.append("..");
-            sb.append(parsedURI[i]).append("\n");
+            sb.append("'").append(parsedURI[i]).append("'").append("\n");
         }
         return sb.toString();
     }
@@ -81,7 +79,33 @@ public class RestServlet extends HttpServlet {
     }
 
     public int determineRequest(String URI) {
-        return 0;
+        String[] parsedURI = parseURI(URI);
+        logger.warn(parsedURI.length);
+        logger.warn(parsedURI[1]);
+        if (parsedURI.length == 3 && parsedURI[2].equalsIgnoreCase("sensors"))
+            return REQUEST_GET_ALL_SENSORS;
+        if (parsedURI.length == 4 && parsedURI[2].equalsIgnoreCase("sensors"))
+            return REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD;
+
+        return REQUEST_UNKNOWN;
+    }
+
+    public String debugRequest(HttpServletRequest request, HttpServletResponse response) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("REST GET"
+                + "\n"
+                + "URI : "
+                + formatURI(request.getRequestURI())
+                + "\n");
+
+        List<String> requestParameterNames = Collections.list((Enumeration<String>) request.getParameterNames());
+
+        for (String parameterName : requestParameterNames) {
+            sb.append(parameterName + " : ");
+            for (int i = 0; i < request.getParameterValues(parameterName).length; i++)
+                sb.append(request.getParameterValues(parameterName)[i] + "\n");
+        }
+        return sb.toString();
     }
 
 }
