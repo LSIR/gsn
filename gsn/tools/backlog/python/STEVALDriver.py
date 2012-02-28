@@ -87,23 +87,26 @@ class STEVALDriver():
             while (time.time() - startTime) < float(deltaTime):
                 d += self._device.read(128)
                 
-            self._logger.info('got all data')
             self._stopDataAcquisition()
             
             d = d[d.find('x'):]
             lines = d.split('\r\n')
+            self._logger.info('got ' + str(len(lines)) + ' lines of data')
 
             i = 0
             data = [[],[],[]]
-            #while i < len(lines) and len(lines[i]) == 31:
-            while i < len(lines) and len(lines[i]) == 37:
-                data[0].append(int(lines[i][2:8]))
-                #data[1].append(int(lines[i][13:19]))
-                data[1].append(int(lines[i][15:21]))
-                #data[2].append(int(lines[i][25:31]))
-                data[2].append(int(lines[i][28:34]))
+            while i < len(lines) and (len(lines[i]) == 37 or len(lines[i]) == 31):
+                if len(lines[i]) == 37:
+                    data[0].append(int(lines[i][2:8]))
+                    data[1].append(int(lines[i][15:21]))
+                    data[2].append(int(lines[i][28:34]))
+                else:
+                    data[0].append(int(lines[i][2:8]))
+                    data[1].append(int(lines[i][13:19]))
+                    data[2].append(int(lines[i][25:31]))
                 i = i + 1
                          
+            self._logger.info('parsed ' + str(len(data[0])) + ' lines of data')
             return data
 
         except Exception as e:
