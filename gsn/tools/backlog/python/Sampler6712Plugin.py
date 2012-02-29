@@ -34,8 +34,8 @@ D_MESSAGE_ORIGIN = {E_MESSAGE_ORIGIN.CRON:'schedule',
                     E_MESSAGE_ORIGIN.GSN:'GSN',
                     E_MESSAGE_ORIGIN.TOS: 'TinyOS'}
     
-E_COMMAND_TYPE = enum(TAKE_SAMPLE=0, REINIT_SAMPLER=1)
-E_GSN_MSG_COMMAND_TYPE = enum(TAKE_SAMPLE=2, GET_6712_REPORT=5, REINIT_SAMPLER=6)
+E_COMMAND_TYPE = enum(TAKE_SAMPLE=0, REINIT_SAMPLER=1, REPORT_STATUS=2)
+E_GSN_MSG_COMMAND_TYPE = enum(TAKE_SAMPLE=2, REPORT_STATUS=3, GET_6712_REPORT=5, REINIT_SAMPLER=6)
 E_SAMPLING_RESULT = enum(SAMPLING_DONE=0, 
                          SAMPLING_SKIPPED__SEE_STATUS=1,
                          SAMPLING_SKIPPED__SAMPLER_STATE_PROGRAM_IDLE=2,
@@ -45,6 +45,8 @@ E_SAMPLING_RESULT = enum(SAMPLING_DONE=0,
                          SAMPLING_SKIPPED__SAMPLER_STATE_PROGRAM_HALTED=6,
                          SAMPLING_SKIPPED__BOTTLE_CAPACITY_EXEEDED=7,
                          SAMPLING_SKIPPED__INVALID_BOTTLE_NUMBER=8 )
+
+E_ACTION_PARAMETER_TYPE = enum(TAKE_SAMPLE=1, REPORT_STATUS=2)
 
 class Sampler6712PluginClass(AbstractPluginClass):
     '''
@@ -116,17 +118,6 @@ class Sampler6712PluginClass(AbstractPluginClass):
                 baudrate = 19200
                 self.warning('invalid baudrate %s: %s' % (sBaudrate, e))
         
-        # read skip sampler configuration from config file
-        sSkipSamplerConfiguration = self.getOptionValue('skip_sampler_configuration')
-        if sSkipSamplerConfiguration is None:
-            self._skipSamplerConfiguration = 0 # don't skip configuration
-        else:
-            try:
-                self._skipSamplerConfiguration = int(sSkipSamplerConfiguration)
-            except Exception as e:
-                self._skipSamplerConfiguration = 0
-                self.warning('invalid skip_sampler_configuration %s: %s' % (sSkipSamplerConfiguration, e))
-        
         # init serial port
         try:
             self.sampler = Sampler6712Driver([sDevice, baudrate])
@@ -155,13 +146,13 @@ class Sampler6712PluginClass(AbstractPluginClass):
         self.name = 'Sampler6712-Thread'
         
         # set configuration
-        sampler6712ProgramSettingsToSet = Sampler6712ProgramSettings(8, 0.5, 1.0, 'AUTO', 1, 1)
-#        sampler6712ProgramSettingsToSet = Sampler6712ProgramSettings(nbOfBottles = 24, 
-#                                                                     bottleVolumeInLit = 1, 
-#                                                                     suctionLineLengthInM = 0.9, 
-#                                                                     suctionLineHeadInM = 0.7, 
-#                                                                     nbOfRinseCycles = 0, 
-#                                                                     nbOfRetries = 0)
+        #sampler6712ProgramSettingsToSet = Sampler6712ProgramSettings(24, 0.5, 1.0, 'AUTO', 1, 1)
+        sampler6712ProgramSettingsToSet = Sampler6712ProgramSettings(nbOfBottles = 24, 
+                                                                     bottleVolumeInLit = 1, 
+                                                                     suctionLineLengthInM = 1.5, 
+                                                                     suctionLineHeadInM = 'AUTO', 
+                                                                     nbOfRinseCycles = 1, 
+                                                                     nbOfRetries = 1)
 
         while not self._plugstop:
             if self._taskqueue.empty(): # verify if tasks in task queue
@@ -192,7 +183,7 @@ class Sampler6712PluginClass(AbstractPluginClass):
                     
                     # check sampler state
                     # get the sampler's menu control status
-                    (eMenuControlSamplerStatus, eMenuControlProgramStatus) = self.sampler.eMenuControlGetSamplerStatus()
+                    (eMenuControlSamplerStatus, eMenuControlSamplerStatusExtension, eMenuControlProgramStatus) = self.sampler.eMenuControlGetSamplerStatus()
                     self.info('Menu control sampler status: %s' %(Sampler6712Driver.D_MENU_CONTROL_SAMPLER_STATUS[eMenuControlSamplerStatus]))
                     
                     if eMenuControlSamplerStatus == Sampler6712Driver.E_MENU_CONTROL_SAMPLER_STATUS.PROGRAM_RUNNING:
@@ -211,7 +202,7 @@ class Sampler6712PluginClass(AbstractPluginClass):
                         
                     elif eMenuControlSamplerStatus == Sampler6712Driver.E_MENU_CONTROL_SAMPLER_STATUS.SAMPLER_OFF:
                         # initialize sampler
-                        self.sampler.init6712(sampler6712ProgramSettingsToSet, self._skipSamplerConfiguration)
+                        self.sampler.init6712(sampler6712ProgramSettingsToSet)
                         
                         # initialize internal bottle status
                         self._bottles.reinitBottles(nbOfBottles = sampler6712ProgramSettingsToSet.nbOfBottles, 
@@ -244,12 +235,18 @@ class Sampler6712PluginClass(AbstractPluginClass):
                     
                 elif lQueueElement[1] == E_COMMAND_TYPE.REINIT_SAMPLER:
                     # initialize sampler
-                    self.sampler.init6712(sampler6712ProgramSettingsToSet, self._skipSamplerConfiguration)
+                    self.sampler.init6712(sampler6712ProgramSettingsToSet)
                     
                     # initialize internal bottle status
                     self._bottles.reinitBottles(nbOfBottles = sampler6712ProgramSettingsToSet.nbOfBottles, 
                                                 bottleVolumeInMl = sampler6712ProgramSettingsToSet.bottleVolumeInLit * 1000)
-
+                
+                elif lQueueElement[1] == E_COMMAND_TYPE.REPORT_STATUS:
+                    # report sampler status
+                    (eSamplerStatus, eSamplerStatusExtension, eProgramStatus, statusOf6712) = self.sampler.getCompleteStatus()
+                    self.sentStatusToGsn(sampler6712ProgramSettingsToSet, eSamplerStatus, eSamplerStatusExtension, eProgramStatus, statusOf6712)
+                    self.info('sent status report')
+                    
                 # unknown queue element
                 else:
                     self.warning('Unknown command type of queue element: %d' % (lQueueElement[1]))
@@ -265,9 +262,15 @@ class Sampler6712PluginClass(AbstractPluginClass):
         # actions are triggered by the schedule plugin
         # here the parameters have to be converted into 'take sample' object
         try:
-            samplingObject = self._parseActionParameter(parameters)
-            self.info('Queue sample message from scheduler (bottle nb: %d, volume: %dml)' % (samplingObject.bottleNb, samplingObject.waterVolumeInMl))
-            self._taskqueue.put([E_MESSAGE_ORIGIN.CRON, E_COMMAND_TYPE.TAKE_SAMPLE, samplingObject])
+            lAction = self._parseActionParameter(parameters)
+            if lAction[0] == E_ACTION_PARAMETER_TYPE.TAKE_SAMPLE:
+                self.info('Queue sample message from scheduler (bottle nb: %d, volume: %dml)' % (lAction[1].bottleNb, lAction[1].waterVolumeInMl))
+                self._taskqueue.put([E_MESSAGE_ORIGIN.CRON, E_COMMAND_TYPE.TAKE_SAMPLE, lAction[1]])
+            elif lAction[0] == E_ACTION_PARAMETER_TYPE.REPORT_STATUS:
+                self.info('Queue report status message from scheduler')
+                self._taskqueue.put([E_MESSAGE_ORIGIN.CRON, E_COMMAND_TYPE.REPORT_STATUS])
+            else:
+                self.info('Invalid schedule parameter: %r' % (parameters))
         except Exception as e:
             self.warning(e) 
 
@@ -275,7 +278,6 @@ class Sampler6712PluginClass(AbstractPluginClass):
         
     def getMsgType(self):
         return BackLogMessage.SAMPLER_6712_MESSAGE_TYPE
-    
             
     def msgReceived(self, data):
         # store data into queue (queue is handled in run())
@@ -292,6 +294,9 @@ class Sampler6712PluginClass(AbstractPluginClass):
         elif data[0] == E_GSN_MSG_COMMAND_TYPE.REINIT_SAMPLER:
             self.info('Queue reinit sampler message from GSN')
             self._taskqueue.put([E_MESSAGE_ORIGIN.GSN, E_COMMAND_TYPE.REINIT_SAMPLER])
+        elif data[0] == E_GSN_MSG_COMMAND_TYPE.REPORT_STATUS:
+            self.info('Queue report status message from GSN')
+            self._taskqueue.put([E_MESSAGE_ORIGIN.GSN, E_COMMAND_TYPE.REPORT_STATUS])
         else:
             self.info('Unknown GSN command message type: %d' % (data[0]))
         
@@ -304,43 +309,51 @@ class Sampler6712PluginClass(AbstractPluginClass):
     def needsWLAN(self):
         return False
             
-    
+    def ackReceived(self, timestamp):
+        pass
+        # self.info('Ack received from GSN: timestamp %r' %(timestamp))
+        
     def _parseActionParameter(self, sParameter):
         '''
         This function parses the parameter of schedule entry. A schedule entry
         should look like as follows:
-            bottle(BOTTLE NB) volume(WATER VOLUME)
+            bottle(BOTTLE NB) volume(WATER VOLUME) or
+            report_status
         Whitespaces inside the brackets are not allowed!
-        The parsed parameters are stored in a Sampling object, containing the 
-        bottle number and the water volume.
+        In case of a bottle/volume parameter, the parsed parameters are stored
+        in a Sampling object, containing the bottle number and the water volume.
         @param sParameter: The parameters as one string given in the schedule 
                            file.
 
-        @return: Sampling object containing bottle number and volume.
+        @return: list with:
+                1st elt: action type parameter (see E_ACTION_PARAMETER_TYPE)
+                2nd elt: 
+                    - TAKE_SAMPLE: Sampling object containing bottle number and volume
+                    - REPORT_STATUS: 2nd element does not exit
 
         '''
-        tsParameters = sParameter.strip().split() # remove leading and trailing whitespaces, split string where whitspaces
-
-        for sParameter in tsParameters:
-            p = sParameter.lower() # convert parameter to lowercase
-            if p.startswith('bottle'):
-                sBottleNb = p.split('(')[1].split(')')[0] # read bottle number
-                try:
-                    bottleNb = int(float(sBottleNb)) # convert string into number
-                except Exception as e:
-                    raise Exception('Invalid water volume in %s: %s' % (sParameter, e))
-            elif p.startswith('volume'):
-                sWaterVolume = p.split('(')[1].split(')')[0] # read bottle number
-                try:
-                    waterVolumeInMl = int(float(sWaterVolume)) # convert string into number
-                except Exception as e:
-                    raise Exception('Invalid water volume in %s: %s' % (sParameter, e))
-            else:
-                raise('unrecognized parameter >%s< in schedule' % (sParameter,))
-            
-        sampling = Sampling(bottleNb, waterVolumeInMl) # create new Sampling object to store
         
-        return sampling
+        # search bottle and volume
+        lBottleVolumeSearchResult = re.findall('.*bottle\((\d+)\).*volume\((\d+)\).*',sParameter)
+        
+        # search
+        lStatusSearchResult = re.findall('.*(report_status).*', sParameter)
+        
+        if lBottleVolumeSearchResult != []:
+            if len(lBottleVolumeSearchResult[0]) == 2:
+                bottleNb = int(float(lBottleVolumeSearchResult[0][0])) # convert string into number
+                waterVolumeInMl = int(float(lBottleVolumeSearchResult[0][1])) # convert string into number
+                sampling = Sampling(bottleNb, waterVolumeInMl) # create new Sampling object to store
+                eActionParameterType = E_ACTION_PARAMETER_TYPE.TAKE_SAMPLE
+                return [eActionParameterType, sampling]
+            else:
+                raise Exception('Invalid bottle volume parameter in schedule job (%r)' %(sParameter))
+        elif lStatusSearchResult != []:
+            eActionParameterType = E_ACTION_PARAMETER_TYPE.REPORT_STATUS
+            return [eActionParameterType] 
+        else:
+            raise Exception('Invalid schedule job parameter')
+            
     def _takeSample(self, samplingObject, samplingTrigger):
         '''
         This function takes a sample and reports the result to the GSN
@@ -376,7 +389,7 @@ class Sampler6712PluginClass(AbstractPluginClass):
                               timeoutCounter > 0:
                             timeoutCounter -= 1
                             status = self.sampler.getExternalProgramControlStatus() # read current status
-                            self.info('Status during sampling: %s, recent sampling result: %s' % (Sampler6712Driver.D_EXTERNAL_PROGRAM_CONTROL_SAMPLER_STATUS[status.samplerStatus], Sampler6712Driver.D_EXTERNAL_PROGRAM_CONTROL_LAST_SAMPLE_RESULT[status.mostRecentSamplingResult]))
+                            self.info('Status during sampling: %r, recent sampling result: %r' % (Sampler6712Driver.D_EXTERNAL_PROGRAM_CONTROL_SAMPLER_STATUS[status.samplerStatus], Sampler6712Driver.D_EXTERNAL_PROGRAM_CONTROL_LAST_SAMPLE_RESULT[status.mostRecentSamplingResult]))
                             
                         if timeoutCounter == 0:
                             self.warning('Sampling last to long, status polling timed out')
@@ -400,7 +413,7 @@ class Sampler6712PluginClass(AbstractPluginClass):
                         # sampling skipped, for more details see sampler status
                         samplingResult = E_SAMPLING_RESULT.SAMPLING_SKIPPED__SEE_STATUS
                     
-                    self.info('B%d - Status after sampling: %s, recent sampling result: %s, bottle level: %dml'\
+                    self.info('B%d - Status after sampling: %r, recent sampling result: %r, bottle level: %dml'\
                         % (samplingObject.bottleNb, Sampler6712Driver.D_EXTERNAL_PROGRAM_CONTROL_SAMPLER_STATUS[status.samplerStatus], Sampler6712Driver.D_EXTERNAL_PROGRAM_CONTROL_LAST_SAMPLE_RESULT[status.mostRecentSamplingResult], self._bottles.getLevel(samplingObject.bottleNb) ))
                 else:
                     # bottle capacity is not enough to hold new sampling
@@ -421,9 +434,32 @@ class Sampler6712PluginClass(AbstractPluginClass):
         lGsnMsgPayload += [E_GSN_MESSAGE_TYPE.SAMPLING_RESULT] # set type of gsn msg
         lGsnMsgPayload += [samplingTrigger] # sampling trigger
         lGsnMsgPayload += [samplingObject.bottleNb, samplingObject.waterVolumeInMl] # bottle nb and volume
-        lGsnMsgPayload += [samplingResult] # set overall status
+        lGsnMsgPayload += [samplingResult] # set sampling result
         lGsnMsgPayload += status.getStatusAsList() # set sampling result
         
+        self.info('Sampling result sent to GSN')
+        self.processMsg(timestamp, lGsnMsgPayload)
+
+    def sentStatusToGsn(self, sampler6712ProgramSettingsToSet, eSamplerStatus, eSamplerStatusExtension, eProgramStatus, statusOf6712):
+        '''
+        This function sends the sampler status to the GSN
+        @param sampler6712ProgramSettingsToSet: program settings (object of type Sampler6712ProgramSettings)
+        @param eSamplerStatus: menu control mode sampler status (E_MENU_CONTROL_SAMPLER_STATUS)
+        @param eSamplerStatusExtension: menu control mode sampler status extension (E_MENU_CONTROL_SAMPLER_STATUS_EXTENSION)
+        @param eProgramStatus: menu control mode program status (E_MENU_CONTROL_PROGRAM_STATUS)
+        @param statusOf6712: extenden program control mode status (STS,1)
+        '''
+        # report sampling result
+        timestamp = self.getTimeStamp()
+        lGsnMsgPayload = []
+        lGsnMsgPayload += [E_GSN_MESSAGE_TYPE.SAMPLER_STATUS] # set type of gsn msg
+        lGsnMsgPayload += sampler6712ProgramSettingsToSet.lGetSettingsAsGsnList() # sampling trigger
+        lGsnMsgPayload += [eSamplerStatus]
+        lGsnMsgPayload += [eSamplerStatusExtension]
+        lGsnMsgPayload += [eProgramStatus]
+        lGsnMsgPayload += statusOf6712.getStatusAsList() # set sampling result
+        
+        self.info('Sampler status sent to GSN')
         self.processMsg(timestamp, lGsnMsgPayload)
 
 class Delay():
@@ -567,6 +603,10 @@ class Sampler6712Driver():
                                      E_MENU_CONTROL_PROGRAM_STATUS.DISABLED: 'DISABLED', 
                                      E_MENU_CONTROL_PROGRAM_STATUS.UNKNOWN: 'UNKNOWN'}
 
+    E_MENU_CONTROL_SAMPLER_STATUS_EXTENSION = enum(NONE=0, 
+                                                   ERRORS=1, 
+                                                   UNKNOWN=2)
+    
     E_EXTERNAL_PROGRAM_CONTROL_SAMPLER_STATUS = enum(   WAITING_TO_SAMPLE=1,
                                                         POWER_FAILED=4,
                                                         PUMP_JAMMED=5,
@@ -649,15 +689,32 @@ class Sampler6712Driver():
         self._vt100Decoder = Vt100Decoder(self._serial, self._logger)
         
         # try to determine the sampler status
-        (eMenuControlSamplerStatus, eMenuControlProgramStatus) = self.eMenuControlGetSamplerStatus()
+        (eMenuControlSamplerStatus, eMenuControlSamplerStatusExtension, eMenuControlProgramStatus) = self.eMenuControlGetSamplerStatus()
 
 
-    def get6712OveralStatus(self):
+    def getCompleteStatus(self):
         '''
         This function returns the 6712 water sampler overal status.
         @return: overall status
         '''
-        return self._samplerOveralStatus
+        try:
+            (eSamplerStatus, eSamplerStatusExtension, eProgramStatus) = self.eMenuControlGetSamplerStatus()
+        except Exception as e:
+            eSamplerStatus = self.E_MENU_CONTROL_SAMPLER_STATUS.UNKNOWN
+            eSamplerStatusExtension = self.E_MENU_CONTROL_SAMPLER_STATUS_EXTENSION.UNKNOWN
+            eProgramStatus = self.E_MENU_CONTROL_PROGRAM_STATUS.UNKNOWN
+            self._logger.error(e)
+            
+        try:
+            # set remote operation mode to 'external program control' to
+            # allow the status read
+            eCurrentMode, sReadReply = self._set6712RemoteOperationMode(self.E_REMOTE_OPERATION_MODE.EXTERNAL_PROGRAM_CONTROL_MODE)
+            statusOf6712 = self.getExternalProgramControlStatus()
+        except Exception as e:
+            statusOf6712 = Status6712()
+            self._logger.error(e)
+        
+        return (eSamplerStatus, eSamplerStatusExtension, eProgramStatus, statusOf6712)
 
     def set6712ExtendedProgrammingLevel(self):
         '''
@@ -772,17 +829,16 @@ class Sampler6712Driver():
         self._samplerOveralStatus = self.E_SAMPLER_OVERAL_STATUS.OK # change overal status
         return statusOf6712
 
-    def init6712(self, sampler6712ProgramSettingsToSet, skipSamplerConfiguration):
+    def init6712(self, sampler6712ProgramSettingsToSet):
         '''
         This function configures the 6712 according to the parameter containing
-        the program settings. The configuration can be skipped by setting
-        the parameter 'skipSamplerConfiguration' to a value other than 0. 
+        the program settings. 
         After the initialization, the sampler is set into the 
         'Program Running (disable)' state.
         
         @param sampler6712ProgramSettingsToSet: program settings
-        @param skipSamplerConfiguration: 0-> do not skip sampler configuration
         '''
+        
         self._logger.info('Initialize 6712')
         
         # turn on sampler
@@ -791,7 +847,7 @@ class Sampler6712Driver():
             counter -= 1
             try:
                 # get the sampler's menu control status
-                (eMenuControlSamplerStatus, eMenuControlProgramStatus) = self.eMenuControlGetSamplerStatus()
+                (eMenuControlSamplerStatus, eMenuControlSamplerStatusExtension, eMenuControlProgramStatus) = self.eMenuControlGetSamplerStatus()
                 self._logger.info('Menu control sampler status: %s' %(Sampler6712Driver.D_MENU_CONTROL_SAMPLER_STATUS[eMenuControlSamplerStatus]))
                 
                 # program is running
@@ -809,14 +865,13 @@ class Sampler6712Driver():
                     
                     # init sampler
                     lnNavigationList = []
+                    # the software options have to set first, because the other
+                    # navigation relies on it (programmin style is set to 
+                    # QUICK VIEW)
+                    lnNavigationList += sampler6712ProgramSettingsToSet.getSoftwareOptionsNavigationList() 
                     lnNavigationList += sampler6712ProgramSettingsToSet.getProgramStartNavigationList() # configure start condition
-                
-                    if skipSamplerConfiguration == 0:
-                        # add bottle settings to configuration
-                        lnNavigationList += sampler6712ProgramSettingsToSet.getBottleNavigationList()  # configure nb of bottles, bottle volume etc.
-                        #lnNavigationList += sampler6712ProgramSettingsToSet.getReportNavigationList()  # configure report
-                    else:
-                        self._logger.info('Sampler configuration is skipped')
+                    lnNavigationList += sampler6712ProgramSettingsToSet.getBottleNavigationList()  # configure nb of bottles, bottle volume etc.
+                    #lnNavigationList += sampler6712ProgramSettingsToSet.getReportNavigationList()  # configure report
     
                     self.doRemoteControlOfSamplerKeypadNavigation(lnNavigationList)
     
@@ -873,7 +928,7 @@ class Sampler6712Driver():
         LN_START_PROGRAM_NAVIGATION = [
             self.N_NAVIGATE_TO_MAIN_MENU_SCREEN,
             Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['RUN'], None, 0, '\r', 'L', 10, Exception('Navigation to RUN failed')),
-            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['PLEASE WAIT'], Delay(1), 30, None, None, 0, None),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['PLEASE WAIT'], Delay(2), 30, Exception('Testing of distributor system last too long'), None, 0, None),
             Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['ENTER START BOTTLE:'], None, 0, '1\r', None, 0, None)]
         
         self._logger.info('Attempt to start 6712 sampler program')
@@ -988,7 +1043,8 @@ class Sampler6712Driver():
         PROGRAM_RUNNING status, the program status is also determined.
         
         @return: tuple with sampler and program status: 
-            (E_MENU_CONTROL_SAMPLER_STATUS, E_MENU_CONTROL_PROGRAM_STATUS status)
+            (E_MENU_CONTROL_SAMPLER_STATUS, E_MENU_CONTROL_SAMPLER_STATUS_EXTENSION,
+            E_MENU_CONTROL_PROGRAM_STATUS status)
         '''
         
         D_MENU_CONTROL_STATUS = {'Program Waiting Start': self.E_MENU_CONTROL_SAMPLER_STATUS.PROGRAM_WAITING_START,
@@ -997,6 +1053,8 @@ class Sampler6712Driver():
                                  'Program Idle': self.E_MENU_CONTROL_SAMPLER_STATUS.PROGRAM_IDLE,
                                  'Sampler Off': self.E_MENU_CONTROL_SAMPLER_STATUS.SAMPLER_OFF,
                                  'Program Halted': self.E_MENU_CONTROL_SAMPLER_STATUS.PROGRAM_HALTED}
+        
+        D_MENU_CONTROL_STATUS_EXTENSION = {'ERRORS': self.E_MENU_CONTROL_SAMPLER_STATUS_EXTENSION.ERRORS}
         
         eMenuControlProgramStatus = None
         eMenuControlSamplerStatus = None
@@ -1017,9 +1075,31 @@ class Sampler6712Driver():
                 sReadReply = self._read6712Reply(self._DELAY_BETWEEN_MENU_CONTROL_STATUS_REQUEST_AND_REPLY)
                 
                 # determine sampler status (search in key list)
+                # the sampler status could be extended with the error information
+                # (in case of power fail the sampler status is as follows:
+                # 'Sampler Status: Program Running (ERRORS)')
                 for x in D_MENU_CONTROL_STATUS.keys():
                     if x in sReadReply:
                         eMenuControlSamplerStatus = D_MENU_CONTROL_STATUS[x]
+                        
+                        # determine sampler status extension (follows in brackets after
+                        # sampler status)
+                        sResult = re.findall('.*%s.*\((.*)\).*' %(x), sReadReply)
+                        
+                        if sResult == []:
+                            # no brackets found
+                            eMenuControlSamplerStatusExtension = self.E_MENU_CONTROL_SAMPLER_STATUS_EXTENSION.NONE
+                        else:
+                            # check text inside brackets
+                            for y in D_MENU_CONTROL_STATUS_EXTENSION.keys():
+                                if y in sResult:
+                                    eMenuControlSamplerStatusExtension = D_MENU_CONTROL_STATUS_EXTENSION[y]
+                                    break
+                            else:
+                                # sampler status extension not found in dictionary
+                                eMenuControlSamplerStatusExtension = self.E_MENU_CONTROL_SAMPLER_STATUS_EXTENSION.UNKNOWN
+                                raise Exception('Invalid menu control status extension %r received: %r' %(sResult, sReadReply))
+
                         break # leave for loop
                 else:
                     # not found
@@ -1049,7 +1129,7 @@ class Sampler6712Driver():
                 else:
                     raise Exception(e)
                     
-        return (eMenuControlSamplerStatus, eMenuControlProgramStatus)
+        return (eMenuControlSamplerStatus, eMenuControlSamplerStatusExtension, eMenuControlProgramStatus)
 
     def lsMenuControlGetCommandList(self):
         '''
@@ -1199,8 +1279,11 @@ class Sampler6712Driver():
                     sCommandReply += sNewLine 
                     
                     if lFindResult == []:
-                        # search status reply
-                        lFindResult = re.findall('.*MO,.*,ID,.*,TI,.*,STS,.*,STI,.*,BTL,.*,SVO,.*,SOR,.*,CS,.*',sNewLine)
+                        # search status reply (STI, BTL, SVO and SOR or not 
+                        # verified because they may be not present if
+                        # no sampling has ever taken before (e.g. after
+                        # reinitialize of the 6712 controller)
+                        lFindResult = re.findall('.*MO,.*,ID,.*,TI,.*,STS,.*,CS,.*',sNewLine)
                     else:
                         # search caret
                         if sNewLine.find('> ') >= 0:
@@ -1493,12 +1576,9 @@ class Status6712():
     '''
     def __init__(self, sStatus=None):
         '''
-        This function parses the status string of the 6712 and returns the parsed
-        data as a Status6712 object. If sStatus is None, an object containing
-        all Nones is returned.
+        This function parses the status string of the 6712.
     
-        @param sStatus: data to parse
-        @return: parsed data if parsing was successful or None if parsing failed
+        @param sStatus: data to parse (string)
         '''
         self.modelNb = None
         self.id = None
@@ -1511,28 +1591,41 @@ class Status6712():
         self.checksum = None
 
         if sStatus != None:
-            lStatus = sStatus.split(',') # split data into list, commas are removed
-    
             try:
-                # parse data and store it into status object
-                self.modelNb = int(lStatus[lStatus.index('MO') + 1])
-                self.id = int(lStatus[lStatus.index('ID') + 1])
-                self.timeOf6712 = float(lStatus[lStatus.index('TI') + 1])
-                self.samplerStatus = int(lStatus[lStatus.index('STS') + 1])
-                self.mostRecentSamplingTime = float(lStatus[lStatus.index('STI') + 1])
-                self.mostRecentSamplingBottle = int(lStatus[lStatus.index('BTL') + 1])
-                self.mostRecentSamplingVolume = int(lStatus[lStatus.index('SVO') + 1])
-                self.mostRecentSamplingResult = int(lStatus[lStatus.index('SOR') + 1])
-                self.checksum = int(lStatus[lStatus.index('CS') + 1])
-    
-                # verify checksum
-                if _calculateChecksum(sStatus) == self.checksum:
-                    self._checksumOk = True
-                else: 
-                    self._checksumOk = False
-                    raise Exception('Checksum of \'%s\' is wrong: %s' % (sStatus, e))
+                # search identifiers MO, ID, TI, STS and CS (the others may
+                # be not available because a most recent sampling does not exists) 
+                lResultStatus = re.findall('.*MO,(\d+),ID,(\d+),TI,(\d+.\d+),STS,(\d+),(.*)CS,(\d+).*', sStatus)
+                
+                if lResultStatus == []:
+                    raise Exception('Status reply %r is invalid' %(sStatus))
+                else:
+                    # extract and convert MO, ID, TI, STS and CS and store
+                    # them into status object
+                    self.modelNb = int(lResultStatus[0][0])
+                    self.id = int(lResultStatus[0][1])
+                    self.timeOf6712 = float(lResultStatus[0][2])
+                    self.samplerStatus = int(lResultStatus[0][3])
+                    self.checksum = int(lResultStatus[0][5])
+                    
+                    # check if most recent sampling is available
+                    if lResultStatus[0][4] != '': 
+                        # most recent sampling is available
+                        lResultLastSampling = re.findall('.*STI,(\d+.\d+),BTL,(\d+),SVO,(\d+),SOR,(\d+).*', lResultStatus[0][4])
+                        
+                        if lResultLastSampling != []:
+                            self.mostRecentSamplingTime = float(lResultLastSampling[0][0])
+                            self.mostRecentSamplingBottle = int(lResultLastSampling[0][1])
+                            self.mostRecentSamplingVolume = int(lResultLastSampling[0][2])
+                            self.mostRecentSamplingResult = int(lResultLastSampling[0][3])
+                    
+                    # verify checksum
+                    if _calculateChecksum(sStatus) == self.checksum:
+                        self._checksumOk = True
+                    else: 
+                        self._checksumOk = False
+                        raise Exception('Checksum of %r is wrong: %r' % (sStatus, e))
             except Exception as e:
-                raise Exception('Status parsing of \'%s\' failed: %s' % (sStatus, e))
+                raise Exception('Status parsing of %r failed: %r' % (sStatus, e))
     
     def getStatusAsList(self):
         '''
@@ -1692,7 +1785,7 @@ class Vt100Decoder():
         try:
             self._evaluateVt100Cmd(lVt100Cmd)
         except Exception as e:
-            self._logger.warning('Invalid VT100 command, command skipped: %s' %(e))
+            self._logger.warning('Invalid VT100 command, command skipped: %r' %(e))
         
     
     def _evaluateVt100Cmd(self, lVt100Cmd):
@@ -1842,14 +1935,14 @@ class Vt100Decoder():
                 # send string
                 self._logger.info('Send remote keypad command %r' %(action))
                 self._serial.write(action) # send cmd
-                self._cmdScreenHistory.append('%s: %r' %(sActionType, action)) # store display
+                self._cmdScreenHistory.append('%r: %r' %(sActionType, action)) # store display
                 time.sleep(1)                
             elif isinstance(action, Navigation):
                 # do another navigation
                 self.navigate(action)
             elif isinstance(action, Delay):
                 # do delay
-                self._cmdScreenHistory.append('%s: sleep %fs' %(sActionType, action.delayInSec)) # store display
+                self._cmdScreenHistory.append('%r: sleep %fs' %(sActionType, action.delayInSec)) # store display
                 time.sleep(action.delayInSec)
             elif isinstance(action, type(None)):
                 pass # don't do anything
@@ -1858,7 +1951,7 @@ class Vt100Decoder():
                 self._cmdScreenHistory.append('Exception: %r' %(action)) # store display
                 raise action
             else:
-                raise Exception('Invalid %s %r of type %s' %(sActionType, action, type(action)))
+                raise Exception('Invalid %r %r of type %r' %(sActionType, action, type(action)))
 
 class RingBuffer():
     def __init__(self, size):
@@ -1894,7 +1987,7 @@ class Sampling():
             self.bottleNb = int(bottleNb)
             self.waterVolumeInMl = int(waterVolumeInMl)
         except Exception as e:
-            raise Exception('Creation of sampling object failed: %s' % e)
+            raise Exception('Creation of sampling object failed: %r' % e)
 
 
     
@@ -1942,7 +2035,7 @@ class Report():
                 elif lBottleScreenData[0][2] == 'ml':
                     bottleVolumeInLit = float(lBottleScreenData[0][1])/1000
                 else:
-                    raise Exception('Invalid bottel volume unit: %s' %(lBottleScreenData[2]))
+                    raise Exception('Invalid bottel volume unit: %r' %(lBottleScreenData[2]))
                 
                 # set number of bottles
                 nbOfBottles = int(lBottleScreenData[0][0])
@@ -2018,6 +2111,8 @@ class Sampler6712ProgramSettings():
     
     N_NEXT_MENU_PAGE = Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['>'], None, 0, '\r', 'R', 10, Exception('Navigation to next menu page failed'))
     N_NAVIGATE_TO_MAIN_MENU_SCREEN = Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['  PROGRAM  '], None, 0, None, 'S', 10, Exception('Navigation to main menu failed'))
+    N_SELECT_YES = Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['YES'], None, 0, '\r', 'R', 5, Exception('Navigation to YES failed'))
+    N_SELECT_NO = Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['NO'], None, 0, '\r', 'R', 5, Exception('Navigation to NO failed'))
     
     def __init__(self, nbOfBottles, bottleVolumeInLit, suctionLineLengthInM, 
                  suctionLineHeadInM, nbOfRinseCycles, nbOfRetries):
@@ -2030,7 +2125,13 @@ class Sampler6712ProgramSettings():
         @param nbOfRinseCycles: number of rinse cycles as an integer (integer between 0..3)
         @param nbOfRetries: number of retires (integer between 0..3)
         '''
-
+        self.nbOfBottles = None
+        self.bottleVolumeInLit = None
+        self.suctionLineLengthInM = None
+        self.suctionLineHeadInM = None
+        self.nbOfRinseCycles = None
+        self.nbOfRinseCycles = None
+        
         # verify and set nb of bottles
         if nbOfBottles in self.L_VALID_NB_OF_BOTTLES:
             self.nbOfBottles = nbOfBottles
@@ -2086,7 +2187,7 @@ class Sampler6712ProgramSettings():
             sSuctionLineHead = '%.2f' % (self.suctionLineHeadInM)
         
         # generate string containing configuration info
-        sConfiguration = 'Nb of bottles %d, Bottle volume [l]: %.2f, Suction line length [m]: %.2f, Suction head [m]: %s, Nb of rinse cycles: %d, Nb of retries: %d' \
+        sConfiguration = 'Nb of bottles %d, Bottle volume [l]: %.2f, Suction line length [m]: %.2f, Suction head [m]: %r, Nb of rinse cycles: %d, Nb of retries: %d' \
             %(self.nbOfBottles, self.bottleVolumeInLit, self.suctionLineLengthInM, sSuctionLineHead, self.nbOfRinseCycles, self.nbOfRetries)
         
         return sConfiguration
@@ -2114,19 +2215,49 @@ class Sampler6712ProgramSettings():
         lnNavigationList = [
              self.N_NAVIGATE_TO_MAIN_MENU_SCREEN,
              Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['PROGRAM'], None, 0, '\r', 'R', 10, Exception('Navigation failed')),
-             Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['START'], None, 0, None, self.N_NEXT_MENU_PAGE, 15, Exception('Navigation failed a')),
-             Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['START'], None, 0, '\r', 'R', 5, Exception('Navigation failed a')),
-             Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['WAIT FOR PHONE CALL'], None, 0, '\r', 'R', 10, Exception('Navigation failed a'))
+             Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['START'], None, 0, None, self.N_NEXT_MENU_PAGE, 15, Exception('Navigation to START failed')),
+             Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['START'], None, 0, '\r', 'R', 5, Exception('Setting START failed')),
+             Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['WAIT FOR PHONE CALL'], None, 0, '\r', 'R', 10, Exception('Navigation to WAIT FOR PHONE CALL failed'))
              ]
         return lnNavigationList
+    
+    def getSoftwareOptionsNavigationList(self):
+        '''
+        This function returns the navigation list to configure the 6712 software
+        options (see 6712 datasheet chapter 5.18 Software Options)
+        
+        @return: navigation list
+        '''
+        N_SELECT_QUICK_VIEW = Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['QUICK VIEW/CHANGE'], None, 0, '\r', 'R', 5, Exception('Navigation to QUICK VIEW/CHANGE failed'))
+        
+        LN_SOFTWARE_OPTIONS_NAVIGATION = [
+            self.N_NAVIGATE_TO_MAIN_MENU_SCREEN,
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['OTHER FUNCTIONS'], None, 0, '\r', 'R', 10, Exception('Navigation to OTHER FUNCTIONS failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['SOFTWARE OPTIONS'], None, 0, '\r', 'R', 10, Exception('Navigation to SOFTWARE OPTIONS failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['USE LIQUID DETECTOR?'], None, 0, self.N_SELECT_YES, None, 0, None),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['PROGRAMMING STYLE'], None, 0, N_SELECT_QUICK_VIEW, None, 0, None),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['LIQUID DETECT'], None, 0, None, self.N_NEXT_MENU_PAGE, 10, Exception('Navigation to LIQUID DETECT failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['LIQUID DETECT'], None, 0, '\r', 'L', 10, Exception('Navigation to LIQUID DETECT failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['USE LIQUID DETECTOR?'], None, 0, self.N_SELECT_YES, Delay(1), 1, Exception('Navigation to USE LIQUID DETECTOR failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['BACKLIGHT', 'BTL FULL DETECT'], None, 0, None, self.N_NEXT_MENU_PAGE, 10, Exception('Navigation to BACKLIGHT failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['BACKLIGHT'], None, 0, '\r', 'R', 10, Exception('Navigation to BACKLIGHT failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['TIMED BACKLIGHT'], None, 0, '\r', 'R', 10, Exception('Setting TIMED BACKLIGHT failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['BTL FULL DETECT'], None, 0, '\r', 'R', 10, Exception('Navigation to BTL FULL DETECT failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['BOTTLE FULL DETECT?'], None, 0, self.N_SELECT_NO, Delay(1), 1, Exception('Setting BOTTLE FULL DETECT? failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['PUMP COUNTS FOR', 'EACH PURGE CYCLE:'], None, 0, None, self.N_NEXT_MENU_PAGE, 10, Exception('Navigation to PUMP COUNTS FOR EACH PURGE CYCLE failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['PRE-SAMPLE'], None, 0, '\r', 'R', 10, Exception('Navigation to PRE-SAMPLE failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['PRE-SAMPLE PURGE'], None, 0, '200\r', None, 1, Exception('Setting PRE-SAMPLE PURGE failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['POST-SAMPLE'], None, 0, '\r', 'R', 10, Exception('Navigation to POST-SAMPLE PURGE failed')),
+            Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['DEPENDENT ON HEAD'], None, 0, '\r', 'R', 5, Exception('Setting POST-SAMPLE PURGE failed'))
+            ]
+        return LN_SOFTWARE_OPTIONS_NAVIGATION
     
     def getBottleNavigationList(self):
         '''
         This function returns a navigation list to set the bottle settings
         @return: navigation list 
         '''
-        N_WAIT_FOR_SUCTION_HEAD_SCREEN = Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['BTLS', 'SUCTION LINE'], None, 0, None, Delay(0.2), 10, None)
-        N_SELECT_YES = Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['YES'], None, 0, '\r', 'R', 5, Exception('Navigation to YES failed'))
+        N_WAIT_FOR_SUCTION_HEAD_SCREEN = Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['BTLS', 'SUCTION LINE'], None, 0, None, Delay(1), 10, Exception('Waiting form completion of pump table generation last too long'))
         
         # build strings containing the settings
         sNbOfBottles = '%d' %(self.nbOfBottles)
@@ -2145,7 +2276,7 @@ class Sampler6712ProgramSettings():
         lNavigationList.append(Navigation(Navigation.E_SEARCH_TYPE.SELECTION, [sNbOfBottles], None, 0, '\r', 'R', 10, Exception('Navigation to %r failed' %(sNbOfBottles))))
         lNavigationList.append(Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['BOTTLE VOLUME IS','ml'], None, 0, sBottleVolumeInMl, None, 0, None))
         lNavigationList.append(Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['BOTTLE VOLUME IS','lit'], None, 0, sBottleVolumeInLit, None, 0, None))
-        lNavigationList.append(Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['WARNING!'], None, 0, N_SELECT_YES, None, 0, None)) # select 'yes' if warning is shown
+        lNavigationList.append(Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['WARNING!'], None, 0, self.N_SELECT_YES, None, 0, None)) # select 'yes' if warning is shown
             
         lNavigationList.append(Navigation(Navigation.E_SEARCH_TYPE.SELECTION, ['SUCTION LINE'], None, 0, '\r', 'R', 10, Exception('Navigation to SUCTION LINE failed')))
         lNavigationList.append(Navigation(Navigation.E_SEARCH_TYPE.SCREEN, ['SUCTION LINE LENGTH'], None, 0, sSuctionLineLengthInM, None, 0, Exception('Setting suction line length to %r failed' %(sSuctionLineLengthInM)))) # one digit after comma
@@ -2181,7 +2312,24 @@ class Sampler6712ProgramSettings():
         ]
         
         return lnNavigationList
+    def lGetSettingsAsGsnList(self):
+        # set suctionLineHeadInM to None if it is set to 'AUTO'
+        # explicit float type cast for java DOUBLE values is necessary! 
+        if isinstance(self.suctionLineHeadInM, str):
+            suctionLineHeadInM = None
+        else:
+            suctionLineHeadInM = float(self.suctionLineHeadInM)
 
+        lGsnList = [
+                    self.nbOfBottles,
+                    float(self.bottleVolumeInLit),
+                    float(self.suctionLineLengthInM),
+                    suctionLineHeadInM,
+                    self.nbOfRinseCycles,
+                    self.nbOfRetries
+                    ]
+        return lGsnList
+    
 class Bottles():
     def __init__(self, backupFileName):
         self._lBottles = [] # list with bottle objects

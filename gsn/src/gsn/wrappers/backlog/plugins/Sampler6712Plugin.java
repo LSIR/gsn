@@ -30,7 +30,7 @@ public class Sampler6712Plugin extends AbstractPlugin {
 		new DataField("SAMPLING_TRIGGER_SOURCE", "INTEGER"),
 		new DataField("BOTTLE_NUMBER", "INTEGER"),
 		new DataField("VOLUME", "INTEGER"),
-		new DataField("SAMPLER_OVERAL_STATUS", "INTEGER"),
+		new DataField("SAMPLING_RESULT", "INTEGER"),
 		new DataField("SAMPLER_MODEL", "INTEGER"),
 		new DataField("SAMPLER_ID", "INTEGER"),
 		new DataField("SAMPLER_TIME", "DOUBLE"),
@@ -46,17 +46,26 @@ public class Sampler6712Plugin extends AbstractPlugin {
 		new DataField("GENERATION_TIME", "BIGINT"),
 		new DataField("DEVICE_ID", "INTEGER"),
 		
-		new DataField("LM92_TEMP", "INTEGER"),
-		new DataField("V_EXT2", "INTEGER"),
-		new DataField("V_EXT1", "INTEGER"),
-		new DataField("V_EXT3", "INTEGER"),
-		new DataField("I_V12DC_EXT", "INTEGER"),
-		new DataField("V12DC_IN", "INTEGER"),
-		new DataField("I_V12DC_IN", "INTEGER"),
-		new DataField("VCC_5_0", "INTEGER"),
-		new DataField("VCC_NODE", "INTEGER"),
-		new DataField("I_VCC_NODE", "INTEGER"),
-		new DataField("VCC_4_2", "INTEGER")};	
+		new DataField("NB_OF_BOTTLES", "INTEGER"),
+		new DataField("BOTTLE_VOLUME_IN_LIT", "DOUBLE"),
+		new DataField("SUCTION_LINE_LENGTH_IN_M", "DOUBLE"),
+		new DataField("SUCTION_LINE_HEAD", "DOUBLE"),
+		new DataField("NB_OF_RINSE_CYCLES", "INTEGER"),
+		new DataField("NB_OF_RETRIES", "INTEGER"),
+		
+		new DataField("MC_SAMPLER_STATUS", "INTEGER"),
+		new DataField("MC_SAMPLER_STATUS_EXTENSION", "INTEGER"),
+		new DataField("MC_PROGRAM_STATUS", "INTEGER"),
+				
+		new DataField("EPC_SAMPLER_MODEL", "INTEGER"),
+		new DataField("EPC_SAMPLER_ID", "INTEGER"),
+		new DataField("EPC_SAMPLER_TIME", "DOUBLE"),
+		new DataField("EPC_SAMPLER_STATUS", "INTEGER"),
+		new DataField("EPC_MOST_RECENT_SAMPLE_TIME", "DOUBLE"),
+		new DataField("EPC_MOST_RECENT_SAMPLE_BOTTLE", "INTEGER"),
+		new DataField("EPC_MOST_RECENT_SAMPLE_VOLUME", "INTEGER"),
+		new DataField("EPC_MOST_RECENT_SAMPLE_RESULT", "INTEGER"),
+		new DataField("EPC_CHECKSUM", "INTEGER")};
 
 	private static final Hashtable<String, NameDataFieldPair> statusNamingTable = new Hashtable<String, NameDataFieldPair>();
 	static
@@ -67,11 +76,9 @@ public class Sampler6712Plugin extends AbstractPlugin {
 	
 	private enum Task{
 		// list with tasks enumerations and according code and string
-		SEND_COMMAND_TASK(0, "send_command"),
-		TURN_ON_SAMPLER_TASK(1, "turn_on_sampler"),
 		TAKE_SAMPLE_TASK(2, "take_sample"),
-		REQ_SAMPLER_STATUS_TASK(3, "req_sampler_status"),
-		REQ_DATA_STATUS_TASK(4, "req_data_status");
+		REINIT_SAMPLER_TASK(6, "reinit_sampler"),
+		REPORT_STATUS_TASK(3, "report_status");
 		
 		private final short code;	 	// code representing task
 		private final String string;	// string representing task
@@ -187,24 +194,19 @@ public class Sampler6712Plugin extends AbstractPlugin {
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		Serializable[] command = null;
 		Task task;
-		String sCmd = "";
 				
 		// determine task depending on action string
 		task = Task.fromString(action);
 		
 		switch( task )
 		{
-			case SEND_COMMAND_TASK:
-				for (int i = 0 ; i < paramNames.length ; i++) {
-					if( paramNames[i].compareToIgnoreCase("command") == 0 )
-						sCmd = (String) paramValues[i];					
-				}
-				command = new Serializable[] {task.getCode(), sCmd};
+			case REINIT_SAMPLER_TASK:
+				// create command
+				command = new Serializable[] {task.getCode()};
 				break;
 				
-			case TURN_ON_SAMPLER_TASK:			
-			case REQ_SAMPLER_STATUS_TASK:				
-			case REQ_DATA_STATUS_TASK:
+			case REPORT_STATUS_TASK:
+				// create command
 				command = new Serializable[] {task.getCode()};
 				break;
 				
