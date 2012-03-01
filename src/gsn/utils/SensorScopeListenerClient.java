@@ -330,6 +330,94 @@ public class SensorScopeListenerClient extends Thread {
             new DataField("decagon_10hs_vwc_15", "double", "Decagon 10HS vwc (15)"),
             new DataField("decagon_10hs_vwc_16", "double", "Decagon 10HS vwc (16)"),
 
+            new DataField("snow_height", "double", "Snow Height"),
+            new DataField("snow_height_2", "double", "Snow Height (2)"),
+            new DataField("snow_height_3", "double", "Snow Height (3)"),
+            new DataField("snow_height_4", "double", "Snow Height (4)"),
+            new DataField("snow_height_5", "double", "Snow Height (5)"),
+            new DataField("snow_height_6", "double", "Snow Height (6)"),
+            new DataField("snow_height_7", "double", "Snow Height (7)"),
+            new DataField("snow_height_8", "double", "Snow Height (8)"),
+            new DataField("snow_height_9", "double", "Snow Height (9)"),
+            new DataField("snow_height_10", "double", "Snow Height (10)"),
+            new DataField("snow_height_11", "double", "Snow Height (11)"),
+            new DataField("snow_height_12", "double", "Snow Height (12)"),
+            new DataField("snow_height_13", "double", "Snow Height (13)"),
+            new DataField("snow_height_14", "double", "Snow Height (14)"),
+            new DataField("snow_height_15", "double", "Snow Height (15)"),
+            new DataField("snow_height_16", "double", "Snow Height (16)"),
+
+            new DataField("no2", "double", "NO2"),
+            new DataField("no2_2", "double", "NO2 (2)"),
+            new DataField("no2_3", "double", "NO2 (3)"),
+            new DataField("no2_4", "double", "NO2 (4)"),
+            new DataField("no2_5", "double", "NO2 (5)"),
+            new DataField("no2_6", "double", "NO2 (6)"),
+            new DataField("no2_7", "double", "NO2 (7)"),
+            new DataField("no2_8", "double", "NO2 (8)"),
+            new DataField("no2_9", "double", "NO2 (9)"),
+            new DataField("no2_10", "double", "NO2 (10)"),
+            new DataField("no2_11", "double", "NO2 (11)"),
+            new DataField("no2_12", "double", "NO2 (12)"),
+            new DataField("no2_13", "double", "NO2 (13)"),
+            new DataField("no2_14", "double", "NO2 (14)"),
+            new DataField("no2_15", "double", "NO2 (15)"),
+            new DataField("no2_16", "double", "NO2 (16)"),
+
+            new DataField("co", "double", "CO"),
+            new DataField("co_2", "double", "CO (2)"),
+            new DataField("co_3", "double", "CO (3)"),
+            new DataField("co_4", "double", "CO (4)"),
+            new DataField("co_5", "double", "CO (5)"),
+            new DataField("co_6", "double", "CO (6)"),
+            new DataField("co_7", "double", "CO (7)"),
+            new DataField("co_8", "double", "CO (8)"),
+            new DataField("co_9", "double", "CO (9)"),
+            new DataField("co_10", "double", "CO (10)"),
+            new DataField("co_11", "double", "CO (11)"),
+            new DataField("co_12", "double", "CO (12)"),
+            new DataField("co_13", "double", "CO (13)"),
+            new DataField("co_14", "double", "CO (14)"),
+            new DataField("co_15", "double", "CO (15)"),
+            new DataField("co_16", "double", "CO (16)"),
+
+            new DataField("co2", "double", "CO2"),
+            new DataField("co2_2", "double", "CO2 (2)"),
+            new DataField("co2_3", "double", "CO2 (3)"),
+            new DataField("co2_4", "double", "CO2 (4)"),
+            new DataField("co2_5", "double", "CO2 (5)"),
+            new DataField("co2_6", "double", "CO2 (6)"),
+            new DataField("co2_7", "double", "CO2 (7)"),
+            new DataField("co2_8", "double", "CO2 (8)"),
+            new DataField("co2_9", "double", "CO2 (9)"),
+            new DataField("co2_10", "double", "CO2 (10)"),
+            new DataField("co2_11", "double", "CO2 (11)"),
+            new DataField("co2_12", "double", "CO2 (12)"),
+            new DataField("co2_13", "double", "CO2 (13)"),
+            new DataField("co2_14", "double", "CO2 (14)"),
+            new DataField("co2_15", "double", "CO2 (15)"),
+            new DataField("co2_16", "double", "CO2 (16)"),
+
+            new DataField("dendrometer", "double", "Dendrometer"),
+            new DataField("dendrometer_2", "double", "Dendrometer (2)"),
+            new DataField("dendrometer_3", "double", "Dendrometer (3)"),
+            new DataField("dendrometer_4", "double", "Dendrometer (4)"),
+            new DataField("dendrometer_5", "double", "Dendrometer (5)"),
+            new DataField("dendrometer_6", "double", "Dendrometer (6)"),
+            new DataField("dendrometer_7", "double", "Dendrometer (7)"),
+            new DataField("dendrometer_8", "double", "Dendrometer (8)"),
+            new DataField("dendrometer_9", "double", "Dendrometer (9)"),
+            new DataField("dendrometer_10", "double", "Dendrometer (10)"),
+            new DataField("dendrometer_11", "double", "Dendrometer (11)"),
+            new DataField("dendrometer_12", "double", "Dendrometer (12)"),
+            new DataField("dendrometer_13", "double", "Dendrometer (13)"),
+            new DataField("dendrometer_14", "double", "Dendrometer (14)"),
+            new DataField("dendrometer_15", "double", "Dendrometer (15)"),
+            new DataField("dendrometer_16", "double", "Dendrometer (16)"),
+
+            new DataField("longitude", "double", "Longitude"),
+            new DataField("latitude", "double", "Latitude"),
+
             new DataField("timestamp", "bigint", "Timestamp")
     };
 
@@ -375,6 +463,16 @@ public class SensorScopeListenerClient extends Thread {
     private static final int OFFSET_SOLAR_RAD_SP212 = 5 + (MAX_DUPN + 1) * 15;
     private static final int OFFSET_DECAGON_10HS_MV = 5 + (MAX_DUPN + 1) * 16;
     private static final int OFFSET_DECAGON_10HS_VWC = 5 + (MAX_DUPN + 1) * 17;
+
+    private static final int OFFSET_SNOW_HEIGHT = 5 + (MAX_DUPN + 1) * 18;
+    private static final int OFFSET_NO2 = 5 + (MAX_DUPN + 1) * 19;
+    private static final int OFFSET_CO = 5 + (MAX_DUPN + 1) * 20;
+    private static final int OFFSET_CO2 = 5 + (MAX_DUPN + 1) * 21;
+    private static final int OFFSET_DENDROMETER = 5 + (MAX_DUPN + 1) * 22;
+
+    private static final int OFFSET_LATITUDE= 5 + (MAX_DUPN + 1) * 23;
+    private static final int OFFSET_LONGITUDE = 5 + (MAX_DUPN + 1) * 23 + 1;
+
 
     public static void config() {
         Properties propertiesFile = new Properties();
@@ -959,7 +1057,9 @@ public class SensorScopeListenerClient extends Thread {
                 long snow_height_raw = chunk[0] * 256 + chunk[1];
                 double sid142_snow_height = ((snow_height_raw * 2.5) / 4095.0) * ((10.0 + 3.3) / 10.0) * (1024.0 / 3.3);
 
-                //TODO: add to buffers
+                buffer[OFFSET_SNOW_HEIGHT + dupn] = new Double(sid142_snow_height);
+                buf[OFFSET_SNOW_HEIGHT + dupn] = new Double(sid142_snow_height);
+                count[OFFSET_SNOW_HEIGHT + dupn]++;
 
                 logger.info("sid142_snow_height: " + measure.format(sid142_snow_height));
                 break;
@@ -974,15 +1074,21 @@ public class SensorScopeListenerClient extends Thread {
 
                 if (1556 <= raw_1 && raw_1 <= 1720) {
                     sid135_no2 = raw_2 * 2.5 / 4095.0 / 0.05;
-                    //TODO: add to buffers
+                    buffer[OFFSET_NO2 + dupn] = new Double(sid135_no2);
+                    buf[OFFSET_NO2 + dupn] = new Double(sid135_no2);
+                    count[OFFSET_NO2 + dupn]++;
                     logger.info("sid135_no2: " + measure.format(sid135_no2));
                 } else if (2293 <= raw_1 && raw_1 <= 2620) {
                     sid135_co = raw_2 * 2.5 / 4095.0 / 0.1;
-                    //TODO: add to buffers
+                    buffer[OFFSET_CO + dupn] = new Double(sid135_co);
+                    buf[OFFSET_CO + dupn] = new Double(sid135_co);
+                    count[OFFSET_CO + dupn]++;
                     logger.info("sid135_co: " + measure.format(sid135_co));
                 } else if (3112 <= raw_1 && raw_1 <= 3439) {
                     sid135_co2 = raw_2 * 2.5 / 4095.0 / 0.00125;
-                    //TODO: add to buffers
+                    buffer[OFFSET_CO2 + dupn] = new Double(sid135_co2);
+                    buf[OFFSET_CO2 + dupn] = new Double(sid135_co2);
+                    count[OFFSET_CO2 + dupn]++;
                     logger.info("sid135_co2: " + measure.format(sid135_co2));
                 }
 
@@ -1001,7 +1107,9 @@ public class SensorScopeListenerClient extends Thread {
                 else
                     sid138_dendrometer = (4095.0 - (distance / dendrometer_count)) * 20000.0 / 4095.0;
 
-                //TODO: add to buffers
+                buffer[OFFSET_DENDROMETER + dupn] = new Double(sid138_dendrometer);
+                buf[OFFSET_DENDROMETER + dupn] = new Double(sid138_dendrometer);
+                count[OFFSET_DENDROMETER + dupn]++;
 
                 logger.info("sid138_dendrometer: " + measure.format(sid138_dendrometer));
                 break;
@@ -1010,7 +1118,9 @@ public class SensorScopeListenerClient extends Thread {
                 long latitude_raw = chunk[0] * 256 + chunk[1];
                 double sid92_latitude = toDeg(latitude_raw);
 
-                //TODO: add to buffers
+                buffer[OFFSET_LATITUDE + dupn] = new Double(sid92_latitude);
+                buf[OFFSET_LATITUDE + dupn] = new Double(sid92_latitude);
+                count[OFFSET_LATITUDE + dupn]++;
 
                 logger.info("sid92_latitude: " + measure.format(sid92_latitude));
                 break;
@@ -1019,7 +1129,9 @@ public class SensorScopeListenerClient extends Thread {
                 long longitude_raw = chunk[0] * 256 + chunk[1];
                 double sid93_longitude = toDeg(longitude_raw);
 
-                //TODO: add to buffers
+                buffer[OFFSET_LONGITUDE + dupn] = new Double(sid93_longitude);
+                buf[OFFSET_LONGITUDE + dupn] = new Double(sid93_longitude);
+                count[OFFSET_LONGITUDE + dupn]++;
 
                 logger.info("sid93_longitude: " + measure.format(sid93_longitude));
                 break;
