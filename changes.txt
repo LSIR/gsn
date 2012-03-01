@@ -1,6 +1,14 @@
 GSN Change logs
 ---------------
 
+r1.1.2
+New sensorscope listener server fixing problem of missing data
+Added count-based checkpoints to the CSV wrapper, logging line counts instead of latest timestamp
+Added new sensor types to sensorscope listener (NO2, CO, CO2, snow height, dendrometer, new temperature and air pressure sensors, data logger voltage, and GPS coordinates)
+Added /dynamicgeodata servlet, which allows making basic spatial queries for moving sensors
+Added new REST API for accessing data (beta)
+Fixed leak in unused connections (StorageManager pool configuration)
+
 r1.1.1
 Added URL-based queries for GML handler
 Added dataclean virtual sensor
