@@ -136,10 +136,18 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
   	  ArrayList<StreamElement> checkBuffer;
       ArrayList<StreamElement> streamBuffer;
   	  if (inputStreamName.equalsIgnoreCase("refdata_stampfenbachstrasse")) {
+  	    if (data.getData("OZONE_PPB") == null) {
+          logger.warn("OZONE_PPB field returned null of stream " + inputStreamName);
+          return;
+        }
   	    checkBuffer = sensorBuffer_Stampfenbachstr;
         streamBuffer = referenceBuffer_Stampfenbachstr;
   	  }
   	  else if (inputStreamName.equalsIgnoreCase("refdata_schimmelstrasse")) {
+  	    if (data.getData("OZONE_PPB") == null) {
+          logger.warn("OZONE_PPB field returned null of stream " + inputStreamName);
+          return;
+        }
   	    checkBuffer = sensorBuffer_Schimmelstr;
         streamBuffer = referenceBuffer_Schimmelstr;
   	  }
