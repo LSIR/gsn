@@ -330,6 +330,40 @@ public class SensorScopeListenerClient extends Thread {
             new DataField("decagon_10hs_vwc_15", "double", "Decagon 10HS vwc (15)"),
             new DataField("decagon_10hs_vwc_16", "double", "Decagon 10HS vwc (16)"),
 
+            new DataField("decagon_air_temp", "double", "Decagon Air Temperature"),
+            new DataField("decagon_air_temp_2", "double", "Decagon Air Temperature (2)"),
+            new DataField("decagon_air_temp_3", "double", "Decagon Air Temperature (3)"),
+            new DataField("decagon_air_temp_4", "double", "Decagon Air Temperature (4)"),
+            new DataField("decagon_air_temp_5", "double", "Decagon Air Temperature (5)"),
+            new DataField("decagon_air_temp_6", "double", "Decagon Air Temperature (6)"),
+            new DataField("decagon_air_temp_7", "double", "Decagon Air Temperature (7)"),
+            new DataField("decagon_air_temp_8", "double", "Decagon Air Temperature (8)"),
+            new DataField("decagon_air_temp_9", "double", "Decagon Air Temperature (9)"),
+            new DataField("decagon_air_temp_10", "double", "Decagon Air Temperature (10)"),
+            new DataField("decagon_air_temp_11", "double", "Decagon Air Temperature (11)"),
+            new DataField("decagon_air_temp_12", "double", "Decagon Air Temperature (12)"),
+            new DataField("decagon_air_temp_13", "double", "Decagon Air Temperature (13)"),
+            new DataField("decagon_air_temp_14", "double", "Decagon Air Temperature (14)"),
+            new DataField("decagon_air_temp_15", "double", "Decagon Air Temperature (15)"),
+            new DataField("decagon_air_temp_16", "double", "Decagon Air Temperature (16)"),
+
+            new DataField("decagon_humid", "double", "Decagon Hunidity"),
+            new DataField("decagon_humid_2", "double", "Decagon Hunidity (2)"),
+            new DataField("decagon_humid_3", "double", "Decagon Hunidity (3)"),
+            new DataField("decagon_humid_4", "double", "Decagon Hunidity (4)"),
+            new DataField("decagon_humid_5", "double", "Decagon Hunidity (5)"),
+            new DataField("decagon_humid_6", "double", "Decagon Hunidity (6)"),
+            new DataField("decagon_humid_7", "double", "Decagon Hunidity (7)"),
+            new DataField("decagon_humid_8", "double", "Decagon Hunidity (8)"),
+            new DataField("decagon_humid_9", "double", "Decagon Hunidity (9)"),
+            new DataField("decagon_humid_10", "double", "Decagon Hunidity (10)"),
+            new DataField("decagon_humid_11", "double", "Decagon Hunidity (11)"),
+            new DataField("decagon_humid_12", "double", "Decagon Hunidity (12)"),
+            new DataField("decagon_humid_13", "double", "Decagon Hunidity (13)"),
+            new DataField("decagon_humid_14", "double", "Decagon Hunidity (14)"),
+            new DataField("decagon_humid_15", "double", "Decagon Hunidity (15)"),
+            new DataField("decagon_humid_16", "double", "Decagon Hunidity (16)"),
+
             new DataField("snow_height", "double", "Snow Height"),
             new DataField("snow_height_2", "double", "Snow Height (2)"),
             new DataField("snow_height_3", "double", "Snow Height (3)"),
@@ -464,14 +498,16 @@ public class SensorScopeListenerClient extends Thread {
     private static final int OFFSET_DECAGON_10HS_MV = 5 + (MAX_DUPN + 1) * 16;
     private static final int OFFSET_DECAGON_10HS_VWC = 5 + (MAX_DUPN + 1) * 17;
 
-    private static final int OFFSET_SNOW_HEIGHT = 5 + (MAX_DUPN + 1) * 18;
-    private static final int OFFSET_NO2 = 5 + (MAX_DUPN + 1) * 19;
-    private static final int OFFSET_CO = 5 + (MAX_DUPN + 1) * 20;
-    private static final int OFFSET_CO2 = 5 + (MAX_DUPN + 1) * 21;
-    private static final int OFFSET_DENDROMETER = 5 + (MAX_DUPN + 1) * 22;
+    private static final int OFFSET_DECAGON_AIR_TEMP = 5 + (MAX_DUPN + 1) * 18;
+    private static final int OFFSET_DECAGON_HUMID = 5 + (MAX_DUPN + 1) * 19;
+    private static final int OFFSET_SNOW_HEIGHT = 5 + (MAX_DUPN + 1) * 20;
+    private static final int OFFSET_NO2 = 5 + (MAX_DUPN + 1) * 21;
+    private static final int OFFSET_CO = 5 + (MAX_DUPN + 1) * 22;
+    private static final int OFFSET_CO2 = 5 + (MAX_DUPN + 1) * 23;
+    private static final int OFFSET_DENDROMETER = 5 + (MAX_DUPN + 1) * 24;
 
-    private static final int OFFSET_LATITUDE= 5 + (MAX_DUPN + 1) * 23;
-    private static final int OFFSET_LONGITUDE = 5 + (MAX_DUPN + 1) * 23 + 1;
+    private static final int OFFSET_LATITUDE= 5 + (MAX_DUPN + 1) * 25;
+    private static final int OFFSET_LONGITUDE = 5 + (MAX_DUPN + 1) * 25 + 1;
 
 
     public static void config() {
@@ -1036,6 +1072,14 @@ public class SensorScopeListenerClient extends Thread {
 
                 double sid21_decagon_air_temp = raw_decagon_airtemp * 1.0 / 100 - 39.6;
                 double sid21_decagon_air_humid = (raw_decagon_airhumidity * 1.0 * 0.0405) - 4 - (raw_decagon_airhumidity * raw_decagon_airhumidity * 0.0000028) + ((raw_decagon_airhumidity * 0.00008) + 0.01) * (sid21_decagon_air_temp - 25);
+
+                buffer[OFFSET_DECAGON_AIR_TEMP + dupn] = new Double(sid21_decagon_air_temp);
+                buf[OFFSET_DECAGON_AIR_TEMP + dupn] = sid21_decagon_air_temp;
+                count[OFFSET_DECAGON_AIR_TEMP + dupn]++;
+
+                buffer[OFFSET_DECAGON_HUMID + dupn] = new Double(sid21_decagon_air_humid);
+                buf[OFFSET_DECAGON_HUMID + dupn] = sid21_decagon_air_humid;
+                count[OFFSET_DECAGON_HUMID + dupn]++;
 
                 logger.info("sid21_decagon_air_temp_" + dupn + ": " + measure.format(sid21_decagon_air_temp));
                 logger.info("sid21_decagon_air_humid_" + dupn + ": " + measure.format(sid21_decagon_air_humid));
