@@ -137,7 +137,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
       ArrayList<StreamElement> streamBuffer;
   	  if (inputStreamName.equalsIgnoreCase("refdata_stampfenbachstrasse")) {
   	    if (data.getData("OZONE_PPB") == null) {
-          logger.warn("OZONE_PPB field returned null of stream " + inputStreamName);
+          logger.warn("OZONE_PPB field returned null from stream " + inputStreamName);
           return;
         }
   	    checkBuffer = sensorBuffer_Stampfenbachstr;
@@ -145,7 +145,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
   	  }
   	  else if (inputStreamName.equalsIgnoreCase("refdata_schimmelstrasse")) {
   	    if (data.getData("OZONE_PPB") == null) {
-          logger.warn("OZONE_PPB field returned null of stream " + inputStreamName);
+          logger.warn("OZONE_PPB field returned null from stream " + inputStreamName);
           return;
         }
   	    checkBuffer = sensorBuffer_Schimmelstr;
@@ -158,8 +158,8 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
   	    if (r == RefStations.NONE) return;
   	    
         if (r == RefStations.STAMPFENBACHSTR) {
-  	    checkBuffer = referenceBuffer_Stampfenbachstr;
-        streamBuffer = sensorBuffer_Stampfenbachstr;
+          checkBuffer = referenceBuffer_Stampfenbachstr;
+          streamBuffer = sensorBuffer_Stampfenbachstr;
         }
         else if (r == RefStations.SCHIMMELSTR) {
           checkBuffer = referenceBuffer_Schimmelstr;
@@ -188,6 +188,16 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
           
           double resistance, reference;
           if (inputStreamName.contains("refdata")) {
+            
+            if (data == null) {
+              logger.warn("data equals null from stream " + inputStreamName);
+              return;
+            }
+            else if (data.getData("OZONE_PPB") == null) {
+              logger.warn("OZONE_PPB field returned null from stream " + inputStreamName + ":" + data.getFieldNames().toString() );
+              return;
+            }
+            
             reference = ((Double)data.getData("OZONE_PPB")).doubleValue();
             resistance = ((Integer)bufData.getData("RESISTANCE_1")).intValue() * Math.exp(kT * (((Double)bufData.getData("TEMPERATURE")).doubleValue() - 25));
           }
