@@ -15,7 +15,7 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="PAYLOAD_UPTIME" type="INTEGER" unit="relatime"/>
+            <field name="PAYLOAD_UPTIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SYSVOLTAGE" type="INTEGER" />
             <field name="PAYLOAD_TEMPERATURE" type="INTEGER" />
             <field name="PAYLOAD_HUMIDITY" type="INTEGER" />
