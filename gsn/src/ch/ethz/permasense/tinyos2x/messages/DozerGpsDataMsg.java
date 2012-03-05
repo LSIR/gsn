@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 30;
+    public static final int DEFAULT_MESSAGE_SIZE = 37;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 176;
 
-    /** Create a new DataGps of size 30. */
+    /** Create a new DataGps of size 37. */
     public DozerGpsDataMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -153,10 +153,28 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
         s += "  [payload.pseudoRange_double_7=0x"+Long.toHexString(get_payload_pseudoRange_double_7())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
+        s += "  [payload.doppler_single_0=0x"+Long.toHexString(get_payload_doppler_single_0())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.doppler_single_1=0x"+Long.toHexString(get_payload_doppler_single_1())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.doppler_single_2=0x"+Long.toHexString(get_payload_doppler_single_2())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.doppler_single_3=0x"+Long.toHexString(get_payload_doppler_single_3())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
         s += "  [payload.vehicleNum=0x"+Long.toHexString(get_payload_vehicleNum())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.measIndicator=0x"+Long.toHexString(get_payload_measIndicator())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.signalStrength=0x"+Long.toHexString(get_payload_signalStrength())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.lossLockIndicator=0x"+Long.toHexString(get_payload_lossLockIndicator())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -480,9 +498,9 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.weekNumber
-    //   Field type: byte
+    //   Field type: short
     //   Offset (bits): 88
-    //   Size (bits): 8
+    //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
@@ -514,37 +532,37 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     }
 
     /**
-     * Return the value (as a byte) of the field 'payload.weekNumber'
+     * Return the value (as a short) of the field 'payload.weekNumber'
      */
-    public byte get_payload_weekNumber() {
-        return (byte)getSIntElement(offsetBits_payload_weekNumber(), 8);
+    public short get_payload_weekNumber() {
+        return (short)getSIntElement(offsetBits_payload_weekNumber(), 16);
     }
 
     /**
      * Set the value of the field 'payload.weekNumber'
      */
-    public void set_payload_weekNumber(byte value) {
-        setSIntElement(offsetBits_payload_weekNumber(), 8, value);
+    public void set_payload_weekNumber(short value) {
+        setSIntElement(offsetBits_payload_weekNumber(), 16, value);
     }
 
     /**
      * Return the size, in bytes, of the field 'payload.weekNumber'
      */
     public static int size_payload_weekNumber() {
-        return (8 / 8);
+        return (16 / 8);
     }
 
     /**
      * Return the size, in bits, of the field 'payload.weekNumber'
      */
     public static int sizeBits_payload_weekNumber() {
-        return 8;
+        return 16;
     }
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.carrierPhase_double_0
     //   Field type: short
-    //   Offset (bits): 96
+    //   Offset (bits): 104
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -566,14 +584,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.carrierPhase_double_0'
      */
     public static int offset_payload_carrierPhase_double_0() {
-        return (96 / 8);
+        return (104 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.carrierPhase_double_0'
      */
     public static int offsetBits_payload_carrierPhase_double_0() {
-        return 96;
+        return 104;
     }
 
     /**
@@ -607,7 +625,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.carrierPhase_double_1
     //   Field type: short
-    //   Offset (bits): 104
+    //   Offset (bits): 112
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -629,14 +647,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.carrierPhase_double_1'
      */
     public static int offset_payload_carrierPhase_double_1() {
-        return (104 / 8);
+        return (112 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.carrierPhase_double_1'
      */
     public static int offsetBits_payload_carrierPhase_double_1() {
-        return 104;
+        return 112;
     }
 
     /**
@@ -670,7 +688,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.carrierPhase_double_2
     //   Field type: short
-    //   Offset (bits): 112
+    //   Offset (bits): 120
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -692,14 +710,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.carrierPhase_double_2'
      */
     public static int offset_payload_carrierPhase_double_2() {
-        return (112 / 8);
+        return (120 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.carrierPhase_double_2'
      */
     public static int offsetBits_payload_carrierPhase_double_2() {
-        return 112;
+        return 120;
     }
 
     /**
@@ -733,7 +751,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.carrierPhase_double_3
     //   Field type: short
-    //   Offset (bits): 120
+    //   Offset (bits): 128
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -755,14 +773,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.carrierPhase_double_3'
      */
     public static int offset_payload_carrierPhase_double_3() {
-        return (120 / 8);
+        return (128 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.carrierPhase_double_3'
      */
     public static int offsetBits_payload_carrierPhase_double_3() {
-        return 120;
+        return 128;
     }
 
     /**
@@ -796,7 +814,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.carrierPhase_double_4
     //   Field type: short
-    //   Offset (bits): 128
+    //   Offset (bits): 136
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -818,14 +836,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.carrierPhase_double_4'
      */
     public static int offset_payload_carrierPhase_double_4() {
-        return (128 / 8);
+        return (136 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.carrierPhase_double_4'
      */
     public static int offsetBits_payload_carrierPhase_double_4() {
-        return 128;
+        return 136;
     }
 
     /**
@@ -859,7 +877,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.carrierPhase_double_5
     //   Field type: short
-    //   Offset (bits): 136
+    //   Offset (bits): 144
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -881,14 +899,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.carrierPhase_double_5'
      */
     public static int offset_payload_carrierPhase_double_5() {
-        return (136 / 8);
+        return (144 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.carrierPhase_double_5'
      */
     public static int offsetBits_payload_carrierPhase_double_5() {
-        return 136;
+        return 144;
     }
 
     /**
@@ -922,7 +940,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.carrierPhase_double_6
     //   Field type: short
-    //   Offset (bits): 144
+    //   Offset (bits): 152
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -944,14 +962,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.carrierPhase_double_6'
      */
     public static int offset_payload_carrierPhase_double_6() {
-        return (144 / 8);
+        return (152 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.carrierPhase_double_6'
      */
     public static int offsetBits_payload_carrierPhase_double_6() {
-        return 144;
+        return 152;
     }
 
     /**
@@ -985,7 +1003,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.carrierPhase_double_7
     //   Field type: short
-    //   Offset (bits): 152
+    //   Offset (bits): 160
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1007,14 +1025,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.carrierPhase_double_7'
      */
     public static int offset_payload_carrierPhase_double_7() {
-        return (152 / 8);
+        return (160 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.carrierPhase_double_7'
      */
     public static int offsetBits_payload_carrierPhase_double_7() {
-        return 152;
+        return 160;
     }
 
     /**
@@ -1048,7 +1066,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.pseudoRange_double_0
     //   Field type: short
-    //   Offset (bits): 160
+    //   Offset (bits): 168
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1070,14 +1088,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.pseudoRange_double_0'
      */
     public static int offset_payload_pseudoRange_double_0() {
-        return (160 / 8);
+        return (168 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.pseudoRange_double_0'
      */
     public static int offsetBits_payload_pseudoRange_double_0() {
-        return 160;
+        return 168;
     }
 
     /**
@@ -1111,7 +1129,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.pseudoRange_double_1
     //   Field type: short
-    //   Offset (bits): 168
+    //   Offset (bits): 176
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1133,14 +1151,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.pseudoRange_double_1'
      */
     public static int offset_payload_pseudoRange_double_1() {
-        return (168 / 8);
+        return (176 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.pseudoRange_double_1'
      */
     public static int offsetBits_payload_pseudoRange_double_1() {
-        return 168;
+        return 176;
     }
 
     /**
@@ -1174,7 +1192,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.pseudoRange_double_2
     //   Field type: short
-    //   Offset (bits): 176
+    //   Offset (bits): 184
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1196,14 +1214,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.pseudoRange_double_2'
      */
     public static int offset_payload_pseudoRange_double_2() {
-        return (176 / 8);
+        return (184 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.pseudoRange_double_2'
      */
     public static int offsetBits_payload_pseudoRange_double_2() {
-        return 176;
+        return 184;
     }
 
     /**
@@ -1237,7 +1255,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.pseudoRange_double_3
     //   Field type: short
-    //   Offset (bits): 184
+    //   Offset (bits): 192
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1259,14 +1277,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.pseudoRange_double_3'
      */
     public static int offset_payload_pseudoRange_double_3() {
-        return (184 / 8);
+        return (192 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.pseudoRange_double_3'
      */
     public static int offsetBits_payload_pseudoRange_double_3() {
-        return 184;
+        return 192;
     }
 
     /**
@@ -1300,7 +1318,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.pseudoRange_double_4
     //   Field type: short
-    //   Offset (bits): 192
+    //   Offset (bits): 200
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1322,14 +1340,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.pseudoRange_double_4'
      */
     public static int offset_payload_pseudoRange_double_4() {
-        return (192 / 8);
+        return (200 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.pseudoRange_double_4'
      */
     public static int offsetBits_payload_pseudoRange_double_4() {
-        return 192;
+        return 200;
     }
 
     /**
@@ -1363,7 +1381,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.pseudoRange_double_5
     //   Field type: short
-    //   Offset (bits): 200
+    //   Offset (bits): 208
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1385,14 +1403,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.pseudoRange_double_5'
      */
     public static int offset_payload_pseudoRange_double_5() {
-        return (200 / 8);
+        return (208 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.pseudoRange_double_5'
      */
     public static int offsetBits_payload_pseudoRange_double_5() {
-        return 200;
+        return 208;
     }
 
     /**
@@ -1426,7 +1444,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.pseudoRange_double_6
     //   Field type: short
-    //   Offset (bits): 208
+    //   Offset (bits): 216
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1448,14 +1466,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.pseudoRange_double_6'
      */
     public static int offset_payload_pseudoRange_double_6() {
-        return (208 / 8);
+        return (216 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.pseudoRange_double_6'
      */
     public static int offsetBits_payload_pseudoRange_double_6() {
-        return 208;
+        return 216;
     }
 
     /**
@@ -1489,7 +1507,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.pseudoRange_double_7
     //   Field type: short
-    //   Offset (bits): 216
+    //   Offset (bits): 224
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1511,14 +1529,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.pseudoRange_double_7'
      */
     public static int offset_payload_pseudoRange_double_7() {
-        return (216 / 8);
+        return (224 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.pseudoRange_double_7'
      */
     public static int offsetBits_payload_pseudoRange_double_7() {
-        return 216;
+        return 224;
     }
 
     /**
@@ -1550,9 +1568,261 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     }
 
     /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.doppler_single_0
+    //   Field type: short
+    //   Offset (bits): 232
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.doppler_single_0' is signed (false).
+     */
+    public static boolean isSigned_payload_doppler_single_0() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.doppler_single_0' is an array (false).
+     */
+    public static boolean isArray_payload_doppler_single_0() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.doppler_single_0'
+     */
+    public static int offset_payload_doppler_single_0() {
+        return (232 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.doppler_single_0'
+     */
+    public static int offsetBits_payload_doppler_single_0() {
+        return 232;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.doppler_single_0'
+     */
+    public short get_payload_doppler_single_0() {
+        return (short)getUIntBEElement(offsetBits_payload_doppler_single_0(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.doppler_single_0'
+     */
+    public void set_payload_doppler_single_0(short value) {
+        setUIntBEElement(offsetBits_payload_doppler_single_0(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.doppler_single_0'
+     */
+    public static int size_payload_doppler_single_0() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.doppler_single_0'
+     */
+    public static int sizeBits_payload_doppler_single_0() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.doppler_single_1
+    //   Field type: short
+    //   Offset (bits): 240
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.doppler_single_1' is signed (false).
+     */
+    public static boolean isSigned_payload_doppler_single_1() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.doppler_single_1' is an array (false).
+     */
+    public static boolean isArray_payload_doppler_single_1() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.doppler_single_1'
+     */
+    public static int offset_payload_doppler_single_1() {
+        return (240 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.doppler_single_1'
+     */
+    public static int offsetBits_payload_doppler_single_1() {
+        return 240;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.doppler_single_1'
+     */
+    public short get_payload_doppler_single_1() {
+        return (short)getUIntBEElement(offsetBits_payload_doppler_single_1(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.doppler_single_1'
+     */
+    public void set_payload_doppler_single_1(short value) {
+        setUIntBEElement(offsetBits_payload_doppler_single_1(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.doppler_single_1'
+     */
+    public static int size_payload_doppler_single_1() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.doppler_single_1'
+     */
+    public static int sizeBits_payload_doppler_single_1() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.doppler_single_2
+    //   Field type: short
+    //   Offset (bits): 248
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.doppler_single_2' is signed (false).
+     */
+    public static boolean isSigned_payload_doppler_single_2() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.doppler_single_2' is an array (false).
+     */
+    public static boolean isArray_payload_doppler_single_2() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.doppler_single_2'
+     */
+    public static int offset_payload_doppler_single_2() {
+        return (248 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.doppler_single_2'
+     */
+    public static int offsetBits_payload_doppler_single_2() {
+        return 248;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.doppler_single_2'
+     */
+    public short get_payload_doppler_single_2() {
+        return (short)getUIntBEElement(offsetBits_payload_doppler_single_2(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.doppler_single_2'
+     */
+    public void set_payload_doppler_single_2(short value) {
+        setUIntBEElement(offsetBits_payload_doppler_single_2(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.doppler_single_2'
+     */
+    public static int size_payload_doppler_single_2() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.doppler_single_2'
+     */
+    public static int sizeBits_payload_doppler_single_2() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.doppler_single_3
+    //   Field type: short
+    //   Offset (bits): 256
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.doppler_single_3' is signed (false).
+     */
+    public static boolean isSigned_payload_doppler_single_3() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.doppler_single_3' is an array (false).
+     */
+    public static boolean isArray_payload_doppler_single_3() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.doppler_single_3'
+     */
+    public static int offset_payload_doppler_single_3() {
+        return (256 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.doppler_single_3'
+     */
+    public static int offsetBits_payload_doppler_single_3() {
+        return 256;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.doppler_single_3'
+     */
+    public short get_payload_doppler_single_3() {
+        return (short)getUIntBEElement(offsetBits_payload_doppler_single_3(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.doppler_single_3'
+     */
+    public void set_payload_doppler_single_3(short value) {
+        setUIntBEElement(offsetBits_payload_doppler_single_3(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.doppler_single_3'
+     */
+    public static int size_payload_doppler_single_3() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.doppler_single_3'
+     */
+    public static int sizeBits_payload_doppler_single_3() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.vehicleNum
     //   Field type: short
-    //   Offset (bits): 224
+    //   Offset (bits): 264
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1574,14 +1844,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.vehicleNum'
      */
     public static int offset_payload_vehicleNum() {
-        return (224 / 8);
+        return (264 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.vehicleNum'
      */
     public static int offsetBits_payload_vehicleNum() {
-        return 224;
+        return 264;
     }
 
     /**
@@ -1615,7 +1885,7 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.measIndicator
     //   Field type: short
-    //   Offset (bits): 232
+    //   Offset (bits): 272
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
@@ -1637,14 +1907,14 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the offset (in bytes) of the field 'payload.measIndicator'
      */
     public static int offset_payload_measIndicator() {
-        return (232 / 8);
+        return (272 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'payload.measIndicator'
      */
     public static int offsetBits_payload_measIndicator() {
-        return 232;
+        return 272;
     }
 
     /**
@@ -1672,6 +1942,132 @@ public class DozerGpsDataMsg extends ch.ethz.permasense.tinyos2x.messages.DataHe
      * Return the size, in bits, of the field 'payload.measIndicator'
      */
     public static int sizeBits_payload_measIndicator() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.signalStrength
+    //   Field type: short
+    //   Offset (bits): 280
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.signalStrength' is signed (false).
+     */
+    public static boolean isSigned_payload_signalStrength() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.signalStrength' is an array (false).
+     */
+    public static boolean isArray_payload_signalStrength() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.signalStrength'
+     */
+    public static int offset_payload_signalStrength() {
+        return (280 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.signalStrength'
+     */
+    public static int offsetBits_payload_signalStrength() {
+        return 280;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.signalStrength'
+     */
+    public short get_payload_signalStrength() {
+        return (short)getUIntBEElement(offsetBits_payload_signalStrength(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.signalStrength'
+     */
+    public void set_payload_signalStrength(short value) {
+        setUIntBEElement(offsetBits_payload_signalStrength(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.signalStrength'
+     */
+    public static int size_payload_signalStrength() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.signalStrength'
+     */
+    public static int sizeBits_payload_signalStrength() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.lossLockIndicator
+    //   Field type: short
+    //   Offset (bits): 288
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.lossLockIndicator' is signed (false).
+     */
+    public static boolean isSigned_payload_lossLockIndicator() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.lossLockIndicator' is an array (false).
+     */
+    public static boolean isArray_payload_lossLockIndicator() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.lossLockIndicator'
+     */
+    public static int offset_payload_lossLockIndicator() {
+        return (288 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.lossLockIndicator'
+     */
+    public static int offsetBits_payload_lossLockIndicator() {
+        return 288;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.lossLockIndicator'
+     */
+    public short get_payload_lossLockIndicator() {
+        return (short)getUIntBEElement(offsetBits_payload_lossLockIndicator(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.lossLockIndicator'
+     */
+    public void set_payload_lossLockIndicator(short value) {
+        setUIntBEElement(offsetBits_payload_lossLockIndicator(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.lossLockIndicator'
+     */
+    public static int size_payload_lossLockIndicator() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.lossLockIndicator'
+     */
+    public static int sizeBits_payload_lossLockIndicator() {
         return 8;
     }
 

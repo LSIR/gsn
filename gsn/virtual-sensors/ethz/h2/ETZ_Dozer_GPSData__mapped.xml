@@ -15,28 +15,34 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
 			<field name="PAYLOAD_TIMEOFWEEKMS" type="BIGINT"/>
 			<field name="PAYLOAD_WEEKNUMBER" type="INTEGER"/>
-			<field name="PAYLOAD_CARRIERPHASE_DOUBLE_0" type="SMALLINT"/>
-			<field name="PAYLOAD_CARRIERPHASE_DOUBLE_1" type="SMALLINT"/>
-			<field name="PAYLOAD_CARRIERPHASE_DOUBLE_2" type="SMALLINT"/>
-			<field name="PAYLOAD_CARRIERPHASE_DOUBLE_3" type="SMALLINT"/>
-			<field name="PAYLOAD_CARRIERPHASE_DOUBLE_4" type="SMALLINT"/>
-			<field name="PAYLOAD_CARRIERPHASE_DOUBLE_5" type="SMALLINT"/>
-			<field name="PAYLOAD_CARRIERPHASE_DOUBLE_6" type="SMALLINT"/>
-			<field name="PAYLOAD_CARRIERPHASE_DOUBLE_7" type="SMALLINT"/>
-			<field name="PAYLOAD_PSEUDORANGE_DOUBLE_0" type="SMALLINT"/>
-			<field name="PAYLOAD_PSEUDORANGE_DOUBLE_1" type="SMALLINT"/>
-			<field name="PAYLOAD_PSEUDORANGE_DOUBLE_2" type="SMALLINT"/>
-			<field name="PAYLOAD_PSEUDORANGE_DOUBLE_3" type="SMALLINT"/>
-			<field name="PAYLOAD_PSEUDORANGE_DOUBLE_4" type="SMALLINT"/>
-			<field name="PAYLOAD_PSEUDORANGE_DOUBLE_5" type="SMALLINT"/>
-			<field name="PAYLOAD_PSEUDORANGE_DOUBLE_6" type="SMALLINT"/>
-			<field name="PAYLOAD_PSEUDORANGE_DOUBLE_7" type="SMALLINT"/>
-			<field name="PAYLOAD_VEHICLENUM" type="SMALLINT"/>
-			<field name="PAYLOAD_MEASINDICATOR" type="SMALLINT"/>
+      	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_0" type="SMALLINT"/>
+      	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_1" type="SMALLINT"/>
+      	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_2" type="SMALLINT"/>
+      	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_3" type="SMALLINT"/>
+      	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_4" type="SMALLINT"/>
+      	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_5" type="SMALLINT"/>
+      	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_6" type="SMALLINT"/>
+      	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_7" type="SMALLINT"/>
+      	    <field name="PAYLOAD_PSEUDORANGE_DOUBLE_0" type="SMALLINT"/>
+      	    <field name="PAYLOAD_PSEUDORANGE_DOUBLE_1" type="SMALLINT"/>
+      	    <field name="PAYLOAD_PSEUDORANGE_DOUBLE_2" type="SMALLINT"/>
+	        <field name="PAYLOAD_PSEUDORANGE_DOUBLE_3" type="SMALLINT"/>
+      	    <field name="PAYLOAD_PSEUDORANGE_DOUBLE_4" type="SMALLINT"/>
+	        <field name="PAYLOAD_PSEUDORANGE_DOUBLE_5" type="SMALLINT"/>
+      	    <field name="PAYLOAD_PSEUDORANGE_DOUBLE_6" type="SMALLINT"/>
+      	    <field name="PAYLOAD_PSEUDORANGE_DOUBLE_7" type="SMALLINT"/>
+	        <field name="PAYLOAD_DOPPLER_SINGLE_0" type="SMALLINT"/>
+	        <field name="PAYLOAD_DOPPLER_SINGLE_1" type="SMALLINT"/>
+      	    <field name="PAYLOAD_DOPPLER_SINGLE_2" type="SMALLINT"/>
+      	    <field name="PAYLOAD_DOPPLER_SINGLE_3" type="SMALLINT"/>
+      	    <field name="PAYLOAD_VEHICLENUM" type="SMALLINT"/>
+	        <field name="PAYLOAD_MEASINDICATOR" type="TINYINT"/>
+      	    <field name="PAYLOAD_SIGNALSTRENGTH" type="SMALLINT"/>
+      	    <field name="PAYLOAD_LOSSLOCKINDICATOR" type="TINYINT"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>DozerGPSDataMsg from Felix GPSDozer Application</description>
+    <description>Dozer messages (DozerGPSDataMsg) from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
