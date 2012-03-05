@@ -13,7 +13,7 @@
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
-			<field name="PAYLOAD_TIMEOFWEEKMS" type="BIGINT"/>
+	        <field name="PAYLOAD_TIMEOFWEEKMS" type="INTEGER"/>
 			<field name="PAYLOAD_WEEKNUMBER" type="INTEGER"/>
       	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_0" type="SMALLINT"/>
       	    <field name="PAYLOAD_CARRIERPHASE_DOUBLE_1" type="SMALLINT"/>
