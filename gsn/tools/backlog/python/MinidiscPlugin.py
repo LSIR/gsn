@@ -80,9 +80,8 @@ class MinidiscPluginClass(AbstractPluginClass):
           self.info('GPS reading done')
           
           dataPackage += [mdMsg]
-          self.info('Compelte msg send:')
-          self.info(dataPackage)
-          #self.processMsg(self.getTimeStamp(), dataPackage)  
+          self.info('Send complete msg')
+          self.processMsg(self.getTimeStamp(), dataPackage)  
           
         else:
           self.warning('No Minidisc data')

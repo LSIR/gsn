@@ -50,7 +50,7 @@ public class MinidiscPlugin extends AbstractPlugin {
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 		
-		if (data.length != 16) {
+		if (data.length != 15) {
 			logger.error("The message with timestamp >" + timestamp + "< seems unparsable.(length: " + data.length + ")");
 			ackMessage(timestamp, super.priority);
 			return true;
@@ -58,7 +58,7 @@ public class MinidiscPlugin extends AbstractPlugin {
 
 		try {
 		  
-		  if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[15]}) )
+		  if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[14]}) )
         ackMessage(timestamp, super.priority);
       else
         logger.warn("The Minidisc message with timestamp >" + timestamp + "< could not be stored in the database.");
