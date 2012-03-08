@@ -153,7 +153,7 @@ class STEVALDriver():
             self._device.write('e')
             self._device.write('v')
             self._device.write('\r')
-            d = self._device.read(11)
+            d = self._device.read(7)
 
             if d == '':
                 self._logger.warning("No answer from the STEVAL-MKI004V1 device to *dev request")
@@ -176,7 +176,7 @@ class STEVALDriver():
             self._device.write('e')
             self._device.write('r')
             self._device.write('\r')
-            d = self._device.read(11)
+            d = self._device.read(7)
 
             if d == '':
                 self._logger.warning("No answer from the STEVAL-MKI004V1 device to *ver request")
