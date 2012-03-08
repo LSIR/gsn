@@ -1,6 +1,6 @@
 #! /usr/bin/python
 # -*- coding: UTF-8 -*-
-__author__      = "xxx"
+__author__      = "David Hasenfratz"
 __copyright__   = "Copyright 2011, ETH Zurich, Switzerland"
 __license__     = "GPL"
 __version__     = "$Revision$"

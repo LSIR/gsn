@@ -62,6 +62,7 @@ OSTest_STEVAL_Dynamic_Proc.xml
 OSTest_STEVAL_Dynamic_Raw.xml
 OSTest_STEVAL_Dynamic_RawProc.xml
 OSTest_STEVAL_Static.xml
+OSTest_MiniDisc.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml

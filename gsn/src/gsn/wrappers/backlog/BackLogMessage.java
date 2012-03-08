@@ -147,6 +147,11 @@ public class BackLogMessage {
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.MotionDetectionPlugin MotionDetectionPlugin}. */
 	public static final short MOTION_DETECTION_MESSAGE_TYPE = 84;
+	
+  /** Minidisc 
+   *  
+   *  {@link gsn.wrappers.backlog.plugins.MinidiscPlugin MinidiscPlugin}. */
+	public static final short MINIDISC_MESSAGE_TYPE = 85;
 
 	/** CamZilla
      *  
