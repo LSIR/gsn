@@ -126,6 +126,8 @@ OSTest_MiniDiSC__mapped.xml
 OSTest_MiniDiSC_GPS.xml
 OSTest_GasMobile_Ozone_Uncalibrated.xml
 OSTest_Data_Latency.xml
+OSTest_MiniDisc_EMB__muxed__mapped.xml
+OSTest_MiniDisc_EMB__mapped.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
