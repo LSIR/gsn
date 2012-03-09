@@ -24,22 +24,22 @@ defines
 DEFAULT_BACKLOG = True
 
 class MinidiscPluginClass(AbstractPluginClass):
-    
+
     def __init__(self, parent, config):
-	    
+
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         self._sleeper = Event()
         self._stopped = False
         self._pollInterval = 5.0
-        
+
         self.info('Init MinidiscPlugin...')
-        
+
         self._gpsDeviceStr = self.getOptionValue('gps_device')
         self.gps = GPSDriverNAV.GPSDriverNAV([self._gpsDeviceStr])
-        
+
         self._mdDeviceStr = self.getOptionValue('md_device')
         self.md = MinidiscDriver.MinidiscDriver([self._mdDeviceStr])
-        
+
         self.info("Done init")
 
     def getMsgType(self):
@@ -47,7 +47,7 @@ class MinidiscPluginClass(AbstractPluginClass):
 
     def isBusy(self):
         return False
-    
+
     def run(self):
         self.name = 'MinidiscPlugin-Thread'
         self.info('MinidiscPlugin started...')
@@ -62,31 +62,31 @@ class MinidiscPluginClass(AbstractPluginClass):
         self.info('died')
 
     def action(self):
-        
+
         # Read message
         mdMsg = ''
         mdMsg = self.md._read()
         self.info('Minidisc reading done')
-        
+
         if mdMsg != '' and mdMsg is not None and mdMsg.rfind('>') != -1:
-          
+
           mdMsg = mdMsg[mdMsg.rfind('>')+1:]
           self.info(mdMsg)
-          
+
           # Read GPS message
           gpsMsg = self.gps._read()
           # Parse message
           dataPackage = self._parseGPSMsg(gpsMsg)
           self.info('GPS reading done')
-          
+
           dataPackage += [mdMsg]
           self.info('Send complete msg')
-          self.processMsg(self.getTimeStamp(), dataPackage)  
-          
+          self.processMsg(self.getTimeStamp(), dataPackage)
+
         else:
           self.warning('No Minidisc data')
-        
-        
+
+
     def remoteAction(self, parameters):
         return
 
@@ -105,4 +105,4 @@ class MinidiscPluginClass(AbstractPluginClass):
 
         else:
             self.info("WARNING: GPS MSG packet was empty!")
-        
+
