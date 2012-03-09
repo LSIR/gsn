@@ -75,13 +75,23 @@ class MinidiscPluginClass(AbstractPluginClass):
 
           # Read GPS message
           gpsMsg = self.gps._read()
-          # Parse message
-          dataPackage = self._parseGPSMsg(gpsMsg)
-          self.info('GPS reading done')
+          
+          if gpsMsg != '' and gpsMsg is not None:
+          
+            # Parse message
+            dataPackage = self._parseGPSMsg(gpsMsg)
+            
+            if dataPackage == '':
+                self.warn('Could not parse GPS reading')
+                return
+            
+            self.info('GPS reading done')
 
-          dataPackage += [mdMsg]
-          self.info('Send complete msg')
-          self.processMsg(self.getTimeStamp(), dataPackage)
+            dataPackage += [mdMsg]
+            self.info('Send complete msg')
+            self.processMsg(self.getTimeStamp(), dataPackage)
+          else:
+              self.warning('No GPS data')
 
         else:
           self.warning('No Minidisc data')
