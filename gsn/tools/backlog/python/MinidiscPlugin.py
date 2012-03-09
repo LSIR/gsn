@@ -76,7 +76,7 @@ class MinidiscPluginClass(AbstractPluginClass):
           # Read GPS message
           gpsMsg = self.gps._read()
           
-          if gpsMsg != '' and gpsMsg is not None:
+          if gpsMsg != 0 and gpsMsg != '' and gpsMsg is not None:
           
             # Parse message
             dataPackage = self._parseGPSMsg(gpsMsg)
