@@ -51,7 +51,7 @@ public class MinidiscPlugin extends AbstractPlugin {
 		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 		
 		if (data.length != 15) {
-			logger.error("The message with timestamp >" + timestamp + "< seems unparsable.(length: " + data.length + ")");
+			logger.warn("The message with timestamp >" + timestamp + "< seems unparsable.(length: " + data.length + ")");
 			ackMessage(timestamp, super.priority);
 			return true;
 		}

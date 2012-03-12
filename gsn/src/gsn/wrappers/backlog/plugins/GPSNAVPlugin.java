@@ -50,7 +50,7 @@ public class GPSNAVPlugin extends AbstractPlugin {
 	  long measurement_id = -1;
 	  
 		if (data.length < 15 || data.length > 16) {
-			logger.warn("The message with timestamp >" + timestamp + "< seems unparsable.");
+			logger.debug("The message with timestamp >" + timestamp + "< seems unparsable.");
 			ackMessage(timestamp, super.priority);
 		}
 		else {

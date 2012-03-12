@@ -142,7 +142,7 @@ public class GPSStreamJoiner extends BridgeVirtualSensorPermasense {
       }
       // No match found, add stream element to the streamBuffer and check buffer size
       if (streamBuffer.size() == MAX_BUFFER_SIZE) {
-        logger.info("Remove buffered element with measurement_id " + (Long)streamBuffer.get(0).getData("MEASUREMENT_ID") + " from " + inputStreamName + " buffer of joinType " + joinType);
+        logger.debug("Remove buffered element with measurement_id " + (Long)streamBuffer.get(0).getData("MEASUREMENT_ID") + " from " + inputStreamName + " buffer of joinType " + joinType);
         streamBuffer.remove(0);
       }
       streamBuffer.add(data);
