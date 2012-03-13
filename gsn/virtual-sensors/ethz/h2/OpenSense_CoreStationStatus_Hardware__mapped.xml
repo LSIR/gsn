@@ -10,6 +10,13 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+			<field name="USB1_ON" type="TINYINT" />
+			<field name="USB2_ON" type="TINYINT" />
+			<field name="USB3_ON" type="TINYINT" />
+			<field name="EXT1_ON" type="TINYINT" />
+			<field name="EXT2_ON" type="TINYINT" />
+			<field name="EXT3_ON" type="TINYINT" />
             <field name="V_EXT1" type="INTEGER" unit="mV"/>
             <field name="V_EXT2" type="INTEGER" unit="mV"/>
             <field name="V_EXT3" type="INTEGER" unit="mV"/>
