@@ -193,7 +193,7 @@ class CamZillaPluginClass(AbstractPluginClass):
             
         if not self._plugStop and not self._powerSaveMode:
             try:
-                self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(time.time())) + '_pic%03n_unknown.%C')
+                self._downloadUnknownPictures()
             except Exception, e:
                 self.error(e.__str__())
 
@@ -227,7 +227,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                     
                     if not self._plugStop:
                         try:
-                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%03n_unknown.%C')
+                            self._downloadUnknownPictures()
                         except Exception, e:
                             self.error(e.__str__())
                     
@@ -276,15 +276,18 @@ class CamZillaPluginClass(AbstractPluginClass):
                                                             
                                                         if bracketing:
                                                             if parsedTask[7] == 0:
-                                                                self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy_%s.%s' % (pic, int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
+                                                                l = []
+                                                                for i in range(3):
+                                                                    l.append('%s_pic%.3d_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
+                                                                self._downloadPictures(l)
                                                             else:
                                                                 for i in range(3):
-                                                                    pic_name_list.append(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy_bracket%d' % (pic, int(round(self._x*10)), int(round(self._y*10)), i+1))
+                                                                    pic_name_list.append('%s_pic%.3d_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
                                                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
                                                         else:
-                                                            pic_str = time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%.3d_%dx_%dy' % (pic, int(round(self._x*10)), int(round(self._y*10)))
+                                                            pic_str = '%s_pic%.3d_%dx_%dy.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)), '%C')
                                                             if parsedTask[7] == 0:
-                                                                self._downloadPictures('%s.%s' % (pic_str, '%C'))
+                                                                self._downloadPictures([pic_str])
                                                             else:
                                                                 pic_name_list.append(pic_str)
                                                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
@@ -315,7 +318,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                         self._startupRobotAndCam()
                     
                     try:
-                        self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic%03n_unknown.%C')
+                        self._downloadUnknownPictures()
                     except Exception, e:
                         self.error(e.__str__())
                         
@@ -340,9 +343,12 @@ class CamZillaPluginClass(AbstractPluginClass):
                                 if not self._plugStop:
                                     try:
                                         if bracketing:
-                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic001_%dx_%dy_%s.%s' % (int(round(self._x*10)), int(round(self._y*10)), 'bracket%01n', '%C'))
+                                            l = []
+                                            for i in range(3):
+                                                l.append('%s_pic001_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
+                                            self._downloadPictures(l)
                                         else:
-                                            self._downloadPictures(time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)) + '_pic001_%dx_%dy.%s' % (int(round(self._x*10)), int(round(self._y*10)), '%C'))
+                                            self._downloadPictures(['%s_pic001_%dx_%dy.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), int(round(self._x*10)), int(round(self._y*10)), '%C')])
                                     except Exception, e:
                                         if not self._plugStop:
                                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*8 + [config])
@@ -587,7 +593,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._execCommand(command)
         
         
-    def _downloadPictures(self, filename):
+    def _downloadPictures(self, filenames):
         self.info('downloading all pictures from photo camera')
         if not os.path.isdir(TMPPICTUREFOLDER):
             os.makedirs(TMPPICTUREFOLDER)
@@ -595,26 +601,59 @@ class CamZillaPluginClass(AbstractPluginClass):
             self.warning('there are still files in the temporary directory -> move them to %s' % (self._pictureFolder,))
             for file in sorted(os.listdir(TMPPICTUREFOLDER)):
                 shutil.move(os.path.join(TMPPICTUREFOLDER, file), self._pictureFolder)
-        if isinstance(filename, str):
-            self._execCommand([GPHOTO2, '--port="usb:"', '--quiet', '--get-all-files', '--filename=' + filename, '--recurse', '--delete-all-files'], TMPPICTUREFOLDER)
-        elif isinstance(filename, list):
-            self._execCommand([GPHOTO2, '--port="usb:"', '--quiet', '--get-all-files', '--recurse', '--delete-all-files'], TMPPICTUREFOLDER)
-            if len(os.listdir(TMPPICTUREFOLDER)) != len(filename):
-                raise Exception('number of downloaded pictures does not correspond to number of pictures taken in task')
-            for index,file in enumerate(sorted(os.listdir(TMPPICTUREFOLDER))):
-                os.rename(os.path.join(TMPPICTUREFOLDER, file), os.path.join(TMPPICTUREFOLDER, '%s%s' % (filename[index], os.path.splitext(file)[1])))
-        else:
-            raise Exception('downloadPictures function has to be used with String or List parameter')
-        for file in sorted(os.listdir(TMPPICTUREFOLDER)):
-            shutil.move(os.path.join(TMPPICTUREFOLDER, file), self._pictureFolder)
+               
+        pic_count = 0
+        for filename in filenames:
+            if self._plugStop:
+                break
+            self._execCommand([GPHOTO2, '--port="usb:"', '--quiet', '--get-file=1', '--filename=' + filename, '--recurse', '--delete-file=1'], TMPPICTUREFOLDER)
+            bugwait=5
+            for file in os.listdir(TMPPICTUREFOLDER):
+                file = os.path.join(TMPPICTUREFOLDER, file)
+                bugwait = os.path.getsize(file) / 500000
+                shutil.move(file, self._pictureFolder)
+            self._delay.wait(bugwait)
+            pic_count += 1
+        if pic_count > 0:
+            self.info('downloaded %d pictures from photo camera' % (pic_count,))
+
         os.rmdir(TMPPICTUREFOLDER)
         
         
-    def _execCommand(self, params, cwd=None):
+    def _downloadUnknownPictures(self):
+        self.info('downloading all unknown pictures from photo camera')
+        if not os.path.isdir(TMPPICTUREFOLDER):
+            os.makedirs(TMPPICTUREFOLDER)
+        if os.listdir(TMPPICTUREFOLDER):
+            self.warning('there are still files in the temporary directory -> move them to %s' % (self._pictureFolder,))
+            for file in sorted(os.listdir(TMPPICTUREFOLDER)):
+                shutil.move(os.path.join(TMPPICTUREFOLDER, file), self._pictureFolder)
+               
+        pic_count = 0
+        filename_time = time.strftime('%Y%m%d_%H%M%S', time.gmtime(time.time()))
+        ret = self._execCommand([GPHOTO2, '--port="usb:"', '--quiet', '--list-files'], stdOutput = False)
+        for line in ret[0].splitlines():
+            if line.find('DSC_') != -1 and not self._plugStop:
+                pic_count += 1
+                self._execCommand([GPHOTO2, '--port="usb:"', '--quiet', '--get-file=1', '--filename=%s_pic%.3d_unknown.%s' % (filename_time,pic_count,'%C'), '--recurse', '--delete-file=1'], TMPPICTUREFOLDER)
+                bugwait=5
+                for file in os.listdir(TMPPICTUREFOLDER):
+                    file = os.path.join(TMPPICTUREFOLDER, file)
+                    bugwait = os.path.getsize(file) / 500000
+                    shutil.move(file, self._pictureFolder)
+                self._delay.wait(bugwait)
+        if pic_count > 0:
+            self.info('downloaded %d unknown pictures from photo camera' % (pic_count,))
+
+        os.rmdir(TMPPICTUREFOLDER)
+        
+        
+        
+    def _execCommand(self, params, cwd=None, stdOutput=True):
         p = subprocess.Popen(params, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
         ret = p.wait()
         output = p.communicate()
-        if output[0]:
+        if output[0] and stdOutput:
             self.info(output[0])
         if ret == 0:
             if output[1]:
@@ -625,6 +664,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                     self.error(output[1])
             else:
                 raise Exception('camera has no more power -> gphoto2 could not execute command')
+        return output
             
             
     def _parkRobot(self):
