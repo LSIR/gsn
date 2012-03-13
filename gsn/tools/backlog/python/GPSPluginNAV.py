@@ -47,17 +47,26 @@ class GPSPluginNAVClass(AbstractPluginClass):
         return False
 
     def action(self, parameters):
-
-        self.info('GPSPluginNAV started...')
+        try:
+          self.info('GPSPluginNAV started...')
         
-        # Read GPS message
-        gpsMsg = self.gps._read()
-        # Parse message
-        dataPackage = self._parseNavMsg(gpsMsg)
-        dataPackage += [parameters]
-        self.processMsg(self.getTimeStamp(), dataPackage)
+          # Read GPS message
+          gpsMsg = self.gps._read()
+          
+          if gpsMsg != 0 and gpsMsg != '' and gpsMsg is not None:
+          
+            # Parse message
+            dataPackage = self._parseNavMsg(gpsMsg)
+            dataPackage += [parameters]
+            self.processMsg(self.getTimeStamp(), dataPackage)
         
-        self.info('GPS reading done')
+            self.info('GPS reading done')
+          else:
+            self.warning('No GPS data')
+        except Exception as e:
+          self._logger.error( "Exception: " + str(e))
+          self._logger.error("Could not execute action")
+          return
         
     def remoteAction(self, parameters):
         self.action(parameters)

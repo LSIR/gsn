@@ -49,17 +49,22 @@ class MinidiscPluginClass(AbstractPluginClass):
         return False
 
     def run(self):
-        self.name = 'MinidiscPlugin-Thread'
-        self.info('MinidiscPlugin started...')
-        t = time.time()
+        try:
+          self.name = 'MinidiscPlugin-Thread'
+          self.info('MinidiscPlugin started...')
+          t = time.time()
 
-        while not self._stopped:
-            self._sleeper.wait(self._pollInterval - (time.time() - t))
-            if self._sleeper.isSet():
-                continue
-            t = time.time()
-            self.action()
-        self.info('died')
+          while not self._stopped:
+              self._sleeper.wait(self._pollInterval - (time.time() - t))
+              if self._sleeper.isSet():
+                  continue
+              t = time.time()
+              self.action()
+          self.info('died')
+        except Exception as e:
+          self._logger.error( "Exception: " + str(e))
+          self._logger.error("Could not execute run")
+          return
 
     def action(self):
 
