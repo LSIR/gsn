@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
+import gsn.wrappers.BackLogWrapper;
 
 
 public class GPSNAVPlugin extends AbstractPlugin {
@@ -27,6 +28,8 @@ public class GPSNAVPlugin extends AbstractPlugin {
 						new DataField("MEASUREMENT_ID", "BIGINT")};
 
 	private final transient Logger logger = Logger.getLogger( GPSNAVPlugin.class );
+	
+	private int consecutiveErrors;
 
 	@Override
 	public short getMessageType() {
@@ -43,6 +46,14 @@ public class GPSNAVPlugin extends AbstractPlugin {
 	public DataField[] getOutputFormat() {
 		return dataField;
 	}
+	
+	@Override
+  public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
+    
+    consecutiveErrors = 0;
+    
+    return true;
+  }
 
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
@@ -50,10 +61,15 @@ public class GPSNAVPlugin extends AbstractPlugin {
 	  long measurement_id = -1;
 	  
 		if (data.length < 15 || data.length > 16) {
-			logger.debug("The message with timestamp >" + timestamp + "< seems unparsable.");
+		  consecutiveErrors++;
+      if (consecutiveErrors == 10) {
+        logger.error(consecutiveErrors + " consecutive messages (last timestamp >" + timestamp + "<) could not be parsed. (length: " + data.length + ")");
+        consecutiveErrors = 0;
+      }
 			ackMessage(timestamp, super.priority);
 		}
 		else {
+		  consecutiveErrors = 0;
 		  if (data.length == 15) {
 		    if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], measurement_id}) )
 		      ackMessage(timestamp, super.priority);

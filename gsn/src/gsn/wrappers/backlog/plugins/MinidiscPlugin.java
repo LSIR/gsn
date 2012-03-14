@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
+import gsn.wrappers.BackLogWrapper;
 
 
 public class MinidiscPlugin extends AbstractPlugin {
@@ -30,6 +31,7 @@ public class MinidiscPlugin extends AbstractPlugin {
 		  new DataField("MINIDISC_RAW_DATA", "VARCHAR(256)")};
 
 	private final transient Logger logger = Logger.getLogger( MinidiscPlugin.class );
+	private int consecutiveErrors;
 
 	@Override
 	public short getMessageType() {
@@ -45,16 +47,29 @@ public class MinidiscPlugin extends AbstractPlugin {
 	public DataField[] getOutputFormat() {
     return dataField;
 	}
+	
+	@Override
+  public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
+	  
+	  consecutiveErrors = 0;
+	  
+	  return true;
+	}
 
 	@Override
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 		logger.debug("message received from CoreStation with DeviceId: " + deviceId);
 		
 		if (data.length != 15) {
-			logger.debug("The message with timestamp >" + timestamp + "< seems unparsable.(length: " + data.length + ")");
+		  consecutiveErrors++;
+		  if (consecutiveErrors == 10) {
+		    logger.error(consecutiveErrors + " consecutive messages (last timestamp >" + timestamp + "<) could not be parsed. (length: " + data.length + ")");
+		    consecutiveErrors = 0;
+		  }
 			ackMessage(timestamp, super.priority);
 			return true;
 		}
+		consecutiveErrors = 0;
 
 		try {
 		  
