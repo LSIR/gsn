@@ -49,7 +49,7 @@ public class GPSNAVPlugin extends AbstractPlugin {
 	
 	@Override
   public boolean initialize ( BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
-    
+    super.initialize(backlogwrapper, coreStationName, deploymentName);
     consecutiveErrors = 0;
     
     return true;
