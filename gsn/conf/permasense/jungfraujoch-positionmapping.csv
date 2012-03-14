@@ -70,7 +70,7 @@
 
 # changed relays for north side connectivity on 18-09-2010
 "2005","2010-09-18 18:30:00+02:00","2010-10-26 18:30:00+02:00","11","Relay top railing north"
-"2008","2010-09-18 18:30:00+02:00","2011-09-09 00:00:00","12","Relay top railing south"
+"2008","2010-09-18 18:30:00+02:00","2011-09-09 00:00:00","12","Relay top railing west"
 
 # changed relays for north side connectivity on 26-10-2010
 "2007","2010-10-26 18:30:00+02:00","2010-11-06 12:00:00+01:00","11","Relay top railing north"
@@ -110,8 +110,9 @@
 
 # 18.10.2011 relay node changes
 "2021","2011-10-18 00:00:00","9999-01-01 00:00:00","16","Relay research station hut"
-"2024","2011-10-18 00:00:00","9999-01-01 00:00:00","12","Relay sphinx top railing west"
-"2036","2011-10-18 00:00:00","9999-01-01 00:00:00","27","Relay sphinx top railing south"
+"2024","2011-10-18 00:00:00","2012-03-13 10:00:00+02:00","12","Relay sphinx top railing west"
+"2036","2011-10-18 00:00:00","2012-03-13 10:00:00+02:00","27","Relay sphinx top railing south"
 "2003","2011-10-18 00:00:00","9999-01-01 00:00:00","11","Relay sphinx top railing north"
 
-"2051","2012-03-13 10:00:00+02:00","9999-01-01 00:00:00","26","Relay south snowfield"
+"2036","2012-03-13 10:00:00+02:00","9999-01-01 00:00:00","12","Relay sphinx top railing west"
+"2113","2012-03-13 10:00:00+02:00","9999-01-01 00:00:00","26","Relay south snowfield"
