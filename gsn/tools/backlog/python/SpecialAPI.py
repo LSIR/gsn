@@ -917,9 +917,15 @@ class PowerControl:
             if self._extDefaultMap[extNumber] is not None:
                 file = open(EXT_GPIO_MAP[extNumber], 'w')
                 if self._extDefaultMap[extNumber]:
-                    file.write('out set')
+                    if status:
+                        file.write('out clear')
+                    else:
+                        file.write('out set')
                 else:
-                    file.write('out clear')
+                    if status:
+                        file.write('out set')
+                    else:
+                        file.write('out clear')
                 file.close()
             else:
                 raise Exception('ext%d is not configured in %s -> can not set EXT status' % (extNumber, EXT_CONFIG_FILE))
