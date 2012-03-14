@@ -63,10 +63,15 @@ public class AlphasenseVirtualSensor extends BridgeVirtualSensorPermasense {
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		try {
 			short type = (Short) data.getData("MESSAGE_TYPE");
+			
+			  if (data.getData("RAW_DATA") == null) {
+			    logger.warn("Field RAW_DATA not available. Timed: " + data.getTimeStamp() + ", Gentime: " + data.getData("GENERATION_TIME"));
+          return;
+			  }
 		    
 		    String inputString = new String((String)data.getData("RAW_DATA"));
 		    if (inputString.length() != 146 && inputString.length() != 140 && inputString.length() != 137 && inputString.length() != 134 && inputString.length() != 110 && inputString.length() != 131) {
-		    	logger.warn("RAW_DATA has wrong length " + inputString.length());
+		    	logger.warn("RAW_DATA has wrong length " + inputString.length() + ". Timed: " + data.getTimeStamp() + ", Gentime: " + data.getData("GENERATION_TIME"));
 		    	return;
 		    }
 		    String delims = "[ ]+";
