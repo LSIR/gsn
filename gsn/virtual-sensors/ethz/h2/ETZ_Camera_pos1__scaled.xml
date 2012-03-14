@@ -7,7 +7,10 @@
             <param name="file_type">jpeg</param>
         </init-params>
         <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="RELATIVE_FILE" type="VARCHAR(255)" />
+            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE" />
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
@@ -21,7 +24,7 @@
                 <address wrapper="local">
                     <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from ETZ_Binary__mapped where RELATIVE_FILE like 'webcam1/%'</predicate>
                 </address>
-                <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 1</query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 1</query>
             </source>
             <query> select * from source </query>
         </stream>
