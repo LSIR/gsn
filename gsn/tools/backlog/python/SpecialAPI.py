@@ -959,7 +959,7 @@ class PowerControl:
                 else:
                     value = 'clear'
                 
-            file = open(USB_GPIO_MAP[usb], 'w')
+            file = open(USB_GPIO_MAP[usbNumber], 'w')
             file.write('out ' + value)
             file.close()
         else:
