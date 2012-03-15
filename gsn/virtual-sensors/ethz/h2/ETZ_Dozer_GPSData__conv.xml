@@ -1,0 +1,75 @@
+<virtual-sensor name="ETZ_Dozer_GPSData__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                		CARRIERPHASE = Double.longBitsToDouble(
+                			((long)( PAYLOAD_CARRIERPHASE_DOUBLE_0 & 0xff )) |
+                			((long)( PAYLOAD_CARRIERPHASE_DOUBLE_1 & 0xff )) << 8) |
+                			((long)( PAYLOAD_CARRIERPHASE_DOUBLE_2 & 0xff )) << 16) |
+                			((long)( PAYLOAD_CARRIERPHASE_DOUBLE_3 & 0xff )) << 24) |
+                			((long)( PAYLOAD_CARRIERPHASE_DOUBLE_4 & 0xff )) << 32) |
+                			((long)( PAYLOAD_CARRIERPHASE_DOUBLE_5 & 0xff )) << 40) |
+                			((long)( PAYLOAD_CARRIERPHASE_DOUBLE_6 & 0xff )) << 48) |
+                			((long)( PAYLOAD_CARRIERPHASE_DOUBLE_7 & 0xff )) << 56));
+                		PSEUDORANGE = Double.longBitsToDouble(
+                			((long)( PAYLOAD_PSEUDORANGE_DOUBLE_0 & 0xff )) |
+                			((long)( PAYLOAD_PSEUDORANGE_DOUBLE_1 & 0xff )) << 8) |
+                			((long)( PAYLOAD_PSEUDORANGE_DOUBLE_2 & 0xff )) << 16) |
+                			((long)( PAYLOAD_PSEUDORANGE_DOUBLE_3 & 0xff )) << 24) |
+                			((long)( PAYLOAD_PSEUDORANGE_DOUBLE_4 & 0xff )) << 32) |
+                			((long)( PAYLOAD_PSEUDORANGE_DOUBLE_5 & 0xff )) << 40) |
+                			((long)( PAYLOAD_PSEUDORANGE_DOUBLE_6 & 0xff )) << 48) |
+                			((long)( PAYLOAD_PSEUDORANGE_DOUBLE_7 & 0xff )) << 56));
+                		DOPPLER = Double.longBitsToDouble(
+                			((long)( PAYLOAD_DOPPLER_SINGLE_0 & 0xff )) |
+                			((long)( PAYLOAD_DOPPLER_SINGLE_1 & 0xff )) << 8) |
+                			((long)( PAYLOAD_DOPPLER_SINGLE_2 & 0xff )) << 16) |
+                			((long)( PAYLOAD_DOPPLER_SINGLE_3 & 0xff )) << 24));
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+	        <field name="PAYLOAD_TIMEOFWEEKMS" type="INTEGER" unit="ms"/>
+			<field name="PAYLOAD_WEEKNUMBER" type="INTEGER"/>
+      	    <field name="PAYLOAD_VEHICLENUM" type="SMALLINT"/>
+	        <field name="PAYLOAD_MEASINDICATOR" type="TINYINT"/>
+      	    <field name="PAYLOAD_SIGNALSTRENGTH" type="SMALLINT"/>
+      	    <field name="PAYLOAD_LOSSLOCKINDICATOR" type="TINYINT"/>
+      	    <field name="CARRIERPHASE" type="DOUBLE"/>
+      	    <field name="PSEUDORANGE" type="DOUBLE"/>
+	        <field name="DOPPLER" type="DOUBLE"/>
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Converted Dozer messages (DozerGPSDataMsg) from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_GPSData__mapped </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
