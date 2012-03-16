@@ -190,7 +190,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 						}
 						else {
 							coreStationDeviceId = arr2int(tmp, 1);
-							logger.info("connected successfully to core station with device id " + coreStationDeviceId + " at " + deploymentName + " deployment");
+							logger.info("connected successfully to CoreStation " + hostName + " with device id " + coreStationDeviceId + " at " + deploymentName + " deployment");
 							asyncCoreStationClient.addDeviceId(deploymentName, coreStationDeviceId, this);
 							connectionFinished();
 							conn = true;
@@ -489,7 +489,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 		}
 		else if (pluginMessageHandler.isMsgQueueReady()) {
 			sendQueueReadyMsg();
-			logger.warn("message queue ready => sending queue ready message");
+			logger.debug("message queue ready => sending queue ready message");
 		}
 
 		synchronized (connected) {
@@ -534,7 +534,7 @@ public class BackLogMessageMultiplexer extends Thread implements CoreStationList
 
 	@Override
 	public void connectionLost() {
-		logger.info("connection to core station with device id " + coreStationDeviceId + " at " + deploymentName + " deployment lost");
+		logger.info("connection to CoreStation " + hostName + " with device id " + coreStationDeviceId + " at " + deploymentName + " deployment lost");
 		
 		recvQueue.clear();
 		pluginMessageHandler.clearMsgQueue();

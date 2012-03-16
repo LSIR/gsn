@@ -281,7 +281,7 @@ public class AsyncCoreStationClient extends Thread  {
 			CoreStationListener listener;
 			listener = socketToListenerList.get(socketChannel);
 			listener.connectionEstablished();
-			logger.info("connection established to core station: " + listener.getCoreStationName());
+			logger.debug("connection established to core station: " + listener.getCoreStationName());
 		  
 			// Register an interest in reading on this channel
 			key.interestOps(SelectionKey.OP_READ);
