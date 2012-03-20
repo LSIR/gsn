@@ -46,7 +46,7 @@
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">172.31.71.22:9003</predicate>
+                    <predicate key="remote-connection">opensense-etz-bs02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogConfigPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -57,7 +57,7 @@
         <stream name="data3">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-etz-bs04.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">opensense-caa-tram-4.dyndns.biz:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogConfigPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -69,7 +69,7 @@
         <stream name="data4">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-etz-bs03.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">opensense-caa-tram-3.dyndns.biz:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogConfigPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -82,7 +82,7 @@
         <stream name="data5">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-etz-bs05.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">opensense-caa-tram-5.dyndns.biz:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogConfigPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -96,7 +96,7 @@
         <stream name="data6">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-etz-bs06.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">opensense-caa-tram-6.dyndns.biz:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BackLogConfigPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
