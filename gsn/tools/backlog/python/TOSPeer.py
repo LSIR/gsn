@@ -14,7 +14,7 @@ from threading import Thread, Event
 
 import tos
 import tos1x
-import BackLogMessage
+from BackLogMessage import PLUGIN_MESSAGE_TYPES
 from SpecialAPI import Statistics
 
 DEFAULT_BACKLOG = True
@@ -189,7 +189,7 @@ class TOSWriter(Thread):
                 write(packet, amId, timeout, blocking, maxretries)
                 self._tosPeer.counterAction(self._tosPeer._msgSentCounterId)
                 if isEnabledFor(logging.DEBUG):
-                    self._logger.debug('snd (%d,?,%d)' % (BackLogMessage.TOS_MESSAGE_TYPE, len(packet)))
+                    self._logger.debug('snd (%d,?,%d)' % (PLUGIN_MESSAGE_TYPES['TOSPlugin'], len(packet)))
             except Exception, e:
                 if not self._tosWriterStop:
                     self._logger.warning('could not write message to serial port: %s' % (e,))
