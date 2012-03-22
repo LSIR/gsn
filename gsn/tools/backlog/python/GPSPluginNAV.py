@@ -46,7 +46,7 @@ class GPSPluginNAVClass(AbstractPluginClass):
     def action(self, parameters):
         try:
           self.info('GPSPluginNAV started...')
-        
+          
           # Read GPS message
           gpsMsg = self.gps._read()
           

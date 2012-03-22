@@ -62,6 +62,22 @@ class GPSDriverNAV():
     def _read(self):
         
         try:
+            
+          data = self._readGPS();
+            
+          if data == 0 or data == '' or data is None:
+            time.sleep(0.5)
+            data = self._readGPS();
+        
+          return data
+      
+        except Exception as e:
+          self._logger.error( "_read exception: " + str(e))
+          return 0
+
+    def _readGPS(self):
+        
+        try:
             self._device.open()
             t = time.time()
             #self._device.read(self._device.inWaiting())
@@ -90,8 +106,6 @@ class GPSDriverNAV():
                 return 0
         
         except Exception as e:
-            self._logger.error( "serialAccess Exception" + str(e))
-            self._logger.error("Could not execute _read")
             self._device.close()
             return 0
         
