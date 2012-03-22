@@ -74,7 +74,7 @@ VaisalaWXT520Plugin = 40,
 GPSPlugin = 60,
 
 # GPSNAVPlugin
-GPSPluginNav = 61,
+GPSPluginNAV = 61,
 
 #Power Manager
 PowerManagerPlugin = 70,
