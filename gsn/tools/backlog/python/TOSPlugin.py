@@ -69,10 +69,6 @@ class TOSPluginClass(AbstractPluginClass):
                 self.debug('access node queue closed')
                 self._QueueClosedEvent.set()
         return self.processMsg(timestamp, self._tos2backlog(packet), self._priority, self._backlog)
-        
-        
-    def getMsgType(self):
-        return BackLogMessage.TOS_MESSAGE_TYPE
     
             
     def msgReceived(self, data):

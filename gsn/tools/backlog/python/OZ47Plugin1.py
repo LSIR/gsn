@@ -86,10 +86,6 @@ class OZ47Plugin1Class(AbstractPluginClass):
                self.info("Done init")
         else:
             self.error("Failed init")
-                
-        
-    def getMsgType(self):
-        return BackLogMessage.OZ47_MESSAGE_TYPE
 
     def isBusy(self):
         return False
@@ -130,8 +126,8 @@ class OZ47Plugin1Class(AbstractPluginClass):
         else:
             self.warning ('OZ47 read failed')
 
-    def remoteAction(self, parameters):
-        self.action(parameters)
+    def recvInterPluginCommand(self, command):
+        self.action(command)
 
     def stop(self):
         self._stopped = True

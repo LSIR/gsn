@@ -83,6 +83,7 @@ class BinaryPluginClass(AbstractPluginClass):
     _binaryWriter
     _notifier
     _plugStop
+    _interPlugStop
     _filedequelock
     _filedeque
     _msgqueue
@@ -91,6 +92,7 @@ class BinaryPluginClass(AbstractPluginClass):
     _filedescriptor
     _watches
     _packetCRC
+    _inrun
     _readyfornewbinary
     
     TODO: remove CRC functionality after long time testing. It is not necessary over TCP.
@@ -208,37 +210,47 @@ class BinaryPluginClass(AbstractPluginClass):
             self._isBusy = True
                 
         self._filedescriptor = None
+        self._inrun = Event()
         self._plugStop = False
-
-
-    def getMsgType(self):
-        return BackLogMessage.BINARY_MESSAGE_TYPE
+        self._interPlugStop = False
     
     
     def msgReceived(self, data):
         self.debug('message received')
-        self._msgqueue.put(data)
+        if not self._interPlugStop:
+            self._msgqueue.put(data)
         
     
     def connectionToGSNestablished(self):
         self.debug('connection established')
-        if (self._filedescriptor and not self._filedescriptor.closed) or self._filedeque:
-            self._isBusy = True
-        self._binaryWriter.resetResendCounter()
-        self._binaryWriter.sendMessage([START_PACKET])
+        if not self._interPlugStop:
+            self._restartSending()
         
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
-        self._isBusy = False
-        if self._filedescriptor:
-            if os.path.exists(self._filedescriptor.name):
-                self._filedequelock.acquire()
-                self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
-                self._filedequelock.release()
-            self._filedescriptor.close()
-        self._emptyQueue()
-        self._binaryWriter.stopSending()
+        if not self._inrun.isSet():
+            self._stopSending()
+        
+        
+    def recvInterPluginCommand(self, command):
+        if command == 'stop':
+            if not self._interPlugStop:
+                self.info('inter plugin stop command received')
+                self._interPlugStop = True
+                if not self._inrun.isSet():
+                    self._stopSending()
+            else:
+                self.warning('inter plugin stop command received but Plugin already stopped')
+        elif command == 'start':
+            if self._interPlugStop:
+                self.info('inter plugin start command received')
+                self._interPlugStop = False
+                self._restartSending()
+            else:
+                self.warning('inter plugin start command received but Plugin already running')
+        else:
+            self.error('inter plugin command unknown: %s' % (str(command)))
         
     
     def run(self):
@@ -257,6 +269,7 @@ class BinaryPluginClass(AbstractPluginClass):
         while not self._plugStop:
             try:
                 data = self._msgqueue.get()
+                self._inrun.set()
                 if self._plugStop:
                     try:
                         self._msgqueue.task_done()
@@ -264,57 +277,63 @@ class BinaryPluginClass(AbstractPluginClass):
                         self.exception(e)
                     break
                 
-                # the first entry of the data defines its packet number
-                pktNr = data[0]
-                # the second entry of the data defines its type
-                pktType = data[1]
-                
-                if pktNr == self._binaryWriter.getSentMsgNr():
-                    self._binaryWriter.stopSending()
-                    # if the type is INIT_PACKET we have to send a new file
-                    if pktType == INIT_PACKET:
-                        self.debug('new binary request received')
-                        self._getInitialBinaryPacket()
-                    # if the type is RESEND_PACKET we have to resend a part of a file...
-                    elif pktType == RESEND_PACKET:
-                        self.debug('binary retransmission request received')
-                        if self._reopenFile(data[2], struct.unpack('i', struct.pack('I', data[3]))[0], data[4]):
-                            self._getNextChunk()
-                        else:
+                if not self._interPlugStop and self.isGSNConnected():
+                    # the first entry of the data defines its packet number
+                    pktNr = data[0]
+                    # the second entry of the data defines its type
+                    pktType = data[1]
+                    
+                    if pktNr == self._binaryWriter.getSentMsgNr():
+                        self._binaryWriter.stopSending()
+                        # if the type is INIT_PACKET we have to send a new file
+                        if pktType == INIT_PACKET:
+                            self.debug('new binary request received')
                             self._getInitialBinaryPacket()
-                    elif pktType == ACK_PACKET:
-                        ackType = data[2]
-                        self.debug('acknowledge received for packet type %d' % (ackType,))
-                            
-                        if ackType == INIT_PACKET:
-                            self.debug('acknowledge received for init packet')
-                            self._getNextChunk()
-                        elif ackType == CHUNK_PACKET:
-                            self.debug('acknowledge for packet number >%d< received' % (pktNr,))
-                            self._getNextChunk()
-                        elif ackType == CRC_PACKET:
-                            filename = self._filedescriptor.name
-                            if os.path.isfile(filename):
-                                os.chmod(filename, 0744)
-                                self._filedescriptor.close()
-                                # crc has been accepted by GSN
-                                self.debug('crc has been accepted for %s => remove it' % (filename,))
-                                # remove it from disk
-                                os.remove(filename)
+                        # if the type is RESEND_PACKET we have to resend a part of a file...
+                        elif pktType == RESEND_PACKET:
+                            self.debug('binary retransmission request received')
+                            if self._reopenFile(data[2], struct.unpack('i', struct.pack('I', data[3]))[0], data[4]):
+                                self._getNextChunk()
                             else:
-                                self.debug('crc acknowledge file does not exist')
-                            self._getInitialBinaryPacket()
-                        else:
-                            self.error('unexpected acknowledge received')
-                elif pktNr == self._binaryWriter.getSentMsgNr()-1 or (pktNr == MESSAGE_NUMBER_MOD-1 and self._binaryWriter.getSentMsgNr() == 0):
-                    self.debug('packet number already received')
-                else:
-                    self.error('packet number out of order (recv=%d, sent=%d)' % (pktNr, self._binaryWriter.getSentMsgNr()))
+                                self._getInitialBinaryPacket()
+                        elif pktType == ACK_PACKET:
+                            ackType = data[2]
+                            self.debug('acknowledge received for packet type %d' % (ackType,))
+                                
+                            if ackType == INIT_PACKET:
+                                self.debug('acknowledge received for init packet')
+                                self._getNextChunk()
+                            elif ackType == CHUNK_PACKET:
+                                self.debug('acknowledge for packet number >%d< received' % (pktNr,))
+                                self._getNextChunk()
+                            elif ackType == CRC_PACKET:
+                                filename = self._filedescriptor.name
+                                if os.path.isfile(filename):
+                                    os.chmod(filename, 0744)
+                                    self._filedescriptor.close()
+                                    # crc has been accepted by GSN
+                                    self.debug('crc has been accepted for %s => remove it' % (filename,))
+                                    # remove it from disk
+                                    os.remove(filename)
+                                else:
+                                    self.debug('crc acknowledge file does not exist')
+                                self._getInitialBinaryPacket()
+                            else:
+                                self.error('unexpected acknowledge received')
+                    elif pktNr == self._binaryWriter.getSentMsgNr()-1 or (pktNr == MESSAGE_NUMBER_MOD-1 and self._binaryWriter.getSentMsgNr() == 0):
+                        self.debug('packet number already received')
+                    else:
+                        self.error('packet number out of order (recv=%d, sent=%d)' % (pktNr, self._binaryWriter.getSentMsgNr()))
                         
                 try:
                     self._msgqueue.task_done()
                 except ValueError, e:
                     self.exception(e)
+                    
+                self._inrun.clear()
+                    
+                if self._interPlugStop or not self.isGSNConnected():
+                    self._stopSending()
             except Exception, e:
                 self._backlogMain.incrementExceptionCounter()
                 self._logger.exception(str(e))
@@ -324,6 +343,27 @@ class BinaryPluginClass(AbstractPluginClass):
             self._filedescriptor.close()
             
         self._logger.info('died')
+        
+        
+        
+    def _stopSending(self):
+        self._isBusy = False
+        self._binaryWriter.pause()
+        if self._filedescriptor:
+            if os.path.exists(self._filedescriptor.name):
+                self._filedequelock.acquire()
+                self._filedeque.append([self._filedescriptor.name, os.path.getsize(self._filedescriptor.name)])
+                self._filedequelock.release()
+            self._filedescriptor.close()
+        self._emptyQueue()
+        
+        
+    def _restartSending(self):
+        if (self._filedescriptor and not self._filedescriptor.closed) or self._filedeque:
+            self._isBusy = True
+        self._binaryWriter.restart()
+        self._binaryWriter.resetResendCounter()
+        self._binaryWriter.sendMessage([START_PACKET])
 
 
     def _emptyQueue(self):
@@ -546,6 +586,7 @@ class BinaryWriter(Thread):
     _messageNr
     _resendcounter
     _stopsending
+    _paused
     _binaryWriterStop
     '''
 
@@ -553,10 +594,11 @@ class BinaryWriter(Thread):
         Thread.__init__(self, name='BinaryWriter-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         self._binaryPluginClass = parent
-        self._sendqueue = Queue.Queue(2)
+        self._sendqueue = Queue.Queue(1)
         self._stopsending = Event()
         self._messageNr = -1
         self._resendcounter = 0
+        self._paused = False
         self._binaryWriterStop = False
 
 
@@ -566,31 +608,43 @@ class BinaryWriter(Thread):
         while not self._binaryWriterStop:
             msg = self._sendqueue.get()
             self._stopsending.clear()
-            self._messageNr = (self._messageNr+1)%MESSAGE_NUMBER_MOD
-            
-            if not self._binaryWriterStop:
-                self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
-                while not self._stopsending.isSet() and self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop:
-                    self._stopsending.wait(self._binaryPluginClass._chunk_resend_timeout)
-                    if not self._stopsending.isSet() and self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop:
-                        self._logger.debug('resend message')
-                        self._resendcounter += 1
-                        self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
-            self._sendqueue.task_done()
+            if not self._paused:
+                self._messageNr = (self._messageNr+1)%MESSAGE_NUMBER_MOD
+                
+                if not self._binaryWriterStop:
+                    self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
+                    while not self._stopsending.isSet() and self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop:
+                        self._stopsending.wait(self._binaryPluginClass._chunk_resend_timeout)
+                        if not self._stopsending.isSet() and self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop:
+                            self._logger.debug('resend message')
+                            self._resendcounter += 1
+                            self._binaryPluginClass.processMsg(self._binaryPluginClass.getTimeStamp(), [self._messageNr, self._resendcounter] + msg)
+            try:
+                self._sendqueue.task_done()
+            except Exception, e:
+                self._exception(e)
             
         self._logger.info('died')
         
         
     def sendMessage(self, msg):
-        if self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop:
+        if self._binaryPluginClass.isGSNConnected() and not self._binaryWriterStop and not self._paused:
             try:
                 self._sendqueue.put_nowait(msg)
             except Queue.Full:
                 self._exception('send queue is full')
-        
-        
+                
+                
     def stopSending(self):
         self._stopsending.set()
+        
+        
+    def pause(self):
+        self._paused = True
+        self._stopsending.set()
+        
+    def restart(self):
+        self._paused = False
         
         
     def resetResendCounter(self):
@@ -602,6 +656,7 @@ class BinaryWriter(Thread):
 
     def stop(self):
         self._binaryWriterStop = True
+        self._paused = False
         self._stopsending.set()
         try:
             self._sendqueue.put('stop')

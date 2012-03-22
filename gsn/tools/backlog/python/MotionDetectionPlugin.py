@@ -49,9 +49,6 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         self.steval = STEVALDriver.STEVALDriver([self._deviceStr])
         #self.steval._setSensor()
 
-    def getMsgType(self):
-        return BackLogMessage.MOTION_DETECTION_MESSAGE_TYPE
-
     def isBusy(self):
         return False
 
@@ -106,16 +103,30 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         if std_x <= self._stdThreshold and std_y <= self._stdThreshold and std_z <= self._stdThreshold:
             self.info('Vehicle is not moving')
             # Execute action function of the specified plugins
-            pluginList = [BackLogMessage.OZ47_MESSAGE_TYPE, BackLogMessage.GPS_NAV_MESSAGE_TYPE, BackLogMessage.ALPHASENSE_MESSAGE_TYPE]
-            #pluginList = [BackLogMessage.GPS_NAV_MESSAGE_TYPE]
-            num = self.runPluginRemoteAction(pluginList, self.getTimeStamp())
-            self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
+            pluginList = ['OZ47Plugin1', 'GPSPluginNAV', 'AlphasensePlugin']
+            #pluginList = ['GPSPluginNAV']
+            num = 0
+            for pluginName in pluginList:
+                try:
+                    self.sendInterPluginCommand(pluginName, self.getTimeStamp())
+                except Exception, e:
+                    self.error(str(e))
+                else:
+                    num += 1
+            self.info('recvInterPluginCommand successfully called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
         else:
             self.info('Vehicle is moving')
             # Execute action function of the specified plugins
-            pluginListMoving = [BackLogMessage.STEVAL_MESSAGE_TYPE]
-            num = self.runPluginRemoteAction(pluginListMoving, self.getTimeStamp())
-            self.info('remoteAction called from ' + str(num) + ' of ' + str(len(pluginListMoving)) + ' plugins')
+            pluginListMoving = ['STEVALPlugin']
+            num = 0
+            for pluginName in pluginListMoving:
+                try:
+                    self.sendInterPluginCommand(pluginName, self.getTimeStamp())
+                except Exception, e:
+                    self.error(str(e))
+                else:
+                    num += 1
+            self.info('recvInterPluginCommand successfully called from ' + str(num) + ' of ' + str(len(pluginListMoving)) + ' plugins')
 
             #self._moving = self._moving + 1
             # Store std values from the last motion detection

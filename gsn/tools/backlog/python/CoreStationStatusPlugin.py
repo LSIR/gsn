@@ -58,10 +58,6 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             self._interval = float(value)
             self.info('interval: %s' % (self._interval,))
         
-    
-    def getMsgType(self):
-        return BackLogMessage.CORESTATION_STATUS_MESSAGE_TYPE
-        
         
     def isBusy(self):
         return False

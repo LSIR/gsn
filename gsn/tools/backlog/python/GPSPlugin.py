@@ -191,15 +191,6 @@ class GPSPluginClass(AbstractPluginClass):
         self._busy = False
         self._stopped = True
         self.info('GPSPlugin stopped')
-
-    '''
-    ##########################################################################################
-    getMsgType()
-    ##########################################################################################
-    '''
-    
-    def getMsgType(self):
-        return BackLogMessage.GPS_MESSAGE_TYPE
     
     '''
     ##########################################################################################

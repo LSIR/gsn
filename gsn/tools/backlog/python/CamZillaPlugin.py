@@ -155,10 +155,6 @@ class CamZillaPluginClass(AbstractPluginClass):
         else:
             self.info('power save mode is turned off')
             self._startupRobotAndCam()
-    
-    
-    def getMsgType(self):
-        return BackLogMessage.CAMZILLA_MESSAGE_TYPE
         
         
     def isBusy(self):
@@ -595,6 +591,12 @@ class CamZillaPluginClass(AbstractPluginClass):
         
     def _downloadPictures(self, filenames):
         self.info('downloading all pictures from photo camera')
+        
+        try:
+            sendInterPluginCommand('BinaryPlugin', 'stop')
+        except Exception, e:
+            self.error(str(e))
+            
         if not os.path.isdir(TMPPICTUREFOLDER):
             os.makedirs(TMPPICTUREFOLDER)
         if os.listdir(TMPPICTUREFOLDER):
@@ -616,6 +618,11 @@ class CamZillaPluginClass(AbstractPluginClass):
             pic_count += 1
         if pic_count > 0:
             self.info('downloaded %d pictures from photo camera' % (pic_count,))
+            
+        try:
+            sendInterPluginCommand('BinaryPlugin', 'start')
+        except Exception, e:
+            self.error(str(e))
 
         os.rmdir(TMPPICTUREFOLDER)
         

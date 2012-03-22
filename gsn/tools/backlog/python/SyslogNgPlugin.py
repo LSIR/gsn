@@ -48,10 +48,6 @@ class SyslogNgPluginClass(AbstractPluginClass):
         
         self._clientSocket = None
         self._stopped = False
-    
-    
-    def getMsgType(self):
-        return BackLogMessage.SYSLOG_NG_MESSAGE_TYPE
         
         
     def isBusy(self):

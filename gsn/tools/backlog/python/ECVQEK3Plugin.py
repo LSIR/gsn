@@ -31,9 +31,6 @@ class ECVQEK3PluginClass(AbstractPluginClass):
 
         self.info("Done init")
 
-    def getMsgType(self):
-        return BackLogMessage.ECVQEK3_MESSAGE_TYPE
-
     def isBusy(self):
         return False
     

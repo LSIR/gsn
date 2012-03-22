@@ -48,10 +48,6 @@ class BackLogStatusPluginClass(AbstractPluginClass):
         else:
             self._interval = float(value)
             self.info('interval: %s' % (self._interval,))
-    
-    
-    def getMsgType(self):
-        return BackLogMessage.BACKLOG_STATUS_MESSAGE_TYPE
         
         
     def isBusy(self):

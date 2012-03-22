@@ -86,10 +86,6 @@ class OZ47Plugin2Class(AbstractPluginClass):
     	       self.info("Done init")
         else:
             self.error("Failed init")
-                
-        
-    def getMsgType(self):
-        return BackLogMessage.OZ47_MESSAGE_TYPE
 
     def isBusy(self):
         return False

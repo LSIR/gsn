@@ -42,10 +42,6 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
             self._interval = float(value)
         
         self.info('interval: %s' % (self._interval,))
-        
-    
-    def getMsgType(self):
-        return BackLogMessage.VAISALA_WXT520_MESSAGE_TYPE
             
         
     def run(self):

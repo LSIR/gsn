@@ -221,15 +221,6 @@ class PowerManagerPluginClass(AbstractPluginClass):
         self._busy = False
         self._stopped = True
         self.info('BatteryPlugin stopped')
-
-    '''
-    ##########################################################################################
-    getMsgType()
-    ##########################################################################################
-    '''
-    
-    def getMsgType(self):
-        return BackLogMessage.POWERMANAGER_MESSAGE_TYPE
     
     '''
     ##########################################################################################

@@ -67,9 +67,6 @@ class STEVALPluginClass(AbstractPluginClass):
         dataPackage += [self._firmwareNum]
         self.processMsg(self.getTimeStamp(), dataPackage)
 
-    def getMsgType(self):
-        return BackLogMessage.STEVAL_MESSAGE_TYPE        
-
     def isBusy(self):
         return False
 
@@ -94,10 +91,9 @@ class STEVALPluginClass(AbstractPluginClass):
         self.processMsg(self.getTimeStamp(), dataPackage)
         if self._outputOpt == PROC_OPT:
             self.info(dataPackage)
-            
 
-    def remoteAction(self, parameters):
-        self.action(parameters)
+    def recvInterPluginCommand(self, command):
+        self.action(command)
 
     def stop(self):
         self._stopped = True

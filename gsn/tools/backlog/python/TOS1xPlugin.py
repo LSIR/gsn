@@ -21,9 +21,6 @@ class TOS1xPluginClass(TOSPluginClass, AbstractPluginClass):
     This plugin forwards all incoming TOSv1.x packets to GSN and vice versa.
     '''
 
-    def getMsgType(self):
-        return BackLogMessage.TOS1x_MESSAGE_TYPE
-
 
     def _sendCloseQueueCommand(self):
         if self.sendTOSmsg(array.array('B', [0x02, 0x00, 0x01, 0x00, 0x50, 0x7D, 0x00, 0x80]).tolist(), 0x00, 1, True, 10):

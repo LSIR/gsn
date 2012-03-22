@@ -13,6 +13,7 @@ import inspect
 from threading import Thread
 
 from SpecialAPI import Statistics
+from BackLogMessage import PLUGIN_MESSAGE_TYPES
 from JobsObserver import DEFAULT_RUNTIME_MODE, RUNTIME_MODE_STOP_ALLWAYS, RUNTIME_MODE_STOP_DC_ALLWAYS, RUNTIME_MODE_STOP_LAST, RUNTIME_MODE_STOP_DC_LAST, RUNTIME_MODE_NO_OBSERVE
 
 
@@ -97,7 +98,6 @@ class AbstractPluginClass(Thread, Statistics):
                 raise TypeError('runtime_mode is set to an unknown value in the configuration file')
             
         self._procMsg = self._backlogMain.gsnpeer.processMsg
-        self._runPluginRemoteAction = self._backlogMain.runPluginRemoteAction
         self._pluginName = inspect.stack()[1][0].f_locals['self'].__class__.__name__[:-5]
             
         self.info('backlog: %s' % (self._backlog,))
@@ -153,29 +153,6 @@ class AbstractPluginClass(Thread, Statistics):
                             schedule file.
         '''
         pass
-    
-
-    def getMsgType(self):
-        '''
-        Return the BackLog message type this plugin is 'working' with.
-        
-        This function should be implemented as following:
-            def getMsgType(self):
-                return BackLogMessage.'MESSAGENAME'_MESSAGE_TYPE
-                
-        where 'MESSAGENAME' should be a unique name of the plugin.
-        
-        'MESSAGENAME'_MESSAGE_TYPE has to be implemented and documented in
-        BackLogMessage.
-        
-        
-        @return: the BackLog message type this plugin is 'working' with.
-        
-        @raise NotImplementedError: if this function is not implemented by the plugin
-        
-        @see: BackLogMessage
-        '''
-        raise NotImplementedError('getMsgType is not implemented')
     
     
     def msgReceived(self, data):
@@ -354,7 +331,7 @@ class AbstractPluginClass(Thread, Statistics):
         
         @raise NotImplementedError: if this function is not implemented by the plugin
         '''
-        raise NotImplementedError('isBusy is not implemented')
+        raise NotImplementedError('isBusy is not implemented by %s' % (self._pluginName,))
     
         
     def needsWLAN(self):
@@ -370,7 +347,7 @@ class AbstractPluginClass(Thread, Statistics):
         
         @raise NotImplementedError: if this function is not implemented by this plugin
         '''
-        raise NotImplementedError('needsWLAN is not implemented')
+        raise NotImplementedError('needsWLAN is not implemented by %s' % (self._pluginName,))
     
     
     def isDutyCycleMode(self):
@@ -480,6 +457,37 @@ class AbstractPluginClass(Thread, Statistics):
                   enabled in init.
         '''
         return self._powerControl
+            
+            
+    def sendInterPluginCommand(self, pluginName, command):
+        '''
+        Inter Plugin communication functionality. This function can be used
+        to send a command to an other plugin.
+        
+        @param pluginName: The name (case sensitive) of the plugin the command
+                            should be sent to. 
+        @param command:    The command for the plugin.
+        
+        @raise KeyError:            if the plugin name is not in the
+                                     PLUGIN_MESSAGE_TYPES map.
+               NotImplementedError: if the plugin has not implemented the
+                                     recvInterPluginCommand function.
+               Exception:            if the plugin is not started yet.
+        '''
+
+        try:
+            PLUGIN_MESSAGE_TYPES[pluginName]
+        except:
+            raise Exception('plugin name %s unknown -> can not send inter plugin command' % (pluginName))
+        return self._backlogMain.sendInterPluginCommand(pluginName, command)
+        
+        
+    def recvInterPluginCommand(self, command):
+        '''
+        Inter Plugin communication functionality. This function will be called if
+         an other plugin wants to talk to this plugin.
+        '''
+        pass
     
     
     def setSchedule(self, schedule, merge=True):
@@ -516,6 +524,24 @@ class AbstractPluginClass(Thread, Statistics):
         @param schedule: The whole schedule as a string.
         '''
         pass
+    
+
+    def getMsgType(self):
+        '''
+        Returns the BackLog message type this plugin is 'working' with.
+        
+        The plugin message type has to be implemented and documented in
+        BackLogMessage.
+        
+        
+        @return: the BackLog message type this plugin is 'working' with.
+        
+        @raise KeyError: if this plugins name is not in the PLUGIN_MESSAGE_TYPES
+                         map.
+        
+        @see: BackLogMessage
+        '''
+        return PLUGIN_MESSAGE_TYPES[self._pluginName]
 
     
     def exception(self, exception):
@@ -564,19 +590,4 @@ class AbstractPluginClass(Thread, Statistics):
         '''
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug(msg)
-            
-            
-    def runPluginRemoteAction(self, pluginMsgTypes, parameters):
-        '''
-        Remotely executes the remoteAction function of the plugins in the list
-        '''
-
-        return self._runPluginRemoteAction(pluginMsgTypes, parameters)
-        
-        
-    def remoteAction(self, parameters):
-        '''
-        This function can be remotely called by any other plugin
-        '''
-        pass
         

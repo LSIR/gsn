@@ -273,11 +273,6 @@ class Sampler6712PluginClass(AbstractPluginClass):
                 self.info('Invalid schedule parameter: %r' % (parameters))
         except Exception as e:
             self.warning(e) 
-
-        
-        
-    def getMsgType(self):
-        return BackLogMessage.SAMPLER_6712_MESSAGE_TYPE
             
     def msgReceived(self, data):
         # store data into queue (queue is handled in run())

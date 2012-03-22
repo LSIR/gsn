@@ -40,9 +40,6 @@ class GPSPluginNAVClass(AbstractPluginClass):
         
         self.info("Done init")
 
-    def getMsgType(self):
-        return BackLogMessage.GPS_NAV_MESSAGE_TYPE
-
     def isBusy(self):
         return False
 
@@ -67,9 +64,9 @@ class GPSPluginNAVClass(AbstractPluginClass):
           self._logger.error( "Exception: " + str(e))
           self._logger.error("Could not execute action")
           return
-        
-    def remoteAction(self, parameters):
-        self.action(parameters)
+
+    def recvInterPluginCommand(self, command):
+        self.action(command)
 
     def stop(self):
         self._stopped = True

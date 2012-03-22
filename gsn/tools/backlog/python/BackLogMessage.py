@@ -35,72 +35,77 @@ MESSAGE_QUEUE_LIMIT_MESSAGE_TYPE = 4
 # to control the message flow.
 MESSAGE_QUEUE_READY_MESSAGE_TYPE = 5
 
-
-### plugin message types ###
-
-# The backlog status message type. This message type is used to
-# send/receive backlog status messages by the 
-# plugins.BackLogStatusPlugin.
-BACKLOG_STATUS_MESSAGE_TYPE = 10
-
-# The CoreStation status message type. This message type is used to
-# send CoreStation status messages to GSN.
-CORESTATION_STATUS_MESSAGE_TYPE = 11
-
-# The syslog-ng message type. This message type is used to
-# send syslog-ng log messages to GSN.
-SYSLOG_NG_MESSAGE_TYPE = 12
-
-# The TOS message type. This message type is used to
-# send/receive TOS messages by the plugins.TOSPlugin.
-TOS_MESSAGE_TYPE = 20
-TOS1x_MESSAGE_TYPE = 21
-
-# The binary message type. This message type is used to
-# send any binary data to GSN.
-BINARY_MESSAGE_TYPE = 30
-
-# The Vaisala weather sensor (WXT520) message type.
-VAISALA_WXT520_MESSAGE_TYPE = 40
-
 # The Schedule message type.
 SCHEDULE_MESSAGE_TYPE = 50
 
 # The Configuration message type.
 CONFIG_MESSAGE_TYPE = 51
 
+
+### plugin message types ###
+
+PLUGIN_MESSAGE_TYPES = dict(
+# The backlog status message type. This message type is used to
+# send/receive backlog status messages by the 
+# plugins.BackLogStatusPlugin.
+BackLogStatusPlugin = 10,
+
+# The CoreStation status message type. This message type is used to
+# send CoreStation status messages to GSN.
+CoreStationStatusPlugin = 11,
+
+# The syslog-ng message type. This message type is used to
+# send syslog-ng log messages to GSN.
+SyslogNgPlugin = 12,
+
+# The TOS message type. This message type is used to
+# send/receive TOS messages by the plugins.TOSPlugin.
+TOSPlugin = 20,
+TOS1xPlugin = 21,
+
+# The binary message type. This message type is used to
+# send any binary data to GSN.
+BinaryPlugin = 30,
+
+# The Vaisala weather sensor (WXT520) message type.
+VaisalaWXT520Plugin = 40,
+
 # The GPS message type.
-GPS_MESSAGE_TYPE = 60
+GPSPlugin = 60,
 
 # GPSNAVPlugin
-GPS_NAV_MESSAGE_TYPE = 61
+GPSPluginNav = 61,
 
 #Power Manager
-POWERMANAGER_MESSAGE_TYPE = 70
+PowerManagerPlugin = 70,
 
 # MiCS-OZ-47 Ozone Sensor 
-OZ47_MESSAGE_TYPE = 80
+OZ47Plugin1 = 80,
+OZ47Plugin2 = 80,
 
 # ECVQ-EK3 Gas Sensor 
-ECVQEK3_MESSAGE_TYPE = 81
+ECVQEK3Plugin = 81,
 
 # STEVAL Accelerometer 
-STEVAL_MESSAGE_TYPE = 82
+STEVALPlugin = 82,
 
 # STEVAL Accelerometer 
-ALPHASENSE_MESSAGE_TYPE = 83
+AlphasensePlugin = 83,
 
 # MOTION DETECTION 
-MOTION_DETECTION_MESSAGE_TYPE = 84
+MotionDetectionPlugin = 84,
 
 # MINIDISC 
-MINIDISC_MESSAGE_TYPE = 85
+MinidiscPlugin = 85,
 
 # CamZillaPlugin
-CAMZILLA_MESSAGE_TYPE = 90
+CamZillaPlugin = 90,
 
 # Sampler 6712
-SAMPLER_6712_MESSAGE_TYPE = 100
+Sampler6712Plugin = 100,
+
+TestPlugin = 126
+)
 
 # The maximum supported payload size (2^32-9bytes). This is due to
 # the sending mechanism. A sent message is defined by preceding

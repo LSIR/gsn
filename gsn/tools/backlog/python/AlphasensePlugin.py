@@ -50,9 +50,6 @@ class AlphasensePluginClass(AbstractPluginClass):
         #dataPackage += [msgSens]
 
         #self.processMsg(self.getTimeStamp(), dataPackage)
-        
-    def getMsgType(self):
-        return BackLogMessage.ALPHASENSE_MESSAGE_TYPE
 
     def isBusy(self):
         return False
@@ -71,8 +68,8 @@ class AlphasensePluginClass(AbstractPluginClass):
 
         self.info('Alphasense reading done')
 
-    def remoteAction(self, parameters):
-        self.action(parameters)
+    def recvInterPluginCommand(self, command):
+        self.action(command)
 
     def stop(self):
         self._stopped = True
