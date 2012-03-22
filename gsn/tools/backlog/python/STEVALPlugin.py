@@ -71,13 +71,16 @@ class STEVALPluginClass(AbstractPluginClass):
         return False
 
     def action(self, parameters):
-        self.info('STEVALPlugin action...')
+        self.debug('STEVALPlugin action...')
+        
+        if parameters == '' or parameters <= 0:
+            parameters = -1
         
         self.steval._openDevice()
         self._data = self.steval._startDataAcquisition(self._duration)
         self.steval._closeDevice()
         
-        self.info("STEVAL: Data read done -- data points per axes: " + str(len(self._data[0])))
+        self.debug("STEVAL: Data read done -- data points per axes: " + str(len(self._data[0])))
         
         if self._outputOpt == RAW_OPT:
             dataPackage = [DYNAMIC_RAW_DATA]
@@ -90,7 +93,7 @@ class STEVALPluginClass(AbstractPluginClass):
         dataPackage += [parameters]
         self.processMsg(self.getTimeStamp(), dataPackage)
         if self._outputOpt == PROC_OPT:
-            self.info(dataPackage)
+            self.debug(dataPackage)
 
     def recvInterPluginCommand(self, command):
         self.action(command)

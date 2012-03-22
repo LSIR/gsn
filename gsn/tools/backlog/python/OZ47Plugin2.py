@@ -48,9 +48,9 @@ class OZ47Plugin2Class(AbstractPluginClass):
         adding a new parameter for statistics
         '''
         self._statisticsReadOffset = self.getOptionValue('oz47_statisticsOffset')
-        self.info ('self._statisticsReadOffset' + str(self._statisticsReadOffset))
+        self.debug ('self._statisticsReadOffset' + str(self._statisticsReadOffset))
                 
-        self.info("Set sensor into automatic mode")
+        self.debug("Set sensor into automatic mode")
         msg = ''
         '''
         modified the init process max try is 30 times
@@ -71,7 +71,7 @@ class OZ47Plugin2Class(AbstractPluginClass):
             time.sleep(0.1)
         
         if autoValue == 1:
-            self.info("Set gTimer_delay to 30s")
+            self.debug("Set gTimer_delay to 30s")
             msg = ''
             timerSetCounter = 0
             flagTimer = 0
@@ -92,7 +92,10 @@ class OZ47Plugin2Class(AbstractPluginClass):
 
     def action(self, parameters):
 
-        self.info('OZ47Plugin started...')
+        self.debug('OZ47Plugin started...')
+        
+        if parameters == '' or parameters <= 0:
+            parameters = -1
 
         # Read message
         msg = ''
@@ -101,7 +104,7 @@ class OZ47Plugin2Class(AbstractPluginClass):
         while len(str(msg)) != 18 and readCount < 10:
             msg = self.oz47._read()
             if str(msg) != 'None' and msg.find('{M') >= 0:
-                self.info(msg)
+                self.debug(msg)
                 if msg.find('{M000') >= 0:
                     self.initAfterPlugout()
                 readFlag = 1
@@ -122,7 +125,7 @@ class OZ47Plugin2Class(AbstractPluginClass):
             if self.statisticsCounterValue == int(self._statisticsReadOffset):
                 self.statistics()
                 self.statisticsCounterValue = 0
-            self.info('OZ47 reading done')
+            self.debug('OZ47 reading done')
         else:
             self.warning ('OZ47 read failed')
 
@@ -133,7 +136,7 @@ class OZ47Plugin2Class(AbstractPluginClass):
 
     def resetPage(self):
 
-        self.info('OZ47Plugin Page 0 cleared and written with default values...')
+        self.debug('OZ47Plugin Page 0 cleared and written with default values...')
         
         m = self.oz47._erasePage('0')
         m0 = self.oz47._writePageIndex('0', '0', '0002020;')
@@ -154,12 +157,12 @@ class OZ47Plugin2Class(AbstractPluginClass):
         m0 = self.oz47._writePageIndex('0', '?', '3<003C0:')
 
         # Read message
-        self.info('OZ47 reset Page 0 done')
+        self.debug('OZ47 reset Page 0 done')
 
 
     def statistics(self):
 
-        self.info('OZ47Plugin statistics...')
+        self.debug('OZ47Plugin statistics...')
         m1 = ''
         m2 = ''
         m3 = ''
@@ -283,13 +286,13 @@ class OZ47Plugin2Class(AbstractPluginClass):
         # Read message
         msg = m1 + m2 + m3 + m4 + m5 + x0_1 + x1_1 + x2_1 + x3_1 + kt_1 + x0_2 + x1_2 + x2_2 + x3_2 + kt_2
         
-        self.info('statistics message' + msg)
+        self.debug('statistics message' + msg)
         dataPackage = [STATISTICS_NAMING]
         dataPackage += [msg]
         dataPackage += [SENSOR_ID]
         self.processMsg(self.getTimeStamp(), dataPackage)
 
-        self.info('OZ47 statistics done')
+        self.debug('OZ47 statistics done')
         
     def initAfterPlugout(self):
 
@@ -309,6 +312,6 @@ class OZ47Plugin2Class(AbstractPluginClass):
             setAutoCounter=setAutoCounter+1
             time.sleep(0.1)
         if autoValue  == 1:    
-            self.info('OZ47 initialized after re-plugin')
+            self.debug('OZ47 initialized after re-plugin')
         else:
             self.error('OZ47 initialization failed after re-plugin')        

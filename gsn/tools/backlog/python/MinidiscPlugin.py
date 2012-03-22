@@ -48,7 +48,7 @@ class MinidiscPluginClass(AbstractPluginClass):
     def run(self):
         try:
           self.name = 'MinidiscPlugin-Thread'
-          self.info('MinidiscPlugin started...')
+          self.debug('MinidiscPlugin started...')
           t = time.time()
 
           while not self._stopped:
@@ -68,12 +68,12 @@ class MinidiscPluginClass(AbstractPluginClass):
         # Read message
         mdMsg = ''
         mdMsg = self.md._read()
-        self.info('Minidisc reading done')
+        self.debug('Minidisc reading done')
 
         if mdMsg != '' and mdMsg is not None and mdMsg.rfind('>') != -1:
 
           mdMsg = mdMsg[mdMsg.rfind('>')+1:]
-          self.info(mdMsg)
+          self.debug(mdMsg)
 
           # Read GPS message
           gpsMsg = self.gps._read()
@@ -87,10 +87,10 @@ class MinidiscPluginClass(AbstractPluginClass):
                 self.warn('Could not parse GPS reading')
                 return
             
-            self.info('GPS reading done')
+            self.debug('GPS reading done')
 
             dataPackage += [mdMsg]
-            self.info('Send complete msg')
+            self.debug('Send complete msg')
             self.processMsg(self.getTimeStamp(), dataPackage)
           else:
               self.warning('No GPS data')
@@ -112,9 +112,9 @@ class MinidiscPluginClass(AbstractPluginClass):
             for i in range(1, len(msg)):
                 dataPackage += [msg[i]]
 
-            self.info(dataPackage)
+            self.debug(dataPackage)
             return dataPackage
 
         else:
-            self.info("WARNING: GPS MSG packet was empty!")
+            self.debug("WARNING: GPS MSG packet was empty!")
 

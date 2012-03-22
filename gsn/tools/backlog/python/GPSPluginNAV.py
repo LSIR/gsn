@@ -45,7 +45,10 @@ class GPSPluginNAVClass(AbstractPluginClass):
 
     def action(self, parameters):
         try:
-          self.info('GPSPluginNAV started...')
+          self.debug('GPSPluginNAV started...')
+          
+          if parameters == '' or parameters <= 0:
+            parameters = -1
           
           # Read GPS message
           gpsMsg = self.gps._read()
@@ -57,7 +60,7 @@ class GPSPluginNAVClass(AbstractPluginClass):
             dataPackage += [parameters]
             self.processMsg(self.getTimeStamp(), dataPackage)
         
-            self.info('GPS reading done')
+            self.debug('GPS reading done')
           else:
             self.warning('No GPS data')
         except Exception as e:
@@ -78,9 +81,9 @@ class GPSPluginNAVClass(AbstractPluginClass):
             for i in range(1, len(msg)):
                 dataPackage += [msg[i]]
 
-            self.info(dataPackage)
+            self.debug(dataPackage)
             return dataPackage
 
         else:
-            self.info("WARNING: MSG packet was empty!")
+            self.debug("WARNING: MSG packet was empty!")
         

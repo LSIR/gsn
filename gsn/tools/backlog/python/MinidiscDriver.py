@@ -34,7 +34,7 @@ class MinidiscDriver():
             self._device = serial.Serial(self._deviceStr, 256000, timeout=1)
             while self._device.inWaiting() != 0:
               self._device.flushInput()
-            self._logger.info("Device Init Successful for " + str(self._device))
+            self._logger.debug("Device Init Successful for " + str(self._device))
         except Exception as e:
             self._logger.error("serial access exception " + str(e))
             self._logger.error("Could not initialize Minidisc device " + self._deviceStr)

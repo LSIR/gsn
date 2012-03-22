@@ -64,7 +64,7 @@ class OZ47Driver():
             self._device.open()
             while self._device.inWaiting() != 0:
                 self._device.flushInput()
-            self._logger.info("input buffer flushed")
+            self._logger.debug("input buffer flushed")
             self._device.close()
         except Exception as e:
             self._logger.error( "serialAccess Exception (1)" + str(e))
@@ -87,7 +87,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device to {M} request")
             else:
-                self._logger.info("Read OZ-47 device: " + d)
+                self._logger.debug("Read OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -111,7 +111,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device to {S} request")
             else:
-                self._logger.info("Write OZ-47 device: " + d)
+                self._logger.debug("Write OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -135,7 +135,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device to {W0?3<00330:} request")
             else:
-                self._logger.info("Write OZ-47 device: " + d)
+                self._logger.debug("Write OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -152,7 +152,7 @@ class OZ47Driver():
             
     def _readPageIndex(self, pageValue, indexValue):
         msg = '{R' + pageValue + indexValue + '}'
-        self._logger.info (" Read Command: " + msg)
+        self._logger.debug (" Read Command: " + msg)
 
         try:
             self._device.open()
@@ -167,7 +167,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device for read request")
             else:
-                self._logger.info("Read OZ-47 device: " + d)
+                self._logger.debug("Read OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -184,7 +184,7 @@ class OZ47Driver():
             
     def _writePageIndex(self, pageValue, indexValue, registerValue):
         msg = '{W' + pageValue + indexValue + registerValue + '}'
-        self._logger.info (" Write Command: " + msg)
+        self._logger.debug (" Write Command: " + msg)
 
         try:
             self._device.open()
@@ -199,7 +199,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device for write request")
             else:
-                self._logger.info("Write OZ-47 device: " + d)
+                self._logger.debug("Write OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -229,7 +229,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device for command state")
             else:
-                self._logger.info("Read OZ-47 device: " + d)
+                self._logger.debug("Read OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:
@@ -253,7 +253,7 @@ class OZ47Driver():
             if d == '':
                 self._logger.warning("No answer from the OZ-47 device to {X} request")
             else:
-                self._logger.info("Write OZ-47 device: " + d)
+                self._logger.debug("Write OZ-47 device: " + d)
             return d.strip()
 
         except Exception as e:

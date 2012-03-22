@@ -83,7 +83,7 @@ class GPSDriverNAV():
             #self._device.read(self._device.inWaiting())
             while time.time() - t < 0.2: #self._device.inWaiting() != 0:
                 self._device.flushInput()
-            self._logger.info("readGpsMessage: input buffer flushed")
+            self._logger.debug("readGpsMessage: input buffer flushed")
             pos = -1
             
             while pos == -1 and time.time() - t < 5:

@@ -39,7 +39,7 @@ class AlphasenseDriver():
         
         try:
             self._device = serial.Serial(self._deviceStr, 1200, timeout=self._serialTimeout)
-            self._logger.info("Successfully opened " + str(self._device))
+            self._logger.debug("Successfully opened " + str(self._device))
         except Exception as e:
             self._logger.error("serial access exception " + str(e))
             self._logger.error("Could not access Alphasense device " + self._deviceStr)
@@ -62,7 +62,7 @@ class AlphasenseDriver():
             self._device.open()
             while self._device.inWaiting() != 0:
                 self._device.flushInput()
-            self._logger.info("readGpsMessage: input buffer flushed")
+            self._logger.debug("readGpsMessage: input buffer flushed")
             self._device.close()
         except Exception as e:
             self._logger.error( "serialAccess Exception (1)" + str(e))
@@ -86,7 +86,7 @@ class AlphasenseDriver():
                 self._logger.warning("No answer from the Alphasense device to read request")
             else:
                 d = ''.join( [ "%02X " % ord( x ) for x in d ] ).strip()
-                self._logger.info("Sensor reading Alphasense: " + d)
+                self._logger.debug("Sensor reading Alphasense: " + d)
             return d.strip()
 
         except Exception as e:
@@ -100,7 +100,7 @@ class AlphasenseDriver():
             self._device.open()
             while self._device.inWaiting() != 0:
                 self._device.flushInput()
-            self._logger.info("readGpsMessage: input buffer flushed")
+            self._logger.debug("readGpsMessage: input buffer flushed")
             self._device.close()
         except Exception as e:
             self._logger.error( "serialAccess Exception (1)" + str(e))
@@ -124,7 +124,7 @@ class AlphasenseDriver():
                 self._logger.warning("No answer from the Alphasense device to get calibration data")
             else:
                 d = ''.join( [ "%02X " % ord( x ) for x in d ] ).strip()
-                self._logger.info("Calibration data Alphasense: " + d)
+                self._logger.debug("Calibration data Alphasense: " + d)
             return d.strip()
 
         except Exception as e:
@@ -138,7 +138,7 @@ class AlphasenseDriver():
             self._device.open()
             while self._device.inWaiting() != 0:
                 self._device.flushInput()
-            self._logger.info("readGpsMessage: input buffer flushed")
+            self._logger.debug("readGpsMessage: input buffer flushed")
             self._device.close()
         except Exception as e:
             self._logger.error( "serialAccess Exception (1)" + str(e))
@@ -162,7 +162,7 @@ class AlphasenseDriver():
                 self._logger.warning("No answer from the Alphasense device to get sensitivity data")
             else:
                 d = ''.join( [ "%02X " % ord( x ) for x in d ] ).strip()
-                self._logger.info("Sensitivity data Alphasense: " + d)
+                self._logger.debug("Sensitivity data Alphasense: " + d)
             return d.strip()
 
         except Exception as e:

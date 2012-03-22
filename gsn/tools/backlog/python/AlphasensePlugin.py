@@ -50,13 +50,18 @@ class AlphasensePluginClass(AbstractPluginClass):
         #dataPackage += [msgSens]
 
         #self.processMsg(self.getTimeStamp(), dataPackage)
+        
+        self.info("Done init")
 
     def isBusy(self):
         return False
 
     def action(self, parameters):
 
-        self.info('AlphasensePlugin started...')
+        self.debug('AlphasensePlugin started...')
+        
+        if parameters == '' or parameters <= 0:
+            parameters = -1
         
         msg = self.alphasense._read()
         
@@ -66,7 +71,7 @@ class AlphasensePluginClass(AbstractPluginClass):
 
         self.processMsg(self.getTimeStamp(), dataPackage)
 
-        self.info('Alphasense reading done')
+        self.debug('Alphasense reading done')
 
     def recvInterPluginCommand(self, command):
         self.action(command)

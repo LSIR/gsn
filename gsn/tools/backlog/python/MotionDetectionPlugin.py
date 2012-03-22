@@ -48,13 +48,15 @@ class MotionDetectionPluginClass(AbstractPluginClass):
 
         self.steval = STEVALDriver.STEVALDriver([self._deviceStr])
         #self.steval._setSensor()
+        
+        self.info("Done init")
 
     def isBusy(self):
         return False
 
     def run(self):
         self.name = 'MotionDetectionPlugin-Thread'
-        self.info('started')
+        self.debug('started')
         t = time.time()
 
         while not self._stopped:
@@ -98,24 +100,25 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         std_y = float(numpy.std(self._data[1]))
         std_z = float(numpy.std(self._data[2]))
 
-        self.info('xStd is ' + str(std_x) + ' yStd is ' + str(std_y) + ' and zStd is ' + str(std_z));
+        self.debug('xStd is ' + str(std_x) + ' yStd is ' + str(std_y) + ' and zStd is ' + str(std_z));
 
         if std_x <= self._stdThreshold and std_y <= self._stdThreshold and std_z <= self._stdThreshold:
-            self.info('Vehicle is not moving')
+            self.debug('Vehicle is not moving')
             # Execute action function of the specified plugins
             pluginList = ['OZ47Plugin1', 'GPSPluginNAV', 'AlphasensePlugin']
             #pluginList = ['GPSPluginNAV']
             num = 0
+            time_id = self.getTimeStamp()
             for pluginName in pluginList:
                 try:
-                    self.sendInterPluginCommand(pluginName, self.getTimeStamp())
+                    self.sendInterPluginCommand(pluginName, time_id)
                 except Exception, e:
                     self.error(str(e))
                 else:
                     num += 1
-            self.info('recvInterPluginCommand successfully called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
+            self.debug('recvInterPluginCommand successfully called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
         else:
-            self.info('Vehicle is moving')
+            self.debug('Vehicle is moving')
             # Execute action function of the specified plugins
             pluginListMoving = ['STEVALPlugin']
             num = 0
@@ -126,7 +129,7 @@ class MotionDetectionPluginClass(AbstractPluginClass):
                     self.error(str(e))
                 else:
                     num += 1
-            self.info('recvInterPluginCommand successfully called from ' + str(num) + ' of ' + str(len(pluginListMoving)) + ' plugins')
+            self.debug('recvInterPluginCommand successfully called from ' + str(num) + ' of ' + str(len(pluginListMoving)) + ' plugins')
 
             #self._moving = self._moving + 1
             # Store std values from the last motion detection
