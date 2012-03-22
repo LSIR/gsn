@@ -593,7 +593,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         self.info('downloading all pictures from photo camera')
         
         try:
-            sendInterPluginCommand('BinaryPlugin', 'stop')
+            self.sendInterPluginCommand('BinaryPlugin', 'stop')
         except Exception, e:
             self.error(str(e))
             
@@ -620,7 +620,7 @@ class CamZillaPluginClass(AbstractPluginClass):
             self.info('downloaded %d pictures from photo camera' % (pic_count,))
             
         try:
-            sendInterPluginCommand('BinaryPlugin', 'start')
+            self.sendInterPluginCommand('BinaryPlugin', 'start')
         except Exception, e:
             self.error(str(e))
 
