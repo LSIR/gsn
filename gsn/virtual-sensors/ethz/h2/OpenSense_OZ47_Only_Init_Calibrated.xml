@@ -13,16 +13,9 @@
 					 def a_1;
 					 def kT;
 					 
-					 if (DEVICE_ID == 3) {
-  					 a_0 = 3.635901;
-             a_1 = 0.026868;
-             kT = 0.0199999995529652;
-					 }
-					 else {
-					   // For not supported devices
-					   a_0 = 0;
-             a_1 = 0;
-					 }
+           a_0 = 3.635901;
+           a_1 = 0.026868;
+           kT = 0.0199999995529652;
 					
 					 def res = RESISTANCE_1 * Math.exp(kT * (TEMPERATURE-25));
 					 OZONE_PPB = a_0 + a_1*res;
