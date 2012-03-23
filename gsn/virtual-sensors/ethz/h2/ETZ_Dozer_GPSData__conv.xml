@@ -56,11 +56,11 @@
                 			PAYLOAD_DOPPLER_SINGLE_2 != null &&
                 			PAYLOAD_DOPPLER_SINGLE_3 != null)
                 		{
-	                		DOPPLER = Double.longBitsToDouble(
-    	            			((long)( PAYLOAD_DOPPLER_SINGLE_0 & 0xff )) |
-        	        			(((long)( PAYLOAD_DOPPLER_SINGLE_1 & 0xff )) << 8) |
-            	    			(((long)( PAYLOAD_DOPPLER_SINGLE_2 & 0xff )) << 16) |
-                				(((long)( PAYLOAD_DOPPLER_SINGLE_3 & 0xff )) << 24));
+	                		DOPPLER = (double) Float.intBitsToFloat(
+    	            			((int)( PAYLOAD_DOPPLER_SINGLE_0 & 0xff )) |
+        	        			(((int)( PAYLOAD_DOPPLER_SINGLE_1 & 0xff )) << 8) |
+            	    			(((int)( PAYLOAD_DOPPLER_SINGLE_2 & 0xff )) << 16) |
+                				(((int)( PAYLOAD_DOPPLER_SINGLE_3 & 0xff )) << 24));
                 		}
                 		else
                 			DOPPLER = null;
