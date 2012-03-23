@@ -53,8 +53,8 @@ $(document).ready(function() {
       {  title:"Acoustic Emission Statistics",
          signals: [{
           vsensor:".*_dozer_aestatistics__mapped",
-          field:["payload_ch1_measured","payload_ch1_parametrized","payload_ch1_stored","payload_ch1_bufferunderflows","payload_ch1_noisefloor",
-                 "payload_ch2_measured","payload_ch2_parametrized","payload_ch2_stored","payload_ch2_bufferunderflows","payload_ch2_noisefloor"],
+          field:["payload_ch1_measured","payload_ch1_noisefloor",
+                 "payload_ch2_measured","payload_ch2_noisefloor"],
           select:"sensornode[nodetype=4]"
         }],      
       },
