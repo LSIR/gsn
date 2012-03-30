@@ -65,6 +65,7 @@ ETZ_GPS_Logger__config.xml
 ETZ_GPS_Logger__data__mapped.xml
 ETZ_GPS_Logger__events.xml
 ETZ_GPS_Logger__files__mapped.xml
+ETZ_GPS_Logger__parsing.xml
 ETZ_GPS_Logger__status.xml
 ETZ_GPS_RAW__binary.xml
 ETZ_GPS_RAW__mapped.xml

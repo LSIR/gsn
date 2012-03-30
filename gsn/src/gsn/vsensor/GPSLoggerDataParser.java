@@ -18,7 +18,9 @@ import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,9 +32,18 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	private static final byte RAW_DATA_TYPE = 0;
 	private static final byte STATUS_TYPE = 1;
 
-	private static final String RAW_STATUS_FILE_TYPE = "raw-status";
-	private static final String CONFIG_FILE_TYPE = "configuration";
-	private static final String EVENT_FILE_TYPE = "events";
+	private static final String RAW_STATUS_STREAM_TYPE = "raw-status";
+	private static final String CONFIG_STREAM_TYPE = "configuration";
+	private static final String EVENT_STREAM_TYPE = "events";
+	private static final String PARSING_STATUS_STREAM_TYPE = "parsing-status";
+	
+	private static final Hashtable<Byte, String> streamTypeNamingTable = new Hashtable<Byte, String>();
+	static
+	{
+		streamTypeNamingTable.put((byte) 1, RAW_STATUS_STREAM_TYPE);
+		streamTypeNamingTable.put((byte) 2, CONFIG_STREAM_TYPE);
+		streamTypeNamingTable.put((byte) 3, EVENT_STREAM_TYPE);
+	}
 	
 	private static final byte[] rawHeader = {(byte) 0xB5, 0x62, 0x02, 0x10};
 	private static final byte[] statusHeader = {0x6D, 0x74, 0x01, 0x01};
@@ -40,7 +51,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	private static final transient Logger logger = Logger.getLogger(GPSLoggerDataParser.class);
 
 	private String storage_directory = null;
-	private short file_type;
+	private byte stream_type;
 	private GPSFileParserThread gpsFileParserThread;
 	
 	private static DataField[] rawStatusField = {
@@ -101,6 +112,17 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("HIGH_POWER_MEASUREMENT", "SMALLINT"),
 			new DataField("ANTENNA_SERIAL", "VARCHAR(32)")};
 	
+	private static DataField[] parsingStatusField = {
+			new DataField("DEVICE_ID", "INTEGER"),
+			
+			new DataField("FILE_TYPE", "VARCHAR(16)"),
+			new DataField("FILE_NAME", "VARCHAR(64)"),
+			new DataField("FILE_QUEUE_SIZE", "INTEGER"),
+			new DataField("START_PARSING", "BIGINT"),
+			new DataField("FINISHED_PARSING", "BIGINT"),
+			new DataField("GENERATED_STREAMS", "INTEGER"),
+			new DataField("UNPARSABLE_STREAMS", "INTEGER")};
+	
 	@Override
 	public boolean initialize() {
 		boolean ret = super.initialize();
@@ -109,26 +131,32 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			storage_directory = new File(storage_directory, deployment).getPath();
 		}
 		
-		String filetype = getVirtualSensorConfiguration().getMainClassInitialParams().get("file_type");
-		if (filetype != null) {
-			if (filetype.equalsIgnoreCase(RAW_STATUS_FILE_TYPE))
-				file_type = 1;
-			else if (filetype.equalsIgnoreCase(CONFIG_FILE_TYPE))
-				file_type = 2;
-			else if (filetype.equalsIgnoreCase(EVENT_FILE_TYPE))
-				file_type = 3;
+		String streamtype = getVirtualSensorConfiguration().getMainClassInitialParams().get("stream_type");
+		if (streamtype != null) {
+			if (streamtype.equalsIgnoreCase(RAW_STATUS_STREAM_TYPE))
+				stream_type = 1;
+			else if (streamtype.equalsIgnoreCase(CONFIG_STREAM_TYPE))
+				stream_type = 2;
+			else if (streamtype.equalsIgnoreCase(EVENT_STREAM_TYPE))
+				stream_type = 3;
+			else if (streamtype.equalsIgnoreCase(PARSING_STATUS_STREAM_TYPE))
+				stream_type = 127;
 			else {
-				logger.error("file_type " + filetype + " not recognized");
+				logger.error("stream_type " + streamtype + " not recognized");
 				return false;
 			}
 		}
 		else {
-			logger.error("file_type init parameter has to specified in virtual sensor xml file");
+			logger.error("stream_type init parameter has to specified in virtual sensor xml file");
 			return false;
 		}
 		
-		gpsFileParserThread = new GPSFileParserThread();
-		new Thread(gpsFileParserThread).start();
+
+		gpsFileParserThread = GPSFileParserThread.getSingletonObject(stream_type, this);
+		synchronized (gpsFileParserThread) {
+			if (!gpsFileParserThread.isAlive())
+				gpsFileParserThread.start();
+		}
 		
 		return ret;
 	}
@@ -136,14 +164,16 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
-		String relativeFile = (String) data.getData("relative_file" + file_type);
-		if (relativeFile != null) {
-			File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), relativeFile);
-			file = file.getAbsoluteFile();
-			try {
-				gpsFileParserThread.newFile(file, inputStreamName, data);
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage());
+		if (stream_type < 127) {
+			String relativeFile = (String) data.getData("relative_file" + stream_type);
+			if (relativeFile != null) {
+				File file = new File(new File(storage_directory, Integer.toString((Integer)data.getData("device_id"))).getPath(), relativeFile);
+				file = file.getAbsoluteFile();
+				try {
+					gpsFileParserThread.newFile(stream_type, file, inputStreamName, data);
+				} catch (InterruptedException e) {
+					logger.error(e.getMessage());
+				}
 			}
 		}
 	}
@@ -159,96 +189,33 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		super.dataAvailable(inputStreamName, data);
 	}
 	
-	
-	private byte[] getRawPacket(DataInputStream dis, byte[] header, String filename) throws IOException, EOFException {
-		dis.mark(66000);
-		byte [] length = new byte [2];
-		dis.read(length);
-		byte [] rest = new byte [((length[0]&0xFF) | ((length[1]&0xFF) << 8)) + 2];
-		int plength = dis.read(rest);
-		if (plength != rest.length) {
-			if (plength != -1)
-				logger.warn("could not read a whole data packet at the end of file " + filename + " -> drop " + plength + " bytes");
-			throw new EOFException();
-		}
-		
-		return concatAll(header, new byte [] {length[0], length[1]}, rest);
-	}
-	
-	
-	private long getGPSRawTimestamp(byte[] rawPacket) {
-		ByteBuffer buf = ByteBuffer.wrap(rawPacket);
-		buf.order(ByteOrder.LITTLE_ENDIAN);
-		return (315964800L+(604800L*(long)buf.getShort(10)))*1000L+(long)buf.getInt(6);
-	}
 
-
-	private File fixFile(File f) throws IOException {
-		FileInputStream fis = new FileInputStream(f);
-		FileOutputStream fos = new FileOutputStream(f.getAbsolutePath() + ".fix");
+	private static class GPSFileParserThread extends Thread {
 		
-		byte[] tmp = new byte [1016];
-		while (fis.skip(8) == 8) {
-			int i = fis.read(tmp);
-			if (i == -1)
-				break;
-			else if (i != 1016)
-				logger.warn("less than 1016 bytes have been read at the end of file " + f.getAbsolutePath() + " -> drop " + i + " bytes");
-			
-			fos.write(tmp);
-		}
-		fis.close();
-		fos.close();
+		private static GPSFileParserThread singletonObject = null;
 		
-		return new File(f.getAbsolutePath() + ".fix");
-	}
-	
-	
-	private boolean checkChecksum(byte [] check) {
-		long ck_a = 0x00;
-		long ck_b = 0x00;
-		
-		for (int i=2; i<check.length-2; i++) {
-			ck_a += (long) check[i] & 0xFF;
-			ck_b += ck_a;
-		}
-		ck_a &= 0xFF;
-		ck_b &= 0xFF;
-		return ((check[check.length-2] & 0xFF) == ck_a) && ((check[check.length-1] & 0xFF) == ck_b);
-	}
-	
-	private static short getUByte(byte b) {
-		return (short) (b&0xFF);
-	}
-	
-	private static int getUShort(byte[] array) {
-		return (array[1]&0xFF) << 8 | (array[0]&0xFF);
-	}
-	
-	private static long getUInt(byte[] array) {
-		return (long) ((array[3]&0xFF) << 24 | (array[2]&0xFF) << 16 | (array[1]&0xFF) << 8 | (array[0]&0xFF));
-	}
-	
-	private static byte[] concatAll(byte[] first, byte[]... rest) {
-		int totalLength = first.length;
-		for (byte[] array : rest) {
-			totalLength += array.length;
-		}
-		byte[] result = Arrays.copyOf(first, totalLength);
-		int offset = first.length;
-		for (byte[] array : rest) {
-			System.arraycopy(array, 0, result, offset, array.length);
-			offset += array.length;
-		}
-		return result;
-	}
-
-	private class GPSFileParserThread implements Runnable {
 		private final BlockingQueue<FileItem> queue = new LinkedBlockingQueue<FileItem>();
 		private boolean stop = false;
+		private static Map<Short,GPSLoggerDataParser> streamtypeToListener = new Hashtable<Short,GPSLoggerDataParser>();
 		
-		protected void newFile(File file, String inputStreamName, StreamElement data) throws InterruptedException {
-			queue.put(new FileItem(file, inputStreamName, data));
+		
+		private GPSFileParserThread() {
+			setName("GPSFileParserThread-Thread");
+		}
+		
+		
+		@SuppressWarnings("unused")
+		public synchronized static GPSFileParserThread getSingletonObject(short streamtype, GPSLoggerDataParser listener) {
+			if (singletonObject == null)
+				singletonObject = new GPSFileParserThread();
+			
+			streamtypeToListener.put(streamtype, listener);
+			
+			return singletonObject;
+		}
+		
+		protected void newFile(byte type, File file, String inputStreamName, StreamElement data) throws InterruptedException {
+			queue.put(new FileItem(type, file, inputStreamName, data));
 		}
 
 		@Override
@@ -256,14 +223,25 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			try {
 				while (!stop) {
 					FileItem fileItem = queue.take();
+					byte streamType = fileItem.getType();
 					File file = fileItem.getFile();
 					String inputStreamName = fileItem.getInputStreamName();
 					StreamElement data = fileItem.getData();
+					GPSLoggerDataParser listener = streamtypeToListener.get(streamType);
 					long timed = data.getTimeStamp();
+					
+					if (listener == null) {
+						logger.error("for stream type " + streamType + " there is no listener available -> skip file");
+						continue;
+					}
+					
+					processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
+							(String) data.getData("relative_file" + streamType), queue.size(), timed, null, null, null);
 
-					switch (file_type) {
+					boolean finished = false;
+					switch (streamType) {
 						case 1:
-							logger.info("new incoming " + RAW_STATUS_FILE_TYPE + " file (" + file.getAbsolutePath() + ")");
+							logger.info("new incoming " + RAW_STATUS_STREAM_TYPE + " file (" + file.getAbsolutePath() + ")");
 							
 							short GPS_RAW_DATA_VERSION = 1;
 							int rawSampleCount = 1;
@@ -274,7 +252,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(fixFile(file))));
 								
 								int b = dis.readByte();
-								while (true) {
+								while (!stop) {
 									boolean readOn = false;
 									if (b == rawHeader[0]) {
 										b = dis.readByte();
@@ -304,7 +282,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																null,
 																rawPacket}, timed++);
 			
-														newStreamElement(inputStreamName, data);
+														listener.newStreamElement(inputStreamName, data);
 													}
 													else {
 														rawIncorrectChecksumCount++;
@@ -352,7 +330,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																buf.getShort(),
 																rawPacket}, timed++);
 			
-														newStreamElement(inputStreamName, data);
+														listener.newStreamElement(inputStreamName, data);
 													}
 													else {
 														statusIncorrectChecksumCount++;
@@ -376,20 +354,29 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 										b = dis.readByte();
 								}
 							} catch (EOFException e) {
+								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
+										(String) data.getData("relative_file" + streamType), queue.size(), timed, System.currentTimeMillis(),
+										rawSampleCount+statusSampleCount-2-rawIncorrectChecksumCount-statusIncorrectChecksumCount,
+										rawIncorrectChecksumCount+statusIncorrectChecksumCount);
+								finished = true;
 								logger.debug("end of file reached");
 							} catch (IOException e) {
 								logger.error(e.getMessage(), e);
 							}
 			
-							logger.info((rawSampleCount-1) + " raw samples and " + (statusSampleCount-1) + " status samples read");
-							if (rawIncorrectChecksumCount > 0)
-								logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data samples in " + file.getAbsolutePath());
-							if (statusIncorrectChecksumCount > 0)
-								logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data samples in " + file.getAbsolutePath());
+							if (finished) {
+								logger.info((rawSampleCount-1) + " raw samples and " + (statusSampleCount-1) + " status samples read");
+								if (rawIncorrectChecksumCount > 0)
+									logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data samples in " + file.getAbsolutePath());
+								if (statusIncorrectChecksumCount > 0)
+									logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data samples in " + file.getAbsolutePath());
+							}
+							else
+								logger.error("end of raw status file has not been reached -> not all stream elements could be generated");
 							break;
 						case 2:
-							logger.info("new incoming " + CONFIG_FILE_TYPE + " file (" + file.getAbsolutePath() + ")");
-							
+							logger.info("new incoming " + CONFIG_STREAM_TYPE + " file (" + file.getAbsolutePath() + ")");
+
 							try {
 								BufferedReader bufr = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(file))));
 								
@@ -400,97 +387,108 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								
 								String line;
 								int pos = -1;
-								while ((line = bufr.readLine()) != null) {
-									String [] spl = line.split("=", 2);
-									if (spl.length == 2) {
-										String param = spl[0].trim().toLowerCase();
-										String value = spl[1].trim();
-										try {
-											if (param.equals("start_date")) {
-												try {
-													out[1] = out[2] = out[5] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
-												} catch (ParseException e) {
-													logger.error(e.getMessage());
+								while (!stop) {
+									if ((line = bufr.readLine()) != null) {
+										String [] spl = line.split("=", 2);
+										if (spl.length == 2) {
+											String param = spl[0].trim().toLowerCase();
+											String value = spl[1].trim();
+											try {
+												if (param.equals("start_date")) {
+													try {
+														out[1] = out[2] = out[5] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
+													} catch (ParseException e) {
+														logger.error(e.getMessage());
+													}
+												} else if (param.equals("end_date")) {
+													try {
+														out[6] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
+													} catch (ParseException e) {
+														logger.error(e.getMessage());
+													}
+												} else if (param.equals("uploader")) {
+													out[7] = value;
+												} else if (param.equals("protocol")) {
+													out[8] = value;
+												} else if (param.equals("software_version")) {
+													pos = 9;
+													out[pos] = Integer.parseInt(value);
+												} else if (param.equals("firmware")) {
+													pos = 10;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("position")) {
+													pos = 11;
+													out[pos] = Integer.parseInt(value);
+												} else if (param.equals("low_power_cycle_time")) {
+													pos = 12;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("low_power_active_time")) {
+													pos = 13;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("low_power_measurement")) {
+													pos = 14;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("entry_voltage")) {
+													pos = 15;
+													out[pos] = Integer.parseInt(value);
+												} else if (param.equals("exit_voltage")) {
+													pos = 16;
+													out[pos] = Integer.parseInt(value);
+												} else if (param.equals("logging_rate")) {
+													pos = 17;
+													out[pos] = Integer.parseInt(value);
+												} else if (param.equals("config_used")) {
+													pos = 18;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("config_total")) {
+													pos = 19;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("config_string")) {
+													pos = 20;
+													out[pos] = value.getBytes();
+												} else if (param.equals("mast_orientation_start")) {
+													pos = 21;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("mast_orientation_end")) {
+													pos = 22;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("data_pages")) {
+													pos = 23;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("event_pages")) {
+													pos = 24;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("high_power_measurement")) {
+													pos = 25;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("antenna_serial")) {
+													out[26] = value;
 												}
-											} else if (param.equals("end_date")) {
-												try {
-													out[6] = (new SimpleDateFormat("dd/MM/yyyy").parse(value)).getTime();
-												} catch (ParseException e) {
-													logger.error(e.getMessage());
-												}
-											} else if (param.equals("uploader")) {
-												out[7] = value;
-											} else if (param.equals("protocol")) {
-												out[8] = value;
-											} else if (param.equals("software_version")) {
-												pos = 9;
-												out[pos] = Integer.parseInt(value);
-											} else if (param.equals("firmware")) {
-												pos = 10;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("position")) {
-												pos = 11;
-												out[pos] = Integer.parseInt(value);
-											} else if (param.equals("low_power_cycle_time")) {
-												pos = 12;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("low_power_active_time")) {
-												pos = 13;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("low_power_measurement")) {
-												pos = 14;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("entry_voltage")) {
-												pos = 15;
-												out[pos] = Integer.parseInt(value);
-											} else if (param.equals("exit_voltage")) {
-												pos = 16;
-												out[pos] = Integer.parseInt(value);
-											} else if (param.equals("logging_rate")) {
-												pos = 17;
-												out[pos] = Integer.parseInt(value);
-											} else if (param.equals("config_used")) {
-												pos = 18;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("config_total")) {
-												pos = 19;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("config_string")) {
-												pos = 20;
-												out[pos] = value.getBytes();
-											} else if (param.equals("mast_orientation_start")) {
-												pos = 21;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("mast_orientation_end")) {
-												pos = 22;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("data_pages")) {
-												pos = 23;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("event_pages")) {
-												pos = 24;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("high_power_measurement")) {
-												pos = 25;
-												out[pos] = Short.parseShort(value);
-											} else if (param.equals("antenna_serial")) {
-												out[26] = value;
+											} catch (NumberFormatException e) {
+												logger.error(e.getMessage());
+												out[pos] = null;
 											}
-										} catch (NumberFormatException e) {
-											logger.error(e.getMessage());
-											out[pos] = null;
 										}
 									}
+									else
+										finished = true;
 								}
 								data = new StreamElement(configField, out, timed++);
 
-								newStreamElement(inputStreamName, data);
+								listener.newStreamElement(inputStreamName, data);
 							} catch (IOException e) {
 								logger.error(e.getMessage(), e);
 							}
+							
+							if (finished){
+								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
+										(String) data.getData("relative_file" + streamType), queue.size(), timed, System.currentTimeMillis(), 1, 0);
+							}
+							else
+								logger.error("end of config file has not been reached -> stream element could be generated");
 							break;
 						case 3:
-							logger.info("new incoming " + EVENT_FILE_TYPE + " file (" + file.getAbsolutePath() + ")");
+							logger.info("new incoming " + EVENT_STREAM_TYPE + " file (" + file.getAbsolutePath() + ")");
 							
 							int eventCount = 0;
 							int unknownEventCounter = 0;
@@ -501,8 +499,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								byte[] tmp2b = new byte[2];
 								Vector<String> noTimestampEvents = new Vector<String>();
 								boolean timestampReady = false;
-								boolean loop = true;
-								while (loop) {
+								while (!finished && !stop) {
 									if(dis.read(tmp4b) != 4)
 										break;
 									long timestamp = getUInt(tmp4b)*1000L;
@@ -518,7 +515,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 									String event = null;
 									switch (eventNr) {
 										case 0x0000:
-											loop = false;
+											finished = true;
 											continue;
 										case 0x0001:
 											timestampReady = false;
@@ -617,7 +614,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 															eventCount,
 															noTimeStampEvent}, timed++);
 
-													newStreamElement(inputStreamName, data);
+													listener.newStreamElement(inputStreamName, data);
 													cnt--;
 													eventCount++;
 												}
@@ -633,7 +630,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 													eventCount,
 													event}, timed++);
 
-											newStreamElement(inputStreamName, data);
+											listener.newStreamElement(inputStreamName, data);
 											
 										}
 										else
@@ -649,36 +646,153 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							} catch (IOException e) {
 								logger.error(e.getMessage(), e);
 							}
-			
-							logger.info(eventCount + " events read");
-							if (unknownEventCounter > 0)
-								logger.warn(unknownEventCounter + " events have not been recognized");
+							if (finished) {
+								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
+										(String) data.getData("relative_file" + streamType), queue.size(), timed, System.currentTimeMillis(),
+										eventCount-unknownEventCounter, unknownEventCounter);
+								logger.info(eventCount + " events read");
+								if (unknownEventCounter > 0)
+									logger.warn(unknownEventCounter + " events have not been recognized");
+							}
+							else
+								logger.error("end of event file has not been reached -> not all stream elements could be generated");
 							break;
 						default:
-							logger.error("file_type unknown");
+							logger.error("stream_type unknown");
 							break;
 					}
 				}
 			} catch (InterruptedException e) { }
 		}
 		
-		public void shutdown() {
-			stop = true;
-			synchronized(queue) {
-				queue.notifyAll();
+		synchronized public void shutdown() {
+			if (!stop) {
+				stop = true;
+				synchronized(queue) {
+					queue.notifyAll();
+				}
 			}
 		}
 		
+		
+		private void processParsingStatusStreamElement(String inputStreamName, StreamElement data, String type, String name,
+				Integer queuesize, Long start, Long finished, Integer generated, Integer unparsable) {
+			long timestamp = System.currentTimeMillis();
+			data = new StreamElement(parsingStatusField, new Serializable[]{
+				data.getData(parsingStatusField[0].getName()),
+				type,
+				name,
+				queuesize,
+				start,
+				finished,
+				generated,
+				unparsable}, timestamp);
+	
+			GPSLoggerDataParser listener = streamtypeToListener.get(127);
+			if (listener != null)
+				listener.newStreamElement(inputStreamName, data);
+			else
+				logger.warn("no listener for parsing status stream elements available");
+		}
+		
+		
+		private byte[] getRawPacket(DataInputStream dis, byte[] header, String filename) throws IOException, EOFException {
+			dis.mark(66000);
+			byte [] length = new byte [2];
+			dis.read(length);
+			byte [] rest = new byte [((length[0]&0xFF) | ((length[1]&0xFF) << 8)) + 2];
+			int plength = dis.read(rest);
+			if (plength != rest.length) {
+				if (plength != -1)
+					logger.warn("could not read a whole data packet at the end of file " + filename + " -> drop " + plength + " bytes");
+				throw new EOFException();
+			}
+			
+			return concatAll(header, new byte [] {length[0], length[1]}, rest);
+		}
+		
+		
+		private boolean checkChecksum(byte [] check) {
+			long ck_a = 0x00;
+			long ck_b = 0x00;
+			
+			for (int i=2; i<check.length-2; i++) {
+				ck_a += (long) check[i] & 0xFF;
+				ck_b += ck_a;
+			}
+			ck_a &= 0xFF;
+			ck_b &= 0xFF;
+			return ((check[check.length-2] & 0xFF) == ck_a) && ((check[check.length-1] & 0xFF) == ck_b);
+		}
+		
+		
+		private long getGPSRawTimestamp(byte[] rawPacket) {
+			ByteBuffer buf = ByteBuffer.wrap(rawPacket);
+			buf.order(ByteOrder.LITTLE_ENDIAN);
+			return (315964800L+(604800L*(long)buf.getShort(10)))*1000L+(long)buf.getInt(6);
+		}
+
+
+		private File fixFile(File f) throws IOException {
+			FileInputStream fis = new FileInputStream(f);
+			FileOutputStream fos = new FileOutputStream(f.getAbsolutePath() + ".fix");
+			
+			byte[] tmp = new byte [1016];
+			while (fis.skip(8) == 8) {
+				int i = fis.read(tmp);
+				if (i == -1)
+					break;
+				else if (i != 1016)
+					logger.warn("less than 1016 bytes have been read at the end of file " + f.getAbsolutePath() + " -> drop " + i + " bytes");
+				
+				fos.write(tmp);
+			}
+			fis.close();
+			fos.close();
+			
+			return new File(f.getAbsolutePath() + ".fix");
+		}
+		
+		private short getUByte(byte b) {
+			return (short) (b&0xFF);
+		}
+		
+		private int getUShort(byte[] array) {
+			return (array[1]&0xFF) << 8 | (array[0]&0xFF);
+		}
+		
+		private long getUInt(byte[] array) {
+			return (long) ((array[3]&0xFF) << 24 | (array[2]&0xFF) << 16 | (array[1]&0xFF) << 8 | (array[0]&0xFF));
+		}
+		
+		private byte[] concatAll(byte[] first, byte[]... rest) {
+			int totalLength = first.length;
+			for (byte[] array : rest) {
+				totalLength += array.length;
+			}
+			byte[] result = Arrays.copyOf(first, totalLength);
+			int offset = first.length;
+			for (byte[] array : rest) {
+				System.arraycopy(array, 0, result, offset, array.length);
+				offset += array.length;
+			}
+			return result;
+		}
+		
 		private class FileItem {
+			private byte type;
 			private File file;
 			private String inputStreamName;
 			private StreamElement data;
 			
-			public FileItem (File file, String inputStreamName, StreamElement data) {
+			public FileItem (byte type, File file, String inputStreamName, StreamElement data) {
+				this.type = type;
 				this.file = file;
 				this.inputStreamName = inputStreamName;
 				this.data = data;
 			}
+			
+			public byte getType() { return type; };
 			
 			public File getFile() { return file; };
 			
