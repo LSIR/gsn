@@ -68,7 +68,7 @@ class AlphasenseDriver():
             self._logger.error( "serialAccess Exception (1)" + str(e))
             self._logger.error("Could not flush input buffer")
             self._device.close()
-            return False
+            return ''
         
         msg = '\x55\x02\x00\x00\xd0\x00\xaa'
 
@@ -93,6 +93,7 @@ class AlphasenseDriver():
             self._logger.error("serial access exception: " + str(e))
             self._logger.error("Could not read Alphasense sensor reading")
             self._device.close()
+            return ''
             
     def _getCalibData(self):
         

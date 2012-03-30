@@ -69,19 +69,24 @@ class MotionDetectionPluginClass(AbstractPluginClass):
 
     def action(self, parameters):
 
-        self.steval._openDevice()
-        self._data = self.steval._startDataAcquisition(self._pollDuration)
-        self.detectMotion()
+        #self.steval._openDevice()
+        #self._data = self.steval._startDataAcquisition(self._pollDuration)
+        #self.detectMotion()
 
-        self.steval._closeDevice()
-        self._numPolls = self._numPolls + 1
-        # Send statistics
-        #if self._numPolls == self._sendStatistic:
-        #    self._numPolls = 0
-        #    dataPackage = [self._stdThreshold, self._pollInterval, self._pollDuration, self._std_x, self._std_y, self._std_z, self._moving]
-        #    self._moving = 0
-        #    self.info(dataPackage)
-        #    self.processMsg(self.getTimeStamp(), dataPackage)
+        #self.steval._closeDevice()
+        #self._numPolls = self._numPolls + 1
+        
+        pluginList = ['OZ47Plugin1', 'GPSPluginNAV', 'AlphasensePlugin', 'STEVALPlugin']
+        num = 0
+        time_id = self.getTimeStamp()
+        for pluginName in pluginList:
+            try:
+                self.sendInterPluginCommand(pluginName, time_id)
+            except Exception, e:
+                self.error(str(e))
+            else:
+                num += 1
+        self.debug('recvInterPluginCommand successfully called from ' + str(num) + ' of ' + str(len(pluginList)) + ' plugins')
 
     def isBusy(self):
         return False
