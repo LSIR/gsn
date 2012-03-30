@@ -59,6 +59,10 @@ class GPSPluginClass(AbstractPluginClass):
         
         # The measurement interval in seconds
         self._interval = float(self.getOptionValue('poll_interval'))
+        if self._interval >= 10:
+            self.info('poll interval: %s' % (self._interval,))
+        else:
+            self.warning('poll interval: %s (are you sure you want such a small interval?)' % (self._interval,))
     	# The measurement time in seconds
         self._measTime = int(self.getOptionValue('measurement_time'))
         # The device identifier

@@ -45,6 +45,11 @@ class MotionDetectionPluginClass(AbstractPluginClass):
         if self._pollInterval <= self._pollDuration:
             self.warning('Bad configuration, poll interval is smaller equal than poll duration!')
             self._pollInterval = self._pollDuration + 5
+            
+        if self._pollInterval >= 10:
+            self.info('poll interval: %s seconds' % (self._pollInterval,))
+        else:
+            self.warning('poll interval: %s seconds (are you sure you want such a small interval?)' % (self._pollInterval,))
 
         self.steval = STEVALDriver.STEVALDriver([self._deviceStr])
         #self.steval._setSensor()

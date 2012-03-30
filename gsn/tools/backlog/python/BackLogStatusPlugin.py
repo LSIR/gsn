@@ -47,7 +47,10 @@ class BackLogStatusPluginClass(AbstractPluginClass):
             self._interval = None
         else:
             self._interval = float(value)
-            self.info('interval: %s' % (self._interval,))
+            if self._interval >= 10:
+                self.info('poll interval: %s seconds' % (self._interval,))
+            else:
+                self.warning('poll interval: %s seconds (are you sure you want such a small interval?)' % (self._interval,))
         
         
     def isBusy(self):
