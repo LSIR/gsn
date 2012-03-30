@@ -196,7 +196,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		
 		private final BlockingQueue<FileItem> queue = new LinkedBlockingQueue<FileItem>();
 		private boolean stop = false;
-		private static Map<Short,GPSLoggerDataParser> streamtypeToListener = new Hashtable<Short,GPSLoggerDataParser>();
+		private static Map<Byte,GPSLoggerDataParser> streamtypeToListener = new Hashtable<Byte,GPSLoggerDataParser>();
 		
 		
 		private GPSFileParserThread() {
@@ -205,7 +205,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		
 		
 		@SuppressWarnings("unused")
-		public synchronized static GPSFileParserThread getSingletonObject(short streamtype, GPSLoggerDataParser listener) {
+		public synchronized static GPSFileParserThread getSingletonObject(byte streamtype, GPSLoggerDataParser listener) {
 			if (singletonObject == null)
 				singletonObject = new GPSFileParserThread();
 			
