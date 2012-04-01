@@ -22,6 +22,7 @@ public class RestServlet extends HttpServlet {
     private static final int REQUEST_GET_MEASUREMENTS_FOR_SENSOR = 1;
     private static final int REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD = 2;
     private static final int REQUEST_GET_GEO_DATA_FOR_SENSOR = 3;
+    private static final int REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD = 4;
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -31,16 +32,30 @@ public class RestServlet extends HttpServlet {
         //response.getWriter().write(debugRequest(request, response));
         RestResponse restResponse;
 
+        String sensor = null;
+        String field = null;
+        String str_from = null;
+        String str_to = null;
+        String str_size = null;
+
         switch (determineRequest(request.getRequestURI())) {
             case REQUEST_GET_ALL_SENSORS:
                 restResponse = getRequestHandler.getSensors();
                 break;
             case REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD:
-                String sensor = parseURI(request.getRequestURI())[3];
-                String field = parseURI(request.getRequestURI())[4];
-                String str_from = request.getParameter("from");
-                String str_to = request.getParameter("to");
+                sensor = parseURI(request.getRequestURI())[3];
+                field = parseURI(request.getRequestURI())[4];
+                str_from = request.getParameter("from");
+                str_to = request.getParameter("to");
                 restResponse = getRequestHandler.getMeasurementsForSensorField(sensor, field, str_from, str_to);
+                break;
+            case REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD:
+                sensor = parseURI(request.getRequestURI())[3];
+                field = parseURI(request.getRequestURI())[4];
+                str_from = request.getParameter("from");
+                str_to = request.getParameter("to");
+                str_size = request.getParameter("size");
+                restResponse = getRequestHandler.getPreviewMeasurementsForSensorField(sensor, field, str_from, str_to, str_size);
                 break;
             default:
                 restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Cannot interpret request.");
@@ -82,6 +97,8 @@ public class RestServlet extends HttpServlet {
         String[] parsedURI = parseURI(URI);
         logger.warn(parsedURI.length);
         logger.warn(parsedURI[1]);
+        if (parsedURI.length == 5 && parsedURI[2].equalsIgnoreCase("preview"))
+            return REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD;
         if (parsedURI.length == 3 && parsedURI[2].equalsIgnoreCase("sensors"))
             return REQUEST_GET_ALL_SENSORS;
         if (parsedURI.length == 5 && parsedURI[2].equalsIgnoreCase("sensors"))

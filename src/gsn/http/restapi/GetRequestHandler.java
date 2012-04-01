@@ -21,6 +21,7 @@ public class GetRequestHandler {
 
     private static transient Logger logger = Logger.getLogger(GetRequestHandler.class);
     private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final long DEFAULT_PREVIEW_SIZE = 1000;
 
 
     public RestResponse getSensors() {
@@ -105,6 +106,147 @@ public class GetRequestHandler {
 
         return restResponse;
     }
+
+    public RestResponse getPreviewMeasurementsForSensorField(String sensor, String field, String from, String to, String size) {
+
+        RestResponse restResponse = new RestResponse();
+
+        Vector<Double> stream = new Vector<Double>();
+        Vector<Long> timestamps = new Vector<Long>();
+
+        boolean errorFlag = false;
+
+        long n = -1;
+        long fromAsLong = -1;
+        long toAsLong = -1;
+
+        if (size == null)
+            n = DEFAULT_PREVIEW_SIZE;
+        else
+            try {
+                n = Long.parseLong(size);
+            } catch (NumberFormatException e) {
+                logger.error(e.getMessage(), e);
+            }
+
+        if (n<1) n = DEFAULT_PREVIEW_SIZE; // size should be strictly larger than 0
+
+        if (from == null) { // no lower bound provided
+            fromAsLong = getMinTimestampForSensorField(sensor, field);
+        } else try {
+            fromAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(from).getTime();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            errorFlag = true;
+        }
+
+        if (to == null) { // no lower bound provided
+            toAsLong = getMaxTimestampForSensorField(sensor, field);
+        } else try {
+            toAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(to).getTime();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            errorFlag = true;
+        }
+
+        if (errorFlag) {
+            restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Malformed date for from or to field.");
+            return (restResponse);
+        }
+
+        errorFlag = !getDataPreview(sensor, field, fromAsLong, toAsLong, stream, timestamps, n);
+
+        if (errorFlag) {
+            restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Error in request.");
+            return (restResponse);
+        }
+
+        JSONObject jsonResponse = new JSONObject();
+        jsonResponse.put("sensor", sensor);
+        jsonResponse.put("field", field);
+        jsonResponse.put("from", from);
+        jsonResponse.put("to", to);
+        JSONArray streamArray = new JSONArray();
+        JSONArray timestampsArray = new JSONArray();
+        for (int i = 0; i < stream.size(); i++) {
+            streamArray.add(stream.get(i));
+            timestampsArray.add(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i))));
+        }
+        jsonResponse.put("timestamps", timestampsArray);
+        jsonResponse.put("values", streamArray);
+        restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
+        restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
+        restResponse.setResponse(jsonResponse.toJSONString());
+
+        return restResponse;
+    }
+
+    private long getMinTimestampForSensorField(String sensor, String field) {
+        return getTimestampBoundForSensorField(sensor, field, "min");
+    }
+
+    private long getMaxTimestampForSensorField(String sensor, String field) {
+        return getTimestampBoundForSensorField(sensor, field, "max");
+    }
+
+    private long getTimestampBoundForSensorField(String sensor, String field, String boundType) {
+        Connection conn = null;
+        ResultSet resultSet = null;
+
+        boolean result = true;
+        long timestamp = -1;
+
+        try {
+            conn = Main.getDefaultStorage().getConnection();
+            StringBuilder query = new StringBuilder("select ").append(boundType).append("(timed) from ").append(sensor);
+
+            resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
+
+            if (resultSet.next()) {
+
+                timestamp = resultSet.getLong(1);
+            }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            result = false;
+        } finally {
+            Main.getStorage(sensor).close(resultSet);
+            Main.getStorage(sensor).close(conn);
+        }
+
+        return timestamp;
+    }
+
+    private long getTableSize(String sensor) {
+        Connection conn = null;
+        ResultSet resultSet = null;
+
+        boolean result = true;
+        long timestamp = -1;
+
+        try {
+            conn = Main.getDefaultStorage().getConnection();
+            StringBuilder query = new StringBuilder("select count(*) from ").append(sensor);
+
+            resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
+
+            if (resultSet.next()) {
+
+                timestamp = resultSet.getLong(1);
+            }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            result = false;
+        } finally {
+            Main.getStorage(sensor).close(resultSet);
+            Main.getStorage(sensor).close(conn);
+        }
+
+        return timestamp;
+    }
+
 
     public RestResponse getMeasurementsForSensorField(String sensor, String field, String from, String to) {
 
@@ -196,4 +338,43 @@ public class GetRequestHandler {
         return result;
     }
 
+    public boolean getDataPreview(String sensor, String field, long from, long to, Vector<Double> stream, Vector<Long> timestamps, long size) {
+        Connection conn = null;
+        ResultSet resultSet = null;
+
+        boolean result = true;
+
+        long skip = getTableSize(sensor) / size;
+
+        try {
+            conn = Main.getDefaultStorage().getConnection();
+            StringBuilder query = new StringBuilder("select timed, ")
+                    .append(field)
+                    .append(" from ")
+                    .append(sensor)
+                    .append(" where mod(pk,")
+                    .append(skip)
+                    .append(")=1");
+
+            resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
+
+            while (resultSet.next()) {
+                //int ncols = resultSet.getMetaData().getColumnCount();
+                long timestamp = resultSet.getLong(1);
+                double value = resultSet.getDouble(2);
+                //logger.warn(ncols + " cols, value: " + value + " ts: " + timestamp);
+                stream.add(value);
+                timestamps.add(timestamp);
+            }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            result = false;
+        } finally {
+            Main.getStorage(sensor).close(resultSet);
+            Main.getStorage(sensor).close(conn);
+        }
+
+        return result;
+    }
 }
