@@ -179,11 +179,13 @@ public class MultiDataDownload extends HttpServlet {
 			vsAndFieldsEntry = vsAndFields.next();
 			vsname = new StringBuilder();
 			vsname.append(vsAndFieldsEntry.getKey());
+			vsname.append(":");
 			fieldsIterator = vsAndFieldsEntry.getValue().iterator();
             while (fieldsIterator.hasNext()) {
-				vsname.append(":");
 				String n = fieldsIterator.next();
                 vsname.append(n);
+                if (fieldsIterator.hasNext())
+                	vsname.append(",");
 			}
 			vsnames.add(vsname.toString());
 		}
