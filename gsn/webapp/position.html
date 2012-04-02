@@ -190,7 +190,7 @@ $(document).ready(function() {
           "signals": {
               "y1": [
               {
-                  "displayName": "Particulate matter [#]",
+                  "displayName": "Tram 1: Particulate matter [#]",
                   "gsnUrl": window.location.host,
                   "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_gps",
                   "field": "number",
@@ -200,7 +200,7 @@ $(document).ready(function() {
                   "thresholds": [ 25000.0, 20000.0 ]
               },
               {
-                    "displayName": "Ozone [ppb]",
+                    "displayName": "Tram 1: Ozone [ppb]",
                     "gsnUrl": window.location.host,
                     "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_instant_calibrated",
                     "field": "ozone_ppb",
@@ -210,7 +210,7 @@ $(document).ready(function() {
                     "thresholds": [ 18.0, 8.0 ]
               },
               {
-                    "displayName": "CO [ppm]",
+                    "displayName": "Tram 1: CO [ppm]",
                     "gsnUrl": window.location.host,
                     "virtualSensor": deployments[visible].name.toLowerCase() + "_alphasense_co_gps",
                     "field": "sensor_ppm",
@@ -220,17 +220,7 @@ $(document).ready(function() {
                     "thresholds": [ 1.5, 1.0 ]
               },
               {
-                  "displayName": "GPS Satellites [#]",
-                  "gsnUrl": window.location.host,
-                  "virtualSensor": deployments[visible].name.toLowerCase() + "_gps_nav__mapped",
-                  "field": "nr_satellites",
-                  "deviceId": 3,
-                  "scaling": 1.0,
-                  "visible": true,
-                  "thresholds": [ 6.0, 7.0 ]
-              },
-              {
-                  "displayName": "GasMobile Ozone [ppb]",
+                  "displayName": "Smartphone: Ozone [ppb]",
                   "gsnUrl": window.location.host,
                   "virtualSensor": deployments[visible].name.toLowerCase() + "_gasmobile_ozone_uncalibrated",
                   "field": "ozone_ppb",
