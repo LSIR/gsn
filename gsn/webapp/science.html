@@ -61,21 +61,21 @@ $(document).ready(function() {
 
       // opensense
       
-      { title:"Ozone Concentration [ppb]: Tram 1",
+      { title:"Tram 1: Ozone Concentration [ppb]",
         signals: [{
           vsensor:".*_oz47_only_init_calibrated",
           field:["ozone_ppb"],
           deviceId: [3]
         }]
       },
-      { title:"Carbon Monoxide Concentration [ppm]: Tram 1",
+      { title:"Tram 1: Carbon Monoxide Concentration [ppm]",
         signals: [{
           vsensor:".*_alphasense_dynamic__mapped",
           field:["sensor_ppm_1"],
           deviceId: [3]
         }]
       },
-      { title:"Particulate Matter [particle/cm^3]: Tram 1",
+      { title:"Tram 1: Particulate Matter [particle/cm^3]",
         signals: [{
           vsensor:".*_minidisc__mapped",
           field:["number"],
