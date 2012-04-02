@@ -12,7 +12,7 @@ public class FieldsCollection {
 	private String timedfield;
 	
 	public FieldsCollection(String[] _fields, String timedfield) {
-		this.timedfield=timedfield;
+		this.timedfield=timedfield.trim();
 		init(_fields);
 	}
 	
@@ -24,6 +24,7 @@ public class FieldsCollection {
 	private void init(String[] _fields) {
 		wantTimed = false;
 		for (int j = 0; j < _fields.length; j++) {
+			_fields[j] = _fields[j].trim();
 			if (_fields[j].compareToIgnoreCase(timedfield) == 0)
 				wantTimed = true;
 		}

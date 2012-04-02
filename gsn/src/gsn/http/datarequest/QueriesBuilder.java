@@ -78,7 +78,7 @@ public class QueriesBuilder {
 			}
 			else {
 				name = vsnamesParameters[i].substring(0, firstColumnIndex);
-				streams = vsnamesParameters[i].substring(firstColumnIndex + 1).split(":");
+				streams = vsnamesParameters[i].substring(firstColumnIndex + 1).split(",");
 			}
 
 			vsnamesAndStreams.put(name, new FieldsCollection (streams, timedfield));
