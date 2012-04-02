@@ -230,6 +230,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					StreamElement data = fileItem.getData();
 					GPSLoggerDataParser listener = streamtypeToListener.get(streamType);
 					long timed = data.getTimeStamp();
+					String relativeFile = (String) data.getData("relative_file" + streamType);
 					
 					if (listener == null) {
 						logger.error("for stream type " + streamType + " there is no listener available -> skip file");
@@ -237,12 +238,12 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					}
 					
 					processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
-							(String) data.getData("relative_file" + streamType), queue.size(), startParsingTime, null, null, null);
+							relativeFile, queue.size(), startParsingTime, null, null, null);
 
 					boolean finished = false;
 					switch (streamType) {
 						case 1:
-							logger.info("start parsing " + RAW_STATUS_STREAM_TYPE + " file (" + file.getAbsolutePath() + ")");
+							logger.info("start parsing " + RAW_STATUS_STREAM_TYPE + " file (" + relativeFile + ")");
 							
 							short GPS_RAW_DATA_VERSION = 1;
 							int rawSampleCount = 1;
@@ -263,7 +264,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 												b = dis.readByte();
 												if (b == rawHeader[3]) {
 													// gps logger raw data
-													byte [] rawPacket = getRawPacket(dis, rawHeader, file.getAbsolutePath());
+													byte [] rawPacket = getRawPacket(dis, rawHeader, relativeFile);
 													if (checkChecksum(rawPacket)) {
 														long timestamp = getGPSRawTimestamp(rawPacket);
 														data = new StreamElement(rawStatusField, new Serializable[]{
@@ -287,7 +288,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 													}
 													else {
 														rawIncorrectChecksumCount++;
-														logger.warn("checksum for gps raw data sample " + rawSampleCount + " is not correct in " + file.getAbsolutePath());
+														logger.warn("checksum for gps raw data sample " + rawSampleCount + " is not correct in " + relativeFile);
 														dis.reset();
 													}
 													
@@ -308,7 +309,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 												b = dis.readByte();
 												if (b == statusHeader[3]) {
 													// gps logger status data
-													byte [] rawPacket = getRawPacket(dis, statusHeader, file.getAbsolutePath());
+													byte [] rawPacket = getRawPacket(dis, statusHeader, relativeFile);
 													if (checkChecksum(rawPacket)) {
 														ByteBuffer buf = ByteBuffer.wrap(rawPacket);
 														buf.order(ByteOrder.LITTLE_ENDIAN);
@@ -335,7 +336,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 													}
 													else {
 														statusIncorrectChecksumCount++;
-														logger.warn("checksum for gps status data sample " + statusSampleCount + " is not correct in " + file.getAbsolutePath());
+														logger.warn("checksum for gps status data sample " + statusSampleCount + " is not correct in " + relativeFile);
 														dis.reset();
 													}
 													
@@ -364,11 +365,11 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							if (finished) {
 								logger.info((rawSampleCount-1) + " raw samples and " + (statusSampleCount-1) + " status samples read");
 								if (rawIncorrectChecksumCount > 0)
-									logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data samples in " + file.getAbsolutePath());
+									logger.warn(rawIncorrectChecksumCount + " checksums did not match for raw data samples in " + relativeFile);
 								if (statusIncorrectChecksumCount > 0)
-									logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data samples in " + file.getAbsolutePath());
+									logger.warn(statusIncorrectChecksumCount + " checksums did not match for status data samples in " + relativeFile);
 								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
-										(String) data.getData("relative_file" + streamType), queue.size(), startParsingTime, System.currentTimeMillis(),
+										relativeFile, queue.size(), startParsingTime, System.currentTimeMillis(),
 										rawSampleCount+statusSampleCount-2-rawIncorrectChecksumCount-statusIncorrectChecksumCount,
 										rawIncorrectChecksumCount+statusIncorrectChecksumCount);
 							}
@@ -376,7 +377,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								logger.error("end of raw status file has not been reached -> not all stream elements could be generated");
 							break;
 						case 2:
-							logger.info("start parsing  " + CONFIG_STREAM_TYPE + " file (" + file.getAbsolutePath() + ")");
+							logger.info("start parsing  " + CONFIG_STREAM_TYPE + " file (" + relativeFile + ")");
 
 							try {
 								BufferedReader bufr = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(file))));
@@ -484,15 +485,15 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							}
 							
 							if (finished){
-								logger.info("successfully parsed config file (" + file.getAbsolutePath() + ")");
+								logger.info("successfully parsed config file (" + relativeFile + ")");
 								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
-										(String) data.getData("relative_file" + streamType), queue.size(), startParsingTime, System.currentTimeMillis(), 1, 0);
+										relativeFile, queue.size(), startParsingTime, System.currentTimeMillis(), 1, 0);
 							}
 							else
 								logger.error("end of config file has not been reached -> stream element could be generated");
 							break;
 						case 3:
-							logger.info("start parsing " + EVENT_STREAM_TYPE + " file (" + file.getAbsolutePath() + ")");
+							logger.info("start parsing " + EVENT_STREAM_TYPE + " file (" + relativeFile + ")");
 							
 							int eventCount = 0;
 							int unknownEventCounter = 0;
@@ -653,7 +654,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							}
 							if (finished) {
 								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
-										(String) data.getData("relative_file" + streamType), queue.size(), startParsingTime, System.currentTimeMillis(),
+										relativeFile, queue.size(), startParsingTime, System.currentTimeMillis(),
 										eventCount-unknownEventCounter, unknownEventCounter);
 								logger.info(eventCount + " events read");
 								if (unknownEventCounter > 0)
