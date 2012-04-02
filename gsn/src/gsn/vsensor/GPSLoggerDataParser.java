@@ -37,12 +37,12 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	private static final String EVENT_STREAM_TYPE = "events";
 	private static final String PARSING_STATUS_STREAM_TYPE = "parsing-status";
 	
-	private static final Hashtable<Byte, String> streamTypeNamingTable = new Hashtable<Byte, String>();
+	private static final Hashtable<Short, String> streamTypeNamingTable = new Hashtable<Short, String>();
 	static
 	{
-		streamTypeNamingTable.put((byte) 1, RAW_STATUS_STREAM_TYPE);
-		streamTypeNamingTable.put((byte) 2, CONFIG_STREAM_TYPE);
-		streamTypeNamingTable.put((byte) 3, EVENT_STREAM_TYPE);
+		streamTypeNamingTable.put((short) 1, RAW_STATUS_STREAM_TYPE);
+		streamTypeNamingTable.put((short) 2, CONFIG_STREAM_TYPE);
+		streamTypeNamingTable.put((short) 3, EVENT_STREAM_TYPE);
 	}
 	
 	private static final byte[] rawHeader = {(byte) 0xB5, 0x62, 0x02, 0x10};
@@ -51,7 +51,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 	private static final transient Logger logger = Logger.getLogger(GPSLoggerDataParser.class);
 
 	private String storage_directory = null;
-	private byte stream_type;
+	private short stream_type;
 	private GPSFileParserThread gpsFileParserThread;
 	
 	private static DataField[] rawStatusField = {
@@ -196,7 +196,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		
 		private final BlockingQueue<FileItem> queue = new LinkedBlockingQueue<FileItem>();
 		private boolean stop = false;
-		private static Map<Byte,GPSLoggerDataParser> streamtypeToListener = new Hashtable<Byte,GPSLoggerDataParser>();
+		private static Map<Short,GPSLoggerDataParser> streamtypeToListener = new Hashtable<Short,GPSLoggerDataParser>();
 		
 		
 		private GPSFileParserThread() {
@@ -205,7 +205,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		
 		
 		@SuppressWarnings("unused")
-		public synchronized static GPSFileParserThread getSingletonObject(byte streamtype, GPSLoggerDataParser listener) {
+		public synchronized static GPSFileParserThread getSingletonObject(short streamtype, GPSLoggerDataParser listener) {
 			if (singletonObject == null)
 				singletonObject = new GPSFileParserThread();
 			
@@ -214,7 +214,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			return singletonObject;
 		}
 		
-		protected void newFile(byte type, File file, String inputStreamName, StreamElement data) throws InterruptedException {
+		protected void newFile(short type, File file, String inputStreamName, StreamElement data) throws InterruptedException {
 			queue.put(new FileItem(type, file, inputStreamName, data));
 		}
 
@@ -223,7 +223,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			try {
 				while (!stop) {
 					FileItem fileItem = queue.take();
-					byte streamType = fileItem.getType();
+					long startParsingTime = System.currentTimeMillis();
+					short streamType = fileItem.getType();
 					File file = fileItem.getFile();
 					String inputStreamName = fileItem.getInputStreamName();
 					StreamElement data = fileItem.getData();
@@ -236,7 +237,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					}
 					
 					processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
-							(String) data.getData("relative_file" + streamType), queue.size(), timed, null, null, null);
+							(String) data.getData("relative_file" + streamType), queue.size(), startParsingTime, null, null, null);
 
 					boolean finished = false;
 					switch (streamType) {
@@ -355,7 +356,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								}
 							} catch (EOFException e) {
 								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
-										(String) data.getData("relative_file" + streamType), queue.size(), timed, System.currentTimeMillis(),
+										(String) data.getData("relative_file" + streamType), queue.size(), startParsingTime, System.currentTimeMillis(),
 										rawSampleCount+statusSampleCount-2-rawIncorrectChecksumCount-statusIncorrectChecksumCount,
 										rawIncorrectChecksumCount+statusIncorrectChecksumCount);
 								finished = true;
@@ -470,8 +471,10 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 											}
 										}
 									}
-									else
+									else {
 										finished = true;
+										break;
+									}
 								}
 								data = new StreamElement(configField, out, timed++);
 
@@ -482,7 +485,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							
 							if (finished){
 								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
-										(String) data.getData("relative_file" + streamType), queue.size(), timed, System.currentTimeMillis(), 1, 0);
+										(String) data.getData("relative_file" + streamType), queue.size(), startParsingTime, System.currentTimeMillis(), 1, 0);
 							}
 							else
 								logger.error("end of config file has not been reached -> stream element could be generated");
@@ -648,7 +651,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							}
 							if (finished) {
 								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
-										(String) data.getData("relative_file" + streamType), queue.size(), timed, System.currentTimeMillis(),
+										(String) data.getData("relative_file" + streamType), queue.size(), startParsingTime, System.currentTimeMillis(),
 										eventCount-unknownEventCounter, unknownEventCounter);
 								logger.info(eventCount + " events read");
 								if (unknownEventCounter > 0)
@@ -688,7 +691,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 				generated,
 				unparsable}, timestamp);
 	
-			GPSLoggerDataParser listener = streamtypeToListener.get(127);
+			GPSLoggerDataParser listener = streamtypeToListener.get((short)127);
 			if (listener != null)
 				listener.newStreamElement(inputStreamName, data);
 			else
@@ -780,19 +783,19 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		}
 		
 		private class FileItem {
-			private byte type;
+			private short type;
 			private File file;
 			private String inputStreamName;
 			private StreamElement data;
 			
-			public FileItem (byte type, File file, String inputStreamName, StreamElement data) {
+			public FileItem (short type, File file, String inputStreamName, StreamElement data) {
 				this.type = type;
 				this.file = file;
 				this.inputStreamName = inputStreamName;
 				this.data = data;
 			}
 			
-			public byte getType() { return type; };
+			public short getType() { return type; };
 			
 			public File getFile() { return file; };
 			
