@@ -4,7 +4,7 @@
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="position_mapping" />
-            <param name="file_type">raw-status</param>
+            <param name="stream_type">raw-status</param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
