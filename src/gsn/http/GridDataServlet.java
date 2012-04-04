@@ -94,7 +94,6 @@ public class GridDataServlet extends HttpServlet {
         return generateASCIIFileName(sensor, timestamp, DEFAULT_TIMEFORMAT);
     }
 
-
     private void writeASCIIFile(String fileName, String folder, String content) {
         try {
             FileWriter outFile = new FileWriter(folder + "/" + fileName);
@@ -130,7 +129,5 @@ public class GridDataServlet extends HttpServlet {
             zipOutputStream.close();
         } catch (IOException e) {
         }
-
-
     }
 }
