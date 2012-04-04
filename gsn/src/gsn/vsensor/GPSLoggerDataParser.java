@@ -275,8 +275,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																timestamp,
 																timestamp,
 																gsn_timestamp++,
-																data.getData(rawStatusField[3].getName()),
 																data.getData(rawStatusField[4].getName()),
+																data.getData(rawStatusField[5].getName()),
 																RAW_DATA_TYPE,
 																rawSampleCount,
 																GPS_RAW_DATA_VERSION,
@@ -324,8 +324,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																timestamp,
 																timestamp,
 																gsn_timestamp++,
-																data.getData(rawStatusField[3].getName()),
 																data.getData(rawStatusField[4].getName()),
+																data.getData(rawStatusField[5].getName()),
 																STATUS_TYPE,
 																statusSampleCount,
 																null,
@@ -390,8 +390,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								Serializable [] out = new Serializable[configField.length];
 								out[0] = data.getData(configField[0].getName());
 								out[3] = gsn_timestamp;
-								out[4] = data.getData(configField[3].getName());
-								out[5] = data.getData(configField[4].getName());
+								out[4] = data.getData(configField[4].getName());
+								out[5] = data.getData(configField[5].getName());
 								
 								String line;
 								int pos = -1;
@@ -621,8 +621,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 															timestamp-cnt,
 															timestamp-cnt,
 															gsn_timestamp++,
-															data.getData(eventField[3].getName()),
 															data.getData(eventField[4].getName()),
+															data.getData(eventField[5].getName()),
 															eventCount,
 															noTimeStampEvent});
 
@@ -638,8 +638,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 													timestamp,
 													timestamp,
 													gsn_timestamp++,
-													data.getData(eventField[3].getName()),
 													data.getData(eventField[4].getName()),
+													data.getData(eventField[5].getName()),
 													eventCount,
 													event});
 
