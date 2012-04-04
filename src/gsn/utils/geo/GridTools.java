@@ -3,6 +3,8 @@ package gsn.utils.geo;
 import gsn.Main;
 import gsn.beans.DataTypes;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -154,6 +156,10 @@ public class GridTools {
         StringBuilder sb = new StringBuilder();
         ResultSet results = null;
 
+        JSONObject jsonResponse = new JSONObject();
+        jsonResponse.put("sensor", sensor);
+        jsonResponse.put("epoch", timestamp);
+
         try {
             connection = Main.getDefaultStorage().getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -164,12 +170,6 @@ public class GridTools {
             numCols = metaData.getColumnCount();    // How many columns?
             results.last();                         // Move to last row
             numRows = results.getRow();             // How many rows?
-
-            String s;
-
-            // headers
-            sb.append("# Query: " + query + "\n");
-            sb.append("# ");
 
             byte typ[] = new byte[numCols];
             String columnLabel[] = new String[numCols];
@@ -183,18 +183,24 @@ public class GridTools {
                 results.absolute(row + 1);                // Go to the specified row
                 for (int col = 0; col < numCols; col++) {
                     Object o = results.getObject(col + 1); // Get value of the column
-                    if (o == null)
-                        s = "null";
-                    else
-                        s = o.toString();
+
                     if (typ[col] == DataTypes.BINARY) {
                         byte[] bin = (byte[]) o;
-                        sb.append(GridTools.deSerializeToString(bin));
+                        Double[][] array = GridTools.deSerialize(bin);
+                        JSONArray jsonArray = new JSONArray();
+                        for (int i=0;i<array.length;i++) {
+                            JSONArray anArray = new JSONArray();
+                            for (int j=0;j<array[i].length;j++) {
+                                anArray.put(array[i][j]);
+                            }
+                            jsonArray.put(anArray);
+                        }
+                        jsonResponse.put(columnLabel[col], jsonArray);
+                        jsonResponse.put(columnLabel[col], GridTools.deSerializeToString(bin));
                     } else {
-                        sb.append(columnLabel[col] + " " + s + "\n");
+                        jsonResponse.put(columnLabel[col], o);
                     }
                 }
-                sb.append("\n");
             }
         } catch (SQLException e) {
             sb.append("ERROR in execution of query: " + e.getMessage());
@@ -208,6 +214,6 @@ public class GridTools {
             Main.getDefaultStorage().close(connection);
         }
 
-        return sb.toString();
+        return jsonResponse.toJSONString();
     }
 }
