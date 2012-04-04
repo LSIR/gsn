@@ -72,7 +72,7 @@
                     <predicate key="remote-contact-point">http://whymper.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
+                <query> select timed, timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -82,7 +82,7 @@
                     <predicate key="query">select * from Dirruhorn_GPS_Logger__data__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+                <query> select timed, GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
             </source>
             <query> select * from source </query>
         </stream>
