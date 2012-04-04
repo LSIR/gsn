@@ -38,11 +38,9 @@ public class RestServlet extends HttpServlet {
         String str_from = null;
         String str_to = null;
         String str_size = null;
+        String str_date = null;
 
         switch (determineRequest(request.getRequestURI())) {
-            case REQUEST_GET_GRID:
-                restResponse = getRequestHandler.getGridData();
-                break;
             case REQUEST_GET_ALL_SENSORS:
                 restResponse = getRequestHandler.getSensors();
                 break;
@@ -60,6 +58,11 @@ public class RestServlet extends HttpServlet {
                 str_to = request.getParameter("to");
                 str_size = request.getParameter("size");
                 restResponse = getRequestHandler.getPreviewMeasurementsForSensorField(sensor, field, str_from, str_to, str_size);
+                break;
+            case REQUEST_GET_GRID:
+                sensor = parseURI(request.getRequestURI())[3];
+                str_date = request.getParameter("date");
+                restResponse = getRequestHandler.getGridData(sensor, str_date);
                 break;
             default:
                 restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Cannot interpret request.");

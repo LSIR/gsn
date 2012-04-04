@@ -7,6 +7,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
 
 import java.sql.*;
+import java.text.ParseException;
 import java.util.*;
 
 import org.apache.log4j.Logger;
@@ -106,12 +107,29 @@ public class GetRequestHandler {
         return restResponse;
     }
 
-    public RestResponse getGridData() {
+    public RestResponse getGridData(String sensor, String date) {
+        logger.warn(sensor);
+        logger.warn(date);
         RestResponse restResponse = new RestResponse();
+        long timestamp = -1;
+        try {
+            timestamp = new java.text.SimpleDateFormat(ISO_FORMAT).parse(date).getTime();
+        } catch (ParseException e) {
+            logger.warn("Timestamp is badly formatted: " + date);
+        }
+        if (timestamp == -1) {
+            restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Malformed date for 'date' field.");
+            logger.warn(restResponse.toString());
+            return restResponse;
+        }
 
+        restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
+        restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
+        restResponse.setResponse(GridTools.executeQueryForGridAsJSON(sensor, timestamp));
+
+        logger.warn(restResponse.toString());
         return restResponse;
     }
-
 
 
     public RestResponse getPreviewMeasurementsForSensorField(String sensor, String field, String from, String to, String size) {
