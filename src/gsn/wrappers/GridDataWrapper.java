@@ -183,8 +183,7 @@ public class GridDataWrapper extends AbstractWrapper {
                         success = false;
                     }
                 }
-            }
-            catch (IndexOutOfBoundsException e) {
+            } catch (IndexOutOfBoundsException e) {
                 success = false;
                 logger.warn("Badly formatted file: " + fileName);
                 logger.warn(e);
@@ -216,11 +215,13 @@ public class GridDataWrapper extends AbstractWrapper {
                     for (int j = 0; j < aLine.length; j++) {
 
                         try {
-                        Double d = Double.parseDouble(aLine[j]);
-                        raw.add(d);
-                        }
-                        catch (java.lang.NumberFormatException e) {
-                            logger.warn(j+": \""+aLine[j]+"\"");
+                            Double d = Double.parseDouble(aLine[j]);
+                            if (d != null)
+                                raw.add(d);
+                            else
+                                raw.add(NODATA_value);
+                        } catch (java.lang.NumberFormatException e) {
+                            logger.warn(j + ": \"" + aLine[j] + "\"");
                             logger.warn(e);
                             logger.warn(e.getMessage());
                         }
@@ -364,52 +365,11 @@ public class GridDataWrapper extends AbstractWrapper {
             }
 
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);
-        }
-        catch (ClassNotFoundException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            logger.error(e.getMessage(), e);
         }
     }
-
-    /*
-    * deserialization
-    * */
-    public static Double[][] deserialize(byte[] bytes) {
-
-        Double deserial[][] = new Double[0][];
-
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            ObjectInputStream in = null;
-
-            in = new ObjectInputStream(bis);
-
-
-
-            deserial = (Double[][]) in.readObject();
-            in.close();
-
-            logger.debug("deserial.length" + deserial.length);
-            logger.debug("deserial[0].length" + deserial[0].length);
-
-            for (int i = 0; i < deserial.length; i++) {
-                StringBuilder sb = new StringBuilder();
-                for (int j = 0; j < deserial[0].length; j++) {
-                    sb.append(deserial[i][j]).append(" ");
-                }
-                logger.debug(sb.toString());
-            }
-
-        } catch (IOException e) {
-            logger.error(e.getMessage(),e);
-        }
-        catch (ClassNotFoundException e) {
-            logger.error(e.getMessage(),e);
-        }
-
-        return deserial;
-    }
-
 
     public String getWrapperName() {
         return "GridDataWrapper";
@@ -421,8 +381,7 @@ public class GridDataWrapper extends AbstractWrapper {
         try {
             DateTimeFormatter fmt = DateTimeFormat.forPattern(timeFormat);
             l = fmt.parseDateTime(s).getMillis();
-        }
-        catch (java.lang.IllegalArgumentException e) {
+        } catch (java.lang.IllegalArgumentException e) {
             logger.warn(e.getMessage(), e);
         }
         return l;
