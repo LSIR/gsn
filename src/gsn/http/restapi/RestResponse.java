@@ -47,4 +47,13 @@ public class RestResponse {
         restResponse.setResponse(jsonObject.toJSONString());
         return restResponse;
     }
+
+    @Override
+    public String toString() {
+        return "RestResponse{\n" +
+                "Response='" + Response + '\'' +
+                ",\n Type='" + Type + '\'' +
+                ",\n httpStatus=" + httpStatus +
+                "\n}";
+    }
 }
