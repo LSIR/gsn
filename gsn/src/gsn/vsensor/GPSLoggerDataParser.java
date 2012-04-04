@@ -58,6 +58,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("POSITION", "INTEGER"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("TIMESTAMP", "BIGINT"),
+			new DataField("GSN_TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
 			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
@@ -76,6 +77,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("POSITION", "INTEGER"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("TIMESTAMP", "BIGINT"),
+			new DataField("GSN_TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
 			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
@@ -86,6 +88,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("POSITION", "INTEGER"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("TIMESTAMP", "BIGINT"),
+			new DataField("GSN_TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			
 			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
@@ -229,7 +232,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 					String inputStreamName = fileItem.getInputStreamName();
 					StreamElement data = fileItem.getData();
 					GPSLoggerDataParser listener = streamtypeToListener.get(streamType);
-					long timed = data.getTimeStamp();
+					long gsn_timestamp = data.getTimeStamp();
 					String relativeFile = (String) data.getData("relative_file" + streamType);
 					
 					if (listener == null) {
@@ -271,6 +274,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																data.getData(rawStatusField[0].getName()),
 																timestamp,
 																timestamp,
+																gsn_timestamp++,
 																data.getData(rawStatusField[3].getName()),
 																data.getData(rawStatusField[4].getName()),
 																RAW_DATA_TYPE,
@@ -282,7 +286,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																null,
 																null,
 																null,
-																rawPacket}, timed++);
+																rawPacket});
 			
 														listener.newStreamElement(inputStreamName, data);
 													}
@@ -319,6 +323,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																data.getData(rawStatusField[0].getName()),
 																timestamp,
 																timestamp,
+																gsn_timestamp++,
 																data.getData(rawStatusField[3].getName()),
 																data.getData(rawStatusField[4].getName()),
 																STATUS_TYPE,
@@ -330,7 +335,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 																(short)(buf.getShort()/10),
 																buf.getShort(),
 																buf.getShort(),
-																rawPacket}, timed++);
+																rawPacket});
 			
 														listener.newStreamElement(inputStreamName, data);
 													}
@@ -384,8 +389,9 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 								
 								Serializable [] out = new Serializable[configField.length];
 								out[0] = data.getData(configField[0].getName());
-								out[3] = data.getData(configField[3].getName());
-								out[4] = data.getData(configField[4].getName());
+								out[3] = gsn_timestamp;
+								out[4] = data.getData(configField[3].getName());
+								out[5] = data.getData(configField[4].getName());
 								
 								String line;
 								int pos = -1;
@@ -398,73 +404,73 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 											try {
 												if (param.equals("start_date")) {
 													try {
-														out[1] = out[2] = out[5] = (new SimpleDateFormat("dd/MM/yy").parse(value)).getTime();
+														out[1] = out[2] = out[6] = (new SimpleDateFormat("dd/MM/yy").parse(value)).getTime();
 													} catch (ParseException e) {
 														logger.error(e.getMessage());
 													}
 												} else if (param.equals("end_date")) {
 													try {
-														out[6] = (new SimpleDateFormat("dd/MM/yy").parse(value)).getTime();
+														out[7] = (new SimpleDateFormat("dd/MM/yy").parse(value)).getTime();
 													} catch (ParseException e) {
 														logger.error(e.getMessage());
 													}
 												} else if (param.equals("uploader")) {
-													out[7] = value;
-												} else if (param.equals("protocol")) {
 													out[8] = value;
+												} else if (param.equals("protocol")) {
+													out[9] = value;
 												} else if (param.equals("software_version")) {
-													pos = 9;
+													pos = 10;
 													out[pos] = Integer.parseInt(value);
 												} else if (param.equals("firmware")) {
-													pos = 10;
+													pos = 11;
 													out[pos] = Short.parseShort(value);
 												} else if (param.equals("position")) {
-													pos = 11;
+													pos = 12;
 													out[pos] = Integer.parseInt(value);
 												} else if (param.equals("low_power_cycle_time")) {
-													pos = 12;
-													out[pos] = Short.parseShort(value);
-												} else if (param.equals("low_power_active_time")) {
 													pos = 13;
 													out[pos] = Short.parseShort(value);
-												} else if (param.equals("low_power_measurement")) {
+												} else if (param.equals("low_power_active_time")) {
 													pos = 14;
 													out[pos] = Short.parseShort(value);
-												} else if (param.equals("entry_voltage")) {
+												} else if (param.equals("low_power_measurement")) {
 													pos = 15;
-													out[pos] = Integer.parseInt(value);
-												} else if (param.equals("exit_voltage")) {
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("entry_voltage")) {
 													pos = 16;
 													out[pos] = Integer.parseInt(value);
-												} else if (param.equals("logging_rate")) {
+												} else if (param.equals("exit_voltage")) {
 													pos = 17;
 													out[pos] = Integer.parseInt(value);
-												} else if (param.equals("config_used")) {
+												} else if (param.equals("logging_rate")) {
 													pos = 18;
-													out[pos] = Short.parseShort(value);
-												} else if (param.equals("config_total")) {
+													out[pos] = Integer.parseInt(value);
+												} else if (param.equals("config_used")) {
 													pos = 19;
 													out[pos] = Short.parseShort(value);
-												} else if (param.equals("config_string")) {
+												} else if (param.equals("config_total")) {
 													pos = 20;
+													out[pos] = Short.parseShort(value);
+												} else if (param.equals("config_string")) {
+													pos = 21;
 													out[pos] = value.getBytes();
 												} else if (param.equals("mast_orientation_start")) {
-													pos = 21;
-													out[pos] = Short.parseShort(value);
-												} else if (param.equals("mast_orientation_end")) {
 													pos = 22;
 													out[pos] = Short.parseShort(value);
-												} else if (param.equals("data_pages")) {
+												} else if (param.equals("mast_orientation_end")) {
 													pos = 23;
 													out[pos] = Short.parseShort(value);
-												} else if (param.equals("event_pages")) {
+												} else if (param.equals("data_pages")) {
 													pos = 24;
 													out[pos] = Short.parseShort(value);
-												} else if (param.equals("high_power_measurement")) {
+												} else if (param.equals("event_pages")) {
 													pos = 25;
 													out[pos] = Short.parseShort(value);
+												} else if (param.equals("high_power_measurement")) {
+													pos = 26;
+													out[pos] = Short.parseShort(value);
 												} else if (param.equals("antenna_serial")) {
-													out[26] = value;
+													out[27] = value;
 												}
 											} catch (NumberFormatException e) {
 												logger.error(e.getMessage());
@@ -477,7 +483,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 										break;
 									}
 								}
-								data = new StreamElement(configField, out, timed++);
+								data = new StreamElement(configField, out);
 
 								listener.newStreamElement(inputStreamName, data);
 							} catch (IOException e) {
@@ -614,10 +620,11 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 															data.getData(eventField[0].getName()),
 															timestamp-cnt,
 															timestamp-cnt,
+															gsn_timestamp++,
 															data.getData(eventField[3].getName()),
 															data.getData(eventField[4].getName()),
 															eventCount,
-															noTimeStampEvent}, timed++);
+															noTimeStampEvent});
 
 													listener.newStreamElement(inputStreamName, data);
 													cnt--;
@@ -630,10 +637,11 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 													data.getData(eventField[0].getName()),
 													timestamp,
 													timestamp,
+													gsn_timestamp++,
 													data.getData(eventField[3].getName()),
 													data.getData(eventField[4].getName()),
 													eventCount,
-													event}, timed++);
+													event});
 
 											listener.newStreamElement(inputStreamName, data);
 											
