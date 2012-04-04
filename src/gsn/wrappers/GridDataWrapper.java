@@ -233,11 +233,11 @@ public class GridDataWrapper extends AbstractWrapper {
                 logger.debug("Size of list => " + raw.size() + " ? " + ncols * nrows);
                 logger.debug(raw);
 
-                if (raw.size() == ncols * nrows) {
-                    rawData = new Double[ncols][nrows];
-                    for (int i = 0; i < ncols; i++)
-                        for (int j = 0; j < nrows; j++) {
-                            rawData[i][j] = (Double) raw.get(i * nrows + j);
+                if (raw.size() == nrows * ncols) {
+                    rawData = new Double[nrows][ncols];
+                    for (int i = 0; i < nrows; i++)
+                        for (int j = 0; j < ncols; j++) {
+                            rawData[i][j] = (Double) raw.get(i * ncols + j);
                             //System.out.println(i + "," + j + " : " + rawData[i][j]);
                         }
                     logger.debug("rawData.length " + rawData.length);
