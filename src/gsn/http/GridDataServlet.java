@@ -67,7 +67,7 @@ public class GridDataServlet extends HttpServlet {
         }
 
 
-        response.getWriter().write(executeQuery(query));
+        response.getWriter().write(executeQueryForGridAsString(query));
 
         /*
         for (String vsName : sensors) {
@@ -84,7 +84,7 @@ public class GridDataServlet extends HttpServlet {
         doGet(request, res);
     }
 
-    public String executeQuery(String query) {
+    public String executeQueryForGridAsString(String query) {
 
         Connection connection = null;
         StringBuilder sb = new StringBuilder();
