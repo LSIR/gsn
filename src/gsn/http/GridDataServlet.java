@@ -3,6 +3,7 @@ package gsn.http;
 import gsn.Main;
 import gsn.beans.DataTypes;
 import gsn.utils.Helpers;
+import gsn.utils.geo.GridTools;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -124,7 +125,7 @@ public class GridDataServlet extends HttpServlet {
                         s = o.toString();
                     if (typ[col] == DataTypes.BINARY) {
                         byte[] bin = (byte[]) o;
-                        sb.append(deserialize(bin));
+                        sb.append(GridTools.deSerializeToString(bin));
                     } else {
                         sb.append(columnLabel[col] + " " + s + "\n");
                     }
@@ -145,42 +146,6 @@ public class GridDataServlet extends HttpServlet {
 
         return sb.toString();
     }
-
-    private String deserialize(byte[] bytes) {
-
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            ObjectInputStream in = null;
-
-            in = new ObjectInputStream(bis);
-
-            Double deserial[][] = new Double[0][];
-
-            deserial = (Double[][]) in.readObject();
-            in.close();
-
-            logger.debug("deserial.length" + deserial.length);
-            logger.debug("deserial[0].length" + deserial[0].length);
-
-            for (int i = 0; i < deserial.length; i++) {
-
-                for (int j = 0; j < deserial[0].length; j++) {
-                    sb.append(deserial[i][j]).append(" ");
-                }
-                sb.append("\n");
-            }
-
-        } catch (IOException e) {
-            logger.warn(e);
-        } catch (ClassNotFoundException e) {
-            logger.warn(e);
-        }
-
-        return sb.toString();
-    }
-
 
     private String generateASCIIFileName(String sensor, long timestamp, String timeFormat) {
         StringBuilder sb = new StringBuilder();
