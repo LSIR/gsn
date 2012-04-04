@@ -23,6 +23,7 @@ public class RestServlet extends HttpServlet {
     private static final int REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD = 2;
     private static final int REQUEST_GET_GEO_DATA_FOR_SENSOR = 3;
     private static final int REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD = 4;
+    private static final int REQUEST_GET_GRID = 5;
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -39,6 +40,9 @@ public class RestServlet extends HttpServlet {
         String str_size = null;
 
         switch (determineRequest(request.getRequestURI())) {
+            case REQUEST_GET_GRID:
+                restResponse = getRequestHandler.getGridData();
+                break;
             case REQUEST_GET_ALL_SENSORS:
                 restResponse = getRequestHandler.getSensors();
                 break;
@@ -103,6 +107,8 @@ public class RestServlet extends HttpServlet {
             return REQUEST_GET_ALL_SENSORS;
         if (parsedURI.length == 5 && parsedURI[2].equalsIgnoreCase("sensors"))
             return REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD;
+        if (parsedURI.length == 4 && parsedURI[2].equalsIgnoreCase("grid"))
+            return REQUEST_GET_GRID;
 
         return REQUEST_UNKNOWN;
     }
