@@ -136,7 +136,7 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
                 }
                 
                 RestDelivery deliverySystem = new RestDelivery(continuation, parser.getLimit());
-                streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), startTime);
+                streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), startTime, parser.isContinuous());
                 DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
 			}catch (Exception e) {
 				logger.warn(e.getMessage());
@@ -211,7 +211,7 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 				return;
 			}
 
-			DefaultDistributionRequest distributionReq = DefaultDistributionRequest.create(delivery, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
+			DefaultDistributionRequest distributionReq = DefaultDistributionRequest.create(delivery, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime(), parser.isContinuous());
 			logger.debug("Rest request received: "+distributionReq.toString());
 			DataDistributer.getInstance(delivery.getClass()).addListener(distributionReq);
 			logger.debug("Streaming request received and registered:"+distributionReq.toString());
@@ -303,13 +303,13 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 						}
 						continue;
 					case 2:
-						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase());
+						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase().trim());
 						continue;
 					case 3:
-						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase());
+						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase().trim());
 						continue;
 					case 4:
-						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase());
+						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase().trim());
 						continue;
 					default:
 						throw new Exception("URL mall formated >" + requestURI + "<");

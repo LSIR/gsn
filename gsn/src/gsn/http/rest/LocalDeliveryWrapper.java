@@ -65,7 +65,9 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 
 		
 		long lastVisited = -1;
+		boolean continuous = false;
 		if (startTime.equals("continue")) {
+			continuous = true;
 			Connection conn = null;
 			ResultSet rs = null;
 			try {
@@ -140,7 +142,7 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			logger.debug("Local wrapper request received for: "+vsName);
 			
 			vSensorConfig = Mappings.getConfig(vsName);
-			distributionRequest = DefaultDistributionRequest.create(this, vSensorConfig, query, lastVisited);
+			distributionRequest = DefaultDistributionRequest.create(this, vSensorConfig, query, lastVisited, continuous);
 			// This call MUST be executed before adding this listener to the data-distributer because distributer checks the isClose method before flushing.
 		}catch (Exception e) {
 			logger.error("Problem in the query parameter of the local-wrapper.");

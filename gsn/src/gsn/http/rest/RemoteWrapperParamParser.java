@@ -157,7 +157,7 @@ public class RemoteWrapperParamParser {
 		String toSend;
 		try {
 			if (continuous)
-				toSend = getRemoteContactPoint()+URLEncoder.encode(query, "UTF-8")+"/"+URLEncoder.encode(getStartTimeInString(lastModifiedTime)+"/c", "UTF-8");
+				toSend = getRemoteContactPoint()+URLEncoder.encode(query, "UTF-8")+"/"+URLEncoder.encode(getStartTimeInString(lastModifiedTime), "UTF-8")+"/c";
 			else
 				toSend = getRemoteContactPoint()+URLEncoder.encode(query, "UTF-8")+"/"+URLEncoder.encode(getStartTimeInString(lastModifiedTime), "UTF-8");
 		} catch (UnsupportedEncodingException e) {

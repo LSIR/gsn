@@ -15,6 +15,7 @@ public class DefaultDistributionRequest implements DistributionRequest {
 	private static transient Logger       logger     = Logger.getLogger ( DefaultDistributionRequest.class );
 
 	private long startTime;
+	private boolean continuous;
 
     private long lastVisitedPk = -1;
 
@@ -24,17 +25,18 @@ public class DefaultDistributionRequest implements DistributionRequest {
 
 	private VSensorConfig vSensorConfig;
 
-    private DefaultDistributionRequest(DeliverySystem deliverySystem, VSensorConfig sensorConfig, String query, long startTime) throws IOException, SQLException {
+    private DefaultDistributionRequest(DeliverySystem deliverySystem, VSensorConfig sensorConfig, String query, long startTime, boolean continuous) throws IOException, SQLException {
 		this.deliverySystem = deliverySystem;
 		vSensorConfig = sensorConfig;
 		this.query = query;
 		this.startTime = startTime;
+		this.continuous = continuous;
 		DataField[] selectedColmnNames = SQLValidator.getInstance().extractSelectColumns(query,vSensorConfig);
 		deliverySystem.writeStructure(selectedColmnNames);
 	}
 
-	public static DefaultDistributionRequest create(DeliverySystem deliverySystem, VSensorConfig sensorConfig,String query, long startTime) throws IOException, SQLException {
-		DefaultDistributionRequest toReturn = new DefaultDistributionRequest(deliverySystem,sensorConfig,query,startTime);
+	public static DefaultDistributionRequest create(DeliverySystem deliverySystem, VSensorConfig sensorConfig,String query, long startTime, boolean continuous) throws IOException, SQLException {
+		DefaultDistributionRequest toReturn = new DefaultDistributionRequest(deliverySystem,sensorConfig,query,startTime, continuous);
 		return toReturn;
 	}
 
@@ -42,8 +44,8 @@ public class DefaultDistributionRequest implements DistributionRequest {
 		return new StringBuilder("DefaultDistributionRequest Request[[ Delivery System: ")
                 .append(deliverySystem.getClass().getName())
                 .append("],[Query:").append(query)
-                .append("],[startTime:")
-                .append(startTime)
+                .append("],[startTime:").append(startTime)
+                .append("],[continuous:").append(continuous)
                 .append("],[VirtualSensorName:")
                 .append(vSensorConfig.getName())
                 .append("]]").toString();
@@ -65,6 +67,10 @@ public class DefaultDistributionRequest implements DistributionRequest {
 
 	public long getStartTime() {
 		return startTime;
+	}
+
+	public boolean isContinuous() {
+		return continuous;
 	}
 
     public long getLastVisitedPk() {
