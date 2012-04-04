@@ -196,7 +196,6 @@ public class GridTools {
                             jsonArray.put(anArray);
                         }
                         jsonResponse.put(columnLabel[col], jsonArray);
-                        jsonResponse.put(columnLabel[col], GridTools.deSerializeToString(bin));
                     } else {
                         jsonResponse.put(columnLabel[col], o);
                     }
