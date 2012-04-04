@@ -3,17 +3,16 @@ package gsn.http.restapi;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
+import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
-import gsn.utils.Helpers;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import gsn.utils.geo.GridTools;
 
 import org.apache.commons.collections.KeyValue;
 
@@ -107,6 +106,14 @@ public class GetRequestHandler {
         return restResponse;
     }
 
+    public RestResponse getGridData() {
+        RestResponse restResponse = new RestResponse();
+
+        return restResponse;
+    }
+
+
+
     public RestResponse getPreviewMeasurementsForSensorField(String sensor, String field, String from, String to, String size) {
 
         RestResponse restResponse = new RestResponse();
@@ -129,7 +136,7 @@ public class GetRequestHandler {
                 logger.error(e.getMessage(), e);
             }
 
-        if (n<1) n = DEFAULT_PREVIEW_SIZE; // size should be strictly larger than 0
+        if (n < 1) n = DEFAULT_PREVIEW_SIZE; // size should be strictly larger than 0
 
         if (from == null) { // no lower bound provided
             fromAsLong = getMinTimestampForSensorField(sensor, field);
@@ -168,12 +175,15 @@ public class GetRequestHandler {
         jsonResponse.put("to", to);
         JSONArray streamArray = new JSONArray();
         JSONArray timestampsArray = new JSONArray();
+        JSONArray epochsArray = new JSONArray();
         for (int i = 0; i < stream.size(); i++) {
             streamArray.add(stream.get(i));
             timestampsArray.add(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i))));
+            epochsArray.add(timestamps.get(i));
         }
         jsonResponse.put("timestamps", timestampsArray);
         jsonResponse.put("values", streamArray);
+        jsonResponse.put("epochs", epochsArray);
         restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
         restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
         restResponse.setResponse(jsonResponse.toJSONString());
@@ -286,11 +296,14 @@ public class GetRequestHandler {
         jsonResponse.put("to", to);
         JSONArray streamArray = new JSONArray();
         JSONArray timestampsArray = new JSONArray();
+        JSONArray epochsArray = new JSONArray();
         for (int i = 0; i < stream.size(); i++) {
             streamArray.add(stream.get(i));
+            epochsArray.add(timestamps.get(i));
             timestampsArray.add(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i))));
         }
         jsonResponse.put("timestamps", timestampsArray);
+        jsonResponse.put("epochs", epochsArray);
         jsonResponse.put("values", streamArray);
         restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
         restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
@@ -346,15 +359,22 @@ public class GetRequestHandler {
 
         long skip = getTableSize(sensor) / size;
 
+        /*
+        logger.warn("skip = " + skip);
+        logger.warn("size = " + size);
+        logger.warn("getTableSize(sensor) = " + getTableSize(sensor));
+        */
+
         try {
             conn = Main.getDefaultStorage().getConnection();
             StringBuilder query = new StringBuilder("select timed, ")
                     .append(field)
                     .append(" from ")
-                    .append(sensor)
-                    .append(" where mod(pk,")
-                    .append(skip)
-                    .append(")=1");
+                    .append(sensor);
+            if (skip > 1)
+                query.append(" where mod(pk,")
+                        .append(skip)
+                        .append(")=1");
 
             resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
 
