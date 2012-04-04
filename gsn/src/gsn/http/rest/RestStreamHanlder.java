@@ -14,6 +14,9 @@ import gsn.utils.Helpers;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -98,9 +101,42 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
                 	timeoutTimer = new Timer("timeoutTimer");
                 	timeoutTimer.schedule(new TimeoutTimerTask(), parser.getTimeout()*1000);
                 }
+
+            	long startTime = parser.getStartTime();
+                if (parser.isContinuous()) {
+                    String vsName = parser.getVSensorConfig().getName();
+    				Connection conn = null;
+    				ResultSet rs = null;
+    				try {
+    					conn = Main.getStorage(vsName).getConnection();
+    	
+    					// check if table already exists
+    					rs = conn.getMetaData().getTables(null, null, vsName, new String[] {"TABLE"});
+    					if (rs.next()) {
+    						StringBuilder query = new StringBuilder();
+    						query.append("select max(timed) from ").append(vsName);
+    						Main.getStorage(vsName).close(rs);
+    						rs = Main.getStorage(vsName).executeQueryWithResultSet(query, conn);
+    						if (rs.next()) {
+    							long t = rs.getLong(1);
+    							if (startTime > t) {
+    								startTime = t;
+    								logger.info("newest local timed is older than requested start time -> using timed as start time");
+    							}
+    						}
+    					}
+    					else
+    						logger.info("Table '" + vsName + "' doesn't exist => can not check for newest local timed");
+    				} catch (SQLException e) {
+    					logger.error(e.getMessage(), e);
+    				} finally {
+    					Main.getStorage(vsName).close(rs);
+    					Main.getStorage(vsName).close(conn);
+    				}
+                }
                 
                 RestDelivery deliverySystem = new RestDelivery(continuation, parser.getLimit());
-                streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
+                streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), startTime);
                 DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
 			}catch (Exception e) {
 				logger.warn(e.getMessage());
@@ -242,6 +278,7 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 		private long startTime;
 		private Integer limit = null;
 		private Integer timeout = null;
+		private boolean continuous = false;
 		private VSensorConfig config;
 		public URLParser(HttpServletRequest request) throws UnsupportedEncodingException, Exception {
 			String requestURI = request.getRequestURI().substring(request.getRequestURI().toLowerCase().indexOf(STREAMING)+STREAMING.length());
@@ -266,16 +303,19 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 						}
 						continue;
 					case 2:
-						timeout = Integer.parseInt(URLDecoder.decode(token,"UTF-8"));
+						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase());
 						continue;
 					case 3:
-						limit = Integer.parseInt(URLDecoder.decode(token,"UTF-8"));
+						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase());
+						continue;
+					case 4:
+						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase());
 						continue;
 					default:
 						throw new Exception("URL mall formated >" + requestURI + "<");
 					}
 				}
-				if (pos > 4)
+				if (pos > 5)
 					throw new Exception("URL mall formated >" + requestURI + "<");
 			}
 			tableName = SQLValidator.getInstance().validateQuery(query);
@@ -288,20 +328,31 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 			tableName=tableName.toLowerCase();
 			config = Mappings.getConfig(tableName);
 		}
-		public VSensorConfig getVSensorConfig() {
+		private void checkToken(String s) {
+			if (s.startsWith("t"))
+				timeout = Integer.parseInt(s.substring(1));
+			else if (s.startsWith("l"))
+				limit = Integer.parseInt(s.substring(1));
+			else if (s.equals("c"))
+				continuous = true;
+		}
+		protected VSensorConfig getVSensorConfig() {
 			return config;
 		}
-		public String getQuery() {
+		protected String getQuery() {
 			return query;
 		}
-		public long getStartTime() {
+		protected long getStartTime() {
 			return startTime;
 		}
-		public Integer getLimit() {
+		protected Integer getLimit() {
 			return limit;
 		}
-		public Integer getTimeout() {
+		protected Integer getTimeout() {
 			return timeout;
+		}
+		protected boolean isContinuous() {
+			return continuous;
 		}
 
 	}

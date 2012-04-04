@@ -2,8 +2,12 @@ package gsn.http.rest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import gsn.DataDistributer;
+import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.ContainerConfig;
 import gsn.utils.Helpers;
@@ -17,6 +21,7 @@ public class RemoteWrapperParamParser {
 
 	private long startTime;
 	private boolean isPushBased;
+	private boolean continuous = false;
 	private String query,deliveryContactPoint,remoteContactPoint;
 	private String username,password;
     private boolean isSSLRequired;
@@ -27,6 +32,7 @@ public class RemoteWrapperParamParser {
 	private  final String CURRENT_TIME = ISODateTimeFormat.dateTime().print(System.currentTimeMillis());
 
 	public RemoteWrapperParamParser(AddressBean addressBean, boolean isPushBased) {
+		this.isPushBased = isPushBased;
 
 		query = addressBean.getPredicateValueWithException("query" );
 		
@@ -61,12 +67,49 @@ public class RemoteWrapperParamParser {
         isSSLRequired = remoteContactPoint.toLowerCase().startsWith("https");
         
 		String str = addressBean.getPredicateValueWithDefault("start-time",CURRENT_TIME);
-		try {
-			if (!str.equals("continue") && !str.startsWith("-"))
+		
+        String strStartTime = addressBean.getPredicateValue("start-time");
+		if (strStartTime != null && strStartTime.equals("continue")) {
+			Connection conn = null;
+			ResultSet rs = null;
+			try {
+				conn = Main.getStorage(addressBean.getVirtualSensorName()).getConnection();
+
+				// check if table already exists
+				rs = conn.getMetaData().getTables(null, null, addressBean.getVirtualSensorName(), new String[] {"TABLE"});
+				if (rs.next()) {
+					StringBuilder query = new StringBuilder();
+					query.append("select max(timed) from ").append(addressBean.getVirtualSensorName());
+					Main.getStorage(addressBean.getVirtualSensorName()).close(rs);
+					rs = Main.getStorage(addressBean.getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+					if (rs.next()) {
+						startTime = rs.getLong(1);
+						continuous = true;
+					}
+				}
+				else
+					logger.info("Table '" + addressBean.getVirtualSensorName() + "' doesn't exist => using all data from the remote database");
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+				throw new RuntimeException(e);
+			} finally {
+				Main.getStorage(addressBean.getVirtualSensorName()).close(rs);
+				Main.getStorage(addressBean.getVirtualSensorName()).close(conn);
+			}
+		} else if (strStartTime != null && strStartTime.startsWith("-")) {
+			try {
+				startTime = System.currentTimeMillis() - Long.parseLong(strStartTime.substring(1));
+			} catch (NumberFormatException e) {
+				logger.error("Problem in parsing the start-time parameter, the provided value is: " + strStartTime);
+				throw new RuntimeException(e);
+			}
+		} else {
+			try {
 				startTime = Helpers.convertTimeFromIsoToLong(str);
-		}catch (Exception e) {
-			logger.error("Failed to parse the start-time parameter of the remote wrapper, a sample time could be:"+(CURRENT_TIME));
-			throw new RuntimeException(e);
+			} catch (Exception e) {
+				logger.error("Failed to parse the start-time parameter of the remote wrapper, a sample time could be:"+(CURRENT_TIME));
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
@@ -113,7 +156,10 @@ public class RemoteWrapperParamParser {
     public String getRemoteContactPointEncoded(long lastModifiedTime) {
 		String toSend;
 		try {
-			toSend = getRemoteContactPoint()+URLEncoder.encode(query, "UTF-8")+"/"+URLEncoder.encode(getStartTimeInString(lastModifiedTime), "UTF-8");
+			if (continuous)
+				toSend = getRemoteContactPoint()+URLEncoder.encode(query, "UTF-8")+"/"+URLEncoder.encode(getStartTimeInString(lastModifiedTime)+"/c", "UTF-8");
+			else
+				toSend = getRemoteContactPoint()+URLEncoder.encode(query, "UTF-8")+"/"+URLEncoder.encode(getStartTimeInString(lastModifiedTime), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}

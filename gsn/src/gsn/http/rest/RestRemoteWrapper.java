@@ -11,8 +11,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.security.KeyStore;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.http.HttpResponse;
@@ -96,45 +94,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
             Scheme plainsch = new Scheme("http", PlainSocketFactory.getSocketFactory(), Main.getContainerConfig().getContainerPort());
             httpclient.getConnectionManager().getSchemeRegistry().register(plainsch);
             //
-	        
-	        String startTime = getActiveAddressBean().getPredicateValue("start-time");
-			if (startTime != null && startTime.equals("continue")) {
-				Connection conn = null;
-				ResultSet rs = null;
-				try {
-					conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
-	
-					// check if table already exists
-					rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
-					if (rs.next()) {
-						StringBuilder query = new StringBuilder();
-						query.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
-						Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
-						rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
-						if (rs.next()) {
-							lastReceivedTimestamp = rs.getLong(1);
-						}
-					}
-					else
-						logger.info("Table '" + getActiveAddressBean().getVirtualSensorName() + "' doesn't exist => using all data from the remote database");
-				} catch (SQLException e) {
-					logger.error(e.getMessage(), e);
-					return false;
-				} finally {
-					Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
-					Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
-				}
-			} else if (startTime != null && startTime.startsWith("-")) {
-				try {
-					lastReceivedTimestamp = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
-				} catch (NumberFormatException e) {
-					logger.error("Problem in parsing the start-time parameter, the provided value is: " + startTime);
-					logger.error(e.getMessage(), e);
-					return false;
-				}
-			} else {
-				lastReceivedTimestamp = initParams.getStartTime();
-			}
+            lastReceivedTimestamp = initParams.getStartTime();
 			logger.info("lastReceivedTimestamp=" + String.valueOf(lastReceivedTimestamp));
 
             structure = connectToRemote();

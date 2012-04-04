@@ -88,6 +88,30 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
 				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
 			}
+			try {
+				conn = Main.getStorage(vsName).getConnection();
+				
+				rs = conn.getMetaData().getTables(null, null, vsName, new String[] {"TABLE"});
+				if (rs.next()) {
+					StringBuilder dbquery = new StringBuilder();
+					dbquery.append("select max(timed) from ").append(vsName);
+					Main.getStorage(vsName).close(rs);
+
+					rs = Main.getStorage(vsName).executeQueryWithResultSet(dbquery, conn);
+					if (rs.next()) {
+						long t = rs.getLong(1);
+						if (lastVisited > t) {
+							lastVisited = t;
+							logger.info("newest timed from " + vsName + " is older than requested start time -> using timed as start time");
+						}
+					}
+				}
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+			} finally {
+				Main.getStorage(vsName).close(rs);
+				Main.getStorage(vsName).close(conn);
+			}
 		} else if (startTime.startsWith("-")) {
 			try {
 				lastVisited = System.currentTimeMillis() - Long.parseLong(startTime.substring(1));
