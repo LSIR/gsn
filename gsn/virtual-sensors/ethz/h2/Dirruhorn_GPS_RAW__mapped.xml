@@ -34,10 +34,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SAMPLE_COUNT, GPS_SATS, GPS_RAW_DATA from Dirruhorn_GPS_RAW__binary</predicate>
+                    <predicate key="query">select * from Dirruhorn_GPS_RAW__binary</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SAMPLE_COUNT, GPS_SATS, GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

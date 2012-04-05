@@ -110,8 +110,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("CONFIG_STRING", "BINARY"),
 			new DataField("MAST_ORIENTATION_START", "SMALLINT"),
 			new DataField("MAST_ORIENTATION_END", "SMALLINT"),
-			new DataField("DATA_PAGES", "SMALLINT"),
-			new DataField("EVENT_PAGES", "SMALLINT"),
+			new DataField("DATA_PAGES", "INTEGER"),
+			new DataField("EVENT_PAGES", "INTEGER"),
 			new DataField("HIGH_POWER_MEASUREMENT", "SMALLINT"),
 			new DataField("ANTENNA_SERIAL", "VARCHAR(32)")};
 	
@@ -462,10 +462,10 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 													out[pos] = Short.parseShort(value);
 												} else if (param.equals("data_pages")) {
 													pos = 24;
-													out[pos] = Short.parseShort(value);
+													out[pos] = Integer.parseInt(value);
 												} else if (param.equals("event_pages")) {
 													pos = 25;
-													out[pos] = Short.parseShort(value);
+													out[pos] = Integer.parseInt(value);
 												} else if (param.equals("high_power_measurement")) {
 													pos = 26;
 													out[pos] = Short.parseShort(value);
