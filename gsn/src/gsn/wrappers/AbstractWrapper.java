@@ -228,10 +228,9 @@ public abstract class AbstractWrapper extends Thread {
 						|| toReturn;
 			}
 
-			if (++noOfCallsToPostSE
-					% GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS == 0) {
-				int removedRaws = removeUselessValues();
-			}
+			if (++noOfCallsToPostSE % GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS == 0)
+				removeUselessValues();
+
 			return toReturn;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -287,10 +286,8 @@ public abstract class AbstractWrapper extends Thread {
 
 		Connection conn = null;
 		try {
-            if (isOutOfOrder(se)) {
-				logger.warn(getActiveAddressBean().getVirtualSensorName() + "[source=" + getActiveAddressBean().getInputStreamName() + "]: Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
+            if (isOutOfOrder(se))
 				return false;
-			}
 			conn = Main.getWindowStorage().getConnection();
 			Main.getWindowStorage().executeInsert(aliasCodeS, getOutputFormat(), se, conn);
             lastInOrderTimestamp = se.getTimeStamp();
@@ -320,7 +317,10 @@ public abstract class AbstractWrapper extends Thread {
 					lastInOrderTimestamp = Long.MIN_VALUE; // Table is empty
 				}
 			}
-            return (se.getTimeStamp() < lastInOrderTimestamp);
+            boolean isOutOfOrder = (se.getTimeStamp() < lastInOrderTimestamp);
+            if (isOutOfOrder)
+            	logger.warn(getActiveAddressBean().getVirtualSensorName() + "[source=" + getActiveAddressBean().getInputStreamName() + "]: Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
+            return isOutOfOrder;
 		} finally {
 			Main.getWindowStorage().close(rs);
 			Main.getWindowStorage().close(conn);
