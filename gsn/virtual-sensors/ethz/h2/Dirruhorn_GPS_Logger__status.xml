@@ -32,7 +32,7 @@
                     <predicate key="query">select * from Dirruhorn_GPS_Logger__data__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT, STATUS_V12DC_IN as V12DC_IN, STATUS_HUMIDITY as HUMIDITY, STATUS_TEMPERATURE as TEMPERATURE, STATUS_INCLINOMETER_X as INCLINOMETER_X, STATUS_INCLINOMETER_Y as INCLINOMETER_Y, RAW_DATA from wrapper where data_type = 1</query>
+                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT, STATUS_V12DC_IN as V12DC_IN, STATUS_HUMIDITY as HUMIDITY, STATUS_TEMPERATURE as TEMPERATURE, STATUS_INCLINOMETER_X as INCLINOMETER_X, STATUS_INCLINOMETER_Y as INCLINOMETER_Y, RAW_DATA from wrapper where data_type = 1</query>
             </source>
             <query> select * from source </query>
         </stream>
