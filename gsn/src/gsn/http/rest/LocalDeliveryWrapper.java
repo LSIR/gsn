@@ -66,20 +66,20 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		
 		long lastVisited = -1;
 		boolean continuous = false;
+		Connection conn = null;
+		ResultSet rs = null;
 		if (startTime.equals("continue")) {
 			continuous = true;
-			Connection conn = null;
-			ResultSet rs = null;
 			try {
-				conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
+				conn = Main.getStorage(params.getVirtualSensorName()).getConnection();
 				
-				rs = conn.getMetaData().getTables(null, null, getActiveAddressBean().getVirtualSensorName(), new String[] {"TABLE"});
+				rs = conn.getMetaData().getTables(null, null, params.getVirtualSensorName(), new String[] {"TABLE"});
 				if (rs.next()) {
 					StringBuilder dbquery = new StringBuilder();
-					dbquery.append("select max(timed) from ").append(getActiveAddressBean().getVirtualSensorName());
-					Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
+					dbquery.append("select max(timed) from ").append(params.getVirtualSensorName());
+					Main.getStorage(params.getVirtualSensorName()).close(rs);
 
-					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(dbquery, conn);
+					rs = Main.getStorage(params.getVirtualSensorName()).executeQueryWithResultSet(dbquery, conn);
 					if (rs.next()) {
 						lastVisited = rs.getLong(1);
 					}
@@ -87,32 +87,8 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
-				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
-			}
-			try {
-				conn = Main.getStorage(vsName).getConnection();
-				
-				rs = conn.getMetaData().getTables(null, null, vsName, new String[] {"TABLE"});
-				if (rs.next()) {
-					StringBuilder dbquery = new StringBuilder();
-					dbquery.append("select max(timed) from ").append(vsName);
-					Main.getStorage(vsName).close(rs);
-
-					rs = Main.getStorage(vsName).executeQueryWithResultSet(dbquery, conn);
-					if (rs.next()) {
-						long t = rs.getLong(1);
-						if (lastVisited > t) {
-							lastVisited = t;
-							logger.info("newest timed from " + vsName + " is older than requested start time -> using timed as start time");
-						}
-					}
-				}
-			} catch (SQLException e) {
-				logger.error(e.getMessage(), e);
-			} finally {
-				Main.getStorage(vsName).close(rs);
-				Main.getStorage(vsName).close(conn);
+				Main.getStorage(params.getVirtualSensorName()).close(rs);
+				Main.getStorage(params.getVirtualSensorName()).close(conn);
 			}
 		} else if (startTime.startsWith("-")) {
 			try {
@@ -131,12 +107,40 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 				return false;
 			}
 		}
-		logger.info("lastVisited=" + String.valueOf(lastVisited));
 
 		try {
 			vsName = SQLValidator.getInstance().validateQuery(query);
 			if(vsName==null) //while the other instance is not loaded.
 				return false;
+			
+			if (startTime.equals("continue")){
+				try {
+					conn = Main.getStorage(vsName).getConnection();
+					
+					rs = conn.getMetaData().getTables(null, null, vsName, new String[] {"TABLE"});
+					if (rs.next()) {
+						StringBuilder dbquery = new StringBuilder();
+						dbquery.append("select max(timed) from ").append(vsName);
+						Main.getStorage(vsName).close(rs);
+
+						rs = Main.getStorage(vsName).executeQueryWithResultSet(dbquery, conn);
+						if (rs.next()) {
+							long t = rs.getLong(1);
+							if (lastVisited > t) {
+								lastVisited = t;
+								logger.info("newest timed from " + vsName + " is older than requested start time -> using timed as start time");
+							}
+						}
+					}
+				} catch (SQLException e) {
+					logger.error(e.getMessage(), e);
+				} finally {
+					Main.getStorage(vsName).close(rs);
+					Main.getStorage(vsName).close(conn);
+				}
+			}
+			logger.info("lastVisited=" + String.valueOf(lastVisited));
+			
 			query = SQLUtils.newRewrite(query, vsName, vsName.toLowerCase()).toString();
 			
 			logger.debug("Local wrapper request received for: "+vsName);
