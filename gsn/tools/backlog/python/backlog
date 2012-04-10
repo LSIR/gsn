@@ -29,7 +29,7 @@ case "$1" in
 	fi
     if [ -x $SUBPROCESSFAKED ]; then
     	echo -n "and $SUBPROCESSFAKENAME... "
-		killall $SUBPROCESSFAKENAME
+		pkill -TERM -P $(pgrep -o $SUBPROCESSFAKENAME)
     fi
     echo "done."
     ;;
@@ -42,6 +42,9 @@ case "$1" in
 	fi
     echo -n "restarting $SUBPROCESSFAKENAME... "
     if [ -x $SUBPROCESSFAKED ]; then
+    	PID=`pgrep -o $SUBPROCESSFAKENAME`
+		pkill -TERM -P $PID
+		while ps -p $PID > /dev/null; do sleep 1; done
 		$SUBPROCESSFAKED | logger -t $SUBPROCESSFAKENAME &
 	fi
     echo -n "starting $DESC... "
