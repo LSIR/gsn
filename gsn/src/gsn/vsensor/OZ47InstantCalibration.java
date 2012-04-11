@@ -71,7 +71,7 @@ public class OZ47InstantCalibration extends BridgeVirtualSensorPermasense {
 			  data = new StreamElement(data, dataField, new Serializable[] {ozone_calib, rs.getDouble("calib_param_0"), rs.getDouble("calib_param_1")});
 			}
 			else {
-			  logger.info("no calibration found, using default parameters (time=" + time + ")");
+			  logger.debug("no calibration found, using default parameters (time=" + time + ")");
 			  ozone_calib = defaultParam[0] + defaultParam[1] * resistance.doubleValue() * Math.exp(kT * (temp.doubleValue() - 25));
 			  if (ozone_calib < 0) ozone_calib = 0;
 			  data = new StreamElement(data, dataField, new Serializable[] {ozone_calib, defaultParam[0], defaultParam[1]});
