@@ -72,5 +72,16 @@
             </source>
             <query> select * from source </query>
         </stream>
+        
+        <stream name="data4">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OSTest_MiniDisc_EMB__muxed__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
     </streams>
 </virtual-sensor>

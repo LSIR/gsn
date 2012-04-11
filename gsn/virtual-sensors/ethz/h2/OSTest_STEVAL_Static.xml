@@ -16,17 +16,6 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data0">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-etz-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.STEVALPlugin</predicate>
-                    <predicate key="status-data-type">static</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
         
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
@@ -44,60 +33,6 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">opensense-etz-bs02.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.STEVALPlugin</predicate>
-                    <predicate key="status-data-type">static</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-        
-        <stream name="data3">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-caa-tram-4.dyndns.biz:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.STEVALPlugin</predicate>
-                    <predicate key="status-data-type">static</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-
-        
-        <stream name="data4">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-caa-tram-3.dyndns.biz:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.STEVALPlugin</predicate>
-                    <predicate key="status-data-type">static</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-
-
-        
-        <stream name="data5">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-caa-tram-5.dyndns.biz:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.STEVALPlugin</predicate>
-                    <predicate key="status-data-type">static</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-
-
-
-        
-        <stream name="data6">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">opensense-caa-tram-6.dyndns.biz:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.STEVALPlugin</predicate>
                     <predicate key="status-data-type">static</predicate>
                 </address>
