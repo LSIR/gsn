@@ -29,7 +29,7 @@
 			<field name="BAT_REM_TIME" type="BIGINT" unit="min" />
 			<field name="BAT_REM_TIME_DIFF" type="INTEGER" unit="min" />
 			<field name="V_BAT" type="INTEGER" unit="mV" />
-			<field name="I_V12DC_TOT" type="INTEGER" unit="µA" />
+			<field name="I_V12DC_TOT" type="INTEGER" unit="mA" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
