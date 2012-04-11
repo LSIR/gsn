@@ -36,7 +36,7 @@ $(document).ready(function() {
       // OpenSense Data Latency
       { title:"Tram 1: Data Latency [ms]",
         signals: [{
-          vsensor:"opensense_data_latency",
+          vsensor:"*_data_latency",
           field:["latency"],
           deviceId: [3]
         }]
@@ -44,12 +44,76 @@ $(document).ready(function() {
       // OpenSense Backlog num. entries
       { title:"Tram 1: BackLog DB [# of entries]",
         signals: [{
-          vsensor:"opensense_backlogstatus_dynamic__mapped",
+          vsensor:"*_backlogstatus_dynamic__mapped",
           field:["db_entries"],
           deviceId: [3]
         }]
       },
-    
+      // OpenSense Data Latency
+      { title:"Tram 3: Data Latency [ms]",
+        signals: [{
+          vsensor:"*_data_latency",
+          field:["latency"],
+          deviceId: [5]
+        }]
+      },
+      // OpenSense Backlog num. entries
+      { title:"Tram 3: BackLog DB [# of entries]",
+        signals: [{
+          vsensor:"*_backlogstatus_dynamic__mapped",
+          field:["db_entries"],
+          deviceId: [5]
+        }]
+      },
+      // OpenSense Data Latency
+      { title:"Tram 4: Data Latency [ms]",
+        signals: [{
+          vsensor:"*_data_latency",
+          field:["latency"],
+          deviceId: [6]
+        }]
+      },
+      // OpenSense Backlog num. entries
+      { title:"Tram 4: BackLog DB [# of entries]",
+        signals: [{
+          vsensor:"*_backlogstatus_dynamic__mapped",
+          field:["db_entries"],
+          deviceId: [6]
+        }]
+      },
+      // OpenSense Data Latency
+      { title:"Tram 5: Data Latency [ms]",
+        signals: [{
+          vsensor:"*_data_latency",
+          field:["latency"],
+          deviceId: [7]
+        }]
+      },
+      // OpenSense Backlog num. entries
+      { title:"Tram 5: BackLog DB [# of entries]",
+        signals: [{
+          vsensor:"*_backlogstatus_dynamic__mapped",
+          field:["db_entries"],
+          deviceId: [7]
+        }]
+      },
+      // OpenSense Data Latency
+      { title:"Tram 6: Data Latency [ms]",
+        signals: [{
+          vsensor:"*_data_latency",
+          field:["latency"],
+          deviceId: [8]
+        }]
+      },
+      // OpenSense Backlog num. entries
+      { title:"Tram 6: BackLog DB [# of entries]",
+        signals: [{
+          vsensor:"*_backlogstatus_dynamic__mapped",
+          field:["db_entries"],
+          deviceId: [8]
+        }]
+      },
+      
       // Dozer Health
       { title:"Dozer System Voltage",
         signals: [{

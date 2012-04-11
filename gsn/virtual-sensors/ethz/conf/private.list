@@ -137,7 +137,7 @@ OpenSense_Binary.xml
 OpenSense_MotionDetection.xml
 OpenSense_STEVAL_Dynamic_Proc.xml
 OpenSense_STEVAL_Static.xml
-#OpenSense_MiniDisc.xml
+OpenSense_MiniDisc.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
 Statistics_Sensorviz.xml
