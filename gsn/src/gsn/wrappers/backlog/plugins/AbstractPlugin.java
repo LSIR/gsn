@@ -397,7 +397,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 					ret[i-dataoffset] = (Byte)data[i];
 					break;
 				case DataTypes.DOUBLE:
-					ret[i-dataoffset] = (Double)data[i];
+					ret[i-dataoffset] = toDouble(data[i]);
 					break;
 				default:
 					ret[i-dataoffset] = data[i];
@@ -433,6 +433,24 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 			return (Long) value;
 		else
 			throw new Exception("value can not be cast to Long.");
+	}
+	
+	
+	protected static <T> Double toDouble(T value) throws Exception {
+		if (value == null)
+			return null;
+		else if (value instanceof Byte)
+			return new Double((Byte)value);
+		else if (value instanceof Short)
+			return new Double((Short)value);
+		else if (value instanceof Integer)
+			return new Double((Integer)value);
+		else if (value instanceof Long)
+			return new Double((Long)value);
+		else if (value instanceof Double)
+			return (Double) value;
+		else
+			throw new Exception("value can not be cast to Double.");
 	}
 	
 	
