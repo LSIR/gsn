@@ -33,7 +33,7 @@
 var g1Config = null;
 
 var topologyUpdateInfo;
-var LOOK_N_DAYS_BACK = 5;
+var LOOK_N_MIN_BACK = 5;
 var deployments = new Array();
 var selectedDeploymentNr;
 var tableEnding = "";
@@ -50,11 +50,11 @@ function deployment(name) {
 
 function coreStation(id) {
   this.id = id;
-  this.marker = new google.maps.Marker({map: aggMap.map});
+  this.marker = new google.maps.Marker();
 }
 
 function getCoreStationIds(deploymentId) {
-  var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
+  var date = new Date((new Date()).getTime()-(LOOK_N_MIN_BACK*60000));
   var ids = new Array();
   $.ajax({
     type: "GET",
@@ -305,6 +305,7 @@ function fetchGPSPositions() {
             longi = Math.round(absdlon + (absmlon/60.) ) * 1/1000000;
 
             var myLatlng = new google.maps.LatLng(lati, longi);
+            marker.setMap(aggMap.map);
             marker.setPosition(myLatlng);
             marker.setTitle("Device: "+id);
           }

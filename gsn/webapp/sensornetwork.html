@@ -34,7 +34,7 @@ $(document).ready(function() {
     GsnPlots.setConfig([
       
       // OpenSense Data Latency
-      { title:"Data Latency [ms]: Tram 1",
+      { title:"Tram 1: Data Latency [ms]",
         signals: [{
           vsensor:"opensense_data_latency",
           field:["latency"],
@@ -42,7 +42,7 @@ $(document).ready(function() {
         }]
       },
       // OpenSense Backlog num. entries
-      { title:"BackLog DB [# of entries]: Tram 1",
+      { title:"Tram 1: BackLog DB [# of entries]",
         signals: [{
           vsensor:"opensense_backlogstatus_dynamic__mapped",
           field:["db_entries"],

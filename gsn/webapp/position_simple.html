@@ -25,7 +25,7 @@
 <!--//<![CDATA[
 
 var topologyUpdateInfo;
-var LOOK_N_DAYS_BACK = 5;
+var LOOK_N_MIN_BACK = 5;
 var deployments = new Array();
 var selectedDeploymentNr;
 var tableEnding = "";
@@ -46,7 +46,7 @@ function coreStation(id) {
 }
 
 function getCoreStationIds(deploymentId) {
-  var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
+  var date = new Date((new Date()).getTime()-(LOOK_N_MIN_BACK*60000));
   var ids = new Array();
   $.ajax({
     type: "GET",
