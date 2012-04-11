@@ -64,7 +64,7 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			new DataField("BAT_STATE", "SMALLINT"),
 			new DataField("BAT_SOC", "DOUBLE"),
 			new DataField("BAT_REM_TIME", "BIGINT"),
-			new DataField("BAT_REM_TIME_DIFF", "INTEGER"),
+			new DataField("BAT_REM_TIME_DIFF", "BIGINT"),
 			new DataField("V_BAT", "INTEGER"),
 			new DataField("I_V12DC_TOT", "INTEGER")};
 
