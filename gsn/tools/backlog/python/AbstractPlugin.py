@@ -444,6 +444,110 @@ class AbstractPluginClass(Thread, Statistics):
         pass
     
     
+    def getBatteryState(self):
+        '''
+        Returns the current state of the battery.
+        
+        @return:    -2 = mains operation (9V Power supply connected)
+                    -1 = unknown
+                     0 = discharging
+                     1 = bulk
+                     2 = absorption
+                     3 = float
+                     4 = trickle
+                     None, if not set
+        
+        @raise Exception:    if PowerMonitor is not available
+        '''
+        if self._backlogMain.powerMonitor is None:
+            raise Exception('PowerMonitor is not available')
+        return self._backlogMain.powerMonitor._bat.get_state()
+    
+    
+    def getBatterySOC(self):
+        '''
+        Returns the current state of the battery.
+        
+        @return:    The current state of charge of the battery [0,100]
+                    or None if not set.
+        
+        @raise Exception:    if PowerMonitor is not available
+        '''
+        if self._backlogMain.powerMonitor is None:
+            raise Exception('PowerMonitor is not available')
+        return self._backlogMain.powerMonitor._bat.get_soc()
+    
+    
+    def getRemainingBatteryTime(self):
+        '''
+        Returns the remaining time of the battery in minutes assuming a constant
+        load level (System Current)
+        
+        @return:    Remaining Time of the battery in minutes or None if not set.
+        
+        @raise Exception:    if PowerMonitor is not available
+        '''
+        if self._backlogMain.powerMonitor is None:
+            raise Exception('PowerMonitor is not available')
+        return self._backlogMain.powerMonitor._bat.get_remainingTime()
+    
+    
+    def getRemainingBatteryTimeDiff(self):
+        '''
+        Returns the remaining time of the battery in minutes based on the
+        differential of the State of Charge!
+        
+        @return:    Remaining Time of the battery in minutes or None if not set.
+        
+        @raise Exception:    if PowerMonitor is not available
+        '''
+        if self._backlogMain.powerMonitor is None:
+            raise Exception('PowerMonitor is not available')
+        return self._backlogMain.powerMonitor._bat.get_remainingTimeDiff()
+    
+    
+    def getRemainingBatteryTimeDiffLT(self):
+        '''
+        Returns the remaining time of the battery in minutes based on the long
+        term differential of the SoC!
+        
+        @return:    Remaining Time of the battery in minutes or None if not set.
+        
+        @raise Exception:    if PowerMonitor is not available
+        '''
+        if self._backlogMain.powerMonitor is None:
+            raise Exception('PowerMonitor is not available')
+        return self._backlogMain.powerMonitor._bat.get_remainingTimeDiff_LT()
+    
+    
+    def getBatteryVoltage(self):
+        '''
+        Returns the approximated battery voltage. This means the measured voltage
+        of the Corestation corrected by the voltage drop of the powercable.
+        
+        @return:    Current voltage of the Battery or None if not set.
+        
+        @raise Exception:    if PowerMonitor is not available
+        '''
+        if self._backlogMain.powerMonitor is None:
+            raise Exception('PowerMonitor is not available')
+        return self._backlogMain.powerMonitor._bat.get_voltage()
+    
+    
+    def getCurrent(self):
+        '''
+        Returns the approximated battery voltage. This means the measured voltage
+        of the Corestation corrected by the voltage drop of the powercable.
+
+        @return:    Current voltage of the Battery or None if not set.
+        
+        @raise Exception:    if PowerMonitor is not available
+        '''
+        if self._backlogMain.powerMonitor is None:
+            raise Exception('PowerMonitor is not available')
+        return self._backlogMain.powerMonitor._bat.get_current()
+    
+    
     def getPowerControlObject(self):
         '''
         Returns the singleton PowerControl object or None if not

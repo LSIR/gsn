@@ -96,6 +96,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
         self._checkLM92Temp()
         self._checkExtStatus()
         self._checkUsbStatus()
+        self._checkPowerMonitorStatus()
         
         self.processMsg(self.getTimeStamp(), [STATIC_TYPE] + self._getInitStats())
         self._initFinish = True
@@ -147,6 +148,7 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
             hw_data_list += self._getUsbStatus()
             hw_data_list += self._getExtStatus()
             hw_data_list += self._getAD77x8()
+            hw_data_list += self._getPowerMonitorStatus()
             
             sw_data_list = [SW_TYPE]
             sw_timestamp = self.getTimeStamp()
@@ -1356,6 +1358,41 @@ class CoreStationStatusPluginClass(AbstractPluginClass):
                        self.getPowerControlObject().getVccNode(),
                        self.getPowerControlObject().getIVccNode(),
                        self.getPowerControlObject().getVcc42()]
+            except Exception, e:
+                self.warning(e.__str__())
+            
+        return ret
+        
+        
+    def _checkPowerMonitorStatus(self):
+        self._powerMonitor = False
+        try:
+            self.getBatteryState()
+        except Exception, e:
+            self.warning(e.__str__())
+        else:
+            self._powerMonitor = True
+    
+    
+    def _getPowerMonitorStatus(self):
+        '''
+            [batteryStat (short),
+             batterySOC (float),
+             remainingBatteryTime (long),
+             remainingBatteryTimeDiff (int),
+             batteryVoltage (int),
+             current (int)]
+        '''
+        ret = [None]*6
+        
+        if self._powerMonitor:
+            try:
+                ret = [self.getBatteryState(),
+                       self.getBatterySOC(),
+                       self.getRemainingBatteryTime(),
+                       self.getRemainingBatteryTimeDiff(),
+                       self.getBatteryVoltage(),
+                       self.getCurrent()]
             except Exception, e:
                 self.warning(e.__str__())
             

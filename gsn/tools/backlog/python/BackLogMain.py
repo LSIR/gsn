@@ -27,6 +27,7 @@ from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
 from JobsObserver import JobsObserverClass
 from ScheduleHandler import ScheduleHandlerClass, SUBPROCESS_BUG_BYPASS
+from PowerMonitor import PowerMonitor
 from ConfigParser import NoSectionError
 
 
@@ -176,9 +177,15 @@ class BackLogMainClass(Thread, Statistics):
         self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, self.confighandler.getParsedConfig()['config_schedule'])
         self._msgtypetoplugin.update({self.schedulehandler.getMsgType(): [self.schedulehandler]})
         
-        self.powerControl = None
         self.powerControl = PowerControl(self, self.confighandler.getParsedConfig()['wlan_port'], platform)
         self._logger.info('loaded PowerControl class')
+        
+        self.powerMonitor = None
+        try:
+            self.powerMonitor = PowerMonitor(self, self.confighandler.getParsedConfig()['config_powermonitor'])
+            self._logger.info('loaded PowerMonitor class')
+        except Exception, e:
+            self._logger.warning(e)
 
         # get plugins section from config files
         try:
@@ -232,6 +239,8 @@ class BackLogMainClass(Thread, Statistics):
             self._tospeer.start()
         self.schedulehandler.start()
         self.confighandler.start()
+        if self.powerMonitor:
+            self.powerMonitor.start()
 
         for plugin_name, plugin in self.plugins.items():
             self._logger.info('starting %s' % (plugin_name,))
@@ -282,7 +291,14 @@ class BackLogMainClass(Thread, Statistics):
             except Exception, e:
                 self.incrementExceptionCounter()
                 self._logger.exception(e)
-                
+        
+        if self.powerMonitor:
+            try:
+                self.powerMonitor.stop()            
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
+        
         try:
             self.schedulehandler.stop()
         except Exception, e:

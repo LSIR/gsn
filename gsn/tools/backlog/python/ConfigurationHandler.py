@@ -18,6 +18,7 @@ import hashlib
 from pyinotify import WatchManager, ThreadedNotifier, EventsCodes, ProcessEvent
 
 from ScheduleHandler import ScheduleHandlerClass
+from PowerMonitor import PowerMonitor
 from BackLogMessage import CONFIG_MESSAGE_TYPE
 
 
@@ -282,6 +283,16 @@ class ConfigurationHandlerClass():
         
         ScheduleHandlerClass.checkConfig(duty_cycle_mode, config_schedule)
         ret.update(config_schedule=config_schedule)
+        
+        # get powermonitor section from config files
+        config_powermonitor = []
+        try:
+            config_powermonitor = config.items('powermonitor')
+        except ConfigParser.NoSectionError:
+            self._logger.warning('no [powermonitor] section specified in %s -> PowerMonitor can not be used' % (config_file,))
+        
+        PowerMonitor.checkConfig(config_powermonitor)
+        ret.update(config_powermonitor=config_powermonitor)
         
         return ret
                 
