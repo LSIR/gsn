@@ -63,7 +63,7 @@ $(document).ready(function() {
       
       { title:"Tram 1: Ozone Concentration [ppb]",
         signals: [{
-          vsensor:".*_oz47_only_init_calibrated",
+          vsensor:".*_oz47_instant_calibrated",
           field:["ozone_ppb"],
           deviceId: [3]
         }]
@@ -82,6 +82,92 @@ $(document).ready(function() {
           deviceId: [2006]
         }]
       },
+      { title:"Tram 3: Ozone Concentration [ppb]",
+        signals: [{
+          vsensor:".*_oz47_instant_calibrated",
+          field:["ozone_ppb"],
+          deviceId: [5]
+        }]
+      },
+      { title:"Tram 3: Carbon Monoxide Concentration [ppm]",
+        signals: [{
+          vsensor:".*_alphasense_dynamic__mapped",
+          field:["sensor_ppm_1"],
+          deviceId: [5]
+        }]
+      },
+      { title:"Tram 3: Particulate Matter [particle/cm^3]",
+        signals: [{
+          vsensor:".*_minidisc_emb__mapped",
+          field:["number"],
+          deviceId: [5]
+        }]
+      },
+      { title:"Tram 4: Ozone Concentration [ppb]",
+        signals: [{
+          vsensor:".*_oz47_instant_calibrated",
+          field:["ozone_ppb"],
+          deviceId: [6]
+        }]
+      },
+      { title:"Tram 4: Carbon Monoxide Concentration [ppm]",
+        signals: [{
+          vsensor:".*_alphasense_dynamic__mapped",
+          field:["sensor_ppm_1"],
+          deviceId: [6]
+        }]
+      },
+      { title:"Tram 4: Particulate Matter [particle/cm^3]",
+        signals: [{
+          vsensor:".*_minidisc_emb__mapped",
+          field:["number"],
+          deviceId: [6]
+        }]
+      },
+      { title:"Tram 5: Ozone Concentration [ppb]",
+        signals: [{
+          vsensor:".*_oz47_instant_calibrated",
+          field:["ozone_ppb"],
+          deviceId: [7]
+        }]
+      },
+      { title:"Tram 5: Carbon Monoxide Concentration [ppm]",
+        signals: [{
+          vsensor:".*_alphasense_dynamic__mapped",
+          field:["sensor_ppm_1"],
+          deviceId: [7]
+        }]
+      },
+      { title:"Tram 5: Particulate Matter [particle/cm^3]",
+        signals: [{
+          vsensor:".*_minidisc_emb__mapped",
+          field:["number"],
+          deviceId: [7]
+        }]
+      },
+      { title:"Tram 6: Ozone Concentration [ppb]",
+        signals: [{
+          vsensor:".*_oz47_instant_calibrated",
+          field:["ozone_ppb"],
+          deviceId: [8]
+        }]
+      },
+      { title:"Tram 6: Carbon Monoxide Concentration [ppm]",
+        signals: [{
+          vsensor:".*_alphasense_dynamic__mapped",
+          field:["sensor_ppm_1"],
+          deviceId: [8]
+        }]
+      },
+      { title:"Tram 6: Particulate Matter [particle/cm^3]",
+        signals: [{
+          vsensor:".*_minidisc_emb__mapped",
+          field:["number"],
+          deviceId: [8]
+        }]
+      },
+      
+      
       { title:"Air Pollution NABEL Zuerich",
         signals: [{
           vsensor:".*_nabel_zuerich__mapped",
