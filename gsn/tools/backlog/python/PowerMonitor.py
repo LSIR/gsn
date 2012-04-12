@@ -92,7 +92,11 @@ class PowerMonitor(Thread):
             self._timer.wait(int(self._interval-self._samples))
             if self._timer.isSet():
                 break
-            self._action()
+            try:
+                self._action()
+            except Exception, e:
+                self._logger.exception(e)
+                self._backlogMain.incrementExceptionCounter()
         self._logger.info('died')
     
     
@@ -813,7 +817,10 @@ class BatteryState:
     
     def get_soc(self):
         """returns the current state of charge of the battery (int value between 0 and 100)"""
-        return self._soc
+        if self._soc is None:
+            return None
+        else:
+            return float(self._soc)
     
     def get_remainingTimeDiff_LT(self):
         """returns the remaining time of the battery assuming the current load is constant"""
