@@ -92,7 +92,8 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 *
      * @param deviceId the DeviceId the message has been received from
      * @param timestamp contained in the message {@link BackLogMessage}
-     * @param data of the message
+     * @param data of the message. data does not contain time stamps
+     * 		  and device IDs
      * 
      * @return true, if the plugin did process the message properly
      */
@@ -375,6 +376,23 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	}
 	
 	
+	/**
+	 * This function converts the numbers in the incoming message of type serializable to Java types.
+	 * The conversion is done according the type in the datafields parameter.
+	 * CAUTION: Only number types are converted! Binary and strings are NOT converted. 
+	 *  
+	 * @param data
+	 * 			data of the incoming message to convert	
+	 * @param dataoffset
+	 * 			data start index
+	 * @param datafields
+	 * 			data fields of incoming data
+	 * @param datafieldoffset
+	 * 			data field start index
+	 * 			
+	 * @return converted Serializable array containing Java types.          
+	 *          
+	 */
 	protected static Serializable[] checkAndCastData(Serializable[] data, int dataoffset, DataField[] datafields, int datafieldoffset) throws Exception {
 		if (data.length-dataoffset != datafields.length-datafieldoffset)
 			throw new Exception("data length does not correspond with the datafield length");

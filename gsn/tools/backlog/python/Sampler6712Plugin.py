@@ -149,9 +149,9 @@ class Sampler6712PluginClass(AbstractPluginClass):
         #sampler6712ProgramSettingsToSet = Sampler6712ProgramSettings(24, 0.5, 1.0, 'AUTO', 1, 1)
         sampler6712ProgramSettingsToSet = Sampler6712ProgramSettings(nbOfBottles = 24, 
                                                                      bottleVolumeInLit = 1, 
-                                                                     suctionLineLengthInM = 1.5, 
-                                                                     suctionLineHeadInM = 'AUTO', 
-                                                                     nbOfRinseCycles = 1, 
+                                                                     suctionLineLengthInM = 10.0, 
+                                                                     suctionLineHeadInM = 3.0, 
+                                                                     nbOfRinseCycles = 0, 
                                                                      nbOfRetries = 1)
 
         while not self._plugstop:
@@ -2100,7 +2100,7 @@ class Sampler6712ProgramSettings():
     L_BOTTLE_VOLUME_RANGE = (((1,2,4,8), 0.3, 100.0), # list of bottles and theire 
                              ((12, 24), 0.3, 30.0))   # min and max bottle volume in liter 
     L_SUCTION_LINE_LENGTH_RANGE_IN_M = (0.9, 30.2) # suction line length range in meter
-    L_SUCTION_HEAD_LENGTH_RANGE_IN_M = (0.3, 0.9) # suction head length range in meter
+    L_SUCTION_HEAD_LENGTH_RANGE_IN_M = (0.3, 8.5) # suction head length range in meter
     L_RINSE_CYCLES_RANGE = (0, 1, 2, 3)
     L_RETRIES_RANGE = (0, 1, 2, 3)
     
@@ -2153,7 +2153,8 @@ class Sampler6712ProgramSettings():
 
         # verify and set suction line head
         if (suctionLineHeadInM >= self.L_SUCTION_HEAD_LENGTH_RANGE_IN_M[0] and \
-            suctionLineHeadInM <= self.L_SUCTION_HEAD_LENGTH_RANGE_IN_M[1]) or \
+            suctionLineHeadInM <= self.L_SUCTION_HEAD_LENGTH_RANGE_IN_M[1] and 
+            suctionLineHeadInM <= suctionLineLengthInM) or \
             suctionLineHeadInM == 'AUTO': # corresponds to auto suction head
             self.suctionLineHeadInM = suctionLineHeadInM
         else:

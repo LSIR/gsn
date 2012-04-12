@@ -279,8 +279,8 @@ public final class StreamElement implements Serializable {
 			//    for (String k : this.indexedFieldNames.keySet())
 			//    System.out.println("Key : "+k + " VALUE = "+this.indexedFieldNames.get(k));
 		}
-		//  System.out.print(fieldName+" AT INDEX : "+ this.indexedFieldNames.get( fieldName ) );
-		//  System.out.println(" HAS VALUE : "+this.fieldValues[ this.indexedFieldNames.get( fieldName ) ]);
+		//System.out.print(fieldName+" AT INDEX : "+ this.indexedFieldNames.get( fieldName ) );
+		//System.out.println(" HAS VALUE : "+this.fieldValues[ this.indexedFieldNames.get( fieldName ) ]);
 		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {
 			logger.debug("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
@@ -289,6 +289,31 @@ public final class StreamElement implements Serializable {
 		return this.fieldValues[ index ];
 	}
 
+	/**
+	 * This method gets the attribute name as the input and returns the type
+	 * corresponding to that tuple.
+	 * 
+	 * @param fieldName The name of the tuple.
+	 * @return The type corresponding to the named tuple.
+	 */
+	public final Byte getType ( final String fieldName ) {
+		if ( indexedFieldNames == null ) {
+			indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
+			for ( int i = 0 ; i < this.fieldNames.length ; i++ )
+				this.indexedFieldNames.put( fieldNames[ i ] , i );
+			//    for (String k : this.indexedFieldNames.keySet())
+			//    System.out.println("Key : "+k + " VALUE = "+this.indexedFieldNames.get(k));
+		}
+		//System.out.print(fieldName+" AT INDEX : "+ this.indexedFieldNames.get( fieldName ) );
+		//System.out.println(" HAS VALUE : "+this.fieldTypes[ this.indexedFieldNames.get( fieldName ) ]);
+		Integer index = indexedFieldNames.get( fieldName );
+		if (index == null) {
+			logger.debug("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
+			return null;
+		}
+		return this.fieldTypes[ index ];
+	}
+	
 	public long getInternalPrimayKey ( ) {
 		return internalPrimayKey;
 	}
