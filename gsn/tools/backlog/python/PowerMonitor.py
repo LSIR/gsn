@@ -60,9 +60,11 @@ class PowerMonitor(Thread):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._logger.info('initalizing...')
         self._interval = self.getOptionvalue('update_interval',config)
+
         if self._interval == '' or self._interval == None:
             raise Exception('PowerMonitor is disabled')
         else:
+	    self._extraLoadCurrent = int(self.getOptionValue('extraLoadCurrent', config))
             self._interval = int(self._interval)
             self._samples = int(self.getOptionvalue('samples',config))
             self._cableLength = int(self.getOptionvalue('cable_length',config))
@@ -153,7 +155,7 @@ class PowerMonitor(Thread):
         
         # Get the sensor measurements and average the values..
         v_sys = self._mean(self._measure_V)         # mV
-        i_sys = self._mean(self._measure_I)/1000    # mA
+        i_sys = self._mean(self._measure_I)/1000 + self._extraLoadCurrent   # mA
         temp = self._mean(self._measure_temp)
         
         # Correct the measured voltage with the value of the cable.. so that we can approx the battery
@@ -232,6 +234,11 @@ class PowerMonitor(Thread):
         voltage_controller_resistance = PowerMonitor.getOptionvalue('voltage_controller_resistance',config)
         if voltage_controller_resistance == None or not voltage_controller_resistance.isdigit() or int(voltage_controller_resistance) < 0:
             raise TypeError('voltage_controller_resistance has to be a positive integer!')
+	  
+	# Additional load on battery
+        extraLoad = PowerMonitor.getOptionvalue('extraLoadCurrent',config)
+        if extraLoad == None or not extraLoad.isdigit() or int(extraLoad) < 0:
+            raise TypeError('extraLoadCurrent has to be a positive integer!')
     
     checkConfig = Callable(checkConfig)
     
