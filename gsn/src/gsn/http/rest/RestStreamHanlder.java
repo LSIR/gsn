@@ -289,33 +289,11 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 			int pos = 0;
 			while (tokens.hasMoreTokens()) {
 				String token = tokens.nextToken();
-				if (token.equals("/")) {
+				if (!token.equals("/")) {
+					checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase().trim());
 					pos++;
 				}
-				else {
-					switch (pos) {
-					case 1:
-						String time = URLDecoder.decode(token,"UTF-8");
-						try {
-							startTime = Long.parseLong(time);
-						} catch (NumberFormatException e) {
-							startTime= Helpers.convertTimeFromIsoToLong(time);
-						}
-						continue;
-					case 2:
-						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase().trim());
-						continue;
-					case 3:
-						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase().trim());
-						continue;
-					case 4:
-						checkToken(URLDecoder.decode(token,"UTF-8").toLowerCase().trim());
-						continue;
-					default:
-						throw new Exception("URL mall formated >" + requestURI + "<");
-					}
-				}
-				if (pos > 5)
+				if (pos > 4)
 					throw new Exception("URL mall formated >" + requestURI + "<");
 			}
 			tableName = SQLValidator.getInstance().validateQuery(query);
@@ -328,13 +306,20 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 			tableName=tableName.toLowerCase();
 			config = Mappings.getConfig(tableName);
 		}
-		private void checkToken(String s) {
+		private void checkToken(String s) throws Exception {
 			if (s.startsWith("t"))
 				timeout = Integer.parseInt(s.substring(1));
 			else if (s.startsWith("l"))
 				limit = Integer.parseInt(s.substring(1));
 			else if (s.equals("c"))
 				continuous = true;
+			else {
+				try {
+					startTime = Long.parseLong(s);
+				} catch (NumberFormatException e) {
+					startTime= Helpers.convertTimeFromIsoToLong(s);
+				}
+			}
 		}
 		protected VSensorConfig getVSensorConfig() {
 			return config;
