@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasense 
 {
-	private static final transient Logger logger = Logger.getLogger(ControlAlgorithmVirtualSensor.class);
+	private static final transient Logger logger = Logger.getLogger(OutlierNoiseFilterVirtualSensor.class);
 
 	private Map<Long, RawValue> mRawValueBuffer; // hashmap as buffer containing <generation_time, raw value> pairs
 
