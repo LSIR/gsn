@@ -508,6 +508,8 @@ class ScheduleHandlerClass(Thread, Statistics):
                 s = ''
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED) == TOSTypes.CONTROL_WAKEUP_TYPE_SCHEDULED:
                     s += 'SCHEDULE '
+                if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_POWER_ON) == TOSTypes.CONTROL_WAKEUP_TYPE_POWER_ON:
+                    s += 'POWER_ON '
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE) == TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE:
                     s += 'SERVICE '
                     self._servicewindow = True
