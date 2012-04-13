@@ -107,7 +107,7 @@ class AlphasenseDriver():
             self._logger.error( "serialAccess Exception (1)" + str(e))
             self._logger.error("Could not flush input buffer")
             self._device.close()
-            return False
+            return ''
         
         msg = '\x55\x41\x00\x00\x21\xd4\xaa'
 
@@ -145,7 +145,7 @@ class AlphasenseDriver():
             self._logger.error( "serialAccess Exception (1)" + str(e))
             self._logger.error("Could not flush input buffer")
             self._device.close()
-            return False
+            return ''
         
         msg = '\x55\x40\x00\x00\x70\x14\xaa'
 
