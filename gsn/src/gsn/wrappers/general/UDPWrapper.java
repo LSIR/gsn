@@ -53,7 +53,7 @@ public class UDPWrapper extends AbstractWrapper {
    }
    
    public void run ( ) {
-      byte [ ] receivedData = new byte [ 50 ];
+      byte [ ] receivedData = new byte [ 4096 ];
       DatagramPacket receivedPacket = null;
       while ( isActive( ) ) {
          try {
