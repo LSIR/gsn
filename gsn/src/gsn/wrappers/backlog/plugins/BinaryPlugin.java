@@ -763,33 +763,30 @@ public class BinaryPlugin extends AbstractPlugin {
 	private Serializable[] specificBinaryRequestPacket(String remoteLocation, long sizeAlreadyDownloaded, long crc) {
 		return new Serializable[] {lastReceivedPacketNr, RESEND_PACKET, sizeAlreadyDownloaded, crc, remoteLocation};
 	}
-}
 
 
-
-
-
-/**
- * A message to be put into the message queue.
- * 
- * @author Tonio Gsell
- */
-class Message {
-	private long timestamp;
-	private Serializable[] packet;
-	
-	Message() {	}
-	
-	Message(long t, Serializable[] pkt) {
-		timestamp = t;
-		packet = pkt.clone();
-	}
-	
-	public long getTimestamp() {
-		return timestamp;
-	}
-	
-	public Serializable[] getData() {
-		return packet;
+	/**
+	 * A message to be put into the message queue.
+	 * 
+	 * @author Tonio Gsell
+	 */
+	class Message {
+		private long timestamp;
+		private Serializable[] packet;
+		
+		Message() {	}
+		
+		Message(long t, Serializable[] pkt) {
+			timestamp = t;
+			packet = pkt.clone();
+		}
+		
+		public long getTimestamp() {
+			return timestamp;
+		}
+		
+		public Serializable[] getData() {
+			return packet;
+		}
 	}
 }
