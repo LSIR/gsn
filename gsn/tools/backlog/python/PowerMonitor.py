@@ -64,7 +64,7 @@ class PowerMonitor(Thread):
         if self._interval == '' or self._interval == None:
             raise Exception('PowerMonitor is disabled')
         else:
-	    self._extraLoadCurrent = int(self.getOptionValue('extraLoadCurrent', config))
+	    self._extraLoadCurrent = int(self.getOptionvalue('extraLoadCurrent', config))
             self._interval = int(self._interval)
             self._samples = int(self.getOptionvalue('samples',config))
             self._cableLength = int(self.getOptionvalue('cable_length',config))
@@ -155,11 +155,14 @@ class PowerMonitor(Thread):
         
         # Get the sensor measurements and average the values..
         v_sys = self._mean(self._measure_V)         # mV
-        i_sys = self._mean(self._measure_I)/1000 + self._extraLoadCurrent   # mA
+        i_sys = self._mean(self._measure_I)/1000   # mA
         temp = self._mean(self._measure_temp)
         
         # Correct the measured voltage with the value of the cable.. so that we can approx the battery
-        v_sys = v_sys + i_sys * self._cableResistance
+        v_sys = v_sys + i_sys * self._cableResistance 
+        
+        #in case there are "hidden" loads that can't be measured and does not affect correction of v_sys
+        i_sys += self._extraLoadCurrent
         
         # Update the battery state with the averaged values.
         self._bat.update(v_sys,i_sys,temp, time.time())
@@ -400,7 +403,7 @@ class BatteryState:
         # rate the current in terms of the capacity!
         current = current / (self._capacity*1000)
         if self._logger.isEnabledFor(logging.DEBUG):
-            self._logger.debug('Rated Current %.5f', current)
+            self._logger.debug('Relative Load Current %.5f', current)
         
         # If there is no battery attached, return 100 %
         if self._batNum == 0:
@@ -648,7 +651,7 @@ class BatteryState:
                 # If we have less then 5 measurements make sure we stay in UNKNOWN. So that we can base our decisions on
                 # the tendency...
                 self._state = UNKNOWN
-                self._update_soc(cur_soc,time)
+                self._update_soc(0,time) #was cur_soc instead of 0
                 return
             # UNKNOWN => BULK
             if self._tendencyV == RISE and self._tendencyI != DROP and cur_soc < BULK_MAXSOC:
@@ -688,7 +691,7 @@ class BatteryState:
             
             # From DISCHARGING we have transitions to BULK
             # Check for Bulk transition, if we have suddenly a X% higher SoC...
-            if cur_soc > soc_threshold:
+            if cur_soc > soc_threshold or (self._tendencyV == RISE and self._tendencyI != DROP ):
                 self._state = BULK
                 self._prevState = DISCHARGING
                 self._v_bulk = []
