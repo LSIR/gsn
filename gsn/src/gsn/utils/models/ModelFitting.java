@@ -20,7 +20,14 @@ public class ModelFitting {
     * comparison is case insensitive
     * */
     public static int getModelIdFromString(String strModel) {
+
         int result = -1;
+
+        if (strModel.matches("\\d")) {  // model given as number
+            result = Integer.parseInt(strModel);
+            return result;
+        }
+
         for (int i=0;i<MODEL_NAMES.length;i++) {
             if (MODEL_NAMES[i].toUpperCase().equals(strModel.toUpperCase())) {
                 result = i;

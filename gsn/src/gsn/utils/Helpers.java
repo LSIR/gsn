@@ -19,7 +19,7 @@ public class Helpers {
 		properties.put( "log4j.logger.org.apache" , "WARN" );
 		properties.put( "log4j.appender.console.layout" , "org.apache.log4j.PatternLayout" );
 		properties.put( "log4j.appender.console.layout.ConversionPattern" , "%-6p[%d] [%t] (%13F:%L) %3x - %m%n" );
-		PropertyConfigurator.configure( properties ); 
+		PropertyConfigurator.configure( properties );
 	}
 
 	public static String formatTimePeriod (long timestamp) {
@@ -27,10 +27,15 @@ public class Helpers {
 		if (timestamp < 60 * 1000) return (timestamp / 1000) + " sec";
 		if (timestamp < 60 * 60 * 1000) return (timestamp / (1000 * 60)) + " min";
 		if (timestamp < 24 * 60 * 60 * 1000) return (timestamp / (1000 * 60 * 60)) + " h";
-		return (timestamp / (24 * 1000 * 60 * 60)) + " day";	  
+		return (timestamp / (24 * 1000 * 60 * 60)) + " day";
 	}
 	public static long convertTimeFromIsoToLong(String time) throws Exception {
 		DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+		return fmt.parseDateTime(time).getMillis();
+	}
+
+    public static long convertTimeFromIsoToLong(String time, String format) throws Exception {
+		DateTimeFormatter fmt = DateTimeFormat.forPattern(format);
 		return fmt.parseDateTime(time).getMillis();
 	}
 

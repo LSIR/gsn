@@ -5,6 +5,7 @@ import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
@@ -70,8 +71,15 @@ public class GMLHandler implements RequestHandler {
             if (reqGroup != null && !(sensorConfig.getName().startsWith(reqGroup + "_"))) continue;
 
             if (Main.getContainerConfig().isAcEnabled()) {
-                if (user == null) continue; // null, means that user cannot be authenticated
-                else if (!user.hasReadAccessRight(sensorConfig.getName()) && !user.isAdmin()) continue;
+                if (user == null) {
+                    if (authenticateUserFromURL)
+                        continue; // means that username and password provided are rejected dince they don't map to a correct User object
+                    else // no username was provided, show only public sensors
+                        if (DataSource.isVSManaged(sensorConfig.getName()))
+                            continue; //skip sensor if it is managed by access control
+                } else // user authenticated, verify that it has the right credentials
+                    if (!user.hasReadAccessRight(sensorConfig.getName()) && !user.isAdmin() && !DataSource.isVSManaged(sensorConfig.getName()))
+                        continue;
             }
 
             for (KeyValue df : sensorConfig.getAddressing()) {
