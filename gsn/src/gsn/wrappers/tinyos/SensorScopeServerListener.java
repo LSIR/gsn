@@ -403,16 +403,10 @@ public class SensorScopeServerListener {
 
     private static Map<Integer, Long> latestTimestampForStation = new HashMap<Integer, Long>();
     private static Map<Integer, Serializable[]> latestBufferForStation = new HashMap<Integer, Serializable[]>();
+    private static Map<Integer, Map<Long, Serializable[]>> stationsBuffer = new HashMap<Integer, Map<Long, Serializable[]>>();
+
 
     public SensorScopeServerListener() {
-        // Create a server socket
-        try {
-            serverSocket = new ServerSocket(port);
-        } catch (IOException e) {
-            logger.error("Couldn't create server socket");
-            logger.error(e.getMessage(), e);
-            System.exit(-1);
-        }
 
         Properties propertiesFile = new Properties();
         try {
@@ -426,12 +420,35 @@ public class SensorScopeServerListener {
         csvFolderName = propertiesFile.getProperty("csvFolder", DEFAULT_FOLDER_FOR_CSV_FILES);
         nullString = propertiesFile.getProperty("nullString", DEFAULT_NULL_STRING);
 
+        String str_port = propertiesFile.getProperty("serverPort");
+
+        if (str_port == null) {
+            logger.error("Couldn't find serverPort value in configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
+            System.exit(-1);
+        }
+        try {
+            port = Integer.parseInt(str_port);
+        } catch (NumberFormatException e) {
+            logger.error("Incorrect value (" + str_port + ") for serverPort in configuration file: " + CONF_SENSORSCOPE_SERVER_PROPERTIES);
+            System.exit(-1);
+        }
+
         logger.info("CSV folder for CSV files: " + csvFolderName);
         logger.info("Null string: \"" + nullString + "\"");
 
         mRxBuf = new int[RX_BUFFER_SIZE];
         mTxBuf = new byte[TX_BUFFER_SIZE];
-        logger.info("Server initialized.");
+
+        // Create a server socket
+        try {
+            serverSocket = new ServerSocket(port);
+        } catch (IOException e) {
+            logger.error("Couldn't create server socket");
+            logger.error(e.getMessage(), e);
+            System.exit(-1);
+        }
+
+        logger.info("Server initialized on port " + port);
     }
 
     Socket client = null;
@@ -1021,56 +1038,155 @@ public class SensorScopeServerListener {
         }
     }
 
-    Serializable[] mergeBuffers(Serializable[] olderBuffer, Serializable[] newerBuffer) {
-        Serializable[] newBuffer = olderBuffer.clone();
-        for (int i = 0; i < olderBuffer.length; i++) {
-            if (olderBuffer[i] == null && newerBuffer[i] != null)
-                newBuffer[i] = newerBuffer[i];
+    Serializable[] mergePackets(Serializable[] olderPacket, Serializable[] newerPacket) {
+        Serializable[] mergedPacket = olderPacket.clone();
+        for (int i = 0; i < olderPacket.length; i++) {
+            if (olderPacket[i] == null && newerPacket[i] != null)
+                mergedPacket[i] = newerPacket[i];
         }
-        return newBuffer;
+        return mergedPacket;
     }
 
-    private void PublishBuffer(Serializable[] buffer, long timestamp, int stationID) {
+    /*
+    * Publish buffer
+    * Merges packets for similar timestamps including timestamps older than latest,
+    * uses a buffer of size 10 to store history (moving window of size 10 and step 1)
+    * */
+    private void PublishPacketWithHistory(Serializable[] packet, long timestamp, int stationID) {
+        if (stationsBuffer.containsKey(stationID)) {
+            AddToStationBuffer(stationID, timestamp, packet);
+        } else {
+            stationsBuffer.put(stationID, new HashMap<Long, Serializable[]>()); // create buffer for station stationID
+            stationsBuffer.get(stationID).put(timestamp, packet); // add packet for station stationID
+        }
+    }
+
+    private void AddToStationBuffer(int stationID, long timestamp, Serializable[] packet) {
+        if (stationsBuffer.get(stationID).containsKey(timestamp)) { // timestamp already present
+            stationsBuffer.get(stationID).put(timestamp, mergePackets(stationsBuffer.get(stationID).get(timestamp), packet)); // merge new buffer with previous
+        } else {
+            stationsBuffer.get(stationID).put(timestamp, packet);
+        }
+        CheckQueueSizeForStation(stationID);
+    }
+
+    /*
+    * Keeps only 10 values in the queue
+    * Removes oldest value if queue is has more than 10 elements
+    * (moving window of size 10 and step 1)
+    * */
+    private void CheckQueueSizeForStation(int stationID) {
+        int queueSize = stationsBuffer.get(stationID).size();
+        logger.info("Queue [" + stationID + "] = " + queueSize);
+        // search for oldest timestamp (smaller value)
+        Long oldestTimestamp = Long.MAX_VALUE;
+        for (Long timestamp : stationsBuffer.get(stationID).keySet()) {
+            if (timestamp < oldestTimestamp)
+                oldestTimestamp = timestamp;
+        }
+        Serializable[] _buffer = stationsBuffer.get(stationID).get(oldestTimestamp);
+        if (queueSize > 10) {
+            try {  // Publish one element
+                String stationFileName = csvFolderName + "/" + stationID + ".csv";
+                FileWriter fstream = new FileWriter(stationFileName, true);
+                BufferedWriter out = new BufferedWriter(fstream);
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < _buffer.length; i++) {
+                    if (_buffer[i] == null)
+                        sb.append(nullString).append(",");
+                    else
+                        sb.append(_buffer[i]).append(",");
+                }
+                sb.append(Helpers.convertTimeFromLongToIso(oldestTimestamp, "yyyy-MM-dd HH:mm:ss"));
+                sb.append("\n");
+                out.write(sb.toString());
+                out.close();
+                stationsBuffer.get(stationID).remove(oldestTimestamp); // Remove one element
+                logger.info("Queue [" + stationID + "] = " + queueSize + " after publishing");
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    /*
+    * Publish buffer
+    * Merges packets for similar timestamps but doesn't handle timestamps older than latest
+    * */
+    private void PublishBuffer(Serializable[] packet, long timestamp, int stationID) {
         if (!latestTimestampForStation.containsKey(stationID)) { // first time we receive that stationID
             logger.debug("first time we receive stationID=" + stationID);
             latestTimestampForStation.put(stationID, timestamp);
-            latestBufferForStation.put(stationID, buffer.clone());
+            latestBufferForStation.put(stationID, packet.clone());
         } else {
             if (timestamp == latestTimestampForStation.get(stationID)) {
-                latestBufferForStation.put(stationID, mergeBuffers(latestBufferForStation.get(stationID), buffer));
+                latestBufferForStation.put(stationID, mergePackets(latestBufferForStation.get(stationID), packet));
                 logger.debug("Merging buffers for stationID=" + stationID);
             } else {
-                logger.debug("Publishing data for stationID=" + stationID);
-                latestTimestampForStation.put(stationID, timestamp); // update timestamp
-                latestBufferForStation.put(stationID, buffer.clone()); // update buffer
-                try {  // Publish it
-                    String stationFileName = csvFolderName + "/" + stationID + ".csv";
-                    FileWriter fstream = new FileWriter(stationFileName, true);
-                    BufferedWriter out = new BufferedWriter(fstream);
+                if ((timestamp > latestTimestampForStation.get(stationID))) {
+                    logger.debug("Publishing data for stationID=" + stationID);
+                    latestTimestampForStation.put(stationID, timestamp); // update timestamp
+                    latestBufferForStation.put(stationID, packet.clone()); // update buffer
+                    try {  // Publish it
+                        String stationFileName = csvFolderName + "/" + stationID + "_nopast.csv";
+                        FileWriter fstream = new FileWriter(stationFileName, true);
+                        BufferedWriter out = new BufferedWriter(fstream);
 
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < buffer.length; i++) {
-                        if (buffer[i] == null)
-                            sb.append(nullString).append(",");
-                        else
-                            sb.append(buffer[i]).append(",");
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < packet.length; i++) {
+                            if (packet[i] == null)
+                                sb.append(nullString).append(",");
+                            else
+                                sb.append(packet[i]).append(",");
+                        }
+                        sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss"));
+                        sb.append("\n");
+                        out.write(sb.toString());
+                        out.close();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
                     }
-                    sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
-                    sb.append("\n");
-                    out.write(sb.toString());
-                    out.close();
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                } else {
+                    //TODO: received data from the past
                 }
             }
         }
+    }
+
+   /*
+   * Publish buffer
+   * Doesn't merge buffers for similar timestamps
+   */
+    private void PublishBufferNoMerge(Serializable[] packet, long timestamp, int stationID) {
+        logger.debug("Publishing data for stationID=" + stationID);
+        try {
+            String stationFileName = csvFolderName + "/" + stationID + "_nomerge.csv";
+            FileWriter fstream = new FileWriter(stationFileName, true);
+            BufferedWriter out = new BufferedWriter(fstream);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < packet.length; i++) {
+                if (packet[i] == null)
+                    sb.append(nullString).append(",");
+                else
+                    sb.append(packet[i]).append(",");
+            }
+            sb.append(Helpers.convertTimeFromLongToIso(timestamp, "yyyy-MM-dd HH:mm:ss"));
+            sb.append("\n");
+            out.write(sb.toString());
+            out.close();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
     }
 
 
     private StreamElement publishSensor(long timestamp, int stationID, int sid, int dupn, int[] reading) {
 
         StreamElement aStreamElement = null;
-        // interpreting raw readings
+// interpreting raw readings
 
         double sid1_int_batt_volt;
         double sid1_ext_batt_volt;
@@ -1104,8 +1220,8 @@ public class SensorScopeServerListener {
         buffer[OUTPUT_STRUCTURE_SIZE - 1] = new Long(last_timestamp);
         doPostStreamElement = true;
 
-        // extended sensors (when other sensors share the same bus)
-        // are supported up to dupn=MAX_DUPN (MAX_DUPN+1 sensors in total)
+// extended sensors (when other sensors share the same bus)
+// are supported up to dupn=MAX_DUPN (MAX_DUPN+1 sensors in total)
         if (dupn > MAX_DUPN)
             doPostStreamElement = false;
 
@@ -1289,7 +1405,7 @@ public class SensorScopeServerListener {
 
                 case 12:
                     long battery_board_voltage_raw = reading[0] * 256 + reading[1];
-                    //TODO: verify packet size (1 or 2 bytes)
+//TODO: verify packet size (1 or 2 bytes)
 
                     sid12_battery_board_voltage = battery_board_voltage_raw * 6 * 2.5 / 4095;
 
@@ -1311,9 +1427,11 @@ public class SensorScopeServerListener {
 
             aStreamElement = new StreamElement(outputStructureCache, buffer, timestamp * 1000);
 
-            PublishBuffer(buffer, timestamp * 1000, stationID);
+            //PublishBuffer(buffer, timestamp * 1000, stationID);
+            PublishPacketWithHistory(buffer, timestamp * 1000, stationID);     // moving window of size 10, step 1
+            //PublishBufferNoMerge(buffer, timestamp * 1000, stationID);
 
-            // reset
+// reset
             for (int i = 0; i < OUTPUT_STRUCTURE_SIZE; i++) { // i=1 => don't reset SID
                 buffer[i] = null;
                 buf[i] = -1;
@@ -1337,7 +1455,7 @@ public class SensorScopeServerListener {
             if (currentPacket.get(0) == 0 || currentPacket.get(0) >= currentPacket.getSize()) {
                 logger.error("Corrupted packet found (invalid packet length)");
                 continue; // skip it
-                //TODO: check whether all packets should be skipped or just current one
+//TODO: check whether all packets should be skipped or just current one
             }
 
             int[] dataPacket = currentPacket.getDataPacket();
@@ -1345,10 +1463,6 @@ public class SensorScopeServerListener {
             interpretPacket(dataPacket);
 
         }
-    }
-
-    private void postStreamElement(long last_timestamp, Serializable[] buffer) {
-        logger.info("*** postStreamElement ***");
     }
 
     private boolean CheckAuthentication(String passkey, int i, int i1, byte b, byte b1) {
@@ -1366,7 +1480,7 @@ public class SensorScopeServerListener {
         long utc;
         int crc;
 
-        // Packet size
+// Packet size
         challenge[0] = 24;
 
         Random randomGenerator = new Random();
@@ -1382,7 +1496,7 @@ public class SensorScopeServerListener {
         challenge[21] = 0;
         challenge[22] = 0;
 
-        // CRC
+// CRC
         int[] _challenge = new int[22];
 
         System.arraycopy(challenge, 1, _challenge, 0, 22);
@@ -1430,12 +1544,9 @@ public class SensorScopeServerListener {
 
     public static void main(java.lang.String[] args) {
         PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
-        String str_port = args[0];
 
-        port = Integer.parseInt(str_port);
-
-        logger.warn("Server started on port: " + port);
         SensorScopeServerListener server = new SensorScopeServerListener();
+
         logger.warn("Entering server mode...");
 
         while (true) {
