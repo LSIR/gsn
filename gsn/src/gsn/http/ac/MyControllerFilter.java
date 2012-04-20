@@ -120,6 +120,38 @@ public class MyControllerFilter implements Filter {
                     }
                 }
 
+                // support for request 114
+                if ("/gsn".equals(req.getServletPath()) && (requestType == 114)) {
+                    if ((reqUsername != null) && (reqPassword != null) && (reqVirtualSensorName != null)) {
+                        User userByURL = UserUtils.allowUserToLogin(reqUsername, reqPassword);
+
+                        if (userByURL == null) {
+                            res.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified user.");
+                            return;
+                        }
+
+                        boolean flag = false;
+                        flag = UserUtils.userHasAccessToVirtualSensor(reqUsername, reqPassword, reqVirtualSensorName) || !DataSource.isVSManaged(reqVirtualSensorName);
+
+                        if (flag) {
+                            chain.doFilter(request, response);
+                            return;
+                        } else {
+                            res.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified resource.");
+                            return;
+                        }
+                    } else { // if resource is public and no password was provided
+                        if (!DataSource.isVSManaged(reqVirtualSensorName)) {
+                            chain.doFilter(request, response);
+                            return;
+                        } else {
+                            res.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified resource.");
+                            return;
+                        }
+                    }
+                }
+
+
                 // bypass if servlet is gsn and request is for ContainerInfoHandler
 
                 if (("/gsn".equals(req.getServletPath()) && (requestType == 0 || requestType == 901))

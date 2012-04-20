@@ -87,11 +87,12 @@ public class GridDataServlet extends HttpServlet {
 
         Connection connection = null;
         StringBuilder sb = new StringBuilder();
+        ResultSet results = null;
 
         try {
             connection = Main.getDefaultStorage().getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            ResultSet results = statement.executeQuery(query);
+            results = statement.executeQuery(query);
             ResultSetMetaData metaData;    // Additional information about the results
             int numCols, numRows;          // How many rows and columns in the table
             metaData = results.getMetaData();       // Get metadata on them
@@ -133,6 +134,12 @@ public class GridDataServlet extends HttpServlet {
         } catch (SQLException e) {
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
+            if (results != null)
+                try {
+                    results.close();
+                } catch (SQLException e) {
+                    logger.warn(e.getMessage(), e);
+                }
             Main.getDefaultStorage().close(connection);
         }
 
