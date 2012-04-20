@@ -42,6 +42,10 @@ public class SQLValidator implements VSensorStateChangeListener {
 		SessionFactoryEmbedded factory = new SessionFactoryEmbedded();
 		session = (Session) factory.createSession(connInfo);
 		this.connection = DriverManager.getConnection(URL,properties);
+		
+		//This is only a workaround for queries containing 'UNIX_TIMESTAMP()' with no parameter.
+		//It does not return the same value as UNIX_TIMESTAMP() in MySQL returns!
+		executeDDL("CREATE ALIAS UNIX_TIMESTAMP FOR \"java.lang.System.currentTimeMillis()\"");
 	}
 
 	public void executeDDL(String ddl) throws SQLException {

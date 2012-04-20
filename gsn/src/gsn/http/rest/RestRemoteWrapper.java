@@ -108,7 +108,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 
     public DataField[] connectToRemote() throws IOException, ClassNotFoundException {
         // Create the GET request
-        HttpGet httpget = new HttpGet(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp));
+        HttpGet httpget = new HttpGet(initParams.getRemoteContactPointEncoded(lastReceivedTimestamp)+"?username=" + initParams.getUsername() + "&password=" + initParams.getPassword());
         // Create local execution context
         HttpContext localContext = new BasicHttpContext();
         //

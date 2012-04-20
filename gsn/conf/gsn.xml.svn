@@ -5,7 +5,7 @@
    <description>Database Middleware for PermaSense</description>
    <port>22001</port>
 
-<!-- Enable SSL -->
+<!-- SSL Support, Optional -->
 <!--
    <ssl-port>8443</ssl-port>
    <ssl-key-store-password>changeit</ssl-key-store-password>

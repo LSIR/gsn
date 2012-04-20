@@ -9,83 +9,91 @@ import java.text.NumberFormat;
 
 public class SensorScope2VS extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger( SensorScope2VS.class );
+    private static final transient Logger logger = Logger.getLogger(SensorScope2VS.class);
 
-    Double[] buffer;
+    private Double[] buffer;
 
-    int length=-1;
-    NumberFormat nf = NumberFormat.getInstance();
+    private int length = -1;
+    private NumberFormat nf = NumberFormat.getInstance();
 
-	public boolean initialize ( ) {
+    private boolean allowNulls = false;
+
+    public boolean initialize() {
         VSensorConfig vsensor = getVirtualSensorConfiguration();
-        //TreeMap<String, String> params = vsensor.getMainClassInitialParams();
+        TreeMap<String, String> params = vsensor.getMainClassInitialParams();
+
+        String allow_nulls_str = params.get("allow-nulls");
+
+        if (allow_nulls_str != null)
+            if (allow_nulls_str.trim().equalsIgnoreCase("true"))
+                allowNulls = true;
+
+
+        logger.warn("Allow nulls => " + allowNulls);
 
         length = vsensor.getOutputStructure().length;
 
         buffer = new Double[length];
 
-        /*
-        String sampling_time = params.get("sampling");
+        return true;
+    }
 
-        if (sampling_time != null) {
-            try {
-                Long st = Long.parseLong(sampling_time);
-                SAMPLING_RATE = st.intValue();
-            }
-            catch (NumberFormatException e) {
-                logger.debug(e.getMessage());
-            }
-        }
-        logger.warn("Sampling rate : > " + SAMPLING_RATE + " <");
-        */
-		return true;
-	}
-
-	public void dataAvailable ( String inputStreamName , StreamElement data ) {
+    public void dataAvailable(String inputStreamName, StreamElement data) {
 
 
         logger.debug("Data => " + data.toString());
 
         // verify if all tuples are null, avoids duplicating data using buffer
-        boolean nullpacket=true;
-        for (int i=0;i<length;i++) {
-            if ((Double)data.getData()[i]!=null)
+        boolean nullpacket = true;
+        for (int i = 0; i < length; i++) {
+            if ((Double) data.getData()[i] != null)
                 nullpacket = false;
         }
-        if (nullpacket) return;
+        if (nullpacket) {
+            logger.debug("Completely empty packet (all nulls). Discarded" + "\nData: " + data);
+            return;
+        }
 
+        // if nulls are allowed
+        if (allowNulls) {
+            dataProduced(data);
+            if (logger.isDebugEnabled())
+                logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
+            return;
+        }
 
+        // if nulls are not allowed, using buffer
 
-        for (int i=0;i<length;i++) {
-            Double d = (Double)data.getData()[i];
-            if (d!=null)
-                buffer[i]=d;
+        for (int i = 0; i < length; i++) {
+            Double d = (Double) data.getData()[i];
+            if (d != null)
+                buffer[i] = d;
         }
 
         /*
         * check if buffer contains any null values
         * */
 
-        boolean publish=true;
+        boolean publish = true;
 
-        for (int i=0;i<length;i++) {
-            data.setData(i,buffer[i]);
-            if (buffer[i]==null) publish = false;
+        for (int i = 0; i < length; i++) {
+            data.setData(i, buffer[i]);
+            if (buffer[i] == null) publish = false;
         }
 
-        logger.debug("Pub => " + data.toString());
+        //logger.debug("Pub => " + data.toString());
 
         if (publish) {
-		    dataProduced( data );
-		    if ( logger.isDebugEnabled( ) ) logger.debug( "Data received under the name: " + inputStreamName );
+            dataProduced(data);
+            if (logger.isDebugEnabled())
+                logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
+        } else {
+            logger.debug("null values, not published (" + this.getVirtualSensorConfiguration().getName() + ")");
         }
-        else {
-            logger.debug("null values, not published ");
-        }
-	}
+    }
 
-	public void dispose ( ) {
+    public void dispose() {
 
-	}
+    }
 
 }

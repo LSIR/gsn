@@ -222,6 +222,12 @@
     </servlet>
 
 
+   <servlet>
+       <servlet-name>GridDataServlet</servlet-name>
+       <display-name>GridDataServlet</display-name>
+       <servlet-class>gsn.http.GridDataServlet</servlet-class>
+   </servlet>
+
 
 
    
@@ -259,6 +265,12 @@
         <servlet-name>GeoData</servlet-name>
         <url-pattern>/geodata</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>GridDataServlet</servlet-name>
+        <url-pattern>/griddata</url-pattern>
+    </servlet-mapping>
+
 
     <servlet-mapping>
         <servlet-name>MenuServlet</servlet-name>
@@ -445,8 +457,9 @@
     <!-- The following remove all constraints as no auth-constraint is specified. -->
     <security-constraint >
         <web-resource-collection>
-            <web-resource-name>Open MSR WebService</web-resource-name>
+            <web-resource-name>Open Area</web-resource-name>
             <url-pattern>/services/Service/*</url-pattern>
+            <url-pattern>/menu.jsp</url-pattern>
         </web-resource-collection>
     </security-constraint>
  
@@ -466,6 +479,7 @@
        <url-pattern>/data</url-pattern>
        <url-pattern>/multidata</url-pattern>
        <url-pattern>/geodata</url-pattern>
+       <url-pattern>/griddata</url-pattern>
    </filter-mapping>
 
       
