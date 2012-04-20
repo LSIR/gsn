@@ -107,7 +107,7 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
 
     private static final String PARAM_PERSITANT = "persistant";
 
-    private static Timer timer = null;
+    private Timer timer = null;
 
     /**
      * This field holds the scriplet (state and logic) executed upon reception of a new {@link gsn.beans.StreamElement}.
@@ -295,7 +295,7 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
         }
     }
 
-    private synchronized static Timer getTimer() {
+    private synchronized Timer getTimer() {
         if (timer == null)
             timer = new Timer(false);
         return timer;
