@@ -121,7 +121,8 @@ public class DataEnumerator implements DataEnumeratorIF {
 			dataFieldTypes = fieldTypes.toArray( new Byte [ ] {} );
 			if ( indexofPK == -1 && linkBinaryData ) throw new RuntimeException( "The specified query can't be used with binaryLinked paramter set to true." );
 		} catch ( Exception e ) {
-			logger.error( e.getMessage( ) , e );
+			logger.error("Trying to create DataEnumerator with:\n"+preparedStatement.toString());
+            logger.error( e.getMessage( ) , e );
 			hasNext = false;
 			hadError = true;
 		}finally {

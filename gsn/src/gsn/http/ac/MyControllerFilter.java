@@ -22,6 +22,7 @@ public class MyControllerFilter implements Filter {
 
     private FilterConfig config = null;
     private static transient Logger logger = Logger.getLogger(MyControllerFilter.class);
+    private boolean logging = false; // basic logging for requests, TODO: make as config parameter in webapp config
 
     public void init(FilterConfig config) throws ServletException {
         this.config = config;
@@ -36,6 +37,12 @@ public class MyControllerFilter implements Filter {
         if (request instanceof HttpServletRequest) {
             HttpServletRequest req = (HttpServletRequest) request;
             HttpServletResponse res = (HttpServletResponse) response;
+
+            if (logging)
+                if ("/multidata".equals(req.getServletPath()))
+                    logger.warn(req.getRemoteAddr() + " => multidata\n" + listRequestParameters(req));
+
+
             HttpSession session = req.getSession();
             User user = (User) session.getAttribute("user");
             if (Main.getContainerConfig().isAcEnabled() == false) // do as filter does not exist
@@ -147,6 +154,17 @@ public class MyControllerFilter implements Filter {
                 }
             }
         }
+    }
+
+    private String listRequestParameters(HttpServletRequest req) {
+        StringBuilder sb = new StringBuilder();
+        Enumeration e = req.getParameterNames();
+
+        while (e.hasMoreElements()) {
+            String key = (String) e.nextElement();
+            sb.append("\t").append(key).append(":").append(req.getParameter(key)).append("\n");
+        }
+        return sb.toString();
     }
 
     private List<String> createListOfVirtualSensorsFromRequest(HttpServletRequest req) {
