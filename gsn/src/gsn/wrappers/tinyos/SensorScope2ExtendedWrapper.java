@@ -40,6 +40,10 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
     private static final int OFFSET_SOIL_CONDUCT_DECAGON = 5 + (MAX_DUPN + 1) * 11;
     private static final int OFFSET_WIND_DIRECTION = 5 + (MAX_DUPN + 1) * 12;
     private static final int OFFSET_WIND_SPEED = 5 + (MAX_DUPN + 1) * 13;
+    private static final int OFFSET_BATTERY_BOARD_VOLTAGE = 5 + (MAX_DUPN + 1) * 14;
+    private static final int OFFSET_SOLAR_RAD_SP212 = 5 + (MAX_DUPN + 1) * 15;
+    private static final int OFFSET_DECAGON_10HS_MV = 5 + (MAX_DUPN + 1) * 16;
+    private static final int OFFSET_DECAGON_10HS_VWC = 5 + (MAX_DUPN + 1) * 17;
 
     private static int threadCounter = 0;
 
@@ -292,6 +296,74 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
             new DataField("wind_speed_14", "double", "Davis Anemometer Speed (14)"),
             new DataField("wind_speed_15", "double", "Davis Anemometer Speed (15)"),
             new DataField("wind_speed_16", "double", "Davis Anemometer Speed (16)"),
+
+            new DataField("battery_board_voltage", "double", "Battery board 2.3 voltage"),
+            new DataField("battery_board_voltage_2", "double", "Battery board 2.3 voltage (2)"),
+            new DataField("battery_board_voltage_3", "double", "Battery board 2.3 voltage (3)"),
+            new DataField("battery_board_voltage_4", "double", "Battery board 2.3 voltage (4)"),
+            new DataField("battery_board_voltage_5", "double", "Battery board 2.3 voltage (5)"),
+            new DataField("battery_board_voltage_6", "double", "Battery board 2.3 voltage (6)"),
+            new DataField("battery_board_voltage_7", "double", "Battery board 2.3 voltage (7)"),
+            new DataField("battery_board_voltage_8", "double", "Battery board 2.3 voltage (8)"),
+            new DataField("battery_board_voltage_9", "double", "Battery board 2.3 voltage (9)"),
+            new DataField("battery_board_voltage_10", "double", "Battery board 2.3 voltage (10)"),
+            new DataField("battery_board_voltage_11", "double", "Battery board 2.3 voltage (11)"),
+            new DataField("battery_board_voltage_12", "double", "Battery board 2.3 voltage (12)"),
+            new DataField("battery_board_voltage_13", "double", "Battery board 2.3 voltage (13)"),
+            new DataField("battery_board_voltage_14", "double", "Battery board 2.3 voltage (14)"),
+            new DataField("battery_board_voltage_15", "double", "Battery board 2.3 voltage (15)"),
+            new DataField("battery_board_voltage_16", "double", "Battery board 2.3 voltage (16)"),
+
+            new DataField("solar_rad_sp212", "double", ""),
+            new DataField("solar_rad_sp212_2", "double", " (2)"),
+            new DataField("solar_rad_sp212_3", "double", " (3)"),
+            new DataField("solar_rad_sp212_4", "double", " (4)"),
+            new DataField("solar_rad_sp212_5", "double", " (5)"),
+            new DataField("solar_rad_sp212_6", "double", " (6)"),
+            new DataField("solar_rad_sp212_7", "double", " (7)"),
+            new DataField("solar_rad_sp212_8", "double", " (8)"),
+            new DataField("solar_rad_sp212_9", "double", " (9)"),
+            new DataField("solar_rad_sp212_10", "double", " (10)"),
+            new DataField("solar_rad_sp212_11", "double", " (11)"),
+            new DataField("solar_rad_sp212_12", "double", " (12)"),
+            new DataField("solar_rad_sp212_13", "double", " (13)"),
+            new DataField("solar_rad_sp212_14", "double", " (14)"),
+            new DataField("solar_rad_sp212_15", "double", " (15)"),
+            new DataField("solar_rad_sp212_16", "double", " (16)"),
+
+            new DataField("decagon_10hs_mv", "double", "Decagon 10HS mV"),
+            new DataField("decagon_10hs_mv_2", "double", "Decagon 10HS mV (2)"),
+            new DataField("decagon_10hs_mv_3", "double", "Decagon 10HS mV (3)"),
+            new DataField("decagon_10hs_mv_4", "double", "Decagon 10HS mV (4)"),
+            new DataField("decagon_10hs_mv_5", "double", "Decagon 10HS mV (5)"),
+            new DataField("decagon_10hs_mv_6", "double", "Decagon 10HS mV (6)"),
+            new DataField("decagon_10hs_mv_7", "double", "Decagon 10HS mV (7)"),
+            new DataField("decagon_10hs_mv_8", "double", "Decagon 10HS mV (8)"),
+            new DataField("decagon_10hs_mv_9", "double", "Decagon 10HS mV (9)"),
+            new DataField("decagon_10hs_mv_10", "double", "Decagon 10HS mV (10)"),
+            new DataField("decagon_10hs_mv_11", "double", "Decagon 10HS mV (11)"),
+            new DataField("decagon_10hs_mv_12", "double", "Decagon 10HS mV (12)"),
+            new DataField("decagon_10hs_mv_13", "double", "Decagon 10HS mV (13)"),
+            new DataField("decagon_10hs_mv_14", "double", "Decagon 10HS mV (14)"),
+            new DataField("decagon_10hs_mv_15", "double", "Decagon 10HS mV (15)"),
+            new DataField("decagon_10hs_mv_16", "double", "Decagon 10HS mV (16)"),
+
+            new DataField("decagon_10hs_vwc", "double", "Decagon 10HS vwc"),
+            new DataField("decagon_10hs_vwc_2", "double", "Decagon 10HS vwc (2)"),
+            new DataField("decagon_10hs_vwc_3", "double", "Decagon 10HS vwc (3)"),
+            new DataField("decagon_10hs_vwc_4", "double", "Decagon 10HS vwc (4)"),
+            new DataField("decagon_10hs_vwc_5", "double", "Decagon 10HS vwc (5)"),
+            new DataField("decagon_10hs_vwc_6", "double", "Decagon 10HS vwc (6)"),
+            new DataField("decagon_10hs_vwc_7", "double", "Decagon 10HS vwc (7)"),
+            new DataField("decagon_10hs_vwc_8", "double", "Decagon 10HS vwc (8)"),
+            new DataField("decagon_10hs_vwc_9", "double", "Decagon 10HS vwc (9)"),
+            new DataField("decagon_10hs_vwc_10", "double", "Decagon 10HS vwc (10)"),
+            new DataField("decagon_10hs_vwc_11", "double", "Decagon 10HS vwc (11)"),
+            new DataField("decagon_10hs_vwc_12", "double", "Decagon 10HS vwc (12)"),
+            new DataField("decagon_10hs_vwc_13", "double", "Decagon 10HS vwc (13)"),
+            new DataField("decagon_10hs_vwc_14", "double", "Decagon 10HS vwc (14)"),
+            new DataField("decagon_10hs_vwc_15", "double", "Decagon 10HS vwc (15)"),
+            new DataField("decagon_10hs_vwc_16", "double", "Decagon 10HS vwc (16)"),
 
             new DataField("timestamp", "bigint", "Timestamp")
     };
@@ -583,6 +655,10 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                 double sid9_soil_conduct;
                                 double sid10_wind_direction;
                                 double sid10_wind_speed;
+                                double sid12_battery_board_voltage;
+                                double sid19_decagon_10hs_mv;
+                                double sid19_decagon_10hs_vwc;
+                                double sid20_solar_rad_sp212;
 
                                 if (logger.isDebugEnabled()) {
                                     logger.debug("SensorID:" + sid + " Dupn:" + dupn + " Reading:" + list_array(reading));
@@ -751,6 +827,47 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
                                             count[OFFSET_WIND_SPEED + dupn]++;
                                             logger.info("sid10_wind_direction: " + measure.format(sid10_wind_direction) +
                                                     " sid10_wind_speed: " + measure.format(sid10_wind_speed));
+                                            break;
+
+                                        case 19:
+                                            long decagon_10hs_raw = reading[0] * 256 + reading[1];
+
+                                            sid19_decagon_10hs_mv =  (decagon_10hs_raw * 2.5) / (4.095 * 2);
+                                            sid19_decagon_10hs_vwc =  (0.00000000297 * sid19_decagon_10hs_mv*sid19_decagon_10hs_mv*sid19_decagon_10hs_mv) - (0.00000737 * sid19_decagon_10hs_mv*sid19_decagon_10hs_mv) + (0.00669 * sid19_decagon_10hs_mv) - 1.92;
+
+                                            buffer[OFFSET_DECAGON_10HS_MV + dupn] = new Double(sid19_decagon_10hs_mv);
+                                            buf[OFFSET_DECAGON_10HS_MV + dupn] = sid19_decagon_10hs_mv;
+                                            count[OFFSET_DECAGON_10HS_MV + dupn]++;
+                                            buffer[OFFSET_DECAGON_10HS_VWC + dupn] = new Double(sid19_decagon_10hs_vwc);
+                                            buf[OFFSET_DECAGON_10HS_VWC + dupn] = sid19_decagon_10hs_vwc;
+                                            count[OFFSET_DECAGON_10HS_VWC + dupn]++;
+                                            logger.info("sid19_decagon_10hs_mv: " + measure.format(sid19_decagon_10hs_mv) +
+                                                    " sid19_decagon_10hs_vwc: " + measure.format(sid19_decagon_10hs_vwc));
+                                            break;
+
+                                        case 20:
+                                            long solar_rad_sp212_raw = reading[0] * 256 + reading[1];
+
+                                            sid20_solar_rad_sp212 = solar_rad_sp212_raw * 2.5 / 4.095 * 0.5;
+
+                                            buffer[OFFSET_SOLAR_RAD_SP212 + dupn] = new Double(sid20_solar_rad_sp212);
+                                            buf[OFFSET_SOLAR_RAD_SP212 + dupn] = sid20_solar_rad_sp212;
+                                            count[OFFSET_SOLAR_RAD_SP212 + dupn]++;
+
+                                            logger.info("sid20_solar_rad_sp212: " + measure.format(sid20_solar_rad_sp212) );
+                                            break;
+
+                                        case 12:
+                                            long battery_board_voltage_raw = reading[0] * 256 + reading[1];
+                                            //TODO: verify packet size (1 or 2 bytes)
+
+                                            sid12_battery_board_voltage = battery_board_voltage_raw * 6 * 2.5 / 4095;
+
+                                            buffer[OFFSET_BATTERY_BOARD_VOLTAGE + dupn] = new Double(sid12_battery_board_voltage);
+                                            buf[OFFSET_BATTERY_BOARD_VOLTAGE + dupn] = sid12_battery_board_voltage;
+                                            count[OFFSET_BATTERY_BOARD_VOLTAGE + dupn]++;
+
+                                            logger.info("sid12_battery_board_voltage: " + measure.format(sid12_battery_board_voltage) );
                                             break;
 
                                         default:
