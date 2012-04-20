@@ -58,11 +58,18 @@
         <servlet-class>gsn.http.rest.RestStreamHanlder</servlet-class>
     </servlet>
 
-        <servlet>
+    <servlet>
         <servlet-name>GeoData</servlet-name>
         <display-name>Sensor Data with Geo Location</display-name>
         <servlet-class>gsn.http.GeoDataServlet</servlet-class>
     </servlet>
+
+    <servlet>
+            <servlet-name>DynamicGeoData</servlet-name>
+            <display-name>Dynamic Sensor Data with Geo Location</display-name>
+            <servlet-class>gsn.http.DynamicGeoDataServlet</servlet-class>
+    </servlet>
+
 
     <servlet>
         <servlet-name>MenuServlet</servlet-name>
@@ -265,7 +272,10 @@
         <servlet-name>GeoData</servlet-name>
         <url-pattern>/geodata</url-pattern>
     </servlet-mapping>
-
+    <servlet-mapping>
+        <servlet-name>DynamicGeoData</servlet-name>
+        <url-pattern>/dynamicgeodata</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>GridDataServlet</servlet-name>
         <url-pattern>/griddata</url-pattern>
@@ -470,6 +480,10 @@
         <display-name>MyControllerFilter</display-name>
         <filter-name>MyControllerFilter</filter-name>
         <filter-class>gsn.http.ac.MyControllerFilter</filter-class>
+         <init-param>
+            <param-name>logIPs</param-name>
+            <param-value>false</param-value>
+        </init-param>
     </filter>
 
    <filter-mapping>

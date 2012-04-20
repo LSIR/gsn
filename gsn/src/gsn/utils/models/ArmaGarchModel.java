@@ -6,11 +6,13 @@ import gsn.utils.models.jgarch.util.ArrayUtils;
 import gsn.utils.models.jgarch.wrappers.REngineManager;
 import org.apache.log4j.Logger;
 
+import java.lang.Math;
+
 import java.util.List;
 
 public class ArmaGarchModel implements IModel {
 
-    private final transient Logger logger        = Logger.getLogger( ArmaGarchModel.class );
+    private final transient Logger logger = Logger.getLogger(ArmaGarchModel.class);
     private double[] stream;
 
     private int windowSize;
@@ -81,11 +83,11 @@ public class ArmaGarchModel implements IModel {
 
             double quality_metric = 0;
             if (predUVar != 0.0)
-                quality_metric = 1 - (stream[currIdx] - predValue) / (3 * predUVar);
+                quality_metric = 1 / Math.sqrt(2 * Math.PI * predUVar * predUVar) * Math.exp(-((stream[currIdx] - predValue) * (stream[currIdx] - predValue)) / (2 * predUVar * predUVar));
 
             quality[currIdx] = quality_metric;
 
-            logger.warn("quality : " + currIdx + " : " + quality_metric + "U-var: "+ predUVar + "L-var: " + predLVar);
+            logger.warn("quality : " + currIdx + " : " + quality_metric + "U-var: " + predUVar + "L-var: " + predLVar);
 
             if (predUVar > minVar) {
                 if ((stream[currIdx] <= predValue + errorBound * Math.sqrt(predUVar)) &&
