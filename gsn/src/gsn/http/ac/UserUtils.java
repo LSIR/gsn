@@ -37,7 +37,8 @@ public class UserUtils {
 
             } else {
 
-                logger.warn("This username \"" + username + "\" does not exist !");
+                if (username.compareToIgnoreCase("null") != 0)
+                    logger.warn("This username \"" + username + "\" does not exist !");
             }
 
         } catch (Exception e) {
