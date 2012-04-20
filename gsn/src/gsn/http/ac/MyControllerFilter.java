@@ -2,6 +2,9 @@ package gsn.http.ac;
 
 
 import gsn.Main;
+import gsn.Mappings;
+import gsn.beans.DataField;
+import gsn.beans.VSensorConfig;
 import gsn.http.WebConstants;
 import org.apache.log4j.Logger;
 
@@ -10,14 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Behnaz Bostanipour
- * Date: Apr 15, 2010
- * Time: 7:25:07 PM
- * To change this template use File | Settings | File Templates.
- */
 public class MyControllerFilter implements Filter {
 
     private FilterConfig config = null;
@@ -32,12 +32,13 @@ public class MyControllerFilter implements Filter {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
         if (request instanceof HttpServletRequest) {
             HttpServletRequest req = (HttpServletRequest) request;
             HttpServletResponse res = (HttpServletResponse) response;
             HttpSession session = req.getSession();
             User user = (User) session.getAttribute("user");
-            if (Main.getContainerConfig().isAcEnabled() == false)// do as filter does not exist
+            if (Main.getContainerConfig().isAcEnabled() == false) // do as filter does not exist
             {
                 chain.doFilter(request, response);
             } else {
@@ -64,6 +65,19 @@ public class MyControllerFilter implements Filter {
                         reqVirtualSensorName = req.getParameter("vsName");
                 }
 
+                if ((reqUsername == null) && (reqPassword == null) && (user == null) && ("/multidata".equals(req.getServletPath()))) { // generally request from web client for plotting
+                    List<String> listOfVirtualSensors = createListOfVirtualSensorsFromRequest(req);
+                    boolean flag = UserUtils.userHasAccessToAllVirtualSensorsInList(reqUsername, reqPassword, listOfVirtualSensors) || DataSource.allVirtualSensorsInListAreNotManaged(listOfVirtualSensors);
+                    if (flag) {
+                        chain.doFilter(request, response);
+                        return;
+                    } else {
+                        res.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified resource.");
+                        return;
+                    }
+
+                }
+
                 if ((reqUsername != null) && (reqPassword != null) && (reqVirtualSensorName != null)) {
                     //logger.debug("Detected URL-based login");
                     //logger.debug("User: " + reqUsername);
@@ -78,7 +92,14 @@ public class MyControllerFilter implements Filter {
                         return;
                     }
 
-                    boolean flag = UserUtils.userHasAccessToVirtualSensor(reqUsername, reqPassword, reqVirtualSensorName) || !DataSource.isVSManaged(reqVirtualSensorName);
+                    boolean flag = false;
+
+                    if ("/multidata".equals(req.getServletPath())) {
+                        List<String> listOfVirtualSensors = createListOfVirtualSensorsFromRequest(req);
+
+                        flag = UserUtils.userHasAccessToAllVirtualSensorsInList(reqUsername, reqPassword, listOfVirtualSensors) || DataSource.allVirtualSensorsInListAreNotManaged(listOfVirtualSensors);
+                    } else
+                        flag = UserUtils.userHasAccessToVirtualSensor(reqUsername, reqPassword, reqVirtualSensorName) || !DataSource.isVSManaged(reqVirtualSensorName);
 
                     if (flag) {
                         chain.doFilter(request, response);
@@ -92,7 +113,6 @@ public class MyControllerFilter implements Filter {
                 // bypass if servlet is gsn and request is for ContainerInfoHandler
 
                 if (("/gsn".equals(req.getServletPath()) && (requestType == 0 || requestType == 901))
-                        || ("/multidata".equals(req.getServletPath()))
                         || ("/field".equals(req.getServletPath()))
                         ) {
                     chain.doFilter(request, response);
@@ -127,5 +147,31 @@ public class MyControllerFilter implements Filter {
                 }
             }
         }
+    }
+
+    private List<String> createListOfVirtualSensorsFromRequest(HttpServletRequest req) {
+        Enumeration e = req.getParameterNames();
+        List<String> l = new ArrayList<String>();
+        while (e.hasMoreElements()) {
+            String key = (String) e.nextElement();
+            if (key.startsWith("vs[")) {
+                if (req.getParameter(key).equals("All"))
+                    l.addAll(getAllVirtualSensors());
+                else
+                    l.add(req.getParameter(key));
+            }
+        }
+        return l;
+    }
+
+    private List<String> getAllVirtualSensors() {
+        List<String> l = new ArrayList<String>();
+        Iterator<VSensorConfig> iter = Mappings.getAllVSensorConfigs();
+        VSensorConfig vsc;
+        while (iter.hasNext()) {
+            vsc = (VSensorConfig) iter.next();
+            l.add(vsc.getName());
+        }
+        return l;
     }
 }

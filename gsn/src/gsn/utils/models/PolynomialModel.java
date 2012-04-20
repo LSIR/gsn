@@ -26,8 +26,7 @@ public class PolynomialModel implements IModel {
 
 	}
 
-	@Override
-	public boolean FitAndMarkDirty(double[] processed, double[] dirtyness) {
+	public boolean FitAndMarkDirty(double[] processed, double[] dirtyness, double[] quality) {
 		//fit piece wize
 		this.currentPos = 0;
 		double[] x;

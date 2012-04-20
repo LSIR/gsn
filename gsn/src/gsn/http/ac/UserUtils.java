@@ -2,6 +2,9 @@ package gsn.http.ac;
 
 import org.apache.log4j.Logger;
 
+import java.util.Iterator;
+import java.util.List;
+
 
 public class UserUtils {
 
@@ -57,5 +60,18 @@ public class UserUtils {
             logger.warn("user.hasReadAccessRight(" + vsname + ") => " + user.hasReadAccessRight(vsname));
             return (user.hasReadAccessRight(vsname) || user.isAdmin());
         }
+    }
+
+    public static boolean userHasAccessToAllVirtualSensorsInList(String reqUsername, String reqPassword, List<String> listOfVirtualSensors) {
+
+        if (listOfVirtualSensors.isEmpty())
+            return false;
+
+        Iterator<String> iterator = listOfVirtualSensors.iterator();
+        boolean result = true;
+        while (iterator.hasNext() && result) {
+            result = result && userHasAccessToVirtualSensor(reqUsername, reqPassword, iterator.next());
+        }
+        return result;
     }
 }
