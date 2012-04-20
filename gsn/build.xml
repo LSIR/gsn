@@ -292,7 +292,15 @@
     <!-- Starts a sensorscope server, which listens on a port for data and publishes to CSV files -->
     <!-- configuration is set in conf/sensorscope_server.properties -->
     <target name="sensorscope-server" depends="build" description="Tests sensorscope server">
-        <java classname="gsn.wrappers.tinyos.SensorScopeServerListener" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+            <java classname="gsn.utils.SensorScopeListener" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+        <!--<java classname="gsn.wrappers.tinyos.SensorScopeServerListener" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">-->
+            <classpath refid="classpath"/>
+            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+        </java>
+    </target>
+
+    <target name="sensorscope-server-test" depends="build" description="Tests sensorscope server">
+        <java classname="gsn.utils.SensorScopeListenerTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
         </java>
