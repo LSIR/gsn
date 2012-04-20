@@ -22,10 +22,12 @@ import org.apache.log4j.Logger;
 public class UDPWrapper extends AbstractWrapper {
    
    private static final String    RAW_PACKET    = "RAW_PACKET";
+   private static final Integer       DEFAULT_DATAGRAM_SIZE = 50;
    
    private final transient Logger logger        = Logger.getLogger( UDPWrapper.class );
    
    private int                    threadCounter = 0;
+   private int                    datagramSize;
    
    public InputStream             is;
    
@@ -48,12 +50,13 @@ public class UDPWrapper extends AbstractWrapper {
          logger.warn( e.getMessage( ) , e );
          return false;
       }
+      datagramSize = Integer.parseInt( addressBean.getPredicateValueWithDefault("datagram-size", DEFAULT_DATAGRAM_SIZE.toString()) );
       setName( "UDPWrapper-Thread" + ( ++threadCounter ) );
       return true;
    }
    
    public void run ( ) {
-      byte [ ] receivedData = new byte [ 4096 ];
+      byte [ ] receivedData = new byte [ datagramSize ];
       DatagramPacket receivedPacket = null;
       while ( isActive( ) ) {
          try {
@@ -76,7 +79,8 @@ public class UDPWrapper extends AbstractWrapper {
    }
    
    public void dispose (  ) {
-      threadCounter--;
+	   socket.close();
+	   threadCounter--;
    }
    public String getWrapperName() {
     return "network udp";
