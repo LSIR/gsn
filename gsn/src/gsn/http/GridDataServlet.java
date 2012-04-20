@@ -3,6 +3,7 @@ package gsn.http;
 import gsn.Main;
 import gsn.beans.DataTypes;
 import gsn.utils.Helpers;
+import gsn.utils.geo.GridTools;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -66,7 +67,7 @@ public class GridDataServlet extends HttpServlet {
         }
 
 
-        response.getWriter().write(executeQuery(query));
+        response.getWriter().write(GridTools.executeQueryForGridAsString(query));
 
         /*
         for (String vsName : sensors) {
@@ -83,105 +84,6 @@ public class GridDataServlet extends HttpServlet {
         doGet(request, res);
     }
 
-    public String executeQuery(String query) {
-
-        Connection connection = null;
-        StringBuilder sb = new StringBuilder();
-        ResultSet results = null;
-
-        try {
-            connection = Main.getDefaultStorage().getConnection();
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            results = statement.executeQuery(query);
-            ResultSetMetaData metaData;    // Additional information about the results
-            int numCols, numRows;          // How many rows and columns in the table
-            metaData = results.getMetaData();       // Get metadata on them
-            numCols = metaData.getColumnCount();    // How many columns?
-            results.last();                         // Move to last row
-            numRows = results.getRow();             // How many rows?
-
-            String s;
-
-            // headers
-            sb.append("# Query: " + query + "\n");
-            sb.append("# ");
-
-            byte typ[] = new byte[numCols];
-            String columnLabel[] = new String[numCols];
-
-            for (int col = 0; col < numCols; col++) {
-                columnLabel[col] = metaData.getColumnLabel(col + 1);
-                typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
-            }
-
-            for (int row = 0; row < numRows; row++) {
-                results.absolute(row + 1);                // Go to the specified row
-                for (int col = 0; col < numCols; col++) {
-                    Object o = results.getObject(col + 1); // Get value of the column
-                    if (o == null)
-                        s = "null";
-                    else
-                        s = o.toString();
-                    if (typ[col] == DataTypes.BINARY) {
-                        byte[] bin = (byte[]) o;
-                        sb.append(deserialize(bin));
-                    } else {
-                        sb.append(columnLabel[col] + " " + s + "\n");
-                    }
-                }
-                sb.append("\n");
-            }
-        } catch (SQLException e) {
-            sb.append("ERROR in execution of query: " + e.getMessage());
-        } finally {
-            if (results != null)
-                try {
-                    results.close();
-                } catch (SQLException e) {
-                    logger.warn(e.getMessage(), e);
-                }
-            Main.getDefaultStorage().close(connection);
-        }
-
-        return sb.toString();
-    }
-
-    private String deserialize(byte[] bytes) {
-
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            ObjectInputStream in = null;
-
-            in = new ObjectInputStream(bis);
-
-            Double deserial[][] = new Double[0][];
-
-            deserial = (Double[][]) in.readObject();
-            in.close();
-
-            logger.debug("deserial.length" + deserial.length);
-            logger.debug("deserial[0].length" + deserial[0].length);
-
-            for (int i = 0; i < deserial.length; i++) {
-
-                for (int j = 0; j < deserial[0].length; j++) {
-                    sb.append(deserial[i][j]).append(" ");
-                }
-                sb.append("\n");
-            }
-
-        } catch (IOException e) {
-            logger.warn(e);
-        } catch (ClassNotFoundException e) {
-            logger.warn(e);
-        }
-
-        return sb.toString();
-    }
-
-
     private String generateASCIIFileName(String sensor, long timestamp, String timeFormat) {
         StringBuilder sb = new StringBuilder();
         sb.append(sensor).append("_").append(Helpers.convertTimeFromLongToIso(timestamp, timeFormat));
@@ -191,7 +93,6 @@ public class GridDataServlet extends HttpServlet {
     private String generaACIIFIleName(String sensor, long timestamp) {
         return generateASCIIFileName(sensor, timestamp, DEFAULT_TIMEFORMAT);
     }
-
 
     private void writeASCIIFile(String fileName, String folder, String content) {
         try {
@@ -228,7 +129,5 @@ public class GridDataServlet extends HttpServlet {
             zipOutputStream.close();
         } catch (IOException e) {
         }
-
-
     }
 }

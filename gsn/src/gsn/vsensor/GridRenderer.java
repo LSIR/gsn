@@ -3,9 +3,8 @@ package gsn.vsensor;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.utils.geo.GridTools;
 import org.apache.log4j.Logger;
-import gsn.wrappers.GridDataWrapper;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -60,7 +59,7 @@ public class GridRenderer extends AbstractVirtualSensor {
         long timestamp = streamElement.getTimeStamp();
         byte a[] = (byte[]) streamElement.getData("grid");
 
-        Double values[][] = GridDataWrapper.deserialize((byte[]) streamElement.getData("grid"));
+        Double values[][] = GridTools.deSerialize((byte[]) streamElement.getData("grid"));
         byte b[] = createImageFromArray(values);
 
         StreamElement se = new StreamElement(new String[]{"grid"},
