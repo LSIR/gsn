@@ -87,8 +87,7 @@
     </target>
 
     <target name="bind" depends="build" description="Compile the JIBX mappings.">
-        <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
-              failonerror="true">
+        <java classname="org.jibx.binding.Compile" maxmemory="${maxMemoryUsage}" fork="yes" dir="${basedir}" failonerror="true">
             <classpath refid="classpath"/>
             <arg value="conf/containerJIBX.xml"/>
             <arg value="conf/VirtualSensorDescription.xml"/>
