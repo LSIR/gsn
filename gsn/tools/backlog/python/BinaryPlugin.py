@@ -283,47 +283,54 @@ class BinaryPluginClass(AbstractPluginClass):
                     # the second entry of the data defines its type
                     pktType = data[1]
                     
-                    if pktNr == self._binaryWriter.getSentMsgNr():
-                        self._binaryWriter.stopSending()
-                        # if the type is INIT_PACKET we have to send a new file
-                        if pktType == INIT_PACKET:
-                            self.debug('new binary request received')
-                            self._getInitialBinaryPacket()
-                        # if the type is RESEND_PACKET we have to resend a part of a file...
-                        elif pktType == RESEND_PACKET:
-                            self.debug('binary retransmission request received')
-                            if self._reopenFile(data[2], struct.unpack('i', struct.pack('I', data[3]))[0], data[4]):
-                                self._getNextChunk()
-                            else:
+                    try:
+                        if pktNr == self._binaryWriter.getSentMsgNr():
+                            self._binaryWriter.stopSending()
+                            # if the type is INIT_PACKET we have to send a new file
+                            if pktType == INIT_PACKET:
+                                self.debug('new binary request received')
                                 self._getInitialBinaryPacket()
-                        elif pktType == ACK_PACKET:
-                            ackType = data[2]
-                            self.debug('acknowledge received for packet type %d' % (ackType,))
-                                
-                            if ackType == INIT_PACKET:
-                                self.debug('acknowledge received for init packet')
-                                self._getNextChunk()
-                            elif ackType == CHUNK_PACKET:
-                                self.debug('acknowledge for packet number >%d< received' % (pktNr,))
-                                self._getNextChunk()
-                            elif ackType == CRC_PACKET:
-                                filename = self._filedescriptor.name
-                                if os.path.isfile(filename):
-                                    os.chmod(filename, 0744)
-                                    self._filedescriptor.close()
-                                    # crc has been accepted by GSN
-                                    self.debug('crc has been accepted for %s => remove it' % (filename,))
-                                    # remove it from disk
-                                    os.remove(filename)
+                            # if the type is RESEND_PACKET we have to resend a part of a file...
+                            elif pktType == RESEND_PACKET:
+                                self.debug('binary retransmission request received')
+                                if self._reopenFile(data[2], struct.unpack('i', struct.pack('I', data[3]))[0], data[4]):
+                                    self._getNextChunk()
                                 else:
-                                    self.debug('crc acknowledge file does not exist')
-                                self._getInitialBinaryPacket()
-                            else:
-                                self.error('unexpected acknowledge received')
-                    elif pktNr == self._binaryWriter.getSentMsgNr()-1 or (pktNr == MESSAGE_NUMBER_MOD-1 and self._binaryWriter.getSentMsgNr() == 0):
-                        self.debug('packet number already received')
-                    else:
-                        self.error('packet number out of order (recv=%d, sent=%d)' % (pktNr, self._binaryWriter.getSentMsgNr()))
+                                    self._getInitialBinaryPacket()
+                            elif pktType == ACK_PACKET:
+                                ackType = data[2]
+                                self.debug('acknowledge received for packet type %d' % (ackType,))
+                                    
+                                if ackType == INIT_PACKET:
+                                    self.debug('acknowledge received for init packet')
+                                    self._getNextChunk()
+                                elif ackType == CHUNK_PACKET:
+                                    self.debug('acknowledge for packet number >%d< received' % (pktNr,))
+                                    self._getNextChunk()
+                                elif ackType == CRC_PACKET:
+                                    filename = self._filedescriptor.name
+                                    if os.path.isfile(filename):
+                                        os.chmod(filename, 0744)
+                                        self._filedescriptor.close()
+                                        # crc has been accepted by GSN
+                                        self.debug('crc has been accepted for %s => remove it' % (filename,))
+                                        # remove it from disk
+                                        os.remove(filename)
+                                    else:
+                                        self.debug('crc acknowledge file does not exist')
+                                    self._getInitialBinaryPacket()
+                                else:
+                                    self.error('unexpected acknowledge received')
+                        elif pktNr == self._binaryWriter.getSentMsgNr()-1 or (pktNr == MESSAGE_NUMBER_MOD-1 and self._binaryWriter.getSentMsgNr() == 0):
+                            self.debug('packet number already received')
+                        else:
+                            self.error('packet number out of order (recv=%d, sent=%d)' % (pktNr, self._binaryWriter.getSentMsgNr()))
+                    except Exception, e:
+                        self._backlogMain.incrementExceptionCounter()
+                        self._logger.exception(str(e))
+                        if self._filedescriptor and not self._filedescriptor.closed:
+                            self._filedescriptor.close()
+                        self._getInitialBinaryPacket()
                         
                 try:
                     self._msgqueue.task_done()
@@ -381,64 +388,70 @@ class BinaryPluginClass(AbstractPluginClass):
                 
     def _getInitialBinaryPacket(self):
         while not self._plugStop:
-            if self._filedescriptor and not self._filedescriptor.closed:
-                self._filedescriptor.seek(0)
-                filename = self._filedescriptor.name
-                if not os.path.isfile(filename):
+            try:
+                if self._filedescriptor and not self._filedescriptor.closed:
+                    self._filedescriptor.seek(0)
+                    filename = self._filedescriptor.name
+                    if not os.path.isfile(filename):
+                        self._filedescriptor.close()
+                        continue
+                else:
+                    try:
+                        # get the next file to send out of the fifo
+                        fileobj = self._filedeque.pop()
+                    except IndexError:
+                        self.debug('file FIFO is empty waiting for next file to arrive')
+                        self._readyfornewbinary = True
+                        self._isBusy = False
+                        return
+                        
+                    filename = fileobj[0]
+                
+                    if os.path.isfile(filename):
+                        # open the file
+                        self._filedescriptor = open(filename, 'rb')
+                        os.chmod(filename, 0444)
+                    else:
+                        # if the file does not exist we are continuing in the fifo
+                        continue
+                
+                # get the size of the file
+                filelen = os.path.getsize(filename)
+                
+                if filelen == 0:
+                    # if the file is empty we ignore it and continue in the fifo
+                    self.debug('ignore empty file: %s' % (filename,))
+                    os.chmod(filename, 0744)
+                    self._filedescriptor.close()
+                    os.remove(filename)
+                    continue
+                
+                filenamenoprefix = filename.replace(self._rootdir, '')
+                self.debug('filename without prefix: %s' % (filenamenoprefix,))
+                filenamelen = len(filenamenoprefix)
+                if filenamelen > 255:
+                    filenamelen = 255
+                
+                # check witch watch this file belongs to
+                l = -1
+                watch = None
+                for w in self._watches:
+                    if (filename.count(w[0]) > 0 or w[0] == './') and len(w[0]) > l:
+                        watch = w
+                        l = len(w[0])
+                if not watch:
+                    self.error('no watch specified for %s (this is very strange!!!) -> close file' % (filename,))
+                    os.chmod(filename, 0744)
                     self._filedescriptor.close()
                     continue
-            else:
-                try:
-                    # get the next file to send out of the fifo
-                    fileobj = self._filedeque.pop()
-                except IndexError:
-                    self.debug('file FIFO is empty waiting for next file to arrive')
-                    self._readyfornewbinary = True
-                    self._isBusy = False
-                    return
-                    
-                filename = fileobj[0]
-            
-                if os.path.isfile(filename):
-                    # open the file
-                    self._filedescriptor = open(filename, 'rb')
-                    os.chmod(filename, 0444)
-                else:
-                    # if the file does not exist we are continuing in the fifo
-                    continue
-            
-            # get the size of the file
-            filelen = os.path.getsize(filename)
-            
-            if filelen == 0:
-                # if the file is empty we ignore it and continue in the fifo
-                self.debug('ignore empty file: %s' % (filename,))
-                os.chmod(filename, 0744)
-                self._filedescriptor.close()
-                os.remove(filename)
-                continue
-            
-            filenamenoprefix = filename.replace(self._rootdir, '')
-            self.debug('filename without prefix: %s' % (filenamenoprefix,))
-            filenamelen = len(filenamenoprefix)
-            if filenamelen > 255:
-                filenamelen = 255
-            
-            # check witch watch this file belongs to
-            l = -1
-            watch = None
-            for w in self._watches:
-                if (filename.count(w[0]) > 0 or w[0] == './') and len(w[0]) > l:
-                    watch = w
-                    l = len(w[0])
-            if not watch:
-                self.error('no watch specified for %s (this is very strange!!!) -> close file' % (filename,))
-                os.chmod(filename, 0744)
-                self._filedescriptor.close()
-                continue
-
-            break
-            
+    
+                break
+            except Exception, e:
+                self._backlogMain.incrementExceptionCounter()
+                self._logger.exception(str(e))
+                if self._filedescriptor and not self._filedescriptor.closed:
+                    self._filedescriptor.close()
+                
         if not self._plugStop:
             self._binaryWriter.resetResendCounter()
                 
