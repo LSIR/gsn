@@ -1,0 +1,50 @@
+<virtual-sensor name="Thur_Algorithm_Configuration" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="scriptlet">
+                <![CDATA[
+                	if (SCHEDULE_GENERATION_STATE == "SCHEDULE_GENERATION") {
+                    // the mail recipients for error and exception counter increase
+                    def mailrecipients = ["danielbu@ee.ethz.ch"];
+
+            		// Notify by email
+            		def emailTitle = "[PermaSense-GSN-Test] - Schedule generated";
+            		def emailContent = "New schedule generated at " + (new Date(GENERATION_TIME)).getDateTimeString() + " for core station " + DEVICE_ID;
+
+					org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+            		sendEmail(mailrecipients, emailTitle, emailContent); 
+                    }
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/> 
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="DATA_TYPE" type="TINYINT" /> <!-- defines whether sensor (0) or control (1) data -->
+            
+            <field name="CONTROL_ALGORITHM_ENABLE_STATE" type="TINYINT" />
+            <field name="SCHEDULE_GENERATION_EVENT" type="VARCHAR(128)" />
+            <field name="SCHEDULE_GENERATION_STATE" type="VARCHAR(128)" />
+            
+       	</output-structure>
+    </processing-class>
+    <description>algorithm configuration of control algorithm for controlling water sampler at Thur deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Thur_Algorithm_Control_Device_ID_7000 where data_type = 1 </predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
+

@@ -25,9 +25,9 @@ import org.apache.log4j.Logger;
 
 /**
  * This virtual sensor does outlier and noise filtering.
- * The filters are applied on the column 'raw_value_in' from the wrapper/stream 
+ * The filters are applied on the column 'raw_value' from the wrapper/stream 
  * query. Use aliasing for renaming the column name of interest. The column
- * 'raw_value_in' has to be a number, but can be of one of the following types: 
+ * 'raw_value' has to be a number, but can be of one of the following types: 
  * TINYINT, SMALLINT, INTEGER, DOUBLE or VARCHAR.
  * 
  * This processing class does not alter the data in the stream element but 
@@ -55,7 +55,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 	
 	
 	private static DataField[] dataField = {	
-        			new DataField("RAW_VALUE_OUT", "DOUBLE"),
+        			new DataField("RAW_VALUE", "DOUBLE"),
 					new DataField("OUTLIER_FILTER_MEDIAN", "DOUBLE"),
 					new DataField("OUTLIER_FILTER_LOWER_BOUND", "DOUBLE"),
 					new DataField("OUTLIER_FILTER_UPPER_BOUND", "DOUBLE"),
@@ -203,9 +203,9 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 				String sSqlStreamQuery = streamSource.getSqlQuery();
 				String sSqlWrapperQuery = streamSource.getAddressing()[0].getPredicateValue("query");
 
-				logger.info("The wrapper name is: " + sWrapperName);
-				logger.info("The sql stream query is: " + sSqlStreamQuery);
-				logger.info("The sql wrapper query is: " + sSqlWrapperQuery);
+				logger.debug("The wrapper name is: " + sWrapperName);
+				logger.debug("The sql stream query is: " + sSqlStreamQuery);
+				logger.debug("The sql wrapper query is: " + sSqlWrapperQuery);
 				
 				if(sWrapperName.contains("remote-rest")) {
 					logger.info("remote-rest buffer initialization not implemented yet");
@@ -227,25 +227,25 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 						// build query: 
 						// 1. wrapper query is placed into source query (by replacing 'wrapper')
 						// 2. new source query (see 1.) is extended
-						query.append("select raw_value_in, generation_time from (");
+						query.append("select raw_value, generation_time from (");
 						query.append(sSqlStreamQuery.replace("wrapper", "(" + sSqlWrapperQuery + ")"));	// replace wrapper by query
-						query.append(") where raw_value_in is not null and generation_time >= ");
+						query.append(") where raw_value is not null and generation_time >= ");
 						query.append(System.currentTimeMillis() - iOutlierFilterWindowWidthInMinutes * 60 * 1000);
 						query.append(" order by generation_time desc limit ").append(iBufferSize);
-						logger.info("query: " + query); // output query
+						//logger.debug("query: " + query); // output query
 						
 						// execute query
 						rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
 						
 						// read query result as long as buffer is not full and results are available
 						while(rs.next() & mRawValueBuffer.size() < iBufferSize){
-							dRawValue = rs.getDouble("raw_value_in"); 		// read raw value
+							dRawValue = rs.getDouble("raw_value"); 		// read raw value
 							lGenTime = rs.getLong("generation_time"); 	// read generation time
 							oRawValue = new RawValue(dRawValue, OutlierClassification.NOT_CLASSIFIED);
 							// verify if raw value already in buffer
 							if( mRawValueBuffer.containsKey(lGenTime) == false){
 								mRawValueBuffer.put(lGenTime, oRawValue);
-								logger.info("buffer init data: genTime: " + lGenTime + ", value: " + oRawValue.getRawValue());
+								logger.debug("buffer init data: genTime: " + lGenTime + ", value: " + oRawValue.getRawValue());
 							}
 						}
 						
@@ -274,28 +274,28 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 		long lNewGenTime;
 		RawValue oNewRawValue; // temporary storage for raw value and filter results/settings
 		
-		logger.info("New streaming data from " + inputStreamName + ". Raw value: " + data.getData("raw_value_in"));
+		logger.debug("New streaming data from " + inputStreamName + ". Raw value: " + data.getData("raw_value"));
 		
 		// check if data is valid, i.e. not null
-		if(data.getData("raw_value_in") == null){
-			logger.info("New streaming data from " + inputStreamName + " discarded. Raw value: " + data.getData("raw_value_in"));
+		if(data.getData("raw_value") == null){
+			logger.debug("New streaming data from " + inputStreamName + " discarded. Raw value: " + data.getData("raw_value"));
 			return;
 		}
 		
 		// read and convert raw value and generation time from data stream
-		byte bType = data.getType("raw_value_in");
+		byte bType = data.getType("raw_value");
 		switch( bType ){
 			case DataTypes.TINYINT:
 			case DataTypes.SMALLINT:
 			case DataTypes.INTEGER:
 			case DataTypes.DOUBLE:
-				dNewRawValue = (Double) data.getData("raw_value_in");
+				dNewRawValue = (Double) data.getData("raw_value");
 				break;
 			case DataTypes.VARCHAR:
-				dNewRawValue = (double)Double.parseDouble((String)data.getData("raw_value_in"));
+				dNewRawValue = (double)Double.parseDouble((String)data.getData("raw_value"));
 				break;
 			default:
-				logger.info("The OutlierNoseFilterVirtualSensor does not support data of type: " + bType);
+				logger.warn("The OutlierNoseFilterVirtualSensor does not support data of type: " + bType);
 				return;
 		}
 		
@@ -343,13 +343,13 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 						// outlier
 						oNewRawValue.setOutlierClassification(OutlierClassification.OUTLIER_CLASSIFIED);
 						
-						logger.info("New streaming data from " + inputStreamName + " is an outlier (median: " + oneSidedMedianMenoldReturn.getMedian() + ", raw value: " + oNewRawValue.getRawValue() + ")");
+						logger.debug("New streaming data from " + inputStreamName + " is an outlier (median: " + oneSidedMedianMenoldReturn.getMedian() + ", raw value: " + oNewRawValue.getRawValue() + ")");
 						
 						// replace outlier with last valid value
 						oNewRawValue.setOutlierFilteredValue(Double.NaN);
 						for(Map.Entry<Long, RawValue> entry: descendingOutlierFilterWindowMap.entrySet()){
 							
-							logger.info("find last non outlier: gentime " + entry.getKey());
+							logger.debug("find last non outlier: gentime " + entry.getKey());
 							
 							if( entry.getValue().getOutlierClassification() == OutlierClassification.NON_OUTLIER_CLASSIFIED){
 								oNewRawValue.setOutlierFilteredValue(entry.getValue().getRawValue());
@@ -377,7 +377,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 		else {
 			// not enough values in window
 			oNewRawValue.setOutlierClassification(OutlierClassification.NOT_CLASSIFIED);
-			logger.info("New streaming data from " + inputStreamName + " not classified, not enough values in window (only " + descendingOutlierFilterWindowMap.size() + " instead of " + iOutlierFilterMinNbOfValuesInWindow + ")");
+			logger.debug("New streaming data from " + inputStreamName + " not classified, not enough values in window (only " + descendingOutlierFilterWindowMap.size() + " instead of " + iOutlierFilterMinNbOfValuesInWindow + ")");
 		}
 		
 		/* NOISE FILTER */
@@ -436,7 +436,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 					logger.warn("Removing data point from buffer failed. Key >" + lOldestDataPoint + "< not found." );
 				}
 				else{
-					logger.info("Remove oldest data point with gentime: " + lOldestDataPoint);
+					logger.debug("Remove oldest data point with gentime: " + lOldestDataPoint);
 				}
 				
 				// add new data point
@@ -454,7 +454,16 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 		}
 		
 		// generate output stream
-		data = new StreamElement(data, dataField, new Serializable[] { oNewRawValue.getRawValue(), (Double.isNaN(oNewRawValue.getMedian())) ? null:oNewRawValue.getMedian() , (Double.isNaN(oNewRawValue.getLowerBound()))? null:oNewRawValue.getLowerBound(),  (Double.isNaN(oNewRawValue.getUpperBound()))?null:oNewRawValue.getUpperBound(), oNewRawValue.getOutlierClassification().getCode(), (Double.isNaN(oNewRawValue.getOutlierFilteredValue())) ? null:oNewRawValue.getOutlierFilteredValue(), (Double.isNaN(oNewRawValue.getNoiseFilteredValue())) ? null:oNewRawValue.getNoiseFilteredValue()});
+		data = new StreamElement(	data, dataField, 
+								 	new Serializable[] { 
+									oNewRawValue.getRawValue(),
+									(Double.isNaN(oNewRawValue.getMedian())) ? null:oNewRawValue.getMedian(), 
+									(Double.isNaN(oNewRawValue.getLowerBound()))? null:oNewRawValue.getLowerBound(),
+									(Double.isNaN(oNewRawValue.getUpperBound()))?null:oNewRawValue.getUpperBound(), 
+									oNewRawValue.getOutlierClassification().getCode(), 
+									(Double.isNaN(oNewRawValue.getOutlierFilteredValue())) ? null:oNewRawValue.getOutlierFilteredValue(), 
+									(Double.isNaN(oNewRawValue.getNoiseFilteredValue())) ? null:oNewRawValue.getNoiseFilteredValue()}
+		);
 		//logger.info("data stream: " + data + ", timestamp: " + data.getTimeStamp());
 		
 		super.dataAvailable(inputStreamName, data);
@@ -509,19 +518,6 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 		}
 	}
 
-
-	private void startGumstix(int iDestination) {
-		String[] paramNames = {"destination", "cmd", "arg", "repetitioncnt"};
-		Serializable[] paramValues = new Serializable [] {Integer.toString(iDestination), "14", "1", "3"};
-		super.dataFromWeb("tosmsg", paramNames, paramValues);
-	}
-	
-	private void clearWakeUpBeacon(int iDestination) {
-		String[] paramNames = {"destination", "cmd", "arg", "repetitioncnt"};
-		Serializable[] paramValues = new Serializable [] {Integer.toString(iDestination), "14", "4", "3"};
-		super.dataFromWeb("tosmsg", paramNames, paramValues);
-	}
-	
 	@Override
 	public synchronized void dispose() {
 
