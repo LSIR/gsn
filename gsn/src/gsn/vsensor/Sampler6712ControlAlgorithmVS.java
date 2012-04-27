@@ -32,9 +32,9 @@ import org.apache.log4j.Logger;
  * 
  * @author Daniel Burgener
  */
-public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
+public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 {
-	private static final transient Logger logger = Logger.getLogger(ControlAlgorithmVirtualSensor.class);
+	private static final transient Logger logger = Logger.getLogger(Sampler6712ControlAlgorithmVS.class);
 	private static long lMinMaxDeltaThresholdOversteppingTime = 0; // 0 corresponds to min-max delta below threshold
 	private static boolean bControlAlgorithmEnableState; // true=enabled
 	private static ScheduleStateMachine sm;
@@ -669,7 +669,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 		 * @param event: new event
 		 * @param objects: optional parameters
 		 */
-		public void putEvent(Event event, Object...objects ){
+		protected void putEvent(Event event, Object...objects ){
 			
 			State newState = null;
 			Object aoSetStateParameter = null;
@@ -785,7 +785,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 		 * 
 		 * @return current state
 		 */
-		public State getState(){
+		protected State getState(){
 			return this.state;
 		}
 	}
@@ -811,7 +811,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 		 * @param shSamplingIntervalInMin: time between two samplings [min]
 		 * @return schedule as string
 		 */
-		public void addSamplingJobSeries(	byte btStartBottleNr,
+		protected void addSamplingJobSeries(	byte btStartBottleNr,
 											byte btStopBottleNr,
 											byte btNbOfSamplesPerBottle,
 											short shSamplingVolumeInMlPerSample,
@@ -831,7 +831,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 		 * 
 		 * @return schedule as string
 		 */
-		public String getScheduleAsString(){
+		protected String getScheduleAsString(){
 			StringBuilder sbSchedule = new StringBuilder();
 			
 			// sort sampling jobs according data (ascending)
@@ -860,7 +860,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 		 * @param btBottleNb: bottle number
 		 * @param shVolumeInMl: sampling volume
 		 */
-		public void addSamplingJob(	Date date,
+		protected void addSamplingJob(	Date date,
 									byte btBottleNb,
 									short shVolumeInMl){
 			this.mSamplingJob.put(date, new SamplingJob(date, btBottleNb, shVolumeInMl, BT_BACKWARD_TOLERANCE_IN_MIN));
@@ -869,7 +869,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 		/**
 		 * This function clears all sampling jobs
 		 */
-		public void clearAllSamplingJobs(){
+		protected void clearAllSamplingJobs(){
 			this.mSamplingJob.clear();
 		}
 		
@@ -882,7 +882,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 		 * @param sDayOfMonth: day of month of crontab
 		 * @param sMonth: month of crontab
 		 */
-		public void replaceReportStatusJob(	String sMin,
+		protected void replaceReportStatusJob(	String sMin,
 											String sHour,
 											String sDayOfMonth,
 											String sMonth){
@@ -904,7 +904,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 			 * @param sDayOfMonth: day of month
 			 * @param sMonth: month (1-12)
 			 */
-			public ReportStatus(String sMin,
+			protected ReportStatus(String sMin,
 					String sHour,
 					String sDayOfMonth,
 					String sMonth) {
@@ -919,7 +919,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 			 * 
 			 * @return report status cron job as string
 			 */
-			public String toCronJobString(){
+			protected String toCronJobString(){
 				StringBuilder sbReportStatus = new StringBuilder();
 				
 				sbReportStatus.append(this.sMin).append("	");
@@ -947,7 +947,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 			 * @param shVolumeInMl: sample volume [ml]
 			 * @param btBackwardToleranceInMinutes: backward tolerance
 			 */
-			public SamplingJob(Date date, byte btBottleNb, short shVolumeInMl, byte btBackwardToleranceInMinutes) {
+			protected SamplingJob(Date date, byte btBottleNb, short shVolumeInMl, byte btBackwardToleranceInMinutes) {
 				this.date = date;
 				this.btBottleNb = btBottleNb;
 				this.shVolumeInMl = shVolumeInMl;
@@ -959,7 +959,7 @@ public class ControlAlgorithmVirtualSensor extends BridgeVirtualSensorPermasense
 			 * 
 			 * @return schedule cron job as string
 			 */
-			public String toCronJobString(){
+			protected String toCronJobString(){
 				Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")); // use UTC time
 				calendar.setTime(this.date);
 				

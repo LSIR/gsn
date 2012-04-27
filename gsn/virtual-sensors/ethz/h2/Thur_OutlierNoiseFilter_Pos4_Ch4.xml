@@ -1,4 +1,4 @@
-<virtual-sensor name="Thur_OutlierNoiseFilter_Pos4_Ch4" priority="10" >
+<virtual-sensor name="Thur_OutlierNoiseFilter_Pos4__Ch4" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.OutlierNoiseFilterVirtualSensor</class-name>
         <init-params>

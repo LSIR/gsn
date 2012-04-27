@@ -1,4 +1,4 @@
-<virtual-sensor name="Thur_Algorithm_Data_Evaluation" priority="10" >
+<virtual-sensor name="Thur_Sampler6712_Algorithm__eval" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -25,7 +25,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Thur_Algorithm_Control_Device_ID_7000 where data_type = 0 </predicate>
+                    <predicate key="query"> select * from Thur_Sampler6712_Algorithm__control__Id7000 where data_type = 0 </predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

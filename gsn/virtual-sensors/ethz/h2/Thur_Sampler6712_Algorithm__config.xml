@@ -1,4 +1,4 @@
-<virtual-sensor name="Thur_Algorithm_Configuration" priority="10" >
+<virtual-sensor name="Thur_Sampler6712_Algorithm__config" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -6,15 +6,15 @@
             <param name="scriptlet">
                 <![CDATA[
                 	if (SCHEDULE_GENERATION_STATE == "SCHEDULE_GENERATION") {
-                    // the mail recipients for error and exception counter increase
-                    def mailrecipients = ["danielbu@ee.ethz.ch"];
+                    	// the mail recipients for error and exception counter increase
+                    	def mailrecipients = ["danielbu@ee.ethz.ch", "tgsell@tik.ee.ethz.ch"];
 
-            		// Notify by email
-            		def emailTitle = "[PermaSense-GSN-Test] - Schedule generated";
-            		def emailContent = "New schedule generated at " + (new Date(GENERATION_TIME)).getDateTimeString() + " for core station " + DEVICE_ID;
+            			// Notify by email
+            			def emailTitle = "[PermaSense-GSN-Test] - Schedule generated";
+            			def emailContent = "New schedule generated at " + (new Date(GENERATION_TIME)).getDateTimeString() + " for CoreStation with device id " + DEVICE_ID;
 
-					org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
-            		sendEmail(mailrecipients, emailTitle, emailContent); 
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+            			sendEmail(mailrecipients, emailTitle, emailContent); 
                     }
                 ]]>
             </param>
@@ -39,7 +39,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Thur_Algorithm_Control_Device_ID_7000 where data_type = 1 </predicate>
+                    <predicate key="query"> select * from Thur_Sampler6712_Algorithm__control__Id7000 where data_type = 1 </predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

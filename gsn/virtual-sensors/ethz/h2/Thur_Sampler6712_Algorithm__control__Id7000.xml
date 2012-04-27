@@ -1,4 +1,4 @@
-<virtual-sensor name="Thur_Algorithm_Control_Device_ID_7000" priority="10" >
+<virtual-sensor name="Thur_Sampler6712_Algorithm__control__Id7000" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ControlAlgorithmVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -59,7 +59,7 @@
             <source alias="source" storage-size="12h" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
-                        select * from Thur_OutlierNoiseFilter_Pos4_Ch4
+                        select * from Thur_OutlierNoiseFilter_Pos4__Ch4
                     </predicate>
                 </address>
                 <query> select MIN(noise_filter_value) as minValue, MAX(noise_filter_value) as maxValue from wrapper

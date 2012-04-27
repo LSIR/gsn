@@ -76,16 +76,16 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 			this.string = string;
 		}
 		
-		public short getCode(){
+		protected short getCode(){
 			return this.code;
 		}
 		
-		public String getString(){
+		protected String getString(){
 			return this.string;
 		}
 		
 		// translate the custom string representation back to the corresponding enum
-		public static OutlierFilter fromString(String text) {
+		protected static OutlierFilter fromString(String text) {
 		    if (text != null) {
 		    	for (OutlierFilter b : OutlierFilter.values()) {
 		    		if (text.equalsIgnoreCase(b.string)) {
@@ -109,16 +109,16 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 			this.string = string;
 		}
 		
-		public short getCode(){
+		protected short getCode(){
 			return this.code;
 		}
 		
-		public String getString(){
+		protected String getString(){
 			return this.string;
 		}
 		
 		// translate the custom string representation back to the corresponding enum
-		public static NoiseFilter fromString(String text) {
+		protected static NoiseFilter fromString(String text) {
 		    if (text != null) {
 		    	for (NoiseFilter b : NoiseFilter.values()) {
 		    		if (text.equalsIgnoreCase(b.string)) {
@@ -144,16 +144,16 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 			this.string = string;
 		}
 		
-		public short getCode(){
+		protected short getCode(){
 			return this.code;
 		}
 		
-		public String getString(){
+		protected String getString(){
 			return this.string;
 		}
 		
 		// translate the custom string representation back to the corresponding enum
-		public static OutlierClassification fromString(String text) {
+		protected static OutlierClassification fromString(String text) {
 		    if (text != null) {
 		    	for (OutlierClassification b : OutlierClassification.values()) {
 		    		if (text.equalsIgnoreCase(b.string)) {
@@ -524,7 +524,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 	}
 	
 
-	public class RawValue{
+	private class RawValue{
 		private double dRawValue; // raw value
 		private double dOutlierFilteredValue; // outlier filtered value
 		private double dNoiseFilteredValue; // noise filtered value
@@ -534,7 +534,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 		private double dMedian;
 		
 		// constructor
-		public RawValue(double dRawValue) {
+		protected RawValue(double dRawValue) {
 			this.dRawValue = dRawValue;  // raw value
 			this.dOutlierFilteredValue = Double.NaN; // outlier filtered value
 			this.dNoiseFilteredValue = Double.NaN ; // noise filtered value
@@ -544,7 +544,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 			this.dMedian = Double.NaN;
 		}
 		
-		public RawValue(double dRawValue, OutlierClassification cOutlierClassification) {
+		protected RawValue(double dRawValue, OutlierClassification cOutlierClassification) {
 			this.dRawValue = dRawValue;  // raw value
 			this.dOutlierFilteredValue = Double.NaN; // filtered value
 			this.dOutlierFilteredValue = Double.NaN; // outlier filtered value
@@ -554,49 +554,49 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 			this.dMedian = Double.NaN;
 		}
 		
-		public double getRawValue() {
+		protected double getRawValue() {
 			return this.dRawValue;
 		}
 		
-		public void setMedianAndBounds(double dMedian, double dLowerBound, double dUpperBound){
+		protected void setMedianAndBounds(double dMedian, double dLowerBound, double dUpperBound){
 			this.dMedian = dMedian;
 			this.dUpperBound = dUpperBound;
 			this.dLowerBound = dLowerBound;
 		}
 		
-		public double getMedian(){
+		protected double getMedian(){
 			return this.dMedian;
 		}
 		
-		public double getLowerBound(){
+		protected double getLowerBound(){
 			return this.dLowerBound;
 		}
 		
-		public double getUpperBound(){
+		protected double getUpperBound(){
 			return this.dUpperBound;
 		}
 		
-		public void setOutlierClassification(OutlierClassification outlierClassification){
+		protected void setOutlierClassification(OutlierClassification outlierClassification){
 			this.cOutlierClassification = outlierClassification;
 		}
 		
-		public OutlierClassification getOutlierClassification(){
+		protected OutlierClassification getOutlierClassification(){
 			return this.cOutlierClassification;
 		}
 		
-		public void setOutlierFilteredValue(double dFilteredValue){
+		protected void setOutlierFilteredValue(double dFilteredValue){
 			this.dOutlierFilteredValue = dFilteredValue;
 		}
 		
-		public double getOutlierFilteredValue(){
+		protected double getOutlierFilteredValue(){
 			return this.dOutlierFilteredValue;
 		}
 		
-		public void setNoiseFilteredValue(double dNoiseFilteredValue){
+		protected void setNoiseFilteredValue(double dNoiseFilteredValue){
 			this.dNoiseFilteredValue = dNoiseFilteredValue;
 		}
 		
-		public double getNoiseFilteredValue(){
+		protected double getNoiseFilteredValue(){
 			return this.dNoiseFilteredValue;
 		}
 	}
