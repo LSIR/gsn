@@ -1,6 +1,6 @@
 <virtual-sensor name="Thur_Sampler6712_Algorithm__control__Id7000" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.ControlAlgorithmVirtualSensor</class-name>
+        <class-name>gsn.vsensor.Sampler6712ControlAlgorithmVS</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="threshold">10</param> <!-- threshold in uS/cm-->
@@ -11,11 +11,11 @@
             <param name="core_station_wake_up_repetition_cnt">3</param> <!-- nb of attempts to wake up CS -->
             
             <!-- settings for sending new schedule to core station (http post) -->
-            <param name="schedule_host_name">http://whymper:23001/</param> <!-- host name of schedule VS location: PermaSense :: GSN - Test - Private -->
+            <param name="schedule_host_name">http://whymper.ee.ethz.ch:23001/</param> <!-- host name of schedule VS location: PermaSense :: GSN - Test - Private -->
             <param name="schedule_vs_name">thur_schedule</param> <!-- VS name of schedule VS -->
 
             <!-- settings for wake up of core station (http post) -->
-            <param name="dozer_command_host_name">http://whymper:22001/</param> <!-- host name of dozer command VS location: PermaSense :: GSN - Private -->
+            <param name="dozer_command_host_name">http://whymper.ee.ethz.ch:22001/</param> <!-- host name of dozer command VS location: PermaSense :: GSN - Private -->
             <param name="dozer_command_vs_name">thur_dozer_command</param> <!-- VS name of dozer command VS -->
         </init-params>
 
@@ -85,7 +85,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
                     <predicate key="query"> select * from Thur_Dozer_Command where device_id = 7000 </predicate>
-                    <predicate key="remote-contact-point">http://whymper:22001/streaming</predicate> <!-- PermaSense :: GSN - Private -->
+                    <predicate key="remote-contact-point">http://whymper.ee.ethz.ch:22001/streaming/</predicate> <!-- PermaSense :: GSN - Private -->
                 </address>
                 <query> select * from wrapper 
                 </query>

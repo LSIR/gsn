@@ -35,7 +35,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
                     <predicate key="query"> select * from thur_dozer_decagonmux__conv where position = 3</predicate>
-                    <predicate key="remote-contact-point">http://data.permasense.ch/streaming/</predicate>
+                    <predicate key="remote-contact-point">http://data.permasense.ch:22001/streaming/</predicate>
                 </address>
                 <query> select device_id, position, timestamp, generation_time, conductivity0 as raw_value_in from wrapper </query>
             </source>
