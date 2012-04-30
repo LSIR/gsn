@@ -219,6 +219,16 @@ $(document).ready(function() {
                     "thresholds": [ 1.5, 1.0 ]
               },
               {
+                    "displayName": "Tram 1: Temperature [°C]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_instant_calibrated",
+                    "field": "temperature",
+                    "deviceId": 3,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 6.0, 15.0 ]
+              },
+              {
                   "displayName": "Tram 3: Particulate matter [#]",
                   "gsnUrl": window.location.host,
                   "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_emb__mapped",
@@ -244,6 +254,96 @@ $(document).ready(function() {
                     "virtualSensor": deployments[visible].name.toLowerCase() + "_alphasense_co_gps",
                     "field": "sensor_ppm",
                     "deviceId": 5,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 1.5, 1.0 ]
+              },
+              {
+                  "displayName": "Tram 4: Particulate matter [#]",
+                  "gsnUrl": window.location.host,
+                  "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_emb__mapped",
+                  "field": "number",
+                  "deviceId": 6,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 25000.0, 20000.0 ]
+              },
+              {
+                    "displayName": "Tram 4: Ozone [ppb]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_only_init_calibrated",
+                    "field": "ozone_ppb",
+                    "deviceId": 6,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 18.0, 8.0 ]
+              },
+              {
+                    "displayName": "Tram 4: CO [ppm]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_alphasense_co_gps",
+                    "field": "sensor_ppm",
+                    "deviceId": 6,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 1.5, 1.0 ]
+              },
+              {
+                  "displayName": "Tram 5: Particulate matter [#]",
+                  "gsnUrl": window.location.host,
+                  "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_emb__mapped",
+                  "field": "number",
+                  "deviceId": 7,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 25000.0, 20000.0 ]
+              },
+              {
+                    "displayName": "Tram 5: Ozone [ppb]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_only_init_calibrated",
+                    "field": "ozone_ppb",
+                    "deviceId": 7,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 18.0, 8.0 ]
+              },
+              {
+                    "displayName": "Tram 5: CO [ppm]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_alphasense_co_gps",
+                    "field": "sensor_ppm",
+                    "deviceId": 7,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 1.5, 1.0 ]
+              },
+              {
+                  "displayName": "Tram 6: Particulate matter [#]",
+                  "gsnUrl": window.location.host,
+                  "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_emb__mapped",
+                  "field": "number",
+                  "deviceId": 8,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 25000.0, 20000.0 ]
+              },
+              {
+                    "displayName": "Tram 6: Ozone [ppb]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_only_init_calibrated",
+                    "field": "ozone_ppb",
+                    "deviceId": 8,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 18.0, 8.0 ]
+              },
+              {
+                    "displayName": "Tram 6: CO [ppm]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_alphasense_co_gps",
+                    "field": "sensor_ppm",
+                    "deviceId": 8,
                     "scaling": 1.0,
                     "visible": true,
                     "thresholds": [ 1.5, 1.0 ]
@@ -307,7 +407,28 @@ function fetchGPSPositions() {
             var myLatlng = new google.maps.LatLng(lati, longi);
             marker.setMap(aggMap.map);
             marker.setPosition(myLatlng);
-            marker.setTitle("Device: "+id);
+            
+            if (id == 3) {
+              marker.setTitle("Tram: 1 (3005), Depot: Oerlikon,  Dev. ID: 3");
+            }
+            else if (id == 4) {
+              marker.setTitle("Tram: 2 (-), Depot: -,  Dev. ID: 4");
+            }
+            else if (id == 5) {
+              marker.setTitle("Tram: 3 (3009), Depot: Kalkbreite,  Dev. ID: 5");
+            }
+            else if (id == 6) {
+              marker.setTitle("Tram: 4 (3033), Depot: Kalkbreite,  Dev. ID: 6");
+            }
+            else if (id == 7) {
+              marker.setTitle("Tram: 5 (3040), Depot: Kalkbreite,  Dev. ID: 7");
+            }
+            else if (id == 8) {
+              marker.setTitle("Tram: 6 (3053), Depot: Irchel,  Dev. ID: 8");
+            }
+            else {
+              marker.setTitle("Device: "+id);
+            }
           }
         })
       }
