@@ -76,8 +76,14 @@ public class FieldDownloadServlet extends HttpServlet {
 			query = new StringBuilder( ).append( prefix ).append( vsName ).append(" where timed = (select max(timed) from " ).append(vsName).append(")");
 		}
 		else {
-			pk = Long.parseLong(primaryKey);
-			query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
+			try {
+				pk = Long.parseLong(primaryKey);
+				query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
+			}
+			catch (Exception e) {
+				res.sendError( res.SC_BAD_REQUEST , "The pk parameter is malformed." );
+				return;
+			}
 		}
 		// TODO : Check to see if the requested column exists.
 		Connection conn = null;
