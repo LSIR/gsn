@@ -82,6 +82,27 @@ $(document).ready(function() {
           deviceId: [2006]
         }]
       },
+      { title:"Tram 2: Ozone Concentration [ppb]",
+        signals: [{
+          vsensor:".*_oz47_instant_calibrated",
+          field:["ozone_ppb"],
+          deviceId: [4]
+        }]
+      },
+      { title:"Tram 2: Carbon Monoxide Concentration [ppm]",
+        signals: [{
+          vsensor:".*_alphasense_dynamic__mapped",
+          field:["sensor_ppm_1"],
+          deviceId: [4]
+        }]
+      },
+      { title:"Tram 2: Particulate Matter [particle/cm^3]",
+        signals: [{
+          vsensor:".*_minidisc_emb__mapped",
+          field:["number"],
+          deviceId: [4]
+        }]
+      },
       { title:"Tram 3: Ozone Concentration [ppb]",
         signals: [{
           vsensor:".*_oz47_instant_calibrated",

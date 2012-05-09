@@ -229,6 +229,36 @@ $(document).ready(function() {
                     "thresholds": [ 6.0, 15.0 ]
               },
               {
+                  "displayName": "Tram 2: Particulate matter [#]",
+                  "gsnUrl": window.location.host,
+                  "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_emb__mapped",
+                  "field": "number",
+                  "deviceId": 4,
+                  "scaling": 1.0,
+                  "visible": true,
+                  "thresholds": [ 25000.0, 20000.0 ]
+              },
+              {
+                    "displayName": "Tram 2: Ozone [ppb]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_oz47_only_init_calibrated",
+                    "field": "ozone_ppb",
+                    "deviceId": 4,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 18.0, 8.0 ]
+              },
+              {
+                    "displayName": "Tram 2: CO [ppm]",
+                    "gsnUrl": window.location.host,
+                    "virtualSensor": deployments[visible].name.toLowerCase() + "_alphasense_co_gps",
+                    "field": "sensor_ppm",
+                    "deviceId": 4,
+                    "scaling": 1.0,
+                    "visible": true,
+                    "thresholds": [ 1.5, 1.0 ]
+              },
+              {
                   "displayName": "Tram 3: Particulate matter [#]",
                   "gsnUrl": window.location.host,
                   "virtualSensor": deployments[visible].name.toLowerCase() + "_minidisc_emb__mapped",

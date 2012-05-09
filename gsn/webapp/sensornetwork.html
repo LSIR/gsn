@@ -50,6 +50,22 @@ $(document).ready(function() {
         }]
       },
       // OpenSense Data Latency
+      { title:"Tram 2: Data Latency [ms]",
+        signals: [{
+          vsensor:"opensense_data_latency",
+          field:["latency"],
+          deviceId: [4]
+        }]
+      },
+      // OpenSense Backlog num. entries
+      { title:"Tram 2: BackLog DB [# of entries]",
+        signals: [{
+          vsensor:"opensense_backlogstatus_dynamic__mapped",
+          field:["db_entries"],
+          deviceId: [4]
+        }]
+      },
+      // OpenSense Data Latency
       { title:"Tram 3: Data Latency [ms]",
         signals: [{
           vsensor:"opensense_data_latency",
