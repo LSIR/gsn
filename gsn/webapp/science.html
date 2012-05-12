@@ -374,6 +374,13 @@ $(document).ready(function() {
           field:["gps_sats"],
           select:"sensornode[position][iscorestation='true']"
         }]
+      },
+      { title:"Crackmeter Pos65",
+	    signals: [{
+	      vsensor:"dirruhorn_crackmeter__ccct",
+	      field:["ccct_dx0","ccct_dx1","ccct_dx2","ccct_t3"],
+	      select:"sensornode[position=65]"
+	    }]
       }
       
     ]);
