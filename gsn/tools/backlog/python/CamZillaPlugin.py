@@ -244,15 +244,15 @@ class CamZillaPluginClass(AbstractPluginClass):
                                     pic = 1
                                     try:
                                         config, bracketing = self._configureCamera(parsedTask[8])
-                                        y = parsedTask[1]
-                                        while y < parsedTask[1]+(parsedTask[3]*parsedTask[5]) and not self._plugStop:
-                                            ret = self._position(y=y)
+                                        y_cnt = 0
+                                        while y_cnt < parsedTask[3] and not self._plugStop:
+                                            ret = self._position(y=(parsedTask[1]+y_cnt*parsedTask[5]))
                                             yLimit = ret[3]
-                                            x = parsedTask[0]
+                                            x_cnt = 0
                                             
-                                            while x < parsedTask[0]+(parsedTask[2]*parsedTask[4]) and not self._plugStop:
-                                                ret = self._position(x=x)
-                                                xLimit = ret[3]
+                                            while x_cnt < parsedTask[2] and not self._plugStop:
+                                                ret = self._position(x=(parsedTask[0]+x_cnt*parsedTask[4]))
+                                                xLimit = ret[2]
                                                 if parsedTask[6] > 0:
                                                     self._delay.wait(parsedTask[6])
                                                 if not self._plugStop:
@@ -264,11 +264,11 @@ class CamZillaPluginClass(AbstractPluginClass):
                                                     if not self._plugStop:
                                                         s = 'successfully'
                                                         if (xLimit is True and yLimit is True):
-                                                            s += ' (reached x and y limit)'
+                                                            s += ' (x and y limit reached)'
                                                         elif (xLimit is True and yLimit is False):
-                                                            s += ' (reached x limit)'
+                                                            s += ' (x limit reached)'
                                                         elif (xLimit is False and yLimit is True):
-                                                            s += ' (reached y limit)'
+                                                            s += ' (y limit reached)'
                                                             
                                                         if bracketing:
                                                             if parsedTask[7] == 0:
@@ -289,9 +289,9 @@ class CamZillaPluginClass(AbstractPluginClass):
                                                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
                                                         pic += 1
                     
-                                                        x += parsedTask[4]
+                                                        x_cnt += 1
                                                 
-                                            y += parsedTask[5]
+                                            y_cnt += 1
                                             
                                         if parsedTask[7] != 0:
                                             self._downloadPictures(pic_name_list)
@@ -370,11 +370,11 @@ class CamZillaPluginClass(AbstractPluginClass):
                         if not self._plugStop:
                             s = 'finished successfully'
                             if (pos[2] is True and pos[3] is True):
-                                s += ' (reached x and y limit)'
+                                s += ' (x and y limit reached)'
                             elif (pos[2] is True and pos[3] is False):
-                                s += ' (reached x limit)'
+                                s += ' (x limit reached)'
                             elif (pos[2] is False and pos[3] is True):
-                                s += ' (reached y limit)'
+                                s += ' (y limit reached)'
                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['positioning', s, self._x, self._y] + [None]*9)
                             self.info('positioning task %s' % (s,))
                 elif task[0] == MODE_TASK:
@@ -765,10 +765,12 @@ class CamZillaPluginClass(AbstractPluginClass):
             self._x = tmp[0] / self._pulsesPerDegree
             ret[0] = self._x
             ret[2] = tmp[2]
+            ret[3] = tmp[3]
         if y is not None and y != self._y:
             tmp = self._write('y=%d' % (int(round(y*self._pulsesPerDegree)),))
             self._y = tmp[1] / self._pulsesPerDegree
             ret[1] = self._y
+            ret[2] = tmp[2]
             ret[3] = tmp[3]
         return ret
         
