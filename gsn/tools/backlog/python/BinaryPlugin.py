@@ -229,6 +229,7 @@ class BinaryPluginClass(AbstractPluginClass):
     
     def connectionToGSNlost(self):
         self.debug('connection lost')
+        self._readyfornewbinary = False
         if not self._inrun.isSet():
             self._stopSending()
         
@@ -572,7 +573,7 @@ class BinaryPluginClass(AbstractPluginClass):
         
         
     def beaconCleared(self):
-        if self._readyfornewbinary or not self.isGSNConnected():
+        if self._readyfornewbinary:
             self._isBusy = False
     
     
@@ -705,7 +706,7 @@ class BinaryChangedProcessing(ProcessEvent):
             self._binaryPlugin._filedequelock.acquire()
             self._binaryPlugin._filedeque.appendleft([event.pathname, os.path.getsize(event.pathname)])
             self._binaryPlugin._filedequelock.release()
-            if self._binaryPlugin._readyfornewbinary and self._binaryPlugin.isGSNConnected():
+            if self._binaryPlugin._readyfornewbinary:
                 self._binaryPlugin._readyfornewbinary = False
                 self._binaryPlugin._isBusy = True
                 self._binaryPlugin._getInitialBinaryPacket()
