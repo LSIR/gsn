@@ -8,7 +8,7 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>RAW GPS information from ETZ deployment</description>
+    <description>Processed GPS data from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />

@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_Logger__parsed" priority="10" >
+<virtual-sensor name="ETZ_GPS_Logger__realtime" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -9,24 +9,33 @@
                 	try {
                     	def spl = new String(RAW_PACKET, "UTF-8").split(",");
 
-                    	POSITION = spl[0].toInteger();
-                    	GENERATION_TIME = spl[1].toLong();
+                    	POSITION = spl[1].toInteger();
+                    	GENERATION_TIME = spl[2].toLong();
                     	
-                    	GPS_WEEK = spl[2].toShort();
-                    	GPS_TIME = spl[3].toInteger();
-                    	X_ECEF = spl[4].toDouble();
-                    	Y_ECEF = spl[5].toDouble();
-                    	Z_ECEF = spl[6].toDouble();
-                    	Q = spl[7].toInteger();
-                    	NS = spl[8].toInteger();
-                    	SD_X = spl[9].toDouble();
-                    	SD_Y = spl[10].toDouble();
-                    	SD_Z = spl[11].toDouble();
-                    	SD_XY = spl[12].toDouble();
-                    	SD_YZ = spl[13].toDouble();
-                    	SD_ZX = spl[14].toDouble();
-                    	AGE = spl[15].toDouble();
-                    	RATIO = spl[16].toDouble();
+                    	GPS_WEEK = spl[3].toShort();
+                    	GPS_TIME = spl[4].toInteger();
+                    	
+                    	X_ECEF = spl[5].toDouble();
+                    	Y_ECEF = spl[6].toDouble();
+                    	Z_ECEF = spl[7].toDouble();
+                    	SD_X = spl[8].toDouble();
+                    	SD_Y = spl[9].toDouble();
+                    	SD_Z = spl[10].toDouble();
+                    	SD_XY = spl[11].toDouble();
+                    	SD_YZ = spl[12].toDouble();
+                    	SD_ZX = spl[13].toDouble();
+                    	
+                    	N =  spl[14].toDouble();
+                    	E =  spl[15].toDouble();
+                    	H =  spl[16].toDouble();
+                    	SD_N =  spl[17].toDouble();
+                    	SD_E =  spl[18].toDouble();
+                    	SD_H =  spl[19].toDouble();
+
+                    	Q = spl[20].toInteger();
+                    	NS = spl[21].toInteger();
+                    	AGE = spl[22].toDouble();
+                    	RATIO = spl[23].toDouble();
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -39,24 +48,33 @@
             
 			<field name="GPS_WEEK" type="SMALLINT" />
 			<field name="GPS_TIME" type="INTEGER" />
+            
 			<field name="X_ECEF" type="DOUBLE" unit="m" />
 			<field name="Y_ECEF" type="DOUBLE" unit="m" />
 			<field name="Z_ECEF" type="DOUBLE" unit="m" />
-			<field name="Q" type="INTEGER" />
-			<field name="NS" type="INTEGER" />
 			<field name="SD_X" type="DOUBLE" unit="m" />
 			<field name="SD_Y" type="DOUBLE" unit="m" />
 			<field name="SD_Z" type="DOUBLE" unit="m" />
 			<field name="SD_XY" type="DOUBLE" unit="m" />
 			<field name="SD_YZ" type="DOUBLE" unit="m" />
 			<field name="SD_ZX" type="DOUBLE" unit="m" />
+			
+			<field name="N" type="DOUBLE" unit="m" />
+			<field name="E" type="DOUBLE" unit="m" />
+			<field name="H" type="DOUBLE" unit="m" />
+			<field name="SD_N" type="DOUBLE" unit="m" />
+			<field name="SD_E" type="DOUBLE" unit="m" />
+			<field name="SD_H" type="DOUBLE" unit="m" />
+			
+			<field name="Q" type="INTEGER" />
+			<field name="NS" type="INTEGER" />
 			<field name="AGE" type="DOUBLE" unit="s" />
 			<field name="RATIO" type="DOUBLE" />
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>Parsed differential GPS data from ETZ deployment</description>
+    <description>Parsed differential GPS data from real-time processing from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -64,7 +82,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_Differential__streaming</predicate>
+                    <predicate key="query">select * from ETZ_GPS_Differential__streaming where RAW_PACKET like '1,%'</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
