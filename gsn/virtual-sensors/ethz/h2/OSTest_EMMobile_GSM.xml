@@ -26,9 +26,9 @@
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="local">
-                    <predicate key="query">select * from OSTest_Binary__mapped</predicate>
-                    <predicate key="start-time">continue</predicate>
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from OpenSense_Binary__mapped </predicate>
+                    <predicate key="remote-contact-point">http://tik41x.ee.ethz.ch:22001/streaming/</predicate> <!-- PermaSense :: GSN - Public -->
                 </address>
                 <query> select * from wrapper where FILE_COMPLETE = 1 and DEVICE_ID = 301</query>
             </source>
