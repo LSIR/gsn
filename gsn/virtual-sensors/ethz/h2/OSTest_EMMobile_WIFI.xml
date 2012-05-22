@@ -1,0 +1,38 @@
+<virtual-sensor name="OSTest_EMMobile_WIFI" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.EMMobileDataParserWIFI</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            
+            <field name="SSID" type="VARCHAR(256)" />
+            <field name="CAPABILITY" type="VARCHAR(256)" />
+            <field name="FREQ" type="INTEGER" unit="MHz" />
+            <field name="RSSI" type="INTEGER" unit="dBm" />
+            <field name="FIELD_STRENGTH" type="DOUBLE" unit="V/m" />
+		    
+		        <field name="LATITUDE" type="DOUBLE" unit="N"/>
+            <field name="LONGITUDE" type="DOUBLE" unit="E"/>
+		    
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Android EMMobile WIFI data from OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OSTest_Binary__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where FILE_COMPLETE = 1 and DEVICE_ID = 301</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
