@@ -118,9 +118,9 @@ OSTest_OZ47_Uncalibrated.xml
 OSTest_OZ47_Only_Init_Calibrated.xml
 OSTest_OZ47_Param_Instant_Cal.xml
 #OSTest_OZ47_Instant_Calibrated.xml
-OSTest_OstLuft_Schimmelstrasse.xml
+#OSTest_OstLuft_Schimmelstrasse.xml
 #OSTest_OstLuft_Schwamendingen.xml
-OSTest_OstLuft_Stampfenbachstrasse.xml
+#OSTest_OstLuft_Stampfenbachstrasse.xml
 #OSTest_MiniDiSC__mapped.xml
 #OSTest_STEVAL_Dynamic_Proc_GPS.xml
 OSTest_MiniDiSC_GPS.xml
