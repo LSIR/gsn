@@ -105,11 +105,11 @@ public class EMMobileDataParserBT extends BridgeVirtualSensorPermasense {
           }
         }
 			  
-				// If there is no timestamp or location information is missing then skip this line.
-				if (timestamp == null || timestamp == 0 ||
-						readingsDouble[0] == null || readingsDouble[0] == 0 ||
-						readingsDouble[1] == null || readingsDouble[1] == 0)
-					continue;
+        // If there is no timestamp or location information or RSSI measurement is missing then skip this line.
+        if (timestamp == null || timestamp == 0 || readingsInt[0] == null ||
+            readingsDouble[0] == null || readingsDouble[0] == 0 ||
+            readingsDouble[1] == null || readingsDouble[1] == 0)
+          continue;
 				
 				// Convert GPS coordinate.
 				int lati = readingsDouble[0].intValue();

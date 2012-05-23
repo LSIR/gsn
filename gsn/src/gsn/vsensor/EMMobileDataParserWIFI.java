@@ -106,8 +106,8 @@ public class EMMobileDataParserWIFI extends BridgeVirtualSensorPermasense {
           }
         }
 			  
-				// If there is no timestamp or location information is missing then skip this line.
-				if (timestamp == null || timestamp == 0 ||
+				// If there is no timestamp or location information or RSSI measurement is missing then skip this line.
+				if (timestamp == null || timestamp == 0 || readingsInt[1] == null ||
 						readingsDouble[0] == null || readingsDouble[0] == 0 ||
 						readingsDouble[1] == null || readingsDouble[1] == 0)
 					continue;
