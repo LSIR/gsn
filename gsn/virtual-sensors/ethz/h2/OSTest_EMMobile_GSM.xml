@@ -27,10 +27,11 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
-                    <predicate key="query"> select * from OpenSense_Binary__mapped </predicate>
+                    <predicate key="query"> select * from OpenSense_Binary__mapped where FILE_COMPLETE = 1 and DEVICE_ID = 301 </predicate>
+                    <predicate key="start-time">continue</predicate>
                     <predicate key="remote-contact-point">http://tik41x.ee.ethz.ch:22001/streaming/</predicate> <!-- PermaSense :: GSN - Public -->
                 </address>
-                <query> select * from wrapper where FILE_COMPLETE = 1 and DEVICE_ID = 301</query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

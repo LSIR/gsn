@@ -40,7 +40,10 @@ public class EMMobileDataParserBT extends BridgeVirtualSensorPermasense {
 		
 		storage_directory = getVirtualSensorConfiguration().getStorage().getStorageDirectory();
 		if (storage_directory != null) {
-			storage_directory = new File(storage_directory, deployment).getPath();
+		  // FIX: As long as we are running on ostest, replace deployment name with opensense
+		  // because the data is uploaded via the productive opensense system
+		  storage_directory = new File(storage_directory, "opensense").getPath();
+		  //storage_directory = new File(storage_directory, deployment).getPath();
 		}
 			
 		return ret;
@@ -135,7 +138,7 @@ public class EMMobileDataParserBT extends BridgeVirtualSensorPermasense {
 		file = file.getAbsoluteFile();
 		
 		if (file.getAbsolutePath().indexOf("bt") == -1)
-      return;
+		  return;
 		
 		parseData(file, inputStreamName, data);
 		logger.debug("parsed new incoming file (" + file.getAbsolutePath() + ")");
