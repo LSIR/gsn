@@ -39,9 +39,6 @@ public class EMMobileDataParserBT extends BridgeVirtualSensorPermasense {
 		boolean ret = super.initialize();
 		
 		storage_directory = getVirtualSensorConfiguration().getStorage().getStorageDirectory();
-		if (storage_directory != null) {
-		  storage_directory = new File(storage_directory, deployment).getPath();
-		}
 			
 		return ret;
 	}
