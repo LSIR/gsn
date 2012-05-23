@@ -300,6 +300,10 @@ OpenSense_Data_Latency.xml
 #OpenSense_GasMobile_Ozone_Only_Init_Calibrated.xml
 OpenSense_MiniDisc_EMB__muxed__mapped.xml
 OpenSense_MiniDisc_EMB__mapped.xml
+OpenSense_EMMobile_GSM.xml
+OpenSense_EMMobile_WIFI.xml
+OpenSense_EMMobile_BT.xml
+OpenSense_EMMobile_FM.xml
 Statistics_GSN.xml
 Statistics_MySQL.xml
 Statistics_Sensorviz__mapped.xml

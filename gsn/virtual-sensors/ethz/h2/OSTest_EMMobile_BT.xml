@@ -20,14 +20,13 @@
     <description>Android EMMobile BT data from OSTest deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
-                    <predicate key="query"> select * from OpenSense_Binary__mapped where FILE_COMPLETE = 1 and DEVICE_ID = 301 </predicate>
+                <address wrapper="local">
+                    <predicate key="query"> select * from OSTest_Binary__mapped where FILE_COMPLETE = 1 and DEVICE_ID = 301 </predicate>
                     <predicate key="start-time">continue</predicate>
-                    <predicate key="remote-contact-point">http://tik41x.ee.ethz.ch:22001/streaming/</predicate> <!-- PermaSense :: GSN - Public -->
                 </address>
                 <query> select * from wrapper </query>
             </source>

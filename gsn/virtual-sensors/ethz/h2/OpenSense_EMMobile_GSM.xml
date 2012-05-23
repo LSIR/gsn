@@ -1,4 +1,4 @@
-<virtual-sensor name="OSTest_EMMobile_GSM" priority="10" >
+<virtual-sensor name="OpenSense_EMMobile_GSM" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.EMMobileDataParserGSM</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -19,15 +19,15 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>Android EMMobile GSM data from OSTest deployment</description>
+    <description>Android EMMobile GSM data from OpenSense deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from OSTest_Binary__mapped where FILE_COMPLETE = 1 and DEVICE_ID = 301 </predicate>
+                    <predicate key="query"> select * from OpenSense_Binary__mapped where FILE_COMPLETE = 1 and DEVICE_ID = 301 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

@@ -41,10 +41,7 @@ public class EMMobileDataParserGSM extends BridgeVirtualSensorPermasense {
 		
 		storage_directory = getVirtualSensorConfiguration().getStorage().getStorageDirectory();
 		if (storage_directory != null) {
-		  // FIX: As long as we are running on ostest, replace deployment name with opensense
-		  // because the data is uploaded via the productive opensense system
-		  storage_directory = new File(storage_directory, "opensense").getPath();
-		  //storage_directory = new File(storage_directory, deployment).getPath();
+		  storage_directory = new File(storage_directory, deployment).getPath();
 		}
 			
 		return ret;
