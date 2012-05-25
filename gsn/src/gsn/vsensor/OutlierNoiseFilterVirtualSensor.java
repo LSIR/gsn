@@ -171,7 +171,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 		 * */
 		boolean ret = super.initialize();
 		
-		mRawValueBuffer = new HashMap<Long, RawValue>(); // integer is device id, object is decacon mux
+		mRawValueBuffer = new HashMap<Long, RawValue>(); // integer is generation time, object sensor value
 		
 		// read configuration from xml file
 		TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
@@ -314,6 +314,8 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 		// create sub map of data within window
 		SortedMap<Long, RawValue> descendingOutlierFilterWindowMap = descendingSortedMap.subMap(lNewGenTime, lNewGenTime - iOutlierFilterWindowWidthInMinutes * 60 * 1000);
 
+		logger.debug("map size: " + descendingOutlierFilterWindowMap.size());
+		
 		// check if enough data points inside window
 		if( descendingOutlierFilterWindowMap.size() >= iOutlierFilterMinNbOfValuesInWindow ){
 			// enough values in window
@@ -377,7 +379,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 		else {
 			// not enough values in window
 			oNewRawValue.setOutlierClassification(OutlierClassification.NOT_CLASSIFIED);
-			logger.debug("New streaming data from " + inputStreamName + " not classified, not enough values in window (only " + descendingOutlierFilterWindowMap.size() + " instead of " + iOutlierFilterMinNbOfValuesInWindow + ")");
+			logger.info("New streaming data from " + inputStreamName + " not classified, not enough values within window (only " + descendingOutlierFilterWindowMap.size() + " instead of " + iOutlierFilterMinNbOfValuesInWindow + ")");
 		}
 		
 		/* NOISE FILTER */

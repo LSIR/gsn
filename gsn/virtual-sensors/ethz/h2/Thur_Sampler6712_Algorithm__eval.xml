@@ -10,6 +10,8 @@
 
             <field name="START_CONDITION_THRESHOLD" type="DOUBLE" />
             <field name="START_CONDITION_HOLD_TIME_IN_MIN" type="INTEGER" />
+            <field name="WINDOW_SIZE_IN_MIN" type="INTEGER" />
+            <field name="MINIMUM_NB_OF_DATA_POINTS_WITHIN_HOLD_TIME" type="INTEGER" />
             <field name="START_CONDITION_FULFILLED" type="TINYINT" />
             <field name="MIN" type="DOUBLE" />
             <field name="MAX" type="DOUBLE" />

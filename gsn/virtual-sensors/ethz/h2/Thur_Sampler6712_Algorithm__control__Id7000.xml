@@ -5,10 +5,20 @@
         <init-params>
             <param name="threshold">10</param> <!-- threshold in uS/cm-->
             <param name="hold_time_in_min">10</param>  <!-- once signal the input has rised above the threshold, the hold time determines how long the output stays low -->
+            <param name="window_size_in_min">720</param>  <!-- window size to use for the min/max value determination -->
+            <param name="min_nb_of_data_points_within_hold_time">3</param>  <!-- min nb of data points within hold time, otherwise start condition check is skipped -->
             <param name="destination_device_id">7000</param> <!-- id of device to control (id of core station 6712 water sampler is connected to)-->
             
             <param name="core_station_wake_up_timeout_in_min">15</param> <!-- time before wake-up is sent again to CS-->
             <param name="core_station_wake_up_repetition_cnt">3</param> <!-- nb of attempts to wake up CS -->
+            
+            <!-- settings for static sampling -->
+            <param name="sampling_start_delay_in_min">15</param>  <!-- delay between threshold condition fulfilled and first sampling, minimum value is 5min -->
+            <param name="bottle_start_nb">1</param>
+            <param name="bottle_stop_nb">10</param>
+            <param name="nb_of_samplings_per_bottle">2</param>
+            <param name="sampling_volume_in_ml">1</param> <!-- 1ml is an invalid volume, i.e. to 6712 is told to take a sample but refuses because of invalid volume -->
+            <param name="sampling_interval_in_min">30</param>
             
             <!-- settings for sending new schedule to core station (http post) -->
             <param name="schedule_host_name">http://whymper.ee.ethz.ch:23001/</param> <!-- host name of schedule VS location: PermaSense :: GSN - Test - Private -->
@@ -37,6 +47,8 @@
 
             <field name="START_CONDITION_THRESHOLD" type="DOUBLE" />
             <field name="START_CONDITION_HOLD_TIME_IN_MIN" type="INTEGER" />
+            <field name="WINDOW_SIZE_IN_MIN" type="INTEGER" />
+            <field name="MINIMUM_NB_OF_DATA_POINTS_WITHIN_HOLD_TIME" type="INTEGER" />
             <field name="START_CONDITION_FULFILLED" type="TINYINT" />
             <field name="MIN" type="DOUBLE" />
             <field name="MAX" type="DOUBLE" />
@@ -56,13 +68,13 @@
     <streams>
         <!-- sensor data stream for control algorithm -->
         <stream name="sensor">
-            <source alias="source" storage-size="12h" sampling-rate="1">
+            <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">
                         select * from Thur_OutlierNoiseFilter_Pos4__Ch4
                     </predicate>
                 </address>
-                <query> select MIN(noise_filter_value) as minValue, MAX(noise_filter_value) as maxValue from wrapper
+                <query> select noise_filter_value as sensor_value, generation_time from wrapper
                 </query>
             </source>
             <query> select * from source </query>

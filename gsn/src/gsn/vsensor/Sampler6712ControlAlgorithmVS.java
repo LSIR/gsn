@@ -10,20 +10,24 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.lang.String;
 import java.io.File;
 import javax.swing.Timer;
-
-import gsn.Main;
-import gsn.http.ClientHttpRequest;
-
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
+import gsn.http.ClientHttpRequest;
+import gsn.Main;
 import gsn.beans.DataField;
+import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.beans.StreamSource;
 
 
 import org.apache.log4j.Logger;
@@ -35,22 +39,39 @@ import org.apache.log4j.Logger;
 public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 {
 	private static final transient Logger logger = Logger.getLogger(Sampler6712ControlAlgorithmVS.class);
-	private static long lMinMaxDeltaThresholdOversteppingTime = 0; // 0 corresponds to min-max delta below threshold
 	private static boolean bControlAlgorithmEnableState; // true=enabled
 	private static ScheduleStateMachine sm;
 	private static int iAutoScheduleGenerationResetTimeInMin; // time after transmitted schedule, state is automatically changed to idle
 	private static int iHashCodeOfLastSentScheduleString;
+	private Map<Long, Double> mSensorValueBuffer; // hashmap as buffer containing <generation_time, sensor_value> pairs
 	
-	// from xml-file
+	/* START data from xml-file
+	 */
 	private static double dStartConditionThreshold;
 	private static int iStartConditionHoldTimeInMin;
+	private static int iWindowSizeInMin;
+	private static int iMinNbOfDataPointsWithinHoldTime;
 	private static int iDestinationDeviceId;
+	
 	private static int iCoreStationWakeupTimeoutInMin;
 	private static int iCoreStationWakeupRepetitionCnt;
+	
+	private static int iSamplingStartDelayInMin;
+	private static int iBottleStartNumber;
+	private static int iBottleStopNumber;
+	private static int iNbOfSamplingsPerBottle;
+	private static int iSamplingVolumeInMl;
+	private static int iSamplingIntervalInMin;
+	
 	private static String sScheduleHostName;
 	private static String sScheduleVsName;
+	
 	private static String sDozerCommandHostName;
 	private static String sDozerCommandVsName;
+	/*  END read data from xml-file
+	 */
+		
+	private static int iBufferSize;
 	
 	private static final int I_SCHEDULE_ACK_TIMEOUT_IN_SEC = 30;
 	private static final int I_SCHEDULE_ACK_MAX_NB_OF_TIMEOUT = 3;
@@ -84,6 +105,24 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 						DEBUG_GENERATE_SINGLE_SAMPLE_SCHEDULE,
 						SCHEDULE_AUTOMATIC_RESET}
 	
+	private enum SensorValueEvaluationResult{
+		// list with outlier filter enumerations and according code and string
+		START_CONDITION_NOT_FULFILLED((byte)0),
+		START_CONDITION_FULFILLED((byte)1),
+		NOT_ENOUGH_DATA_POINTS_WITHIN_HOLD_TIME((byte)2),
+		DATA_POINT_OUTSIDE_WINDOW((byte)3);
+		
+		private final byte code;	 	// code representing task
+		
+		private SensorValueEvaluationResult(byte code){
+			this.code = (byte)code;
+		}
+		
+		public byte getCode(){
+			return this.code;
+		}
+	}
+	
 	private static DataField[] dataField = {	
 		new DataField("GENERATION_TIME", "BIGINT"),
 		new DataField("TIMESTAMP", "BIGINT"),
@@ -93,6 +132,8 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		// SENSOR DATA
 		new DataField("START_CONDITION_THRESHOLD", "DOUBLE"),
 		new DataField("START_CONDITION_HOLD_TIME_IN_MIN", "INTEGER"),
+		new DataField("WINDOW_SIZE_IN_MIN", "INTEGER"),
+		new DataField("MINIMUM_NB_OF_DATA_POINTS_WITHIN_HOLD_TIME", "INTEGER"),
 		new DataField("START_CONDITION_FULFILLED", "TINYINT"),
 		new DataField("MIN", "DOUBLE"),
 		new DataField("MAX", "DOUBLE"),
@@ -112,14 +153,31 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		// variables for db access
 		Connection conn = null;
 		ResultSet rs = null;
+		double dSensorValue;
+		long lGenTimeToVerify;
+		
+		mSensorValueBuffer = new HashMap<Long, Double>(); // key is generation time, value is sensor value
 		
 		// read configuration from xml file
 		TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
 		
 		dStartConditionThreshold = Double.parseDouble(params.get("threshold"));
 		iStartConditionHoldTimeInMin = Integer.parseInt(params.get("hold_time_in_min"));
-		
+		iWindowSizeInMin = Integer.parseInt(params.get("window_size_in_min"));
+		iMinNbOfDataPointsWithinHoldTime = Integer.parseInt(params.get("min_nb_of_data_points_within_hold_time"));
 		iDestinationDeviceId = Integer.parseInt(params.get("destination_device_id"));
+		
+		// buffer has size so that it can hold sensor values with a rate of 
+		// 1 value per minute (current rate is 1 value per 2 minutes)
+		iBufferSize = (iStartConditionHoldTimeInMin + iWindowSizeInMin); 
+		
+		iSamplingStartDelayInMin = Integer.parseInt(params.get("sampling_start_delay_in_min"));
+		iBottleStartNumber= Integer.parseInt(params.get("bottle_start_nb"));
+		iBottleStopNumber= Integer.parseInt(params.get("bottle_stop_nb"));
+		iNbOfSamplingsPerBottle= Integer.parseInt(params.get("nb_of_samplings_per_bottle"));
+		iSamplingVolumeInMl= Integer.parseInt(params.get("sampling_volume_in_ml"));
+		iSamplingIntervalInMin= Integer.parseInt(params.get("sampling_interval_in_min"));
+		
 		iCoreStationWakeupTimeoutInMin = Integer.parseInt(params.get("core_station_wake_up_timeout_in_min"));
 		iCoreStationWakeupRepetitionCnt = Integer.parseInt(params.get("core_station_wake_up_repetition_cnt"));
 		
@@ -133,7 +191,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		// init bControlAlgorithmEnableState and iAutoScheduleGenerationResetTimeInMin
 		// based on DB
 		try {
-			logger.info("Get control algorithm enable state and suto schedule generation reset time from DB ");
+			logger.info("Get control algorithm enable state and set schedule generation reset time from DB ");
 			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
 			StringBuilder query = new StringBuilder();
 	
@@ -173,6 +231,105 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		logger.info("Control algorithm enable state initialized to: " + bControlAlgorithmEnableState);
 		logger.info("Auto schedule generation reset time initialized to: " + iAutoScheduleGenerationResetTimeInMin + "min.");
 		
+		// init sensor value buffer
+		Collection < gsn.beans.InputStream > cInputStreams = getVirtualSensorConfiguration().getInputStreams();
+		StreamSource streamSource;
+		gsn.beans.InputStream inputStreamSource;
+
+		// check all input streams if they are called 'sensor'
+		for( Iterator<gsn.beans.InputStream> i = cInputStreams.iterator(); i.hasNext(); ) {
+			inputStreamSource = i.next();
+			
+			logger.debug("stream name: " + inputStreamSource.getInputStreamName());
+			
+			// verify if stream name is correct
+			if( inputStreamSource.getInputStreamName().contains("sensor") ) {
+				// verify if input stream has only one source
+				if(inputStreamSource.getSources().length == 1) {
+					streamSource = inputStreamSource.getSources()[0]; // get stream source
+					
+					String sWrapperName = streamSource.getAddressing()[0].getWrapper();
+					String sSqlStreamQuery = streamSource.getSqlQuery();
+					String sSqlWrapperQuery = streamSource.getAddressing()[0].getPredicateValue("query");
+		
+					//logger.info("The wrapper name is: " + sWrapperName);
+					//logger.info("The sql stream query is: " + sSqlStreamQuery);
+					//logger.info("The sql wrapper query is: " + sSqlWrapperQuery);
+					
+					if(sWrapperName.contains("remote-rest")) {
+						logger.info("remote-rest buffer initialization not implemented yet");
+					
+					}
+					else if( sWrapperName.contains("local") ) {
+						try {
+							logger.info("Init buffer of control algorithm with maximal " + iBufferSize + " entries");
+							conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
+							StringBuilder query = new StringBuilder();
+							// query is done according parameters in configuration file (xml)
+							// query only takes:
+							// - valid values, i.e. values != null
+							// - values within the window width + hold time
+							// furthermore the number of values is limited by the buffer size.
+							// if more values are available in the specified window width than
+							// the buffer is big, then the most recent values are used
+							
+							// build query: 
+							// 1. wrapper query is placed into source query (by replacing 'wrapper')
+							// 2. new source query (see 1.) is extended
+							query.append("select sensor_value, generation_time from (");
+							query.append(sSqlStreamQuery.replace("wrapper", "(" + sSqlWrapperQuery + ")"));	// replace wrapper by query
+							query.append(") where sensor_value is not null and generation_time >= ");
+							query.append(System.currentTimeMillis() - (iWindowSizeInMin + iStartConditionHoldTimeInMin) * 60 * 1000);
+							query.append(" order by generation_time desc limit ").append(iBufferSize);
+							//logger.info("query: " + query); // output query
+							
+							// execute query
+							rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
+							
+							// read query result as long as buffer is not full and results are available
+							// most current sensor values are read first
+							while(rs.next() & mSensorValueBuffer.size() < iBufferSize){
+								
+								lGenTimeToVerify = rs.getLong("generation_time"); 	// read generation time
+								dSensorValue = rs.getDouble("sensor_value"); 	// read raw value
+								// check if last column read was NULL (shouldn't happen because of query, see above)
+								// last column read is 'sensor_value'
+								if( rs.wasNull() == false){
+									// sensor value is not NULL
+									// verify if sensor value already in buffer
+									if( mSensorValueBuffer.containsKey(lGenTimeToVerify) == false){
+										logger.debug("buffer init data: genTime: " + lGenTimeToVerify + ", value: " + dSensorValue);
+										mSensorValueBuffer.put(lGenTimeToVerify, dSensorValue);										
+									}
+									else{
+										logger.info("Sensor value " + dSensorValue + " with genTime: " + lGenTimeToVerify + " occurred multiple times in database");
+									}
+								}
+								else{
+									// sensor value is NULL
+									// this case should not occur because the query above only selects
+									// sensor data which are not NULL
+									logger.debug("sensor value with genTime " + lGenTimeToVerify + " was NULL");
+								}
+							}
+							
+						} catch (Exception e) {
+							logger.error(e.getMessage(), e);
+						}
+					}
+					else{
+						logger.warn("The wrapper name >" + sWrapperName + "< is not supported");
+					}
+				}
+				else{
+					logger.warn("Number of stream sources has to be exactly 1! " + cInputStreams.iterator().next().getSources().length + " number of stream sources is not supported");
+				}
+				
+				break; // leave for loop
+			}
+		}
+
+		
 		// create and init state machine
 		sm = new ScheduleStateMachine(iCoreStationWakeupRepetitionCnt, 
 									  iCoreStationWakeupTimeoutInMin,
@@ -187,16 +344,26 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 	 * This function is called when new streaming data is available. This 
 	 * virtual sensor consumes streaming data of different type. Therefore
 	 * the names of the streams (<stream name="xxx"> in *.xml) has to be
-	 * set appropriate.
-	 * 
+	 * set appropriate:
+	 * - stream name of data source: "source"
+	 * - stream name of schedule: "schedule"
+	 * - stream name of dozer command: "dozer_command"
 	 */
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
-		double dMinValue;
-		double dMaxValue;
-		double dMinMaxDelta;
-		boolean bStartConditionFulfilled = false;
+		double dMinValue = Double.NaN;
+		double dMaxValue = Double.NaN;
+		double dMinMaxDelta = Double.NaN;
 		long lCurrentTime;
+		
+		// data of new sensor value 
+		long lGenerationTimeOfNewSensorValue;
+		double dNewSensorValue;
+		
+		SensorValueEvaluationResult eSensorValueEvaluationResult;
+		
+		TreeMap<Long, Double> tmAscendingSortedSensorValueBuffer;
+
 		Event event = Event.NONE;
 
 		lCurrentTime = System.currentTimeMillis();
@@ -212,59 +379,119 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 			
 			// determine trigger
 			// -----------------
-			// The start condition is fullfilled if the min-max delta is larger than
-			// the threshold for a given hold time. The trigger output is cleared
-			// a.s.a the min-max delta falls below the threshold.
+			// The start condition is fulfilled if the min-max delta is larger than
+			// the threshold for all sensor values within the hold time window. 
 			
-			if(data.getData("minValue") == null |
-			   data.getData("maxValue") == null){
-				logger.debug("New streaming data from " + inputStreamName + " discarded. minValue: " + data.getData("minValue") + " , maxValue: " + data.getData("maxValue"));
+			//logger.info("New streaming data from " + inputStreamName + ". gentime: " + data.getData("generation_time") + ", sensor value: " + data.getData("sensor_value"));
+			
+			// the sensor value is not evaluated if it is null
+			if(data.getData("sensor_value") == null){
+				logger.debug("New streaming data from " + inputStreamName + " discarded. sensor value: " + data.getData("sensor_value"));
 				return;
 			}
 			
-			// read min and max value and calculate delta
-			dMinValue = (Double) data.getData("minValue");
-			dMaxValue = (Double) data.getData("maxValue");
-			dMinMaxDelta = dMaxValue - dMinValue;
-			logger.debug("min: " + dMinValue + ", max: " + dMaxValue + ", delta: " + dMinMaxDelta);
+			// read generation time and sensor value
+			lGenerationTimeOfNewSensorValue = (Long) data.getData("generation_time");
+			dNewSensorValue = (Double) data.getData("sensor_value");
 			
-			// determine if start condition is fulfilled
-			if( dMinMaxDelta > dStartConditionThreshold ){
-				if( lMinMaxDeltaThresholdOversteppingTime == 0 ){
-					// overstepping of threshold
-					lMinMaxDeltaThresholdOversteppingTime  = lCurrentTime;
-				}
-				
-				if( lCurrentTime - lMinMaxDeltaThresholdOversteppingTime >= iStartConditionHoldTimeInMin * 60 * 1000 ){
-					// min-max delta above threshold for more than hold time
-					// --> set start condition fulfilled
-					bStartConditionFulfilled = true;
-				}
-				else {
-					bStartConditionFulfilled = false;
-				}
+			// check if generation time is within window + hold time (with respect to current time)
+			if( lGenerationTimeOfNewSensorValue < lCurrentTime - (iWindowSizeInMin + iStartConditionHoldTimeInMin) * 60 * 1000 ){
+				// skip sensor value because it is not within window
+				eSensorValueEvaluationResult = SensorValueEvaluationResult.DATA_POINT_OUTSIDE_WINDOW;
+				logger.debug("Skip new sensor value because not within window. Gen time: " + lGenerationTimeOfNewSensorValue + ", Sensor value: " + dNewSensorValue);
 			}
 			else {
-				// reset min max delta threshold overstepping time and clear 
-				// start condition fulfilled
-				lMinMaxDeltaThresholdOversteppingTime = 0;
-				bStartConditionFulfilled = false;
+				// sensor value within window + hold time
+				logger.debug("New sensor value within window. Gen time: " + lGenerationTimeOfNewSensorValue + ", Sensor value: " + dNewSensorValue);
+				
+				// sort sensor values according generation time in ascending order (smallest (oldest) values first)
+				tmAscendingSortedSensorValueBuffer = new TreeMap<Long, Double>(mSensorValueBuffer);
+				
+				// store sensor value in buffer
+				// add/replace new sensor value only if either enough space is available in buffer
+				// or buffer contains an older sensor value which can be removed 
+				if( mSensorValueBuffer.size() < iBufferSize ){
+					// enough space in buffer
+					mSensorValueBuffer.put(lGenerationTimeOfNewSensorValue, dNewSensorValue);
+				}
+				else {
+					// not enough space in buffer
+					long lGenerationTimeOfOldestSensorValue = tmAscendingSortedSensorValueBuffer.firstKey(); // get oldest data point
+				
+					if( lGenerationTimeOfOldestSensorValue <= lGenerationTimeOfNewSensorValue ) {
+						// remove oldest data point
+						if( mSensorValueBuffer.remove(lGenerationTimeOfOldestSensorValue) == null){
+							logger.warn("Removing data point from buffer failed. Key >" + lGenerationTimeOfOldestSensorValue + "< not found." );
+						}
+						else{
+							logger.debug("Remove oldest data point with gentime: " + lGenerationTimeOfOldestSensorValue);
+						}
+						
+						// add new data point
+						mSensorValueBuffer.put(lGenerationTimeOfNewSensorValue, dNewSensorValue);
+					}
+					else{
+						logger.warn("Control algorithm buffer too small to store all data within the window size");
+					}
+				}
+				
+				SortedMap<Long, Double> smSensorValuesWithinHoldTime; // this map contains sensor values which are within hold time window
+				
+				// sort sensor value according generation time in ascending order (smallest (oldest) values first)
+				tmAscendingSortedSensorValueBuffer = new TreeMap<Long, Double>(mSensorValueBuffer);
+				// create sub map with sensor data within hold time window (with respect to the current time)
+				smSensorValuesWithinHoldTime = tmAscendingSortedSensorValueBuffer.subMap(lCurrentTime - iStartConditionHoldTimeInMin * 60 * 1000, lCurrentTime);
+
+				// check whether enough values within hold time window
+				if(smSensorValuesWithinHoldTime.size() < iMinNbOfDataPointsWithinHoldTime) {
+					// not enough values within hold time window
+					logger.info("Not enough values within hold time. " + smSensorValuesWithinHoldTime.size() + " instead of " + iMinNbOfDataPointsWithinHoldTime);
+					eSensorValueEvaluationResult = SensorValueEvaluationResult.NOT_ENOUGH_DATA_POINTS_WITHIN_HOLD_TIME;
+				}
+				else{
+					// enough values within hold time window
+					logger.debug("Enough values within window: " + smSensorValuesWithinHoldTime.size() );
+					// verify if min/max delta is above threshold for all sensor values
+					// within hold time window (starting with the oldest sensor value)
+					// the min, max and delta values of the most current sensor value
+					// are used for storing in the database.
+					
+					SortedMap<Long, Double> smSensorDataWithinWindow;
+					Collection<Double> col;
+					eSensorValueEvaluationResult = SensorValueEvaluationResult.START_CONDITION_FULFILLED;
+					for( Long lGenTimeToVerify : smSensorValuesWithinHoldTime.keySet() ){
+						// get data within window for sensor value to verify (in ascending order)
+						smSensorDataWithinWindow = tmAscendingSortedSensorValueBuffer.subMap(lGenTimeToVerify - iWindowSizeInMin * 60 * 1000, lGenTimeToVerify + 1); // '+1' to include the sensor value with lGenTimeToVerify
+						
+						// determine min and max value
+						col = smSensorDataWithinWindow.values();
+						dMaxValue = Collections.max(col); // calculate max value
+						dMinValue = Collections.min(col); // calculate min value
+						dMinMaxDelta = dMaxValue - dMinValue;
+						logger.debug("Gen time: " + lGenTimeToVerify + ", min: " + dMinValue + ", max: " + dMaxValue + ", delta: " + dMinMaxDelta);
+						
+						if( dMinMaxDelta <= dStartConditionThreshold ){
+							eSensorValueEvaluationResult = SensorValueEvaluationResult.START_CONDITION_NOT_FULFILLED;
+						}
+					}
+				}
 			}
-			
-			logger.debug("Start condition fulfilled: " + bStartConditionFulfilled + ", overstepping time: " + lMinMaxDeltaThresholdOversteppingTime);
+						
+			logger.debug("Sensor evaluation result: " + eSensorValueEvaluationResult.toString());
 			
 			// determine if a new schedule has to be transmitted
-			if(bControlAlgorithmEnableState == true & bStartConditionFulfilled == true){
+			if( bControlAlgorithmEnableState == true &
+				eSensorValueEvaluationResult == SensorValueEvaluationResult.START_CONDITION_FULFILLED ){
 				event = Event.GENERATE_SCHEDULE;
 				sm.putEvent(event);
 				
-				// generate output stream
-				data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
+				// generate output stream with control type information
+				data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
 				super.dataAvailable(inputStreamName, data);
 			}
 			
-			// generate output stream
-			data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_SENSOR_DATA_TYPE, dStartConditionThreshold, iStartConditionHoldTimeInMin, bStartConditionFulfilled? (byte)1:(byte)0, dMinValue, dMaxValue, dMinMaxDelta, null, null, null, null} );
+			// generate output stream with sensor data information
+			data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_SENSOR_DATA_TYPE, dStartConditionThreshold, iStartConditionHoldTimeInMin, iWindowSizeInMin, iMinNbOfDataPointsWithinHoldTime, eSensorValueEvaluationResult.getCode(), Double.isNaN(dMinValue)? null:dMinValue, Double.isNaN(dMaxValue)? null:dMaxValue, Double.isNaN(dMinMaxDelta)? null:dMinMaxDelta, null, null, null, null} );
 			super.dataAvailable(inputStreamName, data);
 		}
 		else if ( inputStreamName.toLowerCase().contentEquals("schedule") ){
@@ -285,7 +512,6 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				if( sTransmissionTime == null){
 					// schedule has not been transmitted yet
 					event = Event.SCHEDULE_ACK;
-					
 				}
 				else{
 					// schedule has been transmitted
@@ -300,18 +526,18 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 			sm.putEvent(event);
 			
 			// generate output stream
-			data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
+			data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
 			super.dataAvailable(inputStreamName, data);
 		}
 		else if ( inputStreamName.toLowerCase().contentEquals("dozer_command") ){
 			// new schedule data received
-			logger.debug("Dozer command send to core station");
+			// not used
 		}
 		else if ( inputStreamName.toLowerCase().contentEquals("sampler6712_sampling") ){
-			// 
+			// not used
 		}
 		else if ( inputStreamName.toLowerCase().contentEquals("sampler6712_status") ){
-			// 
+			// not used
 		}
 		else {
 			logger.warn("Unknown input stream element received: '"+ inputStreamName + "'. Check stream names in VS description file (*.xml)");
@@ -367,7 +593,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				sm.putEvent(event);
 				
 				// generate output stream
-				StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
+				StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
 				dataProduced( data );
 				
 				return true;
@@ -410,7 +636,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				sm.putEvent(event);
 				
 				// generate output stream
-				StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
+				StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
 				dataProduced( data );
 				
 				return true;
@@ -499,7 +725,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 			putEvent(event); // send event
 			
 			// generate output stream
-			StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
+			StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
 			dataProduced( data );
 		}
 		
@@ -514,18 +740,15 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 			logger.debug("State machine: State " + state + " (re-) entered");
 			
 			// state exiting procedure
-			if( this.state != state ){
-				switch(this.state){
-					case SCHEDULE_TRANSMITTED:
-						if( this.timeoutTimerAutoScheduleReset != null ){
-							if( this.timeoutTimerAutoScheduleReset.isRunning()){
-								this.timeoutTimerAutoScheduleReset.stop();
-								logger.debug("Stop schedule auto reset timer");
-							}
+			switch(this.state){
+				case SCHEDULE_TRANSMITTED:
+					if( this.timeoutTimerAutoScheduleReset != null ){
+						if( this.timeoutTimerAutoScheduleReset.isRunning()){
+							this.timeoutTimerAutoScheduleReset.stop();
+							logger.debug("Stop schedule auto reset timer");
 						}
-				}
+					}
 			}
-				
 			
 			// state entering procedure
 			this.state = state; // set new state and ... 
@@ -541,7 +764,8 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 					if( objects.length == 1){
 						
 						Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")); // get current UTC time
-						calendar.add(Calendar.MINUTE, 15); // start in 15min with sampling
+						// delay start time of sampling, minimum value is 5 minutes
+						calendar.add(Calendar.MINUTE, (iSamplingStartDelayInMin<5)? 5:iSamplingStartDelayInMin); 
 						
 						// generate schedule depending on parameter
 						switch((ScheduleType)objects[0]){
@@ -554,19 +778,19 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 															  (byte)1, 	// nb of samplings per bottle
 															  (short)1, // sampling volume [ml]
 															  calendar, // start time
-															  (short)30); // sampling intervall [min]
+															  (short)30); // sampling interval [min]
 								break;
 								
 							case STATIC_SCHEDULE:
 								// generate schedule
 								schedule = new Schedule();
 								schedule.replaceReportStatusJob("0", "9", "*", "*");
-								schedule.addSamplingJobSeries((byte)1, 	// bottle start nb
-															  (byte)24, // bottle stop nb
-															  (byte)1, 	// nb of samplings per bottle
-															  (short)10, // sampling volume [ml]
+								schedule.addSamplingJobSeries((byte)iBottleStartNumber, 	// bottle start nb
+															  (byte)iBottleStopNumber, // bottle stop nb
+															  (byte)iNbOfSamplingsPerBottle, 	// nb of samplings per bottle
+															  (short)iSamplingVolumeInMl, // sampling volume [ml]
 															  calendar, // start time
-															  (short)30); // sampling intervall [min]
+															  (short)iSamplingIntervalInMin); // sampling intervall [min]
 								break;
 						
 							case NONE:
@@ -726,6 +950,12 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 							this.iTimeoutCntScheduleTransmitted = 0;  // clear timeout counter
 							newState = State.WAIT_FOR_TRANSMISSION;
 							break;
+							
+						case SCHEDULE_TRANSMITTED:
+							this.timeoutTimerScheduleAckReceived.stop(); // stop timer
+							newState = State.SCHEDULE_TRANSMITTED;
+							break;
+							
 					}
 					break;
 					
