@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class UDPWrapper extends AbstractWrapper {
 
-   private static final String       DEFAULT_PACKET_SEPARATOR = "\n";
+   private static final String       PACKET_SEPARATOR = "\n";
    private static final String    RAW_PACKET    = "RAW_PACKET";
    private static final Integer       DEFAULT_DATAGRAM_SIZE = 50;
    
@@ -30,7 +30,6 @@ public class UDPWrapper extends AbstractWrapper {
    
    private int                    threadCounter = 0;
    private int                    datagramSize;
-   private String                 packetSeparator;
    
    public InputStream             is;
    
@@ -54,7 +53,6 @@ public class UDPWrapper extends AbstractWrapper {
          return false;
       }
       datagramSize = Integer.parseInt( addressBean.getPredicateValueWithDefault("datagram-size", DEFAULT_DATAGRAM_SIZE.toString()) );
-      packetSeparator = addressBean.getPredicateValueWithDefault("packet-separator", DEFAULT_PACKET_SEPARATOR);
       setName( "UDPWrapper-Thread" + ( ++threadCounter ) );
       return true;
    }
@@ -71,10 +69,10 @@ public class UDPWrapper extends AbstractWrapper {
             if ( logger.isDebugEnabled( ) ) logger.debug( "UDPWrapper received a packet : " + data );
             data = rest + data;
             
-            String elements[] = data.split(packetSeparator);
+            String elements[] = data.split(PACKET_SEPARATOR);
             int stop = elements.length;
             rest = "";
-            if (!data.endsWith(packetSeparator)) {
+            if (!data.endsWith(PACKET_SEPARATOR)) {
             	stop--;
             	rest = elements[elements.length-1];
             }

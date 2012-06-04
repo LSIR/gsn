@@ -18,7 +18,6 @@
                 <address wrapper="udp">
                     <predicate key="PORT">22002</predicate>
                     <predicate key="datagram-size">1024</predicate>
-                    <predicate key="packet-separator">\n</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
