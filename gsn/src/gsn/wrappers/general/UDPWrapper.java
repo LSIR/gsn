@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
@@ -20,7 +21,8 @@ import org.apache.log4j.Logger;
  * received packets through UDP to the host running this wrapper.
  */
 public class UDPWrapper extends AbstractWrapper {
-   
+
+   private static final String       DEFAULT_PACKET_SEPARATOR = "\n";
    private static final String    RAW_PACKET    = "RAW_PACKET";
    private static final Integer       DEFAULT_DATAGRAM_SIZE = 50;
    
@@ -28,6 +30,7 @@ public class UDPWrapper extends AbstractWrapper {
    
    private int                    threadCounter = 0;
    private int                    datagramSize;
+   private String                 packetSeparator;
    
    public InputStream             is;
    
@@ -51,6 +54,7 @@ public class UDPWrapper extends AbstractWrapper {
          return false;
       }
       datagramSize = Integer.parseInt( addressBean.getPredicateValueWithDefault("datagram-size", DEFAULT_DATAGRAM_SIZE.toString()) );
+      packetSeparator = addressBean.getPredicateValueWithDefault("packet-separator", DEFAULT_PACKET_SEPARATOR);
       setName( "UDPWrapper-Thread" + ( ++threadCounter ) );
       return true;
    }
@@ -58,15 +62,27 @@ public class UDPWrapper extends AbstractWrapper {
    public void run ( ) {
       byte [ ] receivedData = new byte [ datagramSize ];
       DatagramPacket receivedPacket = null;
+      String rest = "";
       while ( isActive( ) ) {
          try {
             receivedPacket = new DatagramPacket( receivedData , receivedData.length );
             socket.receive( receivedPacket );
-            String dataRead = new String( receivedPacket.getData( ) );
-            if ( logger.isDebugEnabled( ) ) logger.debug( "UDPWrapper received a packet : " + dataRead );
-            StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { receivedPacket.getData( ) } , System
-                  .currentTimeMillis( ) );
-            postStreamElement( streamElement );
+            String data = new String(Arrays.copyOfRange(receivedPacket.getData(), receivedPacket.getOffset(), receivedPacket.getLength()));
+            if ( logger.isDebugEnabled( ) ) logger.debug( "UDPWrapper received a packet : " + data );
+            data = rest + data;
+            
+            String elements[] = data.split(packetSeparator);
+            int stop = elements.length;
+            rest = "";
+            if (!data.endsWith(packetSeparator)) {
+            	stop--;
+            	rest = elements[elements.length-1];
+            }
+            for (int i=0; i<stop; i++) {
+                StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { elements[i].getBytes() } , System
+                      .currentTimeMillis( ) );
+                postStreamElement( streamElement );
+            }
          } catch ( IOException e ) {
             logger.warn( "Error while receiving data on UDP socket : " + e.getMessage( ) );
          }

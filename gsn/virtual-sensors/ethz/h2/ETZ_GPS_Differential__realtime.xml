@@ -9,33 +9,56 @@
                 	try {
                     	def spl = new String(RAW_PACKET, "UTF-8").split(",");
 
-                    	POSITION = spl[1].toInteger();
-                    	GENERATION_TIME = spl[2].toLong();
+                    	if (spl[1].isNumber())
+                    		POSITION = spl[1].toInteger();
+                    	if (spl[2].isNumber())
+                    		GENERATION_TIME = spl[2].toLong();
                     	
-                    	GPS_WEEK = spl[3].toShort();
-                    	GPS_TIME = spl[4].toInteger();
+                    	if (spl[3].isNumber())
+                    		GPS_WEEK = spl[3].toShort();
+                    	if (spl[4].isNumber())
+                    		GPS_TIME = spl[4].toInteger();
                     	
-                    	X_ECEF = spl[5].toDouble();
-                    	Y_ECEF = spl[6].toDouble();
-                    	Z_ECEF = spl[7].toDouble();
-                    	SD_X = spl[8].toDouble();
-                    	SD_Y = spl[9].toDouble();
-                    	SD_Z = spl[10].toDouble();
-                    	SD_XY = spl[11].toDouble();
-                    	SD_YZ = spl[12].toDouble();
-                    	SD_ZX = spl[13].toDouble();
+                    	if (spl[5].isNumber())
+                    		X_ECEF = spl[5].toDouble();
+                    	if (spl[6].isNumber())
+                    		Y_ECEF = spl[6].toDouble();
+                    	if (spl[7].isNumber())
+                    		Z_ECEF = spl[7].toDouble();
+                    	if (spl[8].isNumber())
+                    		SD_X = spl[8].toDouble();
+                    	if (spl[9].isNumber())
+                    		SD_Y = spl[9].toDouble();
+                    	if (spl[10].isNumber())
+                    		SD_Z = spl[10].toDouble();
+                    	if (spl[11].isNumber())
+                    		SD_XY = spl[11].toDouble();
+                    	if (spl[12].isNumber())
+                    		SD_YZ = spl[12].toDouble();
+                    	if (spl[13].isNumber())
+                    		SD_ZX = spl[13].toDouble();
                     	
-                    	N =  spl[14].toDouble();
-                    	E =  spl[15].toDouble();
-                    	H =  spl[16].toDouble();
-                    	SD_N =  spl[17].toDouble();
-                    	SD_E =  spl[18].toDouble();
-                    	SD_H =  spl[19].toDouble();
+                    	if (spl[14].isNumber())
+                    		N =  spl[14].toDouble();
+                    	if (spl[15].isNumber())
+                    		E =  spl[15].toDouble();
+                    	if (spl[16].isNumber())
+                    		H =  spl[16].toDouble();
+                    	if (spl[17].isNumber())
+                    		SD_N =  spl[17].toDouble();
+                    	if (spl[18].isNumber())
+                    		SD_E =  spl[18].toDouble();
+                    	if (spl[19].isNumber())
+                    		SD_H =  spl[19].toDouble();
 
-                    	Q = spl[20].toInteger();
-                    	NS = spl[21].toInteger();
-                    	AGE = spl[22].toDouble();
-                    	RATIO = spl[23].toDouble();
+                    	if (spl[20].isNumber())
+                    		Q = spl[20].toInteger();
+                    	if (spl[21].isNumber())
+                    		NS = spl[21].toInteger();
+                    	if (spl[22].isNumber())
+                    		AGE = spl[22].toDouble();
+                    	if (spl[23].isNumber())
+                    		RATIO = spl[23].toDouble();
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
