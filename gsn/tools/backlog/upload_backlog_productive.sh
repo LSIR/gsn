@@ -62,8 +62,24 @@ echo "to permasense-thur-bs01:"
 scp $* root@permasense-thur-bs01:$BACKLOG_PYTHON_DIR
 
 echo ""
-echo "to opensense-caa-tram-1:"
-scp $* root@opensense-caa-tram-1.dyndns.biz:$BACKLOG_PYTHON_DIR
+echo "to opensense-caa-tram-2:"
+scp $* root@opensense-caa-tram-2.dyndns.biz:$BACKLOG_PYTHON_DIR
+
+echo ""
+echo "to opensense-caa-tram-3:"
+scp $* root@opensense-caa-tram-3.dyndns.biz:$BACKLOG_PYTHON_DIR
+
+echo ""
+echo "to opensense-caa-tram-4:"
+scp $* root@opensense-caa-tram-4.dyndns.biz:$BACKLOG_PYTHON_DIR
+
+echo ""
+echo "to opensense-caa-tram-5:"
+scp $* root@opensense-caa-tram-5.dyndns.biz:$BACKLOG_PYTHON_DIR
+
+echo ""
+echo "to opensense-caa-tram-6:"
+scp $* root@opensense-caa-tram-6.dyndns.biz:$BACKLOG_PYTHON_DIR
 
 
 echo ""
