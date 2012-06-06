@@ -14,12 +14,8 @@
             
             <!-- settings for static sampling -->
             <param name="sampling_start_delay_in_min">15</param>  <!-- delay between threshold condition fulfilled and first sampling, minimum value is 5min -->
-            <param name="bottle_start_nb">1</param>
-            <param name="bottle_stop_nb">10</param>
-            <param name="nb_of_samplings_per_bottle">2</param>
-            <param name="sampling_volume_in_ml">1</param> <!-- 1ml is an invalid volume, i.e. to 6712 is told to take a sample but refuses because of invalid volume -->
-            <param name="sampling_interval_in_min">30</param>
-            
+            <param name="sampling_scheme">1,6,10,1000;7,12,30,1000;13,24,60,1000</param>
+
             <!-- settings for sending new schedule to core station (http post) -->
             <param name="schedule_host_name">http://whymper.ee.ethz.ch:23001/</param> <!-- host name of schedule VS location: PermaSense :: GSN - Test - Private -->
             <param name="schedule_vs_name">thur_schedule</param> <!-- VS name of schedule VS -->
@@ -31,12 +27,8 @@
 
         <web-input password="test">
          	<command name="configuration">
-                <field name="control_state" type="select:on|off">on/off of control algorithm</field>
-                <field name="special_action" type="select:none|reset_schedule_generation|manual_start_schedule_generation"></field>
-        	</command>
-            <command name="debug">
-                <field name="auto_schedule_generation_reset_time" type="*text" defaultvalue="0">in minutes, 0 = disable</field>
-                <field name="special_action" type="select:none|start_single_sampling_schedule_generation"></field>
+                <field name="control_state" type="select:leave_unchanged|on|off">on/off of control algorithm</field>
+                <field name="special_action" type="select:none|manual_start_schedule_generation"></field>
         	</command>
    		</web-input>
         <output-structure>

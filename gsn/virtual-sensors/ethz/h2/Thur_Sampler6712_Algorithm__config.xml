@@ -7,7 +7,7 @@
                 <![CDATA[
                 	if (SCHEDULE_GENERATION_STATE == "SCHEDULE_GENERATION") {
                     	// the mail recipients for error and exception counter increase
-                    	def mailrecipients = ["danielbu@ee.ethz.ch", "tgsell@tik.ee.ethz.ch"];
+                    	def mailrecipients = ["burgani@gmx.ch", "tgsell@tik.ee.ethz.ch", "philipp.schneider@geo.uzh.ch"];
 
             			// Notify by email
             			def emailTitle = "[PermaSense-GSN-Test] - Schedule generated";

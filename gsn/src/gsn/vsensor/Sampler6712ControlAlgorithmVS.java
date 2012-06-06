@@ -21,11 +21,13 @@ import javax.swing.Timer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import gsn.http.ClientHttpRequest;
 import gsn.Main;
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
+//import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 
@@ -36,14 +38,14 @@ import org.apache.log4j.Logger;
  * 
  * @author Daniel Burgener
  */
-public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
+public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense implements ActionListener
 {
 	private static final transient Logger logger = Logger.getLogger(Sampler6712ControlAlgorithmVS.class);
 	private static boolean bControlAlgorithmEnableState; // true=enabled
 	private static ScheduleStateMachine sm;
-	private static int iAutoScheduleGenerationResetTimeInMin; // time after transmitted schedule, state is automatically changed to idle
 	private static int iHashCodeOfLastSentScheduleString;
 	private Map<Long, Double> mSensorValueBuffer; // hashmap as buffer containing <generation_time, sensor_value> pairs
+	private Timer timerGenerateInitialControlDataStream;
 	
 	/* START data from xml-file
 	 */
@@ -57,11 +59,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 	private static int iCoreStationWakeupRepetitionCnt;
 	
 	private static int iSamplingStartDelayInMin;
-	private static int iBottleStartNumber;
-	private static int iBottleStopNumber;
-	private static int iNbOfSamplingsPerBottle;
-	private static int iSamplingVolumeInMl;
-	private static int iSamplingIntervalInMin;
+	private static SamplingScheme samplingScheme;
 	
 	private static String sScheduleHostName;
 	private static String sScheduleVsName;
@@ -101,9 +99,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 						SCHEDULE_TRANSMITTED_TIMEOUT_EXPIRED,
 						SCHEDULE_TRANSMITTED, 
 						SCHEDULE_RESET,
-						MANUAL_SCHEDULE_GENERATION,
-						DEBUG_GENERATE_SINGLE_SAMPLE_SCHEDULE,
-						SCHEDULE_AUTOMATIC_RESET}
+						MANUAL_SCHEDULE_GENERATION}
 	
 	private enum SensorValueEvaluationResult{
 		// list with outlier filter enumerations and according code and string
@@ -172,11 +168,17 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		iBufferSize = (iStartConditionHoldTimeInMin + iWindowSizeInMin); 
 		
 		iSamplingStartDelayInMin = Integer.parseInt(params.get("sampling_start_delay_in_min"));
-		iBottleStartNumber= Integer.parseInt(params.get("bottle_start_nb"));
-		iBottleStopNumber= Integer.parseInt(params.get("bottle_stop_nb"));
-		iNbOfSamplingsPerBottle= Integer.parseInt(params.get("nb_of_samplings_per_bottle"));
-		iSamplingVolumeInMl= Integer.parseInt(params.get("sampling_volume_in_ml"));
-		iSamplingIntervalInMin= Integer.parseInt(params.get("sampling_interval_in_min"));
+
+		try {
+			// read and convert sampling scheme
+			samplingScheme = new SamplingScheme(params.get("sampling_scheme"));
+			logger.info("Sampling scheme: \n" + samplingScheme.getSamplingSchemeAsString());
+		}
+		catch (Exception e) {
+			logger.warn("Reading the sampling scheme from the xml-file failed: " + e);
+		}
+		 
+		//String sSamplingScheme[] = s.split("|");
 		
 		iCoreStationWakeupTimeoutInMin = Integer.parseInt(params.get("core_station_wake_up_timeout_in_min"));
 		iCoreStationWakeupRepetitionCnt = Integer.parseInt(params.get("core_station_wake_up_repetition_cnt"));
@@ -188,7 +190,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		
 		iHashCodeOfLastSentScheduleString = 0;
 		
-		// init bControlAlgorithmEnableState and iAutoScheduleGenerationResetTimeInMin
+		// init bControlAlgorithmEnableState
 		// based on DB
 		try {
 			logger.info("Get control algorithm enable state and set schedule generation reset time from DB ");
@@ -215,21 +217,16 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				else{
 					bControlAlgorithmEnableState = true;
 				}
-			
-				iAutoScheduleGenerationResetTimeInMin = rs.getInt("auto_schedule_generation_reset_time_in_min");
 			}
 			else{
-				iAutoScheduleGenerationResetTimeInMin = 0; // 0 = disable
-				bControlAlgorithmEnableState = true;
+				bControlAlgorithmEnableState = false;
 			}
 		} catch (Exception e) {
-			logger.error("Reading DB for init of control algorithm enable state and auto schedue generation reset time failed: " + e.getMessage());
-			iAutoScheduleGenerationResetTimeInMin = 0; // 0 = disable
-			bControlAlgorithmEnableState = true;
+			logger.error("Reading DB for init of control algorithm enable state failed: " + e.getMessage());
+			bControlAlgorithmEnableState = false;
 		}
 		
 		logger.info("Control algorithm enable state initialized to: " + bControlAlgorithmEnableState);
-		logger.info("Auto schedule generation reset time initialized to: " + iAutoScheduleGenerationResetTimeInMin + "min.");
 		
 		// init sensor value buffer
 		Collection < gsn.beans.InputStream > cInputStreams = getVirtualSensorConfiguration().getInputStreams();
@@ -313,6 +310,8 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 								}
 							}
 							
+							logger.info("Buffer of control algorithm initialized with " + mSensorValueBuffer.size() + " entries.");
+							
 						} catch (Exception e) {
 							logger.error(e.getMessage(), e);
 						}
@@ -337,9 +336,35 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 									  sScheduleVsName,
 									  sDozerCommandHostName,
 									  sDozerCommandVsName);
+		
+		// send initial state machine state in 10s
+		this.timerGenerateInitialControlDataStream = new Timer( 10 * 1000 , this );
+		this.timerGenerateInitialControlDataStream.setActionCommand("GENERATE_CONTROL_DATA_STREAM"); 
+		this.timerGenerateInitialControlDataStream.setRepeats(false); // use timer as one shot timer
+		this.timerGenerateInitialControlDataStream.start( );
+				
 		return ret;
 	}
 
+	/**
+	 * This function is called by the timeout timer when it has expired.
+	 * 
+	 * @param actionEvent: event to send to the state machine
+	 * 
+	 */
+	public void actionPerformed ( ActionEvent actionEvent ) {
+		long lCurrentTime = System.currentTimeMillis();
+
+		// send initial state of state machine
+		// this is a work around because sending the initial state in the 
+		// initialize() function does not work!
+
+		// send initial state of state machine
+		logger.info("send initial state machine state");
+		StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, Event.NONE.toString(), sm.getState().toString(), null} );
+		dataProduced( data );
+	}
+	
 	/**
 	 * This function is called when new streaming data is available. This 
 	 * virtual sensor consumes streaming data of different type. Therefore
@@ -484,10 +509,6 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				eSensorValueEvaluationResult == SensorValueEvaluationResult.START_CONDITION_FULFILLED ){
 				event = Event.GENERATE_SCHEDULE;
 				sm.putEvent(event);
-				
-				// generate output stream with control type information
-				data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
-				super.dataAvailable(inputStreamName, data);
 			}
 			
 			// generate output stream with sensor data information
@@ -524,10 +545,6 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				
 			// treat event
 			sm.putEvent(event);
-			
-			// generate output stream
-			data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
-			super.dataAvailable(inputStreamName, data);
 		}
 		else if ( inputStreamName.toLowerCase().contentEquals("dozer_command") ){
 			// new schedule data received
@@ -547,9 +564,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 	@Override
 	public boolean dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
 		Event event = Event.NONE;
-		
-		long lCurrentTime = System.currentTimeMillis();
-		
+
 		logger.debug("action: " + command + ", compare result: " +command.compareToIgnoreCase("configuration"));
 		
 		// determine action
@@ -571,8 +586,12 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				if( sControlState.equalsIgnoreCase("on") ) {
 					bControlAlgorithmEnableState = true;
 				}
-				else{
+				else if (sControlState.equalsIgnoreCase("off")){
 					bControlAlgorithmEnableState = false;
+				}
+				else
+				{
+					// don't modify control algorithm state
 				}
 				
 				if( sSpecialAction.equalsIgnoreCase("none")){
@@ -591,53 +610,6 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				
 				// treat event
 				sm.putEvent(event);
-				
-				// generate output stream
-				StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
-				dataProduced( data );
-				
-				return true;
-			}
-			catch(Exception e){
-				logger.warn("Invalid input values, input not treated: " +e);
-				return false;
-			}
-		}
-		else if( command.compareToIgnoreCase("debug") == 0 ) {
-			String sAutoScheduleGenerationResetTime = "", sSpecialAction = "";
-			// read fields
-			for (int i = 0 ; i < paramNames.length ; i++) {
-				if( paramNames[i].compareToIgnoreCase("auto_schedule_generation_reset_time") == 0 ) {
-					sAutoScheduleGenerationResetTime = (String)paramValues[i];
-				}
-				
-				if( paramNames[i].compareToIgnoreCase("special_action") == 0 ) {
-					sSpecialAction = (String)paramValues[i];
-				}
-			}
-			
-			// convert fields
-			try{
-				// convert auto schedule generation reset time
-				iAutoScheduleGenerationResetTimeInMin = Integer.parseInt(sAutoScheduleGenerationResetTime);
-				
-				if( sSpecialAction.equalsIgnoreCase("none")){
-					event = Event.NONE;
-				}
-				else if( sSpecialAction.equalsIgnoreCase("start_single_sampling_schedule_generation")){
-					event = Event.DEBUG_GENERATE_SINGLE_SAMPLE_SCHEDULE;
-				}
-				else{
-					logger.warn("Unknown special action");
-					return false;
-				}
-				
-				// treat event
-				sm.putEvent(event);
-				
-				// generate output stream
-				StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
-				dataProduced( data );
 				
 				return true;
 			}
@@ -669,7 +641,6 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		private State state;
 		private Timer timeoutTimerScheduleAckReceived;
 		private Timer timeoutTimerScheduleTransmitted;
-		private Timer timeoutTimerAutoScheduleReset;
 		private int iTimeoutCntScheduleTransmitted;
 		private int iTimeoutCntScheduleAckReceived;
 		private int iMaxNbOfRepetition;
@@ -717,16 +688,10 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		 * 
 		 */
 		public void actionPerformed ( ActionEvent actionEvent ) {
-			long lCurrentTime = System.currentTimeMillis();
-			
 			// convert actionEvent into event (enum)
 			Event event = Event.valueOf(actionEvent.getActionCommand());
 			logger.debug("actionPerformed event: " + event);
 			putEvent(event); // send event
-			
-			// generate output stream
-			StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), iAutoScheduleGenerationResetTimeInMin} );
-			dataProduced( data );
 		}
 		
 		/**
@@ -742,12 +707,8 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 			// state exiting procedure
 			switch(this.state){
 				case SCHEDULE_TRANSMITTED:
-					if( this.timeoutTimerAutoScheduleReset != null ){
-						if( this.timeoutTimerAutoScheduleReset.isRunning()){
-							this.timeoutTimerAutoScheduleReset.stop();
-							logger.debug("Stop schedule auto reset timer");
-						}
-					}
+					// emtpy
+					break;
 			}
 			
 			// state entering procedure
@@ -785,12 +746,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 								// generate schedule
 								schedule = new Schedule();
 								schedule.replaceReportStatusJob("0", "9", "*", "*");
-								schedule.addSamplingJobSeries((byte)iBottleStartNumber, 	// bottle start nb
-															  (byte)iBottleStopNumber, // bottle stop nb
-															  (byte)iNbOfSamplingsPerBottle, 	// nb of samplings per bottle
-															  (short)iSamplingVolumeInMl, // sampling volume [ml]
-															  calendar, // start time
-															  (short)iSamplingIntervalInMin); // sampling intervall [min]
+								schedule.addSamplingJobList(samplingScheme.getSamplingList(), calendar);
 								break;
 						
 							case NONE:
@@ -840,13 +796,8 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 					break;
 					
 				case SCHEDULE_TRANSMITTED:
-					if( iAutoScheduleGenerationResetTimeInMin != 0 ){
-						// start schedule transmitted timeout
-						this.timeoutTimerAutoScheduleReset= new Timer( iAutoScheduleGenerationResetTimeInMin * 60 * 1000 , this );
-						this.timeoutTimerAutoScheduleReset.setActionCommand(Event.SCHEDULE_AUTOMATIC_RESET.toString()); // action command is event enum
-						this.timeoutTimerAutoScheduleReset.setRepeats(false); // use timer as one shot timer
-						this.timeoutTimerAutoScheduleReset.start( );
-					}
+					// disable control algorithm
+					bControlAlgorithmEnableState = false;
 					break;
 					
 				case WAIT_FOR_TRANSMISSION:
@@ -874,7 +825,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 					this.timeoutTimerScheduleTransmitted.setActionCommand("SCHEDULE_TRANSMITTED_TIMEOUT_EXPIRED"); // action command is event enum
 					this.timeoutTimerScheduleTransmitted.setRepeats(false); // use timer as one shot timer
 					this.timeoutTimerScheduleTransmitted.start( );
-					
+
 					break;
 					
 				default:
@@ -898,116 +849,112 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 			State newState = null;
 			Object aoSetStateParameter = null;
 			
-			// return if event is none
-			if(event == Event.NONE){
-				return; 
-			}
-			
-			logger.debug("State machine: new event: " + event);
-			
-			// determine new state depending on current state and event
-			switch(this.state) {
-				case IDLE:
-					
-					switch(event) {
-						case MANUAL_SCHEDULE_GENERATION:	
-						case GENERATE_SCHEDULE:
-							this.iTimeoutCntScheduleAckReceived = 0;  // clear timeout counter
-							newState = State.SCHEDULE_GENERATION;
-							aoSetStateParameter = ScheduleType.STATIC_SCHEDULE;
-							break;
-							
-						// only for debugging
-						case DEBUG_GENERATE_SINGLE_SAMPLE_SCHEDULE:
-							this.iTimeoutCntScheduleAckReceived = 0;  // clear timeout counter
-							newState = State.SCHEDULE_GENERATION;
-							aoSetStateParameter = ScheduleType.SINGLE_SAMPLING_DEBUG_SCHEDULE;
-							break;
-					}
-					break;
-					
-				case SCHEDULE_GENERATION:
-					switch(event){
-						case SCHEDULE_ACK_TIMEOUT_EXPIRED:
-							
-							//logger.info("sm received timeout expired");
-							this.iTimeoutCntScheduleAckReceived++; // increment timeout counter
-							
-							if( this.iTimeoutCntScheduleAckReceived > I_SCHEDULE_ACK_MAX_NB_OF_TIMEOUT) {
-								// timer does not have to be stopped because it
-								// is stopped after first action
-								logger.info("Schedule could not been set because of missing ack!");
-								newState = State.IDLE;
-							}
-							else{
-								// timer is restarted in state entering procedure
-								newState = State.SCHEDULE_GENERATION;
-							}
-							break;
-							
-						case SCHEDULE_ACK:
-							this.timeoutTimerScheduleAckReceived.stop(); // stop timer
-							this.iTimeoutCntScheduleTransmitted = 0;  // clear timeout counter
-							newState = State.WAIT_FOR_TRANSMISSION;
-							break;
-							
-						case SCHEDULE_TRANSMITTED:
-							this.timeoutTimerScheduleAckReceived.stop(); // stop timer
-							newState = State.SCHEDULE_TRANSMITTED;
-							break;
-							
-					}
-					break;
-					
-				case WAIT_FOR_TRANSMISSION:
-					switch(event){
-						case SCHEDULE_TRANSMITTED_TIMEOUT_EXPIRED:
-							//logger.info("sm received timeout expired");
-							this.iTimeoutCntScheduleTransmitted++; // increment timeout counter
-							
-							if( this.iTimeoutCntScheduleTransmitted > this.iMaxNbOfRepetition) {
-								// timer does not have to be stopped because it
-								// is stopped after first action
-								logger.info("Schedule could not been set because of missing transmission ack!");
-								newState = State.IDLE;
-							}
-							else{
-								// timer is restarted in state entering procedure
-								newState = State.WAIT_FOR_TRANSMISSION;
-							}
-							break;
-							
-						case SCHEDULE_TRANSMITTED:
-							this.timeoutTimerScheduleTransmitted.stop(); // stop timer
-							newState = State.SCHEDULE_TRANSMITTED;
-							break;
-					}
+			// check if event is non event
+			if(event != Event.NONE){
+				logger.debug("State machine: new event: " + event);
+				
+				// determine new state depending on current state and event
+				switch(this.state) {
+					case IDLE:
 						
-					break;
-					
-				case SCHEDULE_TRANSMITTED:
-					switch(event){
-						case SCHEDULE_RESET:
-						case SCHEDULE_AUTOMATIC_RESET:
-							newState = State.IDLE;
-							break;
-					}
-					break;
-			}
-			
-			// check if state has to be changed or not
-			if(newState == null){
-				logger.debug("State machine: Event " + event + " has no effect on state");
-			}
-			else{
-				// change state and perform state entering procedure
-				if(aoSetStateParameter == null){
-					this.setState(newState);
+						switch(event) {
+							case MANUAL_SCHEDULE_GENERATION:	
+							case GENERATE_SCHEDULE:
+								this.iTimeoutCntScheduleAckReceived = 0;  // clear timeout counter
+								newState = State.SCHEDULE_GENERATION;
+								aoSetStateParameter = ScheduleType.STATIC_SCHEDULE;
+								break;
+						}
+						break;
+						
+					case SCHEDULE_GENERATION:
+						switch(event){
+							case SCHEDULE_ACK_TIMEOUT_EXPIRED:
+								
+								//logger.info("sm received timeout expired");
+								this.iTimeoutCntScheduleAckReceived++; // increment timeout counter
+								
+								if( this.iTimeoutCntScheduleAckReceived > I_SCHEDULE_ACK_MAX_NB_OF_TIMEOUT) {
+									// timer does not have to be stopped because it
+									// is stopped after first action
+									logger.info("Schedule could not been set because of missing ack!");
+									newState = State.IDLE;
+								}
+								else{
+									// timer is restarted in state entering procedure
+									newState = State.SCHEDULE_GENERATION;
+								}
+								break;
+								
+							case SCHEDULE_ACK:
+								this.timeoutTimerScheduleAckReceived.stop(); // stop timer
+								this.iTimeoutCntScheduleTransmitted = 0;  // clear timeout counter
+								newState = State.WAIT_FOR_TRANSMISSION;
+								break;
+								
+							case SCHEDULE_TRANSMITTED:
+								this.timeoutTimerScheduleAckReceived.stop(); // stop timer
+								newState = State.SCHEDULE_TRANSMITTED;
+								break;
+								
+						}
+						break;
+						
+					case WAIT_FOR_TRANSMISSION:
+						switch(event){
+							case SCHEDULE_TRANSMITTED_TIMEOUT_EXPIRED:
+								//logger.info("sm received timeout expired");
+								this.iTimeoutCntScheduleTransmitted++; // increment timeout counter
+								
+								if( this.iTimeoutCntScheduleTransmitted > this.iMaxNbOfRepetition) {
+									// timer does not have to be stopped because it
+									// is stopped after first action
+									logger.info("Schedule could not been set because of missing transmission ack!");
+									newState = State.IDLE;
+								}
+								else{
+									// timer is restarted in state entering procedure
+									newState = State.WAIT_FOR_TRANSMISSION;
+								}
+								break;
+								
+							case SCHEDULE_TRANSMITTED:
+								this.timeoutTimerScheduleTransmitted.stop(); // stop timer
+								newState = State.SCHEDULE_TRANSMITTED;
+								break;
+						}
+							
+						break;
+						
+					case SCHEDULE_TRANSMITTED:
+						switch(event){
+							case SCHEDULE_RESET:
+								newState = State.IDLE;
+								break;
+						}
+						break;
+				}
+				
+				// check if state has to be changed/reentered or not
+				if(newState == null){
+					logger.debug("State machine: Event " + event + " has no effect on state");
 				}
 				else{
-					this.setState(newState, aoSetStateParameter);
+					// change state and perform state entering procedure
+					if(aoSetStateParameter == null){
+						this.setState(newState);
+					}
+					else{
+						this.setState(newState, aoSetStateParameter);
+					}
 				}
 			}
+			
+			long lCurrentTime = System.currentTimeMillis();
+
+			// generate output stream
+			StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, event.toString(), sm.getState().toString(), null} );
+			dataProduced( data );
 		}
 		
 		/**
@@ -1020,6 +967,92 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		}
 	}
 	
+	/*
+	 * Format of sampling scheme:
+	 * startBottle, stopBottle, samplingIntervalInMin, samplingVolumeInMl ; startBottle, stopBottle, ...
+	 * e.g.: "1,2,10,10;2,3,20,100;5,20,30,50"
+	 */
+	
+	class SamplingScheme{
+		List<SingleSampling> lSamplingList;
+		
+		SamplingScheme(String sSamplingScheme){
+			byte btStartBottleNumber;
+			byte btStopBottleNumber;
+			short shSamplingIntervalInMin;
+			short shSamplingVolumeInMl;
+			
+			lSamplingList = new ArrayList<SingleSampling>();
+
+			logger.info("Sampling scheme: "+ sSamplingScheme);
+			
+			// split into sub sampling schemas
+			String saSamplingScheme[] = sSamplingScheme.split(";");
+			
+			logger.debug("nb of sub sampling scheme: "+ saSamplingScheme.length);
+			
+			// for each sub sampling scheme add single samplings to list
+			for(int i=0; i < saSamplingScheme.length; i++){
+				
+				logger.debug("sub sampling scheme: "+ saSamplingScheme[i]);
+				
+				// read data of sub sampling scheme
+				String saSubSamplingScheme[] = saSamplingScheme[i].split(",");
+				
+				btStartBottleNumber = (byte) Integer.parseInt(saSubSamplingScheme[0]);
+				btStopBottleNumber = (byte) Integer.parseInt(saSubSamplingScheme[1]);
+				shSamplingIntervalInMin = (short) Integer.parseInt(saSubSamplingScheme[2]);
+				shSamplingVolumeInMl = (short) Integer.parseInt(saSubSamplingScheme[3]);
+				
+				// generate and stor sub sampling scheme (in list)
+				for(byte bBottleCntr = btStartBottleNumber; bBottleCntr <= btStopBottleNumber; bBottleCntr++){
+					lSamplingList.add(new SingleSampling(bBottleCntr, shSamplingIntervalInMin, shSamplingVolumeInMl));
+				}
+			}
+		}
+		
+		/*	
+		 * This function returns the sampling scheme as string
+		 * 
+		 * 
+		 */
+		protected String getSamplingSchemeAsString(){
+			StringBuilder sbSamplingScheme = new StringBuilder();
+			
+			for (SingleSampling singleSampling : this.lSamplingList) {
+				sbSamplingScheme.append("Bottle number: " + singleSampling.btBottleNumber + ", interval: " + singleSampling.shSamplingIntervalInMin + "min., volume: " + singleSampling.shSamplingVolumeInMl + "ml\n");
+			}
+			
+			return sbSamplingScheme.toString();
+		}
+		
+		protected List<SingleSampling> getSamplingList(){
+			return lSamplingList;
+		}
+	}
+	
+	/*
+	 * class to store a single sampling consisting of:
+	 * - bottle number (where to store the sample)
+	 * - sampling volume (water volume to draw in ml)
+	 * - sampling interval (time periode between this and previous sampling)
+	 */
+	class SingleSampling{
+		byte btBottleNumber;
+		short shSamplingVolumeInMl;
+		short shSamplingIntervalInMin;
+		
+		SingleSampling(	byte btBottleNumber,
+						short shSamplingIntervalInMin,
+						short shSamplingVolumeInMl){
+			this.btBottleNumber = btBottleNumber;
+			this.shSamplingVolumeInMl = shSamplingVolumeInMl;
+			this.shSamplingIntervalInMin = shSamplingIntervalInMin;
+		}
+		
+		
+	}
+	
 	class Schedule{
 		private ReportStatus reportStatus = null;
 		private Map<Date, SamplingJob> mSamplingJob;
@@ -1028,6 +1061,24 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		// constructor
 		Schedule(){
 			this.mSamplingJob = new HashMap<Date, SamplingJob>(); // hashmap as buffer containing <generation_time, raw value> pairs
+		}
+		/**
+		 * This function appends a list of sampling jobs.
+		 * @param lSamplingList: containing sampling information
+		 * @param startCalendar: start time of first sampling (in UTC)
+		 */
+		protected void addSamplingJobList(List<SingleSampling> lSamplingList, Calendar startCalendar){
+			
+			// Subtract first sampling interval because first sampling is not 
+			// started the sampling interval but immediately, i.e. at the 
+			// startCalendar time
+			startCalendar.add(Calendar.MINUTE, -lSamplingList.get(0).shSamplingIntervalInMin);
+			
+			// add sampling jobs
+			for (SingleSampling singleSampling : lSamplingList) {
+				startCalendar.add(Calendar.MINUTE, singleSampling.shSamplingIntervalInMin); // increment time
+				this.addSamplingJob(startCalendar.getTime(), singleSampling.btBottleNumber, singleSampling.shSamplingVolumeInMl);
+			}
 		}
 		
 		/**
