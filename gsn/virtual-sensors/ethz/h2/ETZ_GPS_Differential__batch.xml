@@ -7,7 +7,7 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                    	def spl = new String(RAW_PACKET, "UTF-8").split(",");
+                    	def spl = new String(RAW_PACKET, "UTF-8").split(",", 34);
 
                     	if (spl[1].isNumber())
                     		POSITION = spl[1].toInteger();
@@ -25,9 +25,9 @@
                     	
                     	if (spl[7].isNumber())
                     		X_ECEF = spl[7].toDouble();
-                    	if (spl[7].isNumber())
-	                    	Y_ECEF = spl[8].toDouble();
                     	if (spl[8].isNumber())
+	                    	Y_ECEF = spl[8].toDouble();
+                    	if (spl[9].isNumber())
                     		Z_ECEF = spl[9].toDouble();
                     	if (spl[10].isNumber())
                     		SD_X = spl[10].toDouble();
@@ -80,6 +80,7 @@
                     	
                     	if (spl[32].isNumber())
                     		VERSION = spl[32].toShort();
+                    		
                     	COMMENTS = spl[33];
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);

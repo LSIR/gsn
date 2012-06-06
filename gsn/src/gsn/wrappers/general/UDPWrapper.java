@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class UDPWrapper extends AbstractWrapper {
 
-   private static final String       PACKET_SEPARATOR = "\n";
+   private static final String       PACKET_SEPARATOR = System.getProperty("line.separator");
    private static final String    RAW_PACKET    = "RAW_PACKET";
    private static final Integer       DEFAULT_DATAGRAM_SIZE = 50;
    
@@ -67,6 +67,7 @@ public class UDPWrapper extends AbstractWrapper {
             socket.receive( receivedPacket );
             String data = new String(Arrays.copyOfRange(receivedPacket.getData(), receivedPacket.getOffset(), receivedPacket.getLength()));
             if ( logger.isDebugEnabled( ) ) logger.debug( "UDPWrapper received a packet : " + data );
+            
             data = rest + data;
             
             String elements[] = data.split(PACKET_SEPARATOR);
@@ -76,6 +77,7 @@ public class UDPWrapper extends AbstractWrapper {
             	stop--;
             	rest = elements[elements.length-1];
             }
+            
             for (int i=0; i<stop; i++) {
                 StreamElement streamElement = new StreamElement( new String [ ] { RAW_PACKET } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { elements[i].getBytes() } , System
                       .currentTimeMillis( ) );
