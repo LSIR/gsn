@@ -15,17 +15,73 @@
             // Minidisc Data
             String[] tokens = MINIDISC_RAW_DATA.split();
             if (tokens.length == 11) {
-              NUMBER = tokens[0].toDouble();
-              DIAM = tokens[1].toDouble();
-              LDSA = tokens[2].toDouble();
-              DIFFUSION = tokens[3].toDouble();
-              FILTER = tokens[4].toDouble();
-              UCOR = tokens[5].toDouble();
-              RECHARGE = tokens[6].toDouble();
-              FLOW = tokens[7].toDouble();
-              TEMP = tokens[8].toDouble();
-              SUPPLY = tokens[9].toDouble();
-              STATUS = tokens[10].toInteger();
+              if (tokens[0] != null && tokens[0].size() != 0 && tokens[0].indexof("inf") == -1) {
+                NUMBER = tokens[0].toDouble();
+              }
+              else {
+                NUMBER = NULL;
+              }
+              if (tokens[1] != null && tokens[1].size() != 0 && tokens[1].indexof("inf") == -1) {
+                DIAM = tokens[1].toDouble();
+              }
+              else {
+                DIAM = NULL;
+              }
+              if (tokens[2] != null && tokens[2].size() != 0 && tokens[2].indexof("inf") == -1) {
+                LDSA = tokens[2].toDouble();
+              }
+              else {
+                LDSA = NULL;
+              }
+              if (tokens[3] != null && tokens[3].size() != 0 && tokens[3].indexof("inf") == -1) {
+                DIFFUSION = tokens[3].toDouble();
+              }
+              else {
+                DIFFUSION = NULL;
+              }
+              if (tokens[4] != null && tokens[4].size() != 0 && tokens[4].indexof("inf") == -1) {
+                FILTER = tokens[4].toDouble();
+              }
+              else {
+                FILTER = NULL;
+              }
+              if (tokens[5] != null && tokens[5].size() != 0 && tokens[5].indexof("inf") == -1) {
+                UCOR = tokens[5].toDouble();
+              }
+              else {
+                UCOR = NULL;
+              }
+              if (tokens[6] != null && tokens[6].size() != 0 && tokens[6].indexof("inf") == -1) {
+                RECHARGE = tokens[6].toDouble();
+              }
+              else {
+                RECHARGE = NULL;
+              }
+              if (tokens[7] != null && tokens[7].size() != 0 && tokens[7].indexof("inf") == -1) {
+                FLOW = tokens[7].toDouble();
+              }
+              else {
+                FLOW = NULL;
+              }
+              if (tokens[8] != null && tokens[8].size() != 0 && tokens[8].indexof("inf") == -1) {
+                TEMP = tokens[8].toDouble();
+              }
+              else {
+                TEMP = NULL;
+              }
+              if (tokens[9] != null && tokens[9].size() != 0 && tokens[9].indexof("inf") == -1) {
+                SUPPLY = tokens[9].toDouble();
+              }
+              else {
+                SUPPLY = NULL;
+              }
+              if (tokens[10] != null && tokens[10].size() != 0 && tokens[10].indexof("inf") == -1) {
+                STATUS = tokens[10].toInteger();
+              }
+              else {
+                STATUS = NULL;
+              }
+              
             }
           
             // GPS Data
