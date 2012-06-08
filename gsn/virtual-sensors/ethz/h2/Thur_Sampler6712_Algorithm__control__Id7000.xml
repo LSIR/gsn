@@ -28,7 +28,7 @@
         <web-input password="test">
          	<command name="configuration">
                 <field name="control_state" type="select:leave_unchanged|on|off">on/off of control algorithm</field>
-                <field name="special_action" type="select:none|manual_start_schedule_generation"></field>
+                <field name="special_action" type="select:none|reset_schedule_generation|manual_start_schedule_generation"></field>
         	</command>
    		</web-input>
         <output-structure>

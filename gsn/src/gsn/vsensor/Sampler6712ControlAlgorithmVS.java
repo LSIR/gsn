@@ -99,7 +99,8 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 						SCHEDULE_TRANSMITTED_TIMEOUT_EXPIRED,
 						SCHEDULE_TRANSMITTED, 
 						SCHEDULE_RESET,
-						MANUAL_SCHEDULE_GENERATION}
+						MANUAL_SCHEDULE_GENERATION,
+						INIT_STATE_MACHINE}
 	
 	private enum SensorValueEvaluationResult{
 		// list with outlier filter enumerations and according code and string
@@ -353,16 +354,14 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 	 * 
 	 */
 	public void actionPerformed ( ActionEvent actionEvent ) {
-		long lCurrentTime = System.currentTimeMillis();
-
-		// send initial state of state machine
+		// init state machine and send its initial state as data stream
 		// this is a work around because sending the initial state in the 
 		// initialize() function does not work!
 
-		// send initial state of state machine
-		logger.info("send initial state machine state");
-		StreamElement data = new StreamElement(dataField, new Serializable[] {lCurrentTime, lCurrentTime, iDestinationDeviceId, BT_CONTROL_TYPE, null, null, null, null, null, null, null, null, bControlAlgorithmEnableState? (byte)1:(byte)0, Event.NONE.toString(), sm.getState().toString(), null} );
-		dataProduced( data );
+		// init state machine
+		Event event = Event.INIT_STATE_MACHINE;
+		logger.info("Initialize schedule state machine (event: " + event + ")");
+		sm.putEvent(event); // send event
 	}
 	
 	/**
@@ -864,6 +863,9 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 								newState = State.SCHEDULE_GENERATION;
 								aoSetStateParameter = ScheduleType.STATIC_SCHEDULE;
 								break;
+							case INIT_STATE_MACHINE:
+								newState = State.IDLE;
+								break;
 						}
 						break;
 						
@@ -896,6 +898,10 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 								this.timeoutTimerScheduleAckReceived.stop(); // stop timer
 								newState = State.SCHEDULE_TRANSMITTED;
 								break;
+							
+							case INIT_STATE_MACHINE:
+								newState = State.IDLE;
+								break;
 								
 						}
 						break;
@@ -922,6 +928,10 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 								this.timeoutTimerScheduleTransmitted.stop(); // stop timer
 								newState = State.SCHEDULE_TRANSMITTED;
 								break;
+							
+							case INIT_STATE_MACHINE:
+								newState = State.IDLE;
+								break;
 						}
 							
 						break;
@@ -929,6 +939,10 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 					case SCHEDULE_TRANSMITTED:
 						switch(event){
 							case SCHEDULE_RESET:
+								newState = State.IDLE;
+								break;
+								
+							case INIT_STATE_MACHINE:
 								newState = State.IDLE;
 								break;
 						}
