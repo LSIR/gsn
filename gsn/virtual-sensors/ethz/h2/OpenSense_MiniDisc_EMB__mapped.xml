@@ -19,67 +19,67 @@
                 NUMBER = tokens[0].toDouble();
               }
               else {
-                NUMBER = NULL;
+                NUMBER = null;
               }
               if (tokens[1] != null && tokens[1].size() != 0 && tokens[1].isDouble()) {
                 DIAM = tokens[1].toDouble();
               }
               else {
-                DIAM = NULL;
+                DIAM = null;
               }
               if (tokens[2] != null && tokens[2].size() != 0 && tokens[2].isDouble()) {
                 LDSA = tokens[2].toDouble();
               }
               else {
-                LDSA = NULL;
+                LDSA = null;
               }
               if (tokens[3] != null && tokens[3].size() != 0 && tokens[3].isDouble()) {
                 DIFFUSION = tokens[3].toDouble();
               }
               else {
-                DIFFUSION = NULL;
+                DIFFUSION = null;
               }
               if (tokens[4] != null && tokens[4].size() != 0 && tokens[4].isDouble()) {
                 FILTER = tokens[4].toDouble();
               }
               else {
-                FILTER = NULL;
+                FILTER = null;
               }
               if (tokens[5] != null && tokens[5].size() != 0 && tokens[5].isDouble()) {
                 UCOR = tokens[5].toDouble();
               }
               else {
-                UCOR = NULL;
+                UCOR = null;
               }
               if (tokens[6] != null && tokens[6].size() != 0 && tokens[6].isDouble()) {
                 RECHARGE = tokens[6].toDouble();
               }
               else {
-                RECHARGE = NULL;
+                RECHARGE = null;
               }
               if (tokens[7] != null && tokens[7].size() != 0 && tokens[7].isDouble()) {
                 FLOW = tokens[7].toDouble();
               }
               else {
-                FLOW = NULL;
+                FLOW = null;
               }
               if (tokens[8] != null && tokens[8].size() != 0 && tokens[8].isDouble()) {
                 TEMP = tokens[8].toDouble();
               }
               else {
-                TEMP = NULL;
+                TEMP = null;
               }
               if (tokens[9] != null && tokens[9].size() != 0 && tokens[9].isDouble()) {
                 SUPPLY = tokens[9].toDouble();
               }
               else {
-                SUPPLY = NULL;
+                SUPPLY = null;
               }
               if (tokens[10] != null && tokens[10].size() != 0 && tokens[10].isInteger()) {
                 STATUS = tokens[10].toInteger();
               }
               else {
-                STATUS = NULL;
+                STATUS = null;
               }
               
             }
