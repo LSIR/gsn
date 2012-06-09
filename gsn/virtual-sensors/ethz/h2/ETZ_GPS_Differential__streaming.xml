@@ -15,7 +15,7 @@
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="udp">
+                <address wrapper="tcp">
                     <predicate key="PORT">22002</predicate>
                     <predicate key="datagram-size">1024</predicate>
                 </address>
