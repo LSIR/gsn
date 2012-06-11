@@ -11,9 +11,9 @@
 
                     	if (spl[1].isNumber())
                     		POSITION = spl[1].toInteger();
+						
                     	if (spl[2].isNumber())
                     		GENERATION_TIME = spl[2].toLong();
-                    	
                     	if (spl[3].isNumber())
                     		MIN_GENERATION_TIME = spl[3].toLong();
                     	if (spl[4].isNumber())
@@ -25,62 +25,107 @@
                     	
                     	if (spl[7].isNumber())
                     		X_ECEF = spl[7].toDouble();
+                    	else
+                    		X_ECEF = null;
                     	if (spl[8].isNumber())
 	                    	Y_ECEF = spl[8].toDouble();
+	                    else
+	                    	Y_ECEF = null;
                     	if (spl[9].isNumber())
                     		Z_ECEF = spl[9].toDouble();
+                    	else
+                    		Z_ECEF = null;
                     	if (spl[10].isNumber())
                     		SD_X = spl[10].toDouble();
+                    	else
+                    		SD_X = null;
                     	if (spl[11].isNumber())
                     		SD_Y = spl[11].toDouble();
+                    	else
+                    		SD_Y = null;
                     	if (spl[12].isNumber())
                     		SD_Z = spl[12].toDouble();
+                    	else
+                    		SD_Z = null;
                     	if (spl[13].isNumber())
                     		SD_XY = spl[13].toDouble();
+                    	else
+                    		SD_XY = null;
                     	if (spl[14].isNumber())
                     		SD_YZ = spl[14].toDouble();
+                    	else
+                    		SD_YZ = null;
                     	if (spl[15].isNumber())
                     		SD_ZX = spl[15].toDouble();
-                    	
+                    	else
+                    		SD_ZX = null;
                     	if (spl[16].isNumber())
                     		N =  spl[16].toDouble();
+                    	else
+                    		N = null;
                     	if (spl[17].isNumber())
                     		E =  spl[17].toDouble();
+                    	else
+                    		E = null;
                     	if (spl[18].isNumber())
                     		H =  spl[18].toDouble();
+                    	else
+                    		H = null;
                     	if (spl[19].isNumber())
                     		SD_N =  spl[19].toDouble();
+                    	else
+                    		SD_N = null;
                     	if (spl[20].isNumber())
                     		SD_E =  spl[20].toDouble();
+                    	else
+                    		SD_E = null;
                     	if (spl[21].isNumber())
                     		SD_H =  spl[21].toDouble();
-                    	
+                    	else
+                    		SD_H = null;
                     	if (spl[22].isNumber())
                     		V_N =  spl[22].toDouble();
+                    	else
+                    		V_N = null;
                     	if (spl[23].isNumber())
                     		V_E =  spl[23].toDouble();
+                    	else
+                    		V_E = null;	
                     	if (spl[24].isNumber())
                     		V_H =  spl[24].toDouble();
+                    	else
+                    		V_H = null;
                     	if (spl[25].isNumber())
                     		SD_V_N =  spl[25].toDouble();
+                    	else
+                    		SD_V_N = null;
                     	if (spl[26].isNumber())
                     		SD_V_E =  spl[26].toDouble();
+                    	else
+                    		SD_V_E = null;
                     	if (spl[27].isNumber())
                     		SD_V_H =  spl[27].toDouble();
-                    	
+                    	else
+                    		SD_V_H = null;
                     	if (spl[28].isNumber())
                     		V_3D =  spl[28].toDouble();
+                    	else
+                    		V_3D = null;
                     	if (spl[29].isNumber())
                     		SD_V_3D =  spl[29].toDouble();
-                    	
+                    	else
+                    		SD_V_3D = null;
                     	if (spl[30].isNumber())
                     		V_HORIZ =  spl[30].toDouble();
+                    	else
+                    		V_HORIZ = null;
                     	if (spl[31].isNumber())
                     		SD_V_HORIZ =  spl[31].toDouble();
-                    	
+                    	else
+                    		SD_V_HORIZ = null;
                     	if (spl[32].isNumber())
                     		VERSION = spl[32].toShort();
-                    		
+                    	
                     	COMMENTS = spl[33];
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
