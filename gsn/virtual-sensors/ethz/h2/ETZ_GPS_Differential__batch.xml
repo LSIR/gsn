@@ -125,8 +125,10 @@
                     		SD_V_HORIZ = null;
                     	if (spl[32].isNumber())
                     		VERSION = spl[32].toShort();
-                    	
-                    	COMMENTS = spl[33];
+                    	if (spl[33].equals(","))
+                    		COMMENTS = "";
+                    	else
+                    		COMMENTS = spl[33];
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
