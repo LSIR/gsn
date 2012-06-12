@@ -6,19 +6,21 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                	try {
-                    	def spl = new String(RAW_PACKET, "UTF-8").split(",", 24);
+                       import java.text.DecimalFormat;
+                        import java.text.NumberFormat;  
+                        try {
+                        def spl = new String(RAW_PACKET, "UTF-8").split(",", 25);
+                        def f = new DecimalFormat("###.####");
+                        
+                        if (spl[1].isNumber())
+                                POSITION = spl[1].toInteger();
+                        if (f.format(Double.parseDouble(spl[2])).isNumber())
+                                GENERATION_TIME = f.format(Double.parseDouble(spl[2])).toLong();
+                        if (spl[3].isNumber())
+                                GPS_WEEK = spl[3].toShort();
+                        if (f.format(Double.parseDouble(spl[4])).isNumber())
+                                GPS_TIME = f.format(Double.parseDouble(spl[4])).toInteger();
 
-                    	if (spl[1].isNumber())
-                    		POSITION = spl[1].toInteger();
-                    	if (spl[2].isNumber())
-                    		GENERATION_TIME = spl[2].toLong();
-                    	
-                    	if (spl[3].isNumber())
-                    		GPS_WEEK = spl[3].toShort();
-                    	if (spl[4].isNumber())
-                    		GPS_TIME = spl[4].toInteger();
-                    	
                     	if (spl[5].isNumber())
                     		X_ECEF = spl[5].toDouble();
                     	if (spl[6].isNumber())
@@ -68,32 +70,32 @@
         <output-structure>
             <field name="POSITION" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-            
-			<field name="GPS_WEEK" type="SMALLINT" />
-			<field name="GPS_TIME" type="INTEGER" />
-            
-			<field name="X_ECEF" type="DOUBLE" unit="m" />
-			<field name="Y_ECEF" type="DOUBLE" unit="m" />
-			<field name="Z_ECEF" type="DOUBLE" unit="m" />
-			<field name="SD_X" type="DOUBLE" unit="m" />
-			<field name="SD_Y" type="DOUBLE" unit="m" />
-			<field name="SD_Z" type="DOUBLE" unit="m" />
-			<field name="SD_XY" type="DOUBLE" unit="m" />
-			<field name="SD_YZ" type="DOUBLE" unit="m" />
-			<field name="SD_ZX" type="DOUBLE" unit="m" />
-			
-			<field name="N" type="DOUBLE" unit="m" />
-			<field name="E" type="DOUBLE" unit="m" />
-			<field name="H" type="DOUBLE" unit="m" />
-			<field name="SD_N" type="DOUBLE" unit="m" />
-			<field name="SD_E" type="DOUBLE" unit="m" />
-			<field name="SD_H" type="DOUBLE" unit="m" />
-			
-			<field name="Q" type="INTEGER" />
-			<field name="NS" type="INTEGER" />
-			<field name="AGE" type="DOUBLE" unit="s" />
-			<field name="RATIO" type="DOUBLE" />
-            
+
+            <field name="GPS_WEEK" type="SMALLINT" />
+            <field name="GPS_TIME" type="INTEGER" unit="sec"/>
+
+            <field name="X_ECEF" type="DOUBLE" unit="m" />
+            <field name="Y_ECEF" type="DOUBLE" unit="m" />
+            <field name="Z_ECEF" type="DOUBLE" unit="m" />
+            <field name="SD_X" type="DOUBLE" unit="m" />
+            <field name="SD_Y" type="DOUBLE" unit="m" />
+            <field name="SD_Z" type="DOUBLE" unit="m" />
+            <field name="SD_XY" type="DOUBLE" unit="m^2" />
+            <field name="SD_YZ" type="DOUBLE" unit="m^2" />
+            <field name="SD_ZX" type="DOUBLE" unit="m^2" />
+
+            <field name="N" type="DOUBLE" unit="m" />
+            <field name="E" type="DOUBLE" unit="m" />
+            <field name="H" type="DOUBLE" unit="m" />
+            <field name="SD_N" type="DOUBLE" unit="m" />
+            <field name="SD_E" type="DOUBLE" unit="m" />
+            <field name="SD_H" type="DOUBLE" unit="m" />
+
+            <field name="Q" type="INTEGER" />
+            <field name="NS" type="INTEGER" />
+            <field name="AGE" type="DOUBLE" unit="s" />
+            <field name="RATIO" type="DOUBLE" />
+
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
