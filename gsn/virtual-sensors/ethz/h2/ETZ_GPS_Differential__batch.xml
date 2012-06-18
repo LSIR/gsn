@@ -130,7 +130,7 @@
 			if (spl[34].length()>0)
 				COMMENTS = spl[33];
                     	else
-                    		COMMENTS = "";
+                    		COMMENTS = null;
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
