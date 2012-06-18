@@ -126,9 +126,9 @@
                     	if (spl[32].isNumber())
                     		VERSION = spl[32].toShort();
                     	if (spl[33].isNumber())
-                    		PROCESSING_TIME = spl[33];
+                    		PROCESSING_TIME = spl[33].toLong();
 			if (spl[34].length()>0)
-				COMMENTS = spl[33];
+				COMMENTS = spl[34];
                     	else
                     		COMMENTS = null;
 					} catch(Throwable e) {
