@@ -6,20 +6,17 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                       import java.text.DecimalFormat;
-                        import java.text.NumberFormat;  
                         try {
                         def spl = new String(RAW_PACKET, "UTF-8").split(",", 25);
-                        def f = new DecimalFormat("###.####");
                         
                         if (spl[1].isNumber())
                                 POSITION = spl[1].toInteger();
-                        if (f.format(Double.parseDouble(spl[2])).isNumber())
-                                GENERATION_TIME = f.format(Double.parseDouble(spl[2])).toLong();
+                        if (spl[2].isNumber())
+                                GENERATION_TIME = spl[2].toLong();
                         if (spl[3].isNumber())
                                 GPS_WEEK = spl[3].toShort();
-                        if (f.format(Double.parseDouble(spl[4])).isNumber())
-                                GPS_TIME = f.format(Double.parseDouble(spl[4])).toInteger();
+                        if (spl[4].isNumber())
+                                GPS_TIME = spl[4].toInteger();
 
                     	if (spl[5].isNumber())
                     		X_ECEF = spl[5].toDouble();
@@ -39,17 +36,18 @@
                     		SD_YZ = spl[12].toDouble();
                     	if (spl[13].isNumber())
                     		SD_ZX = spl[13].toDouble();
-                    	
                     	if (spl[14].isNumber())
-                    		N =  spl[14].toDouble();
+                    		E =  spl[14].toDouble();
+
                     	if (spl[15].isNumber())
-                    		E =  spl[15].toDouble();
+                    		N =  spl[15].toDouble();
                     	if (spl[16].isNumber())
                     		H =  spl[16].toDouble();
                     	if (spl[17].isNumber())
-                    		SD_N =  spl[17].toDouble();
-                    	if (spl[18].isNumber())
-                    		SD_E =  spl[18].toDouble();
+                    		SD_E =  spl[17].toDouble();
+			if (spl[18].isNumber())
+                    		SD_N =  spl[18].toDouble();
+
                     	if (spl[19].isNumber())
                     		SD_H =  spl[19].toDouble();
 
@@ -84,11 +82,11 @@
             <field name="SD_YZ" type="DOUBLE" unit="m^2" />
             <field name="SD_ZX" type="DOUBLE" unit="m^2" />
 
-            <field name="N" type="DOUBLE" unit="m" />
             <field name="E" type="DOUBLE" unit="m" />
+            <field name="N" type="DOUBLE" unit="m" />
             <field name="H" type="DOUBLE" unit="m" />
-            <field name="SD_N" type="DOUBLE" unit="m" />
             <field name="SD_E" type="DOUBLE" unit="m" />
+	    <field name="SD_N" type="DOUBLE" unit="m" />
             <field name="SD_H" type="DOUBLE" unit="m" />
 
             <field name="Q" type="INTEGER" />
