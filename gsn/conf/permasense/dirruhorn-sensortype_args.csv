@@ -9,10 +9,7 @@
 "3","sdivoltage","0.00483","AEBoard"
 "3","sysvoltage","0.00091","AEBoard"
 
-# adccomdiff_ccct
-"1","ccct_dx0","500",
-"1","ccct_dx1","500",
-"1","ccct_dx2","500",
-"1","ccct_t3","0.0",
+# adccomdiff_cnnn
+"1","cnnn_dx0","500",
 
 
