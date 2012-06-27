@@ -60,49 +60,49 @@
                     	else
                     		SD_ZX = null;
                     	if (spl[16].isNumber())
-                    		N =  spl[16].toDouble();
-                    	else
-                    		N = null;
-                    	if (spl[17].isNumber())
-                    		E =  spl[17].toDouble();
+                    		E =  spl[16].toDouble();
                     	else
                     		E = null;
+                    	if (spl[17].isNumber())
+                    		N =  spl[17].toDouble();
+                    	else
+                    		N = null;
                     	if (spl[18].isNumber())
                     		H =  spl[18].toDouble();
                     	else
                     		H = null;
                     	if (spl[19].isNumber())
-                    		SD_N =  spl[19].toDouble();
-                    	else
-                    		SD_N = null;
-                    	if (spl[20].isNumber())
-                    		SD_E =  spl[20].toDouble();
+                    		SD_E =  spl[19].toDouble();
                     	else
                     		SD_E = null;
+                    	if (spl[20].isNumber())
+                    		SD_N =  spl[20].toDouble();
+                    	else
+                    		SD_N = null;
                     	if (spl[21].isNumber())
                     		SD_H =  spl[21].toDouble();
                     	else
                     		SD_H = null;
                     	if (spl[22].isNumber())
-                    		V_N =  spl[22].toDouble();
+                    		V_E =  spl[22].toDouble();
                     	else
-                    		V_N = null;
+                    		V_E = null;
                     	if (spl[23].isNumber())
-                    		V_E =  spl[23].toDouble();
+                    		V_N =  spl[23].toDouble();
                     	else
-                    		V_E = null;	
+                    		V_N = null;	
                     	if (spl[24].isNumber())
                     		V_H =  spl[24].toDouble();
                     	else
                     		V_H = null;
                     	if (spl[25].isNumber())
-                    		SD_V_N =  spl[25].toDouble();
-                    	else
-                    		SD_V_N = null;
-                    	if (spl[26].isNumber())
-                    		SD_V_E =  spl[26].toDouble();
+                    		SD_V_E =  spl[25].toDouble();
                     	else
                     		SD_V_E = null;
+                    	if (spl[26].isNumber())
+                    		SD_V_N =  spl[26].toDouble();
+                    	else
+                    		SD_V_N = null;
                     	if (spl[27].isNumber())
                     		SD_V_H =  spl[27].toDouble();
                     	else
@@ -156,18 +156,18 @@
 			<field name="SD_YZ" type="DOUBLE" unit="m^2" />
 			<field name="SD_ZX" type="DOUBLE" unit="m^2" />
 			
-			<field name="N" type="DOUBLE" unit="m" />
 			<field name="E" type="DOUBLE" unit="m" />
+			<field name="N" type="DOUBLE" unit="m" />
 			<field name="H" type="DOUBLE" unit="m" />
-			<field name="SD_N" type="DOUBLE" unit="m" />
 			<field name="SD_E" type="DOUBLE" unit="m" />
+			<field name="SD_N" type="DOUBLE" unit="m" />
 			<field name="SD_H" type="DOUBLE" unit="m" />
 			
-			<field name="V_N" type="DOUBLE" unit="cm/d" />
 			<field name="V_E" type="DOUBLE" unit="cm/d" />
+			<field name="V_N" type="DOUBLE" unit="cm/d" />
 			<field name="V_H" type="DOUBLE" unit="cm/d" />
-			<field name="SD_V_N" type="DOUBLE" unit="cm/d" />
 			<field name="SD_V_E" type="DOUBLE" unit="cm/d" />
+			<field name="SD_V_N" type="DOUBLE" unit="cm/d" />
 			<field name="SD_V_H" type="DOUBLE" unit="cm/d" />
 			
 			<field name="V_3D" type="DOUBLE" unit="cm/d" />
