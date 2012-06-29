@@ -6,9 +6,13 @@ AdM_Binary.xml
 AdM_CoreStationStatus_Hardware.xml
 AdM_CoreStationStatus_Software.xml
 AdM_CoreStationStatus_Static.xml
+AdM_Dozer_AdcComDiff.xml
+AdM_Dozer_AdcMux1.xml
+AdM_Dozer_AdcMux2.xml
 AdM_Dozer_BaseDebug.xml
 AdM_Dozer_BaseStatus.xml
 AdM_Dozer_Command.xml
+AdM_Dozer_DigitalDCX.xml
 AdM_Dozer_Drift.xml
 AdM_Dozer_EventLogger.xml
 AdM_Dozer_ModbusHolding.xml
