@@ -502,7 +502,7 @@ public class AsyncCoreStationClient extends Thread  {
 			return new Serializable[]{true, size};
 		}
 		else {
-			logger.warn("not connected");
+			logger.warn(listener.getCoreStationName() + " is not connected");
 			return new Serializable[]{false, null};
 		}
 	}
