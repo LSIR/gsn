@@ -1,0 +1,26 @@
+<virtual-sensor name="AdM_Topology__public" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.MappedTopologyVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DATA" type="BINARY:application/vnd.google-earth.kml+xml" />
+        </output-structure>
+    </processing-class>
+    <description>Sensornode Topology of AdM deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage history-size="1" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from AdM_Topology</predicate>
+                    <predicate key="remote-contact-point">http://whymper.ee.ethz.ch:22001/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select stringtoutf8(replace(utf8tostring(DATA), ' configurable="true"','')) as DATA from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
