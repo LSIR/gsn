@@ -254,6 +254,9 @@ class BackLogDBClass(Thread, Statistics):
     def _convert(self, value):
         if value == None:
             return None
+        elif int(value*1000) > sys.maxint:
+            self.exception("value %d out of range -> set it to None type" % (int(value*1000),))
+            return None
         else:
             return int(value*1000)
             

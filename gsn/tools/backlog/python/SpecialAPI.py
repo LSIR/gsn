@@ -345,6 +345,7 @@ class Statistics:
 
 
 
+import sys
 import tos
 import TOSTypes
 
@@ -882,6 +883,10 @@ class PowerControl:
                     ad77x8_10 = int(round(ad77x8_10 * 2))
                         
                     self._ad77x8Values = [ad77x8_1, ad77x8_2, ad77x8_3, ad77x8_4, ad77x8_5, ad77x8_6, ad77x8_7, ad77x8_8, ad77x8_9, ad77x8_10]
+                    for i, val in enumerate(self._ad77x8Values):
+                        if val > sys.maxint:
+                            self._logger.warning("value %d at index %d in _ad77x8Values array out of range -> set it to None type" % (val, i))
+                            self._ad77x8Values[i] = None
                     self._ad77x8Timer = time.time()
                 except Exception, e:
                     self._logger.warning(e.__str__())
