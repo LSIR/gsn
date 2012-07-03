@@ -17,10 +17,7 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="CCCT_DX0" type="VARCHAR(30)" />
-            <field name="CCCT_DX1" type="VARCHAR(30)" />
-            <field name="CCCT_DX2" type="VARCHAR(30)" />
-            <field name="CCCT_T3" type="VARCHAR(30)" />
+            <field name="CNNN_DX0" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
     <description>Crackmeter/CNNN data from Dirruhorn deployment</description>
