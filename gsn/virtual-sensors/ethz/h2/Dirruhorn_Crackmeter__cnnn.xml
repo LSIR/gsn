@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_Crackmeter__ccct" priority="10" >
+<virtual-sensor name="Dirruhorn_Crackmeter__cnnn" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -23,7 +23,7 @@
             <field name="CCCT_T3" type="VARCHAR(30)" />
         </output-structure>
     </processing-class>
-    <description>Crackmeter/CCCT data from Dirruhorn deployment</description>
+    <description>Crackmeter/CNNN data from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -34,7 +34,7 @@
                     <predicate key="query"> select * from Dirruhorn_Dozer_AdcComDiff__mapped </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where SENSORTYPE is not null and locate(' ccct:', SENSORTYPE) != 0 </query>
+                <query> select * from wrapper where SENSORTYPE is not null and locate(' cnnn:', SENSORTYPE) != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>
