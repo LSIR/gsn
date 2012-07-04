@@ -9,6 +9,7 @@ __source__      = "$URL$"
 
 import sqlite3
 import os
+import sys
 import logging
 from threading import Thread, Lock, Event
 
