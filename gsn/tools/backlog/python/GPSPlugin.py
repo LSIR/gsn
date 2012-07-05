@@ -74,7 +74,7 @@ class GPSPluginClass(AbstractPluginClass):
         # The GPS loggin Mode (binary or ascii)
         self._logMode = self.getOptionValue('gps_log_mode')
         #power save mode
-        self._pmEnable = self.getOptionValue('gps_power_save_mode')
+        self._pmEnable = int(self.getOptionValue('gps_power_save_mode'))
 
         if (self._logMode == "ascii"):
             RAW_DATA_VERSION = 0
@@ -90,14 +90,13 @@ class GPSPluginClass(AbstractPluginClass):
         if (self.isDutyCycleMode()):    	
             self._WlanThread = WlanThread(self,int(self.getOptionValue('wlan_on_time')),int(self.getOptionValue('wlan_off_time')))
         
+        if (not os.path.exists(str(self.getOptionValue('cnt_file')))):
+	  fp = open(str(self.getOptionValue('cnt_file')),"w+")
+	  fp.write('0')
+	  fp.close()
         #counter
         try:
-	    fd = str(self.getOptionValue('cnt_file'))
-	    if (os.path.exists(fd)):
-	      fp = open(fd,"rw")
-	    else:
-	      fp = open(fd,"rw")
-	      fp.write('0')
+	  fp = open(str(self.getOptionValue('cnt_file')),"rw")
         except Exception as e:
             self.exception( "could not open sample count file: %s %s" % (self.getOptionValue('cnt_file'), e))
         cnt = int(fp.readline())
