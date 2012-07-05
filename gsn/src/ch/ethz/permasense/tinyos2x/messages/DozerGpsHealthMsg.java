@@ -12,7 +12,7 @@ public class DozerGpsHealthMsg extends ch.ethz.permasense.tinyos2x.messages.Data
     public static final int DEFAULT_MESSAGE_SIZE = 30;
 
     /** The Active Message type associated with this message. */
-    public static final int AM_TYPE = 188;
+    public static final int AM_TYPE = 210;
 
     /** Create a new DozerGpsHealthMsg of size 30. */
     public DozerGpsHealthMsg() {
