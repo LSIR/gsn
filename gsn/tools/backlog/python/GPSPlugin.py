@@ -271,6 +271,7 @@ class WlanThread(Thread):
                         self._work.wait(10)
                     	for utmp in UtmpFile():
 		      		if utmp.ut_user_process:
+				    if (utmp.ut_user == "root"):
 					self._loggedin = True
 					break
 		      		else:
