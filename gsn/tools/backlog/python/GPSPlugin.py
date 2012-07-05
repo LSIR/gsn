@@ -22,6 +22,8 @@ import time
 from threading import Event, Thread
 import GPSDriver
 from SpecialAPI import PowerControl
+from pyutmp import UtmpFile
+import os.path
 
 from ScheduleHandler import SUBPROCESS_BUG_BYPASS
 if SUBPROCESS_BUG_BYPASS:
@@ -90,7 +92,12 @@ class GPSPluginClass(AbstractPluginClass):
         
         #counter
         try:
-            fp = open(str(self.getOptionValue('cnt_file')),"rw")
+	    fd = str(self.getOptionValue('cnt_file'))
+	    if (os.path.exists(fd)):
+	      fp = open(fd,"rw")
+	    else:
+	      fp = open(fd,"rw")
+	      fp.write('0')
         except Exception as e:
             self.exception( "could not open sample count file: %s %s" % (self.getOptionValue('cnt_file'), e))
         cnt = int(fp.readline())
@@ -229,6 +236,7 @@ class WlanThread(Thread):
         self._parent = parent
         self._work = Event()
         self._stopped = False
+	self._loggedin = False
         self._online = parent.getPowerControlObject().getWlanStatus()
     
     #*********************************************************
@@ -240,19 +248,34 @@ class WlanThread(Thread):
             self._parent._logger.info('WlanThread: Waiting for %d secs before cycling WLAN' % (self._uptime,))
             self._work.wait(self._uptime)
             if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?
-                p = subprocess.Popen('/usr/bin/who')
-                p.wait()
-                user = p.communicate()[0]
+                #p = subprocess.Popen('/usr/bin/who')
+                #p.wait()
+                #user = p.communicate()[0]
+                for utmp in UtmpFile():
+		  if utmp.ut_user_process:
+		    self._loggedin = True
+		    break
                 #self._parent._logger.info(str(user))
                 #self._parent._logger.info(str("HOST\nroot" in user))
                 start = time.time()
-                while ((("HOST\nroot" in user) or (self._parent.isResendingDB())) and not self._stopped):
-                    self._parent._logger.info('Someone is logged in or we are flushing DB... NOT power cycling WLAN!')
+                #while ((("HOST\nroot" in user) or (self._parent.isResendingDB())) and not self._stopped):
+		while (self._parent.isResendingDB() and not self._stopped):
+                    self._parent._logger.info('We are flushing DB... NOT power cycling WLAN!')
                     self._parent._logger.info('Waiting for 10 sec')
                     self._work.wait(10)
-                    p = subprocess.Popen('/usr/bin/who')
-                    p.wait()
-                    user = p.communicate()[0]
+                    #p = subprocess.Popen('/usr/bin/who')
+                    #p.wait()
+                    #user = p.communicate()[0]
+		while (self._loggedin):
+			self._parent._logger.info('Someone is logged in... NOT power cycling WLAN!')          
+                        self._parent._logger.info('Waiting for 10 sec')                                       
+                        self._work.wait(10)
+                    	for utmp in UtmpFile():
+		      		if utmp.ut_user_process:
+					self._loggedin = True
+					break
+		      		else:
+					self._loggedin = False
                 if (not self._stopped):
                     duration = time.time() - start 
                     if (self._downtime - duration > 0):

@@ -76,7 +76,7 @@ class GPSDriver():
         #N/ACKs
     	self._ACK = struct.pack('2B', 0x05, 0x01)
     	self._NACK = struct.pack('2B', 0x05, 0x00)
-    	
+    	self.pmEnable = False	
         if (config[0] != None): #Device string
     		self._device = config[0]
     	if (config[1] != None): # The measurement interval in seconds
@@ -387,33 +387,33 @@ class GPSDriver():
     	old = ''
     	while (not old):
             old = self._pollGpsMessage(self._prtMessageId)
-            rec=struct.unpack('20B',old[3])
-            want=struct.unpack('19B',newport)
-            prtchange=False
-            if want[0]!=rec[0]:
-                prtchange=True
-                self._logger.debug('Wrong Portnumber')
-            for i in range(3,19):
-                if want[i]!=rec[i+1]:
-                    prtchange=True
-                    if self._logger.isEnabledFor(logging.DEBUG):
-                        self._logger.debug('Bit %d from prtMessage not matching %s instead of %s' % (i, rec[i], want[i]))
-                    
-            if prtchange==True:
-                self._logger.debug('Port protocols changed')
-                self._logger.info("New Protocol: %s" % (want,))
-                cnt=0
-                ACK=0
-                while not ACK and cnt<=3:
-                    self._write(self._prtMessageId,newport)
-                    ACK=self._readRaw(self._ACK)
-                    cnt=cnt+1
-                    if cnt==3:
-                        self._logger.info('New configuration could not be sent!')
-                        break
-                    self._runEv.wait(1)
-                change=True
-            self._logger.debug("Done setting message type...")       
+	rec=struct.unpack('20B',old[3])
+	want=struct.unpack('19B',newport)
+	prtchange=False
+	if want[0]!=rec[0]:
+	    prtchange=True
+	    self._logger.debug('Wrong Portnumber')
+	for i in range(3,19):
+	    if want[i]!=rec[i+1]:
+		prtchange=True
+		if self._logger.isEnabledFor(logging.DEBUG):
+		    self._logger.debug('Bit %d from prtMessage not matching %s instead of %s' % (i, rec[i], want[i]))
+		
+	if prtchange==True:
+	    self._logger.debug('Port protocols changed')
+	    self._logger.info("New Protocol: %s" % (want,))
+	    cnt=0
+	    ACK=0
+	    while not ACK and cnt<=3:
+		self._write(self._prtMessageId,newport)
+		ACK=self._readRaw(self._ACK)
+		cnt=cnt+1
+		if cnt==3:
+		    self._logger.info('New configuration could not be sent!')
+		    break
+		self._runEv.wait(1)
+	    change=True
+	self._logger.debug("Done setting message type...")       
     
         ###################################
         #set the measurement rate
@@ -449,11 +449,11 @@ class GPSDriver():
             newOutput=struct.pack('8B',0x02,0x10,0x00,0x00,0x00,0x01,0x00,0x00)
     	elif (self._mode == "nav"):
             newOutput = struct.pack('10B',0x08,0x00,0xF0,0x00,0x00,0x00,0x00,0x01,0x00,0x01) 
-            self._write(self._msgMessageId,self._messageId)
+        self._write(self._msgMessageId,self._messageId)
     	old = self._pollGpsMessage(self._msgMessageId)
     	while (old == None):
             old = self._readRaw(self._msgMessageId)
-            if old!=newOutput:
+        if old!=newOutput:
                 self._logger.debug('Output message changed')
                 self._logger.info("Msg Port Mode: %s" % (newOutput,))
                 cnt=0
@@ -470,10 +470,14 @@ class GPSDriver():
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug('Done setting %s on USB...' % (self._mode,))
     
-            #self._logger.debug("WARNING! NOT setting Powermode!!")
+        #self._logger.debug("WARNING! NOT setting Powermode!!")
     	
     	self._logger.debug("Setting Powermode...")
-        
+        ##################################################
+    	#Set powermode
+    	##################################################
+    	
+        '''
         #newPSM=struct.pack('24B',0,0x3C,0,0,0x10,0,0,0,0x88,0x13,0,0,0xE8,0x03,0,0,0,0,0,0,0,0,0,0)
         newPSM=struct.pack('24B', 0x00, 0x3C, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0xB8, 0x0B, 0x00, 
                            0x00, 0xD0, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00 )
@@ -491,12 +495,19 @@ class GPSDriver():
                     self._logger.info('New configuration could not be sent!')
                 self._runEv.wait(1)
             change=True
-    	
+    	'''
     	if (self.pmEnable):
+	    self._logger.info("WARNING: Setting power save mode!!")
     	    newPowerMode=struct.pack('2B',0,4)
         else:
-            newPowerMode = struct.pack('2B',0,0)
-        if self._pollGpsMessage(self._rxmMessageId)[2]!= newPowerMode:
+            	newPowerMode = struct.pack('2B',0x00,0x00)
+	oldPowerMode = False
+	while (not oldPowerMode):
+	  oldPowerMode= self._pollGpsMessage(self._rxmMessageId)
+	
+	self._logger.info("Old psm " + str(oldPowerMode))
+	self._logger.info((oldPowerMode[3] == '\x08\x00'))
+        if oldPowerMode[3] != '\x08\x00':
             self._logger.debug('PowerMode changed')
             cnt=0
             ACK=0
@@ -508,7 +519,8 @@ class GPSDriver():
                     self._logger.info('New configuration could not be sent!')
                 self._runEv.wait(1)
             change=True
-        self._logger.debug("Done setting Powermode")    
+        self._logger.debug("Done setting Powermode")  
+        
         #Save configuration on Flash memory of LEA-6T
     	self._logger.debug("Saving changes (if any) to flash")
         if change==True:
