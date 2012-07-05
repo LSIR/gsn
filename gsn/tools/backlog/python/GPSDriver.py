@@ -505,8 +505,6 @@ class GPSDriver():
 	while (not oldPowerMode):
 	  oldPowerMode= self._pollGpsMessage(self._rxmMessageId)
 	
-	self._logger.info("Old psm " + str(oldPowerMode))
-	self._logger.info((oldPowerMode[3] == '\x08\x00'))
         if oldPowerMode[3] != '\x08\x00':
             self._logger.debug('PowerMode changed')
             cnt=0
