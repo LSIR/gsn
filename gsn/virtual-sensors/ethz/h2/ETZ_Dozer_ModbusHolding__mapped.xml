@@ -1,8 +1,12 @@
-<virtual-sensor name="AdM_Dozer_ModbusHolding" priority="10" >
+<virtual-sensor name="ETZ_Dozer_ModbusHolding__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>
         <output-structure>
+            <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
@@ -25,17 +29,17 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>Dozer messages (DozerModbusHoldingMsg) from AdM deployment</description>
+    <description>Dozer messages (DozerModbusHoldingMsg) from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
     <streams>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-adm-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerModbusHoldingMsg</predicate>
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from ETZ_Dozer_ModbusHolding</predicate>
+                    <predicate key="remote-contact-point">http://whymper.ee.ethz.ch:23001/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

@@ -10,6 +10,7 @@ ETZ_CoreStationStatus_Hardware__conv.xml
 ETZ_CoreStationStatus_Static__mapped.xml
 ETZ_CoreStationStatus_Software__mapped.xml
 ETZ_CoreStationStatus_Hardware__mapped.xml
+ETZ_CR1000.xml
 ETZ_Dozer_AdcComDiff__mapped.xml
 ETZ_Dozer_AdcMux1__mapped.xml
 ETZ_Dozer_AdcMux2__mapped.xml
@@ -32,6 +33,7 @@ ETZ_Dozer_EventLogger__muxed__mapped.xml
 ETZ_Dozer_GPSData__conv.xml
 ETZ_Dozer_GPSData__mapped.xml
 ETZ_Dozer_GPSHealth__mapped.xml
+ETZ_Dozer_ModbusHolding__mapped.xml
 ETZ_Dozer_NodeHealth__mapped.xml
 ETZ_Dozer_NodeHealth__conv.xml
 ETZ_Dozer_NodeInfo__mapped.xml

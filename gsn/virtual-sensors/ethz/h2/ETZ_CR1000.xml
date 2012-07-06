@@ -1,0 +1,99 @@
+<virtual-sensor name="ETZ_CR1000" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                		BATTERY = PANEL_TEMP = THERMISTOR_1 = THERMISTOR_2 = THERMISTOR_3 = THERMISTOR_4 = THERMISTOR_5 = null;
+                		THERMISTOR_6 = THERMISTOR_7 = THERMISTOR_8 = THERMISTOR_9 = THERMISTOR_10 = THERMISTOR_11 = null;
+                		THERMISTOR_12 = THERMISTOR_13 = THERMISTOR_14 = THERMISTOR_15 = null;
+                		
+                    	def dbl1 = (double) Float.intBitsToFloat(PAYLOAD_HOLDING_REGISTER1 | PAYLOAD_HOLDING_REGISTER2<<16);
+                    	def dbl2 = (double) Float.intBitsToFloat(PAYLOAD_HOLDING_REGISTER3 | PAYLOAD_HOLDING_REGISTER4<<16);
+                    	def dbl3 = (double) Float.intBitsToFloat(PAYLOAD_HOLDING_REGISTER5 | PAYLOAD_HOLDING_REGISTER6<<16);
+                    	def dbl4 = (double) Float.intBitsToFloat(PAYLOAD_HOLDING_REGISTER7 | PAYLOAD_HOLDING_REGISTER8<<16);
+                    	
+                    	if (PAYLOAD_STARTING_ADDRESS == 0) {
+                    		BATTERY = dbl1;
+                    		PANEL_TEMP = dbl2;
+                    		THERMISTOR_1 = dbl3;
+                    		THERMISTOR_2 = dbl4;
+                    	}
+                    	else if (PAYLOAD_STARTING_ADDRESS == 8) {
+                    		THERMISTOR_3 = dbl1;
+                    		THERMISTOR_4 = dbl2;
+                    		THERMISTOR_5 = dbl3;
+                    		THERMISTOR_6 = dbl4;
+                    	}
+                    	else if (PAYLOAD_STARTING_ADDRESS == 16) {
+                    		THERMISTOR_7 = dbl1;
+                    		THERMISTOR_8 = dbl2;
+                    		THERMISTOR_9 = dbl3;
+                    		THERMISTOR_10 = dbl4;
+                    	}
+                    	else if (PAYLOAD_STARTING_ADDRESS == 24) {
+                    		THERMISTOR_11 = dbl1;
+                    		THERMISTOR_12 = dbl2;
+                    		THERMISTOR_13 = dbl3;
+                    		THERMISTOR_14 = dbl4;
+                    	}
+                    	else if (PAYLOAD_STARTING_ADDRESS == 32) {
+                    		THERMISTOR_15 = dbl1;
+                    	}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="PAYLOAD_SLAVE_ADDRESS" type="SMALLINT" />
+            <field name="BATTERY" type="DOUBLE" unit="V"/>
+            <field name="PANEL_TEMP" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_1" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_2" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_3" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_4" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_5" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_6" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_7" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_8" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_9" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_10" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_11" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_12" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_13" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_14" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_15" type="DOUBLE" unit="°C"/>
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>CR1000 data from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_ModbusHolding__mapped </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where PAYLOAD_SAMPLE_VALID = 1 </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
