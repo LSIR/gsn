@@ -18,20 +18,23 @@ import com.thoughtworks.xstream.XStream;
 public class RestDelivery implements DeliverySystem {
 
     private Continuation continuation;
+    private String remoteHost;
     private ObjectOutputStream objectStream;
     private Integer limit = null;
 
     private static final StreamElement keepAliveMsg = new StreamElement(new DataField[]{new DataField("keepalive", "string")}, new Serializable[]{"keep-alive message"});
 
-    public RestDelivery(Continuation connection) throws IOException {
+    public RestDelivery(Continuation connection, String remoteHost) throws IOException {
         this.continuation = connection;
+        this.remoteHost = remoteHost;
         XStream dataStream = StreamElement4Rest.getXstream();
         objectStream = dataStream.createObjectOutputStream((new WriterOutputStream(continuation.getServletResponse().getWriter())));
     }
     
-    public RestDelivery(Continuation connection, Integer limit) throws IOException {
-    	this.limit = limit;
+    public RestDelivery(Continuation connection, String remoteHost, Integer limit) throws IOException {
         this.continuation = connection;
+        this.remoteHost = remoteHost;
+    	this.limit = limit;
         XStream dataStream = StreamElement4Rest.getXstream();
         objectStream = dataStream.createObjectOutputStream((new WriterOutputStream(continuation.getServletResponse().getWriter())));
     }
@@ -100,5 +103,10 @@ public class RestDelivery implements DeliverySystem {
 		if (limit != null && limit <= 0)
 			return true;
 		return false;
+	}
+
+	@Override
+	public String getUser() {
+		return remoteHost;
 	}
 }

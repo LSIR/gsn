@@ -126,4 +126,10 @@ public class PushDelivery implements DeliverySystem {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public String getUser() {
+		return httpPut.getURI().getHost();
+	}
 }

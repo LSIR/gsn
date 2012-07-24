@@ -222,7 +222,10 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 	public void setTimeout(long timeoutMs) {
 	}
 
-
+	@Override
+	public String getUser() {
+		return "local wrapper";
+	}
 }
 
  	  	 

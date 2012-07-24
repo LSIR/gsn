@@ -18,4 +18,6 @@ public interface DeliverySystem {
 	public abstract boolean isClosed();
 
 	public abstract void setTimeout(long timeoutMs);
+
+	public abstract String getUser();
 }

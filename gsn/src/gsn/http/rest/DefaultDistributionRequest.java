@@ -8,11 +8,7 @@ import gsn.storage.SQLValidator;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-
 public class DefaultDistributionRequest implements DistributionRequest {
-
-	private static transient Logger       logger     = Logger.getLogger ( DefaultDistributionRequest.class );
 
 	private long startTime;
 	private boolean continuous;
@@ -43,6 +39,7 @@ public class DefaultDistributionRequest implements DistributionRequest {
 	public String toString() {
 		return new StringBuilder("DefaultDistributionRequest Request[[ Delivery System: ")
                 .append(deliverySystem.getClass().getName())
+                .append("],[User: ").append(deliverySystem.getUser())
                 .append("],[Query:").append(query)
                 .append("],[startTime:").append(startTime)
                 .append("],[continuous:").append(continuous)
