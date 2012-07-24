@@ -76,14 +76,18 @@
                                     if(i != timestamp_idx && data[i]!=undefined ){
                                         var key;
                                         if (i>timestamp_idx)
-                                          key = keys[i-1];
+                                        	key = keys[i-1];
                                         else
-                                          key = keys[i];
+                                        	key = keys[i];
                                         var d;
-                                        if (data[i]=='null')
-                                          d=data[i];
+                                        if (isNaN(data[i])) {
+                                        	if (data[i].slice(0, 10) == '/field?vs=')
+                                        		d='BINARY_DATA';
+                                        	else
+                                        		d=data[i];
+                                        }
                                         else
-                                          d=parseFloat(data[i]);
+                                        	d=parseFloat(data[i]);
                                         if (format == 'unix') {
                                             datasets[key].data.push([parseInt(timestamp),d]);
                                         } else {
