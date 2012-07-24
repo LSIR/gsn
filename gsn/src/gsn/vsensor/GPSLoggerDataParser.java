@@ -404,7 +404,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 											try {
 												if (param.equals("start_date")) {
 													try {
-														out[1] = out[2] = out[6] = (new SimpleDateFormat("dd/MM/yy").parse(value)).getTime();
+														out[6] = (new SimpleDateFormat("dd/MM/yy").parse(value)).getTime();
 													} catch (ParseException e) {
 														logger.error(e.getMessage());
 													}
@@ -477,6 +477,15 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 												out[pos] = null;
 											}
 										}
+										
+										try {
+											out[1] = out[2] = ((Long)out[7]+(Long)out[6])/2;
+										}
+										catch (Exception e) {
+											logger.error("can not set generation_time because start_date and/or end_date is not set properly");
+											out[1] = out[2] = null;
+										}
+											
 									}
 									else {
 										finished = true;
