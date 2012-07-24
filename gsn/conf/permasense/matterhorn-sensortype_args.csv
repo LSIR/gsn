@@ -32,6 +32,8 @@
 "2","ccnn_dx1","150",
 "3","ccnn_dx0","100",
 "3","ccnn_dx1","150",
+"4","ccnn_dx0","150",
+"4","ccnn_dx1","150",
 
 # nodehealth
 "0","sdivoltage","0.0046805046805","BaseBoard v2 r2.0"
