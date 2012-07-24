@@ -138,11 +138,11 @@ public class MultiDataDownload extends HttpServlet {
 				throw new DataRequestException("Unknown download_format >" + downloadFormat + "<");
 			}
 		} catch (DataRequestException e) {
-			logger.error(e.getMessage());
+			logger.error("[Host: " + req.getRemoteHost() + "] " + e.getMessage());
 			res.sendError(WebConstants.ERROR_INVALID_VSNAME, e.getMessage());
 			return;
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("[Host: " + req.getRemoteHost() + "] " + e.getMessage());
 			res.sendError(WebConstants.UNSUPPORTED_REQUEST_ERROR, e.getMessage());
 			return;
 		}
