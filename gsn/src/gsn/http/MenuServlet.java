@@ -27,7 +27,7 @@ public class MenuServlet extends HttpServlet {
         out.println("<li" + ("weather".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"weather.html#weather\">on-site weather</a></li>");
         //out.println("<li" + ("map".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"map.html#map\">map</a></li>");
         //out.println("<li" + ("fullmap".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"fullmap.html#fullmap\">fullmap</a></li>");
-        out.println("<li" + ("position".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"position.html#position\">position</a></li>");
+        //out.println("<li" + ("position".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"position.html#position\">position</a></li>");
         if (Main.getContainerConfig().isAcEnabled()) {
             out.println("<li><a href=\"/gsn/MyAccessRightsManagementServlet\">access rights management</a></li>");
         }
