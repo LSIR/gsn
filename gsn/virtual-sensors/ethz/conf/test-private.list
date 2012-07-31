@@ -50,7 +50,6 @@ OSTest_BackLogStatus_Dynamic.xml
 OSTest_CoreStationStatus_Static.xml
 OSTest_CoreStationStatus_Software.xml
 OSTest_CoreStationStatus_Hardware.xml
-OSTest_ECVQEK3.xml
 OSTest_GPS_NAV.xml
 OSTest_OZ47.xml
 OSTest_Alphasense.xml
