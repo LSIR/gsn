@@ -124,7 +124,7 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 			data = new StreamElement(data, 
 					new String[]{"gps_unixtime"}, 
 					new Byte[]{DataTypes.BIGINT},
-					new Serializable[]{gps2unix((Integer)data.getData("gps_time"), (Short)data.getData("gps_week"))});
+					new Serializable[]{(long)(gps2unix((double)((Integer)data.getData("gps_time")/1000.0), (Short)data.getData("gps_week"))*1000.0)});
 		}
 
 		for (Enumeration<String> elem = jpeg_scaled.elements() ; elem.hasMoreElements() ; ) {
@@ -221,37 +221,38 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 	By contrast, for example, the original implementation maps both gps
 	times 46828800.5 and 46828800 map to unix time 362793599.5 
 	*/
-	private static final long GPS_OFFSET = 315964800;
+	private static final long GPS_OFFSET = 315964800L;
 
-	private static final long[] leaps = {46828800, 78364801, 109900802, 173059203, 252028804,
-		315187205, 346723206, 393984007, 425520008, 457056009, 504489610,
-		551750411, 599184012, 820108813, 914803214, 1025136015,
-		1341118800};
+	private static final long[] leaps = {46828800L, 78364801L, 109900802L, 173059203L, 252028804L,
+		315187205L, 346723206L, 393984007L, 425520008L, 457056009L, 504489610L,
+		551750411L, 599184012L, 820108813L, 914803214L, 1025136015L,
+		1341118800L};
 	
-	private long gps2unix(int gpsMs, short gpsWeek) {
-		double gpsTime = (double)((long)gpsWeek*604800000L + (long)gpsMs)/1000.0;
+	private double gps2unix(double gpsSec, short gpsWeek) {
+		double gpsTime = (double)(gpsWeek*604800 + gpsSec);
 		
 		if ( gpsTime < 0)
-			return (long) (gpsTime + GPS_OFFSET)*1000;
+			return gpsTime + GPS_OFFSET;
 		
 		double fpart = gpsTime % 1;
-		double ipart = Math.floor(gpsTime);
-		
-		double unixTime = ipart + GPS_OFFSET - countleaps(ipart, false);
+		long ipart = (long) Math.floor(gpsTime);
+
+		long leap = countleaps(ipart, false);
+		double unixTime = (double)(ipart + GPS_OFFSET - leap);
 		
 		if (isleap(ipart + 1))
-			unixTime = unixTime + fpart / 2.0;
+			unixTime = unixTime + fpart / 2;
 		else if (isleap(ipart))
-			unixTime = unixTime + (fpart + 1) / 2.0;
+			unixTime = unixTime + (fpart + 1) / 2;
 		else
 			unixTime = unixTime + fpart;
 		
-		return (long) (unixTime*1000.0);
+		return unixTime;
 	}
 	
-	private boolean isleap(double gpsTime) {
+	private boolean isleap(long gpsTime) {
 		boolean isLeap = false;
-		for (int i = 0; i < leaps.length; i += 1) {
+		for (int i = 0; i < leaps.length; i++) {
 			if (gpsTime == leaps[i]) {
 				isLeap = true;
 				break;
@@ -260,17 +261,20 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 		return isLeap;
 	}
 	
-	private long countleaps(double gpsTime, boolean accum_leaps) {
+	private long countleaps(long gpsTime, boolean accum_leaps) {
 		long nleaps = 0;
 		
-		if (accum_leaps)
-			for (int i = 0; i < leaps.length; i += 1)
+		if (accum_leaps) {
+			for (int i = 0; i < leaps.length; i++)
 				if (gpsTime + i >= leaps[i])
-					nleaps += 1;
-		else
-			for (i = 0; i < leaps.length; i += 1)
+					nleaps++;
+		}
+		else {
+			for (int i = 0; i < leaps.length; i++)
 				if (gpsTime >= leaps[i])
-					nleaps += 1;
+					nleaps++;
+		}
+		
 		return nleaps;
 	}
 }
