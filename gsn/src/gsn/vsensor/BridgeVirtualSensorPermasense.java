@@ -220,18 +220,6 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 	
 	By contrast, for example, the original implementation maps both gps
 	times 46828800.5 and 46828800 map to unix time 362793599.5 
-	
-	
-	Following may be helpful for conversion when new leap seconds are
-	announced.
-	
-	gnu 'date':
-	
-	date --date='2012-06-30 23:59:59' +%s 
-	
-	Mac OSX 'date': 
-	
-	date -j -f '%Y-%m-%d %H:%M:%S' '2012-06-30 23:59:60' +%s
 	*/
 	private static final long GPS_OFFSET = 315964800;
 
@@ -240,28 +228,28 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 		551750411, 599184012, 820108813, 914803214, 1025136015,
 		1341118800};
 	
-	private long gps2unix(int gpsSec, short gpsWeek) {
-		long gpsTime = gpsWeek*604800 + gpsSec;
+	private long gps2unix(int gpsMs, short gpsWeek) {
+		double gpsTime = (double)((long)gpsWeek*604800000L + (long)gpsMs)/1000.0;
 		
 		if ( gpsTime < 0)
-			return gpsTime + GPS_OFFSET;
+			return (long) (gpsTime + GPS_OFFSET)*1000;
 		
-		long fpart = gpsTime % 1;
-		long ipart = (long) Math.floor(gpsTime);
+		double fpart = gpsTime % 1;
+		double ipart = Math.floor(gpsTime);
 		
-		long unixTime = ipart + GPS_OFFSET - countleaps(ipart, false);
+		double unixTime = ipart + GPS_OFFSET - countleaps(ipart, false);
 		
 		if (isleap(ipart + 1))
-			unixTime = unixTime + fpart / 2;
+			unixTime = unixTime + fpart / 2.0;
 		else if (isleap(ipart))
-			unixTime = unixTime + (fpart + 1) / 2;
+			unixTime = unixTime + (fpart + 1) / 2.0;
 		else
 			unixTime = unixTime + fpart;
 		
-		return unixTime;
+		return (long) (unixTime*1000.0);
 	}
 	
-	private boolean isleap(long gpsTime) {
+	private boolean isleap(double gpsTime) {
 		boolean isLeap = false;
 		for (int i = 0; i < leaps.length; i += 1) {
 			if (gpsTime == leaps[i]) {
@@ -272,7 +260,7 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 		return isLeap;
 	}
 	
-	private long countleaps(long gpsTime, boolean accum_leaps) {
+	private long countleaps(double gpsTime, boolean accum_leaps) {
 		long nleaps = 0;
 		
 		if (accum_leaps)
