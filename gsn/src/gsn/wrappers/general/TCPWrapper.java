@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 
@@ -20,14 +19,13 @@ public class TCPWrapper extends AbstractWrapper {
 	private static final String			PACKET_SEPARATOR = System.getProperty("line.separator");
 	private static final String			RAW_PACKET    = "RAW_PACKET";
 	private static final Integer		DEFAULT_BUFFER_SIZE = 4096;
-	private static final Integer		MAX_CONNECTIONS = 8;
+	private static final Integer		MAX_CONNECTIONS = 50;
 	
 	private final transient Logger		logger        = Logger.getLogger( TCPWrapper.class );
 	
 	private int							threadCounter = 0;
 	private int							bufferSize;
 	private ServerSocket				serverSocket;
-	private final Semaphore				connections = new Semaphore(MAX_CONNECTIONS, true);
 	   
 	/*
 	 * Needs the following information from XML file : port : the tcp port it
@@ -35,7 +33,7 @@ public class TCPWrapper extends AbstractWrapper {
 	 */
 	public boolean initialize (  ) {
 		try {
-			serverSocket = new ServerSocket( Integer.parseInt( getActiveAddressBean( ).getPredicateValue( "port" ) ) );
+			serverSocket = new ServerSocket( Integer.parseInt( getActiveAddressBean( ).getPredicateValue( "port" ) ), MAX_CONNECTIONS );
 		} catch ( Exception e ) {
 			logger.warn( e.getMessage( ) , e );
 			return false;
@@ -49,7 +47,6 @@ public class TCPWrapper extends AbstractWrapper {
 	public void run ( ) {
 		while ( isActive( ) ) {
 			try {
-				connections.acquire();
 				new TCPConntectionThread(serverSocket.accept()).start();
 			} catch (Exception e) {
 				logger.error(e);
@@ -115,7 +112,6 @@ public class TCPWrapper extends AbstractWrapper {
 			} catch ( IOException e ) {
 				logger.warn( "Error while receiving data on TCP socket from " + tcpSocket.getInetAddress().getCanonicalHostName() + ": " + e.getMessage( ) );
 			}
-			connections.release();
 		}
 	}
 }
