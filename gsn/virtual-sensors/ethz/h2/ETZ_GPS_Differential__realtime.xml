@@ -10,7 +10,7 @@
                         POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = GPS_WEEK = GPS_TIME = X_ECEF = Y_ECEF = Z_ECEF = SD_X = null;
                         SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = SD_H = Q = NS = AGE = RATIO = VERSION = null;
                         
-                        def spl = new String(RAW_PACKET, "UTF-8").split(",", 25);
+                        def spl = new String(RAW_PACKET, "UTF-8").split(",", 27);
                         
                         if (spl[1].isNumber())
                                 POSITION = spl[1].toInteger();

@@ -12,7 +12,7 @@
                 		SD_ZX = E = N = H = SD_E = SD_N = SD_H = V_E = V_N = V_H = SD_V_E = SD_V_N = SD_V_H = V_3D = SD_V_3D = null;
                 		V_HORIZ = SD_V_HORIZ = VERSION = PROCESSING_TIME = COMMENTS = null;
                 		
-                    	def spl = new String(RAW_PACKET, "UTF-8").split(",", 35);
+                    	def spl = new String(RAW_PACKET, "UTF-8").split(",", 37);
 
                     	if (spl[1].isNumber())
                     		POSITION = spl[1].toInteger();
