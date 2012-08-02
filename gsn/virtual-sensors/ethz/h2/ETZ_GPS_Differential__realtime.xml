@@ -7,58 +7,70 @@
             <param name="scriptlet">
                 <![CDATA[
                         try {
+                        POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = GPS_WEEK = GPS_TIME = X_ECEF = Y_ECEF = Z_ECEF = SD_X = null;
+                        SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = SD_H = Q = NS = AGE = RATIO = VERSION = null;
+                        
                         def spl = new String(RAW_PACKET, "UTF-8").split(",", 25);
                         
                         if (spl[1].isNumber())
                                 POSITION = spl[1].toInteger();
                         if (spl[2].isNumber())
-                                GENERATION_TIME = spl[2].toLong();
-                        if (spl[3].isNumber())
-                                GPS_WEEK = spl[3].toShort();
+                                DEVICE_ID = spl[2].toInteger();
+			            if (spl[3].length()>0)
+				            SENSOR_TYPE = spl[3];
+                    	else
+                    		SENSOR_TYPE = null;
                         if (spl[4].isNumber())
-                                GPS_TIME = spl[4].toInteger();
+                                GENERATION_TIME = spl[4].toLong();
+                                
+                        if (spl[5].isNumber())
+                                GPS_WEEK = spl[5].toShort();
+                        if (spl[6].isNumber())
+                                GPS_TIME = spl[6].toInteger();
 
-                    	if (spl[5].isNumber())
-                    		X_ECEF = spl[5].toDouble();
-                    	if (spl[6].isNumber())
-                    		Y_ECEF = spl[6].toDouble();
                     	if (spl[7].isNumber())
-                    		Z_ECEF = spl[7].toDouble();
+                    		X_ECEF = spl[7].toDouble();
                     	if (spl[8].isNumber())
-                    		SD_X = spl[8].toDouble();
+                    		Y_ECEF = spl[8].toDouble();
                     	if (spl[9].isNumber())
-                    		SD_Y = spl[9].toDouble();
+                    		Z_ECEF = spl[9].toDouble();
                     	if (spl[10].isNumber())
-                    		SD_Z = spl[10].toDouble();
+                    		SD_X = spl[10].toDouble();
                     	if (spl[11].isNumber())
-                    		SD_XY = spl[11].toDouble();
+                    		SD_Y = spl[11].toDouble();
                     	if (spl[12].isNumber())
-                    		SD_YZ = spl[12].toDouble();
+                    		SD_Z = spl[12].toDouble();
                     	if (spl[13].isNumber())
-                    		SD_ZX = spl[13].toDouble();
+                    		SD_XY = spl[13].toDouble();
                     	if (spl[14].isNumber())
-                    		E =  spl[14].toDouble();
-
+                    		SD_YZ = spl[14].toDouble();
                     	if (spl[15].isNumber())
-                    		N =  spl[15].toDouble();
+                    		SD_ZX = spl[15].toDouble();
                     	if (spl[16].isNumber())
-                    		H =  spl[16].toDouble();
+                    		E =  spl[16].toDouble();
+
                     	if (spl[17].isNumber())
-                    		SD_E =  spl[17].toDouble();
-			if (spl[18].isNumber())
-                    		SD_N =  spl[18].toDouble();
-
+                    		N =  spl[17].toDouble();
+                    	if (spl[18].isNumber())
+                    		H =  spl[18].toDouble();
                     	if (spl[19].isNumber())
-                    		SD_H =  spl[19].toDouble();
+                    		SD_E =  spl[19].toDouble();
+			            if (spl[20].isNumber())
+                    		SD_N =  spl[20].toDouble();
 
-                    	if (spl[20].isNumber())
-                    		Q = spl[20].toInteger();
                     	if (spl[21].isNumber())
-                    		NS = spl[21].toInteger();
+                    		SD_H =  spl[21].toDouble();
+
                     	if (spl[22].isNumber())
-                    		AGE = spl[22].toDouble();
+                    		Q = spl[22].toInteger();
                     	if (spl[23].isNumber())
-                    		RATIO = spl[23].toDouble();
+                    		NS = spl[23].toInteger();
+                    	if (spl[24].isNumber())
+                    		AGE = spl[24].toDouble();
+                    	if (spl[25].isNumber())
+                    		RATIO = spl[25].toDouble();
+                    	if (spl[26].isNumber())
+                    		VERSION = spl[26].toShort();
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -67,7 +79,10 @@
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+			<field name="VERSION" type="SMALLINT" />
 
             <field name="GPS_WEEK" type="SMALLINT" />
             <field name="GPS_TIME" type="INTEGER" unit="sec"/>
@@ -78,15 +93,15 @@
             <field name="SD_X" type="DOUBLE" unit="m" />
             <field name="SD_Y" type="DOUBLE" unit="m" />
             <field name="SD_Z" type="DOUBLE" unit="m" />
-            <field name="SD_XY" type="DOUBLE" unit="m^2" />
-            <field name="SD_YZ" type="DOUBLE" unit="m^2" />
-            <field name="SD_ZX" type="DOUBLE" unit="m^2" />
+            <field name="SD_XY" type="DOUBLE" unit="m" />
+            <field name="SD_YZ" type="DOUBLE" unit="m" />
+            <field name="SD_ZX" type="DOUBLE" unit="m" />
 
             <field name="E" type="DOUBLE" unit="m" />
             <field name="N" type="DOUBLE" unit="m" />
             <field name="H" type="DOUBLE" unit="m" />
             <field name="SD_E" type="DOUBLE" unit="m" />
-	    <field name="SD_N" type="DOUBLE" unit="m" />
+	        <field name="SD_N" type="DOUBLE" unit="m" />
             <field name="SD_H" type="DOUBLE" unit="m" />
 
             <field name="Q" type="INTEGER" />
