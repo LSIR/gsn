@@ -19,7 +19,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from Dirruhorn_Binary_Http__mapped where RELATIVE_FILE like 'webcam2/%'</predicate>
+                    <predicate key="query">select * from Dirruhorn_Binary_Http__mapped where RELATIVE_FILE like 'webcam8/%'</predicate>
                 </address>
                 <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where POSITION = 60</query>
             </source>
