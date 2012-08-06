@@ -20,7 +20,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam4/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">grabengufer-top</predicate>
+                    <predicate key="subdirectory-name">webcam1</predicate>
                     <predicate key="device-id">6003</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -32,7 +32,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam5/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">grabengufer-grosshaupt</predicate>
+                    <predicate key="subdirectory-name">webcam2</predicate>
                     <predicate key="device-id">6004</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -44,7 +44,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam2/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">grabengufer-miesboden</predicate>
+                    <predicate key="subdirectory-name">webcam3</predicate>
                     <predicate key="device-id">6005</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -56,7 +56,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam7/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">gugla-bielzigji</predicate>
+                    <predicate key="subdirectory-name">webcam4</predicate>
                     <predicate key="device-id">6006</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -68,7 +68,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam6/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">grossegrabe</predicate>
+                    <predicate key="subdirectory-name">webcam5</predicate>
                     <predicate key="device-id">6007</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -80,7 +80,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam3/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">findelengletscher</predicate>
+                    <predicate key="subdirectory-name">webcam6</predicate>
                     <predicate key="device-id">6008</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -92,7 +92,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam8/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">dirru-geisstriftbach</predicate>
+                    <predicate key="subdirectory-name">webcam7</predicate>
                     <predicate key="device-id">6009</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -104,7 +104,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://permasense-rd-cam01/record/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">webcam2</predicate>
+                    <predicate key="subdirectory-name">webcam8</predicate>
                     <predicate key="device-id">6010</predicate>
                     <predicate key="username">USERNAME</predicate>
                     <predicate key="password">PASSWORD</predicate>
