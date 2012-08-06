@@ -1,7 +1,6 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -57,23 +56,21 @@ public class MyAccessRightsManagementServlet extends HttpServlet
         out.println("</HEAD>");
         out.println("<body>");
         out.println("<div id=\"container\">");
-        out.println("<div class=box>");
 
 	}
    private void printLayoutMastHead(PrintWriter out, User user)
     {
         out.println("<div id=\"masthead\">");
-
-        out.println("<div class=\"image_float\"><img src=\"/style/gsn-mark.png\" alt=\"GSN logo\" /></div><br>");
-
-        out.println("<h1>Access Rights Management</h1>");
-        out.println("<div class=\"spacer\"></div>");
+        out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
 
         out.println("</div>");
-        out.println("<div id=\"mastheadborder\">");
-        this.printLinks(out,user);
+        out.println("<div id=\"navigation\">");
+        out.println("<div id=\"menu\">");
+        this.printLinks(out);
+        out.println("</div>");
+        out.println("<div id=\"logintext\">");
         this.printUserName(out, user);
-        out.println("<br><br>");
+        out.println("</div>");
         out.println("</div>");
     }
     private void printLayoutContent(PrintWriter out)
@@ -83,31 +80,34 @@ public class MyAccessRightsManagementServlet extends HttpServlet
     private void printLayoutFooter(PrintWriter out)
     {
         out.println("</div>");
+        out.println("<div class=\"separator\">");
         out.println("<div id=\"footer\">");
-        out.println(" <p align=\"center\"><FONT COLOR=\"#000000\"/>Powered by <a class=\"nonedecolink\" href=\"http://globalsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2010</p>");
+        out.println("<table width=\"100%\"><tr>");
+        out.println("<td style=\"width:50%;color:#444444;font-size:12px;line-height:1.4em;\"><b>A Project of <a href=\"http://www.ethz.ch\" target=\"_blank\">ETH Zurich</a>, <a href=\"http://www.unibas.ch\" target=\"_blank\">Uni Basel</a> and <a href=\"http://www.uzh.ch\" target=\"_blank\">Uni Zurich</a></b></td>");
+        out.println("<td style=\"text-align:right;width:50%;font-size:9px;color:#666666;\">Powered by <a href=\"http://gsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>");
+		out.println("</tr></table>");
         out.println("</div>");//footer
-        out.println("</div>");//box
+        out.println("</div>");//separator
         out.println("</div>");//container
         out.println("</body>");
         out.println("</html>");
     }
 
-    private void printLinks(PrintWriter out, User user)
+    private void printLinks(PrintWriter out)
     {
-        //out.println("<a class=linkclass href=\"/gsn/MyLoginHandlerServlet\">login</a>");
-        out.println("<a class=linkclass href=\"/\">GSN home</a>");
-        if(user!=null)
-        {
-            out.println("<a class=linkclass href=\"/gsn/MyLogoutHandlerServlet\">logout</a>");
-        }
+        out.println("<li><a href=\"/\">Home</a></li>");
+        out.println("<li class=\"selected\"><a href=/gsn/MyAccessRightsManagementServlet>access rights</a></li>");
 
     }
     private void printUserName(PrintWriter out, User user)
     {
         //String username=user.getUserName();
-        if(user !=null)
-        {
-            out.println("<p id=\"login\">logged in as : "+user.getUserName()+"</p>");
+        if(user == null) {
+            out.println("<li><a href=\"/gsn/MyLoginHandlerServlet\">login</a></li>");
+        }
+        else {
+            out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
+            out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
         }
     }
     public void printUserAccountLinks(PrintWriter out)

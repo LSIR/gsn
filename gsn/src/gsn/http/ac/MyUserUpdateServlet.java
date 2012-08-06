@@ -71,8 +71,24 @@ public class MyUserUpdateServlet  extends HttpServlet
         out.println("</HEAD>");
         out.println("<body onload=\"loadScroll()\" onunload=\"saveScroll()\" >");
         out.println("<div id=\"container\">");
-        out.println("<div class=box>");
 	}
+
+    private void printLayoutMastHead(PrintWriter out, User user)
+    {
+        out.println("<div id=\"masthead\">");
+        out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
+
+        out.println("</div>");
+        out.println("<div id=\"navigation\">");
+        out.println("<div id=\"menu\">");
+        this.printLinks(out);
+        out.println("</div>");
+        out.println("<div id=\"logintext\">");
+        this.printUserName(out, user);
+        out.println("</div>");
+        out.println("</div>");
+    }
+    
      ///gsn/MyLogoutHandlerServlet
     private void printForm(PrintWriter out,User user)
 	{
@@ -104,22 +120,7 @@ public class MyUserUpdateServlet  extends HttpServlet
             }
         }
     }
-
-    private void printLayoutMastHead(PrintWriter out, User user)
-    {
-        out.println("<div id=\"masthead\">");
-
-        out.println("<div class=\"image_float\"><img src=\"/style/gsn-mark.png\" alt=\"GSN logo\" /></div><br>");
-        out.println("<h1>Update Access Rights Form </h1>");
-        out.println("<div class=\"spacer\"></div>");
-
-        out.println("</div>");
-        out.println("<div id=\"mastheadborder\">");
-        this.printLinks(out);
-        this.printUserName(out, user);
-        out.println("<br><br>");
-        out.println("</div>");
-    }
+    
     private void printLayoutContent(PrintWriter out, User user, ConnectToDB ctdb)throws SQLException
     {
         //out.println("<div id=\"content\">");
@@ -138,12 +139,15 @@ public class MyUserUpdateServlet  extends HttpServlet
 
     private void printLayoutFooter(PrintWriter out)
     {
-        out.println("<div id=\"twocolumnsfooter\">");
-        out.println("<p align=center><FONT COLOR=#000000>Powered by <a class=nonedecolink href=\"http://globalsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2010</p>");
+        out.println("<div class=\"separator\">");
+        out.println("<div id=\"footer\">");
+        out.println("<table width=\"100%\"><tr>");
+        out.println("<td style=\"width:50%;color:#444444;font-size:12px;line-height:1.4em;\"><b>A Project of <a href=\"http://www.ethz.ch\" target=\"_blank\">ETH Zurich</a>, <a href=\"http://www.unibas.ch\" target=\"_blank\">Uni Basel</a> and <a href=\"http://www.uzh.ch\" target=\"_blank\">Uni Zurich</a></b></td>");
+        out.println("<td style=\"text-align:right;width:50%;font-size:9px;color:#666666;\">Powered by <a href=\"http://gsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>");
+		out.println("</tr></table>");
         out.println("</div>");//footer
-        out.println("</div>");//box
+        out.println("</div>");//separator
         out.println("</div>");//container
-        out.println("<BR>");
         //out.println("<HR>");
         out.println("</BODY>");
         out.println("</html>");
@@ -184,20 +188,17 @@ public class MyUserUpdateServlet  extends HttpServlet
 
     private void printLinks(PrintWriter out)
     {
-        //out.println("<a class=linkclass href=\"/\">GSN home</a>");
-        //out.println("<a class=linkclass href=/gsn/MyAccessRightsManagementServlet>access rights management</a>");
-        out.println("<a class=linkclass href=\"/gsn/MyUserAccountManagementServlet\">User account</a>");
-        //out.println("<a class=linkclass href=\"/gsn/MyLoginHandlerServlet\">login</a>");
-        out.println("<a class=linkclass href=\"/gsn/MyLogoutHandlerServlet\">logout</a>");
-
-
+        out.println("<li><a href=\"/\">Home</a></li>");
+        out.println("<li><a href=/gsn/MyAccessRightsManagementServlet>access rights</a></li>");
+        out.println("<li><a href=/gsn/MyUserAccountManagementServlet>user account</a></li>");
+        out.println("<li class=\"selected\"><a href=/gsn/MyUserUpdateServlet>update access rights</a></li>");
     }
+    
     private void printUserName(PrintWriter out, User user)
     {
         //String username=user.getUserName();
-        out.println("<p id=\"login\">logged in as : "+user.getUserName()+"</p>");
-
-
+        out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
     }
 
     private void printUserGroupList(PrintWriter out,User user,ConnectToDB ctdb)throws SQLException
@@ -213,7 +214,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         }
         else
         {
-            out.println("<table>");
+            out.println("<table class=tab>");
             out.println("<tr>");
             out.println("<th>group name</th>");
             out.println("<th>group structure</th>");
@@ -236,7 +237,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                 }
                 else
                 {
-                    out.println("<td>"+"<FONT COLOR=#0000FF>in updates waiting list!</td>");
+                    out.println("<td>"+"<FONT COLOR=#0000FF>in waiting list!</td>");
                 }
                 out.println("</tr>");
             }
@@ -272,7 +273,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         }
         else
         {
-            out.println("<table>");
+            out.println("<table class=tab>");
             out.println("<tr>");
             out.println("<th>group name</th>");
             out.println("<th>group structure</th>");
@@ -296,7 +297,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                 }
                 else
                 {
-                    out.println("<td>"+"<FONT COLOR=#0000FF>in updates waiting list!</td>");
+                    out.println("<td>"+"<FONT COLOR=#0000FF>in waiting list!</td>");
                 }
                 out.println("</tr>");
             }
@@ -317,7 +318,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         }
         else
         {
-            out.println("<table>");
+            out.println("<table class=tab>");
             out.println("<tr><th> virtual sensor name </th>");
             out.println("<th> access right</th></tr>");
             for(int j=0;j<user.getDataSourceList().size();j++)
@@ -364,7 +365,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                     }
                     if(ctdb.valueExistsForThisColumnUnderTwoConditions(new Column("ISUSERWAITING","yes"),new Column("USERNAME",user.getUserName()),new Column("DATASOURCENAME",dataSourceName), "ACUSER_ACDATASOURCE"))
                     {
-                        out.println("<td>"+"<FONT COLOR=#0000FF>in updates waiting list!</td></tr>");
+                        out.println("<td>"+"<FONT COLOR=#0000FF>in waiting list!</td></tr>");
 
                     }
                     else
@@ -391,7 +392,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         }
         else
         {
-            out.println("<table>");
+            out.println("<table class=tab>");
             out.println("<tr><th> virtual sensor name </th>");
             out.println("<th> access right</th></tr>");
             for(int i=0; i<remainingDataSourcesList.size();i++)
@@ -412,7 +413,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                 }
                 if(ctdb.valueExistsForThisColumnUnderTwoConditions(new Column("ISUSERWAITING","yes"),new Column("USERNAME",user.getUserName()),new Column("DATASOURCENAME",dataSource.getDataSourceName()), "ACUSER_ACDATASOURCE"))
                 {
-                    out.println("<td>"+"<FONT COLOR=#0000FF>in updates waiting list!</td></tr>");
+                    out.println("<td>"+"<FONT COLOR=#0000FF>in waiting list!</td></tr>");
                 }
                 else
                 {

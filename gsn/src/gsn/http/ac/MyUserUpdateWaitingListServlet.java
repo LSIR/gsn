@@ -108,7 +108,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
         //For Java Script!!
         //this.printEmbeddedJS(out);
         out.println("<script type=\"text/javascript\" src=\"/js/acjavascript.js\"></script>");
-		out.println("<TITLE>Users Updates Waiting List</TITLE>");
+		out.println("<TITLE>Users Update Waiting List</TITLE>");
         out.println(" <link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" href=\"/style/acstyle.css\"/>");
         //printStyle(out);
         out.println("</HEAD>");
@@ -122,16 +122,16 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
     private void printLayoutMastHead(PrintWriter out, User user)
     {
         out.println("<div id=\"masthead\">");
-
-        out.println("<div class=\"image_float\"><img src=\"/style/gsn-mark.png\" alt=\"GSN logo\" /></div><br>");
-        out.println("<h1>Users Updates Waiting List</h1>");
-        out.println("<div class=\"spacer\"></div>");
+        out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
 
         out.println("</div>");
-        out.println("<div id=\"mastheadborder\">");
+        out.println("<div id=\"navigation\">");
+        out.println("<div id=\"menu\">");
         this.printLinks(out);
+        out.println("</div>");
+        out.println("<div id=\"logintext\">");
         this.printUserName(out, user);
-        out.println("<br><br>");
+        out.println("</div>");
         out.println("</div>");
     }
     private void printLayoutContent(PrintWriter out)
@@ -141,9 +141,14 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
     private void printLayoutFooter(PrintWriter out)
     {
         out.println("</div>");
+        out.println("<div class=\"separator\">");
         out.println("<div id=\"footer\">");
-        out.println(" <p align=\"center\"><FONT COLOR=\"#000000\"/>Powered by <a class=\"nonedecolink\" href=\"http://globalsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2010</p>");
-        out.println("</div>");
+        out.println("<table width=\"100%\"><tr>");
+        out.println("<td style=\"width:50%;color:#444444;font-size:12px;line-height:1.4em;\"><b>A Project of <a href=\"http://www.ethz.ch\" target=\"_blank\">ETH Zurich</a>, <a href=\"http://www.unibas.ch\" target=\"_blank\">Uni Basel</a> and <a href=\"http://www.uzh.ch\" target=\"_blank\">Uni Zurich</a></b></td>");
+        out.println("<td style=\"text-align:right;width:50%;font-size:9px;color:#666666;\">Powered by <a href=\"http://gsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>");
+		out.println("</tr></table>");
+        out.println("</div>");//footer
+        out.println("</div>");//separator
         out.println("</div>");
         out.println("</div>");
         out.println("</body>");
@@ -151,14 +156,16 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
     }
     private void printLinks(PrintWriter out)
     {
-
-        out.println("<a class=linkclass href=\"/gsn/MyAdminManagementServlet\">admin only</a>");
-        out.println("<a class=linkclass href=\"/gsn/MyLogoutHandlerServlet\">logout</a>");
+        out.println("<li><a href=\"/\">Home</a></li>");
+        out.println("<li><a href=/gsn/MyAccessRightsManagementServlet>access rights</a></li>");
+        out.println("<li><a href=/gsn/MyAdminManagementServlet>admin</a></li>");
+        out.println("<li class=\"selected\"><a href=/gsn/MyUserUpdateWaitingListServlet>user updates</a></li>");
     }
     private void printUserName(PrintWriter out, User user)
     {
         //String username=user.getUserName();
-        out.println("<p id=\"login\">logged in as : "+user.getUserName()+"</p>");
+        out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
 
 
     }
@@ -206,7 +213,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
         }
         else
         {
-            out.println("<table >");
+            out.println("<table class=tab >");
             out.println("<tr><th> group name </th>");
             out.println("<th> group structure</th>");
             out.println("<th> user choice</th>");
@@ -317,7 +324,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
         String dsname=null;
         String dstype=null;
         String label=null;
-        out.println("<table >");
+        out.println("<table class=tab >");
         out.println(" <caption>"+group.getGroupName()+" combination</caption>");
         out.println("<tr><th> virtual sensor name </th>");
         out.println("<th> access right</th></tr>");
@@ -349,7 +356,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
 
     private void printUserInformation(PrintWriter out,User user)
     {
-        out.println("<table>");
+        out.println("<table class=tab>");
         out.println("<tr><th>username</th>");
         out.println("<th>user first name</th>");
         out.println("<th>user last name</th>");
@@ -372,14 +379,14 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
 
          if(user.getDataSourceList().size()==0)
         {
-            out.println("<p>No virtaul sensor is selected.</p>");
+            out.println("<p>No virtual sensor is selected.</p>");
             out.println("<BR>");
         }
 
         else
          {
 
-            out.println("<table>");
+            out.println("<table class=tab>");
             out.println("<tr><th> virtual sensor name </th>");
             out.println("<th> access right</th>");
             out.println("<th> owner decision</th>");
@@ -442,7 +449,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
     {
 
         out.println("<p>\n" +
-                "<table width=\"100%\"><tr>\n" +
+                "<table class=tab width=\"100%\"><tr>\n" +
                 "<td align=right><A HREF=\"/gsn/MyLogoutHandlerServlet\">logout</a>"+
                 "  <A HREF=/gsn/MyAdminManagementServlet>back to admin account management </a></td>"+
                 "</tr></table>");

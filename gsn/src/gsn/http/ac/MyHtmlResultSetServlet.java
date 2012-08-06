@@ -1,7 +1,6 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
 import org.apache.log4j.Logger;
 
@@ -136,16 +135,16 @@ public class MyHtmlResultSetServlet extends HttpServlet
     private void printLayoutMastHead(PrintWriter out, User user, String tableName)
     {
         out.println("<div id=\"masthead\">");
-
-        out.println("<div class=\"image_float\"><img src=\"/style/gsn-mark.png\" alt=\"GSN logo\" /></div>");
-        out.println("<h1>"+ tableName +" Table Content</h1>");
-        out.println("<div class=\"spacer\"></div>");
+        out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
 
         out.println("</div>");
-        out.println("<div id=\"mastheadborder\">");
-        this.printLinks(out);
+        out.println("<div id=\"navigation\">");
+        out.println("<div id=\"menu\">");
+        this.printLinks(out, tableName);
+        out.println("</div>");
+        out.println("<div id=\"logintext\">");
         this.printUserName(out, user);
-        out.println("<br><br>");
+        out.println("</div>");
         out.println("</div>");
     }
     private void printLayoutContent(PrintWriter out)
@@ -153,28 +152,32 @@ public class MyHtmlResultSetServlet extends HttpServlet
         out.println("<div id=\"content\">");
     }
 
-    private void printLinks(PrintWriter out)
+    private void printLinks(PrintWriter out, String tableName)
     {
-        //out.println("<a class=linkclass href=\"/gsn/MyLoginHandlerServlet\">login</a>");
-        //out.println("<a class=linkclass href=\"/gsn/MyAdminManagementServlet\">admin</a>");
-        out.println("<a class=linkclass href=\"/gsn/MyDisplayACTablesContentServlet\"> display AC tables content</a>");
-        out.println("<a class=linkclass href=\"/gsn/MyLogoutHandlerServlet\">logout</a>");
-
-        //out.println("<a class=linkclass href=\"/\">GSN home</a>");
-
+        out.println("<li><a href=\"/\">Home</a></li>");
+        out.println("<li><a href=/gsn/MyAccessRightsManagementServlet>access rights</a></li>");
+        out.println("<li><a href=/gsn/MyAdminManagementServlet>admin</a></li>");
+        out.println("<li><a href=/gsn/MyDisplayACTablesContentServlet>ac table</a></li>");
+        out.println("<li class=\"selected\" style=\"font-size:0.8em;font-weight:bolder;padding: 0 8px;text-decoration:none;text-transform:uppercase;\">" + tableName + " table content</li>");
     }
     private void printUserName(PrintWriter out, User user)
     {
         //String username=user.getUserName();
-        out.println("<p id=\"login\">logged in as : "+user.getUserName()+"</p>");
+        out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
     }
 
     private void printLayoutFooter(PrintWriter out)
     {
         out.println("</div>");//content
+        out.println("<div class=\"separator\">");
         out.println("<div id=\"footer\">");
-        out.println(" <p align=\"center\"><FONT COLOR=\"#000000\"/>Powered by <a class=\"nonedecolink\" href=\"http://globalsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2010</p>");
+        out.println("<table width=\"100%\"><tr>");
+        out.println("<td style=\"width:50%;color:#444444;font-size:12px;line-height:1.4em;\"><b>A Project of <a href=\"http://www.ethz.ch\" target=\"_blank\">ETH Zurich</a>, <a href=\"http://www.unibas.ch\" target=\"_blank\">Uni Basel</a> and <a href=\"http://www.uzh.ch\" target=\"_blank\">Uni Zurich</a></b></td>");
+        out.println("<td style=\"text-align:right;width:50%;font-size:9px;color:#666666;\">Powered by <a href=\"http://gsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>");
+		out.println("</tr></table>");
         out.println("</div>");//footer
+        out.println("</div>");//separator
         out.println("</div>");//box
         out.println("</div>");//container
         out.println("</body>");
@@ -191,7 +194,7 @@ public class MyHtmlResultSetServlet extends HttpServlet
     {
         StringBuffer out = new StringBuffer();
         // Start a table to display the result set
-        out.append("<TABLE>\n");
+        out.append("<table class=tab>\n");
         try
         {
             ResultSetMetaData rsmd = resultset.getMetaData();
@@ -225,7 +228,7 @@ public class MyHtmlResultSetServlet extends HttpServlet
         }
         catch (SQLException e)
         {
-            out.append("</TABLE><H1>ERROR:</H1> " + e.getMessage() + "\n");
+            out.append("</table class=tab><H1>ERROR:</H1> " + e.getMessage() + "\n");
         }
         return out.toString();
     }

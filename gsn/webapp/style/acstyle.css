@@ -1,10 +1,26 @@
 /***********************************default body properties*********************************/
-body {
-text-align:center;
-font-size:12px;
-font-family:'Lucida Grande',Verdana,sans-serif;
-margin:10px;
+body, html 
+{
+	margin:0;
+	padding:0;
+	background:#F5F5F5;
+	color:#333;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size:12px;
+	line-height:1.4em;
 }
+
+body 
+{
+	overflow:scroll;
+	overflow-x:hidden;
+	min-width:750px;	
+	width: 100%; 
+	height: 100%; 
+	margin: 0; 
+	padding: 0;	
+}
+
 .loginhandlerbody {
 text-align:left;
 
@@ -17,7 +33,9 @@ text-align:left;
 
 /***********************************Headings***********************************************/
 h1 {
-font-size:22px;
+color:white;
+margin:0;
+padding:95px 60px;
 }
 
 h2 {
@@ -25,7 +43,7 @@ font-size:15px;
 /*color: #0000FF;*/
 /*background-color:#DFDFDF;*/
 color: #000000;
-background:#EEEEE0;
+background:#5CA1E7;
 padding:0.3em;
 }
 
@@ -51,8 +69,8 @@ font-weight:bold;
 font-size:17px;
 /*color: #0000FF;*/
 /*background-color:#DFDFDF;*/
-border-top: 2px solid #FFA84C;
-border-bottom: 2px solid #FFA84C;
+border-top: 2px solid #5290CD;
+border-bottom: 2px solid #5290CD;
 background: #FFE0BF;
 margin: 5px 0;
 padding:0.3em;
@@ -76,12 +94,18 @@ font-weight:bold;
 /*********************************layout structure ***************************************/
 
 #container {
+margin:10px auto;
+/*padding:1px;*/
+width:1000px;
+background:#FFFFFF;
 text-align:left;
-width: 1200px;
-margin: 10px auto 10px auto;
-padding: none;
-border: none;
-background-color:#FCFDDC;
+}
+
+a	
+{
+	color: #666666;
+	text-decoration:none;
+	background-color:inherit;
 }
 
 
@@ -92,7 +116,7 @@ width: 600px;
 margin: 10px;
 padding: none;
 border: none;
-background-color:#FCFDDC;
+background-color:#FFFFFF;
 }
 
 #loginhandlercontainer {
@@ -101,97 +125,218 @@ border: none;
 padding: 20px;
 }
 
-.box {
-width:100%;
-margin:none;
-padding:non;
-border: 2px ridge #DFDFDF;
+
+
+#masthead {
+background-image:url("permasense-header.jpg");
+height:150px;
+}
+
+#gsn-name {
+color: #FFFFFF;
+text-decoration:none;
+}
+#navigation
+{
+	height:2.2em;
+	line-height:2.2em;
+	margin:0;
+	padding:0;
+	background:#5ca1e7;
+	color:#9e9e9e;
+}
+
+#navigation ul
+{
+	margin:0;
+	padding:0;
+}
+
+#navigation #menu li
+{
+	float:left;
+	list-style-type:none;
+	border-right:1px solid #ffffff;
+	white-space:nowrap;
+}
+
+#navigation #linkWebsite li
+{
+	float:right;
+	list-style-type:none;
+	border-left:1px solid #ffffff;
+	white-space:nowrap;
+}
+#navigation #logintext li
+{
+    float:right;
+    list-style-type:none;
+	border-right:1px solid #ffffff;
+	color: #000000;
+	font-weight:bold;
+
+}
+#logintextprime 
+{
+    padding:0 10px;
+	font-size:0.8em;
+	font-weight:bolder;
+	text-transform:uppercase;
+	text-decoration:none;
+	background-color:inherit;
+	color: #000000;
+}
+#logintextfirst
+{
+
+	display:block;
+	padding:0 10px;
+	font-weight:bolder;
+	text-transform:uppercase;
+	text-decoration:none;
+	background-color:inherit;
+	color: #000000;
+}
+
+#logintextsecond
+{
+    
+    color: #000000;
+    font-weight:bold;
+	
+}
+#logintextthird a
+{
+    
+	display:block;
+	padding:0 10px;
+	font-size:0.8em;
+	font-weight:bolder;
+	text-transform:uppercase;
+	text-decoration:none;
+	background-color:inherit;
+	color: #000000;
 }
 
 
 
-#masthead {
-margin:0;
-padding:10px;
-border:1px solid #FFF;
-background-color:#FFEE00;
+#navigation li a
+{
+	display:block;
+	padding:0 8px;
+	font-size:0.8em;
+	font-weight:bolder;
+	text-transform:uppercase;
+	text-decoration:none;
+	background-color:inherit;
+	color: #000000;
+}
+
+* html #navigation a 
+{
+	width:1%;
+}
+
+#navigation .selected
+{
+	background:#ffffff;
+	color:#000000;
+	text-decoration:none;
+}
+#navigation a:hover
+{
+	/*background:#80b0da;*/
+	/*color:#ffffff;*/
+	background:#b8caf7; /*#ff6f00;*/
+	color:#000000;
+	text-decoration:none;
 }
 
 #groupmasthead {
 margin:none;
 padding:none;
 border:none;
-background-color:#FFEE00;
+background-color:#B8CAF7;
 }
 
 #mastheadborder {
-margin:0 0 10px 0;
-padding:10px;
-border:1px solid #FFF;
-background-color:#FFA84C;
+height:2.2em;
+line-height:2.2em;
+margin:0;
+padding:0;
+background:#5ca1e7;
+color:#9e9e9e;
 }
 
 #groupmastheadborder {
 margin:none;
 padding:none;
 border:none;
-background-color:#FFA84C;
+background-color:#5CA1E7;
 }
 
 #content {
 margin-bottom:10px;
 padding:10px;
-background-color:#FCFDDC;
+background-color:#FFFFFF;
 }
 
 #groupcontent {
 margin-bottom:none;
 padding:none;
-background-color:#FCFDDC;
+background-color:#FFFFFF;
 }
 
 #twocolumnscontent {
 float:left;
-width:34%;
+width:40%;
 margin-bottom:10px;
 padding:10px;
 border:1px solid transparent;
-background-color:#FCFDDC;
+background-color:#FFFFFF;
 }
 
 
 #sidebar {
 float:right;
-width:56%;
+width:55%;
 margin-bottom:10px;
 padding:10px;
 border:1px solid transparent;
-background-color:#FCFDDC;
+background-color:#FFFFFF;
 }
 
-#footer {
-padding:10px;
-border:1px solid #FFF;
-background-color:#FFA84C;
+
+#separator, .separator
+{
+	padding: 15px 10px;
 }
 
-#groupfooter {
-padding:10px;
-border:1px solid #FFF;
-background-color:#FFA84C;
+#starttext, #footer
+{
+	padding: 10px;
+	text-align:justify;
 }
 
-#twocolumnsfooter {
-clear:both;
-padding:10px;
-border:1px solid #FFF;
-background-color:#FFA84C;
+#footer 
+{
+	border: 1px solid #5290CD;
+	clear:both;
+	color:#808080;
+}
+
+#footer p 
+{
+	padding:10px 0 5px 0;
+	margin:0;
+	text-align:center;
 }
 
 p {
 font-size:12px;
 line-height:150%;
 }
+
 /*********************************link list ***************************************/
 .linklistul {
 list-style-type:none;
@@ -203,7 +348,7 @@ font: bold 12px 'Lucida Grande',Verdana,sans-serif;
 
 
 .linklistli {
-background: #EEEEE0;
+background: #5290CD;
 margin: 0; padding: 2px 10px;
 border-left: 1px solid #fff;
 border-top: 1px solid #fff;
@@ -221,12 +366,11 @@ color:#0000;
 }
 
 ul a:visited {
-color:#666;
+color:#212121;
 }
 
-ul a:hover {
-color:#0000FF;
-background:#FFF;
+li a:hover {
+background:#B8CAF7;
 }
 
 ul a:active {
@@ -241,7 +385,7 @@ padding: 2px 10px 2px 10px;
 margin-right: 4px;
 border: 1px solid #FFE0BF;
 text-decoration: none;
-color: #666;
+color: #212121;
 }
 
 
@@ -258,7 +402,7 @@ text-align:center;
 }
 
 .displaylinkli {
-background: #EEEEE0;
+background: #B8CAF7;
 font :12px 'Lucida Grande',Verdana,sans-serif;
 margin: 0; padding: 2px 10px;
 border-left: 1px solid #fff;
@@ -332,7 +476,7 @@ width:250px;
 text-decoration:none;
 display:block; padding: 2px 10px;
 color:#858585;
-background-color: #EEEEE0;
+background-color: #B8CAF7;
 font: bold 12px 'Lucida Grande',Verdana,sans-serif;
 margin:5px;
 }
@@ -345,14 +489,14 @@ text-decoration:none;
 }
 
 .linkclass {
-background: #FFE0BF;
+background: #5CA1E7;
 font-size: 10px;
 line-height: 14px;
 font-weight: bold;
 padding: 2px 10px 2px 10px;
 margin-right: 4px;
-border: 1px solid #FFE0BF;
-text-decoration: none; color: #666;
+border: 1px solid #FFFFFF;
+text-decoration: none; color: #212121;
 }
 
 #signup {
@@ -404,43 +548,38 @@ margin-bottom:10px;
 }
 /********************************* table ***************************************/
 
-table
+.tab table
 {
 /*border: 1px solid transparent;*/
-border: 1px solid #FFA84C;
+border: 1px solid #5290CD;
 font: normal 12px 'Lucida Grande',Verdana,sans-serif;
 font-color:#515435;
 /*background-color:#D1A695;*/
 /*background-color:#A28C75;*/
 background-color:transparent;
-
-
-
 }
 
-td, th {
+.tab td, th {
 padding:3px;
 }
 
-th {
-
-
+.tab th {
 color:#000;
 /*background-color:#515435;*/
-background-color:#FFA84C;
+background-color:#5290CD;
 border-style:solid; border-width:1px;
 border-color:transparent;
 }
 
-td {
-background-color:#FFE0BF;
+.tab td {
+background-color:#B8CAF7;
 border-style:solid;
 border-width:1px;
 border-color:transparent;
 padding:8px;
 }
 
-table caption {
+.tab table caption {
 font-weight:bold; font-size:10px;
 padding:5px;
 }
@@ -451,7 +590,7 @@ font: normal 12px 'Lucida Grande',Verdana,sans-serif;
 }
 
 .invisibletable td {
-background-color:#FCFDDC;
+background-color:#FFFFFF;
 border:none;
 }
 
@@ -494,15 +633,15 @@ padding:0;
 font: normal 12px 'Lucida Grande',Verdana,sans-serif;
 margin:0 0 10px 0;
 padding:5px;
-border:1px solid #FFA84C;
+border:1px solid #5290CD;
 
 }
 
 .loginhandlerfieldset p {
 margin:3px 0 2px 0;
 padding:5px;
-border:1px solid #FFA84C;
-background-color:#FFE0BF;
+border:1px solid #5290CD;
+background-color:#B8CAF7;
 }
 label {
 font-weight:bold;
@@ -519,12 +658,12 @@ border:1px solid #8A8A8A;
 fieldset p {
 margin:3px 0 2px 0;
 padding:5px;
-border:1px solid #FFA84C;
-background-color:#FFEE00;
+border:1px solid #5290CD;
+background-color:#B8CAF7;
 }
 
 legend {
-background-color:#EEEEE0 ;
+background-color:#5CA1E7 ;
 margin: 0;
 padding:5px;
 border-style:solid;
@@ -535,17 +674,17 @@ border-color:#FFF #AAA #666 #FFF;
 
 .inputclass{
 margin:5px 0 5px 0;
-border:3px double #FFA84C;
+border:3px double #5290CD;
 }
 
 .checkboxclass{
 margin:5px 0 5px 0;
-border:3px double #FFA84C;
+border:3px double #5290CD;
 }
 
 .textarea {
 margin:5px 0 5px 0;
-border:3px double #FFA84C;
+border:3px double #5290CD;
 }
 
 #vsname {
@@ -564,7 +703,7 @@ width:100%;
 /********************************* button ***************************************/
 .buttonstyle {
 color: #000;
-background:#D8E3CA;
+background:#88A9FD;
 border: 2px outset #d7b9c9;
 width:50px;
 text-align:center;
@@ -573,7 +712,7 @@ width:100px;
 
 .fileuploaderbuttonstyle {
 color: #000;
-background:#D8E3CA;
+background:#88A9FD;
 border: 2px outset #d7b9c9;
 width:50px;
 text-align:center;
@@ -582,7 +721,7 @@ height:30px;
 }
 
 .loginhandlerbuttonstyle {
-background:#EEEEE0;
+background:#88A9FD;
 margin:5px 0 5px 0;
 border:1px double #8A8A8A;
 /*border-color:#FFF #AAA #666 #FFF;*/
@@ -594,7 +733,7 @@ text-align:center;
 
 .bigsumitbuttonstyle{
 color: #000;
-background: #D8E3CA;
+background: #88A9FD;
 border: 2px outset #d7b9c9;
 width:160px;
 height:40px;
@@ -605,7 +744,7 @@ padding:10px;
 
 .sumitbuttonstyle{
 color: #000;
-background:#D8E3CA;
+background:#88A9FD;
 border: 2px outset #d7b9c9;
 width:50px;
 text-align:center;
@@ -616,7 +755,7 @@ height:30px;
 
 .halfsumitbuttonstyle{
 color: #000;
-background: #D8E3CA;
+background: #88A9FD;
 border: 2px outset #d7b9c9;
 width:100px;
 height:40px;
@@ -628,7 +767,7 @@ padding:10px;
 
 .changegroupbuttonstyle {
 color: #000;
-background: #FFA84C;
+background: #5290CD;
 border: 2px outset #d7b9c9;
 width:180px;
 text-align:center;
@@ -638,7 +777,7 @@ font-weight:bold;
 
 .creategroupbuttonstyle {
 color: #000;
-background: #D8E3CA;
+background: #88A9FD;
 border: 2px outset #d7b9c9;
 width:180px;
 text-align:center;

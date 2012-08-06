@@ -28,7 +28,7 @@ public class MyUserDetailUpdateServlet extends HttpServlet
             checkSessionScheme(req, res);
             setSessionPrintWriter(req,out);
 		    printHeader(out);
-            printLayoutMastHead(out);
+            printLayoutMastHead(out,user);
             printLayoutContent(out);
 		    printForm(out, user);
 		    printLayoutFooter(out);
@@ -62,18 +62,19 @@ public class MyUserDetailUpdateServlet extends HttpServlet
         out.println("<div class=box>");
 
 	}
-    private void printLayoutMastHead(PrintWriter out)
+    private void printLayoutMastHead(PrintWriter out, User user)
     {
         out.println("<div id=\"masthead\">");
-
-        out.println("<div class=\"image_float\"><img src=\"/style/gsn-mark.png\" alt=\"GSN logo\" /></div><br>");
-        out.println("<h1>Sign Up Form </h1>");
-        out.println("<div class=\"spacer\"></div>");
+        out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
 
         out.println("</div>");
-        out.println("<div id=\"mastheadborder\">");
+        out.println("<div id=\"navigation\">");
+        out.println("<div id=\"menu\">");
         this.printLinks(out);
-        out.println("<br><br>");
+        out.println("</div>");
+        out.println("<div id=\"logintext\">");
+        this.printUserName(out, user);
+        out.println("</div>");
         out.println("</div>");
     }
     private void printLayoutContent(PrintWriter out)
@@ -83,20 +84,36 @@ public class MyUserDetailUpdateServlet extends HttpServlet
     private void printLayoutFooter(PrintWriter out)
     {
         out.println("</div>");
+        out.println("<div class=\"separator\">");
         out.println("<div id=\"footer\">");
-        out.println(" <p align=\"center\"><FONT COLOR=\"#000000\"/>Powered by <a class=\"nonedecolink\" href=\"http://globalsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2010</p>");
-        out.println("</div>");
+        out.println("<table width=\"100%\"><tr>");
+        out.println("<td style=\"width:50%;color:#444444;font-size:12px;line-height:1.4em;\"><b>A Project of <a href=\"http://www.ethz.ch\" target=\"_blank\">ETH Zurich</a>, <a href=\"http://www.unibas.ch\" target=\"_blank\">Uni Basel</a> and <a href=\"http://www.uzh.ch\" target=\"_blank\">Uni Zurich</a></b></td>");
+        out.println("<td style=\"text-align:right;width:50%;font-size:9px;color:#666666;\">Powered by <a href=\"http://gsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>");
+		out.println("</tr></table>");
+        out.println("</div>");//footer
+        out.println("</div>");//separator
         out.println("</div>");
         out.println("</div>");
         out.println("</body>");
         out.println("</html>");
     }
+    
     private void printLinks(PrintWriter out)
     {
-        out.println("<a class=linkclass href=\"/\">GSN home</a>");
-        out.println("<a class=linkclass href=/gsn/MyAccessRightsManagementServlet>access rights management</a>");
+        out.println("<li><a href=\"/\">Home</a></li>");
+        out.println("<li><a href=/gsn/MyAccessRightsManagementServlet>access rights</a></li>");
+        out.println("<li><a href=/gsn/MyUserAccountManagementServlet>user account</a></li>");
+        out.println("<li class=\"selected\"><a href=/gsn/MyUserDetailUpdateServlet>user details</a></li>");
     }
-     private void printForm(PrintWriter out, User user) throws ServletException
+    
+    private void printUserName(PrintWriter out, User user)
+    {
+        //String username=user.getUserName();
+        out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+    }
+    
+    private void printForm(PrintWriter out, User user) throws ServletException
 	{
         Vector groupList = this.getGroupList();
         if(groupList==null)
@@ -136,7 +153,7 @@ public class MyUserDetailUpdateServlet extends HttpServlet
     }
     private void printPersonalInputs(PrintWriter out, User user)
     {
-        out.println("<table>");
+        out.println("<table class=tab>");
         out.println("<tr><th>first name</th><td><input class=\"inputclass\" type=\"text\" name=\"firstname\" size=\"30\" value=\"" + user.getFirstName() + "\" /></td></tr>");
         out.println("<tr><th>last name</th><td><input class=\"inputclass\" type=\"text\" name=\"lastname\" size=\"30\" value=\"" + user.getLastName() + "\" /></td></tr>");
         out.println("<tr><th>E-mail</th><td><input class=\"inputclass\" type=\"text\" name=\"email\"  size=\"30\" value=\"" + user.getEmail() + "\"/></td></tr>");
@@ -146,7 +163,7 @@ public class MyUserDetailUpdateServlet extends HttpServlet
     }
     private void printAccountInputs(PrintWriter out, User user)
     {
-        out.println("<table>");
+        out.println("<table class=tab>");
         out.println("<tr><th>username</th><td>" + user.getUserName() + "</td></tr>");
         out.println("<tr><th>password</th><td><input class=\"inputclass\" type=\"password\" name=\"password\" size=\"30\" /></td></tr>");
         out.println("<tr><th>new password</th><td><input class=\"inputclass\" type=\"password\" name=\"newpassword\" size=\"30\" /></td></tr>");

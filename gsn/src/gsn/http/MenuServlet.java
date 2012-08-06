@@ -29,7 +29,7 @@ public class MenuServlet extends HttpServlet {
         //out.println("<li" + ("fullmap".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"fullmap.html#fullmap\">fullmap</a></li>");
         //out.println("<li" + ("position".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"position.html#position\">position</a></li>");
         if (Main.getContainerConfig().isAcEnabled()) {
-            out.println("<li><a href=\"/gsn/MyAccessRightsManagementServlet\">access rights management</a></li>");
+            out.println("<li><a href=\"/gsn/MyAccessRightsManagementServlet\">access rights</a></li>");
         }
         out.println("</ul>");
         if (Main.getContainerConfig().isAcEnabled()) {

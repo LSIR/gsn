@@ -1,7 +1,6 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -31,9 +30,11 @@ public class MyLoginHandlerServlet extends HttpServlet
 		PrintWriter out = res.getWriter();
         checkSessionScheme(req,res);
         setSessionPrintWriter(req,out);
-        printHeader(out);
-		printForm(out);
-		printFooter(out);
+        this.printHeader(out);
+        this.printLayoutMastHead(out);
+        this.printLayoutContent(out);
+		this.printLayoutForm(out);
+        this.printLayoutFooter(out);
     }
     public void doPost(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
 	{
@@ -52,23 +53,40 @@ public class MyLoginHandlerServlet extends HttpServlet
 		out.println("<TITLE>Login Form</TITLE>");
         out.println(" <link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" href=\"/style/acstyle.css\"/>");
         out.println("</HEAD>");
-		out.println("<BODY class=loginhandlerbody>");
-      }
+        out.println("<body>");
+        out.println("<div id=\"container\">");
+	}
+    
+    private void printLayoutMastHead(PrintWriter out)
+    {
+        out.println("<div id=\"masthead\">");
+        out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
 
+        out.println("</div>");
+        out.println("<div id=\"navigation\">");
+        out.println("<div id=\"menu\">");
+        this.printLinks(out);
+        out.println("</div>");
+        out.println("</div>");
+    }
+    
+    private void printLayoutContent(PrintWriter out)
+    {
+        out.println("<div id=\"content\">");
+    }
 
-
-    private void printForm(PrintWriter out)
+    private void printLayoutForm(PrintWriter out)
     {
         out.println("<div id=\"loginhandlercontainer\">");
         out.println(" <form method=\"post\" id=\"enquiryform\">");
-        out.println("<fieldset>");
-        out.println("<legend>Login Form</legend>");
-        out.println("<BR>");
 
-
-
+        //out.println("<div class=image_float>");
+        out.println("<h2>Login Form</h2>");
+        //out.println("<br>");
         this.printFormInputs(out);
-        out.println("</fieldset>");
+        out.println("<br>");
+        out.println("<br>");
+
 
         out.println("<input type=\"submit\" class=\"loginhandlerbuttonstyle\" value=\"Login\" tabindex=\"3\" />");
 
@@ -77,21 +95,34 @@ public class MyLoginHandlerServlet extends HttpServlet
         out.println("</div>");
         out.println("<HR>");
     }
-
-    private void printFooter(PrintWriter out) throws ServletException
-	{
-		out.println("</BODY>");
-        out.println("<div class=loginhandlerlink>");
-        out.println("<p align=right><A  HREF=\"/\"> GSN home</a></p>");
+    private void printLayoutFooter(PrintWriter out)
+    {
         out.println("</div>");
-	}
+        out.println("<div class=\"separator\">");
+        out.println("<div id=\"footer\">");
+        out.println("<table width=\"100%\"><tr>");
+        out.println("<td style=\"width:50%;color:#444444;font-size:12px;line-height:1.4em;\"><b>A Project of <a href=\"http://www.ethz.ch\" target=\"_blank\">ETH Zurich</a>, <a href=\"http://www.unibas.ch\" target=\"_blank\">Uni Basel</a> and <a href=\"http://www.uzh.ch\" target=\"_blank\">Uni Zurich</a></b></td>");
+        out.println("<td style=\"text-align:right;width:50%;font-size:9px;color:#666666;\">Powered by <a href=\"http://gsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>");
+		out.println("</tr></table>");
+        out.println("</div>");//footer
+        out.println("</div>");//separator
+        out.println("</div>");//container
+        out.println("</body>");
+        out.println("</html>");
+    }
+
     private void printFormInputs(PrintWriter out)
     {
-        out.println("<p><label for=\"name\">username </label><br>");
-        out.println("<input class=inputclass type=\"text\" name=\"username\" id=\"loginhandlerusername\" tabindex=\"1\" /></p>");
-        out.println("<p><label for=\"password\">password </label><br>");
-        out.println("<input class=inputclass type=\"PASSWORD\" name=\"password\" id=\"loginhandlerpassword\" tabindex=\"2\" /></p>");
+        out.println("<table class=tab>");
+        out.println("<tr><th>username</th><td><INPUT class=inputclass TYPE=TEXT name=\"username\" id=\"loginhandlerusername\" tabindex=\"1\"size=30></td></tr>");
+        out.println("<tr><th>last name</th><td><INPUT class=inputclass type=\"PASSWORD\" name=\"password\" id=\"loginhandlerpassword\" tabindex=\"2\" size=30></td></tr>");
+        out.println("</table>");
+    }
 
+    private void printLinks(PrintWriter out)
+    {
+        out.println("<li><a href=\"/\">Home</a></li>");
+        out.println("<li class=\"selected\" style=\"font-size:0.8em;font-weight:bolder;padding: 0 8px;text-decoration:none;text-transform:uppercase;\">login</li>");
 
     }
 

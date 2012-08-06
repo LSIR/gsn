@@ -1,5 +1,7 @@
 package gsn.http.ac;
 
+import gsn.Main;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -56,15 +58,13 @@ public class MyRegistrationOkServlet  extends HttpServlet
    private void printLayoutMastHead(PrintWriter out)
    {
        out.println("<div id=\"masthead\">");
-       out.println("<div class=\"image_float\"><img src=\"/style/gsn-mark.png\" alt=\"GSN logo\" /></div><br>");
-       //out.println("<br>");
-       out.println("<h1>Sign Up Form</h1>");
-       out.println("<div class=\"spacer\"></div>");
-       out.println("</div>");
-       out.println("<div id=\"mastheadborder\">");
-       this.printLinks(out);
+       out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
 
-       out.println("<br>");
+       out.println("</div>");
+       out.println("<div id=\"navigation\">");
+       out.println("<div id=\"menu\">");
+       this.printLinks(out);
+       out.println("</div>");
        out.println("</div>");
    }
     
@@ -81,9 +81,14 @@ public class MyRegistrationOkServlet  extends HttpServlet
    private void printLayoutFooter(PrintWriter out)
    {
        out.println("</div>");//content
+       out.println("<div class=\"separator\">");
        out.println("<div id=\"footer\">");
-       out.println(" <p align=\"center\"><FONT COLOR=\"#000000\"/>Powered by <a class=\"nonedecolink\" href=\"http://globalsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2010</p>");
+       out.println("<table width=\"100%\"><tr>");
+       out.println("<td style=\"width:50%;color:#444444;font-size:12px;line-height:1.4em;\"><b>A Project of <a href=\"http://www.ethz.ch\" target=\"_blank\">ETH Zurich</a>, <a href=\"http://www.unibas.ch\" target=\"_blank\">Uni Basel</a> and <a href=\"http://www.uzh.ch\" target=\"_blank\">Uni Zurich</a></b></td>");
+       out.println("<td style=\"text-align:right;width:50%;font-size:9px;color:#666666;\">Powered by <a href=\"http://gsn.sourceforge.net/\">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>");
+		out.println("</tr></table>");
        out.println("</div>");//footer
+       out.println("</div>");//separator
        //out.println("</div>");//box
        out.println("</div>");//container
        out.println("</body>");
