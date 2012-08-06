@@ -64,37 +64,33 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
             return;
         }
 
-        String[] cred = null;
-        if (Main.getContainerConfig().isAcEnabled()) {
-            cred = parseAuthorizationHeader(request);
-            if (cred == null) {
-                try {
-                    response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
-                    response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
-                }
-                catch (IOException e) {
-                    logger.debug(e.getMessage(), e);
-                }
-                return;
-            }
-        }
-
 		if(continuation.isInitial()) {
             continuation.setAttribute("status", new LinkedBlockingQueue<Boolean>(1));
             continuation.addContinuationListener(this);
             continuation.suspend();
             try {
                 URLParser parser = new URLParser(request);
+                String vsName = parser.getVSensorConfig().getName();
+                
                 //
-                if ( Main.getContainerConfig().isAcEnabled()){
-                    String vsName = parser.getVSensorConfig().getName();
-                    if (DataSource.isVSManaged(vsName)) {
-                        User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
-                        if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName) ){
+                	String[] cred = parseAuthorizationHeader(request);
+                    if (cred == null) {
+                        try {
                             response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
                             response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
-                            return;
                         }
+                        catch (IOException e) {
+                            logger.debug(e.getMessage(), e);
+                        }
+                        return;
+                    }
+                	
+                    User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
+                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                        response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
+                        response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
+                        return;
                     }
                 }
                 if (parser.getTimeout() != null) {
@@ -104,7 +100,6 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 
             	long startTime = parser.getStartTime();
                 if (parser.isContinuous()) {
-                    String vsName = parser.getVSensorConfig().getName();
     				Connection conn = null;
     				ResultSet rs = null;
     				try {
@@ -172,7 +167,7 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
             String vsName = parser.getVSensorConfig().getName();
 
             //
-            if (Main.getContainerConfig().isAcEnabled()) {
+            if (Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)) {
                 String[] cred = parseAuthorizationHeader(request);
                 if (cred == null) {
                     try {
@@ -184,13 +179,12 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
                     }
                     return;
                 }
-                if (DataSource.isVSManaged(vsName)){
-                    User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
-                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
-                        response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
-                        response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
-                        return;
-                    }
+
+                User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
+                if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                    response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
+                    response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
+                    return;
                 }
             }
             //

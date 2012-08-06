@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 //import gsn.http.accesscontrol.User;
+import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -54,15 +55,13 @@ public class OutputStructureHandler implements RequestHandler {
             return false;
         }
 
-        //Added by Behnaz.
-        if (user != null) // meaning, that a login session is active, otherwise we couldn't get there
-            if (Main.getContainerConfig().isAcEnabled() == true) {
-                if (user.hasReadAccessRight(vsName) == false && user.isAdmin() == false)  // ACCESS_DENIED
-                {
-                    response.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified virtual sensor .");
-                    return false;
-                }
+        if (Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)) {
+            if (user == null || (!user.hasReadAccessRight(vsName) && !user.isAdmin()))  // ACCESS_DENIED
+            {
+                response.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified virtual sensor .");
+                return false;
             }
+        }
 
         return true;
     }

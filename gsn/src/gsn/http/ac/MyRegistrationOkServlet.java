@@ -75,7 +75,9 @@ public class MyRegistrationOkServlet  extends HttpServlet
 
    private void printLinks(PrintWriter out)
    {
-       out.println("<a class=linkclass href=\"/\">GSN home</a>");
+       out.println("<li><a href=\"/\">Home</a></li>");
+       out.println("<li><a href=/gsn/MyAccessRightsManagementServlet>access rights</a></li>");
+       out.println("<li class=\"selected\" style=\"font-size:0.8em;font-weight:bolder;padding: 0 8px;text-decoration:none;text-transform:uppercase;\">registration request</li>");
    }
 
    private void printLayoutFooter(PrintWriter out)

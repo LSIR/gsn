@@ -6,6 +6,7 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 //import gsn.http.accesscontrol.User;
+import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
 
@@ -96,14 +97,12 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler {
             response.sendError(WebConstants.ERROR_INVALID_VSNAME, "The specified virtual sensor doesn't exist.");
             return false;
         }
-        //Added by Behnaz.
-        if (Main.getContainerConfig().isAcEnabled() == true) {
-            if (user != null) // meaning, that a login session is active, otherwise we couldn't get there
-                if (user.hasReadAccessRight(vsName) == false && user.isAdmin() == false)  // ACCESS_DENIED
-                {
-                    response.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified virtual sensor .");
-                    return false;
-                }
+        if (Main.getContainerConfig().isAcEnabled() == true && DataSource.isVSManaged(vsName)) {
+            if (user == null || (!user.hasReadAccessRight(vsName) && !user.isAdmin()))  // ACCESS_DENIED
+            {
+                response.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified virtual sensor .");
+                return false;
+            }
         }
 
         return true;
