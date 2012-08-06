@@ -20,7 +20,7 @@
                 <address wrapper="http-get">
                     <predicate key="url">http://permasense-jj-cam01/record/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">mobotix-cam</predicate>
+                    <predicate key="subdirectory-name">webcam1</predicate>
                     <predicate key="device-id">6010</predicate>
                     <predicate key="username">USERNAME</predicate>
                     <predicate key="password">PASSWORD</predicate>

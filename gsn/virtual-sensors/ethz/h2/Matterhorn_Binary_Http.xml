@@ -22,7 +22,7 @@
                     <predicate key="username">admin</predicate>
                     <predicate key="password">meinsm</predicate>
                     <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">kmh-radar</predicate>
+                    <predicate key="subdirectory-name">webcam1</predicate>
                     <predicate key="device-id">6010</predicate>
                 </address>
                 <query> select * from wrapper </query>
