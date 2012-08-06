@@ -75,8 +75,10 @@ public class CoreStationStatistics {
 	
 	public Long getTotalMsgRecvCounter() {
 		long total = 0;
-		for (Iterator<Long> iter = msgRecvCounterMap.values().iterator(); iter.hasNext();)
-			total += iter.next();
+		synchronized (msgRecvCounterMap) {
+			for (Iterator<Long> iter = msgRecvCounterMap.values().iterator(); iter.hasNext();)
+				total += iter.next();
+		}
 		return total;
 	}
 	
@@ -84,8 +86,10 @@ public class CoreStationStatistics {
 	
 	public Long getTotalMsgRecvByteCounter() {
 		long total = 0;
-		for (Iterator<Long> iter = msgRecvByteCounterMap.values().iterator(); iter.hasNext();)
-			total += iter.next();
+		synchronized (msgRecvByteCounterMap) {
+			for (Iterator<Long> iter = msgRecvByteCounterMap.values().iterator(); iter.hasNext();)
+				total += iter.next();
+		}
 		return total;
 	}
 	
@@ -119,8 +123,10 @@ public class CoreStationStatistics {
 	
 	public Long getTotalMsgSendCounter() {
 		long total = 0;
-		for (Iterator<Long> iter = msgSendCounterMap.values().iterator(); iter.hasNext();)
-			total += iter.next();
+		synchronized (msgSendCounterMap) {
+			for (Iterator<Long> iter = msgSendCounterMap.values().iterator(); iter.hasNext();)
+				total += iter.next();
+		}
 		return total;
 	}
 	
@@ -128,8 +134,10 @@ public class CoreStationStatistics {
 	
 	public Long getTotalMsgSendByteCounter() {
 		long total = 0;
-		for (Iterator<Long> iter = msgSendByteCounterMap.values().iterator(); iter.hasNext();)
-			total += iter.next();
+		synchronized (msgSendByteCounterMap) {
+			for (Iterator<Long> iter = msgSendByteCounterMap.values().iterator(); iter.hasNext();)
+				total += iter.next();
+		}
 		return total;
 	}
 	

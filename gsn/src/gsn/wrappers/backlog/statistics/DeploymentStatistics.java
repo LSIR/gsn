@@ -49,12 +49,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Boolean> map = new Hashtable<Integer, Boolean>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Boolean val = csstat.isConnected();
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Boolean val = csstat.isConnected();
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -64,12 +66,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getTotalMsgRecvCounter();
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getTotalMsgRecvCounter();
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -78,12 +82,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getMsgRecvCounter(type);
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getMsgRecvCounter(type);
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -92,12 +98,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getTotalRecvByteCounter();
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getTotalRecvByteCounter();
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -106,12 +114,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getTotalMsgRecvByteCounter();
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getTotalMsgRecvByteCounter();
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -120,12 +130,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getMsgRecvByteCounter(type);
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getMsgRecvByteCounter(type);
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -135,12 +147,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getTotalMsgSendCounter();
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getTotalMsgSendCounter();
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -149,12 +163,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getMsgSendCounter(type);
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getMsgSendCounter(type);
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -163,12 +179,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getTotalSendByteCounter();
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getTotalSendByteCounter();
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -177,12 +195,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getTotalMsgSendByteCounter();
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getTotalMsgSendByteCounter();
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
@@ -191,12 +211,14 @@ public class DeploymentStatistics {
 		if (coreStationToCoreStationStatsList.isEmpty())
 			return null;
 		Map<Integer, Long> map = new Hashtable<Integer, Long>();
-		for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
-			CoreStationStatistics csstat = iter.next();
-			Integer id = csstat.getDeviceId();
-			Long val = csstat.getMsgSendByteCounter(type);
-			if (id != null && val != null)
-				map.put(id, val);
+		synchronized (coreStationToCoreStationStatsList){
+			for (Iterator<CoreStationStatistics> iter = coreStationToCoreStationStatsList.values().iterator(); iter.hasNext();) {
+				CoreStationStatistics csstat = iter.next();
+				Integer id = csstat.getDeviceId();
+				Long val = csstat.getMsgSendByteCounter(type);
+				if (id != null && val != null)
+					map.put(id, val);
+			}
 		}
 		return map;
 	}
