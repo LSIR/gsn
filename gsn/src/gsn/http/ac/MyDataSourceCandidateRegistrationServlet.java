@@ -165,7 +165,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
 
         ConnectToDB ctdb = null;
         HttpSession session = req.getSession();
-		PrintWriter out = (PrintWriter) session.getAttribute("out");
+		PrintWriter out = res.getWriter();
         User user = (User) session.getAttribute("user");
 		ParameterSet pm = new ParameterSet(req,"virtual-sensors/receivedVSFiles");
         logger.warn(pm);
