@@ -15,7 +15,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://whymper.ee.ethz.ch:24001/sensorviz?stats</predicate>
+                    <predicate key="url">http://whymper.ee.ethz.ch:24001/vizzly?stats</predicate>
                     <predicate key="rate">30000</predicate>
                 </address>
                 <query> select * from wrapper </query>
