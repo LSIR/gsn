@@ -302,6 +302,16 @@ public class MyUserDetailUpdateServlet extends HttpServlet
                             if(ctdb.updateUserDetails(user))
                             {
                                 logger.debug("Successfully updated the user details.");
+                                
+                            	Emailer email = new Emailer();
+                                String msgHead = "Dear "+user.getFirstName() +", "+"\n"+"\n";
+                                
+                                String msgBody = "Your user details have been updated!"+"\n"+"\n";
+                                
+                                String msgTail = "Best Regards,"+"\n"+"GSN Team";
+
+                                // first change Emailer class params to use sendEmail
+                                email.sendEmail( "GSN USER DETAILS ", "GSN USER",ctdb.getUserForUserName("Admin").getEmail(),"New registration request to GSN", msgHead, msgBody, msgTail);
                             }
                             else
                             {

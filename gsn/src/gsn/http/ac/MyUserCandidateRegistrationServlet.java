@@ -356,6 +356,20 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
                         User temp=new User(pm.valueForName("username"),Protector.encrypt(pm.valueForName("password")),pm.valueForName("firstname"),pm.valueForName("lastname"),pm.valueForName("email"),groupList,"yes");
                         if(ctdb.registerUserCandidate(temp)== true)
                         {
+                        	Emailer email = new Emailer();
+                            String msgHead = "Dear GSN Admin, "+"\n"+"\n";
+                            
+                            String msgBody = "A new registration request has been generated from:"+"\n"
+                                    +"first name : "+temp.getFirstName()+"\n"
+                                    +"last name : "+temp.getLastName()+"\n"
+                                    +"email : "+temp.getEmail()+"\n"
+                                    +"username : "+temp.getUserName()+"\n"+"\n";
+                            
+                            String msgTail = "Best Regards,"+"\n"+"GSN Team";
+
+                            // first change Emailer class params to use sendEmail
+                            email.sendEmail( "GSN REGISTRATION ", "GSN ADMIN",ctdb.getUserForUserName("Admin").getEmail(),"New registration request to GSN", msgHead, msgBody, msgTail);
+                            
                             waitinguser=temp;
                         }
                         else

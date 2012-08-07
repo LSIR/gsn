@@ -1,7 +1,6 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
 import org.apache.log4j.Logger;
 

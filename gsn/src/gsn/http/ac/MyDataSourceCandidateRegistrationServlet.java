@@ -194,6 +194,18 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
                         //out.println("File upload was successful. <BR>");
                         //out.println("Ready to upload the next file. <BR>");
                         this.managaeUserAlert(out, "File upload was successful.",false );
+
+                    	Emailer email = new Emailer();
+                        String msgHead = "Dear GSN Admin, "+"\n"+"\n";
+                        
+                        String msgBody = "A new virtual sensor registration request has been generated from "+user.getUserName()+":\n"
+                                +"VS name : "+ds.getDataSourceName()+"\n"
+                                +"file name : "+ds.getFileName()+"\n"+"\n";
+                        
+                        String msgTail = "Best Regards,"+"\n"+"GSN Team";
+
+                        // first change Emailer class params to use sendEmail
+                        email.sendEmail( "VS REGISTRATION ", "GSN ADMIN",ctdb.getUserForUserName("Admin").getEmail(),"New virtual sensor registration request from GSN", msgHead, msgBody, msgTail);
                     }
                      else
                     {
