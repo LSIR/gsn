@@ -18,9 +18,11 @@ public class UserUtils {
     public static User allowUserToLogin(String username, String password) {
         User user = null;
         ConnectToDB ctdb = null;
+        
+        if (username == null || username.equals("") || password == null)
+        	return null;
 
         try {
-
             ctdb = new ConnectToDB();
             if (ctdb.valueExistsForThisColumnUnderOneCondition(new Column("USERNAME", username), new Column("ISCANDIDATE", "no"), "ACUSER") == true) {
                 String enc = Protector.encrypt(password);
@@ -35,9 +37,7 @@ public class UserUtils {
                     user.setEmail(userFromBD.getEmail());
                     user.setFirstName(userFromBD.getFirstName());
                 }
-
             } else {
-
                 if (username.compareToIgnoreCase("null") != 0)
                     logger.warn("This username \"" + username + "\" does not exist !");
             }
@@ -54,6 +54,9 @@ public class UserUtils {
     }
 
     public static boolean userHasAccessToVirtualSensor(String username, String password, String vsname) {
+    	if (!DataSource.isVSManaged(vsname))
+    		return true;
+    	
         User user = allowUserToLogin(username, password);
         if (user == null)
             return false;

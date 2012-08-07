@@ -63,18 +63,21 @@ public class DynamicGeoDataServlet extends HttpServlet {
         List<String> allowedSensors = new Vector<String>();
 
         if (Main.getContainerConfig().isAcEnabled()) {
-            if (username != null && password != null) {
-                if (UserUtils.allowUserToLogin(username, password) == null) {
-                    response.getWriter().write("ERROR: incorrect login for user '" + username + "'. Check your credentials.");
-                    return;
-                } else { // user authenticated correctly
-                    allowedSensors = UserUtils.getAllowedVirtualSensorsForUser(username, password, getAllSensors());
+        	allowedSensors = UserUtils.getAllowedVirtualSensorsForUser(username, password, getAllSensors());
+        	
+        	if (allowedSensors.isEmpty()) {
+                if (username != null && password != null) {
+                    if (UserUtils.allowUserToLogin(username, password) == null) {
+                        response.getWriter().write("ERROR: incorrect login for user '" + username + "'. Check your credentials.");
+                        return;
+                    }
                 }
-
-            } else { // username or password is null
-                response.getWriter().write("ERROR: username and password required.");
+                if (username == null)
+                	response.getWriter().write("ERROR: username and password required.");
+                else
+                	response.getWriter().write("ERROR: no access to the VSs for '" + username + "'. Check your credentials.");
                 return;
-            }
+        	}
         } else { // No access control
             allowedSensors = getAllSensors();
         }

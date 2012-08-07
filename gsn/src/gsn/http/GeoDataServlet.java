@@ -71,7 +71,7 @@ public class GeoDataServlet extends HttpServlet {
         StringBuilder matchingSensors = new StringBuilder();
 
         for (String vsName : sensors) {
-            if (!Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(vsName) || user.isAdmin()))) {
+            if (!Main.getContainerConfig().isAcEnabled() || !DataSource.isVSManaged(vsName) || (user != null && (user.hasReadAccessRight(vsName) || user.isAdmin()))) {
                 matchingSensors.append(vsName);
                 matchingSensors.append(GetSensorDataWithGeo.SEPARATOR);
             }
