@@ -48,7 +48,7 @@ public class MyControllerFilter implements Filter {
 
             HttpSession session = req.getSession();
             User user = (User) session.getAttribute("user");
-            if (Main.getContainerConfig().isAcEnabled() == false) // do as filter does not exist
+            if (!Main.getContainerConfig().isAcEnabled()) // do as filter does not exist
             {
                 chain.doFilter(request, response);
             } else {
@@ -163,7 +163,7 @@ public class MyControllerFilter implements Filter {
 
                 //
 
-                if (user == null)// if user has not already logged-in
+                if (user == null || reqVirtualSensorName == null || DataSource.isVSManaged(reqVirtualSensorName))
                 {
                     if (req.getQueryString() == null) // if there is no query string in uri, we suppose that target is GSN home
                     {
