@@ -163,7 +163,7 @@ public class MyControllerFilter implements Filter {
 
                 //
 
-                if (user == null || reqVirtualSensorName == null || DataSource.isVSManaged(reqVirtualSensorName))
+                if (user == null && (reqVirtualSensorName == null || DataSource.isVSManaged(reqVirtualSensorName)))
                 {
                     if (req.getQueryString() == null) // if there is no query string in uri, we suppose that target is GSN home
                     {
