@@ -165,7 +165,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
     {
         //String username=user.getUserName();
         out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
 
 
     }
@@ -232,7 +232,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
                 }
                 else if(groupType.equals("0"))
                 {
-                    label=" user wants to delete this group ";
+                    label=" user wants to be removed from this group ";
                 }
                 out.println("<tr><td>"+groupName +"</td>");
                 this.printGroupStructureLink(out, group.getGroupName());
@@ -285,7 +285,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
         }
         else if(groupType.equals("0"))
         {
-             label=" user wants to delete this group ";
+             label=" user wants to be removed from this group ";
         }
 
         out.println("<table class=\"transparenttable\">");
@@ -415,7 +415,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
                 }
                 else if(dstype.charAt(1)=='0')
                 {
-                    label="delete";
+                    label="remove";
                 }
                 if(ownerDecision.equals("notreceived"))
                 {

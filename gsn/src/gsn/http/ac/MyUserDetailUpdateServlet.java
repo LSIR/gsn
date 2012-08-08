@@ -110,7 +110,7 @@ public class MyUserDetailUpdateServlet extends HttpServlet
     {
         //String username=user.getUserName();
         out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
     }
     
     private void printForm(PrintWriter out, User user) throws ServletException
@@ -244,18 +244,56 @@ public class MyUserDetailUpdateServlet extends HttpServlet
         ParameterSet pm = new ParameterSet(req);
         if (session.getAttribute("user") != null)
         {
-        User muser=allowUserToRegister(pm, out,new User((User)session.getAttribute("user")));
-        if(muser!= null)
-        {
-            try
-			{
-				res.sendRedirect("/gsn/MyLogoutHandlerServlet");
-			}
-			catch (Exception ignored)
-			{
-				out.println("problem with redirecting to the target !");
-			}
-        }
+	        User muser=allowUserToRegister(pm, out,new User((User)session.getAttribute("user")));
+	        if(muser!= null)
+	        {
+	            try
+				{
+					res.sendRedirect("/gsn/MyLogoutHandlerServlet");
+				}
+				catch (Exception ignored)
+				{
+					out.println("problem with redirecting to the target !");
+				}
+
+	            ConnectToDB ctdb =null;
+	            try {
+	            	ctdb=new ConnectToDB();
+	            	Emailer email = new Emailer();
+	                String msgHead = "Dear GSN Admin, "+"\n"+"\n";
+	                
+	                String msgBody = muser.getFirstName() +" " + muser.getLastName() + "(username=" +muser.getUserName()+") has updated the user details:"+"\n"
+	                        +"first name : "+muser.getFirstName()+"\n"
+	                        +"last name : "+muser.getLastName()+"\n"
+	                        +"email : "+muser.getEmail()+"\n"+"\n";
+	                
+	                String msgTail = "Best Regards,"+"\n"+"GSN Team";
+	
+	                // first change Emailer class params to use sendEmail
+	                email.sendEmail(ctdb.getUserForUserName("Admin").getEmail(),Main.getContainerConfig( ).getWebName( )+": User detail update", msgHead, msgBody, msgTail);
+
+	                msgHead = "Dear " + muser.getFirstName() +" " + muser.getLastName() +", "+"\n"+"\n";
+	                
+	                msgBody = "You have successfully updated your user details:"+"\n"
+	                        +"first name : "+muser.getFirstName()+"\n"
+	                        +"last name : "+muser.getLastName()+"\n"+"\n";
+	
+	                // first change Emailer class params to use sendEmail
+	                email.sendEmail(muser.getEmail(),Main.getContainerConfig( ).getWebName( )+": User detail updated", msgHead, msgBody, msgTail);
+	            }
+	            catch(Exception e)
+	            {
+	                out.println("Exception caught : "+e.getMessage());
+	            }
+	            finally
+	            {
+	                if(ctdb!=null)
+	                {
+	                    ctdb.closeStatement();
+	                    ctdb.closeConnection();
+	                }
+	            }
+	        }
         }
     }
 
@@ -311,7 +349,7 @@ public class MyUserDetailUpdateServlet extends HttpServlet
                                 String msgTail = "Best Regards,"+"\n"+"GSN Team";
 
                                 // first change Emailer class params to use sendEmail
-                                email.sendEmail( "GSN USER DETAILS ", "GSN USER",ctdb.getUserForUserName("Admin").getEmail(),"New registration request to GSN", msgHead, msgBody, msgTail);
+                                email.sendEmail(ctdb.getUserForUserName("Admin").getEmail(),"New registration request to GSN", msgHead, msgBody, msgTail);
                             }
                             else
                             {

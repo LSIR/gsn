@@ -13,8 +13,6 @@ package gsn.http.ac;
 
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -756,6 +754,12 @@ public class ConnectToDB
 
      /****************************************** DB Get methods *********************************************/
    /********************************************************************************************************/
+
+   /* return the owner of the DataSource */
+   User getOwnerOfDataSource(String dataSourceName)throws SQLException
+   {
+	   return this.getUserForUserName(this.getValueForOneColumnUnderTwoConditions(new Column("USERNAME"), new Column("DATASOURCENAME",dataSourceName), new Column("DATASOURCETYPE","4"),"ACUSER_ACDATASOURCE"));
+   }
 
    /* return the list of all groups existing in AC DB */
    Vector getGroupList()throws SQLException

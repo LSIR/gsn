@@ -35,7 +35,7 @@ public class MyAccessRightsManagementServlet extends HttpServlet
         this.printHeader(out);
         this.printLayoutMastHead(out,user);
         this.printLayoutContent(out);
-        this.printUserAccountLinks(out);
+        this.printUserAccountLinks(out, user);
         this.printLayoutFooter(out);
     }
     public void doPost(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
@@ -107,16 +107,24 @@ public class MyAccessRightsManagementServlet extends HttpServlet
         }
         else {
             out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-            out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+            out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
         }
     }
-    public void printUserAccountLinks(PrintWriter out)
+    public void printUserAccountLinks(PrintWriter out, User user)
     {
         out.println("<p>Welcome to your access rights management ! you have the following options:</p>");
         out.println("<ul class=linklistul >");
-        out.println("<LI class=linklistli><a href=/gsn/MyUserCandidateRegistrationServlet>New User?  Sign Up</a></LI>");
-        out.println("<LI class=linklistli><a href=\"/gsn/MyUserAccountManagementServlet\">User Account Management</a></LI>");
-        out.println("<LI class=linklistli><a href=\"/gsn/MyAdminManagementServlet\">Admin Only</a></LI>");
+        if (user == null) {
+            out.println("<LI class=linklistli><a href=/gsn/MyUserCandidateRegistrationServlet>Sign Up</a></LI>");
+            out.println("<LI class=linklistli><a href=/gsn/MyLoginHandlerServlet>Login</a></LI>");
+        }
+        else {
+            out.println("<LI class=linklistli><a href=/gsn/MyUserCandidateRegistrationServlet>Create New User</a></LI>");
+	        if (user.isAdmin())
+	        	out.println("<LI class=linklistli><a href=\"/gsn/MyAdminManagementServlet\">Admin Only</a></LI>");
+	        else
+	        	out.println("<LI class=linklistli><a href=\"/gsn/MyUserAccountManagementServlet\">User Account Management</a></LI>");
+        }
         out.println("</ul>");
     }
 

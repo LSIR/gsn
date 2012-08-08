@@ -1,14 +1,12 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
 
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.Vector;
 
 /**
@@ -176,7 +174,7 @@ public class MyOwnerWaitingListServlet extends HttpServlet
     {
         //String username=user.getUserName();
         out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
 
 
     }
@@ -235,38 +233,18 @@ public class MyOwnerWaitingListServlet extends HttpServlet
         out.println("</tr>");
         out.println("<tr>");
         out.println("<th>access right</th>");
-        out.println("<td>"+ setLabel(user.getDataSource())  +"</td>");
+        out.println("<td>"+ user.getDataSource().getAccessRightsString()  +"</td>");
         out.println("</tr>");
         out.println("</table>");
         
 
     }
-
-
-    private String setLabel(DataSource ds)
-    {
-        String label=null;
-        if(ds.getDataSourceType().charAt(1)=='1')
-        {
-                label="read";
-        }
-        else if(ds.getDataSourceType().charAt(1)=='2')
-        {
-            label="write";
-        }
-        else if(ds.getDataSourceType().charAt(1)=='3')
-        {
-            label="read/write";
-        }
-        return label;
-
-    }
+    
     /****************************************** AC Related Methods*******************************************/
     /***********************************************************************************************************/
 
     void handleForm(HttpServletRequest req, HttpServletResponse res)
     {
-        User temp=null;
         HttpSession session = req.getSession();
         PrintWriter out = (PrintWriter) session.getAttribute("out");
 
@@ -285,12 +263,33 @@ public class MyOwnerWaitingListServlet extends HttpServlet
             {
 
                 ctdb.updateOwnerDecision("has accepted the registration",pm.valueForName("username"), pm.valueForName("datasourcename") );
+				
+                Emailer email = new Emailer();
+				User requester = ctdb.getOwnerOfDataSource(pm.valueForName("datasourcename"));
+                String msgHead = "Dear "+requester.getFirstName()+" "+requester.getLastName()+", "+"\n"+"\n";
+
+				String msgBody = "The owner of "+pm.valueForName("datasourcename")+" has accepted your access rights update request."+"\n"
+				        +"But the administrator still has to aprove it.\n"+"\n";
+				
+				String msgTail = "Best Regards,"+"\n"+"GSN Team";
+				
+				email.sendEmail(requester.getEmail(),Main.getContainerConfig( ).getWebName( )+": Virtual Sensor access rights update accepted by owner", msgHead, msgBody, msgTail);
             }
 
             else if(pm.valueForName("register").equals("No"))
             {
                 ctdb.updateOwnerDecision("has refused the registration",pm.valueForName("username"), pm.valueForName("datasourcename") );
+				
+                Emailer email = new Emailer();
+				User requester = ctdb.getOwnerOfDataSource(pm.valueForName("datasourcename"));
+                String msgHead = "Dear "+requester.getFirstName()+" "+requester.getLastName()+", "+"\n"+"\n";
 
+				String msgBody = "The owner of "+pm.valueForName("datasourcename")+" has refused your access rights update request."+"\n"
+				        +"But the administrator still has to aprove it.\n"+"\n";
+				
+				String msgTail = "Best Regards,"+"\n"+"GSN Team";
+				
+				email.sendEmail(requester.getEmail(),Main.getContainerConfig( ).getWebName( )+": Virtual Sensor access rights update refused by owner", msgHead, msgBody, msgTail);
             }
         }
         catch(Exception e)

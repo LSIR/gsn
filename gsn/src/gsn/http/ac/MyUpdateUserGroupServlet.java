@@ -59,7 +59,12 @@ public class MyUpdateUserGroupServlet extends HttpServlet
                try
                {
                    ctdb = new ConnectToDB();
-                   User waitingUser = new User(pm.valueForName("username"));
+                   Emailer email = new Emailer();
+                   User waitingUser = ctdb.getUserForUserName(pm.valueForName("username"));
+                   String msgHead = "Dear "+waitingUser.getFirstName()+" "+waitingUser.getLastName()+", "+"\n"+"\n";
+   				   String msgTail = "Best Regards,"+"\n"+"GSN Team";
+   				   String msgBody = null;
+   				   String subject = null;
 
                    if(pm.valueForName("update").equals("yes"))
                    {
@@ -67,10 +72,16 @@ public class MyUpdateUserGroupServlet extends HttpServlet
                        {
                            waitingUser.setIsWaiting("no");
                            ctdb.updateGroupForUser(waitingUser,new Group(pm.valueForName("groupname"),"n"));
+                           
+                           subject = "Registration to group accepted by administrator";
+           				   msgBody = "The administrator has accepted your registration to the group "+pm.valueForName("groupname")+"."+"\n"+"\n";
                        }
                        else if(pm.valueForName("grouptype").equals("0"))
                        {
                            ctdb.deleteGroupForUser(new Group(pm.valueForName("groupname")), waitingUser);
+                           
+                           subject = "Removal from group accepted by administrator";
+           				   msgBody = "The administrator has accepted to remove you from the group "+pm.valueForName("groupname")+"."+"\n"+"\n";
                        }
                    }
                    else if(pm.valueForName("update").equals("no"))
@@ -78,17 +89,24 @@ public class MyUpdateUserGroupServlet extends HttpServlet
                        if(pm.valueForName("grouptype").equals("5"))
                        {
                            ctdb.deleteGroupForUser(new Group(pm.valueForName("groupname")), waitingUser);
+                           
+                           subject = "Registration to group refused by administrator";
+           				   msgBody = "The administrator has refused your registration to the group "+pm.valueForName("groupname")+"."+"\n"+"\n";
                        }
                        else if(pm.valueForName("grouptype").equals("0"))
                        {
                            waitingUser.setIsWaiting("no");
                            ctdb.updateGroupForUser(waitingUser,new Group(pm.valueForName("groupname"),"n"));
-
+                           
+                           subject = "Removal from group refused by administrator";
+           				   msgBody = "The administrator has refused to remove you from the group "+pm.valueForName("groupname")+"."+"\n"+"\n";
                        }
 
                    }
+                   
+   				   email.sendEmail(waitingUser.getEmail(),Main.getContainerConfig( ).getWebName( )+": "+subject, msgHead, msgBody, msgTail);
 
-                    res.sendRedirect("/gsn/MyUserUpdateWaitingListServlet");
+                   res.sendRedirect("/gsn/MyUserUpdateWaitingListServlet");
                }
                catch(Exception e)
                {

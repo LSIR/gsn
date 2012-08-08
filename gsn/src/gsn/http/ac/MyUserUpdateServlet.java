@@ -1,7 +1,6 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
 import org.apache.log4j.Logger;
 
 
@@ -198,7 +197,7 @@ public class MyUserUpdateServlet  extends HttpServlet
     {
         //String username=user.getUserName();
         out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
     }
 
     private void printUserGroupList(PrintWriter out,User user,ConnectToDB ctdb)throws SQLException
@@ -232,7 +231,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                     out.println("<FORM ACTION=/gsn/MyUpdateUserWaitingForGroupServlet METHOD=POST>");
                     out.println("<INPUT  TYPE=HIDDEN NAME=groupname VALUE="+groupName+">");
                     out.println("<INPUT  TYPE=HIDDEN NAME=deletegroup VALUE=Yes>");
-                    out.println("<td style=text-align:center><INPUT TYPE=SUBMIT class= buttonstyle  VALUE=\"delete\"></td>");
+                    out.println("<td style=text-align:center><INPUT TYPE=SUBMIT class= buttonstyle  VALUE=\"remove\"></td>");
                     out.println("</FORM>");
                 }
                 else
@@ -313,7 +312,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         if(user.getDataSourceList().size()==0)
         {
             out.println("<table class =transparenttable>");
-            out.println("<tr><td><FONT COLOR=#000000>No virtaul sensor is available.</td></tr>");
+            out.println("<tr><td><FONT COLOR=#000000>No virtual sensor is available.</td></tr>");
             out.println("</table>");
         }
         else
@@ -336,6 +335,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                     if(ctdb.valueExistsForThisColumnUnderTwoConditions(new Column("ISUSERWAITING","yes"),new Column("USERNAME",user.getUserName()),new Column("DATASOURCENAME",dataSourceName), "ACUSER_ACDATASOURCE"))
                     {
                           out.println("<tr><td>" + dataSourceName + " </td>");
+                          out.println("<td>"+"<FONT COLOR=#0000FF>in waiting list!</td></tr>");
                     }
                     else
                     {
@@ -346,31 +346,23 @@ public class MyUserUpdateServlet  extends HttpServlet
                             out.println("<td><INPUT CHECKED TYPE=RADIO NAME="+dataSourceName+" VALUE= 1>read");
                             out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE= 2>write ");
                             out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE=3>read/write");
-                            out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE=0>delete ");
+                            out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE=0>remove ");
                         }
                         if(dataSourceType.charAt(0)=='2')
                         {
                             out.println("<td><INPUT TYPE=RADIO NAME="+dataSourceName+" VALUE= 1> read ");
                             out.println("<INPUT CHECKED TYPE=RADIO NAME="+dataSourceName+" VALUE= 2> write ");
                             out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE=3> read/write ");
-                            out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE=0> delete ");
+                            out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE=0> remove ");
                         }
                         if(dataSourceType.charAt(0)=='3')
                         {
                             out.println("<td><INPUT TYPE=RADIO NAME="+dataSourceName+" VALUE= 1> read ");
                             out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE= 2> write ");
                             out.println("<INPUT CHECKED TYPE=RADIO NAME="+dataSourceName+" VALUE=3> read/write ");
-                            out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE=0> delete ");
+                            out.println("<INPUT  TYPE=RADIO NAME="+dataSourceName+" VALUE=0> remove ");
                         }
-                    }
-                    if(ctdb.valueExistsForThisColumnUnderTwoConditions(new Column("ISUSERWAITING","yes"),new Column("USERNAME",user.getUserName()),new Column("DATASOURCENAME",dataSourceName), "ACUSER_ACDATASOURCE"))
-                    {
-                        out.println("<td>"+"<FONT COLOR=#0000FF>in waiting list!</td></tr>");
-
-                    }
-                    else
-                    {
-
+                        
                         out.println("&nbsp&nbsp&nbsp<INPUT TYPE=SUBMIT class= buttonstyle VALUE=\"update\"></td></tr>");
                         out.println("</FORM>");
                     }
@@ -387,7 +379,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         if(remainingDataSourcesList.size()==0)
         {
             out.println("<table class=transparenttable>");
-            out.println("<tr><td><FONT COLOR=#000000>No virtaul sensor is available.</td></tr>");
+            out.println("<tr><td><FONT COLOR=#000000>No virtual sensor is available.</td></tr>");
             out.println("</table>");
         }
         else
@@ -402,6 +394,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                 if(ctdb.valueExistsForThisColumnUnderTwoConditions(new Column("ISUSERWAITING","yes"),new Column("USERNAME",user.getUserName()),new Column("DATASOURCENAME",dataSource.getDataSourceName()), "ACUSER_ACDATASOURCE"))
                 {
                     out.println("<tr><td>" + dataSourceName + " </td>");
+                    out.println("<td>"+"<FONT COLOR=#0000FF>in waiting list!</td></tr>");
                 }
                 else
                 {
@@ -410,14 +403,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                     out.println("<td><INPUT TYPE=RADIO NAME="+dataSourceName+" VALUE= 1> read ");
                     out.println("<INPUT TYPE=RADIO NAME="+dataSourceName+" VALUE= 2> write ");
                     out.println("<INPUT TYPE=RADIO NAME="+dataSourceName+" VALUE=3> read/write ");
-                }
-                if(ctdb.valueExistsForThisColumnUnderTwoConditions(new Column("ISUSERWAITING","yes"),new Column("USERNAME",user.getUserName()),new Column("DATASOURCENAME",dataSource.getDataSourceName()), "ACUSER_ACDATASOURCE"))
-                {
-                    out.println("<td>"+"<FONT COLOR=#0000FF>in waiting list!</td></tr>");
-                }
-                else
-                {
-                    out.println("&nbsp&nbsp&nbsp<INPUT TYPE=SUBMIT TYPE=SUBMIT class= buttonstyle VALUE=\"add\"></td></tr>");
+                    out.println("&nbsp&nbsp&nbsp<INPUT TYPE=SUBMIT class= buttonstyle VALUE=\"add\"></td></tr>");
                     out.println("</FORM>");
                 }
             }

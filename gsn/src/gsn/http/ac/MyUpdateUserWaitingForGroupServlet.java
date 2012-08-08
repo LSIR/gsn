@@ -1,8 +1,6 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
-
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -60,11 +58,20 @@ public class MyUpdateUserWaitingForGroupServlet  extends HttpServlet
                        {
                            if(pm.valueForName("addgroup").equals("Yes"))
                            {
-                               group.setGroupType("5");
-                               user.setIsWaiting("yes");
-                               ctdb.registerGroupForUser(user,group);
+                                group.setGroupType("5");
+                                user.setIsWaiting("yes");
+                                ctdb.registerGroupForUser(user,group);
 
-                           }
+	       						Emailer email = new Emailer();
+	       		                String msgHead = "Dear GSN Admin"+"\n"+"\n";
+	
+	       						String msgBody = user.getFirstName()+" "+user.getLastName()+" ("+user.getUserName()+") would like to be added to group "+group.getGroupName()+".\n"+"\n";
+	       						
+	       						String msgTail = "Best Regards,"+"\n"+"GSN Team";
+	       						
+	       						// first change Emailer class params to use sendEmail
+	                            email.sendEmail(ctdb.getUserForUserName("Admin").getEmail(),Main.getContainerConfig( ).getWebName( )+": Add to Group request", msgHead, msgBody, msgTail);
+	                       }
                          }
                          if(pm.valueForName("deletegroup")!=null)
                          {
@@ -73,7 +80,17 @@ public class MyUpdateUserWaitingForGroupServlet  extends HttpServlet
                                  group.setGroupType("0");
                                  user.setIsWaiting("yes");
                                  ctdb.updateGroupForUser(user,group);
-                             }
+
+ 	       						 Emailer email = new Emailer();
+ 	       		                 String msgHead = "Dear GSN Admin"+"\n"+"\n";
+ 	
+ 	       						 String msgBody = user.getFirstName()+" "+user.getLastName()+" ("+user.getUserName()+") would like to be removed from group "+group.getGroupName()+".\n"+"\n";
+ 	       						
+ 	       						 String msgTail = "Best Regards,"+"\n"+"GSN Team";
+ 	       						
+ 	       						 // first change Emailer class params to use sendEmail
+ 	                             email.sendEmail(ctdb.getUserForUserName("Admin").getEmail(),Main.getContainerConfig( ).getWebName( )+": Remove from Group request", msgHead, msgBody, msgTail);
+ 	                         }
                          }
                      }
                    res.sendRedirect("/gsn/MyUserUpdateServlet");

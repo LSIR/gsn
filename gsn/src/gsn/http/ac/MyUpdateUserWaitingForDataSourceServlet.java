@@ -1,14 +1,12 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
 
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -75,22 +73,44 @@ public class MyUpdateUserWaitingForDataSourceServlet extends HttpServlet
 
                    if(oldDataSource==null)
                    {
-                       
-                       user.setIsWaiting("yes");
-                       newDataSource.setDataSourceType("5"+ newDataSource.getDataSourceType());
-                       newDataSource.setOwnerDecision("notreceived");
-                       ctdb.registerDataSourceForUser(user,newDataSource);
-                   }
-                   else
+						user.setIsWaiting("yes");
+						newDataSource.setDataSourceType("5"+ newDataSource.getDataSourceType());
+						newDataSource.setOwnerDecision("notreceived");
+						ctdb.registerDataSourceForUser(user,newDataSource);
+
+						Emailer email = new Emailer();
+						User owner = ctdb.getOwnerOfDataSource(newDataSource.getDataSourceName());
+		                String msgHead = "Dear "+owner.getFirstName()+" "+owner.getLastName()+", "+"\n"+"\n";
+						
+						String msgBody = user.getFirstName()+" "+user.getLastName()+" (username="+user.getUserName()+") would like to have access rights:"+"\n"
+						        +"virtual sensor: "+newDataSource.getDataSourceName()+"\n"
+						        +"access right: "+newDataSource.getAccessRightsString()+"\n"+"\n";
+						
+						String msgTail = "Best Regards,"+"\n"+"GSN Team";
+						
+						// first change Emailer class params to use sendEmail
+						email.sendEmail(owner.getEmail(),Main.getContainerConfig( ).getWebName( )+": Virtual Sensor New Access Rights request", msgHead, msgBody, msgTail);
+	       	       }
+                   else if(!oldDataSource.getDataSourceType().equals(newDataSource.getDataSourceType()))
                    {
-                       if(oldDataSource.getDataSourceType().equals(newDataSource.getDataSourceType())==false)
-                       {
-                           user.setIsWaiting("yes");
-                           oldDataSource.setDataSourceType(oldDataSource.getDataSourceType().charAt(0)+ newDataSource.getDataSourceType());
-                           oldDataSource.setOwnerDecision("notreceived");
-                           ctdb.updateDataSourceForUser(user,oldDataSource);
-                           
-                       }
+						Emailer email = new Emailer();
+						User owner = ctdb.getOwnerOfDataSource(oldDataSource.getDataSourceName());
+		                String msgHead = "Dear "+owner.getFirstName()+" "+owner.getLastName()+", "+"\n"+"\n";
+
+						String msgBody = user.getFirstName()+" "+user.getLastName()+" (username="+user.getUserName()+") would like to update access rights:"+"\n"
+						        +"virtual sensor: "+oldDataSource.getDataSourceName()+"\n"
+								+"existing access right: "+oldDataSource.getAccessRightsString()+"\n"
+								+"requested access right: "+newDataSource.getAccessRightsString()+"\n"+"\n";
+						
+						String msgTail = "Best Regards,"+"\n"+"GSN Team";
+						
+						// first change Emailer class params to use sendEmail
+						email.sendEmail(owner.getEmail(),Main.getContainerConfig( ).getWebName( )+": Virtual Sensor Update Access Rights request", msgHead, msgBody, msgTail);
+                        
+						user.setIsWaiting("yes");
+                        oldDataSource.setDataSourceType(oldDataSource.getDataSourceType().charAt(0)+ newDataSource.getDataSourceType());
+                        oldDataSource.setOwnerDecision("notreceived");
+                        ctdb.updateDataSourceForUser(user,oldDataSource);
                    }
                }
                res.sendRedirect("/gsn/MyUserUpdateServlet");

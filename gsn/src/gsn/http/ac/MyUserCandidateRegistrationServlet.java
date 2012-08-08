@@ -111,7 +111,7 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
         }
         else {
             out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-            out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+            out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
         }
     }
     private void printLinks(PrintWriter out)
@@ -368,7 +368,7 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
                             String msgTail = "Best Regards,"+"\n"+"GSN Team";
 
                             // first change Emailer class params to use sendEmail
-                            email.sendEmail( "GSN REGISTRATION ", "GSN ADMIN",ctdb.getUserForUserName("Admin").getEmail(),"New registration request to GSN", msgHead, msgBody, msgTail);
+                            email.sendEmail(ctdb.getUserForUserName("Admin").getEmail(),Main.getContainerConfig( ).getWebName( )+": New registration request", msgHead, msgBody, msgTail);
                             
                             waitinguser=temp;
                         }

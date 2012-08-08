@@ -1,7 +1,6 @@
 package gsn.http.ac;
 
 import gsn.utils.services.EmailService;
-import org.apache.commons.mail.SimpleEmail;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class Emailer
 {
     private static transient Logger logger                             = Logger.getLogger( Emailer.class );
 
-    public void sendEmail( String senderAlias, String receiverName,String receiverEmail,String subject, String msgHead, String msgBody, String msgTail)
+    public void sendEmail(String receiverEmail,String subject, String msgHead, String msgBody, String msgTail)
     {
 
         ArrayList<String> to = new ArrayList<String>();

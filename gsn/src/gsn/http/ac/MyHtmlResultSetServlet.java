@@ -164,7 +164,7 @@ public class MyHtmlResultSetServlet extends HttpServlet
     {
         //String username=user.getUserName();
         out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
     }
 
     private void printLayoutFooter(PrintWriter out)

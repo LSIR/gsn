@@ -147,7 +147,7 @@ public class MyUserCandidateWaitingListServlet extends HttpServlet
     {
         //String username=user.getUserName();
         out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
 
 
     }
@@ -329,8 +329,7 @@ public class MyUserCandidateWaitingListServlet extends HttpServlet
                 ctdb =new ConnectToDB();
                 user = ctdb.getUserForUserName(pm.valueForName("username"));
                 Emailer email = new Emailer();
-                msgHead = "Dear "+user.getFirstName() +", "+"\n"+"\n";
-                msgTail = "Best Regards,"+"\n"+"GSN Team";
+                msgHead = "Dear " + user.getFirstName() +" " + user.getLastName() +", "+"\n"+"\n";
                 if(pm.valueForName("register").equals("Yes"))
                 {
                     ctdb.updateOneColumnUnderOneCondition(new Column("ISCANDIDATE","no"),new Column("USERNAME",pm.valueForName("username")),"ACUSER");
@@ -352,8 +351,9 @@ public class MyUserCandidateWaitingListServlet extends HttpServlet
 
                     //send e-mail to user with comments
                 }
+                msgTail = "Best Regards,"+"\n"+"GSN Team";
                 // first change Emailer class params to use sendEmail
-                email. sendEmail( "GSN ACCESS ", "GSN USER",user.getEmail(),"Your registration to GSN ", msgHead, msgBody, msgTail);
+                email. sendEmail(user.getEmail(),Main.getContainerConfig( ).getWebName( )+": Registration", msgHead, msgBody, msgTail);
             }
             catch(Exception e)
             {

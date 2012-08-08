@@ -60,7 +60,12 @@ public class MyUpdateUserDataSourceServlet  extends HttpServlet
                try
                {
                    ctdb = new ConnectToDB();
-                   User waitingUser = new User(pm.valueForName("username"));
+                   Emailer email = new Emailer();
+                   User waitingUser = ctdb.getUserForUserName(pm.valueForName("username"));
+                   String msgHead = "Dear "+waitingUser.getFirstName()+" "+waitingUser.getLastName()+", "+"\n"+"\n";
+   				   String msgTail = "Best Regards,"+"\n"+"GSN Team";
+   				   String msgBody = null;
+   				   String subject = null;
                    //String updatedType=null;
 
                    if(pm.valueForName("update").equals("yes"))
@@ -68,6 +73,9 @@ public class MyUpdateUserDataSourceServlet  extends HttpServlet
                        if(pm.valueForName("datasourcetype").charAt(1)=='0')
                        {
                           ctdb.deleteDataSourceForUser(new DataSource(pm.valueForName("datasourcename")), waitingUser);
+                          
+                          subject = "Virtual Sensor access rights removal accepted by administrator";
+          				  msgBody = "The administrator has accepted your access rights removal request for the virtual sensor "+pm.valueForName("datasourcename")+"."+"\n"+"\n";
                        }
                        else
                        {
@@ -75,6 +83,9 @@ public class MyUpdateUserDataSourceServlet  extends HttpServlet
                            waitingUser.setIsWaiting("no");
                            ctdb.updateDataSourceForUser(waitingUser,new DataSource(pm.valueForName("datasourcename"),pm.valueForName("datasourcetype").substring(1,2)));
                            ctdb.updateOwnerDecision("notreceived",pm.valueForName("username"), pm.valueForName("datasourcename") );
+                           
+                           subject = "Virtual Sensor access rights update accepted by administrator";
+           				   msgBody = "The administrator has accepted your access rights update request for the virtual sensor "+pm.valueForName("datasourcename")+"."+"\n"+"\n";
                        }
                    }
                    else if(pm.valueForName("update").equals("no"))
@@ -82,6 +93,9 @@ public class MyUpdateUserDataSourceServlet  extends HttpServlet
                        if(pm.valueForName("datasourcetype").charAt(0)=='5')
                        {
                            ctdb.deleteDataSourceForUser(new DataSource(pm.valueForName("datasourcename")), waitingUser);
+                           
+                           subject = "Virtual Sensor access rights update refused by administrator";
+           				   msgBody = "The administrator has refused your access rights update request for the virtual sensor "+pm.valueForName("datasourcename")+"."+"\n"+"\n";
                        }
                        else
                        {
@@ -89,13 +103,15 @@ public class MyUpdateUserDataSourceServlet  extends HttpServlet
                            waitingUser.setIsWaiting("no");
                            ctdb.updateDataSourceForUser(waitingUser,new DataSource(pm.valueForName("datasourcename"),pm.valueForName("datasourcetype").substring(0,1)));
                            ctdb.updateOwnerDecision("notreceived",pm.valueForName("username"), pm.valueForName("datasourcename") );
+                           
+                           subject = "Virtual Sensor access rights removal refused by administrator";
+           				   msgBody = "The administrator has refused your access rights removal request for the virtual sensor "+pm.valueForName("datasourcename")+"."+"\n"+"\n";
                        }
                    }
+                   
+   				   email.sendEmail(waitingUser.getEmail(),Main.getContainerConfig( ).getWebName( )+": "+subject, msgHead, msgBody, msgTail);
 
-
-
-
-                    res.sendRedirect("/gsn/MyUserUpdateWaitingListServlet");
+                   res.sendRedirect("/gsn/MyUserUpdateWaitingListServlet");
                 }
                 catch(Exception e)
                 {

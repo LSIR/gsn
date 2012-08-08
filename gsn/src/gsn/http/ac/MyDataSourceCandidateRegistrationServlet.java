@@ -121,7 +121,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
     {
         //String username=user.getUserName();
         out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
-        out.println("<li><div id=\"logintextprime\">logged in as : "+user.getUserName()+"</div></li>");
+        out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
     }
 
 
@@ -205,7 +205,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
                         String msgTail = "Best Regards,"+"\n"+"GSN Team";
 
                         // first change Emailer class params to use sendEmail
-                        email.sendEmail( "VS REGISTRATION ", "GSN ADMIN",ctdb.getUserForUserName("Admin").getEmail(),"New virtual sensor registration request from GSN", msgHead, msgBody, msgTail);
+                        email.sendEmail(ctdb.getUserForUserName("Admin").getEmail(),Main.getContainerConfig( ).getWebName( )+": New virtual sensor registration request", msgHead, msgBody, msgTail);
                     }
                      else
                     {
