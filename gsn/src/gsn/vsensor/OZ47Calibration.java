@@ -355,7 +355,6 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 	  Double _lon = (Double)data.getData("LONGITUDE");
 	  
 	  if (_lat == null || _lon == null) {
-	    //logger.warn("Parsing data from OpenSense_OZ47_Uncalibrated: LATITUDE or LONGITUDE is null");
 	    return RefStations.NONE;
 	  }
 	  

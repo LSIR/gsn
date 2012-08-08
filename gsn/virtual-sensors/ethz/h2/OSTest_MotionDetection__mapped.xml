@@ -43,7 +43,7 @@
                     	}
                     	if (timeDifference > timeDifferenceOffset) {
                     		// Notify by email
-                    		def emailTitle = "[OpenSense GSN] - WARNING: No more " + vsname + " data received from position " + entry.key;
+                    		def emailTitle = "[OSTest GSN] - WARNING: No more " + vsname + " data received from position " + entry.key;
                     		def emailContent = "WARNING: No " + vsname + " data received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
 
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);

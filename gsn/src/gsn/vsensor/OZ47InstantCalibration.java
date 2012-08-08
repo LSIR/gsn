@@ -61,7 +61,7 @@ public class OZ47InstantCalibration extends BridgeVirtualSensorPermasense {
 		try {
 			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
 			StringBuilder query = new StringBuilder();
-			query.append("select calib_param_0, calib_param_1 from opensense_oz47_param_instant_cal where generation_time <= ").append(time.longValue()).append(" and device_id = ").append(dev_id.intValue()).append(" order by generation_time desc limit 1");
+			query.append("select calib_param_0, calib_param_1 from ostest_oz47_param_instant_cal where generation_time <= ").append(time.longValue()).append(" and device_id = ").append(dev_id.intValue()).append(" order by generation_time desc limit 1");
 			
 			rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
 			
