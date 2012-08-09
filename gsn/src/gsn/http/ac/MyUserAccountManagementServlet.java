@@ -39,7 +39,7 @@ public class MyUserAccountManagementServlet   extends HttpServlet
            this.printHeader(out);
            this.printLayoutMastHead(out, user );
            this.printLayoutContent(out);
-           this.printUserAccountLinks(out);
+           this.printUserAccountLinks(out, user);
            this.printLayoutFooter(out);
   
        }
@@ -117,15 +117,19 @@ public class MyUserAccountManagementServlet   extends HttpServlet
         out.println("<li><a href=\"/gsn/MyLogoutHandlerServlet\">logout</a></li>");
         out.println("<li><div id=\"logintextprime\">logged in as: "+user.getUserName()+"</div></li>");
     }
-    public void printUserAccountLinks(PrintWriter out)
+    public void printUserAccountLinks(PrintWriter out, User user)
     {
         out.println("<p>Welcome to your account management ! you have the following options:</p>");
-        out.println("<ul class=linklistul >");
-        out.println("<li class=linklistli><a href=\"/gsn/MyUserDetailUpdateServlet\">Update your user details</a></LI>");
-        out.println("<LI class=linklistli><a href=\"/gsn/MyUserUpdateServlet\">Update your access rights</a></LI>");
-        out.println("<LI class=linklistli><a href=\"/gsn/MyDataSourceCandidateRegistrationServlet\">Upload new virtual sensor files</a></LI>");
-        out.println("<LI class=linklistli><a href=\"/gsn/MyOwnerWaitingListServlet\">Check the waiting list for your virtual sensor(s)</a></LI>");
-        out.println("</ul>");
+        if (user != null) {
+	        out.println("<ul class=linklistul >");
+	        out.println("<li class=linklistli><a href=\"/gsn/MyUserDetailUpdateServlet\">Update your user details</a></LI>");
+	        if (!user.isAdmin())
+	        	out.println("<LI class=linklistli><a href=\"/gsn/MyUserUpdateServlet\">Update your access rights</a></LI>");
+	        out.println("<LI class=linklistli><a href=\"/gsn/MyDataSourceCandidateRegistrationServlet\">Upload new virtual sensor files</a></LI>");
+	        if (!user.isAdmin())
+	        	out.println("<LI class=linklistli><a href=\"/gsn/MyOwnerWaitingListServlet\">Check the waiting list for your virtual sensor(s)</a></LI>");
+	        out.println("</ul>");
+        }
     }
 
     /****************************************** Client Session related Methods*******************************************/

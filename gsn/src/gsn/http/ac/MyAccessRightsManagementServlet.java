@@ -120,10 +120,9 @@ public class MyAccessRightsManagementServlet extends HttpServlet
         }
         else {
             out.println("<LI class=linklistli><a href=/gsn/MyUserCandidateRegistrationServlet>Create New User</a></LI>");
+        	out.println("<LI class=linklistli><a href=\"/gsn/MyUserAccountManagementServlet\">User Account Management</a></LI>");
 	        if (user.isAdmin())
 	        	out.println("<LI class=linklistli><a href=\"/gsn/MyAdminManagementServlet\">Admin Only</a></LI>");
-	        else
-	        	out.println("<LI class=linklistli><a href=\"/gsn/MyUserAccountManagementServlet\">User Account Management</a></LI>");
         }
         out.println("</ul>");
     }
