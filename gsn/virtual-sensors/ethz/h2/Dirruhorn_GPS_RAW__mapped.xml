@@ -2,12 +2,16 @@
     <processing-class>
         <class-name>gsn.vsensor.GPSRawDemuxBridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="gps_time_conversion" />
+        </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
+            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" index="true"/>
             
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
