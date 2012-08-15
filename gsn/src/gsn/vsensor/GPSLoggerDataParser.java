@@ -2,6 +2,7 @@ package gsn.vsensor;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+import gsn.utils.Helpers;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -384,8 +385,9 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 						case 2:
 							logger.info("start parsing  " + CONFIG_STREAM_TYPE + " file (" + relativeFile + ")");
 
+							BufferedReader bufr = null;
 							try {
-								BufferedReader bufr = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(file))));
+								bufr = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(file))));
 								
 								Serializable [] out = new Serializable[configField.length];
 								out[0] = data.getData(configField[0].getName());
@@ -498,6 +500,13 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							} catch (IOException e) {
 								logger.error(e.getMessage(), e);
 							}
+							finally {
+								try {
+									bufr.close();
+								} catch (IOException e) {
+									logger.error(e.getMessage(), e);
+								}
+							}
 							
 							if (finished){
 								logger.info("successfully parsed config file (" + relativeFile + ")");
@@ -512,8 +521,9 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							
 							int eventCount = 0;
 							int unknownEventCounter = 0;
+							DataInputStream dis = null;
 							try {
-								DataInputStream dis = new DataInputStream(new FileInputStream(fixFile(file)));
+								dis = new DataInputStream(new FileInputStream(fixFile(file)));
 			
 								byte[] tmp4b = new byte[4];
 								byte[] tmp2b = new byte[2];
@@ -669,6 +679,13 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 							} catch (IOException e) {
 								logger.error(e.getMessage(), e);
 							}
+							finally {
+								try {
+									dis.close();
+								} catch (IOException e) {
+									logger.error(e.getMessage(), e);
+								}
+							}
 							if (finished) {
 								processParsingStatusStreamElement(inputStreamName, data, streamTypeNamingTable.get(streamType),
 										relativeFile, queue.size(), startParsingTime, System.currentTimeMillis(),
@@ -752,7 +769,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		private long getGPSRawTimestamp(byte[] rawPacket) {
 			ByteBuffer buf = ByteBuffer.wrap(rawPacket);
 			buf.order(ByteOrder.LITTLE_ENDIAN);
-			return (315964800L+(604800L*(long)buf.getShort(10)))*1000L+(long)buf.getInt(6);
+			return (long) (Helpers.convertGPSTimeToUnixTime((double)(buf.getInt(6)/1000.0), buf.getShort(10))*1000.0);
 		}
 
 

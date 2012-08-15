@@ -51,6 +51,109 @@ public class Helpers {
         return fmt.print(dt);
 	}
 
+    
+	
+/*
+	Modified version (by Tonio Gsell) of:
+	
+	gpstimeutil.js: a javascript library which translates between GPS and unix time
+	
+	Copyright (C) 2012  Jeffery Kline
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+	
+	*/
+	
+	// 
+	// v0.0: Sat May 19 22:24:16 CDT 2012
+	//     initial release
+	// v0.1: Sat May 19 22:24:31 CDT 2012
+	//     fix bug converting negative fractional gps times
+	//     fix bug converting negative fractional unix times
+	//     introduce global variable
+	// v0.2: Sat May 19 23:08:05 CDT 2012
+	//     ensure that unix2gps/gps2unix treats all input/output as Number
+	
+	/*
+	Javascript code is based on original at:
+	http://www.andrews.edu/~tzs/timeconv/timealgorithm.html
+	
+	The difference between the original and this version is that this
+	version handles the leap seconds using linear interpolation, not a
+	discontinuity.  Linear interpolation guarantees a 1-1 correspondence
+	between gps times and unix times.
+	
+	By contrast, for example, the original implementation maps both gps
+	times 46828800.5 and 46828800 map to unix time 362793599.5 
+	*/
+	private static final long GPS_OFFSET = 315964800L;
+
+	private static final long[] leaps = {46828800L, 78364801L, 109900802L, 173059203L, 252028804L,
+		315187205L, 346723206L, 393984007L, 425520008L, 457056009L, 504489610L,
+		551750411L, 599184012L, 820108813L, 914803214L, 1025136015L,
+		1341118800L};
+	
+	public static double convertGPSTimeToUnixTime(double gpsSec, short gpsWeek) {
+		double gpsTime = (double)(gpsWeek*604800 + gpsSec);
+		
+		if ( gpsTime < 0)
+			return gpsTime + GPS_OFFSET;
+		
+		double fpart = gpsTime % 1;
+		long ipart = (long) Math.floor(gpsTime);
+
+		long leap = countleaps(ipart, false);
+		double unixTime = (double)(ipart + GPS_OFFSET - leap);
+		
+		if (isleap(ipart + 1))
+			unixTime = unixTime + fpart / 2;
+		else if (isleap(ipart))
+			unixTime = unixTime + (fpart + 1) / 2;
+		else
+			unixTime = unixTime + fpart;
+		
+		return unixTime;
+	}
+	
+	private static boolean isleap(long gpsTime) {
+		boolean isLeap = false;
+		for (int i = 0; i < leaps.length; i++) {
+			if (gpsTime == leaps[i]) {
+				isLeap = true;
+				break;
+			}
+		}
+		return isLeap;
+	}
+	
+	private static long countleaps(long gpsTime, boolean accum_leaps) {
+		long nleaps = 0;
+		
+		if (accum_leaps) {
+			for (int i = 0; i < leaps.length; i++)
+				if (gpsTime + i >= leaps[i])
+					nleaps++;
+		}
+		else {
+			for (int i = 0; i < leaps.length; i++)
+				if (gpsTime >= leaps[i])
+					nleaps++;
+		}
+		
+		return nleaps;
+	}
+
 }
 
 
