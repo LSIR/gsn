@@ -3,16 +3,8 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <web-input password="test">
-            <command name="panorama_picture">
+            <command name="picture_now">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
-                <field name="start_x" type="text" defaultvalue="0">Lower-left horizontal starting point</field>
-                <field name="start_y" type="text" defaultvalue="0">Lower-left vertical starting point</field>
-                <field name="pictures_x" type="text" defaultvalue="1">Number of pictures taken horizontally</field>
-                <field name="pictures_y" type="text" defaultvalue="1">Number of pictures taken vertically</field>
-                <field name="rotation_x" type="text" defaultvalue="">Horizontal rotation in degrees between pictures</field>
-                <field name="rotation_y" type="text" defaultvalue="">Vertical rotation in degrees between pictures</field>
-                <field name="delay" type="text" defaultvalue="0">Delay between rotation and picture taking</field>
-                <field name="batch_download" type="checkbox:batch_download" defaultvalue="1">select if picture download from camera should be done after all pictures have been taken</field>
                 <field name="image_quality" type="select:JPEG Basic,0|JPEG Normal,1|JPEG Fine,2|NEF (Raw),3|NEF+Basic,4|NEF+Normal,5|NEF+Fine,6|TIFF (RGB),7">select image quality</field>
                 <field name="image_size" type="select:2144x1424,2|3216x2136,1|4288x2848,0">select image size</field>
                 <field name="aperture" type="select:auto|f/5.6,0|f/6.3,1|f/7.1,2|f/8,3|f/9,4|f/10,5|f/11,6|f/13,7|f/14,8|f/16,9|f/18,10|f/20,11|f/22,12|f/25,13|f/29,14|f/32,15|f/36,16">select aperture</field>
@@ -25,8 +17,16 @@
                 <field name="focus" type="text" defaultvalue="">manual focus value</field>
                 <field name="gphoto2_config" type="text" defaultvalue="">Comma separated configurations for gphoto2</field>
             </command>
-            <command name="picture_now">
+            <command name="panorama_picture">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
+                <field name="start_x" type="text" defaultvalue="0">Lower-left horizontal starting point</field>
+                <field name="start_y" type="text" defaultvalue="0">Lower-left vertical starting point</field>
+                <field name="pictures_x" type="text" defaultvalue="1">Number of pictures taken horizontally</field>
+                <field name="pictures_y" type="text" defaultvalue="1">Number of pictures taken vertically</field>
+                <field name="rotation_x" type="text" defaultvalue="">Horizontal rotation in degrees between pictures</field>
+                <field name="rotation_y" type="text" defaultvalue="">Vertical rotation in degrees between pictures</field>
+                <field name="delay" type="text" defaultvalue="0">Delay between rotation and picture taking</field>
+                <field name="batch_download" type="checkbox:batch_download" defaultvalue="1">select if picture download from camera should be done after all pictures have been taken</field>
                 <field name="image_quality" type="select:JPEG Basic,0|JPEG Normal,1|JPEG Fine,2|NEF (Raw),3|NEF+Basic,4|NEF+Normal,5|NEF+Fine,6|TIFF (RGB),7">select image quality</field>
                 <field name="image_size" type="select:2144x1424,2|3216x2136,1|4288x2848,0">select image size</field>
                 <field name="aperture" type="select:auto|f/5.6,0|f/6.3,1|f/7.1,2|f/8,3|f/9,4|f/10,5|f/11,6|f/13,7|f/14,8|f/16,9|f/18,10|f/20,11|f/22,12|f/25,13|f/29,14|f/32,15|f/36,16">select aperture</field>
@@ -84,11 +84,183 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data1">
+		<stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">permasense-etz-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data3">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data4">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps03.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data5">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                     <predicate key="remote-connection">tik-gumstix-dyn-01.ethz.ch:9003</predicate>
+                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data6">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                     <predicate key="remote-connection">tik-gumstix-dyn-02.ethz.ch:9003</predicate>
+                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data7">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                     <predicate key="remote-connection">tik-gumstix-dyn-03.ethz.ch:9003</predicate>
+                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data8">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                     <predicate key="remote-connection">tik-gumstix-dyn-04.ethz.ch:9003</predicate>
+                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data11">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                     <predicate key="remote-connection">permasense-etz-cam01.ethz.ch:9003</predicate>
+                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data12">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data13">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps06.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data14">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps05.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data15">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-gps02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+        <stream name="data16">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">xsense-caa-etz-2.dyndns.biz:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+		<stream name="data17">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-uz3g-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+
+		<stream name="data18">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-etz-bs03.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CamZillaPlugin</predicate>
+                    <predicate key="status-data-type">dynamic</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
