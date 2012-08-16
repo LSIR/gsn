@@ -101,6 +101,12 @@ MinidiscPlugin = 85,
 # CONO2
 CONO2Plugin = 87,
 
+# Wifi
+WifiPlugin = 88,
+
+# Gsm
+GsmPlugin = 89,
+
 # CamZillaPlugin
 CamZillaPlugin = 90,
 
