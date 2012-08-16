@@ -119,6 +119,10 @@ OSTest_OZ47_Instant_Calibrated.xml
 OSTest_Data_Latency.xml
 OSTest_MiniDisc_EMB__muxed__mapped.xml
 OSTest_MiniDisc_EMB__mapped.xml
+#OSTest_Wifi__mapped.xml
+#OSTest_Wifi__muxed__mapped.xml
+#OSTest_Gsm__mapped.xml
+#OSTest_Gsm__muxed__mapped.xml
 #OSTest_STEVAL_Dynamic_Proc_GPS.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml

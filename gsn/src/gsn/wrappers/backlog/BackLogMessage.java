@@ -157,7 +157,17 @@ public class BackLogMessage {
    *  
    *  {@link gsn.wrappers.backlog.plugins.CONO2Plugin CONO2Plugin}. */
   public static final short CONO2_MESSAGE_TYPE = 87;
+  
+  /** WifiPlugin 
+   *  
+   *  {@link gsn.wrappers.backlog.plugins.WifiPluginn WifiPlugin}. */
+  public static final short WIFI_MESSAGE_TYPE = 88;
 
+  /** GsmPlugin 
+   *  
+   *  {@link gsn.wrappers.backlog.plugins.GsmPlugin GsmPlugin}. */
+  public static final short GSM_MESSAGE_TYPE = 89;
+  
 	/** CamZilla
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.CamZillaPlugin CamZillaPlugin}. */

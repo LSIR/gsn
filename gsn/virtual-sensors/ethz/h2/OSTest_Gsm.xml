@@ -1,0 +1,43 @@
+<virtual-sensor name="OSTest_Gsm" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+            <field name="UTC_RAW_DATA" type="VARCHAR(32)" />
+            <field name="LAT_RAW_DATA" type="VARCHAR(32)" />
+            <field name="LAT_N_RAW_DATA" type="VARCHAR(32)" />
+            <field name="LONG_RAW_DATA" type="VARCHAR(32)" />
+            <field name="LONG_N_RAW_DATA" type="VARCHAR(32)" />
+            <field name="QUAL_RAW_DATA" type="VARCHAR(32)" />
+            <field name="SAT_RAW_DATA" type="VARCHAR(32)" />
+            <field name="HDOP_RAW_DATA" type="VARCHAR(32)" />
+            <field name="GEO_HEIGHT_RAW_DATA" type="VARCHAR(32)" />
+            <field name="GEO_HEIGHT_U_RAW_DATA" type="VARCHAR(32)" />
+            <field name="GEO_SEP_RAW_DATA" type="VARCHAR(32)" />
+            <field name="GEO_SEP_U_RAW_DATA" type="VARCHAR(32)" />
+           
+            <field name="GSM_RAW_DATA" type="VARCHAR(256)"/>
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>GSM readings from the OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">opensense-etz-bs02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GsmPlugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
