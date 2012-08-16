@@ -98,6 +98,9 @@ MotionDetectionPlugin = 84,
 # MINIDISC 
 MinidiscPlugin = 85,
 
+# CONO2
+CONO2Plugin = 87,
+
 # CamZillaPlugin
 CamZillaPlugin = 90,
 

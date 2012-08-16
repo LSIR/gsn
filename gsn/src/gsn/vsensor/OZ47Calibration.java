@@ -270,7 +270,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
             return;
           }
           else if (data.getData("OZONE_PPB") == null) {
-            logger.warn("OZONE_PPB field returned null from stream " + inputStreamName + ":" + data.getFieldNames().toString() );
+            logger.debug("OZONE_PPB field returned null from stream " + inputStreamName + ":" + data.getFieldNames().toString() );
             return;
           }
           devId = ((Integer)bufData.getData("DEVICE_ID")).intValue();

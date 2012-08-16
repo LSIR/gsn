@@ -152,6 +152,11 @@ public class BackLogMessage {
    *  
    *  {@link gsn.wrappers.backlog.plugins.MinidiscPlugin MinidiscPlugin}. */
 	public static final short MINIDISC_MESSAGE_TYPE = 85;
+	
+	/** CONO2 
+   *  
+   *  {@link gsn.wrappers.backlog.plugins.CONO2Plugin CONO2Plugin}. */
+  public static final short CONO2_MESSAGE_TYPE = 87;
 
 	/** CamZilla
      *  

@@ -42,7 +42,8 @@ public class OstLuftWrapper extends AbstractWrapper {
       new DataField("GENERATION_TIME", "BIGINT"),
       new DataField("OZONE_PPB", "DOUBLE"),
       new DataField("CO_PPM", "DOUBLE"),
-      new DataField("NO2_PPB", "DOUBLE")};
+      new DataField("NO2_PPB", "DOUBLE"),
+      new DataField("TEMPERATURE_C", "DOUBLE")};
 
 	/**
 	* From XML file it needs the followings :
@@ -143,7 +144,7 @@ public class OstLuftWrapper extends AbstractWrapper {
         content = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
   
         while ((decodedString = content.readLine()) != null) {
-  
+          
           HtmlTableParser parser = new HtmlTableParser();
           parser.parse(decodedString);
           
@@ -152,7 +153,7 @@ public class OstLuftWrapper extends AbstractWrapper {
             try {
               
               // Check that vector has exactly four elements.
-              if (contents.get(i).size() != 4) continue;
+              if (contents.get(i).size() != 5) continue;
               
               Date newDate = formatTable.parse((String) contents.get(i).get(0));
               // Go from cest (UTC+2h) to time format on the core station (UTC+1h)
@@ -161,6 +162,7 @@ public class OstLuftWrapper extends AbstractWrapper {
               Double ozone = null;
               Double co = null;
               Double no2 = null;
+              Double temp = null;
               
               if (((String) contents.get(i).get(1)).indexOf("-") < 0) {
                 ozone = new Double((String) contents.get(i).get(1));
@@ -174,10 +176,13 @@ public class OstLuftWrapper extends AbstractWrapper {
                 no2 = new Double((String) contents.get(i).get(3));
                 no2 = no2/1.91;
               }
+              if (((String) contents.get(i).get(4)).indexOf("-") < 0) {
+                temp = new Double((String) contents.get(i).get(4));
+              }
               
               // Only post stream if one of the values are not null
-              if (ozone != null || co != null || no2 != null)
-                postStreamElement(new Serializable[]{deviceId, newDate.getTime() - 3600000, ozone, co, no2});
+              if (ozone != null || co != null || no2 != null || temp != null)
+                postStreamElement(new Serializable[]{deviceId, newDate.getTime() - 3600000, ozone, co, no2, temp});
               
             } catch (java.text.ParseException e){
               logger.error("Format parse exception: " + e.getMessage());
@@ -229,6 +234,7 @@ public class OstLuftWrapper extends AbstractWrapper {
       start = htmlContent.indexOf("<th ", start+1);
       start = htmlContent.indexOf("<th ", start+1);
       start = htmlContent.indexOf("<th ", start+1);
+      start = htmlContent.indexOf("<th ", start+1);
 
       for(int i=start+1; i<htmlContent.length(); i++) {
         // Search <th
@@ -247,8 +253,8 @@ public class OstLuftWrapper extends AbstractWrapper {
         String cell1Content = htmlContent.substring(idxTr,idxTrEnd);
         row.add(cell1Content.replaceAll("\\<.*?\\>", ""));
 
-        // For O3, CO, and NO2.
-        for (int u = 0; u < 3; u++) {
+        // For O3, CO, NO2, and temp.
+        for (int u = 0; u < 4; u++) {
           // Search <td
           int idxTd = htmlContent.indexOf("<td ", i);
           if (idxTd < 0)

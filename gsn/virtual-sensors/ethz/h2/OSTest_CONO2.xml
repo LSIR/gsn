@@ -1,0 +1,33 @@
+<virtual-sensor name="OSTest_CONO2" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="RAW_DATA" type="VARCHAR(256)"/>
+            <field name="MEASUREMENT_ID" type="BIGINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>CONO2 sensor reading from the OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">opensense-caa-due-1.dyndns.biz:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.CONO2Plugin</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        
+        
+    </streams>
+</virtual-sensor>
