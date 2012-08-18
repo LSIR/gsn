@@ -1,0 +1,287 @@
+<virtual-sensor name="OSTest_Gsm__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+    		<init-params>
+            <param name="persistant">true</param>
+	    	<param name="scriptlet">
+	    	<![CDATA[
+	    		
+                // Convert the dBm to Watts.
+                def dbmToWatt(double powerDbm) {
+                    double powerW = Math.pow(10, (powerDbm/10.0))*0.001;
+                    return powerW;
+                }
+
+                // And back to dBm.
+                def wattToDbm(double powerW) {
+                    double powerDbm = 10*Math.log10(powerW/0.001);
+                    return powerDbm;
+                }
+
+                // Returns the E filed strength.
+                // rssi in dBm, freq in Hz, gain linear.
+                def rssiToFieldStrength(double rssi, double freq, double gain) {
+                    double C = 299792458; // Speed of light
+                    double Z0 = 376.73; // Free space impedance
+          
+                    double powerW = dbmToWatt(rssi);
+                    double wavelength = C/freq;
+                    double fieldStrength = Math.sqrt(powerW*Z0/(gain*Math.pow(wavelength,2)/(4*Math.PI)));
+
+                    return fieldStrength;
+                }
+
+                // Returns the downlink frequency in MHz
+                def arfcnToFrequency(int arfcn) {
+                    // GSM 900
+                    double downlink = 0
+                    if (arfcn >= 0 && arfcn <= 124) {
+                        downlink = 800 + 0.2 * arfcn + 45;
+                    }
+                    // GSM 1800
+                    else if (arfcn >= 512 && arfcn <= 885) {
+                        downlink = 1710.2 + 0.2 * (arfcn - 512) + 95;
+                    }
+                    return downlink
+                }
+
+	    		if ( ! isdef('positionMap')) { positionMap = [:]; }
+                    if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+                    try {
+                        // Gsm Data
+                        String[] tokens = GSM_RAW_DATA.split(",");
+                        if (tokens.length == 28) {
+                            def lacArray = new int[7];
+                            def cidArray = new int[7];
+                            def arfcnArray = new int[7];
+                            def frequencyArray = new double[7];
+                            def rssiArray = new int[7];
+                            def fieldStrengthArray = new double[7];
+
+                            def rssiSumWatt900MHz = 0.0;
+                            def fieldStrengthSumSquared900MHz = 0.0;
+                            def rssiSumWatt1800MHz = 0.0;
+                            def fieldStrengthSumSquared1800MHz = 0.0;
+
+                            for(int i = 0; i < 7; i++) {
+                                lacArray[i] = tokens[i*4].toInteger();
+                                cidArray[i] = tokens[i*4 + 1].toInteger();
+                                // Not all entries have to be filled, so ignore the ones without lac/cid.
+                                if(lacArray[i] == 0 || cidArray[i] == 0) {
+                                    lacArray[i] = 0;
+                                    cidArray[i] = 0;
+                                    arfcnArray[i] = 0;
+                                    rssiArray[i] = 0;
+                                    fieldStrengthArray[i] = 0;
+                                    continue;
+                                }
+                                arfcnArray[i] = tokens[i*4 + 2].toInteger();
+                                frequencyArray[i] = arfcnToFrequency(arfcnArray[i]);
+                                rssiArray[i] = tokens[i*4 + 3].toInteger();
+                                fieldStrengthArray[i] = rssiToFieldStrength(rssiArray[i], (frequencyArray[i]*1000000).toDouble(), 1.0);
+
+                                if(frequencyArray[i] < 1000) {
+                                    rssiSumWatt900MHz += dbmToWatt(rssiArray[i]);
+                                    fieldStrengthSumSquared900MHz += Math.pow(fieldStrengthArray[i], 2);
+                                }
+                                else {
+                                    rssiSumWatt1800MHz += dbmToWatt(rssiArray[i]);
+                                    fieldStrengthSumSquared1800MHz += Math.pow(fieldStrengthArray[i], 2);
+                                }
+                            }
+
+                            LAC_1 = lacArray[0];
+                            CID_1 = cidArray[0];
+                            ARFCN_1 = arfcnArray[0];
+                            FREQUENCY_1 = frequencyArray[0];
+                            RSSI_1 = rssiArray[0];
+                            FIELD_STRENGTH_1 = fieldStrengthArray[0];
+                            LAC_2 = lacArray[1];
+                            CID_2 = cidArray[1];
+                            ARFCN_2 = arfcnArray[1];
+                            FREQUENCY_2 = frequencyArray[1];
+                            RSSI_2 = rssiArray[1];
+                            FIELD_STRENGTH_2 = fieldStrengthArray[1];
+                            LAC_3 = lacArray[2];
+                            CID_3 = cidArray[2];
+                            ARFCN_3 = arfcnArray[2];
+                            FREQUENCY_3 = frequencyArray[2];
+                            RSSI_3 = rssiArray[2];
+                            FIELD_STRENGTH_3 = fieldStrengthArray[2];
+                            LAC_4 = lacArray[3];
+                            CID_4 = cidArray[3];
+                            ARFCN_4 = arfcnArray[3];
+                            FREQUENCY_4 = frequencyArray[3];
+                            RSSI_4 = rssiArray[3];
+                            FIELD_STRENGTH_4 = fieldStrengthArray[3];
+                            LAC_5 = lacArray[4];
+                            CID_5 = cidArray[4];
+                            ARFCN_5 = arfcnArray[4];
+                            FREQUENCY_5 = frequencyArray[4];
+                            RSSI_5 = rssiArray[4];
+                            FIELD_STRENGTH_5 = fieldStrengthArray[4];
+                            LAC_6 = lacArray[5];
+                            CID_6 = cidArray[5];
+                            ARFCN_6 = arfcnArray[5];
+                            FREQUENCY_6 = frequencyArray[5];
+                            RSSI_6 = rssiArray[5];
+                            FIELD_STRENGTH_6 = fieldStrengthArray[5];
+                            LAC_7 = lacArray[6];
+                            CID_7 = cidArray[6];
+                            ARFCN_7 = arfcnArray[6];
+                            FREQUENCY_7 = frequencyArray[6];
+                            RSSI_7 = rssiArray[6];
+                            FIELD_STRENGTH_7 = fieldStrengthArray[6];
+
+                            RSSI_SUM_900MHZ = wattToDbm(rssiSumWatt900MHz);
+                            FIELD_STRENGTH_SUM_900MHZ = Math.sqrt(fieldStrengthSumSquared900MHz);
+                            RSSI_SUM_1800MHZ = wattToDbm(rssiSumWatt1800MHz);
+                            FIELD_STRENGTH_SUM_1800MHZ = Math.sqrt(fieldStrengthSumSquared1800MHz);
+                        }
+
+          
+                        // GPS Data
+						if (UTC_RAW_DATA != null && UTC_RAW_DATA.size() != 0) {
+							UTC_POS_TIME = UTC_RAW_DATA.toDouble() as int;
+						}
+						else {
+							UTC_POS_TIME = null;
+						}
+						if (LAT_RAW_DATA != null && LAT_RAW_DATA.size() != 0) {
+							LATITUDE = LAT_RAW_DATA.toDouble();
+						}
+						else {
+							LATITUDE = null;
+						}
+						LAT_HEMISPHERE = LAT_N_RAW_DATA;
+						if (LONG_RAW_DATA != null && LONG_RAW_DATA.size() != 0) {
+							LONGITUDE = LONG_RAW_DATA.toDouble();
+						}
+						else {
+							LONGITUDE = null;
+						}
+						LONG_HEMISPHERE = LONG_N_RAW_DATA;
+						if (QUAL_RAW_DATA != null && QUAL_RAW_DATA.size() != 0) {
+							QUALITY = QUAL_RAW_DATA.toInteger();
+						}
+						else {
+							QUALITY = null;
+						}
+						if (SAT_RAW_DATA != null && SAT_RAW_DATA.size() != 0) {
+							NR_SATELLITES = SAT_RAW_DATA.toInteger();
+						}
+						else {
+							NR_SATELLITES = null;
+						}
+						if (HDOP_RAW_DATA != null && HDOP_RAW_DATA.size() != 0) {
+							HDOP = HDOP_RAW_DATA.toDouble();
+						}
+						else {
+							HDOP = null;
+						}
+						if (GEO_HEIGHT_RAW_DATA != null && GEO_HEIGHT_RAW_DATA.size() != 0) {
+							GEOID_HEIGHT = GEO_HEIGHT_RAW_DATA.toDouble();
+						}
+						else {
+							GEOID_HEIGHT = null;
+						}
+						GEOID_HEIGHT_UNIT = GEO_HEIGHT_U_RAW_DATA;
+						if (GEO_SEP_RAW_DATA != null && GEO_SEP_RAW_DATA.size() != 0) {
+							GEOID_SEP = GEO_SEP_RAW_DATA.toDouble();
+						}
+						else {
+							GEOID_SEP = null;
+						}
+						GEOID_SEP_UNIT = GEO_SEP_U_RAW_DATA;
+					}catch(Throwable e){
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+				]]>
+	    	</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="UTC_POS_TIME" type="INTEGER"/>
+            <field name="LATITUDE" type="DOUBLE" />
+            <field name="LAT_HEMISPHERE" type="VARCHAR(32)" />
+            <field name="LONGITUDE" type="DOUBLE" />
+            <field name="LONG_HEMISPHERE" type="VARCHAR(32)" />
+            <field name="QUALITY" type="INTEGER" />
+            <field name="NR_SATELLITES" type="INTEGER" />
+            <field name="HDOP" type="DOUBLE" />
+            <field name="GEOID_HEIGHT" type="DOUBLE" />
+            <field name="GEOID_HEIGHT_UNIT" type="VARCHAR(32)" />
+            <field name="GEOID_SEP" type="DOUBLE" />
+            <field name="GEOID_SEP_UNIT" type="VARCHAR(32)" />
+            
+            <field name="RSSI_SUM_900MHZ" type="DOUBLE" unit="dBm" />
+            <field name="FIELD_STRENGTH_SUM_900MHZ" type="DOUBLE" unit="V/m" />
+            <field name="RSSI_SUM_1800MHZ" type="DOUBLE" unit="dBm" />
+            <field name="FIELD_STRENGTH_SUM_1800MHZ" type="DOUBLE" unit="V/m" />
+            <field name="LAC_1" type="INTEGER" />
+            <field name="CID_1" type="INTEGER" />
+            <field name="ARFCN_1" type="INTEGER" />
+            <field name="FREQUENCY_1" type="DOUBLE" unit="MHz" />
+            <field name="RSSI_1" type="INTEGER" unit="dBm" />
+            <field name="FIELD_STRENGTH_1" type="DOUBLE" unit="V/m" />
+            <field name="LAC_2" type="INTEGER" />
+            <field name="CID_2" type="INTEGER" />
+            <field name="ARFCN_2" type="INTEGER" />
+            <field name="FREQUENCY_2" type="DOUBLE" unit="MHz" />
+            <field name="RSSI_2" type="INTEGER" unit="dBm" />
+            <field name="FIELD_STRENGTH_2" type="DOUBLE" unit="V/m" />
+            <field name="LAC_3" type="INTEGER" />
+            <field name="CID_3" type="INTEGER" />
+            <field name="ARFCN_3" type="INTEGER" />
+            <field name="FREQUENCY_3" type="DOUBLE" unit="MHz" />
+            <field name="RSSI_3" type="INTEGER" unit="dBm" />
+            <field name="FIELD_STRENGTH_3" type="DOUBLE" unit="V/m" />
+            <field name="LAC_4" type="INTEGER" />
+            <field name="CID_4" type="INTEGER" />
+            <field name="ARFCN_4" type="INTEGER" />
+            <field name="FREQUENCY_4" type="DOUBLE" unit="MHz" />
+            <field name="RSSI_4" type="INTEGER" unit="dBm" />
+            <field name="FIELD_STRENGTH_4" type="DOUBLE" unit="V/m" />
+            <field name="LAC_5" type="INTEGER" />
+            <field name="CID_5" type="INTEGER" />
+            <field name="ARFCN_5" type="INTEGER" />
+            <field name="FREQUENCY_5" type="DOUBLE" unit="MHz" />
+            <field name="RSSI_5" type="INTEGER" unit="dBm" />
+            <field name="FIELD_STRENGTH_5" type="DOUBLE" unit="V/m" />
+            <field name="LAC_6" type="INTEGER" />
+            <field name="CID_6" type="INTEGER" />
+            <field name="ARFCN_6" type="INTEGER" />
+            <field name="FREQUENCY_6" type="DOUBLE" unit="MHz" />
+            <field name="RSSI_6" type="INTEGER" unit="dBm" />
+            <field name="FIELD_STRENGTH_6" type="DOUBLE" unit="V/m" />
+            <field name="LAC_7" type="INTEGER" />
+            <field name="CID_7" type="INTEGER" />
+            <field name="ARFCN_7" type="INTEGER" />
+            <field name="FREQUENCY_7" type="DOUBLE" unit="MHz" />
+            <field name="RSSI_7" type="INTEGER" unit="dBm" />
+            <field name="FIELD_STRENGTH_7" type="DOUBLE" unit="V/m" />
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>GSM data from the OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from OSTest_Gsm__muxed__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
