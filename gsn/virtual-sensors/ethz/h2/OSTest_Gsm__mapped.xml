@@ -72,6 +72,7 @@
                                     lacArray[i] = 0;
                                     cidArray[i] = 0;
                                     arfcnArray[i] = 0;
+                                    frequencyArray[i] = 0;
                                     rssiArray[i] = 0;
                                     fieldStrengthArray[i] = 0;
                                     continue;
@@ -92,52 +93,120 @@
                             }
 
                             LAC_1 = lacArray[0];
+                            if(LAC_1 == 0) LAC_1 = null;
                             CID_1 = cidArray[0];
+                            if(CID_1 == 0) CID_1 = null;
                             ARFCN_1 = arfcnArray[0];
+                            if(ARFCN_1 == 0) ARFCN_1 = null;
                             FREQUENCY_1 = frequencyArray[0];
+                            if(FREQUENCY_1 == 0) FREQUENCY_1 = null;
                             RSSI_1 = rssiArray[0];
+                            if(RSSI_1 == 0) RSSI_1 = null;
                             FIELD_STRENGTH_1 = fieldStrengthArray[0];
-                            LAC_2 = lacArray[1];
-                            CID_2 = cidArray[1];
-                            ARFCN_2 = arfcnArray[1];
-                            FREQUENCY_2 = frequencyArray[1];
-                            RSSI_2 = rssiArray[1];
-                            FIELD_STRENGTH_2 = fieldStrengthArray[1];
-                            LAC_3 = lacArray[2];
-                            CID_3 = cidArray[2];
-                            ARFCN_3 = arfcnArray[2];
-                            FREQUENCY_3 = frequencyArray[2];
-                            RSSI_3 = rssiArray[2];
-                            FIELD_STRENGTH_3 = fieldStrengthArray[2];
-                            LAC_4 = lacArray[3];
-                            CID_4 = cidArray[3];
-                            ARFCN_4 = arfcnArray[3];
-                            FREQUENCY_4 = frequencyArray[3];
-                            RSSI_4 = rssiArray[3];
-                            FIELD_STRENGTH_4 = fieldStrengthArray[3];
-                            LAC_5 = lacArray[4];
-                            CID_5 = cidArray[4];
-                            ARFCN_5 = arfcnArray[4];
-                            FREQUENCY_5 = frequencyArray[4];
-                            RSSI_5 = rssiArray[4];
-                            FIELD_STRENGTH_5 = fieldStrengthArray[4];
-                            LAC_6 = lacArray[5];
-                            CID_6 = cidArray[5];
-                            ARFCN_6 = arfcnArray[5];
-                            FREQUENCY_6 = frequencyArray[5];
-                            RSSI_6 = rssiArray[5];
-                            FIELD_STRENGTH_6 = fieldStrengthArray[5];
-                            LAC_7 = lacArray[6];
-                            CID_7 = cidArray[6];
-                            ARFCN_7 = arfcnArray[6];
-                            FREQUENCY_7 = frequencyArray[6];
-                            RSSI_7 = rssiArray[6];
-                            FIELD_STRENGTH_7 = fieldStrengthArray[6];
+                            if(FIELD_STRENGTH_1 == 0) FIELD_STRENGTH_1 = null;
 
-                            RSSI_SUM_900MHZ = wattToDbm(rssiSumWatt900MHz);
-                            FIELD_STRENGTH_SUM_900MHZ = Math.sqrt(fieldStrengthSumSquared900MHz);
-                            RSSI_SUM_1800MHZ = wattToDbm(rssiSumWatt1800MHz);
-                            FIELD_STRENGTH_SUM_1800MHZ = Math.sqrt(fieldStrengthSumSquared1800MHz);
+                            LAC_2 = lacArray[1];
+                            if(LAC_2 == 0) LAC_2 = null;
+                            CID_2 = cidArray[1];
+                            if(CID_2 == 0) CID_2 = null;
+                            ARFCN_2 = arfcnArray[1];
+                            if(ARFCN_2 == 0) ARFCN_2 = null;
+                            FREQUENCY_2 = frequencyArray[1];
+                            if(FREQUENCY_2 == 0) FREQUENCY_2 = null;
+                            RSSI_2 = rssiArray[1];
+                            if(RSSI_2 == 0) RSSI_2 = null;
+                            FIELD_STRENGTH_2 = fieldStrengthArray[1];
+                            if(FIELD_STRENGTH_2 == 0) FIELD_STRENGTH_2 = null;
+
+                            LAC_3 = lacArray[2];
+                            if(LAC_3 == 0) LAC_3 = null;
+                            CID_3 = cidArray[2];
+                            if(CID_3 == 0) CID_3 = null;
+                            ARFCN_3 = arfcnArray[2];
+                            if(ARFCN_3 == 0) ARFCN_3 = null;
+                            FREQUENCY_3 = frequencyArray[2];
+                            if(FREQUENCY_3 == 0) FREQUENCY_3 = null;
+                            RSSI_3 = rssiArray[2];
+                            if(RSSI_3 == 0) RSSI_3 = null;
+                            FIELD_STRENGTH_3 = fieldStrengthArray[2];
+                            if(FIELD_STRENGTH_3 == 0) FIELD_STRENGTH_3 = null;
+
+                            LAC_4 = lacArray[3];
+                            if(LAC_4 == 0) LAC_4 = null;
+                            CID_4 = cidArray[3];
+                            if(CID_4 == 0) CID_4 = null;
+                            ARFCN_4 = arfcnArray[3];
+                            if(ARFCN_4 == 0) ARFCN_4 = null;
+                            FREQUENCY_4 = frequencyArray[3];
+                            if(FREQUENCY_4 == 0) FREQUENCY_4 = null;
+                            RSSI_4 = rssiArray[3];
+                            if(RSSI_4 == 0) RSSI_4 = null;
+                            FIELD_STRENGTH_4 = fieldStrengthArray[3];
+                            if(FIELD_STRENGTH_4 == 0) FIELD_STRENGTH_4 = null;
+
+                            LAC_5 = lacArray[4];
+                            if(LAC_5 == 0) LAC_5 = null;
+                            CID_5 = cidArray[4];
+                            if(CID_5 == 0) CID_5 = null;
+                            ARFCN_5 = arfcnArray[4];
+                            if(ARFCN_5 == 0) ARFCN_5 = null;
+                            FREQUENCY_5 = frequencyArray[4];
+                            if(FREQUENCY_5 == 0) FREQUENCY_5 = null;
+                            RSSI_5 = rssiArray[4];
+                            if(RSSI_5 == 0) RSSI_5 = null;
+                            FIELD_STRENGTH_5 = fieldStrengthArray[4];
+                            if(FIELD_STRENGTH_5 == 0) FIELD_STRENGTH_5 = null;
+
+                            LAC_6 = lacArray[5];
+                            if(LAC_6 == 0) LAC_6 = null;
+                            CID_6 = cidArray[5];
+                            if(CID_6 == 0) CID_6 = null;
+                            ARFCN_6 = arfcnArray[5];
+                            if(ARFCN_6 == 0) ARFCN_6 = null;
+                            FREQUENCY_6 = frequencyArray[5];
+                            if(FREQUENCY_6 == 0) FREQUENCY_6 = null;
+                            RSSI_6 = rssiArray[5];
+                            if(RSSI_6 == 0) RSSI_6 = null;
+                            FIELD_STRENGTH_6 = fieldStrengthArray[5];
+                            if(FIELD_STRENGTH_6 == 0) FIELD_STRENGTH_6 = null;
+
+                            LAC_7 = lacArray[6];
+                            if(LAC_7 == 0) LAC_7 = null;
+                            CID_7 = cidArray[6];
+                            if(CID_7 == 0) CID_7 = null;
+                            ARFCN_7 = arfcnArray[6];
+                            if(ARFCN_7 == 0) ARFCN_7 = null;
+                            FREQUENCY_7 = frequencyArray[6];
+                            if(FREQUENCY_7 == 0) FREQUENCY_7 = null;
+                            RSSI_7 = rssiArray[6];
+                            if(RSSI_7 == 0) RSSI_7 = null;
+                            FIELD_STRENGTH_7 = fieldStrengthArray[6];
+                            if(FIELD_STRENGTH_7 == 0) FIELD_STRENGTH_7 = null;
+
+                            if(rssiSumWatt900MHz != 0.0) {
+                                RSSI_SUM_900MHZ = wattToDbm(rssiSumWatt900MHz);
+                            }
+                            else {
+                                RSSI_SUM_900MHZ = null;
+                            }
+                            if(fieldStrengthSumSquared900MHz != 0.0) {
+                                FIELD_STRENGTH_SUM_900MHZ = Math.sqrt(fieldStrengthSumSquared900MHz);
+                            }
+                            else {
+                                FIELD_STRENGTH_SUM_900MHZ = null;
+                            }
+                            if(rssiSumWatt1800MHz != 0.0) {
+                                RSSI_SUM_1800MHZ = wattToDbm(rssiSumWatt1800MHz);
+                            }
+                            else {
+                                RSSI_SUM_1800MHZ = null;
+                            }
+                            if(fieldStrengthSumSquared1800MHz != 0.0) {
+                                FIELD_STRENGTH_SUM_1800MHZ = Math.sqrt(fieldStrengthSumSquared1800MHz);
+                            }
+                            else {
+                                FIELD_STRENGTH_SUM_1800MHZ = null;
+                            }
                         }
 
           
