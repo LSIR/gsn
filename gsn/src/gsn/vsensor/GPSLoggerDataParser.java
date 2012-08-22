@@ -156,7 +156,8 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		}
 		
 
-		gpsFileParserThread = GPSFileParserThread.getSingletonObject(stream_type, this);
+		gpsFileParserThread = GPSFileParserThread.getSingletonObject(deployment);
+		gpsFileParserThread.setNewListener(stream_type, this);
 		synchronized (gpsFileParserThread) {
 			if (!gpsFileParserThread.isAlive())
 				gpsFileParserThread.start();
@@ -197,25 +198,30 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 
 	private static class GPSFileParserThread extends Thread {
 		
-		private static GPSFileParserThread singletonObject = null;
+		private static Map<String,GPSFileParserThread> perDeploymentSingletons = new Hashtable<String,GPSFileParserThread>();
 		
-		private final BlockingQueue<FileItem> queue = new LinkedBlockingQueue<FileItem>();
-		private boolean stop = false;
-		private static Map<Short,GPSLoggerDataParser> streamtypeToListener = new Hashtable<Short,GPSLoggerDataParser>();
+		private final BlockingQueue<FileItem> queue;
+		private boolean stop;
+		private Map<Short,GPSLoggerDataParser> streamtypeToListener;
 		
 		
 		private GPSFileParserThread() {
+			stop = false;
+			queue = new LinkedBlockingQueue<FileItem>();
+			streamtypeToListener = new Hashtable<Short,GPSLoggerDataParser>();
 			setName("GPSFileParserThread-Thread");
 		}
 		
 		
-		public synchronized static GPSFileParserThread getSingletonObject(short streamtype, GPSLoggerDataParser listener) {
-			if (singletonObject == null)
-				singletonObject = new GPSFileParserThread();
+		public synchronized static GPSFileParserThread getSingletonObject(String deployment) {
+			if (!perDeploymentSingletons.containsKey(deployment))
+				perDeploymentSingletons.put(deployment, new GPSFileParserThread());
 			
+			return perDeploymentSingletons.get(deployment);
+		}
+		
+		protected void setNewListener(short streamtype, GPSLoggerDataParser listener) {
 			streamtypeToListener.put(streamtype, listener);
-			
-			return singletonObject;
 		}
 		
 		protected void newFile(short type, File file, String inputStreamName, StreamElement data) throws InterruptedException {
