@@ -120,18 +120,6 @@
             <query> select * from source </query>
         </stream>
 
-        <stream name="data10">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-etz-gps04.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
-                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerHealthMsg</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-
         <stream name="data11">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
@@ -202,5 +190,18 @@
             </source>
             <query> select * from source </query>
         </stream>
+
+        <!--<stream name="data17">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select timed, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
+                    	PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, PAYLOAD_UPTIME, PAYLOAD_SYSVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY,
+                    	PAYLOAD_QUEUESIZE, PAYLOAD_PARENTID, PAYLOAD_HOPCOUNT, PAYLOAD_CHILDCOUNT from ETZ_Dozer_GPSHealth</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>-->
         </streams>
 </virtual-sensor>
