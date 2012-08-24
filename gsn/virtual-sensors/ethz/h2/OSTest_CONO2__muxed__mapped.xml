@@ -14,7 +14,7 @@
             <param name="scriplet-periodic">
                 <![CDATA[
                 	// default alarm time after which an email is sent if no messages have been received
-                    def timeDifferenceOffsetDefault = 86400000;
+                    def timeDifferenceOffsetDefault = 600000;
                 	// a list of alarm time per position
                     def timeDifferenceOffsetPositionMap = [9999:600000];
                     // the mail recipients
