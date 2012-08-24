@@ -30,14 +30,15 @@ class GsmPluginClass(AbstractPluginClass):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         self._sleeper = Event()
         self._stopped = False
-        self._pollInterval = 15.0
+        self._pollInterval = float(self.getOptionValue('poll_interval'))
 
         self.info('Init GsmPlugin...')
 
         self._gpsDeviceStr = self.getOptionValue('gps_device')
         self.gps = GPSDriverNAV.GPSDriverNAV([self._gpsDeviceStr])
 
-        self.gsm = GsmScanner.GsmScanner()
+        self._gsmDeviceStr = self.getOptionValue('gsm_device')
+        self.gsm = GsmScanner.GsmScanner([self._gsmDeviceStr])
 
         self.info("Done init")
 
@@ -58,14 +59,15 @@ class GsmPluginClass(AbstractPluginClass):
               self.action()
           self.info('died')
         except Exception as e:
-          self._logger.error( "Exception: " + str(e))
-          self._logger.error("Could not execute run")
+          self.error( "Exception: " + str(e))
+          self.error("Could not execute run")
           return
 
     def action(self):
 
         # Read message
         gsmMsg = ''
+        self.debug('start GSM scan')
         [gsmMsg, gsmMsgList] = self.gsm.scan()
         self.debug('GSM scan completed')
 
@@ -88,7 +90,6 @@ class GsmPluginClass(AbstractPluginClass):
 
             dataPackage += [gsmMsg]
             self.debug('Send complete msg')
-            #self.info(dataPackage)
             self.processMsg(self.getTimeStamp(), dataPackage)
           else:
               self.warning('No GPS data')

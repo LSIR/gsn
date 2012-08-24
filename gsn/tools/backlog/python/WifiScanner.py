@@ -14,6 +14,7 @@ import time
 import math
 import re
 import socket
+#import logging
 
 pexpect_path = os.path.abspath('/media/card/backlog/python2.6/pexpect-2.3')
 sys.path.append(pexpect_path)
@@ -21,7 +22,15 @@ sys.path.append(pexpect_path)
 import pexpect
 
 class WifiScanner():
-    def __init__(self):
+    def __init__(self, config):
+        #self._logger = logging.getLogger(self.__class__.__name__)
+        #self._logger.info('Init Wifi Scanner...')
+
+        if config[0] != None:
+            self._wifiDeviceStr = config[0]
+        else:
+            self._wifiDeviceStr = 'wlan1'
+
         self.DURATION_2GHZ = 5
         self.DURATION_5GHZ = 10
         self.BUCKETS_2GHZ = 10
@@ -53,6 +62,7 @@ class WifiScanner():
         return 10*math.log(float(power_milli_watt), 10)
 
     def parse_data(self, data):
+        #self._logger.debug('strip escape sequences')
         data = self.strip_ANSI_escape_sequences(data)
         # Log the whole output to a file.
         #log_file = open('wifi.log', 'a')
@@ -61,15 +71,14 @@ class WifiScanner():
 
         averaged_list = []
         averaged_string = ''
+        if data == '':
+            #self._logger.debug('no Wifi data')
+            return averaged_string, averaged_list
         # The two scans are separeted by the string 'scan_delimeter'
         for band, scan in enumerate(data.split('scan_delimeter')):
             results = []
             scan_count_complete = 0
             scan_count_all = 0
-            #if band == 0:
-                #print '2.4 GHz'
-            #elif band == 1:
-                #print '5 GHz'
 
             # The scan is repeated several times, so average the readings.
             # The structure of a single scan is as follows:
@@ -114,9 +123,6 @@ class WifiScanner():
                                 else:
                                     results[index][1] += self.power_to_milli_watt(elements[1])
 
-            #print 'scan count all:', scan_count_all
-            #print 'scan count complete:', scan_count_complete
-            #print 'bucket count:', len(results)
             for line in results:
                 if averaged_string != '':
                     averaged_string += ','
@@ -126,7 +132,7 @@ class WifiScanner():
                 averaged_string += str(average)
                 averaged_list.append(average)
 
-        #print 'parsing finished'
+        #self._logger.debug('finished parsing')
         return averaged_string, averaged_list
 
     def get_raw_data(self):
@@ -139,34 +145,39 @@ class WifiScanner():
                 ' "/interface wireless spectral-scan buckets=' + str(self.BUCKETS_2GHZ) + \
                 ' duration=' + str(self.DURATION_2GHZ) + \
                 ' range=' + self.BAND_2GHZ + \
-                ' wlan1;' + \
+                ' ' + self._wifiDeviceStr + ';' + \
                 ' put "scan_delimeter";' + \
                 ' /interface wireless spectral-scan buckets=' + str(self.BUCKETS_5GHZ) + \
                 ' duration=' + str(self.DURATION_5GHZ) + \
                 ' range=' + self.BAND_5GHZ + \
-                ' wlan1;' + \
+                ' ' + self._wifiDeviceStr + ';' + \
                 ' /quit;"'
 
         try:
+            #self._logger.debug('spawn ssh')
             p = pexpect.spawn(cmd, timeout=5)
+            #self._logger.debug('sleep')
             time.sleep(1)
             # Increase the terminal size. Default is 24 (maybe), with this up to 80 scan buckets are possible.
+            #self._logger.debug('set winsize')
             p.setwinsize(500,80)
             p.logfile_read = log_mem_file
             # The timeout should be large enough for both scan durations.
+            #self._logger.debug('wait for interrupted')
             p.expect('interrupted', timeout=self.SCAN_TIMEOUT)
             p.close()
 
             log = log_mem_file.getvalue()
             log_mem_file.close()
+            #self._logger.debug('ssh done')
         except pexpect.ExceptionPexpect as e:
-            #print e
-            # Dump the whole output to a file.
             log = log_mem_file.getvalue()
             log_mem_file.close()
-            error_file = open('error.log', 'a')
-            error_file.write(log)
-            error_file.close()
+            p.close()
+            # Strip the output, or the debug output gets garbled.
+            log = self.strip_ANSI_escape_sequences(log)
+            #self._logger.warning('Wifi scan failed')
+            #self._logger.debug('pexpect log: ' + log)
             return ''
 
         return log
@@ -174,5 +185,4 @@ class WifiScanner():
     def scan(self):
         data = self.get_raw_data()
         results_string, results_list = self.parse_data(data)
-        #print 'scan finished'
         return results_string, results_list

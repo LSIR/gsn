@@ -9,10 +9,19 @@ __id__          = "$Id: GPSPluginNAV.py 3717 2011-10-13 07:16:45Z dhasenfratz $"
 
 import Mc75iDriver
 import time
+import logging
 
 class GsmScanner():
-    def __init__(self, device='/dev/acm/mc75i'):
-        self.serial_device = Mc75iDriver.Mc75iDriver(device)
+    def __init__(self, config):
+        self._logger = logging.getLogger(self.__class__.__name__)
+        self._logger.info('Init Gsm Scanner...')
+
+        if config[0] != None:
+            self._deviceStr = config[0]
+        else:
+            self._deviceStr = '/dev/acm/mc75i'
+
+        self.serial_device = Mc75iDriver.Mc75iDriver(self._deviceStr)
 
     def send_command(self, command):
         self.serial_device.write(command + '\r\n')
@@ -25,9 +34,10 @@ class GsmScanner():
 
     def parse_response_smonc(self, response):
         if response.count('ERROR') > 0:
-            print 'received error'
+            self._logger.error('GSM scan failed (ERROR received)')
             return None, None
         elif response.count('OK') > 0:
+            self._logger.debug('OK received')
             processed = response.partition('SMONC:')[2]
             processed = processed.partition('OK')[0]
             processed = processed.strip()
@@ -48,11 +58,12 @@ class GsmScanner():
                 results_list += [lac, cid, arfcn, rssi]
             return results_string, results_list
         else:
-            print 'invalid response'
+            self._logger.error('GSM scan failed (invalid response)')
             return None, None
 
     def scan(self):
         response = ''
+        self._logger.debug('send AT^SMONC')
         self.send_command('AT^SMONC')
         response = self.read_response()
 
