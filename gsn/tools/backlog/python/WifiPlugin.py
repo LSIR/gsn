@@ -85,7 +85,7 @@ class WifiPluginClass(AbstractPluginClass):
             except OSError:
                 self.error('no process to kill')
 
-        p = subprocess.Popen(['python', 'WifiScannerWorkaround.py', self._wifiDeviceStr],
+        p = subprocess.Popen(['python', '/media/card/backlog/python2.6/WifiScannerWorkaround.py', self._wifiDeviceStr],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
         # Make sure the new python process gets killed after 100 seconds in case it hangs.
