@@ -46,10 +46,12 @@ class WifiPluginClass(AbstractPluginClass):
         self.gps = GPSDriverNAV.GPSDriverNAV([self._gpsDeviceStr])
 
         self._wifiDeviceStr = self.getOptionValue('wifi_device')
-        self.wifi = WifiScanner.WifiScanner([self._wifiDeviceStr])
 
         self._mikrotikPort = self.getOptionValue('mikrotik_port')
-
+        self._mikrotikIP = self.getOptionValue('mikrotik_ip')
+        
+        self.wifi = WifiScanner.WifiScanner([self._wifiDeviceStr, self._mikrotikIP])
+        
         self.reboot_counter = 0
 
         self.info("Done init")
@@ -85,9 +87,8 @@ class WifiPluginClass(AbstractPluginClass):
             except OSError:
                 self.error('no process to kill')
 
-        p = subprocess.Popen(['python', '/media/card/backlog/python2.6/WifiScannerWorkaround.py', self._wifiDeviceStr],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+        p = subprocess.Popen(['python', '/media/card/backlog/python2.6/WifiScannerWorkaround.py', self._wifiDeviceStr, self._mikrotikIP],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # Make sure the new python process gets killed after 100 seconds in case it hangs.
         # Should never happen, since the scanner has a timeout itself.
         t = Timer(100, kill_scan)

@@ -10,9 +10,9 @@ __id__          = "$Id: GPSPluginNAV.py 3717 2011-10-13 07:16:45Z dhasenfratz $"
 import sys
 import WifiScanner
 
-if len(sys.argv) != 2:
-    sys.exit('no wlan device given')
+if len(sys.argv) != 3:
+    sys.exit('no wlan device and IP given')
 
-scanner = WifiScanner.WifiScanner([sys.argv[1]])
+scanner = WifiScanner.WifiScanner([sys.argv[1], sys.argv[2]])
 [wifiMsg, wifiMsgList] = scanner.scan()
 print wifiMsg

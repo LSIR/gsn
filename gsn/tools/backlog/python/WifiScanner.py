@@ -30,6 +30,11 @@ class WifiScanner():
             self._wifiDeviceStr = config[0]
         else:
             self._wifiDeviceStr = 'wlan1'
+            
+        if config[1] != None:
+            self.mikrotik_address = config[1]
+        else:
+            self.mikrotik_address = '192.168.20.1'
 
         self.DURATION_2GHZ = 5
         self.DURATION_5GHZ = 10
@@ -38,10 +43,6 @@ class WifiScanner():
         self.BAND_2GHZ = '2.4ghz'
         self.BAND_5GHZ = '5ghz'
         self.SCAN_TIMEOUT = 30
-        # The MikroTik address is the gumstix address - 1
-        temp_address = socket.gethostbyname(socket.gethostname()).split('.')
-        temp_address[-1] = str(int(temp_address[-1]) - 1)
-        self.mikrotik_address = '.'.join(temp_address)
         # Regular expression to strip ANSI escape sequences from the scan.
         self.strip_ANSI_escape_sequences_sub = re.compile(r"""
             \x1b     # literal ESC
