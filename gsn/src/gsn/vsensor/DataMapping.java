@@ -276,7 +276,7 @@ public class DataMapping {
 				logger.error(vsName+"[source="+inputStreamName+"]: Sensor conversion mapping data not available for deployment "+deployment);
 				return null;
 			}
-			synchronized (deployments.get(deployment).sensortype_query) {
+			synchronized (deployments.get(deployment).conversion_query) {
 				PreparedStatement conversion_query = deployments.get(deployment).conversion_query;
 				Map<String,Converter> converterList = deployments.get(deployment).converterList;
 				conversion_query.setInt(1, ((Integer) data.getData("position")).intValue());
