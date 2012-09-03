@@ -169,23 +169,21 @@ public class DataMapping {
 		Integer res = null;
 		long start = System.nanoTime();
 		try {
-			synchronized (deployments) {
-				if (!deployments.containsKey(deployment)) {
-					logger.error(vsName+"[source="+inputStreamName+"]: Position mapping data not available for deployment "+deployment);
-					return null;
-				}
-				PreparedStatement position_query = deployments.get(deployment).position_query;
-				position_query.setInt(1, device_id);
-				position_query.setTimestamp(2, generation_time);
-				ResultSet rs = position_query.executeQuery();
-				if (rs.next()) {
-					res = rs.getInt(1);
-					if (rs.wasNull())
-						res = null;
-				}
-				if (res==null)
-					logger.warn(vsName+"[source="+inputStreamName+"]: No position mapping available for deployment "+deployment+" device-id "+device_id+" and generation_time="+generation_time);
+			if (!deployments.containsKey(deployment)) {
+				logger.error(vsName+"[source="+inputStreamName+"]: Position mapping data not available for deployment "+deployment);
+				return null;
 			}
+			PreparedStatement position_query = deployments.get(deployment).position_query;
+			position_query.setInt(1, device_id);
+			position_query.setTimestamp(2, generation_time);
+			ResultSet rs = position_query.executeQuery();
+			if (rs.next()) {
+				res = rs.getInt(1);
+				if (rs.wasNull())
+					res = null;
+			}
+			if (res==null)
+				logger.warn(vsName+"[source="+inputStreamName+"]: No position mapping available for deployment "+deployment+" device-id "+device_id+" and generation_time="+generation_time);
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
 		}
@@ -198,22 +196,20 @@ public class DataMapping {
 		Coordinate res = null;
 		long start = System.nanoTime();
 		try {
-			synchronized (deployments) {
-				if (!deployments.containsKey(deployment)) {
-					logger.error(vsName+"[source="+inputStreamName+"]: Geographic coordinate mapping data not available for deployment "+deployment);
-					return null;
-				}
-				PreparedStatement coordinate_query = deployments.get(deployment).coordinate_query;
-				coordinate_query.setInt(1, position);
-				ResultSet rs = coordinate_query.executeQuery();
-				if (rs.next()) {
-					res = new Coordinate(rs.getDouble(1), rs.getDouble(2), rs.getDouble(3));
-					if (rs.wasNull())
-						res = null;
-				}
-				if (res==null)
-					logger.warn(vsName+"[source="+inputStreamName+"]: No coordinate mapping available for deployment "+deployment+" position "+position);
+			if (!deployments.containsKey(deployment)) {
+				logger.error(vsName+"[source="+inputStreamName+"]: Geographic coordinate mapping data not available for deployment "+deployment);
+				return null;
 			}
+			PreparedStatement coordinate_query = deployments.get(deployment).coordinate_query;
+			coordinate_query.setInt(1, position);
+			ResultSet rs = coordinate_query.executeQuery();
+			if (rs.next()) {
+				res = new Coordinate(rs.getDouble(1), rs.getDouble(2), rs.getDouble(3));
+				if (rs.wasNull())
+					res = null;
+			}
+			if (res==null)
+				logger.warn(vsName+"[source="+inputStreamName+"]: No coordinate mapping available for deployment "+deployment+" position "+position);
 		} catch (SQLException e) {
 			logger.warn(e.getMessage(), e);
 		}
@@ -230,31 +226,29 @@ public class DataMapping {
 		Serializable[] res = new Serializable[]{null, null, null};
 		long start = System.nanoTime();
 		try {
-			synchronized (deployments) {
-				if (!deployments.containsKey(deployment)) {
-					logger.error(vsName+"[source="+inputStreamName+"]: Sensor mapping data not available for deployment "+deployment);
-					return null;
-				}
-				PreparedStatement sensortype_query = deployments.get(deployment).sensortype_query;
-				PreparedStatement serialid_query = deployments.get(deployment).serialid_query;
-				sensortype_query.setInt(1, position);
-				sensortype_query.setTimestamp(2, generation_time);			
-				rs = sensortype_query.executeQuery();
-				if (rs.first()) {
-					do {
-						s = rs.getString(1);
-						sb.append(" " + s.substring(s.indexOf('_') + 1) + ":" + rs.getString(2));
-					} while (rs.next());
-					s = sb.toString();
-				}			
-				serialid_query.setInt(1, position);
-				serialid_query.setTimestamp(2, generation_time);
-				rs = serialid_query.executeQuery();
-				if (rs.next()) {
-					serialid = rs.getLong(1);
-					if (rs.wasNull())
-						serialid = null;
-				}
+			if (!deployments.containsKey(deployment)) {
+				logger.error(vsName+"[source="+inputStreamName+"]: Sensor mapping data not available for deployment "+deployment);
+				return null;
+			}
+			PreparedStatement sensortype_query = deployments.get(deployment).sensortype_query;
+			PreparedStatement serialid_query = deployments.get(deployment).serialid_query;
+			sensortype_query.setInt(1, position);
+			sensortype_query.setTimestamp(2, generation_time);			
+			rs = sensortype_query.executeQuery();
+			if (rs.first()) {
+				do {
+					s = rs.getString(1);
+					sb.append(" " + s.substring(s.indexOf('_') + 1) + ":" + rs.getString(2));
+				} while (rs.next());
+				s = sb.toString();
+			}			
+			serialid_query.setInt(1, position);
+			serialid_query.setTimestamp(2, generation_time);
+			rs = serialid_query.executeQuery();
+			if (rs.next()) {
+				serialid = rs.getLong(1);
+				if (rs.wasNull())
+					serialid = null;
 			}
 			res = new Serializable[]{s, serialid};
 		} catch (SQLException e) {
@@ -272,49 +266,47 @@ public class DataMapping {
 		long start = System.nanoTime();
 		ListIterator<String> list = Arrays.asList(data.getFieldNames()).listIterator();
 		try {
-			synchronized (deployments) {
-				if (!deployments.containsKey(deployment)) {
-					logger.error(vsName+"[source="+inputStreamName+"]: Sensor conversion mapping data not available for deployment "+deployment);
-					return null;
-				}
-				PreparedStatement conversion_query = deployments.get(deployment).conversion_query;
-				Map<String,Converter> converterList = deployments.get(deployment).converterList;
-				conversion_query.setInt(1, ((Integer) data.getData("position")).intValue());
-				conversion_query.setTimestamp(2, new Timestamp(((Long) data.getData("generation_time")).longValue()));
-				while (list.hasNext()) {
-					s = list.next().toLowerCase();
-					if (s.startsWith("payload_") && !s.startsWith("payload_sample_") && data.getData(s) != null) {
-						conversion_query.setString(3, s.substring("payload_".length()));
-						ResultSet rs = conversion_query.executeQuery();
-						if (rs.next()) {
-							physical = rs.getString(1);
-							conversion = rs.getString(2);
-							input = rs.getString(3);
-							value = rs.getString(4);
-							// physical_signal, conversion, input, value
-							logger.debug(vsName+"[source="+inputStreamName+"]: physical_signal:" + physical + " conversion:" + conversion +
-									" input:" + input + " value:" + value);
+			if (!deployments.containsKey(deployment)) {
+				logger.error(vsName+"[source="+inputStreamName+"]: Sensor conversion mapping data not available for deployment "+deployment);
+				return null;
+			}
+			PreparedStatement conversion_query = deployments.get(deployment).conversion_query;
+			Map<String,Converter> converterList = deployments.get(deployment).converterList;
+			conversion_query.setInt(1, ((Integer) data.getData("position")).intValue());
+			conversion_query.setTimestamp(2, new Timestamp(((Long) data.getData("generation_time")).longValue()));
+			while (list.hasNext()) {
+				s = list.next().toLowerCase();
+				if (s.startsWith("payload_") && !s.startsWith("payload_sample_") && data.getData(s) != null) {
+					conversion_query.setString(3, s.substring("payload_".length()));
+					ResultSet rs = conversion_query.executeQuery();
+					if (rs.next()) {
+						physical = rs.getString(1);
+						conversion = rs.getString(2);
+						input = rs.getString(3);
+						value = rs.getString(4);
+						// physical_signal, conversion, input, value
+						logger.debug(vsName+"[source="+inputStreamName+"]: physical_signal:" + physical + " conversion:" + conversion +
+								" input:" + input + " value:" + value);
 
-							try {
-								synchronized (converterList) {
-									if (!converterList.containsKey(conversion)) {
-										String className = "gsn.vsensor.permasense." + conversion.substring(0,1).toUpperCase() + conversion.substring(1);
-										logger.info("Instantiating converter '" + className);
-										Class<?> classTemplate = Class.forName(className);
-										converterList.put(conversion, (Converter)classTemplate.getConstructor().newInstance());
-									}
-									converter = converterList.get(conversion);
-								}	
-								map.put(physical, converter.convert(data.getData(s), value));
-							} catch (Exception e) {
-								logger.error(e.getMessage(), e);
-							}
-						} else {
-							logger.debug(vsName+"[source="+inputStreamName+"]: no conversion found for >" + s + "< (" + s.substring("payload_".length()) + ")");
+						try {
+							synchronized (converterList) {
+								if (!converterList.containsKey(conversion)) {
+									String className = "gsn.vsensor.permasense." + conversion.substring(0,1).toUpperCase() + conversion.substring(1);
+									logger.info("Instantiating converter '" + className);
+									Class<?> classTemplate = Class.forName(className);
+									converterList.put(conversion, (Converter)classTemplate.getConstructor().newInstance());
+								}
+								converter = converterList.get(conversion);
+							}	
+							map.put(physical, converter.convert(data.getData(s), value));
+						} catch (Exception e) {
+							logger.error(e.getMessage(), e);
 						}
 					} else {
-						logger.debug(vsName+"[source="+inputStreamName+"]: ignoring >" + s + "<");
+						logger.debug(vsName+"[source="+inputStreamName+"]: no conversion found for >" + s + "< (" + s.substring("payload_".length()) + ")");
 					}
+				} else {
+					logger.debug(vsName+"[source="+inputStreamName+"]: ignoring >" + s + "<");
 				}
 			}
 			if (!map.isEmpty()) {
