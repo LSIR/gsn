@@ -149,17 +149,11 @@
             </param>
         </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" />
+            <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			<field name="VERSION" type="SMALLINT" />
-			<field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
- 
-            <field name="MIN_GENERATION_TIME" type="BIGINT" unit="unixtime"/>
-            <field name="MAX_GENERATION_TIME" type="BIGINT" unit="unixtime"/>
-            <field name="MIN_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="MAX_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
             
 			<field name="X_ECEF" type="DOUBLE" unit="m" />
 			<field name="Y_ECEF" type="DOUBLE" unit="m" />
@@ -192,6 +186,12 @@
 			<field name="SD_V_HORIZ" type="DOUBLE" unit="cm/d" />
 			
 			<field name="COMMENTS" type="VARCHAR(512)" />
+			
+			<field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
+            <field name="MIN_GENERATION_TIME" type="BIGINT" unit="unixtime"/>
+            <field name="MAX_GENERATION_TIME" type="BIGINT" unit="unixtime"/>
+            <field name="MIN_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="MAX_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>

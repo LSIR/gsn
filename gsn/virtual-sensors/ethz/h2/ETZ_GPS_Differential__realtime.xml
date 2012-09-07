@@ -3,6 +3,7 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
+            <param name="gps_time_conversion" />
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
@@ -78,14 +79,11 @@
             </param>
         </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" />
+            <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			<field name="VERSION" type="SMALLINT" />
-
-            <field name="GPS_WEEK" type="SMALLINT" />
-            <field name="GPS_TIME" type="INTEGER" unit="sec"/>
 
             <field name="X_ECEF" type="DOUBLE" unit="m" />
             <field name="Y_ECEF" type="DOUBLE" unit="m" />
@@ -108,6 +106,10 @@
             <field name="NS" type="INTEGER" />
             <field name="AGE" type="DOUBLE" unit="s" />
             <field name="RATIO" type="DOUBLE" />
+
+            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" />
+            <field name="GPS_WEEK" type="SMALLINT" />
+            <field name="GPS_TIME" type="INTEGER" unit="sec"/>
 
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
