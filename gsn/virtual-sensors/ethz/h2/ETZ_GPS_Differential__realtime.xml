@@ -3,7 +3,6 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="gps_time_conversion" />
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
@@ -27,7 +26,7 @@
                         if (spl[5].isNumber())
                                 GPS_WEEK = spl[5].toShort();
                         if (spl[6].isNumber())
-                                GPS_TIME = spl[6].toInteger()*1000;
+                                GPS_TIME = spl[6].toInteger();
 
                     	if (spl[7].isNumber())
                     		X_ECEF = spl[7].toDouble();
@@ -107,9 +106,8 @@
             <field name="AGE" type="DOUBLE" unit="s" />
             <field name="RATIO" type="DOUBLE" />
 
-            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" />
             <field name="GPS_WEEK" type="SMALLINT" />
-            <field name="GPS_TIME" type="INTEGER" unit="ms"/>
+            <field name="GPS_TIME" type="INTEGER" unit="sec"/>
 
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
