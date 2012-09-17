@@ -165,7 +165,7 @@ var GsnPlots = {
                 "showForm": true
               },
               "inittimerange": 2592000000,
-              "appUrl": "http://whymper.ethz.ch:24001/sensorviz?",
+              "appUrl": "http://whymper.ethz.ch:24001/vizzly?",
               "signals": {
                 "y1": []
               },
