@@ -723,7 +723,6 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 		
 		private void processParsingStatusStreamElement(String inputStreamName, StreamElement data, String type, String name,
 				Integer queuesize, Long start, Long finished, Integer generated, Integer unparsable) {
-			long timestamp = System.currentTimeMillis();
 			data = new StreamElement(parsingStatusField, new Serializable[]{
 				data.getData(parsingStatusField[0].getName()),
 				type,
@@ -732,7 +731,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 				start,
 				finished,
 				generated,
-				unparsable}, timestamp);
+				unparsable});
 	
 			GPSLoggerDataParser listener = streamtypeToListener.get((short)127);
 			if (listener != null)
