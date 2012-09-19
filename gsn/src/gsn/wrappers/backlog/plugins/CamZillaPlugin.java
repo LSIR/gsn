@@ -25,6 +25,8 @@ public class CamZillaPlugin extends AbstractPlugin {
 	private static final short POSITIONING_TASK = 2;
 	private static final short MODE_TASK = 3;
 	private static final short CALIBRATION_TASK = 4;
+
+	private static final int CAMERA_DEFAULT = 1;
 	
 	private static DataField[] dataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
@@ -101,8 +103,11 @@ public class CamZillaPlugin extends AbstractPlugin {
 		Serializable[] command = null;
 		if( action.compareToIgnoreCase("panorama_picture") == 0 ) {
 			String sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", b = "0", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
+			int  camera = CAMERA_DEFAULT;
 			for (int i = 0 ; i < paramNames.length ; i++) {
-				if( paramNames[i].compareToIgnoreCase("start_x") == 0 )
+				if( paramNames[i].compareToIgnoreCase("camera") == 0 )
+					camera = Integer.parseInt((String) paramValues[i]);
+				else if( paramNames[i].compareToIgnoreCase("start_x") == 0 )
 					sx = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("start_y") == 0 )
 					sy = (String) paramValues[i];
@@ -156,12 +161,15 @@ public class CamZillaPlugin extends AbstractPlugin {
 			str += "gphoto2("+getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, compensation, bracketing, autofocus, focus, opt)+")";
 			
 			logger.info("uploading panorama picture task >" + str + "<");
-			command = new Serializable[] {TASK_MESSAGE, PANORAMA_TASK, str};
+			command = new Serializable[] {TASK_MESSAGE, PANORAMA_TASK, camera , str};
 		}
 		else if ( action.compareToIgnoreCase("picture_now") == 0 ) {
 			String str, imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
+			int camera = CAMERA_DEFAULT;
 			for (int i = 0 ; i < paramNames.length ; i++) {
-				if( paramNames[i].compareToIgnoreCase("image_quality") == 0 )
+				if( paramNames[i].compareToIgnoreCase("camera") == 0 )
+					camera = Integer.parseInt((String) paramValues[i]);
+				else if( paramNames[i].compareToIgnoreCase("image_quality") == 0 )
 					imgquality = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("image_size") == 0 )
 					imgsize = (String) paramValues[i];
@@ -187,7 +195,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 
 			str = getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, compensation, bracketing, autofocus, focus, opt);
 			logger.info("uploading picture now task >" + str + "<");
-			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK, str};
+			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK, camera, str};
 		}
 		else if ( action.compareToIgnoreCase("positioning") == 0 ) {
 			double x = 0, y = 0;
