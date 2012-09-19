@@ -75,8 +75,10 @@ class CamZillaPluginClass(AbstractPluginClass):
     _calibrated
     _delay
     _powerSaveMode
+    _cameraAvailable
     _pictureFolder
-    _webcamWget
+    _webcamAvailable
+    _webcamHttp
     _webcamPictureFolder
     _robotAvailable
     _parkActionLock
@@ -103,6 +105,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._manualControl = True
         self._plugStop = False
         self._calibrated = False
+        self._cameraAvailable = False
         self._x = 0.0
         self._y = 0.0
         self._parkX = 0
@@ -111,7 +114,8 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._autofocusAllowed = False
         self._powerSaveMode = False
         self._pictureFolder = None
-        self._webcamWget = None
+        self._webcamAvailable = False
+        self._webcamHttp = None
         self._webcamPictureFolder = None
         self._robotAvailable = False
         self._pulsesPerDegree = None
@@ -122,51 +126,66 @@ class CamZillaPluginClass(AbstractPluginClass):
         if not os.access(GPHOTO2, os.X_OK):
             raise TypeError('%s can not be executed' % (GPHOTO2,))
         
-        self._pictureFolder = self.getOptionValue('picture_folder')
-        if self._pictureFolder is None:
-            raise TypeError('no picture_folder specified')
-        if not os.path.isdir(self._pictureFolder):
-            self.warning('picture folder >%s< is not a directory -> creating it' % (self._pictureFolder,))
-            os.makedirs(self._pictureFolder)
-        
-        self._webcamWget = self.getOptionValue('webcam_wget')
-        if self._webcamWget is not None:
-            self.warning('secondary webcam funtionality available')
-        
-            self._webcamPictureFolder = self.getOptionValue('webcam_picture_folder')
-            if self._webcamPictureFolder is None:
-                raise TypeError('no webcam_picture_folder specified')
-            if not os.path.isdir(self._pictureFolder):
-                self.warning('webcam picture folder >%s< is not a directory -> creating it' % (self._webcamPictureFolder,))
-                os.makedirs(self._webcamPictureFolder)
-            
-        value = self.getOptionValue('autofocus')
+        value = self.getOptionValue('camera_available')
         if value != None and int(value) == 1:
-            self.info('autofocus can be used')
-            self._autofocusAllowed = True
+            self.info('a primary camera is available')
+            self._cameraAvailable = True
         else:
-            self.info('autofocus is locked')
+            self.info('there is no primary camera available')
         
-        value = self.getOptionValue('ext_port_camera')
-        if value is None:
-            raise TypeError('no ext_port_camera specified')
-        elif int(value) == 1:
-            self.cameraPowerStatus = self.getPowerControlObject().getExt1Status
-            self.cameraPowerOn = self.getPowerControlObject().ext1On
-            self.cameraPowerOff = self.getPowerControlObject().ext1Off
-        elif int(value) == 2:
-            self.cameraPowerStatus = self.getPowerControlObject().getExt2Status
-            self.cameraPowerOn = self.getPowerControlObject().ext2On
-            self.cameraPowerOff = self.getPowerControlObject().ext2Off
-        elif int(value) == 3:
-            self.cameraPowerStatus = self.getPowerControlObject().getExt3Status
-            self.cameraPowerOn = self.getPowerControlObject().ext3On
-            self.cameraPowerOff = self.getPowerControlObject().ext3Off
-        else:
-            raise TypeError('ext_port_camera has to be set to 1, 2 or 3')
+        if self._cameraAvailable:
+            self._pictureFolder = self.getOptionValue('picture_folder')
+            if self._pictureFolder is None:
+                raise TypeError('no picture_folder specified')
+            if not os.path.isdir(self._pictureFolder):
+                self.warning('picture folder >%s< is not a directory -> creating it' % (self._pictureFolder,))
+                os.makedirs(self._pictureFolder)
+                
+            value = self.getOptionValue('autofocus')
+            if value != None and int(value) == 1:
+                self.info('autofocus can be used')
+                self._autofocusAllowed = True
+            else:
+                self.info('autofocus is locked')
+            
+            value = self.getOptionValue('ext_port_camera')
+            if value is None:
+                raise TypeError('no ext_port_camera specified')
+            elif int(value) == 1:
+                self.cameraPowerStatus = self.getPowerControlObject().getExt1Status
+                self.cameraPowerOn = self.getPowerControlObject().ext1On
+                self.cameraPowerOff = self.getPowerControlObject().ext1Off
+            elif int(value) == 2:
+                self.cameraPowerStatus = self.getPowerControlObject().getExt2Status
+                self.cameraPowerOn = self.getPowerControlObject().ext2On
+                self.cameraPowerOff = self.getPowerControlObject().ext2Off
+            elif int(value) == 3:
+                self.cameraPowerStatus = self.getPowerControlObject().getExt3Status
+                self.cameraPowerOn = self.getPowerControlObject().ext3On
+                self.cameraPowerOff = self.getPowerControlObject().ext3Off
+            else:
+                raise TypeError('ext_port_camera has to be set to 1, 2 or 3')
+            
+            if value == self.getOptionValue('ext_port_heater'):
+                raise TypeError('ext_port_camera and ext_port_heater must be different')
         
-        if value == self.getOptionValue('ext_port_heater'):
-            raise TypeError('ext_port_camera and ext_port_heater must be different')
+            value = self.getOptionValue('usb_port_camera')
+            if value is None:
+                raise TypeError('no usb_port_camera specified')
+            elif int(value) == 1:
+                self.cameraUsbStatus = self.getPowerControlObject().getUsb1Status
+                self.cameraUsbOn = self.getPowerControlObject().usb1On
+                self.cameraUsbOff = self.getPowerControlObject().usb1Off
+            elif int(value) == 2:
+                self.cameraUsbStatus = self.getPowerControlObject().getUsb2Status
+                self.cameraUsbOn = self.getPowerControlObject().usb2On
+                self.cameraUsbOff = self.getPowerControlObject().usb2Off
+            elif int(value) == 3:
+                self.cameraUsbStatus = self.getPowerControlObject().getUsb3Status
+                self.cameraUsbOn = self.getPowerControlObject().usb3On
+                self.cameraUsbOff = self.getPowerControlObject().usb3Off
+            else:
+                raise TypeError('usb_port_camera has to be set to 1, 2 or 3')
         
         value = self.getOptionValue('ext_port_heater')
         if value is None:
@@ -186,23 +205,30 @@ class CamZillaPluginClass(AbstractPluginClass):
         else:
             raise TypeError('ext_port_heater has to be set to 1, 2 or 3')
         
-        value = self.getOptionValue('usb_port_camera')
-        if value is None:
-            raise TypeError('no usb_port_camera specified')
-        elif int(value) == 1:
-            self.cameraUsbStatus = self.getPowerControlObject().getUsb1Status
-            self.cameraUsbOn = self.getPowerControlObject().usb1On
-            self.cameraUsbOff = self.getPowerControlObject().usb1Off
-        elif int(value) == 2:
-            self.cameraUsbStatus = self.getPowerControlObject().getUsb2Status
-            self.cameraUsbOn = self.getPowerControlObject().usb2On
-            self.cameraUsbOff = self.getPowerControlObject().usb2Off
-        elif int(value) == 3:
-            self.cameraUsbStatus = self.getPowerControlObject().getUsb3Status
-            self.cameraUsbOn = self.getPowerControlObject().usb3On
-            self.cameraUsbOff = self.getPowerControlObject().usb3Off
+        
+        value = self.getOptionValue('webcam_available')
+        if value != None and int(value) == 1:
+            self.info('a secondary webcam is available')
+            self._webcamAvailable = True
         else:
-            raise TypeError('usb_port_camera has to be set to 1, 2 or 3')
+            self.info('there is no secondary webcam available')
+        
+        if self._webcamAvailable:
+            self._webcamHttp = self.getOptionValue('webcam_http')
+            if self._webcamHttp is None:
+                raise TypeError('webcam_http not specified')
+            
+            if not os.path.exists(WGET):
+                raise TypeError('%s does not exist' % (WGET,))
+            if not os.access(WGET, os.X_OK):
+                raise TypeError('%s can not be executed' % (WGET,))
+        
+            self._webcamPictureFolder = self.getOptionValue('webcam_picture_folder')
+            if self._webcamPictureFolder is None:
+                raise TypeError('no webcam_picture_folder specified')
+            if not os.path.isdir(self._webcamPictureFolder):
+                self.warning('webcam picture folder >%s< is not a directory -> creating it' % (self._webcamPictureFolder,))
+                os.makedirs(self._webcamPictureFolder)
         
         value = self.getOptionValue('robot_available')
         if value != None and int(value) == 1:
@@ -232,6 +258,24 @@ class CamZillaPluginClass(AbstractPluginClass):
                 self.robotUsbOff = self.getPowerControlObject().usb3Off
             else:
                 raise TypeError('usb_port_robot has to be set to 1, 2 or 3')
+            
+            value = self.getOptionValue('ext_port_robot')
+            if value is None:
+                raise TypeError('no ext_port_robot specified')
+            elif int(value) == 1:
+                self.robotPowerStatus = self.getPowerControlObject().getExt1Status
+                self.robotPowerOn = self.getPowerControlObject().ext1On
+                self.robotPowerOff = self.getPowerControlObject().ext1Off
+            elif int(value) == 2:
+                self.robotPowerStatus = self.getPowerControlObject().getExt2Status
+                self.robotPowerOn = self.getPowerControlObject().ext2On
+                self.robotPowerOff = self.getPowerControlObject().ext2Off
+            elif int(value) == 3:
+                self.robotPowerStatus = self.getPowerControlObject().getExt3Status
+                self.robotPowerOn = self.getPowerControlObject().ext3On
+                self.robotPowerOff = self.getPowerControlObject().ext3Off
+            else:
+                raise TypeError('ext_port_robot has to be set to 1, 2 or 3')
             
             device = self.getOptionValue('device_name')
             if device is None:
@@ -267,25 +311,11 @@ class CamZillaPluginClass(AbstractPluginClass):
                 self._powerSaveMode = True
             else:
                 self.info('power save mode is turned off')
-                self._startupRobotAndCam()
+                self._startupRobot()
+                if self._cameraAvailable:
+                    self._powerOnCam()
         else:
             self._powerSaveMode = True
-        
-        if self.cameraUsbStatus():
-            self.info('camera USB port is turned on')
-        else:
-            self.info('camera USB port is turned off')
-        
-        if self.cameraPowerStatus():
-            if self._robotAvailable:
-                self.info('robot and photo camera are powered')
-            else:
-                self.info('photo camera is powered')
-        else:
-            if self._robotAvailable:
-                self.info('robot and photo camera are not powered')
-            else:
-                self.info('photo camera is not powered')
         
         
     def isBusy(self):
@@ -318,14 +348,8 @@ class CamZillaPluginClass(AbstractPluginClass):
                 except Exception, e:
                     self.exception(str(e))
             
-        if not self._plugStop and not self._powerSaveMode:
-            try:
-                self._downloadUnknownPictures()
-            except Exception, e:
-                self.error(e.__str__())
-                
-        if not self._robotAvailable:
-            self._startupRobotAndCam()
+        if self._cameraAvailable and not self._plugStop and not self._powerSaveMode:
+            self._powerOnCam()
             try:
                 self._downloadUnknownPictures()
             except Exception, e:
@@ -334,8 +358,6 @@ class CamZillaPluginClass(AbstractPluginClass):
         while not self._plugStop:
             if self._taskqueue.empty():
                 self._isBusy = False
-                if not self._robotAvailable:
-                    self._shutdownRobotAndCam()
             task = self._taskqueue.get()
             
             if self._parkTimer is not None:
@@ -356,175 +378,191 @@ class CamZillaPluginClass(AbstractPluginClass):
             try:
                 now = time.time()
                 if task[0] == PANORAMA_TASK:
-                    if self._robotAvailable:
-                        if self._powerSaveMode:
-                            self._startupRobotAndCam()
-                            if not self._calibrated:
-                                self._calibrateRobot()
-                        
-                        if not self._plugStop:
-                            if task[1] == CAMERA:
-                                try:
-                                    self._downloadUnknownPictures()
-                                except Exception, e:
-                                    self.error(e.__str__())
-                        
+                    if task[1] == CAMERA and not self._cameraAvailable:
+                        self.error('panorama camera task can not be executed without configuring a camera')
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'panorama camera task can not be executed without configuring a camera', self._x,self._y] + [None]*9)
+                    elif task[1] == WEBCAM and not self._webcamAvailable:
+                        self.error('panorama webcam task can not be executed without configuring a webcam')
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'panorama webcam task can not be executed without configuring a webcam', self._x,self._y] + [None]*9)
+                    else:
+                        if self._robotAvailable:
+                            if self._powerSaveMode:
+                                self._startupRobot()
+                                if self._cameraAvailable:
+                                    self._powerOnCam()
+                                if not self._calibrated:
+                                    self._calibrateRobot()
+                            
                             if not self._plugStop:
-                                now = time.time()
+                                if task[1] == CAMERA:
+                                    try:
+                                        self._downloadUnknownPictures()
+                                    except Exception, e:
+                                        self.error(e.__str__())
+                            
+                                if not self._plugStop:
+                                    now = time.time()
+                                    
+                                    try:
+                                        parsedTask = self._parseTask(task[2])
+                                    except Exception, e:
+                                        if not self._plugStop:
+                                            self.error(e.__str__())
+                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not execute task: %s' % (e.__str__(),), self._x,self._y] + [None]*9)
+                                    else:
+                                        if task[1] == CAMERA:
+                                            self.info('executing panorama picture task with camera: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) batch(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedtask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7]), str(parsedTask[8])))
+                                        else:
+                                            self.info('executing panorama picture task with webcam: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s)' % (str(parsedTask[0]), str(parsedtask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6])))
+                                        pic_name_list = []
+                                        
+                                        if self._isRobotPowered() and self._isCameraPowered():
+                                            pic = 1
+                                            try:
+                                                bracketing = False
+                                                config = None
+                                                if task[1] == CAMERA:
+                                                    config, bracketing = self._configureCamera(parsedTask[8])
+                                                y_cnt = 0
+                                                while y_cnt < parsedTask[3] and not self._plugStop:
+                                                    ret = self._position(y=(parsedtask[2]+y_cnt*parsedTask[5]))
+                                                    yLimit = ret[3]
+                                                    x_cnt = 0
+                                                    
+                                                    while x_cnt < parsedTask[2] and not self._plugStop:
+                                                        ret = self._position(x=(parsedTask[0]+x_cnt*parsedTask[4]))
+                                                        xLimit = ret[2]
+                                                        if parsedTask[6] > 0:
+                                                            self._delay.wait(parsedTask[6])
+                                                        if not self._plugStop:
+                                                            if bracketing:
+                                                                self.info('taking pictures number %d-%d/%d at position (%f,%f)' % (1+(pic-1)*3,3+(pic-1)*3,parsedTask[2]*parsedTask[3]*3,self._x,self._y))
+                                                            else:
+                                                                self.info('taking picture number %d/%d at position (%f,%f)' % (pic,parsedTask[2]*parsedTask[3],self._x,self._y))
+                                                            pic_str = '%s_pic%.3d_%dx_%dy' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)))
+                                                            self._takePicture(task[1], '%s.jpg' % (pic_str,))
+                                                            if not self._plugStop:
+                                                                s = 'successfully'
+                                                                if (xLimit is True and yLimit is True):
+                                                                    s += ' (x and y limit reached)'
+                                                                elif (xLimit is True and yLimit is False):
+                                                                    s += ' (x limit reached)'
+                                                                elif (xLimit is False and yLimit is True):
+                                                                    s += ' (y limit reached)'
+                                                                    
+                                                                if bracketing:
+                                                                    if parsedTask[7] == 0:
+                                                                        l = []
+                                                                        for i in range(3):
+                                                                            l.append('%s_pic%.3d_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
+                                                                        self._downloadPictures(l)
+                                                                    else:
+                                                                        for i in range(3):
+                                                                            pic_name_list.append('%s_pic%.3d_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
+                                                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
+                                                                else:
+                                                                    if task[1] == CAMERA:
+                                                                        if parsedTask[7] == 0:
+                                                                            self._downloadPictures(['%s.%s' % (pic_str, '%C')])
+                                                                        else:
+                                                                            pic_name_list.append('%s.%s' % (pic_str, '%C'))
+                                                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
+                                                                pic += 1
+                            
+                                                                x_cnt += 1
+                                                        
+                                                    y_cnt += 1
+                                                    
+                                                if parsedTask[7] != 0 and task[1] == CAMERA:
+                                                    self._downloadPictures(pic_name_list)
+                                            except Exception, e:
+                                                if not self._plugStop:
+                                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not finish task successfully (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
+                                                    self.error(e.__str__())
+                                            else:
+                                                if not self._plugStop:
+                                                    self.info('all pictures taken successfully')
+                                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
+                                                    self.info('panorama picture task finished successfully')
+                                        else:
+                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'CamZilla is not powered -> turn power on first', self._x,self._y] + [None]*9)
+                                            self.error('CamZilla is not powered -> turn power on first')
+                        else:
+                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'CamZilla can not take panorama pictures without robot', self._x, self._y] + [None]*9)
+                            self.error('CamZilla can not take panorama pictures without robot')
+                elif task[0] == PICTURE_TASK:
+                    if task[1] == CAMERA and not self._cameraAvailable:
+                        self.error('picture camera task can not be executed without configuring a camera')
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture camera task can not be executed without configuring a camera', self._x, self._y] + [None]*9)
+                    elif task[1] == WEBCAM and not self._webcamAvailable:
+                        self.error('picture webcam task can not be executed without configuring a webcam')
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture webcam task can not be executed without configuring a webcam', self._x, self._y] + [None]*9)
+                    else:
+                        if self._robotAvailable:
+                            self.info('picture now task received -> taking picture(s) in current robot position (x=%f,y=%f)' % (self._x, self._y))
+                        else:
+                            self.info('picture now task received -> taking picture(s)')
+                        
+                        if task[1] == CAMERA:
+                            if self._powerSaveMode and not self._plugStop:
+                                self._powerOnCam()
                                 
+                            try:
+                                self._downloadUnknownPictures()
+                            except Exception, e:
+                                self.error(e.__str__())
+                            
+                        if not self._plugStop:
+                            now = time.time()
+                            
+                            if task[1] == CAMERA:
+                                if task[2]:
+                                    gphoto2conf = task[2].split(',')
+                                else:
+                                    gphoto2conf = []
+                            
+                            if not self._plugStop:
                                 try:
-                                    parsedTask = self._parseTask(task[2])
+                                    bracketing = False
+                                    config = None
+                                    if task[1] == CAMERA:
+                                        config, bracketing = self._configureCamera(gphoto2conf)
+                                    self.info('taking picture(s) now')
+                                    if self._robotAvailable:
+                                        pic_str = '%s_pic001_%dx_%dy' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), int(round(self._x*10)), int(round(self._y*10)))
+                                    else:
+                                        pic_str = time.strftime('%Y%m%d_%H%M%S', time.gmtime(now))
+                                    self._takePicture(task[1], '%s.jpg' % (pic_str,))
                                 except Exception, e:
                                     if not self._plugStop:
+                                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not take picture now (%s)' % (e.__str__(),), self._x, self._y] + [None]*8 + [config])
                                         self.error(e.__str__())
-                                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not execute task: %s' % (e.__str__(),), self._x,self._y] + [None]*9)
                                 else:
-                                    if task[1] == CAMERA:
-                                        self.info('executing panorama picture task with camera: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) batch(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedtask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7]), str(parsedTask[8])))
-                                    else:
-                                        self.info('executing panorama picture task with webcam: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s)' % (str(parsedTask[0]), str(parsedtask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6])))
-                                    pic_name_list = []
-                                    
-                                    if self._isPowered():
-                                        pic = 1
+                                    if not self._plugStop:
                                         try:
-                                            bracketing = False
-                                            config = None
-                                            if task[1] == CAMERA:
-                                                config, bracketing = self._configureCamera(parsedTask[8])
-                                            y_cnt = 0
-                                            while y_cnt < parsedTask[3] and not self._plugStop:
-                                                ret = self._position(y=(parsedtask[2]+y_cnt*parsedTask[5]))
-                                                yLimit = ret[3]
-                                                x_cnt = 0
-                                                
-                                                while x_cnt < parsedTask[2] and not self._plugStop:
-                                                    ret = self._position(x=(parsedTask[0]+x_cnt*parsedTask[4]))
-                                                    xLimit = ret[2]
-                                                    if parsedTask[6] > 0:
-                                                        self._delay.wait(parsedTask[6])
-                                                    if not self._plugStop:
-                                                        if bracketing:
-                                                            self.info('taking pictures number %d-%d/%d at position (%f,%f)' % (1+(pic-1)*3,3+(pic-1)*3,parsedTask[2]*parsedTask[3]*3,self._x,self._y))
-                                                        else:
-                                                            self.info('taking picture number %d/%d at position (%f,%f)' % (pic,parsedTask[2]*parsedTask[3],self._x,self._y))
-                                                        pic_str = '%s_pic%.3d_%dx_%dy' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)))
-                                                        self._takePicture(task[1], pic_str)
-                                                        if not self._plugStop:
-                                                            s = 'successfully'
-                                                            if (xLimit is True and yLimit is True):
-                                                                s += ' (x and y limit reached)'
-                                                            elif (xLimit is True and yLimit is False):
-                                                                s += ' (x limit reached)'
-                                                            elif (xLimit is False and yLimit is True):
-                                                                s += ' (y limit reached)'
-                                                                
-                                                            if bracketing:
-                                                                if parsedTask[7] == 0:
-                                                                    l = []
-                                                                    for i in range(3):
-                                                                        l.append('%s_pic%.3d_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
-                                                                    self._downloadPictures(l)
-                                                                else:
-                                                                    for i in range(3):
-                                                                        pic_name_list.append('%s_pic%.3d_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
-                                                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
-                                                            else:
-                                                                if task[1] == CAMERA:
-                                                                    if parsedTask[7] == 0:
-                                                                        self._downloadPictures(['%s.%s' % (pic_str, '%C')])
-                                                                    else:
-                                                                        pic_name_list.append('%s.%s' % (pic_str, '%C'))
-                                                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'picture number %d/%d taken %s' % (pic, parsedTask[2]*parsedTask[3], s), self._x,self._y] + parsedTask[:-1] + [config])
-                                                            pic += 1
-                        
-                                                            x_cnt += 1
-                                                    
-                                                y_cnt += 1
-                                                
-                                            if parsedTask[7] != 0 and task[1] == CAMERA:
-                                                self._downloadPictures(pic_name_list)
+                                            if bracketing:
+                                                l = []
+                                                for i in range(3):
+                                                    if self._robotAvailable:
+                                                        l.append('%s_pic001_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
+                                                    else:
+                                                        l.append('%s_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), i+1, '%C'))
+                                                self._downloadPictures(l)
+                                            elif task[1] == CAMERA:
+                                                self._downloadPictures(['%s.%s' % (pic_str, '%C')])
                                         except Exception, e:
                                             if not self._plugStop:
-                                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not finish task successfully (%s)' % (e.__str__(),), self._x, self._y] + parsedTask[:-1] + [config])
+                                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*8 + [config])
                                                 self.error(e.__str__())
                                         else:
                                             if not self._plugStop:
-                                                self.info('all pictures taken successfully')
-                                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'finished successfully', self._x, self._y] + parsedTask[:-1] + [config])
-                                                self.info('panorama picture task finished successfully')
-                                    else:
-                                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'CamZilla is not powered -> turn power on first', self._x,self._y] + [None]*9)
-                                        self.error('CamZilla is not powered -> turn power on first')
-                    else:
-                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'CamZilla can not take panorama pictures without robot', self._x, self._y] + [None]*9)
-                        self.error('CamZilla can not take panorama pictures without robot')
-                elif task[0] == PICTURE_TASK:
-                    if self._robotAvailable:
-                        self.info('picture now task received -> taking picture(s) in current robot position (x=%f,y=%f)' % (self._x, self._y))
-                    else:
-                        self.info('picture now task received -> taking picture(s)')
-    
-                    if self._powerSaveMode and not self._plugStop:
-                        self._startupRobotAndCam()
-                    
-                    if task[1] == CAMERA:
-                        try:
-                            self._downloadUnknownPictures()
-                        except Exception, e:
-                            self.error(e.__str__())
-                        
-                    if not self._plugStop:
-                        now = time.time()
-                        
-                        if task[1] == CAMERA:
-                            if task[2]:
-                                gphoto2conf = task[2].split(',')
-                            else:
-                                gphoto2conf = []
-                        
-                        if not self._plugStop:
-                            try:
-                                bracketing = False
-                                config = None
-                                if task[1] == CAMERA:
-                                    config, bracketing = self._configureCamera(gphoto2conf)
-                                self.info('taking picture(s) now')
-                                if self._robotAvailable:
-                                    pic_str = '%s_pic001_%dx_%dy' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), int(round(self._x*10)), int(round(self._y*10)))
-                                else:
-                                    pic_str = time.strftime('%Y%m%d_%H%M%S', time.gmtime(now))
-                                self._takePicture(task[1], pic_str)
-                            except Exception, e:
-                                if not self._plugStop:
-                                    self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not take picture now (%s)' % (e.__str__(),), self._x, self._y] + [None]*8 + [config])
-                                    self.error(e.__str__())
-                            else:
-                                if not self._plugStop:
-                                    try:
-                                        if bracketing:
-                                            l = []
-                                            for i in range(3):
-                                                if self._robotAvailable:
-                                                    l.append('%s_pic001_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
-                                                else:
-                                                    l.append('%s_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), i+1, '%C'))
-                                            self._downloadPictures(l)
-                                        elif task[1] == CAMERA:
-                                            self._downloadPictures(['%s.%s' % (pic_str, '%C')])
-                                    except Exception, e:
-                                        if not self._plugStop:
-                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'could not download all pictures (%s)' % (e.__str__(),), self._x, self._y] + [None]*8 + [config])
-                                            self.error(e.__str__())
-                                    else:
-                                        if not self._plugStop:
-                                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'finished successfully', self._x, self._y] + [None]*8 + [config])
-                                            self.info('picture now task finished successfully')
+                                                self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture_now', 'finished successfully', self._x, self._y] + [None]*8 + [config])
+                                                self.info('picture now task finished successfully')
                 elif task[0] == POSITIONING_TASK:
                     self.info('positioning task received (x=%f,y=%f)' % (task[1], task[2]))
                     if self._robotAvailable:
                         if self._powerSaveMode:
-                            self._startupRobotAndCam()
+                            self._startupRobot()
                             if not self._calibrated:
                                 self._calibrateRobot()
                                 
@@ -550,7 +588,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                         self.error('CamZilla can not be positioned without robot')
                 elif task[0] == MODE_TASK:
                     if self._robotAvailable:
-                        if self._isPowered():
+                        if self._isRobotPowered():
                             if task[1] == 0:
                                 self.info('mode task received from GSN >joystick off<')
                                 self._write("j=off")
@@ -570,7 +608,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                         self.error('CamZilla mode command can not be used without robot')
                 elif task[0] == CALIBRATION_TASK:
                     if self._robotAvailable:
-                        if self._isPowered():
+                        if self._isRobotPowered():
                             self.info('calibration task received from GSN -> calibrate robot')
                         self._calibrateRobot()
                     else:
@@ -585,9 +623,12 @@ class CamZillaPluginClass(AbstractPluginClass):
                 self.exception(e)
             self._parkActionLock.release()
             
-            if self._robotAvailable and self._taskqueue.empty() and not self._plugStop:
-                self._parkTimer = Timer(self._parkIdleTime, self._parkAction)
-                self._parkTimer.start()
+            if self._taskqueue.empty() and not self._plugStop:
+                if self._robotAvailable:
+                    self._parkTimer = Timer(self._parkIdleTime, self._parkAction)
+                    self._parkTimer.start()
+                elif self._cameraAvailable:
+                    self._powerOffCam()
         
         self.info('died')
 
@@ -628,8 +669,11 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._delay.set()
         self._taskqueue.put('end')
         self.join()
-        self._parkRobot()
-        self._shutdownRobotAndCam()
+        if self._robotAvailable:
+            self._parkRobot()
+            self._shutdownRobot()
+        if self._cameraAvailable:
+            self._powerOffCam()
         
         
     def _parkAction(self):
@@ -641,7 +685,9 @@ class CamZillaPluginClass(AbstractPluginClass):
             self.exception(str(e))
         if self._powerSaveMode:
             try:
-                self._shutdownRobotAndCam()
+                self._shutdownRobot()
+                if self._cameraAvailable:
+                    self._powerOffCam()
             except Exception, e:
                 self.exception(str(e))
         
@@ -659,23 +705,33 @@ class CamZillaPluginClass(AbstractPluginClass):
             now = time.time()
             self.info('power message received from GSN')
             if data[1] == 0:
-                if self._robotAvailable:
+                if self._robotAvailable and self._cameraAvailable:
                     self.info('turn robot and camera off')
                     log_str = 'Camera and robot are turned off'
-                else:
+                    self._powerOffCam()
+                    self._shutdownRobot()
+                elif self._robotAvailable:
+                    self.info('turn robot off')
+                    log_str = 'Robot is turned off'
+                    self._shutdownRobot()
+                elif self._cameraAvailable:
                     self.info('turn camera off')
                     log_str = 'Camera is turned off'
-                self._shutdownRobotAndCam()
+                    self._powerOffCam()
             elif data[1] == 1:
-                if self._robotAvailable:
-                    self.info('turn robot and camera on')
-                else:
-                    self.info('turn camera on')
                 try:
-                    self._startupRobotAndCam()
-                    if self._robotAvailable:
+                    if self._robotAvailable and self._cameraAvailable:
+                        self.info('turn robot and camera on')
+                        self._startupRobot()
+                        self._powerOnCam()
                         log_str = 'Camera and robot are turned on'
-                    else:
+                    elif self._robotAvailable:
+                        self.info('turn robot on')
+                        self._startupRobot()
+                        log_str = 'Robot is turned on'
+                    elif self._cameraAvailable:
+                        self.info('turn camera on')
+                        self._powerOnCam()
                         log_str = 'Camera is turned on'
                 except TypeError, e:
                     self.error(str(e))
@@ -802,7 +858,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                 command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--set-config-index /main/settings/capturetarget=1', '--capture-image']
                 #command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--capture-image']
         elif camera == WEBCAM:
-            command = [WGET, '--output-document=%s' % (os.path.join(self._webcamPictureFolder, filename),), self._webcamWget]
+            command = [WGET, '--output-document=%s' % (os.path.join(self._webcamPictureFolder, filename),), self._webcamHttp]
         else:
             self.error('camera type %s unknown' % (camera,))
             return
@@ -892,7 +948,7 @@ class CamZillaPluginClass(AbstractPluginClass):
             if output[1]:
                 self.warning(output[1])
         else:
-            if self._isPowered():
+            if self._isCameraPowered():
                 if output[1]:
                     self.error(output[1])
             else:
@@ -900,29 +956,36 @@ class CamZillaPluginClass(AbstractPluginClass):
         return output
     
     
-    def _isPowered(self):
-        if self._robotAvailable:
-            return self.cameraPowerStatus() and self.cameraUsbStatus() and self.robotUsbStatus()
-        else:
-            return self.cameraPowerStatus() and self.cameraUsbStatus()
+    def _isRobotPowered(self):
+        return self.robotPowerStatus() and self.robotUsbStatus()
+    
+    
+    def _isCameraPowered(self):
+        return self.cameraPowerStatus() and self.cameraUsbStatus()
             
             
     def _parkRobot(self):
-        if self._isPowered():
+        if self._isRobotPowered():
             self._position(self._parkX, self._parkY)
     
     
-    def _shutdownRobotAndCam(self):
-        if self._isPowered():
+    def _powerOffCam(self):
+        if self._isCameraPowered():
             # turn the camera USB port off
             self.cameraUsbOff()
             # turn the robot and photo camera off
             self.cameraPowerOff()
+    
+    
+    def _shutdownRobot(self):
+        if self._isRobotPowered():
             if self._robotAvailable:
                 if self._serial.isOpen():
                     self._serial.close()
                 # turn the robot USB port off
                 self.robotUsbOff()
+                # turn the robot EXT port off
+                self.robotPowerOff()
                 self._calibrated = False
             return True
         
@@ -931,17 +994,22 @@ class CamZillaPluginClass(AbstractPluginClass):
         return False
         
     
-    def _startupRobotAndCam(self):
-        if not self._isPowered():
+    def _powerOnCam(self):
+        if not self._isCameraPowered():
             # turn the camera USB port on
             self.cameraUsbOn()
-            # turn the robot and photo camera on
+            # turn the photo camera on
             self.cameraPowerOn()
-            
+        
+    
+    def _startupRobot(self):
+        if not self._isRobotPowered():
             if self._robotAvailable:
                 self.info('wait for robot to startup')
                 # turn the robot USB port on
                 self.robotUsbOn()
+                # turn the robot on
+                self.robotPowerOn()
                 
                 if not self._serial or not self._serial.isOpen():
                     connect_cnt = 0
@@ -973,7 +1041,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         
     def _calibrateRobot(self):
         now = self.getTimeStamp()
-        if self._isPowered():
+        if self._isRobotPowered():
             self._write("j=off")
             cal = self._write("cal")
             self._calibrated = True
