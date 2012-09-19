@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_Camera_pos1__scaled" priority="10" >
+<virtual-sensor name="ETZ_Camera_pos16__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -14,7 +14,7 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>webcam pictures from position 1 at ETZ deployment as thumbnails</description>
+    <description>webcam pictures from position 16 at ETZ deployment as thumbnails</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" history-size="1"/>
@@ -24,7 +24,7 @@
                 <address wrapper="local">
                     <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from ETZ_Binary__mapped where RELATIVE_FILE like 'webcam1/%'</predicate>
                 </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 1</query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 16</query>
             </source>
             <query> select * from source </query>
         </stream>
