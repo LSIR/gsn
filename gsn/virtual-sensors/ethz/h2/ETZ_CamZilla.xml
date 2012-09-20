@@ -5,7 +5,7 @@
         <web-input password="test">
             <command name="picture_now">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
-                <field name="camera" type="select:D300s,1|MobotixM24,2">select camera</field>
+                <field name="camera" type="select:DSLR,1|Webcam,2">select camera</field>
                 <field name="image_quality" type="select:JPEG Basic,0|JPEG Normal,1|JPEG Fine,2|NEF (Raw),3|NEF+Basic,4|NEF+Normal,5|NEF+Fine,6|TIFF (RGB),7">select image quality</field>
                 <field name="image_size" type="select:2144x1424,2|3216x2136,1|4288x2848,0">select image size</field>
                 <field name="aperture" type="select:auto|f/5.6,0|f/6.3,1|f/7.1,2|f/8,3|f/9,4|f/10,5|f/11,6|f/13,7|f/14,8|f/16,9|f/18,10|f/20,11|f/22,12|f/25,13|f/29,14|f/32,15|f/36,16">select aperture</field>
@@ -20,7 +20,7 @@
             </command>
             <command name="panorama_picture">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
-                <field name="camera" type="select:D300s,1|MobotixM24,2">select camera</field>
+                <field name="camera" type="select:DSLR,1|Webcam,2">select camera</field>
                 <field name="start_x" type="text" defaultvalue="0">Lower-left horizontal starting point</field>
                 <field name="start_y" type="text" defaultvalue="0">Lower-left vertical starting point</field>
                 <field name="pictures_x" type="text" defaultvalue="1">Number of pictures taken horizontally</field>
