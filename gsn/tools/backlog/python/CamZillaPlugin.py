@@ -55,7 +55,7 @@ POSITIONING_TASK = 2
 MODE_TASK = 3
 CALIBRATION_TASK = 4
 
-CAMERA = 1
+DSLR = 1
 WEBCAM = 2
 
 class CamZillaPluginClass(AbstractPluginClass):
@@ -75,7 +75,7 @@ class CamZillaPluginClass(AbstractPluginClass):
     _calibrated
     _delay
     _powerSaveMode
-    _cameraAvailable
+    _dslrAvailable
     _pictureFolder
     _webcamAvailable
     _webcamHttp
@@ -105,7 +105,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._manualControl = True
         self._plugStop = False
         self._calibrated = False
-        self._cameraAvailable = False
+        self._dslrAvailable = False
         self._x = 0.0
         self._y = 0.0
         self._parkX = 0
@@ -126,14 +126,14 @@ class CamZillaPluginClass(AbstractPluginClass):
         if not os.access(GPHOTO2, os.X_OK):
             raise TypeError('%s can not be executed' % (GPHOTO2,))
         
-        value = self.getOptionValue('camera_available')
+        value = self.getOptionValue('dslr_available')
         if value != None and int(value) == 1:
-            self.info('a primary camera is available')
-            self._cameraAvailable = True
+            self.info('a primary DSLR camera is available')
+            self._dslrAvailable = True
         else:
-            self.info('there is no primary camera available')
+            self.info('there is no primary DSLR camera available')
         
-        if self._cameraAvailable:
+        if self._dslrAvailable:
             self._pictureFolder = self.getOptionValue('picture_folder')
             if self._pictureFolder is None:
                 raise TypeError('no picture_folder specified')
@@ -148,44 +148,44 @@ class CamZillaPluginClass(AbstractPluginClass):
             else:
                 self.info('autofocus is locked')
             
-            value = self.getOptionValue('ext_port_camera')
+            value = self.getOptionValue('ext_port_dslr')
             if value is None:
-                raise TypeError('no ext_port_camera specified')
+                raise TypeError('no ext_port_dslr specified')
             elif int(value) == 1:
-                self.cameraPowerStatus = self.getPowerControlObject().getExt1Status
-                self.cameraPowerOn = self.getPowerControlObject().ext1On
-                self.cameraPowerOff = self.getPowerControlObject().ext1Off
+                self.dslrPowerStatus = self.getPowerControlObject().getExt1Status
+                self.dslrPowerOn = self.getPowerControlObject().ext1On
+                self.dslrPowerOff = self.getPowerControlObject().ext1Off
             elif int(value) == 2:
-                self.cameraPowerStatus = self.getPowerControlObject().getExt2Status
-                self.cameraPowerOn = self.getPowerControlObject().ext2On
-                self.cameraPowerOff = self.getPowerControlObject().ext2Off
+                self.dslrPowerStatus = self.getPowerControlObject().getExt2Status
+                self.dslrPowerOn = self.getPowerControlObject().ext2On
+                self.dslrPowerOff = self.getPowerControlObject().ext2Off
             elif int(value) == 3:
-                self.cameraPowerStatus = self.getPowerControlObject().getExt3Status
-                self.cameraPowerOn = self.getPowerControlObject().ext3On
-                self.cameraPowerOff = self.getPowerControlObject().ext3Off
+                self.dslrPowerStatus = self.getPowerControlObject().getExt3Status
+                self.dslrPowerOn = self.getPowerControlObject().ext3On
+                self.dslrPowerOff = self.getPowerControlObject().ext3Off
             else:
-                raise TypeError('ext_port_camera has to be set to 1, 2 or 3')
+                raise TypeError('ext_port_dslr has to be set to 1, 2 or 3')
             
             if value == self.getOptionValue('ext_port_heater'):
-                raise TypeError('ext_port_camera and ext_port_heater must be different')
+                raise TypeError('ext_port_dslr and ext_port_heater must be different')
         
-            value = self.getOptionValue('usb_port_camera')
+            value = self.getOptionValue('usb_port_dslr')
             if value is None:
-                raise TypeError('no usb_port_camera specified')
+                raise TypeError('no usb_port_dslr specified')
             elif int(value) == 1:
-                self.cameraUsbStatus = self.getPowerControlObject().getUsb1Status
-                self.cameraUsbOn = self.getPowerControlObject().usb1On
-                self.cameraUsbOff = self.getPowerControlObject().usb1Off
+                self.dslrUsbStatus = self.getPowerControlObject().getUsb1Status
+                self.dslrUsbOn = self.getPowerControlObject().usb1On
+                self.dslrUsbOff = self.getPowerControlObject().usb1Off
             elif int(value) == 2:
-                self.cameraUsbStatus = self.getPowerControlObject().getUsb2Status
-                self.cameraUsbOn = self.getPowerControlObject().usb2On
-                self.cameraUsbOff = self.getPowerControlObject().usb2Off
+                self.dslrUsbStatus = self.getPowerControlObject().getUsb2Status
+                self.dslrUsbOn = self.getPowerControlObject().usb2On
+                self.dslrUsbOff = self.getPowerControlObject().usb2Off
             elif int(value) == 3:
-                self.cameraUsbStatus = self.getPowerControlObject().getUsb3Status
-                self.cameraUsbOn = self.getPowerControlObject().usb3On
-                self.cameraUsbOff = self.getPowerControlObject().usb3Off
+                self.dslrUsbStatus = self.getPowerControlObject().getUsb3Status
+                self.dslrUsbOn = self.getPowerControlObject().usb3On
+                self.dslrUsbOff = self.getPowerControlObject().usb3Off
             else:
-                raise TypeError('usb_port_camera has to be set to 1, 2 or 3')
+                raise TypeError('usb_port_dslr has to be set to 1, 2 or 3')
         
         value = self.getOptionValue('ext_port_heater')
         if value is None:
@@ -239,7 +239,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         if self._robotAvailable:
             if value == self.getOptionValue('usb_port_robot'):
-                raise TypeError('usb_port_camera and usb_port_robot must be different')
+                raise TypeError('usb_port_dslr and usb_port_robot must be different')
             
             value = self.getOptionValue('usb_port_robot')
             if value is None:
@@ -277,6 +277,9 @@ class CamZillaPluginClass(AbstractPluginClass):
             else:
                 raise TypeError('ext_port_robot has to be set to 1, 2 or 3')
             
+            if value == self.getOptionValue('ext_port_heater'):
+                raise TypeError('ext_port_robot and ext_port_heater must be different')
+            
             device = self.getOptionValue('device_name')
             if device is None:
                 raise TypeError('no device_name specified')
@@ -312,7 +315,7 @@ class CamZillaPluginClass(AbstractPluginClass):
             else:
                 self.info('power save mode is turned off')
                 self._startupRobot()
-                if self._cameraAvailable:
+                if self._dslrAvailable:
                     self._powerOnCam()
         else:
             self._powerSaveMode = True
@@ -348,7 +351,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                 except Exception, e:
                     self.exception(str(e))
             
-        if self._cameraAvailable and not self._plugStop and not self._powerSaveMode:
+        if self._dslrAvailable and not self._plugStop and not self._powerSaveMode:
             self._powerOnCam()
             try:
                 self._downloadUnknownPictures()
@@ -378,9 +381,9 @@ class CamZillaPluginClass(AbstractPluginClass):
             try:
                 now = time.time()
                 if task[0] == PANORAMA_TASK:
-                    if task[1] == CAMERA and not self._cameraAvailable:
-                        self.error('panorama camera task can not be executed without configuring a camera')
-                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'panorama camera task can not be executed without configuring a camera', self._x,self._y] + [None]*9)
+                    if task[1] == DSLR and not self._dslrAvailable:
+                        self.error('panorama DSLR task can not be executed without configuring a DSLR')
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'panorama DSLR task can not be executed without configuring a DSLR', self._x,self._y] + [None]*9)
                     elif task[1] == WEBCAM and not self._webcamAvailable:
                         self.error('panorama webcam task can not be executed without configuring a webcam')
                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'panorama webcam task can not be executed without configuring a webcam', self._x,self._y] + [None]*9)
@@ -388,13 +391,13 @@ class CamZillaPluginClass(AbstractPluginClass):
                         if self._robotAvailable:
                             if self._powerSaveMode:
                                 self._startupRobot()
-                                if self._cameraAvailable:
+                                if self._dslrAvailable:
                                     self._powerOnCam()
                                 if not self._calibrated:
                                     self._calibrateRobot()
                             
                             if not self._plugStop:
-                                if task[1] == CAMERA:
+                                if task[1] == DSLR:
                                     try:
                                         self._downloadUnknownPictures()
                                     except Exception, e:
@@ -410,19 +413,19 @@ class CamZillaPluginClass(AbstractPluginClass):
                                             self.error(e.__str__())
                                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'could not execute task: %s' % (e.__str__(),), self._x,self._y] + [None]*9)
                                     else:
-                                        if task[1] == CAMERA:
-                                            self.info('executing panorama picture task with camera: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) batch(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedtask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7]), str(parsedTask[8])))
+                                        if task[1] == DSLR:
+                                            self.info('executing panorama picture task with DSLR: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s) batch(%s) gphoto2(%s)' % (str(parsedTask[0]), str(parsedtask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6]), str(parsedTask[7]), str(parsedTask[8])))
                                         else:
                                             self.info('executing panorama picture task with webcam: start(%s,%s) pictures(%s,%s) rotation(%s,%s) delay(%s)' % (str(parsedTask[0]), str(parsedtask[1]), str(parsedTask[2]), str(parsedTask[3]), str(parsedTask[4]), str(parsedTask[5]), str(parsedTask[6])))
                                         pic_name_list = []
                                         
-                                        if self._isRobotPowered() and self._isCameraPowered():
+                                        if self._isRobotPowered() and self._isDSLRPowered():
                                             pic = 1
                                             try:
                                                 bracketing = False
                                                 config = None
-                                                if task[1] == CAMERA:
-                                                    config, bracketing = self._configureCamera(parsedTask[8])
+                                                if task[1] == DSLR:
+                                                    config, bracketing = self._configureDSLR(parsedTask[8])
                                                 y_cnt = 0
                                                 while y_cnt < parsedTask[3] and not self._plugStop:
                                                     ret = self._position(y=(parsedtask[2]+y_cnt*parsedTask[5]))
@@ -461,7 +464,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                                                                             pic_name_list.append('%s_pic%.3d_%dx_%dy_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), pic, int(round(self._x*10)), int(round(self._y*10)), i+1, '%C'))
                                                                     self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'pictures number %d-%d/%d taken %s'  % (1+(pic-1)*3, 3+(pic-1)*3, parsedTask[2]*parsedTask[3]*3, s), self._x,self._y] + parsedTask[:-1] + [config])
                                                                 else:
-                                                                    if task[1] == CAMERA:
+                                                                    if task[1] == DSLR:
                                                                         if parsedTask[7] == 0:
                                                                             self._downloadPictures(['%s.%s' % (pic_str, '%C')])
                                                                         else:
@@ -473,7 +476,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                                                         
                                                     y_cnt += 1
                                                     
-                                                if parsedTask[7] != 0 and task[1] == CAMERA:
+                                                if parsedTask[7] != 0 and task[1] == DSLR:
                                                     self._downloadPictures(pic_name_list)
                                             except Exception, e:
                                                 if not self._plugStop:
@@ -491,9 +494,9 @@ class CamZillaPluginClass(AbstractPluginClass):
                             self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['panorama', 'CamZilla can not take panorama pictures without robot', self._x, self._y] + [None]*9)
                             self.error('CamZilla can not take panorama pictures without robot')
                 elif task[0] == PICTURE_TASK:
-                    if task[1] == CAMERA and not self._cameraAvailable:
-                        self.error('picture camera task can not be executed without configuring a camera')
-                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture camera task can not be executed without configuring a camera', self._x, self._y] + [None]*9)
+                    if task[1] == DSLR and not self._dslrAvailable:
+                        self.error('picture DSLR task can not be executed without configuring a DSLR')
+                        self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture DSLR task can not be executed without configuring a DSLR', self._x, self._y] + [None]*9)
                     elif task[1] == WEBCAM and not self._webcamAvailable:
                         self.error('picture webcam task can not be executed without configuring a webcam')
                         self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture webcam task can not be executed without configuring a webcam', self._x, self._y] + [None]*9)
@@ -503,7 +506,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                         else:
                             self.info('picture now task received -> taking picture(s)')
                         
-                        if task[1] == CAMERA:
+                        if task[1] == DSLR:
                             if self._powerSaveMode and not self._plugStop:
                                 self._powerOnCam()
                                 
@@ -515,7 +518,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                         if not self._plugStop:
                             now = time.time()
                             
-                            if task[1] == CAMERA:
+                            if task[1] == DSLR:
                                 if task[2]:
                                     gphoto2conf = task[2].split(',')
                                 else:
@@ -525,8 +528,8 @@ class CamZillaPluginClass(AbstractPluginClass):
                                 try:
                                     bracketing = False
                                     config = None
-                                    if task[1] == CAMERA:
-                                        config, bracketing = self._configureCamera(gphoto2conf)
+                                    if task[1] == DSLR:
+                                        config, bracketing = self._configureDSLR(gphoto2conf)
                                     self.info('taking picture(s) now')
                                     if self._robotAvailable:
                                         pic_str = '%s_pic001_%dx_%dy' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), int(round(self._x*10)), int(round(self._y*10)))
@@ -548,7 +551,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                                                     else:
                                                         l.append('%s_bracket%d.%s' % (time.strftime('%Y%m%d_%H%M%S', time.gmtime(now)), i+1, '%C'))
                                                 self._downloadPictures(l)
-                                            elif task[1] == CAMERA:
+                                            elif task[1] == DSLR:
                                                 self._downloadPictures(['%s.%s' % (pic_str, '%C')])
                                         except Exception, e:
                                             if not self._plugStop:
@@ -627,7 +630,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                 if self._robotAvailable:
                     self._parkTimer = Timer(self._parkIdleTime, self._parkAction)
                     self._parkTimer.start()
-                elif self._cameraAvailable:
+                elif self._dslrAvailable:
                     self._powerOffCam()
         
         self.info('died')
@@ -648,14 +651,14 @@ class CamZillaPluginClass(AbstractPluginClass):
                 self.error('action unrecognized >%s<' % (parameters,))
                 return
                 
-            if parameters.lower().startswith('camera('):
-                task[1] = CAMERA
+            if parameters.lower().startswith('dslr('):
+                task[1] = DSLR
                 task[2] = parameters[7:-1]
             elif parameters.lower().startswith('webcam('):
                 task[1] = WEBCAM
                 task[2] = parameters[7:-1]
             else:
-                task[1] = CAMERA
+                task[1] = DSLR
                 task[2] = parameters
                 
             self._taskqueue.put(task)
@@ -672,7 +675,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         if self._robotAvailable:
             self._parkRobot()
             self._shutdownRobot()
-        if self._cameraAvailable:
+        if self._dslrAvailable:
             self._powerOffCam()
         
         
@@ -686,7 +689,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         if self._powerSaveMode:
             try:
                 self._shutdownRobot()
-                if self._cameraAvailable:
+                if self._dslrAvailable:
                     self._powerOffCam()
             except Exception, e:
                 self.exception(str(e))
@@ -705,38 +708,38 @@ class CamZillaPluginClass(AbstractPluginClass):
             now = time.time()
             self.info('power message received from GSN')
             if data[1] == 0:
-                if self._robotAvailable and self._cameraAvailable:
-                    self.info('turn robot and camera off')
-                    log_str = 'Camera and robot are turned off'
+                if self._robotAvailable and self._dslrAvailable:
+                    self.info('turn robot and DSLR off')
+                    log_str = 'DSLR and robot are turned off'
                     self._powerOffCam()
                     self._shutdownRobot()
                 elif self._robotAvailable:
                     self.info('turn robot off')
                     log_str = 'Robot is turned off'
                     self._shutdownRobot()
-                elif self._cameraAvailable:
-                    self.info('turn camera off')
-                    log_str = 'Camera is turned off'
+                elif self._dslrAvailable:
+                    self.info('turn DSLR off')
+                    log_str = 'DSLR is turned off'
                     self._powerOffCam()
             elif data[1] == 1:
                 try:
-                    if self._robotAvailable and self._cameraAvailable:
-                        self.info('turn robot and camera on')
+                    if self._robotAvailable and self._dslrAvailable:
+                        self.info('turn robot and DSLR on')
                         self._startupRobot()
                         self._powerOnCam()
-                        log_str = 'Camera and robot are turned on'
+                        log_str = 'DSLR and robot are turned on'
                     elif self._robotAvailable:
                         self.info('turn robot on')
                         self._startupRobot()
                         log_str = 'Robot is turned on'
-                    elif self._cameraAvailable:
-                        self.info('turn camera on')
+                    elif self._dslrAvailable:
+                        self.info('turn DSLR on')
                         self._powerOnCam()
-                        log_str = 'Camera is turned on'
+                        log_str = 'DSLR is turned on'
                 except TypeError, e:
                     self.error(str(e))
             else:
-                self.error('unknown robot and camera message received from GSN')
+                self.error('unknown power message received from GSN')
                 
             heater = None
             if data[2] == 0:
@@ -808,8 +811,8 @@ class CamZillaPluginClass(AbstractPluginClass):
     
     
     
-    def _configureCamera(self, settings):
-        self.info('configure camera')
+    def _configureDSLR(self, settings):
+        self.info('configure DSLR')
         configlist = []
         
         for default in DEFAULT_GPHOTO2_SETTINGS:
@@ -835,7 +838,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                 if self._autofocusAllowed:
                     self._autofocus = '--set-config %s' % (setting.strip(),)
                 else:
-                    self.warning('using autofocus is not allowed -> configure camera without')
+                    self.warning('using autofocus is not allowed -> configure DSLR without')
             elif setting.find('/main/actions/manualfocusdrive') != -1:
                 self._setFocus(setting)
             else:
@@ -850,7 +853,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         
     def _takePicture(self, camera, filename):
-        if camera == CAMERA:
+        if camera == DSLR:
             if self._autofocus:
                 command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', '--set-config-index /main/settings/capturetarget=1', self._autofocus, '--capture-image']
                 #command = [GPHOTO2, '--port="usb:"', '--force-overwrite', '--quiet', self._autofocus, '--capture-image']
@@ -872,7 +875,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         
     def _downloadPictures(self, filenames):
-        self.info('downloading all pictures from photo camera')
+        self.info('downloading all pictures from DSLR')
         
         try:
             self.sendInterPluginCommand('BinaryPlugin', 'stop')
@@ -899,7 +902,7 @@ class CamZillaPluginClass(AbstractPluginClass):
             self._delay.wait(bugwait)
             pic_count += 1
         if pic_count > 0:
-            self.info('downloaded %d pictures from photo camera' % (pic_count,))
+            self.info('downloaded %d pictures from DSLR' % (pic_count,))
             
         try:
             self.sendInterPluginCommand('BinaryPlugin', 'start')
@@ -910,7 +913,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         
     def _downloadUnknownPictures(self):
-        self.info('downloading all unknown pictures from photo camera')
+        self.info('downloading all unknown pictures from DSLR')
         if not os.path.isdir(TMPPICTUREFOLDER):
             os.makedirs(TMPPICTUREFOLDER)
         if os.listdir(TMPPICTUREFOLDER):
@@ -932,7 +935,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                     shutil.move(file, self._pictureFolder)
                 self._delay.wait(bugwait)
         if pic_count > 0:
-            self.info('downloaded %d unknown pictures from photo camera' % (pic_count,))
+            self.info('downloaded %d unknown pictures from DSLR' % (pic_count,))
 
         os.rmdir(TMPPICTUREFOLDER)
         
@@ -948,11 +951,11 @@ class CamZillaPluginClass(AbstractPluginClass):
             if output[1]:
                 self.warning(output[1])
         else:
-            if self._isCameraPowered():
+            if self._isDSLRPowered():
                 if output[1]:
                     self.error(output[1])
             else:
-                raise Exception('camera has no more power -> gphoto2 could not execute command')
+                raise Exception('DSLR has no more power -> gphoto2 could not execute command')
         return output
     
     
@@ -960,8 +963,8 @@ class CamZillaPluginClass(AbstractPluginClass):
         return self.robotPowerStatus() and self.robotUsbStatus()
     
     
-    def _isCameraPowered(self):
-        return self.cameraPowerStatus() and self.cameraUsbStatus()
+    def _isDSLRPowered(self):
+        return self.dslrPowerStatus() and self.dslrUsbStatus()
             
             
     def _parkRobot(self):
@@ -970,11 +973,11 @@ class CamZillaPluginClass(AbstractPluginClass):
     
     
     def _powerOffCam(self):
-        if self._isCameraPowered():
-            # turn the camera USB port off
-            self.cameraUsbOff()
-            # turn the robot and photo camera off
-            self.cameraPowerOff()
+        if self._isDSLRPowered():
+            # turn the DSLR USB port off
+            self.dslrUsbOff()
+            # turn the robot and DSLR off
+            self.dslrPowerOff()
     
     
     def _shutdownRobot(self):
@@ -995,11 +998,11 @@ class CamZillaPluginClass(AbstractPluginClass):
         
     
     def _powerOnCam(self):
-        if not self._isCameraPowered():
-            # turn the camera USB port on
-            self.cameraUsbOn()
-            # turn the photo camera on
-            self.cameraPowerOn()
+        if not self._isDSLRPowered():
+            # turn the DSLR USB port on
+            self.dslrUsbOn()
+            # turn the DSLR on
+            self.dslrPowerOn()
         
     
     def _startupRobot(self):
