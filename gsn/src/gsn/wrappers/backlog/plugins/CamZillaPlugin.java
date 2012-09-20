@@ -25,8 +25,6 @@ public class CamZillaPlugin extends AbstractPlugin {
 	private static final short POSITIONING_TASK = 2;
 	private static final short MODE_TASK = 3;
 	private static final short CALIBRATION_TASK = 4;
-
-	private static final int CAMERA_DEFAULT = 1;
 	
 	private static DataField[] dataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
@@ -102,11 +100,10 @@ public class CamZillaPlugin extends AbstractPlugin {
 	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		Serializable[] command = null;
 		if( action.compareToIgnoreCase("panorama_picture") == 0 ) {
-			String sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", b = "0", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
-			int  camera = CAMERA_DEFAULT;
+			String camera = "", sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", b = "0", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("camera") == 0 )
-					camera = Integer.parseInt((String) paramValues[i]);
+					camera = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("start_x") == 0 )
 					sx = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("start_y") == 0 )
@@ -148,6 +145,8 @@ public class CamZillaPlugin extends AbstractPlugin {
 			}
 
 			String str = "";
+			if (!camera.trim().isEmpty())
+				str = "camera("+camera+") ";
 			if (!sx.trim().isEmpty() && !sy.trim().isEmpty())
 				str = "start("+sx+","+sy+") ";
 			if (!px.trim().isEmpty() && !py.trim().isEmpty())
@@ -161,14 +160,13 @@ public class CamZillaPlugin extends AbstractPlugin {
 			str += "gphoto2("+getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, compensation, bracketing, autofocus, focus, opt)+")";
 			
 			logger.info("uploading panorama picture task >" + str + "<");
-			command = new Serializable[] {TASK_MESSAGE, PANORAMA_TASK, camera , str};
+			command = new Serializable[] {TASK_MESSAGE, PANORAMA_TASK , str};
 		}
 		else if ( action.compareToIgnoreCase("picture_now") == 0 ) {
-			String str, imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
-			int camera = CAMERA_DEFAULT;
+			String camera = "", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
 			for (int i = 0 ; i < paramNames.length ; i++) {
 				if( paramNames[i].compareToIgnoreCase("camera") == 0 )
-					camera = Integer.parseInt((String) paramValues[i]);
+					camera = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("image_quality") == 0 )
 					imgquality = (String) paramValues[i];
 				else if( paramNames[i].compareToIgnoreCase("image_size") == 0 )
@@ -192,10 +190,15 @@ public class CamZillaPlugin extends AbstractPlugin {
 				else if( paramNames[i].compareToIgnoreCase("gphoto2_config") == 0 )
 					opt = (String) paramValues[i];
 			}
+			
+			String str = "";
+			if (!camera.trim().isEmpty())
+				str = "camera("+camera+") ";
 
-			str = getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, compensation, bracketing, autofocus, focus, opt);
+			str += "gphoto2("+getD300sConfig(imgquality, imgsize, aperture, shutter, iso, whitebalance, compensation, bracketing, autofocus, focus, opt)+")";
+			
 			logger.info("uploading picture now task >" + str + "<");
-			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK, camera, str};
+			command = new Serializable[] {TASK_MESSAGE, PICTURE_TASK, str};
 		}
 		else if ( action.compareToIgnoreCase("positioning") == 0 ) {
 			double x = 0, y = 0;
