@@ -503,10 +503,10 @@ class CamZillaPluginClass(AbstractPluginClass):
                     else:
                         if parsedTask[0] == DSLR and not self._dslrAvailable:
                             self.error('picture DSLR task can not be executed without configuring a DSLR')
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture DSLR task can not be executed without configuring a DSLR', self._x, self._y] + [None]*9)
+                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture', 'picture DSLR task can not be executed without configuring a DSLR', self._x, self._y] + [None]*9)
                         elif parsedTask[0] == WEBCAM and not self._webcamAvailable:
                             self.error('picture webcam task can not be executed without configuring a webcam')
-                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture webcam task can not be executed without configuring a webcam', self._x, self._y] + [None]*9)
+                            self.processMsg(self.getTimeStamp(), [int(now*1000)] + ['picture', 'picture webcam task can not be executed without configuring a webcam', self._x, self._y] + [None]*9)
                         else:
                             if self._robotAvailable:
                                 self.info('picture now task received -> taking picture(s) in current robot position (x=%f,y=%f)' % (self._x, self._y))
