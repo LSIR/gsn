@@ -148,7 +148,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 			if (!camera.trim().isEmpty())
 				str = "camera("+camera+") ";
 			if (!sx.trim().isEmpty() && !sy.trim().isEmpty())
-				str = "start("+sx+","+sy+") ";
+				str += "start("+sx+","+sy+") ";
 			if (!px.trim().isEmpty() && !py.trim().isEmpty())
 				str += "pictures("+px+","+py+") ";
 			if (!rx.trim().isEmpty() && !ry.trim().isEmpty())
