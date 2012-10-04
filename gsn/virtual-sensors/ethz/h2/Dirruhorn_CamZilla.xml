@@ -6,7 +6,7 @@
             <command name="picture_now">
                 <field name="core_station" type="*text" defaultvalue="65535">the device_id of the receiving core station</field>
                 <field name="camera" type="select:DSLR,1|Webcam,2">select camera</field>
-                <field name="image_quality" type="select:JPEG Basic,0|JPEG Normal,1|JPEG Fine,2|NEF (Raw),3|NEF+Basic,4|NEF+Normal,5|NEF+Fine,6|TIFF (RGB),7">select image quality</field>
+                <field name="image_quality" type="select:JPEG Basic,0|JPEG Normal,1|JPEG Fine,2|TIFF (RGB),3|NEF (Raw),4|NEF+Basic,5|NEF+Normal,6|NEF+Fine,7">select image quality</field>
                 <field name="image_size" type="select:2144x1424,2|3216x2136,1|4288x2848,0">select image size</field>
                 <field name="aperture" type="select:auto|f/5.6,0|f/6.3,1|f/7.1,2|f/8,3|f/9,4|f/10,5|f/11,6|f/13,7|f/14,8|f/16,9|f/18,10|f/20,11|f/22,12|f/25,13|f/29,14|f/32,15|f/36,16">select aperture</field>
                 <field name="shutter_speed" type="select:auto|0.0001s,0|0.0002s,1|0.0003s,2|0.0004s,3|0.0005s,4|0.0006s,5|0.0008s,6|0.0010s,7|0.0012s,8|0.0015s,9|0.0020s,10|0.0025s,11|0.0031s,12|0.0050s,13|0.0050s,14|0.0062s,15|0.0080s,16|0.0100s,17|0.0125s,18|0.0166s,19|0.0200s,20|0.0250s,21|0.0333s,22|0.0400s,23|0.0500s,24|0.0666s,25|0.0769s,26|0.1000s,27|0.1250s,28|0.1666s,29|0.2000s,30|0.2500s,31|0.3333s,32|0.4000s,33|0.5000s,34|0.6250s,35|0.7692s,36|1.0000s,37|1.300s,38|1.6000s,39|2.0000s,40|2.5000s,41|3.0000s,42|4.0000s,43|5.0000s,44|6.0000s,45|8.0000s,46|10.0000s,47|13.0000s,48|15.0000s,49|20.0000s,50|25.0000s,51|30.0000s,52">select shutter speed</field>
@@ -29,7 +29,7 @@
                 <field name="rotation_y" type="text" defaultvalue="">Vertical rotation in degrees between pictures</field>
                 <field name="delay" type="text" defaultvalue="0">Delay between rotation and picture taking</field>
                 <field name="batch_download" type="checkbox:batch_download" defaultvalue="1">select if picture download from camera should be done after all pictures have been taken</field>
-                <field name="image_quality" type="select:JPEG Basic,0|JPEG Normal,1|JPEG Fine,2|NEF (Raw),3|NEF+Basic,4|NEF+Normal,5|NEF+Fine,6|TIFF (RGB),7">select image quality</field>
+                <field name="image_quality" type="select:JPEG Basic,0|JPEG Normal,1|JPEG Fine,2|TIFF (RGB),3|NEF (Raw),4|NEF+Basic,5|NEF+Normal,6|NEF+Fine,7">select image quality</field>
                 <field name="image_size" type="select:2144x1424,2|3216x2136,1|4288x2848,0">select image size</field>
                 <field name="aperture" type="select:auto|f/5.6,0|f/6.3,1|f/7.1,2|f/8,3|f/9,4|f/10,5|f/11,6|f/13,7|f/14,8|f/16,9|f/18,10|f/20,11|f/22,12|f/25,13|f/29,14|f/32,15|f/36,16">select aperture</field>
                 <field name="shutter_speed" type="select:auto|0.0001s,0|0.0002s,1|0.0003s,2|0.0004s,3|0.0005s,4|0.0006s,5|0.0008s,6|0.0010s,7|0.0012s,8|0.0015s,9|0.0020s,10|0.0025s,11|0.0031s,12|0.0050s,13|0.0050s,14|0.0062s,15|0.0080s,16|0.0100s,17|0.0125s,18|0.0166s,19|0.0200s,20|0.0250s,21|0.0333s,22|0.0400s,23|0.0500s,24|0.0666s,25|0.0769s,26|0.1000s,27|0.1250s,28|0.1666s,29|0.2000s,30|0.2500s,31|0.3333s,32|0.4000s,33|0.5000s,34|0.6250s,35|0.7692s,36|1.0000s,37|1.300s,38|1.6000s,39|2.0000s,40|2.5000s,41|3.0000s,42|4.0000s,43|5.0000s,44|6.0000s,45|8.0000s,46|10.0000s,47|13.0000s,48|15.0000s,49|20.0000s,50|25.0000s,51|30.0000s,52">select shutter speed</field>
