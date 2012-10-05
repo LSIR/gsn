@@ -17,10 +17,10 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="CCCT_DX0" type="VARCHAR(30)" />
-            <field name="CCCT_DX1" type="VARCHAR(30)" />
-            <field name="CCCT_DX2" type="VARCHAR(30)" />
-            <field name="CCCT_T3" type="VARCHAR(30)" />
+            <field name="CCCT_DX0" type="VARCHAR(30)" unit="mm" />
+            <field name="CCCT_DX1" type="VARCHAR(30)" unit="mm" />
+            <field name="CCCT_DX2" type="VARCHAR(30)" unit="mm" />
+            <field name="CCCT_T3" type="VARCHAR(30)" unit="°C" />
         </output-structure>
     </processing-class>
     <description>Crackmeter/CCCT data from Matterhorn deployment</description>

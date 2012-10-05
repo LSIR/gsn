@@ -17,8 +17,8 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="CCNN_DX0" type="VARCHAR(30)" />
-            <field name="CCNN_DX1" type="VARCHAR(30)" />
+            <field name="CCNN_DX0" type="VARCHAR(30)" unit="mm" />
+            <field name="CCNN_DX1" type="VARCHAR(30)" unit="mm" />
         </output-structure>
     </processing-class>
     <description>Crackmeter/CCNN data from Matterhorn deployment</description>

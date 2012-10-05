@@ -66,15 +66,15 @@
             
             <field name="COMMAND" type="VARCHAR(127)" />
             <field name="INFO" type="VARCHAR(255)" />
-            <field name="X" type="VARCHAR(8)" />
-            <field name="Y" type="VARCHAR(8)" />
-            <field name="START_X" type="VARCHAR(8)" />
-            <field name="START_Y" type="VARCHAR(8)" />
+            <field name="X" type="VARCHAR(8)" unit="°" />
+            <field name="Y" type="VARCHAR(8)" unit="°" />
+            <field name="START_X" type="VARCHAR(8)" unit="°" />
+            <field name="START_Y" type="VARCHAR(8)" unit="°" />
             <field name="PICTURES_X" type="SMALLINT" />
             <field name="PICTURES_Y" type="SMALLINT" />
             <field name="ROTATION_X" type="VARCHAR(8)" />
             <field name="ROTATION_Y" type="VARCHAR(8)" />
-            <field name="DELAY" type="SMALLINT" />
+            <field name="DELAY" type="SMALLINT" unit="s" />
             <field name="BATCH_DOWNLOAD" type="SMALLINT" />
             <field name="GPHOTO2_CONFIG" type="BINARY" />
             

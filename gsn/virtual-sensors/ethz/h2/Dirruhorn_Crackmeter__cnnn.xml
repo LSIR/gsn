@@ -17,7 +17,7 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="CNNN_DX0" type="VARCHAR(30)" />
+            <field name="CNNN_DX0" type="VARCHAR(30)" unit="mm" />
         </output-structure>
     </processing-class>
     <description>Crackmeter/CNNN data from Dirruhorn deployment</description>

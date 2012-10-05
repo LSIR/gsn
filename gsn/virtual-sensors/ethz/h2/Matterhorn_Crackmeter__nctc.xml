@@ -17,9 +17,9 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="NCTC_DX1" type="VARCHAR(30)" />
-            <field name="NCTC_T1" type="VARCHAR(30)" />
-            <field name="NCTC_DX2" type="VARCHAR(30)" />
+            <field name="NCTC_DX1" type="VARCHAR(30)" unit="mm" />
+            <field name="NCTC_T1" type="VARCHAR(30)" unit="°C" />
+            <field name="NCTC_DX2" type="VARCHAR(30)" unit="mm" />
         </output-structure>
     </processing-class>
     <description>Crackmeter/NCTC data from Matterhorn deployment</description>

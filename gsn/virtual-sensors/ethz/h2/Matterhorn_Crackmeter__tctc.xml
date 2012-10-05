@@ -17,10 +17,10 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TCTC_DX1" type="VARCHAR(30)" />
-            <field name="TCTC_T1" type="VARCHAR(30)" />
-            <field name="TCTC_DX2" type="VARCHAR(30)" />
-            <field name="TCTC_T2" type="VARCHAR(30)" />
+            <field name="TCTC_DX1" type="VARCHAR(30)" unit="mm" />
+            <field name="TCTC_T1" type="VARCHAR(30)" unit="°C" />
+            <field name="TCTC_DX2" type="VARCHAR(30)" unit="mm" />
+            <field name="TCTC_T2" type="VARCHAR(30)" unit="°C" />
         </output-structure>
     </processing-class>
     <description>Crackmeter/TCTC data from Matterhorn deployment</description>
