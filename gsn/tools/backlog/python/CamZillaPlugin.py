@@ -68,7 +68,7 @@ class CamZillaPluginClass(AbstractPluginClass):
     data/instance attributes:
     _manualControl
     _autofocus
-    _autofocusAllowed
+    _focusAllowed
     _x
     _y
     _parkX
@@ -112,7 +112,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         self._parkX = 0
         self._parkY = 0
         self._autofocus = None
-        self._autofocusAllowed = False
+        self._focusAllowed = False
         self._powerSaveMode = False
         self._pictureFolder = None
         self._webcamAvailable = False
@@ -142,12 +142,12 @@ class CamZillaPluginClass(AbstractPluginClass):
                 self.warning('picture folder >%s< is not a directory -> creating it' % (self._pictureFolder,))
                 os.makedirs(self._pictureFolder)
                 
-            value = self.getOptionValue('autofocus')
+            value = self.getOptionValue('focus')
             if value != None and int(value) == 1:
-                self.info('autofocus can be used')
-                self._autofocusAllowed = True
+                self.info('focus can be used')
+                self._focusAllowed = True
             else:
-                self.info('autofocus is locked')
+                self.info('focus is locked')
             
             value = self.getOptionValue('ext_port_dslr')
             if value is None:
@@ -824,12 +824,15 @@ class CamZillaPluginClass(AbstractPluginClass):
                 ret += ', '
             ret += setting
             if setting.find('/main/actions/autofocusdrive') != -1:
-                if self._autofocusAllowed:
+                if self._focusAllowed:
                     self._autofocus = '--set-config %s' % (setting.strip(),)
                 else:
                     self.warning('using autofocus is not allowed -> configure DSLR without')
             elif setting.find('/main/actions/manualfocusdrive') != -1:
-                self._setFocus(setting)
+                if self._focusAllowed:
+                    self._setFocus(setting)
+                else:
+                    self.warning('using manual focus is not allowed -> configure DSLR without')
             else:
                 sets.append('--set-config-index %s' % (setting.strip(),))
             
