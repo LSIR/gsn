@@ -1,17 +1,17 @@
 "SENSORTYPE_ARGS","PHYSICAL_SIGNAL","VALUE","COMMENT"
 
-# adccomdiff_nctn
-"1","nctn_t1","0.0",
-"1","nctn_dx1","200",
-"5","nctn_t1","0.0",
-"5","nctn_dx1","50",
-"6","nctn_t1","0.0",
-"6","nctn_dx1","150",
+# adccomdiff_ctnn
+"1","ctnn_dx0","100",
+"1","ctnn_t1","0.0",
+"2","ctnn_dx0","150",
+"2","ctnn_t1","0.0",
+"3","ctnn_dx0","200",
+"3","ctnn_t1","0.0",
 
-# adccomdiff_ncnn
-"2","ncnn_dx1","150",
-"3","ncnn_dx1","50",
-"4","ncnn_dx1","100",
+# adccomdiff_cnnn
+"1","cnnn_dx0","100",
+"2","cnnn_dx0","150",
+"3","cnnn_dx0","200",
 
 # nodehealth
 "0","sdivoltage","0.0046805046805","BaseBoard v2 r2.0"
