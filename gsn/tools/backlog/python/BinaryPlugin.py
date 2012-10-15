@@ -247,7 +247,8 @@ class BinaryPluginClass(AbstractPluginClass):
             if self._interPlugStop:
                 self.info('inter plugin start command received')
                 self._interPlugStop = False
-                self._restartSending()
+                if self.isGSNConnected():
+                    self._restartSending()
             else:
                 self.warning('inter plugin start command received but Plugin already running')
         else:
