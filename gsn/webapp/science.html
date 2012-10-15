@@ -429,6 +429,20 @@ $(document).ready(function() {
 	      field:["cnnn_dx0"],
 	      select:"sensornode[position=65]"
 	    }]
+      },
+      {  title:"Inclinometer X-axis",
+         signals: [{
+          vsensor:"dirruhorn_gps_logger__status",
+          field:["inclinometer_x"],
+          position: [14,15,16,17,18,19,21,23,25,27,29,31,33,35,43,44,55,56,57,62,63,64]
+        }],
+      },
+      {  title:"Inclinometer Y-axis",
+         signals: [{
+          vsensor:"dirruhorn_gps_logger__status",
+          field:["inclinometer_y"],
+          position: [14,15,16,17,18,19,21,23,25,27,29,31,33,35,43,44,55,56,57,62,63,64]
+        }],
       }
       
     ]);
