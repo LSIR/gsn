@@ -19,7 +19,7 @@
                 	// a list of alarm time per position
                     def timeDifferenceOffsetPositionMap = [:];
                     // the mail recipients
-                    def mailrecipients = ["tgsell@tik.ee.ethz.ch"];
+                    def mailrecipients = ["tgsell@tik.ee.ethz.ch","bbuchli@ethz.ch"];
                     
                     if ( isdef('positionMap')) {
                     	def rmlist = [];
