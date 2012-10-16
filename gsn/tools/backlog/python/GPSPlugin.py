@@ -17,12 +17,11 @@ stdlib imports
 '''
 import struct
 from time import gmtime, time, strftime
-import time
 from threading import Event, Thread
-import GPSDriver
 from SpecialAPI import PowerControl, Statistics
 import os.path
 import serial
+import logging
 
 
 from ScheduleHandler import SUBPROCESS_BUG_BYPASS
@@ -80,13 +79,12 @@ class GPSPluginClass(AbstractPluginClass):
 	self._stay_online = str(self.getOptionValue('stay_online_for_db_resend'))
 	self._dc_wlan = int(self.getOptionValue('dc_wlan'))
 	self._WlanThread = None
-	if (self._dc_wlan):
+	if (self._dc_wlan): # and self.isDutyCycled):
 	  self.info("WLAN duty-cycle enabled!")
 	  wlan_ontime = int(self.getOptionValue('wlan_on_time'))
 	  wlan_offtime = int(self.getOptionValue('wlan_off_time'))
 	  #Wlan must only be cycled when in dc mode!!
-	  if (self.isDutyCycled):    	
-            self._WlanThread = WlanThread(self,self._dc_wlan,self._wlan_ontime,self._wlan_offtime,self._stay_online)
+          self._WlanThread = WlanThread(self,wlan_ontime, wlan_offtime,self._stay_online)
         else:
 	  self.info("WLAN duty-cycle disabled!")
 	  
@@ -99,7 +97,7 @@ class GPSPluginClass(AbstractPluginClass):
 	    self._fp.close()
 	  except Exception as e:
 	    self.debug("GPS count file could not be created!!\n" + str(e))
-	    self.exception("GPS count file could not be created!!\n" + str(e))
+	    self.error("GPS count file could not be created!!\n" + str(e))
 	    self.stop()
 	    return None
         try:
@@ -118,10 +116,10 @@ class GPSPluginClass(AbstractPluginClass):
             self.stop()
             return None
         
-        self.gps = GPSDriver.GPSDriver(self,[self._deviceStr, self._interval, self._config_file])
+        self.gps = GPSDriver(self,[self._deviceStr, self._interval, self._config_file])
 
 	if (self.gps == None or not self.gps._isInitialized() or self.gps._isStopped()):
-            self.exception('Initializing GPS Driver failed!!')
+            self.error('Initializing GPS Driver failed!!')
             self.stop()
             return None
 	
@@ -176,16 +174,18 @@ class GPSPluginClass(AbstractPluginClass):
     def runPlugin(self,param):
     
         self.info('GPSPlugin running...')
-        if (self.isDutyCycled):  
-	  if (self._dc_wlan and not self._WlanThread.isAlive()):
+        #if (self.isDutyCycled):  
+	if (self._dc_wlan and not self._WlanThread.isAlive()):
             self._WlanThread.start()
         
         rawMsg = self.gps._readMSG()
         rawMsg = self.gps._readMSG()
         
         while (not self._stopped): 
-	    if (self.gps is not None):
+	    if (self.gps is not None and self.gps._isInitialized()):
+	      self.debug('Reading raw at %s' %(strftime("%H:%M:%S +0000", gmtime())))
 	      rawMsg = self.gps._readMSG()
+
 	      if (rawMsg):
 		self._stats.counterAction(self._counterID)
 		cnt = self._stats.getCounterValue(self._counterID)
@@ -198,16 +198,16 @@ class GPSPluginClass(AbstractPluginClass):
               else:
 		self.debug(str(rawMsg))
             else:
-	      self._DriverRestarts -= 1
 	      if (self._DriverRestarts <= 0):
 		self.error("Restarting the driver did not help! Giving up!!")
 		self.stop()
 	      else:
+		self._DriverRestarts -= 1
 		self.warning("GPS receiver disappeared! Trying to restart Driver!")
 		del self.gps
-		self.gps = GPSDriver.GPSDriver(self,[self._deviceStr, self._interval, self._config_file])
+		self.gps = GPSDriver(self,[self._deviceStr, self._interval, self._config_file])
 		if (self.gps is None or not self.gps._isInitialized() or self.gps._isStopped()):
-		  self.exception('Initializing GPS Driver failed!!')
+		  self.warning('Initializing GPS Driver failed!!')
     
     '''
     ##########################################################################################
@@ -223,8 +223,9 @@ class GPSPluginClass(AbstractPluginClass):
 	except Exception as e:
 	  self.debug("GPSDriver already stopped\n" + str(e))
         self._runEv.set()
-        if (self.isDutyCycled):  
-	    self._WlanThread.join()
+        #if (self.isDutyCycled and self._WlanThread != None):  
+        if (self._WlanThread != None):
+	    #self._WlanThread.join()
             self._WlanThread.stop()
         self._busy = False
         self._stopped = True
@@ -252,97 +253,11 @@ class GPSPluginClass(AbstractPluginClass):
 	  self.exception("Unable to write to GPS count file!\n" + str(e))
 	  self.info("Unable to write to GPS count file!\n" + str(e))
       
-      
-#############################################################
-# Class WlanThread
-#############################################################
-class WlanThread(Thread):
-
-    #*********************************************************
-    # init()
-    #*********************************************************
-    def __init__(self,parent,uptime=10,downtime=40,stay_online=1):
-        Thread.__init__(self, name='Wlan-Thrad')
-        self._uptime=uptime*60
-        self._downtime=downtime*60
-        self._parent = parent
-        self._work = Event()
-        self._stopped = False
-	self._loggedin = False
-	self._test = False
-        self._online = parent.getPowerControlObject().getWlanStatus()
-        self._stay_online = stay_online
-        try:
-	  self._utmp = open('/media/card/backlog/dummy') #open("/var/run/utmp")
-	  self._utmp.close()
-	except Exception as e:
-	  self.info("Unable to open UTMP file!\n" + str(e))
-	  
-    
-    #*********************************************************
-    # run()
-    #*********************************************************
-    def run(self):
-        self._parent._logger.info('WlanThread: started')
-        while not self._stopped: 
-            self._parent._logger.info('WlanThread: Waiting for %d secs before cycling WLAN' % (self._uptime,))
-            self._work.wait(self._uptime-30)
-            if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?		
-		if (self._test):
-		  self._loggedin = self.isUserLoggedIn()
-		  
-                start = time.time()
-		while (not self._stopped and self._stay_online and self._parent.isResendingDB()):
-                    self._parent._logger.debug('We are flushing DB... NOT power cycling WLAN!')
-                    self._parent._logger.debug('Waiting for 10 sec')
-                    self._work.wait(10)
-                    
-		while (not self._stopped and self._loggedin):
-			self._parent._logger.debug('Someone is logged in... NOT power cycling WLAN!')          
-                        self._parent._logger.debug('Waiting for 10 sec')                                       
-                        self._work.wait(10)
-                        if (self._test):
-			  self._loggedin = self.isUserLoggedIn()
-		
-                if (not self._stopped):
-                    duration = time.time() - start 
-                    if (self._downtime - duration > 0):
-			self._parent._logger.info('Will cut Wlan connection in 30 seconds for ' + str(self._downtime) + ' seconds!')
-			self._work.wait(30)
-			self._parent._logger.info("Cutting power to WLAN Now!!")
-                        self._parent.getPowerControlObject().wlanOff()
-                        self._parent._logger.debug('Waiting for %d secs' % (self._downtime-duration,))
-                        self._work.wait(self._downtime - duration)
-            #If WLAN is off, turn it on
-            if (not self._stopped and not self._parent.getPowerControlObject().getWlanStatus()):
-                self._parent._logger.info("We are not online, so turn on wlan")
-                self._parent.getPowerControlObject().wlanOn()  
-        self._parent._logger.info('WlanThread: died')
-
-    def isUserLoggedIn(self):
-      try:
-	self._utmp = open('/media/card/backlog/dummy') #open("/var/run/utmp")
-	for line in self._utmp:
-	  if line.find("root") >= 0:
-	    self._loggedin = True
-	    break
-	self._utmp.close()
-	return True
-      except Exception as e:
-	self._parent._logger.debug("Exception in isUserLoggedIn!\n" + str(e))
-	return False
-	
-    #*********************************************************
-    # stop()
-    #*********************************************************
-    def stop(self):
-	self._parent._logger.info('WlanThread: stopping...')
-        self._stopped = True
-        self._work.set()
-        self._parent._logger.info('WlanThread: stopped')
-        
-
+'''
+***********************************************************************************************
 #Reads raw GPS messages from a u-blox device and sends them to GSN
+***********************************************************************************************
+'''
 class GPSDriver():
     
     def __init__(self,parent,config):
@@ -441,7 +356,7 @@ class GPSDriver():
 	    self._logger.warning("Unable to write to GPS")
 	    return False
       except Exception as e:
-	  self._logger.error("GPSDriver._write: Unhandled Exception!\n" + str(e))
+	  self._logger.warning("GPSDriver._write: Unhandled Exception!\n" + str(e))
 	  self._logger.debug(str(com))
 	  return False
 	  
@@ -499,11 +414,11 @@ class GPSDriver():
 		  self._logger.debug('Got a GPS Sample @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
 		  header = struct.unpack('2B', recMsgId)
 		  rawPayloadLength = self.serialAccess(2,'r')
-		  while (not rawPayloadLength or (len(rawPayloadLength) != 2)):
+		  while (not self.stopped and ( not rawPayloadLength or (len(rawPayloadLength) != 2))):
 		    rawPayloadLength = self.serialAccess(2,'r')
 		  payloadLength = struct.unpack('H', rawPayloadLength)[0]
 		  payload = self.serialAccess(payloadLength,'r')
-		  while (not payload):
+		  while (not self.stopped and not payload):
 		    payload = self.serialAccess(payloadLength, 'r')
 		  if (len(payload) != payloadLength):
 		    self._logger.debug("Expected " + payloadLength + "bytes, but got " + len(payload))
@@ -603,10 +518,11 @@ class GPSDriver():
 	  self._logger.error( "No GPS receiver found! Giving up!")
 	  self._stop()
 	  
-      try:
-	self.device.close()
-      except Exception as e:
-	self._logger.debug("Unable to close the serial port\n" + str(e))
+      if (self.device is not None):
+	try:
+	  self.device.close()
+	except Exception as e:
+	  self._logger.debug("Unable to close the serial port\n" + str(e))
       try:
 	p = subprocess.Popen(['bb_usbpwr.py', '--list'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	p.wait()
@@ -636,7 +552,7 @@ class GPSDriver():
 	  return True
 	return False
       except Exception as e:
-	self._logger.error("Unhandled Exception in fixDevice:\n" + str(e))
+	self._logger.warning("Unhandled Exception in fixDevice:\n" + str(e))
 	return False
 	
     '''
@@ -694,7 +610,7 @@ class GPSDriver():
       try:
 	fp = open(self._config_file,'r')
       except Exception as e:
-	self._logger.error("GPSDriver.config_device: " + str(e))
+	self._logger.warning("GPSDriver.config_device: " + str(e))
 	return False
       success = 0
       cnt = 0
@@ -717,3 +633,93 @@ class GPSDriver():
 	  self._logger.debug(str(e))
       fp.close()
       return True
+      
+#############################################################
+# Class WlanThread
+#############################################################
+class WlanThread(Thread):
+
+    #*********************************************************
+    # init()
+    #*********************************************************
+    def __init__(self,parent,uptime=10,downtime=40,stay_online=1):
+        Thread.__init__(self, name='Wlan-Thrad')
+        self._uptime=uptime*60
+        self._downtime=downtime*60
+        self._parent = parent
+        self._work = Event()
+        self._stopped = False
+	self._loggedin = False
+	self._test = False
+        self._online = parent.getPowerControlObject().getWlanStatus()
+        self._stay_online = stay_online
+        try:
+	  self._utmp = open('/media/card/backlog/dummy') #open("/var/run/utmp")
+	  self._utmp.close()
+	except Exception as e:
+	  self.info("Unable to open UTMP file!\n" + str(e))
+	  
+    
+    #*********************************************************
+    # run()
+    #*********************************************************
+    def run(self):
+        self._parent._logger.info('WlanThread: started')
+        while not self._stopped: 
+            self._parent._logger.info('WlanThread: Waiting for %d secs before cycling WLAN' % (self._uptime,))
+            self._work.wait(self._uptime-30)
+            if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?		
+		if (self._test):
+		  self._loggedin = self.isUserLoggedIn()
+		  
+                start = time()
+		while (not self._stopped and self._stay_online and self._parent.isResendingDB()):
+                    self._parent._logger.debug('We are flushing DB... NOT power cycling WLAN!')
+                    self._parent._logger.debug('Waiting for 10 sec')
+                    self._work.wait(10)
+                    
+		while (not self._stopped and self._loggedin):
+			self._parent._logger.debug('Someone is logged in... NOT power cycling WLAN!')          
+                        self._parent._logger.debug('Waiting for 10 sec')                                       
+                        self._work.wait(10)
+                        if (self._test):
+			  self._loggedin = self.isUserLoggedIn()
+		
+                if (not self._stopped):
+                    duration = time() - start 
+                    if (self._downtime - duration > 0):
+			self._parent._logger.info('Will cut Wlan connection in 30 seconds for ' + str(self._downtime) + ' seconds!')
+			self._work.wait(30)
+			self._parent._logger.info("Cutting power to WLAN Now!!")
+                        self._parent.getPowerControlObject().wlanOff()
+                        self._parent._logger.debug('Waiting for %d secs' % (self._downtime-duration,))
+                        self._work.wait(self._downtime - duration)
+            #If WLAN is off, turn it on
+            if (not self._stopped and not self._parent.getPowerControlObject().getWlanStatus()):
+                self._parent._logger.info("We are not online, so turn on wlan")
+                self._parent.getPowerControlObject().wlanOn()  
+        self._parent._logger.info('WlanThread: died')
+
+    def isUserLoggedIn(self):
+      try:
+	self._utmp = open('/media/card/backlog/dummy') #open("/var/run/utmp")
+	for line in self._utmp:
+	  if line.find("root") >= 0:
+	    self._loggedin = True
+	    break
+	self._utmp.close()
+	return True
+      except Exception as e:
+	self._parent._logger.debug("Exception in isUserLoggedIn!\n" + str(e))
+	return False
+	
+    #*********************************************************
+    # stop()
+    #*********************************************************
+    def stop(self):
+	self._parent._logger.info('WlanThread: stopping...')
+        self._work.set()
+        self._stopped = True
+        self._parent._logger.info('WlanThread: stopped')
+        
+
