@@ -649,15 +649,8 @@ class WlanThread(Thread):
         self._parent = parent
         self._work = Event()
         self._stopped = False
-	self._loggedin = False
-	self._test = False
         self._online = parent.getPowerControlObject().getWlanStatus()
         self._stay_online = stay_online
-        try:
-	  self._utmp = open('/media/card/backlog/dummy') #open("/var/run/utmp")
-	  self._utmp.close()
-	except Exception as e:
-	  self.info("Unable to open UTMP file!\n" + str(e))
 	  
     
     #*********************************************************
@@ -669,9 +662,7 @@ class WlanThread(Thread):
             self._parent._logger.info('WlanThread: Waiting for %d secs before cycling WLAN' % (self._uptime,))
             self._work.wait(self._uptime-30)
             if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?		
-		if (self._test):
-		  self._loggedin = self.isUserLoggedIn()
-		  
+		
                 start = time()
 		while (not self._stopped and self._stay_online and self._parent.isResendingDB()):
                     self._parent._logger.debug('We are flushing DB... NOT power cycling WLAN!')
@@ -682,8 +673,6 @@ class WlanThread(Thread):
 			self._parent._logger.debug('Someone is logged in... NOT power cycling WLAN!')          
                         self._parent._logger.debug('Waiting for 10 sec')                                       
                         self._work.wait(10)
-                        if (self._test):
-			  self._loggedin = self.isUserLoggedIn()
 		
                 if (not self._stopped):
                     duration = time() - start 
@@ -699,19 +688,6 @@ class WlanThread(Thread):
                 self._parent._logger.info("We are not online, so turn on wlan")
                 self._parent.getPowerControlObject().wlanOn()  
         self._parent._logger.info('WlanThread: died')
-
-    def isUserLoggedIn(self):
-      try:
-	self._utmp = open('/media/card/backlog/dummy') #open("/var/run/utmp")
-	for line in self._utmp:
-	  if line.find("root") >= 0:
-	    self._loggedin = True
-	    break
-	self._utmp.close()
-	return True
-      except Exception as e:
-	self._parent._logger.debug("Exception in isUserLoggedIn!\n" + str(e))
-	return False
 	
     #*********************************************************
     # stop()
