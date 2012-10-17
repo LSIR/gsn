@@ -57,11 +57,10 @@ class GPSPluginClass(AbstractPluginClass):
     '''
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG, needPowerControl=True)
-        self._runEv = Event()
-        self.name = 'GPSPlugin-Thread'
-        self.info('Init GPSPlugin...')
         self._stopped = False
         self._busy = True
+        self.gps = None
+        self._workEvent = Event()
 
         #How often should driver be restarted in case of problems
         self._DriverRestarts = 4
@@ -69,122 +68,68 @@ class GPSPluginClass(AbstractPluginClass):
         # The measurement interval in seconds
         self._interval = int(self.getOptionValue('poll_interval'))
 
-        self.isDutyCycled = self.isDutyCycleMode()
-
         # The device identifier
         self._deviceStr = self.getOptionValue('gps_device')
         # GPS configuration file as produced by u-center
         self._config_file = str(self.getOptionValue('gps_config_file'))
         self._cnt_file = str(self.getOptionValue('cnt_file'))
-        self._stay_online = str(self.getOptionValue('stay_online_for_db_resend'))
-        self._dc_wlan = int(self.getOptionValue('dc_wlan'))
         self._WlanThread = None
-        if (self._dc_wlan): # and self.isDutyCycled):
+        if (int(self.getOptionValue('dc_wlan')) == 1): # and self.isDutyCycleMode()):
             self.info("WLAN duty-cycle enabled!")
+            stay_online = str(self.getOptionValue('stay_online_for_db_resend'))
             wlan_ontime = int(self.getOptionValue('wlan_on_time'))
             wlan_offtime = int(self.getOptionValue('wlan_off_time'))
             #Wlan must only be cycled when in dc mode!!
-            self._WlanThread = WlanThread(self,wlan_ontime, wlan_offtime,self._stay_online)
+            self._WlanThread = WlanThread(self,wlan_ontime, wlan_offtime,stay_online)
         else:
             self.info("WLAN duty-cycle disabled!")
 
         #if count file does not exist, create it!
         if (not os.path.exists(str(self._cnt_file))):
-            self.debug("GPS count file does not exist! Creating it!")
+            self.info("GPS count file does not exist! Creating it!")
             try:
-                self._fp = open(str(self._cnt_file),"r+")
-                self._fp.write('0')
-                self._fp.close()
+                fp = open(str(self._cnt_file),"r+")
+                fp.write('0')
+                fp.close()
             except Exception as e:
-                self.debug("GPS count file could not be created!!\n" + str(e))
-                self.error("GPS count file could not be created!!\n" + str(e))
                 self.stop()
-                return None
+                raise Exception("GPS count file could not be created!!\n" + str(e))
+        
         try:
-            self._fp = open(str(self._cnt_file),"r+")
-            cnt = int(self._fp.readline())
+            fp = open(str(self._cnt_file),"r+")
+            cnt = int(fp.readline())
             if (cnt >= (pow(2,32)-1) or cnt == ""):
                 self._logger.warning("Sample counter wrapped around! %s" % (cnt,))
                 cnt = 0
             self._stats = Statistics()
             self.info("Starting with %d" % (cnt,))
             self._counterID = self._stats.createCounter(0,cnt)
-            self._fp.close()
+            fp.close()
         except Exception as e:
-            self.exception( "Could not open sample count file: %s %s" % (self._cnt_file, e))
-            self.info("Could not open sample count file! Exiting!")
             self.stop()
-            return None
-
-        self.gps = GPSDriver(self,[self._deviceStr, self._interval, self._config_file])
-
-        if (self.gps == None or not self.gps._isInitialized() or self.gps._isStopped()):
-            self.error('Initializing GPS Driver failed!!')
-            self.stop()
-            return None
+            raise Exception( "Could not open sample count file: %s %s" % (self._cnt_file, e))
 
         self.debug("Done init GPS Plugin")
 
     '''
     ##########################################################################################
-    action():   This function will be fired by the schedule handler each time
-                this plugin is scheduled. The function is started in a new
-                thread.
-
-                @param parameters:  The parameters as one string given in the
-                                    schedule file.
-    ##########################################################################################
-    '''
-    def action(self,parameters):
-        self.debug("Action called!")
-        if (self._stopped):
-            self.warning("Action called but we're stopped!! Exiting...")
-            return
-
-        if (not self.isDutyCycled):
-            self.warning("GPSPlugin's action called even though we are not in duty-cycle mode!")
-            return
-        if (not self.gps._isStopped()):
-            if (parameters != ""):
-                self.info("GPSPlugin's action called with paramaters:\n" + str(parameters))
-            else:
-                self.info("GPSPlugin's action called with no parameters!")
-            self.runPlugin(parameters)
-        else:
-            self.info("Stopping GPSPlugin in action()")
-            self.stop()
-
-    '''
-    ##########################################################################################
-    run():     This function gets called when the plugin is loaded. In duty-cycle mode the
-               action() function takes care of running the plugin
+    run():     This function gets called when the plugin is loaded. This occurs either when
+               BackLog is started and the GPS plugin is activated or when action is called
+               the first time.
     ##########################################################################################
     '''
     def run(self):
-        if (self.isDutyCycled or self._stopped):
-            return
-        elif (not self._stopped):
-            self.runPlugin('')
-
-    '''
-    ##########################################################################################
-    runPlugin():  This function is essentially the run function
-    ##########################################################################################
-    '''
-    def runPlugin(self,param):
-
-        self.info('GPSPlugin running...')
-        #if (self.isDutyCycled):
-        if (self._dc_wlan and not self._WlanThread.isAlive()):
+        self.name = 'GPSPlugin-Thread'
+        self.info('started')
+        
+        #if (self.isDutyCycleMode()):
+        if (self._WlanThread is not None and not self._WlanThread.isAlive()):
             self._WlanThread.start()
-
-        rawMsg = self.gps._readMSG()
-        rawMsg = self.gps._readMSG()
-
-        while (not self._stopped):
-            if (self.gps is not None and self.gps._isInitialized()):
+    
+        while not self._stopped:
+            if (self.gps is not None and self.gps.isInitialized()):
                 self.debug('Reading raw at %s' %(strftime("%H:%M:%S +0000", gmtime())))
-                rawMsg = self.gps._readMSG()
+                rawMsg = self.gps.readMSG()
 
                 if (rawMsg):
                     self._stats.counterAction(self._counterID)
@@ -204,10 +149,15 @@ class GPSPluginClass(AbstractPluginClass):
                 else:
                     self._DriverRestarts -= 1
                     self.warning("GPS receiver disappeared! Trying to restart Driver!")
-                    del self.gps
                     self.gps = GPSDriver(self,[self._deviceStr, self._interval, self._config_file])
-                    if (self.gps is None or not self.gps._isInitialized() or self.gps._isStopped()):
+                    if self.gps.isInitialized():
+                        rawMsg = self.gps.readMSG()
+                        rawMsg = self.gps.readMSG()
+                    else:
                         self.warning('Initializing GPS Driver failed!!')
+        
+        self.info('died')
+        
 
     '''
     ##########################################################################################
@@ -219,12 +169,11 @@ class GPSPluginClass(AbstractPluginClass):
         #self.writeToFile(self._cnt)
         #self._fp.close()
         try:
-            self.gps._stop()
+            self.gps.stop()
         except Exception as e:
             self.debug("GPSDriver already stopped\n" + str(e))
-        self._runEv.set()
-        #if (self.isDutyCycled and self._WlanThread != None):
-        if (self._WlanThread != None):
+        #if (self.isDutyCycleMode() and self._WlanThread != None):
+        if (self._WlanThread is not None):
             #self._WlanThread.join()
             self._WlanThread.stop()
         self._busy = False
@@ -246,12 +195,11 @@ class GPSPluginClass(AbstractPluginClass):
 
     def writeToFile(self, val):
         try:
-            self._fp = open(str(self._cnt_file),"w")
-            self._fp.write(str(val))
-            self._fp.close()
+            fp = open(str(self._cnt_file),"w")
+            fp.write(str(val))
+            fp.close()
         except Exception as e:
             self.exception("Unable to write to GPS count file!\n" + str(e))
-            self.info("Unable to write to GPS count file!\n" + str(e))
 
 '''
 ***********************************************************************************************
@@ -288,26 +236,26 @@ class GPSDriver():
         #raw messages
         self._messageId = struct.pack('2B', 0x02, 0x10)
 
-        self.stopped = False
+        self._stopped = False
         self._initialized = False
 
         #handler to the serial interface
         self.device = None
         self._runEv = Event()
-        success = self.testDevice(self._deviceStr)
-        while (not success and not self.stopped):
+        
+        #reset serial timeout to 30!
+        self._serialTimeout = 30
+        
+        success = self._testDevice(self._deviceStr)
+        while (not success and not self._stopped):
             self._logger.debug("Testing device at " + str(self._deviceStr))
             success = self.fixDevice()
             self._runEv.wait(10)
         if (not success):
-            self._stop()
-            return None
-
-        #device is tested by config in that it tries to write to it.
-        self._initialized = self.config_device()
-        #reset serial timeout to 30!
-        self._serialTimeout = 30
-        return None
+            self.stop()
+        else:
+            #device is tested by config in that it tries to write to it.
+            self._initialized = self._configDevice()
 
 
     '''
@@ -315,48 +263,48 @@ class GPSDriver():
     # PUBLIC FUNCTIONS
     ##########################################################################################
     '''
+    
+    
     '''
     ##########################################################################################
     # _read(self): returns a GPS message according to configuration
     ##########################################################################################
     '''
-    def _readMSG(self):
-        ret = self.readRaw()
-        return ret
+    def readMSG(self):
+        return self._readRaw()
 
-    def _stop(self):
-        self.stopped = True
+    def stop(self):
+        self._stopped = True
         self._initialized = False
         self._runEv.set()
         self._logger.info('GPSDriver stopped')
-        return
 
     '''
     ##########################################################################################
-    # _write(self,payload): writes payload appropriately prepended with sync chars & header, and
+    # write(self,payload): writes payload appropriately prepended with sync chars & header, and
     # appended with checksums to the GPS device.
     ##########################################################################################
     '''
-    def _write(self,com=None):
+    def write(self,com=None):
         try:
             success = False
             com = com.split("-")[2]
             com = com.split()
-            checksums = self.getChecksum(com)
+            checksums = self._getChecksum(com)
             command = self._gpsHeader
             for item in com:
                 command += struct.pack('B', int(item, 16))
             command += struct.pack('2B', int(checksums[0], 16), int(checksums[1],16))
             tries = 10
-            while (not self.stopped and not success):
-                success = self.serialAccess(command,'w')
+            while (not self._stopped and not success):
+                success = self._serialAccess(command,'w')
                 tries -= 1
                 #print "Trying to write " + str(10-tries)
                 if (tries == 0 and not success):
                     self._logger.warning("Unable to write to GPS")
                     return False
         except Exception as e:
-            self._logger.warning("GPSDriver._write: Unhandled Exception!\n" + str(e))
+            self._logger.warning("GPSDriver.write: Unhandled Exception!\n" + str(e))
             self._logger.debug(str(com))
             return False
 
@@ -364,19 +312,11 @@ class GPSDriver():
 
     '''
     ##########################################################################################
-    _isInitialized():
+    isInitialized():
     ##########################################################################################
     '''
-    def _isInitialized(self):
+    def isInitialized(self):
         return self._initialized
-
-    '''
-    ##########################################################################################
-    _isStopped():
-    ##########################################################################################
-    '''
-    def _isStopped(self):
-        return self.stopped
 
     '''
     #########################################################################
@@ -386,49 +326,49 @@ class GPSDriver():
 
     '''
     #########################################################################
-    #readRaw(): reads RAW UBX data
+    #_readRaw(): reads RAW UBX data
     #########################################################################
         '''
-    def readRaw(self):
+    def _readRaw(self):
 
         success = False
         self._logger.debug('Entered _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
 
-        while not self.stopped and not success:
+        while not self._stopped and not success:
 
             # Wait for the Header
-            head = self.serialAccess(1,'r')
-            while not self.stopped and (not head or (len(head) == 1 and ord(head) != 0xB5)):
-                head = self.serialAccess(1,'r')
-            msg = self.serialAccess(1,'r')
+            head = self._serialAccess(1,'r')
+            while not self._stopped and (not head or (len(head) == 1 and ord(head) != 0xB5)):
+                head = self._serialAccess(1,'r')
+            msg = self._serialAccess(1,'r')
 
             if msg:
                 if len(msg)==1 and ord(msg) == 0x62:
                     self._logger.debug('Got a GPS Header @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
                     # Got a message! :)  Read 2 bytes to determine class & id
                     recMsgId = ""
-                    while (not self.stopped and not recMsgId):
-                        recMsgId = self.serialAccess(2,'r')
+                    while (not self._stopped and not recMsgId):
+                        recMsgId = self._serialAccess(2,'r')
                     # Is it the right Msg Type?
                     if (recMsgId == self._messageId):
                         self._logger.debug('Got a GPS Sample @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
                         header = struct.unpack('2B', recMsgId)
-                        rawPayloadLength = self.serialAccess(2,'r')
-                        while (not self.stopped and ( not rawPayloadLength or (len(rawPayloadLength) != 2))):
-                            rawPayloadLength = self.serialAccess(2,'r')
+                        rawPayloadLength = self._serialAccess(2,'r')
+                        while (not self._stopped and ( not rawPayloadLength or (len(rawPayloadLength) != 2))):
+                            rawPayloadLength = self._serialAccess(2,'r')
                         payloadLength = struct.unpack('H', rawPayloadLength)[0]
-                        payload = self.serialAccess(payloadLength,'r')
-                        while (not self.stopped and not payload):
-                            payload = self.serialAccess(payloadLength, 'r')
+                        payload = self._serialAccess(payloadLength,'r')
+                        while (not self._stopped and not payload):
+                            payload = self._serialAccess(payloadLength, 'r')
                         if (len(payload) != payloadLength):
                             self._logger.debug("Expected " + payloadLength + "bytes, but got " + len(payload))
-                        ck = self.serialAccess(2,'r')
-                        while not self.stopped and ((ck == False) or (len(ck) != 2)):
-                            ck = self.serialAccess(2,'r')
+                        ck = self._serialAccess(2,'r')
+                        while not self._stopped and ((ck == False) or (len(ck) != 2)):
+                            ck = self._serialAccess(2,'r')
 
                         try:
                             submitChecksum = struct.unpack('2B', ck)
-                            calculatedChecksum = self.verifyChecksum(recMsgId + rawPayloadLength + payload, submitChecksum)
+                            calculatedChecksum = self._verifyChecksum(recMsgId + rawPayloadLength + payload, submitChecksum)
                         except Exception as e:
                             self._logger.debug("Exception in computing checksum: " + str(e))
                             calculatedChecksum = False
@@ -451,31 +391,26 @@ class GPSDriver():
 
     '''
     ##########################################################################################
-    serialAccess()
+    _serialAccess()
         mode = w: data is written
         mode = r: data specifies number of bytes to read
 
         return TRUE or data if success, FALSE otherwise
     ##########################################################################################
     '''
-    def serialAccess(self,data,mode):
+    def _serialAccess(self,data,mode):
         if (mode == 'w'):
             try:
                 self.device.write(data)
                 return True
             except Exception as e:
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug("serialAccess Exception: %s" % (e,))
                 self._logger.info("serialAccess Exception: " + str(e))
                 self.fixDevice()
                 return False
         elif (mode == 'r'):
             try:
-                d = self.device.read(data)
-                return d
+                return self.device.read(data)
             except Exception as e:
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug("serialAccess Exception: %s" % (e,))
                 self._logger.info("serialAccess Exception: " + str(e))
                 self.fixDevice()
                 return False
@@ -486,10 +421,10 @@ class GPSDriver():
 
     '''
     ##########################################################################################
-    testDevice(): Tests if the serial port can be opened at given device string
+    _testDevice(): Tests if the serial port can be opened at given device string
     ##########################################################################################
     '''
-    def testDevice(self, devString):
+    def _testDevice(self, devString):
         try:
             self.device = serial.Serial(devString, 19200, timeout=self._serialTimeout)
         except Exception as e:
@@ -516,7 +451,7 @@ class GPSDriver():
         self._serialConnTries -= 1
         if (self._serialConnTries == 0):
             self._logger.error( "No GPS receiver found! Giving up!")
-            self._stop()
+            self.stop()
 
         if (self.device is not None):
             try:
@@ -547,20 +482,18 @@ class GPSDriver():
                         self.parent.getPowerControlObject().usb3On()
                     self._logger.debug("Power-cycled usb port " + str(i))
                     self._runEv.wait(10)
-            ret = self.testDevice(self._deviceStr)
-            if (ret):
-                return True
-            return False
+
+            return self._testDevice(self._deviceStr)
         except Exception as e:
             self._logger.warning("Unhandled Exception in fixDevice:\n" + str(e))
             return False
 
     '''
     ##########################################################################################
-    getChecksum(): computes checksum of given message
+    _getChecksum(): computes checksum of given message
     ##########################################################################################
     '''
-    def getChecksum(self, msg):
+    def _getChecksum(self, msg):
         ck_a = 0
         ck_b = 0
 
@@ -586,10 +519,10 @@ class GPSDriver():
 
     '''
     ##########################################################################################
-    verifyChecksum(): Verifies checksum of given message and checksum
+    _verifyChecksum(): Verifies checksum of given message and checksum
     ##########################################################################################
     '''
-    def verifyChecksum(self, msg, chksum):
+    def _verifyChecksum(self, msg, chksum):
         ck_a = 0
         ck_b = 0
 
@@ -602,10 +535,10 @@ class GPSDriver():
 
     '''
     ##########################################################################################
-    config_device(): configures GPS receiver with string given in config file
+    _configDevice(): configures GPS receiver with string given in config file
     ##########################################################################################
     '''
-    def config_device(self):
+    def _configDevice(self):
         self._logger.info("Configuring GPS receiver...")
         try:
             fp = open(self._config_file,'r')
@@ -616,7 +549,7 @@ class GPSDriver():
         cnt = 0
         for line in fp:
             cnt += 1
-            if (self._write(line)):
+            if (self.write(line)):
                 success += 1
             self._runEv.wait(.1)
 
@@ -627,8 +560,8 @@ class GPSDriver():
                 rate=str(hex((self._interval*1000)&0xff)).split('0x')[1] + " " + str(hex((self._interval*1000)>>8)).split('0x')[1]
                 newrate="CFG-RATE - 06 08 06 00 " + rate + " 01 00 01 00"
                 self._logger.debug(newrate)
-                self._write(newrate)
-                self._write("CFG-CFG - 06 09 0D 00 00 00 00 00 FF FF 00 00 00 00 00 00 07")
+                self.write(newrate)
+                self.write("CFG-CFG - 06 09 0D 00 00 00 00 00 FF FF 00 00 00 00 00 00 07")
             except Exception as e:
                 self._logger.debug(str(e))
         fp.close()
@@ -643,13 +576,13 @@ class WlanThread(Thread):
     # init()
     #*********************************************************
     def __init__(self,parent,uptime=10,downtime=40,stay_online=1):
-        Thread.__init__(self, name='Wlan-Thrad')
+        Thread.__init__(self, name='Wlan-Thread')
+        self._logger = logging.getLogger(self.__class__.__name__)
         self._uptime=uptime*60
         self._downtime=downtime*60
         self._parent = parent
         self._work = Event()
         self._stopped = False
-        self._online = parent.getPowerControlObject().getWlanStatus()
         self._stay_online = stay_online
 
 
@@ -657,43 +590,44 @@ class WlanThread(Thread):
     # run()
     #*********************************************************
     def run(self):
-        self._parent._logger.info('WlanThread: started')
-        while not self._stopped:
-            self._parent._logger.info('WlanThread: Waiting for %d secs before cycling WLAN' % (self._uptime,))
-            self._work.wait(self._uptime-30)
-            if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?
-
-                start = time()
-                while (not self._stopped and self._stay_online and self._parent.isResendingDB()):
-                    self._parent._logger.debug('We are flushing DB... NOT power cycling WLAN!')
-                    self._parent._logger.debug('Waiting for 10 sec')
-                    self._work.wait(10)
-
-                while (not self._stopped and self._loggedin):
-                    self._parent._logger.debug('Someone is logged in... NOT power cycling WLAN!')
-                    self._parent._logger.debug('Waiting for 10 sec')
-                    self._work.wait(10)
-
-                if (not self._stopped):
-                    duration = time() - start
-                    if (self._downtime - duration > 0):
-                        self._parent._logger.info('Will cut Wlan connection in 30 seconds for ' + str(self._downtime) + ' seconds!')
-                        self._work.wait(30)
-                        self._parent._logger.info("Cutting power to WLAN Now!!")
-                        self._parent.getPowerControlObject().wlanOff()
-                        self._parent._logger.debug('Waiting for %d secs' % (self._downtime-duration,))
-                        self._work.wait(self._downtime - duration)
-            #If WLAN is off, turn it on
-            if (not self._stopped and not self._parent.getPowerControlObject().getWlanStatus()):
-                self._parent._logger.info("We are not online, so turn on wlan")
-                self._parent.getPowerControlObject().wlanOn()
-        self._parent._logger.info('WlanThread: died')
+        self._logger.info('started')
+        
+        try:
+            while not self._stopped:
+                self._logger.info('Waiting for %d secs before cycling WLAN' % (self._uptime,))
+                self._work.wait(self._uptime-30)
+                if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?
+    
+                    start = time()
+                    while (not self._stopped and self._stay_online and self._parent.isResendingDB()):
+                        self._logger.debug('We are flushing DB... NOT power cycling WLAN!')
+                        self._logger.debug('Waiting for 10 sec')
+                        self._work.wait(10)
+    
+                    if (not self._stopped):
+                        duration = time() - start
+                        if (self._downtime - duration > 0):
+                            self._logger.info('Will cut Wlan connection in 30 seconds for ' + str(self._downtime) + ' seconds!')
+                            self._work.wait(30)
+                            self._logger.info("Cutting power to WLAN Now!!")
+                            self._parent.getPowerControlObject().wlanOff()
+                            self._logger.debug('Waiting for %d secs' % (self._downtime-duration,))
+                            self._work.wait(self._downtime - duration)
+                #If WLAN is off, turn it on
+                if (not self._stopped and not self._parent.getPowerControlObject().getWlanStatus()):
+                    self._logger.info("We are not online, so turn on wlan")
+                    self._parent.getPowerControlObject().wlanOn()
+        except Exception, e:
+            self._parent.exception(e)
+                
+        self._parent.getPowerControlObject().wlanOn()
+        self._logger.info('died')
 
     #*********************************************************
     # stop()
     #*********************************************************
     def stop(self):
-        self._parent._logger.info('WlanThread: stopping...')
+        self._logger.info('stopping...')
         self._work.set()
         self._stopped = True
-        self._parent._logger.info('WlanThread: stopped')
+        self._logger.info('stopped')
