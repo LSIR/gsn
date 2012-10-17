@@ -6,7 +6,7 @@
             <param name="sensorvalue_conversion" />
         </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" />
+            <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>

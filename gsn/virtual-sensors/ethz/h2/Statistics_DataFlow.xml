@@ -3,7 +3,7 @@
         <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
-            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="VS_NAME" type="VARCHAR(255)" />
             <field name="EVENT_TYPE" type="TINYINT" />
             <field name="SOURCE" type="VARCHAR(255)" />
