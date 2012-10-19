@@ -56,9 +56,9 @@ class GPSPluginClass(AbstractPluginClass):
         self._busy = True
         self.gps = None
         self._workEvent = Event()
-	
-	self.DEBUG = False
-	
+
+        self.DEBUG = False
+
         #How often should driver be restarted in case of problems
         self._initDriverRestarts = 3
         self._DriverRestarts = self._initDriverRestarts
@@ -72,7 +72,7 @@ class GPSPluginClass(AbstractPluginClass):
         self._config_file = str(self.getOptionValue('gps_config_file'))
         self._cnt_file = str(self.getOptionValue('cnt_file'))
         self._WlanThread = None
-        if (int(self.getOptionValue('dc_wlan')) == 1): 
+        if (int(self.getOptionValue('dc_wlan')) == 1):
             self.info("WLAN duty-cycle enabled!")
             stay_online = str(self.getOptionValue('stay_online_for_db_resend'))
             wlan_ontime = int(self.getOptionValue('wlan_on_time'))
@@ -91,7 +91,7 @@ class GPSPluginClass(AbstractPluginClass):
             except Exception as e:
                 self.stop()
                 raise Exception("GPS count file could not be created!!\n" + str(e))
-        
+
         try:
             fp = open(str(self._cnt_file),"r+")
             cnt = int(fp.readline())
@@ -118,10 +118,10 @@ class GPSPluginClass(AbstractPluginClass):
     def run(self):
         self.name = 'GPSPlugin-Thread'
         self.info('started')
-        
+
         if (self._WlanThread is not None and not self._WlanThread.isAlive()):
             self._WlanThread.start()
-    
+
         while not self._stopped:
             if (self.gps is not None and self.gps.isInitialized()):
                 self.debug('Reading raw at %s' %(strftime("%H:%M:%S +0000", gmtime())))
@@ -142,19 +142,19 @@ class GPSPluginClass(AbstractPluginClass):
                 if (self._DriverRestarts <= 0):
                     self.error("Restarting the driver did not help! Giving up!!")
                     if (self.isDutyCycleMode()):
-			#if we stop immediately, system will shutdown
-			self.info("Waiting for 15 minutes for help to come...")
-			self._workEvent.wait(15*60)
+                        #if we stop immediately, system will shutdown
+                        self.info("Waiting for 15 minutes for help to come...")
+                        self._workEvent.wait(15*60)
                     self.stop()
                 else:
-		    self.warning("Trying to (re)start GPSDriver!")
+                    self.warning("Trying to (re)start GPSDriver!")
                     self._DriverRestarts -= 1
                     self.gps = GPSDriver(self,[self._deviceStr, self._interval, self._config_file])
                     if not self.gps.isInitialized():
-			self.warning('Initializing GPS Driver failed!!')
-        
+                        self.warning('Initializing GPS Driver failed!!')
+
         self.info('died')
-        
+
 
     '''
     ##########################################################################################
@@ -235,13 +235,13 @@ class GPSDriver():
         #handler to the serial interface
         self.device = None
         self._runEv = Event()
-        
+
         #reset serial timeout to 30!
         if (self._interval is not None):
-	  self._serialTimeout = self._interval
+            self._serialTimeout = self._interval
         else:
-	  self._serialTimeout = 30
-        
+            self._serialTimeout = 30
+
         success = self._testDevice(self._deviceStr)
         while (not success and not self._stopped):
             success = self.fixDevice()
@@ -313,45 +313,45 @@ class GPSDriver():
 
         success = False
         if (self.DEBUG):
-	    self._logger.debug('Entered _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
+            self._logger.debug('Entered _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
 
-	# Wait for the Header
-	head = self._serialAccess(1,'r')
-	tries = 10
-	while (not self._stopped and tries > 0 and (len(head) != 1 or ord(head) != 0xB5)):
-	    head = self._serialAccess(1, 'r')
-	    tries -= 1
+        # Wait for the Header
+        head = self._serialAccess(1,'r')
+        tries = 10
+        while (not self._stopped and tries > 0 and (len(head) != 1 or ord(head) != 0xB5)):
+            head = self._serialAccess(1, 'r')
+            tries -= 1
 
-	msg = self._serialAccess(1,'r')
+        msg = self._serialAccess(1,'r')
 
-	if len(msg)==1 and ord(msg) == 0x62:
-	    if(self.DEBUG):
-		self._logger.debug('Got a GPS Header @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
-	    # Got a message! :)  Read 2 bytes to determine class & id
-	    recMsgId = self._serialAccess(2,'r')
-	    # Is it the right Msg Type?
-	    if (recMsgId == self._messageId):
-		if (self.DEBUG):
-		    self._logger.debug('Got a GPS Sample @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
+        if len(msg)==1 and ord(msg) == 0x62:
+            if(self.DEBUG):
+                self._logger.debug('Got a GPS Header @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
+            # Got a message! :)  Read 2 bytes to determine class & id
+            recMsgId = self._serialAccess(2,'r')
+            # Is it the right Msg Type?
+            if (recMsgId == self._messageId):
+                if (self.DEBUG):
+                    self._logger.debug('Got a GPS Sample @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
 
-		try:
-		    header = struct.unpack('2B', recMsgId)
-		    rawPayloadLength = self._serialAccess(2,'r')
-		    payloadLength = struct.unpack('H', rawPayloadLength)[0]
-		    payload = self._serialAccess(payloadLength,'r')	    
+                try:
+                    header = struct.unpack('2B', recMsgId)
+                    rawPayloadLength = self._serialAccess(2,'r')
+                    payloadLength = struct.unpack('H', rawPayloadLength)[0]
+                    payload = self._serialAccess(payloadLength,'r')
 
-		    ck = self._serialAccess(2,'r')
-		    submitChecksum = struct.unpack('2B', ck)
-		    success = self._verifyChecksum(recMsgId + rawPayloadLength + payload, submitChecksum)
-		    if (not success):
-			self._logger.warning('The received checksum did not match the computed')
-		except Exception as e:
-		    self._logger.exception("Exception in readRaw: " + str(e))
-		    return False
+                    ck = self._serialAccess(2,'r')
+                    submitChecksum = struct.unpack('2B', ck)
+                    success = self._verifyChecksum(recMsgId + rawPayloadLength + payload, submitChecksum)
+                    if (not success):
+                        self._logger.warning('The received checksum did not match the computed')
+                except Exception as e:
+                    self._parent.exception("Exception in readRaw: " + str(e))
+                    return False
 
         if (success):
-	    if (self.DEBUG):
-		self._logger.debug('Returning from _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
+            if (self.DEBUG):
+                self._logger.debug('Returning from _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
             rawPayload = self._gpsHeader + struct.pack('2B', 0x02, 0x10) + rawPayloadLength + payload + ck
             self._serialConnTries = self._initialSerialConnTries
             return (header[0], header[1], rawPayload, payload, payloadLength) #ID, class, payload
@@ -381,10 +381,10 @@ class GPSDriver():
                 return False
         elif (mode == 'r'):
             try:
-	      d = self.device.read(data)
-	      if (len(d) != data):
-		  return ''
-	      return d
+                d = self.device.read(data)
+                if (len(d) != data):
+                    return ''
+                return d
             except Exception as e:
                 self._logger.debug("serialAccess Exception: " + str(e))
                 self.fixDevice()
@@ -400,7 +400,7 @@ class GPSDriver():
     ##########################################################################################
     '''
     def _testDevice(self, devString):
-	self._logger.debug("Testing device at " + str(self._deviceStr))
+        self._logger.debug("Testing device at " + str(self._deviceStr))
         try:
             self.device = serial.Serial(devString, 19200, timeout=self._serialTimeout)
         except Exception as e:
@@ -568,19 +568,19 @@ class WlanThread(Thread):
     #*********************************************************
     def run(self):
         self._logger.info('started')
-        
+
         try:
             while not self._stopped:
                 self._logger.info('Waiting for %d secs before cycling WLAN' % (self._uptime,))
                 self._work.wait(self._uptime-30)
                 if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?
-    
+
                     start = time()
                     while (not self._stopped and self._stay_online and self._parent.isResendingDB()):
                         self._logger.debug('We are flushing DB... NOT power cycling WLAN!')
                         self._logger.debug('Waiting for 10 sec')
                         self._work.wait(10)
-    
+
                     if (not self._stopped):
                         duration = time() - start
                         if (self._downtime - duration > 0):
@@ -596,7 +596,7 @@ class WlanThread(Thread):
                     self._parent.getPowerControlObject().wlanOn()
         except Exception, e:
             self._parent.exception(e)
-                
+
         self._parent.getPowerControlObject().wlanOn()
         self._logger.info('died')
 
