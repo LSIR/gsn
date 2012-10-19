@@ -42,12 +42,7 @@ RAW_TYPE = 2
 #Which conversion must be applied to this data at the GSN end? 0 -> NONE, 1 -> RAW->ASCII
 RAW_DATA_VERSION = 1
 NAV_DATA_VERSION = 1
-'''
-TODO
--log all exceptions with self.exception(string)
--what to do if gps can't be inited
--Override the default config file values if provided in backlog config
-'''
+
 #Reads raw GPS messages from a u-blox device and sends them to GSN
 class GPSPluginClass(AbstractPluginClass):
     '''
@@ -61,9 +56,11 @@ class GPSPluginClass(AbstractPluginClass):
         self._busy = True
         self.gps = None
         self._workEvent = Event()
-
+	
+	self.DEBUG = False
+	
         #How often should driver be restarted in case of problems
-        self._initDriverRestarts = 1
+        self._initDriverRestarts = 3
         self._DriverRestarts = self._initDriverRestarts
 
         # The measurement interval in seconds
@@ -315,7 +312,8 @@ class GPSDriver():
     def _readRaw(self):
 
         success = False
-        self._logger.debug('Entered _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
+        if (self.DEBUG):
+	    self._logger.debug('Entered _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
 
 	# Wait for the Header
 	head = self._serialAccess(1,'r')
@@ -327,37 +325,35 @@ class GPSDriver():
 	msg = self._serialAccess(1,'r')
 
 	if len(msg)==1 and ord(msg) == 0x62:
-	    self._logger.debug('Got a GPS Header @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
+	    if(self.DEBUG):
+		self._logger.debug('Got a GPS Header @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
 	    # Got a message! :)  Read 2 bytes to determine class & id
 	    recMsgId = self._serialAccess(2,'r')
 	    # Is it the right Msg Type?
 	    if (recMsgId == self._messageId):
-		self._logger.debug('Got a GPS Sample @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
-		
-		rawPayloadLength = self._serialAccess(2,'r')
-		payloadLength = struct.unpack('H', rawPayloadLength)[0]
-		payload = self._serialAccess(payloadLength,'r')	    
-		ck = self._serialAccess(2,'r')
-		
-		try:
-		    submitChecksum = struct.unpack('2B', ck)
-		    calculatedChecksum = self._verifyChecksum(recMsgId + rawPayloadLength + payload, submitChecksum)
-		except Exception as e:
-		    self._logger.debug("Exception in computing checksum: " + str(e))
-		    calculatedChecksum = False
+		if (self.DEBUG):
+		    self._logger.debug('Got a GPS Sample @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
 
-		if(calculatedChecksum):
-		    success = True
-		else:
-		    self._logger.warning('The submitted checksum did not match the expected one')
-		    self._logger.debug('Expected: %s got: %s' % (calculatedChecksum, submitChecksum))
-		    success = False
+		try:
+		    header = struct.unpack('2B', recMsgId)
+		    rawPayloadLength = self._serialAccess(2,'r')
+		    payloadLength = struct.unpack('H', rawPayloadLength)[0]
+		    payload = self._serialAccess(payloadLength,'r')	    
+
+		    ck = self._serialAccess(2,'r')
+		    submitChecksum = struct.unpack('2B', ck)
+		    success = self._verifyChecksum(recMsgId + rawPayloadLength + payload, submitChecksum)
+		    if (not success):
+			self._logger.warning('The received checksum did not match the computed')
+		except Exception as e:
+		    self._logger.exception("Exception in readRaw: " + str(e))
+		    return False
 
         if (success):
+	    if (self.DEBUG):
+		self._logger.debug('Returning from _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
             rawPayload = self._gpsHeader + struct.pack('2B', 0x02, 0x10) + rawPayloadLength + payload + ck
-            self._logger.debug('Returning from _readRaw @ %s ' %(strftime("%H:%M:%S +0000", gmtime())))
             self._serialConnTries = self._initialSerialConnTries
-            header = struct.unpack('2B', recMsgId)
             return (header[0], header[1], rawPayload, payload, payloadLength) #ID, class, payload
         else:
             self._logger.debug("readGpsMessage: returned nothing!")
@@ -385,7 +381,10 @@ class GPSDriver():
                 return False
         elif (mode == 'r'):
             try:
-	      return self.device.read(data)
+	      d = self.device.read(data)
+	      if (len(d) != data):
+		  return ''
+	      return d
             except Exception as e:
                 self._logger.debug("serialAccess Exception: " + str(e))
                 self.fixDevice()
