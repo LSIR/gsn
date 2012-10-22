@@ -1,4 +1,4 @@
-<virtual-sensor name="AdM_Crackmeter__cnnn" priority="10" >
+<virtual-sensor name="AdM_Crackmeter__nctn" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -17,10 +17,11 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="CNNN_DX0" type="VARCHAR(30)" unit="mm" />
+            <field name="NCTN_DX1" type="VARCHAR(30)" unit="mm" />
+            <field name="NCTN_T2" type="VARCHAR(30)" unit="°C" />
         </output-structure>
     </processing-class>
-    <description>Crackmeter/CNNN data from AdM deployment</description>
+    <description>Crackmeter/NCTN data from AdM deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -31,7 +32,7 @@
                     <predicate key="query"> select * from AdM_Dozer_AdcComDiff__mapped </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where SENSORTYPE is not null and locate(' cnnn:', SENSORTYPE) != 0 </query>
+                <query> select * from wrapper where SENSORTYPE is not null and locate(' nctn:', SENSORTYPE) != 0 </query>
             </source>
             <query> select * from source </query>
         </stream>

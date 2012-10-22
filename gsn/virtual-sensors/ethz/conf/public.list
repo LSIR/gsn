@@ -8,8 +8,8 @@ AdM_CoreStationStatus_Hardware__mapped.xml
 AdM_CoreStationStatus_Software__mapped.xml
 AdM_CoreStationStatus_Static__mapped.xml
 AdM_CR1000.xml
-AdM_Crackmeter__cnnn.xml
-AdM_Crackmeter__ctnn.xml
+AdM_Crackmeter__ncnn.xml
+AdM_Crackmeter__nctn.xml
 AdM_Dozer_AdcComDiff__mapped.xml
 AdM_Dozer_AdcMux1__mapped.xml
 AdM_Dozer_AdcMux2__mapped.xml
