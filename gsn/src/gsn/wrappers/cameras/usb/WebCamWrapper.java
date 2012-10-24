@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
 import javax.media.Buffer;
 import javax.media.CaptureDeviceInfo;
 import javax.media.CaptureDeviceManager;
@@ -54,9 +55,6 @@ import javax.swing.WindowConstants;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-
 public class WebCamWrapper extends AbstractWrapper implements ControllerListener {
    
    public static final String            PICTURE_KEY                  = "PICTURE";
@@ -66,8 +64,6 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
    private Buffer                        buff                         = new Buffer( );
    
    private PushBufferStream              camStream;                                                             // Global
-                                                                                                                 
-   private JPEGImageEncoder              codec                        = JPEGCodec.createJPEGEncoder( baos );
    
    private BufferToImage                 converter;                                                             // Global
                                                                                                                  
@@ -282,7 +278,7 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
       try {
          baos.reset( );
          if ( reading != null ) {
-            codec.encode( reading.getBufferedImage( ) );
+            ImageIO.write(reading.getBufferedImage( ), "jpg", baos);
             streamElement = new StreamElement( new String [ ] { PICTURE_KEY } , new Byte [ ] { DataTypes.BINARY } , new Serializable [ ] { baos.toByteArray( ) } , System.currentTimeMillis( ) );
          }
       } catch ( Exception e ) {
