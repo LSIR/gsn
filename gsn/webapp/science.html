@@ -65,7 +65,14 @@ $(document).ready(function() {
       { title:"Crackmeter Position 1",
         signals: [{
           vsensor:"matterhorn_crackmeter__nctt",
-          field:["nctt_dx1","nctt_t1","nctt_t2"],
+          field:["nctt_dx1"],
+          select:"sensornode[position=1]"
+        }]
+      },
+      { title:"Temperature Position 1",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__nctt",
+          field:["nctt_t1","nctt_t2"],
           select:"sensornode[position=1]"
         }]
       },
@@ -79,7 +86,14 @@ $(document).ready(function() {
       { title:"Crackmeter Position 2",
         signals: [{
           vsensor:"matterhorn_crackmeter__nctt",
-          field:["nctt_dx1","nctt_t2"],
+          field:["nctt_dx1"],
+          select:"sensornode[position=2]"
+        }]
+      },
+      { title:"Temperature Position 2",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__nctt",
+          field:["nctt_t2"],
           select:"sensornode[position=2]"
         }]
       },
@@ -97,7 +111,14 @@ $(document).ready(function() {
       { title:"Crackmeter Position 3",
         signals: [{
           vsensor:"matterhorn_crackmeter__nctt",
-          field:["nctt_dx1","nctt_t1","nctt_t2"],
+          field:["nctt_dx1"],
+          select:"sensornode[position=3]"
+        }]
+      },
+      { title:"Temperature Position 3",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__nctt",
+          field:["nctt_t1","nctt_t2"],
           select:"sensornode[position=3]"
         }]
       },
@@ -155,10 +176,24 @@ $(document).ready(function() {
           select:"sensornode[position=5]"
         }]
       },
-      { title:"Crackmeter Position 6",
+      { title:"Crackmeter 1 - Position 6",
         signals: [{
           vsensor:"matterhorn_crackmeter__tctc",
-          field:["tctc_dx1","tctc_t1","tctc_dx2","tctc_t2"],
+          field:["tctc_dx1"],
+          select:"sensornode[position=6]"
+        }]
+      },
+      { title:"Crackmeter 2 - Position 6",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__tctc",
+          field:["tctc_dx2"],
+          select:"sensornode[position=6]"
+        }]
+      },
+      { title:"Temperature Position 6",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__tctc",
+          field:["tctc_t1","tctc_t2"],
           select:"sensornode[position=6]"
         }]
       },
@@ -187,10 +222,24 @@ $(document).ready(function() {
           select:"sensornode[position=7]"
         }]
       },
-      { title:"Crackmeter Position 8",
+      { title:"Crackmeter 1 - Position 8",
         signals: [{
           vsensor:"matterhorn_crackmeter__nctc",
-          field:["nctc_dx1","nctc_t1","nctc_dx2"],
+          field:["nctc_dx1"],
+          select:"sensornode[position=8]"
+        }]
+      },
+      { title:"Crackmeter 2 - Position 8",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__nctc",
+          field:["nctc_dx2"],
+          select:"sensornode[position=8]"
+        }]
+      },
+      { title:"Temperature Position 8",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__nctc",
+          field:["nctc_t1"],
           select:"sensornode[position=8]"
         }]
       },
@@ -201,10 +250,31 @@ $(document).ready(function() {
           select:"sensornode[position=8]"
         }]
       },
-      { title:"Crackmeter Position 9",
+      { title:"Crackmeter 1 - Position 9",
         signals: [{
           vsensor:"matterhorn_crackmeter__ccct",
-          field:["ccct_dx0","ccct_dx1","ccct_dx2","ccct_t3"],
+          field:["ccct_dx0"],
+          select:"sensornode[position=9]"
+        }]
+      },
+      { title:"Crackmeter 2 - Position 9",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__ccct",
+          field:["ccct_dx1"],
+          select:"sensornode[position=9]"
+        }]
+      },
+      { title:"Crackmeter 3 - Position 9",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__ccct",
+          field:["ccct_dx2"],
+          select:"sensornode[position=9]"
+        }]
+      },
+      { title:"Temperature Position 9",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__ccct",
+          field:["ccct_t3"],
           select:"sensornode[position=9]"
         }]
       },
@@ -215,7 +285,7 @@ $(document).ready(function() {
           select:"sensornode[position=10]"
         }]
       },
-      { title:"Thermistor Position 10",
+      { title:"Temperature Position 10",
         signals: [{
           vsensor:"matterhorn_temperature__ntnn",
           field:["ntnn_t1"],
@@ -257,24 +327,45 @@ $(document).ready(function() {
           select:"sensornode[position=13]"
         }]
       },
-      { title:"Crackmeter Position 20",
+      { title:"Crackmeter 1 - Position 20",
         signals: [{
           vsensor:"matterhorn_crackmeter__ccnn",
-          field:["ccnn_dx0","ccnn_dx1"],
+          field:["ccnn_dx0"],
           select:"sensornode[position=20]"
         }]
       },
-      { title:"Crackmeter Position 21",
+      { title:"Crackmeter 2 - Position 20",
         signals: [{
           vsensor:"matterhorn_crackmeter__ccnn",
-          field:["ccnn_dx0","ccnn_dx1"],
+          field:["ccnn_dx1"],
+          select:"sensornode[position=20]"
+        }]
+      },
+      { title:"Crackmeter 1 - Position 21",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__ccnn",
+          field:["ccnn_dx0"],
           select:"sensornode[position=21]"
         }]
       },
-      { title:"Crackmeter Position22",
+      { title:"Crackmeter 2 - Position 21",
         signals: [{
           vsensor:"matterhorn_crackmeter__ccnn",
-          field:["ccnn_dx0","ccnn_dx1"],
+          field:["ccnn_dx1"],
+          select:"sensornode[position=21]"
+        }]
+      },
+      { title:"Crackmeter 1 - Position 22",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__ccnn",
+          field:["ccnn_dx0"],
+          select:"sensornode[position=22]"
+        }]
+      },
+      { title:"Crackmeter 2 - Position 22",
+        signals: [{
+          vsensor:"matterhorn_crackmeter__ccnn",
+          field:["ccnn_dx1"],
           select:"sensornode[position=22]"
         }]
       },
@@ -285,7 +376,14 @@ $(document).ready(function() {
       { title:"Crackmeter Position 1",
         signals: [{
           vsensor:"adm_crackmeter__nctn",
-          field:["nctn_dx1","nctn_t2"],
+          field:["nctn_dx1"],
+          select:"sensornode[position=1]"
+        }]
+      },
+      { title:"Temperature Position 1",
+        signals: [{
+          vsensor:"adm_crackmeter__nctn",
+          field:["nctn_t2"],
           select:"sensornode[position=1]"
         }]
       },
@@ -306,7 +404,14 @@ $(document).ready(function() {
       { title:"Crackmeter Position 4",
         signals: [{
           vsensor:"adm_crackmeter__nctn",
-          field:["nctn_dx1","nctn_t2"],
+          field:["nctn_dx1"],
+          select:"sensornode[position=4]"
+        }]
+      },
+      { title:"Temperature Position 4",
+        signals: [{
+          vsensor:"adm_crackmeter__nctn",
+          field:["nctn_t2"],
           select:"sensornode[position=4]"
         }]
       },
@@ -320,7 +425,14 @@ $(document).ready(function() {
       { title:"Crackmeter Position 6",
         signals: [{
           vsensor:"adm_crackmeter__nctn",
-          field:["nctn_dx1","nctn_t2"],
+          field:["nctn_dx1"],
+          select:"sensornode[position=6]"
+        }]
+      },
+      { title:"Temperature Position 6",
+        signals: [{
+          vsensor:"adm_crackmeter__nctn",
+          field:["nctn_t2"],
           select:"sensornode[position=6]"
         }]
       },
@@ -388,14 +500,14 @@ $(document).ready(function() {
           select:"sensornode[position][iscorestation='true']"
         }]
       },
-      { title:"GPS Signal Strength",
+      { title:"GPS Signal Strength - CoreStation",
         signals: [{
           vsensor:"dirruhorn_gps_raw__mapped",
           field:["signal_strength"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },
-      { title:"GPS Number of Satellites",
+      { title:"GPS Number of Satellites - CoreStation",
         signals: [{
           vsensor:"dirruhorn_gps_raw__mapped",
           field:["gps_sats"],
@@ -423,6 +535,102 @@ $(document).ready(function() {
           select:"sensornode[position=2],sensornode[position=6],sensornode[position=9],sensornode[position=70],"
         }]
       },
+
+      {  title:"GPS Position East - Realtime",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__realtime",
+          field:["e"],
+          position: [0,4,5,7,12,39,41]
+        }],
+      },
+      {  title:"GPS Position North - Realtime",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__realtime",
+          field:["n"],
+          position: [0,4,5,7,12,39,41]
+        }],
+      },
+
+      {  title:"GPS Position Altitude - Realtime",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__realtime",
+          field:["h"],
+          position: [0,4,5,7,12,39,41]
+        }],
+      },
+
+      {  title:"GPS Position Standard Deviation East - Realtime",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__realtime",
+          field:["sd_e"],
+          position: [0,4,5,7,12,39,41]
+        }],
+      },
+
+      {  title:"GPS Position Standard Deviation North - Realtime",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__realtime",
+          field:["sd_n"],
+          position: [0,4,5,7,12,39,41]
+        }],
+      },
+
+      {  title:"GPS Position Standard Deviation Altitidue - Realtime",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__realtime",
+          field:["sd_h"],
+          position: [0,4,5,7,12,39,41]
+        }],
+      },
+
+      {  title:"GPS Position East - Batch",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__batch",
+          field:["e"],
+          position: [0,4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64]
+        }],
+      },
+
+      {  title:"GPS Position North - Batch",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__batch",
+          field:["n"],
+          position: [0,4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64]
+        }],
+      },
+
+      {  title:"GPS Position Altitude - Batch",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__batch",
+          field:["h"],
+          position: [0,4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64]
+        }],
+      },
+
+      {  title:"GPS Position Standard Deviation East - Batch",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__batch",
+          field:["sd_e"],
+          position: [0,4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64]
+        }],
+      },
+
+      {  title:"GPS Position Standard Deviation North - Batch",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__batch",
+          field:["sd_n"],
+          position: [0,4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64]
+        }],
+      },
+
+      {  title:"GPS Position Standard Deviation Altitude - Batch",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__batch",
+          field:["sd_h"],
+          position: [0,4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64]
+        }],
+      },
+
       { title:"Crackmeter Pos65",
 	    signals: [{
 	      vsensor:"dirruhorn_crackmeter__cnnn",
