@@ -60,8 +60,6 @@ class GPSPluginClass(AbstractPluginClass):
         self.gps = None
         self._workEvent = Event()
 
-        self.DEBUG = False
-
         #How often should driver be restarted in case of problems
         self._DriverRestarts = INIT_DRIVER_RESTART
 
@@ -220,7 +218,7 @@ class GPSDriver():
         self._logger = logging.getLogger(self.__class__.__name__)
 
         self._logger.info('Init GPS Driver...')
-
+        self.DEBUG = False
         self._parent = parent
 
         self.pmEnable = None
@@ -470,7 +468,7 @@ class GPSDriver():
                     elif i == 3:
                         self._parent.getPowerControlObject().usb3Off()
                         self._runEv.wait(10)
-                        self.parent.getPowerControlObject().usb3On()
+                        self._parent.getPowerControlObject().usb3On()
                     self._logger.debug("Power-cycled usb port " + str(i))
                     self._runEv.wait(10)
 
