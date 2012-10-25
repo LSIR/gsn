@@ -84,10 +84,10 @@ class GPSPluginClass(AbstractPluginClass):
             self.info('wlan off-time: %d minutes' % (wlan_offtime,))
             if int(self.getOptionValue('stay_online_for_db_resend')) == 1:
                 stay_online = True
-                self.info('wlan will not be turned off while db is resending' % (wlan_offtime,))
+                self.info('wlan will not be turned off while db is resending')
             else:
                 stay_online = False
-                self.info('wlan can be turned off while db is resending' % (wlan_offtime,))
+                self.info('wlan can be turned off while db is resending')
             self._WlanThread = WlanThread(self,wlan_ontime, wlan_offtime,stay_online)
         else:
             self.info("WLAN duty-cycle disabled!")
