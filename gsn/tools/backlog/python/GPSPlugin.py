@@ -98,7 +98,7 @@ class GPSPluginClass(AbstractPluginClass):
         if (not os.path.exists(str(self._cnt_file))):
             self.info("GPS count file does not exist! Creating it!")
             try:
-                fp = open(str(self._cnt_file),"r+")
+                fp = open(str(self._cnt_file),"w")
                 fp.write('0')
                 fp.close()
             except Exception as e:
