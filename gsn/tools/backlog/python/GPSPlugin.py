@@ -43,6 +43,9 @@ RAW_TYPE = 2
 RAW_DATA_VERSION = 1
 NAV_DATA_VERSION = 1
 
+#How often should driver be restarted in case of problems
+INIT_DRIVER_RESTART = 3
+
 #Reads raw GPS messages from a u-blox device and sends them to GSN
 class GPSPluginClass(AbstractPluginClass):
     '''
@@ -60,27 +63,39 @@ class GPSPluginClass(AbstractPluginClass):
         self.DEBUG = False
 
         #How often should driver be restarted in case of problems
-        self._initDriverRestarts = 3
-        self._DriverRestarts = self._initDriverRestarts
+        self._DriverRestarts = INIT_DRIVER_RESTART
 
         # The measurement interval in seconds
         self._interval = int(self.getOptionValue('poll_interval'))
+        self.info('poll interval: %s seconds' % (self._interval,))
 
         # The device identifier
         self._deviceStr = self.getOptionValue('gps_device')
+        self.info('using GPS device: %s' % (self._deviceStr,))
+        
         # GPS configuration file as produced by u-center
         self._config_file = str(self.getOptionValue('gps_config_file'))
-        self._cnt_file = str(self.getOptionValue('cnt_file'))
+        self.info('using GPS configuration file: %s' % (self._config_file,))
+        
         self._WlanThread = None
-        if (int(self.getOptionValue('dc_wlan')) == 1):
+        if int(self.getOptionValue('dc_wlan')) == 1:
             self.info("WLAN duty-cycle enabled!")
-            stay_online = str(self.getOptionValue('stay_online_for_db_resend'))
             wlan_ontime = int(self.getOptionValue('wlan_on_time'))
+            self.info('wlan on-time: %d minutes' % (wlan_ontime,))
             wlan_offtime = int(self.getOptionValue('wlan_off_time'))
+            self.info('wlan off-time: %d minutes' % (wlan_offtime,))
+            if int(self.getOptionValue('stay_online_for_db_resend')) == 1:
+                stay_online = True
+                self.info('wlan will not be turned off while db is resending' % (wlan_offtime,))
+            else:
+                stay_online = False
+                self.info('wlan can be turned off while db is resending' % (wlan_offtime,))
             self._WlanThread = WlanThread(self,wlan_ontime, wlan_offtime,stay_online)
         else:
             self.info("WLAN duty-cycle disabled!")
 
+        self._cnt_file = str(self.getOptionValue('cnt_file'))
+        self.info('using GPS sample count file: %s' % (self._cnt_file,))
         #if count file does not exist, create it!
         if (not os.path.exists(str(self._cnt_file))):
             self.info("GPS count file does not exist! Creating it!")
@@ -132,7 +147,7 @@ class GPSPluginClass(AbstractPluginClass):
                     cnt = self._stats.getCounterValue(self._counterID)
                     self.processMsg(self.getTimeStamp(), [RAW_TYPE, RAW_DATA_VERSION, cnt, ((rawMsg[4]-8)/24), bytearray(rawMsg[2])])
                     self.writeToFile(cnt)
-                    self._DriverRestarts = self._initDriverRestarts
+                    self._DriverRestarts = INIT_DRIVER_RESTART
                     self.debug('Got a sample @ %s' %(strftime("%H:%M:%S +0000", gmtime())))
                     self.debug("GPS Sample Nr: %d" % (cnt,))
                     self.debug("%d Satellites (%d Bytes)" %((rawMsg[4]-8)/24, rawMsg[4]))
@@ -552,7 +567,7 @@ class WlanThread(Thread):
     #*********************************************************
     # init()
     #*********************************************************
-    def __init__(self,parent,uptime=10,downtime=40,stay_online=1):
+    def __init__(self,parent,uptime=10,downtime=40,stay_online=True):
         Thread.__init__(self, name='Wlan-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         self._uptime=uptime*60
@@ -576,14 +591,14 @@ class WlanThread(Thread):
                 if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?
 
                     start = time()
-                    while (not self._stopped and self._stay_online and self._parent.isResendingDB()):
+                    while not self._stopped and self._stay_online and self._parent.isResendingDB():
                         self._logger.debug('We are flushing DB... NOT power cycling WLAN!')
                         self._logger.debug('Waiting for 10 sec')
                         self._work.wait(10)
 
-                    if (not self._stopped):
+                    if not self._stopped:
                         duration = time() - start
-                        if (self._downtime - duration > 0):
+                        if self._downtime - duration > 0:
                             self._logger.info('Will cut Wlan connection in 30 seconds for ' + str(self._downtime) + ' seconds!')
                             self._work.wait(30)
                             self._logger.info("Cutting power to WLAN Now!!")
@@ -591,7 +606,7 @@ class WlanThread(Thread):
                             self._logger.debug('Waiting for %d secs' % (self._downtime-duration,))
                             self._work.wait(self._downtime - duration)
                 #If WLAN is off, turn it on
-                if (not self._stopped and not self._parent.getPowerControlObject().getWlanStatus()):
+                if not self._stopped and not self._parent.getPowerControlObject().getWlanStatus():
                     self._logger.info("We are not online, so turn on wlan")
                     self._parent.getPowerControlObject().wlanOn()
         except Exception, e:
