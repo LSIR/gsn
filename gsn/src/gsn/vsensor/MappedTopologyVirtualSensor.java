@@ -3,7 +3,6 @@ package gsn.vsensor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
@@ -18,6 +17,7 @@ import gsn.beans.NetworkTopology;
 import gsn.beans.SensorNode;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.wrappers.DataMappingWrapper;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -52,9 +52,9 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 						if (n.node_id !=null && n.generation_time != null) {
 							node_ids.remove(n.node_id);
 							if (now - n.timestamp < MAPPING_UPDATE_TIMEOUT_MS) {
-								n.position = DataMapping.getPosition(n.node_id.intValue(), new Timestamp(n.generation_time), deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
+								n.position = DataMappingWrapper.getPosition(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 								if (n.position != null) {
-									n.coordinate = DataMapping.getCoordinate(n.position.intValue(), deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
+									n.coordinate = DataMappingWrapper.getCoordinate(n.position.intValue(), deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 									cachedmappings.put(n.node_id, new MappingEntry(n.position, n.coordinate));
 								}
 							}
@@ -103,20 +103,10 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public void dispose() {
-		DataMapping.removeVS(this);
-	}
-
-	@Override
 	public boolean initialize() {
 		VSensorConfig vsensor = getVirtualSensorConfiguration();
 		deployment = vsensor.getName().split("_")[0].toLowerCase();
-		try {
-			DataMapping.registerVS(this, deployment);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return false;
-		}
+		
 		return true;
 	}
 	
@@ -129,5 +119,8 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 			this.coordinate = coordinate;
 		}
 	}
+
+	@Override
+	public void dispose() {}
 
 }
