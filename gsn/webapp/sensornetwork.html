@@ -145,6 +145,14 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
+      { title:"Randa PV Voltage",
+        signals: [{
+          vsensor:"dirruhorn_corestationstatus_hardware__conv",
+          field:["v_ext1","v_ext2"],
+          select:"sensornode[position=8][iscorestation='true']"
+        }]
+      },
+
       { title:"Dozer Temperature",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
@@ -323,7 +331,21 @@ $(document).ready(function() {
       { title:"CoreStation V12DC Input",
         signals: [{
           vsensor:".*_corestationstatus_hardware__mapped",
-          field:["v12dc_in","i_v12dc_in"],
+          field:["v12dc_in"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"CoreStation I_V12DC Input",
+        signals: [{
+          vsensor:".*_corestationstatus_hardware__mapped",
+          field:["i_v12dc_in"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"CoreStation I_V12DC_EXT Output",
+        signals: [{
+          vsensor:".*_corestationstatus_hardware__mapped",
+          field:["i_v12dc_ext"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },

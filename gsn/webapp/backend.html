@@ -61,6 +61,24 @@ $(document).ready(function() {
         { vsensor:"statistics_mysql",
           field:["select_max","select_avg","insert_max","insert_avg","delete_max","delete_avg","others_max","others_avg","fetch_max","fetch_avg"],
           timeline:"timed"}]
+      },
+      { title:"Vizzly Uptime",
+        signals: [
+        { vsensor:"statistics_sensorviz__parsed",
+          field:["uptime","requests"],
+          timeline:"timed"}]
+      },
+      { title:"Vizzly Cache File Size",
+        signals: [
+        { vsensor:"statistics_sensorviz__parsed",
+          field:["cache_file_size"],
+          timeline:"timed"}]
+      },
+      { title:"Vizzly Signals/Cache",
+        signals: [
+        { vsensor:"statistics_sensorviz__parsed",
+          field:["seen_signals","cache_entries","cache_requests","cache_hits","cache_misses"],
+          timeline:"timed"}]
       }
     ]);
     
