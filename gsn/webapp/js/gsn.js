@@ -788,6 +788,7 @@ var GSN = {
             var name,cat,type,value,defaultvalue,unit;
             var last_cmd,cmd;
             var hiddenclass ="";
+            var datepickers ="";
             //update the vsbox the first time, when it's empty
             if ($(dynamic).children().size()==0 && $(static_).children().size()==0){
                 var gotDynamic,gotStatic,gotInput = false;
@@ -901,7 +902,18 @@ var GSN = {
                             for (var i = 0; i < options.length;i++){
                                 value += '<input type="'+type.split(":")[0]+'" name="'+cmd+";"+name+'" value="'+options[i]+'">'+options[i]+'</input>';
                             }
-                        } else {
+                        } else if (type.split(":")[0].indexOf("date") != -1) {
+                        	var id = $(vs).attr("name")+"_"+cmd+"_"+name;
+                            if (defaultvalue == null)
+                                defaultvalue="";
+                            value = '<input id="'+id +'" type="text" name="'+cmd+";"+name+'" value="'+defaultvalue+'"/>';
+                            
+                            if (datepickers == "")
+                            	datepickers = "#"+id;
+                            else
+                            	datepickers += ", #"+id;
+                        }
+                        else {
                             if (defaultvalue == null)
                                defaultvalue="";
                             value = '<input type="text" name="'+cmd+";"+name+'" value="'+defaultvalue+'"/>';
@@ -926,6 +938,9 @@ var GSN = {
 				
                 }
                 $(vsd).find("img").ToolTip();
+                
+                if (datepickers != "")
+                	$(datepickers).datepicker({prevText: "", nextText: "", firstDay: 1, showOn: "both",  buttonImage: "/style/calendar.png", buttonImageOnly: true, dateFormat: "dd/mm/yy 00:00:00" });
                 return true;
             } else {
                 //update the vsbox when the value already exists
@@ -970,6 +985,7 @@ var GSN = {
                 value = $("field[name=timed]",vs).text();
                 //if (value != "") value = GSN.util.printDate(value);
                 $("span.timed", vsd).empty().append(value);
+
                 return false;
             }
         }

@@ -1,6 +1,7 @@
 package gsn.wrappers.backlog.plugins;
 
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -48,7 +49,7 @@ public class BackLogConfigPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+	public InputInfo sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if( action.compareToIgnoreCase("config_command") == 0 ) {
 			byte [] configuration = null;
 			int id = -1;
@@ -68,16 +69,18 @@ public class BackLogConfigPlugin extends AbstractPlugin {
 				if (!sendRemote(System.currentTimeMillis(), new Serializable [] {configuration}, super.priority)) {
 					dataProcessed(time, new Serializable[] {id, time, "no connection to the CoreStation: could not upload configuration -> try again later", configuration});
 					logger.warn("no connection to the CoreStation: could not upload configuration -> try again later");
+					return new InputInfo(getActiveAddressBean().toString(), "no connection to the CoreStation: could not upload configuration -> try again later", false);
 				}
+				else
+					return new InputInfo(getActiveAddressBean().toString(), "configuration uploaded", true);
 			} catch (IOException e) {
 				dataProcessed(time, new Serializable[] {id, time, e.getMessage() + ": could not upload configuration -> try again later", configuration});
 				logger.info(e.getMessage() + ": could not upload configuration -> try again later");
+				return new InputInfo(getActiveAddressBean().toString(), e.getMessage() + ": could not upload configuration -> try again later", false);
 			}
-
-			return true;
 		}
 		else
-			return false;
+			return new InputInfo(getActiveAddressBean().toString(), "action >" + action + "< not supported", false);
 	}
 
 }

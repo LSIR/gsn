@@ -10,6 +10,7 @@ import javax.naming.OperationNotSupportedException;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
+import gsn.beans.InputInfo;
 import gsn.wrappers.BackLogWrapper;
 import gsn.wrappers.backlog.BackLogMessage;
 import gsn.wrappers.backlog.BackLogMessageListener;
@@ -135,7 +136,7 @@ public abstract class AbstractPlugin extends Thread implements BackLogMessageLis
 	 * 			 data otherwise false
 	 * @throws OperationNotSupportedException 
 	 */
-	public boolean sendToPlugin ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
+	public InputInfo sendToPlugin ( String action , String [ ] paramNames , Object [ ] paramValues ) throws OperationNotSupportedException {
 		throw new OperationNotSupportedException( "This plugin doesn't support sending data back to the source." );
 	}
 

@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import gsn.Main;
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 
 
 
@@ -159,7 +160,7 @@ public class SchedulePlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+	public InputInfo sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if( action.compareToIgnoreCase("schedule_command") == 0 ) {
 			byte [] schedule = null;
 			int id = -1;
@@ -179,14 +180,16 @@ public class SchedulePlugin extends AbstractPlugin {
 			
 			// and try to send it to the deployment
 			try {
-				sendRemote(System.currentTimeMillis(), new Serializable [] {TYPE_SCHEDULE, time, schedule}, super.priority);
+				if (sendRemote(System.currentTimeMillis(), new Serializable [] {TYPE_SCHEDULE, time, schedule}, super.priority))
+					return new InputInfo(getActiveAddressBean().toString(), "schedule successfully sent to CoreStation", true);
+				else
+					return new InputInfo(getActiveAddressBean().toString(), "schedule could not be sent to CoreStation", false);
 			} catch (IOException e) {
 				logger.warn(e.getMessage());
+				return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 			}
-
-			return true;
 		}
 		else
-			return false;
+			return new InputInfo(getActiveAddressBean().toString(), "action >" + action + "< not supported", false);
 	}
 }

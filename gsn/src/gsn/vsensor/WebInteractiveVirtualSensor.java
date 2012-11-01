@@ -1,6 +1,7 @@
 package gsn.vsensor;
 
 import gsn.beans.DataTypes;
+import gsn.beans.InputInfo;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.others.visualization.svg.SVGCircle;
@@ -76,7 +77,7 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
       
    }
    
-   public boolean dataFromWeb ( String command, String[] paramNames, Serializable[] paramValues ) {
+   public InputInfo dataFromWeb ( String command, String[] paramNames, Serializable[] paramValues ) {
       String streamSourceAliasName = "ss_bla";
       try {
         return  vsensor.getInputStream( INPUT_STREAM_NAME ).getSource( streamSourceAliasName ).getWrapper().sendToWrapper( command , paramNames , paramValues );
@@ -84,7 +85,8 @@ public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
          logger.warn( new StringBuilder( ).append( "The virtual sensor : " ).append( vsensor.getName( ) ).append(
             " want to send data to a stream source which doesn't support receiving data." ).toString( ) );
          logger.warn( e.getMessage( ) , e );
-         return false;
+         return new InputInfo(getVirtualSensorConfiguration().getName(), new StringBuilder( ).append( "The virtual sensor : " ).append( vsensor.getName( ) ).append(
+                 " want to send data to a stream source which doesn't support receiving data." ).toString( ), false);
       }
    }
    

@@ -2,6 +2,7 @@ package gsn.wrappers.backlog.plugins;
 
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
+import gsn.beans.InputInfo;
 import gsn.wrappers.BackLogWrapper;
 
 import java.io.FileInputStream;
@@ -248,7 +249,7 @@ public class MigMessagePlugin extends AbstractPlugin
 
 
 	@Override
-	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+	public InputInfo sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if (getDeviceID() != null && getDeviceID() <= ACCESS_NODE_ID_BOUNDARY) {
 			boolean ret = false;
 			if (logger.isDebugEnabled())
@@ -260,11 +261,11 @@ public class MigMessagePlugin extends AbstractPlugin
 				
 				if( paramNames.length != 3 ) {
 					logger.error("upload action must have three parameter names: 'destination', 'amtype' and 'data'");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "upload action must have three parameter names: 'destination', 'amtype' and 'data'", false);
 				}
 				if( paramValues.length != 3 ) {
 					logger.error("upload action must have three parameter values");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "upload action must have three parameter values", false);
 				}
 				
 				for( int i=0; i<3; i++ ) {
@@ -278,13 +279,13 @@ public class MigMessagePlugin extends AbstractPlugin
 							data = ((String) paramValues[i]).getBytes();
 					} catch(Exception e) {
 						logger.error("Could not interprete upload arguments: " + e.getMessage());
-						return false;
+						return new InputInfo(getActiveAddressBean().toString(), "Could not interprete upload arguments: " + e.getMessage(), false);
 					}
 				}
 				
 				if( moteId < -256 | amType < -256 | data == null ) {
 					logger.error("upload action must contain all three parameter names: 'destination', 'am type' and 'data'");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "upload action must contain all three parameter names: 'destination', 'am type' and 'data'", false);
 				}
 				
 				if(data.length == 0) {
@@ -329,7 +330,7 @@ public class MigMessagePlugin extends AbstractPlugin
 					}
 					catch (Exception e) {
 						logger.error(e);
-						return false;
+						return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 					}
 				}
 					
@@ -377,18 +378,21 @@ public class MigMessagePlugin extends AbstractPlugin
 					}
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 				}
 			}
 			else
 				logger.error("Unknown action");
 			
-			return ret;
+			if (ret)
+				return new InputInfo(getActiveAddressBean().toString(), "MIG message upload successfull", ret);
+			else
+				return new InputInfo(getActiveAddressBean().toString(), "MIG message upload not successfull", ret);
 		}
 		else {
 			if (getDeviceID() != null)
 				logger.debug("device ID (" + getDeviceID() + ") bigger than " + ACCESS_NODE_ID_BOUNDARY);
-			return true;
+			return new InputInfo(getActiveAddressBean().toString(), "device ID (" + getDeviceID() + ") bigger than " + ACCESS_NODE_ID_BOUNDARY, false);
 		}
 	}
 

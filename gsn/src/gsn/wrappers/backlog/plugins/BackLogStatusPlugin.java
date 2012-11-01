@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 import gsn.wrappers.BackLogWrapper;
 
 
@@ -219,23 +220,25 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 	 * program can unpack it.
 	 */
 	@Override
-	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+	public InputInfo sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		if( action.compareToIgnoreCase("resend_backlogged_data") == 0 ) {
 			Serializable[] command = {1};
 			try {
 				if( sendRemote(System.currentTimeMillis(), command, super.priority) ) {
 					if (logger.isDebugEnabled())
 						logger.debug("Upload command sent (resend backlogged data)");
+					return new InputInfo(getActiveAddressBean().toString(), "command resend backlogged data successfull", true);
 				}
 				else {
 					logger.warn("Upload command (resend backlogged data) could not be sent");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "Upload command (resend backlogged data) could not be sent", false);
 				}
 			} catch (IOException e) {
 				logger.warn(e.getMessage());
+				return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 			}
 		}
-		
-		return true;
+		else
+			return new InputInfo(getActiveAddressBean().toString(), "action >" + action + "< not supported", false);
 	}
 }

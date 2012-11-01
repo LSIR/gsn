@@ -1,6 +1,7 @@
 package gsn.wrappers.backlog.plugins;
 
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -97,7 +98,7 @@ public class CamZillaPlugin extends AbstractPlugin {
 	
 	
 	@Override
-	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+	public InputInfo sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		Serializable[] command = null;
 		if( action.compareToIgnoreCase("panorama_picture") == 0 ) {
 			String camera = "", sx = "", sy = "", px = "", py = "", rx = "", ry = "", d = "", b = "0", imgquality = "", imgsize = "", aperture = "", shutter = "", iso = "", whitebalance = "", compensation = "", bracketing = "", autofocus = "", focus = "", opt = "";
@@ -252,23 +253,24 @@ public class CamZillaPlugin extends AbstractPlugin {
 			command = new Serializable[] {POWER_MESSAGE, camRobot, heater};
 		}
 		else {
-			logger.warn("unrecognized action >" + action + "<");
+			logger.warn("action >" + action + "< not supported");
+			return new InputInfo(getActiveAddressBean().toString(), "action >" + action + "< not supported", false);
 		}
 		
 		try {
 			if( sendRemote(System.currentTimeMillis(), command, super.priority) ) {
 				if (logger.isDebugEnabled())
-					logger.debug("Panorama picture task sent to CoreStation");
+					logger.debug(action + " task sent to CoreStation");
+				return new InputInfo(getActiveAddressBean().toString(), action + " task sent to CoreStation", true);
 			}
 			else {
-				logger.warn("Panorama picture task could not be sent to CoreStation");
-				return false;
+				logger.warn(action + " task could not be sent to CoreStation");
+				return new InputInfo(getActiveAddressBean().toString(), action + " task could not be sent to CoreStation", false);
 			}
 		} catch (IOException e) {
 			logger.warn(e.getMessage());
+			return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 		}
-		
-		return true;
 	}
 	
 	

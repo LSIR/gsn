@@ -10,6 +10,7 @@ import gsn.wrappers.backlog.BackLogMessageMultiplexer;
 import gsn.wrappers.backlog.plugins.AbstractPlugin;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 
 
 /**
@@ -243,7 +244,7 @@ public class BackLogWrapper extends AbstractWrapper {
 	 * @throws OperationNotSupportedException 
 	 */
 	@Override
-	public boolean sendToWrapper ( String action , String [ ] paramNames , Serializable [ ] paramValues ) throws OperationNotSupportedException {
+	public InputInfo sendToWrapper ( String action , String [ ] paramNames , Serializable [ ] paramValues ) throws OperationNotSupportedException {
 		Integer id = 65535;
 		for (int i = 0 ; i < paramNames.length ; i++) {
 			if ( paramNames[i].compareToIgnoreCase("core_station") == 0 ) {
@@ -251,14 +252,14 @@ public class BackLogWrapper extends AbstractWrapper {
 					id = Integer.parseInt((String) paramValues[i]);
 				} catch (NumberFormatException e) {
 					logger.error("The device_id in the core station field has to be an integer.");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "The device_id in the core station field has to be an integer.", false);
 				}
 			}
 		}
 		
 		if (id < 0 || id > 65535) {
 			logger.error("device_id has to be a number between 0 and 65535 (inclusive)");
-			return false;
+			return new InputInfo(getActiveAddressBean().toString(), "device_id has to be a number between 0 and 65535 (inclusive)", false);
 		}
 		
 		if (blMsgMultiplexer.getDeviceID() == null) {
@@ -270,7 +271,7 @@ public class BackLogWrapper extends AbstractWrapper {
 				logger.debug("Upload command received for device id " + id);
 			return pluginObject.sendToPlugin(action, paramNames, paramValues);
 		}
-		return true;
+		return new InputInfo(getActiveAddressBean().toString(), "", true);
 	}
 
 

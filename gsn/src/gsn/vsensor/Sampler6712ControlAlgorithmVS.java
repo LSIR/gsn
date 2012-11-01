@@ -27,6 +27,7 @@ import java.util.List;
 import gsn.http.ClientHttpRequest;
 import gsn.Main;
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 //import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
@@ -561,7 +562,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 	}
 	
 	@Override
-	public boolean dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
+	public InputInfo dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
 		Event event = Event.NONE;
 
 		logger.debug("action: " + command + ", compare result: " +command.compareToIgnoreCase("configuration"));
@@ -604,22 +605,22 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 				}
 				else{
 					logger.warn("Unknown special action");
-					return false;
+					return new InputInfo(getVirtualSensorConfiguration().getName(), "Unknown special action", false);
 				}
 				
 				// treat event
 				sm.putEvent(event);
-				
-				return true;
+
+				return new InputInfo(getVirtualSensorConfiguration().getName(), "action: " + command + " successfull", true);
 			}
 			catch(Exception e){
 				logger.warn("Invalid input values, input not treated: " +e);
-				return false;
+				return new InputInfo(getVirtualSensorConfiguration().getName(), "Invalid input values, input not treated: " +e.getMessage(), false);
 			}
 		}
 		else{
 			logger.info("action not supported (" + command +")" );
-			return false;
+			return new InputInfo(getVirtualSensorConfiguration().getName(), "action not supported (" + command +")", false);
 		}
 	}
 	

@@ -7,12 +7,15 @@ import gsn.beans.InputStream;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
+import gsn.beans.InputInfo;
 import gsn.statistics.StatisticsElement;
 import gsn.statistics.StatisticsHandler;
 
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Iterator;
+
+import javax.naming.OperationNotSupportedException;
 
 import org.apache.log4j.Logger;
 
@@ -142,17 +145,18 @@ public abstract class AbstractVirtualSensor {
 	 */
 	public abstract void dispose ( );
 	
-	public boolean dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
-		boolean ret = false;
+	public InputInfo dataFromWeb(String command, String[] paramNames, Serializable[] paramValues) {
+		InputInfo ret = new InputInfo();
 		Iterator<InputStream> streams = getVirtualSensorConfiguration().getInputStreams().iterator();
 		while (streams.hasNext()) {
-			StreamSource[] sources = streams.next().getSources();
+			InputStream str = streams.next();
+			StreamSource[] sources = str.getSources();
 			for (int j=0; j<sources.length; j++) {
 				try {
-					if (sources[j].getWrapper().sendToWrapper(command, paramNames, paramValues))
-						ret = true;
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
+					ret.addInfo(sources[j].getWrapper().sendToWrapper(command, paramNames, paramValues));
+				} catch (OperationNotSupportedException e) {
+					logger.error(e.getMessage());
+					ret.addInfo(new InputInfo(virtualSensorConfiguration.getName() + " (stream=" + str.getInputStreamName() + ", source=" + sources[j].getAlias().toString() + ")", e.getMessage(), false));
 				}
 			}
 		}

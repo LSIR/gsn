@@ -12,6 +12,7 @@ import net.tinyos1x.message.TOSMsg;
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 import gsn.wrappers.BackLogWrapper;
 
 
@@ -87,7 +88,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 	}
 
 	@Override
-	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+	public InputInfo sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		boolean ret = false;
 		if (logger.isDebugEnabled())
 			logger.debug("action: " + action);
@@ -98,11 +99,11 @@ public class MigUploadPlugin extends AbstractPlugin {
 			
 			if( paramNames.length != 3 ) {
 				logger.error("upload action must have three parameter names: 'moteid', 'amtype' and 'data'");
-				return false;
+				return new InputInfo(getActiveAddressBean().toString(), "upload action must have three parameter names: 'moteid', 'amtype' and 'data'", false);
 			}
 			if( paramValues.length != 3 ) {
 				logger.error("upload action must have three parameter values");
-				return false;
+				return new InputInfo(getActiveAddressBean().toString(), "upload action must have three parameter values", false);
 			}
 			
 			for( int i=0; i<3; i++ ) {
@@ -116,13 +117,13 @@ public class MigUploadPlugin extends AbstractPlugin {
 						data = ((String) paramValues[i]).getBytes();
 				} catch(Exception e) {
 					logger.error("Could not interprete upload arguments: " + e.getMessage());
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "Could not interprete upload arguments: " + e.getMessage(), false);
 				}
 			}
 			
 			if( moteId < -256 | amType < -256 | data == null ) {
 				logger.error("upload action must contain all three parameter names: 'mote id', 'am type' and 'payload'");
-				return false;
+				return new InputInfo(getActiveAddressBean().toString(), "upload action must contain all three parameter names: 'mote id', 'am type' and 'payload'", false);
 			}
 			
 			if(data.length == 0) {
@@ -135,7 +136,7 @@ public class MigUploadPlugin extends AbstractPlugin {
 					logger.debug("Mig message sent to mote id " + moteId + " with AM type " + amType);
 			} catch (IOException e) {
 				logger.warn(e.getMessage());
-				return false;
+				return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 			}
 		}
 		else if( action.compareToIgnoreCase("binary_packet") == 0 ) {
@@ -146,19 +147,19 @@ public class MigUploadPlugin extends AbstractPlugin {
 						ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
 					} catch (IOException e) {
 						logger.warn(e.getMessage());
-						return false;
+						return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 					}
 					if (logger.isDebugEnabled())
 						logger.debug("Mig binary message sent with length " + ((String) paramValues[0]).length());
 				}
 				else {
 					logger.error("Upload failed due to empty 'binary packet' field");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "Upload failed due to empty 'binary packet' field", false);
 				}
 			}
 			else {
 				logger.error("binary_packet upload action needs a 'binary packet' field.");
-				return false;
+				return new InputInfo(getActiveAddressBean().toString(), "binary_packet upload action needs a 'binary packet' field.", false);
 			}
 		}
 		else
@@ -168,7 +169,10 @@ public class MigUploadPlugin extends AbstractPlugin {
 		if (!dataProcessed(System.currentTimeMillis(), output))
 			logger.warn("command could not be stored in the database");
 		
-		return ret;
+		if (ret)
+			return new InputInfo(getActiveAddressBean().toString(), "MIG message upload successfull", ret);
+		else
+			return new InputInfo(getActiveAddressBean().toString(), "MIG message upload not successfull", ret);
 	}
 
 	

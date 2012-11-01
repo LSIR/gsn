@@ -3,6 +3,7 @@ package gsn.wrappers;
 import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.beans.windowing.LocalTimeBasedSlidingHandler;
@@ -126,14 +127,15 @@ public abstract class AbstractWrapper extends Thread {
 	 * @param dataItem
 	 *            : The data which is going to be send to the source of the data
 	 *            for this wrapper.
-	 * @return True if the send operation is successful.
+	 * @return InputInfo containing the information string and true if successfull,
+	 * 			  otherwise false.
 	 * @throws OperationNotSupportedException
 	 *             If the wrapper doesn't support sending the data back to the
 	 *             source. Note that by default this method throws this
 	 *             exception unless the wrapper overrides it.
 	 */
 
-	public boolean sendToWrapper(String action, String[] paramNames,
+	public InputInfo sendToWrapper(String action, String[] paramNames,
 			Serializable[] paramValues) throws OperationNotSupportedException {
 		throw new OperationNotSupportedException(
 				"This wrapper doesn't support sending data back to the source.");

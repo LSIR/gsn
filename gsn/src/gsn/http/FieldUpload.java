@@ -2,6 +2,7 @@ package gsn.http;
 
 import gsn.Mappings;
 import gsn.VirtualSensorInitializationFailedException;
+import gsn.beans.InputInfo;
 import gsn.beans.StreamElement;
 import gsn.vsensor.AbstractVirtualSensor;
 
@@ -22,6 +23,8 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
+
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 /**
  * @todo validation & security part
@@ -97,35 +100,36 @@ public class FieldUpload extends HttpServlet {
 				//do something with xml aka statement.toString()
 			
 			    AbstractVirtualSensor vs = null;
-			    boolean ret = false;
+			    InputInfo info = new InputInfo();
 			    try {
 			    	vs = Mappings.getVSensorInstanceByVSName( vsname ).borrowVS( );
-			    	ret = vs.dataFromWeb( cmd , paramNames.toArray(new String[]{}) , paramValues.toArray(new Serializable[]{}) );
+			    	info = vs.dataFromWeb( cmd , paramNames.toArray(new String[]{}) , paramValues.toArray(new Serializable[]{}) );
 			    } catch ( VirtualSensorInitializationFailedException e ) {
 			      logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
 			    } finally {
 			    	Mappings.getVSensorInstanceByVSName(vsname).returnVS(vs);
 			    }
 				
-			    if (ret) {
+			    if (info.hasAtLeastOneSuccess()) {
 					code = 200;
-					msg = "The upload to the virtual sensor went successfully! ("+vsname+")";
+					msg = escapeHtml("The upload to the virtual sensor went successfully! ("+vsname+")\n\n" + info.toString()).replace("\n", "<br/>");
 			    }
 			    else {
 					code = 500;
-					msg = "The upload could not be processed successfully! ("+vsname+")";
+					msg = escapeHtml("The upload could not be processed successfully! ("+vsname+")\n\n" + info.toString()).replace("\n", "<br/>");
 			    }
 			} catch (ServletFileUpload.SizeLimitExceededException e) {
 				code = 600;
-				msg = "Upload size exceeds maximum limit!";
+				msg = escapeHtml("Upload size exceeds maximum limit!").replace("\n", "<br/>");
 				logger.error(msg, e);
-	        } catch(Exception e){
+	        } catch(Exception e) {
 				code = 500;
-				msg = "Internal Error: "+e;
+				msg = escapeHtml("Internal Error: "+e).replace("\n", "<br/>");
 				logger.error(msg, e);
 			}
 			
 		}
+		
 		//callback to the javascript
 		out.write("<script>window.parent.GSN.msgcallback('"+msg+"',"+code+");</script>");
 	}

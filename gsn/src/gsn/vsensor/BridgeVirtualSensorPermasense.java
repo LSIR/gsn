@@ -21,6 +21,7 @@ import gsn.beans.VSensorConfig;
 import gsn.processor.ScriptletProcessor;
 import gsn.utils.ParamParser;
 import gsn.utils.Helpers;
+import gsn.wrappers.DataMappingWrapper;
 
 import org.apache.log4j.Logger;
 
@@ -79,15 +80,6 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 
 		if (params.get("gps_time_conversion") != null)
 			gps_time_conversion = true;
-
-		if (position_mapping || sensortype_mapping || sensorvalue_conversion) {
-			try {
-				DataMapping.registerVS(this, deployment);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				return false;
-			}
-		}
 		
 		processScriptlet = super.initialize();
 		return true;
@@ -98,8 +90,8 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 		String s;
 		if (position_mapping && data.getData("device_id") != null) {
 			if (data.getData("generation_time") != null) {
-				Integer position = DataMapping.getPosition(((Integer) data.getData("device_id")).intValue(),
-						new Timestamp(((Long) data.getData("generation_time")).longValue()),
+				Integer position = DataMappingWrapper.getPosition(((Integer) data.getData("device_id")).intValue(),
+						((Long) data.getData("generation_time")).longValue(),
 						deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 				data = new StreamElement(data, 
 						new String[]{"position"}, 
@@ -110,8 +102,8 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 		}
 		if (sensortype_mapping && 
 				data.getData("position") != null &&	data.getData("generation_time") != null) {
-			Serializable[] sensortype = DataMapping.getSensorType(((Integer) data.getData("position")).intValue(), 
-					new Timestamp(((Long) data.getData("generation_time")).longValue()),
+			Serializable[] sensortype = DataMappingWrapper.getSensorType(((Integer) data.getData("position")).intValue(), 
+					((Long) data.getData("generation_time")).longValue(),
 					deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 			data = new StreamElement(data, 
 					new String[]{"sensortype", "sensortype_serialid"}, 
@@ -119,7 +111,7 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 					sensortype);
 		}
 		if (sensorvalue_conversion && data.getData("position") != null &&	data.getData("generation_time") != null) {
-			data = DataMapping.getConvertedValues(data, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
+			data = DataMappingWrapper.getConvertedValues(data, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 		}
 		if (gps_time_conversion && data.getData("gps_time") != null && data.getData("gps_week") != null) {
 			data = new StreamElement(data, 
@@ -174,6 +166,5 @@ public class BridgeVirtualSensorPermasense extends ScriptletProcessor
 	public synchronized void dispose() {
 		if (processScriptlet)
 			super.dispose();
-		DataMapping.removeVS(this);
 	}
 }

@@ -23,6 +23,7 @@ import org.jibx.runtime.JiBXException;
 
 import gsn.Main;
 import gsn.Mappings;
+import gsn.beans.InputInfo;
 import gsn.beans.Link;
 import gsn.beans.NetworkTopology;
 import gsn.beans.SensorNode;
@@ -448,13 +449,13 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	}
 	
 	@Override
-	synchronized public boolean dataFromWeb ( String action,String[] paramNames, Serializable[] paramValues ) {
+	synchronized public InputInfo dataFromWeb ( String action,String[] paramNames, Serializable[] paramValues ) {
 		ArrayList<SensorNode> configurationQueue;
 		// read new network configuration
 		int index = Arrays.asList(paramNames).indexOf("configuration");
 		if (index < 0) {
 			logger.debug("field <configuration> not found.");
-			return false;
+			return new InputInfo(getVirtualSensorConfiguration().getName(), "field <configuration> not found.", false);
 		}
 		logger.debug("trying to parse configuration.");
 		IBindingFactory bfact;
@@ -516,17 +517,17 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			}
 			else {
 				logger.warn("data type was "+s.getClass().getCanonicalName());
-				return false;
+				return new InputInfo(getVirtualSensorConfiguration().getName(), "data type was "+s.getClass().getCanonicalName(), false);
 			}
 		} catch (JiBXException e) {
 			logger.error("unmarshall did fail: "+e);
-			return false;
+			return new InputInfo(getVirtualSensorConfiguration().getName(), "unmarshall did fail: "+e.getMessage(), false);
 		}
 		// schedule reconfigure commands
 		if(configurationQueue.size()>0 && scheduler!=null) {
 			scheduler.reschedule(configurationQueue);
 		}
-		return true;
+		return new InputInfo(getVirtualSensorConfiguration().getName(), "", true);
 	}
 	
 	synchronized void generateData() {

@@ -136,7 +136,7 @@ public final class AddressBean implements Serializable{
 	}
 
 	public String toString ( ) {
-		final StringBuffer result = new StringBuffer( "[" ).append( this.getWrapper( ) );
+		final StringBuffer result = new StringBuffer( "[Wrapper: " ).append( this.getWrapper( ) ).append(" Predicates: ");
 		for ( final KeyValue predicate : this.predicates ) {
 			result.append( predicate.getKey( ) + " = " + predicate.getValue( ) + "," );
 		}

@@ -2,6 +2,7 @@ package gsn.vsensor;
 
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
+import gsn.beans.InputInfo;
 import gsn.beans.StreamElement;
 
 import java.io.Serializable;
@@ -136,7 +137,7 @@ public class SMSVirtualSensor extends AbstractVirtualSensor {
 		return resultMessage;
 	}
 
-	public synchronized boolean dataFromWeb ( String action, String[] paramNames, Serializable[] paramValues ) {
+	public synchronized InputInfo dataFromWeb ( String action, String[] paramNames, Serializable[] paramValues ) {
 		boolean retval;
 
 		if(action.equals(ADD_COMMAND_NAME))
@@ -145,9 +146,9 @@ public class SMSVirtualSensor extends AbstractVirtualSensor {
 			retval = removePhoneNumber(paramNames, paramValues);
 		else {
 			logger.warn("Wrong action got from web, uploaded data discarded.");
-			return false;
+			return new InputInfo(getVirtualSensorConfiguration().getName(), "Wrong action got from web, uploaded data discarded.", false);
 		}
-		return retval;
+		return new InputInfo(getVirtualSensorConfiguration().getName(), "", retval);
 	}
 
 	/**

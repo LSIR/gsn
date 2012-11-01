@@ -6,6 +6,7 @@ import gsn.Mappings;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.SQLUtils;
@@ -20,8 +21,6 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.Date;
-
-import javax.naming.OperationNotSupportedException;
 
 import org.apache.log4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
@@ -156,15 +155,15 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		return true;
 	}
 
-	public boolean sendToWrapper ( String action,String[] paramNames, Serializable[] paramValues ) throws OperationNotSupportedException {
+	public InputInfo sendToWrapper ( String action,String[] paramNames, Serializable[] paramValues ) {
 		AbstractVirtualSensor vs;
 		try {
 			vs = Mappings.getVSensorInstanceByVSName( vSensorConfig.getName( ) ).borrowVS( );
 		} catch ( VirtualSensorInitializationFailedException e ) {
 			logger.warn("Sending data back to the source virtual sensor failed !: "+e.getMessage( ),e);
-			return false;
+			return new InputInfo("LocalDeliveryWrapper", "Sending data back to the source virtual sensor failed !: "+e.getMessage(), false);
 		}
-		boolean toReturn = vs.dataFromWeb( action , paramNames , paramValues );
+		InputInfo toReturn = vs.dataFromWeb( action , paramNames , paramValues );
 		Mappings.getVSensorInstanceByVSName( vSensorConfig.getName( ) ).returnVS( vs );
 		return toReturn;
 	}

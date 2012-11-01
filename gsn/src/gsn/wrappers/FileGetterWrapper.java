@@ -15,6 +15,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 
 public class FileGetterWrapper extends AbstractWrapper {
 	
@@ -116,7 +117,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 	}
 	
 	@Override
-	public boolean sendToWrapper ( String action , String [ ] paramNames , Serializable [ ] paramValues ) throws OperationNotSupportedException {
+	public InputInfo sendToWrapper ( String action , String [ ] paramNames , Serializable [ ] paramValues ) throws OperationNotSupportedException {
 		if( action.compareToIgnoreCase("files") == 0 ) {
 			try {
 				long gentime = System.currentTimeMillis();
@@ -140,14 +141,14 @@ public class FileGetterWrapper extends AbstractWrapper {
 						Matcher m = filenamePatternArray[i].matcher(inputFileItems.get(i).getFileItem().getName());
 						if (!m.matches()) {
 							logger.error("filename " + inputFileItems.get(i).getFileItem().getName() + " does not match regular expression " + filenamePatternArray[i].toString());
-							return false;
+							return new InputInfo(getActiveAddressBean().toString(), "filename " + inputFileItems.get(i).getFileItem().getName() + " does not match regular expression " + filenamePatternArray[i].toString(), false);
 						}
 		
 						if (deviceIdFromFilename) {
 							String id = m.group(1);
 							if (deviceid != null && deviceid.compareTo(id) != 0 && lastFileItem != null) {
 								logger.error("the device id extracted from " + lastFileItem.getName() + " and " + inputFileItems.get(i).getFileItem().getName() + " are not equal");
-								return false;
+								return new InputInfo(getActiveAddressBean().toString(), "the device id extracted from " + lastFileItem.getName() + " and " + inputFileItems.get(i).getFileItem().getName() + " are not equal", false);
 							}
 							deviceid = id;
 							lastFileItem = inputFileItems.get(i).getFileItem();
@@ -157,7 +158,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 				
 				if (deviceid.equals("")) {
 					logger.error("device_id argument has to be an integer between 0 and 65535");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "device_id argument has to be an integer between 0 and 65535", false);
 				}
 				
 				Integer id;
@@ -165,18 +166,18 @@ public class FileGetterWrapper extends AbstractWrapper {
 					id = Integer.parseInt(deviceid);
 				} catch(Exception e) {
 					logger.error("Could not interprete device_id argument (" + deviceid +") as integer");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "Could not interprete device_id argument (" + deviceid +") as integer", false);
 				}
 				if (id < 0 || id > 65534) {
 					logger.error("device_id argument has to be an integer between 0 and 65535");
-					return false;
+					return new InputInfo(getActiveAddressBean().toString(), "device_id argument has to be an integer between 0 and 65535", false);
 				}
 				
 				File storageDir = new File(new File(deploymentBinaryDir, id.toString()), subdirectoryName);
 				if (!storageDir.exists()) {
 			    	if (!storageDir.mkdirs()) {
 			    		logger.error("could not mkdir >" + storageDir + "<");
-			    		return false;
+			    		return new InputInfo(getActiveAddressBean().toString(), "could not mkdir >" + storageDir + "<", false);
 					}
 			    	else
 			    		logger.info("created new storage directory >" + storageDir + "<");
@@ -206,22 +207,25 @@ public class FileGetterWrapper extends AbstractWrapper {
 							inputLoggerFile.getFileItem().write(outputFile);
 						} catch (Exception e) {
 							logger.error(e.getMessage());
-							return false;
+							return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 						}
 						output[i++] = subdirectoryName + "/" + filename;
 						output[i++] = outputFile.length();
 					}
 				}
 				
-				return postStreamElement(output);
+				if (postStreamElement(output))
+					return new InputInfo(getActiveAddressBean().toString(), "file successfully uploaded", true);
+				else
+					return new InputInfo(getActiveAddressBean().toString(), "file could not be uploaded", false);
 			} catch(Exception e) {
 				logger.error(e.getMessage(), e);
-				return false;
+				return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 			}
 		}
 		else {
 			logger.warn("action >" + action + "< not supported");
-			return false;
+			return new InputInfo(getActiveAddressBean().toString(), "action >" + action + "< not supported", false);
 		}
 	}
 

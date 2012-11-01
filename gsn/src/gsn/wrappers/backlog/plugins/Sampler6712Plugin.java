@@ -1,6 +1,7 @@
 package gsn.wrappers.backlog.plugins;
 
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
 import gsn.wrappers.BackLogWrapper;
 
 import java.io.IOException;
@@ -191,7 +192,7 @@ public class Sampler6712Plugin extends AbstractPlugin {
 	
 	
 	@Override
-	public boolean sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+	public InputInfo sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
 		Serializable[] command = null;
 		Task task;
 				
@@ -226,7 +227,8 @@ public class Sampler6712Plugin extends AbstractPlugin {
 				break;
 				
 			default:
-				logger.warn("unrecognized action >" + action + "<");
+				logger.warn(">" + action + "< not supported");
+				return new InputInfo(getActiveAddressBean().toString(), ">" + action + "< not supported", false);
 		}
 
 		
@@ -234,15 +236,15 @@ public class Sampler6712Plugin extends AbstractPlugin {
 			if( sendRemote(System.currentTimeMillis(), command, super.priority) ) {
 				if (logger.isDebugEnabled())
 					logger.debug("6712 sampler task sent to CoreStation");
+				return new InputInfo(getActiveAddressBean().toString(), "6712 sampler task successfully sent to CoreStation", true);
 			}
 			else {
 				logger.warn("6712 sampler task could not be sent to CoreStation");
-				return false;
+				return new InputInfo(getActiveAddressBean().toString(), "6712 sampler task could not be sent to CoreStation", false);
 			}
 		} catch (IOException e) {
 			logger.warn(e.getMessage());
+			return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 		}
-		
-		return true;
 	}
 }
