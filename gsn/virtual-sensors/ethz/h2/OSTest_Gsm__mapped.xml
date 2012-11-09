@@ -55,14 +55,8 @@
                 try {
                     // Gsm Data
                     String[] tokens = GSM_RAW_DATA.split(",");
-                    def defaultProvider = false;
-                    def el = 6;
-                    if (tokens.length == 28) {
-                        defaultProvider = true;
-                        el = 4;
-                    }
-                        
-                    if (tokens.length == 28 || tokens.length == 42) {
+
+                    if (tokens.length == 28 || tokens.length == 30) {
                         def mccArray = new int[7];
                         def mncArray = new int[7];
                         def lacArray = new int[7];
@@ -75,27 +69,24 @@
                         def rssiSumWatt900MHz = 0.0;
                         def rssiSumWatt1800MHz = 0.0;
 
+                        def mcc = 228 // Switzerland
+                        def mnc = 1 // Swisscom
+                        
+                        if (tokens.length == 30) {
+                            mcc = tokens[28].toInteger();
+                            mnc = tokens[29].toInteger();
+                        }
+
+
                         for(int i = 0; i < 7; i++) {
-                            lacArray[i] = tokens[i*el].toInteger();
-                            cidArray[i] = tokens[i*el + 1].toInteger();
-                            arfcnArray[i] = tokens[i*el + 2].toInteger();
-                            rssiArray[i] = tokens[i*el + 3].toInteger();
-                            if(defaultProvider == true) {
-                                mccArray[i] = 228; // Switzerland
-                                mncArray[i] = 1; // Swisscom
-                            }
-                            else {
-                                mccArray[i] = tokens[i*el + 4].toInteger();
-                                mncArray[i] = tokens[i*el + 5].toInteger();
-                            }
+                            lacArray[i] = tokens[i*4].toInteger();
+                            cidArray[i] = tokens[i*4 + 1].toInteger();
+                            arfcnArray[i] = tokens[i*4 + 2].toInteger();
+                            rssiArray[i] = tokens[i*4 + 3].toInteger();
                             // Not all entries have to be filled, so ignore the ones where the values are set to zero.
-                            if(mccArray[i] == 0 ||
-                                    mncArray[i] == 0 ||
-                                    lacArray[i] == 0 ||
+                            if(lacArray[i] == 0 ||
                                     cidArray[i] == 0 ||
                                     arfcnArray[i] == 0) {
-                                mccArray[i] = -1;
-                                mncArray[i] = -1;
                                 lacArray[i] = -1;
                                 cidArray[i] = -1;
                                 arfcnArray[i] = -1;
@@ -115,10 +106,9 @@
                             }
                         }
 
-                        MCC_1 = mccArray[0];
-                        if(MCC_1 < 0) MCC_1 = null;
-                        MNC_1 = mncArray[0];
-                        if(MNC_1 < 0) MNC_1 = null;
+                        MCC = mcc;
+                        MNC = mnc;
+
                         LAC_1 = lacArray[0];
                         if(LAC_1 < 0) LAC_1 = null;
                         CID_1 = cidArray[0];
@@ -132,10 +122,6 @@
                         FIELD_STRENGTH_1 = fieldStrengthArray[0];
                         if(FIELD_STRENGTH_1 < 0) FIELD_STRENGTH_1 = null;
 
-                        MCC_2 = mccArray[1];
-                        if(MCC_2 < 0) MCC_2 = null;
-                        MNC_2 = mncArray[1];
-                        if(MNC_2 < 0) MNC_2 = null;
                         LAC_2 = lacArray[1];
                         if(LAC_2 < 0) LAC_2 = null;
                         CID_2 = cidArray[1];
@@ -149,10 +135,6 @@
                         FIELD_STRENGTH_2 = fieldStrengthArray[1];
                         if(FIELD_STRENGTH_2 < 0) FIELD_STRENGTH_2 = null;
 
-                        MCC_3 = mccArray[2];
-                        if(MCC_3 < 0) MCC_3 = null;
-                        MNC_3 = mncArray[2];
-                        if(MNC_3 < 0) MNC_3 = null;
                         LAC_3 = lacArray[2];
                         if(LAC_3 < 0) LAC_3 = null;
                         CID_3 = cidArray[2];
@@ -166,10 +148,6 @@
                         FIELD_STRENGTH_3 = fieldStrengthArray[2];
                         if(FIELD_STRENGTH_3 < 0) FIELD_STRENGTH_3 = null;
 
-                        MCC_4 = mccArray[3];
-                        if(MCC_4 < 0) MCC_4 = null;
-                        MNC_4 = mncArray[3];
-                        if(MNC_4 < 0) MNC_4 = null;
                         LAC_4 = lacArray[3];
                         if(LAC_4 < 0) LAC_4 = null;
                         CID_4 = cidArray[3];
@@ -183,10 +161,6 @@
                         FIELD_STRENGTH_4 = fieldStrengthArray[3];
                         if(FIELD_STRENGTH_4 < 0) FIELD_STRENGTH_4 = null;
 
-                        MCC_5 = mccArray[4];
-                        if(MCC_5 < 0) MCC_5 = null;
-                        MNC_5 = mncArray[4];
-                        if(MNC_5 < 0) MNC_5 = null;
                         LAC_5 = lacArray[4];
                         if(LAC_5 < 0) LAC_5 = null;
                         CID_5 = cidArray[4];
@@ -200,10 +174,6 @@
                         FIELD_STRENGTH_5 = fieldStrengthArray[4];
                         if(FIELD_STRENGTH_5 < 0) FIELD_STRENGTH_5 = null;
 
-                        MCC_6 = mccArray[5];
-                        if(MCC_6 < 0) MCC_6 = null;
-                        MNC_6 = mncArray[5];
-                        if(MNC_6 < 0) MNC_6 = null;
                         LAC_6 = lacArray[5];
                         if(LAC_6 < 0) LAC_6 = null;
                         CID_6 = cidArray[5];
@@ -217,10 +187,6 @@
                         FIELD_STRENGTH_6 = fieldStrengthArray[5];
                         if(FIELD_STRENGTH_6 < 0) FIELD_STRENGTH_6 = null;
 
-                        MCC_7 = mccArray[6];
-                        if(MCC_7 < 0) MCC_7 = null;
-                        MNC_7 = mncArray[6];
-                        if(MNC_7 < 0) MNC_7 = null;
                         LAC_7 = lacArray[6];
                         if(LAC_7 < 0) LAC_7 = null;
                         CID_7 = cidArray[6];
@@ -313,7 +279,7 @@
 	    	</param>
         </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" index="true"/>
+            <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
@@ -334,56 +300,44 @@
             <field name="FIELD_STRENGTH_SUM_900MHZ" type="DOUBLE" unit="V/m" />
             <field name="RSSI_SUM_1800MHZ" type="DOUBLE" unit="dBm" />
             <field name="FIELD_STRENGTH_SUM_1800MHZ" type="DOUBLE" unit="V/m" />
-            <field name="MCC_1" type="INTEGER" />
-            <field name="MNC_1" type="INTEGER" />
+            <field name="MCC" type="INTEGER" />
+            <field name="MNC" type="INTEGER" />
             <field name="LAC_1" type="INTEGER" />
             <field name="CID_1" type="INTEGER" />
             <field name="ARFCN_1" type="INTEGER" />
             <field name="FREQUENCY_1" type="DOUBLE" unit="MHz" />
             <field name="RSSI_1" type="INTEGER" unit="dBm" />
             <field name="FIELD_STRENGTH_1" type="DOUBLE" unit="V/m" />
-            <field name="MCC_2" type="INTEGER" />
-            <field name="MNC_2" type="INTEGER" />
             <field name="LAC_2" type="INTEGER" />
             <field name="CID_2" type="INTEGER" />
             <field name="ARFCN_2" type="INTEGER" />
             <field name="FREQUENCY_2" type="DOUBLE" unit="MHz" />
             <field name="RSSI_2" type="INTEGER" unit="dBm" />
             <field name="FIELD_STRENGTH_2" type="DOUBLE" unit="V/m" />
-            <field name="MCC_3" type="INTEGER" />
-            <field name="MNC_3" type="INTEGER" />
             <field name="LAC_3" type="INTEGER" />
             <field name="CID_3" type="INTEGER" />
             <field name="ARFCN_3" type="INTEGER" />
             <field name="FREQUENCY_3" type="DOUBLE" unit="MHz" />
             <field name="RSSI_3" type="INTEGER" unit="dBm" />
             <field name="FIELD_STRENGTH_3" type="DOUBLE" unit="V/m" />
-            <field name="MCC_4" type="INTEGER" />
-            <field name="MNC_4" type="INTEGER" />
             <field name="LAC_4" type="INTEGER" />
             <field name="CID_4" type="INTEGER" />
             <field name="ARFCN_4" type="INTEGER" />
             <field name="FREQUENCY_4" type="DOUBLE" unit="MHz" />
             <field name="RSSI_4" type="INTEGER" unit="dBm" />
             <field name="FIELD_STRENGTH_4" type="DOUBLE" unit="V/m" />
-            <field name="MCC_5" type="INTEGER" />
-            <field name="MNC_5" type="INTEGER" />
             <field name="LAC_5" type="INTEGER" />
             <field name="CID_5" type="INTEGER" />
             <field name="ARFCN_5" type="INTEGER" />
             <field name="FREQUENCY_5" type="DOUBLE" unit="MHz" />
             <field name="RSSI_5" type="INTEGER" unit="dBm" />
             <field name="FIELD_STRENGTH_5" type="DOUBLE" unit="V/m" />
-            <field name="MCC_6" type="INTEGER" />
-            <field name="MNC_6" type="INTEGER" />
             <field name="LAC_6" type="INTEGER" />
             <field name="CID_6" type="INTEGER" />
             <field name="ARFCN_6" type="INTEGER" />
             <field name="FREQUENCY_6" type="DOUBLE" unit="MHz" />
             <field name="RSSI_6" type="INTEGER" unit="dBm" />
             <field name="FIELD_STRENGTH_6" type="DOUBLE" unit="V/m" />
-            <field name="MCC_7" type="INTEGER" />
-            <field name="MNC_7" type="INTEGER" />
             <field name="LAC_7" type="INTEGER" />
             <field name="CID_7" type="INTEGER" />
             <field name="ARFCN_7" type="INTEGER" />
