@@ -1,0 +1,67 @@
+<virtual-sensor name="AdM_Binary_Http" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="SIZE" type="INTEGER" unit="bytes" />
+            <field name="RELATIVE_FILE" type="VARCHAR(255)"/>
+            <field name="DATA" type="BINARY" data-path-field="RELATIVE_FILE"/>
+        </output-structure>
+    </processing-class>
+    <description>HTTP Binaries from AdM deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://www.chamonix.com/webcam/webcam-argentiere-glacier.jpg</predicate>
+                    <predicate key="rate">300000</predicate>
+                    <predicate key="subdirectory-name">webcam1</predicate>
+                    <predicate key="device-id">6000</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://www.chamonix.com/webcam/webcam-argentiere-mont-blanc.jpg</predicate>
+                    <predicate key="rate">300000</predicate>
+                    <predicate key="subdirectory-name">webcam2</predicate>
+                    <predicate key="device-id">6001</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data3">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://www.compagniedumontblanc.fr/webcam/tam_arrete.jpg</predicate>
+                    <predicate key="rate">300000</predicate>
+                    <predicate key="subdirectory-name">webcam3</predicate>
+                    <predicate key="device-id">6002</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data4">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://www.compagniedumontblanc.fr/webcam/tam2vuemontblanc.jpg</predicate>
+                    <predicate key="rate">300000</predicate>
+                    <predicate key="subdirectory-name">webcam4</predicate>
+                    <predicate key="device-id">6003</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

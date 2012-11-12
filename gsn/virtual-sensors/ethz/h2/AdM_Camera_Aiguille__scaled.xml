@@ -1,0 +1,28 @@
+<virtual-sensor name="AdM_Camera_Aiguille__scaled" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="jpeg_scaled">JPEG_SCALED</param>
+        </init-params>
+        <output-structure>
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="JPEG_SCALED" type="binary:image/jpeg" />
+        </output-structure>
+    </processing-class>
+    <description>Aiguille Camera from Aiguille du Midi deployment as thumbnail</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from AdM_Binary_Http__mapped</predicate>
+                </address>
+                <query> select * from wrapper where position = 12</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
