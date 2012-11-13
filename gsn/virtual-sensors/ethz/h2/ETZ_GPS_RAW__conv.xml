@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_GPS_RAW__conv" priority="10" >
+<virtual-sensor name="ETZ_GPS_RAW__conv" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.GPSRawDemuxBridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -30,7 +30,7 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>RAW GPS information from Dirruhorn deployment</description>
+    <description>RAW GPS information from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
