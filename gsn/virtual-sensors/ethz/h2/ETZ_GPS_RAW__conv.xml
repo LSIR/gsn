@@ -1,6 +1,6 @@
-<virtual-sensor name="ETZ_GPS_RAW__mapped" priority="10" >
+<virtual-sensor name="Dirruhorn_GPS_RAW__conv" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <class-name>gsn.vsensor.GPSRawDemuxBridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="gps_time_conversion" />
@@ -30,7 +30,7 @@
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>RAW GPS information from ETZ deployment</description>
+    <description>RAW GPS information from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -38,20 +38,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, GPS_UNIXTIME, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SAMPLE_COUNT, GPS_SATS, GPS_TIME, GPS_WEEK, CARRIER_PHASE, PSEUDO_RANE, DOPPLER, SPACE_VEHICLE, MEASUREMENT_QUALITY, SIGNAL_STRENGTH, LLI, DATA_IMPORT_SOURCE from ETZ_GPS_RAW__conv</predicate>
+                    <predicate key="query">select * from ETZ_GPS_RAW__binary</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-	<stream name="data1">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="local">
-                    <predicate key="query">select * from Dirruhorn_Dozer_GPSData__conv</predicate>
-                    <predicate key="start-time">continue</predicate>
-                </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, header_seqnr as "GPS_SAMPLE_COUNT", payload_timeofweekms as "GPS_TIME", payload_weeknumber as "GPS_WEEK", payload_vehiclenum as "SPACE_VEHICLE", payload_measindicator as "MEASUREMENT_QUALITY", payload_signalstrength as "SIGNAL_STRENGTH", payload_losslockindicator as "LLI" carrierphase as "CARRIER_PHASE", pseudorange as "PSEUDO_RANGE", doppler as "DOPPLER" from wrapper </query>
+                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SAMPLE_COUNT, GPS_SATS, GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
