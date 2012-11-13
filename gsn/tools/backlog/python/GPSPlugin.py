@@ -107,7 +107,13 @@ class GPSPluginClass(AbstractPluginClass):
 
         try:
             fp = open(str(self._cnt_file),"r+")
+	except Exception as e:
+	    raise Exception("Could not open sample count file")
+	try:
             cnt = int(fp.readline())
+	except Exception as e:
+	    cnt = 0
+	try:
             if (cnt >= (pow(2,32)-1) or cnt == ""):
                 self._logger.warning("Sample counter wrapped around! %s" % (cnt,))
                 cnt = 0
@@ -116,8 +122,7 @@ class GPSPluginClass(AbstractPluginClass):
             self._counterID = self._stats.createCounter(0,cnt)
             fp.close()
         except Exception as e:
-            self.stop()
-            raise Exception( "Could not open sample count file: %s %s" % (self._cnt_file, e))
+            raise Exception( "Exception in creating counter instance")
 
         self.debug("Done init GPS Plugin")
 
@@ -610,7 +615,7 @@ class WlanThread(Thread):
         except Exception, e:
             self._parent.exception(e)
 
-        if not self._backlogMain.shutdown:
+        if not self._parent._parent.shutdown:
             self._parent.getPowerControlObject().wlanOn()
         self._logger.info('died')
 
