@@ -48,7 +48,7 @@
 	<stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from Dirruhorn_Dozer_GPSData__conv</predicate>
+                    <predicate key="query">select * from ETZ_Dozer_GPSData__conv</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, header_seqnr as "GPS_SAMPLE_COUNT", payload_timeofweekms as "GPS_TIME", payload_weeknumber as "GPS_WEEK", payload_vehiclenum as "SPACE_VEHICLE", payload_measindicator as "MEASUREMENT_QUALITY", payload_signalstrength as "SIGNAL_STRENGTH", payload_losslockindicator as "LLI" carrierphase as "CARRIER_PHASE", pseudorange as "PSEUDO_RANGE", doppler as "DOPPLER" from wrapper </query>
