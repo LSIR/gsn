@@ -615,7 +615,7 @@ class WlanThread(Thread):
         except Exception, e:
             self._parent.exception(e)
 
-        if not self._parent._parent.shutdown:
+        if not self._parent._backlogMain.shutdown:
             self._parent.getPowerControlObject().wlanOn()
         self._logger.info('died')
 
