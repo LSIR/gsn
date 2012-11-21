@@ -990,6 +990,10 @@ class ScheduleCron(CronTab):
                 td = timedelta(minutes=backwardmin)
                 nextdt = self._getNextSchedule(date_time - td, schedule)
                 if nextdt < now:
+                    d = now-nextdt
+                    runtimemax = runtimemax - (d.seconds / 60 + d.days * 1440)
+                    if runtimemax < runtimemin:
+                        runtimemax = runtimemin+1
                     backward_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
                 
             nextdt = self._getNextSchedule(date_time, schedule)
