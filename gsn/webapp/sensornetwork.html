@@ -152,7 +152,20 @@ $(document).ready(function() {
           select:"sensornode[position=8][iscorestation='true']"
         }]
       },
-
+      { title:"Weather Station Voltage",
+        signals: [{
+          vsensor:"dirruhorn_vaisalawxt520sup",
+          field:["heating_voltage","supply_voltage","heating_temperature"],
+          select:"sensornode[position=13],sensornode[position=42]"
+        }]
+      },
+      { title:"Weather Station Voltage",
+        signals: [{
+          vsensor:"matterhorn_vaisalawxt520sup",
+          field:["heating_voltage","supply_voltage","heating_temperature"],
+          select:"sensornode[position=25]"
+        }]
+      },
       { title:"Dozer Temperature",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
