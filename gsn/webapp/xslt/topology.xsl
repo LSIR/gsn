@@ -121,12 +121,13 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 
   <xsl:for-each select="network/sensornodes/sensornode[@longitude][@latitude][@altitude]">
     <Placemark>
-       <name><xsl:value-of select="@node_id"/></name>
+       <name><xsl:value-of select="@position"/></name>
        <description>
        <b>Permasense SensorNode</b><br/>
        <table id="datatable" style="margin-left:0px;padding:0px">
        <tr><td><b>Position</b></td><td><xsl:value-of select="@position"/></td></tr>
-       <tr><td><b>Node Type</b></td><td>
+       <tr><td><b>Device Id</b></td><td><xsl:value-of select="@node_id"/></td></tr>
+       <tr><td><b>Device Type</b></td><td>
        <xsl:choose>
         <xsl:when test="@nodetype = 0">SensorNode (SIB)</xsl:when>
         <xsl:otherwise>

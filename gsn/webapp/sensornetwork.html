@@ -145,21 +145,28 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-      { title:"Randa PV Voltage",
+      { title:"Dirruhorn Duty Cycled PV Voltages",
+        signals: [{
+          vsensor:"dirruhorn_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=5],sensornode[position=7],sensornode[position=12],sensornode[position=41],sensornode[position=66],sensornode[position=67]"
+        }]
+      },
+      { title:"Randa PV Voltages",
         signals: [{
           vsensor:"dirruhorn_corestationstatus_hardware__conv",
           field:["v_ext1","v_ext2"],
           select:"sensornode[position=8][iscorestation='true']"
         }]
       },
-      { title:"Weather Station Voltage",
+      { title:"Weather Station Voltages",
         signals: [{
           vsensor:"dirruhorn_vaisalawxt520sup",
           field:["heating_voltage","supply_voltage","heating_temperature"],
           select:"sensornode[position=13],sensornode[position=42]"
         }]
       },
-      { title:"Weather Station Voltage",
+      { title:"Weather Station Voltages",
         signals: [{
           vsensor:"matterhorn_vaisalawxt520sup",
           field:["heating_voltage","supply_voltage","heating_temperature"],
