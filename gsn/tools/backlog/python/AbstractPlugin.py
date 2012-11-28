@@ -307,9 +307,9 @@ class AbstractPluginClass(Thread, Statistics):
         return self._backlogMain.getUptime()
     
     
-    def resendFinished(self):
+    def resendStopped(self):
         '''
-        This function is called by BacklogDB if resend is finished.
+        This function is called by BacklogDB if resend is stopped.
         '''
         pass
     

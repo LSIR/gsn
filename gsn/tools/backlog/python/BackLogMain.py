@@ -625,15 +625,17 @@ class BackLogMainClass(Thread, Statistics):
             raise Exception('%s has not been started yet -> can not send inter plugin command' % (pluginName,))
         
         
-    def sendResendFinished(self):
+    def sendResendStopped(self):
         if self._backlogStopped:
             return
         
         try:
-            [plugin.resendFinished() for plugin in self.plugins.values()]
+            [plugin.resendStopped() for plugin in self.plugins.values()]
         except Exception, e:
             self.incrementExceptionCounter()
             self._logger.exception(e)
+            
+        self.schedulehandler.backlogResendFinished()
             
     def sendResendStarted(self):
         if self._backlogStopped:

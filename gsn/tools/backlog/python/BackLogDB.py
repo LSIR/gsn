@@ -282,17 +282,16 @@ class BackLogDBClass(Thread, Statistics):
             timestamp = 0
             
             resendCounter = self._resendAmount
+            self._backlogMain.sendResendStarted()
             if resendCounter > 0:
                 self._logger.info('trying to resend %d messages from backlog database' % (resendCounter,))
-                self._backlogMain.sendResendStarted()
                 
                 while not self._stopped:
                     if resendCounter <= 0:
                         self._logger.info('resend finished')
                         if resendCounter < 0:
                             self.exception('resend counter dropped below zero')
-                        self._backlogMain.schedulehandler.backlogResendFinished()
-                        self._backlogMain.sendResendFinished()
+                        self._backlogMain.sendResendStopped()
                         break
                     
                     try:
@@ -311,8 +310,7 @@ class BackLogDBClass(Thread, Statistics):
                     
                     if not rows:
                         self._logger.warning('empty select request received -> resend finished')
-                        self._backlogMain.schedulehandler.backlogResendFinished()
-                        self._backlogMain.sendResendFinished()
+                        self._backlogMain.sendResendStopped()
                         break
                     resendCounter -= len(rows)
     
@@ -335,7 +333,7 @@ class BackLogDBClass(Thread, Statistics):
                                 self._logger.debug('rsnd (%d,%d,%d)' % (msgType, timestamp, len(message)))
                         else:
                             self._logger.info('resend interrupted')
-                            self._backlogMain.schedulehandler.backlogResendFinished()
+                            self._backlogMain.sendResendStopped()
                             interrupt = True
                             break
                         
@@ -348,7 +346,7 @@ class BackLogDBClass(Thread, Statistics):
                     if not self._backlogMain.gsnpeer.isConnected() or self._stopped:
                         break
             else:
-                self._backlogMain.schedulehandler.backlogResendFinished()
+                self._backlogMain.sendResendStopped()
 
             self._isBusy = False
             self._resend.clear()
