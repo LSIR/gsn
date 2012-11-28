@@ -595,7 +595,11 @@ class BackLogMainClass(Thread, Statistics):
         
         
     def newScheduleSet(self, origin, schedule):
-        [plugin.scheduleEvent(origin, schedule) for plugin in self.plugins.values()]
+        try:
+            [plugin.scheduleEvent(origin, schedule) for plugin in self.plugins.values()]
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
     
     
     def wlanNeeded(self):
@@ -619,6 +623,27 @@ class BackLogMainClass(Thread, Statistics):
             thread.start_new_thread(plugin.recvInterPluginCommand, (command,))
         else:
             raise Exception('%s has not been started yet -> can not send inter plugin command' % (pluginName,))
+        
+        
+    def sendResendFinished(self):
+        if self._backlogStopped:
+            return
+        
+        try:
+            [plugin.resendFinished() for plugin in self.plugins.values()]
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
+            
+    def sendResendStarted(self):
+        if self._backlogStopped:
+            return
+        
+        try:
+            [plugin.resendStarted() for plugin in self.plugins.values()]
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
         
         
     def checkFolderUsage(self):

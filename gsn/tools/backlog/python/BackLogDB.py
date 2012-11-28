@@ -284,6 +284,7 @@ class BackLogDBClass(Thread, Statistics):
             resendCounter = self._resendAmount
             if resendCounter > 0:
                 self._logger.info('trying to resend %d messages from backlog database' % (resendCounter,))
+                self._backlogMain.sendResendStarted()
                 
                 while not self._stopped:
                     if resendCounter <= 0:
@@ -291,6 +292,7 @@ class BackLogDBClass(Thread, Statistics):
                         if resendCounter < 0:
                             self.exception('resend counter dropped below zero')
                         self._backlogMain.schedulehandler.backlogResendFinished()
+                        self._backlogMain.sendResendFinished()
                         break
                     
                     try:
@@ -310,6 +312,7 @@ class BackLogDBClass(Thread, Statistics):
                     if not rows:
                         self._logger.warning('empty select request received -> resend finished')
                         self._backlogMain.schedulehandler.backlogResendFinished()
+                        self._backlogMain.sendResendFinished()
                         break
                     resendCounter -= len(rows)
     
