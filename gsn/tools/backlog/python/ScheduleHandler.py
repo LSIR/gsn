@@ -94,7 +94,7 @@ class ScheduleHandlerClass(Thread, Statistics):
     _scheduleLock
     _waitForNextJob
     _allJobsFinished
-    _resendFinished
+    _resendStopped
     _waitForGSNFinished
     _schedule
     _newSchedule
@@ -164,7 +164,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._waitForNextJob = Event()
         self._allJobsFinished = Event()
         self._allJobsFinished.set()
-        self._resendFinished = Event()
+        self._resendStopped = Event()
         self._waitForGSNFinished = Event()
         self._tosMessageLock = Lock()
         self._tosMessageAckReceived = Event()
@@ -446,7 +446,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._connectionEvent.set()
         self._newScheduleEvent.set()
         self._allJobsFinished.set()
-        self._resendFinished.set()
+        self._resendStopped.set()
         self._waitForNextJob.set()
         
         if self._duty_cycle_mode:
@@ -470,8 +470,8 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._allJobsFinished.clear()
         
         
-    def backlogResendFinished(self):
-        self._resendFinished.set()
+    def backlogResendStopped(self):
+        self._resendStopped.set()
     
     
     def getMsgType(self):
@@ -725,7 +725,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._logger.warning('gsn has not answered on any schedule request')
         else:
             self._logger.warning('gsn has not connected')
-            self._resendFinished.set()
+            self._resendStopped.set()
             
         self._waitForGSNFinished.set()
         
@@ -813,12 +813,12 @@ class ShutdownThread(Thread):
                 
         # wait for backlog to finish resend data
         max_wait = int(self._scheduleHandler._getOptionValue('max_db_resend_runtime', self._scheduleHandler._config))*60.0
-        if not self._scheduleHandler._resendFinished.isSet() and max_wait > self._scheduleHandler._backlogMain.getUptime():
+        if not self._scheduleHandler._resendStopped.isSet() and max_wait > self._scheduleHandler._backlogMain.getUptime():
             self._logger.info('waiting for database resend process to finish for a maximum of %f seconds' % (max_wait-self._scheduleHandler._backlogMain.getUptime(),))
-            self._scheduleHandler._resendFinished.wait(max_wait-self._scheduleHandler._backlogMain.getUptime())
+            self._scheduleHandler._resendStopped.wait(max_wait-self._scheduleHandler._backlogMain.getUptime())
             if self._shutdownThreadStop:
                 return
-            if not self._scheduleHandler._resendFinished.isSet():
+            if not self._scheduleHandler._resendStopped.isSet():
                 self._logger.warning('backlog database is not finish with resending')
             else:
                 self._logger.warning('backlog database finished resending')

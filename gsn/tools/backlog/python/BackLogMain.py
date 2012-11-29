@@ -635,7 +635,7 @@ class BackLogMainClass(Thread, Statistics):
             self.incrementExceptionCounter()
             self._logger.exception(e)
             
-        self.schedulehandler.backlogResendFinished()
+        self.schedulehandler.backlogResendStopped()
             
     def sendResendStarted(self):
         if self._backlogStopped:
