@@ -9,10 +9,10 @@
                 	try {
                 		POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = MIN_GENERATION_TIME = MAX_GENERATION_TIME = null;
                 		MIN_GSN_TIMESTAMP = MAX_GSN_TIMESTAMP = X_ECEF = Y_ECEF = Z_ECEF = SD_X = SD_Y = SD_Z = SD_XY = SD_YZ = null;
-                		SD_ZX = E = N = H = SD_E = SD_N = SD_H = V_E = V_N = V_H = SD_V_E = SD_V_N = SD_V_H = V_3D = SD_V_3D = null;
+                		SD_ZX = E = N = H = SD_E = SD_N = SD_H = SD_EN = SD_EH = SD_NH = V_E = V_N = V_H = SD_V_E = SD_V_N = SD_V_H = V_3D = SD_V_3D = null;
                 		V_HORIZ = SD_V_HORIZ = VERSION = PROCESSING_TIME = COMMENTS = null;
                 		
-                    	def spl = new String(RAW_PACKET, "UTF-8").split(",", 37);
+                    	def spl = new String(RAW_PACKET, "UTF-8").split(",", 40);
 
                     	if (spl[1].isNumber())
                     		POSITION = spl[1].toInteger();
@@ -95,51 +95,63 @@
                     	else
                     		SD_H = null;
                     	if (spl[24].isNumber())
-                    		V_E =  spl[24].toDouble();
+                    		SD_EN =  spl[24].toDouble();
+                    	else
+                    		SD_EN = null;
+                    	if (spl[25].isNumber())
+                    		SD_EH =  spl[25].toDouble();
+                    	else
+                    		SD_EH = null;
+                    	if (spl[26].isNumber())
+                    		SD_NH =  spl[26].toDouble();
+                    	else
+                    		SD_NH = null;
+                    	if (spl[27].isNumber())
+                    		V_E =  spl[27].toDouble();
                     	else
                     		V_E = null;
-                    	if (spl[25].isNumber())
-                    		V_N =  spl[25].toDouble();
+                    	if (spl[28].isNumber())
+                    		V_N =  spl[28].toDouble();
                     	else
                     		V_N = null;	
-                    	if (spl[26].isNumber())
-                    		V_H =  spl[26].toDouble();
+                    	if (spl[29].isNumber())
+                    		V_H =  spl[29].toDouble();
                     	else
                     		V_H = null;
-                    	if (spl[27].isNumber())
-                    		SD_V_E =  spl[27].toDouble();
+                    	if (spl[30].isNumber())
+                    		SD_V_E =  spl[30].toDouble();
                     	else
                     		SD_V_E = null;
-                    	if (spl[28].isNumber())
-                    		SD_V_N =  spl[28].toDouble();
+                    	if (spl[31].isNumber())
+                    		SD_V_N =  spl[31].toDouble();
                     	else
                     		SD_V_N = null;
-                    	if (spl[29].isNumber())
-                    		SD_V_H =  spl[29].toDouble();
+                    	if (spl[32].isNumber())
+                    		SD_V_H =  spl[32].toDouble();
                     	else
                     		SD_V_H = null;
-                    	if (spl[30].isNumber())
-                    		V_3D =  spl[30].toDouble();
+                    	if (spl[33].isNumber())
+                    		V_3D =  spl[33].toDouble();
                     	else
                     		V_3D = null;
-                    	if (spl[31].isNumber())
-                    		SD_V_3D =  spl[31].toDouble();
+                    	if (spl[34].isNumber())
+                    		SD_V_3D =  spl[34].toDouble();
                     	else
                     		SD_V_3D = null;
-                    	if (spl[32].isNumber())
-                    		V_HORIZ =  spl[32].toDouble();
+                    	if (spl[35].isNumber())
+                    		V_HORIZ =  spl[35].toDouble();
                     	else
                     		V_HORIZ = null;
-                    	if (spl[33].isNumber())
-                    		SD_V_HORIZ =  spl[33].toDouble();
+                    	if (spl[36].isNumber())
+                    		SD_V_HORIZ =  spl[36].toDouble();
                     	else
                     		SD_V_HORIZ = null;
-                    	if (spl[34].isNumber())
-                    		VERSION = spl[34].toShort();
-                    	if (spl[35].isNumber())
-                    		PROCESSING_TIME = spl[35].toLong();
-			            if (spl[36].length()>0)
-				            COMMENTS = spl[36];
+                    	if (spl[37].isNumber())
+                    		VERSION = spl[37].toShort();
+                    	if (spl[38].isNumber())
+                    		PROCESSING_TIME = spl[38].toLong();
+			            if (spl[39].length()>0)
+				            COMMENTS = spl[39];
                     	else
                     		COMMENTS = null;
 					} catch(Throwable e) {
@@ -161,9 +173,9 @@
 			<field name="SD_X" type="DOUBLE" unit="m" />
 			<field name="SD_Y" type="DOUBLE" unit="m" />
 			<field name="SD_Z" type="DOUBLE" unit="m" />
-			<field name="SD_XY" type="DOUBLE" unit="m" />
-			<field name="SD_YZ" type="DOUBLE" unit="m" />
-			<field name="SD_ZX" type="DOUBLE" unit="m" />
+			<field name="SD_XY" type="DOUBLE" unit="m^2" />
+			<field name="SD_YZ" type="DOUBLE" unit="m^2" />
+			<field name="SD_ZX" type="DOUBLE" unit="m^2" />
 			
 			<field name="E" type="DOUBLE" unit="m" />
 			<field name="N" type="DOUBLE" unit="m" />
@@ -171,6 +183,9 @@
 			<field name="SD_E" type="DOUBLE" unit="m" />
 			<field name="SD_N" type="DOUBLE" unit="m" />
 			<field name="SD_H" type="DOUBLE" unit="m" />
+            <field name="SD_EN" type="DOUBLE" unit="m^2" />
+	        <field name="SD_EH" type="DOUBLE" unit="m^2" />
+            <field name="SD_NH" type="DOUBLE" unit="m^2" />
 			
 			<field name="V_E" type="DOUBLE" unit="cm/d" />
 			<field name="V_N" type="DOUBLE" unit="cm/d" />

@@ -8,9 +8,9 @@
                 <![CDATA[
                         try {
                         POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = GPS_WEEK = GPS_TIME = X_ECEF = Y_ECEF = Z_ECEF = SD_X = null;
-                        SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = SD_H = Q = NS = AGE = RATIO = VERSION = null;
+                        SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = SD_H = SD_EN = SD_EH = SD_NH = Q = NS = AGE = RATIO = VERSION = null;
                         
-                        def spl = new String(RAW_PACKET, "UTF-8").split(",", 27);
+                        def spl = new String(RAW_PACKET, "UTF-8").split(",", 30);
                         
                         if (spl[1].isNumber())
                                 POSITION = spl[1].toInteger();
@@ -57,20 +57,26 @@
                     		SD_E =  spl[19].toDouble();
 			            if (spl[20].isNumber())
                     		SD_N =  spl[20].toDouble();
-
                     	if (spl[21].isNumber())
                     		SD_H =  spl[21].toDouble();
-
+                    		
                     	if (spl[22].isNumber())
-                    		Q = spl[22].toInteger();
+                    		SD_EN =  spl[22].toDouble();
                     	if (spl[23].isNumber())
-                    		NS = spl[23].toInteger();
+                    		SD_EH =  spl[23].toDouble();
                     	if (spl[24].isNumber())
-                    		AGE = spl[24].toDouble();
+                    		SD_NH =  spl[24].toDouble();
+
                     	if (spl[25].isNumber())
-                    		RATIO = spl[25].toDouble();
+                    		Q = spl[25].toInteger();
                     	if (spl[26].isNumber())
-                    		VERSION = spl[26].toShort();
+                    		NS = spl[26].toInteger();
+                    	if (spl[27].isNumber())
+                    		AGE = spl[27].toDouble();
+                    	if (spl[28].isNumber())
+                    		RATIO = spl[28].toDouble();
+                    	if (spl[29].isNumber())
+                    		VERSION = spl[29].toShort();
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -90,9 +96,9 @@
             <field name="SD_X" type="DOUBLE" unit="m" />
             <field name="SD_Y" type="DOUBLE" unit="m" />
             <field name="SD_Z" type="DOUBLE" unit="m" />
-            <field name="SD_XY" type="DOUBLE" unit="m" />
-            <field name="SD_YZ" type="DOUBLE" unit="m" />
-            <field name="SD_ZX" type="DOUBLE" unit="m" />
+            <field name="SD_XY" type="DOUBLE" unit="m^2" />
+            <field name="SD_YZ" type="DOUBLE" unit="m^2" />
+            <field name="SD_ZX" type="DOUBLE" unit="m^2" />
 
             <field name="E" type="DOUBLE" unit="m" />
             <field name="N" type="DOUBLE" unit="m" />
@@ -100,6 +106,9 @@
             <field name="SD_E" type="DOUBLE" unit="m" />
 	        <field name="SD_N" type="DOUBLE" unit="m" />
             <field name="SD_H" type="DOUBLE" unit="m" />
+            <field name="SD_EN" type="DOUBLE" unit="m^2" />
+	        <field name="SD_EH" type="DOUBLE" unit="m^2" />
+            <field name="SD_NH" type="DOUBLE" unit="m^2" />
 
             <field name="Q" type="INTEGER" />
             <field name="NS" type="INTEGER" />
