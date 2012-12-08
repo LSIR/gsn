@@ -315,6 +315,12 @@
         </junitreport>
     </target>
 
+    <target name="test-lsm" depends="build" description="Tests connection to LSM">
+        <java classname="gsn.utils.TestLSM" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+            <classpath refid="classpath"/>
+        </java>
+    </target>
+
     <target name="test-sensorscope" depends="build" description="Tests sensorscope server">
         <java classname="gsn.wrappers.tinyos.SenscorscopeTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
