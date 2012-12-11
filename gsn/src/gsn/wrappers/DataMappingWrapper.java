@@ -1163,7 +1163,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 		
 		public synchronized void setConversionQuery() throws SQLException {
 			conversion_select = h2DBconn.prepareStatement("SELECT st.physical_signal AS physical_signal, st.conversion AS conversion, st.input as input, CASEWHEN(st.input IS NULL OR sm.sensortype_args IS NULL,NULL,sta.value) as value " +
-					"FROM " + deployment + "_sensor AS sm, sensortype AS st, sensortype_args AS sta WHERE sm.position = ? AND ? BETWEEN sm.begin AND sm.end AND sm.sensortype = st.sensortype " +
+					"FROM " + deployment + "_sensor AS sm, sensortype AS st, sensortype_args AS sta WHERE sm.position = ? AND ((sm.end is null AND sm.begin <= ?) OR (? BETWEEN sm.begin AND sm.end)) AND sm.sensortype = st.sensortype " +
 					"AND st.signal_name = ? AND CASEWHEN(st.input IS NULL OR sm.sensortype_args IS NULL,TRUE,sm.sensortype_args = sta.sensortype_args AND sta.physical_signal = st.physical_signal) LIMIT 1");
 		}
 		
@@ -1177,7 +1177,8 @@ public class DataMappingWrapper extends AbstractWrapper {
 				synchronized (conversion_select) {
 					conversion_select.setInt(1, pos);
 					conversion_select.setLong(2, generationTime);
-					conversion_select.setString(3, conv);
+					conversion_select.setLong(3, generationTime);
+					conversion_select.setString(4, conv);
 					ResultSet rs = conversion_select.executeQuery();
 					if (rs.next()) {
 						values = new String[]{rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4)};
