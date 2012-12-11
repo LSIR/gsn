@@ -948,8 +948,8 @@ public class DataMappingWrapper extends AbstractWrapper {
 		
 		
 		public synchronized void setSensorQueries() throws SQLException {
-			sensor_select = h2DBconn.prepareStatement("SELECT sensortype, sensortype_args FROM " + deployment + "_sensor WHERE position = ? AND ? BETWEEN begin AND end AND sensortype != 'serialid'");
-			serialid_select = h2DBconn.prepareStatement("SELECT sensortype_args AS sensortype_serialid FROM " + deployment + "_sensor WHERE position = ? AND ? BETWEEN begin AND end AND sensortype = 'serialid' LIMIT 1");
+			sensor_select = h2DBconn.prepareStatement("SELECT sensortype, sensortype_args FROM " + deployment + "_sensor WHERE position = ? AND ((end is null AND begin <= ?) OR (? BETWEEN begin AND end)) AND sensortype != 'serialid'");
+			serialid_select = h2DBconn.prepareStatement("SELECT sensortype_args AS sensortype_serialid FROM " + deployment + "_sensor WHERE position = ? AND ((end is null AND begin <= ?) OR (? BETWEEN begin AND end)) AND sensortype = 'serialid' LIMIT 1");
 			sensor_insert = h2DBconn.prepareStatement("INSERT INTO " + deployment + "_sensor (position, begin, end, sensortype, sensortype_args, comment) VALUES (?,?,?,?,?,?)");
 		}
 		
@@ -1127,7 +1127,8 @@ public class DataMappingWrapper extends AbstractWrapper {
 			if (sensor_select != null) {
 				synchronized (sensor_select) {
 					sensor_select.setInt(1, pos);
-					sensor_select.setLong(2, generationTime);			
+					sensor_select.setLong(2, generationTime);
+					sensor_select.setLong(3, generationTime);
 					ResultSet rs = sensor_select.executeQuery();
 					if (rs.first()) {
 						do {
@@ -1147,6 +1148,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 				synchronized (serialid_select) {
 					serialid_select.setInt(1, pos);
 					serialid_select.setLong(2, generationTime);
+					serialid_select.setLong(3, generationTime);
 					ResultSet rs = serialid_select.executeQuery();
 					if (rs.next()) {
 						serialid = rs.getLong(1);
