@@ -13,7 +13,7 @@ Map projection
     Oblique, conformal cylindrical projection (Mercator projection)
     Bessel ellipsoid 1841
     The projection center is the fundamental point at the old observatory in Bern
-    (Longitude 7 ° 26 '22:50 "/ latitude 46 ° 57' 08.66" -> coordinates 600'000 .000 East / North 200'000 .000)
+    (Longitude 7  26 '22:50 "/ latitude 46  57' 08.66" -> coordinates 600'000 .000 East / North 200'000 .000)
     Approximation (accuracy on the 1-meter level)
  */
 
@@ -148,7 +148,7 @@ public class ApproxSwissProj {
 		return d;
 	}
 
-	// Convert WGS lat/long (° dec) and height to CH h
+	// Convert WGS lat/long (ï¿½ dec) and height to CH h
 	private static double WGStoCHh(double lat, double lng, double h) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);
@@ -168,7 +168,7 @@ public class ApproxSwissProj {
 		return h;
 	}
 
-	// Convert WGS lat/long (° dec) to CH x
+	// Convert WGS lat/long (ï¿½ dec) to CH x
 	private static double WGStoCHx(double lat, double lng) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);
@@ -191,7 +191,7 @@ public class ApproxSwissProj {
 		return x;
 	}
 
-	// Convert WGS lat/long (° dec) to CH y
+	// Convert WGS lat/long (ï¿½ dec) to CH y
 	private static double WGStoCHy(double lat, double lng) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);
