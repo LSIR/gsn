@@ -124,7 +124,6 @@ public class SQLUtils {
 		if (indexOfWhere<0)
 			return " true ";
 		String toReturn = pQuery.substring(indexOfWhere+" where".length(),pQuery.length());
-		System.out.println(toReturn);
 		return toReturn;
 	}
 

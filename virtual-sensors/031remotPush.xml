@@ -1,0 +1,35 @@
+<virtual-sensor name="AndroidPush2" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<output-structure>
+			<field name="ozone1" type="int" />
+			<field name="ozone2" type="int" />
+			<field name="resistance1" type="int" />
+			<field name="resistance2" type="int" />
+			<field name="humidity" type="int" />
+			<field name="temperature" type="double" />
+			<field name="ozoneCalibrated" type="double" />
+                        <field name="latitude" type="double" />
+                        <field name="longitude" type="double" />
+                        <field name="speed" type="double" />
+		</output-structure>
+
+	</processing-class>
+	<description>Get data from android</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Not yet specified</predicate>
+	</addressing>
+	<storage history-size="2000000" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1" storage-size="1">
+				<address wrapper="remote-direct">
+					<predicate key="notification-id">10</predicate>
+				</address>
+				<query>select ozone1,ozone2,resistance1,resistance2,humidity,temperature,ozoneCalibrated,latitude,longitude,speed,timed from wrapper</query>
+			</source>
+			<query>select ozone1,ozone2,resistance1,resistance2,humidity,temperature,ozoneCalibrated,latitude,longitude,speed,timed from source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>

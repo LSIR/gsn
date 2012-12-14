@@ -6,6 +6,7 @@ import gsn.beans.VSensorConfig;
 import gsn.http.ac.ConnectToDB;
 import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
+import gsn.http.rest.WPPushDelivery;
 import gsn.http.rest.RestDelivery;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
@@ -146,11 +147,15 @@ public final class Main {
 		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));
+		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(WPPushDelivery.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
+		vsloader.addVSensorStateChangeListener(ModelDistributer.getInstance(WPPushDelivery.class));
 
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
+		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(WPPushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
+		ContainerImpl.getInstance().addVSensorDataListener(ModelDistributer.getInstance(WPPushDelivery.class));
 		vsloader.startLoading();
 
 
@@ -288,9 +293,9 @@ public final class Main {
 			logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath");
 			logger.error ( e.getMessage ( ),e );
 			System.exit ( 1 );
-		}finally {
-			return toReturn;
 		}
+		return toReturn;
+
 	}
 
 	/**

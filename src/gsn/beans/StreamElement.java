@@ -228,7 +228,7 @@ public final class StreamElement implements Serializable {
 		//  System.out.println(" HAS VALUE : "+this.fieldValues[ this.indexedFieldNames.get( fieldName ) ]);
 		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {
-			logger.info("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
+			logger.warn("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
 			return null;
 		}
 		return this.fieldValues[ index ];

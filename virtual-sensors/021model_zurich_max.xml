@@ -1,0 +1,56 @@
+<virtual-sensor name="model_zurich_max" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.ModellingVirtualSensor</class-name>
+                <init-params>
+                    <param name="model">gsn.utils.models.AggregateModel</param> <!-- class name of the model to load -->
+                    <param name="mmminputsVs">model_zurich_o3,model_zurich_co,model_zurich_pm</param>
+                </init-params>
+		<output-structure>
+                        <field name="temperature" type="double"/>
+                        <field name="humidity" type="integer"/>
+                        <field name="o3_rel" type="integer"/>
+			<field name="o3_abs" type="integer"/>
+			<field name="co_rel" type="integer"/>
+			<field name="co_abs" type="integer"/>
+			<field name="pm_rel" type="integer"/>
+			<field name="pm_abs" type="integer"/>
+			<field name="latitude" type="double"/>
+			<field name="longitude" type="double"/>
+		</output-structure>
+	</processing-class>
+	<description>Virtual sensor returns data for query of latitude+longitude.</description>
+
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">OSM_VSZ_O3</predicate>
+		<predicate key="usage">OpenSense Nearest Neighbor Interpolation</predicate>
+	</addressing>
+	
+	<storage history-size="1m" />
+	<streams>
+		<stream name="sensor1">	
+			<source alias="zurich_o3_vs" storage-size="1"  sampling-rate="1">
+				<address wrapper="local">
+                          <predicate key="NAME">opensense_zurich_o3</predicate>
+				</address>
+				<query>select  timed, temperature, humidity, o3_rel, o3_abs, latitude, longitude from WRAPPER</query>
+			</source>
+                          <source alias="zurich_co_vs" storage-size="1"  sampling-rate="1">
+                                <address wrapper="local">
+                          <predicate key="NAME">opensense_zurich_co</predicate>
+                                </address>
+                                <query>select  timed, temperature, co_rel, co_abs, latitude, longitude from WRAPPER</query>
+                        </source>
+                        <source alias="zurich_pm_vs" storage-size="1"  sampling-rate="1">
+                                <address wrapper="local">
+                          <predicate key="NAME">opensense_zurich_pm</predicate>
+                                </address>
+                                <query>select  timed, temperature, pm_rel, pm_abs, latitude, longitude from WRAPPER</query>
+                        </source>
+
+			<query>
+				select  zurich_o3_vs.timed, zurich_o3_vs.temperature, zurich_o3_vs.humidity, o3_rel,o3_abs,co_rel,co_abs,pm_rel,pm_abs, zurich_o3_vs.latitude, zurich_o3_vs.longitude from zurich_o3_vs ,zurich_co_vs,zurich_pm_vs
+			</query>
+		</stream>
+	</streams>
+</virtual-sensor> 

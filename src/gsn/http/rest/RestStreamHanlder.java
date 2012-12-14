@@ -3,6 +3,8 @@ package gsn.http.rest;
 import gsn.DataDistributer;
 import gsn.Main;
 import gsn.Mappings;
+import gsn.ModelDistributer;
+import gsn.VirtualSensor;
 import gsn.beans.VSensorConfig;
 import gsn.http.WebConstants;
 import gsn.http.ac.DataSource;
@@ -11,6 +13,9 @@ import gsn.http.ac.User;
 import gsn.storage.SQLUtils;
 import gsn.storage.SQLValidator;
 import gsn.utils.Helpers;
+import gsn.utils.models.AbstractModel;
+import gsn.vsensor.AbstractVirtualSensor;
+import gsn.vsensor.ModellingVirtualSensor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -113,52 +118,83 @@ public class RestStreamHanlder extends HttpServlet {
 	public void doPost ( HttpServletRequest request , HttpServletResponse response ) throws ServletException  {
         try {
 			URLParser parser = new URLParser(request);
-            String vsName = parser.getVSensorConfig().getName();
-
-            //
-            if (Main.getContainerConfig().isAcEnabled()) {
-                String[] cred = parseAuthorizationHeader(request);
-                if (cred == null) {
-                    try {
-                        response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
-                        response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
-                    }
-                    catch (IOException e) {
-                        logger.debug(e.getMessage(), e);
-                    }
-                    return;
-                }
-                if (DataSource.isVSManaged(vsName)){
-                    User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
-                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
-                        response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
-                        response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
-                        return;
-                    }
-                }
-            }
-            //
-            Double notificationId = Double.parseDouble(request.getParameter(PushDelivery.NOTIFICATION_ID_KEY));
-			String localContactPoint = request.getParameter(PushDelivery.LOCAL_CONTACT_POINT);
-			if (localContactPoint == null) {
-				logger.warn("Push streaming request received without "+PushDelivery.LOCAL_CONTACT_POINT+" parameter !");
-				return;
+			if (parser.pushType.equals("direct")){
+				double notificationId = Double.parseDouble(request.getParameter(PushDelivery.NOTIFICATION_ID_KEY));
+				IPushWrapper notification = NotificationRegistry.getInstance().getNotification(notificationId);
+				try {
+					if (notification!=null) {
+						boolean status = notification.registerAndSetStructure(request.getParameter(PushDelivery.DATA));
+		                if (status)
+		                    response.setStatus(SUCCESS_200);
+		                else
+		                    response.setStatus(_300);
+					}else {
+						logger.warn("Received a Http registration for an INVALID notificationId: " + notificationId);
+						response.sendError(_300);
+					}
+				} catch (IOException e) {
+					logger.warn("Failed in writing the status code into the connection.\n"+e.getMessage(),e);
+				}
+			
+			}else{
+	            String vsName = parser.getVSensorConfig().getName();
+	
+	            //
+	            if (Main.getContainerConfig().isAcEnabled()) {
+	                String[] cred = parseAuthorizationHeader(request);
+	                if (cred == null) {
+	                    try {
+	                        response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
+	                        response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
+	                    }
+	                    catch (IOException e) {
+	                        logger.debug(e.getMessage(), e);
+	                    }
+	                    return;
+	                }
+	                if (DataSource.isVSManaged(vsName)){
+	                    User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
+	                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+	                        response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
+	                        response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
+	                        return;
+	                    }
+	                }
+	            }
+	            //
+	            Double notificationId = Double.parseDouble(request.getParameter(PushDelivery.NOTIFICATION_ID_KEY));
+				String localContactPoint = request.getParameter(PushDelivery.LOCAL_CONTACT_POINT);
+				if (localContactPoint == null) {
+					logger.warn("Push streaming request received without "+PushDelivery.LOCAL_CONTACT_POINT+" parameter !");
+					return;
+				}
+				//checking to see if there is an already registered notification id, in that case, we ignore (re)registeration.
+				
+				DeliverySystem delivery;
+				if (parser.pushType.equals("wp"))
+					delivery = new WPPushDelivery(localContactPoint,notificationId,response.getWriter(),parser.nClass,parser.nMessage);
+				else
+					delivery = new PushDelivery(localContactPoint,notificationId,response.getWriter());
+	
+				boolean isExist = DataDistributer.getInstance(delivery.getClass()).contains(delivery);
+				if (isExist) {
+					logger.debug("Keep alive request received for the notification-id:"+notificationId);
+					response.setStatus(SUCCESS_200);
+					delivery.close();
+					return;
+				}
+				if (parser.getModelClass()==null){ //query on the database
+					DefaultDistributionRequest distributionReq = DefaultDistributionRequest.create(delivery, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
+					logger.debug("Rest request received: "+distributionReq.toString());
+					DataDistributer.getInstance(delivery.getClass()).addListener(distributionReq);
+					logger.debug("Streaming request received and registered:"+distributionReq.toString());
+				}else{ // query on a model
+					ModelDistributionRequest distributionReq = ModelDistributionRequest.create(delivery, parser.getVSensorConfig(), parser.getQuery(), parser.getModelClass());
+					logger.warn("Rest request received: "+distributionReq.toString());
+					ModelDistributer.getInstance(delivery.getClass()).addListener(distributionReq);
+					logger.warn("Streaming request received and registered:"+distributionReq.toString());
+				}
 			}
-			//checking to see if there is an already registered notification id, in that case, we ignore (re)registeration.
-			PushDelivery delivery = new PushDelivery(localContactPoint,notificationId,response.getWriter());
-
-			boolean isExist = DataDistributer.getInstance(delivery.getClass()).contains(delivery);
-			if (isExist) {
-				logger.debug("Keep alive request received for the notification-id:"+notificationId);
-				response.setStatus(SUCCESS_200);
-				delivery.close();
-				return;
-			}
-
-			DefaultDistributionRequest distributionReq = DefaultDistributionRequest.create(delivery, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
-			logger.debug("Rest request received: "+distributionReq.toString());
-			DataDistributer.getInstance(delivery.getClass()).addListener(distributionReq);
-			logger.debug("Streaming request received and registered:"+distributionReq.toString());
 		}catch (Exception e) {
 			logger.warn(e.getMessage(),e);
 			return ;
@@ -169,7 +205,7 @@ public class RestStreamHanlder extends HttpServlet {
 	 */
 	public void doPut( HttpServletRequest request , HttpServletResponse response ) throws ServletException  {
 		double notificationId = Double.parseDouble(request.getParameter(PushDelivery.NOTIFICATION_ID_KEY));
-		PushRemoteWrapper notification = NotificationRegistry.getInstance().getNotification(notificationId);
+		IPushWrapper notification = NotificationRegistry.getInstance().getNotification(notificationId);
 		try {
 			if (notification!=null) {
 				boolean status = notification.manualDataInsertion(request.getParameter(PushDelivery.DATA));
@@ -219,16 +255,38 @@ public class RestStreamHanlder extends HttpServlet {
 
 	class URLParser{
 		private String query,tableName;
+		private String cName = null;
+		private AbstractModel modelClass = null;
+		private String pushType = "";
+		private int nClass = 0;
 		private long startTime;
+		private String nMessage = "";
 		private VSensorConfig config;
 		public URLParser(HttpServletRequest request) throws UnsupportedEncodingException, Exception {
 			String requestURI = request.getRequestURI().substring(request.getRequestURI().toLowerCase().indexOf(STREAMING)+STREAMING.length());
 			StringTokenizer tokens = new StringTokenizer(requestURI,"/");
 			startTime = System.currentTimeMillis();
-			query = tokens.nextToken();
+			String first = tokens.nextToken();
+			if (first.startsWith("wp")){ //registering from a Windows Phone
+				pushType = "wp";
+				nClass = Integer.parseInt(first.substring(2,3));
+				nMessage = first.substring(3);
+				query = tokens.nextToken();
+			}else if (first.equals("direct")){ //registering to direct push
+				pushType = "direct";
+				return;
+			}else{
+				query = first;
+			}
 			query = URLDecoder.decode(query,"UTF-8");
-			if (tokens.hasMoreTokens()) 
-				startTime= Helpers.convertTimeFromIsoToLong(URLDecoder.decode(tokens.nextToken(),"UTF-8"));
+			while (tokens.hasMoreTokens()) {
+				String nt = tokens.nextToken();
+			    if (nt.startsWith("using")){
+			    	cName = nt.substring(6);
+			    }else{
+			    	startTime= Helpers.convertTimeFromIsoToLong(URLDecoder.decode(nt,"UTF-8"));
+			    }
+			}
 			tableName = SQLValidator.getInstance().validateQuery(query);
 			if (tableName==null)
 				throw new RuntimeException("Bad Table name in the query:"+query);
@@ -238,6 +296,15 @@ public class RestStreamHanlder extends HttpServlet {
 			query = SQLUtils.newRewrite(query, tableName, tableName.toLowerCase()).toString();
 			tableName=tableName.toLowerCase();
 			config = Mappings.getConfig(tableName);
+			if (cName != null){
+				VirtualSensor vs = Mappings.getVSensorInstanceByFileName(config.getFileName());
+				AbstractVirtualSensor avs = vs.borrowVS();
+				if (avs instanceof ModellingVirtualSensor){
+					modelClass = ((ModellingVirtualSensor)avs).getModel(cName)[0];
+				}
+				vs.returnVS(avs);
+			}
+			
 		}
 		public VSensorConfig getVSensorConfig() {
 			return config;
@@ -248,6 +315,10 @@ public class RestStreamHanlder extends HttpServlet {
 		public long getStartTime() {
 			return startTime;
 		}
+		public AbstractModel getModelClass(){
+			return modelClass;
+		}
+		
 
 	}
 

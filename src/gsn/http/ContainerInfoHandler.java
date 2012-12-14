@@ -118,24 +118,26 @@ public class ContainerInfoHandler implements RequestHandler {
             sb.append(" category=\"predicate\">");
             sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
             sb.append("</field>\n" );
-          }
-          if (sensorConfig.getWebinput( )!=null){
-            for ( WebInput wi : sensorConfig.getWebinput( ) ) {
-              for ( DataField df : wi.getParameters ( ) ) {
-                sb.append( "\t<field");
-                sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
-                sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
-                sb.append(" category=\"input\"");
-                sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
-                if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
-                  sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
-                sb.append( "></field>\n" );
-              }
-            }
+
           }
           counter++;
         }
       }
+	  if (sensorConfig.getWebinput( )!=null){
+	    for ( WebInput wi : sensorConfig.getWebinput( ) ) {
+	      for ( DataField df : wi.getParameters ( ) ) {
+	        sb.append( "\t<field");
+	        sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
+	        sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
+	        sb.append(" category=\"input\"");
+	        sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
+	        if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
+	          sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
+	        sb.append( "></field>\n" );
+	      }
+	    }
+	  }
+
       sb.append( "</virtual-sensor>\n" );
     }
     sb.append( "</gsn>\n" );

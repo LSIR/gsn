@@ -15,7 +15,9 @@ public final class DataField implements Serializable {
    private byte               dataTypeID       = -1;
    
    private String            type;
-   
+
+   private boolean index=false;   
+
    private DataField ( ) {}
    
    public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {

@@ -1,6 +1,24 @@
 GSN Change logs
 ---------------
 
+branche opensense v1.0.0
+- vsensors loaded in lexical order by file-name
+- model distributer (to be merged with data distributer)
+- adding Windows Phone Push delivery
+- trying to make data distributed resilient to loss of DB connection (to be improved)
+- change deprecated JPEG codec in camera usb wrapper
+- added some virtual sensors (indexing, modelling and grid from model)
+- added osm overlay option to grid renderer
+- added abstract models and some examples for aggregating, nearest-neighbor,...
+- fixed relative path in dataenumerator for binary download and in html+js files
+- added model enumerator
+- added servlet to query models
+- webinput changes (I don't remember why...)
+- added direct push option and new interface for push classes
+- modified reststreamhandler to support those push classes
+- updated weka library (and changed some classes)
+- change datafield compatible with permasense
+
 r1.1.2
 New sensorscope listener server fixing problem of missing data
 Added count-based checkpoints to the CSV wrapper, logging line counts instead of latest timestamp

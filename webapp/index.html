@@ -35,7 +35,7 @@ $(document).ready(function() {
 			GSN.map.autozoomandcenter();
 		}
 	});
-    $.get('/menu.jsp', {selected: "index"}, function(data) {
+    $.get('menu.jsp', {selected: "index"}, function(data) {
         $('#navigation').html(data);
     });
 });	

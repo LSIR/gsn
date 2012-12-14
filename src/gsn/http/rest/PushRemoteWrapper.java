@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 
 import com.thoughtworks.xstream.XStream;
 
-public class PushRemoteWrapper extends AbstractWrapper {
+public class PushRemoteWrapper extends AbstractWrapper implements IPushWrapper{
 
     private static final int KEEP_ALIVE_PERIOD = 5000;
 
@@ -99,6 +99,10 @@ public class PushRemoteWrapper extends AbstractWrapper {
 
     public String getWrapperName() {
         return "Push-Remote Wrapper";
+    }
+    
+    public boolean registerAndSetStructure(String struct){
+    	return false;
     }
 
     public DataField[] registerAndGetStructure() throws IOException, ClassNotFoundException {

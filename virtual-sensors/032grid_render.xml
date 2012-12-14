@@ -1,0 +1,31 @@
+<virtual-sensor name="gridrender" priority="10">
+    <processing-class>
+        <class-name>gsn.vsensor.GridRenderer</class-name>
+        <init-params>
+            <param name="cellpixels">1</param> 
+	     <param name="mapoverlay">true</param>
+        </init-params>
+        <output-structure>
+            <field name="grid" type="binary:image/png"/>
+        </output-structure>
+    </processing-class>
+    <description>This virtual sensor renders grids</description>
+    <life-cycle pool-size="10"/>
+	<addressing>
+		<predicate key="geographical">OSM_VSZ_O3</predicate>
+		<predicate key="usage">OpenSense Nearest Neighbor Interpolation</predicate>
+	</addressing>
+    <storage history-size="5m"/>
+    <streams>
+<stream name="data">
+			<source alias="source1" storage-size="1"  sampling-rate="1">
+				<address wrapper="local">
+                          <predicate key="NAME">gridmodel</predicate>
+				</address>
+				<query>select  * from WRAPPER</query>
+			</source>
+
+			<query>select * from source1</query>
+		</stream>
+    </streams>
+</virtual-sensor>

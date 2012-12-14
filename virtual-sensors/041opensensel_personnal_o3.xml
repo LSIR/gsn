@@ -1,0 +1,37 @@
+<virtual-sensor name="opensense_personnal_o3" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.OpenSense_Zurich_O3_Indexer</class-name>
+		<output-structure>
+			<field name="ozone_ppb" type="double"/>
+			<field name="temperature" type="double"/>
+			<field name="humidity" type="integer"/>
+			<field name="o3_rel" type="integer"/>
+			<field name="o3_abs" type="integer"/>
+                        <field name="latitude" type="double"/>
+			<field name="longitude" type="double"/>
+
+		</output-structure>
+	</processing-class>
+	<description>Virtual sensor returns data for query of latitude+longitude.</description>
+
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">OSM_VSZ_O3</predicate>
+		<predicate key="usage">OpenSense Nearest Neighbor Interpolation</predicate>
+	</addressing>
+	
+	<storage history-size="1m" />
+	<streams>
+		<stream name="sensor1">	
+			<source alias="zurich_o3_vs" storage-size="1"  sampling-rate="1">
+				<address wrapper="local">
+                          <predicate key="NAME">AndroidPush2</predicate>
+				</address>
+				<query>select  timed, temperature, humidity, ozoneCalibrated, latitude, longitude from WRAPPER</query>
+			</source>
+			<query>
+				select  timed, temperature, humidity, ozoneCalibrated, latitude, longitude from zurich_o3_vs	
+			</query>
+		</stream>
+	</streams>
+</virtual-sensor> 

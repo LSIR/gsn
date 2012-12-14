@@ -12,6 +12,8 @@ import gsn.wrappers.WrappersUtil;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -333,6 +335,13 @@ public class VSensorLoader extends Thread {
             };
 
             File files[] = new File(virtualSensorsPath).listFiles(filter);
+
+			Arrays.sort(files, new Comparator<File>(){
+				@Override
+				public int compare(File a, File b) {
+					return a.getName().compareTo(b.getName());
+				}});
+			
             // --- preparing the remove list
             // Removing those in the previous which are not existing the new files
             // or modified.

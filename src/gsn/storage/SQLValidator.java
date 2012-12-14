@@ -18,6 +18,8 @@ import org.h2.command.dml.Select;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Session;
 import org.h2.engine.SessionFactoryEmbedded;
+import org.h2.expression.Expression;
+import org.h2.util.ObjectArray;
 
 public class SQLValidator implements VSensorStateChangeListener {
 
@@ -106,6 +108,16 @@ public class SQLValidator implements VSensorStateChangeListener {
 		
 		return getFields(select,vSensorConfig.getOutputStructure());
 	}
+	
+	//to allow the use of queries over models and not only VS
+	public  DataField[] extractSelectColumns(String query, DataField[] datafields) {
+		Select select = queryToSelect(query);
+		if (select ==null)
+			return new DataField[0];
+		
+		return getFields(select,datafields);
+	}
+
 
 	public Connection getSampleConnection() {
 		return connection;

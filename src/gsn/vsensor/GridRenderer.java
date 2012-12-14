@@ -8,8 +8,13 @@ import org.apache.log4j.Logger;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Hashtable;
 import java.util.TreeMap;
 
 public class GridRenderer extends AbstractVirtualSensor {
@@ -17,12 +22,49 @@ public class GridRenderer extends AbstractVirtualSensor {
     private static final transient Logger logger = Logger.getLogger(GridRenderer.class);
 
     private static final String CELL_PIXELS = "cellpixels";
+    private static final String MAP_OVERLAY = "mapoverlay";
 
     private int map[];
     private double minvalue;
     private double maxvalue;
+    private double cellsize;
+    private double yllcorner;
+    private double xllcorner;
+    private int ncols;
+    private int nrows;
+    
+    private Hashtable<double[],BufferedImage> cache = new Hashtable<double[],BufferedImage>();
+
 
     int cell_pixels = 20;
+    boolean map_overlay = false;
+    
+    
+    public static void main(String args[]){
+    	
+    	GridRenderer gr = new GridRenderer();
+    	gr.initColorMap();
+    	Double[][] ar = new Double[][]{new Double[]{2.0,3.0,4.1,3.5,3.2,3.1},new Double[]{2.0,3.0,4.1,3.5,3.2,3.1},
+    			new Double[]{2.0,3.0,4.1,3.5,3.2,3.1},new Double[]{2.0,3.0,4.1,3.5,3.2,3.1},
+    	        new Double[]{2.0,3.0,4.1,3.5,3.2,3.1},new Double[]{2.0,3.0,4.1,3.5,3.2,3.1}};
+    	gr.ncols = 6;
+    	gr.nrows = 6;
+    	gr.xllcorner = 8.3;
+    	gr.yllcorner = 47.3;
+    	gr.cellsize = 200;
+    	gr.cell_pixels = 50;
+    	try {
+			FileOutputStream fos = new FileOutputStream("test2.png");
+			fos.write(gr.createImageFromArray(ar));
+			fos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
+    	
+    }
 
     @Override
     public boolean initialize() {
@@ -40,6 +82,19 @@ public class GridRenderer extends AbstractVirtualSensor {
                 logger.warn("Parameter \"" + CELL_PIXELS + "\" has incorrect value in Virtual Sensor file. Assuming default value.");
             }
         }
+        
+        String map_overlay_str = params.get(MAP_OVERLAY);
+
+        if (map_overlay_str != null) {
+        	map_overlay_str = map_overlay_str.trim().toLowerCase();
+            if(map_overlay_str.equals("no") || map_overlay_str.equals("false")){
+                map_overlay = false;
+            }else if(map_overlay_str.equals("yes") || map_overlay_str.equals("true")){
+            	map_overlay = true;
+            } else {
+                logger.warn("Parameter \"" + MAP_OVERLAY + "\" has incorrect value in Virtual Sensor file. Assuming default value.");
+            }
+        }
 
 
         initColorMap();
@@ -55,12 +110,20 @@ public class GridRenderer extends AbstractVirtualSensor {
 
     @Override
     public void dataAvailable(String inputStreamName, StreamElement streamElement) {
-        logger.warn("Data => " + streamElement.toString());
+    	
+    	 ncols = (Integer) streamElement.getData("ncols");
+         nrows = (Integer) streamElement.getData("nrows");
+         xllcorner = (Double) streamElement.getData("xllcorner");
+         yllcorner = (Double) streamElement.getData("yllcorner");
+         cellsize = (Double) streamElement.getData("cellsize"); // must be in meters
+         
+        //logger.warn("Data => " + streamElement.toString());
         long timestamp = streamElement.getTimeStamp();
-        byte a[] = (byte[]) streamElement.getData("grid");
-
         Double values[][] = GridTools.deSerialize((byte[]) streamElement.getData("grid"));
         byte b[] = createImageFromArray(values);
+        
+       
+        
 
         StreamElement se = new StreamElement(new String[]{"grid"},
                 new Byte[]{DataTypes.BINARY},
@@ -70,9 +133,20 @@ public class GridRenderer extends AbstractVirtualSensor {
     }
 
 
+    /**
+     * earth radius taken from 
+     * http://www.uwgb.edu/dutchs/UsefulData/UTMFormulas.htm
+     * grayscale conversion from
+     * http://en.wikipedia.org/wiki/Grayscale
+     * @param a
+     * @return
+     */
+    
     private byte[] createImageFromArray(Double[][] a) {
-
-        // search for minimum and maximum
+    	
+    	BufferedImage back;
+    	
+    	// search for minimum and maximum
         minvalue = a[0][0];
         maxvalue = a[0][0];
 
@@ -81,33 +155,76 @@ public class GridRenderer extends AbstractVirtualSensor {
                 if (minvalue > a[i][j]) minvalue = a[i][j];
                 if (maxvalue < a[i][j]) maxvalue = a[i][j];
             }
-
+        
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        logger.warn("min: " + minvalue);
-        logger.warn("max: " + maxvalue);
-
-        int Y = a.length;
-        int X = a[0].length;
-
-        BufferedImage I = new BufferedImage(X * cell_pixels, Y * cell_pixels, BufferedImage.TYPE_INT_RGB);
-
-        int bigPixel[] = new int[cell_pixels * cell_pixels];
-
-        for (int i = 0; i < X; ++i)
-            for (int j = 0; j < Y; ++j) {
-
-                int color = map[mapValue(a[j][i])];
-
-                for (int k = 0; k < cell_pixels * cell_pixels; k++)
-                    bigPixel[k] = color;
-
-                I.setRGB(i * cell_pixels, j * cell_pixels, cell_pixels, cell_pixels, bigPixel, 0, cell_pixels);
-
-            }
+    	
+    	if (map_overlay){
+	    	double centerY = yllcorner + (360/(6356752.0*2*Math.PI) * cellsize * nrows)/2;
+	    	double centerX = xllcorner + (360/(6378137*2*Math.PI*Math.cos(Math.toRadians(centerY))*cellsize * ncols)/2);
+	    	
+	    	int zoom = (int) Math.ceil(Math.log(cell_pixels*6378137*2*Math.PI*Math.cos(Math.toRadians(centerY))/cellsize)/Math.log(2)-8);
+	    	
+	    	//adjusting to match the zoom level's pixel/meter
+	    	int width = (int) (cellsize * ncols / (6378137*2*Math.PI*Math.cos(Math.toRadians(centerY))/Math.pow(2, zoom+8)));
+	    	int height = (int) (cellsize * nrows / (6378137*2*Math.PI*Math.cos(Math.toRadians(centerY))/Math.pow(2, zoom+8)));
+	    	
+	    	BufferedImage osmap = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	    	back = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	    	
+	    	try {
+	    		
+	    		if (cache.containsKey(new double[]{centerX,centerY,zoom,width,height})){
+	    			osmap = cache.get(new double[]{centerX,centerY,zoom,width,height});
+	    		}else{
+	    			osmap = ImageIO.read(new URL("http://staticmap.openstreetmap.de/staticmap.php?center="+centerY+","+centerX+"&zoom="+zoom+"&size="+width+"x"+height));
+	    		    cache.put(new double[]{centerX,centerY,zoom,width,height}, osmap);
+	    		}
+			} catch (MalformedURLException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+	    	
+	    	for (int x=0;x<width;x++)
+	        	for (int y=0;y<height;y++){
+	        		
+	        		int i = (int) (x/(width * 1.0 / ncols));
+	        		int j = (int) (y/(height * 1.0 / ncols));
+	        		
+	        		int val = osmap.getRGB(x, y);
+	        		int r = (val & 0x00ff0000) >> 16;
+	        		int g = (val & 0x0000ff00) >> 8;
+	        		int b = (val & 0x000000ff);
+	        		int bw = (int)(0.2126*r+0.7152*g+0.0722*b);
+	        		int color = map[mapValue(a[j][i])];
+	        		int r2 = (color & 0x00ff0000) >> 16;
+	        		int g2 = (color & 0x0000ff00) >> 8;
+	        		int b2 = (color & 0x000000ff);
+	        		int rgb = (bw+r2)/2 * 256 * 256 + (bw+g2)/2 * 256 + (bw+b2)/2;
+	        		back.setRGB(x, y, rgb);
+	        	}
+    	} else {
+	        int Y = a.length;
+	        int X = a[0].length;
+	
+	        back = new BufferedImage(X * cell_pixels, Y * cell_pixels, BufferedImage.TYPE_INT_RGB);
+	
+	        int bigPixel[] = new int[cell_pixels * cell_pixels];
+	
+	        for (int i = 0; i < X; ++i)
+	            for (int j = 0; j < Y; ++j) {
+	
+	                int color = map[mapValue(a[j][i])];
+	
+	                for (int k = 0; k < cell_pixels * cell_pixels; k++)
+	                    bigPixel[k] = color;
+	
+	                back.setRGB(i * cell_pixels, j * cell_pixels, cell_pixels, cell_pixels, bigPixel, 0, cell_pixels);
+	            }
+    	}
 
         try {
-            ImageIO.write(I, "png", outputStream);
+            ImageIO.write(back, "png", outputStream);
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
         }

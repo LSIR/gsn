@@ -161,7 +161,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 						break;
 					case DataTypes.BINARY :
 						if ( linkBinaryData ) {
-							output[ innerIndex ] = "/field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnLabel( actualColIndex ) + "&amp;pk=" + pkValue;
+							output[ innerIndex ] = "field?vs=" + resultSet.getMetaData( ).getTableName( actualColIndex ) + "&amp;field=" + resultSet.getMetaData( ).getColumnLabel( actualColIndex ) + "&amp;pk=" + pkValue;
                             resultSet.getBytes( actualColIndex );
                         }
 						else

@@ -29,7 +29,7 @@
                     format = format || 'unix';
                     $('#time_format').val(format);
                     prepare_form_for_submission(tag);
-                    $.post('/multidata', tag.parents('form').serializeArray(), function(response, text_status, request){
+                    $.post('multidata', tag.parents('form').serializeArray(), function(response, text_status, request){
                         var lines = response.split("\n");
                         var headers = [];
                         var timestamp_idx = -1;
@@ -281,7 +281,7 @@
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
-                $.get("/gsn?REQUEST=0", function(xml){
+                $.get("gsn?REQUEST=0", function(xml){
                     lovs = xml
                     $('virtual-sensor',xml).each(function(){
                         var vsname = $(this).attr('name');
@@ -419,7 +419,7 @@
                 function(){$(this).addClass('ui-hover-state');},
                 function(){$(this).removeClass('ui-hover-state');});
 
-                $.get('/menu.jsp', {selected: "data"}, function(data) {
+                $.get('menu.jsp', {selected: "data"}, function(data) {
                     $('#navigation').html(data);
                 });
             });
@@ -438,7 +438,7 @@
                 <br/>
                 <div id="datachooser">
                     <div id="data_1" class="clearfix">
-                        <form action="/multidata" method="post">
+                        <form action="multidata" method="post">
                             <div class="accordion">
                                 <div class="ui-accordion-group">
                                     <h3 class="ui-accordion-header"><a href="#">Data Output</a></h3>

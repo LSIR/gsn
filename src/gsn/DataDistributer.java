@@ -258,7 +258,26 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     private DataEnumerator makeDataEnum(DistributionRequest listener) {
 
         PreparedStatement prepareStatement = preparedStatements.get(listener);
-        try {
+        try {	
+            if (prepareStatement.isClosed()){
+            	logger.error("Connection to Database was unexpectedly closed, trying to reconnect...");
+        		preparedStatements.remove(listener);
+                boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
+                String query = SQLValidator.addPkField(listener.getQuery());
+                if (needsAnd)
+                    query += " AND ";
+                else
+                    query += " WHERE ";
+                query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
+                PreparedStatement prepareStatementnew = null;
+                try {
+                    prepareStatementnew = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
+                    prepareStatementnew.setMaxRows(1000); // Limit the number of rows loaded in memory.
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                preparedStatements.put(listener, prepareStatement);
+        	}
             //prepareStatement.setLong(1, listener.getStartTime());
             prepareStatement.setLong(1, listener.getLastVisitedPk());
         } catch (SQLException e) {
