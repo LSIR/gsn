@@ -8,7 +8,6 @@ import gsn.utils.models.ModelLoader;
 import org.apache.log4j.Logger;
 
 import weka.core.Attribute;
-import weka.core.DenseInstance;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -36,7 +35,7 @@ public class GridModelDataPredictVS extends AbstractVirtualSensor {
     private ModelLoader ms;
     private int gridSize = 0;
     private double cellSize = 0;
-    private FastVector<Attribute> att = new FastVector<Attribute>();
+    private FastVector att = new FastVector();
 
 
 
@@ -219,7 +218,7 @@ public class GridModelDataPredictVS extends AbstractVirtualSensor {
 
 	private Instance instanceFromStream(StreamElement data) {
 		try{
-		Instance i = new DenseInstance(data.getFieldNames().length);
+		Instance i = new Instance(data.getFieldNames().length);
 		for(int j=0;j<data.getFieldNames().length;j++){
 			i.setValue(j, ((Double)data.getData()[j]));
 		}
