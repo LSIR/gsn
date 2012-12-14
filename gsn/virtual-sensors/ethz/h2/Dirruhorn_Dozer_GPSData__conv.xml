@@ -64,6 +64,9 @@
                 		}
                 		else
                 			DOPPLER = null;
+				PAYLOAD_WEEKNUMBER = (short)PAYLOAD_WEEKNUMBER;
+                                SENSOR_TYPE = "gps-tinynode";
+				GPS_RAW_DATA_VERSION = (short)1; 
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -75,18 +78,21 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="HEADER_SEQNR" type="INTEGER" />
+	    <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="SENSOR_TYPE" type="VARCHAR(16)" />
+	    <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/> 
+	    <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
-	        <field name="PAYLOAD_TIMEOFWEEKMS" type="INTEGER" unit="ms"/>
-			<field name="PAYLOAD_WEEKNUMBER" type="INTEGER"/>
+	    <field name="PAYLOAD_TIMEOFWEEKMS" type="INTEGER" unit="ms"/>
+	    <field name="PAYLOAD_WEEKNUMBER" type="SMALLINT"/>
       	    <field name="PAYLOAD_VEHICLENUM" type="SMALLINT"/>
-	        <field name="PAYLOAD_MEASINDICATOR" type="TINYINT"/>
+	    <field name="PAYLOAD_MEASINDICATOR" type="TINYINT"/>
       	    <field name="PAYLOAD_SIGNALSTRENGTH" type="SMALLINT"/>
       	    <field name="PAYLOAD_LOSSLOCKINDICATOR" type="TINYINT"/>
       	    <field name="CARRIERPHASE" type="DOUBLE"/>
       	    <field name="PSEUDORANGE" type="DOUBLE"/>
-	        <field name="DOPPLER" type="DOUBLE"/>
+	    <field name="DOPPLER" type="DOUBLE"/>
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
