@@ -32,6 +32,8 @@ public final class StreamElement implements Serializable {
 
 	public StreamElement (StreamElement other) {
 		this.fieldNames=new String[other.fieldNames.length];
+		this.fieldValues=new Serializable[other.fieldValues.length];
+		this.fieldTypes=new Byte[other.fieldTypes.length];
 		for (int i=0;i<other.fieldNames.length;i++) {
 			fieldNames[i]=other.fieldNames[i];
 			fieldValues[i]=other.fieldValues[i];
@@ -394,5 +396,17 @@ public final class StreamElement implements Serializable {
 	public StreamElement4Rest toRest() {
 		StreamElement4Rest toReturn = new StreamElement4Rest(this);
 		return toReturn;
+	}
+	public void setData(String fieldName, Serializable data) {
+		if ( indexedFieldNames == null ) {
+			indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
+			for ( int i = 0 ; i < this.fieldNames.length ; i++ )
+				this.indexedFieldNames.put( fieldNames[ i ] , i );
+		}
+		Integer index = indexedFieldNames.get( fieldName );
+		if (index == null) {
+			logger.warn("There is a request for setting field "+fieldName+" for StreamElement: "+this.toString()+". But the requested field doesn't exist.");
+		}
+		setData(index,data);		
 	}
 }

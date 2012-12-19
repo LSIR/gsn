@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 public class GridModelVS extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensor.class);
+    private static final transient Logger logger = Logger.getLogger(GridModelVS.class);
 
     private static final String PARAM_MODEL = "modelVS";
     private static final String PARAM_FIELD = "field";
@@ -67,6 +67,9 @@ public class GridModelVS extends AbstractVirtualSensor {
 			    AbstractVirtualSensor avs = vs.borrowVS();
 				if (avs instanceof ModellingVirtualSensor){
 					modelVS = ((ModellingVirtualSensor)avs).getModel("")[0];
+					if (modelVS==null){
+						logger.error("Virtual Sensor " + model_str + " returned no model.");
+					}
 				}else{
 					logger.error("Virtual Sensor " + model_str + " is not a modelling Virtual Sensor.");	
 					return false;
@@ -143,8 +146,8 @@ public class GridModelVS extends AbstractVirtualSensor {
             return false;
         }
         
-        YCellSize = cellSize *360.0 / 6356753;
-        XCellSize = cellSize *360.0 / (6378137*Math.cos(Math.toRadians(y_BL)));
+        YCellSize = cellSize *360.0 / (6356753*2*Math.PI);
+        XCellSize = cellSize *360.0 / (6378137*Math.cos(Math.toRadians(y_BL))*2*Math.PI);
 
         return true;
     }
@@ -170,11 +173,12 @@ public class GridModelVS extends AbstractVirtualSensor {
 			Double[][] rawData = new Double[gridSize][gridSize];
 			for (int j=0;j<gridSize;j++){
 				for(int k=0;k<gridSize;k++){
-					double[] pos = ApproxSwissProj.WGS84toLV03((y_BL+YCellSize * j), (x_BL+XCellSize * k), 0);
+					double[] pos = new double[]{(y_BL+YCellSize * j)*60+1880, (x_BL+XCellSize * k)*60+320};
 					StreamElement se = new StreamElement(fields, new Serializable[]{pos[0],pos[1]});
 					StreamElement r = modelVS.query(se)[0];
-					rawData[j][k] = (Double) r.getData(field);
+					rawData[gridSize-j-1][k] = (Double) r.getData(field);
 				}
+                         //logger.warn("line "+j+" of "+gridSize);
 			}
 
 			//preparing the output

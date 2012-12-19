@@ -8,6 +8,8 @@ public abstract class AbstractModel {
 	
 	protected AbstractModel nextModel;
 	protected DataField[] outputfield;
+	
+	public static final String MODEL_FOLDER = "/home/jeberle/gsn/opensense/models/";
 
 	public DataField[] getOutputFields() {
 		return outputfield;
@@ -33,5 +35,9 @@ public abstract class AbstractModel {
 	}
 
 	public abstract void setParam(String k, String string);
+
+	public boolean initialize() {
+		return true;
+	}
 	
 }

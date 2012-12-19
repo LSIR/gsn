@@ -53,6 +53,9 @@ public class ModellingVirtualSensor extends AbstractVirtualSensor {
 					am[0].setParam(k.substring(PARAM_MODEL_PREFIX.length()),params.get(k));
 				}	
 			}
+			if (! am[0].initialize()){
+				return false;
+			}
 					
 		} catch (Exception e) {
 			logger.error( e.getMessage( ) , e );
@@ -74,6 +77,9 @@ public class ModellingVirtualSensor extends AbstractVirtualSensor {
 				if (k.startsWith(PARAM_MODEL_PREFIX2)){
 					am[1].setParam(k.substring(PARAM_MODEL_PREFIX2.length()),params.get(k));
 				}	
+			}
+			if (! am[1].initialize()){
+				return false;
 			}
 			
 		} catch (Exception e) {

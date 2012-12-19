@@ -6,6 +6,9 @@ import gsn.beans.VSensorConfig;
 import gsn.utils.geo.GridTools;
 import org.apache.log4j.Logger;
 import javax.imageio.ImageIO;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -33,7 +36,7 @@ public class GridRenderer extends AbstractVirtualSensor {
     private int ncols;
     private int nrows;
     
-    private Hashtable<double[],BufferedImage> cache = new Hashtable<double[],BufferedImage>();
+    private Hashtable<Double,BufferedImage> cache = new Hashtable<Double,BufferedImage>();
 
 
     int cell_pixels = 20;
@@ -160,7 +163,7 @@ public class GridRenderer extends AbstractVirtualSensor {
     	
     	if (map_overlay){
 	    	double centerY = yllcorner + (360/(6356752.0*2*Math.PI) * cellsize * nrows)/2;
-	    	double centerX = xllcorner + (360/(6378137*2*Math.PI*Math.cos(Math.toRadians(centerY))*cellsize * ncols)/2);
+	    	double centerX = xllcorner + (360/(6378137*2*Math.PI*Math.cos(Math.toRadians(centerY)))*cellsize * ncols)/2;
 	    	
 	    	int zoom = (int) Math.ceil(Math.log(cell_pixels*6378137*2*Math.PI*Math.cos(Math.toRadians(centerY))/cellsize)/Math.log(2)-8);
 	    	
@@ -173,11 +176,11 @@ public class GridRenderer extends AbstractVirtualSensor {
 	    	
 	    	try {
 	    		
-	    		if (cache.containsKey(new double[]{centerX,centerY,zoom,width,height})){
-	    			osmap = cache.get(new double[]{centerX,centerY,zoom,width,height});
+	    		if (cache.containsKey(centerX+centerY*180+zoom*180*360+width*180*360*20+height*180*360*20*1000)){
+	    			osmap = cache.get(centerX+centerY*180+zoom*180*360+width*180*360*20+height*180*360*20*1000);
 	    		}else{
 	    			osmap = ImageIO.read(new URL("http://staticmap.openstreetmap.de/staticmap.php?center="+centerY+","+centerX+"&zoom="+zoom+"&size="+width+"x"+height));
-	    		    cache.put(new double[]{centerX,centerY,zoom,width,height}, osmap);
+	    		    cache.put(centerX+centerY*180+zoom*180*360+width*180*360*20+height*180*360*20*1000, osmap);
 	    		}
 			} catch (MalformedURLException e1) {
 				e1.printStackTrace();
@@ -222,7 +225,19 @@ public class GridRenderer extends AbstractVirtualSensor {
 	                back.setRGB(i * cell_pixels, j * cell_pixels, cell_pixels, cell_pixels, bigPixel, 0, cell_pixels);
 	            }
     	}
-
+    	int bigPixel[] = new int[15];
+    	for (int x=0;x<back.getHeight();x++){
+    		int color = map[255-(int)(x*255.0/back.getHeight())];
+            for (int k = 0; k < 15; k++)
+                bigPixel[k] = color;
+    		back.setRGB(0, x, 15, 1, bigPixel, 0,15);
+    	}
+    	
+    	Graphics2D gp = back.createGraphics();
+    	gp.setColor(Color.black);
+    	gp.drawString(""+maxvalue, 3, 12);
+    	gp.drawString(""+minvalue, 3, back.getHeight()-3);
+    	
         try {
             ImageIO.write(back, "png", outputStream);
         } catch (IOException e) {

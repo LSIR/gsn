@@ -32,6 +32,18 @@ public class DirectPushRemoteWrapper extends AbstractWrapper implements IPushWra
         try {
             uid = Double.parseDouble(getActiveAddressBean().getPredicateValueWithException(PushDelivery.NOTIFICATION_ID_KEY));
             NotificationRegistry.getInstance().addNotification(uid, this);
+            DataField df[] = new DataField[10];
+            df[0] = new DataField("ozone1", "int");
+            df[1] = new DataField("ozone2", "int");
+            df[2] = new DataField("resistance1", "int");
+            df[3] = new DataField("resistance2", "int");
+            df[4] = new DataField("humidity", "int");
+            df[5] = new DataField("temperature", "double");
+            df[6] = new DataField("ozoneCalibrated", "double");
+            df[7] = new DataField("latitude", "double");
+            df[8] = new DataField("longitude", "double");
+            df[9] = new DataField("speed", "double");
+            structure = df;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             NotificationRegistry.getInstance().removeNotification(uid);
@@ -47,7 +59,7 @@ public class DirectPushRemoteWrapper extends AbstractWrapper implements IPushWra
     }
 
     public String getWrapperName() {
-        return "Push-Remote Wrapper";
+        return "Direct Push-Remote Wrapper";
     }
 
     public boolean registerAndSetStructure(String struct) { 
