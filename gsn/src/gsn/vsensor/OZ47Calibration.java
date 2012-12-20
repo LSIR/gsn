@@ -92,6 +92,12 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 		deviceList.add(6);
 		deviceList.add(7);
 		deviceList.add(8);
+		deviceList.add(9);
+		deviceList.add(10);
+		deviceList.add(11);
+		deviceList.add(12);
+		deviceList.add(13);
+		deviceList.add(14);
 		
 		// Create bins and buffers for each device
 		for (int d = 0; d < deviceList.size(); d++) {
