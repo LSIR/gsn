@@ -16,12 +16,12 @@
 	<script type="text/javascript" src="js/functions.js"></script>
         <script type="text/javascript" src="js/uptime.js"></script>
         <!-- Visualization -->
-        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/vizzly.css" />
+        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/vizzly.min.css" />
         <link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
         <!--[if IE]><script src="http://whymper.ethz.ch:24001/excanvas.js"></script><![endif]-->
         <script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
-        <script type='text/javascript' src='http://whymper.ethz.ch:24001/dygraph-combined.js'></script>
-        <script type='text/javascript' src='http://whymper.ethz.ch:24001/vizzly.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/extlib/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/vizzly.min.js'></script>
         <script type='text/javascript' src='js/gsnplots.js'></script>
 
 <script type="text/javascript">
@@ -72,19 +72,26 @@ $(document).ready(function() {
         // plot configuration
         GsnPlots.setConfig([
           { title:"Temperature",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_temperature","internal_temperature"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["air_temperature","internal_temperature"], select:"sensornode[position][iscorestation=true]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_temperature"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
+                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["air_temperature"], select:"sensornode[position=0]"}]
           },{ title:"Wind Speed",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position][iscorestation=true]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
+                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position=0]"}]
           },{ title:"Wind Direction",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position][iscorestation=true]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
+                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position=0]"}]
           },{ title:"Humidity",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position][iscorestation=true]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
+                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position=0]"}]
           },{ title:"Air Pressure",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position][iscorestation=true]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
+                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position=0]"}]
           },{ title:"Rain",
-            signals: [ { vsensor:".*_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position][iscorestation=true]"}]
+            signals: [ { vsensor:".*_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
+                       { vsensor:"matterhorn_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position=0]"}]
           },{ title:"Hail",
-            signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, { vsensor:"etz_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position][iscorestation=true]"}]
+            signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
+                       { vsensor:"matterhorn_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position=0]"}]
           },
         ]);
 

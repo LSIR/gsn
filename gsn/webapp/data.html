@@ -12,12 +12,12 @@
         <script type="text/javascript" src="js/uptime.js"></script>
 
         <!-- Visualization -->
-        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/vizzly.css" />
+        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/vizzly.min.css" />
         <link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
         <!--[if IE]><script src="http://whymper.ethz.ch:24001/excanvas.js"></script><![endif]-->
         <script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
-        <script type='text/javascript' src='http://whymper.ethz.ch:24001/dygraph-combined.js'></script>
-        <script type='text/javascript' src='http://whymper.ethz.ch:24001/vizzly.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/extlib/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/vizzly.min.js'></script>
 
         <script type="text/javascript">
 	    <!--//<![CDATA[
@@ -234,17 +234,13 @@
                       "showForm": true
                       },
                       "appUrl": "http://whymper.ethz.ch:24001/vizzly?",
-                      "signals": {
-                        "y1": []
-                      },
+                      "signals": [],
                       loaddata : function(fullReload, signals, start, end, callback) { updatePlot(fullReload, signals, start, end, callback); }
                     };
-                    $(labels).each(function(index) {if (index>0) graphconfig.signals.y1.push({
+                    $(labels).each(function(index) {if (index>0) graphconfig.signals.push({
                       "displayName":this,
-                      "gsnUrl": "",
-                      "virtualSensor": "",
-                      "field": this,
                       "scaling": 1.0,
+                      "deviceSelect": { "type": "ignore" },
                       "visible": this.match(/\(aggregation_interval\)/)?false:true
                     });});
                     new FrontendCreator(graphconfig);
@@ -490,7 +486,7 @@
                   var ux_start = start?start.getTime():plotdata.mintime;
                   var ux_end = end?end.getTime():plotdata.maxtime;
                   var visibles = [0];
-                  $(signals.y1).each(function(index){      
+                  $(signals).each(function(index){      
                     if (this.visible==true)
                       visibles.push(index+1);
                   });

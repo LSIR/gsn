@@ -13,12 +13,12 @@
         <script type="text/javascript" src="js/uptime.js"></script>
 
         <!-- Visualization -->
-        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/vizzly.css" />
+        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/vizzly.min.css" />
         <link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
         <!--[if IE]><script src="http://whymper.ethz.ch:24001/excanvas.js"></script><![endif]-->
         <script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
-        <script type='text/javascript' src='http://whymper.ethz.ch:24001/dygraph-combined.js'></script>
-        <script type='text/javascript' src='http://whymper.ethz.ch:24001/vizzly.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/extlib/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://whymper.ethz.ch:24001/vizzly.min.js'></script>
         <script type='text/javascript' src='js/gsnplots.js'></script>
 
 <script type="text/javascript">
@@ -145,11 +145,18 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-      { title:"Dirruhorn Duty Cycled PV Voltages",
+      { title:"Dirruhorn PV Voltages",
         signals: [{
           vsensor:"dirruhorn_dozer_nodehealth__conv",
           field:["sdivoltage"],
-          select:"sensornode[position=5],sensornode[position=7],sensornode[position=12],sensornode[position=41],sensornode[position=66],sensornode[position=67]"
+          select:"sensornode[position=0],sensornode[position=5],sensornode[position=7],sensornode[position=10],sensornode[position=11],sensornode[position=12]"
+        }]
+      },
+      { title:"Grabengufer PV Voltages",
+        signals: [{
+          vsensor:"dirruhorn_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=39],sensornode[position=41],sensornode[position=58],sensornode[position=66],sensornode[position=67]"
         }]
       },
       { title:"Randa PV Voltages",
@@ -157,6 +164,27 @@ $(document).ready(function() {
           vsensor:"dirruhorn_corestationstatus_hardware__conv",
           field:["v_ext1","v_ext2"],
           select:"sensornode[position=8][iscorestation='true']"
+        }]
+      },
+      { title:"Randa Camzilla PV Voltages",
+        signals: [{
+          vsensor:"dirruhorn_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=59]"
+        }]
+      },
+      { title:"Matterhorn PV Voltages",
+        signals: [{
+          vsensor:"matterhorn_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=0],sensornode[position=14],sensornode[position=19],sensornode[position=23],sensornode[position=26]"
+        }]
+      },
+      { title:"Jungfraujoch PV Voltages",
+        signals: [{
+          vsensor:"jungfraujoch_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=20],sensornode[position=21],sensornode[position=23]"
         }]
       },
       { title:"Weather Station Voltages",

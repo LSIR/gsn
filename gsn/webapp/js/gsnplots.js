@@ -166,9 +166,7 @@ var GsnPlots = {
               },
               "inittimerange": 2592000000,
               "appUrl": "http://whymper.ethz.ch:24001/vizzly?",
-              "signals": {
-                "y1": []
-              },
+              "signals": [],
           };
           $(this.signals).each(function() {
           // switch following cases:
@@ -181,16 +179,16 @@ var GsnPlots = {
               $(this.field).each(function(index, value) {
                 var signal = {
                   "displayName": this,
-                  "gsnUrl": GsnPlots.gsnserver,
-                  "virtualSensor": thissignal.vs,
-                  "field": this,
-                  "scaling": 1.0,
-                  "visible": true,
-                  "timeline": thissignal.timeline?thissignal.timeline:"generation_time"
+                  "dataSource": { "type": "gsn", "serverAddress": GsnPlots.gsnserver, "name": thissignal.vs },
+				  "dataField": this,
+                  "deviceSelect": { "type": "all" },
+				  "timeField": thissignal.timeline?thissignal.timeline:"generation_time",
+		          "scaling": 1.0,
+                  "visible": true
                 };
                 if (typeof thissignal.unit[index] == "string")
                   signal.unit = thissignal.unit[index];
-                vizconfig.signals.y1.push(signal);      
+                vizconfig.signals.push(signal);      
               });
             }
             
@@ -206,17 +204,16 @@ var GsnPlots = {
                 $(thissignal.field).each(function(index, value) {
                   var signal = {
                     "displayName":"Position "+p +" "+this,
-                    "gsnUrl": GsnPlots.gsnserver,
-                    "virtualSensor": thissignal.vs,
-                    "position": p,
-                    "field": this,
-                    "scaling": 1.0,
-                    "visible": true,
-                    "timeline": thissignal.timeline?thissignal.timeline:"generation_time"
-                  };
+					"dataSource": { "type": "gsn", "serverAddress": GsnPlots.gsnserver, "name": thissignal.vs },
+					"dataField": this,
+	                "deviceSelect": { "type": "single", "field": "position", "value": p },
+					"timeField": thissignal.timeline?thissignal.timeline:"generation_time",
+			        "scaling": 1.0,
+	                "visible": true
+		          };
                   if (typeof thissignal.unit[index] == "string")
                     signal.unit = thissignal.unit[index];
-                  vizconfig.signals.y1.push(signal);      
+                  vizconfig.signals.push(signal);      
                 });
               });              
             }
@@ -228,17 +225,16 @@ var GsnPlots = {
                 $(thissignal.field).each(function(index, value) {
                   var signal = {
                     "displayName":"Position "+p +" "+this,
-                    "gsnUrl": GsnPlots.gsnserver,
-                    "virtualSensor": thissignal.vs,
-                    "position": p,
-                    "field": this,
-                    "scaling": 1.0,
-                    "visible": true,
-                    "timeline": thissignal.timeline?thissignal.timeline:"generation_time"
+					"dataSource": { "type": "gsn", "serverAddress": GsnPlots.gsnserver, "name": thissignal.vs },
+					"dataField": this,
+	                "deviceSelect": { "type": "single", "field": "position", "value": p },
+					"timeField": thissignal.timeline?thissignal.timeline:"generation_time",
+			        "scaling": 1.0,
+	                "visible": true
                   };
                   if (typeof thissignal.unit[index] == "string")
                     signal.unit = thissignal.unit[index];
-                  vizconfig.signals.y1.push(signal);      
+                  vizconfig.signals.push(signal);      
                 });
               });              
             }
@@ -250,17 +246,16 @@ var GsnPlots = {
                 $(thissignal.field).each(function(index, value) {
                   var signal = {
                     "displayName":"Device "+id +" "+this,
-                    "gsnUrl": GsnPlots.gsnserver,
-                    "virtualSensor": thissignal.vs,
-                    "deviceId": id,
-                    "field": this,
-                    "scaling": 1.0,
-                    "visible": true,
-                    "timeline": thissignal.timeline?thissignal.timeline:"generation_time"
+					"dataSource": { "type": "gsn", "serverAddress": GsnPlots.gsnserver, "name": thissignal.vs },
+					"dataField": this,
+	                "deviceSelect": { "type": "single", "field": "device_id", "value": id },
+					"timeField": thissignal.timeline?thissignal.timeline:"generation_time",
+			        "scaling": 1.0,
+	                "visible": true
                   };
                   if (typeof thissignal.unit[index] == "string")
                     signal.unit = thissignal.unit[index];
-                  vizconfig.signals.y1.push(signal);      
+                  vizconfig.signals.push(signal);      
                 });
               });              
             }
@@ -268,7 +263,7 @@ var GsnPlots = {
           });
           
           // finally add to html
-          if (vizconfig.signals.y1.length>0)
+          if (vizconfig.signals.length>0)
             GsnPlots._addPlotsAddGraph(htmlelement, vizconfig, GsnPlots.config[this.index].title);
         });
       }
