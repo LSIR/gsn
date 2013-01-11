@@ -16,7 +16,7 @@ public class OpenSenseVSZCO extends AbstractModel {
 
         private static final transient Logger logger = Logger.getLogger( OpenSenseVSZCO.class );
 	
-	private static final String[] OUTPUT_FIELDS = new String [] {"CO_REL","CO_ABS"};
+	private static final String[] OUTPUT_FIELDS = new String [] {"CO_REL","CO_ABS","temperature"};
 	private static final double[] CO_THRESHOLDS = new double [] {0, 5000, 7500, 10000, 20000, Integer.MAX_VALUE};
 	private static final int[] CO_MAP = new int [] {1,2,4,3,5};
 	

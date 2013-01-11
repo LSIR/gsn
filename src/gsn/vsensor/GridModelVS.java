@@ -176,7 +176,12 @@ public class GridModelVS extends AbstractVirtualSensor {
 					double[] pos = new double[]{(y_BL+YCellSize * j)*60+1880, (x_BL+XCellSize * k)*60+320};
 					StreamElement se = new StreamElement(fields, new Serializable[]{pos[0],pos[1]});
 					StreamElement r = modelVS.query(se)[0];
-					rawData[gridSize-j-1][k] = (Double) r.getData(field);
+					Serializable s = r.getData(field);
+					if (s instanceof Double){
+					    rawData[gridSize-j-1][k] = (Double) r.getData(field);
+					}else if(s instanceof Integer){
+						rawData[gridSize-j-1][k] = ((Integer) r.getData(field)).doubleValue();
+					}
 				}
                          //logger.warn("line "+j+" of "+gridSize);
 			}

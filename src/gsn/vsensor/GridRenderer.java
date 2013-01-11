@@ -26,8 +26,12 @@ public class GridRenderer extends AbstractVirtualSensor {
 
     private static final String CELL_PIXELS = "cellpixels";
     private static final String MAP_OVERLAY = "mapoverlay";
+    private static final String MAX_V = "max_value";
+    private static final String MIN_V = "min_value";
 
     private int map[];
+    private double min_v;
+    private double max_v;
     private double minvalue;
     private double maxvalue;
     private double cellsize;
@@ -83,6 +87,28 @@ public class GridRenderer extends AbstractVirtualSensor {
                 cell_pixels = Integer.parseInt(cell_pixels_str.trim());
             } catch (NumberFormatException e) {
                 logger.warn("Parameter \"" + CELL_PIXELS + "\" has incorrect value in Virtual Sensor file. Assuming default value.");
+            }
+        }
+        
+        String min_str = params.get(MIN_V);
+
+        if (min_str != null) {
+        	min_str = min_str.trim().toLowerCase();
+            try {
+                min_v = Double.parseDouble(min_str.trim());
+            } catch (NumberFormatException e) {
+                logger.warn("Parameter \"" + MIN_V + "\" has incorrect value in Virtual Sensor file.");
+            }
+        }
+        
+        String max_str = params.get(MAX_V);
+
+        if (max_str != null) {
+        	max_str = max_str.trim().toLowerCase();
+            try {
+                max_v = Double.parseDouble(max_str.trim());
+            } catch (NumberFormatException e) {
+                logger.warn("Parameter \"" + MAX_V + "\" has incorrect value in Virtual Sensor file.");
             }
         }
         
@@ -149,6 +175,8 @@ public class GridRenderer extends AbstractVirtualSensor {
     	
     	BufferedImage back;
     	
+    	
+    	if ((min_v == 0 && max_v == 0) || min_v >= max_v){
     	// search for minimum and maximum
         minvalue = a[0][0];
         maxvalue = a[0][0];
@@ -158,7 +186,11 @@ public class GridRenderer extends AbstractVirtualSensor {
                 if (minvalue > a[i][j]) minvalue = a[i][j];
                 if (maxvalue < a[i][j]) maxvalue = a[i][j];
             }
-        
+    	}else{
+    		minvalue = min_v;
+    		maxvalue = max_v;
+    	}
+    	
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     	
     	if (map_overlay){
@@ -199,7 +231,7 @@ public class GridRenderer extends AbstractVirtualSensor {
 	        		int g = (val & 0x0000ff00) >> 8;
 	        		int b = (val & 0x000000ff);
 	        		int bw = (int)(0.2126*r+0.7152*g+0.0722*b);
-	        		int color = map[mapValue(a[j][i])];
+	        		int color = mapValue(a[j][i]);
 	        		int r2 = (color & 0x00ff0000) >> 16;
 	        		int g2 = (color & 0x0000ff00) >> 8;
 	        		int b2 = (color & 0x000000ff);
@@ -217,7 +249,7 @@ public class GridRenderer extends AbstractVirtualSensor {
 	        for (int i = 0; i < X; ++i)
 	            for (int j = 0; j < Y; ++j) {
 	
-	                int color = map[mapValue(a[j][i])];
+	                int color = mapValue(a[j][i]);
 	
 	                for (int k = 0; k < cell_pixels * cell_pixels; k++)
 	                    bigPixel[k] = color;
@@ -261,15 +293,15 @@ public class GridRenderer extends AbstractVirtualSensor {
             else
                 g = 255;
             b = 0;//255;
-            map[i] = r * 256 * 256 + g * 256 + b;
+            map[255-i] = r * 256 * 256 + g * 256 + b;
         }
     }
 
     public int mapValue(double value) {
         if (value > maxvalue)
-            return map[255];
+            return  0; //black
         if (value < minvalue)
-            return map[0];
-        return (int) Math.round((value - minvalue) * 255 / (maxvalue - minvalue));
+            return 255 * 256 * 256 + 255 * 256 + 255; //white
+        return map[(int) Math.round((value - minvalue) * 255 / (maxvalue - minvalue))];
     }
 }
