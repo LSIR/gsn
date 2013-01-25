@@ -15,11 +15,11 @@ import weka.core.Instances;
 
 public class OpenSenseVSZO3 extends AbstractModel {
 
-        private static final transient Logger logger = Logger.getLogger( OpenSenseVSZO3.class );
+	private static final transient Logger logger = Logger.getLogger( OpenSenseVSZO3.class );
 	
 	private static final String[] OUTPUT_FIELDS = new String [] {"TEMPERATURE","HUMIDITY","LATITUDE","LONGITUDE","O3_REL","O3_ABS"};
 	private static final double[] O3_THRESHOLDS = new double [] {0, 60, 120, 180, 240, Integer.MAX_VALUE};
-	private static final int[] O3_MAP = new int [] {2,1,3,4,5};
+	private static final int[] O3_MAP = new int [] {1,3,2,4,5};
 	
 	private Classifier cls_o3;
 	private SimpleKMeans kmeans_temp;
@@ -31,7 +31,7 @@ public class OpenSenseVSZO3 extends AbstractModel {
 	    	
 	    	try {
 
-				cls_o3 = (Classifier) weka.core.SerializationHelper.read(MODEL_FOLDER + "ZURICH_O3_IBK.model");
+				cls_o3 = (Classifier) weka.core.SerializationHelper.read(MODEL_FOLDER + "ZURICH_O3_J48.model");
 				kmeans_temp = (SimpleKMeans) weka.core.SerializationHelper.read(MODEL_FOLDER + "ZURICH_O3_TEMP.model");
 				kmeans_loc = (SimpleKMeans) weka.core.SerializationHelper.read(MODEL_FOLDER + "ZURICH_O3_LOC.model");
 				kmeans_h = (SimpleKMeans) weka.core.SerializationHelper.read(MODEL_FOLDER + "ZURICH_O3_HUM.model");
@@ -77,9 +77,9 @@ public class OpenSenseVSZO3 extends AbstractModel {
 	            if (fieldName.equalsIgnoreCase("humidity"))
 	                h = (Integer) data.getData(fieldName);
 	            if (fieldName.equalsIgnoreCase("latitude"))
-	                lat = (Double) data.getData(fieldName);
+	                lat = ((Double) data.getData(fieldName))/100;
 	            if (fieldName.equalsIgnoreCase("longitude"))
-	                lon = (Double) data.getData(fieldName);
+	                lon = ((Double) data.getData(fieldName))/100;
 	            if (fieldName.equalsIgnoreCase("timed"))
 	                time = (Long) data.getData(fieldName);
 	        }	
@@ -97,7 +97,7 @@ public class OpenSenseVSZO3 extends AbstractModel {
 			// Create attributes to be used with classifiers
 			// Create instances for each pollutant with attribute values pollutant
 			// Set instance's values for "pollutant concentration"
-	        //Check for null values by checking if pollutant values are >= 0.0, they are -1.0 if null returned from database
+	        // Check for null values by checking if pollutant values are >= 0.0, they are -1.0 if null returned from database
 	        
 			if(o3 >= 0.0)
 			{

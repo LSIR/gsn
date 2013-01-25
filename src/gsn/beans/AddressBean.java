@@ -146,6 +146,15 @@ public final class AddressBean implements Serializable{
 
 	private String inputStreamName;
 	private String virtualSensorName;
+	private VSensorConfig vsconfig;
+
+	public VSensorConfig getVsconfig() {
+		return vsconfig;
+	}
+
+	public void setVsconfig(VSensorConfig vsconfig) {
+		this.vsconfig = vsconfig;
+	}
 
 	public String getInputStreamName() {
 		return inputStreamName;

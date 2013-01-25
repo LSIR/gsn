@@ -32,7 +32,7 @@ public class DirectPushRemoteWrapper extends AbstractWrapper implements IPushWra
 
         try {
             uid = Double.parseDouble(getActiveAddressBean().getPredicateValueWithException(PushDelivery.NOTIFICATION_ID_KEY));
-            structure = Mappings.getVSensorConfig(getActiveAddressBean().getVirtualSensorName()).getOutputStructure();
+            structure = getActiveAddressBean().getVsconfig().getOutputStructure();
             NotificationRegistry.getInstance().addNotification(uid, this);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

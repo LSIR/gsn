@@ -67,9 +67,9 @@ public class OpenSenseVSZPM extends AbstractModel {
 	            if (fieldName.equalsIgnoreCase("humidity"))
 	                h = (Integer) data.getData(fieldName);
 	            if (fieldName.equalsIgnoreCase("latitude"))
-	                lat = (Double) data.getData(fieldName);
+	                lat = ((Double) data.getData(fieldName))/100;
 	            if (fieldName.equalsIgnoreCase("longitude"))
-	                lon = (Double) data.getData(fieldName);
+	                lon = ((Double) data.getData(fieldName))/100;
 	            if (fieldName.equalsIgnoreCase("timed"))
 	                time = (Long) data.getData(fieldName);
 	        }	

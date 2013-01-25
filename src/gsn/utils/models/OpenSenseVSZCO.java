@@ -18,7 +18,7 @@ public class OpenSenseVSZCO extends AbstractModel {
 	
 	private static final String[] OUTPUT_FIELDS = new String [] {"CO_REL","CO_ABS","temperature"};
 	private static final double[] CO_THRESHOLDS = new double [] {0, 5000, 7500, 10000, 20000, Integer.MAX_VALUE};
-	private static final int[] CO_MAP = new int [] {1,2,4,3,5};
+	private static final int[] CO_MAP = new int [] {1,3,2,5,4};
 	
 	private SimpleKMeans kmeans_temp;
 	private SimpleKMeans kmeans_loc;
@@ -70,9 +70,9 @@ public class OpenSenseVSZCO extends AbstractModel {
 	            if (fieldName.equalsIgnoreCase("ambient_temp"))
 	                t = (Double) data.getData(fieldName);
 	            if (fieldName.equalsIgnoreCase("latitude"))
-	                lat = (Double) data.getData(fieldName);
+	                lat = ((Double) data.getData(fieldName))/100;
 	            if (fieldName.equalsIgnoreCase("longitude"))
-	                lon = (Double) data.getData(fieldName);
+	                lon = ((Double) data.getData(fieldName))/100;
 	            if (fieldName.equalsIgnoreCase("timed"))
 	                time = (Long) data.getData(fieldName);
 	        }	
