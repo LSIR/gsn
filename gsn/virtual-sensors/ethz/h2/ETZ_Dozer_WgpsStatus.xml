@@ -17,6 +17,9 @@
             <field name="PAYLOAD_TNCURRENT" type="INTEGER" />
             <field name="PAYLOAD_INCLINOMETERX" type="INTEGER" />
             <field name="PAYLOAD_INCLINOMETERY" type="INTEGER" />
+            <field name="PAYLOAD_GPSTIME" type="BIGINT" />
+            <field name="PAYLOAD_GPSWEEK" type="INTEGER" />
+            <field name="PAYLOAD_NUMSV" type="SMALLINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>

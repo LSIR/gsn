@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 21;
+    public static final int DEFAULT_MESSAGE_SIZE = 28;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 188;
 
-    /** Create a new DozerWgpsStatusMsg of size 21. */
+    /** Create a new DozerWgpsStatusMsg of size 28. */
     public DozerWgpsStatusMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -121,6 +121,15 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.inclinometery=0x"+Long.toHexString(get_payload_inclinometery())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.numsv=0x"+Long.toHexString(get_payload_numsv())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.gpsweek=0x"+Long.toHexString(get_payload_gpsweek())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.gpstime=0x"+Long.toHexString(get_payload_gpstime())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -884,6 +893,195 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
      */
     public static int sizeBits_payload_inclinometery() {
         return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.numsv
+    //   Field type: short
+    //   Offset (bits): 168
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.numsv' is signed (false).
+     */
+    public static boolean isSigned_payload_numsv() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.numsv' is an array (false).
+     */
+    public static boolean isArray_payload_numsv() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.numsv'
+     */
+    public static int offset_payload_numsv() {
+        return (168 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.numsv'
+     */
+    public static int offsetBits_payload_numsv() {
+        return 168;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.numsv'
+     */
+    public short get_payload_numsv() {
+        return (short)getUIntBEElement(offsetBits_payload_numsv(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.numsv'
+     */
+    public void set_payload_numsv(short value) {
+        setUIntBEElement(offsetBits_payload_numsv(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.numsv'
+     */
+    public static int size_payload_numsv() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.numsv'
+     */
+    public static int sizeBits_payload_numsv() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.gpsweek
+    //   Field type: int
+    //   Offset (bits): 176
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.gpsweek' is signed (false).
+     */
+    public static boolean isSigned_payload_gpsweek() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.gpsweek' is an array (false).
+     */
+    public static boolean isArray_payload_gpsweek() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.gpsweek'
+     */
+    public static int offset_payload_gpsweek() {
+        return (176 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.gpsweek'
+     */
+    public static int offsetBits_payload_gpsweek() {
+        return 176;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.gpsweek'
+     */
+    public int get_payload_gpsweek() {
+        return (int)getUIntBEElement(offsetBits_payload_gpsweek(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.gpsweek'
+     */
+    public void set_payload_gpsweek(int value) {
+        setUIntBEElement(offsetBits_payload_gpsweek(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.gpsweek'
+     */
+    public static int size_payload_gpsweek() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.gpsweek'
+     */
+    public static int sizeBits_payload_gpsweek() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.gpstime
+    //   Field type: long
+    //   Offset (bits): 192
+    //   Size (bits): 32
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.gpstime' is signed (false).
+     */
+    public static boolean isSigned_payload_gpstime() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.gpstime' is an array (false).
+     */
+    public static boolean isArray_payload_gpstime() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.gpstime'
+     */
+    public static int offset_payload_gpstime() {
+        return (192 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.gpstime'
+     */
+    public static int offsetBits_payload_gpstime() {
+        return 192;
+    }
+
+    /**
+     * Return the value (as a long) of the field 'payload.gpstime'
+     */
+    public long get_payload_gpstime() {
+        return (long)getUIntBEElement(offsetBits_payload_gpstime(), 32);
+    }
+
+    /**
+     * Set the value of the field 'payload.gpstime'
+     */
+    public void set_payload_gpstime(long value) {
+        setUIntBEElement(offsetBits_payload_gpstime(), 32, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.gpstime'
+     */
+    public static int size_payload_gpstime() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.gpstime'
+     */
+    public static int sizeBits_payload_gpstime() {
+        return 32;
     }
 
 }

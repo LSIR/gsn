@@ -3,13 +3,15 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
-            <param name="sensorvalue_conversion" />
+            <param name="gps_time_conversion" />
         </init-params>      
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" />
+            
             <field name="SENSORTYPE" type="VARCHAR(100)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
@@ -23,6 +25,9 @@
             <field name="GPSCURRENT" type="VARCHAR(30)" unit="mA"/>
             <field name="SAM7CURRENT" type="VARCHAR(30)" unit="mA"/>
             <field name="TNCURRENT" type="VARCHAR(30)" unit="mA"/>
+            <field name="GPS_TIME" type="BIGINT" />
+            <field name="GPS_WEEK" type="INTEGER" />
+            <field name="NUM_SV" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWgpsStatusMsg) from ETZ deployment converted</description>
@@ -38,6 +43,7 @@
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR,
                 HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, PAYLOAD_INCLINOMETERX, PAYLOAD_INCLINOMETERY,
+                PAYLOAD_GPSTIME as GPS_TIME, PAYLOAD_GPSWEEK as GPS_WEEK, PAYLOAD_NUMSV as NUM_SV,
                 cast(round(PAYLOAD_GPSVOLTAGE * (2.5/4096) * (39/24), 3) as CHAR(30)) as GPSVOLTAGE,
                 cast(round(PAYLOAD_GPSCURRENT * (2.5/4096) * (10/0.15), 3) as CHAR(30)) as GPSCURRENT,
                 cast(round(PAYLOAD_SAM7CURRENT * (2.5/4096) * (10/0.15), 3) as CHAR(30)) as SAM7CURRENT,
