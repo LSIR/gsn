@@ -28,6 +28,7 @@
             <field name="GPS_TIME" type="INTEGER" />
             <field name="GPS_WEEK" type="SMALLINT" />
             <field name="NUM_SV" type="TINYINT" />
+            <field name="CRC" type="INTEGER" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWgpsStatusMsg) from ETZ deployment converted</description>
@@ -43,7 +44,7 @@
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR,
                 HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, PAYLOAD_INCLINOMETERX, PAYLOAD_INCLINOMETERY,
-                PAYLOAD_GPSTIME as GPS_TIME, PAYLOAD_GPSWEEK as GPS_WEEK, PAYLOAD_NUMSV as NUM_SV,
+                PAYLOAD_GPSTIME as GPS_TIME, PAYLOAD_GPSWEEK as GPS_WEEK, PAYLOAD_NUMSV as NUM_SV, PAYLOAD_CRC as NUM_CRC,
                 cast(round(PAYLOAD_GPSVOLTAGE * (2.5/4096) * (39/24), 3) as CHAR(30)) as GPSVOLTAGE,
                 cast(round(PAYLOAD_GPSCURRENT * (2.5/4096) * (10/0.15), 3) as CHAR(30)) as GPSCURRENT,
                 cast(round(PAYLOAD_SAM7CURRENT * (2.5/4096) * (10/0.15), 3) as CHAR(30)) as SAM7CURRENT,

@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 28;
+    public static final int DEFAULT_MESSAGE_SIZE = 30;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 188;
 
-    /** Create a new DozerWgpsStatusMsg of size 28. */
+    /** Create a new DozerWgpsStatusMsg of size 30. */
     public DozerWgpsStatusMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -130,6 +130,9 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.gpstime=0x"+Long.toHexString(get_payload_gpstime())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.crc=0x"+Long.toHexString(get_payload_crc())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -1082,6 +1085,69 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
      */
     public static int sizeBits_payload_gpstime() {
         return 32;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.crc
+    //   Field type: int
+    //   Offset (bits): 224
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.crc' is signed (false).
+     */
+    public static boolean isSigned_payload_crc() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.crc' is an array (false).
+     */
+    public static boolean isArray_payload_crc() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.crc'
+     */
+    public static int offset_payload_crc() {
+        return (224 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.crc'
+     */
+    public static int offsetBits_payload_crc() {
+        return 224;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.crc'
+     */
+    public int get_payload_crc() {
+        return (int)getUIntBEElement(offsetBits_payload_crc(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.crc'
+     */
+    public void set_payload_crc(int value) {
+        setUIntBEElement(offsetBits_payload_crc(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.crc'
+     */
+    public static int size_payload_crc() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.crc'
+     */
+    public static int sizeBits_payload_crc() {
+        return 16;
     }
 
 }
