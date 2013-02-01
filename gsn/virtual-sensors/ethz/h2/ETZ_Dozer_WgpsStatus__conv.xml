@@ -25,9 +25,9 @@
             <field name="GPSCURRENT" type="VARCHAR(30)" unit="mA"/>
             <field name="SAM7CURRENT" type="VARCHAR(30)" unit="mA"/>
             <field name="TNCURRENT" type="VARCHAR(30)" unit="mA"/>
-            <field name="GPS_TIME" type="BIGINT" />
-            <field name="GPS_WEEK" type="INTEGER" />
-            <field name="NUM_SV" type="SMALLINT" />
+            <field name="GPS_TIME" type="INTEGER" />
+            <field name="GPS_WEEK" type="SMALLINT" />
+            <field name="NUM_SV" type="TINYINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWgpsStatusMsg) from ETZ deployment converted</description>
