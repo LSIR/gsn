@@ -13,8 +13,8 @@
 
 	                	DOPPLER = (double) Float.intBitsToFloat(PAYLOAD_DOPPLER);
                 				
-			        	MEASUREMENT_QUALITY = (PAYLOAD_LLIANDMQI & 0x3F);
-			        	LOSS_OF_LOCK = (PAYLOAD_LLIANDMQI >> 6);
+			        	MEASUREMENT_QUALITY = (short)(PAYLOAD_LLIANDMQI & 0x3F);
+			        	LOSS_OF_LOCK = (short)(PAYLOAD_LLIANDMQI >> 6);
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -38,8 +38,8 @@
             <field name="CARRIERPHASE" type="DOUBLE" />
             <field name="PSEUDORANGE" type="DOUBLE" />
             <field name="DOPPLER" type="DOUBLE" />
-            <field name="MEASUREMENT_QUALITY" type="TINYINT" />
-            <field name="LOSS_OF_LOCK" type="TINYINT" />
+            <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
+            <field name="LOSS_OF_LOCK" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWgpsSvMsg) from ETZ deployment converted</description>
