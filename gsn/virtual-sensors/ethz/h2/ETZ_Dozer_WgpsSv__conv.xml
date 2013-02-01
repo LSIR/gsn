@@ -14,7 +14,7 @@
 	                	DOPPLER = (double) Float.intBitsToFloat(PAYLOAD_DOPPLER);
                 				
 			        	MEASUREMENT_QUALITY = (PAYLOAD_LLIANDMQI & 0x3F);
-			        	LOSS_OF_LOCK = (PAYLOAD_WEEKNUMBER >> 6);
+			        	LOSS_OF_LOCK = (PAYLOAD_LLIANDMQI >> 6);
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
