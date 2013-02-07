@@ -726,6 +726,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         else:
             self._logger.warning('gsn has not connected')
             self._resendStopped.set()
+            self._backlogMain.backlog.gsnNotConnected()
             
         self._waitForGSNFinished.set()
         

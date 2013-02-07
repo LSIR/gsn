@@ -360,6 +360,10 @@ class BackLogDBClass(Thread, Statistics):
         
     def resumeResending(self):
         self._resendtimer.resume()
+        
+        
+    def gsnNotConnected(self):
+        self._isBusy = False
 
 
     def __del__(self):
