@@ -101,9 +101,8 @@
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
+                <address wrapper="local">
                     <predicate key="query"> select * from ETZ_Dozer_GPSData__mapped </predicate>
-		    <predicate key="remote-contact-point">http://data.permasense.ch/streaming/</predicate>
 		    <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
