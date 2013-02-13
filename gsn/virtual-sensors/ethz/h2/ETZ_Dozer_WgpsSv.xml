@@ -9,12 +9,25 @@
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
-            <field name="PAYLOAD_CARRIERPHASE" type="BIGINT" />
-            <field name="PAYLOAD_PSEUDORANGE" type="BIGINT" />
-            <field name="PAYLOAD_DOPPLER" type="INTEGER" />
-            <field name="PAYLOAD_SV" type="SMALLINT" />
-            <field name="PAYLOAD_SIGNALSTRENGTH" type="TINYINT" />
-            <field name="PAYLOAD_LLIANDMQI" type="SMALLINT" />
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I0" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I1" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I2" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I3" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I4" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I0" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I1" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I2" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I3" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I4" type="TINYINT" />
+            <field name="PAYLOAD_DOPPLER_I0" type="TINYINT" />
+            <field name="PAYLOAD_DOPPLER_I1" type="TINYINT" />
+            <field name="PAYLOAD_DOPPLER_I2" type="TINYINT" />
+            <field name="PAYLOAD_SPACE_VEHICLE" type="TINYINT" />
+            <field name="PAYLOAD_MEASUREMENT_QUALITY" type="TINYINT" />
+            <field name="PAYLOAD_SIGNAL_STRENGTH" type="TINYINT" />
+            <field name="PAYLOAD_LOSS_OF_LOCK" type="TINYINT" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>

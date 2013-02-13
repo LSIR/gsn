@@ -70,8 +70,8 @@ echo "to permasense-rd-cam02:"
 scp $* root@permasense-rd-cam02:$BACKLOG_PYTHON_DIR
 
 echo ""
-echo "to opensense-caa-adm-1:"
-scp $* root@opensense-caa-adm-1.dyndns.biz:$BACKLOG_PYTHON_DIR
+echo "to permasense-caa-adm-1:"
+scp $* root@permasense-caa-adm-1.dyndns.biz:$BACKLOG_PYTHON_DIR
 
 
 echo ""

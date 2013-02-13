@@ -19,8 +19,8 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="PAYLOAD_INCLINOMETERX" type="INTEGER" />
-            <field name="PAYLOAD_INCLINOMETERY" type="INTEGER" />
+            <field name="INCLINOMETER_X" type="VARCHAR(30)" unit="°" />
+            <field name="INCLINOMETER_Y" type="VARCHAR(30)" unit="°" />
             <field name="GPSVOLTAGE" type="VARCHAR(30)" unit="V"/>
             <field name="GPSCURRENT" type="VARCHAR(30)" unit="mA"/>
             <field name="SAM7CURRENT" type="VARCHAR(30)" unit="mA"/>
@@ -43,12 +43,14 @@
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR,
-                HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO, PAYLOAD_INCLINOMETERX, PAYLOAD_INCLINOMETERY,
-                PAYLOAD_GPSTIME as GPS_TIME, PAYLOAD_GPSWEEK as GPS_WEEK, PAYLOAD_NUMSV as NUM_SV, PAYLOAD_CRC as NUM_CRC,
-                cast(round(PAYLOAD_GPSVOLTAGE * (2.5/4096) * (39/24), 3) as CHAR(30)) as GPSVOLTAGE,
-                cast(round(PAYLOAD_GPSCURRENT * (2.5/4096) * (10/0.15), 3) as CHAR(30)) as GPSCURRENT,
-                cast(round(PAYLOAD_SAM7CURRENT * (2.5/4096) * (10/0.15), 3) as CHAR(30)) as SAM7CURRENT,
-                cast(round(PAYLOAD_TNCURRENT * (2.5/4096) * (10/0.15), 3) as CHAR(30)) as TNCURRENT from wrapper </query>
+                HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                PAYLOAD_GPSTIME as GPS_TIME, PAYLOAD_GPSWEEK as GPS_WEEK, PAYLOAD_NUMSV as NUM_SV, PAYLOAD_CRC as CRC,
+                cast(round((PAYLOAD_INCLINOMETERX / 32768.0) * 90.0, 3) as CHAR(30)) as INCLINOMETER_X,
+                cast(round((PAYLOAD_INCLINOMETERY / 32768.0) * 90.0 , 3) as CHAR(30)) as INCLINOMETER_Y,
+                cast(round(PAYLOAD_GPSVOLTAGE * (2.5/4096.0) * (39.0/24.0), 3) as CHAR(30)) as GPSVOLTAGE,
+                cast(round(PAYLOAD_GPSCURRENT * (2.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as GPSCURRENT,
+                cast(round(PAYLOAD_SAM7CURRENT * (2.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as SAM7CURRENT,
+                cast(round(PAYLOAD_TNCURRENT * (2.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as TNCURRENT from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

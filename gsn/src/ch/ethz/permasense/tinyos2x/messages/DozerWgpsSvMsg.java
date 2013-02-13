@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerWgpsSvMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 30;
+    public static final int DEFAULT_MESSAGE_SIZE = 24;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 190;
 
-    /** Create a new DozerWgpsSvMsg of size 30. */
+    /** Create a new DozerWgpsSvMsg of size 24. */
     public DozerWgpsSvMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -99,22 +99,61 @@ public class DozerWgpsSvMsg extends ch.ethz.permasense.tinyos2x.messages.DataHea
         s += "  [header.aTime.high=0x"+Long.toHexString(get_header_aTime_high())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.carrierphase=0x"+Long.toHexString(get_payload_carrierphase())+"]\n";
+        s += "  [payload.sample.valid=0x"+Long.toHexString(get_payload_sample_valid())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.pseudorange=0x"+Long.toHexString(get_payload_pseudorange())+"]\n";
+        s += "  [payload.sample.no=0x"+Long.toHexString(get_payload_sample_no())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.doppler=0x"+Long.toHexString(get_payload_doppler())+"]\n";
+        s += "  [payload.carrier_phase_i0=0x"+Long.toHexString(get_payload_carrier_phase_i0())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.sv=0x"+Long.toHexString(get_payload_sv())+"]\n";
+        s += "  [payload.carrier_phase_i1=0x"+Long.toHexString(get_payload_carrier_phase_i1())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.signalstrength=0x"+Long.toHexString(get_payload_signalstrength())+"]\n";
+        s += "  [payload.carrier_phase_i2=0x"+Long.toHexString(get_payload_carrier_phase_i2())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.lliandmqi=0x"+Long.toHexString(get_payload_lliandmqi())+"]\n";
+        s += "  [payload.carrier_phase_i3=0x"+Long.toHexString(get_payload_carrier_phase_i3())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.carrier_phase_i4=0x"+Long.toHexString(get_payload_carrier_phase_i4())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.pseudo_range_i0=0x"+Long.toHexString(get_payload_pseudo_range_i0())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.pseudo_range_i1=0x"+Long.toHexString(get_payload_pseudo_range_i1())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.pseudo_range_i2=0x"+Long.toHexString(get_payload_pseudo_range_i2())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.pseudo_range_i3=0x"+Long.toHexString(get_payload_pseudo_range_i3())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.pseudo_range_i4=0x"+Long.toHexString(get_payload_pseudo_range_i4())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.doppler_i0=0x"+Long.toHexString(get_payload_doppler_i0())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.doppler_i1=0x"+Long.toHexString(get_payload_doppler_i1())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.doppler_i2=0x"+Long.toHexString(get_payload_doppler_i2())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.measurement_quality=0x"+Long.toHexString(get_payload_measurement_quality())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.space_vehicle=0x"+Long.toHexString(get_payload_space_vehicle())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.loss_of_lock=0x"+Long.toHexString(get_payload_loss_of_lock())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.signal_strength=0x"+Long.toHexString(get_payload_signal_strength())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -374,381 +413,1209 @@ public class DozerWgpsSvMsg extends ch.ethz.permasense.tinyos2x.messages.DataHea
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.carrierphase
-    //   Field type: long
+    // Accessor methods for field: payload.sample.valid
+    //   Field type: byte
     //   Offset (bits): 56
-    //   Size (bits): 64
+    //   Size (bits): 1
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.carrierphase' is signed (false).
+     * Return whether the field 'payload.sample.valid' is signed (false).
      */
-    public static boolean isSigned_payload_carrierphase() {
+    public static boolean isSigned_payload_sample_valid() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.carrierphase' is an array (false).
+     * Return whether the field 'payload.sample.valid' is an array (false).
      */
-    public static boolean isArray_payload_carrierphase() {
+    public static boolean isArray_payload_sample_valid() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.carrierphase'
+     * Return the offset (in bytes) of the field 'payload.sample.valid'
      */
-    public static int offset_payload_carrierphase() {
+    public static int offset_payload_sample_valid() {
         return (56 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.carrierphase'
+     * Return the offset (in bits) of the field 'payload.sample.valid'
      */
-    public static int offsetBits_payload_carrierphase() {
+    public static int offsetBits_payload_sample_valid() {
         return 56;
     }
 
     /**
-     * Return the value (as a long) of the field 'payload.carrierphase'
+     * Return the value (as a byte) of the field 'payload.sample.valid'
      */
-    public long get_payload_carrierphase() {
-        return (long)getUIntBEElement(offsetBits_payload_carrierphase(), 64);
+    public byte get_payload_sample_valid() {
+        return (byte)getUIntBEElement(offsetBits_payload_sample_valid(), 1);
     }
 
     /**
-     * Set the value of the field 'payload.carrierphase'
+     * Set the value of the field 'payload.sample.valid'
      */
-    public void set_payload_carrierphase(long value) {
-        setUIntBEElement(offsetBits_payload_carrierphase(), 64, value);
+    public void set_payload_sample_valid(byte value) {
+        setUIntBEElement(offsetBits_payload_sample_valid(), 1, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.carrierphase'
+     * Return the size, in bytes, of the field 'payload.sample.valid'
+     * WARNING: This field is not an even-sized number of bytes (1 bits).
      */
-    public static int size_payload_carrierphase() {
-        return (64 / 8);
+    public static int size_payload_sample_valid() {
+        return (1 / 8) + 1;
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.carrierphase'
+     * Return the size, in bits, of the field 'payload.sample.valid'
      */
-    public static int sizeBits_payload_carrierphase() {
-        return 64;
+    public static int sizeBits_payload_sample_valid() {
+        return 1;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.pseudorange
-    //   Field type: long
+    // Accessor methods for field: payload.sample.no
+    //   Field type: short
+    //   Offset (bits): 57
+    //   Size (bits): 15
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.sample.no' is signed (false).
+     */
+    public static boolean isSigned_payload_sample_no() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.sample.no' is an array (false).
+     */
+    public static boolean isArray_payload_sample_no() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.sample.no'
+     * WARNING: This field is not byte-aligned (bit offset 57).
+     */
+    public static int offset_payload_sample_no() {
+        return (57 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.sample.no'
+     */
+    public static int offsetBits_payload_sample_no() {
+        return 57;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.sample.no'
+     */
+    public short get_payload_sample_no() {
+        return (short)getUIntBEElement(offsetBits_payload_sample_no(), 15);
+    }
+
+    /**
+     * Set the value of the field 'payload.sample.no'
+     */
+    public void set_payload_sample_no(short value) {
+        setUIntBEElement(offsetBits_payload_sample_no(), 15, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.sample.no'
+     * WARNING: This field is not an even-sized number of bytes (15 bits).
+     */
+    public static int size_payload_sample_no() {
+        return (15 / 8) + 1;
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.sample.no'
+     */
+    public static int sizeBits_payload_sample_no() {
+        return 15;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.carrier_phase_i0
+    //   Field type: short
+    //   Offset (bits): 72
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i0' is signed (false).
+     */
+    public static boolean isSigned_payload_carrier_phase_i0() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i0' is an array (false).
+     */
+    public static boolean isArray_payload_carrier_phase_i0() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.carrier_phase_i0'
+     */
+    public static int offset_payload_carrier_phase_i0() {
+        return (72 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.carrier_phase_i0'
+     */
+    public static int offsetBits_payload_carrier_phase_i0() {
+        return 72;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.carrier_phase_i0'
+     */
+    public short get_payload_carrier_phase_i0() {
+        return (short)getUIntBEElement(offsetBits_payload_carrier_phase_i0(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.carrier_phase_i0'
+     */
+    public void set_payload_carrier_phase_i0(short value) {
+        setUIntBEElement(offsetBits_payload_carrier_phase_i0(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.carrier_phase_i0'
+     */
+    public static int size_payload_carrier_phase_i0() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.carrier_phase_i0'
+     */
+    public static int sizeBits_payload_carrier_phase_i0() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.carrier_phase_i1
+    //   Field type: short
+    //   Offset (bits): 80
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i1' is signed (false).
+     */
+    public static boolean isSigned_payload_carrier_phase_i1() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i1' is an array (false).
+     */
+    public static boolean isArray_payload_carrier_phase_i1() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.carrier_phase_i1'
+     */
+    public static int offset_payload_carrier_phase_i1() {
+        return (80 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.carrier_phase_i1'
+     */
+    public static int offsetBits_payload_carrier_phase_i1() {
+        return 80;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.carrier_phase_i1'
+     */
+    public short get_payload_carrier_phase_i1() {
+        return (short)getUIntBEElement(offsetBits_payload_carrier_phase_i1(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.carrier_phase_i1'
+     */
+    public void set_payload_carrier_phase_i1(short value) {
+        setUIntBEElement(offsetBits_payload_carrier_phase_i1(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.carrier_phase_i1'
+     */
+    public static int size_payload_carrier_phase_i1() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.carrier_phase_i1'
+     */
+    public static int sizeBits_payload_carrier_phase_i1() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.carrier_phase_i2
+    //   Field type: short
+    //   Offset (bits): 88
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i2' is signed (false).
+     */
+    public static boolean isSigned_payload_carrier_phase_i2() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i2' is an array (false).
+     */
+    public static boolean isArray_payload_carrier_phase_i2() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.carrier_phase_i2'
+     */
+    public static int offset_payload_carrier_phase_i2() {
+        return (88 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.carrier_phase_i2'
+     */
+    public static int offsetBits_payload_carrier_phase_i2() {
+        return 88;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.carrier_phase_i2'
+     */
+    public short get_payload_carrier_phase_i2() {
+        return (short)getUIntBEElement(offsetBits_payload_carrier_phase_i2(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.carrier_phase_i2'
+     */
+    public void set_payload_carrier_phase_i2(short value) {
+        setUIntBEElement(offsetBits_payload_carrier_phase_i2(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.carrier_phase_i2'
+     */
+    public static int size_payload_carrier_phase_i2() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.carrier_phase_i2'
+     */
+    public static int sizeBits_payload_carrier_phase_i2() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.carrier_phase_i3
+    //   Field type: short
+    //   Offset (bits): 96
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i3' is signed (false).
+     */
+    public static boolean isSigned_payload_carrier_phase_i3() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i3' is an array (false).
+     */
+    public static boolean isArray_payload_carrier_phase_i3() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.carrier_phase_i3'
+     */
+    public static int offset_payload_carrier_phase_i3() {
+        return (96 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.carrier_phase_i3'
+     */
+    public static int offsetBits_payload_carrier_phase_i3() {
+        return 96;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.carrier_phase_i3'
+     */
+    public short get_payload_carrier_phase_i3() {
+        return (short)getUIntBEElement(offsetBits_payload_carrier_phase_i3(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.carrier_phase_i3'
+     */
+    public void set_payload_carrier_phase_i3(short value) {
+        setUIntBEElement(offsetBits_payload_carrier_phase_i3(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.carrier_phase_i3'
+     */
+    public static int size_payload_carrier_phase_i3() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.carrier_phase_i3'
+     */
+    public static int sizeBits_payload_carrier_phase_i3() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.carrier_phase_i4
+    //   Field type: short
+    //   Offset (bits): 104
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i4' is signed (false).
+     */
+    public static boolean isSigned_payload_carrier_phase_i4() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.carrier_phase_i4' is an array (false).
+     */
+    public static boolean isArray_payload_carrier_phase_i4() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.carrier_phase_i4'
+     */
+    public static int offset_payload_carrier_phase_i4() {
+        return (104 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.carrier_phase_i4'
+     */
+    public static int offsetBits_payload_carrier_phase_i4() {
+        return 104;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.carrier_phase_i4'
+     */
+    public short get_payload_carrier_phase_i4() {
+        return (short)getUIntBEElement(offsetBits_payload_carrier_phase_i4(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.carrier_phase_i4'
+     */
+    public void set_payload_carrier_phase_i4(short value) {
+        setUIntBEElement(offsetBits_payload_carrier_phase_i4(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.carrier_phase_i4'
+     */
+    public static int size_payload_carrier_phase_i4() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.carrier_phase_i4'
+     */
+    public static int sizeBits_payload_carrier_phase_i4() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.pseudo_range_i0
+    //   Field type: short
+    //   Offset (bits): 112
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.pseudo_range_i0' is signed (false).
+     */
+    public static boolean isSigned_payload_pseudo_range_i0() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.pseudo_range_i0' is an array (false).
+     */
+    public static boolean isArray_payload_pseudo_range_i0() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.pseudo_range_i0'
+     */
+    public static int offset_payload_pseudo_range_i0() {
+        return (112 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.pseudo_range_i0'
+     */
+    public static int offsetBits_payload_pseudo_range_i0() {
+        return 112;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.pseudo_range_i0'
+     */
+    public short get_payload_pseudo_range_i0() {
+        return (short)getUIntBEElement(offsetBits_payload_pseudo_range_i0(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.pseudo_range_i0'
+     */
+    public void set_payload_pseudo_range_i0(short value) {
+        setUIntBEElement(offsetBits_payload_pseudo_range_i0(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.pseudo_range_i0'
+     */
+    public static int size_payload_pseudo_range_i0() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.pseudo_range_i0'
+     */
+    public static int sizeBits_payload_pseudo_range_i0() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.pseudo_range_i1
+    //   Field type: short
     //   Offset (bits): 120
-    //   Size (bits): 64
+    //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.pseudorange' is signed (false).
+     * Return whether the field 'payload.pseudo_range_i1' is signed (false).
      */
-    public static boolean isSigned_payload_pseudorange() {
+    public static boolean isSigned_payload_pseudo_range_i1() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.pseudorange' is an array (false).
+     * Return whether the field 'payload.pseudo_range_i1' is an array (false).
      */
-    public static boolean isArray_payload_pseudorange() {
+    public static boolean isArray_payload_pseudo_range_i1() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.pseudorange'
+     * Return the offset (in bytes) of the field 'payload.pseudo_range_i1'
      */
-    public static int offset_payload_pseudorange() {
+    public static int offset_payload_pseudo_range_i1() {
         return (120 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.pseudorange'
+     * Return the offset (in bits) of the field 'payload.pseudo_range_i1'
      */
-    public static int offsetBits_payload_pseudorange() {
+    public static int offsetBits_payload_pseudo_range_i1() {
         return 120;
     }
 
     /**
-     * Return the value (as a long) of the field 'payload.pseudorange'
+     * Return the value (as a short) of the field 'payload.pseudo_range_i1'
      */
-    public long get_payload_pseudorange() {
-        return (long)getUIntBEElement(offsetBits_payload_pseudorange(), 64);
+    public short get_payload_pseudo_range_i1() {
+        return (short)getUIntBEElement(offsetBits_payload_pseudo_range_i1(), 8);
     }
 
     /**
-     * Set the value of the field 'payload.pseudorange'
+     * Set the value of the field 'payload.pseudo_range_i1'
      */
-    public void set_payload_pseudorange(long value) {
-        setUIntBEElement(offsetBits_payload_pseudorange(), 64, value);
+    public void set_payload_pseudo_range_i1(short value) {
+        setUIntBEElement(offsetBits_payload_pseudo_range_i1(), 8, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.pseudorange'
+     * Return the size, in bytes, of the field 'payload.pseudo_range_i1'
      */
-    public static int size_payload_pseudorange() {
-        return (64 / 8);
+    public static int size_payload_pseudo_range_i1() {
+        return (8 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.pseudorange'
+     * Return the size, in bits, of the field 'payload.pseudo_range_i1'
      */
-    public static int sizeBits_payload_pseudorange() {
-        return 64;
+    public static int sizeBits_payload_pseudo_range_i1() {
+        return 8;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.doppler
-    //   Field type: long
+    // Accessor methods for field: payload.pseudo_range_i2
+    //   Field type: short
+    //   Offset (bits): 128
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.pseudo_range_i2' is signed (false).
+     */
+    public static boolean isSigned_payload_pseudo_range_i2() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.pseudo_range_i2' is an array (false).
+     */
+    public static boolean isArray_payload_pseudo_range_i2() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.pseudo_range_i2'
+     */
+    public static int offset_payload_pseudo_range_i2() {
+        return (128 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.pseudo_range_i2'
+     */
+    public static int offsetBits_payload_pseudo_range_i2() {
+        return 128;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.pseudo_range_i2'
+     */
+    public short get_payload_pseudo_range_i2() {
+        return (short)getUIntBEElement(offsetBits_payload_pseudo_range_i2(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.pseudo_range_i2'
+     */
+    public void set_payload_pseudo_range_i2(short value) {
+        setUIntBEElement(offsetBits_payload_pseudo_range_i2(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.pseudo_range_i2'
+     */
+    public static int size_payload_pseudo_range_i2() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.pseudo_range_i2'
+     */
+    public static int sizeBits_payload_pseudo_range_i2() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.pseudo_range_i3
+    //   Field type: short
+    //   Offset (bits): 136
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.pseudo_range_i3' is signed (false).
+     */
+    public static boolean isSigned_payload_pseudo_range_i3() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.pseudo_range_i3' is an array (false).
+     */
+    public static boolean isArray_payload_pseudo_range_i3() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.pseudo_range_i3'
+     */
+    public static int offset_payload_pseudo_range_i3() {
+        return (136 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.pseudo_range_i3'
+     */
+    public static int offsetBits_payload_pseudo_range_i3() {
+        return 136;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.pseudo_range_i3'
+     */
+    public short get_payload_pseudo_range_i3() {
+        return (short)getUIntBEElement(offsetBits_payload_pseudo_range_i3(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.pseudo_range_i3'
+     */
+    public void set_payload_pseudo_range_i3(short value) {
+        setUIntBEElement(offsetBits_payload_pseudo_range_i3(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.pseudo_range_i3'
+     */
+    public static int size_payload_pseudo_range_i3() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.pseudo_range_i3'
+     */
+    public static int sizeBits_payload_pseudo_range_i3() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.pseudo_range_i4
+    //   Field type: short
+    //   Offset (bits): 144
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.pseudo_range_i4' is signed (false).
+     */
+    public static boolean isSigned_payload_pseudo_range_i4() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.pseudo_range_i4' is an array (false).
+     */
+    public static boolean isArray_payload_pseudo_range_i4() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.pseudo_range_i4'
+     */
+    public static int offset_payload_pseudo_range_i4() {
+        return (144 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.pseudo_range_i4'
+     */
+    public static int offsetBits_payload_pseudo_range_i4() {
+        return 144;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.pseudo_range_i4'
+     */
+    public short get_payload_pseudo_range_i4() {
+        return (short)getUIntBEElement(offsetBits_payload_pseudo_range_i4(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.pseudo_range_i4'
+     */
+    public void set_payload_pseudo_range_i4(short value) {
+        setUIntBEElement(offsetBits_payload_pseudo_range_i4(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.pseudo_range_i4'
+     */
+    public static int size_payload_pseudo_range_i4() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.pseudo_range_i4'
+     */
+    public static int sizeBits_payload_pseudo_range_i4() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.doppler_i0
+    //   Field type: short
+    //   Offset (bits): 152
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.doppler_i0' is signed (false).
+     */
+    public static boolean isSigned_payload_doppler_i0() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.doppler_i0' is an array (false).
+     */
+    public static boolean isArray_payload_doppler_i0() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.doppler_i0'
+     */
+    public static int offset_payload_doppler_i0() {
+        return (152 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.doppler_i0'
+     */
+    public static int offsetBits_payload_doppler_i0() {
+        return 152;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.doppler_i0'
+     */
+    public short get_payload_doppler_i0() {
+        return (short)getUIntBEElement(offsetBits_payload_doppler_i0(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.doppler_i0'
+     */
+    public void set_payload_doppler_i0(short value) {
+        setUIntBEElement(offsetBits_payload_doppler_i0(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.doppler_i0'
+     */
+    public static int size_payload_doppler_i0() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.doppler_i0'
+     */
+    public static int sizeBits_payload_doppler_i0() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.doppler_i1
+    //   Field type: short
+    //   Offset (bits): 160
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.doppler_i1' is signed (false).
+     */
+    public static boolean isSigned_payload_doppler_i1() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.doppler_i1' is an array (false).
+     */
+    public static boolean isArray_payload_doppler_i1() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.doppler_i1'
+     */
+    public static int offset_payload_doppler_i1() {
+        return (160 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.doppler_i1'
+     */
+    public static int offsetBits_payload_doppler_i1() {
+        return 160;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.doppler_i1'
+     */
+    public short get_payload_doppler_i1() {
+        return (short)getUIntBEElement(offsetBits_payload_doppler_i1(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.doppler_i1'
+     */
+    public void set_payload_doppler_i1(short value) {
+        setUIntBEElement(offsetBits_payload_doppler_i1(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.doppler_i1'
+     */
+    public static int size_payload_doppler_i1() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.doppler_i1'
+     */
+    public static int sizeBits_payload_doppler_i1() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.doppler_i2
+    //   Field type: short
+    //   Offset (bits): 168
+    //   Size (bits): 8
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.doppler_i2' is signed (false).
+     */
+    public static boolean isSigned_payload_doppler_i2() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.doppler_i2' is an array (false).
+     */
+    public static boolean isArray_payload_doppler_i2() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.doppler_i2'
+     */
+    public static int offset_payload_doppler_i2() {
+        return (168 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.doppler_i2'
+     */
+    public static int offsetBits_payload_doppler_i2() {
+        return 168;
+    }
+
+    /**
+     * Return the value (as a short) of the field 'payload.doppler_i2'
+     */
+    public short get_payload_doppler_i2() {
+        return (short)getUIntBEElement(offsetBits_payload_doppler_i2(), 8);
+    }
+
+    /**
+     * Set the value of the field 'payload.doppler_i2'
+     */
+    public void set_payload_doppler_i2(short value) {
+        setUIntBEElement(offsetBits_payload_doppler_i2(), 8, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.doppler_i2'
+     */
+    public static int size_payload_doppler_i2() {
+        return (8 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.doppler_i2'
+     */
+    public static int sizeBits_payload_doppler_i2() {
+        return 8;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.measurement_quality
+    //   Field type: byte
+    //   Offset (bits): 176
+    //   Size (bits): 2
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.measurement_quality' is signed (false).
+     */
+    public static boolean isSigned_payload_measurement_quality() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.measurement_quality' is an array (false).
+     */
+    public static boolean isArray_payload_measurement_quality() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.measurement_quality'
+     */
+    public static int offset_payload_measurement_quality() {
+        return (176 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.measurement_quality'
+     */
+    public static int offsetBits_payload_measurement_quality() {
+        return 176;
+    }
+
+    /**
+     * Return the value (as a byte) of the field 'payload.measurement_quality'
+     */
+    public byte get_payload_measurement_quality() {
+        return (byte)getUIntBEElement(offsetBits_payload_measurement_quality(), 2);
+    }
+
+    /**
+     * Set the value of the field 'payload.measurement_quality'
+     */
+    public void set_payload_measurement_quality(byte value) {
+        setUIntBEElement(offsetBits_payload_measurement_quality(), 2, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.measurement_quality'
+     * WARNING: This field is not an even-sized number of bytes (2 bits).
+     */
+    public static int size_payload_measurement_quality() {
+        return (2 / 8) + 1;
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.measurement_quality'
+     */
+    public static int sizeBits_payload_measurement_quality() {
+        return 2;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.space_vehicle
+    //   Field type: byte
+    //   Offset (bits): 178
+    //   Size (bits): 6
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.space_vehicle' is signed (false).
+     */
+    public static boolean isSigned_payload_space_vehicle() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.space_vehicle' is an array (false).
+     */
+    public static boolean isArray_payload_space_vehicle() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.space_vehicle'
+     * WARNING: This field is not byte-aligned (bit offset 178).
+     */
+    public static int offset_payload_space_vehicle() {
+        return (178 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.space_vehicle'
+     */
+    public static int offsetBits_payload_space_vehicle() {
+        return 178;
+    }
+
+    /**
+     * Return the value (as a byte) of the field 'payload.space_vehicle'
+     */
+    public byte get_payload_space_vehicle() {
+        return (byte)getUIntBEElement(offsetBits_payload_space_vehicle(), 6);
+    }
+
+    /**
+     * Set the value of the field 'payload.space_vehicle'
+     */
+    public void set_payload_space_vehicle(byte value) {
+        setUIntBEElement(offsetBits_payload_space_vehicle(), 6, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.space_vehicle'
+     * WARNING: This field is not an even-sized number of bytes (6 bits).
+     */
+    public static int size_payload_space_vehicle() {
+        return (6 / 8) + 1;
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.space_vehicle'
+     */
+    public static int sizeBits_payload_space_vehicle() {
+        return 6;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.loss_of_lock
+    //   Field type: byte
     //   Offset (bits): 184
-    //   Size (bits): 32
+    //   Size (bits): 2
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.doppler' is signed (false).
+     * Return whether the field 'payload.loss_of_lock' is signed (false).
      */
-    public static boolean isSigned_payload_doppler() {
+    public static boolean isSigned_payload_loss_of_lock() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.doppler' is an array (false).
+     * Return whether the field 'payload.loss_of_lock' is an array (false).
      */
-    public static boolean isArray_payload_doppler() {
+    public static boolean isArray_payload_loss_of_lock() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.doppler'
+     * Return the offset (in bytes) of the field 'payload.loss_of_lock'
      */
-    public static int offset_payload_doppler() {
+    public static int offset_payload_loss_of_lock() {
         return (184 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.doppler'
+     * Return the offset (in bits) of the field 'payload.loss_of_lock'
      */
-    public static int offsetBits_payload_doppler() {
+    public static int offsetBits_payload_loss_of_lock() {
         return 184;
     }
 
     /**
-     * Return the value (as a long) of the field 'payload.doppler'
+     * Return the value (as a byte) of the field 'payload.loss_of_lock'
      */
-    public long get_payload_doppler() {
-        return (long)getUIntBEElement(offsetBits_payload_doppler(), 32);
+    public byte get_payload_loss_of_lock() {
+        return (byte)getUIntBEElement(offsetBits_payload_loss_of_lock(), 2);
     }
 
     /**
-     * Set the value of the field 'payload.doppler'
+     * Set the value of the field 'payload.loss_of_lock'
      */
-    public void set_payload_doppler(long value) {
-        setUIntBEElement(offsetBits_payload_doppler(), 32, value);
+    public void set_payload_loss_of_lock(byte value) {
+        setUIntBEElement(offsetBits_payload_loss_of_lock(), 2, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.doppler'
+     * Return the size, in bytes, of the field 'payload.loss_of_lock'
+     * WARNING: This field is not an even-sized number of bytes (2 bits).
      */
-    public static int size_payload_doppler() {
-        return (32 / 8);
+    public static int size_payload_loss_of_lock() {
+        return (2 / 8) + 1;
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.doppler'
+     * Return the size, in bits, of the field 'payload.loss_of_lock'
      */
-    public static int sizeBits_payload_doppler() {
-        return 32;
+    public static int sizeBits_payload_loss_of_lock() {
+        return 2;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.sv
-    //   Field type: short
-    //   Offset (bits): 216
-    //   Size (bits): 8
+    // Accessor methods for field: payload.signal_strength
+    //   Field type: byte
+    //   Offset (bits): 186
+    //   Size (bits): 6
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.sv' is signed (false).
+     * Return whether the field 'payload.signal_strength' is signed (false).
      */
-    public static boolean isSigned_payload_sv() {
+    public static boolean isSigned_payload_signal_strength() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.sv' is an array (false).
+     * Return whether the field 'payload.signal_strength' is an array (false).
      */
-    public static boolean isArray_payload_sv() {
+    public static boolean isArray_payload_signal_strength() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.sv'
+     * Return the offset (in bytes) of the field 'payload.signal_strength'
+     * WARNING: This field is not byte-aligned (bit offset 186).
      */
-    public static int offset_payload_sv() {
-        return (216 / 8);
+    public static int offset_payload_signal_strength() {
+        return (186 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.sv'
+     * Return the offset (in bits) of the field 'payload.signal_strength'
      */
-    public static int offsetBits_payload_sv() {
-        return 216;
+    public static int offsetBits_payload_signal_strength() {
+        return 186;
     }
 
     /**
-     * Return the value (as a short) of the field 'payload.sv'
+     * Return the value (as a byte) of the field 'payload.signal_strength'
      */
-    public short get_payload_sv() {
-        return (short)getUIntBEElement(offsetBits_payload_sv(), 8);
+    public byte get_payload_signal_strength() {
+        return (byte)getUIntBEElement(offsetBits_payload_signal_strength(), 6);
     }
 
     /**
-     * Set the value of the field 'payload.sv'
+     * Set the value of the field 'payload.signal_strength'
      */
-    public void set_payload_sv(short value) {
-        setUIntBEElement(offsetBits_payload_sv(), 8, value);
+    public void set_payload_signal_strength(byte value) {
+        setUIntBEElement(offsetBits_payload_signal_strength(), 6, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.sv'
+     * Return the size, in bytes, of the field 'payload.signal_strength'
+     * WARNING: This field is not an even-sized number of bytes (6 bits).
      */
-    public static int size_payload_sv() {
-        return (8 / 8);
+    public static int size_payload_signal_strength() {
+        return (6 / 8) + 1;
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.sv'
+     * Return the size, in bits, of the field 'payload.signal_strength'
      */
-    public static int sizeBits_payload_sv() {
-        return 8;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.signalstrength
-    //   Field type: short
-    //   Offset (bits): 224
-    //   Size (bits): 8
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'payload.signalstrength' is signed (false).
-     */
-    public static boolean isSigned_payload_signalstrength() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'payload.signalstrength' is an array (false).
-     */
-    public static boolean isArray_payload_signalstrength() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'payload.signalstrength'
-     */
-    public static int offset_payload_signalstrength() {
-        return (224 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'payload.signalstrength'
-     */
-    public static int offsetBits_payload_signalstrength() {
-        return 224;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'payload.signalstrength'
-     */
-    public short get_payload_signalstrength() {
-        return (short)getUIntBEElement(offsetBits_payload_signalstrength(), 8);
-    }
-
-    /**
-     * Set the value of the field 'payload.signalstrength'
-     */
-    public void set_payload_signalstrength(short value) {
-        setUIntBEElement(offsetBits_payload_signalstrength(), 8, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'payload.signalstrength'
-     */
-    public static int size_payload_signalstrength() {
-        return (8 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'payload.signalstrength'
-     */
-    public static int sizeBits_payload_signalstrength() {
-        return 8;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.lliandmqi
-    //   Field type: short
-    //   Offset (bits): 232
-    //   Size (bits): 8
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'payload.lliandmqi' is signed (false).
-     */
-    public static boolean isSigned_payload_lliandmqi() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'payload.lliandmqi' is an array (false).
-     */
-    public static boolean isArray_payload_lliandmqi() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'payload.lliandmqi'
-     */
-    public static int offset_payload_lliandmqi() {
-        return (232 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'payload.lliandmqi'
-     */
-    public static int offsetBits_payload_lliandmqi() {
-        return 232;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'payload.lliandmqi'
-     */
-    public short get_payload_lliandmqi() {
-        return (short)getUIntBEElement(offsetBits_payload_lliandmqi(), 8);
-    }
-
-    /**
-     * Set the value of the field 'payload.lliandmqi'
-     */
-    public void set_payload_lliandmqi(short value) {
-        setUIntBEElement(offsetBits_payload_lliandmqi(), 8, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'payload.lliandmqi'
-     */
-    public static int size_payload_lliandmqi() {
-        return (8 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'payload.lliandmqi'
-     */
-    public static int sizeBits_payload_lliandmqi() {
-        return 8;
+    public static int sizeBits_payload_signal_strength() {
+        return 6;
     }
 
 }

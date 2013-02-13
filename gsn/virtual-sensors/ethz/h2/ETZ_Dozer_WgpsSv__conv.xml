@@ -7,14 +7,63 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                		CARRIERPHASE = Double.longBitsToDouble(PAYLOAD_CARRIERPHASE);
-
-	                	PSEUDORANGE = Double.longBitsToDouble(PAYLOAD_PSEUDORANGE);
-
-	                	DOPPLER = (double) Float.intBitsToFloat(PAYLOAD_DOPPLER);
+                		if (PAYLOAD_CARRIER_PHASE_I0 != null &&
+                			PAYLOAD_CARRIER_PHASE_I1 != null &&
+                			PAYLOAD_CARRIER_PHASE_I2 != null &&
+                			PAYLOAD_CARRIER_PHASE_I3 != null &&
+                			PAYLOAD_CARRIER_PHASE_I4 != null)
+                		{
+                			def cp_int64 =
+                				((long)( PAYLOAD_CARRIER_PHASE_I0 & 0xff )) |
+	                			(((long)( PAYLOAD_CARRIER_PHASE_I1 & 0xff )) << 8) |
+    	            			(((long)( PAYLOAD_CARRIER_PHASE_I2 & 0xff )) << 16) |
+        	        			(((long)( PAYLOAD_CARRIER_PHASE_I3 & 0xff )) << 24) |
+            	    			(((long)( PAYLOAD_CARRIER_PHASE_I4 & 0xff )) << 32);
+                			if (((PAYLOAD_CARRIER_PHASE_I4>>7)&0x1) == 1)
+            	    			cp_int64 |= (long)0xFFFFFF << 40;
+            	    		CARRIER_PHASE = ((double)cp_int64)/1024.0;
+                		}
+                		else
+                			CARRIER_PHASE = null;
+                			
+                		if (PAYLOAD_PSEUDO_RANGE_I0 != null &&
+                			PAYLOAD_PSEUDO_RANGE_I1 != null &&
+                			PAYLOAD_PSEUDO_RANGE_I2 != null &&
+                			PAYLOAD_PSEUDO_RANGE_I3 != null &&
+                			PAYLOAD_PSEUDO_RANGE_I4 != null)
+                		{
+	                		def pr_int64 =
+    	            			((long)( PAYLOAD_PSEUDO_RANGE_I0 & 0xff )) |
+        	        			(((long)( PAYLOAD_PSEUDO_RANGE_I1 & 0xff )) << 8) |
+            	    			(((long)( PAYLOAD_PSEUDO_RANGE_I2 & 0xff )) << 16) |
+                				(((long)( PAYLOAD_PSEUDO_RANGE_I3 & 0xff )) << 24) |
+                				(((long)( PAYLOAD_PSEUDO_RANGE_I4 & 0xff )) << 32);
+                			if (((PAYLOAD_PSEUDO_RANGE_I4>>7)&0x1) == 1)
+    	            			pr_int64 |= (long)0xFFFFFF << 40;
+            	    		PSEUDO_RANGE = ((double)pr_int64)/1024.0;
+                		}
+                		else
+                			PSEUDO_RANGE = null;
                 				
-			        	MEASUREMENT_QUALITY = (short)(PAYLOAD_LLIANDMQI & 0x3F);
-			        	LOSS_OF_LOCK = (short)(PAYLOAD_LLIANDMQI >> 6);
+                		if (PAYLOAD_DOPPLER_I0 != null &&
+                			PAYLOAD_DOPPLER_I1 != null &&
+                			PAYLOAD_DOPPLER_I2 != null)
+                		{
+	                		def do_int32 =
+    	            			((int)( PAYLOAD_DOPPLER_I0 & 0xff )) |
+        	        			(((int)( PAYLOAD_DOPPLER_I1 & 0xff )) << 8) |
+            	    			(((int)( PAYLOAD_DOPPLER_I2 & 0xff )) << 16);
+                			if (((PAYLOAD_DOPPLER_I2>>7)&0x1) == 1)
+            	    			do_int32 |= (int)0xFF << 24;
+            	    		DOPPLER = ((double)do_int32)/1024.0;
+                		}
+                		else
+                			DOPPLER = null;
+                			
+                		SPACE_VEHICLE = PAYLOAD_SPACE_VEHICLE;
+                		MEASUREMENT_QUALITY = (short)(PAYLOAD_MEASUREMENT_QUALITY+4);
+                		SIGNAL_STRENGTH = PAYLOAD_SIGNAL_STRENGTH;
+                		LOSS_OF_LOCK = PAYLOAD_LOSS_OF_LOCK;
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -26,20 +75,21 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" />
             
             <field name="SENSORTYPE" type="VARCHAR(100)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
-            <field name="PAYLOAD_SV" type="SMALLINT" />
-            <field name="PAYLOAD_SIGNALSTRENGTH" type="TINYINT" />
-            <field name="CARRIERPHASE" type="DOUBLE" />
-            <field name="PSEUDORANGE" type="DOUBLE" />
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="CARRIER_PHASE" type="DOUBLE" />
+            <field name="PSEUDO_RANGE" type="DOUBLE" />
             <field name="DOPPLER" type="DOUBLE" />
+            <field name="SPACE_VEHICLE" type="TINYINT" />
             <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
-            <field name="LOSS_OF_LOCK" type="SMALLINT" />
+            <field name="SIGNAL_STRENGTH" type="TINYINT" />
+            <field name="LOSS_OF_LOCK" type="TINYINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWgpsSvMsg) from ETZ deployment converted</description>

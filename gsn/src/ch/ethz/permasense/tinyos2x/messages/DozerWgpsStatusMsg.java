@@ -774,7 +774,7 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.inclinometerx
-    //   Field type: int
+    //   Field type: short
     //   Offset (bits): 136
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
@@ -808,17 +808,17 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.inclinometerx'
+     * Return the value (as a short) of the field 'payload.inclinometerx'
      */
-    public int get_payload_inclinometerx() {
-        return (int)getUIntBEElement(offsetBits_payload_inclinometerx(), 16);
+    public short get_payload_inclinometerx() {
+        return (short)getSIntBEElement(offsetBits_payload_inclinometerx(), 16);
     }
 
     /**
      * Set the value of the field 'payload.inclinometerx'
      */
-    public void set_payload_inclinometerx(int value) {
-        setUIntBEElement(offsetBits_payload_inclinometerx(), 16, value);
+    public void set_payload_inclinometerx(short value) {
+        setSIntBEElement(offsetBits_payload_inclinometerx(), 16, value);
     }
 
     /**
@@ -837,7 +837,7 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.inclinometery
-    //   Field type: int
+    //   Field type: short
     //   Offset (bits): 152
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
@@ -871,17 +871,17 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.inclinometery'
+     * Return the value (as a short) of the field 'payload.inclinometery'
      */
-    public int get_payload_inclinometery() {
-        return (int)getUIntBEElement(offsetBits_payload_inclinometery(), 16);
+    public short get_payload_inclinometery() {
+        return (short)getSIntBEElement(offsetBits_payload_inclinometery(), 16);
     }
 
     /**
      * Set the value of the field 'payload.inclinometery'
      */
-    public void set_payload_inclinometery(int value) {
-        setUIntBEElement(offsetBits_payload_inclinometery(), 16, value);
+    public void set_payload_inclinometery(short value) {
+        setSIntBEElement(offsetBits_payload_inclinometery(), 16, value);
     }
 
     /**
@@ -937,14 +937,14 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
      * Return the value (as a short) of the field 'payload.numsv'
      */
     public short get_payload_numsv() {
-        return (short)getUIntBEElement(offsetBits_payload_numsv(), 8);
+        return (short)getUIntElement(offsetBits_payload_numsv(), 8);
     }
 
     /**
      * Set the value of the field 'payload.numsv'
      */
     public void set_payload_numsv(short value) {
-        setUIntBEElement(offsetBits_payload_numsv(), 8, value);
+        setUIntElement(offsetBits_payload_numsv(), 8, value);
     }
 
     /**
@@ -1000,14 +1000,14 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
      * Return the value (as a int) of the field 'payload.gpsweek'
      */
     public int get_payload_gpsweek() {
-        return (int)getUIntBEElement(offsetBits_payload_gpsweek(), 16);
+        return (int)getUIntElement(offsetBits_payload_gpsweek(), 16);
     }
 
     /**
      * Set the value of the field 'payload.gpsweek'
      */
     public void set_payload_gpsweek(int value) {
-        setUIntBEElement(offsetBits_payload_gpsweek(), 16, value);
+        setUIntElement(offsetBits_payload_gpsweek(), 16, value);
     }
 
     /**
@@ -1063,14 +1063,14 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
      * Return the value (as a long) of the field 'payload.gpstime'
      */
     public long get_payload_gpstime() {
-        return (long)getUIntBEElement(offsetBits_payload_gpstime(), 32);
+        return (long)getUIntElement(offsetBits_payload_gpstime(), 32);
     }
 
     /**
      * Set the value of the field 'payload.gpstime'
      */
     public void set_payload_gpstime(long value) {
-        setUIntBEElement(offsetBits_payload_gpstime(), 32, value);
+        setUIntElement(offsetBits_payload_gpstime(), 32, value);
     }
 
     /**
@@ -1126,14 +1126,14 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
      * Return the value (as a int) of the field 'payload.crc'
      */
     public int get_payload_crc() {
-        return (int)getUIntBEElement(offsetBits_payload_crc(), 16);
+        return (int)getUIntElement(offsetBits_payload_crc(), 16);
     }
 
     /**
      * Set the value of the field 'payload.crc'
      */
     public void set_payload_crc(int value) {
-        setUIntBEElement(offsetBits_payload_crc(), 16, value);
+        setUIntElement(offsetBits_payload_crc(), 16, value);
     }
 
     /**
