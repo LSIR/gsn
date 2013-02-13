@@ -659,8 +659,12 @@ public abstract class StorageManager {
                             ps.setByte(counter, ((Number) value).byteValue());
                         break;
                     case DataTypes.DOUBLE:
-                        if (value == null)
+                        if (value == null || Double.isNaN(((Number) value).doubleValue()))
                             ps.setNull(counter, Types.DOUBLE);
+                        else if (((Number) value).doubleValue() == Double.POSITIVE_INFINITY)
+                        	ps.setDouble(counter, Double.MAX_VALUE);
+                        else if (((Number) value).doubleValue() == Double.NEGATIVE_INFINITY)
+                        	ps.setDouble(counter, Double.MIN_VALUE);
                         else
                             ps.setDouble(counter, ((Number) value).doubleValue());
                         break;
