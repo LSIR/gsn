@@ -138,11 +138,13 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 					Main.getStorage(vsName).close(conn);
 				}
 			}
-			logger.info("lastVisited=" + String.valueOf(lastVisited));
+			if (logger.isDebugEnabled())
+				logger.debug("lastVisited=" + String.valueOf(lastVisited));
 			
 			query = SQLUtils.newRewrite(query, vsName, vsName.toLowerCase()).toString();
-			
-			logger.debug("Local wrapper request received for: "+vsName);
+
+			if (logger.isDebugEnabled())
+				logger.debug("Local wrapper request received for: "+vsName);
 			
 			vSensorConfig = Mappings.getConfig(vsName);
 			distributionRequest = DefaultDistributionRequest.create(this, vSensorConfig, query, lastVisited, continuous);
@@ -206,7 +208,8 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		if (getActiveAddressBean().getVirtualSensorConfig().isProducingStatistics())
 			inputEvent(vsName, se.getVolume());
 		boolean isSucced = postStreamElement(se);
-		logger.debug("wants to deliver stream element:"+ se.toString()+ "["+isSucced+"]");
+		if (logger.isDebugEnabled())
+			logger.debug("wants to deliver stream element:"+ se.toString()+ "["+isSucced+"]");
 		return true;
 	}
 

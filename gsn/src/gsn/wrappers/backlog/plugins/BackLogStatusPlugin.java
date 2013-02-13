@@ -138,7 +138,8 @@ public class BackLogStatusPlugin extends AbstractPlugin {
 			logger.error("wrong " + STATUS_DATA_TYPE + " predicate key specified in virtual sensor XML file! (" + STATUS_DATA_TYPE + "=" + statusDataType + ")");
 			return false;
 		}
-		logger.info("using BackLogStatus data type: " + statusDataType);
+		if (logger.isDebugEnabled())
+			logger.debug("using BackLogStatus data type: " + statusDataType);
         
         registerListener();
 

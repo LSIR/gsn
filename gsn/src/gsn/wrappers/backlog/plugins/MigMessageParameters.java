@@ -172,10 +172,12 @@ public class MigMessageParameters {
 				// select getters
 				if (method.getName().startsWith(tinyosGetterPrefix)) {
 					if ( isInMethodList(getters, method) ) {
-						logger.warn("The method >" + method.getName() + "< is already defined in a subclass. This getter is skipped.");
+						if (logger.isDebugEnabled())
+							logger.debug("The method >" + method.getName() + "< is already defined in a subclass. This getter is skipped.");
 					}
 					else if (method.getName().compareToIgnoreCase(tinyosGetterPrefix + "TIMED") == 0) {
-						logger.warn("next data field is the TIMED field");
+						if (logger.isDebugEnabled())
+							logger.debug("next data field is the TIMED field");
 						timedFieldGetter = method;
 					}
 					else {
@@ -225,7 +227,8 @@ public class MigMessageParameters {
 					if (logger.isDebugEnabled())
 						logger.debug("setter: " + method.getName());
 					if ( isInMethodList(setters, method) ) {
-						logger.warn("The method >" + method.getName() + "< is already defined in a subclass. This setter is skipped.");
+						if (logger.isDebugEnabled())
+							logger.debug("The method >" + method.getName() + "< is already defined in a subclass. This setter is skipped.");
 					}
 					else {
 						setters.add(method);

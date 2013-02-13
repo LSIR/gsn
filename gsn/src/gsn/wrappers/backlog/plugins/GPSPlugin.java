@@ -68,7 +68,8 @@ public class GPSPlugin extends AbstractPlugin {
 			logger.error("wrong " + GPS_DATA_TYPE + " predicate key specified in virtual sensor XML file! (" + GPS_DATA_TYPE + "=" + gpsDataType + ")");
 			return false;
 		}
-		logger.info("using GPS data type: " + gpsDataType);
+		if (logger.isDebugEnabled())
+			logger.debug("using GPS data type: " + gpsDataType);
         
         registerListener();
 
@@ -106,24 +107,24 @@ public class GPSPlugin extends AbstractPlugin {
 			short msgType = toShort(data[0]);
 			
 			if (msgType == gpsNamingTable.get(gpsDataType).typeNumber) {
-				logger.debug("msgType: " + msgType);
+				if (logger.isDebugEnabled())
+					logger.debug("msgType: " + msgType);
 				if (gpsDataType.equalsIgnoreCase(NAV_NAMING)) {
-
-          try {
-					  int utcPosTime = (int) Double.parseDouble((String)data[1]);
-					  double latitude = Double.parseDouble((String)data[2]);
-					  double longitude = Double.parseDouble((String)data[4]);
-					  int quality = Short.parseShort((String)data[6]);
-					  int nrSatellites = Short.parseShort((String)data[7]);
-					  double hdop = Double.parseDouble((String)data[8]);
-					  double geoidHeight = Double.parseDouble((String)data[9]);
-					  double geoidSep = Double.parseDouble((String)data[11]);
-					  out = new Serializable[]{timestamp, timestamp, deviceId, utcPosTime, latitude, data[3], longitude, data[5], quality, nrSatellites, hdop, geoidHeight, data[10], geoidSep, data[12]};
-          } catch(Exception ex) {
-			      logger.warn(ex.getMessage(), ex);
-            logger.warn("GPS NAV data could not be parsed.");
-					  out = new Serializable[]{timestamp, timestamp, deviceId, null, null, null, null, null, null, null, null, null, null, null, null};
-          }
+					try {
+						int utcPosTime = (int) Double.parseDouble((String)data[1]);
+						double latitude = Double.parseDouble((String)data[2]);
+						double longitude = Double.parseDouble((String)data[4]);
+						int quality = Short.parseShort((String)data[6]);
+						int nrSatellites = Short.parseShort((String)data[7]);
+						double hdop = Double.parseDouble((String)data[8]);
+						double geoidHeight = Double.parseDouble((String)data[9]);
+						double geoidSep = Double.parseDouble((String)data[11]);
+						out = new Serializable[]{timestamp, timestamp, deviceId, utcPosTime, latitude, data[3], longitude, data[5], quality, nrSatellites, hdop, geoidHeight, data[10], geoidSep, data[12]};
+					} catch(Exception ex) {
+						logger.warn(ex.getMessage(), ex);
+						logger.warn("GPS NAV data could not be parsed.");
+						out = new Serializable[]{timestamp, timestamp, deviceId, null, null, null, null, null, null, null, null, null, null, null, null};
+					}
 				}
 				else if (gpsDataType.equalsIgnoreCase(RAW_NAMING)) {
 					out = new Serializable[]{timestamp, timestamp, deviceId, toShort(data[1]), toInteger(data[2]), toInteger(data[3]), data[4]};
@@ -140,7 +141,7 @@ public class GPSPlugin extends AbstractPlugin {
 				}
 			}
 		} catch (Exception e) {
-      logger.warn("Exception while storing message in the data base.");
+			logger.warn("Exception while storing message in the data base.");
 			logger.warn(e.getMessage(), e);
 			return true;
 		}
