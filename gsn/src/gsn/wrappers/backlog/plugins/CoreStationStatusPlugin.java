@@ -252,7 +252,8 @@ public class CoreStationStatusPlugin extends AbstractPlugin {
 			logger.error("wrong " + STATUS_DATA_TYPE + " predicate key specified in virtual sensor XML file! (" + STATUS_DATA_TYPE + "=" + statusDataType + ")");
 			return false;
 		}
-		logger.info("using CoreStationStatus data type: " + statusDataType);
+		if (logger.isDebugEnabled())
+			logger.debug("using CoreStationStatus data type: " + statusDataType);
         
         registerListener();
 

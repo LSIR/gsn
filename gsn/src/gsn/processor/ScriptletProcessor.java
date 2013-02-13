@@ -192,7 +192,8 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
             return false;
         }
         if ((scriptletPeriodic != null && period < 0) || (scriptletPeriodic == null && period >= 0)) {
-            logger.warn("The Initial Parameters >" + PARAM_SCRIPTLETPERIODIC + "< and >" + PARAM_PERIOD + "< MUST be provided together in the configuration file for the processing class.");
+			if (logger.isDebugEnabled())
+				logger.debug("The Initial Parameters >" + PARAM_SCRIPTLETPERIODIC + "< and >" + PARAM_PERIOD + "< MUST be provided together in the configuration file for the processing class.");
             return false;
         }
 
