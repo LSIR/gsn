@@ -52,125 +52,128 @@ class JobsObserverClass(Thread, Statistics):
         
         
     def run(self):
-        self._logger.info('started')
-        log_beacon_mode = dict()
-        while not self._jobsObserverStop:
-            self._work.wait()
-            if self._jobsObserverStop:
-                break
-            self._work.clear()
-            
+        try:
+            self._logger.info('started')
+            log_beacon_mode = dict()
             while not self._jobsObserverStop:
-                self._wait.wait(JOB_PROCESS_CHECK_INTERVAL_SECONDS)
+                self._work.wait()
                 if self._jobsObserverStop:
                     break
-            
-                if len(log_beacon_mode) > 0 and not self._backlogMain.schedulehandler._beacon:
-                    log_beacon_mode.clear()
+                self._work.clear()
                 
-                allFinished = True
-                index = len(self._jobList)
-                for joblistentry in reversed(self._jobList):
-                    index -= 1
-                    isPlugin, job, job_name, runtime_end, min_runtime = joblistentry
-                    if isPlugin:
-                        if job.isBusy():
-                            if runtime_end is not None:
-                                if runtime_end <= datetime.utcnow():
-                                    self._logger.warning('plugin (%s) has not finished in time -> stop it' % (job_name,))
-                                    self._backlogMain.pluginStop(job_name)
-                                    del self._jobList[index]
-                                    self.counterAction(self._plugNotFinInTimeCounterId)
-                                else:
-                                    allFinished = False
-                                    if self._logger.isEnabledFor(logging.DEBUG):
-                                        self._logger.debug('plugin (%s) has not yet finished -> %s time to run' % (job_name, runtime_end-datetime.utcnow()))
-                            else:
-                                allFinished = False
-                        else:
-                            if min_runtime <= datetime.utcnow():
-                                mode = job.getRuntimeMode()
-                                if self._backlogMain.schedulehandler._beacon and self._backlogMain.duty_cycle_mode and (mode == RUNTIME_MODE_STOP_DC_ALLWAYS or mode == RUNTIME_MODE_STOP_DC_LAST):
-                                    allFinished = False
-                                    if log_beacon_mode.get(job_name) is None:
-                                        self._logger.info('%s should not be stopped if in beacon mode => keep running' % (job_name,))
-                                        log_beacon_mode.update({job_name:False})
-                                elif mode == RUNTIME_MODE_STOP_ALLWAYS or (mode == RUNTIME_MODE_STOP_DC_ALLWAYS and self._backlogMain.duty_cycle_mode):
-                                    self._backlogMain.pluginStop(job_name)
-                                    self._dutyModeDependentLogging('plugin (%s) finished successfully in time' % (job_name,))
-                                    del self._jobList[index]
-                                    self.counterAction(self._plugNotFinInTimeCounterId)
-                            else:
-                                allFinished = False
-                                if self._logger.isEnabledFor(logging.DEBUG):
-                                    self._logger.debug('plugin (%s) has not yet reached min_runtime %s more seconds to go -> keep running' % (job_name, min_runtime-datetime.utcnow()))
-                    else:
-                        ret = job.poll()
-                        if ret == None:
-                            if runtime_end is not None:
-                                if runtime_end <= datetime.utcnow():
-                                    self.error('job (%s) with PID %s has not finished in time -> kill it' % (job_name, job.pid()))
-                                    try:
-                                        os.killpg(job.pid(), signal.SIGTERM)
-                                    except:
-                                        pass
-                                    self._logger.warning('wait for job (%s) to be killed' % (job_name,))
-                                    self._wait.wait(0.1)
-                                    if job.poll() == None:
-                                        self._wait.wait(3)
-                                    if self._wait.isSet():
-                                        break
-                                    if job.poll() == None:
-                                        try:
-                                            os.killpg(job.pid(), signal.SIGKILL)
-                                        except:
-                                            pass
-                                    job.wait()
-                                    stdoutdata, stderrdata = job.communicate()
-                                    self._logger.warning('job (%s) has been killed (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
-                                    del self._jobList[index]
-                                    self.counterAction(self._scriptNotFinInTimeCounterId)
-                                else:
-                                    allFinished = False
-                                    if self._logger.isEnabledFor(logging.DEBUG):
-                                        self._logger.debug('job (%s) with PID %s not yet finished -> %s time to run' % (job_name, job.pid(), runtime_end-datetime.utcnow()))
-                            else:
-                                allFinished = False
-                        else:
-                            stdoutdata, stderrdata = job.communicate()
-                            if ret == 0:
-                                self._dutyModeDependentLogging('job (%s) finished successfully (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
-                                self.counterAction(self._scriptFinSucInTimeCounterId)
-                            else:
-                                self.error('job (%s) finished with return code %s (STDOUT=%s /STDERR=%s)' % (job_name, ret, stdoutdata.decode(), stderrdata.decode()))
-                                self.counterAction(self._scriptFinUnsucInTimeCounterId)
-                            del self._jobList[index]
-                            
-                if allFinished:
-                    self._dutyModeDependentLogging('all observed jobs finished -> stopping the rest')
+                while not self._jobsObserverStop:
+                    self._wait.wait(JOB_PROCESS_CHECK_INTERVAL_SECONDS)
+                    if self._jobsObserverStop:
+                        break
+                
+                    if len(log_beacon_mode) > 0 and not self._backlogMain.schedulehandler._beacon:
+                        log_beacon_mode.clear()
+                    
+                    allFinished = True
                     index = len(self._jobList)
                     for joblistentry in reversed(self._jobList):
                         index -= 1
                         isPlugin, job, job_name, runtime_end, min_runtime = joblistentry
                         if isPlugin:
-                            self._dutyModeDependentLogging('stopping plugin (%s)' % (job_name,))
-                            self._backlogMain.pluginStop(job_name)
-                            del self._jobList[index]
+                            if job.isBusy():
+                                if runtime_end is not None:
+                                    if runtime_end <= datetime.utcnow():
+                                        self._logger.warning('plugin (%s) has not finished in time -> stop it' % (job_name,))
+                                        self._backlogMain.pluginStop(job_name)
+                                        del self._jobList[index]
+                                        self.counterAction(self._plugNotFinInTimeCounterId)
+                                    else:
+                                        allFinished = False
+                                        if self._logger.isEnabledFor(logging.DEBUG):
+                                            self._logger.debug('plugin (%s) has not yet finished -> %s time to run' % (job_name, runtime_end-datetime.utcnow()))
+                                else:
+                                    allFinished = False
+                            else:
+                                if min_runtime <= datetime.utcnow():
+                                    mode = job.getRuntimeMode()
+                                    if self._backlogMain.schedulehandler._beacon and self._backlogMain.duty_cycle_mode and (mode == RUNTIME_MODE_STOP_DC_ALLWAYS or mode == RUNTIME_MODE_STOP_DC_LAST):
+                                        allFinished = False
+                                        if log_beacon_mode.get(job_name) is None:
+                                            self._logger.info('%s should not be stopped if in beacon mode => keep running' % (job_name,))
+                                            log_beacon_mode.update({job_name:False})
+                                    elif mode == RUNTIME_MODE_STOP_ALLWAYS or (mode == RUNTIME_MODE_STOP_DC_ALLWAYS and self._backlogMain.duty_cycle_mode):
+                                        self._backlogMain.pluginStop(job_name)
+                                        self._dutyModeDependentLogging('plugin (%s) finished successfully in time' % (job_name,))
+                                        del self._jobList[index]
+                                        self.counterAction(self._plugNotFinInTimeCounterId)
+                                else:
+                                    allFinished = False
+                                    if self._logger.isEnabledFor(logging.DEBUG):
+                                        self._logger.debug('plugin (%s) has not yet reached min_runtime %s more seconds to go -> keep running' % (job_name, min_runtime-datetime.utcnow()))
                         else:
-                            self.exception('there should be no more scripts around anymore (%s)' % (job_name,))
-                            
+                            ret = job.poll()
+                            if ret == None:
+                                if runtime_end is not None:
+                                    if runtime_end <= datetime.utcnow():
+                                        self.error('job (%s) with PID %s has not finished in time -> kill it' % (job_name, job.pid()))
+                                        try:
+                                            os.killpg(job.pid(), signal.SIGTERM)
+                                        except:
+                                            pass
+                                        self._logger.warning('wait for job (%s) to be killed' % (job_name,))
+                                        self._wait.wait(0.1)
+                                        if job.poll() == None:
+                                            self._wait.wait(3)
+                                        if self._wait.isSet():
+                                            break
+                                        if job.poll() == None:
+                                            try:
+                                                os.killpg(job.pid(), signal.SIGKILL)
+                                            except:
+                                                pass
+                                        job.wait()
+                                        stdoutdata, stderrdata = job.communicate()
+                                        self._logger.warning('job (%s) has been killed (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
+                                        del self._jobList[index]
+                                        self.counterAction(self._scriptNotFinInTimeCounterId)
+                                    else:
+                                        allFinished = False
+                                        if self._logger.isEnabledFor(logging.DEBUG):
+                                            self._logger.debug('job (%s) with PID %s not yet finished -> %s time to run' % (job_name, job.pid(), runtime_end-datetime.utcnow()))
+                                else:
+                                    allFinished = False
+                            else:
+                                stdoutdata, stderrdata = job.communicate()
+                                if ret == 0:
+                                    self._dutyModeDependentLogging('job (%s) finished successfully (STDOUT=%s /STDERR=%s)' % (job_name, stdoutdata.decode(), stderrdata.decode()))
+                                    self.counterAction(self._scriptFinSucInTimeCounterId)
+                                else:
+                                    self.error('job (%s) finished with return code %s (STDOUT=%s /STDERR=%s)' % (job_name, ret, stdoutdata.decode(), stderrdata.decode()))
+                                    self.counterAction(self._scriptFinUnsucInTimeCounterId)
+                                del self._jobList[index]
+                                
+                    if allFinished:
+                        self._dutyModeDependentLogging('all observed jobs finished -> stopping the rest')
+                        index = len(self._jobList)
+                        for joblistentry in reversed(self._jobList):
+                            index -= 1
+                            isPlugin, job, job_name, runtime_end, min_runtime = joblistentry
+                            if isPlugin:
+                                self._dutyModeDependentLogging('stopping plugin (%s)' % (job_name,))
+                                self._backlogMain.pluginStop(job_name)
+                                del self._jobList[index]
+                            else:
+                                self.exception('there should be no more scripts around anymore (%s)' % (job_name,))
+                                
+                        
                     
-                
-                self._lock.acquire()
-                if not self._jobList:
-                    self._work.clear()
-                    self._backlogMain.schedulehandler.allJobsFinished()
-                    self._lock.release()
-                    break
-                else:
-                    self._lock.release()
- 
-        self._logger.info('died')
+                    self._lock.acquire()
+                    if not self._jobList:
+                        self._work.clear()
+                        self._backlogMain.schedulehandler.allJobsFinished()
+                        self._lock.release()
+                        break
+                    else:
+                        self._lock.release()
+     
+            self._logger.info('died')
+        except Exception, e:
+            self.exception(str(e))
         
         
         

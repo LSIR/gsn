@@ -276,153 +276,156 @@ class ScheduleHandlerClass(Thread, Statistics):
         
         
     def run(self):
-        self._logger.info('started')
-        
-        if self._duty_cycle_mode:
-            self._pingThread.start()
-            self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
-            if self._scheduleHandlerStop:
-                self._logger.info('died')
-                return
-        else:
-            if self._tosOnline:
-                self.tosMsgSend(TOSTypes.CONTROL_CMD_RESET_WATCHDOG, 0)
-                self._tosOnline = False
-                self._backlogMain.deregisterTOSListener(self)
-        
-        if self._schedule and self._duty_cycle_mode:  
-            # Schedule duty wake-up after this session, for safety reasons.
-            # (The scheduled time here could be in this session if schedules are following
-            # each other in short intervals. In this case it could be possible, that
-            # we have to wait for the next service window in case of an unexpected shutdown.)
-            min = int(self._getOptionValue('max_gsn_connect_wait_minutes', self._config))
-            min += int(self._getOptionValue('max_gsn_get_schedule_wait_minutes', self._config))
-            min += int(self._getOptionValue('max_next_schedule_wait_minutes', self._config))
-            min += int(self._getOptionValue('hard_shutdown_offset_minutes', self._config))
-            sec = int(self._getOptionValue('approximate_startup_seconds', self._config))
-            maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
-            if maxruntime is not None:
-                sec += maxruntime
-            td = timedelta(minutes=min, seconds=sec)
-            nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
-            if error:
-                for e in error:
-                    self.error('error while parsing the schedule file: %s' % (e,))
-            if nextschedule:
-                nextdt, pluginclassname, commandstring, runtimemax, runtimemin = nextschedule[0]
-                self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
-                
-        if self._schedule:
-            thread.start_new_thread(self._waitForGSN, (None,))
-        else:
-            self._waitForGSN()
-        
-        lookback = True
-        service_time = timedelta()
-        self._waitForNextJob.clear()
-        while not self._scheduleHandlerStop:
-            dtnow = datetime.utcnow()
+        try:
+            self._logger.info('started')
             
-            nextschedules = None
+            if self._duty_cycle_mode:
+                self._pingThread.start()
+                self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
+                if self._scheduleHandlerStop:
+                    self._logger.info('died')
+                    return
+            else:
+                if self._tosOnline:
+                    self.tosMsgSend(TOSTypes.CONTROL_CMD_RESET_WATCHDOG, 0)
+                    self._tosOnline = False
+                    self._backlogMain.deregisterTOSListener(self)
+            
+            if self._schedule and self._duty_cycle_mode:  
+                # Schedule duty wake-up after this session, for safety reasons.
+                # (The scheduled time here could be in this session if schedules are following
+                # each other in short intervals. In this case it could be possible, that
+                # we have to wait for the next service window in case of an unexpected shutdown.)
+                min = int(self._getOptionValue('max_gsn_connect_wait_minutes', self._config))
+                min += int(self._getOptionValue('max_gsn_get_schedule_wait_minutes', self._config))
+                min += int(self._getOptionValue('max_next_schedule_wait_minutes', self._config))
+                min += int(self._getOptionValue('hard_shutdown_offset_minutes', self._config))
+                sec = int(self._getOptionValue('approximate_startup_seconds', self._config))
+                maxruntime = self._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
+                if maxruntime is not None:
+                    sec += maxruntime
+                td = timedelta(minutes=min, seconds=sec)
+                nextschedule, error = self._schedule.getNextSchedules(datetime.utcnow() + td)
+                if error:
+                    for e in error:
+                        self.error('error while parsing the schedule file: %s' % (e,))
+                if nextschedule:
+                    nextdt, pluginclassname, commandstring, runtimemax, runtimemin = nextschedule[0]
+                    self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
+                    
             if self._schedule:
-                # get the next schedule(s) in time
-                self._scheduleLock.acquire()
-                nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback)
-                for e in error:
-                    self.error('error while parsing the schedule file: %s' % (e,))
-                self._newScheduleEvent.clear()
-                lookback = False
-                self._scheduleLock.release()
-                
-            # if there is no schedule shutdown again and wait for next service window or wait for a schedule
-            if not nextschedules:
-                if self._duty_cycle_mode and not self._beacon:
-                    self._logger.warning('no schedule or empty schedule available -> shutdown')
-                    if self._shutdownThread:
-                        self._shutdownThread.stop()
-                    self._shutdownThread = ShutdownThread(self)
-                    self._shutdownThread.start()
-                    break
-                else:
-                    self._logger.info('no schedule or empty schedule available -> waiting for a schedule')
-                    self._newScheduleEvent.clear()
-                    self._newScheduleEvent.wait()
-                    continue
+                thread.start_new_thread(self._waitForGSN, (None,))
+            else:
+                self._waitForGSN()
             
-            for nextdt, pluginclassname, commandstring, runtimemax, runtimemin in nextschedules:
-                if self._logger.isEnabledFor(logging.DEBUG):
-                    self._logger.debug('(%s,%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax, runtimemin))
+            lookback = True
+            service_time = timedelta()
+            self._waitForNextJob.clear()
+            while not self._scheduleHandlerStop:
                 dtnow = datetime.utcnow()
-                timediff = nextdt - dtnow
                 
-                
-                if self._duty_cycle_mode and not self._beacon:
-                    if self._service_wakeup_disabled and not self._servicewindow:
-                        service_time = timedelta()
-                    else:
-                        service_time = self._serviceTime()
-                        
-                    if timediff > self._max_next_schedule_wait_delta and timediff > service_time:
+                nextschedules = None
+                if self._schedule:
+                    # get the next schedule(s) in time
+                    self._scheduleLock.acquire()
+                    nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback)
+                    for e in error:
+                        self.error('error while parsing the schedule file: %s' % (e,))
+                    self._newScheduleEvent.clear()
+                    lookback = False
+                    self._scheduleLock.release()
+                    
+                # if there is no schedule shutdown again and wait for next service window or wait for a schedule
+                if not nextschedules:
+                    if self._duty_cycle_mode and not self._beacon:
+                        self._logger.warning('no schedule or empty schedule available -> shutdown')
                         if self._shutdownThread:
                             self._shutdownThread.stop()
-                        if service_time <= self._max_next_schedule_wait_delta:
-                            self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self._getOptionValue('max_next_schedule_wait_minutes', self._config),))
-                        else:
-                            self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self._getOptionValue('max_next_schedule_wait_minutes', self._config)),))
                         self._shutdownThread = ShutdownThread(self)
                         self._shutdownThread.start()
+                        break
+                    else:
+                        self._logger.info('no schedule or empty schedule available -> waiting for a schedule')
+                        self._newScheduleEvent.clear()
+                        self._newScheduleEvent.wait()
+                        continue
+                
+                for nextdt, pluginclassname, commandstring, runtimemax, runtimemin in nextschedules:
+                    if self._logger.isEnabledFor(logging.DEBUG):
+                        self._logger.debug('(%s,%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax, runtimemin))
+                    dtnow = datetime.utcnow()
+                    timediff = nextdt - dtnow
                     
-                if nextdt > dtnow:
+                    
+                    if self._duty_cycle_mode and not self._beacon:
+                        if self._service_wakeup_disabled and not self._servicewindow:
+                            service_time = timedelta()
+                        else:
+                            service_time = self._serviceTime()
+                            
+                        if timediff > self._max_next_schedule_wait_delta and timediff > service_time:
+                            if self._shutdownThread:
+                                self._shutdownThread.stop()
+                            if service_time <= self._max_next_schedule_wait_delta:
+                                self._logger.info('nothing more to do in the next %s minutes (max_next_schedule_wait_minutes)' % (self._getOptionValue('max_next_schedule_wait_minutes', self._config),))
+                            else:
+                                self._logger.info('nothing more to do in the next %f minutes (rest of service time plus max_next_schedule_wait_minutes)' % (service_time.seconds/60.0 + service_time.days * 1440.0 + int(self._getOptionValue('max_next_schedule_wait_minutes', self._config)),))
+                            self._shutdownThread = ShutdownThread(self)
+                            self._shutdownThread.start()
+                        
+                    if nextdt > dtnow:
+                        if pluginclassname:
+                            if self._duty_cycle_mode:
+                                self._logger.info('executing >%s.action("%s")< in %f seconds if not shutdown before' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                            else:
+                                if self._logger.isEnabledFor(logging.DEBUG):
+                                    self._logger.debug('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                        else:
+                            if self._duty_cycle_mode:
+                                self._logger.info('executing >%s< in %f seconds if not shutdown before' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                            else:
+                                if self._logger.isEnabledFor(logging.DEBUG):
+                                    self._logger.debug('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                        self._waitForNextJob.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
+                        if self._waitForNextJob.isSet():
+                            self._waitForNextJob.clear()
+                            if self._newSchedule:
+                                lookback = True
+                                self._newSchedule = False
+                            break
+                    
                     if pluginclassname:
                         if self._duty_cycle_mode:
-                            self._logger.info('executing >%s.action("%s")< in %f seconds if not shutdown before' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                            self._logger.info('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
                         else:
                             if self._logger.isEnabledFor(logging.DEBUG):
-                                self._logger.debug('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                                self._logger.debug('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
+                        try:
+                            self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax, runtimemin)
+                        except Exception, e:
+                            self.error('error in scheduled plugin >%s %s<: %s' % (pluginclassname, commandstring, e))
+                        else:
+                            self.counterAction(self._pluginScheduleCounterId)
                     else:
                         if self._duty_cycle_mode:
-                            self._logger.info('executing >%s< in %f seconds if not shutdown before' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                            self._logger.info('executing >%s< now' % (commandstring,))
                         else:
                             if self._logger.isEnabledFor(logging.DEBUG):
-                                self._logger.debug('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
-                    self._waitForNextJob.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
-                    if self._waitForNextJob.isSet():
-                        self._waitForNextJob.clear()
-                        if self._newSchedule:
-                            lookback = True
-                            self._newSchedule = False
-                        break
+                                self._logger.debug('executing >%s< now' % (commandstring,))
+                        try:
+                            job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
+                        except Exception, e:
+                            self.error('error in scheduled script >%s<: %s' % (commandstring, e))
+                        else:
+                            self._backlogMain.jobsobserver.observeJob(job, commandstring, False, runtimemax)
+                            self.counterAction(self._scriptScheduleCounterId)
                 
-                if pluginclassname:
-                    if self._duty_cycle_mode:
-                        self._logger.info('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
-                    else:
-                        if self._logger.isEnabledFor(logging.DEBUG):
-                            self._logger.debug('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
-                    try:
-                        self._backlogMain.pluginAction(pluginclassname, commandstring, runtimemax, runtimemin)
-                    except Exception, e:
-                        self.error('error in scheduled plugin >%s %s<: %s' % (pluginclassname, commandstring, e))
-                    else:
-                        self.counterAction(self._pluginScheduleCounterId)
-                else:
-                    if self._duty_cycle_mode:
-                        self._logger.info('executing >%s< now' % (commandstring,))
-                    else:
-                        if self._logger.isEnabledFor(logging.DEBUG):
-                            self._logger.debug('executing >%s< now' % (commandstring,))
-                    try:
-                        job = subprocess.Popen(shlex.split(commandstring), stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
-                    except Exception, e:
-                        self.error('error in scheduled script >%s<: %s' % (commandstring, e))
-                    else:
-                        self._backlogMain.jobsobserver.observeJob(job, commandstring, False, runtimemax)
-                        self.counterAction(self._scriptScheduleCounterId)
-            
-        if self._duty_cycle_mode:
-            self._pingThread.join()
-                
-        self._logger.info('died')
+            if self._duty_cycle_mode:
+                self._pingThread.join()
+                    
+            self._logger.info('died')
+        except Exception, e:
+            self.exception(str(e))
             
             
     def getStatus(self):
@@ -992,9 +995,10 @@ class ScheduleCron(CronTab):
                 nextdt = self._getNextSchedule(date_time - td, schedule)
                 if nextdt < now:
                     d = now-nextdt
-                    runtimemax = runtimemax - (d.seconds / 60 + d.days * 1440)
-                    if runtimemax < runtimemin:
-                        runtimemax = runtimemin+1
+                    if runtimemax is not None:
+                        runtimemax = runtimemax - (d.seconds / 60 + d.days * 1440)
+                        if runtimemin is not None and runtimemax < runtimemin:
+                            runtimemax = runtimemin+1
                     backward_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
                 
             nextdt = self._getNextSchedule(date_time, schedule)

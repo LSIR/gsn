@@ -72,54 +72,57 @@ class TOSPeerClass(Thread, Statistics):
             
         
     def run(self):
-        self._logger.info('started')
-
-        self._serialsource.start()
-        self._toswriter.start()
-        
-        # speed optimizations
-        read = self._serialsource.read
-        sendAck = self._serialsource.sendAck
-        processTOSMsg = self._backlogMain.processTOSMsg
-        isEnabledFor = self._logger.isEnabledFor
-        
-        while not self._tosPeerStop:
-            # read packet from serial port (this is blocking)
-            try:
-                self._logger.debug('rcv...')
-                packet = read()
-            except Exception, e:
-                if not self._tosPeerStop:
-                    self.exception('could not read from serial source: %s' % (e,))
-                continue
+        try:
+            self._logger.info('started')
+    
+            self._serialsource.start()
+            self._toswriter.start()
             
-            # if the packet is None just continue
-            if not packet:
-                #self._logger.debug('read packet None')
-                continue
-        
-            timestamp = int(time.time()*1000)
-
-            length = len(packet.payload())
-
-            if isEnabledFor(logging.DEBUG):
-                self._logger.debug('rcv (?,%d,%d)' % (timestamp, length))
-
-            self.counterAction(self._msgReceivedCounterId)
-            # tell BackLogMain to send the packet to the plugins
-            # using the serial port we can guarantee flow control to the backlog database!
-            if processTOSMsg(timestamp, packet['type'], packet):
+            # speed optimizations
+            read = self._serialsource.read
+            sendAck = self._serialsource.sendAck
+            processTOSMsg = self._backlogMain.processTOSMsg
+            isEnabledFor = self._logger.isEnabledFor
+            
+            while not self._tosPeerStop:
+                # read packet from serial port (this is blocking)
                 try:
-                    sendAck()
-                    self.counterAction(self._ackSentCounterId)
+                    self._logger.debug('rcv...')
+                    packet = read()
                 except Exception, e:
                     if not self._tosPeerStop:
-                        self.exception('could not send ack: %s' % (e,))
-                        
-        self._toswriter.join()
-        self._serialsource.join()
-
-        self._logger.info('died')
+                        self.exception('could not read from serial source: %s' % (e,))
+                    continue
+                
+                # if the packet is None just continue
+                if not packet:
+                    #self._logger.debug('read packet None')
+                    continue
+            
+                timestamp = int(time.time()*1000)
+    
+                length = len(packet.payload())
+    
+                if isEnabledFor(logging.DEBUG):
+                    self._logger.debug('rcv (?,%d,%d)' % (timestamp, length))
+    
+                self.counterAction(self._msgReceivedCounterId)
+                # tell BackLogMain to send the packet to the plugins
+                # using the serial port we can guarantee flow control to the backlog database!
+                if processTOSMsg(timestamp, packet['type'], packet):
+                    try:
+                        sendAck()
+                        self.counterAction(self._ackSentCounterId)
+                    except Exception, e:
+                        if not self._tosPeerStop:
+                            self.exception('could not send ack: %s' % (e,))
+                            
+            self._toswriter.join()
+            self._serialsource.join()
+    
+            self._logger.info('died')
+        except Exception, e:
+            self.exception(str(e))
         
             
     def sendTOSMsg(self, packet, amId, timeout=None, blocking=True, maxretries = None):

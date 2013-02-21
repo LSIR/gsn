@@ -104,25 +104,29 @@ class GSNPeerClass(Thread, Statistics):
         
         
     def run(self):
-        self._logger.info('started')
-        
-        self._pingwatchdog.start()
-        self._pingtimer.start()
-        
-        self._serversocket.listen(1)
-        
-        threadnr = 1
-        while not self._gsnPeerStop:
-            self._gsnlistener = GSNListener(self, self._port, self._serversocket, threadnr)
-            threadnr = (threadnr+1)%0xFF
-            if not self._gsnPeerStop:
-                self._gsnlistener.start()
-                self._gsnlistener.join()
+        try:
+            self._logger.info('started')
             
-        self._pingwatchdog.join()
-        self._pingtimer.join()
- 
-        self._logger.info('died')
+            self._pingwatchdog.start()
+            self._pingtimer.start()
+            
+            self._serversocket.listen(1)
+            
+            threadnr = 1
+            while not self._gsnPeerStop:
+                self._gsnlistener = GSNListener(self, self._port, self._serversocket, threadnr)
+                threadnr = (threadnr+1)%0xFF
+                if not self._gsnPeerStop:
+                    self._gsnlistener.start()
+                    self._gsnlistener.join()
+                
+            self._pingwatchdog.join()
+            self._pingtimer.join()
+     
+            self._logger.info('died')
+        except Exception, e:
+            self._logger.exception(str(e), e)
+            self._backlogMain.incrementExceptionCounter()
 
 
     def stop(self):
