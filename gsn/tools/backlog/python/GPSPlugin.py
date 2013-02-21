@@ -591,7 +591,7 @@ class WlanThread(Thread):
             while not self._stopped:
                 self._logger.info('Waiting for %d secs before cycling WLAN' % (self._uptime,))
                 self._work.wait(self._uptime-30)
-                if (self._parent.getPowerControlObject().getWlanStatus()): #is WLAN on?
+                if not self._stopped and self._parent.getPowerControlObject().getWlanStatus(): #is WLAN on?
 
                     start = time()
                     while not self._stopped and self._stay_online and self._parent.isResendingDB():
