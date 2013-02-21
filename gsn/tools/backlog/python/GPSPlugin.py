@@ -624,6 +624,6 @@ class WlanThread(Thread):
     #*********************************************************
     def stop(self):
         self._logger.info('stopping...')
-        self._work.set()
         self._stopped = True
+        self._work.set()
         self._logger.info('stopped')
