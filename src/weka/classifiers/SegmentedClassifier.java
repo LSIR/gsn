@@ -15,7 +15,7 @@ import weka.filters.unsupervised.instance.SubsetByExpression;
  * @author jeberle
  *
  */
-public class SegmentedClassifier extends AbstractClassifier implements Classifier{
+public class SegmentedClassifier extends Classifier{
 
 	private static final long serialVersionUID = 2311122072643482718L;
 	
@@ -39,7 +39,7 @@ public class SegmentedClassifier extends AbstractClassifier implements Classifie
 		this.filter = filter;
 		segmentedClass = segClass;
 		segments = seg2;
-		classifiers = AbstractClassifier.makeCopies(c, numSegments());
+		classifiers = Classifier.makeCopies(c, numSegments());
 	}
 	
 	/**
