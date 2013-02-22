@@ -107,45 +107,63 @@ public final class StreamElement implements Serializable {
 		this.timeStamp=timestamp;
 	}
 	
-	private void verifyTypesCompatibility ( final Byte [ ] fieldTypes , final Serializable [ ] data ) throws IllegalArgumentException {
-		for ( int i = 0 ; i < data.length ; i++ ) {
-			if ( data[ i ] == null ) continue;
-			switch ( fieldTypes[ i ] ) {
+	/**
+	 * Verify if the data corresponds to the fieldType
+	 * @param fieldType
+	 * @param data
+	 * @throws IllegalArgumentException
+	 */
+	private void verifyTypeCompatibility ( Byte fieldType , Serializable data) throws IllegalArgumentException {
+			if ( data == null ) return;
+			switch ( fieldType ) {
 			case DataTypes.TINYINT :
-				if ( !( data[ i ] instanceof Byte ) )
-					throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ fieldTypes[i] ]
-					                                                                                                                                                                   + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
+				if ( !( data instanceof Byte ) )
+					throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ]
+					                                    + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" );
 				break;
 			case DataTypes.SMALLINT :
-				if ( !( data[ i ] instanceof Short ) )
-					throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ fieldTypes[i] ]
-					                                                                                                                                                                   + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
+				if ( !( data instanceof Short ) )
+					throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ]
+					                                    + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" );
 				break;
 			case DataTypes.BIGINT :
-				if ( !( data[ i ] instanceof Long ) ) { throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as "
-						+ DataTypes.TYPE_NAMES[ fieldTypes[i] ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" ); }
+				if ( !( data instanceof Long ) ) 
+					throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ] 
+							                            + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" ); 
 				break;
 			case DataTypes.CHAR :
 			case DataTypes.VARCHAR :
-				if ( !( data[ i ] instanceof String ) ) { throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as "
-						+ DataTypes.TYPE_NAMES[ fieldTypes[i] ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" ); }
+				if ( !( data instanceof String ) ) 
+                    throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ] 
+                    		                            + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" );
 				break;
 			case DataTypes.INTEGER :
-				if ( !( data[ i ] instanceof Integer)) { throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as "
-						+ DataTypes.TYPE_NAMES[ fieldTypes[i] ] + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" ); }
+				if ( !( data instanceof Integer)) 
+                    throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ] 
+                    		                            + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" ); 
 				break;
 			case DataTypes.DOUBLE :
-				if ( !( data[ i ] instanceof Double || data[ i ] instanceof Float ) )
-					throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ fieldTypes[i] ]
-					                                                                                                                                                                   + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
+				if ( !( data instanceof Double || data instanceof Float ) )
+					throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ]
+	                                                    + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" );
 				break;
 			case DataTypes.BINARY :
 				// if ( data[ i ] instanceof String ) data[ i ] = ( ( String )
 				// data[ i ] ).getBytes( );
-				if ( !( data[ i ] instanceof byte [ ] || data[ i ] instanceof String ) )
-					throw new IllegalArgumentException( "The newly constructed Stream Element is not consistant. The " + ( i + 1 ) + "th field is defined as " + DataTypes.TYPE_NAMES[ fieldTypes[i] ]
-					                                                                                                                                                                   + " while the actual data in the field is of type : *" + data[ i ].getClass( ).getCanonicalName( ) + "*" );
+				if ( !( data instanceof byte [ ] || data instanceof String ) )
+					throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ]
+                                                        + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" );
 				break;
+			}
+		}
+	
+	
+	private void verifyTypesCompatibility ( final Byte [ ] fieldTypes , final Serializable [ ] data ) throws IllegalArgumentException {
+		for ( int i = 0 ; i < data.length ; i++ ) {
+			try{
+				verifyTypeCompatibility(fieldTypes[i], data[i]);
+			}catch(IllegalArgumentException e){
+				throw new IllegalArgumentException("The newly constructed Stream Element is not consistant for the " + ( i + 1 ) + "th field.", e);
 			}
 		}
 	}
@@ -219,21 +237,30 @@ public final class StreamElement implements Serializable {
 	 * @return The value corresponding to the named tuple.
 	 */
 	public final Serializable getData ( final String fieldName ) {
-		if ( indexedFieldNames == null ) {
-			indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
-			for ( int i = 0 ; i < this.fieldNames.length ; i++ )
-				this.indexedFieldNames.put( fieldNames[ i ] , i );
-			//    for (String k : this.indexedFieldNames.keySet())
-			//    System.out.println("Key : "+k + " VALUE = "+this.indexedFieldNames.get(k));
-		}
-		//  System.out.print(fieldName+" AT INDEX : "+ this.indexedFieldNames.get( fieldName ) );
-		//  System.out.println(" HAS VALUE : "+this.fieldValues[ this.indexedFieldNames.get( fieldName ) ]);
+		generateIndex();
 		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {
 			logger.warn("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
 			return null;
 		}
 		return this.fieldValues[ index ];
+	}
+	
+	/**
+	 * This method gets the attribute name as the input and returns the type of the value
+	 * corresponding to that tuple.
+	 * 
+	 * @param fieldName The name of the tuple.
+	 * @return The type of the value corresponding to the named tuple.
+	 */
+	public final Byte getType ( final String fieldName ) {
+		generateIndex();
+		Integer index = indexedFieldNames.get( fieldName );
+		if (index == null) {
+			logger.warn("There is a request for type of field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
+			return null;
+		}
+		return this.fieldTypes[ index ];
 	}
 
 	public long getInternalPrimayKey ( ) {
@@ -397,16 +424,32 @@ public final class StreamElement implements Serializable {
 		StreamElement4Rest toReturn = new StreamElement4Rest(this);
 		return toReturn;
 	}
-	public void setData(String fieldName, Serializable data) {
+	
+	/**
+	 * Build the index for mapping field name to their positions in the array if it is not yet built
+	 * This assumes that StreamElements cannot change their structure
+	 */
+	private void generateIndex(){
 		if ( indexedFieldNames == null ) {
 			indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
 			for ( int i = 0 ; i < this.fieldNames.length ; i++ )
 				this.indexedFieldNames.put( fieldNames[ i ] , i );
 		}
+	}
+	
+	/**
+	 * set the data in the coresponding field, throws an exception if the data type doesn't match
+	 * @param fieldName
+	 * @param data
+	 * @throws IllegalArgumentException
+	 */
+	public void setData(String fieldName, Serializable data) throws IllegalArgumentException {
+		generateIndex();
 		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {
 			logger.warn("There is a request for setting field "+fieldName+" for StreamElement: "+this.toString()+". But the requested field doesn't exist.");
 		}
+		verifyTypeCompatibility(fieldTypes[index], data);
 		setData(index,data);		
 	}
 }
