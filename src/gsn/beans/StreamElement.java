@@ -32,6 +32,8 @@ public final class StreamElement implements Serializable {
 
 	public StreamElement (StreamElement other) {
 		this.fieldNames=new String[other.fieldNames.length];
+		this.fieldValues=new Serializable[other.fieldValues.length];
+		this.fieldTypes=new Byte[other.fieldTypes.length];
 		for (int i=0;i<other.fieldNames.length;i++) {
 			fieldNames[i]=other.fieldNames[i];
 			fieldValues[i]=other.fieldValues[i];
