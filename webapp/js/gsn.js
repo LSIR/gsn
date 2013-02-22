@@ -537,7 +537,7 @@ var GSN = {
   		
         $.ajax({
             type: "GET",
-            url: "/gsn",
+            url: "gsn",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
@@ -592,7 +592,7 @@ var GSN = {
         GSN.vsbox.bringToFront(vsName);
         $.ajax({
             type: "GET",
-            url: "/gsn?name="+vsName,
+            url: "gsn?name="+vsName,
             success: function(data){
                 $("virtual-sensor[@name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
@@ -1149,7 +1149,7 @@ var GSN = {
                 $.ajax({
                     async: false,
                     type: "GET",
-                    url: "/gsn?REQUEST=113&name="+GSN.selectedSensors[i],
+                    url: "gsn?REQUEST=113&name="+GSN.selectedSensors[i],
                     success: function(msg) {
                         $("virtual-sensor field", msg).each(function() {
                             if ($(this).attr("type").substr(0,3) != "bin") {
