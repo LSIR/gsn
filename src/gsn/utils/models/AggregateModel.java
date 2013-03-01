@@ -71,11 +71,11 @@ public class AggregateModel extends AbstractModel {
 					    AbstractVirtualSensor avs = vs.borrowVS();
 						if (avs instanceof ModellingVirtualSensor){
 							if(n.endsWith("o3")){
-							model_o3 = ((ModellingVirtualSensor)avs).getModel("NNModel")[0];
+							model_o3 = ((ModellingVirtualSensor)avs).getModel(0);
 							}else if(n.endsWith("co")){
-								model_co = ((ModellingVirtualSensor)avs).getModel("NNModel")[0];
+								model_co = ((ModellingVirtualSensor)avs).getModel(0);
 								}else if(n.endsWith("pm")){
-									model_pm = ((ModellingVirtualSensor)avs).getModel("NNModel")[0];
+									model_pm = ((ModellingVirtualSensor)avs).getModel(0);
 								}
 						}
 						vs.returnVS(avs);

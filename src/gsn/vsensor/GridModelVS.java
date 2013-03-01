@@ -28,7 +28,8 @@ public class GridModelVS extends AbstractVirtualSensor {
 
     private static final transient Logger logger = Logger.getLogger(GridModelVS.class);
 
-    private static final String PARAM_MODEL = "modelVS";
+    private static final String PARAM_MODEL_VS = "model_VS";
+    private static final String PARAM_MODEL = "model_index";
     private static final String PARAM_FIELD = "field";
     private static final String PARAM_GRID_SIZE = "grid_size";
     private static final String PARAM_CELL_SIZE = "cell_size";
@@ -52,35 +53,43 @@ public class GridModelVS extends AbstractVirtualSensor {
 
         TreeMap<String, String> params = getVirtualSensorConfiguration().getMainClassInitialParams();
 
-        String model_str = params.get(PARAM_MODEL);
+        //get the model from the modelling virtual sensor
+        String model_str = params.get(PARAM_MODEL_VS);
+        String model_i_str = params.get(PARAM_MODEL);
 
         if (model_str == null) {
+            logger.warn("Parameter \"" + PARAM_MODEL_VS + "\" not provided in Virtual Sensor file");
+            return false;
+        }
+        if (model_i_str == null) {
             logger.warn("Parameter \"" + PARAM_MODEL + "\" not provided in Virtual Sensor file");
             return false;
-        } else {
-        	try {
-			    VirtualSensor vs = Mappings.getVSensorInstanceByVSName(model_str);
-			    if (vs == null){
-			    	logger.error("can't find VS: "+ model_str);
-					return false;
-			    }
-			    AbstractVirtualSensor avs = vs.borrowVS();
-				if (avs instanceof ModellingVirtualSensor){
-					modelVS = ((ModellingVirtualSensor)avs).getModel("")[0];
-					if (modelVS==null){
-						logger.error("Virtual Sensor " + model_str + " returned no model.");
-					}
-				}else{
-					logger.error("Virtual Sensor " + model_str + " is not a modelling Virtual Sensor.");	
-					return false;
+        }
+
+    	try {
+		    VirtualSensor vs = Mappings.getVSensorInstanceByVSName(model_str);
+		    if (vs == null){
+		    	logger.error("can't find VS: "+ model_str);
+				return false;
+		    }
+		    AbstractVirtualSensor avs = vs.borrowVS();
+			if (avs instanceof ModellingVirtualSensor){
+				int modelIndex = Integer.parseInt(model_i_str.trim());
+				modelVS = ((ModellingVirtualSensor)avs).getModel(modelIndex);
+				if (modelVS==null){
+					logger.error("Virtual Sensor " + model_str + " returned no model["+modelIndex+"].");
 				}
-				vs.returnVS(avs);
-			} catch (VirtualSensorInitializationFailedException e) {
-				logger.error("Error loading the model from " + model_str);
+			}else{
+				logger.error("Virtual Sensor " + model_str + " is not a modelling Virtual Sensor.");	
 				return false;
 			}
-        }
-        
+			vs.returnVS(avs);
+		} catch (VirtualSensorInitializationFailedException e) {
+			logger.error("Error loading the model["+model_i_str+"] from " + model_str);
+			return false;
+		}
+
+        //get the field to query to build the grid (integer fields are converted to double)
         field = params.get(PARAM_FIELD);
 
         if (field == null) {
@@ -88,6 +97,7 @@ public class GridModelVS extends AbstractVirtualSensor {
             return false;
         }
         
+        //get the bottom-left corner longitude coordinate in degree
         String cx_str = params.get(PARAM_X);
 
         if (cx_str == null) {
@@ -100,6 +110,7 @@ public class GridModelVS extends AbstractVirtualSensor {
             return false;
         }
         
+      //get the bottom-left corner latitude coordinate in degree
         String cy_str = params.get(PARAM_Y);
 
         if (cy_str == null) {
@@ -112,6 +123,7 @@ public class GridModelVS extends AbstractVirtualSensor {
             return false;
         }
         
+      //get the number of cells of a side of the square grid
         String gridSize_str = params.get(PARAM_GRID_SIZE);
 
         if (gridSize_str == null) {
@@ -129,6 +141,7 @@ public class GridModelVS extends AbstractVirtualSensor {
             return false;
         }
         
+        // get the size of a square cell in meter
         String cellSize_str = params.get(PARAM_CELL_SIZE);
 
         if (cellSize_str == null) {
@@ -146,6 +159,7 @@ public class GridModelVS extends AbstractVirtualSensor {
             return false;
         }
         
+        //compute the width and height of a cell in degree (if the grid is too big, their maybe some deformation)
         YCellSize = cellSize *360.0 / (6356753*2*Math.PI);
         XCellSize = cellSize *360.0 / (6378137*Math.cos(Math.toRadians(y_BL))*2*Math.PI);
 

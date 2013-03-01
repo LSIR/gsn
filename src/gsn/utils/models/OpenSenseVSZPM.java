@@ -5,7 +5,11 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 import org.apache.log4j.Logger;
+
+import java.io.FileInputStream;
 import java.io.Serializable;
+import java.util.Properties;
+
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -14,16 +18,26 @@ import weka.core.Instances;
 
 
 public class OpenSenseVSZPM extends AbstractModel {
+	
+	private String MODEL_FOLDER;
 
         private static final transient Logger logger = Logger.getLogger( OpenSenseVSZPM.class );
 	
-	private static final String[] OUTPUT_FIELDS = new String [] {"TEMPERATURE","LATITUDE","LONGITUDE","PM_REL","PM_ABS"};
+	private static final String[] OUTPUT_FIELDS = new String [] {"TEMPERATURE","LATITUDE","LONGITUDE","PM_REL","PM_ABS","NUMBER"};
 	private static final double[] PM_THRESHOLDS = new double [] {0, 15, 30, 50, 100, Integer.MAX_VALUE};
 	private static final int[] PM_MAP = new int [] {4,3,5,2,1};
 	
 	private Classifier cls_pm;
 
 	    public boolean initialize() {
+	    	
+			Properties modelconf = new Properties( );
+			try {
+				modelconf.load( new FileInputStream( "conf/model.properties" ) );
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			MODEL_FOLDER=modelconf.getProperty("folder");
 	    	try {
 				cls_pm = (Classifier) weka.core.SerializationHelper.read(MODEL_FOLDER + "ZURICH_PM_IBK.model");
 			} catch (Exception e) {
@@ -132,8 +146,8 @@ public class OpenSenseVSZPM extends AbstractModel {
 			StreamElement[] se = new StreamElement[1];
 			
 			se[0] = new StreamElement( OUTPUT_FIELDS , 
-					new Byte[] {DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.INTEGER,  DataTypes.INTEGER} , 
-					new Serializable [] {t, lat, lon, result, abs_ind} , data.getTimeStamp());
+					new Byte[] {DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.INTEGER,  DataTypes.INTEGER,DataTypes.DOUBLE} , 
+					new Serializable [] {t, lat, lon, result, abs_ind,pm} , data.getTimeStamp());
 			
 			return se;
 			

@@ -281,7 +281,13 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
             //prepareStatement.setLong(1, listener.getStartTime());
             prepareStatement.setLong(1, listener.getLastVisitedPk());
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+        	logger.error(e.getMessage(), e);
+            try {
+				prepareStatement.close();
+			} catch (SQLException e1) {
+
+				logger.error(e.getMessage(), e);
+			}
             return new DataEnumerator();
         }
 

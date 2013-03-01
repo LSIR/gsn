@@ -84,7 +84,7 @@ public class DirectPushRemoteWrapper extends AbstractWrapper implements IPushWra
                 return true;
             }
             // Otherwise, we first try to insert the stream element.
-            // If the stream element was inserted succesfully, we wait for the next,
+            // If the stream element was inserted successfully, we wait for the next,
             // otherwise, we return false.
             boolean status = postStreamElement(streamElement);
             return status;

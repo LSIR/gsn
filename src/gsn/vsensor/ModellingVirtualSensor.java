@@ -7,25 +7,25 @@ import org.apache.log4j.Logger;
 import gsn.beans.StreamElement;
 import gsn.utils.models.AbstractModel;
 
+
+/**
+ * This class is linked to an array of AbstractModels and keep them updated by pushing every StreamElement to them.
+ * The model classes are defined by their class names separated by "," as a parameter of the VS.
+ * If a model need some parameters before initializing, they can be specified in the VS parameters as "model.i.param",
+ *  where i is the index of the model and param the parameter name.
+ * @author jeberle
+ *
+ */
 public class ModellingVirtualSensor extends AbstractVirtualSensor {
 	
 	private static final transient Logger logger = Logger.getLogger(ModellingVirtualSensor.class);
 	
 	private static final String PARAM_MODEL_CLASS = "model";
+	private static final String PARAM_MODEL_PREFIX ="model";
 	
-	private static final String PARAM_SEC_MODEL_CLASS ="sec_model";
+	private String[] model;
 	
-	private static final String PARAM_MODEL_PREFIX ="mmm";
-	
-	private static final String PARAM_MODEL_PREFIX2 = "mm2";
-	
-	
-	
-	private String model = "";
-	
-	private String model2 = "";
-	
-	private AbstractModel[] am = new AbstractModel[2];
+	private AbstractModel[] am;
 	
 
 	@Override
@@ -33,85 +33,78 @@ public class ModellingVirtualSensor extends AbstractVirtualSensor {
 
         TreeMap<String, String> params = getVirtualSensorConfiguration().getMainClassInitialParams();
 
+        //get all the models
         String model_str = params.get(PARAM_MODEL_CLASS);
 
         if (model_str == null) {
             logger.warn("Parameter \"" + PARAM_MODEL_CLASS + "\" not provided in Virtual Sensor file");
             return false;
-        } else {
-            model = model_str.trim();
         }
         
-		try {
-			 Class<?>  fc = Class.forName(model);
-			am[0] = (AbstractModel) fc.newInstance();
-			am[0].setOutputFields(getVirtualSensorConfiguration().getOutputStructure());
+        model = model_str.trim().split(",");
+        
+        am = new AbstractModel[model.length];
+        
+        for(int i=0;i<model.length;i++){
+			try {
+				//instantiate the models, ...
+				 Class<?>  fc = Class.forName(model[i]);
+				am[i] = (AbstractModel) fc.newInstance();
+				//output structure of the models is the same as the one of the VS
+				am[i].setOutputFields(getVirtualSensorConfiguration().getOutputStructure());
+				//...set their parameters...			
+				for (String k: params.navigableKeySet())
+				{
+					String prefix = PARAM_MODEL_PREFIX+"."+i+".";
+					if (k.startsWith(prefix)){
+						am[i].setParam(k.substring(prefix.length()),params.get(k));
+					}	
+				}
+				am[i].setVirtualSensor(this);
+				//... and initialize them.
+				if (! am[i].initialize()){
+					return false;
+				}
 						
-			for (String k: params.navigableKeySet())
-			{
-				if (k.startsWith(PARAM_MODEL_PREFIX)){
-					am[0].setParam(k.substring(PARAM_MODEL_PREFIX.length()),params.get(k));
-				}	
-			}
-			if (! am[0].initialize()){
+			} catch (Exception e) {
+				logger.error( e.getMessage( ) , e );
 				return false;
 			}
-					
-		} catch (Exception e) {
-			logger.error( e.getMessage( ) , e );
-			return false;
-		}
-
-		String model2_str = params.get(PARAM_SEC_MODEL_CLASS);
-
-        if (model2_str != null) {
-            model2 = model2_str.trim(); 
-		try {
-			 Class<?>  fc = Class.forName(model2);
-			am[1] = (AbstractModel) fc.newInstance();
-			am[1].setOutputFields(getVirtualSensorConfiguration().getOutputStructure());
-			am[0].setNextModel(am[1]);
-			
-			for (String k: params.navigableKeySet())
-			{
-				if (k.startsWith(PARAM_MODEL_PREFIX2)){
-					am[1].setParam(k.substring(PARAM_MODEL_PREFIX2.length()),params.get(k));
-				}	
-			}
-			if (! am[1].initialize()){
-				return false;
-			}
-			
-		} catch (Exception e) {
-			logger.error( e.getMessage( ) , e );
-			return false;
-		}
         }
         return true;
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void dataAvailable(String inputStreamName,
-			StreamElement streamElement) {
-		StreamElement out = am[0].pushData(streamElement);
-		if (am[1] != null){
-			am[1].pushData(streamElement);
+	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
+		StreamElement out = streamElement;
+		if (am.length > 0){
+		    out = am[0].pushData(streamElement); //by default returns the result from the first model
 		}
-		
+		for(int i=1;i<am.length;i++){
+			if (am[i] != null){
+				am[i].pushData(streamElement);//push the data to all other models too
+			}
+		}
 		if(out != null)
 		    dataProduced(out);
-
 	}
 	
 	
-	public AbstractModel[] getModel(String name){
-		return am;
+	/**
+	 * Return the model corresponding to the given index
+	 * @param index of the model
+	 * @return the model if it exists or null if the index is out of bound
+	 */
+	public AbstractModel getModel(int index){
+		if (index>=0 && index <am.length)
+			return am[index];
+		else
+			return null;
 	}
 
 }

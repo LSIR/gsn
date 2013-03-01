@@ -60,9 +60,9 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ModelGeoData</servlet-name>
-        <display-name>Sensor Data from Model with Geo Location</display-name>
-        <servlet-class>gsn.http.GeoModelServlet</servlet-class>
+        <servlet-name>ModelData</servlet-name>
+        <display-name>Sensor Data from Model</display-name>
+        <servlet-class>gsn.http.ModelServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -276,8 +276,8 @@
         <url-pattern>/geodata</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ModelGeoData</servlet-name>
-        <url-pattern>/geomodel/*</url-pattern>
+        <servlet-name>ModelData</servlet-name>
+        <url-pattern>/modeldata/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DynamicGeoData</servlet-name>

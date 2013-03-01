@@ -3,7 +3,11 @@ package gsn.utils.models;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import org.apache.log4j.Logger;
+
+import java.io.FileInputStream;
 import java.io.Serializable;
+import java.util.Properties;
+
 import weka.classifiers.Classifier;
 import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
@@ -12,11 +16,14 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 
-public class OpenSenseVSZCO extends AbstractModel {
 
-        private static final transient Logger logger = Logger.getLogger( OpenSenseVSZCO.class );
+public class OpenSenseVSZCO extends AbstractModel {
 	
-	private static final String[] OUTPUT_FIELDS = new String [] {"CO_REL","CO_ABS","temperature"};
+	private String MODEL_FOLDER;
+
+    private static final transient Logger logger = Logger.getLogger( OpenSenseVSZCO.class );
+	
+	private static final String[] OUTPUT_FIELDS = new String [] {"SENSOR_PPM","CO_REL","CO_ABS","temperature"};
 	private static final double[] CO_THRESHOLDS = new double [] {0, 5000, 7500, 10000, 20000, Integer.MAX_VALUE};
 	private static final int[] CO_MAP = new int [] {1,3,2,5,4};
 	
@@ -27,6 +34,14 @@ public class OpenSenseVSZCO extends AbstractModel {
 	
 	
 	public boolean initialize() {
+		
+		Properties modelconf = new Properties( );
+		try {
+			modelconf.load( new FileInputStream( "conf/model.properties" ) );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		MODEL_FOLDER=modelconf.getProperty("folder");
 		
 		try {
 		kmeans_temp = (SimpleKMeans) weka.core.SerializationHelper.read(MODEL_FOLDER + "ZURICH_CO_TEMP.model");
@@ -141,8 +156,8 @@ public class OpenSenseVSZCO extends AbstractModel {
 			StreamElement[] se = new StreamElement[1];
 			// create output streamelement to be sent to application, neglect pollutant if index = -1
 			se[0] = new StreamElement(OUTPUT_FIELDS , 
-					new Byte[] {DataTypes.INTEGER,  DataTypes.INTEGER,  DataTypes.DOUBLE} , 
-					new Serializable [] {result, abs_ind, t} , time);
+					new Byte[] {DataTypes.DOUBLE,DataTypes.INTEGER,  DataTypes.INTEGER,  DataTypes.DOUBLE} , 
+					new Serializable [] {co,result, abs_ind, t} , time);
 			
 			return se;
 		}

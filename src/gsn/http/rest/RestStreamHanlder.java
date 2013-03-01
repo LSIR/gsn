@@ -296,14 +296,17 @@ public class RestStreamHanlder extends HttpServlet {
 			query = SQLUtils.newRewrite(query, tableName, tableName.toLowerCase()).toString();
 			tableName=tableName.toLowerCase();
 			config = Mappings.getConfig(tableName);
-			if (cName != null){
-				VirtualSensor vs = Mappings.getVSensorInstanceByFileName(config.getFileName());
-				AbstractVirtualSensor avs = vs.borrowVS();
-				if (avs instanceof ModellingVirtualSensor){
-					modelClass = ((ModellingVirtualSensor)avs).getModel(cName)[0];
-				}
-				vs.returnVS(avs);
+			int modelNB=0;
+			try{
+				modelNB = Integer.parseInt(cName);
+			}catch(Exception e){}
+			VirtualSensor vs = Mappings.getVSensorInstanceByFileName(config.getFileName());
+			AbstractVirtualSensor avs = vs.borrowVS();
+			if (avs instanceof ModellingVirtualSensor){
+				modelClass = ((ModellingVirtualSensor)avs).getModel(modelNB);
 			}
+			vs.returnVS(avs);
+			
 			
 		}
 		public VSensorConfig getVSensorConfig() {

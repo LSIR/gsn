@@ -28,13 +28,20 @@ import java.util.Map;
 
 
 
-public class GeoModelServlet extends HttpServlet {
+public class ModelServlet extends HttpServlet {
 
-    private static transient Logger logger = Logger.getLogger(GeoModelServlet.class);
+    private static transient Logger logger = Logger.getLogger(ModelServlet.class);
     private User user = null;
     
     private XStream xstream = StreamElement4Rest.getXstream();
 
+    /**
+     * Query the given model in the given modeling virtual sensor, using all the other parameters that can be cast to integers or double
+     * The parameter vs is the name of the modeling virtual sensor and is mandatory. If the virtual sensor doesn't exists, it return a 404 error.
+     * The parameter models is the index of the model within the VS. If not specified it is 0.
+     * All the other parameters are used to build the query, if their value can be cast to int or double.
+     * The result is a set of StreamElement in xml.
+     */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	    AbstractModel modelClass = null;
@@ -46,24 +53,31 @@ public class GeoModelServlet extends HttpServlet {
             response.setHeader("Pragma", "no-cache");
         }
 
-        String model = HttpRequestUtils.getStringParameter("models", null, request);
+        int model = HttpRequestUtils.getIntParameter("model", 0, request);
         String vsname = HttpRequestUtils.getStringParameter("vs", null, request);
         
-		if (model != null && vsname != null){
+		if (vsname != null){
 			try {
-			    VirtualSensor vs = Mappings.getVSensorInstanceByVSName(vsname);
-			    if (vs == null){
-			    	logger.error("can't find VS: "+ vsname);
-					response.sendError(404);
-					return;
-			    }
-			    AbstractVirtualSensor avs = vs.borrowVS();
-				if (avs instanceof ModellingVirtualSensor){
-					modelClass = ((ModellingVirtualSensor)avs).getModel(model)[0];
+				if (!Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(vsname) || user.isAdmin()))) {
+				    VirtualSensor vs = Mappings.getVSensorInstanceByVSName(vsname);
+				    if (vs == null){
+				    	logger.error("can't find VS: "+ vsname);
+						response.sendError(404);
+						return;
+				    }
+				    AbstractVirtualSensor avs = vs.borrowVS();
+					if (avs instanceof ModellingVirtualSensor){
+						modelClass = ((ModellingVirtualSensor)avs).getModel(model);
+					}
+					vs.returnVS(avs);
 				}
-				vs.returnVS(avs);
+				else{
+					logger.error("Unauthorized access to "+ vsname);
+					response.sendError(401);
+					return;
+				}
 			} catch (VirtualSensorInitializationFailedException e) {
-				logger.error("Error loading the model for " + model);	
+				logger.error("Error in http request loading the model for " + model);	
 			}
 		}
 		if (modelClass == null){
@@ -77,11 +91,19 @@ public class GeoModelServlet extends HttpServlet {
 			for(String k : m.keySet()){
 				if(k.equals("vs") || k.equals("models")) continue;
 				try{
-				df[i] = new DataField(k,"double"); // !!! _HARDCODED, only supports double
-				sr[i] = Double.parseDouble(m.get(k)[0]);
-				i ++;
-				}catch(Exception e){
-					logger.error("Error getting parameter " + k + " :" + m.get(k)[0]);
+					sr[i] = Integer.parseInt(m.get(k)[0]);
+					df[i] = new DataField(k,"integer");
+					i ++;
+				}
+				catch(NumberFormatException e){
+					try{
+						sr[i] = Double.parseDouble(m.get(k)[0]);
+						df[i] = new DataField(k,"double");
+						i ++;
+					}
+					catch(NumberFormatException ee){
+						logger.error("Error in http request getting parameter " + k + " :" + m.get(k)[0]);
+					}
 				}
 			}
 			 
@@ -89,7 +111,7 @@ public class GeoModelServlet extends HttpServlet {
 	        
 	        StringBuilder str = new StringBuilder();
 	        
-	        str.append("<Results>");
+	        str.append("<results>");
 	        if (se != null){
 	        for (StreamElement s : se){
 	        	if (s != null){
@@ -97,7 +119,7 @@ public class GeoModelServlet extends HttpServlet {
 	        	}
 	        }
 	        }
-	        str.append("</Results>");
+	        str.append("</results>");
 	        response.getWriter().write(str.toString());
 		}
     }

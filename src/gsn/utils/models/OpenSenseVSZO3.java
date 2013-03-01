@@ -4,7 +4,11 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 import org.apache.log4j.Logger;
+
+import java.io.FileInputStream;
 import java.io.Serializable;
+import java.util.Properties;
+
 import weka.classifiers.Classifier;
 import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
@@ -14,10 +18,12 @@ import weka.core.Instances;
 
 
 public class OpenSenseVSZO3 extends AbstractModel {
+	
+	private String MODEL_FOLDER;
 
 	private static final transient Logger logger = Logger.getLogger( OpenSenseVSZO3.class );
 	
-	private static final String[] OUTPUT_FIELDS = new String [] {"TEMPERATURE","HUMIDITY","LATITUDE","LONGITUDE","O3_REL","O3_ABS"};
+	private static final String[] OUTPUT_FIELDS = new String [] {"TEMPERATURE","HUMIDITY","LATITUDE","LONGITUDE","O3_REL","O3_ABS","OZONE_PPB"};
 	private static final double[] O3_THRESHOLDS = new double [] {0, 60, 120, 180, 240, Integer.MAX_VALUE};
 	private static final int[] O3_MAP = new int [] {1,3,2,4,5};
 	
@@ -28,6 +34,14 @@ public class OpenSenseVSZO3 extends AbstractModel {
 
     @Override
 	public boolean initialize() {
+    	
+		Properties modelconf = new Properties( );
+		try {
+			modelconf.load( new FileInputStream( "conf/model.properties" ) );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		MODEL_FOLDER=modelconf.getProperty("folder");
 	    	
 	    	try {
 
@@ -159,8 +173,8 @@ public class OpenSenseVSZO3 extends AbstractModel {
 			StreamElement[] se = new StreamElement[1];
 			
 			se[0] = new StreamElement( OUTPUT_FIELDS , 
-					new Byte[] {DataTypes.DOUBLE,  DataTypes.INTEGER, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.INTEGER,  DataTypes.INTEGER} , 
-					new Serializable [] {t, h, lat, lon, result, abs_ind} , time);
+					new Byte[] {DataTypes.DOUBLE,  DataTypes.INTEGER, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.INTEGER,  DataTypes.INTEGER, DataTypes.DOUBLE} , 
+					new Serializable [] {t, h, lat, lon, result, abs_ind,o3} , time);
 			
 			return se;
 			

@@ -157,13 +157,18 @@ public final class StreamElement implements Serializable {
 			}
 		}
 	
-	
+	/**
+	 * Checks the type compatibility of all fields of the StreamElement
+	 * @param fieldTypes the array of all fields' type
+	 * @param data the array of data to check
+	 * @throws IllegalArgumentException if a data field doesn't match the given type
+	 */
 	private void verifyTypesCompatibility ( final Byte [ ] fieldTypes , final Serializable [ ] data ) throws IllegalArgumentException {
 		for ( int i = 0 ; i < data.length ; i++ ) {
 			try{
 				verifyTypeCompatibility(fieldTypes[i], data[i]);
 			}catch(IllegalArgumentException e){
-				throw new IllegalArgumentException("The newly constructed Stream Element is not consistant for the " + ( i + 1 ) + "th field.", e);
+				throw new IllegalArgumentException("The newly constructed Stream Element is not consistent for the " + ( i + 1 ) + "th field.", e);
 			}
 		}
 	}
@@ -240,7 +245,7 @@ public final class StreamElement implements Serializable {
 		generateIndex();
 		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {
-			logger.warn("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
+			logger.info("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
 			return null;
 		}
 		return this.fieldValues[ index ];
@@ -443,7 +448,7 @@ public final class StreamElement implements Serializable {
 	 * @param data
 	 * @throws IllegalArgumentException
 	 */
-	public void setData(String fieldName, Serializable data) throws IllegalArgumentException {
+	protected void setData(String fieldName, Serializable data) throws IllegalArgumentException {
 		generateIndex();
 		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {

@@ -142,6 +142,7 @@ public class WPPushDelivery implements DeliverySystem {
 				dStatus = response.getFirstHeader("X-DeviceConnectionStatus").getValue();
 			if (response.containsHeader("X-SubscriptionStatus"))
 				sStatus = response.getFirstHeader("X-SubscriptionStatus").getValue();
+			logger.warn("Status for client "+notificationId+":(" +statusCode+")" + nStatus + ", " + dStatus + "," +sStatus);
 			if (statusCode != RestStreamHanlder.SUCCESS_200) {
 				return false;
 			}
@@ -151,7 +152,6 @@ public class WPPushDelivery implements DeliverySystem {
 			if (nStatus.equalsIgnoreCase("Suppressed")){
 				return false;
 			}
-			logger.warn("Status for client "+notificationId+":(" +statusCode+")" + nStatus + ", " + dStatus + "," +sStatus);
 			return true;
 		} catch (Exception e) {
 			logger.warn(e.getMessage(),e);
