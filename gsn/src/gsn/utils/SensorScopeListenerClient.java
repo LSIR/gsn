@@ -1,5 +1,6 @@
 package gsn.utils;
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import org.apache.log4j.Logger;
@@ -8,6 +9,7 @@ import org.apache.log4j.PropertyConfigurator;
 import java.io.*;
 import java.net.*;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class SensorScopeListenerClient extends Thread {
@@ -646,9 +648,11 @@ public class SensorScopeListenerClient extends Thread {
                 if (idx >= bytes.length)
                     break;
 
+            	SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+            	sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
                 if (fullTS) {
                     base_timestamp = bytes[idx] * 16777216 + bytes[idx + 1] * 65536 + bytes[idx + 2] * 256 + bytes[idx + 3];
-                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(base_timestamp * 1000));
+                    String date = sdf.format(new java.util.Date(base_timestamp * 1000));
                     logger.info("base timestamp = " + base_timestamp + " ( " + date + " )");
                     idx += 4;
                     fullTS = false;
@@ -656,7 +660,7 @@ public class SensorScopeListenerClient extends Thread {
                 } else {
                     int timeshift = bytes[idx];  //TODO: verify
                     timestamp = base_timestamp + timeshift;
-                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date((timestamp) * 1000));
+                    String date = sdf.format(new java.util.Date((timestamp) * 1000));
                     logger.info("time shift = + " + timeshift + " => " + timestamp + " ( " + date + " )");
                     ++idx;
 
@@ -703,7 +707,7 @@ public class SensorScopeListenerClient extends Thread {
                         }
                     }
 
-                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(timestamp * 1000));
+                    String date = sdf.format(new java.util.Date(timestamp * 1000));
                     logger.info("timestamp = " + timestamp + " ( " + date + " )");
 
                     logger.info("Station " + id + ": SID = " + sid + ", dupn = " + dupn + ", len = " + size + ", data = ");

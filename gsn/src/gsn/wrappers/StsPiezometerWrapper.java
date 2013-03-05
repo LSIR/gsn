@@ -1,6 +1,7 @@
 package gsn.wrappers;
 
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 
@@ -88,6 +89,8 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 		setName( "StsPiezometerWrapper-Thread:" + ( ++threadCounter ) );
 		dateTimeFormat = new SimpleDateFormat( DateFormat );
 		svnDateTimeFormat = new SimpleDateFormat( SvnDateFormat );
+		dateTimeFormat.setTimeZone(Main.getContainerConfig().getTimeZone());
+		svnDateTimeFormat.setTimeZone(Main.getContainerConfig().getTimeZone());
 		sampling = getActiveAddressBean( ).getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);
 		directory = getActiveAddressBean().getPredicateValue(DIRECTORY);
 		datadirectory = getActiveAddressBean().getPredicateValue("data_directory");

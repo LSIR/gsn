@@ -1,6 +1,9 @@
 package gsn.beans;
 
+import gsn.Main;
+
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import org.apache.log4j.Logger;
 
@@ -220,8 +223,9 @@ public class VSensorMonitorConfig {
    * into a Unix timestamp
    * */
     public static long datetime2timestamp(String s) throws ParseException {
-
-        return  new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(s).getTime();
+    	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    	sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+        return  sdf.parse(s).getTime();
 
         /*
         Pattern datePattern = Pattern.compile("(\\d{2})/(\\d{2})/(\\d{4}) (\\d{2}):(\\d{2}):(\\d{2})");

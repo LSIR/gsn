@@ -3,11 +3,11 @@ package gsn.http.restapi;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
 
 import java.sql.*;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.log4j.Logger;
@@ -113,7 +113,9 @@ public class GetRequestHandler {
         RestResponse restResponse = new RestResponse();
         long timestamp = -1;
         try {
-            timestamp = new java.text.SimpleDateFormat(ISO_FORMAT).parse(date).getTime();
+        	SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
+        	sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+            timestamp = sdf.parse(date).getTime();
         } catch (ParseException e) {
             logger.warn("Timestamp is badly formatted: " + date);
         }
@@ -159,7 +161,9 @@ public class GetRequestHandler {
         if (from == null) { // no lower bound provided
             fromAsLong = getMinTimestampForSensorField(sensor, field);
         } else try {
-            fromAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(from).getTime();
+        	SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
+        	sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+            fromAsLong = sdf.parse(from).getTime();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             errorFlag = true;
@@ -168,7 +172,9 @@ public class GetRequestHandler {
         if (to == null) { // no lower bound provided
             toAsLong = getMaxTimestampForSensorField(sensor, field);
         } else try {
-            toAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(to).getTime();
+        	SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
+        	sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+            toAsLong = sdf.parse(to).getTime();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             errorFlag = true;
@@ -196,7 +202,9 @@ public class GetRequestHandler {
         JSONArray epochsArray = new JSONArray();
         for (int i = 0; i < stream.size(); i++) {
             streamArray.add(stream.get(i));
-            timestampsArray.add(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i))));
+        	SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
+        	sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+            timestampsArray.add(sdf.format(new java.util.Date(timestamps.get(i))));
             epochsArray.add(timestamps.get(i));
         }
         jsonResponse.put("timestamps", timestampsArray);
@@ -288,8 +296,10 @@ public class GetRequestHandler {
         long fromAsLong = 0;
         long toAsLong = 0;
         try {
-            fromAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(from).getTime();
-            toAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(to).getTime();
+        	SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
+        	sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+            fromAsLong = sdf.parse(from).getTime();
+            toAsLong = sdf.parse(to).getTime();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             errorFlag = true;
@@ -318,7 +328,9 @@ public class GetRequestHandler {
         for (int i = 0; i < stream.size(); i++) {
             streamArray.add(stream.get(i));
             epochsArray.add(timestamps.get(i));
-            timestampsArray.add(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i))));
+        	SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
+        	sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+            timestampsArray.add(sdf.format(new java.util.Date(timestamps.get(i))));
         }
         jsonResponse.put("timestamps", timestampsArray);
         jsonResponse.put("epochs", epochsArray);

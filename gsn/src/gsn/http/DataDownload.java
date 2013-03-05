@@ -11,8 +11,6 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -65,7 +63,7 @@ public class DataDownload extends HttpServlet {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(Main.getInstance().getContainerConfig().getTimeFormat());
             SimpleDateFormat sdf_from_ui = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            TimeZone timeZone = GregorianCalendar.getInstance().getTimeZone();
+            sdf_from_ui.setTimeZone(Main.getContainerConfig().getTimeZone());
             boolean responseCVS = false;
             boolean wantTimeStamp = false;
             boolean wantPk = false;

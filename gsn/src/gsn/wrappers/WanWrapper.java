@@ -1,5 +1,6 @@
 package gsn.wrappers;
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 
@@ -42,6 +43,7 @@ public class WanWrapper extends AbstractWrapper {
   public boolean initialize() {
     setName( "WanWrapper-Thread:" + ( ++threadCounter ) );
     dateTimeFormat = new SimpleDateFormat( DateFormat );
+    dateTimeFormat.setTimeZone(Main.getContainerConfig().getTimeZone());
     sampling = getActiveAddressBean( ).getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);
     filename = getActiveAddressBean().getPredicateValue(FILE);
     String not_a_number_constant_val = getActiveAddressBean().getPredicateValue(NOT_A_NUMBER);

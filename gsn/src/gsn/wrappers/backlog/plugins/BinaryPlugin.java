@@ -12,11 +12,11 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
+import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.wrappers.BackLogWrapper;
@@ -338,7 +338,7 @@ public class BinaryPlugin extends AbstractPlugin {
 
 				lastTransmissionTimestamp = System.currentTimeMillis();
 				folderdatetimefm = new SimpleDateFormat(prop);
-				folderdatetimefm.setTimeZone(TimeZone.getTimeZone("UTC"));
+				folderdatetimefm.setTimeZone(Main.getContainerConfig().getTimeZone());
 			    if (storeInDatabase) {
 			    	localBinaryName = rootBinaryDir + deploymentName + "/" + Integer.toString(deviceID) + "_" + TEMP_BINARY_NAME;
 			    }
@@ -399,7 +399,7 @@ public class BinaryPlugin extends AbstractPlugin {
 		
 		try {
 			folderdatetimefm = new SimpleDateFormat(datetimefm);
-			folderdatetimefm.setTimeZone(TimeZone.getTimeZone("UTC"));
+			folderdatetimefm.setTimeZone(Main.getContainerConfig().getTimeZone());
 			
 			if (storage == 1)
 				storeInDatabase = true;

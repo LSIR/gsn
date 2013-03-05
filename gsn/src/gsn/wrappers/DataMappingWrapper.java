@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -446,7 +445,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 		if( action.compareToIgnoreCase(mappingName) == 0 ) {
 	        SimpleDateFormat sdfWeb = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 	        sdfWeb.setLenient(true);
-	        sdfWeb.setTimeZone(TimeZone.getTimeZone("UTC"));
+	        sdfWeb.setTimeZone(Main.getContainerConfig().getTimeZone());
 			ArrayList<Serializable[]> streamElements = null;
 			int index = 0;
 			switch (mappingType) {

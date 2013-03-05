@@ -1,5 +1,6 @@
 package gsn.wrappers.general;
 
+import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -9,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -189,8 +191,9 @@ public class CSVWrapper extends AbstractWrapper {
    * Convenient function used for debugging
    * */
     public void DEBUG_INFO(String s) {
-
-        String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss,SSS").format(new java.util.Date(System.currentTimeMillis()));
+    	SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss,SSS");
+        sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+        String date = sdf.format(new java.util.Date(System.currentTimeMillis()));
         s = "[" + date + "] " + s + "\n";
         try {
             FileUtils.writeStringToFile(new File("DEBUG_INFO_" + threadCounter + ".txt"), s, true);
@@ -200,7 +203,9 @@ public class CSVWrapper extends AbstractWrapper {
     }
 
     String list(String name, long value) {
-        return name + " = " + value + " (" + new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss,SSS").format(new java.util.Date(value)) + ")";
+    	SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss,SSS");
+        sdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+        return name + " = " + value + " (" + sdf.format(new java.util.Date(value)) + ")";
     }
 
 

@@ -53,6 +53,7 @@ public class MultiDataDownload extends HttpServlet {
         //
 
         SimpleDateFormat sdfWeb = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ; // 29/10/2008 22:25:07
+        sdfWeb.setTimeZone(Main.getContainerConfig().getTimeZone());
         try {
 			logger.debug("Query string: " + req.getQueryString());
 

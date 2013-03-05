@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
-import java.util.TimeZone;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +13,7 @@ import javax.naming.OperationNotSupportedException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.InputInfo;
 
@@ -32,7 +32,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 	@Override
 	public boolean initialize() {
 		String rootBinaryDir = null;
-		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		format.setTimeZone(Main.getContainerConfig().getTimeZone());
 		
 		try {
 			subdirectoryName = getActiveAddressBean().getPredicateValueWithException("subdirectory-name");

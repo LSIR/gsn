@@ -29,7 +29,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler {
 
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        SimpleDateFormat sdf = new SimpleDateFormat(Main.getInstance().getContainerConfig().getTimeFormat());
+        SimpleDateFormat sdf = new SimpleDateFormat(Main.getContainerConfig().getTimeFormat());
 
         String vsName = request.getParameter("name");
         String vsCondition = request.getParameter("condition");

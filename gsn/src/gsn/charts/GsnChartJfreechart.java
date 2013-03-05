@@ -1,5 +1,6 @@
 package gsn.charts;
 
+import gsn.Main;
 import gsn.reports.beans.Data;
 
 import java.awt.Color;
@@ -31,7 +32,9 @@ public class GsnChartJfreechart implements GsnChartIF {
 
 	private static final Font TICK_FONT = new Font("Helvetica", Font.PLAIN, 7) ;
 	
-	public GsnChartJfreechart () {}
+	public GsnChartJfreechart () {
+		ssdf.setTimeZone(Main.getContainerConfig().getTimeZone());
+	}
 	
 	public JFreeChart createChart(Collection<Data> datas) {
 		TimeSeries t1 = new TimeSeries("S1");

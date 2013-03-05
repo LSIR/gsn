@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -28,6 +29,10 @@ public class ContainerConfig {
 	public static final int               DEFAULT_GSN_PORT                 = 22001;
 
     public static final int               DEFAULT_SSL_PORT                 = 8443;
+
+	public static final String            DEFAULT_TIME_FORMAT              = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
+    public static final String            DEFAULT_TIME_ZONE                = "UTC";
 
 	protected String                      webName;
 
@@ -68,6 +73,10 @@ public class ContainerConfig {
     private StorageConfig storage ;
 
     private SlidingConfig sliding;
+
+	private String timeFormat = DEFAULT_TIME_FORMAT;
+
+	private String timeZone = DEFAULT_TIME_ZONE;
 
     public boolean isAcEnabled() {
         return acEnabled;
@@ -466,10 +475,12 @@ public class ContainerConfig {
 		return msrMapCached;
 	}
 
-	private String timeFormat = "";
-
 	public String getTimeFormat() {
 		return timeFormat;
+	}
+
+	public TimeZone getTimeZone() {
+		return TimeZone.getTimeZone(timeZone);
 	}
 	
 }

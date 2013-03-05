@@ -1,5 +1,6 @@
 package gsn.wrappers.general;
 
+import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.wrappers.AbstractWrapper;
@@ -54,7 +55,7 @@ public class HttpGetWrapper extends AbstractWrapper {
 	public boolean initialize (  ) {
 		AddressBean addressBean =getActiveAddressBean( );
 		String urlPath = addressBean.getPredicateValue( "url" );
-		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		format.setTimeZone(Main.getContainerConfig().getTimeZone());
 
 		final String username = getActiveAddressBean().getPredicateValue("username");
 		final String password;
@@ -173,7 +174,7 @@ public class HttpGetWrapper extends AbstractWrapper {
 				logger.error(e.getMessage() + ": using default format 'yyyy-MM-dd'");
 			}
 		}
-		folderdatetimefm.setTimeZone(TimeZone.getTimeZone("UTC"));
+		folderdatetimefm.setTimeZone(Main.getContainerConfig().getTimeZone());
  
 		setName( "HttpReceiver-Thread" + ( ++threadCounter ) );
 		if ( logger.isDebugEnabled( ) ) logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
