@@ -13,6 +13,8 @@ public final class AddressBean implements Serializable{
 	private String                 wrapper;
 
 	private  KeyValue[] predicates  = EMPTY_PREDICATES;
+	
+	private DataField [] wrapperOutputStructure = new DataField[0];
 
 	private double random = Math.random();
 
@@ -146,14 +148,13 @@ public final class AddressBean implements Serializable{
 
 	private String inputStreamName;
 	private String virtualSensorName;
-	private VSensorConfig vsconfig;
 
-	public VSensorConfig getVsconfig() {
-		return vsconfig;
+	public DataField[] getOutputStructure() {
+		return wrapperOutputStructure;
 	}
 
-	public void setVsconfig(VSensorConfig vsconfig) {
-		this.vsconfig = vsconfig;
+	public void setVsconfig(DataField[] outputStructure) {
+		this.wrapperOutputStructure = outputStructure;
 	}
 
 	public String getInputStreamName() {

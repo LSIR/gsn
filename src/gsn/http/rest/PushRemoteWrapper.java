@@ -34,14 +34,15 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 
-public class PushRemoteWrapper extends AbstractWrapper implements IPushWrapper{
+public class PushRemoteWrapper extends AbstractWrapper{
 
     private static final int KEEP_ALIVE_PERIOD = 5000;
 
     private final transient Logger logger = Logger.getLogger(PushRemoteWrapper.class);
 
-    private final XStream XSTREAM = StreamElement4Rest.getXstream();
+    protected final XStream XSTREAM = StreamElement4Rest.getXstream();
 
     private double uid = -1; //only set for push based delivery(default)
 
@@ -51,7 +52,7 @@ public class PushRemoteWrapper extends AbstractWrapper implements IPushWrapper{
 
     private long lastReceivedTimestamp;
 
-    private DataField[] structure;
+    protected DataField[] structure;
 
     List<NameValuePair> postParameters;
 
@@ -99,10 +100,6 @@ public class PushRemoteWrapper extends AbstractWrapper implements IPushWrapper{
 
     public String getWrapperName() {
         return "Push-Remote Wrapper";
-    }
-    
-    public boolean registerAndSetStructure(String struct){
-    	return false;
     }
 
     public DataField[] registerAndGetStructure() throws IOException, ClassNotFoundException {
@@ -181,10 +178,12 @@ public class PushRemoteWrapper extends AbstractWrapper implements IPushWrapper{
 
     public boolean manualDataInsertion(String Xstream4Rest) {
         logger.debug(new StringBuilder().append("Received Stream Element at the push wrapper."));
-        StreamElement4Rest se = (StreamElement4Rest) XSTREAM.fromXML(Xstream4Rest);
-        StreamElement streamElement = se.toStreamElement();
-
         try {
+        
+            StreamElement4Rest se = (StreamElement4Rest) XSTREAM.fromXML(Xstream4Rest);
+            StreamElement streamElement = se.toStreamElement();
+
+        
             // If the stream element is out of order, we accept the stream element and wait for the next (update the last received time and return true)
             if (isOutOfOrder(streamElement)) {
                 lastReceivedTimestamp = streamElement.getTimeStamp();
@@ -201,6 +200,10 @@ public class PushRemoteWrapper extends AbstractWrapper implements IPushWrapper{
         catch (SQLException e) {
             logger.warn(e.getMessage(), e);
             return false;
+        }
+        catch (XStreamException e){
+        	logger.warn(e.getMessage(), e);
+        	return false;
         }
     }
 

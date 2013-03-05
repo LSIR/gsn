@@ -60,6 +60,7 @@
                                    <value field="value" style="text"/>
                                </structure>
                           </collection>
+                          <collection name="output-structure"   field="wrapperOutputStructure"  item-type="gsn.beans.DataField" usage="optional"/>
                      </structure>
                   </collection>
                  <value  name="query" field="sqlQuery" />

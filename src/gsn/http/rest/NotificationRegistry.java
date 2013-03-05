@@ -8,13 +8,13 @@ public class NotificationRegistry {
 	
 	private static NotificationRegistry singleton = new NotificationRegistry();
 	
-	private Map<Double, IPushWrapper> clients =Collections.synchronizedMap( new HashMap<Double, IPushWrapper>());
+	private Map<Double, PushRemoteWrapper> clients =Collections.synchronizedMap( new HashMap<Double, PushRemoteWrapper>());
 	
 	public static NotificationRegistry getInstance() {
 		return singleton;
 	}
 	
-	public void addNotification(Double notificationId,IPushWrapper wrapper ) {
+	public void addNotification(Double notificationId,PushRemoteWrapper wrapper ) {
 		clients.put(notificationId, wrapper);
 	}
 	
@@ -22,7 +22,7 @@ public class NotificationRegistry {
 		clients.remove(notificationId);
 	}
 	
-	public IPushWrapper getNotification(Double notificationId) {
+	public PushRemoteWrapper getNotification(Double notificationId) {
 		return clients.get(notificationId);
 	}
 	
