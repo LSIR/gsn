@@ -17,8 +17,6 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
 public class DemoVSensor extends AbstractVirtualSensor {
 
@@ -27,8 +25,6 @@ public class DemoVSensor extends AbstractVirtualSensor {
 	private ArrayList < String >          fields                  = new ArrayList < String >( );
 
 	private ByteArrayOutputStream         outputStream            = new ByteArrayOutputStream( 24 * 1024 );
-
-	private JPEGImageEncoder              codec                   = JPEGCodec.createJPEGEncoder( outputStream );
 
 	private ByteArrayInputStream          input;
 
@@ -91,7 +87,9 @@ public class DemoVSensor extends AbstractVirtualSensor {
 			}
 			graphics.fillOval( locX , locY , size , size );
 			try {
-				codec.encode( bufferedImage );
+				ImageIO.write(bufferedImage,"jpeg", outputStream);
+				outputStream.close();
+
 			}catch (Exception e) {
 				logger.error(e.getMessage(),e);
 			}

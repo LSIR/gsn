@@ -16,7 +16,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
-import sun.misc.*;
+import javax.xml.bind.DatatypeConverter;
 
 
 /* This class helps to encrypt user posswords using AES encryption algo, we use a salt for a more robust encryption, salt is stored in a property file "acuserpassword.properties"*/
@@ -43,7 +43,7 @@ public class Protector
         {
             valueToEnc = salt + eValue;
             byte[] encValue = c.doFinal(valueToEnc.getBytes());
-            eValue = new BASE64Encoder().encode(encValue);
+            eValue = DatatypeConverter.printBase64Binary(encValue);
         }
         return eValue;
     }
@@ -59,7 +59,7 @@ public class Protector
         String valueToDecrypt = value;
         for (int i = 0; i < ITERATIONS; i++)
         {
-            byte[] decordedValue = new BASE64Decoder().decodeBuffer(valueToDecrypt);
+            byte[] decordedValue = DatatypeConverter.parseBase64Binary(valueToDecrypt);
             byte[] decValue = c.doFinal(decordedValue);
             dValue = new String(decValue).substring(salt.length());
             valueToDecrypt = dValue;

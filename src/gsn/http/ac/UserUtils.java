@@ -2,9 +2,13 @@ package gsn.http.ac;
 
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 public class UserUtils {
@@ -90,5 +94,17 @@ public class UserUtils {
         }
 
         return allowedSensors;
+    }
+    
+    public static void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
+    {
+    	StringBuffer url = req.getRequestURL();
+    	String queryString = req.getQueryString();
+    	if (queryString != null) {
+    	    url.append('?');
+    	    url.append(queryString);
+    	}
+        req.getSession().setAttribute("login.target", url.toString());
+        res.sendRedirect("/gsn/MyLoginHandlerServlet");
     }
 }

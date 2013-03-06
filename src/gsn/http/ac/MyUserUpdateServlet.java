@@ -38,7 +38,7 @@ public class MyUserUpdateServlet  extends HttpServlet
 
         if (user == null)
        {
-          this.redirectToLogin(req, res);
+        	UserUtils.redirectToLogin(req, res);
        }
         else
         {
@@ -450,11 +450,7 @@ public class MyUserUpdateServlet  extends HttpServlet
 
         }
     }
-    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
-    {
-        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
-        res.sendRedirect("/gsn/MyLoginHandlerServlet");
-    }
+
      private Vector dataSourceVectorForDataSourceNames(Vector dataSourceNames)
     {
         Vector dataSourceVector = new Vector();

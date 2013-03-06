@@ -38,7 +38,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
 
         if (user == null)
         {
-            redirectToLogin(req,res);
+        	UserUtils.redirectToLogin(req,res);
         }
         else
         {
@@ -309,11 +309,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
 
        }
    }
-    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
-    {
-        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
-        res.sendRedirect("/gsn/MyLoginHandlerServlet");
-    }
+
     /****************************************** JS Methods*************************************************************/
     /******************************************************************************************************************/
 

@@ -22,6 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
@@ -198,19 +199,13 @@ public class RestStreamHanlder extends HttpServlet {
             String[] ahs = authHeader.split(" ");
             if (ahs.length == 2) {
                 String b64UsernamPassword = ahs[1]; // we get: d2VibWFzdGVyOnRyeTJndWVTUw
-                sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
-                try {
-                    String userPass = new String(decoder.decodeBuffer(b64UsernamPassword)); // form: username:passsword
-                    String[] ups;
-                    if ((ups = userPass.split(":")).length == 2) {
-                        return new String[]{
-                                ups[0], // username
-                                ups[1]  // password
-                        };
-                    }
-                }
-                catch (IOException e) {
-                    logger.debug(e.getMessage(), e);
+                String userPass = new String(DatatypeConverter.parseBase64Binary(b64UsernamPassword)); // form: username:passsword
+                String[] ups;
+                if ((ups = userPass.split(":")).length == 2) {
+                    return new String[]{
+                            ups[0], // username
+                            ups[1]  // password
+                    };
                 }
             }
         }

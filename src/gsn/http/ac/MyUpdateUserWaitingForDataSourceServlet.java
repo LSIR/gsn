@@ -35,7 +35,7 @@ public class MyUpdateUserWaitingForDataSourceServlet extends HttpServlet
         User user = (User) session.getAttribute("user");
         if (user == null)
        {
-          this.redirectToLogin(req,res);
+        	UserUtils.redirectToLogin(req,res);
        }
        else
        {
@@ -138,10 +138,6 @@ public class MyUpdateUserWaitingForDataSourceServlet extends HttpServlet
 
         }
     }
-    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
-    {
-        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
-        res.sendRedirect("/gsn/MyLoginHandlerServlet");
-    }
+
 
 }
