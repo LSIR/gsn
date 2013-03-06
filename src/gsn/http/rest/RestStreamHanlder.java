@@ -146,7 +146,11 @@ public class RestStreamHanlder extends HttpServlet {
 				return;
 			}
 			//checking to see if there is an already registered notification id, in that case, we ignore (re)registeration.
-			PushDelivery delivery = new PushDelivery(localContactPoint,notificationId,response.getWriter());
+			DeliverySystem delivery;
+			if (parser.pushType.equals("wp"))
+				delivery = new WPPushDelivery(localContactPoint,notificationId,response.getWriter(),parser.nClass,parser.nMessage);
+			else
+				delivery = new PushDelivery(localContactPoint,notificationId,response.getWriter());
 
 			boolean isExist = DataDistributer.getInstance(delivery.getClass()).contains(delivery);
 			if (isExist) {
@@ -213,14 +217,23 @@ public class RestStreamHanlder extends HttpServlet {
     }
 
 	class URLParser{
-		private String query,tableName;
+		private String query,tableName,pushType,nMessage;
+		private int nClass;
 		private long startTime;
 		private VSensorConfig config;
 		public URLParser(HttpServletRequest request) throws UnsupportedEncodingException, Exception {
 			String requestURI = request.getRequestURI().substring(request.getRequestURI().toLowerCase().indexOf(STREAMING)+STREAMING.length());
 			StringTokenizer tokens = new StringTokenizer(requestURI,"/");
 			startTime = System.currentTimeMillis();
-			query = tokens.nextToken();
+			String first = tokens.nextToken();
+			if (first.startsWith("wp")){ //registering from a Windows Phone
+				pushType = "wp";
+				nClass = Integer.parseInt(first.substring(2,3));
+				nMessage = URLDecoder.decode(first.substring(3),"UTF-8");
+				query = tokens.nextToken();
+			}else{
+				query = first;
+			}
 			query = URLDecoder.decode(query,"UTF-8");
 			if (tokens.hasMoreTokens()) 
 				startTime= Helpers.convertTimeFromIsoToLong(URLDecoder.decode(tokens.nextToken(),"UTF-8"));
