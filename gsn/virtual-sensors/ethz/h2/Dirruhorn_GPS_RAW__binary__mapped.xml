@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_GPS_RAW_binary__mapped" priority="10" >
+<virtual-sensor name="Dirruhorn_GPS_RAW__binary__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
