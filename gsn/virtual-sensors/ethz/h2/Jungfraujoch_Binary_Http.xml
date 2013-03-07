@@ -22,8 +22,8 @@
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam1</predicate>
                     <predicate key="device-id">6010</predicate>
-                    <predicate key="username">USERNAME</predicate>
-                    <predicate key="password">PASSWORD</predicate>
+                    <predicate key="username">root</predicate>
+                    <predicate key="password">perma.PW</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

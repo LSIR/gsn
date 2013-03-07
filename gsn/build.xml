@@ -4,8 +4,8 @@
     <property name="safe-storage-controller-port" value="25712"/>
     <property name="gsn-controller-port" value="22932"/>
     <property name="max-servlets" value="64"/>
-    <property name="max-db-connections" value="48"/>
-    <property name="max-sliding-db-connections" value="48"/>
+    <property name="max-db-connections" value="64"/>
+    <property name="max-sliding-db-connections" value="64"/>
     <property name="remote-keep-alive-period" value="30000"/>
     <property name="aes-enc-salt" value="this is a simple clear salt"/>
 
