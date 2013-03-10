@@ -495,21 +495,21 @@ $(document).ready(function() {
 
       { title:"GPS Measurement Quality - CoreStation",
           signals: [{
-          vsensor:"dirruhorn_gps_raw__mapped",
+          vsensor:"dirruhorn_gps_raw__single__conv",
           field:["measurement_quality"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },
       { title:"GPS Signal Strength - CoreStation",
         signals: [{
-          vsensor:"dirruhorn_gps_raw__mapped",
+          vsensor:"dirruhorn_gps_raw__single__conv",
           field:["signal_strength"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },
       { title:"GPS Number of Satellites - CoreStation",
         signals: [{
-          vsensor:"dirruhorn_gps_raw__mapped",
+          vsensor:"dirruhorn_gps_raw__single__conv",
           field:["gps_sats"],
           select:"sensornode[position][iscorestation='true']"
         }]

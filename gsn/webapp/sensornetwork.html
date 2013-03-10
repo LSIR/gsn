@@ -306,6 +306,13 @@ $(document).ready(function() {
           select:"sensornode[position][iscorestation='true']"
         }]
       },
+      { title:"BackLog Message Counters",
+        signals: [{
+          vsensor:".*_backlogstatus_dynamic__mapped",
+          field:["gsn_plugin_msg_in_counter","gsn_plugin_msg_out_counter","tos_msg_recv_counter","tos_msg_send_counter"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
       { title:"BackLog-GSN Connection Losses",
         signals: [{
           vsensor:".*_backlogstatus_dynamic__mapped",
