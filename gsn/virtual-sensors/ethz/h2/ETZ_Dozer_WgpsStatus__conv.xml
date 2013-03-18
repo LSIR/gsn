@@ -47,10 +47,10 @@
                 PAYLOAD_GPSTIME as GPS_TIME, PAYLOAD_GPSWEEK as GPS_WEEK, PAYLOAD_NUMSV as NUM_SV, PAYLOAD_CRC as CRC,
                 cast(round((PAYLOAD_INCLINOMETERX / 32768.0) * 90.0, 3) as CHAR(30)) as INCLINOMETER_X,
                 cast(round((PAYLOAD_INCLINOMETERY / 32768.0) * 90.0 , 3) as CHAR(30)) as INCLINOMETER_Y,
-                cast(round(PAYLOAD_GPSVOLTAGE * (2.5/4096.0) * (39.0/24.0), 3) as CHAR(30)) as GPSVOLTAGE,
-                cast(round(PAYLOAD_GPSCURRENT * (2.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as GPSCURRENT,
-                cast(round(PAYLOAD_SAM7CURRENT * (2.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as SAM7CURRENT,
-                cast(round(PAYLOAD_TNCURRENT * (2.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as TNCURRENT from wrapper </query>
+                cast(round(PAYLOAD_GPSVOLTAGE * (1.5/4096.0) * (57.0/24.0), 3) as CHAR(30)) as GPSVOLTAGE,
+                cast(round(PAYLOAD_GPSCURRENT * (1.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as GPSCURRENT,
+                cast(round(PAYLOAD_SAM7CURRENT * (1.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as SAM7CURRENT,
+                cast(round(PAYLOAD_TNCURRENT * (1.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as TNCURRENT from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
