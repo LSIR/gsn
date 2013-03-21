@@ -18,16 +18,15 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="PAYLOAD_GPSVOLTAGE" type="INTEGER" />
-            <field name="PAYLOAD_GPSCURRENT" type="INTEGER" />
-            <field name="PAYLOAD_SAM7CURRENT" type="INTEGER" />
-            <field name="PAYLOAD_TNCURRENT" type="INTEGER" />
-            <field name="PAYLOAD_INCLINOMETERX" type="INTEGER" />
-            <field name="PAYLOAD_INCLINOMETERY" type="INTEGER" />
-            <field name="PAYLOAD_GPSTIME" type="INTEGER" />
-            <field name="PAYLOAD_GPSWEEK" type="SMALLINT" />
-            <field name="PAYLOAD_NUMSV" type="TINYINT" />
-            <field name="PAYLOAD_CRC" type="INTEGER" />
+            <field name="PAYLOAD_GPS_VOLTAGE" type="INTEGER" />
+            <field name="PAYLOAD_GPS_CURRENT" type="INTEGER" />
+            <field name="PAYLOAD_SAM7_CURRENT" type="INTEGER" />
+            <field name="PAYLOAD_TN_PER_CURRENT" type="INTEGER" />
+            <field name="PAYLOAD_SAM7_POWER" type="TINYINT" />
+            <field name="PAYLOAD_INCLINOMETER_X" type="INTEGER" />
+            <field name="PAYLOAD_INCLINOMETER_Y" type="INTEGER" />
+            <field name="PAYLOAD_SAM7_UNIXTIME" type="BIGINT" />
+            <field name="PAYLOAD_GPS_SV_QUEUE" type="INTEGER" />
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>

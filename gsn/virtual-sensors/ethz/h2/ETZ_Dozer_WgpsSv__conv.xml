@@ -3,6 +3,7 @@
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
+            <param name="gps_time_conversion" />
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
@@ -75,14 +76,17 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" />
             
             <field name="SENSORTYPE" type="VARCHAR(100)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
-            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
-            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            
+            <field name="GPS_TIME" type="INTEGER" />
+            <field name="GPS_WEEK" type="SMALLINT" />
+            <field name="NUM_SV" type="TINYINT" />
             <field name="CARRIER_PHASE" type="DOUBLE" />
             <field name="PSEUDO_RANGE" type="DOUBLE" />
             <field name="DOPPLER" type="DOUBLE" />
@@ -103,7 +107,12 @@
                     <predicate key="query"> select * from ETZ_Dozer_WgpsSv__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR,
+                		HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_GPS_TIME as GPS_TIME, PAYLOAD_GPS_WEEK as GPS_WEEK, PAYLOAD_NUM_SV as NUM_SV,
+                		PAYLOAD_CARRIER_PHASE_I0, PAYLOAD_CARRIER_PHASE_I1, PAYLOAD_CARRIER_PHASE_I2, PAYLOAD_CARRIER_PHASE_I3, PAYLOAD_CARRIER_PHASE_I4,
+                		PAYLOAD_PSEUDO_RANGE_I0, PAYLOAD_PSEUDO_RANGE_I1, PAYLOAD_PSEUDO_RANGE_I2, PAYLOAD_PSEUDO_RANGE_I3, PAYLOAD_PSEUDO_RANGE_I4,
+                		PAYLOAD_DOPPLER_I0, PAYLOAD_DOPPLER_I1, PAYLOAD_DOPPLER_I2, PAYLOAD_SPACE_VEHICLE, PAYLOAD_MEASUREMENT_QUALITY,
+                		PAYLOAD_SIGNAL_STRENGTH, PAYLOAD_LOSS_OF_LOCK from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

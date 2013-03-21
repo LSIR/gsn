@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 30;
+    public static final int DEFAULT_MESSAGE_SIZE = 28;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 188;
 
-    /** Create a new DozerWgpsStatusMsg of size 30. */
+    /** Create a new DozerWgpsStatusMsg of size 28. */
     public DozerWgpsStatusMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -105,34 +105,31 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
         s += "  [payload.sample.no=0x"+Long.toHexString(get_payload_sample_no())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.gpsvoltage=0x"+Long.toHexString(get_payload_gpsvoltage())+"]\n";
+        s += "  [payload.gps_voltage=0x"+Long.toHexString(get_payload_gps_voltage())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.gpscurrent=0x"+Long.toHexString(get_payload_gpscurrent())+"]\n";
+        s += "  [payload.gps_current=0x"+Long.toHexString(get_payload_gps_current())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.sam7current=0x"+Long.toHexString(get_payload_sam7current())+"]\n";
+        s += "  [payload.sam7_current=0x"+Long.toHexString(get_payload_sam7_current())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.tncurrent=0x"+Long.toHexString(get_payload_tncurrent())+"]\n";
+        s += "  [payload.tn_per_current=0x"+Long.toHexString(get_payload_tn_per_current())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.inclinometerx=0x"+Long.toHexString(get_payload_inclinometerx())+"]\n";
+        s += "  [payload.sam7_power=0x"+Long.toHexString(get_payload_sam7_power())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.inclinometery=0x"+Long.toHexString(get_payload_inclinometery())+"]\n";
+        s += "  [payload.inclinometer_x=0x"+Long.toHexString(get_payload_inclinometer_x())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.numsv=0x"+Long.toHexString(get_payload_numsv())+"]\n";
+        s += "  [payload.inclinometer_y=0x"+Long.toHexString(get_payload_inclinometer_y())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.gpsweek=0x"+Long.toHexString(get_payload_gpsweek())+"]\n";
+        s += "  [payload.sam7_unixtime=0x"+Long.toHexString(get_payload_sam7_unixtime())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.gpstime=0x"+Long.toHexString(get_payload_gpstime())+"]\n";
-      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
-      try {
-        s += "  [payload.crc=0x"+Long.toHexString(get_payload_crc())+"]\n";
+        s += "  [payload.gps_sv_queue=0x"+Long.toHexString(get_payload_gps_sv_queue())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -521,632 +518,569 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.gpsvoltage
+    // Accessor methods for field: payload.gps_voltage
     //   Field type: int
     //   Offset (bits): 72
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.gpsvoltage' is signed (false).
+     * Return whether the field 'payload.gps_voltage' is signed (false).
      */
-    public static boolean isSigned_payload_gpsvoltage() {
+    public static boolean isSigned_payload_gps_voltage() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.gpsvoltage' is an array (false).
+     * Return whether the field 'payload.gps_voltage' is an array (false).
      */
-    public static boolean isArray_payload_gpsvoltage() {
+    public static boolean isArray_payload_gps_voltage() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.gpsvoltage'
+     * Return the offset (in bytes) of the field 'payload.gps_voltage'
      */
-    public static int offset_payload_gpsvoltage() {
+    public static int offset_payload_gps_voltage() {
         return (72 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.gpsvoltage'
+     * Return the offset (in bits) of the field 'payload.gps_voltage'
      */
-    public static int offsetBits_payload_gpsvoltage() {
+    public static int offsetBits_payload_gps_voltage() {
         return 72;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.gpsvoltage'
+     * Return the value (as a int) of the field 'payload.gps_voltage'
      */
-    public int get_payload_gpsvoltage() {
-        return (int)getUIntBEElement(offsetBits_payload_gpsvoltage(), 16);
+    public int get_payload_gps_voltage() {
+        return (int)getUIntBEElement(offsetBits_payload_gps_voltage(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.gpsvoltage'
+     * Set the value of the field 'payload.gps_voltage'
      */
-    public void set_payload_gpsvoltage(int value) {
-        setUIntBEElement(offsetBits_payload_gpsvoltage(), 16, value);
+    public void set_payload_gps_voltage(int value) {
+        setUIntBEElement(offsetBits_payload_gps_voltage(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.gpsvoltage'
+     * Return the size, in bytes, of the field 'payload.gps_voltage'
      */
-    public static int size_payload_gpsvoltage() {
+    public static int size_payload_gps_voltage() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.gpsvoltage'
+     * Return the size, in bits, of the field 'payload.gps_voltage'
      */
-    public static int sizeBits_payload_gpsvoltage() {
+    public static int sizeBits_payload_gps_voltage() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.gpscurrent
+    // Accessor methods for field: payload.gps_current
     //   Field type: int
     //   Offset (bits): 88
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.gpscurrent' is signed (false).
+     * Return whether the field 'payload.gps_current' is signed (false).
      */
-    public static boolean isSigned_payload_gpscurrent() {
+    public static boolean isSigned_payload_gps_current() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.gpscurrent' is an array (false).
+     * Return whether the field 'payload.gps_current' is an array (false).
      */
-    public static boolean isArray_payload_gpscurrent() {
+    public static boolean isArray_payload_gps_current() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.gpscurrent'
+     * Return the offset (in bytes) of the field 'payload.gps_current'
      */
-    public static int offset_payload_gpscurrent() {
+    public static int offset_payload_gps_current() {
         return (88 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.gpscurrent'
+     * Return the offset (in bits) of the field 'payload.gps_current'
      */
-    public static int offsetBits_payload_gpscurrent() {
+    public static int offsetBits_payload_gps_current() {
         return 88;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.gpscurrent'
+     * Return the value (as a int) of the field 'payload.gps_current'
      */
-    public int get_payload_gpscurrent() {
-        return (int)getUIntBEElement(offsetBits_payload_gpscurrent(), 16);
+    public int get_payload_gps_current() {
+        return (int)getUIntBEElement(offsetBits_payload_gps_current(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.gpscurrent'
+     * Set the value of the field 'payload.gps_current'
      */
-    public void set_payload_gpscurrent(int value) {
-        setUIntBEElement(offsetBits_payload_gpscurrent(), 16, value);
+    public void set_payload_gps_current(int value) {
+        setUIntBEElement(offsetBits_payload_gps_current(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.gpscurrent'
+     * Return the size, in bytes, of the field 'payload.gps_current'
      */
-    public static int size_payload_gpscurrent() {
+    public static int size_payload_gps_current() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.gpscurrent'
+     * Return the size, in bits, of the field 'payload.gps_current'
      */
-    public static int sizeBits_payload_gpscurrent() {
+    public static int sizeBits_payload_gps_current() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.sam7current
+    // Accessor methods for field: payload.sam7_current
     //   Field type: int
     //   Offset (bits): 104
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.sam7current' is signed (false).
+     * Return whether the field 'payload.sam7_current' is signed (false).
      */
-    public static boolean isSigned_payload_sam7current() {
+    public static boolean isSigned_payload_sam7_current() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.sam7current' is an array (false).
+     * Return whether the field 'payload.sam7_current' is an array (false).
      */
-    public static boolean isArray_payload_sam7current() {
+    public static boolean isArray_payload_sam7_current() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.sam7current'
+     * Return the offset (in bytes) of the field 'payload.sam7_current'
      */
-    public static int offset_payload_sam7current() {
+    public static int offset_payload_sam7_current() {
         return (104 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.sam7current'
+     * Return the offset (in bits) of the field 'payload.sam7_current'
      */
-    public static int offsetBits_payload_sam7current() {
+    public static int offsetBits_payload_sam7_current() {
         return 104;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.sam7current'
+     * Return the value (as a int) of the field 'payload.sam7_current'
      */
-    public int get_payload_sam7current() {
-        return (int)getUIntBEElement(offsetBits_payload_sam7current(), 16);
+    public int get_payload_sam7_current() {
+        return (int)getUIntBEElement(offsetBits_payload_sam7_current(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.sam7current'
+     * Set the value of the field 'payload.sam7_current'
      */
-    public void set_payload_sam7current(int value) {
-        setUIntBEElement(offsetBits_payload_sam7current(), 16, value);
+    public void set_payload_sam7_current(int value) {
+        setUIntBEElement(offsetBits_payload_sam7_current(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.sam7current'
+     * Return the size, in bytes, of the field 'payload.sam7_current'
      */
-    public static int size_payload_sam7current() {
+    public static int size_payload_sam7_current() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.sam7current'
+     * Return the size, in bits, of the field 'payload.sam7_current'
      */
-    public static int sizeBits_payload_sam7current() {
+    public static int sizeBits_payload_sam7_current() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.tncurrent
+    // Accessor methods for field: payload.tn_per_current
     //   Field type: int
     //   Offset (bits): 120
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.tncurrent' is signed (false).
+     * Return whether the field 'payload.tn_per_current' is signed (false).
      */
-    public static boolean isSigned_payload_tncurrent() {
+    public static boolean isSigned_payload_tn_per_current() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.tncurrent' is an array (false).
+     * Return whether the field 'payload.tn_per_current' is an array (false).
      */
-    public static boolean isArray_payload_tncurrent() {
+    public static boolean isArray_payload_tn_per_current() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.tncurrent'
+     * Return the offset (in bytes) of the field 'payload.tn_per_current'
      */
-    public static int offset_payload_tncurrent() {
+    public static int offset_payload_tn_per_current() {
         return (120 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.tncurrent'
+     * Return the offset (in bits) of the field 'payload.tn_per_current'
      */
-    public static int offsetBits_payload_tncurrent() {
+    public static int offsetBits_payload_tn_per_current() {
         return 120;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.tncurrent'
+     * Return the value (as a int) of the field 'payload.tn_per_current'
      */
-    public int get_payload_tncurrent() {
-        return (int)getUIntBEElement(offsetBits_payload_tncurrent(), 16);
+    public int get_payload_tn_per_current() {
+        return (int)getUIntBEElement(offsetBits_payload_tn_per_current(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.tncurrent'
+     * Set the value of the field 'payload.tn_per_current'
      */
-    public void set_payload_tncurrent(int value) {
-        setUIntBEElement(offsetBits_payload_tncurrent(), 16, value);
+    public void set_payload_tn_per_current(int value) {
+        setUIntBEElement(offsetBits_payload_tn_per_current(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.tncurrent'
+     * Return the size, in bytes, of the field 'payload.tn_per_current'
      */
-    public static int size_payload_tncurrent() {
+    public static int size_payload_tn_per_current() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.tncurrent'
+     * Return the size, in bits, of the field 'payload.tn_per_current'
      */
-    public static int sizeBits_payload_tncurrent() {
+    public static int sizeBits_payload_tn_per_current() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.inclinometerx
+    // Accessor methods for field: payload.sam7_power
     //   Field type: short
     //   Offset (bits): 136
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'payload.inclinometerx' is signed (false).
-     */
-    public static boolean isSigned_payload_inclinometerx() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'payload.inclinometerx' is an array (false).
-     */
-    public static boolean isArray_payload_inclinometerx() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'payload.inclinometerx'
-     */
-    public static int offset_payload_inclinometerx() {
-        return (136 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'payload.inclinometerx'
-     */
-    public static int offsetBits_payload_inclinometerx() {
-        return 136;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'payload.inclinometerx'
-     */
-    public short get_payload_inclinometerx() {
-        return (short)getSIntBEElement(offsetBits_payload_inclinometerx(), 16);
-    }
-
-    /**
-     * Set the value of the field 'payload.inclinometerx'
-     */
-    public void set_payload_inclinometerx(short value) {
-        setSIntBEElement(offsetBits_payload_inclinometerx(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'payload.inclinometerx'
-     */
-    public static int size_payload_inclinometerx() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'payload.inclinometerx'
-     */
-    public static int sizeBits_payload_inclinometerx() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.inclinometery
-    //   Field type: short
-    //   Offset (bits): 152
-    //   Size (bits): 16
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'payload.inclinometery' is signed (false).
-     */
-    public static boolean isSigned_payload_inclinometery() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'payload.inclinometery' is an array (false).
-     */
-    public static boolean isArray_payload_inclinometery() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'payload.inclinometery'
-     */
-    public static int offset_payload_inclinometery() {
-        return (152 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'payload.inclinometery'
-     */
-    public static int offsetBits_payload_inclinometery() {
-        return 152;
-    }
-
-    /**
-     * Return the value (as a short) of the field 'payload.inclinometery'
-     */
-    public short get_payload_inclinometery() {
-        return (short)getSIntBEElement(offsetBits_payload_inclinometery(), 16);
-    }
-
-    /**
-     * Set the value of the field 'payload.inclinometery'
-     */
-    public void set_payload_inclinometery(short value) {
-        setSIntBEElement(offsetBits_payload_inclinometery(), 16, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'payload.inclinometery'
-     */
-    public static int size_payload_inclinometery() {
-        return (16 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'payload.inclinometery'
-     */
-    public static int sizeBits_payload_inclinometery() {
-        return 16;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.numsv
-    //   Field type: short
-    //   Offset (bits): 168
     //   Size (bits): 8
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.numsv' is signed (false).
+     * Return whether the field 'payload.sam7_power' is signed (false).
      */
-    public static boolean isSigned_payload_numsv() {
+    public static boolean isSigned_payload_sam7_power() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.numsv' is an array (false).
+     * Return whether the field 'payload.sam7_power' is an array (false).
      */
-    public static boolean isArray_payload_numsv() {
+    public static boolean isArray_payload_sam7_power() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.numsv'
+     * Return the offset (in bytes) of the field 'payload.sam7_power'
      */
-    public static int offset_payload_numsv() {
-        return (168 / 8);
+    public static int offset_payload_sam7_power() {
+        return (136 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.numsv'
+     * Return the offset (in bits) of the field 'payload.sam7_power'
      */
-    public static int offsetBits_payload_numsv() {
-        return 168;
+    public static int offsetBits_payload_sam7_power() {
+        return 136;
     }
 
     /**
-     * Return the value (as a short) of the field 'payload.numsv'
+     * Return the value (as a short) of the field 'payload.sam7_power'
      */
-    public short get_payload_numsv() {
-        return (short)getUIntElement(offsetBits_payload_numsv(), 8);
+    public short get_payload_sam7_power() {
+        return (short)getUIntBEElement(offsetBits_payload_sam7_power(), 8);
     }
 
     /**
-     * Set the value of the field 'payload.numsv'
+     * Set the value of the field 'payload.sam7_power'
      */
-    public void set_payload_numsv(short value) {
-        setUIntElement(offsetBits_payload_numsv(), 8, value);
+    public void set_payload_sam7_power(short value) {
+        setUIntBEElement(offsetBits_payload_sam7_power(), 8, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.numsv'
+     * Return the size, in bytes, of the field 'payload.sam7_power'
      */
-    public static int size_payload_numsv() {
+    public static int size_payload_sam7_power() {
         return (8 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.numsv'
+     * Return the size, in bits, of the field 'payload.sam7_power'
      */
-    public static int sizeBits_payload_numsv() {
+    public static int sizeBits_payload_sam7_power() {
         return 8;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.gpsweek
-    //   Field type: int
-    //   Offset (bits): 176
+    // Accessor methods for field: payload.inclinometer_x
+    //   Field type: short
+    //   Offset (bits): 144
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.gpsweek' is signed (false).
+     * Return whether the field 'payload.inclinometer_x' is signed (false).
      */
-    public static boolean isSigned_payload_gpsweek() {
+    public static boolean isSigned_payload_inclinometer_x() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.gpsweek' is an array (false).
+     * Return whether the field 'payload.inclinometer_x' is an array (false).
      */
-    public static boolean isArray_payload_gpsweek() {
+    public static boolean isArray_payload_inclinometer_x() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.gpsweek'
+     * Return the offset (in bytes) of the field 'payload.inclinometer_x'
      */
-    public static int offset_payload_gpsweek() {
-        return (176 / 8);
+    public static int offset_payload_inclinometer_x() {
+        return (144 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.gpsweek'
+     * Return the offset (in bits) of the field 'payload.inclinometer_x'
      */
-    public static int offsetBits_payload_gpsweek() {
-        return 176;
+    public static int offsetBits_payload_inclinometer_x() {
+        return 144;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.gpsweek'
+     * Return the value (as a short) of the field 'payload.inclinometer_x'
      */
-    public int get_payload_gpsweek() {
-        return (int)getUIntElement(offsetBits_payload_gpsweek(), 16);
+    public short get_payload_inclinometer_x() {
+        return (short)getSIntBEElement(offsetBits_payload_inclinometer_x(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.gpsweek'
+     * Set the value of the field 'payload.inclinometer_x'
      */
-    public void set_payload_gpsweek(int value) {
-        setUIntElement(offsetBits_payload_gpsweek(), 16, value);
+    public void set_payload_inclinometer_x(short value) {
+        setSIntBEElement(offsetBits_payload_inclinometer_x(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.gpsweek'
+     * Return the size, in bytes, of the field 'payload.inclinometer_x'
      */
-    public static int size_payload_gpsweek() {
+    public static int size_payload_inclinometer_x() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.gpsweek'
+     * Return the size, in bits, of the field 'payload.inclinometer_x'
      */
-    public static int sizeBits_payload_gpsweek() {
+    public static int sizeBits_payload_inclinometer_x() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.gpstime
-    //   Field type: long
-    //   Offset (bits): 192
-    //   Size (bits): 32
-    /////////////////////////////////////////////////////////
-
-    /**
-     * Return whether the field 'payload.gpstime' is signed (false).
-     */
-    public static boolean isSigned_payload_gpstime() {
-        return false;
-    }
-
-    /**
-     * Return whether the field 'payload.gpstime' is an array (false).
-     */
-    public static boolean isArray_payload_gpstime() {
-        return false;
-    }
-
-    /**
-     * Return the offset (in bytes) of the field 'payload.gpstime'
-     */
-    public static int offset_payload_gpstime() {
-        return (192 / 8);
-    }
-
-    /**
-     * Return the offset (in bits) of the field 'payload.gpstime'
-     */
-    public static int offsetBits_payload_gpstime() {
-        return 192;
-    }
-
-    /**
-     * Return the value (as a long) of the field 'payload.gpstime'
-     */
-    public long get_payload_gpstime() {
-        return (long)getUIntElement(offsetBits_payload_gpstime(), 32);
-    }
-
-    /**
-     * Set the value of the field 'payload.gpstime'
-     */
-    public void set_payload_gpstime(long value) {
-        setUIntElement(offsetBits_payload_gpstime(), 32, value);
-    }
-
-    /**
-     * Return the size, in bytes, of the field 'payload.gpstime'
-     */
-    public static int size_payload_gpstime() {
-        return (32 / 8);
-    }
-
-    /**
-     * Return the size, in bits, of the field 'payload.gpstime'
-     */
-    public static int sizeBits_payload_gpstime() {
-        return 32;
-    }
-
-    /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.crc
-    //   Field type: int
-    //   Offset (bits): 224
+    // Accessor methods for field: payload.inclinometer_y
+    //   Field type: short
+    //   Offset (bits): 160
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.crc' is signed (false).
+     * Return whether the field 'payload.inclinometer_y' is signed (false).
      */
-    public static boolean isSigned_payload_crc() {
+    public static boolean isSigned_payload_inclinometer_y() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.crc' is an array (false).
+     * Return whether the field 'payload.inclinometer_y' is an array (false).
      */
-    public static boolean isArray_payload_crc() {
+    public static boolean isArray_payload_inclinometer_y() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.crc'
+     * Return the offset (in bytes) of the field 'payload.inclinometer_y'
      */
-    public static int offset_payload_crc() {
-        return (224 / 8);
+    public static int offset_payload_inclinometer_y() {
+        return (160 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.crc'
+     * Return the offset (in bits) of the field 'payload.inclinometer_y'
      */
-    public static int offsetBits_payload_crc() {
-        return 224;
+    public static int offsetBits_payload_inclinometer_y() {
+        return 160;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.crc'
+     * Return the value (as a short) of the field 'payload.inclinometer_y'
      */
-    public int get_payload_crc() {
-        return (int)getUIntElement(offsetBits_payload_crc(), 16);
+    public short get_payload_inclinometer_y() {
+        return (short)getSIntBEElement(offsetBits_payload_inclinometer_y(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.crc'
+     * Set the value of the field 'payload.inclinometer_y'
      */
-    public void set_payload_crc(int value) {
-        setUIntElement(offsetBits_payload_crc(), 16, value);
+    public void set_payload_inclinometer_y(short value) {
+        setSIntBEElement(offsetBits_payload_inclinometer_y(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.crc'
+     * Return the size, in bytes, of the field 'payload.inclinometer_y'
      */
-    public static int size_payload_crc() {
+    public static int size_payload_inclinometer_y() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.crc'
+     * Return the size, in bits, of the field 'payload.inclinometer_y'
      */
-    public static int sizeBits_payload_crc() {
+    public static int sizeBits_payload_inclinometer_y() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.sam7_unixtime
+    //   Field type: long
+    //   Offset (bits): 176
+    //   Size (bits): 32
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.sam7_unixtime' is signed (false).
+     */
+    public static boolean isSigned_payload_sam7_unixtime() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.sam7_unixtime' is an array (false).
+     */
+    public static boolean isArray_payload_sam7_unixtime() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.sam7_unixtime'
+     */
+    public static int offset_payload_sam7_unixtime() {
+        return (176 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.sam7_unixtime'
+     */
+    public static int offsetBits_payload_sam7_unixtime() {
+        return 176;
+    }
+
+    /**
+     * Return the value (as a long) of the field 'payload.sam7_unixtime'
+     */
+    public long get_payload_sam7_unixtime() {
+        return (long)getUIntElement(offsetBits_payload_sam7_unixtime(), 32);
+    }
+
+    /**
+     * Set the value of the field 'payload.sam7_unixtime'
+     */
+    public void set_payload_sam7_unixtime(long value) {
+        setUIntElement(offsetBits_payload_sam7_unixtime(), 32, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.sam7_unixtime'
+     */
+    public static int size_payload_sam7_unixtime() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.sam7_unixtime'
+     */
+    public static int sizeBits_payload_sam7_unixtime() {
+        return 32;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.gps_sv_queue
+    //   Field type: int
+    //   Offset (bits): 208
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.gps_sv_queue' is signed (false).
+     */
+    public static boolean isSigned_payload_gps_sv_queue() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.gps_sv_queue' is an array (false).
+     */
+    public static boolean isArray_payload_gps_sv_queue() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.gps_sv_queue'
+     */
+    public static int offset_payload_gps_sv_queue() {
+        return (208 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.gps_sv_queue'
+     */
+    public static int offsetBits_payload_gps_sv_queue() {
+        return 208;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.gps_sv_queue'
+     */
+    public int get_payload_gps_sv_queue() {
+        return (int)getUIntBEElement(offsetBits_payload_gps_sv_queue(), 16);
+    }
+
+    /**
+     * Set the value of the field 'payload.gps_sv_queue'
+     */
+    public void set_payload_gps_sv_queue(int value) {
+        setUIntBEElement(offsetBits_payload_gps_sv_queue(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.gps_sv_queue'
+     */
+    public static int size_payload_gps_sv_queue() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.gps_sv_queue'
+     */
+    public static int sizeBits_payload_gps_sv_queue() {
         return 16;
     }
 
