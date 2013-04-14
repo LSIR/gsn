@@ -37,7 +37,7 @@ public class MyUserCandidateWaitingListServlet extends HttpServlet
         User user = (User) session.getAttribute("user");
         if (user == null)
        {
-        	UserUtils.redirectToLogin(req,res);
+          this.redirectToLogin(req,res);
        }
        else
        {
@@ -332,7 +332,7 @@ public class MyUserCandidateWaitingListServlet extends HttpServlet
                     ctdb.deleteGroupListsDifferenceForUser(ctdb.getGroupListForUser(pm.valueForName("username")),newGroupList,pm.valueForName("username"));
 
                     msgBody = "Congratulations ! your registration as a GSN user has been accepted !"+"\n"
-                              +"your username : "+user.getUserName()+"\n"+"\n";
+                              +"your username : "+user.getUserName()+"\n"+"You can now log in.\n";
 
                     //send E-mail to user..
                 }
@@ -400,7 +400,11 @@ public class MyUserCandidateWaitingListServlet extends HttpServlet
 
         }
     }
-
+    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
+    {
+        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
+        res.sendRedirect("/gsn/MyLoginHandlerServlet");
+    }
     /****************************************** JS Methods*************************************************************/
     /******************************************************************************************************************/
 

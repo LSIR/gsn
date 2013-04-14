@@ -38,7 +38,7 @@ public class MyUserUpdateServlet  extends HttpServlet
 
         if (user == null)
        {
-        	UserUtils.redirectToLogin(req, res);
+          this.redirectToLogin(req, res);
        }
         else
         {
@@ -319,7 +319,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         {
             out.println("<table>");
             out.println("<tr><th> virtual sensor name </th>");
-            out.println("<th> access right</th></tr>");
+            out.println("<th> access right</th><th> time limitation</th></tr>");
             for(int j=0;j<user.getDataSourceList().size();j++)
             {
                 dataSource=(DataSource)user.getDataSourceList().get(j);
@@ -328,7 +328,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                 if(dataSourceType.equals("4"))
                 {
                     out.println("<tr><td>" + dataSourceName + " </td>");
-                    out.println("<td>own</td></tr>");
+                    out.println("<td>own</td><td> unlimited </td></tr>");
                 }
                 else
                 {
@@ -370,10 +370,15 @@ public class MyUserUpdateServlet  extends HttpServlet
                     else
                     {
 
-                        out.println("&nbsp&nbsp&nbsp<INPUT TYPE=SUBMIT class= buttonstyle VALUE=\"update\"></td></tr>");
+                        out.println("&nbsp&nbsp&nbsp<INPUT TYPE=SUBMIT class= buttonstyle VALUE=\"update\"></td>");
                         out.println("</FORM>");
                     }
+                    // get the time limitation for this datasource
+                    String time = ctdb.getValueForOneColumnUnderTwoConditions(new Column("DEADLINE"), new Column("USERNAME", user.getUserName()), new Column("DATASOURCENAME", dataSourceName), "ACACCESS_DURATION");
+                    if (time == null) time = "unlimited";
+                    out.println("<td>" +time+"</tr></td>");
                 }
+
             }
         out.println("</table>");
         }
@@ -450,7 +455,11 @@ public class MyUserUpdateServlet  extends HttpServlet
 
         }
     }
-
+    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
+    {
+        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
+        res.sendRedirect("/gsn/MyLoginHandlerServlet");
+    }
      private Vector dataSourceVectorForDataSourceNames(Vector dataSourceNames)
     {
         Vector dataSourceVector = new Vector();

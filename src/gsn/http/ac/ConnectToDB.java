@@ -10,11 +10,12 @@ package gsn.http.ac;
 
 
 
-
+import java.text.SimpleDateFormat;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
+import java.io.LineNumberInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -56,7 +57,7 @@ public class ConnectToDB
         //Get a connection to the database
         con = DriverManager.getConnection(connectionname,dbUser,dbPassword);
         //create a statement object
-        stmt= con.createStatement();
+        stmt= con.createStatement();  ///// changed 20.03.2013
         meta= this.con.getMetaData();
         initUsedDB();
     }
@@ -72,8 +73,6 @@ public class ConnectToDB
         dbPassword= jdbcPassword;
         connectionname=jdbcURL;
         checkACTables();
-
-
     }
      /* Check if AC tables exist , and create them otherwise*/
      static void checkACTables()
@@ -392,6 +391,16 @@ public class ConnectToDB
                     "FOREIGN KEY(USERNAME) REFERENCES ACUSER(USERNAME),"+
                     "FOREIGN KEY(DATASOURCENAME) REFERENCES ACDATASOURCE(DATASOURCENAME))";
             statement.executeUpdate(query);
+
+            ////////////////////////////// ADD one more table for the permissible access date
+            query="CREATE TABLE ACACCESS_DURATION " +
+                    "(USERNAME VARCHAR(100) NOT NULL, " +
+                    "DATASOURCENAME VARCHAR(100) NOT NULL, " +
+                    "DEADLINE DATE, "+
+                    "PRIMARY KEY (USERNAME,DATASOURCENAME), "+
+                    "FOREIGN KEY(USERNAME) REFERENCES ACUSER(USERNAME),"+
+                    "FOREIGN KEY(DATASOURCENAME) REFERENCES ACDATASOURCE(DATASOURCENAME))";
+            statement.executeUpdate(query);
         }
         catch(SQLException e)
         {
@@ -639,6 +648,18 @@ public class ConnectToDB
         }
         return insertOK;
 	}
+
+    boolean insertThreeColumnsValuesStrings(String firstCol,String secondCol,String thirdCol,String tableName) throws SQLException
+    {
+        boolean insertOK=false;
+        String request = "INSERT INTO "+tableName+" VALUES ('" + firstCol + "','"+ secondCol+ "','"+thirdCol+"')";
+        int f =stmt.executeUpdate(request);
+        if(f!=0)
+        {
+            insertOK=true;
+        }
+        return insertOK;
+    }
 
      boolean insertFourColumnsValues(Column firstCol,Column secondCol,Column thirdCol,Column fourthCol,String tableName)throws SQLException
     {
@@ -1116,6 +1137,24 @@ public class ConnectToDB
         return user;
     }
 
+    /* given datasourcename, returns an object user that owns this source */
+    User getUserFromDataSource(String datasourcename)throws SQLException
+    {
+        String query="SELECT USERNAME FROM ACUSER_ACDATASOURCE WHERE DATASOURCENAME ='"+datasourcename+"'";    // get the username for this user
+        rs = stmt.executeQuery(query);
+        rs.next();
+        User user=new User(rs.getString("USERNAME"));                                     // create what will be returned
+        query="SELECT * FROM ACUSER WHERE USERNAME ='"+rs.getString("USERNAME")+"'";      // initialize the rest of the information
+        rs = stmt.executeQuery(query);
+        while(rs.next())
+        {
+            user.setFirstName(rs.getString("FIRSTNAME"));
+            user.setLastName(rs.getString("LASTNAME"));
+            user.setEmail(rs.getString("EMAIL"));
+        }
+        return user;
+    }
+
     /****************************************** DB register methods *********************************************/
    /************************************************************************************************************/
 
@@ -1282,7 +1321,6 @@ public class ConnectToDB
    {
        String query = "DELETE FROM "+tableName+" WHERE "+firstCond.columnLabel+"= '"+firstCond.columnValue+"' AND "+secondCond.columnLabel+"= '"+secondCond.columnValue+"'";
        return stmt.executeUpdate(query);
-
    }
     void deleteUserCandidate(String userName)throws SQLException
     {
@@ -1435,8 +1473,37 @@ public class ConnectToDB
 
 	}
 
+    public void checkVSDuration(String username) throws SQLException
+    {
+        Date dateNow = new Date(); // get the current date
+        SimpleDateFormat dateformatYYYYMMDD = new SimpleDateFormat("yyyy-MM-dd");
+        StringBuilder now = new StringBuilder( dateformatYYYYMMDD.format( dateNow ) );
 
+        String query="SELECT * FROM ACACCESS_DURATION WHERE USERNAME ='"+username+"'";
+        Statement stmt2 = con.createStatement();
+        ResultSet rs2 = stmt2.executeQuery(query);         // get the sources that are used by this user and belong to other users
 
-    
-
+        while(rs2.next())
+        {
+            logger.warn("Source  "+ rs2.getString("DATASOURCENAME")+ " has time "+rs2.getString("DEADLINE"));
+            if (now.toString().compareTo(rs2.getString("DEADLINE")) > 0) {   // if the current day is after the set deadline
+                logger.warn("Will be deleted "+ rs2.getString("DATASOURCENAME"));
+                Column column1 = new Column("USERNAME", username);
+                Column column2 = new Column("DATASOURCENAME", rs2.getString("DATASOURCENAME"));
+                deleteUnderTwoConditions(column1, column2,"ACACCESS_DURATION");           // delete the entries from the respective arrays
+                deleteUnderTwoConditions(column1, column2,"ACUSER_ACDATASOURCE");
+                // Send email informing the user
+                Emailer email = new Emailer();
+                User userFromBD = getUserForUserName(username); // get the details for the Admin account
+                String msgHead = "Dear "+ userFromBD.getFirstName() + " " + userFromBD.getLastName() +", "+"\n"+"\n";
+                String msgTail = "Best Regards,"+"\n"+"GSN Team";
+                String msgBody = "We would like to inform you that you no longer have access to the Virtual Sensor: " + column2.columnValue+
+                         "\n\nYou can manage your Virtual Sensors by choosing the following options in GSN:\n"+
+                        "Access Rights Management -> User Account Management -> Update Access Rights Form\n"+
+                        "or via the URL:{sitename}/gsn/MyUserUpdateServlet\n\n";
+                // first change Emailer class params to use sendEmail
+                email.sendEmail( "GSN ACCESS ", "GSN USER",userFromBD.getEmail(),"Update for a Virtual Sensor access", msgHead, msgBody, msgTail);
+            }
+        }
+    }
 }

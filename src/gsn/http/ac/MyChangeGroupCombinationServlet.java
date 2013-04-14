@@ -36,7 +36,7 @@ public class MyChangeGroupCombinationServlet  extends HttpServlet
         ConnectToDB ctdb = null;
         if (user == null)
         {
-        	UserUtils.redirectToLogin(req,res);
+            this.redirectToLogin(req,res);
         }
         else
         {
@@ -373,7 +373,11 @@ public class MyChangeGroupCombinationServlet  extends HttpServlet
 
         }
     }
-
+    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
+    {
+        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
+        res.sendRedirect("/gsn/MyLoginHandlerServlet");
+    }
      private Vector dataSourceVectorForDataSourceNames(Vector dataSourceNames)
     {
         Vector dataSourceVector = new Vector();

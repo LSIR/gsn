@@ -39,7 +39,7 @@ public class MyGroupManagementServlet extends HttpServlet
         User user = (User) session.getAttribute("user");
         if (user == null)
        {
-        	UserUtils.redirectToLogin(req,res);
+          this.redirectToLogin(req,res);
        }
        else
        {
@@ -237,6 +237,13 @@ public class MyGroupManagementServlet extends HttpServlet
 
         }
     }
+    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
+    {
+        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
+        res.sendRedirect("/gsn/MyLoginHandlerServlet");
+    }
+
+  
 
 
 

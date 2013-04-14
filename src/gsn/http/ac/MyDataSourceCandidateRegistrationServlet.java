@@ -38,7 +38,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
 
         if (user == null)
         {
-        	UserUtils.redirectToLogin(req,res);
+            redirectToLogin(req,res);
         }
         else
         {
@@ -187,13 +187,27 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
                     DataSource ds = pm.fileUploader((pm.valueForName("vsname")).toLowerCase(),"virtual-sensors/receivedVSFiles");
                     if( ds !=null)
                     {
-
                         ds.setIsCandidate("yes");
                         user.setIsWaiting("no");
                         ds.setOwner(user);
                         ctdb.registerDataSourceCandidate(ds);
-                        //out.println("File upload was successful. <BR>");
-                        //out.println("Ready to upload the next file. <BR>");
+                        // send an email to the Administrator
+                        Emailer email = new Emailer();
+                        User userFromBD = ctdb.getUserForUserName("Admin"); // get the details for the Admin account
+                        String msgHead = "Dear "+userFromBD.getFirstName() +", "+"\n"+"\n";
+                        String msgTail = "Best Regards,"+"\n"+"GSN Team";
+                        String msgBody = "A new Virtual Sensor has been uploaded and awaits your activation."+"\n"
+                                +"VS's name is: "+pm.valueForName("vsname")+"\n"
+                                +"The user who uploaded the VS is the following:\n"+
+                                "First name: " + user.getFirstName() + "\n"+
+                                "Last name: " + user.getLastName() + "\n"+
+                                "User name: " + user.getUserName() + "\n"+
+                                "Email address: " + user.getEmail() + "\n\n"+
+                                 "You can manage this request by choosing the following options in GSN:\n"+
+                                "Access Rights Management -> Admin Only -> Virtual Sensor Registration Waiting List\n"+
+                                "or via the URL: "+req.getServerName()+":"+req.getServerPort()+"/gsn/MyDataSourceCandidateWaitingListServlet\n\n";
+                        // first change Emailer class params to use sendEmail
+                        email.sendEmail( "GSN ACCESS ", "GSN USER",userFromBD.getEmail(),"New Virtual Sensor is Uploaded", msgHead, msgBody, msgTail);
                         this.managaeUserAlert(out, "File upload was successful.",false );
                     }
                      else
@@ -309,7 +323,11 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
 
        }
    }
-
+    private void redirectToLogin(HttpServletRequest req, HttpServletResponse res)throws IOException
+    {
+        req.getSession().setAttribute("login.target", HttpUtils.getRequestURL(req).toString());
+        res.sendRedirect("/gsn/MyLoginHandlerServlet");
+    }
     /****************************************** JS Methods*************************************************************/
     /******************************************************************************************************************/
 
