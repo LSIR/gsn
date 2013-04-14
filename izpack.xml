@@ -2,9 +2,9 @@
 <installation version="1.0">
 	<info>
 		<appname>GSN Server</appname>
-		<appversion>Version (pre) 1.0-Beta1</appversion>
+		<appversion>Version 1.1.3</appversion>
 		<authors>
-			<author name="Ali Salehi" email="ali.salehi@epfl.ch / salehiam@gmail.com" />
+			<author name="Ali Salehi" email="sofiane.sarni@epfl.ch / salehiam@gmail.com" />
 		</authors>
 		<javaversion>1.6</javaversion>
 		<url>http://gsn.sf.net</url>
@@ -45,7 +45,7 @@
 	<packs>
 		<pack name="GSN" required="yes" preselected="yes">
       <description>
-        The NexTick with all the required libraries and the source code for Windows and *nix.
+        Global Sensor Networks.
       </description>
 		<fileset dir="dist" targetdir="$INSTALL_PATH" >
 			<include name="**/**" />
