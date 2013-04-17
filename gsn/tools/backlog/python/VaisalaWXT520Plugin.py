@@ -38,13 +38,14 @@ class VaisalaWXT520PluginClass(AbstractPluginClass):
         value = self.getOptionValue('poll_interval')
         if value is None:
             self._interval = None
+            self.info('vaisala will not be polled automatically -> use scheduler')
         else:
             self._interval = float(value)
         
-        if self._interval >= 10:
-            self.info('poll interval: %s seconds' % (self._interval,))
-        else:
-            self.warning('poll interval: %s seconds (are you sure you want such a small interval?)' % (self._interval,))
+            if self._interval >= 10:
+                self.info('poll interval: %s seconds' % (self._interval,))
+            else:
+                self.warning('poll interval: %s seconds (are you sure you want such a small interval?)' % (self._interval,))
             
         
     def run(self):
