@@ -12,12 +12,11 @@
         <script type="text/javascript" src="js/uptime.js"></script>
 
         <!-- Visualization -->
-        <link rel="stylesheet" type="text/css" href="http://whymper.ethz.ch:24001/vizzly.min.css" />
+        <link rel="stylesheet" type="text/css" href="style/dataplot.css" />
         <link rel="stylesheet" type="text/css" href="style/jquery-ui-1.8.13.custom.css" />
-        <!--[if IE]><script src="http://whymper.ethz.ch:24001/excanvas.js"></script><![endif]-->
         <script type='text/javascript' src='js/jquery-ui-1.8.13.min.js'></script>
-        <script type='text/javascript' src='http://whymper.ethz.ch:24001/extlib/dygraph-combined.js'></script>
-        <script type='text/javascript' src='http://whymper.ethz.ch:24001/vizzly.min.js'></script>
+        <script type='text/javascript' src='js/dygraph-combined.js'></script>
+        <script type='text/javascript' src='js/dygraph-gsn.js'></script>
 
         <script type="text/javascript">
 	    <!--//<![CDATA[
@@ -243,7 +242,7 @@
                       "deviceSelect": { "type": "ignore" },
                       "visible": this.match(/\(aggregation_interval\)/)?false:true
                     });});
-                    new FrontendCreator(graphconfig);
+                    new LinePlotWidget(graphconfig);
                 }
 
                 function getSortedKeys(obj){
@@ -500,7 +499,8 @@
                     $(plotdata.datasets).each(function() {
                       var row=this;
                       if (row[0]>=ux_start && row[0]<=ux_end) {
-                        var timestamp = new Date(row[0]);
+                        var d = new Date();
+                        var timestamp = new Date(row[0]+d.getTimezoneOffset()*60*1000);
                         $(visibles).each(function(index){
                           if (this==0)
                             csv+=timestamp.getFullYear()+"/"+(timestamp.getMonth()+1)+"/"+timestamp.getDate()+" "+timestamp.getHours()+":"+timestamp.getMinutes()+":" +timestamp.getSeconds();

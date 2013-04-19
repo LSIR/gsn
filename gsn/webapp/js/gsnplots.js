@@ -159,7 +159,6 @@ var GsnPlots = {
           // this.config.masterslider = GsnPlots.mastertimeslider;
           var vizconfig = {
               "graph": {
-                "type": "dygraph",
                 "width": 940,
                 "height": 350,
                 "showForm": true
@@ -275,7 +274,7 @@ var GsnPlots = {
   _addPlotsAddGraph: function(htmlelement, plot, title) {
     $(htmlelement).append('<div><h2>'+title+'</h2><div id="plot_'+GsnPlots.divid+'"/></div>');
     plot.graph.div='plot_'+(GsnPlots.divid++);
-    var g = new FrontendCreator(plot);
+    var g = new LinePlotWidget(plot);
   },
   
   _masterChangedCallback: function() {

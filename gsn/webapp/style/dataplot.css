@@ -1,0 +1,12 @@
+div.vizzly
+{
+    margin: 0px 0px 0px 0px;
+    border: 0px;
+    padding: 0px;
+    text-align:left;
+    height: 550px;
+}
+.vizzly .status { background-color: #ffff00; text-align: center; }
+.vizzly .ui-time-slider .ui-handle-helper-parent { position: relative; width: 100%; height: 100%; margin: 0 auto; }
+/*.vizzly .ui-time-slider .ui-slider-handle { top:.2em; height: 1.5em; } */
+.vizzly .ui-time-slider .ui-slider-handle .ui-icon { margin: -8px auto 0; position: relative; top: 50%; }
