@@ -120,6 +120,9 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
         s += "  [payload.sam7_power=0x"+Long.toHexString(get_payload_sam7_power())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
+        s += "  [payload.sam7_valid=0x"+Long.toHexString(get_payload_sam7_valid())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
         s += "  [payload.inclinometer_x=0x"+Long.toHexString(get_payload_inclinometer_x())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
@@ -771,9 +774,9 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
 
     /////////////////////////////////////////////////////////
     // Accessor methods for field: payload.sam7_power
-    //   Field type: short
+    //   Field type: byte
     //   Offset (bits): 136
-    //   Size (bits): 8
+    //   Size (bits): 1
     /////////////////////////////////////////////////////////
 
     /**
@@ -805,31 +808,97 @@ public class DozerWgpsStatusMsg extends ch.ethz.permasense.tinyos2x.messages.Dat
     }
 
     /**
-     * Return the value (as a short) of the field 'payload.sam7_power'
+     * Return the value (as a byte) of the field 'payload.sam7_power'
      */
-    public short get_payload_sam7_power() {
-        return (short)getUIntBEElement(offsetBits_payload_sam7_power(), 8);
+    public byte get_payload_sam7_power() {
+        return (byte)getUIntBEElement(offsetBits_payload_sam7_power(), 1);
     }
 
     /**
      * Set the value of the field 'payload.sam7_power'
      */
-    public void set_payload_sam7_power(short value) {
-        setUIntBEElement(offsetBits_payload_sam7_power(), 8, value);
+    public void set_payload_sam7_power(byte value) {
+        setUIntBEElement(offsetBits_payload_sam7_power(), 1, value);
     }
 
     /**
      * Return the size, in bytes, of the field 'payload.sam7_power'
+     * WARNING: This field is not an even-sized number of bytes (1 bits).
      */
     public static int size_payload_sam7_power() {
-        return (8 / 8);
+        return (1 / 8) + 1;
     }
 
     /**
      * Return the size, in bits, of the field 'payload.sam7_power'
      */
     public static int sizeBits_payload_sam7_power() {
-        return 8;
+        return 1;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.sam7_valid
+    //   Field type: byte
+    //   Offset (bits): 137
+    //   Size (bits): 1
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.sam7_valid' is signed (false).
+     */
+    public static boolean isSigned_payload_sam7_valid() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.sam7_valid' is an array (false).
+     */
+    public static boolean isArray_payload_sam7_valid() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.sam7_valid'
+     * WARNING: This field is not byte-aligned (bit offset 137).
+     */
+    public static int offset_payload_sam7_valid() {
+        return (137 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.sam7_valid'
+     */
+    public static int offsetBits_payload_sam7_valid() {
+        return 137;
+    }
+
+    /**
+     * Return the value (as a byte) of the field 'payload.sam7_valid'
+     */
+    public byte get_payload_sam7_valid() {
+        return (byte)getUIntBEElement(offsetBits_payload_sam7_valid(), 1);
+    }
+
+    /**
+     * Set the value of the field 'payload.sam7_valid'
+     */
+    public void set_payload_sam7_valid(byte value) {
+        setUIntBEElement(offsetBits_payload_sam7_valid(), 1, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.sam7_valid'
+     * WARNING: This field is not an even-sized number of bytes (1 bits).
+     */
+    public static int size_payload_sam7_valid() {
+        return (1 / 8) + 1;
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.sam7_valid'
+     */
+    public static int sizeBits_payload_sam7_valid() {
+        return 1;
     }
 
     /////////////////////////////////////////////////////////

@@ -23,6 +23,7 @@
             <field name="PAYLOAD_SAM7_CURRENT" type="INTEGER" />
             <field name="PAYLOAD_TN_PER_CURRENT" type="INTEGER" />
             <field name="PAYLOAD_SAM7_POWER" type="TINYINT" />
+            <field name="PAYLOAD_SAM7_VALID" type="TINYINT" />
             <field name="PAYLOAD_INCLINOMETER_X" type="INTEGER" />
             <field name="PAYLOAD_INCLINOMETER_Y" type="INTEGER" />
             <field name="PAYLOAD_SAM7_UNIXTIME" type="BIGINT" />
