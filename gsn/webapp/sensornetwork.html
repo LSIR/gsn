@@ -145,6 +145,27 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
+      { title:"Aiguille du Midi PV Temperatures",
+        signals: [{
+          vsensor:"adm_cr1000",
+          field:["panel_temp"],
+          select:"sensornode[position=8],sensornode[position=9]"
+        }]
+      },
+      { title:"Aiguille du Midi CR1000 Voltages",
+        signals: [{
+          vsensor:"adm_cr1000",
+          field:["battery"],
+          select:"sensornode[position=8],sensornode[position=9]"
+        }]
+      },
+      { title:"Aiguille du Midi PV Voltages",
+        signals: [{
+          vsensor:"adm_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=8],sensornode[position=9]"
+        }]
+      },
       { title:"Dirruhorn PV Voltages",
         signals: [{
           vsensor:"dirruhorn_dozer_nodehealth__conv",
