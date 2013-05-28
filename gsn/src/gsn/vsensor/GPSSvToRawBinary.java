@@ -43,6 +43,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		new DataField("GPS_SATS", "INTEGER"),
 		new DataField("GPS_MISSING_SV", "TINYINT"),
 		new DataField("GPS_RAW_DATA", "BINARY"),
+		new DataField("QUEUE_NAME", "VARCHAR(256)"),
 		new DataField("QUEUE_SIZE", "INTEGER")};
 	
 	private Map<String,Map<Long,SvContainer>> inputStreamNameToSvMapList = Collections.synchronizedMap(new HashMap<String,Map<Long,SvContainer>>());
@@ -69,10 +70,22 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		Long gps_unixtime = (Long)data.getData(GPS_TIME_FIELD_NAME);
 		
 		if (!inputStreamNameToSvMapList.containsKey(inputStreamName)) {
-			inputStreamNameToSvMapList.put(inputStreamName, new HashMap<Long,SvContainer>());
+			inputStreamNameToSvMapList.put("buf_"+inputStreamName, new HashMap<Long,SvContainer>());
+			inputStreamNameToSvMapList.put("buf_"+inputStreamName+"_old", new HashMap<Long,SvContainer>());
 		}
 		
-		Map<Long,SvContainer> svContainerMap = inputStreamNameToSvMapList.get(inputStreamName);
+		String bufferName;
+		Long time;
+		if (gps_unixtime > System.currentTimeMillis()-bufferSizeInMs) {
+			bufferName = "buf_"+inputStreamName;
+			time = System.currentTimeMillis();
+		}
+		else {
+			bufferName = "buf_"+inputStreamName+"_old";
+			time = (Long) data.getData(dataField[1].getName());
+		}
+		
+		Map<Long,SvContainer> svContainerMap = inputStreamNameToSvMapList.get(bufferName);
 		
 		SvContainer svContainer = svContainerMap.get(gps_unixtime);
 		if (svContainer == null) {
@@ -83,7 +96,8 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 			if (svContainer.putSv(data)) {
 				data = svContainer.getRawBinaryStream();
 				svContainerMap.remove(gps_unixtime);
-				data.setData(dataField[10].getName(), svContainerMap.size());
+				data.setData(dataField[10].getName(), bufferName);
+				data.setData(dataField[11].getName(), svContainerMap.size());
 				super.dataAvailable(inputStreamName, data);
 				
 			}
@@ -97,10 +111,11 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		Iterator<Long> iter = svContainerMap.keySet().iterator();
 		while (iter.hasNext()) {
 			gps_unixtime = iter.next();
-			if (gps_unixtime < System.currentTimeMillis()-bufferSizeInMs) {
+			if (gps_unixtime < time-bufferSizeInMs) {
 				data = svContainer.getRawBinaryStream();
 				svContainerMap.remove(gps_unixtime);
-				data.setData(dataField[10].getName(), svContainerMap.size());
+				data.setData(dataField[10].getName(), bufferName);
+				data.setData(dataField[11].getName(), svContainerMap.size());
 				super.dataAvailable(inputStreamName, data);
 			}
 		}
@@ -149,7 +164,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 			// RXM-RAW Payload
 			rxmRaw.putInt((Integer)streamElements[0].getData(GPS_ITOW_FIELD_NAME));
 			rxmRaw.putShort((Short)streamElements[0].getData(GPS_WEEK_FIELD_NAME));
-			rxmRaw.put((byte) (numSv & 0xFF));
+			rxmRaw.put((byte) (pointer & 0xFF));
 			rxmRaw.put((byte) 0x00);
 			for (short i=0; i<pointer; i++) {
 				rxmRaw.putDouble((Double)streamElements[i].getData(GPS_CPMES_FIELD_NAME));
