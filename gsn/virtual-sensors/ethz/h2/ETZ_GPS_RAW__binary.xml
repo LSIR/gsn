@@ -47,5 +47,15 @@
             </source>
             <query> select * from source </query>
         </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_GPS_RAW__tobinary__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select *, timed as GSN_TIMESTAMP from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
     </streams>
 </virtual-sensor>
