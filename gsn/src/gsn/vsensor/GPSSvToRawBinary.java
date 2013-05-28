@@ -180,7 +180,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 					streamElements[0].getData(dataField[4].getName()),
 					streamElements[0].getData(dataField[5].getName()),
 					GPS_RAW_DATA_VERSION,
-					(int)numSv,
+					(int)pointer,
 					(byte)(numSv-pointer),
 					rxmRaw.array(),
 					null});
