@@ -227,6 +227,13 @@ public final class StreamElement implements Serializable {
 	}
 
 	public void setData ( String fieldName, Serializable data ) {
+		if ( indexedFieldNames == null ) {
+			indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
+			for ( int i = 0 ; i < this.fieldNames.length ; i++ )
+				this.indexedFieldNames.put( fieldNames[ i ] , i );
+			//    for (String k : this.indexedFieldNames.keySet())
+			//    System.out.println("Key : "+k + " VALUE = "+this.indexedFieldNames.get(k));
+		}
 		this.fieldValues[indexedFieldNames.get( fieldName )] = data;
 	}
 
