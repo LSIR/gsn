@@ -1,27 +1,33 @@
 package gsn.http.restapi;
 
+
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
-import gsn.beans.DataTypes;
 import gsn.beans.VSensorConfig;
-
-import java.sql.*;
-import java.text.ParseException;
-import java.util.*;
-
+import gsn.http.ac.DataSource;
+import gsn.http.ac.User;
+import gsn.utils.geo.GridTools;
+import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import gsn.utils.geo.GridTools;
 
-import org.apache.commons.collections.KeyValue;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class GetRequestHandler {
 
     private static transient Logger logger = Logger.getLogger(GetRequestHandler.class);
     private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final long DEFAULT_PREVIEW_SIZE = 1000;
+    public static final int HTTP_STATUS_OK = 200;
+    public static final int HTTP_STATUS_BAD_REQUEST = 400;
 
 
     public RestResponse getSensors() {
@@ -29,6 +35,16 @@ public class GetRequestHandler {
 
         restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
         restResponse.setResponse(getSensorsInfoAsJSON());
+        restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
+
+        return restResponse;
+    }
+
+    public RestResponse getSensors(User user) {             // added
+        RestResponse restResponse = new RestResponse();
+
+        restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
+        restResponse.setResponse(getSensorsInfoAsJSON(user));
         restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
 
         return restResponse;
@@ -94,6 +110,162 @@ public class GetRequestHandler {
         return sensorsInfo.toJSONString();
     }
 
+
+    //////////////////////////// added
+    public String getSensorsInfoAsJSON(User user) {
+
+        JSONArray sensorsInfo = new JSONArray();
+
+        Iterator<VSensorConfig> vsIterator = Mappings.getAllVSensorConfigs();
+
+        while (vsIterator.hasNext()) {
+
+            JSONObject aSensor = new JSONObject();
+
+            VSensorConfig sensorConfig = vsIterator.next();
+
+            String vs_name = sensorConfig.getName();
+            if (!user.hasReadAccessRight(vs_name) && !user.isAdmin() && DataSource.isVSManaged(vs_name)) {   // if you dont have access to this sensor
+                 continue;
+            }
+
+            aSensor.put("name", vs_name);
+
+            JSONArray listOfFields = new JSONArray();
+
+            for (DataField df : sensorConfig.getOutputStructure()) {
+
+                String field_name = df.getName().toLowerCase();
+                String field_type = df.getType().toLowerCase();
+
+                if (field_type.indexOf("double") >= 0) {
+                    listOfFields.add(field_name);
+                }
+            }
+
+            aSensor.put("fields", listOfFields);
+
+            Double alt = 0.0;
+            Double lat = 0.0;
+            Double lon = 0.0;
+
+            for (KeyValue df : sensorConfig.getAddressing()) {
+
+                String adressing_key = df.getKey().toString().toLowerCase().trim();
+                String adressing_value = df.getValue().toString().toLowerCase().trim();
+
+                if (adressing_key.indexOf("altitude") >= 0)
+                    alt = Double.parseDouble(adressing_value);
+
+                if (adressing_key.indexOf("longitude") >= 0)
+                    lon = Double.parseDouble(adressing_value);
+
+                if (adressing_key.indexOf("latitude") >= 0)
+                    lat = Double.parseDouble(adressing_value);
+            }
+
+            aSensor.put("lat", lat);
+            aSensor.put("lon", lon);
+            aSensor.put("alt", alt);
+
+            sensorsInfo.add(aSensor);
+
+        }
+
+        return sensorsInfo.toJSONString();
+    }
+
+    //////////////////////////// added
+    public void getSensorsInfo(User user, PrintWriter out) {
+        int is_public;
+        Iterator<VSensorConfig> vsIterator = Mappings.getAllVSensorConfigs();
+        out.println("## is_public == 1 if the VS is publicly accessed and 0, otherwise");
+        out.println("##vsname,is_public,altitude,longitude,latitude,List(attribute_name,attribute_type)");
+        while (vsIterator.hasNext()) {
+
+            VSensorConfig sensorConfig = vsIterator.next();
+
+            String vs_name = sensorConfig.getName();
+            if (!user.hasReadAccessRight(vs_name) && !user.isAdmin() && DataSource.isVSManaged(vs_name)) {   // if you dont have access to this sensor
+                continue;
+            }
+
+            Double alt = 0.0;
+            Double lat = 0.0;
+            Double lon = 0.0;
+
+            for (KeyValue df : sensorConfig.getAddressing()) {
+
+                String adressing_key = df.getKey().toString().toLowerCase().trim();
+                String adressing_value = df.getValue().toString().toLowerCase().trim();
+
+                if (adressing_key.indexOf("altitude") >= 0)
+                    alt = Double.parseDouble(adressing_value);
+
+                if (adressing_key.indexOf("longitude") >= 0)
+                    lon = Double.parseDouble(adressing_value);
+
+                if (adressing_key.indexOf("latitude") >= 0)
+                    lat = Double.parseDouble(adressing_value);
+            }
+            is_public = (DataSource.isVSManaged(vs_name)) ? 0 : 1;
+            out.print(vs_name+","+is_public+","+alt+","+lon+","+lat);  // add the coords of the VS
+
+            for (DataField df : sensorConfig.getOutputStructure()) {
+                String field_name = df.getName().toLowerCase();
+                String field_type = df.getType().toLowerCase();
+                out.print(","+field_name+","+field_type);    // add its fields
+            }
+            out.println(); // prepare for the new entry
+        }
+    }
+
+    public int getSensorFields(String sensor, String from, String to, PrintWriter out) {
+
+        boolean errorFlag = false;
+
+        long fromAsLong = 0;
+        long toAsLong = 0;
+        try {
+            fromAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(from).getTime();
+            toAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(to).getTime();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            errorFlag = true;
+        }
+
+        if (errorFlag) {
+            out.print("## Malformed date for from or to field.");
+            return HTTP_STATUS_BAD_REQUEST;
+        }
+
+        out.println("## sensor: " + sensor);
+        out.println("## field, value, timestamp, epoch");
+        out.println();
+        Vector<Double> stream = new Vector<Double>();
+        Vector<Long> timestamps = new Vector<Long>();
+        VSensorConfig sensorConfig = Mappings.getConfig(sensor);    // get the configuration for this vs
+        for (DataField df : sensorConfig.getOutputStructure()) {
+            System.out.println("AAA");
+            String field = df.getName().toLowerCase();    // get the field that is going to be processed
+            ///////////////
+            stream.clear();     // clear from any previous elements
+            timestamps.clear();
+            errorFlag = !getData(sensor, field, fromAsLong, toAsLong, stream, timestamps);
+            if (errorFlag) {
+                out.print("## Error in request.");
+                return HTTP_STATUS_BAD_REQUEST;
+            }
+            // fill in the data
+            for (int i = 0; i < stream.size(); i++) {
+                System.out.println("Bla"+i);
+                out.print(field+","+stream.get(i)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i)))).toString()+","+timestamps.get(i));
+                out.println();
+            }
+            //////////////
+        }
+        return HTTP_STATUS_OK;
+    }
 
     public RestResponse getGeoDataForSensor() {
         RestResponse restResponse = new RestResponse();
@@ -278,6 +450,8 @@ public class GetRequestHandler {
 
     public RestResponse getMeasurementsForSensorField(String sensor, String field, String from, String to) {
 
+      //System.out.println("@@@@@@@MeasurementForSensorField with field ='"+field+"' from = '"+from+"' and to='"+to+"'");
+
         RestResponse restResponse = new RestResponse();
 
         Vector<Double> stream = new Vector<Double>();
@@ -330,6 +504,49 @@ public class GetRequestHandler {
         return restResponse;
     }
 
+    public int getMeasurementsForSensorField(String sensor, String field, String from, String to, PrintWriter out) {           // added
+
+        //System.out.println("@@@@@@@MeasurementForSensorField with field ='"+field+"' from = '"+from+"' and to='"+to+"'");
+
+        Vector<Double> stream = new Vector<Double>();
+        Vector<Long> timestamps = new Vector<Long>();
+
+        boolean errorFlag = false;
+
+        long fromAsLong = 0;
+        long toAsLong = 0;
+        try {
+            fromAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(from).getTime();
+            toAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(to).getTime();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            errorFlag = true;
+        }
+
+        if (errorFlag) {
+            out.print("## Malformed date for from or to field.");
+            return HTTP_STATUS_BAD_REQUEST;
+        }
+
+        errorFlag = !getData(sensor, field, fromAsLong, toAsLong, stream, timestamps);
+
+        if (errorFlag) {
+            out.print("## Error in request.");
+            return HTTP_STATUS_BAD_REQUEST;
+        }
+        out.println("##vsname: "+sensor);
+        out.println("##field: "+field);
+        out.println("##value,timestamp,epoch");
+        for (int i = 0; i < stream.size(); i++) {
+            out.print(stream.get(i)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i)))).toString()+","+timestamps.get(i));
+            out.println();
+        }
+
+        return HTTP_STATUS_OK;
+    }
+
+
+
     public boolean getData(String sensor, String field, long from, long to, Vector<Double> stream, Vector<Long> timestamps) {
         Connection conn = null;
         ResultSet resultSet = null;
@@ -348,12 +565,13 @@ public class GetRequestHandler {
                     .append(to);
 
             resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
-
+    System.out.println("Results"+resultSet.getMetaData().getColumnCount());
             while (resultSet.next()) {
                 //int ncols = resultSet.getMetaData().getColumnCount();
                 long timestamp = resultSet.getLong(1);
                 double value = resultSet.getDouble(2);
                 //logger.warn(ncols + " cols, value: " + value + " ts: " + timestamp);
+             System.out.println("Value = "+value+" time = "+timestamp);
                 stream.add(value);
                 timestamps.add(timestamp);
             }
