@@ -66,18 +66,22 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 			bbuffer.order(ByteOrder.LITTLE_ENDIAN);
 			
 			try {
-				// skip header and payload length
-				bbuffer.position(bbuffer.position()+6);
-				// get GPS time
-				serialized_data[9] = bbuffer.getInt();
-				// get GPS week
-				serialized_data[10] = bbuffer.getShort();
-
-				// get number of satellites
-				int s = (int) bbuffer.get() & 0xFF;
-				// skip reserved byte
-				bbuffer.position(bbuffer.position()+1);
-				if (sats.compareTo(s) == 0) {
+				if (sats.compareTo((int) bbuffer.get(12) & 0xFF) != 0)
+					logger.error("number of statellites (GPS_SATS=" + sats + ") is not equal to the number of satellites in GPS_RAW_DATA (" + ((int) bbuffer.get(12) & 0xFF) + ")");
+				else if (!checksum(bbuffer, sats))
+					logger.error("RXM RAW GPS checksum did not match in packet with generation_time " + data.getData(dataField[1].getName()));
+				else {
+					// skip header and payload length
+					bbuffer.position(bbuffer.position()+6);
+					// get GPS time
+					serialized_data[9] = bbuffer.getInt();
+					// get GPS week
+					serialized_data[10] = bbuffer.getShort();
+	
+					// get number of satellites
+					int s = (int) bbuffer.get() & 0xFF;
+					// skip reserved byte
+					bbuffer.position(bbuffer.position()+1);
 					for (int i=0; i<s; i++) {
 						// set gsn_timestamp
 						serialized_data[2] = gsn_timestamp;
@@ -96,13 +100,11 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 						serialized_data[16] = (short) bbuffer.get();
 						// get LLI
 						serialized_data[17] = (short) ((int)bbuffer.get() & 0xFF);
-
+	
 						data = new StreamElement(dataField, serialized_data);
 						super.dataAvailable(inputStreamName, data);
 					}
 				}
-				else
-					logger.error("number of statellites (GPS_SATS=" + sats + ") is not equal to the number of satellites in GPS_RAW_DATA (" + s + ")");
 			}
 			catch (Exception e) {
 				logger.error(e);
@@ -110,5 +112,19 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 		}
 		else
 			logger.warn("gps_raw_data_version data version not supported (gps_raw_data_version=" + version + ")");
+	}
+
+	private boolean checksum(ByteBuffer bbuffer, int sats) {
+		// RXM-RAW Checksum
+		byte CK_A = 0;
+		byte CK_B = 0;
+		for (int i=2; i<14+24*sats; i++) {
+			CK_A += bbuffer.get(i);
+			CK_B += CK_A;
+		}
+		if (bbuffer.get(14+24*sats) == CK_A && bbuffer.get(15+24*sats) == CK_B)
+			return true;
+		else
+			return false;
 	}
 }
