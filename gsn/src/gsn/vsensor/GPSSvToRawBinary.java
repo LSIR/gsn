@@ -108,7 +108,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 				svContainerMap.put(gps_unixtime, svContainer);
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			logger.error(e.getMessage());
 		}
 		
 		if (refTime != null) {
@@ -239,7 +239,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 			// RXM-RAW Checksum
 			byte CK_A = 0;
 			byte CK_B = 0;
-			for (int i=2; i<6+24*streamElements.size(); i++) {
+			for (int i=2; i<14+24*streamElements.size(); i++) {
 				CK_A += rxmRaw.get(i);
 				CK_B += CK_A;
 			}
