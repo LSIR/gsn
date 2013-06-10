@@ -218,7 +218,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 			rxmRaw.put((byte) 0x10);
 			
 			// RXM-RAW Length
-			rxmRaw.putShort((short) (24*streamElements.size()));
+			rxmRaw.putShort((short) (8+24*streamElements.size()));
 			
 			// RXM-RAW Payload
 			rxmRaw.putInt((Integer)streamElements.get(0).getData(GPS_ITOW_FIELD_NAME));
