@@ -34,7 +34,7 @@
                     <predicate key="query"> select * from ETZ_Dozer_WgpsSv__conv</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select *, 'wireless-gps' as SENSOR_TYPE from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
