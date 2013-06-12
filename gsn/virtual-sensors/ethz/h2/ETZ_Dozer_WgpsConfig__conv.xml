@@ -1,0 +1,122 @@
+<virtual-sensor name="ETZ_Dozer_WgpsConfig__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+						def CMD_TYPE_MASK = 								0xC00;
+						def CMD_VALUE_MASK = 								0x3FF;
+
+						def ADVANCED_CMD_TYPE_MASK = 						0x300;
+						def ADVANCED_CMD_VALUE_MASK = 						0x0FF;
+						def ADVANCED_CMD_LP_EXIT_MASK = 					0x00F;
+						def ADVANCED_CMD_LP_ENTRY_MASK = 					0x0F0;
+						def ADVANCED_CMD_LP_ENTRY_RIGHT_SHIFT = 			4;
+
+						def CMD_MEASUREMENT_LOW_MASK = 						0x01F;
+						def CMD_MEASUREMENT_HIGH_MASK = 					0x3E0;
+						def CMD_MEASUREMENT_RIGHT_SHIFT = 					5;
+
+						def CMD_INTERVAL =									0x000;
+						def CMD_HP_WINDOW =									0x400;
+						def CMD_LP_WINDOW =									0x800;
+						def CMD_ADVANCED =									0xC00;
+
+						def ADVANCED_CMD_VOLTAGE =							0x000;
+						def ADVANCED_CMD_AVERAGE =							0x100;
+						def ADVANCED_CMD_UNUSED =							0x200;
+						def ADVANCED_CMD_SAM7 =								0x300;
+
+						def ADVANCED_CMD_SAM7_SELFTEST =					0x00;
+						def ADVANCED_CMD_SAM7_RESET =						0xFF;
+                			
+                		HIGH_POWER_START_TIME = HIGH_POWER_STOP_TIME = LOW_POWER_START_TIME = LOW_POWER_STOP_TIME = GPS_SAMPLING_INTERVAL = null;
+                		STATUS_SAMPLING_INTERVAL = LOW_POWER_ENTRY_VOLTAGE = LOW_POWER_EXIT_VOLTAGE = BAT_VOLTAGE_AVG_BUFFER_SIZE = SAM7_SELFTEST = SAM7_RESET = null;
+                		
+						def value = EVENT_VALUE & CMD_VALUE_MASK;
+						def lowValue = value & CMD_MEASUREMENT_LOW_MASK;
+						def highValue = (value & CMD_MEASUREMENT_HIGH_MASK) >> CMD_MEASUREMENT_RIGHT_SHIFT;
+						switch (EVENT_VALUE & CMD_TYPE_MASK) {
+							case CMD_HP_WINDOW:
+								HIGH_POWER_START_TIME = lowValue;
+								HIGH_POWER_STOP_TIME = highValue;
+								break;
+							case CMD_LP_WINDOW:
+								LOW_POWER_START_TIME = lowValue;
+								LOW_POWER_STOP_TIME = highValue;
+								break;
+							case CMD_INTERVAL:
+								GPS_SAMPLING_INTERVAL = highValue * 2;
+								STATUS_SAMPLING_INTERVAL = lowValue;
+								break;
+							case CMD_ADVANCED:
+								pwrCmd = value;
+								value = pwrCmd & ADVANCED_CMD_VALUE_MASK;
+								switch (pwrCmd & ADVANCED_CMD_TYPE_MASK) {
+									case ADVANCED_CMD_VOLTAGE:
+										LOW_POWER_ENTRY_VOLTAGE = 11.5 + 0.1 * ((ADVANCED_CMD_LP_ENTRY_MASK&value) >> ADVANCED_CMD_LP_ENTRY_RIGHT_SHIFT);
+										LOW_POWER_EXIT_VOLTAGE = 11.5 + 0.1 * (ADVANCED_CMD_LP_EXIT_MASK&value);
+										break;
+									case ADVANCED_CMD_AVERAGE:
+										BAT_VOLTAGE_AVG_BUFFER_SIZE = value;
+										break;
+									case ADVANCED_CMD_SAM7:
+										switch (value) {
+											case ADVANCED_CMD_SAM7_SELFTEST:
+												SAM7_SELFTEST = (short)1;
+												break;
+											case ADVANCED_CMD_SAM7_RESET:
+												SAM7_RESET = (short)1;
+												break;
+										}
+										break;
+								}
+								break;
+						}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            
+            <field name="EVENT_TIMESTAMP" type="BIGINT" unit="unixtime" index="true"/>
+            
+            <field name="GPS_SAMPLING_INTERVAL" type="INTEGER" unit="s" />
+            <field name="STATUS_SAMPLING_INTERVAL" type="INTEGER" unit="min" />
+            <field name="HIGH_POWER_START_TIME" type="INTEGER" />
+            <field name="HIGH_POWER_STOP_TIME" type="INTEGER" />
+            <field name="LOW_POWER_START_TIME" type="INTEGER" />
+            <field name="LOW_POWER_STOP_TIME" type="INTEGER" />
+            <field name="LOW_POWER_ENTRY_VOLTAGE" type="DOUBLE" unit="V" />
+            <field name="LOW_POWER_EXIT_VOLTAGE" type="DOUBLE" unit="V" />
+            <field name="BAT_VOLTAGE_AVG_BUFFER_SIZE" type="INTEGER" />
+            <field name="SAM7_SELFTEST" type="SMALLINT" />
+            <field name="SAM7_RESET" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>WGPS configuration events from ETZ deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_EventLogger__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where EVENT_ID = 96 </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

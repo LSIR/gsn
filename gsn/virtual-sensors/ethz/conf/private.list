@@ -52,6 +52,8 @@ Dirruhorn_Dozer_NodeInfo.xml
 Dirruhorn_Dozer_PowerSwitch.xml
 Dirruhorn_Dozer_Rssi.xml
 Dirruhorn_Dozer_StateCounter.xml
+Dirruhorn_Dozer_WgpsStatus.xml
+Dirruhorn_Dozer_WgpsSv.xml
 Dirruhorn_Dozer_WXT520Ident.xml
 Dirruhorn_Dozer_WXT520Prec.xml
 Dirruhorn_Dozer_WXT520Sup.xml

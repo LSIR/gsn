@@ -44,16 +44,15 @@
             </source>
             <query> select * from source </query>
         </stream>
-	<stream name="data1">
+		<stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from etz_dozer_gpsdata__conv
-</predicate>
-                   <predicate key="start-time">continue</predicate>
+                    <predicate key="query">select * from etz_dozer_gpsdata__conv</predicate>
+                   	<predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, header_seqnr as GPS_SAMPLE_COUNT, payload_timeofweekms as GPS_TIME, payload_vehiclenum as SPACE_VEHICLE, payload_measindicator as MEASUREMENT_QUALITY, payload_losslockindicator as LLI, carrierphase as CARRIER_PHASE, pseudorange as PSEUDO_RANGE, doppler as DOPPLER, payload_weeknumber as GPS_WEEK, payload_signalstrength as SIGNAL_STRENGTH, DATA_IMPORT_SOURCE from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>  
-</streams>
+	</streams>
 </virtual-sensor>

@@ -139,7 +139,8 @@ var EVENT_MSG = new Array(
 	 "WGPS: Received command is erroneous (command: %s)." /* 97: EVENT_WGPS_COMMAND_ERROR */,
 	 "WGPS: Modbus communication error (code: %s)." /* 98: EVENT_WGPS_MODBUS_ERROR */,
 	 "WGPS: Power state change (new state: %s)." /* 99: EVENT_WGPS_POWER_STATE_CHANGE */,
-	 "" /* not used 100: EVENT_WGPS_TIME_SYNC_FAILED */ );
+	 "" /* not used 100: EVENT_WGPS_TIME_SYNC_FAILED */,
+	 "" /* not used 101: EVENT_WGPS_GPS_CRC_FAILURE */ );
 		 
 var EVENT_MSG_NULL = new Array(
 	 "" /* 0: */,
@@ -242,7 +243,8 @@ var EVENT_MSG_NULL = new Array(
 	 "" /* 97: not used EVENT_WGPS_COMMAND_ERROR */,
 	 "" /* 98: not used EVENT_WGPS_MODBUS_ERROR */,
 	 "" /* 99: not used EVENT_WGPS_POWER_STATE_CHANGE */,
-	 "WGPS: Time synchronization with Sam7 at start-up failed" /* 100: EVENT_WGPS_TIME_SYNC_FAILED */ );
+	 "WGPS: Time synchronization with Sam7 at start-up failed" /* 100: EVENT_WGPS_TIME_SYNC_FAILED */,
+	 "WGPS: GPS checksum match failure detected on Sam7" /* 101: EVENT_WGPS_GPS_CRC_FAILURE */ );
 		
 var EVENT_MSG_ERRORLEVELS = new Array(
 	 6 /* 0: */,
@@ -345,7 +347,8 @@ var EVENT_MSG_ERRORLEVELS = new Array(
 	 3 /* 97: EVENT_WGPS_COMMAND_ERROR */,
 	 3 /* 98: EVENT_WGPS_MODBUS_ERROR */,
 	 4 /* 99: EVENT_WGPS_POWER_STATE_CHANGE */,
-	 3 /* 100: EVENT_WGPS_TIME_SYNC_FAILED */ );
+	 3 /* 100: EVENT_WGPS_TIME_SYNC_FAILED */,
+	 4 /* 101: EVENT_WGPS_GPS_CRC_FAILURE */ );
 
 var deployments = new Array();
 var logContainers = new Array()
