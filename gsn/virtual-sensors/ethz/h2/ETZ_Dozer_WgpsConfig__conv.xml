@@ -41,12 +41,12 @@
 						def highValue = (value & CMD_MEASUREMENT_HIGH_MASK) >> CMD_MEASUREMENT_RIGHT_SHIFT;
 						switch (EVENT_VALUE & CMD_TYPE_MASK) {
 							case CMD_HP_WINDOW:
-								HIGH_POWER_START_TIME = lowValue;
-								HIGH_POWER_STOP_TIME = highValue;
+								HIGH_POWER_START_TIME = highValue;
+								HIGH_POWER_STOP_TIME = lowValue;
 								break;
 							case CMD_LP_WINDOW:
-								LOW_POWER_START_TIME = lowValue;
-								LOW_POWER_STOP_TIME = highValue;
+								LOW_POWER_START_TIME = highValue;
+								LOW_POWER_STOP_TIME = lowValue;
 								break;
 							case CMD_INTERVAL:
 								GPS_SAMPLING_INTERVAL = highValue * 2;
