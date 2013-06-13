@@ -120,6 +120,8 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 						// put old streams into old buffer
 						svContainer = svContainerMap.get(gps_unixtime);
 						iter.remove();
+						if (oldSvBuffer.isEmpty())
+							updateTimer();
 						for (StreamElement se : svContainer.getStreamElements()) {
 							processData(svContainer.getInputStreamName(), se, null, oldSvBuffer, Buf.OLD_BUF);
 						}
