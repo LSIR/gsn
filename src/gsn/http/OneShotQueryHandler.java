@@ -5,21 +5,20 @@ import gsn.Mappings;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-//import gsn.http.accesscontrol.User;
 import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.log4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+//import gsn.http.accesscontrol.User;
 
 public class OneShotQueryHandler implements RequestHandler {
 
@@ -32,6 +31,7 @@ public class OneShotQueryHandler implements RequestHandler {
 
         String vsName = request.getParameter("name");
         String vsCondition = request.getParameter("condition");
+
         if (vsCondition == null || vsCondition.trim().length() == 0)
             vsCondition = " ";
         else
@@ -43,7 +43,7 @@ public class OneShotQueryHandler implements RequestHandler {
             vsFields += " , pk, timed";
         String windowSize = request.getParameter("window");
         if (windowSize == null || windowSize.trim().length() == 0) windowSize = "1";
-        StringBuilder query = new StringBuilder("select " + vsFields + " from " + vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0");
+        StringBuilder query = new StringBuilder("select " + vsFields + " from " + "my"+vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0");
         DataEnumerator result;
         try {
             result = Main.getStorage(vsName).executeQuery(query, true);
@@ -66,6 +66,7 @@ public class OneShotQueryHandler implements RequestHandler {
                         sb.append(StringEscapeUtils.escapeXml(se.getData()[i].toString()));
                 sb.append("</field>\n");
             }
+System.out.println("Time = "+se.getTimeStamp());
             sb.append("<field name=\"timed\" >").append(sdf.format(new Date(se.getTimeStamp()))).append("</field>\n");
             sb.append("</stream-element>\n");
         }
@@ -84,7 +85,6 @@ public class OneShotQueryHandler implements RequestHandler {
         //Added by Behnaz
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-
         if (vsName == null || vsName.trim().length() == 0) {
             response.sendError(WebConstants.MISSING_VSNAME_ERROR, "The virtual sensor name is missing");
             return false;
