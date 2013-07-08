@@ -45,7 +45,7 @@ public class ContainerInfoHandler implements RequestHandler {
         response.setDateHeader("Expires", 0);
         response.setHeader("Pragma","no-cache");
 
-  System.out.println( "The handle was called" );
+  //System.out.println( "The handle was called" );
  // if (reqName != null) System.out.println("requst " + reqName);
  // if (user != null) System.out.println("User " + user.getUserName());
         response.getWriter( ).write( buildOutput(reqName,user));
@@ -71,19 +71,19 @@ public class ContainerInfoHandler implements RequestHandler {
     while ( vsIterator.hasNext( ) ) {
       access = true;  // by default it is considered that everything from the sensor will be retrieved
       VSensorConfig sensorConfig = vsIterator.next( );
-   System.out.println( "Inside buildOutput -- name = "+sensorConfig.getName());
+   //System.out.println( "Inside buildOutput -- name = "+sensorConfig.getName());
       if(Main.getContainerConfig().isAcEnabled())
       {
           if (user != null)
           {
-              System.out.println( "The user is defined"+sensorConfig.getName());
+              //System.out.println( "The user is defined"+sensorConfig.getName());
               if ( (reqName != null && !sensorConfig.getName().equals(reqName) )|| ( user.hasReadAccessRight(sensorConfig.getName())== false && user.isAdmin()==false) ) {//continue;
                                    access = false;
-                  System.out.println("Source = "+sensorConfig.getName()+" has access = "+ access);
+                  //System.out.println("Source = "+sensorConfig.getName()+" has access = "+ access);
               }
           }
           else {
-              System.out.println("Datasource - "+DataSource.isVSManaged(sensorConfig.getName()));
+              //System.out.println("Datasource - "+DataSource.isVSManaged(sensorConfig.getName()));
               if ( (reqName != null && !sensorConfig.getName().equals(reqName)) || DataSource.isVSManaged(sensorConfig.getName()))
               {
                   access = false;
@@ -179,7 +179,7 @@ public class ContainerInfoHandler implements RequestHandler {
       sb.append( "</virtual-sensor>\n" );
     }
     sb.append( "</gsn>\n" );
-      System.out.println(sb.toString());
+      //System.out.println(sb.toString());
     return sb.toString();
   }
   
@@ -193,7 +193,7 @@ public class ContainerInfoHandler implements RequestHandler {
    * @return
    */
   public static ArrayList<StreamElement> getMostRecentValueFor(String virtual_sensor_name) {
-    System.out.println("GET NEW FOR = "+virtual_sensor_name);
+    //System.out.println("GET NEW FOR = "+virtual_sensor_name);
     StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(")");
     ArrayList<StreamElement> toReturn=new ArrayList<StreamElement>() ;
     try {

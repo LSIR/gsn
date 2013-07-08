@@ -96,6 +96,7 @@
     <target name="gsn" depends="bind,cleandb" description="Run GSN server in non graphical mode.">
         <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
+            <jvmarg value="-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-DmaxServlets=${max-servlets}"/>
             <jvmarg value="-DmaxDBConnections=${max-db-connections}"/>
@@ -313,12 +314,6 @@
             </fileset>
             <report format="frames" todir="${reports}/junit"/>
         </junitreport>
-    </target>
-
-    <target name="test-lsm" depends="build" description="Tests connection to LSM">
-        <java classname="gsn.utils.TestLSM" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
-        </java>
     </target>
 
     <target name="test-sensorscope" depends="build" description="Tests sensorscope server">

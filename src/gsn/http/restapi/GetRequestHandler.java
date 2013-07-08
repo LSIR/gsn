@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -190,9 +191,9 @@ public class GetRequestHandler {
                 continue;
             }
 
-            Double alt = 0.0;
-            Double lat = 0.0;
-            Double lon = 0.0;
+            String alt = "0";
+            String lat = "0";
+            String lon = "0";
 
             for (KeyValue df : sensorConfig.getAddressing()) {
 
@@ -200,13 +201,13 @@ public class GetRequestHandler {
                 String adressing_value = df.getValue().toString().toLowerCase().trim();
 
                 if (adressing_key.indexOf("altitude") >= 0)
-                    alt = Double.parseDouble(adressing_value);
+                    alt = adressing_value;
 
                 if (adressing_key.indexOf("longitude") >= 0)
-                    lon = Double.parseDouble(adressing_value);
+                    lon = adressing_value;
 
                 if (adressing_key.indexOf("latitude") >= 0)
-                    lat = Double.parseDouble(adressing_value);
+                    lat = adressing_value;
             }
             is_public = (DataSource.isVSManaged(vs_name)) ? 0 : 1;
             out.print(vs_name+","+is_public+","+alt+","+lon+","+lat);  // add the coords of the VS
@@ -220,7 +221,7 @@ public class GetRequestHandler {
         }
     }
 
-    public int getSensorFields(String sensor, String from, String to, PrintWriter out) {
+    public int getSensorFields(String sensor, String from, String to, String size, PrintWriter out) {
 
         boolean errorFlag = false;
 
@@ -239,30 +240,94 @@ public class GetRequestHandler {
             return HTTP_STATUS_BAD_REQUEST;
         }
 
-        out.println("## sensor: " + sensor);
+     /*   out.println("## sensor: " + sensor);
         out.println("## field, value, timestamp, epoch");
-        out.println();
+        out.println();              */
         Vector<Double> stream = new Vector<Double>();
         Vector<Long> timestamps = new Vector<Long>();
+        ArrayList<Vector<Double>> elements  = new ArrayList<Vector<Double>>();;
         VSensorConfig sensorConfig = Mappings.getConfig(sensor);    // get the configuration for this vs
+        ArrayList<String> fields = new ArrayList<String>();
         for (DataField df : sensorConfig.getOutputStructure()) {
-            System.out.println("AAA");
-            String field = df.getName().toLowerCase();    // get the field that is going to be processed
-            ///////////////
-            stream.clear();     // clear from any previous elements
-            timestamps.clear();
-            errorFlag = !getData(sensor, field, fromAsLong, toAsLong, stream, timestamps);
-            if (errorFlag) {
-                out.print("## Error in request.");
-                return HTTP_STATUS_BAD_REQUEST;
+            fields.add(df.getName().toLowerCase());   // get the field name that is going to be processed
+        }
+        out.print("#");
+        int j;
+        for (j=0; j < (fields.size()-1); j++) {
+            out.print(fields.get(j)+",");
+        }
+        out.println(fields.get(j));
+        ///////////////////////   Connection to the DB to get the data
+
+        Connection conn = null;
+        ResultSet resultSet = null;
+        boolean restrict = false;
+
+        if (size != null)  {
+            restrict = true;
+        }
+
+        try {
+            conn = Main.getStorage(sensor).getConnection();
+
+            StringBuilder query;
+            if (restrict) {
+                Integer window = new Integer(size);
+                query = new StringBuilder("select * from ")
+                        .append(sensor)
+                        .append(" where timed >= ")
+                        .append(fromAsLong)
+                        .append(" and timed <=")
+                        .append(toAsLong)
+                        .append(" order by timed desc")
+                        .append(" limit 0,"+(window+1));
+            } else {
+                query = new StringBuilder("select * from ")
+                        .append(sensor)
+                        .append(" where timed >= ")
+                        .append(fromAsLong)
+                        .append(" and timed <=")
+                        .append(toAsLong);
             }
-            // fill in the data
-            for (int i = 0; i < stream.size(); i++) {
-                System.out.println("Bla"+i);
-                out.print(field+","+stream.get(i)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i)))).toString()+","+timestamps.get(i));
-                out.println();
+            resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
+
+            while (resultSet.next()) {
+                if (restrict) {
+                    Vector<Double> stream2 = new Vector<Double>();
+                    timestamps.add(resultSet.getLong("timed"));
+                    for (String fieldname : fields) {
+                        stream2.add(resultSet.getDouble(fieldname));
+                    }
+                    elements.add(stream2);
+                } else {
+                    long timestamp = resultSet.getLong("timed");
+
+                    for (String fieldname : fields) {
+                        stream.add(resultSet.getDouble(fieldname));
+                    }
+                    for (int i = 0; i < stream.size(); i++) {
+                        out.print(stream.get(i)+",");
+                    }
+                    out.println((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp);
+                    stream.clear();
+                }
             }
-            //////////////
+            if (restrict) {
+                for (int k = elements.size()-1; k > 0; k--) {       // for each one of the results
+                    Vector<Double> streamTemp = elements.get(k);
+                    for (int i = 0; i < streamTemp.size(); i++)  {
+                        out.print(streamTemp.get(i)+",");
+                    }
+                    out.println((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(k)))).toString().replace('T', ' ')+","+ timestamps.get(k));
+                }
+
+            }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            Main.getStorage(sensor).close(resultSet);
+            Main.getStorage(sensor).close(conn);
         }
         return HTTP_STATUS_OK;
     }
@@ -504,9 +569,7 @@ public class GetRequestHandler {
         return restResponse;
     }
 
-    public int getMeasurementsForSensorField(String sensor, String field, String from, String to, PrintWriter out) {           // added
-
-        //System.out.println("@@@@@@@MeasurementForSensorField with field ='"+field+"' from = '"+from+"' and to='"+to+"'");
+    public int getMeasurementsForSensorField(String sensor, String field, String from, String to, String size, PrintWriter out) {           // added
 
         Vector<Double> stream = new Vector<Double>();
         Vector<Long> timestamps = new Vector<Long>();
@@ -528,18 +591,59 @@ public class GetRequestHandler {
             return HTTP_STATUS_BAD_REQUEST;
         }
 
-        errorFlag = !getData(sensor, field, fromAsLong, toAsLong, stream, timestamps);
+        if (size != null)  {
+            Integer window = new Integer(size);
+            ///////////
+            Connection conn = null;
+            ResultSet resultSet = null;
+
+            try {
+                conn = Main.getStorage(sensor).getConnection();
+                StringBuilder query = new StringBuilder("select timed, ")
+                        .append(field)
+                        .append(" from ")
+                        .append(sensor)
+                        .append(" where timed >= ")
+                        .append(fromAsLong)
+                        .append(" and timed <=")
+                        .append(toAsLong)
+                        .append(" order by timed desc")
+                        .append(" limit 0,"+(window+1));
+
+                resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
+                while (resultSet.next()) {
+                    timestamps.add(resultSet.getLong(1));
+                    stream.add(resultSet.getDouble(2));
+                    /*long timestamp = resultSet.getLong(1);
+                    out.println(resultSet.getDouble(2)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp);
+*/
+                }
+                for (int i=stream.size()-1; i > 0; i--) {
+                    long timestamp = timestamps.get(i);
+                    out.println(stream.get(i)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp);
+                }
+                timestamps.clear();stream.clear();
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                Main.getStorage(sensor).close(resultSet);
+                Main.getStorage(sensor).close(conn);
+            }
+            ///////////
+        } else {
+            errorFlag = !getData(sensor, field, fromAsLong, toAsLong, stream, timestamps);
+                 /*   out.println("##vsname: "+sensor);
+        out.println("##field: "+field);
+        out.println("##value,timestamp,epoch");   */
+            for (int i = 0; i < stream.size(); i++) {
+                out.print(stream.get(i)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' ')+","+timestamps.get(i));
+                out.println();
+            }
+        }
 
         if (errorFlag) {
             out.print("## Error in request.");
             return HTTP_STATUS_BAD_REQUEST;
-        }
-        out.println("##vsname: "+sensor);
-        out.println("##field: "+field);
-        out.println("##value,timestamp,epoch");
-        for (int i = 0; i < stream.size(); i++) {
-            out.print(stream.get(i)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i)))).toString()+","+timestamps.get(i));
-            out.println();
         }
 
         return HTTP_STATUS_OK;
@@ -554,7 +658,7 @@ public class GetRequestHandler {
         boolean result = true;
 
         try {
-            conn = Main.getDefaultStorage().getConnection();
+            conn = Main.getStorage(sensor).getConnection();
             StringBuilder query = new StringBuilder("select timed, ")
                     .append(field)
                     .append(" from ")
@@ -565,13 +669,10 @@ public class GetRequestHandler {
                     .append(to);
 
             resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
-    System.out.println("Results"+resultSet.getMetaData().getColumnCount());
             while (resultSet.next()) {
                 //int ncols = resultSet.getMetaData().getColumnCount();
                 long timestamp = resultSet.getLong(1);
                 double value = resultSet.getDouble(2);
-                //logger.warn(ncols + " cols, value: " + value + " ts: " + timestamp);
-             System.out.println("Value = "+value+" time = "+timestamp);
                 stream.add(value);
                 timestamps.add(timestamp);
             }
@@ -586,6 +687,7 @@ public class GetRequestHandler {
 
         return result;
     }
+
 
     public boolean getDataPreview(String sensor, String field, long from, long to, Vector<Double> stream, Vector<Long> timestamps, long size) {
         Connection conn = null;
@@ -602,7 +704,7 @@ public class GetRequestHandler {
         */
 
         try {
-            conn = Main.getDefaultStorage().getConnection();
+            conn = Main.getStorage(sensor).getConnection();
             StringBuilder query = new StringBuilder("select timed, ")
                     .append(field)
                     .append(" from ")

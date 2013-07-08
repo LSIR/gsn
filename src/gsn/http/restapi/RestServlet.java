@@ -93,8 +93,9 @@ public class RestServlet extends HttpServlet {
                             out.print("## The user '"+user.getUserName()+"' doesn't have access to the sensor '"+sensor+"'");
                             returnedCSVStatus = HTTP_STATUS_BAD;
                         } else {
-                            response.setHeader("Content-Disposition", "attachment;filename=\"sensor_field.csv\"");
-                            returnedCSVStatus = getRequestHandler.getMeasurementsForSensorField(sensor, field, str_from, str_to, out);
+                            String size = request.getParameter("size");
+                            response.setHeader("Content-Disposition", "attachment;filename=\"sensor_field_"+field+".csv\"");
+                            returnedCSVStatus = getRequestHandler.getMeasurementsForSensorField(sensor, field, str_from, str_to, size, out);
                             if (returnedCSVStatus != RestResponse.HTTP_STATUS_OK) returnedCSVStatus = HTTP_STATUS_BAD;  // adapt to this error msg
                         }
                         isJason = false;
@@ -128,8 +129,9 @@ public class RestServlet extends HttpServlet {
                             out.print("## The user '"+user.getUserName()+"' doesn't have access to the sensor '"+sensor+"'");
                             returnedCSVStatus = HTTP_STATUS_BAD;
                         } else {
-                            response.setHeader("Content-Disposition", "attachment;filename=\"sensor_fields.csv\"");
-                            returnedCSVStatus = getRequestHandler.getSensorFields(sensor, str_from, str_to, out);
+                            response.setHeader("Content-Disposition", "attachment;filename=\"sensor_"+sensor+"_fields.csv\"");
+                            String size = request.getParameter("size");
+                            returnedCSVStatus = getRequestHandler.getSensorFields(sensor, str_from, str_to, size, out);
                             if (returnedCSVStatus != RestResponse.HTTP_STATUS_OK) returnedCSVStatus = HTTP_STATUS_BAD;  // adapt to this error msg
                         }
                         isJason = false;
