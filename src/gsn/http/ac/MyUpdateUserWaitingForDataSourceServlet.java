@@ -125,7 +125,7 @@ public class MyUpdateUserWaitingForDataSourceServlet extends HttpServlet
                        "Access Rights Management -> User Account Management -> Owner Waiting List\n"+
                        "or via the URL: "+req.getServerName()+":"+req.getServerPort()+"/gsn/MyOwnerWaitingListServlet\n\n";
 
-               email.sendEmail( "GSN ACCESS ", "GSN USER",userFromBD.getEmail(),"Request for access to a Virtual Sensor", msgHead, msgBody, msgTail);
+               email.sendEmail( "GSN ACCESS ", "GSN USER",owner.getEmail(),"Request for access to a Virtual Sensor", msgHead, msgBody, msgTail);
 
                // send an email to the administrator
                msgHead = "Dear "+userFromBD.getFirstName() +", "+"\n"+"\n";
