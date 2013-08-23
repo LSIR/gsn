@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_Camera_Gugla_Bielzigji__scaled" priority="10" >
+<virtual-sensor name="Dirruhorn_Camera_Gugla2_Bielzigji__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -10,7 +10,7 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>Camera Gugla Bielzigji as thumbnail</description>
+    <description>Camera Gugla2 Bielzigji as thumbnail</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
@@ -20,7 +20,7 @@
                 <address wrapper="local">
                     <predicate key="query">select * from Dirruhorn_Binary_Http__mapped</predicate>
                 </address>
-                <query> select * from wrapper where position = 51</query>
+                <query> select * from wrapper where position = 75</query>
             </source>
             <query> select * from source </query>
         </stream>

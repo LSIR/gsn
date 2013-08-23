@@ -8,6 +8,8 @@
 "2","sysvoltage","0.0009768009768","powerswitch"
 "3","sdivoltage","0.00483","AEBoard"
 "3","sysvoltage","0.00091","AEBoard"
+"4","sdivoltage","0.0040","WGPS"
+"4","sysvoltage","0.0008697509765","WGPS"
 
 # adccomdiff_cnnn
 "1","cnnn_dx0","500",

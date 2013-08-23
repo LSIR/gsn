@@ -152,13 +152,6 @@ $(document).ready(function() {
           select:"sensornode[position=7],sensornode[position=8],sensornode[position=9]"
         }]
       },
-      { title:"Aiguille du Midi CR1000 Voltages",
-        signals: [{
-          vsensor:"adm_cr1000",
-          field:["battery"],
-          select:"sensornode[position=7],sensornode[position=8],sensornode[position=9]"
-        }]
-      },
       { title:"Aiguille du Midi PV Voltages",
         signals: [{
           vsensor:"adm_dozer_nodehealth__conv",
@@ -187,13 +180,6 @@ $(document).ready(function() {
           select:"sensornode[position=8][iscorestation='true']"
         }]
       },
-      { title:"Randa Camzilla PV Voltages",
-        signals: [{
-          vsensor:"dirruhorn_dozer_nodehealth__conv",
-          field:["sdivoltage"],
-          select:"sensornode[position=59]"
-        }]
-      },
       { title:"Matterhorn PV Voltages",
         signals: [{
           vsensor:"matterhorn_dozer_nodehealth__conv",
@@ -212,7 +198,7 @@ $(document).ready(function() {
         signals: [{
           vsensor:"dirruhorn_vaisalawxt520sup",
           field:["heating_voltage","supply_voltage","heating_temperature"],
-          select:"sensornode[position=13],sensornode[position=42]"
+          select:"sensornode[position=13],sensornode[position=42],sensornode[position=68]"
         }]
       },
       { title:"Weather Station Voltages",

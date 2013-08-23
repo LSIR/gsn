@@ -34,6 +34,16 @@ $(document).ready(function() {
 
     GsnPlots.setConfig([
 
+      // Thur
+
+      {  title:"Decagon",
+         signals: [{
+          vsensor:"thur_dozer_decagonmux__conv",
+          field:["conductivity0"],
+          position: [2]
+        }],
+      },
+
       // Jungfraujoch
 
       {  title:"Temperatures TH3",
@@ -60,7 +70,7 @@ $(document).ready(function() {
       },
 
 
-      // matterhorn
+      // Matterhorn
 
       { title:"Crackmeter Position 1",
         signals: [{
@@ -371,7 +381,7 @@ $(document).ready(function() {
       },
 
 
-      // adm
+      // ADM
 
       { title:"Borehole Thermistors Position 7",
         signals: [{
@@ -514,46 +524,84 @@ $(document).ready(function() {
 
       // Dirruhorn
 
-      { title:"GPS Measurement Quality - CoreStation",
+      { title:"GPS Measurement Quality",
           signals: [{
           vsensor:"dirruhorn_gps_raw__single__conv",
           field:["measurement_quality"],
-          select:"sensornode[position][iscorestation='true']"
+          position: [0,2,4,5,6,7,9,39,41,55,63,66,67,70]
         }]
       },
-      { title:"GPS Signal Strength - CoreStation",
+//      { title:"GPS Measurement Quality ordered by gps_unixtime",
+//         signals: [{
+//          vsensor:"dirruhorn_gps_raw__single__conv",
+//          field:["measurement_quality"],
+//          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70],
+//          timeline:"gps_unixtime"
+//        }]
+//      },
+      { title:"GPS Signal Strength",
         signals: [{
           vsensor:"dirruhorn_gps_raw__single__conv",
           field:["signal_strength"],
-          select:"sensornode[position][iscorestation='true']"
+          position: [0,2,4,5,6,7,9,39,41,55,63,66,67,70]
         }]
       },
-      { title:"GPS Number of Satellites - CoreStation",
+//      { title:"GPS Signal Strength ordered by gps_unixtime",
+//          signals: [{
+//          vsensor:"dirruhorn_gps_raw__single__conv",
+//          field:["signal_strength"],
+//          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70],
+//          timeline:"gps_unixtime"
+//        }]
+//      },
+      { title:"GPS Number of Satellites",
         signals: [{
-          vsensor:"dirruhorn_gps_raw__single__conv",
+          vsensor:"dirruhorn_gps_raw__binary__mapped",
           field:["gps_sats"],
-          select:"sensornode[position][iscorestation='true']"
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
+        }]
+      },
+//      { title:"GPS Number of Satellites ordered by gps_unixtime",
+//        signals: [{
+//          vsensor:"dirruhorn_gps_raw__single__conv",
+//          field:["gps_sats"],
+//          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70],
+//          timeline:"gps_unixtime"
+//        }]
+//      },
+      { title:"Missing GPS Satellites in WGPSSV to Binary Conversion",
+        signals: [{
+          vsensor:"dirruhorn_gps_raw__tobinary__mapped",
+          field:["gps_missing_sv"],
+          position: [55,63]
+        }]
+      },
+      { title:"Reassembly Buffer Size in WGPSSV to Binary Conversion",
+        signals: [{
+          vsensor:"dirruhorn_gps_raw__tobinary__mapped",
+          field:["current_data_buffer_size","old_data_buffer_size"],
+          position: [55,63]
         }]
       },
       { title:"GPS Measurement Quality - TN-GPS",
           signals: [{
           vsensor:"dirruhorn_dozer_gpsdata__conv",
           field:["payload_measindicator"],
-          select:"sensornode[position=2],sensornode[position=6],sensornode[position=9],sensornode[position=70],"
+          select:"sensornode[position=2],sensornode[position=6],sensornode[position=9],sensornode[position=70]"
         }]
       },
       { title:"GPS Signal Strength - TN-GPS",
           signals: [{
           vsensor:"dirruhorn_dozer_gpsdata__conv",
           field:["payload_signalstrength"],
-          select:"sensornode[position=2],sensornode[position=6],sensornode[position=9],sensornode[position=70],"
+          select:"sensornode[position=2],sensornode[position=6],sensornode[position=9],sensornode[position=70]"
         }]
       },
       { title:"GPS SV Number - TN-GPS",
           signals: [{
           vsensor:"dirruhorn_dozer_gpsdata__conv",
           field:["payload_vehiclenum"],
-          select:"sensornode[position=2],sensornode[position=6],sensornode[position=9],sensornode[position=70],"
+          select:"sensornode[position=2],sensornode[position=6],sensornode[position=9],sensornode[position=70]"
         }]
       },
 
@@ -561,14 +609,14 @@ $(document).ready(function() {
          signals: [{
           vsensor:"dirruhorn_gps_differential__realtime",
           field:["e"],
-          position: [4,5,7,12,39,41,66,67]
+          position: [4,5,7,12,39,41,55,63,66,67]
         }],
       },
       {  title:"GPS Position North - Realtime",
          signals: [{
           vsensor:"dirruhorn_gps_differential__realtime",
           field:["n"],
-          position: [4,5,7,12,39,41,66,67]
+          position: [4,5,7,12,39,41,55,63,66,67]
         }],
       },
 
@@ -576,31 +624,7 @@ $(document).ready(function() {
          signals: [{
           vsensor:"dirruhorn_gps_differential__realtime",
           field:["h"],
-          position: [4,5,7,12,39,41,66,67]
-        }],
-      },
-
-      {  title:"GPS Position Standard Deviation East - Realtime",
-         signals: [{
-          vsensor:"dirruhorn_gps_differential__realtime",
-          field:["sd_e"],
-          position: [4,5,7,12,39,41,66,67]
-        }],
-      },
-
-      {  title:"GPS Position Standard Deviation North - Realtime",
-         signals: [{
-          vsensor:"dirruhorn_gps_differential__realtime",
-          field:["sd_n"],
-          position: [4,5,7,12,39,41]
-        }],
-      },
-
-      {  title:"GPS Position Standard Deviation Altitidue - Realtime",
-         signals: [{
-          vsensor:"dirruhorn_gps_differential__realtime",
-          field:["sd_h"],
-          position: [4,5,7,12,39,41]
+          position: [4,5,7,12,39,41,55,63,66,67]
         }],
       },
 
@@ -608,7 +632,7 @@ $(document).ready(function() {
          signals: [{
           vsensor:"dirruhorn_gps_differential__batch",
           field:["e"],
-          position: [4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67]
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
         }],
       },
 
@@ -616,7 +640,7 @@ $(document).ready(function() {
          signals: [{
           vsensor:"dirruhorn_gps_differential__batch",
           field:["n"],
-          position: [4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67]
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
         }],
       },
 
@@ -624,56 +648,84 @@ $(document).ready(function() {
          signals: [{
           vsensor:"dirruhorn_gps_differential__batch",
           field:["h"],
-          position: [4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67]
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
         }],
       },
 
-      {  title:"GPS Position Standard Deviation East - Batch",
+      { title:"GPS Velocity East - Batch",
          signals: [{
           vsensor:"dirruhorn_gps_differential__batch",
-          field:["sd_e"],
-          position: [4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67]
+          field:["v_e"],
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
         }],
       },
 
-      {  title:"GPS Position Standard Deviation North - Batch",
+      {  title:"GPS Velocity North - Batch",
          signals: [{
           vsensor:"dirruhorn_gps_differential__batch",
-          field:["sd_n"],
-          position: [4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67]
+          field:["v_n"],
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
         }],
       },
 
-      {  title:"GPS Position Standard Deviation Altitude - Batch",
+      {  title:"GPS Velocity Altitude - Batch",
          signals: [{
           vsensor:"dirruhorn_gps_differential__batch",
-          field:["sd_h"],
-          position: [4,5,7,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67]
+          field:["v_h"],
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
+        }],
+      },
+      {  title:"GPS Velocity 3D - Batch",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__batch",
+          field:["v_3d"],
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
+        }],
+      },
+      {  title:"GPS Velocity Horizontal - Batch",
+         signals: [{
+          vsensor:"dirruhorn_gps_differential__batch",
+          field:["v_horiz"],
+          position: [0,2,4,5,6,7,9,12,14,15,16,17,18,19,21,23,25,27,29,31,33,35,39,41,43,44,55,56,57,62,63,64,66,67,70]
         }],
       },
 
-      { title:"Crackmeter Pos65",
+
+      { title:"Grabengufer Crackmeter Pos65",
 	    signals: [{
 	      vsensor:"dirruhorn_crackmeter__cnnn",
 	      field:["cnnn_dx0"],
 	      select:"sensornode[position=65]"
 	    }]
       },
-      {  title:"Inclinometer X-axis",
+      {  title:"GPS Logger Inclinometer X-axis",
          signals: [{
           vsensor:"dirruhorn_gps_logger__status",
           field:["inclinometer_x"],
           position: [14,15,16,17,18,19,21,23,25,27,29,31,33,35,43,44,55,56,57,62,63,64]
         }],
       },
-      {  title:"Inclinometer Y-axis",
+      {  title:"GPS Logger Inclinometer Y-axis",
          signals: [{
           vsensor:"dirruhorn_gps_logger__status",
           field:["inclinometer_y"],
           position: [14,15,16,17,18,19,21,23,25,27,29,31,33,35,43,44,55,56,57,62,63,64]
         }],
+      },
+      {  title:"Wireless GPS Inclinometer X-axis",
+         signals: [{
+          vsensor:"dirruhorn_dozer_wgpsstatus__conv",
+          field:["inclinometer_x"],
+          position: [55,63]
+        }],
+      },
+      {  title:"Wireless GPS Inclinometer Y-axis",
+         signals: [{
+          vsensor:"dirruhorn_dozer_wgpsstatus__conv",
+          field:["inclinometer_y"],
+          position: [55,63]
+        }],
       }
-      
     ]);
 
       // Jungfraujoch
@@ -686,16 +738,17 @@ $(document).ready(function() {
                      select:"sensornode[position="+(this)+"]"}]
         }]);
     });
-    // Thur
 
-    $(["Decagon Conductivity (Position 1, River)","Decagon Conductivity (Position 2, R074)","Decagon Conductivity (Position 3, R073)","Decagon Conductivity (Position 4, R042)","Decagon Conductivity (Position 5, R071)"]).each(function(index) {
-      GsnPlots.setConfig([
-        { title:this, 
-          signals:[{ vsensor :"thur_dozer_decagonmux__conv",
-                     field:["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4"], 
-                     select:"sensornode[position="+(index+1)+"]"}]
-        }]);
-    });
+      // Thur 
+//    $(["Decagon Conductivity (Position 1, River)","Decagon Conductivity (Position 2, R074)","Decagon Conductivity (Position 3, R073)","Decagon Conductivity (Position 4, R042)","Decagon Conductivity (Position 5, R071)"]).each(function(index) {
+//      GsnPlots.setConfig([
+//        { title:this, 
+//          signals:[{ vsensor :"thur_dozer_decagonmux__conv",
+//                     field:["conductivity0","conductivity1","conductivity2","conductivity3","conductivity4"], 
+//                     position: [1,2,3,4,5]
+//                  }],
+//        }]);
+//    });
 
     $.ajax({
       type: "GET",
