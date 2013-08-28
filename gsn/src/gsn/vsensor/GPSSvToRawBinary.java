@@ -31,6 +31,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 	private static String GPS_MESQI_FIELD_NAME = "measurement_quality";
 	private static String GPS_CNO_FIELD_NAME = "signal_strength";
 	private static String GPS_LLI_FIELD_NAME = "loss_of_lock";
+	private static String GPS_SEQUENCE_NR_NAME = "header_seqnr";
 	
 	private static final transient Logger logger = Logger.getLogger(GPSSvToRawBinary.class);
 
@@ -102,7 +103,6 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 				data.setData(dataField[10].getName(), newSvBuffer.size());
 				data.setData(dataField[11].getName(), oldSvBuffer.size());
 				super.dataAvailable(svContainer.getInputStreamName(), data);
-				
 			}
 			else {
 				svContainerMap.put(gps_unixtime, svContainer);
@@ -192,6 +192,15 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		protected boolean putSv(StreamElement streamElement) throws Exception {
 			if (streamElements.size() == numSv)
 				throw new Exception("SvContainer already full!");
+
+			// discard duplicates
+			for (StreamElement se : streamElements) {
+				if ((Integer)se.getData(GPS_SEQUENCE_NR_NAME) == (Integer)streamElement.getData(GPS_SEQUENCE_NR_NAME)) {
+					logger.info("discard duplicate: [" + streamElement.toString() + "]");
+					return false;
+				}
+			}
+			
 			streamElements.add(streamElement);
 			if (streamElements.size() == numSv)
 				return true;
