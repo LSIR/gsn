@@ -80,15 +80,15 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		Integer position = (Integer)data.getData(dataField[0].getName());
+		if (!newSvBuffer.containsKey(position)) {
+			newSvBuffer.put(position, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
+			oldSvBuffer.put(position, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
+		}
 		if ((Long)data.getData(GPS_TIME_FIELD_NAME) > System.currentTimeMillis()-bufferSizeInMs) {
-			if (!newSvBuffer.containsKey(position))
-				newSvBuffer.put(position, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
 			processData(inputStreamName, position, data, System.currentTimeMillis(), newSvBuffer.get(position), Buf.NEW_BUF);
 		}
 		else {
 			updateTimer(position);
-			if (!oldSvBuffer.containsKey(position))
-				oldSvBuffer.put(position, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
 			processData(inputStreamName, position, data, (Long) data.getData(dataField[1].getName()), oldSvBuffer.get(position), Buf.OLD_BUF);
 		}
 	}
