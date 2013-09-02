@@ -301,6 +301,10 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		@Override
 		public void run() {
 			emptyBuffer(oldSvBuffer.get(deviceId));
+			if (newSvBuffer.get(deviceId).isEmpty()) {
+				newSvBuffer.remove(deviceId);
+				oldSvBuffer.remove(deviceId);
+			}
 		}
 		
 	}
