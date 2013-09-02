@@ -19,6 +19,7 @@
             <field name="GPS_RAW_DATA" type="binary"/>
 		    <field name="CURRENT_DATA_BUFFER_SIZE" type="INTEGER"/>
 		    <field name="OLD_DATA_BUFFER_SIZE" type="INTEGER"/>
+		    <field name="TOTAL_NUMBER_OF_BUFFERS" type="INTEGER"/>
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
