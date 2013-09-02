@@ -49,9 +49,9 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		new DataField("GPS_RAW_DATA", "BINARY"),
 		new DataField("CURRENT_DATA_BUFFER_SIZE", "INTEGER"),
 		new DataField("OLD_DATA_BUFFER_SIZE", "INTEGER")};
-	
-	private Map<Long,SvContainer> newSvBuffer = Collections.synchronizedMap(new HashMap<Long,SvContainer>());
-	private Map<Long,SvContainer> oldSvBuffer = Collections.synchronizedMap(new HashMap<Long,SvContainer>());
+
+	private Map<Integer,Map<Long,SvContainer>> newSvBuffer = new HashMap<Integer,Map<Long,SvContainer>>();
+	private Map<Integer,Map<Long,SvContainer>> oldSvBuffer = new HashMap<Integer,Map<Long,SvContainer>>();
 	private long bufferSizeInMs;
 	
 	private enum Buf {
@@ -59,7 +59,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		OLD_BUF
 	}
 
-	private Timer emptyBufferTimer = new Timer();
+	private Map<Integer,Timer> emptyBufferTimers = new HashMap<Integer,Timer>();
 	
 	@Override
 	public boolean initialize() {
@@ -79,16 +79,21 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 	
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
+		Integer position = (Integer)data.getData(dataField[0].getName());
 		if ((Long)data.getData(GPS_TIME_FIELD_NAME) > System.currentTimeMillis()-bufferSizeInMs) {
-			processData(inputStreamName, data, System.currentTimeMillis(), newSvBuffer, Buf.NEW_BUF);
+			if (!newSvBuffer.containsKey(position))
+				newSvBuffer.put(position, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
+			processData(inputStreamName, position, data, System.currentTimeMillis(), newSvBuffer.get(position), Buf.NEW_BUF);
 		}
 		else {
-			updateTimer();
-			processData(inputStreamName, data, (Long) data.getData(dataField[1].getName()), oldSvBuffer, Buf.OLD_BUF);
+			updateTimer(position);
+			if (!oldSvBuffer.containsKey(position))
+				oldSvBuffer.put(position, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
+			processData(inputStreamName, position, data, (Long) data.getData(dataField[1].getName()), oldSvBuffer.get(position), Buf.OLD_BUF);
 		}
 	}
 	
-	private void processData(String inputStreamName, StreamElement data, Long refTime, Map<Long,SvContainer> svContainerMap, Buf buf) {
+	private void processData(String inputStreamName, int position, StreamElement data, Long refTime, Map<Long,SvContainer> svContainerMap, Buf buf) {
 		Long gps_unixtime = (Long)data.getData(GPS_TIME_FIELD_NAME);
 
 		SvContainer svContainer = svContainerMap.get(gps_unixtime);
@@ -100,8 +105,8 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 			if (svContainer.putSv(data)) {
 				data = svContainer.getRawBinaryStream();
 				svContainerMap.remove(gps_unixtime);
-				data.setData(dataField[10].getName(), newSvBuffer.size());
-				data.setData(dataField[11].getName(), oldSvBuffer.size());
+				data.setData(dataField[10].getName(), newSvBuffer.get(position).size());
+				data.setData(dataField[11].getName(), oldSvBuffer.get(position).size());
 				super.dataAvailable(svContainer.getInputStreamName(), data);
 			}
 			else {
@@ -121,9 +126,9 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 						svContainer = svContainerMap.get(gps_unixtime);
 						iter.remove();
 						if (oldSvBuffer.isEmpty())
-							updateTimer();
+							updateTimer(position);
 						for (StreamElement se : svContainer.getStreamElements()) {
-							processData(svContainer.getInputStreamName(), se, null, oldSvBuffer, Buf.OLD_BUF);
+							processData(svContainer.getInputStreamName(), position, se, null, oldSvBuffer.get(position), Buf.OLD_BUF);
 						}
 					}
 					else {
@@ -131,8 +136,8 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 						SvContainer svc = svContainerMap.get(gps_unixtime);
 						iter.remove();
 						data = svc.getRawBinaryStream();
-						data.setData(dataField[10].getName(), newSvBuffer.size());
-						data.setData(dataField[11].getName(), oldSvBuffer.size());
+						data.setData(dataField[10].getName(), newSvBuffer.get(position).size());
+						data.setData(dataField[11].getName(), oldSvBuffer.get(position).size());
 						super.dataAvailable(svc.getInputStreamName(), data);
 					}
 				}
@@ -142,34 +147,41 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 	
 	@Override
 	public synchronized void dispose() {
-		emptyBuffer(newSvBuffer);
-		emptyBuffer(oldSvBuffer);
-		emptyBufferTimer.cancel();
+		emptyBuffers(newSvBuffer);
+		emptyBuffers(oldSvBuffer);
+		for (Timer t: emptyBufferTimers.values())
+			t.cancel();
 		super.dispose();
 	}
 	
-	private void emptyBuffer(Map<Long,SvContainer> buffer) {
-		Iterator<Long> iter = buffer.keySet().iterator();
+	private void emptyBuffers(Map<Integer,Map<Long,SvContainer>> buffer) {
+		Iterator<Map<Long,SvContainer>> iter = buffer.values().iterator();
 		while (iter.hasNext()) {
-			SvContainer svc = buffer.get(iter.next());
+			emptyBuffer(iter.next());
 			iter.remove();
+		}
+	}
+	
+	private void emptyBuffer(Map<Long,SvContainer> buf) {
+		Iterator<Long> it = buf.keySet().iterator();
+		while (it.hasNext()) {
+			SvContainer svc = buf.get(it.next());
+			it.remove();
 			StreamElement data = svc.getRawBinaryStream();
-			data.setData(dataField[10].getName(), newSvBuffer.size());
-			data.setData(dataField[11].getName(), oldSvBuffer.size());
+			data.setData(dataField[10].getName(), newSvBuffer.get(data.getData(dataField[0].getName())).size());
+			data.setData(dataField[11].getName(), oldSvBuffer.get(data.getData(dataField[0].getName())).size());
 			super.dataAvailable(svc.getInputStreamName(), data);
 		}
 	}
 
-    public void updateTimer() {
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-    			emptyBuffer(oldSvBuffer);
-            }
-        };
-        emptyBufferTimer.cancel();
-        emptyBufferTimer = new Timer();
-        emptyBufferTimer.schedule(timerTask, bufferSizeInMs);
+    public void updateTimer(int position) {
+    	if (!emptyBufferTimers.containsKey(position))
+    		emptyBufferTimers.put(position, new Timer());
+    	
+    	TimerTaskWithPosition timerTask = new TimerTaskWithPosition(position);
+    	emptyBufferTimers.get(position).cancel();
+    	emptyBufferTimers.put(position, new Timer());
+        emptyBufferTimers.get(position).schedule(timerTask, bufferSizeInMs);
     }
 
 	class SvContainer {
@@ -195,8 +207,9 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 
 			// discard duplicates
 			for (StreamElement se : streamElements) {
-				if ((Integer)se.getData(GPS_SEQUENCE_NR_NAME) == (Integer)streamElement.getData(GPS_SEQUENCE_NR_NAME)) {
-					logger.info("discard duplicate: [" + streamElement.toString() + "]");
+				if (((Integer)se.getData(GPS_SEQUENCE_NR_NAME)).intValue() == ((Integer)streamElement.getData(GPS_SEQUENCE_NR_NAME)).intValue()) {
+					if (logger.isDebugEnabled())
+						logger.debug("discard duplicate: [" + streamElement.toString() + "]");
 					return false;
 				}
 			}
@@ -271,5 +284,19 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 					null,
 					null});
 		}
+	}
+	
+	class TimerTaskWithPosition extends TimerTask {
+		private int position;
+		
+		public TimerTaskWithPosition(int pos) {
+			position = pos;
+		}
+
+		@Override
+		public void run() {
+			emptyBuffer(oldSvBuffer.get(position));
+		}
+		
 	}
 }
