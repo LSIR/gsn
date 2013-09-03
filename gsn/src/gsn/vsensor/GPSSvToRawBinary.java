@@ -84,6 +84,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		if (!newSvBuffer.containsKey(deviceId)) {
 			newSvBuffer.put(deviceId, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
 			oldSvBuffer.put(deviceId, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
+			logger.info("New SV buffer created for device_id " + deviceId);
 		}
 		if ((Long)data.getData(GPS_TIME_FIELD_NAME) > System.currentTimeMillis()-bufferSizeInMs) {
 			processData(inputStreamName, deviceId, data, System.currentTimeMillis(), newSvBuffer.get(deviceId), Buf.NEW_BUF);
@@ -301,7 +302,10 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		@Override
 		public void run() {
 			emptyBuffer(oldSvBuffer.get(deviceId));
+			if (logger.isDebugEnabled())
+				logger.debug("TimerTask for device_id " + deviceId + " executed");
 			if (newSvBuffer.get(deviceId).isEmpty()) {
+				logger.info("no more SV packages arrived from device_id " + deviceId + " since " + bufferSizeInMs + " ms -> remove SV buffer");
 				newSvBuffer.remove(deviceId);
 				oldSvBuffer.remove(deviceId);
 			}
