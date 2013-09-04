@@ -7,6 +7,18 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
+                	try {
+                		if (!isdef('GPS_UNIXTIME') || GPS_UNIXTIME == null) {
+							def bbuffer = java.nio.ByteBuffer.wrap((byte[]) GPS_RAW_DATA);
+							bbuffer.order(java.nio.ByteOrder.LITTLE_ENDIAN);
+							// skip header and payload length
+							bbuffer.position(bbuffer.position()+6);
+                			GPS_UNIXTIME = (long)(gsn.utils.Helpers.convertGPSTimeToUnixTime((double)bbuffer.getInt()/1000.0, (short)bbuffer.getShort())*1000.0);
+                		}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+					
                     if ( ! isdef('positionMap')) { positionMap = [:]; }
                     if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
                 ]]>
@@ -49,6 +61,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" index="true" />
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
             
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
