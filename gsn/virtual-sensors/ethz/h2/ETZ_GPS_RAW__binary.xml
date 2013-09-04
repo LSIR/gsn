@@ -4,6 +4,23 @@
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="position_mapping" />
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                		if (!isdef('GPS_UNIXTIME') || GPS_UNIXTIME == null) {
+							def bbuffer = java.nio.ByteBuffer.wrap((byte[]) GPS_RAW_DATA);
+							bbuffer.order(java.nio.ByteOrder.LITTLE_ENDIAN);
+							// skip header and payload length
+							bbuffer.position(bbuffer.position()+6);
+                			GPS_UNIXTIME = (long)(gsn.utils.Helpers.convertGPSTimeToUnixTime((double)bbuffer.getInt()/1000.0, (short)bbuffer.getShort())*1000.0);
+                		}
+				}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
@@ -14,7 +31,6 @@
             
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
-		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
             <field name="GPS_RAW_DATA" type="binary"/>
             
@@ -33,7 +49,7 @@
                     <predicate key="remote-contact-point">http://whymper.ethz.ch:23001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
+                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GPS_UNIXTIME, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -43,7 +59,7 @@
                     <predicate key="query">select * from ETZ_GPS_Logger__data__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT as GPS_SAMPLE_COUNT, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+                <query> select GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
             </source>
             <query> select * from source </query>
         </stream>

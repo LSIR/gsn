@@ -15,7 +15,6 @@
             
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
-		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
             <field name="GPS_TIME" type="INTEGER"/>
             <field name="GPS_WEEK" type="SMALLINT" />
@@ -41,7 +40,7 @@
                     <predicate key="query">select * from ETZ_GPS_RAW__binary</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SAMPLE_COUNT, GPS_SATS, GPS_RAW_DATA from wrapper </query>
+                <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

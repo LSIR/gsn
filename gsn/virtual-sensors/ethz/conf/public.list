@@ -96,7 +96,7 @@ Dirruhorn_Dozer_Drift__mapped.xml
 Dirruhorn_Dozer_Drift__muxed__mapped.xml
 Dirruhorn_Dozer_EventLogger__mapped.xml
 Dirruhorn_Dozer_EventLogger__muxed__mapped.xml
-Dirruhorn_Dozer_GPSData__conv.xml
+#Dirruhorn_Dozer_GPSData__conv.xml
 Dirruhorn_Dozer_GPSData__mapped.xml
 Dirruhorn_Dozer_GPSHealth__mapped.xml
 Dirruhorn_Dozer_NodeHealth__conv.xml
@@ -131,8 +131,9 @@ Dirruhorn_GPS_Logger__events.xml
 Dirruhorn_GPS_Logger__files__mapped.xml
 Dirruhorn_GPS_Logger__parsing.xml
 Dirruhorn_GPS_Logger__status.xml
-Dirruhorn_GPS_RAW__binary.xml
-Dirruhorn_GPS_RAW__mapped.xml
+Dirruhorn_GPS_RAW__binary__mapped.xml
+#Dirruhorn_GPS_RAW__single__conv.xml
+#Dirruhorn_GPS_RAW__single__mapped.xml
 Dirruhorn_GPS_RAW__tobinary__mapped.xml
 Dirruhorn_Schedule__mapped.xml
 Dirruhorn_Statistics__mapped.xml
