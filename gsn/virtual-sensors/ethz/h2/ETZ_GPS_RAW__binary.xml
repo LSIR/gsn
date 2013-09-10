@@ -8,6 +8,9 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
+                		if (!isdef('GPS_MISSING_SV')) {
+							GPS_MISSING_SV = (byte)0;
+                		}
                 		if (!isdef('GPS_UNIXTIME') || GPS_UNIXTIME == null) {
 							def bbuffer = java.nio.ByteBuffer.wrap((byte[]) GPS_RAW_DATA);
 							bbuffer.order(java.nio.ByteOrder.LITTLE_ENDIAN);
@@ -32,6 +35,7 @@
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
+		    <field name="GPS_MISSING_SV" type="TINYINT"/>
             <field name="GPS_RAW_DATA" type="binary"/>
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
