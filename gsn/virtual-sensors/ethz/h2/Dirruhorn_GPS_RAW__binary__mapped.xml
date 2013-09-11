@@ -67,7 +67,7 @@
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
-		    <field name="GPS_MISSING_SV" type="INTEGER"/>
+		    <field name="GPS_MISSING_SV" type="TINYINT"/>
             <field name="GPS_RAW_DATA" type="binary"/>
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
@@ -85,7 +85,7 @@
                     <predicate key="remote-contact-point">http://whymper.ee.ethz.ch:22001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, null as GPS_UNIXTIME, 0 as GPS_MISSING_SV, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
+                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, null as GPS_UNIXTIME, null as GPS_MISSING_SV, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -95,7 +95,7 @@
                     <predicate key="query">select * from Dirruhorn_GPS_Logger__data__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, null as GPS_UNIXTIME, 0 as GPS_MISSING_SV, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+                <query> select GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, null as GPS_UNIXTIME, null as GPS_MISSING_SV, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
             </source>
             <query> select * from source </query>
         </stream>
