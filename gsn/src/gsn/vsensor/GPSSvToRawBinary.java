@@ -51,6 +51,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		new DataField("OLD_DATA_BUFFER_SIZE", "INTEGER"),
 		new DataField("TOTAL_NUMBER_OF_BUFFERS", "INTEGER")};
 
+	private Map<Integer,StreamElement> duplicatesBuffer = Collections.synchronizedMap(new HashMap<Integer,StreamElement>());
 	private Map<Integer,Map<Long,SvContainer>> newSvBuffer = new HashMap<Integer,Map<Long,SvContainer>>();
 	private Map<Integer,Map<Long,SvContainer>> oldSvBuffer = new HashMap<Integer,Map<Long,SvContainer>>();
 	private long bufferSizeInMs;
@@ -81,6 +82,18 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
 		Integer deviceId = (Integer)data.getData(dataField[3].getName());
+		if (duplicatesBuffer.containsKey(deviceId)) {
+			StreamElement lastData = duplicatesBuffer.get(deviceId);
+			if (((Long)lastData.getData(GPS_TIME_FIELD_NAME)).longValue() == ((Long)data.getData(GPS_TIME_FIELD_NAME)).longValue() &&
+				((Integer)lastData.getData(GPS_SEQUENCE_NR_NAME)).intValue() == ((Integer)data.getData(GPS_SEQUENCE_NR_NAME)).intValue()) {
+				if (logger.isDebugEnabled())
+					logger.debug("discard duplicate: [" + data.toString() + "]");
+				return;
+			}
+			
+		}
+		duplicatesBuffer.put(deviceId, data);
+		
 		if (!newSvBuffer.containsKey(deviceId)) {
 			newSvBuffer.put(deviceId, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
 			oldSvBuffer.put(deviceId, Collections.synchronizedMap(new HashMap<Long,SvContainer>()));
@@ -214,7 +227,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 			for (StreamElement se : streamElements) {
 				if (((Integer)se.getData(GPS_SEQUENCE_NR_NAME)).intValue() == ((Integer)streamElement.getData(GPS_SEQUENCE_NR_NAME)).intValue()) {
 					if (logger.isDebugEnabled())
-						logger.debug("discard duplicate: [" + streamElement.toString() + "]");
+						logger.debug("discard duplicate in SV container: [" + streamElement.toString() + "]");
 					return false;
 				}
 			}
