@@ -8,10 +8,7 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                		if (!isdef('GPS_MISSING_SV')) {
-							GPS_MISSING_SV = (byte)0;
-                		}
-                		if (!isdef('GPS_UNIXTIME') || GPS_UNIXTIME == null) {
+                		if (GPS_UNIXTIME == null) {
 							def bbuffer = java.nio.ByteBuffer.wrap((byte[]) GPS_RAW_DATA);
 							bbuffer.order(java.nio.ByteOrder.LITTLE_ENDIAN);
 							// skip header and payload length
@@ -53,7 +50,7 @@
                     <predicate key="remote-contact-point">http://whymper.ethz.ch:23001/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
+                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, null as GPS_UNIXTIME, 0 as GPS_MISSING_SV, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -63,7 +60,7 @@
                     <predicate key="query">select * from ETZ_GPS_Logger__data__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+                <query> select GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, null as GPS_UNIXTIME, 0 as GPS_MISSING_SV, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
             </source>
             <query> select * from source </query>
         </stream>
