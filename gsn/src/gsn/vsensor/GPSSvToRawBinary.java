@@ -45,7 +45,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		new DataField("SENSOR_TYPE", "VARCHAR(16)"),
 		new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
 		new DataField("GPS_SATS", "INTEGER"),
-		new DataField("GPS_MISSING_SV", "TINYINT"),
+		new DataField("GPS_MISSING_SV", "INTEGER"),
 		new DataField("GPS_RAW_DATA", "BINARY"),
 		new DataField("CURRENT_DATA_BUFFER_SIZE", "INTEGER"),
 		new DataField("OLD_DATA_BUFFER_SIZE", "INTEGER"),
@@ -205,13 +205,13 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 	class SvContainer {
 		private ArrayList<StreamElement> streamElements;
 		private String inputStreamName;
-		private Byte numSv;
+		private Integer numSv;
 		
 		protected SvContainer(String inputStreamName, Byte numSv) throws Exception {
 			if (numSv <= 0 || numSv > Byte.MAX_VALUE)
 				throw new Exception("numSv out of range: " + numSv);
 			this.inputStreamName = inputStreamName;
-			this.numSv = numSv;
+			this.numSv = (int)numSv;
 			streamElements = new ArrayList<StreamElement>(numSv);
 		}
 		
@@ -241,10 +241,6 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		
 		protected String getInputStreamName() {
 			return inputStreamName;
-		}
-		
-		protected Byte getNumSv() {
-			return numSv;
 		}
 		
 		protected StreamElement getRawBinaryStream() {
@@ -297,7 +293,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 					streamElements.get(0).getData(dataField[5].getName()),
 					GPS_RAW_DATA_VERSION,
 					(int)streamElements.size(),
-					(byte)(numSv-streamElements.size()),
+					numSv-streamElements.size(),
 					rxmRaw.array(),
 					null,
 					null,

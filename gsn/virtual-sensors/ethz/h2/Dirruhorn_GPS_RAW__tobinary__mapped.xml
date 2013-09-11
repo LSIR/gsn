@@ -15,7 +15,7 @@
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
-		    <field name="GPS_MISSING_SV" type="TINYINT"/>
+		    <field name="GPS_MISSING_SV" type="INTEGER"/>
             <field name="GPS_RAW_DATA" type="binary"/>
 		    <field name="CURRENT_DATA_BUFFER_SIZE" type="INTEGER"/>
 		    <field name="OLD_DATA_BUFFER_SIZE" type="INTEGER"/>
