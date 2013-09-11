@@ -14,8 +14,8 @@
 			<field name="V12DC_IN" type="INTEGER" unit="mV"/>
 			<field name="HUMIDITY" type="INTEGER" unit="%"/>
 			<field name="TEMPERATURE" type="SMALLINT" unit="°C"/>
-			<field name="INCLINOMETER_X" type="SMALLINT"/>
-			<field name="INCLINOMETER_Y" type="SMALLINT"/>
+            <field name="INCLINOMETER_X" type="VARCHAR(30)" unit="°" />
+            <field name="INCLINOMETER_Y" type="VARCHAR(30)" unit="°" />
             <field name="RAW_DATA" type="BINARY"/>
             
             <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
@@ -32,7 +32,11 @@
                     <predicate key="query">select * from Dirruhorn_GPS_Logger__data__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT, STATUS_V12DC_IN as V12DC_IN, STATUS_HUMIDITY as HUMIDITY, STATUS_TEMPERATURE as TEMPERATURE, STATUS_INCLINOMETER_X as INCLINOMETER_X, STATUS_INCLINOMETER_Y as INCLINOMETER_Y, RAW_DATA from wrapper where data_type = 1</query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT,
+                STATUS_V12DC_IN as V12DC_IN, STATUS_HUMIDITY as HUMIDITY, STATUS_TEMPERATURE as TEMPERATURE,
+                cast(round((STATUS_INCLINOMETER_X / 32768.0) * 90.0, 3) as CHAR(30)) as INCLINOMETER_X,
+                cast(round((STATUS_INCLINOMETER_Y / 32768.0) * 90.0, 3) as CHAR(30)) as INCLINOMETER_Y,
+                RAW_DATA from wrapper where data_type = 1</query>
             </source>
             <query> select * from source </query>
         </stream>
