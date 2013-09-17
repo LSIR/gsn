@@ -1,0 +1,31 @@
+<virtual-sensor name="ETZ_IButton_Humidity__Measurements" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.permasense.IButtonDataParser</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="MISSION_ID" type="BIGINT" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="SAMPLE_NO" type="SMALLINT" />
+            <field name="MEASUREMENT" type="DOUBLE" unit="RH%" />
+          	    
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>iButton humidity measurements</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_IButton_Data__Upload</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where PAYLOAD_TYPE = 2</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

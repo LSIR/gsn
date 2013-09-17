@@ -1,0 +1,56 @@
+<virtual-sensor name="ETZ_IButton_Missions" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.permasense.IButtonDataParser</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="MISSION_ID" type="BIGINT" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="SESSION_NO" type="INTEGER" />
+            <field name="PROGRAMMING_TIME" type="BIGINT" unit="unixtime" />
+            <field name="COLLECTING_TIME_HOST" type="BIGINT" unit="unixtime" />
+            <field name="COLLECTING_TIME_BUTTON" type="BIGINT" unit="unixtime" />
+            <field name="NUM_SAMPLES" type="INTEGER" />
+            <field name="NUM_ROLLED_OVER" type="INTEGER" />
+            <field name="SAMPLING_RATE" type="INTEGER" />
+            <field name="SAMPLING_START_TIME" type="BIGINT" unit="unixtime" />
+            <field name="ENABLE_TEMP" type="SMALLINT" />
+            <field name="TEMP_HI_RES" type="SMALLINT" />
+            <field name="TEMP_USED_SW_CORR" type="SMALLINT" />
+            <field name="TEMP_COEFF_A" type="DOUBLE" />
+            <field name="TEMP_COEFF_B" type="DOUBLE" />
+            <field name="TEMP_COEFF_C" type="DOUBLE" />
+            <field name="ENABLE_HUMID" type="SMALLINT" />
+            <field name="HUMID_HI_RES" type="SMALLINT" />
+            <field name="HUMID_USED_SW_CORR" type="SMALLINT" />
+            <field name="HUMID_COEFF_A" type="DOUBLE" />
+            <field name="HUMID_COEFF_B" type="DOUBLE" />
+            <field name="HUMID_COEFF_C" type="DOUBLE" />
+            <field name="LON" type="DOUBLE" />
+            <field name="LAT" type="DOUBLE" />
+            <field name="ALT" type="DOUBLE" />
+            <field name="ACCURACY" type="DOUBLE" />
+            <field name="BUTTON_PREFIX" type="INTEGER" />
+            <field name="BUTTON_NO" type="INTEGER" />
+            <field name="SERIAL_NO" type="VARCHAR(23)" />
+            <field name="SYNC_TIME" type="BIGINT" unit="unixtime" />
+		    
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>iButton mission data</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_IButton_Data__Upload</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where PAYLOAD_TYPE = 0</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
