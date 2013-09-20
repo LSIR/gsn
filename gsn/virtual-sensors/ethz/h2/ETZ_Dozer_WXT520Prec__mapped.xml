@@ -26,7 +26,6 @@
             <field name="PAYLOAD_RU_HI" type="INTEGER" />
             <field name="PAYLOAD_RU_RP" type="INTEGER" />
             <field name="PAYLOAD_RU_HP" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWxt520PrecMsg) from ETZ deployment</description>

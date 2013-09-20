@@ -21,7 +21,6 @@
             <field name="GSN_TIME" type="BIGINT" unit="unixtime" />
             <field name="LATENCY" type="BIGINT" unit="ms" />
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show data latency from the OSTest deployment</description>

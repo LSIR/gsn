@@ -273,7 +273,6 @@
             <field name="RSSI_20" type="DOUBLE" unit="dBm" />
             <field name="FIELD_STRENGTH_20" type="DOUBLE" unit="V/m" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Wifi data from the OSTest deployment</description>

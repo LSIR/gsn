@@ -17,7 +17,6 @@
             <field name="STD_Y_RAW_DATA" type="DOUBLE" />
             <field name="STD_Z_RAW_DATA" type="DOUBLE" />
             <field name="MOVING_RAW_DATA" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>detect vehicle's motion from the OSTest deployment</description>

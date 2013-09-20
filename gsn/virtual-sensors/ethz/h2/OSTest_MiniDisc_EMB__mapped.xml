@@ -149,7 +149,6 @@
             <field name="SUPPLY" type="DOUBLE" unit="V" />
             <field name="STATUS" type="INTEGER"/>
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Minidisc data from the OSTest deployment</description>

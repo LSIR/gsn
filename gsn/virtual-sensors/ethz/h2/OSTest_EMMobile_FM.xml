@@ -45,7 +45,6 @@
 		        <field name="LATITUDE" type="DOUBLE" unit="N"/>
             <field name="LONGITUDE" type="DOUBLE" unit="E"/>
 		    
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Android EMMobile FM data from OSTest deployment</description>

@@ -25,7 +25,6 @@
 			<field name="STATUS_INCLINOMETER_Y" type="SMALLINT"/>
             <field name="RAW_DATA" type="binary"/>
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>GPS Logger parsed raw and status information from ETZ deployment</description>

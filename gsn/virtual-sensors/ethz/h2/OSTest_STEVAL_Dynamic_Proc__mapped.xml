@@ -82,7 +82,6 @@
             <field name="Zp_DATA10" type="DOUBLE" />
             <field name="Zp_FREQ10" type="DOUBLE" unit="Hz" />
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>STEVAL sensor reading from the OSTest deployment</description>

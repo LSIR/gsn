@@ -26,7 +26,6 @@
             <field name="SIGNAL_STRENGTH" type="SMALLINT" />
             <field name="LLI" type="SMALLINT" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>RAW GPS information from ETZ deployment</description>

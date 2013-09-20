@@ -55,7 +55,6 @@
             <field name="OFFSET_COMP" type="DOUBLE" unit="uA" />
             <field name="SENSITIVITY_COMP" type="DOUBLE" unit="%" />
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Alphasense sensor reading from the OSTest deployment</description>

@@ -23,7 +23,6 @@
             <field name="GEO_SEP_RAW_DATA" type="VARCHAR(32)" />
             <field name="GEO_SEP_U_RAW_DATA" type="VARCHAR(32)" />
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show Navigation GPS information from the OSTest deployment</description>

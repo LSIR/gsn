@@ -52,7 +52,6 @@
             
             <field name="LOG_MESSAGE" type="BINARY" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show syslog-ng information of the CoreStations from the ETZ deployment</description>

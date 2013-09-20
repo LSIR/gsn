@@ -48,7 +48,6 @@
             <field name="CACHE_HITS" type="INTEGER" />
             <field name="CACHE_MISSES" type="INTEGER" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Sensorviz cache statistics parsed</description>

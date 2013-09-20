@@ -24,7 +24,6 @@
             <field name="PAYLOAD_M3" type="BIGINT" />
             <field name="PAYLOAD_M4" type="BIGINT" />
             <field name="PAYLOAD_M5" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerEnviroScanDataMsg) from ETZ deployment</description>

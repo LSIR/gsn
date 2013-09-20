@@ -345,7 +345,6 @@
             <field name="RSSI_7" type="INTEGER" unit="dBm" />
             <field name="FIELD_STRENGTH_7" type="DOUBLE" unit="V/m" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>GSM data from the OSTest deployment</description>

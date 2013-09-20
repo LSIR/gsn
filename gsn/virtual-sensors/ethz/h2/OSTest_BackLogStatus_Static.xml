@@ -19,7 +19,6 @@
             <field name="PYTHON_BUILD_DATE" type="VARCHAR(255)" />
             <field name="LAST_CLEAN_SHUTDOWN" type="BIGINT" unit="unixtime" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show static status information of the BackLogs and send commands of the OSTest deployment</description>

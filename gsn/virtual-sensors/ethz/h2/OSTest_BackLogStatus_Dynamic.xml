@@ -70,7 +70,6 @@
             <field name="RUSAGE_MAJFLT" type="INTEGER" />
             <field name="RUSAGE_NVCSW" type="INTEGER" />
             <field name="RUSAGE_NIVCSW" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show dynamic status information of the BackLogs and send commands of the OSTest deployment</description>

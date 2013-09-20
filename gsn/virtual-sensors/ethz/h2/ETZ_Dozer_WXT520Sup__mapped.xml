@@ -22,7 +22,6 @@
             <field name="PAYLOAD_SU_VH" type="INTEGER" />
             <field name="PAYLOAD_SU_VS" type="INTEGER" />
             <field name="PAYLOAD_SU_VR" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWxt520SupMsg) from ETZ deployment</description>

@@ -46,7 +46,6 @@
             <field name="GEOID_HEIGHT" type="DOUBLE" unit="m"/>
             
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Only initial calibration of ozone sensor from the OSTest deployment</description>

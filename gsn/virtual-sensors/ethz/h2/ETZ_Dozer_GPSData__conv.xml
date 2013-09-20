@@ -91,7 +91,6 @@
       	    <field name="CARRIERPHASE" type="DOUBLE"/>
       	    <field name="PSEUDORANGE" type="DOUBLE"/>
 	        <field name="DOPPLER" type="DOUBLE"/>
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Converted Dozer messages (DozerGPSDataMsg) from ETZ deployment</description>

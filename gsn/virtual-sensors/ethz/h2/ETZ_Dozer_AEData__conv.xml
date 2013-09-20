@@ -41,7 +41,6 @@
             <field name="ENERGY" type="DOUBLE" unit="V²"/>
             <field name="POSTTRIGGER" type="INTEGER" />
             <field name="THRESHOLD" type="SMALLINT" unit="dB"/>
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerAEDataMsg) from ETZ deployment converted</description>

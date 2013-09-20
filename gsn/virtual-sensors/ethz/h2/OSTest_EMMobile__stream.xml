@@ -4,7 +4,6 @@
         <unique-timestamps>false</unique-timestamps>
         <output-structure>
             <field name="RAW_PACKET" type="BINARY"/>
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Incoming data from EMmobile Android application</description>

@@ -21,7 +21,6 @@
             <field name="GEO_SEP_U_RAW_DATA" type="VARCHAR(32)" />
            
             <field name="MINIDISC_RAW_DATA" type="VARCHAR(256)"/>
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Minidisc readings from the OSTest deployment</description>

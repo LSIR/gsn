@@ -68,7 +68,6 @@
             <field name="STD_Y" type="DOUBLE" />
             <field name="STD_Z" type="DOUBLE" />
             <field name="NUM_STOPPED" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show Navigation GPS information from the OSTest deployment</description>

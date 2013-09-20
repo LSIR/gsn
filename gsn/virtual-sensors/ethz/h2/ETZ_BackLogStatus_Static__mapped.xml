@@ -18,7 +18,6 @@
             <field name="PYTHON_BUILD_DATE" type="VARCHAR(255)" />
             <field name="LAST_CLEAN_SHUTDOWN" type="BIGINT" unit="unixtime" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>static status information of BackLog from ETZ deployment</description>

@@ -18,7 +18,6 @@
             <field name="HUMIDITY" type="INTEGER" unit="%"/>
             <field name="SENSOR_ID" type="INTEGER"/>
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>OZ-47 sensor reading from the OSTest deployment</description>

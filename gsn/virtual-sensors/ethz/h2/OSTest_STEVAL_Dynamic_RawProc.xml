@@ -71,7 +71,6 @@
             <field name="Zp_FREQ9" type="DOUBLE" />
             <field name="Zp_DATA10" type="DOUBLE" />
             <field name="Zp_FREQ10" type="DOUBLE" />           
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>STEVAL sensor reading from the OSTest deployment</description>

@@ -15,7 +15,6 @@
             <field name="PPM_AT_SPAN" type="DOUBLE" unit="ppm" />
             <field name="CURRENT_AT_SPAN" type="DOUBLE" unit="uA" />
             <field name="CALIBRATION_DATE" type="VARCHAR(16)" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Alphasense sensor reading from the OSTest deployment</description>

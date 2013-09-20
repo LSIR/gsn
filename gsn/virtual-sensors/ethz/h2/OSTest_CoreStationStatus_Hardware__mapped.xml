@@ -33,7 +33,6 @@
 			<field name="BAT_REM_TIME_DIFF" type="BIGINT" unit="min" />
 			<field name="V_BAT" type="INTEGER" unit="mV" />
 			<field name="I_V12DC_TOT" type="INTEGER" unit="mA" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>CoreStation hardware status from OSTest deployment</description>

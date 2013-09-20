@@ -20,7 +20,6 @@
             <field name="PROCESSOR" type="VARCHAR(255)" />
             <field name="DISTRIBUTION_NAME" type="VARCHAR(255)" />
             <field name="DISTRIBUTION_VERSION" type="VARCHAR(255)" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>CoreStation static status from ETZ deployment</description>

@@ -27,7 +27,6 @@
             <field name="PAYLOAD_SERIAL5" type="TINYINT" />
             <field name="PAYLOAD_SERIAL6" type="TINYINT" />
             <field name="PAYLOAD_SERIAL7" type="TINYINT" />            
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWxt520IdentMsg) from ETZ deployment</description>

@@ -12,7 +12,6 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="DEVICE_NAME" type="VARCHAR(256)"/>
             <field name="FIRMWARE_VERSION" type="VARCHAR(256)"/>
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>STEVAL sensor reading from the OSTest deployment</description>

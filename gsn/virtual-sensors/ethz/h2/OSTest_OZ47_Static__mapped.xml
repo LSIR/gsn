@@ -33,7 +33,6 @@
             <field name="CALIB_PARAM_X3_2" type="DOUBLE"/>
             <field name="CALIB_PARAM_KT_2" type="DOUBLE"/>
             <field name="SENSOR_ID" type="INTEGER"/>
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>OZ-47 sensor reading from the OSTest deployment</description>

@@ -119,7 +119,6 @@
             <field name="GEOID_SEP" type="DOUBLE" />
             <field name="GEOID_SEP_UNIT" type="VARCHAR(32)" />
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show Navigation GPS information from the OSTest deployment</description>

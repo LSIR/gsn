@@ -34,7 +34,6 @@
 			<field name="OUT_QUEUE_READY_COUNTER" type="BIGINT" />
 			<field name="OUT_QUEUE_READY_VOLUME" type="BIGINT" unit="bytes" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show statistics of the OSTest deployment</description>

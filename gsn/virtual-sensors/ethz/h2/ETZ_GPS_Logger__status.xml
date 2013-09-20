@@ -18,7 +18,6 @@
             <field name="INCLINOMETER_Y" type="VARCHAR(30)" unit="°" />
             <field name="RAW_DATA" type="BINARY"/>
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>GPS Logger status information from ETZ deployment</description>

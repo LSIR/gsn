@@ -35,7 +35,6 @@
 		    <field name="GPS_MISSING_SV" type="INTEGER"/>
             <field name="GPS_RAW_DATA" type="binary"/>
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>RAW GPS information from ETZ deployment</description>

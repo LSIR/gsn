@@ -22,7 +22,6 @@
             <field name="GEOID_HEIGHT" type="DOUBLE" />
             
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>STEVAL sensor reading combined with GPS information from the OSTest deployment</description>

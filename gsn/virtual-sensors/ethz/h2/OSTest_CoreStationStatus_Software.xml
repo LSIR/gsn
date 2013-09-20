@@ -159,7 +159,6 @@
             <field name="UPTIME" type="DOUBLE" unit="s" />
             <field name="IDLETIME" type="DOUBLE" unit="s" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show software status information of the CoreStations from the OSTest deployment</description>

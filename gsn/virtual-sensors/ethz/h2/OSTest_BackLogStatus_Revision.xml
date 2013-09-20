@@ -15,7 +15,6 @@
             <field name="FILE_REVISION" type="VARCHAR(255)" />
             <field name="FILE_MD5" type="VARCHAR(255)" />
 			
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>show file revision status information of the BackLogs and send commands of the OSTest deployment</description>

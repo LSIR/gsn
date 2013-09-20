@@ -31,7 +31,6 @@
 		    		<field name="CALIB_PARAM_0" type="DOUBLE" />
 		    		<field name="CALIB_PARAM_1" type="DOUBLE" />
 		    		
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>OZ47 instant calibration bin parameters for the OSTest deployment</description>

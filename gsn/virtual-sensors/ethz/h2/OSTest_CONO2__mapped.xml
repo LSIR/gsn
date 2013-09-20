@@ -12,7 +12,6 @@
             <field name="TEMPERATURE" type="DOUBLE" unit="C"/>
             <field name="HUMIDITY" type="INTEGER" unit="%"/>
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>CO and NO2 sensor readings from the OSTest deployment</description>

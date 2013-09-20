@@ -13,7 +13,6 @@
             <field name="MESSAGE_TYPE" type="SMALLINT"/>
             <field name="RAW_DATA" type="VARCHAR(512)"/>
             <field name="MEASUREMENT_ID" type="BIGINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Alphasense sensor reading from the OSTest deployment</description>
