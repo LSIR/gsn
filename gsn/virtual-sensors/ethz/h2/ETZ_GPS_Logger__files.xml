@@ -32,6 +32,7 @@
             <field name="SIZE_FILE3" type="BIGINT" unit="bytes"/>
             <field name="CONFIGURATION_DATA" type="binary" data-path-field="RELATIVE_FILE3" />
             
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>GPS Logger files from ETZ deployment</description>
