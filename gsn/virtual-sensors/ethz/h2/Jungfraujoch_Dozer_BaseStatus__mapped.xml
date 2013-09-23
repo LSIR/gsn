@@ -25,7 +25,6 @@
             <field name="PAYLOAD_PACKETSRECEIVED" type="INTEGER" />
             <field name="PAYLOAD_CHILDCOUNT" type="SMALLINT" />
             <field name="PAYLOAD_RSSI" type="SMALLINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerBaseStatusMsg) from Jungfraujoch deployment</description>

@@ -18,7 +18,6 @@
             <field name="RADIOTX_DUTYCYCLE" type="VARCHAR(30)" unit="%" />
             <field name="RADIORX_DUTYCYCLE" type="VARCHAR(30)" unit="%" />
             <field name="PAYLOAD_TRANSMISSIONFAILURES" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerStateCounterMsg) from Dirruhorn deployment converted</description>
@@ -40,7 +39,7 @@
                 cast(round(PAYLOAD_MCUACTIVE * 100.0 / PAYLOAD_PERIOD, 5) as CHAR(30)) as MCUACTIVE_DUTYCYCLE,
                 cast(round(PAYLOAD_RADIOTX * 100.0 / PAYLOAD_PERIOD, 5) as CHAR(30)) as RADIOTX_DUTYCYCLE, 
                 cast(round(PAYLOAD_RADIORX * 100.0 / PAYLOAD_PERIOD, 5) as CHAR(30)) as RADIORX_DUTYCYCLE, 
-                PAYLOAD_TRANSMISSIONFAILURES, DATA_IMPORT_SOURCE 
+                PAYLOAD_TRANSMISSIONFAILURES 
                 from wrapper </query>
             </source>
             <query> select * from source </query>

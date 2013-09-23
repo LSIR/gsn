@@ -16,7 +16,6 @@
 			<field name="GENERATED_STREAMS" type="INTEGER" />
 			<field name="UNPARSABLE_STREAMS" type="INTEGER" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>GPS Logger parsing status information from Dirruhorn deployment</description>

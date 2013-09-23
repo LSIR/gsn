@@ -22,7 +22,6 @@
             <field name="PAYLOAD_DRIFTPPM0" type="SMALLINT" />
             <field name="PAYLOAD_DRIFTPPM1" type="SMALLINT" />
             <field name="PAYLOAD_DRIFTPPM2" type="SMALLINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerDriftMsg) from Thur deployment</description>

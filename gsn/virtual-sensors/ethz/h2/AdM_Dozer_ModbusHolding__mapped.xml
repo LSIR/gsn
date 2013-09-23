@@ -26,7 +26,6 @@
             <field name="PAYLOAD_HOLDING_REGISTER6" type="INTEGER" />
             <field name="PAYLOAD_HOLDING_REGISTER7" type="INTEGER" />
             <field name="PAYLOAD_HOLDING_REGISTER8" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerModbusHoldingMsg) from AdM deployment</description>

@@ -20,7 +20,6 @@
             <field name="FETCH_AVG" type="INTEGER" unit="ms"/>
             <field name="QUERY_USAGE" type="SMALLINT" unit="‰" />
             <field name="FETCH_USAGE" type="SMALLINT" unit="‰" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Statistics about MySQL usage</description>

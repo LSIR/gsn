@@ -27,7 +27,6 @@
             <field name="PAYLOAD_DCX_FLOATVALUE1" type="DOUBLE" />
             <field name="PAYLOAD_DCX_FLOATVALUE2" type="DOUBLE" />
             <field name="PAYLOAD_DCX_FLOATVALUE3" type="DOUBLE" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerDigitalDCXMsg) from Jungfraujoch deployment</description>

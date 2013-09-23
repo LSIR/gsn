@@ -25,7 +25,6 @@
             <field name="BATCH_DOWNLOAD" type="SMALLINT" />
             <field name="GPHOTO2_CONFIG" type="BINARY" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Show CamZilla information of the CoreStations from the Dirruhorn deployment</description>

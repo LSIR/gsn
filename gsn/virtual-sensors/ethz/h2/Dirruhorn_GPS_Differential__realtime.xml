@@ -118,7 +118,6 @@
             <field name="GPS_WEEK" type="SMALLINT" />
             <field name="GPS_TIME" type="INTEGER" unit="sec"/>
 
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Parsed differential GPS data from real-time processing from Dirruhorn deployment</description>

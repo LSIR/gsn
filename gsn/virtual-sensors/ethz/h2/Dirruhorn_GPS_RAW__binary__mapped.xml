@@ -70,7 +70,6 @@
 		    <field name="GPS_MISSING_SV" type="INTEGER"/>
             <field name="GPS_RAW_DATA" type="binary"/>
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>GPS RAW data in UBX binary format from Dirruhorn deployment</description>

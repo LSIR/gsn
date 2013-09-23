@@ -39,7 +39,6 @@
             <field name="I55VDIGITAL" type="INTEGER" />
             <field name="SDEVENTSFREE" type="BIGINT" />
             <field name="DAQPOWERSTATE" type="SMALLINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerAEDAQHealthDataMsg) from Jungfraujoch deployment converted</description>

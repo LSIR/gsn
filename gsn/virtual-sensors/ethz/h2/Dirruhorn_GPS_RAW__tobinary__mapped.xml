@@ -21,7 +21,6 @@
 		    <field name="OLD_DATA_BUFFER_SIZE" type="INTEGER"/>
 		    <field name="TOTAL_NUMBER_OF_BUFFERS" type="INTEGER"/>
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>back converted GPS RAW messages from Dirruhorn deployment</description>

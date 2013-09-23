@@ -25,7 +25,6 @@
             <field name="SIGNAL_STRENGTH" type="SMALLINT" />
             <field name="LLI" type="SMALLINT" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>GPS RAW data displayed in ASCII and per satellite from Dirruhorn deployment</description>
@@ -50,7 +49,7 @@
                     <predicate key="query">select * from Dirruhorn_Dozer_GPSData__conv</predicate>
                    <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, payload_timeofweekms as GPS_TIME, payload_vehiclenum as SPACE_VEHICLE, payload_measindicator as MEASUREMENT_QUALITY, payload_losslockindicator as LLI, carrierphase as CARRIER_PHASE, pseudorange as PSEUDO_RANGE, doppler as DOPPLER, payload_weeknumber as GPS_WEEK, payload_signalstrength as SIGNAL_STRENGTH, DATA_IMPORT_SOURCE from wrapper</query>
+                <query> select timed, timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, payload_timeofweekms as GPS_TIME, payload_vehiclenum as SPACE_VEHICLE, payload_measindicator as MEASUREMENT_QUALITY, payload_losslockindicator as LLI, carrierphase as CARRIER_PHASE, pseudorange as PSEUDO_RANGE, doppler as DOPPLER, payload_weeknumber as GPS_WEEK, payload_signalstrength as SIGNAL_STRENGTH from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>

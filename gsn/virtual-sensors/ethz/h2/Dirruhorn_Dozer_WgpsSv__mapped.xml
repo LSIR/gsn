@@ -36,7 +36,6 @@
             <field name="PAYLOAD_MEASUREMENT_QUALITY" type="TINYINT" />
             <field name="PAYLOAD_SIGNAL_STRENGTH" type="TINYINT" />
             <field name="PAYLOAD_LOSS_OF_LOCK" type="TINYINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWgpsSvMsg) from Dirruhorn deployment</description>

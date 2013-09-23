@@ -37,7 +37,6 @@
 			<field name="HIGH_POWER_MEASUREMENT" type="SMALLINT" />
 			<field name="ANTENNA_SERIAL" type="VARCHAR(32)" />
 			
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>GPS Logger parsed configuration information from Dirruhorn deployment</description>

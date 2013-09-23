@@ -31,7 +31,6 @@
             <field name="PAYLOAD_SERIAL9" type="TINYINT" />            
             <field name="PAYLOAD_SERIAL10" type="TINYINT" />            
             <field name="PAYLOAD_SERIAL11" type="TINYINT" />            
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerEnviroScanIdentMsg) from Jungfraujoch deployment</description>

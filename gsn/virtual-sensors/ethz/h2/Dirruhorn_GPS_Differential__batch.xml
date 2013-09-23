@@ -208,7 +208,6 @@
             <field name="MIN_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="MAX_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Parsed differential GPS data from batch processing from Dirruhorn deployment</description>

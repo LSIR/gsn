@@ -28,7 +28,6 @@
             <field name="PAYLOAD_INCLINOMETER_Y" type="INTEGER" />
             <field name="PAYLOAD_SAM7_UNIXTIME" type="BIGINT" />
             <field name="PAYLOAD_GPS_SV_QUEUE" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWgpsStatusMsg) from Dirruhorn deployment</description>

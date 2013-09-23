@@ -27,7 +27,6 @@
             <field name="PAYLOAD_RSSI_RSSI4" type="SMALLINT" />
             <field name="PAYLOAD_RSSI_RSSI5" type="SMALLINT" />
             <field name="PAYLOAD_RSSI_RSSI6" type="SMALLINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerRssiMsg) from Jungfraujoch deployment</description>

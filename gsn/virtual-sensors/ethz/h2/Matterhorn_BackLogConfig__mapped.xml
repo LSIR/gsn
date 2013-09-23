@@ -10,7 +10,6 @@
 			<field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="MESSAGE" type="VARCHAR(256)" />
 			<field name="CONFIGURATION" type="binary" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
        	</output-structure>
     </processing-class>
     <description>BackLog configuration for Matterhorn deployment</description>

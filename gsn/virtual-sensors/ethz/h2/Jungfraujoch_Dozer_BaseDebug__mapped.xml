@@ -17,7 +17,6 @@
             <field name="PAYLOAD_RADIOSLEEP" type="BIGINT" />
             <field name="PAYLOAD_RADIOUP" type="BIGINT" />
             <field name="PAYLOAD_QUEUE" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerBaseDebugMsg) from Jungfraujoch deployment</description>

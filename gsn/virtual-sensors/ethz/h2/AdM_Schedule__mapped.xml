@@ -12,7 +12,6 @@
 			<field name="TRANSMISSION_TIME" type="BIGINT" unit="unixtime" />
 			<field name="GENERATED_BY" type="VARCHAR(256)" />
 			<field name="SCHEDULE" type="binary" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
        	</output-structure>
     </processing-class>
     <description>schedules for AdM deployment</description>

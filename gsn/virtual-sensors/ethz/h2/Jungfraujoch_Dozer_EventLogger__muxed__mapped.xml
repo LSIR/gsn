@@ -44,7 +44,6 @@
             <field name="PAYLOAD_EVENTLOG_VALUE4" type="INTEGER" />
             <field name="PAYLOAD_EVENTLOG_VALUE5" type="INTEGER" />
             <field name="PAYLOAD_EVENTLOG_VALUE6" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerEventLogMsg) from Jungfraujoch deployment</description>

@@ -35,7 +35,6 @@
             <field name="PROGRAM" type="VARCHAR(256)" />
             <field name="MESSAGE" type="BINARY" />
             
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>parsed syslog-ng messages from Dirruhorn deployment</description>

@@ -22,7 +22,6 @@
             <field name="PAYLOAD_ENERGY" type="BIGINT" />
             <field name="PAYLOAD_POSTTRIGGER" type="INTEGER" />
             <field name="PAYLOAD_THRESHOLDCHANNEL" type="SMALLINT" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerAEDataMsg) from Jungfraujoch deployment</description>

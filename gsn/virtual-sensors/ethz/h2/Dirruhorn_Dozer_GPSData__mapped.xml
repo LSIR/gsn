@@ -39,7 +39,6 @@
 	        <field name="PAYLOAD_MEASINDICATOR" type="TINYINT"/>
       	    <field name="PAYLOAD_SIGNALSTRENGTH" type="SMALLINT"/>
       	    <field name="PAYLOAD_LOSSLOCKINDICATOR" type="TINYINT"/>
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerGPSDataMsg) from Dirruhorn deployment</description>

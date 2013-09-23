@@ -24,7 +24,6 @@
             <field name="PAYLOAD_T4" type="INTEGER" />
             <field name="PAYLOAD_T5" type="INTEGER" />
             <field name="PAYLOAD_T6" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerTh3TempMsg) from Jungfraujoch deployment</description>

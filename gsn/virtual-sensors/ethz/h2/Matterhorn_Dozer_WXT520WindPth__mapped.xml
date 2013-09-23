@@ -28,7 +28,6 @@
             <field name="PAYLOAD_TU_TP" type="INTEGER" />
             <field name="PAYLOAD_TU_UA" type="INTEGER" />
             <field name="PAYLOAD_TU_PA" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerWxt520WindPthMsg) from Matterhorn deployment</description>

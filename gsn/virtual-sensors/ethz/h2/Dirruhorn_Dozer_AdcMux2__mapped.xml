@@ -28,7 +28,6 @@
             <field name="PAYLOAD_A0_18" type="INTEGER" />
             <field name="PAYLOAD_A0_19" type="INTEGER" />
             <field name="PAYLOAD_A0_20" type="INTEGER" />
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>dozer messages (DozerAdcMux2Msg) from Dirruhorn deployment</description>

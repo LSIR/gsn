@@ -77,7 +77,6 @@
             <field name="THERMISTOR_13" type="DOUBLE" unit="°C"/>
             <field name="THERMISTOR_14" type="DOUBLE" unit="°C"/>
             <field name="THERMISTOR_15" type="DOUBLE" unit="°C"/>
-            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>CR1000 data from AdM deployment</description>
