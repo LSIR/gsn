@@ -80,6 +80,7 @@ ETZ_GPS_RAW__binary.xml
 ETZ_GPS_RAW__conv.xml
 ETZ_GPS_RAW__mapped.xml
 ETZ_GPS_RAW__tobinary__mapped.xml
+ETZ_Mapping_Chart.xml
 ETZ_Mapping_Geo.xml
 ETZ_Mapping_Position.xml
 ETZ_Mapping_Sensor.xml

@@ -92,6 +92,7 @@
             <arg value="conf/containerJIBX.xml"/>
             <arg value="conf/VirtualSensorDescription.xml"/>
             <arg value="conf/NetworkTopology.xml"/>
+            <arg value="conf/DeviceMappings.xml"/>
         </java>
     </target>
 

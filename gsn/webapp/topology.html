@@ -30,8 +30,12 @@ var selected_deployment;
 var ACTIVE_TIMEOUT_MS = 2000;
 var STANDBY_TIMEOUT_MS = 300000;
 
+var MAPPING_BAR_HEIGHT = 18;
+var MAPPING_BAR_SPACER = 5;
+
 var rssi_dist = 25;
 var topologyUpdateTimer;
+var mappingUpdateTimer;
 var unmarkTimer;
 var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520", "th3","enviroscan", "powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
 var healthitems=new Array("packet_count", "vsys", "vsdi", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
@@ -99,7 +103,7 @@ function PacketRate() {
     return false;
   }
 
-  function updateGraph(network) {
+  function updateTopologyGraph(network) {
     var topoloy_change=false;
     var oldlinks = current_deployment.links;
     current_deployment.links = new Array();
@@ -110,7 +114,7 @@ function PacketRate() {
       var id = $(this).attr("node_id");
       var index = nodeindex(id);
       if (index < 0) {
-        current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true, nodetype: $(this).attr("nodetype"), corestation_running: $(this).attr("corestation_running") });
+        current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true, nodetype: $(this).attr("nodetype"), iscorestation: $(this).attr("iscorestation") == "true", corestation_running: $(this).attr("corestation_running") });
         topoloy_change = true;
       }
       else {
@@ -498,7 +502,7 @@ function PacketRate() {
         success: function(data){
           updateConfigTable($("sensornodes",data), $("network", data).attr("configurable")=="true");
           updateHealthTable($("sensornodes",data));
-          updateGraph($("sensornodes",data));
+          updateTopologyGraph($("sensornodes",data));
           updateStatusBar($("sensornodes",data));
           current_deployment.isUpdating = false;
           current_deployment = selected_deployment;
@@ -511,6 +515,138 @@ function PacketRate() {
         }
       });    
     }
+  }
+
+  function fetchMappingInfo() {
+     $.ajax({
+       type: "GET",
+       url: "/field?vs="+current_deployment.name+"_mapping_chart&field=DATA&pk=latest",
+       dataType: "xml",
+       success: function(data){
+    	 updatePositionMappingGraph(parseInt($("deviceMappings", data).attr("positionTimeMin")), $("positionTimeTicks",data), $("positionMappings",data));
+         mappingUpdateTimer = setTimeout("fetchMappingInfo()",5000);
+       },
+       error : function(XMLHttpRequest, textStatus, errorThrown) {
+         mappingUpdateTimer = setTimeout("fetchMappingInfo()",10000);
+       }
+     });
+  }
+
+  function updatePositionMappingGraph(positionTimeMin, positionTimeTicks, positionMaps) {
+	  var now = new Date().getTime();
+	  var map = new Array();
+	  $("positionContainer", positionMaps).each(function() {
+		  var devices = new Array();
+		  $("positionMap", this).each(function() {
+			  devices.push([parseInt($(this).attr("device_id")), parseInt($(this).attr("begin")), parseInt($(this).attr("end"))])
+		  });
+		  map.push([parseInt($(this).attr("position")), devices]);
+	  });
+	  
+	  positionTimeMax = now+2592000000;
+	  map = map.sort(sortMappingArray);
+
+	  /* console.log(positionTimeMin, positionTimeMax, positionTimeTicks, positionMaps);
+	  console.log(map); */
+      
+      if (!compareArrays(map, current_deployment.mappings)) {
+	      current_deployment.mappings = map;
+
+    	  current_deployment.mappingvis.height(map.length * (MAPPING_BAR_HEIGHT+MAPPING_BAR_SPACER));
+
+		  if (map.length > current_deployment.bars.length) {
+			  var l = current_deployment.bars.length;
+			  for (var j = 0; j < map.length-l; j++) {
+				  var bar = current_deployment.mappingvis.add(pv.Bar);
+				  bar.height(MAPPING_BAR_HEIGHT)
+				    .fillStyle("#B4C5F1")
+				    .strokeStyle("#599CE0")
+				    .anchor("center").add(pv.Label)
+				      .text(function(d)  d[0]);
+
+				  current_deployment.bars.push(bar);
+			  }
+		  }
+
+	      for (var j = 0; j < current_deployment.bars.length; j++) {
+	    	  if (j < map.length)
+	    	  	current_deployment.bars[j].data(map[j][1])
+			      .width(function(d) {
+			    	  var d2;
+			    	  if (isNaN(d[2]) || d[2] > now+2592000000)
+			    		  d2 = now+2592000000;
+			    	  else
+			    		  d2 = d[2];
+			    	  return (((d2-positionTimeMin) - (d[1]-positionTimeMin))/(positionTimeMax-positionTimeMin))*920;
+			      })
+			      .left(function(d) ((d[1]-positionTimeMin)/(positionTimeMax-positionTimeMin))*920)
+			      .top(j *(MAPPING_BAR_HEIGHT+MAPPING_BAR_SPACER));
+	    	  else
+	    		  current_deployment.bars[j].data([]);
+	      }
+	      
+	    var ticks = new Array();
+	    $("timeTicks", positionTimeTicks).each(function() {
+	    	ticks.push(parseInt($(this).attr("tick")));
+	    });
+	
+		current_deployment.xTicks.left(function(d) ((d-positionTimeMin)/(positionTimeMax-positionTimeMin))*920).data(ticks.reverse());
+		
+		current_deployment.yTicks.data(map);
+
+		console.log("yeah");
+			
+      }
+	
+      current_deployment.now.left(function(d) ((d-positionTimeMin)/(positionTimeMax-positionTimeMin))*920).data([now]);
+      current_deployment.mappingvis.render();
+  }
+  
+  function sortTicksArray(array1, array2){
+	 if (array1[0] < array2[0])
+		 return -1;
+	 else if (array1[0] > array2[0])
+		 return 1;
+	 else
+		 return 0;
+  }
+  
+  function sortMappingArray(array1, array2){
+	 if (array1[0] < array2[0])
+		 return -1;
+	 else if (array1[0] > array2[0])
+		 return 1;
+	 else
+		 return 0;
+  }
+
+  function compareArrays(array1, array2) {
+      if (!array2)
+          return false;
+
+      if (array1.length != array2.length)
+          return false;
+
+      for (var i = 0; i < array1.length; i++) {
+          if (array1[i] instanceof Array && array2[i] instanceof Array) {
+              if (!compareArrays(array1[i], array2[i]))
+                  return false;
+          }
+          else if ((array1[i] != array2[i]) && !(isNaN(array1[i]) && isNaN(array2[i]))) {
+              return false;
+          }
+      }
+      return true;
+  }
+
+  function generateDateString(d) {
+  	var day = d.getDate();
+  	if (day < 10) day = "0" + day;
+  	var month = d.getMonth()+1;
+  	if (month < 10) month = "0" + month;
+  	var hours = d.getHours();
+  	if (hours < 10) hours = "0" + hours;
+  	return day + "." + month + "." + d.getFullYear();
   }
 
 $(document).ready(function() {
@@ -567,14 +703,17 @@ $(document).ready(function() {
         $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
             "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
             "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
-            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
-            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
+            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div><div class=\"mappinggraph\" style=\"display:none\"></div>"+
+            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li><li><a class =\"mappingtab\" href=\"\">Mapping</a></li></ul></div>");
         //$("#topology_"+deployments[i]+" .nodeinfo").show();
         $("#topology_"+deployments[i]+" .nodeinfo img").bind("click", function() { $(this).parent().parent().hide();});
         if (deployments[i]!=visible)
           $("#topology_"+deployments[i]).hide();
         else
           $("#deployment_menu_item_"+deployments[i]).addClass("selected");
+        
+        $($(".mappinggraph", "#topology_"+deployments[i])[0]).append("<div id=\"mapping_graph_"+deployments[i]+"\"></div>");
+        
         // add graph
         deployment_data.push({
           name : deployments[i],
@@ -587,8 +726,47 @@ $(document).ready(function() {
             .width(700)
             .height(300)
             .fillStyle("white")
-            .canvas("topology_graph_"+deployments[i])
+            .canvas("topology_graph_"+deployments[i]),
+          mappingvis: new pv.Panel()
+            .fillStyle("white")
+            .top(12)
+            .bottom(20)
+            .left(30)
+            .canvas("mapping_graph_"+deployments[i]),
+          xTicks : undefined,
+          yTicks : undefined,
+          now : undefined,
+          bars : new Array(),
+          mappings : new Array()
         });
+
+        deployment_data[deployment_data.length-1].now = deployment_data[deployment_data.length-1].mappingvis.add(pv.Rule);
+        deployment_data[deployment_data.length-1].now
+		    .top(-3)
+	  	    .strokeStyle("rgba(255,0,0,1)")
+	  	  .anchor("top").add(pv.Label)
+	  	  	.textStyle("#F00")
+		    .text("now");
+
+        deployment_data[deployment_data.length-1].xTicks = deployment_data[deployment_data.length-1].mappingvis.add(pv.Rule);
+        deployment_data[deployment_data.length-1].xTicks
+		    .bottom(0)
+		    .height(5)
+	  	    .strokeStyle("#000")
+	  	  .anchor("bottom").add(pv.Label)
+		    .text(function(d) generateDateString(new Date(d)));
+
+        deployment_data[deployment_data.length-1].yTicks = deployment_data[deployment_data.length-1].mappingvis.add(pv.Bar);
+        deployment_data[deployment_data.length-1].yTicks
+    	    .height(MAPPING_BAR_HEIGHT)
+    	    .top(function(d) this.index * (MAPPING_BAR_HEIGHT + MAPPING_BAR_SPACER))
+    	    .width(0)
+    	    .left(-5)
+    	  .anchor("left").add(pv.Label)
+    	    .textMargin(5)
+    	    .textAlign("right")
+    	    .text(function(d) d[0]);
+        
         deployment_data[deployment_data.length-1].force =
           deployment_data[deployment_data.length-1].vis
             .add(pv.Layout.Force)
@@ -632,7 +810,7 @@ $(document).ready(function() {
         deployment_data[deployment_data.length-1].node =
           deployment_data[deployment_data.length-1].force
             .node.add(pv.Dot)
-            .shape(function(d) {return d.nodetype==3 || d.nodetype==1?"square":"circle"; })
+            .shape(function(d) { return d.iscorestation?"square":"circle"; })
             .shapeSize(function(d) {return 230;})
             .fillStyle(function(d) {
               var now=new Date().getTime();
@@ -644,7 +822,7 @@ $(document).ready(function() {
                 return d.selected?"#d0fff0":"#a0ffa0";
             })
             .strokeStyle(function() {return this.fillStyle().darker()})
-            .lineWidth(function(d) { return d.nodetype==1?5:(d.corestation_running=="true"?5:1); })
+            .lineWidth(function(d) { return d.corestation_running=="true"?5:1; })
             .event("mouseover", function(d) {d.selected = true;this.render()})
             .event("mouseout", function(d) {d.selected = false;this.render()})
             .event("click", function(d) {
@@ -771,17 +949,34 @@ $(document).ready(function() {
           var thiscontainer = $(this).parent().parent().parent();
           thiscontainer.find(".configtable").show();
           thiscontainer.find(".healthtable").hide();
+          thiscontainer.find(".mappinggraph").hide();
           $(this).addClass("active");
           thiscontainer.find(".healthtab").removeClass("active");
+          thiscontainer.find(".mappingtab").removeClass("active");
+          clearTimeout(mappingUpdateTimer);
           return false;
         });
         $("#topology_"+deployments[i]).find(".healthtab").click(function() { 
           var thiscontainer = $(this).parent().parent().parent();
           thiscontainer.find(".healthtable").show();
           thiscontainer.find(".configtable").hide();
+          thiscontainer.find(".mappinggraph").hide();
           $(this).addClass("active");
           thiscontainer.find(".configtab").removeClass("active");
+          thiscontainer.find(".mappingtab").removeClass("active");
+          clearTimeout(mappingUpdateTimer);
           resetconfigurations(false);
+          return false;
+        });
+        $("#topology_"+deployments[i]).find(".mappingtab").click(function() { 
+          var thiscontainer = $(this).parent().parent().parent();
+          thiscontainer.find(".mappinggraph").show();
+          thiscontainer.find(".configtable").hide();
+          thiscontainer.find(".healthtable").hide();
+          $(this).addClass("active");
+          thiscontainer.find(".healthtab").removeClass("active");
+          thiscontainer.find(".configtab").removeClass("active");
+          mappingUpdateTimer = setTimeout("fetchMappingInfo()",200);
           return false;
         });
       }
@@ -804,6 +999,7 @@ function showTopology(id) {
     current_deployment = selected_deployment;
     clearTimeout(topologyUpdateTimer); 
     topologyUpdateTimer = setTimeout("fetchTopologyInfo()",100);
+    clearTimeout(mappingUpdateTimer);
   }
 }
 //]]>-->

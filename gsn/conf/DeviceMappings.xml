@@ -1,0 +1,54 @@
+<binding>
+    <mapping name="deviceMappings" class="gsn.beans.DeviceMappings">
+  	   <value name="positionTimeMin" field="positionTimeMin" style="attribute" usage="optional"/>
+  	   <value name="positionTimeMax" field="positionTimeMax" style="attribute" usage="optional"/>
+       <collection name="positionTimeTicks" field="positionTimeTicks"  item-type="gsn.beans.TimeTick" />
+       
+  	   <value name="sensorTimeMin" field="sensorTimeMin" style="attribute" usage="optional"/>
+  	   <value name="sensorTimeMax" field="sensorTimeMax" style="attribute" usage="optional"/>
+       <collection name="sensorTimeTicks" field="sensorTimeTicks"  item-type="gsn.beans.TimeTick" />
+       
+       <collection name="positionMappings" field="positionMappings"  item-type="gsn.beans.PositionMappings" />
+       <collection name="sensorMappings" field="sensorMappings"  item-type="gsn.beans.SensorMappings" />
+       <collection name="geoMappings" field="geoMappings"  item-type="gsn.beans.GeoMapping" />
+   </mapping>
+
+   <mapping name="timeTicks" class="gsn.beans.TimeTick" >   
+  	   <value name="tick" field="tick" style="attribute"/>
+   </mapping>
+
+   <mapping name="positionContainer" class="gsn.beans.PositionMappings" >   
+  	   <value name="position" field="position" style="attribute"/>
+  	   
+  	   <collection name="mappings" field="mappings" item-type="gsn.beans.PositionMap" />
+   </mapping>
+   
+   <mapping name="positionMap" class="gsn.beans.PositionMap" >
+  	   <value name="device_id" field="device_id" style="attribute"/>
+  	   <value name="begin" field="begin" style="attribute" usage="optional"/>
+  	   <value name="end" field="end" style="attribute" usage="optional"/>
+  	   <value name="comment" field="comment" style="attribute" usage="optional"/>
+   </mapping>
+
+   <mapping name="sensorContainer" class="gsn.beans.SensorMappings" >   
+  	   <value name="position" field="position" style="attribute"/>
+  	   
+  	   <collection name="mappings" field="mappings" item-type="gsn.beans.SensorMap" />
+   </mapping>
+   
+   <mapping name="sensorMap" class="gsn.beans.SensorMap" >
+  	   <value name="begin" field="begin" style="attribute" usage="optional"/>
+  	   <value name="end" field="end" style="attribute" usage="optional"/>
+  	   <value name="sensortype" field="sensortype" style="attribute"/>
+  	   <value name="sensortype_args" field="sensortype_args" style="attribute"/>
+  	   <value name="comment" field="comment" style="attribute" usage="optional"/>
+   </mapping>
+   
+   <mapping name="geoMappings" class="gsn.beans.GeoMapping" >
+  	   <value name="position" field="position" style="attribute"/>
+  	   <value name="longitude" field="longitude" style="attribute"/>
+  	   <value name="latitude" field="latitude" style="attribute"/>
+  	   <value name="altitude" field="altitude" style="attribute"/>
+  	   <value name="comment" field="comment" style="attribute" usage="optional"/>
+   </mapping>
+</binding>
