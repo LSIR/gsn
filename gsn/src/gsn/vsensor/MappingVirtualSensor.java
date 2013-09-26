@@ -69,13 +69,13 @@ public class MappingVirtualSensor extends BridgeVirtualSensorPermasense {
 		}
 		
 		try {
-			generateData();
+			generateData(data.getTimeStamp());
 		} catch (Exception e) {
 			logger.error(data.toString(), e);
 		}
 	}
 
-	synchronized void generateData() {
+	synchronized void generateData(Long timestamp) {
 		DeviceMappings map = new DeviceMappings(new ArrayList<PositionMappings>(positionMappings.values()), new ArrayList<SensorMappings>(sensorMappings.values()), geoMappings);
 		
 		try {
@@ -83,7 +83,7 @@ public class MappingVirtualSensor extends BridgeVirtualSensorPermasense {
 			IMarshallingContext mctx = bfact.createMarshallingContext();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			mctx.marshalDocument(map, "UTF-8", null, baos);
-			StreamElement se = new StreamElement(getVirtualSensorConfiguration().getOutputStructure(),  new Serializable[]{baos.toString().getBytes()});
+			StreamElement se = new StreamElement(getVirtualSensorConfiguration().getOutputStructure(),  new Serializable[]{baos.toString().getBytes()}, timestamp);
 			dataProduced( se );
 		} catch (JiBXException e) {
 			e.printStackTrace();
