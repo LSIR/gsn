@@ -1,6 +1,8 @@
 package gsn.vsensor;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -11,15 +13,20 @@ import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IMarshallingContext;
+import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
+import gsn.Main;
 import gsn.beans.DeviceMappings;
+import gsn.beans.NetworkTopology;
 import gsn.beans.SensorMappings;
 import gsn.beans.GeoMapping;
 import gsn.beans.PositionMap;
 import gsn.beans.PositionMappings;
 import gsn.beans.SensorMap;
+import gsn.beans.SensorNode;
 import gsn.beans.StreamElement;
+import gsn.storage.DataEnumerator;
 
 public class MappingVirtualSensor extends BridgeVirtualSensorPermasense {
 
@@ -34,6 +41,45 @@ public class MappingVirtualSensor extends BridgeVirtualSensorPermasense {
 		positionMappings = new Hashtable<Integer, PositionMappings>();
 		sensorMappings = new Hashtable<Integer, SensorMappings>();
 		geoMappings = new ArrayList<GeoMapping>();
+		
+		// load last available mapping information
+		String virtual_sensor_name = getVirtualSensorConfiguration().getName();
+		StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append(" where timed = (select max(timed) from " ).append(virtual_sensor_name).append(") order by PK desc limit 1");
+		ArrayList<StreamElement> latestvalues=new ArrayList<StreamElement>() ;
+		try {
+	      DataEnumerator result = Main.getStorage(virtual_sensor_name).executeQuery( query , false );
+	      while ( result.hasMoreElements( ) ) 
+	    	  latestvalues.add(result.nextElement());
+	    } catch (SQLException e) {
+	      logger.error("ERROR IN EXECUTING, query: "+query);
+	      logger.error(e.getMessage(),e);
+	    }
+	    if (latestvalues.size()>0) {
+	    	IBindingFactory bfact;
+			try {
+				Serializable s = latestvalues.get(latestvalues.size()-1).getData()[0];
+				if (s instanceof byte[]) {
+					bfact = BindingDirectory.getFactory(DeviceMappings.class);
+					IUnmarshallingContext uctx = bfact.createUnmarshallingContext();		
+					DeviceMappings lastMapping = (DeviceMappings) uctx.unmarshalDocument(new ByteArrayInputStream((byte[])s), "UTF-8");
+					for (PositionMappings posMap: lastMapping.positionMappings)
+						positionMappings.put(posMap.position, posMap);
+					for (SensorMappings sensorMap: lastMapping.sensorMappings)
+						sensorMappings.put(sensorMap.position, sensorMap);
+					for (GeoMapping geoMap: lastMapping.geoMappings)
+						geoMappings.add(geoMap);
+					logger.info("successfully imported last mappings.");
+				}
+				else {
+					logger.warn("data type was "+s.getClass().getCanonicalName());
+				}
+			} catch (JiBXException e) {
+				logger.error("unmarshall did fail: "+e);
+			}
+	    }
+	    else {
+	    	logger.info("no old mappings found.");
+	    }
 		
 		return true;
 	}
