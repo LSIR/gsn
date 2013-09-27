@@ -557,7 +557,7 @@ function PacketRate() {
 		  if (map.length > current_deployment.bars.length) {
 			  var l = current_deployment.bars.length;
 			  for (var j = 0; j < map.length-l; j++) {
-				  var bar = current_deployment.mappingvis.add(pv.Bar);
+				  var bar = current_deployment.barPanel.add(pv.Bar);
 				  bar.height(MAPPING_BAR_HEIGHT)
 				    .fillStyle("#B4C5F1")
 				    .strokeStyle("#599CE0")
@@ -730,16 +730,20 @@ $(document).ready(function() {
             .bottom(20)
             .left(30)
             .canvas("mapping_graph_"+deployments[i]),
+          barPanel : undefined,
           xTicks : undefined,
           yTicks : undefined,
           now : undefined,
           bars : new Array(),
           mappings : new Array()
         });
+        
+        deployment_data[deployment_data.length-1].barPanel = deployment_data[deployment_data.length-1].mappingvis.add(pv.Panel);
 
         deployment_data[deployment_data.length-1].now = deployment_data[deployment_data.length-1].mappingvis.add(pv.Rule);
         deployment_data[deployment_data.length-1].now
 		    .top(-3)
+		    .bottom(5)
 	  	    .strokeStyle("rgba(255,0,0,1)")
 	  	  .anchor("top").add(pv.Label)
 	  	  	.textStyle("#F00")
