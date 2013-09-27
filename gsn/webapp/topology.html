@@ -525,7 +525,7 @@ function PacketRate() {
        url: "/field?vs="+current_deployment.name+"_mapping_chart&field=DATA&pk=latest",
        dataType: "xml",
        success: function(data){
-    	 updatePositionMappingGraph(parseInt($("deviceMappings", data).attr("positionTimeMin")), $("positionTimeTicks",data), $("positionMappings",data));
+    	 updatePositionMappingGraph(parseInt($("deviceMappings", data).attr("positionTimeMin")), $("positionMappings",data));
          current_deployment.isMappingUpdating = false;
          mappingUpdateTimer = setTimeout("fetchMappingInfo()",5000);
        },
@@ -537,7 +537,7 @@ function PacketRate() {
 	}
   }
 
-  function updatePositionMappingGraph(positionTimeMin, positionTimeTicks, positionMaps) {
+  function updatePositionMappingGraph(positionTimeMin, positionMaps) {
 	  var now = new Date().getTime();
 	  var map = new Array();
 	  $("positionContainer", positionMaps).each(function() {
@@ -551,7 +551,7 @@ function PacketRate() {
 	  positionTimeMax = now+2592000000;
 	  map = map.sort(sortMappingArray);
 
-	  /* console.log(positionTimeMin, positionTimeMax, positionTimeTicks, positionMaps);
+	  /* console.log(positionTimeMin, positionTimeMax, positionMaps);
 	  console.log(map); */
       
       if (!compareArrays(map, current_deployment.mappings)) {
@@ -565,7 +565,9 @@ function PacketRate() {
 			        .cursor(function(d) "help")
 			        .title(function(d) {
 			        	var begin = new Date(d[1]).toLocaleString();
-			        	var end = new Date(d[2]).toLocaleString();
+			        	var end = "open ended";
+			        	if (!isNaN(d[2]))
+			        		end = new Date(d[2]).toLocaleString();
 			        	var ret = "Device ID " + d[0];
 			        	ret += "\nFrom:\t" + begin + "\nTo:\t\t" + end;
 			        	if (d[3])
@@ -597,13 +599,9 @@ function PacketRate() {
 	    	  else
 	    		  current_deployment.bars[j].data([]);
 	      }
-	      
-	    var ticks = new Array();
-	    $("timeTicks", positionTimeTicks).each(function() {
-	    	ticks.push(parseInt($(this).attr("tick")));
-	    });
 	
-		current_deployment.xTicks.left(function(d) ((d-positionTimeMin)/(positionTimeMax-positionTimeMin))*920).data(ticks.reverse());
+		current_deployment.xTicks.left(function(d) ((d-positionTimeMin)/(positionTimeMax-positionTimeMin))*920)
+			.data([positionTimeMin].concat(pv.Scale.linear(positionTimeMin, positionTimeMax).ticks(5)));
 		
 		current_deployment.yTicks.data(map);
 		
