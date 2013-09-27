@@ -560,12 +560,22 @@ function PacketRate() {
 		  if (map.length > current_deployment.bars.length) {
 			  var l = current_deployment.bars.length;
 			  for (var j = 0; j < map.length-l; j++) {
-				  var bar = current_deployment.barPanel.add(pv.Panel).def("comment", false).add(pv.Bar);
+				  var bar = current_deployment.barPanel.add(pv.Bar);
 				  bar.height(MAPPING_BAR_HEIGHT)
-			        .event("mouseover", function() this.parent.comment(true))
-			        .event("mouseout", function() this.parent.comment(false))
+			        .cursor(function(d) "help")
+			        .title(function(d) {
+			        	var begin = new Date(d[1]).toLocaleString();
+			        	var end = new Date(d[2]).toLocaleString();
+			        	var ret = "Device ID " + d[0];
+			        	ret += "\nFrom:\t" + begin + "\nTo:\t\t" + end;
+			        	if (d[3])
+			        		ret += "\nInfo:\t" + d[3];
+			        	return ret;
+			        })
+			        .event("mouseover", function(d) self.status = d[3])
+			        .event("mouseout", function() self.status = "")
 				    .anchor("center").add(pv.Label)
-				      .text(function(d) this.parent.comment() ? d[3] : d[0]);
+				      .text(function(d) d[0]);
 
 				  current_deployment.bars.push(bar);
 			  }
@@ -744,8 +754,8 @@ $(document).ready(function() {
           mappings : new Array()
         });
         
-        deployment_data[deployment_data.length-1].barPanel = deployment_data[deployment_data.length-1].mappingvis.add(pv.Panel);
-
+        deployment_data[deployment_data.length-1].barPanel = deployment_data[deployment_data.length-1].mappingvis.add(pv.Panel)
+        
         deployment_data[deployment_data.length-1].now = deployment_data[deployment_data.length-1].mappingvis.add(pv.Rule);
         deployment_data[deployment_data.length-1].now
 		    .top(-3)
