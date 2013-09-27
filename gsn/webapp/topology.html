@@ -683,6 +683,7 @@ $(document).ready(function() {
       $("#gsn-name").show();
       uptime.setTime($(gsn).attr("uptime"));
       var topology_vs_name = new Array();
+      var deploymentHasMapping = new Array();
       var arraySize = 0;
       $("virtual-sensor",data).each(function(){
         var deploymentname = $(this).attr("name").split("_", 1)[0];
@@ -696,6 +697,11 @@ $(document).ready(function() {
               if (i>-1)
                 topology_vs_name[i]=$(this).attr("name");
           }
+          if (groupname == "mapping" && $(this).attr("name").split("_", 3)[2] == "chart") {
+              var i = $.inArray(deploymentname, deployments);
+                if (i>-1)
+                	deploymentHasMapping[i]=true;
+            }
         }                    
       });
       // display
@@ -711,11 +717,18 @@ $(document).ready(function() {
           "href":"javascript:showTopology("+i+")"
           },deployments[i])));
         // add div
-        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
-            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
-            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
-            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div><div class=\"mappinggraph\" style=\"display:none\"></div>"+
-            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li><li><a class =\"mappingtab\" href=\"\">Mapping</a></li></ul></div>");
+        if (deploymentHasMapping[i])
+	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
+	            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
+	            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
+	            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div><div class=\"mappinggraph\" style=\"display:none\"></div>"+
+	            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li><li><a class =\"mappingtab\" href=\"\">Mapping</a></li></ul></div>");
+        else
+	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
+		            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
+		            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
+		            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
+		            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
         //$("#topology_"+deployments[i]+" .nodeinfo").show();
         $("#topology_"+deployments[i]+" .nodeinfo img").bind("click", function() { $(this).parent().parent().hide();});
         if (deployments[i]!=visible)
@@ -733,6 +746,7 @@ $(document).ready(function() {
           links : new Array(),
           isTopologyUpdating : false,
           isMappingUpdating : false,
+          deploymentHasMapping : deploymentHasMapping[i],
           packethistory : new PacketRate(),
           vis : new pv.Panel()
             .width(700)
@@ -741,7 +755,7 @@ $(document).ready(function() {
             .canvas("topology_graph_"+deployments[i]),
           mappingvis: new pv.Panel()
             .fillStyle("white")
-            .top(12)
+            .top(17)
             .bottom(20)
             .left(30)
             .canvas("mapping_graph_"+deployments[i]),
@@ -777,7 +791,7 @@ $(document).ready(function() {
     	    .height(MAPPING_BAR_HEIGHT)
     	    .top(function(d) this.index * (MAPPING_BAR_HEIGHT + MAPPING_BAR_SPACER))
     	    .width(0)
-    	    .left(-5)
+    	    .left(0)
     	  .anchor("left").add(pv.Label)
     	    .textMargin(5)
     	    .textAlign("right")
