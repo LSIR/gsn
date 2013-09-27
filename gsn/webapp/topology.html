@@ -540,6 +540,7 @@ function PacketRate() {
   function updatePositionMappingGraph(positionTimeMin, positionMaps) {
 	  var now = new Date().getTime();
 	  var map = new Array();
+	  var x = pv.Scale.linear(positionTimeMin, now+2592000000).range(0,895);
 	  $("positionContainer", positionMaps).each(function() {
 		  var devices = new Array();
 		  $("positionMap", this).each(function() {
@@ -548,15 +549,14 @@ function PacketRate() {
 		  map.push([parseInt($(this).attr("position")), devices]);
 	  });
 	  
-	  positionTimeMax = now+2592000000;
 	  map = map.sort(sortMappingArray);
 
-	  /* console.log(positionTimeMin, positionTimeMax, positionMaps);
+	  /* console.log(positionTimeMin, now+2592000000, positionMaps);
 	  console.log(map); */
       
       if (!compareArrays(map, current_deployment.mappings)) {
     	  current_deployment.mappingvis.height(map.length * (MAPPING_BAR_HEIGHT+MAPPING_BAR_SPACER));
-
+  	      
 		  if (map.length > current_deployment.bars.length) {
 			  var l = current_deployment.bars.length;
 			  for (var j = 0; j < map.length-l; j++) {
@@ -571,7 +571,7 @@ function PacketRate() {
 			        	var ret = "Device ID " + d[0];
 			        	ret += "\nFrom:\t" + begin + "\nTo:\t\t" + end;
 			        	if (d[3])
-			        		ret += "\nInfo:\t" + d[3];
+			        		ret += "\nInfo:\t\t" + d[3];
 			        	return ret;
 			        })
 			        .event("mouseover", function(d) self.status = d[3])
@@ -592,23 +592,24 @@ function PacketRate() {
 			    		  d2 = now+2592000000;
 			    	  else
 			    		  d2 = d[2];
-			    	  return (((d2-positionTimeMin) - (d[1]-positionTimeMin))/(positionTimeMax-positionTimeMin))*920;
+			    	  return x(d2) - x(d[1]);
 			      })
-			      .left(function(d) ((d[1]-positionTimeMin)/(positionTimeMax-positionTimeMin))*920)
+			      .left(function(d) x(d[1]))
 			      .top(j *(MAPPING_BAR_HEIGHT+MAPPING_BAR_SPACER));
 	    	  else
 	    		  current_deployment.bars[j].data([]);
 	      }
 	
-		current_deployment.xTicks.left(function(d) ((d-positionTimeMin)/(positionTimeMax-positionTimeMin))*920)
-			.data([positionTimeMin].concat(pv.Scale.linear(positionTimeMin, positionTimeMax).ticks(5)));
+	    var tD = ((now+2592000000)-positionTimeMin)/6;
+		current_deployment.xTicks.left(x)
+			.data([positionTimeMin, positionTimeMin+tD, positionTimeMin+tD*2, positionTimeMin+tD*3, positionTimeMin+tD*4, positionTimeMin+tD*5, now+2592000000]);
 		
 		current_deployment.yTicks.data(map);
 		
 	    current_deployment.mappings = map;
       }
 	
-      current_deployment.now.left(function(d) ((d-positionTimeMin)/(positionTimeMax-positionTimeMin))*920).data([now]);
+      current_deployment.now.left(function(d) x(d)).data([now]);
       current_deployment.mappingvis.render();
   }
   
