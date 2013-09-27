@@ -493,8 +493,8 @@ function PacketRate() {
   }
 
   function fetchTopologyInfo() {
-    if (!current_deployment.isUpdating) {
-      current_deployment.isUpdating = true;
+    if (!current_deployment.isTopologyUpdating) {
+      current_deployment.isTopologyUpdating = true;
       $.ajax({
         type: "GET",
         url: "/field?vs="+current_deployment.topology_vs_name+"&field=DATA&pk=latest",
@@ -504,12 +504,12 @@ function PacketRate() {
           updateHealthTable($("sensornodes",data));
           updateTopologyGraph($("sensornodes",data));
           updateStatusBar($("sensornodes",data));
-          current_deployment.isUpdating = false;
+          current_deployment.isTopologyUpdating = false;
           current_deployment = selected_deployment;
           topologyUpdateTimer = setTimeout("fetchTopologyInfo()",5000);
         },
         error : function(XMLHttpRequest, textStatus, errorThrown) {
-          current_deployment.isUpdating = false;
+          current_deployment.isTopologyUpdating = false;
           current_deployment = selected_deployment;
           topologyUpdateTimer = setTimeout("fetchTopologyInfo()",10000);
         }
@@ -518,18 +518,23 @@ function PacketRate() {
   }
 
   function fetchMappingInfo() {
+	if (!current_deployment.isMappingUpdating) {
+	 current_deployment.isMappingUpdating = true;
      $.ajax({
        type: "GET",
        url: "/field?vs="+current_deployment.name+"_mapping_chart&field=DATA&pk=latest",
        dataType: "xml",
        success: function(data){
     	 updatePositionMappingGraph(parseInt($("deviceMappings", data).attr("positionTimeMin")), $("positionTimeTicks",data), $("positionMappings",data));
+         current_deployment.isMappingUpdating = false;
          mappingUpdateTimer = setTimeout("fetchMappingInfo()",5000);
        },
        error : function(XMLHttpRequest, textStatus, errorThrown) {
+         current_deployment.isMappingUpdating = false;
          mappingUpdateTimer = setTimeout("fetchMappingInfo()",10000);
        }
      });
+	}
   }
 
   function updatePositionMappingGraph(positionTimeMin, positionTimeTicks, positionMaps) {
@@ -538,7 +543,7 @@ function PacketRate() {
 	  $("positionContainer", positionMaps).each(function() {
 		  var devices = new Array();
 		  $("positionMap", this).each(function() {
-			  devices.push([parseInt($(this).attr("device_id")), parseInt($(this).attr("begin")), parseInt($(this).attr("end"))])
+			  devices.push([parseInt($(this).attr("device_id")), parseInt($(this).attr("begin")), parseInt($(this).attr("end")), $(this).attr("comment")])
 		  });
 		  map.push([parseInt($(this).attr("position")), devices]);
 	  });
@@ -550,17 +555,17 @@ function PacketRate() {
 	  console.log(map); */
       
       if (!compareArrays(map, current_deployment.mappings)) {
-	      current_deployment.mappings = map;
-
     	  current_deployment.mappingvis.height(map.length * (MAPPING_BAR_HEIGHT+MAPPING_BAR_SPACER));
 
 		  if (map.length > current_deployment.bars.length) {
 			  var l = current_deployment.bars.length;
 			  for (var j = 0; j < map.length-l; j++) {
-				  var bar = current_deployment.barPanel.add(pv.Bar);
+				  var bar = current_deployment.barPanel.add(pv.Panel).def("comment", false).add(pv.Bar);
 				  bar.height(MAPPING_BAR_HEIGHT)
+			        .event("mouseover", function() this.parent.comment(true))
+			        .event("mouseout", function() this.parent.comment(false))
 				    .anchor("center").add(pv.Label)
-				      .text(function(d)  d[0]);
+				      .text(function(d) this.parent.comment() ? d[3] : d[0]);
 
 				  current_deployment.bars.push(bar);
 			  }
@@ -591,6 +596,8 @@ function PacketRate() {
 		current_deployment.xTicks.left(function(d) ((d-positionTimeMin)/(positionTimeMax-positionTimeMin))*920).data(ticks.reverse());
 		
 		current_deployment.yTicks.data(map);
+		
+	    current_deployment.mappings = map;
       }
 	
       current_deployment.now.left(function(d) ((d-positionTimeMin)/(positionTimeMax-positionTimeMin))*920).data([now]);
@@ -715,7 +722,8 @@ $(document).ready(function() {
           topology_vs_name : topology_vs_name[i],
           sensornodes : new Array(),
           links : new Array(),
-          isUpdating : false,
+          isTopologyUpdating : false,
+          isMappingUpdating : false,
           packethistory : new PacketRate(),
           vis : new pv.Panel()
             .width(700)
@@ -975,6 +983,7 @@ $(document).ready(function() {
           $(this).addClass("active");
           thiscontainer.find(".healthtab").removeClass("active");
           thiscontainer.find(".configtab").removeClass("active");
+          clearTimeout(mappingUpdateTimer);
           mappingUpdateTimer = setTimeout("fetchMappingInfo()",200);
           return false;
         });
@@ -993,18 +1002,20 @@ function showTopology(id) {
   $("#deployment_menu_item_"+deployments[id]).addClass("selected");
   $.cookie("deployment" , deployments[id]);
   selected_deployment = deployment_data[id];
-  if (!current_deployment.isUpdating) {
+  if (!current_deployment.isTopologyUpdating) {
     unmarkNewData();
     current_deployment = selected_deployment;
     clearTimeout(topologyUpdateTimer); 
     topologyUpdateTimer = setTimeout("fetchTopologyInfo()",100);
   }
-  if($(".mappinggraph").is(":visible")) {
-	clearTimeout(mappingUpdateTimer);
-    mappingUpdateTimer = setTimeout("fetchMappingInfo()",200);
-  }
-  else {
-  	clearTimeout(mappingUpdateTimer);
+  if (!current_deployment.isMappingUpdating) {
+	  if($(".mappinggraph").is(":visible")) {
+		clearTimeout(mappingUpdateTimer);
+	    mappingUpdateTimer = setTimeout("fetchMappingInfo()",200);
+	  }
+	  else {
+	  	clearTimeout(mappingUpdateTimer);
+	  }
   }
 }
 //]]>-->
