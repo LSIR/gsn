@@ -1128,7 +1128,16 @@ ul.subnav li{
 }
 
 #topologycontainer td.changing div {
-  border:1px solid #54a742;
+  border:1px solid #54A742;
+}
+
+#topologycontainer .mappinggraph {
+	border:1px solid #CBCBCB;
+}
+
+#topologycontainer .mappinggraph g g rect {
+	fill:#90DF89;
+	stroke:#54A742;
 }
 
 /*

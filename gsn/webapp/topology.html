@@ -559,8 +559,6 @@ function PacketRate() {
 			  for (var j = 0; j < map.length-l; j++) {
 				  var bar = current_deployment.barPanel.add(pv.Bar);
 				  bar.height(MAPPING_BAR_HEIGHT)
-				    .fillStyle("#B4C5F1")
-				    .strokeStyle("#599CE0")
 				    .anchor("center").add(pv.Label)
 				      .text(function(d)  d[0]);
 
@@ -744,7 +742,7 @@ $(document).ready(function() {
         deployment_data[deployment_data.length-1].now
 		    .top(-3)
 		    .bottom(5)
-	  	    .strokeStyle("rgba(255,0,0,1)")
+	  	    .strokeStyle("#F00")
 	  	  .anchor("top").add(pv.Label)
 	  	  	.textStyle("#F00")
 		    .text("now");
@@ -1000,7 +998,13 @@ function showTopology(id) {
     current_deployment = selected_deployment;
     clearTimeout(topologyUpdateTimer); 
     topologyUpdateTimer = setTimeout("fetchTopologyInfo()",100);
-    clearTimeout(mappingUpdateTimer);
+  }
+  if($(".mappinggraph").is(":visible")) {
+	clearTimeout(mappingUpdateTimer);
+    mappingUpdateTimer = setTimeout("fetchMappingInfo()",200);
+  }
+  else {
+  	clearTimeout(mappingUpdateTimer);
   }
 }
 //]]>-->

@@ -128,6 +128,7 @@ OSTest_OZ47_Only_Init_Calibrated.xml
 OSTest_OZ47_Param_Instant_Cal.xml
 OSTest_OZ47_Instant_Calibrated.xml
 OSTest_Data_Latency.xml
+OSTest_Mapping_Chart.xml
 OSTest_Mapping_Geo.xml
 OSTest_Mapping_Position.xml
 OSTest_Mapping_Sensor.xml

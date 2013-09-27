@@ -18,13 +18,11 @@ import org.jibx.runtime.JiBXException;
 
 import gsn.Main;
 import gsn.beans.DeviceMappings;
-import gsn.beans.NetworkTopology;
 import gsn.beans.SensorMappings;
 import gsn.beans.GeoMapping;
 import gsn.beans.PositionMap;
 import gsn.beans.PositionMappings;
 import gsn.beans.SensorMap;
-import gsn.beans.SensorNode;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumerator;
 

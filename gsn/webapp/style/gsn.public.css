@@ -1127,6 +1127,19 @@ ul.subnav li{
   float:left;
 }
 
+#topologycontainer .mappinggraph {
+	border:1px #CBCBCB;
+}
+
+#topologycontainer .mappinggraph {
+	border:1px solid #CBCBCB;
+}
+
+#topologycontainer .mappinggraph g g rect {
+	fill:#B4C5F1;
+	stroke:#599CE0;
+}
+
 /*
  * CSS Styles that are needed by jScrollPane for it to operate correctly.
  */
