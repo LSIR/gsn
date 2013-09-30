@@ -16,16 +16,17 @@
 
 # adccomdiff_ncnn
 "1","ncnn_dx1","50",
-"2","ncnn_dx1","150",
-"3","ncnn_dx1","100",
+"2","ncnn_dx1","100",
+"3","ncnn_dx1","150",
+"4","ncnn_dx1","200",
 
 # adccomdiff_nctn
-"1","nctn_t1","0.0",
-"1","nctn_dx1","200",
-"2","nctn_t1","0.0",
-"2","nctn_dx1","50",
-"3","nctn_t1","0.0",
-"3","nctn_dx1","150",
+"1","nctn_dx1","100",
+"1","nctn_t2","0.0",
+"2","nctn_dx1","150",
+"2","nctn_t2","0.0",
+"3","nctn_dx1","200",
+"3","nctn_t2","0.0",
 
 # adccomdiff_nctc
 "1","nctc_dx1","100",
