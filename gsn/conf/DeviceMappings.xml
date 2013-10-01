@@ -40,7 +40,7 @@
   	   <value name="begin" field="begin" style="attribute" usage="optional"/>
   	   <value name="end" field="end" style="attribute" usage="optional"/>
   	   <value name="sensortype" field="sensortype" style="attribute"/>
-  	   <value name="sensortype_args" field="sensortype_args" style="attribute"/>
+  	   <value name="sensortype_args" field="sensortype_args" style="attribute" usage="optional"/>
   	   <value name="comment" field="comment" style="attribute" usage="optional"/>
    </mapping>
    

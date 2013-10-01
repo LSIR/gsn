@@ -562,7 +562,7 @@ function PacketRate() {
 			  for (var j = 0; j < map.length-l; j++) {
 				  var bar = current_deployment.barPanel.add(pv.Bar);
 				  bar.height(MAPPING_BAR_HEIGHT)
-			        .cursor(function(d) "help")
+			        .cursor(function() {return "help";})
 			        .title(function(d) {
 			        	var begin = new Date(d[1]).toLocaleString();
 			        	var end = "open ended";
@@ -574,10 +574,10 @@ function PacketRate() {
 			        		ret += "\nInfo:\t\t" + d[3];
 			        	return ret;
 			        })
-			        .event("mouseover", function(d) self.status = d[3])
-			        .event("mouseout", function() self.status = "")
+			        .event("mouseover", function(d) {self.status = d[3];})
+			        .event("mouseout", function() {self.status = "";})
 				    .anchor("center").add(pv.Label)
-				      .text(function(d) (isNaN(d[2]) || ((x(d[2]) - x(d[1])) > 25)) ? d[0] : "");
+				      .text(function(d) {return (isNaN(d[2]) || ((x(d[2]) - x(d[1])) > 25)) ? d[0] : "";});
 
 				  current_deployment.bars.push(bar);
 			  }
@@ -594,7 +594,7 @@ function PacketRate() {
 			    		  d2 = d[2];
 			    	  return x(d2) - x(d[1]);
 			      })
-			      .left(function(d) x(d[1]))
+			      .left(function(d) {return x(d[1]);})
 			      .top(j *(MAPPING_BAR_HEIGHT+MAPPING_BAR_SPACER));
 	    	  else
 	    		  current_deployment.bars[j].data([]);
@@ -609,7 +609,7 @@ function PacketRate() {
 	    current_deployment.mappings = map;
       }
 	
-      current_deployment.now.left(function(d) x(d)).data([now]);
+      current_deployment.now.left(function(d) {return x(d);}).data([now]);
       current_deployment.mappingvis.render();
   }
   
@@ -784,18 +784,18 @@ $(document).ready(function() {
 		    .height(5)
 	  	    .strokeStyle("#000")
 	  	  .anchor("bottom").add(pv.Label)
-		    .text(function(d) generateDateString(new Date(d)));
+		    .text(function(d) {return generateDateString(new Date(d));});
 
         deployment_data[deployment_data.length-1].yTicks = deployment_data[deployment_data.length-1].mappingvis.add(pv.Bar);
         deployment_data[deployment_data.length-1].yTicks
     	    .height(MAPPING_BAR_HEIGHT)
-    	    .top(function(d) this.index * (MAPPING_BAR_HEIGHT + MAPPING_BAR_SPACER))
+    	    .top(function(d) {return this.index * (MAPPING_BAR_HEIGHT + MAPPING_BAR_SPACER);})
     	    .width(0)
     	    .left(0)
     	  .anchor("left").add(pv.Label)
     	    .textMargin(5)
     	    .textAlign("right")
-    	    .text(function(d) d[0]);
+    	    .text(function(d) {return d[0];});
         
         deployment_data[deployment_data.length-1].force =
           deployment_data[deployment_data.length-1].vis
