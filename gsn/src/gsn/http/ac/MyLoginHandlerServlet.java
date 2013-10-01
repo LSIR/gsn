@@ -115,7 +115,7 @@ public class MyLoginHandlerServlet extends HttpServlet
     {
         out.println("<table class=tab>");
         out.println("<tr><th>username</th><td><INPUT class=inputclass TYPE=TEXT name=\"username\" id=\"loginhandlerusername\" tabindex=\"1\"size=30></td></tr>");
-        out.println("<tr><th>last name</th><td><INPUT class=inputclass type=\"PASSWORD\" name=\"password\" id=\"loginhandlerpassword\" tabindex=\"2\" size=30></td></tr>");
+        out.println("<tr><th>password</th><td><INPUT class=inputclass type=\"PASSWORD\" name=\"password\" id=\"loginhandlerpassword\" tabindex=\"2\" size=30></td></tr>");
         out.println("</table>");
     }
 
