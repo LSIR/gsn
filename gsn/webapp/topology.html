@@ -577,7 +577,7 @@ function PacketRate() {
 			        .event("mouseover", function(d) self.status = d[3])
 			        .event("mouseout", function() self.status = "")
 				    .anchor("center").add(pv.Label)
-				      .text(function(d) d[0]);
+				      .text(function(d) (isNaN(d[2]) || ((x(d[2]) - x(d[1])) > 25)) ? d[0] : "");
 
 				  current_deployment.bars.push(bar);
 			  }

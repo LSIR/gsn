@@ -572,8 +572,10 @@ public class DataMappingWrapper extends AbstractWrapper {
 					}
 					else if (param.equals("sensortype"))
 						sensortype = (String)paramValues[index];
-					else if (param.equals("sensortype_args"))
-						sensortypeArgs = Long.parseLong((String)paramValues[index]);
+					else if (param.equals("sensortype_args")) {
+						if (!((String)paramValues[index]).trim().isEmpty())
+							sensortypeArgs = Long.parseLong((String)paramValues[index]);
+					}
 					else if (param.equals("comment"))
 						comment = (String)paramValues[index];
 					index++;

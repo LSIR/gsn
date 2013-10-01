@@ -3,6 +3,7 @@ AdM_BackLogStatus_Dynamic__mapped.xml
 AdM_BackLogStatus_Revision__mapped.xml
 AdM_BackLogStatus_Static__mapped.xml
 AdM_Binary__mapped.xml
+AdM_Binary_Http__mapped.xml
 AdM_Camera_Aiguille__scaled.xml
 AdM_Camera_Aiguille_Arrete__scaled.xml
 AdM_Camera_Argentiere_Glacier__scaled.xml
@@ -35,7 +36,10 @@ AdM_Dozer_Rssi__mapped.xml
 AdM_Dozer_Rssi__muxed__mapped.xml
 AdM_Dozer_StateCounter__conv.xml
 AdM_Dozer_StateCounter__mapped.xml
-AdM_Binary_Http__mapped.xml
+AdM_Mapping_Chart.xml
+AdM_Mapping_Geo.xml
+AdM_Mapping_Position.xml
+AdM_Mapping_Sensor.xml
 AdM_Schedule__mapped.xml
 AdM_Statistics__mapped.xml
 AdM_SyslogNg__conv.xml
@@ -135,6 +139,10 @@ Dirruhorn_GPS_RAW__binary__mapped.xml
 #Dirruhorn_GPS_RAW__single__conv.xml
 #Dirruhorn_GPS_RAW__single__mapped.xml
 Dirruhorn_GPS_RAW__tobinary__mapped.xml
+Dirruhorn_Mapping_Chart.xml
+Dirruhorn_Mapping_Geo.xml
+Dirruhorn_Mapping_Position.xml
+Dirruhorn_Mapping_Sensor.xml
 Dirruhorn_Schedule__mapped.xml
 Dirruhorn_Statistics__mapped.xml
 Dirruhorn_SyslogNg__conv.xml
@@ -168,6 +176,10 @@ Glaciers_Dozer_Rssi__mapped.xml
 Glaciers_Dozer_Rssi__muxed__mapped.xml
 Glaciers_Dozer_StateCounter__conv.xml
 Glaciers_Dozer_StateCounter__mapped.xml
+Glaciers_Mapping_Chart.xml
+Glaciers_Mapping_Geo.xml
+Glaciers_Mapping_Position.xml
+Glaciers_Mapping_Sensor.xml
 Glaciers_Schedule__mapped.xml
 Glaciers_Statistics__mapped.xml
 Glaciers_SyslogNg__conv.xml
@@ -223,6 +235,10 @@ Jungfraujoch_Dozer_Th3Ident__conv.xml
 Jungfraujoch_Dozer_Th3Ident__mapped.xml
 Jungfraujoch_Dozer_Th3Temp__conv.xml
 Jungfraujoch_Dozer_Th3Temp__mapped.xml
+Jungfraujoch_Mapping_Chart.xml
+Jungfraujoch_Mapping_Geo.xml
+Jungfraujoch_Mapping_Position.xml
+Jungfraujoch_Mapping_Sensor.xml
 Jungfraujoch_Schedule__mapped.xml
 Jungfraujoch_Sensorrod1.xml
 Jungfraujoch_Sensorrod2.xml
@@ -303,6 +319,10 @@ Matterhorn_VaisalaWXT520WindPth.xml
 Matterhorn_VaisalaWXT520Sup.xml
 Matterhorn_VaisalaWXT520Prec.xml
 Matterhorn_Earthpressure_nepn.xml
+Matterhorn_Mapping_Chart.xml
+Matterhorn_Mapping_Geo.xml
+Matterhorn_Mapping_Position.xml
+Matterhorn_Mapping_Sensor.xml
 Matterhorn_Moisturechain1.xml
 Matterhorn_Moisturechain2.xml
 #Matterhorn_Moisturechain.xml
@@ -358,6 +378,10 @@ Thur_Dozer_Rssi__mapped.xml
 Thur_Dozer_Rssi__muxed__mapped.xml
 Thur_Dozer_StateCounter__conv.xml
 Thur_Dozer_StateCounter__mapped.xml
+Thur_Mapping_Chart.xml
+Thur_Mapping_Geo.xml
+Thur_Mapping_Position.xml
+Thur_Mapping_Sensor.xml
 Thur_Schedule__mapped.xml
 Thur_Statistics__mapped.xml
 Thur_SyslogNg__conv.xml
