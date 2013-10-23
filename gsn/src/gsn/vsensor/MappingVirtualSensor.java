@@ -105,7 +105,7 @@ public class MappingVirtualSensor extends BridgeVirtualSensorPermasense {
 			Iterator<GeoMapping> iter = geoMappings.iterator();
 			while (iter.hasNext()) {
 				GeoMapping map = iter.next();
-				if (map.position == geoMap.position)
+				if (map.position.compareTo(geoMap.position) == 0)
 					iter.remove();
 			}
 			
