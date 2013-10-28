@@ -25,6 +25,7 @@
    
    <mapping name="positionMap" class="gsn.beans.PositionMap" >
   	   <value name="device_id" field="device_id" style="attribute"/>
+  	   <value name="device_type" field="device_type" style="attribute"/>
   	   <value name="begin" field="begin" style="attribute" usage="optional"/>
   	   <value name="end" field="end" style="attribute" usage="optional"/>
   	   <value name="comment" field="comment" style="attribute" usage="optional"/>

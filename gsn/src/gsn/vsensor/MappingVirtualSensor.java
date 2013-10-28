@@ -90,7 +90,7 @@ public class MappingVirtualSensor extends BridgeVirtualSensorPermasense {
 			if (!positionMappings.containsKey(position)) {
 				positionMappings.put(position, new PositionMappings(position, new ArrayList<PositionMap>()));
 			}
-			positionMappings.get(position).add(new PositionMap((Integer)data.getData("device_id"), (Long)data.getData("begin"), (Long)data.getData("end"), (String)data.getData("comment")));
+			positionMappings.get(position).add(new PositionMap((Integer)data.getData("device_id"), (Short)data.getData("device_type"), (Long)data.getData("begin"), (Long)data.getData("end"), (String)data.getData("comment")));
 		}
 
 		if (inputStreamName.equalsIgnoreCase("sensor_mapping")) {
