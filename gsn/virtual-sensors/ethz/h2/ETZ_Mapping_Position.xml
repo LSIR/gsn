@@ -5,6 +5,7 @@
        	<web-input password="test">
          	<command name="position">
                 <field name="device_id" type="*text">the device_id to be mapped</field>
+                <field name="device_type" type="select:please choose,0|SIB TinyNode,1|WGPS TinyNode,2|PowerSitch TN,3|BaseStation,4|GPS CoreStation,5|CamZilla CoreStation,6|GPS Logger,7|Webcam,8">select white balance</field>
                 <field name="begin" type="date">the starting point of the mapping in UTC</field>
                 <field name="end" type="date">the end point of the mapping in UTC</field>
                 <field name="position" type="*text">the position the device_id should be mapped to</field>
@@ -13,6 +14,7 @@
    		</web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
+            <field name="DEVICE_TYPE" type="SMALLINT" />
             <field name="BEGIN" type="BIGINT" unit="unixtime" />
             <field name="END" type="BIGINT" unit="unixtime" />
             <field name="POSITION" type="INTEGER" />

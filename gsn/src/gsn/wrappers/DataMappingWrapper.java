@@ -53,6 +53,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 	
 	private final static DataField[] positionStructure = new DataField[] {
 		new DataField("DEVICE_ID", "INTEGER"),
+		new DataField("DEVICE_TYPE", "SMALLINT"),
 		new DataField("BEGIN", "BIGINT"),
 		new DataField("END", "BIGINT"),
 		new DataField("POSITION", "INTEGER"),
@@ -91,9 +92,10 @@ public class DataMappingWrapper extends AbstractWrapper {
 			createTableStatement = "CREATE TABLE " + deployment + "_position (pk BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
 					+ outputStructure[0].getName() + " " + outputStructure[0].getType() + " NOT NULL, "
 					+ outputStructure[1].getName() + " " + outputStructure[1].getType() + " NOT NULL, "
-					+ outputStructure[2].getName() + " " + outputStructure[2].getType() + " NULL, "
-					+ outputStructure[3].getName() + " " + outputStructure[3].getType() + " NOT NULL, "
-					+ outputStructure[4].getName() + " " + outputStructure[4].getType() + ")";
+					+ outputStructure[2].getName() + " " + outputStructure[2].getType() + " NOT NULL, "
+					+ outputStructure[3].getName() + " " + outputStructure[3].getType() + " NULL, "
+					+ outputStructure[4].getName() + " " + outputStructure[4].getType() + " NOT NULL, "
+					+ outputStructure[5].getName() + " " + outputStructure[5].getType() + ")";
 			createIndexStatement = "CREATE INDEX ON " + deployment + "_position (device_id, begin, end)";
 		}
 		else if (mappingName.compareToIgnoreCase("geo") == 0) {
@@ -227,16 +229,17 @@ public class DataMappingWrapper extends AbstractWrapper {
 						if (rs != null) {
 							while (rs.next()) {
 								isEmpty = false;
-								Long end = rs.getLong(outputStructure[2].getName());
+								Long end = rs.getLong(outputStructure[3].getName());
 								if (rs.wasNull())
 									end = null;
 								mapping.executePositionInsert(
 										getActiveAddressBean().getVirtualSensorName(),
 										rs.getInt(outputStructure[0].getName()),
-										rs.getLong(outputStructure[1].getName()),
+										rs.getShort(outputStructure[1].getName()),
+										rs.getLong(outputStructure[2].getName()),
 										end,
-										rs.getInt(outputStructure[3].getName()),
-										rs.getString(outputStructure[4].getName()),
+										rs.getInt(outputStructure[4].getName()),
+										rs.getString(outputStructure[5].getName()),
 										false);
 							}
 						}
@@ -451,12 +454,18 @@ public class DataMappingWrapper extends AbstractWrapper {
 			switch (mappingType) {
 			case POSITION_MAPPING:
 				Integer deviceId = null, position = null;
+				Short deviceType = null;
 				Long begin = null, end = null;
 				String comment = null;
 				
 				for (String param: paramNames) {
 					if (param.equals("device_id"))
 						deviceId = Integer.parseInt((String)paramValues[index]);
+					else if (param.equals("device_type")) {
+						deviceType = Short.parseShort((String)paramValues[index]);
+						if (deviceType.compareTo((short)0) == 0)
+							return new InputInfo(getActiveAddressBean().toString(), "device type has to be selected", false);
+					}
 					else if (param.equals("begin")) {
 						if (!((String)paramValues[index]).trim().isEmpty())
 							try {
@@ -488,7 +497,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 					return new InputInfo(getActiveAddressBean().toString(), "comment has to be set", false);
 				
 				try {
-					streamElements = deployments.get(deployment).executePositionInsert(getActiveAddressBean().getVirtualSensorName(), deviceId, begin, end, position, comment, true);
+					streamElements = deployments.get(deployment).executePositionInsert(getActiveAddressBean().getVirtualSensorName(), deviceId, deviceType, begin, end, position, comment, true);
 				} catch (Exception e) {
 					return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 				}
@@ -677,7 +686,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 		
 		public synchronized void setPositionQueries() throws SQLException {
 			position_select = h2DBconn.prepareStatement("SELECT position FROM " + deployment + "_position WHERE device_id = ? AND ((end is null AND begin <= ?) OR (? BETWEEN begin AND end)) LIMIT 1");
-			position_insert = h2DBconn.prepareStatement("INSERT INTO " + deployment + "_position (device_id, begin, end, position, comment) VALUES (?,?,?,?,?)");
+			position_insert = h2DBconn.prepareStatement("INSERT INTO " + deployment + "_position (device_id, device_type, begin, end, position, comment) VALUES (?,?,?,?,?,?)");
 		}
 		
 		public synchronized void resetPositionQueries() {
@@ -691,7 +700,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 				return true;
 		}
 		
-		public ArrayList<Serializable[]> executePositionInsert(String vs, int deviceId, Long begin, Long end, int pos, String comment, boolean check) throws Exception {
+		public ArrayList<Serializable[]> executePositionInsert(String vs, int deviceId, short deviceType, Long begin, Long end, int pos, String comment, boolean check) throws Exception {
 			if (position_insert != null) {
 				synchronized (position_insert){
 					ArrayList<Serializable[]> ret = new ArrayList<Serializable[]>(2);
@@ -742,8 +751,12 @@ public class DataMappingWrapper extends AbstractWrapper {
 									logger.error("there are too many result sets");
 								
 								long h2pk = rs.getLong(1);
-								long h2begin = rs.getLong(3);
-								String h2comment = rs.getString(6);
+								long h2deviceType = rs.getLong(3);
+								long h2begin = rs.getLong(4);
+								String h2comment = rs.getString(7);
+								
+								if (h2deviceType != deviceType)
+									throw new Exception("new mapping has not the same device type as the existing one to be ended");
 								
 								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs +
 									" WHERE position = " + pos + " AND end IS null AND begin < " + end), gsnsm.getConnection());
@@ -751,12 +764,12 @@ public class DataMappingWrapper extends AbstractWrapper {
 								if (comment.isEmpty()) {
 									h2Stat.executeUpdate("UPDATE " + deployment + "_position SET end = " + 
 											end + " WHERE pk = " + h2pk);
-									ret.add(new Serializable[] {deviceId, h2begin, end, pos, h2comment});
+									ret.add(new Serializable[] {deviceId, deviceType, h2begin, end, pos, h2comment});
 								}
 								else {
 									h2Stat.executeUpdate("UPDATE " + deployment + "_position SET end = " + 
 											end + ", comment = '" + comment + "' WHERE pk = " + h2pk);
-									ret.add(new Serializable[] {deviceId, h2begin, end, pos, comment});
+									ret.add(new Serializable[] {deviceId, deviceType, h2begin, end, pos, comment});
 								}
 								
 								return ret;
@@ -804,12 +817,12 @@ public class DataMappingWrapper extends AbstractWrapper {
 								if (comment.isEmpty()) {
 									h2Stat.executeUpdate("UPDATE " + deployment + "_position SET end = " + 
 											end + " WHERE pk = " + h2pk);
-									ret.add(new Serializable[] {deviceId, begin, end, pos, h2comment});
+									ret.add(new Serializable[] {deviceId, deviceType, begin, end, pos, h2comment});
 								}
 								else {
 									h2Stat.executeUpdate("UPDATE " + deployment + "_position SET end = " + 
 											end + ", comment = '" + comment + "' WHERE pk = " + h2pk);
-									ret.add(new Serializable[] {deviceId, begin, end, pos, comment});
+									ret.add(new Serializable[] {deviceId, deviceType, begin, end, pos, comment});
 								}
 							}
 							else
@@ -827,28 +840,30 @@ public class DataMappingWrapper extends AbstractWrapper {
 							
 							long h2pk = rs.getLong(1);
 							int h2deviceid = rs.getInt(2);
-							long h2begin = rs.getLong(3);
-							String h2comment = rs.getString(6);
+							Short h2devicetype = rs.getShort(3);
+							long h2begin = rs.getLong(4);
+							String h2comment = rs.getString(7);
 							h2Stat.executeUpdate("UPDATE " + deployment + "_position SET end = " + 
 									(begin-1) + " WHERE pk = " + h2pk);
 							
 							gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs + 
 									" WHERE position = " + pos + " AND end IS null AND begin < " + begin), gsnsm.getConnection());
 
-							ret.add(new Serializable[] {h2deviceid, h2begin, begin-1, pos, h2comment});
+							ret.add(new Serializable[] {h2deviceid, h2devicetype, h2begin, begin-1, pos, h2comment});
 						}
 					}
 					
 					position_insert.setInt(1, deviceId);
-					position_insert.setLong(2, begin);
+					position_insert.setShort(2, deviceType);
+					position_insert.setLong(3, begin);
 					if (end == null)
-						position_insert.setNull(3, java.sql.Types.BIGINT);
+						position_insert.setNull(4, java.sql.Types.BIGINT);
 					else
-						position_insert.setLong(3, end);
-					position_insert.setInt(4, pos);
-					position_insert.setString(5, comment);
+						position_insert.setLong(4, end);
+					position_insert.setInt(5, pos);
+					position_insert.setString(6, comment);
 					position_insert.executeUpdate();
-					ret.add(new Serializable[] {deviceId, begin, end, pos, comment});
+					ret.add(new Serializable[] {deviceId, deviceType, begin, end, pos, comment});
 
 					return ret;
 				}

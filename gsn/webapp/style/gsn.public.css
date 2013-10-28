@@ -1127,18 +1127,30 @@ ul.subnav li{
   float:left;
 }
 
-#topologycontainer .mappinggraph {
+#topologycontainer .mapping_graph_ {
 	margin: 10px 0 0;
 	border:1px #CBCBCB;
-}
-
-#topologycontainer .mappinggraph {
 	border:1px solid #CBCBCB;
 }
 
-#topologycontainer .mappinggraph g g rect {
+#topologycontainer .mapping_graph_ g g rect {
 	fill:#B4C5F1;
 	stroke:#599CE0;
+}
+
+*[id*='mapping_graph_'] {
+	margin: 10px 0 0;
+	border:1px solid #CBCBCB;
+}
+
+*[id*='mapping_graph_'] g g rect {
+	fill:#B4C5F1;
+	stroke:#599CE0;
+}
+
+*[id*='geo_graph_'] {
+	margin: 10px 0 0;
+	border:1px solid #CBCBCB;
 }
 
 /*
