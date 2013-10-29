@@ -42,6 +42,14 @@ var unmarkTimer;
 var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520", "th3","enviroscan", "powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
 var healthitems=new Array("packet_count", "vsys", "vsdi", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
 var nodetypes = Array("SIB", "Corestation (Access Node)", "Powerswitch",  "Corestation (Dutycycled)",  "AE Node" );
+var geoMarkersTypeToIconMap = {	1: {path: google.maps.SymbolPath.CIRCLE, scale: 4, strokeColor: '#04B404'},
+				2: {path: google.maps.SymbolPath.CIRCLE, scale: 4, strokeColor: '#5FB404'},
+				3: {path: google.maps.SymbolPath.CIRCLE, scale: 4, strokeColor: '#04B45F'},
+				4: {path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 4, strokeColor: '#04B404'},
+				5: {path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 4, strokeColor: '#0489B1'},
+				6: {path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 4, strokeColor: '#A901DB'},
+				7: {path: google.maps.SymbolPath.CIRCLE, scale: 4, strokeColor: '#0040FF'},
+				8: {path: google.maps.SymbolPath.CIRCLE, scale: 4, strokeColor: '#DF0174'}};
 
 var infowindow = new google.maps.InfoWindow({content: 'test'});
 
@@ -172,15 +180,15 @@ function PacketRate() {
       current_deployment.geoLinks.length = 0;
       for (i=0; i<current_deployment.links.length; i++) {
 	if (current_deployment.links[i].source !== undefined &&
-	    current_deployment.deviceIdMapping[current_deployment.sensornodes[current_deployment.links[i].source].node_id] !== undefined &&
-	    current_deployment.geoMarkers[current_deployment.deviceIdMapping[current_deployment.sensornodes[current_deployment.links[i].source].node_id].position] !== undefined) {
+	  current_deployment.deviceIdMapping[current_deployment.sensornodes[current_deployment.links[i].source].node_id] !== undefined &&
+	  current_deployment.geoMarkers[current_deployment.deviceIdMapping[current_deployment.sensornodes[current_deployment.links[i].source].node_id].position] !== undefined) {
 	  var flightPath = new google.maps.Polyline({
 	    path: [current_deployment.geoMarkers[current_deployment.deviceIdMapping[current_deployment.sensornodes[current_deployment.links[i].source].node_id].position].getPosition(), current_deployment.geoMarkers[current_deployment.deviceIdMapping[current_deployment.sensornodes[current_deployment.links[i].target].node_id].position].getPosition()],
 	    clickable: false,
 	    geodesic: true,
-	    strokeColor: '#FF0000',
+	    strokeColor: '#04B404',
 	    strokeOpacity: 0.7,
-	    strokeWeight: 1
+	    strokeWeight: 1.5
 	  });
 
 	  flightPath.setMap(current_deployment.geoMap);
@@ -579,7 +587,7 @@ function PacketRate() {
         var begin = parseInt($(this).attr("begin"));
         var end = parseInt($(this).attr("end"));
         if ((begin <= now && isNaN(end)) || (begin <= now && end > now))
-	  current_deployment.deviceIdMapping[parseInt($(this).attr("device_id"))] = {position : pos, end : end, comment : $(this).attr("comment")};
+	  current_deployment.deviceIdMapping[parseInt($(this).attr("device_id"))] = {position : pos, type : $(this).attr("device_type"), end : end, comment : $(this).attr("comment")};
 	  current_deployment.positionToDeviceIdMap[pos] = parseInt($(this).attr("device_id"));
       });
     });
@@ -592,7 +600,7 @@ function PacketRate() {
       var pos = parseInt($(this).attr("position"));
       if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]] !== undefined) {
 	if (!current_deployment.geoMarkers[pos]) {
-	  current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap});
+	  current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type]});
 	  current_deployment.geoMarkers[pos].setPosition(new google.maps.LatLng(parseFloat($(this).attr("latitude")), parseFloat($(this).attr("longitude"))));
 	  current_deployment.geoMarkers[pos].setTitle("Position " + pos + "\n" + $(this).attr("comment"));
 	  hasNewMarker = true;
@@ -606,6 +614,7 @@ function PacketRate() {
     });
     if (hasNewMarker) {
       var latMin, latMax, lngMin, lngMax;
+      var bounds = new google.maps.LatLngBounds ();
       for (var mark in current_deployment.geoMarkers) {
 	if (latMin === undefined || latMin > current_deployment.geoMarkers[mark].getPosition().lat())
 	  latMin = current_deployment.geoMarkers[mark].getPosition().lat();
@@ -615,8 +624,11 @@ function PacketRate() {
 	  lngMin = current_deployment.geoMarkers[mark].getPosition().lng();
 	if (lngMax === undefined || lngMax < current_deployment.geoMarkers[mark].getPosition().lng())
 	  lngMax = current_deployment.geoMarkers[mark].getPosition().lng();
+	
+	bounds.extend(current_deployment.geoMarkers[mark].getPosition());
       }
       current_deployment.geoMap.setCenter(new google.maps.LatLng(latMin+(latMax-latMin)/2.0,lngMin+(lngMax-lngMin)/2.0));
+      current_deployment.geoMap.fitBounds(bounds);
     }
   }
 
@@ -805,7 +817,7 @@ $(document).ready(function() {
 	            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
 	            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
 	            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div><div id=\"mapping_graph_"+deployments[i]+"\" style=\"display:none\"></div><div id=\"geo_graph_"+deployments[i]+"\" style=\"display:none; width:100%; height:500px\"></div>"+
-	            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li><li><a class =\"posmappingtab\" href=\"\">Position Mapping</a></li><li><a class =\"geotab\" href=\"\">Geo Mapping</a></li></ul></div>");
+	            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li><li><a class =\"posmappingtab\" href=\"\">Position Mapping</a></li><li><a class =\"geotab\" href=\"\">Map</a></li></ul></div>");
         else
 	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
 		            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
@@ -846,7 +858,7 @@ $(document).ready(function() {
           now : undefined,
           bars : new Array(),
           mappings : new Array(),
-          geoMap : new google.maps.Map(document.getElementById("geo_graph_"+deployments[i]), {zoom: 15, mapTypeId: google.maps.MapTypeId.TERRAIN}),
+          geoMap : new google.maps.Map(document.getElementById("geo_graph_"+deployments[i]), {zoom: 18, tilt: 0, mapTypeId: google.maps.MapTypeId.SATELLITE}),
           geoMarkers : new Object(),
           geoLinks : new Array(),
           deviceIdMapping : new Object(),
