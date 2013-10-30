@@ -12,7 +12,7 @@
                 		for (entry in (new String(DATA, "UTF-8")).toString().split(",")) {
                 			def spl = entry.split("=");
                 			if (spl[0].toLowerCase() == "uptime")
-                				UPTIME = spl[1].toInteger() / 1000 as int;
+                				UPTIME = spl[1].toLong() / 1000 as long;
                 			else if (spl[0].toLowerCase() == "requests")
                 				REQUESTS = spl[1].toInteger();
                 			else if (spl[0].toLowerCase() == "cachefilesize")
@@ -39,7 +39,7 @@
         <output-structure>
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             
-            <field name="UPTIME" type="INTEGER" unit="s" />
+            <field name="UPTIME" type="BIGINT" unit="s" />
             <field name="REQUESTS" type="INTEGER" />
             <field name="CACHE_FILE_SIZE" type="BIGINT" unit="bytes" />
             <field name="SEEN_SIGNALS" type="INTEGER" />
