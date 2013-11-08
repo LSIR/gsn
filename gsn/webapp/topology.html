@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
   <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
-  <script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/jquery-dom.js"></script>
   <script type="text/javascript" src="js/jquery.history.js"></script>
   <script type="text/javascript" src="js/jquery-tooltip.js"></script>
@@ -39,9 +39,9 @@ var rssi_dist = 25;
 var topologyUpdateTimer;
 var mappingUpdateTimer;
 var unmarkTimer;
-var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520", "th3","enviroscan", "powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
+var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520","th3","enviroscan","modbus","wgps","powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
 var healthitems=new Array("packet_count", "vsys", "vsdi", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
-var nodetypes = Array("SIB", "Corestation (Access Node)", "Powerswitch",  "Corestation (Dutycycled)",  "AE Node" );
+var nodetypes = {1: "SIB TinyNode", 2: "WGPS TinyNode", 3: "PowerSwitch TN", 4: "BaseStation", 5: "GPS CoreStation", 6: "CamZilla CoreStation", 7: "GPS Logger", 8: "Webcam", 9: "AE TinyNode"};
 var geoMarkersTypeToIconMap = {	1: {small: 'img/map-icons/map-icon-green-small-SIB.png', big: 'img/map-icons/map-icon-green-big-SIB.png'},
 				2: {small: 'img/map-icons/map-icon-green-small-WGPS.png', big: 'img/map-icons/map-icon-green-big-WGPS.png'},
 				3: {small: 'img/map-icons/map-icon-green-small-PowerSwitch.png', big: 'img/map-icons/map-icon-green-big-PowerSwitch.png'},
@@ -114,6 +114,18 @@ function PacketRate() {
     }
     return false;
   }
+  
+  function deviceTypeIsDozer(type) {
+    if (type > 0 && type < 7)
+      return true;
+    return false;
+  }
+  
+  function deviceTypeIsCoreStation(type) {
+    if (type > 3 && type < 7)
+      return true;
+    return false;
+  }
 
   function updateTopologyGraph(network) {
     var topology_change=false;
@@ -136,6 +148,19 @@ function PacketRate() {
         current_deployment.sensornodes[index].corestation_running = $(this).attr("corestation_running");
       }
     });
+    if (current_deployment.deploymentHasMapping) {
+      for(var id in current_deployment.deviceIdMapping) {
+        if (deviceTypeIsDozer(current_deployment.deviceIdMapping[id].type)) {
+	  var index = nodeindex(id);
+	  if (index < 0) {
+	    current_deployment.sensornodes.push({node_id : id, timestamp :  undefined, touched : true, nodetype: current_deployment.deviceIdMapping[id].type, iscorestation: deviceTypeIsCoreStation(current_deployment.deviceIdMapping[id].type), corestation_running: undefined });
+	    topology_change = true;
+	  }
+	  else
+	    current_deployment.sensornodes[index].touched = true;
+	}
+      }
+    }
     var tmp = new Array();
     $(current_deployment.sensornodes).each(function(index,value) {
       if (this.touched)
@@ -151,12 +176,14 @@ function PacketRate() {
         var src=nodeindex($(this).attr("node_id"));
         var dst=nodeindex($(this).attr("parent_id"));
         if (src >= 0 && dst >= 0) {
-          var srclink = $("links", this).children("[node_id='"+$(this).attr("parent_id")+"']")[0];
-          var dstlink = $($(network).children("[node_id='"+$(this).attr("parent_id")+"']")[0]).find("link[node_id='"+$(this).attr("node_id")+"']")[0];
-          var newlink = {source : src, target: dst, srcrssi : $(srclink).attr("rssi"), dstrssi : $(dstlink).attr("rssi")};
-          current_deployment.links.push(newlink);
-          if (!linkExists(oldlinks, newlink))
-            topology_change=true;
+          var srcRssi = $($("links", this).children("[node_id='"+$(this).attr("parent_id")+"']")[0]).attr("rssi");
+          var dstRssi = $($($(network).children("[node_id='"+$(this).attr("parent_id")+"']")[0]).find("link[node_id='"+$(this).attr("node_id")+"']")[0]).attr("rssi");
+          if (srcRssi !== undefined || dstRssi !== undefined) {
+	    var newlink = {source : src, target: dst, srcrssi : srcRssi, dstrssi : dstRssi};
+	    current_deployment.links.push(newlink);
+	    if (!linkExists(oldlinks, newlink))
+	      topology_change=true;
+	  }
         }
       }
     });
@@ -172,7 +199,6 @@ function PacketRate() {
       current_deployment.force.iterations(1);
     }
     current_deployment.vis.render();
-    
     
     if ($("#geo_graph_"+current_deployment.name).is(":visible")) {
       for (var i=0; i<current_deployment.geoLinks.length; i++)
@@ -255,7 +281,7 @@ function PacketRate() {
   }
 
   function updateHealthTable(network) {
-    var tablesorter = $("#topology_"+current_deployment.name).find(".healthtable table");;
+    var tablesorter = $("#topology_"+current_deployment.name).find(".healthtable table");
     var table = tablesorter.find("tbody");
     var sortlist = $(tablesorter).get(0).config.sortList;
     if (sortlist.length == 0)
@@ -264,6 +290,7 @@ function PacketRate() {
     var now=new Date().getTime();
     $("sensornode",network).each(function(){
       var id = $(this).attr("node_id");
+      current_deployment.idsInHealthTable[id] = true;
       var index = nodeindex(id);
       if (index < 0) {
         var cols='';
@@ -279,23 +306,38 @@ function PacketRate() {
         $("td", row).each(function(index,value) {
           switch (index) {
           case 0:
-            $(this).empty().text($(data).attr("position")?$(data).attr("position"):"");
+            if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[$(data).attr("node_id")] !== undefined && current_deployment.deviceIdMapping[$(data).attr("node_id")].position !== undefined)
+	      $(this).empty().text(current_deployment.deviceIdMapping[$(data).attr("node_id")].position);
+	    else
+	      $(this).empty().text("?");
             break;
           case 1: break; // node id
           case 3:
-            var img;
-            if (!$(data).attr('batterylevel'))
-              img = 'none';
-            else if ($(data).attr('batterylevel')<=5)
-              img = 'empty';
-            else if ($(data).attr('batterylevel')<=25)
-              img = 'quarter';
-            else if ($(data).attr('batterylevel')<=50)
-              img = 'half';
-            else
-              img = 'full';
-            $(this).empty().text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
-            $(this).append('<img style="margin:0px 0px 0px 5px;vertical-align:middle;" src="img/batterylevels/battery_'+img+'.png">');
+	    var img;
+	    $(this).empty();
+            if (current_deployment.deploymentHasMapping) {
+	      if (!$(data).attr('batterylevel'))
+		img = 'none';
+	      else if ($(data).attr('batterylevel')<=5)
+		img = 'empty';
+	      else if ($(data).attr('batterylevel')<=25)
+		img = 'quarter';
+	      else if ($(data).attr('batterylevel')<=50)
+		img = 'half';
+	      else
+		img = 'full';
+	      $(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
+	    }
+	    else
+	      img = 'none';
+	    $(this).append('<img style="margin:0px 0px 0px 5px;vertical-align:middle;" src="img/batterylevels/battery_'+img+'.png">');
+            break;
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+	    if (current_deployment.deploymentHasMapping)
+	      $(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
             break;
           case 10:
           case 11:
@@ -324,6 +366,19 @@ function PacketRate() {
         $("td:nth-child(2)", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().addClass("offline");
       }
     });
+    if (current_deployment.deploymentHasMapping) {
+      for (var id in current_deployment.deviceIdMapping) {
+	if (deviceTypeIsDozer(current_deployment.deviceIdMapping[id].type) && !current_deployment.idsInHealthTable[id]) {
+	  var cols='';
+	  for (i=0;i<healthitems.length;i++)
+	    cols+='<td></td>';
+	  table.append("<tr class=\"offline\">"+
+	    "<td style=\"display:none\">"+current_deployment.deviceIdMapping[id].position+"</td><td>"+id+'</td>'+cols+'<td></td>'+
+	    "</tr>");
+	  current_deployment.idsInHealthTable[id] = true;
+        }
+      }
+    }
     if ($(network).parent().attr("mapped")=='true') {
       $("td:first-child", table).each(function() {
         $(this).css('display', '');
@@ -352,10 +407,11 @@ function PacketRate() {
     $("sensornode",network).each(function(){
       var id = $(this).attr("node_id");
       var index = nodeindex(id);
+      current_deployment.idsInConfigTable[id] = true;
       if (index < 0) {
         table.append("<tr class=\"disabled\">"+
           "<td style=\"display:none\">"+($(this).attr("position")?$(this).attr("position"):"")+"</td><td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
-          "<td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
+          "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
         if (isConfigurable)
         $("tr:last", table).bind("click",function() {
           if (!$(this).hasClass("disabled"))
@@ -390,7 +446,7 @@ function PacketRate() {
                     case 8: //  .. and event packets
                       c = c + " "+configitems[index-2]+"=\"true\"";
                       break;
-                    case 18: break;
+                    case 20: break;
                     default:
                       if ($(this).children().length > 0)
                         c = c + " "+configitems[index-2]+"=\"" + ($("input:first", this).attr("checked")?"true":"false")+"\"";
@@ -451,7 +507,7 @@ function PacketRate() {
             switch (index) {
             case 0:
             case 1: break;
-            case 18:
+            case 20:
               $(this).text(formatTime($(data).attr(configitems[index-2])));
               break;
             default:
@@ -495,6 +551,16 @@ function PacketRate() {
         tableChanged = true;
       }
     });
+    if (current_deployment.deploymentHasMapping) {
+      for (var id in current_deployment.deviceIdMapping) {
+	if (deviceTypeIsDozer(current_deployment.deviceIdMapping[id].type) && !current_deployment.idsInConfigTable[id]) {
+	  table.append("<tr class=\"disabled offline\">"+
+	    "<td style=\"display:none\">"+current_deployment.deviceIdMapping[id].position+"</td><td>"+id+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
+	    "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
+	  current_deployment.idsInConfigTable[id] = true;
+	}
+      }
+    }
     if ($(network).parent().attr("mapped")=='true') {
       $("td:first-child", table).each(function() {
         $(this).css('display', '');
@@ -515,14 +581,13 @@ function PacketRate() {
   function updateStatusBar(network) {
     var packetcount = 0;
     var nodeonlinecount = 0;
-    var nodetotalcount = 0;
     var now=new Date().getTime();
     $("sensornode",network).each(function(){
       packetcount = packetcount+parseInt($(this).attr("packet_count"));
-      nodetotalcount = nodetotalcount + 1;
       if (now - $(this).attr("timestamp") <= STANDBY_TIMEOUT_MS)
         nodeonlinecount = nodeonlinecount + 1;
     });
+    var nodetotalcount = current_deployment.sensornodes.length;
     current_deployment.packethistory.update(packetcount);
     $(".statusbar", "#topology_"+current_deployment.name).empty();
     $(".statusbar", "#topology_"+current_deployment.name).append("Total: "+nodetotalcount+"<br>Online: "+nodeonlinecount+"<br>Packetrate: "+current_deployment.packethistory.rate+" Pkts/s");
@@ -579,7 +644,8 @@ function PacketRate() {
   
   function generateDeviceIdMapping(positionMaps) {
     var now = new Date().getTime()*1000;
-    current_deployment.deviceIdMapping.length = 0;
+    current_deployment.deviceIdMapping = new Object();
+    current_deployment.positionToDeviceIdMap = new Object();
     
     $("positionContainer", positionMaps).each(function() {
       var pos = parseInt($(this).attr("position"));
@@ -622,9 +688,12 @@ function PacketRate() {
 	}
 	if(current_deployment.geoMarkers[pos].getPosition().lat().toFixed(6) != parseFloat($(this).attr("latitude")).toFixed(6) || current_deployment.geoMarkers[pos].getPosition().lng().toFixed(6) != parseFloat($(this).attr("longitude")).toFixed(6))
 	  current_deployment.geoMarkers[pos].setPosition(new google.maps.LatLng(parseFloat($(this).attr("latitude")), parseFloat($(this).attr("longitude"))));
-	if(current_deployment.geoMarkers[pos].getTitle() != ("Position " + pos + "\n\n" + $(this).attr("comment") + "\ndevice_id=" + current_deployment.positionToDeviceIdMap[pos])) {
+	if(current_deployment.geoMarkers[pos].getTitle() != ("Position " + pos + "\n\n" + $(this).attr("comment") + "\ndevice_id=" + current_deployment.positionToDeviceIdMap[pos]))
 	  current_deployment.geoMarkers[pos].setTitle("Position " + pos + "\n\n" + $(this).attr("comment") + "\ndevice_id=" + current_deployment.positionToDeviceIdMap[pos]);
-	}
+      }
+      else if (current_deployment.geoMarkers[pos] !== undefined) {
+	current_deployment.geoMarkers[pos].setMap(null);
+	delete current_deployment.geoMarkers[pos];
       }
     });
     if (hasNewMarker) {
@@ -660,9 +729,6 @@ function PacketRate() {
 	  });
 	  
 	  map = map.sort(sortMappingArray);
-
-	  /* console.log(positionTimeMin, now+2592000000, positionMaps);
-	  console.log(map); */
       
       if (!compareArrays(map, current_deployment.mappings)) {
     	  current_deployment.mappingvis.height(map.length * (MAPPING_BAR_HEIGHT+MAPPING_BAR_SPACER));
@@ -831,8 +897,8 @@ $(document).ready(function() {
 	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
 	            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
 	            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
-	            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div><div id=\"mapping_graph_"+deployments[i]+"\" style=\"display:none\"></div><div id=\"geo_graph_"+deployments[i]+"\" style=\"display:none; width:100%; height:500px\"></div>"+
-	            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li><li><a class =\"posmappingtab\" href=\"\">Position Mapping</a></li><li><a class =\"geotab\" href=\"\">Map</a></li></ul></div>");
+	            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div id=\"geo_graph_"+deployments[i]+"\" style=\"display:none; width:100%; height:500px\"></div><div id=\"mapping_graph_"+deployments[i]+"\" style=\"display:none\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
+	            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"geotab\" href=\"\">Map</a></li><li><a class =\"posmappingtab\" href=\"\">Position Mapping</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
         else
 	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
 		            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;opacity:0.8;filter:alpha(opacity=80);width:200px;height:160px;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
@@ -852,6 +918,8 @@ $(document).ready(function() {
           topology_vs_name : topology_vs_name[i],
           sensornodes : new Array(),
           links : new Array(),
+          idsInHealthTable : new Object(),
+          idsInConfigTable : new Object(),
           isTopologyUpdating : false,
           isMappingUpdating : false,
           deploymentHasMapping : deploymentHasMapping[i],
@@ -957,17 +1025,17 @@ $(document).ready(function() {
             .shapeSize(function(d) {return 230;})
             .fillStyle(function(d) {
               var now=new Date().getTime();
-              if (now - d.timestamp > STANDBY_TIMEOUT_MS)
-                return d.selected?"#ffd0d0":"#ffa0a0";
+              if (d.timestamp === undefined || (now - d.timestamp) > STANDBY_TIMEOUT_MS)
+                return d.selected?"#ff5555":"#ffa0a0";
               else if (now - d.timestamp > ACTIVE_TIMEOUT_MS)
-                return d.selected?"#d0e0d0":"#a0c0a0";
+                return d.selected?"#1ae01a":"#a0c0a0";
               else
-                return d.selected?"#d0fff0":"#a0ffa0";
+                return d.selected?"#1ae01a":"#a0ffa0";
             })
             .strokeStyle(function() {return this.fillStyle().darker()})
             .lineWidth(function(d) { return d.corestation_running=="true"?5:1; })
             .event("mouseover", function(d) {
-              if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined) {
+              if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined) {
 		current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].big);
 		//current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon({path : google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, strokeWeight: 1, strokeColor: "red", fillColor : "red", fillOpacity : 1, scale : 8});
 		current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
@@ -976,7 +1044,7 @@ $(document).ready(function() {
 	      this.render();
 	    })
             .event("mouseout", function(d) {
-              if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined) {
+              if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined) {
 		current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
 	      }
 	      d.selected = false;
@@ -986,16 +1054,18 @@ $(document).ready(function() {
 		var content = "";
                 var nodeinfo = $("#topology_"+current_deployment.name+" .nodeinfo");
                 if (current_deployment.deploymentHasMapping) {
-		  if (current_deployment.deviceIdMapping[d.node_id] !== undefined)
+		  if (current_deployment.deviceIdMapping[d.node_id] !== undefined) {
 		    nodeinfo.find(".title").empty().append("Position: "+current_deployment.deviceIdMapping[d.node_id].position);
-		  else
+		    content += "<br>Device Id: " + d.node_id + "<br><br>Info:<br>" + current_deployment.deviceIdMapping[d.node_id].comment;
+		  }
+		  else {
 		    nodeinfo.find(".title").empty().append("Position: NOT AVAILABLE");
-		  
-		  content += "<br>Device Id: " + d.node_id;
+		    content += "<br>Device Id: " + d.node_id;
+		  }
 		}
                 else 
 		  nodeinfo.find(".title").empty().append("Node ID: "+d.node_id);
-		nodeinfo.find(".infocontainer").empty().append("Type: "+nodetypes[d.nodetype]+ (d.nodetype==3?(" "+d.corestation_running):"") + content);
+		nodeinfo.find(".infocontainer").empty().append("Type: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("<br>Gumstix running: "+d.corestation_running):"") + content);
                 nodeinfo.show();
               }); /*
             .event("mousedown", pv.Behavior.drag())
@@ -1037,17 +1107,17 @@ $(document).ready(function() {
         $($(".healthtable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
             "<th class=\"header\" style=\"display:none\">Position</th>"+
             "<th class=\"header\" style=\"width:30px\">ID</th>"+
-            "<th class=\"header\">Pkt Count</th>"+
+            "<th class=\"header\">Packet<br>Count</th>"+
             "<th class=\"header\">Vsys</th>"+
-            "<th class=\"header\">Vsdi</th>"+
-            "<th class=\"header\">I</th>"+
-            "<th class=\"header\">Temp</th>"+
-            "<th class=\"header\">Hum</th>"+
-            "<th class=\"header\">Flash Count</th>"+
+            "<th class=\"header\" style=\"width:37px\">Vsdi</th>"+
+            "<th class=\"header\" style=\"width:15px\">I</th>"+
+            "<th class=\"header\" style=\"width:43px\">Temp</th>"+
+            "<th class=\"header\" style=\"width:39px\">Hum</th>"+
+            "<th class=\"header\">Flash<br>Count</th>"+
             "<th class=\"header\">Uptime</th>"+
             "<th class=\"header\">Generation Time</th>"+
             "<th class=\"header\">Timestamp</th>"+
-            "<th class=\"header\">Packetrate</th>"+
+            "<th class=\"header\">Packet<br>rate</th>"+
             "</tr></thead><tbody></tbody></table>");
         $("#topology_"+deployments[i]).find(".healthtable table").tablesorter({ 
           widthFixed: true,
@@ -1068,24 +1138,26 @@ $(document).ready(function() {
         });
         // add config table
         $($(".configtable", "#topology_"+deployments[i])[0]).append("<table class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr>"+
-            "<th class=\"header\" style=\"display:none\">Position</th>"+
-            "<th class=\"header\" style=\"width:30px\">ID</th>"+
-            "<th class=\"header\">info</th>"+
-            "<th class=\"header\">health</th>"+
-            "<th class=\"header\">adcmux</th>"+
-            "<th class=\"header\">adccomdiff</th>"+
-            "<th class=\"header\">dcx</th>"+
-            "<th class=\"header\">drift</th>"+
-            "<th class=\"header\">events</th>"+
-            "<th class=\"header\">rssi</th>"+
-            "<th class=\"header\">statecounter</th>"+
-            "<th class=\"header\">decagon</th>"+
-            "<th class=\"header\">vaisala</th>"+
-            "<th class=\"header\">th3</th>"+
-            "<th class=\"header\">enviroscan</th>"+
-            "<th class=\"header\">powerswitch</th>"+
-            "<th class=\"header\">p1</th>"+
-            "<th class=\"header\">p2</th>"+
+            "<th class=\"header\" style=\"display:none\">Posi<br>tion<br></th>"+
+            "<th class=\"header\" style=\"width:30px\">ID<br></th>"+
+            "<th class=\"header\" style=\"width:33px\">info</th>"+
+            "<th class=\"header\">hea<br>lth</th>"+
+            "<th class=\"header\">adc<br>mux</th>"+
+            "<th class=\"header\">adcco<br>mdiff</th>"+
+            "<th class=\"header\" style=\"width:29px\">dcx</th>"+
+            "<th class=\"header\" style=\"width:35px\">drift</th>"+
+            "<th class=\"header\">ev<br>ents</th>"+
+            "<th class=\"header\" style=\"width:35px\">rssi</th>"+
+            "<th class=\"header\">state<br>cnt</th>"+
+            "<th class=\"header\">deca<br>gon</th>"+
+            "<th class=\"header\">vai<br>sala</th>"+
+            "<th class=\"header\" style=\"width:29px\">th3</th>"+
+            "<th class=\"header\">enviro<br>scan</th>"+
+            "<th class=\"header\">mod<br>bus</th>"+
+            "<th class=\"header\" style=\"width:42px\">wgps</th>"+
+            "<th class=\"header\">power<br>switch</th>"+
+            "<th class=\"header\" style=\"width:25px\">p1</th>"+
+            "<th class=\"header\" style=\"width:25px\">p2</th>"+
             "<th class=\"header\">Timestamp</th>"+
             "</tr></thead><tbody></tbody></table>");
         $("#topology_"+deployments[i]).find(".configtable table").tablesorter({ 

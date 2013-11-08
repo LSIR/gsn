@@ -37,12 +37,14 @@ import gsn.storage.DataEnumerator;
 
 public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	
-	private static final long LINK_TIMEOUT = 3600000;	   // time until a link is removed
-	private static final long NODE_TIMEOUT = 7 * 24 * 3600000; // time until a node and its history is removed
-	private static final long NODE_CONFIGURABLE_TIME = 5 * 60000; // time until a node is not configurable anymore
-	private static final long NODE_CONFIGURE_TIMEOUT = 6 * 60000; // time to wait until configuration is resent
-	private static final long NODE_CONFIGURE_NEXT_TRY_TIMEOUT = 30000; // time to wait until next configuration entry is tried
-	private static final long NODE_CONFIGURE_CHECK_TIMEOUT = 2 * 3600000; // time to wait between config checks
+	public static final long STANDBY_TIMEOUT_MS = 300000L; // time until a node is seen as unconnected
+	public static final long NODE_TIMEOUT = 30L * 24L * 3600000L; // time until a node and its history is removed
+	private static final long LINK_TIMEOUT = 3600000L;	   // time until a link is removed
+	private static final long NODE_CONFIGURABLE_TIME = 5L * 60000L; // time until a node is not configurable anymore
+	private static final long NODE_CONFIGURE_TIMEOUT = 6L * 60000L; // time to wait until configuration is resent
+	private static final long NODE_CONFIGURE_NEXT_TRY_TIMEOUT = 30000L; // time to wait until next configuration entry is tried
+	private static final long NODE_CONFIGURE_CHECK_TIMEOUT = 2L * 3600000L; // time to wait between config checks
+	private static final long NODE_CONFIGURE_CHECK_TIMEOUT_STARTUP = 300000L; // time to wait between config checks on startup
 	private static final short EVENT_DATACONFIG = 40;
 	private static final short EVENT_PSB_POWER = 32;
 	private static final short EVENT_BB_POWER_OFF = 31;
@@ -84,6 +86,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		"sdivoltage-field",
 		"ae-stream-name",
 		"corestation-statistics-stream-name",
+		"wgps-stream-name",
 	};
 	
 	private static final String commandConfigurationParameter = "dozer-command-vs";
@@ -103,10 +106,10 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		boolean notifyscheduler=false;
 		Short event_value = null;
 		Short event_id = null;
-		Integer node_type = null;
+		Short node_type = null;
 		Byte valid = null;
 		Boolean p1 = null;
-		Boolean p2 = null; 
+		Boolean p2 = null;
 		
 		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( "data received under the name *" ).append( inputStreamName ).append( "* to the TopologyVS." ).toString( ) );
 		s = data.getData(configuration[0]);
@@ -202,7 +205,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						node.pendingConfiguration=null;
 				}
 				notifyscheduler=true;
-				node_type = new Integer(node.nodetype);
+				node_type = new Short(node.nodetype);
 			}
 			else if (event_id == EVENT_PSB_POWER && event_value!=null) {
 				p1 = (event_value & 1) > 0;
@@ -218,10 +221,9 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						node.pendingConfiguration=null;
 				}
 				notifyscheduler=true;
-				node_type = new Integer(node.nodetype);
+				node_type = new Short(node.nodetype);
 			}
 			else if (event_id == EVENT_BB_POWER_ON || event_id == EVENT_BB_POWER_OFF) {
-				node.setBBControl();
 				if (event_id == EVENT_BB_POWER_ON)
 					node.corestation_running = new Boolean(true);
 				else
@@ -236,7 +238,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		else {
 			node.packet_count++;
 			if (inputStreamName.equals(configuration[10]) && !node.isAccessNode()) {
-				node.setAccessNode();
+				node.setNodeType(SensorNode.BASESTATION);
 				// adjust configuration
 				node.pendingConfiguration=null;
 				if (node.configuration!=null)
@@ -244,7 +246,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			}
 			else if (inputStreamName.equals(configuration[11])) { // power switch packets
 				if (!node.isPowerSwitch()) {
-					node.setPowerSwitch();
+					node.setNodeType(SensorNode.POWERSWITCH_TN);
 					// 	adjust configuration
 					node.pendingConfiguration=null;
 					if (node.configuration!=null)
@@ -273,11 +275,16 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					}
 					notifyscheduler=true;
 					event_id = EVENT_PSB_POWER;
-					node_type = new Integer(node.nodetype);
+					node_type = new Short(node.nodetype);
 				}
 			}
 			else if (inputStreamName.equals(configuration[22])) { // ae-board packets
-				node.setAENode();
+				node.setNodeType(SensorNode.AE_TINYNODE);
+			}
+			else if (inputStreamName.equals(configuration[24])) { // wgps-board space vehicle packets
+				node.setNodeType(SensorNode.WGPS_TINYNODE);
+				// we do not want all sv packets generating a topology stream
+				return;
 			}
 			s = data.getData(configuration[1]);
 			if (s instanceof Integer) {
@@ -289,25 +296,12 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			if (node.timestamp == timestamp) {
 				// Vsys
 				s = data.getData(configuration[4]);
-				if (s instanceof Integer) {
-					if (node.isSibNode()) {
-						node.setVsys(new Double((Integer)s)  * (2.56d/65536d) * (39d/24d));
-					}
-					else if (node.isPowerSwitch()) {
-						node.setVsys(new Double((Integer)s)  * (1.5d / 4095d) * (8d/3d));
-					} 
-					else if (node.isAENode()) {
-						node.setVsys(new Double((Integer)s)  * 0.00091);
-					}
-				}
+				if (s instanceof Integer)
+					node.vsys = new Double((Integer)s);
 				// Current
 				s = data.getData(configuration[5]);
-				if (s instanceof Integer) {
-					if ((Integer)s==0xffff || !node.isSibNode())
-						node.current=null;
-					else
-						node.current = new Double((Integer)s) * 2.56 / Math.pow(2, 16) / 0.15 * 10;
-				}
+				if (s instanceof Integer)
+					node.current = new Double((Integer)s);
 				// Valid
 				s = data.getData(configuration[18]);
 				if (s instanceof Byte) {
@@ -317,31 +311,16 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				// Temperature
 				s = data.getData(configuration[6]);
 				if (s instanceof Integer) {
-					if ((Integer)s==0xffff || (valid!=null && valid==0)) {
+					if (valid!=null && valid==0) {
 						node.temperature = null;
 						node.humidity = null;
 					}
 					else {
-						if (node.hasSHT15())
-							node.temperature = new Double(-46.85 + 175.72 * (new Double((Integer)s))/Math.pow(2,14)); // SHT21
-						else if (node.hasSHT21())
-							node.temperature = new Double(-39.63d + (0.01d * (new Double((Integer)s)))); // SHT15
+						node.temperature = new Double((Integer)s);
 						// Humidity
 						s = data.getData(configuration[7]);
-						if (s instanceof Integer) {
-							if ((Integer)s==0xffff)
-								node.humidity = null;
-							else {
-								if (node.hasSHT15()) { // SHT15
-									Double d = new Double((Integer)s);
-									Double hum_rel = new Double(-4 + (0.0405d * d) - 0.0000028d * Math.pow(d, 2));				
-									node.humidity = new Double((node.temperature - 25) * (0.01d + (0.00008d * d)) + hum_rel);
-								}
-								else if (node.hasSHT21()) { // SHT21
-									node.humidity = -6d + 125d * new Double((Integer)s) / Math.pow(2, 12);
-								} 
-							}
-						}
+						if (s instanceof Integer)
+							node.humidity = new Double((Integer)s);
 					}
 				}
 				// Flash count
@@ -354,23 +333,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					node.uptime = (Integer)s;
 				// VSdi
 				s = data.getData(configuration[21]);
-				if (s instanceof Integer) {
-					Double vsdi = null;
-					if (node.isSibNode()) {
-						vsdi = new Double((Integer)s)  * (2.56d/65536d) * (204d/24d);
-					}
-					else if (node.isPowerSwitch()) {
-						vsdi = new Double((Integer)s)  * (1.5d / 4095d) * 12d;
-					}
-					else if (node.isBBControl() || node.isAccessNode()) {
-						vsdi = new Double((Integer)s)  * (2.5d / 4095d) * (115d/15d);
-						node.setVsys(vsdi);
-					}
-					else if (node.isAENode()) {
-						vsdi = new Double((Integer)s) * 0.00483;
-					}
-					node.setVsdi(vsdi);
-				}
+				if (s instanceof Integer)
+					node.vsdi = new Double((Integer)s);
 			}
 		}
 		// remove outdated information
@@ -404,7 +368,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 
 	}
 	
-	private void addToQueue(Integer node_id, Integer nodetype, SensorNodeConfiguration c, List<SensorNode> queue) {
+	private void addToQueue(Integer node_id, Short nodetype, SensorNodeConfiguration c, List<SensorNode> queue) {
 		// for each configuration packet add one item to queue
 		if (c.hasDataConfig1()) {
 			logger.debug("add data config 1 to queue for node "+node_id);
@@ -632,7 +596,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	    	scheduler.start();
 	    	if (configurationQueue.size()>0)
 	    		scheduler.reschedule(configurationQueue);
-		}	    
+		}
 		return true;
 	}
 	
@@ -796,7 +760,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			}
 		}
 		
-		public void configurationUpdate(Integer node_id, Short event_value, Integer node_type) {
+		public void configurationUpdate(Integer node_id, Short event_value, Short node_type) {
 			synchronized (this) {
 				logger.debug("configurationUpdate: "+node_id+" "+event_value+" "+node_type);
 				if (currentNode!=null && node_id.equals(currentNode.node_id)) {
@@ -843,7 +807,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			}
 		}
 		
-		public void portConfigurationUpdate(Integer node_id, Boolean p1, Boolean p2, Integer node_type) {
+		public void portConfigurationUpdate(Integer node_id, Boolean p1, Boolean p2, Short node_type) {
 			synchronized (this) {
 				logger.debug("port configurationUpdate: "+node_id+" "+p1+" "+p2+" "+node_type);				
 				if (currentNode!=null && node_id.equals(currentNode.node_id)) {
@@ -880,12 +844,17 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			long timeout;
 			try {
 				synchronized (this) {
-					if (queue.size()==0) {
+					while (running && queue.size()==0) {
 						logger.debug("check for online nodes that returned no configuration information.");
 						tvs.queryUnconfiguredNodes();
 						if (rescheduled) {
 							rescheduled = false;
 							queue = newqueue;							
+						}
+
+						if (queue.size()==0) {
+							logger.debug("suspend scheduler shortly on startup");
+							this.wait(NODE_CONFIGURE_CHECK_TIMEOUT_STARTUP);
 						}
 					}
 					while (running) {
@@ -896,7 +865,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						logger.debug("unsuspend scheduler");
 						if (rescheduled) {
 							rescheduled = false;
-							queue = newqueue;							
+							queue = newqueue;
 						}
 						if (!running)
 							break;

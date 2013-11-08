@@ -11,19 +11,24 @@ import com.vividsolutions.jts.geom.Coordinate;
 */
 
 public class SensorNode {
-	
+
 	private final transient Logger logger = Logger.getLogger( this.getClass() );
 	
-	public static final int NODE_TYPE_SIB = 0;
-	public static final int NODE_TYPE_ACCESS_NODE = 1;
-	public static final int NODE_TYPE_POWERSWITCH = 2;
-	public static final int NODE_TYPE_BBCONTROL = 3;
-	public static final int NODE_TYPE_AE = 4;
-	public static final Integer NODE_TYPE_UNKNOWN = -1;
+	// this has to be the same as in the Position Mapping VS!
+	public static final short SIB_TINYNODE = 1;
+	public static final short WGPS_TINYNODE = 2;
+	public static final short POWERSWITCH_TN = 3;
+	public static final short BASESTATION = 4;
+	public static final short GPS_CORESTATION = 5;
+	public static final short CAMZILLA_CORESTATION = 6;
+	public static final short GPS_LOGGER = 7;
+	public static final short WEBCAM = 8;
+	public static final short AE_TINYNODE = 9;
+	public static final Short NODE_TYPE_UNKNOWN = -1;
 	
 	static final int VOLTAGE_HISTORY_SIZE = 60; // ~ 2h 
 	
-	public Integer nodetype = NODE_TYPE_SIB; // default type
+	public Short nodetype = SIB_TINYNODE;
 		
 	public Integer node_id;
 	public Integer parent_id;
@@ -32,8 +37,8 @@ public class SensorNode {
 	
 	public Integer packet_count = 0;
 	
-	private Double vsys;
-	private Double vsdi;
+	public Double vsys;
+	public Double vsdi;
 	public Double current;
 	public Double temperature;
 	public Double humidity;
@@ -66,57 +71,44 @@ public class SensorNode {
 	}
 	
 	public boolean isSibNode() {
-		return nodetype == NODE_TYPE_SIB;
+		return nodetype == SIB_TINYNODE;
 	}
 	
 	public boolean isAccessNode() {
-		return nodetype == NODE_TYPE_ACCESS_NODE;
+		return nodetype == BASESTATION;
 	}
 	
 	public boolean isPowerSwitch() {
-		return nodetype == NODE_TYPE_POWERSWITCH;
+		return nodetype == POWERSWITCH_TN;
 	}
 	
 	public boolean isBBControl() {
-		return nodetype == NODE_TYPE_BBCONTROL;
+		return nodetype == GPS_CORESTATION || nodetype == CAMZILLA_CORESTATION;
 	}
 
 	public boolean isAENode() {
-		return nodetype == NODE_TYPE_AE;
+		return nodetype == AE_TINYNODE;
+	}
+
+	public boolean isWGPSNode() {
+		return nodetype == WGPS_TINYNODE;
 	}
 	
 	public boolean hasSHT21() {
-		return isBBControl() || isAccessNode() || isAENode();
+		return isBBControl() || isAccessNode() || isAENode() || isWGPSNode();
 	}
 	
 	public boolean hasSHT15() {
 		return isSibNode() || isPowerSwitch();
 	}
 
-	public void setSibNode() {
-		nodetype = NODE_TYPE_SIB;
-		iscorestation = false;
+	public void setNodeType(Short nodetype) {
+		this.nodetype = nodetype;
+		if (nodetype == BASESTATION || nodetype == GPS_CORESTATION || nodetype == CAMZILLA_CORESTATION)
+			iscorestation = true;
+		else
+			iscorestation = false;
 	}
-	
-	public void setAccessNode() {
-		nodetype = NODE_TYPE_ACCESS_NODE;
-		iscorestation = true;
-	}
-	
-	public void setPowerSwitch() {
-		nodetype = NODE_TYPE_POWERSWITCH;
-		iscorestation = false;
-	}
-	
-	public void setBBControl() {
-		nodetype = NODE_TYPE_BBCONTROL;
-		iscorestation = true;
-	}
-	
-	public void setAENode() {
-		nodetype = NODE_TYPE_AE;
-		iscorestation = false;
-	}	
 	
 	public String getVsys() {
 		if (vsys!=null)
@@ -124,10 +116,18 @@ public class SensorNode {
 		return null;
 	}
 	
+	public Double getVsysDbl() {
+		return vsys;
+	}
+	
 	public String getVsdi() {
 		if (vsdi!=null)
 			return df.format(vsdi);
 		return null;
+	}
+	
+	public Double getVsdiDbl() {
+		return vsdi;
 	}
 	
 	public String getCurrent() {
@@ -179,11 +179,11 @@ public class SensorNode {
 		Double std=0d;
 		Double noiseupper=0d;Double uppercount = 0d;
 		Double noiselower=0d;Double lowercount = 0d;
-		if (!isSibNode() && !isBBControl() && !isAccessNode()) {
+		if (!isSibNode() && !isBBControl() && !isAccessNode() && !isPowerSwitch() && !isWGPSNode()) {
 			batterylevel = null;
 			return batterylevel;
 		}
-		else if ((isBBControl() || isAccessNode()) && voltageHistory.size()>0) {
+		else if ((isBBControl() || isAccessNode() || isWGPSNode()) && voltageHistory.size()>0) {
 			if (voltageHistory.getLast()<11.5)
 				batterylevel=50;
 			else if (voltageHistory.getLast()<12)
@@ -316,6 +316,36 @@ public class SensorNode {
 
 	public boolean isDozerSink() {
 		return node_id <= 1024;
+	}
+	
+	public void updateNode(SensorNode node) {
+		this.nodetype = node.nodetype;
+		this.node_id = node.node_id;
+		this.parent_id = node.parent_id;
+		this.timestamp = node.timestamp;		
+		this.generation_time = node.generation_time;
+		
+		this.packet_count = node.packet_count;
+		
+		this.setVsys(node.getVsysDbl());
+		this.setVsdi(node.getVsdi());
+		this.current = node.current;
+		this.temperature = node.temperature;
+		this.humidity = node.humidity;
+		this.flash_count = node.flash_count;
+		this.uptime = node.uptime;
+		this.corestation_running = node.corestation_running;
+		this.iscorestation = node.iscorestation;
+		
+		this.configuration = node.configuration;
+		this.pendingConfiguration = node.pendingConfiguration;
+				
+		this.links = node.links;
+		
+		this.position = node.position;
+		this.geoposition = node.geoposition;
+		
+		this.coordinate = node.coordinate;
 	}
 
 }

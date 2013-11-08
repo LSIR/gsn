@@ -16,6 +16,8 @@ public class SensorNodeConfiguration {
 	public Boolean vaisala_wxt520 = null;
 	public Boolean th3 = null;
 	public Boolean enviroscan = null;
+	public Boolean modbus = null;
+	public Boolean wgps = null;
 	public Boolean powerswitch_p1 = null;
 	public Boolean powerswitch_p2 = null;
 	
@@ -25,7 +27,7 @@ public class SensorNodeConfiguration {
 	public Integer querytype = null;
 	public Long timestamp;
 	
-	private Integer nodetype = null;
+	private Short nodetype = null;
 	
 	//data sources 1
 	private final static int INDEX_INFO = 0;
@@ -43,6 +45,12 @@ public class SensorNodeConfiguration {
 	//data sources 2
 	private final static int INDEX_TH3 = 0;
 	private final static int INDEX_ENVIROSCAN = 1;
+	@SuppressWarnings("unused")
+	private final static int INDEX_UNUSED1 = 2;
+	@SuppressWarnings("unused")
+	private final static int INDEX_UNUSED2 = 3;
+	private final static int INDEX_MODBUS = 4;
+	private final static int INDEX_WGPS = 5;
 
 	
 	private final static int INDEX_POWERSWITCH_P1 = 0;
@@ -54,7 +62,7 @@ public class SensorNodeConfiguration {
 		timestamp = System.currentTimeMillis();
 	}*/
 	
-	public SensorNodeConfiguration(SensorNodeConfiguration config, Integer node_type) {
+	public SensorNodeConfiguration(SensorNodeConfiguration config, Short node_type) {
 		if (node_type != null)
 			nodetype = node_type;
 		update(config.getConfiguration1());
@@ -64,21 +72,21 @@ public class SensorNodeConfiguration {
 		timestamp = config.timestamp;
 	}
 
-	public SensorNodeConfiguration(Short config, Integer node_type, Long timestamp) {
+	public SensorNodeConfiguration(Short config, Short node_type, Long timestamp) {
 		if (node_type != null)
 			nodetype = node_type;
 		update(config);
 		this.timestamp = timestamp;
 	}
 	
-	public SensorNodeConfiguration(Short config, Integer node_type) {
+	public SensorNodeConfiguration(Short config, Short node_type) {
 		if (node_type != null)
 			nodetype = node_type;
 		update(config);
 	}
 
 	public SensorNodeConfiguration(Boolean p1, Boolean p2) {
-		nodetype = SensorNode.NODE_TYPE_POWERSWITCH;
+		nodetype = SensorNode.POWERSWITCH_TN;
 		update(p1, p2);
 	}
 	
@@ -86,7 +94,7 @@ public class SensorNodeConfiguration {
 		this.querytype = querytype;
 	}
 
-	public void update(Short config, Integer node_type) {
+	public void update(Short config, Short node_type) {
 		if (node_type!=null)
 			nodetype = node_type;
 		update(config);
@@ -100,29 +108,32 @@ public class SensorNodeConfiguration {
 			events = (config & (1 << INDEX_EVENTS)) > 0;
 			rssi = (config & (1 << INDEX_RSSI)) > 0;
 			statecounter = (config & (1 << INDEX_STATECOUNTER)) > 0;
-			if (getNodeType() == SensorNode.NODE_TYPE_SIB) {
+			if (getNodeType() == SensorNode.SIB_TINYNODE) {
 				adcmux = (config & (1 << INDEX_ADCMUX)) > 0;
 				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0;
 				dcx = (config & (1 << INDEX_DCX)) > 0;
 				decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
 				vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
 			}
-			else if (getNodeType() == SensorNode.NODE_TYPE_POWERSWITCH)
+			else if (getNodeType() == SensorNode.POWERSWITCH_TN)
 				powerswitch= (config & (1 << INDEX_POWERSWITCH)) > 0;
-			else if (getNodeType() == SensorNode.NODE_TYPE_AE)
+			else if (getNodeType() == SensorNode.AE_TINYNODE)
 				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0; // ae data
 		}
 		else {
-			if (getNodeType() == SensorNode.NODE_TYPE_SIB) {
+			if (getNodeType() == SensorNode.SIB_TINYNODE) {
 				th3 = (config & (1 << INDEX_TH3)) > 0;
 				enviroscan = (config & (1 << INDEX_ENVIROSCAN)) > 0;
+				modbus = (config & (1 << INDEX_MODBUS)) > 0;
 			}
+			else if (getNodeType() == SensorNode.WGPS_TINYNODE)
+				wgps = (config & (1 << INDEX_WGPS)) > 0;
 		}
 		timestamp = System.currentTimeMillis();
 	}
 	
 	public void update(Boolean p1, Boolean p2) {
-		nodetype = SensorNode.NODE_TYPE_POWERSWITCH;
+		nodetype = SensorNode.POWERSWITCH_TN;
 		powerswitch_p1 = p1;
 		powerswitch_p2 = p2;
 		timestamp = System.currentTimeMillis();
@@ -146,16 +157,16 @@ public class SensorNodeConfiguration {
 			rssi!=null &&
 			statecounter!=null;	
 		switch (getNodeType()) {
-		case SensorNode.NODE_TYPE_SIB:
+		case SensorNode.SIB_TINYNODE:
 			return hasconfig &&
 			adcmux!=null &&
 			adccomdiff!=null &&
 			dcx!=null &&
 			decagonmux!=null;
-		case SensorNode.NODE_TYPE_POWERSWITCH:
+		case SensorNode.POWERSWITCH_TN:
 			return hasconfig &&
 			powerswitch!=null;
-		case SensorNode.NODE_TYPE_AE:
+		case SensorNode.AE_TINYNODE:
 			return hasconfig &&
 			adccomdiff!=null;
 		default:
@@ -166,7 +177,9 @@ public class SensorNodeConfiguration {
 	public boolean hasDataConfig2() {
 		return
 			th3!=null && 
-			enviroscan!=null;
+			enviroscan!=null &&
+			modbus!=null &&
+			wgps!=null;
 	}
 	
 	public void removeDataConfig1() {
@@ -187,6 +200,8 @@ public class SensorNodeConfiguration {
 	public void removeDataConfig2() {
 		th3=null; 
 		enviroscan=null;
+		modbus=null;
+		wgps=null;
 	}
 	
 	public Short getConfiguration1() {
@@ -209,7 +224,9 @@ public class SensorNodeConfiguration {
 	public Short getConfiguration2() {
 		return (short) (
 			(th3 == null || !th3 ? 0: 1 << INDEX_TH3) + 
-			(enviroscan == null || !enviroscan ? 0: 1 << INDEX_ENVIROSCAN)
+			(enviroscan == null || !enviroscan ? 0: 1 << INDEX_ENVIROSCAN) + 
+			(modbus == null || !modbus ? 0: 1 << INDEX_MODBUS) + 
+			(wgps == null || !wgps ? 0: 1 << INDEX_WGPS)
 		);
 	}
 	
@@ -250,6 +267,8 @@ public class SensorNodeConfiguration {
 				bothNullOrEqual(sc.vaisala_wxt520, this.vaisala_wxt520) &&
 				bothNullOrEqual(sc.th3, this.th3) &&
 				bothNullOrEqual(sc.enviroscan, this.enviroscan) &&
+				bothNullOrEqual(sc.modbus, this.modbus) &&
+				bothNullOrEqual(sc.wgps, this.wgps) &&
 				bothNullOrEqual(sc.querytype, this.querytype);
 		}
 		else
@@ -274,11 +293,13 @@ public class SensorNodeConfiguration {
 			"\nvaisala_wxt520: "+vaisala_wxt520+
 			"\nth3: "+th3+
 			"\nenviroscan: "+enviroscan+
+			"\nmodbus: "+modbus+
+			"\nwgps: "+wgps+
 			"\nisquery: "+querytype+
 			"\ntimestamp:"+timestamp;
 	}
 	
-	private Integer getNodeType() {
+	private Short getNodeType() {
 		return nodetype!=null?nodetype:SensorNode.NODE_TYPE_UNKNOWN;
 	}
 

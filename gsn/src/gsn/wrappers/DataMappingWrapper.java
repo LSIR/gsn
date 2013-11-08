@@ -300,7 +300,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 	}
 	
 	// mapping queries
-	public static Integer getPosition(int device_id, long generationTime, String deployment, String vsName, String inputStreamName) {
+	public static Integer getPosition(int device_id, long generationTime, String deployment, String vsName, String inputStreamName, boolean warn) {
 		Integer pos = null;
 		long start = -1;
 		if (logger.isDebugEnabled())
@@ -319,12 +319,44 @@ public class DataMappingWrapper extends AbstractWrapper {
 			logger.warn(e.getMessage(), e);
 		}
 		
-		if (pos==null)
+		if (pos==null && (warn || logger.isDebugEnabled()))
 			logger.warn(vsName+"[source="+inputStreamName+"]: No position mapping available for deployment "+deployment+" device-id "+device_id+" and generation_time="+generationTime);
 		if (logger.isDebugEnabled())
 			logger.debug(vsName+"[source="+inputStreamName+"]: getPosition: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
 		
 		return pos;
+	}
+	
+	public static Integer getPosition(int device_id, long generationTime, String deployment, String vsName, String inputStreamName) {
+		return getPosition(device_id, generationTime, deployment, vsName, inputStreamName, true);
+	}
+	
+	// mapping queries
+	public static Short getDeviceType(int device_id, long generationTime, String deployment, String vsName, String inputStreamName) {
+		Short deviceType = null;
+		long start = -1;
+		if (logger.isDebugEnabled())
+			start = System.nanoTime();
+
+		Mappings m = deployments.get(deployment);
+		
+		if (m == null || !m.isPositionAvailable()) {
+			logger.error(vsName+"[source="+inputStreamName+"]: Device type mapping data not available for deployment "+deployment);
+			return null;
+		}
+		
+		try {
+			deviceType = m.executeDeviceTypeSelect(device_id, generationTime);
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
+		
+		if (deviceType==null)
+			logger.warn(vsName+"[source="+inputStreamName+"]: No device type mapping available for deployment "+deployment+" device-id "+device_id+" and generation_time="+generationTime);
+		if (logger.isDebugEnabled())
+			logger.debug(vsName+"[source="+inputStreamName+"]: getDeviceType: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		
+		return deviceType;
 	}
 	
 	public static Coordinate getCoordinate(int position, String deployment, String vsName, String inputStreamName) {
@@ -685,7 +717,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 		private PreparedStatement conversion_select = null;
 		
 		public synchronized void setPositionQueries() throws SQLException {
-			position_select = h2DBconn.prepareStatement("SELECT position FROM " + deployment + "_position WHERE device_id = ? AND ((end is null AND begin <= ?) OR (? BETWEEN begin AND end)) LIMIT 1");
+			position_select = h2DBconn.prepareStatement("SELECT position, device_type FROM " + deployment + "_position WHERE device_id = ? AND ((end is null AND begin <= ?) OR (? BETWEEN begin AND end)) LIMIT 1");
 			position_insert = h2DBconn.prepareStatement("INSERT INTO " + deployment + "_position (device_id, device_type, begin, end, position, comment) VALUES (?,?,?,?,?,?)");
 		}
 		
@@ -888,6 +920,24 @@ public class DataMappingWrapper extends AbstractWrapper {
 				}
 			}
 			return pos;
+		}
+		
+		public Short executeDeviceTypeSelect(int deviceId, long generationTime) throws SQLException {
+			Short deviceType = null;
+			if (position_select != null) {
+				synchronized (position_select){
+					position_select.setInt(1, deviceId);
+					position_select.setLong(2, generationTime);
+					position_select.setLong(3, generationTime);
+					ResultSet rs = position_select.executeQuery();
+					if (rs.next()) {
+						deviceType = rs.getShort(2);
+						if (rs.wasNull())
+							deviceType = null;
+					}
+				}
+			}
+			return deviceType;
 		}
 		
 		

@@ -15,7 +15,7 @@ jQuery.extend({
 		jQuery.historyCallback = callback;
 		var current_hash = location.hash;
 		jQuery.historyCurrentHash = current_hash;
-		if(jQuery.browser.msie) {
+		if(navigator.userAgent.match(/msie/i)) {
 			// add hidden iframe for IE
 			$("body").prepend('<iframe id="jQuery_history" style="display: none;"></iframe>');
 			var history = $("#jQuery_history")[0];
@@ -28,7 +28,7 @@ jQuery.extend({
 		setInterval(jQuery.historyCheck, 100);
 	},
 	historyCheck: function(){
-		if(jQuery.browser.msie) {
+		if(navigator.userAgent.match(/msie/i)) {
 			// On IE, check for location.hash of iframe
 			var history = $("#jQuery_history")[0];
 			var iframe = history.contentDocument || history.contentWindow.document;
@@ -51,7 +51,7 @@ jQuery.extend({
 		var newhash = '#' + hash;
 		location.hash = newhash;
 		jQuery.historyCurrentHash = newhash;
-		if(jQuery.browser.msie) {
+		if(navigator.userAgent.match(/msie/i)) {
 			var history = $("#jQuery_history")[0];
 			var iframe = history.contentWindow.document;
 			iframe.open();

@@ -1,3 +1,6 @@
 "SIGNAL_NAME","PHYSICAL_SIGNAL","CONVERSION","INPUT"
-"sdivoltage","sdivoltage","voltage","adc"
-"sysvoltage","sysvoltage","voltage","adc"
+"sdivoltage","sdivoltage","Voltage","adc"
+"sysvoltage","sysvoltage","Voltage","adc"
+"current","current","Current","adc"
+"msptemperature","msptemperature","MspTemperature","intern"
+"temperature","temperature","Sht11Temperature","spi"
