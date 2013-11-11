@@ -28,9 +28,10 @@
             <param name="evenlogger-id-field">EVENT_ID</param>
             <param name="evenlogger-value-field">EVENT_VALUE</param>
             
-            <!-- param name="dozer-command-vs">Jungfraujoch_Dozer_Command</param -->
+            <param name="dozer-command-vs">Jungfraujoch_Dozer_Command</param>
             <param name="ae-stream-name">data18</param>
             <param name="corestation-statistics-stream-name">data25</param>
+            <param name="wgps-stream-name">data26</param>
         </init-params>
         <!-- web-input>
             <command name="dataconfiguration">
@@ -509,5 +510,17 @@
       </source>
       <query> select * from source </query>
     </stream> 
+    <-- stream name="data26">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME
+            from jungfraujoch_dozer_wgpssv
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream -->
     </streams>
 </virtual-sensor>

@@ -2,24 +2,27 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <title>GSN</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<title>GSN</title>
 
-  <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
-  <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
-  <script type="text/javascript" src="js/jquery.min.js"></script>
-  <script type="text/javascript" src="js/jquery-dom.js"></script>
-  <script type="text/javascript" src="js/jquery.history.js"></script>
-  <script type="text/javascript" src="js/jquery-tooltip.js"></script>
-  <script type="text/javascript" src="js/jquery.cookie.js"></script>
-  <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+<link rel="stylesheet" href="style/gsn.css" type="text/css"
+	media="screen,projection" />
+<link rel="stylesheet" href="style/tablesorter.css" type="text/css"
+	media="screen,projection" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery-dom.js"></script>
+<script type="text/javascript" src="js/jquery.history.js"></script>
+<script type="text/javascript" src="js/jquery-tooltip.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
 
-  <script type="text/javascript" src="js/constants.js"></script>
-  <script type="text/javascript" src="js/functions.js"></script>
-  <script type="text/javascript" src="js/uptime.js"></script>
-  <script type="text/javascript" src="js/protovis-d3.3.js"></script>
-        
-  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="js/constants.js"></script>
+<script type="text/javascript" src="js/functions.js"></script>
+<script type="text/javascript" src="js/uptime.js"></script>
+<script type="text/javascript" src="js/protovis-d3.3.js"></script>
+
+<script type="text/javascript"
+	src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 
 <script type="text/javascript">
 <!--//<![CDATA[
@@ -42,14 +45,15 @@ var unmarkTimer;
 var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520","th3","enviroscan","modbus","wgps","powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
 var healthitems=new Array("packet_count", "vsys", "vsdi", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
 var nodetypes = {1: "SIB TinyNode", 2: "WGPS TinyNode", 3: "PowerSwitch TN", 4: "BaseStation", 5: "GPS CoreStation", 6: "CamZilla CoreStation", 7: "GPS Logger", 8: "Webcam", 9: "AE TinyNode"};
-var geoMarkersTypeToIconMap = {	1: {small: 'img/map-icons/map-icon-green-small-SIB.png', big: 'img/map-icons/map-icon-green-big-SIB.png'},
-				2: {small: 'img/map-icons/map-icon-green-small-WGPS.png', big: 'img/map-icons/map-icon-green-big-WGPS.png'},
-				3: {small: 'img/map-icons/map-icon-green-small-PowerSwitch.png', big: 'img/map-icons/map-icon-green-big-PowerSwitch.png'},
-				4: {small: 'img/map-icons/map-icon-green-small-BaseStation.png', big: 'img/map-icons/map-icon-green-big-BaseStation.png'},
-				5: {small: 'img/map-icons/map-icon-green-small-GPSCoreStation.png', big: 'img/map-icons/map-icon-green-big-GPSCoreStation.png'},
-				6: {small: 'img/map-icons/map-icon-green-small-CamZilla.png', big: 'img/map-icons/map-icon-green-big-CamZilla.png'},
-				7: {small: 'img/map-icons/map-icon-blue-small-GPSLogger.png', big: 'img/map-icons/map-icon-blue-big-GPSLogger.png'},
-				8: {small: 'img/map-icons/map-icon-purple-small-WebCam.png', big: 'img/map-icons/map-icon-purple-big-WebCam.png'}};
+var geoMarkersTypeToIconMap = {	1: {small: 'img/map-icons/map-icon-green-small-SIB.png', big: 'img/map-icons/map-icon-green-big-SIB.png', offlinesmall: 'img/map-icons/map-icon-red-small-SIB.png', offlinebig: 'img/map-icons/map-icon-red-big-SIB.png'},
+				2: {small: 'img/map-icons/map-icon-green-small-WGPS.png', big: 'img/map-icons/map-icon-green-big-WGPS.png', offlinesmall: 'img/map-icons/map-icon-red-small-WGPS.png', offlinebig: 'img/map-icons/map-icon-red-big-WGPS.png'},
+				3: {small: 'img/map-icons/map-icon-green-small-PowerSwitch.png', big: 'img/map-icons/map-icon-green-big-PowerSwitch.png', offlinesmall: 'img/map-icons/map-icon-red-small-PowerSwitch.png', offlinebig: 'img/map-icons/map-icon-red-big-PowerSwitch.png'},
+				4: {small: 'img/map-icons/map-icon-green-small-BaseStation.png', big: 'img/map-icons/map-icon-green-big-BaseStation.png', offlinesmall: 'img/map-icons/map-icon-red-small-BaseStation.png', offlinebig: 'img/map-icons/map-icon-red-big-BaseStation.png'},
+				5: {small: 'img/map-icons/map-icon-green-small-GPSCoreStation.png', big: 'img/map-icons/map-icon-green-big-GPSCoreStation.png', offlinesmall: 'img/map-icons/map-icon-red-small-GPSCoreStation.png', offlinebig: 'img/map-icons/map-icon-red-big-GPSCoreStation.png'},
+				6: {small: 'img/map-icons/map-icon-green-small-CamZilla.png', big: 'img/map-icons/map-icon-green-big-CamZilla.png', offlinesmall: 'img/map-icons/map-icon-red-small-CamZilla.png', offlinebig: 'img/map-icons/map-icon-red-big-CamZilla.png'},
+				7: {small: 'img/map-icons/map-icon-blue-small-GPSLogger.png', big: 'img/map-icons/map-icon-blue-big-GPSLogger.png', offlinesmall: 'img/map-icons/map-icon-blue-small-GPSLogger.png', offlinebig: 'img/map-icons/map-icon-blue-big-GPSLogger.png'},
+				8: {small: 'img/map-icons/map-icon-purple-small-WebCam.png', big: 'img/map-icons/map-icon-purple-big-WebCam.png', offlinesmall: 'img/map-icons/map-icon-purple-small-WebCam.png', offlinebig: 'img/map-icons/map-icon-purple-big-WebCam.png'},
+				9: {small: 'img/map-icons/map-icon-green-small-AE.png', big: 'img/map-icons/map-icon-green-big-AE.png', offlinesmall: 'img/map-icons/map-icon-red-small-AE.png', offlinebig: 'img/map-icons/map-icon-red-big-AE.png'}};
 
 var infowindow = new google.maps.InfoWindow({content: 'test'});
 
@@ -652,9 +656,10 @@ function PacketRate() {
       $("positionMap", this).each(function() {
         var begin = parseInt($(this).attr("begin"));
         var end = parseInt($(this).attr("end"));
-        if ((begin <= now && isNaN(end)) || (begin <= now && end > now))
-	  current_deployment.deviceIdMapping[parseInt($(this).attr("device_id"))] = {position : pos, type : parseInt($(this).attr("device_type")), end : end, comment : $(this).attr("comment")};
+        if ((begin <= now && isNaN(end)) || (begin <= now && end > now)) {
+	  current_deployment.deviceIdMapping[parseInt($(this).attr("device_id"))] = {position : pos, type : parseInt($(this).attr("device_type")), end : end, comment : $(this).attr("comment"), isonline: false};
 	  current_deployment.positionToDeviceIdMap[pos] = parseInt($(this).attr("device_id"));
+	}
       });
     });
   }
@@ -666,19 +671,28 @@ function PacketRate() {
       var pos = parseInt($(this).attr("position"));
       if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]] !== undefined) {
 	if (!current_deployment.geoMarkers[pos]) {
-	  current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small});
+	  if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].isonline)
+	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small});
+	  else
+	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinesmall});
 	  current_deployment.geoMarkers[pos].setPosition(new google.maps.LatLng(parseFloat($(this).attr("latitude")), parseFloat($(this).attr("longitude"))));
 	  current_deployment.geoMarkers[pos].setTitle("Position " + pos + "\n\n" + $(this).attr("comment") + "\ndevice_id=" + current_deployment.positionToDeviceIdMap[pos]);
 	  google.maps.event.addListener(current_deployment.geoMarkers[pos], 'mouseover', function() {
 	    current_deployment.geoMarkers[pos].setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
-	    current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].big);
+	    if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].isonline)
+	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].big);
+	    else
+	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinebig);
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] !== undefined) {
 	      current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].selected = true;
 	      current_deployment.node.render();
 	    }
 	  });
 	  google.maps.event.addListener(current_deployment.geoMarkers[pos], 'mouseout', function() {
-	    current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small);
+	    if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].isonline)
+	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small);
+	    else
+	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinesmall);
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] !== undefined) {
 	      current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].selected = false;
 	      current_deployment.node.render();
@@ -722,10 +736,11 @@ function PacketRate() {
 	  var x = pv.Scale.linear(positionTimeMin, now+2592000000).range(0,895);
 	  $("positionContainer", positionMaps).each(function() {
 		  var devices = new Array();
+		  var pos = parseInt($(this).attr("position"));
 		  $("positionMap", this).each(function() {
-			  devices.push([parseInt($(this).attr("device_id")), parseInt($(this).attr("begin")), parseInt($(this).attr("end")), $(this).attr("comment")])
+			  devices.push([parseInt($(this).attr("device_id")), parseInt($(this).attr("begin")), parseInt($(this).attr("end")), $(this).attr("comment"), pos]);
 		  });
-		  map.push([parseInt($(this).attr("position")), devices]);
+		  map.push([pos, devices]);
 	  });
 	  
 	  map = map.sort(sortMappingArray);
@@ -750,8 +765,20 @@ function PacketRate() {
 			        		ret += "\nInfo:\t\t" + d[3];
 			        	return ret;
 			        })
-			        .event("mouseover", function(d) {self.status = d[3];})
-			        .event("mouseout", function() {self.status = "";})
+			        .event("mouseover", function(d) {
+				  self.status = d[3];
+				  if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[d[4]])] !== undefined) {
+				    current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[d[4]])].selected = true;
+				    current_deployment.node.render();
+				  }
+				})
+			        .event("mouseout", function(d) {
+				  self.status = "";
+				  if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[d[4]])] !== undefined) {
+				    current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[d[4]])].selected = false;
+				    current_deployment.node.render();
+				  }
+				})
 				    .anchor("center").add(pv.Label)
 				      .text(function(d) {return (isNaN(d[2]) || ((x(d[2]) - x(d[1])) > 25)) ? d[0] : "";});
 
@@ -1025,18 +1052,61 @@ $(document).ready(function() {
             .shapeSize(function(d) {return 230;})
             .fillStyle(function(d) {
               var now=new Date().getTime();
-              if (d.timestamp === undefined || (now - d.timestamp) > STANDBY_TIMEOUT_MS)
+              if (d.timestamp === undefined || (now - d.timestamp) > STANDBY_TIMEOUT_MS) {
+		if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] != undefined) {
+		  if (current_deployment.deviceIdMapping[d.node_id].isonline) {
+		    current_deployment.deviceIdMapping[d.node_id].isonline = false;
+		    if (current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] != undefined)
+		      current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinesmall);
+		  }
+		}
                 return d.selected?"#ff5555":"#ffa0a0";
-              else if (now - d.timestamp > ACTIVE_TIMEOUT_MS)
-                return d.selected?"#1ae01a":"#a0c0a0";
-              else
-                return d.selected?"#1ae01a":"#a0ffa0";
+              }
+              else if (now - d.timestamp > ACTIVE_TIMEOUT_MS) {
+		if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] != undefined) {
+		  if (!current_deployment.deviceIdMapping[d.node_id].isonline) {
+		    current_deployment.deviceIdMapping[d.node_id].isonline = true;
+		    if (current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] != undefined)
+		      current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
+		  }
+		}
+		return d.selected?"#1ae01a":"#a0c0a0";
+	      }
+              else {
+		if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] != undefined) {
+		  if (!current_deployment.deviceIdMapping[d.node_id].isonline) {
+		    current_deployment.deviceIdMapping[d.node_id].isonline = true;
+		    if (current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] != undefined)
+		      current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
+		  }
+		}
+		return d.selected?"#1ae01a":"#a0ffa0";
+	      }
             })
             .strokeStyle(function() {return this.fillStyle().darker()})
             .lineWidth(function(d) { return d.corestation_running=="true"?5:1; })
+	    .cursor(function() {return "help";})
+	    .title(function(d) {
+	      var content = "";
+	      if (current_deployment.deploymentHasMapping) {
+		if (current_deployment.deviceIdMapping[d.node_id] !== undefined) {
+		  content = "Position: "+current_deployment.deviceIdMapping[d.node_id].position + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"") + "\nDevice Id: " + d.node_id + "\n\nInfo:\n" + current_deployment.deviceIdMapping[d.node_id].comment;
+		}
+		else {
+		  nodeinfo.find(".title").empty().append();
+		  content = "Position: NOT AVAILABLE" + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"") + "\nDevice Id: " + d.node_id;
+		}
+	      }
+	      else 
+		content = "Node ID: " + d.node_id + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"");
+	      return content;
+	    })
             .event("mouseover", function(d) {
               if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined) {
-		current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].big);
+		if (current_deployment.deviceIdMapping[d.node_id].isonline)
+		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].big);
+		else
+		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinebig);
 		//current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon({path : google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, strokeWeight: 1, strokeColor: "red", fillColor : "red", fillOpacity : 1, scale : 8});
 		current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
 	      }
@@ -1045,7 +1115,10 @@ $(document).ready(function() {
 	    })
             .event("mouseout", function(d) {
               if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined) {
-		current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
+		if (current_deployment.deviceIdMapping[d.node_id].isonline)
+		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
+		else
+		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinesmall);
 	      }
 	      d.selected = false;
 	      this.render();
@@ -1292,38 +1365,47 @@ function showTopology(id) {
 </head>
 <body>
 
-<div id="container">
-	<div id="header">
-		<h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
-	</div>
-	<div id="navigation">
-	</div>
-		
-	<div id="maindiv">
-                <div id="msg" style="display:none"></div>
-                <iframe name="webupload" style="border:0;height:0;width:0;"></iframe>
-		<div id="deployment_navigation">
-		<ul id="deployment_menu"><li /></ul>
-		</div>	
-		<div id="topologycontainer" style="margin-top:5px"></div>
-	</div>
-	<div class="separator">
-		<div id="footer">
-		      <table width="100%">
-				<tr>
-					<td style="width:50%;color:#444444;"><b>A Project of <a href="http://www.ethz.ch" target="_blank">ETH Zurich</a>, <a href="http://www.unibas.ch" target="_blank">Uni Basel</a> and <a href="http://www.uzh.ch" target="_blank">Uni Zurich</a></b></td>
-					<td style="text-align:right;width:50%;font-size:9px;">Powered by <a href="http://gsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>
-				</tr>
-			</table>
+	<div id="container">
+		<div id="header">
+			<h1>
+				<a href="." id="gsn-name" style="display: none">GSN</a>
+			</h1>
+		</div>
+		<div id="navigation"></div>
+
+		<div id="maindiv">
+			<div id="msg" style="display: none"></div>
+			<iframe name="webupload" style="border: 0; height: 0; width: 0;"></iframe>
+			<div id="deployment_navigation">
+				<ul id="deployment_menu">
+					<li />
+				</ul>
+			</div>
+			<div id="topologycontainer" style="margin-top: 5px"></div>
+		</div>
+		<div class="separator">
+			<div id="footer">
+				<table width="100%">
+					<tr>
+						<td style="width: 50%; color: #444444;"><b>A Project of <a
+								href="http://www.ethz.ch" target="_blank">ETH Zurich</a>, <a
+								href="http://www.unibas.ch" target="_blank">Uni Basel</a> and <a
+								href="http://www.uzh.ch" target="_blank">Uni Zurich</a></b></td>
+						<td style="text-align: right; width: 50%; font-size: 9px;">Powered
+							by <a href="http://gsn.sourceforge.net/">GSN</a>, Distributed
+							Information Systems Lab, EPFL 2006
+						</td>
+					</tr>
+				</table>
+			</div>
 		</div>
 	</div>
-</div>
-<div id="debug"></div>
-<script type="text/javascript">
+	<div id="debug"></div>
+	<script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
-<script type="text/javascript">
+	<script type="text/javascript">
 var pageTracker = _gat._getTracker("UA-5632004-2");
 pageTracker._initData();
 pageTracker._trackPageview();
