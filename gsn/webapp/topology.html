@@ -5,10 +5,8 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <title>GSN</title>
 
-<link rel="stylesheet" href="style/gsn.css" type="text/css"
-	media="screen,projection" />
-<link rel="stylesheet" href="style/tablesorter.css" type="text/css"
-	media="screen,projection" />
+<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+<link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/jquery-dom.js"></script>
 <script type="text/javascript" src="js/jquery.history.js"></script>
@@ -21,8 +19,7 @@
 <script type="text/javascript" src="js/uptime.js"></script>
 <script type="text/javascript" src="js/protovis-d3.3.js"></script>
 
-<script type="text/javascript"
-	src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 
 <script type="text/javascript">
 <!--//<![CDATA[
@@ -657,7 +654,7 @@ function PacketRate() {
         var begin = parseInt($(this).attr("begin"));
         var end = parseInt($(this).attr("end"));
         if ((begin <= now && isNaN(end)) || (begin <= now && end > now)) {
-	  current_deployment.deviceIdMapping[parseInt($(this).attr("device_id"))] = {position : pos, type : parseInt($(this).attr("device_type")), end : end, comment : $(this).attr("comment"), isonline: false};
+	  current_deployment.deviceIdMapping[parseInt($(this).attr("device_id"))] = {position : pos, type : parseInt($(this).attr("device_type")), end : end, comment : $(this).attr("comment")};
 	  current_deployment.positionToDeviceIdMap[pos] = parseInt($(this).attr("device_id"));
 	}
       });
@@ -671,28 +668,28 @@ function PacketRate() {
       var pos = parseInt($(this).attr("position"));
       if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]] !== undefined) {
 	if (!current_deployment.geoMarkers[pos]) {
-	  if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].isonline)
-	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small});
-	  else
+	  if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] === undefined || !current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].online)
 	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinesmall});
+	  else
+	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small});
 	  current_deployment.geoMarkers[pos].setPosition(new google.maps.LatLng(parseFloat($(this).attr("latitude")), parseFloat($(this).attr("longitude"))));
 	  current_deployment.geoMarkers[pos].setTitle("Position " + pos + "\n\n" + $(this).attr("comment") + "\ndevice_id=" + current_deployment.positionToDeviceIdMap[pos]);
 	  google.maps.event.addListener(current_deployment.geoMarkers[pos], 'mouseover', function() {
 	    current_deployment.geoMarkers[pos].setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
-	    if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].isonline)
-	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].big);
-	    else
+	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] === undefined || !current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].online)
 	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinebig);
+	    else
+	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].big);
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] !== undefined) {
 	      current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].selected = true;
 	      current_deployment.node.render();
 	    }
 	  });
 	  google.maps.event.addListener(current_deployment.geoMarkers[pos], 'mouseout', function() {
-	    if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].isonline)
-	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small);
-	    else
+	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] === undefined || !current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].online)
 	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinesmall);
+	    else
+	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small);
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] !== undefined) {
 	      current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].selected = false;
 	      current_deployment.node.render();
@@ -1053,32 +1050,26 @@ $(document).ready(function() {
             .fillStyle(function(d) {
               var now=new Date().getTime();
               if (d.timestamp === undefined || (now - d.timestamp) > STANDBY_TIMEOUT_MS) {
-		if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] != undefined) {
-		  if (current_deployment.deviceIdMapping[d.node_id].isonline) {
-		    current_deployment.deviceIdMapping[d.node_id].isonline = false;
-		    if (current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] != undefined)
-		      current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinesmall);
-		  }
+		if (d.online) {
+		  d.online = false;
+		  if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined)
+		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinesmall);
 		}
                 return d.selected?"#ff5555":"#ffa0a0";
               }
               else if (now - d.timestamp > ACTIVE_TIMEOUT_MS) {
-		if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] != undefined) {
-		  if (!current_deployment.deviceIdMapping[d.node_id].isonline) {
-		    current_deployment.deviceIdMapping[d.node_id].isonline = true;
-		    if (current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] != undefined)
-		      current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
-		  }
+		if (!d.online) {
+		  d.online = true;
+		  if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined)
+		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
 		}
 		return d.selected?"#1ae01a":"#a0c0a0";
 	      }
               else {
-		if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] != undefined) {
-		  if (!current_deployment.deviceIdMapping[d.node_id].isonline) {
-		    current_deployment.deviceIdMapping[d.node_id].isonline = true;
-		    if (current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] != undefined)
-		      current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
-		  }
+		if (!d.online) {
+		  d.online = true;
+		  if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined)
+		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
 		}
 		return d.selected?"#1ae01a":"#a0ffa0";
 	      }
@@ -1092,10 +1083,8 @@ $(document).ready(function() {
 		if (current_deployment.deviceIdMapping[d.node_id] !== undefined) {
 		  content = "Position: "+current_deployment.deviceIdMapping[d.node_id].position + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"") + "\nDevice Id: " + d.node_id + "\n\nInfo:\n" + current_deployment.deviceIdMapping[d.node_id].comment;
 		}
-		else {
-		  nodeinfo.find(".title").empty().append();
+		else
 		  content = "Position: NOT AVAILABLE" + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"") + "\nDevice Id: " + d.node_id;
-		}
 	      }
 	      else 
 		content = "Node ID: " + d.node_id + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"");
@@ -1103,7 +1092,7 @@ $(document).ready(function() {
 	    })
             .event("mouseover", function(d) {
               if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined) {
-		if (current_deployment.deviceIdMapping[d.node_id].isonline)
+		if (current_deployment.sensornodes[nodeindex(d.node_id)].online)
 		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].big);
 		else
 		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinebig);
@@ -1115,7 +1104,7 @@ $(document).ready(function() {
 	    })
             .event("mouseout", function(d) {
               if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined) {
-		if (current_deployment.deviceIdMapping[d.node_id].isonline)
+		if (current_deployment.sensornodes[nodeindex(d.node_id)].online)
 		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
 		else
 		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinesmall);
