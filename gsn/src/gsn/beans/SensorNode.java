@@ -26,6 +26,8 @@ public class SensorNode {
 	public static final short AE_TINYNODE = 9;
 	public static final Short NODE_TYPE_UNKNOWN = -1;
 	
+	public static final short [] corestationTypes = {4, 5, 6};
+	
 	static final int VOLTAGE_HISTORY_SIZE = 60; // ~ 2h 
 	
 	public Short nodetype = SIB_TINYNODE;

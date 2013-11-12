@@ -55,6 +55,12 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 									n.nodetype = DataMappingWrapper.getDeviceType(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 									n.coordinate = DataMappingWrapper.getCoordinate(n.position.intValue(), deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 									
+									for (int j=0; j<SensorNode.corestationTypes.length; j++)
+										if (n.nodetype.compareTo(SensorNode.corestationTypes[j]) == 0)
+											n.iscorestation = true;
+										else
+											n.iscorestation = false;
+									
 									Integer vsys = null;
 									if (n.getVsysDbl() != null)
 										vsys = n.getVsysDbl().intValue();
@@ -81,7 +87,7 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 									
 									str = (String)se.getData("sysvoltage");
 									if (str != null) {
-										if (n.isAccessNode())
+										if (n.iscorestation || n.isWGPSNode() || n.isAENode() || n.isAccessNode() || n.isBBControl())
 											n.setVsys(n.getVsdi());
 										else
 											n.setVsys(Double.parseDouble(str));
