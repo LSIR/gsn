@@ -286,9 +286,11 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				node.setNodeType(SensorNode.AE_TINYNODE);
 			}
 			else if (inputStreamName.equals(configuration[24])) { // wgps-board space vehicle packets
-				node.setNodeType(SensorNode.WGPS_TINYNODE);
-				// we do not want all sv packets generating a topology stream
-				return;
+				if(node.nodetype.shortValue() != SensorNode.WGPS_TINYNODE)
+					node.setNodeType(SensorNode.WGPS_TINYNODE);
+				else
+					// we do not want all sv packets generating a topology stream
+					return;
 			}
 			s = data.getData(configuration[1]);
 			if (s instanceof Integer) {
