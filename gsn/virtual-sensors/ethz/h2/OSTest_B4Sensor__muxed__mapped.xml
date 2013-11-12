@@ -1,0 +1,85 @@
+<virtual-sensor name="OSTest_B4Sensor__muxed__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+            <param name="scriptlet">
+                <![CDATA[
+                    if ( ! isdef('positionMap')) { positionMap = [:]; }
+                    if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+                ]]>
+            </param>
+            <param name="period">120000</param>
+            <param name="scriplet-periodic">
+                <![CDATA[
+                	// default alarm time after which an email is sent if no messages have been received
+                    def timeDifferenceOffsetDefault = 600000;
+                	// a list of alarm time per position
+                    def timeDifferenceOffsetPositionMap = [9999:600000];
+                    // the mail recipients
+                    def mailrecipients = ["osense@tik.ee.ethz.ch"];
+                    
+                    if ( isdef('positionMap')) {
+                    	def rmlist = [];
+                    	for (entry in positionMap) {
+                        	def timeDifference = System.currentTimeMillis() - entry.value;
+                        	def timeDifferenceOffset = timeDifferenceOffsetDefault;
+                        	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
+                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
+                        	}
+                        	if (timeDifference > timeDifferenceOffset) {
+                        		// Notify by email
+                        		def emailTitle = "[OSTest GSN] - WARNING: No more " + vsname + " data received from position " + entry.key;
+                        		def emailContent = "WARNING: No " + vsname + " data received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
+
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+                        		sendEmail(mailrecipients, emailTitle, emailContent);
+                        		rmlist.add(entry.key)
+                        	}
+                        }
+                        positionMap.keySet().removeAll( rmlist as Set );
+                    }
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="UTC_RAW_DATA" type="VARCHAR(32)" />
+            <field name="LAT_RAW_DATA" type="VARCHAR(32)" />
+            <field name="LAT_N_RAW_DATA" type="VARCHAR(32)" />
+            <field name="LONG_RAW_DATA" type="VARCHAR(32)" />
+            <field name="LONG_N_RAW_DATA" type="VARCHAR(32)" />
+            <field name="QUAL_RAW_DATA" type="VARCHAR(32)" />
+            <field name="SAT_RAW_DATA" type="VARCHAR(32)" />
+            <field name="HDOP_RAW_DATA" type="VARCHAR(32)" />
+            <field name="GEO_HEIGHT_RAW_DATA" type="VARCHAR(32)" />
+            <field name="GEO_HEIGHT_U_RAW_DATA" type="VARCHAR(32)" />
+            <field name="GEO_SEP_RAW_DATA" type="VARCHAR(32)" />
+            <field name="GEO_SEP_U_RAW_DATA" type="VARCHAR(32)" />
+            <field name="ADC_CHANNEL_01_MV" type="DOUBLE" />
+            <field name="ADC_CHANNEL_01_PPM" type="DOUBLE" />
+            <field name="ADC_CHANNEL_02_MV" type="DOUBLE" />
+        </output-structure>
+    </processing-class>
+    <description>show B4-Sensor readings and optionally GPS information from the OSTest deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query">select * from OSTest_B4Sensor</predicate>
+                    <predicate key="remote-contact-point">http://whymper.ee.ethz.ch:23001/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

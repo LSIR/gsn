@@ -66,6 +66,7 @@ OSTest_MiniDisc.xml
 OSTest_CONO2.xml
 OSTest_Wifi.xml
 OSTest_Gsm.xml
+OSTest_B4Sensor.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml

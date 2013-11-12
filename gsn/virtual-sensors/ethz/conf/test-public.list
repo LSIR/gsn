@@ -137,6 +137,8 @@ OSTest_Wifi__mapped.xml
 OSTest_CONO2__muxed__mapped.xml
 OSTest_CONO2__mapped.xml
 #OSTest_STEVAL_Dynamic_Proc_GPS.xml
+OSTest_B4Sensor__muxed__mapped.xml
+OSTest_B4Sensor__mapped.xml
 #Statistics_DataFlow.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
