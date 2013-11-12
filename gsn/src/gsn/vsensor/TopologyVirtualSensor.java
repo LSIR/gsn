@@ -237,7 +237,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		}
 		else if (inputStreamName.startsWith(configuration[23])) {
 			// corestation statistics
-			node.setCorestationRunning();
+			node.setCorestation();
 		}
 		else {
 			node.packet_count++;

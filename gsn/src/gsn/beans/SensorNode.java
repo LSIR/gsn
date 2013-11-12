@@ -47,6 +47,7 @@ public class SensorNode {
 	public Integer flash_count;
 	public Integer uptime;
 	public Boolean corestation_running;
+	public Boolean iscorestation;
 	
 	public SensorNodeConfiguration configuration;
 	public SensorNodeConfiguration pendingConfiguration;
@@ -105,6 +106,10 @@ public class SensorNode {
 
 	public void setNodeType(Short nodetype) {
 		this.nodetype = nodetype;
+		if (nodetype == BASESTATION || nodetype == GPS_CORESTATION || nodetype == CAMZILLA_CORESTATION)
+			iscorestation = true;
+		else
+			iscorestation = false;
 	}
 	
 	public String getVsys() {
@@ -306,7 +311,8 @@ public class SensorNode {
 		return new Double(coordinate.z).toString();
 	}
 
-	public void setCorestationRunning() {
+	public void setCorestation() {
+		iscorestation = true;
 		corestation_running = true;
 	}
 
@@ -331,6 +337,7 @@ public class SensorNode {
 		this.flash_count = node.flash_count;
 		this.uptime = node.uptime;
 		this.corestation_running = node.corestation_running;
+		this.iscorestation = node.iscorestation;
 		
 		this.configuration = node.configuration;
 		this.pendingConfiguration = node.pendingConfiguration;
