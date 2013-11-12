@@ -139,7 +139,7 @@ function PacketRate() {
       var id = $(this).attr("node_id");
       var index = nodeindex(id);
       if (index < 0) {
-        current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true, nodetype: $(this).attr("nodetype"), iscorestation: $(this).attr("iscorestation") == "true", corestation_running: $(this).attr("corestation_running") });
+        current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true, nodetype: $(this).attr("nodetype"), corestation_running: $(this).attr("corestation_running") });
         topology_change = true;
       }
       else {
@@ -154,7 +154,7 @@ function PacketRate() {
         if (deviceTypeIsDozer(current_deployment.deviceIdMapping[id].type)) {
 	  var index = nodeindex(id);
 	  if (index < 0) {
-	    current_deployment.sensornodes.push({node_id : id, timestamp :  undefined, touched : true, nodetype: current_deployment.deviceIdMapping[id].type, iscorestation: deviceTypeIsCoreStation(current_deployment.deviceIdMapping[id].type), corestation_running: undefined });
+	    current_deployment.sensornodes.push({node_id : id, timestamp :  undefined, touched : true, nodetype: current_deployment.deviceIdMapping[id].type, corestation_running: undefined });
 	    topology_change = true;
 	  }
 	  else
@@ -1045,7 +1045,7 @@ $(document).ready(function() {
         deployment_data[deployment_data.length-1].node =
           deployment_data[deployment_data.length-1].force
             .node.add(pv.Dot)
-            .shape(function(d) { return d.iscorestation?"square":"circle"; })
+            .shape(function(d) { return deviceTypeIsCoreStation(d.nodetype)?"square":"circle"; })
             .shapeSize(function(d) {return 230;})
             .fillStyle(function(d) {
               var now=new Date().getTime();
