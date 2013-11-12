@@ -185,7 +185,7 @@ public class SensorNode {
 			batterylevel = null;
 			return batterylevel;
 		}
-		else if ((isBBControl() || isAccessNode() || isWGPSNode()) && voltageHistory.size()>0) {
+		else if ((isAENode() || isBBControl() || isAccessNode() || isWGPSNode()) && voltageHistory.size()>0) {
 			if (voltageHistory.getLast()<11.5)
 				batterylevel=50;
 			else if (voltageHistory.getLast()<12)
