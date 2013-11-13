@@ -14,8 +14,10 @@ var GsnPlots = {
     // array of { signals [{vsensor, field[], select, position, deviceId}], "title"},
     var a = document.createElement('a');
     a.href="/";
-    if (a.host.match(/tik41x.*:22001/))
+    if (a.host.match(/tik41x.*:22001/) || a.host.match(/data.permasense.ch:22001/) || a.host.match(/data.permasense.ch:8443/) || a.host.match(/data.permasense.ch:443/) || a.host.match(/tik41x.*:8443/) || a.host.match(/tik41x.*:443/) )
       GsnPlots.gsnserver = "data.permasense.ch";
+    else if (a.host.match(/tik51x.*:22001/) || a.host.match(/tik51x.*:8443/))
+    	GsnPlots.gsnserver = "tik51x.ee.ethz.ch:22001";
     else
       GsnPlots.gsnserver = a.host;
     GsnPlots.config = GsnPlots.config.concat(config);

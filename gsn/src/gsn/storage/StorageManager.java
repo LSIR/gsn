@@ -297,10 +297,12 @@ public abstract class StorageManager {
      */
 
     public ResultSet getBinaryFieldByQuery(StringBuilder query,
-                                           String colName, Long pk, Connection connection) throws SQLException {
+                                           String colName, Long pk, Integer position, Connection connection) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(query.toString());
-        if (pk != null) 
+        if (pk != null)
         	ps.setLong(1, pk);
+    	else if (position != null)
+        	ps.setInt(1, position);
         return ps.executeQuery();
     }
 

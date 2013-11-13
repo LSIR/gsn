@@ -31,7 +31,8 @@ public class FieldDownloadServlet extends HttpServlet {
 
 	static final String prefix  = "select * from ";
 
-	static final String postfix = " where PK = ? ";
+	static final String pkpostfix = " where PK = ? ";
+	static final String positionpostfix = " where position = ? ";
 
 	public void doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 		String vsName = req.getParameter( "vs" );
@@ -58,8 +59,16 @@ public class FieldDownloadServlet extends HttpServlet {
 		}
 		String primaryKey = req.getParameter( "pk" );
 		String colName = req.getParameter( "field" );
-		if ( primaryKey == null || colName == null || primaryKey.trim( ).length( ) == 0 || colName.trim( ).length( ) == 0 ) {
-			res.sendError( res.SC_BAD_REQUEST , "The pk and/or field parameters are missing." );
+		String posStr = req.getParameter( "position" );
+		String timeline = req.getParameter( "timeline" );
+		if (timeline == null)
+			timeline = "timed";
+		else if (!timeline.equalsIgnoreCase("generation_time") && !timeline.equalsIgnoreCase("timestamp") && !timeline.equalsIgnoreCase("timed")) {
+			res.sendError( res.SC_BAD_REQUEST , "The timeline parameter is malformed (GENERATION_TIME, TIMESTAMP or TIMED)." );
+			return;
+		}
+		if ( colName == null || (primaryKey == null && posStr == null) || colName.trim( ).length( ) == 0 ) {
+			res.sendError( res.SC_BAD_REQUEST , "The position, pk and/or field parameters are missing." );
 			return;
 		}
 		VSensorConfig sensorConfig = Mappings.getVSensorConfig( vsName );
@@ -67,30 +76,46 @@ public class FieldDownloadServlet extends HttpServlet {
 			res.sendError( WebConstants.ERROR_INVALID_VSNAME , "The specified virtual sensor doesn't exist." );
 			return;
 		}
-
-		primaryKey = primaryKey.trim( );
-		colName = colName.trim( );
+		
 		StringBuilder query;
+		Integer position = null;
 		Long pk = null;
-		if (primaryKey.compareToIgnoreCase("latest")==0) {
-			query = new StringBuilder( ).append( prefix ).append( vsName ).append(" where timed = (select max(timed) from " ).append(vsName).append(")");
+		colName = colName.trim( );
+
+		if (primaryKey != null) {
+			primaryKey = primaryKey.trim( );
+			if (primaryKey.compareToIgnoreCase("latest")==0) {
+				query = new StringBuilder( ).append( prefix ).append( vsName ).append(" where ").append(timeline).append(" = (select max(").append(timeline).append(") from " ).append(vsName).append(")");
+			}
+			else {
+				try {
+					pk = Long.parseLong(primaryKey);
+					query = new StringBuilder( ).append( prefix ).append( vsName ).append( pkpostfix );
+				}
+				catch (Exception e) {
+					res.sendError( res.SC_BAD_REQUEST , "The pk parameter is malformed." );
+					return;
+				}
+			}
 		}
 		else {
+			posStr = posStr.trim();
 			try {
-				pk = Long.parseLong(primaryKey);
-				query = new StringBuilder( ).append( prefix ).append( vsName ).append( postfix );
+				position = Integer.parseInt(posStr);
+				query = new StringBuilder( ).append( prefix ).append( vsName ).append(" where ").append(timeline).append(" = (select max(").append(timeline).append(") from " ).append(vsName).append( positionpostfix ).append(")");
 			}
-			catch (Exception e) {
-				res.sendError( res.SC_BAD_REQUEST , "The pk parameter is malformed." );
+			catch (NumberFormatException e) {
+				res.sendError( res.SC_BAD_REQUEST , "The position parameter is not numeric." );
 				return;
 			}
 		}
+		
 		// TODO : Check to see if the requested column exists.
 		Connection conn = null;
 		ResultSet rs = null;
 		try {
 			conn = Main.getStorage(vsName).getConnection();
-			rs = Main.getStorage(vsName).getBinaryFieldByQuery( query , colName , pk ,conn);
+			rs = Main.getStorage(vsName).getBinaryFieldByQuery( query , colName , pk , position ,conn);
 			if ( !rs.next() ) {
 				res.sendError( res.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
 			}else {

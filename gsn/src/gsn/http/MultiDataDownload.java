@@ -466,7 +466,7 @@ public class MultiDataDownload extends HttpServlet {
 			key = (String) en.getKey() ;
 			if (key.length() > prefix.length() && key.substring(0,prefix.length()).compareToIgnoreCase(prefix) == 0) {	// look for "vs["
 				String[] vals = (String[]) en.getValue();
-				mapping.put(new Integer(key.substring(prefix.length(), key.indexOf("]"))), vals[0]);
+				mapping.put(new Integer(key.substring(prefix.length(), key.indexOf("]"))), vals[0].toLowerCase());
 			}
 		}
 		return mapping;

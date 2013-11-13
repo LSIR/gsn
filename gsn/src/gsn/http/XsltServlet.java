@@ -95,7 +95,7 @@ public class XsltServlet extends HttpServlet {
             ResultSet rs = null;
         	try {
         		conn = Main.getStorage(vsName).getConnection();
-        		rs = Main.getStorage(vsName).getBinaryFieldByQuery( query , colName , null ,conn);
+        		rs = Main.getStorage(vsName).getBinaryFieldByQuery( query , colName , null , null ,conn);
         		if ( !rs.next() ) {
         			res.sendError( HttpServletResponse.SC_NOT_FOUND , "The requested data is marked as obsolete and is not available." );
         		}else {
