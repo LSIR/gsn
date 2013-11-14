@@ -818,6 +818,13 @@ function PacketRate() {
 	      current_deployment.node.render();
 	    }
 	  });
+	  google.maps.event.addListener(current_deployment.geoMarkers[pos], 'click', function() {
+	    var id = current_deployment.positionToDeviceIdMap[pos];
+	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] !== undefined)
+	      showNodeInfoTab(id, current_deployment.deviceIdMapping[id].type, current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].corestation_running);
+	    else
+	      showNodeInfoTab(id, current_deployment.deviceIdMapping[id].type, "?");
+	  });
 	  hasNewMarker = true;
 	}
 	if(current_deployment.geoMarkers[pos].getPosition().lat().toFixed(6) != parseFloat($(this).attr("latitude")).toFixed(6) || current_deployment.geoMarkers[pos].getPosition().lng().toFixed(6) != parseFloat($(this).attr("longitude")).toFixed(6))
@@ -1067,13 +1074,13 @@ $(document).ready(function() {
         // add div
         if (deploymentHasMapping[i])
 	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
-	            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
+	            "<div style=\"position:absolute;z-index:100;margin-top:60px;text-align:left;background-color:#ddd;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
 	            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
 	            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div id=\"geo_graph_"+deployments[i]+"\" style=\"display:none; width:100%; height:500px\"></div><div id=\"mapping_graph_"+deployments[i]+"\" style=\"display:none\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
 	            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"geotab\" href=\"\">Map</a></li><li><a class =\"posmappingtab\" href=\"\">Position Mapping</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
         else
 	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
-		            "<div style=\"position:absolute;margin-top:60px;text-align:left;background-color:#ddd;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
+		            "<div style=\"position:absolute;z-index:100;margin-top:60px;text-align:left;background-color:#ddd;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
 		            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
 		            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
 		            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
@@ -1226,7 +1233,7 @@ $(document).ready(function() {
             })
             .strokeStyle(function() {return this.fillStyle().darker()})
             .lineWidth(function(d) { return d.corestation_running=="true"?5:1; })
-	    .cursor(function() {return "help";})
+	    .cursor(function() {return "pointer";})
 	    .title(function(d) {
 	      var content = "";
 	      if (current_deployment.deploymentHasMapping) {
