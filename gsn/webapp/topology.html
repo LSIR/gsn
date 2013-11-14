@@ -1001,7 +1001,7 @@ function PacketRate() {
 	if (current_deployment.deviceIdMapping[id].schedule !== undefined)
 	  content += "<br>Schedule:<br><div style=\"background-color:#eee;max-width:942px;overflow:auto;white-space:nowrap;margin:0 5px 5px 5px;padding:2px 2px 2px 2px\">" + current_deployment.deviceIdMapping[id].schedule.replace(/(\r\n|\n|\r)/gm,"<br>") + "</div>";
 	if (current_deployment.deviceIdMapping[id].jpeg_timestamp !== undefined)
-	  content += "<br>Last picture from "+formatTime(current_deployment.deviceIdMapping[id].jpeg_timestamp)+":<br><div><img style=\"margin:0 5px 5px 5px;border:solid 1px #222;\" src=\"/field?vs="+current_deployment.name+"_camera_pos"+pos+"__scaled&pk=latest&field=JPEG_SCALED\"></div>";
+	  content += "<br>Last picture from "+formatTime(current_deployment.deviceIdMapping[id].jpeg_timestamp)+":<br><div><img style=\"margin:0 5px 5px 5px;border:solid 1px #222;\" src=\"/field?vs="+current_deployment.name+"_camera_pos"+pos+"__scaled&pk=latest&field=JPEG_SCALED&?"+current_deployment.deviceIdMapping[id].jpeg_timestamp+"\"></div>";
       }
       else {
 	nodeinfo.find(".title").empty().append("Position: NOT AVAILABLE");
