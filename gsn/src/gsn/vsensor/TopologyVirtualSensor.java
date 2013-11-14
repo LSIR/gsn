@@ -87,6 +87,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		"ae-stream-name",
 		"corestation-statistics-stream-name",
 		"wgps-stream-name",
+		"nodehealth-stream-name",
 	};
 	
 	private static final String commandConfigurationParameter = "dozer-command-vs";
@@ -129,239 +130,247 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			return;
 		}
 		synchronized (nodes) {
-		if (!nodes.containsKey(node_id)) {
-			logger.debug("new node: "+node_id);	
-			nodes.put(node_id, new SensorNode(node_id)); 
-		}
-		SensorNode node = nodes.get(node_id);
-		
-		// save always latest timestamp
-		if (node.timestamp==null || node.timestamp < timestamp) {
-			node.timestamp = timestamp;
-			node.generation_time = generation_time;
-		}
+			if (!nodes.containsKey(node_id)) {
+				logger.debug("new node: "+node_id);	
+				nodes.put(node_id, new SensorNode(node_id)); 
+			}
+			SensorNode node = nodes.get(node_id);
 			
-		// RSSI
-		if (inputStreamName.startsWith(configuration[12])) {
-			// save always latest rssi information
-			if (node.timestamp == timestamp) {
-				logger.debug( "got rssi info:" + data.getData("HEADER_ORIGINATORID") + " " + data.getData("RSSI_NODEID") + " " + data.getData("RSSI"));
-				Link newlink=null;
-				Integer rssi_node_id;
-				Short rssi;
-				s = data.getData(configuration[13]);
-				if (s instanceof Integer) {
-					rssi_node_id = (Integer)s;
+			// save always latest timestamp
+			if (node.timestamp==null || node.timestamp.compareTo(timestamp) < 0) {
+				node.timestamp = timestamp;
+				node.generation_time = generation_time;
+			}
+				
+			// RSSI
+			if (inputStreamName.startsWith(configuration[12])) {
+				// save always latest rssi information
+				if (node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+					logger.debug( "got rssi info:" + data.getData("HEADER_ORIGINATORID") + " " + data.getData("RSSI_NODEID") + " " + data.getData("RSSI"));
+					Link newlink=null;
+					Integer rssi_node_id;
+					Short rssi;
+					s = data.getData(configuration[13]);
+					if (s instanceof Integer) {
+						rssi_node_id = (Integer)s;
+					}
+					else {
+						logger.debug("rssi node id wrong type");
+						return;
+					}
+					s = data.getData(configuration[14]);
+					if (s instanceof Short) {
+						rssi = (Short)s;
+					}
+					else {
+						logger.debug("rssi wrong type");
+						return;
+					}
+					for (Iterator<Link> j = node.links.iterator(); j.hasNext();) { 
+						Link l = j.next();
+						if (l.node_id.equals(rssi_node_id)) {
+							newlink = l;
+							break;
+						}
+					}
+					if (newlink == null) {
+						newlink = new Link();
+						node.links.add(newlink);
+					}
+					newlink.node_id=rssi_node_id;
+					newlink.rssi=rssi;
+					newlink.timestamp=timestamp;
+					// do not count rssi info to packets
 				}
-				else {
-					logger.debug("rssi node id wrong type");
-					return;
-				}
-				s = data.getData(configuration[14]);
+			}
+			// events
+			else if (inputStreamName.startsWith(configuration[15])) {
+				// eventlogger
+				s = data.getData(configuration[16]);
 				if (s instanceof Short) {
-					rssi = (Short)s;
+					event_id = (Short)s;
 				}
-				else {
-					logger.debug("rssi wrong type");
-					return;
+				s = data.getData(configuration[17]);
+				if (s instanceof Integer) {
+					event_value = ((Integer)s).shortValue();
 				}
-				for (Iterator<Link> j = node.links.iterator(); j.hasNext();) { 
-					Link l = j.next();
-					if (l.node_id.equals(rssi_node_id)) {
-						newlink = l;
-						break;
-					}
-				}
-				if (newlink == null) {
-					newlink = new Link();
-					node.links.add(newlink);
-				}
-				newlink.node_id=rssi_node_id;
-				newlink.rssi=rssi;
-				newlink.timestamp=timestamp;
-				// do not count rssi info to packets
-			}
-		}
-		// events
-		else if (inputStreamName.startsWith(configuration[15])) {
-			// eventlogger
-			s = data.getData(configuration[16]);
-			if (s instanceof Short) {
-				event_id = (Short)s;
-			}
-			s = data.getData(configuration[17]);
-			if (s instanceof Integer) {
-				event_value = ((Integer)s).shortValue();
-			}
-			logger.debug("got event "+event_id+" with value "+(event_value!=null?event_value:"null"));
-			if (event_id == EVENT_DATACONFIG && event_value!=null) {
-				logger.debug("added data configuration");
-				if (node.configuration==null)
-					node.configuration = new SensorNodeConfiguration(event_value, node.nodetype, timestamp);
-				else
-					node.configuration.update(event_value, node.nodetype);
-				if (node.pendingConfiguration!=null) {
-					if (node.pendingConfiguration.hasDataConfig1() && node.configuration.getConfiguration1().equals(node.pendingConfiguration.getConfiguration1()))
-						node.pendingConfiguration.removeDataConfig1();
-					if (node.pendingConfiguration.hasDataConfig2() && node.configuration.getConfiguration2().equals(node.pendingConfiguration.getConfiguration2()))
-						node.pendingConfiguration.removeDataConfig2();
-					if (!node.pendingConfiguration.hasDataConfig1() && !node.pendingConfiguration.hasDataConfig2() && !node.pendingConfiguration.hasPortConfig())
-						node.pendingConfiguration=null;
-				}
-				notifyscheduler=true;
-				node_type = new Short(node.nodetype);
-			}
-			else if (event_id == EVENT_PSB_POWER && event_value!=null) {
-				p1 = (event_value & 1) > 0;
-				p2 = (event_value & 2) > 0;
-				logger.debug("received port info (event): "+p1+" "+p2);
-				if (node.pendingConfiguration!=null) {
-					logger.debug("have pending "+node.pendingConfiguration.powerswitch_p1+" "+node.pendingConfiguration.powerswitch_p2);
-					if (node.pendingConfiguration.hasPortConfig() && node.pendingConfiguration.powerswitch_p1.equals(p1) && node.pendingConfiguration.powerswitch_p2.equals(p2)) {
-						node.pendingConfiguration.removePortConfig();
-						logger.debug("remove port config");
-					}
-					if (!node.pendingConfiguration.hasDataConfig1() && !node.pendingConfiguration.hasDataConfig2() && !node.pendingConfiguration.hasPortConfig())
-						node.pendingConfiguration=null;
-				}
-				notifyscheduler=true;
-				node_type = new Short(node.nodetype);
-			}
-			else if (event_id == EVENT_BB_POWER_ON || event_id == EVENT_BB_POWER_OFF) {
-				if (event_id == EVENT_BB_POWER_ON)
-					node.corestation_running = new Boolean(true);
-				else
-					node.corestation_running = new Boolean(false);
-			}
-			// do not count events to packets
-		}
-		else if (inputStreamName.startsWith(configuration[23])) {
-			// corestation statistics
-			node.setCorestation();
-		}
-		else {
-			node.packet_count++;
-			if (inputStreamName.equals(configuration[10]) && !node.isAccessNode()) {
-				node.setNodeType(SensorNode.BASESTATION);
-				// adjust configuration
-				node.pendingConfiguration=null;
-				if (node.configuration!=null)
-					node.configuration=new SensorNodeConfiguration(node.configuration, node.nodetype);
-			}
-			else if (inputStreamName.equals(configuration[11])) { // power switch packets
-				if (!node.isPowerSwitch()) {
-					node.setNodeType(SensorNode.POWERSWITCH_TN);
-					// 	adjust configuration
-					node.pendingConfiguration=null;
-					if (node.configuration!=null)
-						node.configuration=new SensorNodeConfiguration(node.configuration, node.nodetype);
-				}
-				s = data.getData(configuration[19]);
-				if (s instanceof Byte)
-					p1 = ((Byte)s == 1);
-				s = data.getData(configuration[20]);
-				if (s instanceof Byte)
-					p2 = ((Byte)s == 1);
-				if (p1!=null && p2!=null) {
+				logger.debug("got event "+event_id+" with value "+(event_value!=null?event_value:"null"));
+				if (event_id == EVENT_DATACONFIG && event_value!=null) {
+					logger.debug("added data configuration");
 					if (node.configuration==null)
-						node.configuration=new SensorNodeConfiguration(p1, p2);
+						node.configuration = new SensorNodeConfiguration(event_value, node.nodetype, timestamp);
 					else
-						node.configuration.update(p1, p2);
-					logger.debug("received port info: "+p1+" "+p2);
+						node.configuration.update(event_value, node.nodetype);
 					if (node.pendingConfiguration!=null) {
-						if (node.pendingConfiguration.hasPortConfig())
-							logger.debug("pending config: "+node.pendingConfiguration.powerswitch_p1+" "+node.pendingConfiguration.powerswitch_p2);
+						if (node.pendingConfiguration.hasDataConfig1() && node.configuration.getConfiguration1().equals(node.pendingConfiguration.getConfiguration1()))
+							node.pendingConfiguration.removeDataConfig1();
+						if (node.pendingConfiguration.hasDataConfig2() && node.configuration.getConfiguration2().equals(node.pendingConfiguration.getConfiguration2()))
+							node.pendingConfiguration.removeDataConfig2();
+						if (!node.pendingConfiguration.hasDataConfig1() && !node.pendingConfiguration.hasDataConfig2() && !node.pendingConfiguration.hasPortConfig())
+							node.pendingConfiguration=null;
+					}
+					notifyscheduler=true;
+					node_type = new Short(node.nodetype);
+				}
+				else if (event_id == EVENT_PSB_POWER && event_value!=null) {
+					p1 = (event_value & 1) > 0;
+					p2 = (event_value & 2) > 0;
+					logger.debug("received port info (event): "+p1+" "+p2);
+					if (node.pendingConfiguration!=null) {
+						logger.debug("have pending "+node.pendingConfiguration.powerswitch_p1+" "+node.pendingConfiguration.powerswitch_p2);
 						if (node.pendingConfiguration.hasPortConfig() && node.pendingConfiguration.powerswitch_p1.equals(p1) && node.pendingConfiguration.powerswitch_p2.equals(p2)) {
 							node.pendingConfiguration.removePortConfig();
+							logger.debug("remove port config");
 						}
 						if (!node.pendingConfiguration.hasDataConfig1() && !node.pendingConfiguration.hasDataConfig2() && !node.pendingConfiguration.hasPortConfig())
 							node.pendingConfiguration=null;
 					}
 					notifyscheduler=true;
-					event_id = EVENT_PSB_POWER;
 					node_type = new Short(node.nodetype);
 				}
+				else if (event_id == EVENT_BB_POWER_ON || event_id == EVENT_BB_POWER_OFF) {
+					if (event_id == EVENT_BB_POWER_ON)
+						node.corestation_running = new Boolean(true);
+					else
+						node.corestation_running = new Boolean(false);
+				}
+				// do not count events to packets
 			}
-			else if (inputStreamName.equals(configuration[22])) { // ae-board packets
-				node.setNodeType(SensorNode.AE_TINYNODE);
-			}
-			else if (inputStreamName.equals(configuration[24])) { // wgps-board space vehicle packets
-				if(node.nodetype.shortValue() != SensorNode.WGPS_TINYNODE)
-					node.setNodeType(SensorNode.WGPS_TINYNODE);
+			else if (inputStreamName.startsWith(configuration[23])) {
+				if (!node.iscorestation)
+				// corestation statistics
+					node.setCorestation();
 				else
-					// we do not want all sv packets generating a topology stream
 					return;
 			}
-			s = data.getData(configuration[1]);
-			if (s instanceof Integer) {
-				node.parent_id = (Integer)s;
-			}
-
-			// health
-			// save always latest health information
-			if (node.timestamp == timestamp) {
-				// Vsys
-				s = data.getData(configuration[4]);
-				if (s instanceof Integer)
-					node.vsys = new Double((Integer)s);
-				// Current
-				s = data.getData(configuration[5]);
-				if (s instanceof Integer)
-					node.current = new Double((Integer)s);
-				// Valid
-				s = data.getData(configuration[18]);
-				if (s instanceof Byte) {
-					valid = (Byte)s;
-					logger.debug("valid is "+valid);
-				}
-				// Temperature
-				s = data.getData(configuration[6]);
-				if (s instanceof Integer) {
-					if (valid!=null && valid==0) {
-						node.temperature = null;
-						node.humidity = null;
-					}
-					else {
-						node.temperature = new Double((Integer)s);
-						// Humidity
-						s = data.getData(configuration[7]);
-						if (s instanceof Integer)
-							node.humidity = new Double((Integer)s);
-					}
-				}
-				// Flash count
-				s = data.getData(configuration[8]);
-				if (s instanceof Integer)
-					node.flash_count = (Integer)s;
-				// Uptime
-				s = data.getData(configuration[9]);
-				if (s instanceof Integer)
-					node.uptime = (Integer)s;
-				// VSdi
-				s = data.getData(configuration[21]);
-				if (s instanceof Integer)
-					node.vsdi = new Double((Integer)s);
-			}
-		}
-		// remove outdated information
-		Long now = System.currentTimeMillis();
-		for (Iterator<SensorNode> i = nodes.values().iterator(); i.hasNext();) {
-			SensorNode n = i.next();
-			if (now - n.timestamp > NODE_TIMEOUT) {
-				logger.debug("remove node "+n.node_id+", last timestamp was "+n.timestamp);
-				i.remove();	
-			}
 			else {
-				for (Iterator<Link> j = n.links.iterator(); j.hasNext();) { 
-					Link l = j.next();
-					if (now - l.timestamp > LINK_TIMEOUT) {
-						logger.debug("remove link from "+n.node_id+" to "+l.node_id+", last timestamp was "+l.timestamp);
-						j.remove();
+				node.packet_count++;
+				if (inputStreamName.equals(configuration[10]) && !node.isAccessNode()) {
+					node.setNodeType(SensorNode.BASESTATION);
+					// adjust configuration
+					node.pendingConfiguration=null;
+					if (node.configuration!=null)
+						node.configuration=new SensorNodeConfiguration(node.configuration, node.nodetype);
+				}
+				else if (inputStreamName.equals(configuration[11])) { // power switch packets
+					if (!node.isPowerSwitch()) {
+						node.setNodeType(SensorNode.POWERSWITCH_TN);
+						// 	adjust configuration
+						node.pendingConfiguration=null;
+						if (node.configuration!=null)
+							node.configuration=new SensorNodeConfiguration(node.configuration, node.nodetype);
+					}
+					s = data.getData(configuration[19]);
+					if (s instanceof Byte)
+						p1 = ((Byte)s == 1);
+					s = data.getData(configuration[20]);
+					if (s instanceof Byte)
+						p2 = ((Byte)s == 1);
+					if (p1!=null && p2!=null) {
+						if (node.configuration==null)
+							node.configuration=new SensorNodeConfiguration(p1, p2);
+						else
+							node.configuration.update(p1, p2);
+						logger.debug("received port info: "+p1+" "+p2);
+						if (node.pendingConfiguration!=null) {
+							if (node.pendingConfiguration.hasPortConfig())
+								logger.debug("pending config: "+node.pendingConfiguration.powerswitch_p1+" "+node.pendingConfiguration.powerswitch_p2);
+							if (node.pendingConfiguration.hasPortConfig() && node.pendingConfiguration.powerswitch_p1.equals(p1) && node.pendingConfiguration.powerswitch_p2.equals(p2)) {
+								node.pendingConfiguration.removePortConfig();
+							}
+							if (!node.pendingConfiguration.hasDataConfig1() && !node.pendingConfiguration.hasDataConfig2() && !node.pendingConfiguration.hasPortConfig())
+								node.pendingConfiguration=null;
+						}
+						notifyscheduler=true;
+						event_id = EVENT_PSB_POWER;
+						node_type = new Short(node.nodetype);
+					}
+				}
+				else if (inputStreamName.equals(configuration[22])) { // ae-board packets
+					if (!node.isAENode())
+						node.setNodeType(SensorNode.AE_TINYNODE);
+					else
+						return;
+				}
+				else if (inputStreamName.equals(configuration[24])) { // wgps-board space vehicle packets
+					if(!node.isWGPSNode())
+						node.setNodeType(SensorNode.WGPS_TINYNODE);
+					else
+						// we do not want all sv packets generating a topology stream
+						return;
+				}
+				s = data.getData(configuration[1]);
+				if (s instanceof Integer) {
+					node.parent_id = (Integer)s;
+				}
+	
+				// health
+				// save always latest health information
+				if (inputStreamName.startsWith(configuration[25]) || node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+					// Vsys
+					s = data.getData(configuration[4]);
+					if (s instanceof Integer)
+						node.vsys = new Double((Integer)s);
+					// Current
+					s = data.getData(configuration[5]);
+					if (s instanceof Integer)
+						node.current = new Double((Integer)s);
+					// Valid
+					s = data.getData(configuration[18]);
+					if (s instanceof Byte) {
+						valid = (Byte)s;
+					}
+					// Temperature
+					s = data.getData(configuration[6]);
+					if (s instanceof Integer) {
+						if (valid!=null && valid==0) {
+							logger.debug("sample not valid");
+							node.temperature = null;
+							node.humidity = null;
+						}
+						else {
+							node.temperature = new Double((Integer)s);
+							// Humidity
+							s = data.getData(configuration[7]);
+							if (s instanceof Integer)
+								node.humidity = new Double((Integer)s);
+						}
+					}
+					// Flash count
+					s = data.getData(configuration[8]);
+					if (s instanceof Integer)
+						node.flash_count = (Integer)s;
+					// Uptime
+					s = data.getData(configuration[9]);
+					if (s instanceof Integer)
+						node.uptime = (Integer)s;
+					// VSdi
+					s = data.getData(configuration[21]);
+					if (s instanceof Integer)
+						node.vsdi = new Double((Integer)s);
+				}
+				else
+					return;
+			}
+			// remove outdated information
+			Long now = System.currentTimeMillis();
+			for (Iterator<SensorNode> i = nodes.values().iterator(); i.hasNext();) {
+				SensorNode n = i.next();
+				if (now - n.timestamp > NODE_TIMEOUT) {
+					logger.debug("remove node "+n.node_id+", last timestamp was "+n.timestamp);
+					i.remove();	
+				}
+				else {
+					for (Iterator<Link> j = n.links.iterator(); j.hasNext();) { 
+						Link l = j.next();
+						if (now - l.timestamp > LINK_TIMEOUT) {
+							logger.debug("remove link from "+n.node_id+" to "+l.node_id+", last timestamp was "+l.timestamp);
+							j.remove();
+						}
 					}
 				}
 			}
-		}
-		generateData();
+			generateData();
 		}
 		// notify scheduler
 		if (notifyscheduler && scheduler!=null) {
@@ -518,6 +527,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dispose() {
+		generateData();
 		if (scheduler != null)
 			scheduler.shutdown();
 	}

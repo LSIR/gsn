@@ -32,6 +32,7 @@
             <param name="ae-stream-name">data18</param>
             <param name="corestation-statistics-stream-name">data25</param>
             <param name="wgps-stream-name">data26</param>
+            <param name="nodehealth-stream-name">data9</param>
         </init-params>
         <!-- web-input>
             <command name="dataconfiguration">
@@ -160,7 +161,7 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_PARENTID, PAYLOAD_SYSVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY, PAYLOAD_SIBCURRENT, PAYLOAD_FLASHSTATUS, PAYLOAD_UPTIME, PAYLOAD_SDIVOLTAGE
+            select HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_PARENTID, PAYLOAD_SYSVOLTAGE, PAYLOAD_TEMPERATURE, PAYLOAD_HUMIDITY, PAYLOAD_SIBCURRENT, PAYLOAD_FLASHSTATUS, PAYLOAD_UPTIME, PAYLOAD_SDIVOLTAGE
             from matterhorn_dozer_nodehealth
           </predicate>
         </address>

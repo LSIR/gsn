@@ -640,6 +640,34 @@ function PacketRate() {
     }
   }
   
+  function checkSchedule(deviceId) {
+    $.ajax({
+      type: "GET",
+      url: "/field?vs="+current_deployment.name+"_schedule__mapped&field=SCHEDULE&position="+current_deployment.deviceIdMapping[deviceId].position+"&timeline=generation_time",
+      dataType: "text",
+      success: function(data){
+	var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
+	if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined) {
+	  if ($.trim(data))
+	    current_deployment.deviceIdMapping[id].schedule = data;
+	  else
+	    current_deployment.deviceIdMapping[id].schedule = "<empty schedule>";
+	}
+	deviceInfoUpdateIndex++;
+	deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
+	current_deployment.isDeviceInfoMappingUpdating = false;
+      },
+      error : function(XMLHttpRequest, textStatus, errorThrown) {
+	var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
+	if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined)
+	  current_deployment.deviceIdMapping[id].schedule = "<no schedule available>";
+	deviceInfoUpdateIndex++;
+	deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
+	current_deployment.isDeviceInfoMappingUpdating = false;
+      }
+    });
+  }
+  
   function updateDeviceInfo() {
     if (!current_deployment.isDeviceInfoMappingUpdating) {
       current_deployment.isDeviceInfoMappingUpdating = true;
@@ -667,33 +695,24 @@ function PacketRate() {
 	      if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined) {
 		if ($.trim(data))
 		  current_deployment.deviceIdMapping[id].jpeg_timestamp = data;
+		  
+		checkSchedule(id);
 	      }
-	    }
-	  });
-	    
-	  $.ajax({
-	    type: "GET",
-	    url: "/field?vs="+current_deployment.name+"_schedule__mapped&field=SCHEDULE&position="+current_deployment.deviceIdMapping[deviceId].position+"&timeline=generation_time",
-	    dataType: "text",
-	    success: function(data){
-	      var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
-	      if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined) {
-		if ($.trim(data))
-		  current_deployment.deviceIdMapping[id].schedule = data;
-		else
-		  current_deployment.deviceIdMapping[id].schedule = "<empty schedule>";
+	      else {
+		deviceInfoUpdateIndex++;
+		deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
+		current_deployment.isDeviceInfoMappingUpdating = false;
 	      }
-	      deviceInfoUpdateIndex++;
-	      deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
-	      current_deployment.isDeviceInfoMappingUpdating = false;
 	    },
 	    error : function(XMLHttpRequest, textStatus, errorThrown) {
 	      var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
-	      if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined)
-		current_deployment.deviceIdMapping[id].schedule = "<no schedule available>";
-	      deviceInfoUpdateIndex++;
-	      deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
-	      current_deployment.isDeviceInfoMappingUpdating = false;
+	      if (id !== undefined)
+		checkSchedule(id);
+	      else {
+		deviceInfoUpdateIndex++;
+		deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
+		current_deployment.isDeviceInfoMappingUpdating = false;
+	      }
 	    }
 	  });
 	}
@@ -965,17 +984,17 @@ function PacketRate() {
   }
   
   function showNodeInfoTab(id, type, corestationrunning) {
-    var content = "";
+    var content = "Type: "+nodetypes[type]+ ((type==5 || type==6)?("<br>Gumstix running: "+corestationrunning):"");
     var nodeinfo = $("#topology_"+current_deployment.name+" .nodeinfo");
     if (current_deployment.deploymentHasMapping) {
       if (current_deployment.deviceIdMapping[id] !== undefined) {
 	var pos = current_deployment.deviceIdMapping[id].position;
 	nodeinfo.find(".title").empty().append("Position: "+pos);
-	content += "<br>Device Id: " + id + "<br><br>Info:<br>" + current_deployment.deviceIdMapping[id].comment;
+	content += "<br>Device Id: " + id + "<br><br>Info:<br><div style=\"margin:0 5px 5px 5px\">" + current_deployment.deviceIdMapping[id].comment + "</div>";
 	if (current_deployment.deviceIdMapping[id].schedule !== undefined)
-	  content += "<br><br>Schedule:<br>" + current_deployment.deviceIdMapping[id].schedule.replace(/(\r\n|\n|\r)/gm,"<br>");
+	  content += "<br>Schedule:<br><div style=\"background-color:#eee;max-width:942px;overflow:auto;white-space:nowrap;margin:0 5px 5px 5px;padding:2px 2px 2px 2px\">" + current_deployment.deviceIdMapping[id].schedule.replace(/(\r\n|\n|\r)/gm,"<br>") + "</div>";
 	if (current_deployment.deviceIdMapping[id].jpeg_timestamp !== undefined)
-	  content += "<br><br>Last picture from "+formatTime(current_deployment.deviceIdMapping[id].jpeg_timestamp)+":<br><div><img src=\"/field?vs=etz_camera_pos"+pos+"__scaled&pk=latest&field=JPEG_SCALED\"></div>";
+	  content += "<br>Last picture from "+formatTime(current_deployment.deviceIdMapping[id].jpeg_timestamp)+":<br><div><img style=\"margin:0 5px 5px 5px;border:solid 1px #222;\" src=\"/field?vs="+current_deployment.name+"_camera_pos"+pos+"__scaled&pk=latest&field=JPEG_SCALED\"></div>";
       }
       else {
 	nodeinfo.find(".title").empty().append("Position: NOT AVAILABLE");
@@ -984,7 +1003,8 @@ function PacketRate() {
     }
     else 
       nodeinfo.find(".title").empty().append("Node ID: "+id);
-    nodeinfo.find(".infocontainer").empty().append("Type: "+nodetypes[type]+ ((type==5 || type==6)?("<br>Gumstix running: "+corestationrunning):"") + content);
+    
+    nodeinfo.find(".infocontainer").empty().append(content);
     nodeinfo.show();
   }
 
@@ -1242,7 +1262,7 @@ $(document).ready(function() {
 	      this.render();
 	    })
             .event("click", function(d) {
-	      showNodeInfoTab(d.node_id, d.type, d.corestation_running);
+	      showNodeInfoTab(d.node_id, d.nodetype, d.corestation_running);
             }); /*
             .event("mousedown", pv.Behavior.drag())
             .event("drag", deployment_data[deployment_data.length-1].force);*/
