@@ -273,7 +273,7 @@ public class MyDataSourceCandidateWaitingListServlet extends HttpServlet
                     ctdb = new ConnectToDB();
                     if(pm.valueForName("register").equals("Yes"))
                     {
-                        ctdb.updateOneColumnUnderOneCondition(new Column("ISCANDIDATE","no"),new Column("DATASOURCENAME",pm.valueForName("datasourcename")),"ACDATASOURCE");
+                    	ctdb.updateDataSourceCandidate(pm.valueForName("datasourcename"));
                         //send e-mail to the DS owner
                     }
                     else if(pm.valueForName("register").equals("No"))

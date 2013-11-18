@@ -34,6 +34,7 @@ public class ConnectToDB
 	private static String dbUser;
 	private static String dbPassword;
     private static Vector ACTables;//list of AC tables
+    private static ArrayList<String> datasourcelist;
 
 	private Connection con ;
 	private Statement stmt ;
@@ -70,10 +71,12 @@ public class ConnectToDB
         dbPassword= jdbcPassword;
         connectionname=jdbcURL;
         checkACTables();
+        initDataSourceList();
 
 
     }
-     /* Check if AC tables exist , and create them otherwise*/
+
+	/* Check if AC tables exist , and create them otherwise*/
      static void checkACTables()
     {
         Connection connection=null;
@@ -149,7 +152,7 @@ public class ConnectToDB
 		}
        catch(Exception e)
        {
-
+			logger.error(e.getMessage(),e);
        }
         finally
          {
@@ -171,6 +174,61 @@ public class ConnectToDB
              }
          }
 
+    }
+    
+    /* initialize DataSource list */
+    private static void initDataSourceList() {
+    	datasourcelist = new ArrayList<String>();
+        Connection connection=null;
+        Statement statement=null;
+        
+        try
+ 		{
+             //Get a connection to the database
+             connection = DriverManager.getConnection(connectionname,dbUser,dbPassword);
+
+ 			//create a statement object
+             statement = connection.createStatement();
+             
+            // execute query
+            ResultSet resultset=statement.executeQuery("SELECT DATASOURCENAME FROM ACDATASOURCE");
+            
+            while (resultset.next())
+            	datasourcelist.add(resultset.getString(1));
+ 		}
+ 		catch(SQLException e)
+ 		{
+             logger.error("ERROR IN INITDATASOURCELIST METHOD :SQLException caught ");
+ 			logger.error(e.getMessage(),e);
+
+ 			while((e = e.getNextException())!= null )
+ 			{
+ 				logger.error(e.getMessage(),e);
+ 			}
+ 		}
+        catch(Exception e)
+        {
+			logger.error(e.getMessage(),e);
+        }
+         finally
+          {
+              try
+              {
+                 if(statement!=null)
+                 {
+                     statement.close();
+                 }
+                 if(connection !=null)
+                 {
+                     connection.close();
+                 }
+              }
+              catch(SQLException e)
+              {
+                  logger.error("ERROR IN CHECKACTABLES METHOD :");
+ 			     logger.error(e.getMessage(),e);
+              }
+          }
     }
 
     /* create a default Administrator for access control system */
@@ -1036,6 +1094,11 @@ public class ConnectToDB
         return newVec;
     }
 
+    /* check if this virtual sensor is managed */
+	public static boolean isDataSourceManaged(String vsname) {
+		return datasourcelist.contains(vsname);
+	}
+
     /* check if this virtual sensor is waiting  */
     boolean isDataSourceCandidate(DataSource ds)throws SQLException
     {
@@ -1153,6 +1216,7 @@ public class ConnectToDB
         boolean success=false;
 		if(this.insertTwoColumnsValues(new Column("DATASOURCENAME",ds.getDataSourceName()),new Column("ISCANDIDATE",ds.getIsCandidate()),"ACDATASOURCE")== true)
 		{
+			datasourcelist.add(ds.getDataSourceName());
             if(registerDataSourceForUser(ds.getOwner(),ds)==true)
             {
                 success=true;
@@ -1222,6 +1286,10 @@ public class ConnectToDB
        else
            return false;
    }
+
+	public void updateDataSourceCandidate(String valueForName) throws SQLException {
+		this.updateOneColumnUnderOneCondition(new Column("ISCANDIDATE","no"),new Column("DATASOURCENAME",valueForName),"ACDATASOURCE");
+	}
 
     /* change the combination of a given group */
     void changeGroupCombination(Group group)throws SQLException
@@ -1297,6 +1365,7 @@ public class ConnectToDB
     {
         this.deleteUnderOneCondition(new Column("DATASOURCENAME",dataSourceName),"ACUSER_ACDATASOURCE");
         this. deleteUnderOneCondition(new Column("DATASOURCENAME",dataSourceName),"ACDATASOURCE");
+		datasourcelist.remove(dataSourceName);
     }
     void deleteGroup(String groupName)throws SQLException
     {
