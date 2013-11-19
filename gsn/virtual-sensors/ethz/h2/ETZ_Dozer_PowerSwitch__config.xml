@@ -24,10 +24,12 @@
 							def PORT2 =										0x002;
 							def PORT1AND2 =									0x003;
 							def POWER_ON_MASK =								0xF80;
+							def POWER_ON_RIGHT_SHIFT =						7;
 							def POWER_OFF_MASK =							0x07C;
+							def POWER_OFF_RIGHT_SHIFT =						2;
 	                		
-	                		def powerOnTime = EVENT_VALUE & POWER_ON_MASK;
-	                		def powerOffTime = EVENT_VALUE & POWER_OFF_MASK;
+	                		def powerOnTime = (EVENT_VALUE & POWER_ON_MASK) >> POWER_ON_RIGHT_SHIFT;
+	                		def powerOffTime = (EVENT_VALUE & POWER_OFF_MASK) >> POWER_OFF_RIGHT_SHIFT;
     	            		
                 			if (powerOnTime == 0 && powerOffTime == 0) {}
                 			else if (powerOnTime == 0x1F && powerOffTime == 0x1F) {
@@ -48,16 +50,16 @@
                 				def java.util.Date offtime = new java.util.Date(GENERATION_TIME + (powerOffTime * 3600000L));
 								switch (EVENT_VALUE & PORT_MASK) {
 									case PORT1:
-										element[0] = ontime.format("hh:mm");
-										element[1] = offtime.format("hh:mm");
+										element[0] = ontime.format("HH:mmZ");
+										element[1] = offtime.format("HH:mmZ");
 										break;
 									case PORT2:
-										element[2] = ontime.format("hh:mm");
-										element[3] = offtime.format("hh:mm");
+										element[2] = ontime.format("HH:mmZ");
+										element[3] = offtime.format("HH:mmZ");
 										break;
 									case PORT1AND2:
-										element[2] = element[0] = ontime.format("hh:mm");
-										element[3] = element[1] = offtime.format("hh:mm");
+										element[2] = element[0] = ontime.format("HH:mmZ");
+										element[3] = element[1] = offtime.format("HH:mmZ");
 										break;
 								}
 							}
@@ -80,10 +82,10 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             
-            <field name="SCHEDULE_POWER_ON_PORT1" type="VARCHAR(8)" />
-            <field name="SCHEDULE_POWER_OFF_PORT1" type="VARCHAR(8)" />
-            <field name="SCHEDULE_POWER_ON_PORT2" type="VARCHAR(8)" />
-            <field name="SCHEDULE_POWER_OFF_PORT2" type="VARCHAR(8)" />
+            <field name="SCHEDULE_POWER_ON_PORT1" type="VARCHAR(12)" />
+            <field name="SCHEDULE_POWER_OFF_PORT1" type="VARCHAR(12)" />
+            <field name="SCHEDULE_POWER_ON_PORT2" type="VARCHAR(12)" />
+            <field name="SCHEDULE_POWER_OFF_PORT2" type="VARCHAR(12)" />
         </output-structure>
     </processing-class>
     <description>PowerSwitch configuration at ETZ deployment</description>
@@ -94,10 +96,10 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from ETZ_Dozer_EventLogger__mapped</predicate>
+                    <predicate key="query"> select * from ETZ_Dozer_EventLogger__mapped where ((EVENT_ID = 4 and DEVICE_ID >= 6000 and DEVICE_ID &lt; 7000 and DEVICE_ID != 6666) or (EVENT_ID = 32 and EVENT_VALUE > 3))</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where (EVENT_ID = 4 and DEVICE_ID >= 6000 and DEVICE_ID &lt; 7000 and DEVICE_ID != 6666) or (EVENT_ID = 32 and EVENT_VALUE > 3)</query>
+                <query> select * from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>
