@@ -113,7 +113,7 @@ Dirruhorn_Dozer_Rssi__mapped.xml
 Dirruhorn_Dozer_Rssi__muxed__mapped.xml
 Dirruhorn_Dozer_StateCounter__conv.xml
 Dirruhorn_Dozer_StateCounter__mapped.xml
-Dirruhorn_Dozer_WgpsConfig__conv.xml
+Dirruhorn_Dozer_Wgps__config.xml
 Dirruhorn_Dozer_WgpsStatus__conv.xml
 Dirruhorn_Dozer_WgpsStatus__mapped.xml
 Dirruhorn_Dozer_WgpsSv__conv.xml
