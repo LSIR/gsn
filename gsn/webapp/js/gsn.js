@@ -547,7 +547,7 @@ var GSN = {
     updatenb: 0
     ,
     updateallchange: function(){
-        if($("#refreshall_timeout").attr("value") != 0)
+        if(document.getElementById("refreshall_timeout").value != 0)
             GSN.updateall();
     }
 	
@@ -568,8 +568,8 @@ var GSN = {
         function nextRefresh() {
           var start = new Date();
           //next refresh
-          if($("#refreshall_timeout").attr("value") > 0)
-            setTimeout("GSN.updateall("+GSN.updatenb+")", $("#refreshall_timeout").attr("value"));
+          if(document.getElementById("refreshall_timeout").value > 0)
+            setTimeout("GSN.updateall("+GSN.updatenb+")", document.getElementById("refreshall_timeout").value);
           $(".refreshing").hide();
 
           var diff = new Date() - start;
