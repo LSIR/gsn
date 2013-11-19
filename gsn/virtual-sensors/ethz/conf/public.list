@@ -106,6 +106,7 @@ Dirruhorn_Dozer_GPSHealth__mapped.xml
 Dirruhorn_Dozer_NodeHealth__conv.xml
 Dirruhorn_Dozer_NodeHealth__mapped.xml
 Dirruhorn_Dozer_NodeInfo__mapped.xml
+Dirruhorn_Dozer_PowerSwitch__config.xml
 Dirruhorn_Dozer_PowerSwitch__conv.xml
 Dirruhorn_Dozer_PowerSwitch__mapped.xml
 Dirruhorn_Dozer_Rssi__conv.xml
@@ -224,6 +225,7 @@ Jungfraujoch_Dozer_EventLogger__muxed__mapped.xml
 Jungfraujoch_Dozer_NodeHealth__conv.xml
 Jungfraujoch_Dozer_NodeHealth__mapped.xml
 Jungfraujoch_Dozer_NodeInfo__mapped.xml
+Jungfraujoch_Dozer_PowerSwitch__config.xml
 Jungfraujoch_Dozer_PowerSwitch__conv.xml
 Jungfraujoch_Dozer_PowerSwitch__mapped.xml
 Jungfraujoch_Dozer_Rssi__conv.xml
@@ -303,6 +305,7 @@ Matterhorn_Dozer_EventLogger__muxed__mapped.xml
 Matterhorn_Dozer_NodeHealth__conv.xml
 Matterhorn_Dozer_NodeHealth__mapped.xml
 Matterhorn_Dozer_NodeInfo__mapped.xml
+Matterhorn_Dozer_PowerSwitch__config.xml
 Matterhorn_Dozer_PowerSwitch__conv.xml
 Matterhorn_Dozer_PowerSwitch__mapped.xml
 Matterhorn_Dozer_Rssi__conv.xml

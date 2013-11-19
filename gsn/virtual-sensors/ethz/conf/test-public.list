@@ -34,6 +34,8 @@ ETZ_Dozer_ModbusHolding__mapped.xml
 ETZ_Dozer_NodeHealth__mapped.xml
 ETZ_Dozer_NodeHealth__conv.xml
 ETZ_Dozer_NodeInfo__mapped.xml
+ETZ_Dozer_PowerSwitch__config.xml
+ETZ_Dozer_PowerSwitch__conv.xml
 ETZ_Dozer_PowerSwitch__mapped.xml
 ETZ_Dozer_Rssi__conv.xml
 ETZ_Dozer_Rssi__mapped.xml

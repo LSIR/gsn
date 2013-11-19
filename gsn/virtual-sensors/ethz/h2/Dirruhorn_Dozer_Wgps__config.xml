@@ -35,11 +35,11 @@
                 		
                 		SAM7_SELFTEST = SAM7_RESET = null;
                 		
-                		if ( ! isdef('positionToValueMap')) { positionToValueMap = [:]; }
-                		if (!positionToValueMap.containsKey(POSITION)) {
-                			positionToValueMap.put(POSITION, [null,null,null,null,null,null,null,null,null]);
+                		if ( ! isdef('deviceIdToValueMap')) { deviceIdToValueMap = [:]; }
+                		if (!deviceIdToValueMap.containsKey(DEVICE_ID)) {
+                			deviceIdToValueMap.put(DEVICE_ID, [null,null,null,null,null,null,null,null,null]);
                 		}
-                		def element = positionToValueMap.get(POSITION);
+                		def element = deviceIdToValueMap.get(DEVICE_ID);
                 		
 						def value = EVENT_VALUE & CMD_VALUE_MASK;
 						def lowValue = value & CMD_MEASUREMENT_LOW_MASK;
@@ -81,7 +81,7 @@
 								}
 								break;
 						}
-						positionToValueMap.put(POSITION, element);
+						deviceIdToValueMap.put(DEVICE_ID, element);
 						
 						GENERATION_TIME = EVENT_TIMESTAMP;
                 		HIGH_POWER_START_TIME = element[0];
