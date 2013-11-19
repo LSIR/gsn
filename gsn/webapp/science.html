@@ -57,7 +57,7 @@ $(document).ready(function() {
          signals: [{
           vsensor:".*_dozer_aedata__conv",
           field:["length","risetime","amplitude_db","count","energy"],
-          select:"sensornode[nodetype=4]"
+          select:"sensornode[nodetype=9]"
         }],      
       },
       {  title:"Acoustic Emission Statistics",
@@ -65,7 +65,7 @@ $(document).ready(function() {
           vsensor:".*_dozer_aestatistics__mapped",
           field:["payload_ch1_measured","payload_ch1_noisefloor",
                  "payload_ch2_measured","payload_ch2_noisefloor"],
-          select:"sensornode[nodetype=4]"
+          select:"sensornode[nodetype=9]"
         }],      
       },
 

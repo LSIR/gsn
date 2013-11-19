@@ -275,7 +275,7 @@ $(document).ready(function() {
         signals: [{
           vsensor:".*_dozer_powerswitch__mapped",
           field:["payload_port1on","payload_port2on"],
-          select:"sensornode[nodetype=2][position]"
+          select:"sensornode[nodetype=3][position]"
         }]
       },
       { title:"BackLog Uptime",
@@ -415,7 +415,7 @@ $(document).ready(function() {
           signals: [{
           vsensor:".*_binary__mapped",
           field:["file_queue_length","file_queue_size"],
-          select:"sensornode[position][iscorestation='true']"
+          select:"sensornode[position=][iscorestation='true']"
         }]
       },
       { title:"Binary Files",
