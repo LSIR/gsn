@@ -87,6 +87,8 @@
             <field name="ADC_CHANNEL_01_MV" type="DOUBLE" unit="mV" />
             <field name="ADC_CHANNEL_01_PPM" type="DOUBLE" unit="ppm"/>
             <field name="ADC_CHANNEL_02_MV" type="DOUBLE" unit="mV"/>
+            <field name="ADC_CHANNEL_03_MV" type="DOUBLE" unit="mV"/>
+            <field name="ADC_CHANNEL_03_PPM" type="DOUBLE" unit="ppm"/>
         </output-structure>
     </processing-class>
     <description>show B4-Sensor readings and GPS information from the OSTest deployment</description>

@@ -27,7 +27,9 @@ public class B4SensorPlugin extends AbstractPlugin {
 						new DataField("GEO_SEP_U_RAW_DATA", "VARCHAR(32)"),
 						new DataField("ADC_CHANNEL_01_MV", "DOUBLE"),
 						new DataField("ADC_CHANNEL_01_PPM", "DOUBLE"),
-						new DataField("ADC_CHANNEL_02_MV", "DOUBLE")};
+						new DataField("ADC_CHANNEL_02_MV", "DOUBLE"),
+						new DataField("ADC_CHANNEL_03_MV", "DOUBLE"),
+						new DataField("ADC_CHANNEL_03_PPM", "DOUBLE")};
 
 	private final transient Logger logger = Logger.getLogger( B4SensorPlugin.class );
 	
@@ -59,7 +61,7 @@ public class B4SensorPlugin extends AbstractPlugin {
 	public boolean messageReceived(int deviceId, long timestamp, Serializable[] data) {
 
 	
-	if (data.length < 3 || data.length > 17)
+	if (data.length < 3 || data.length > 19)
 	{
 		logger.error("message (last timestamp >" + timestamp + "<) could not be parsed. (length: " + data.length + ")");
         ackMessage(timestamp, super.priority);
@@ -73,7 +75,13 @@ public class B4SensorPlugin extends AbstractPlugin {
 		      logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
 		} else if (data.length == 17) 
 		{		
-        if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[14], data[15], data[16]}) )
+        if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[14], data[15], data[16], null, null}) )
+          ackMessage(timestamp, super.priority);
+        else
+          logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+      	} else if (data.length == 19) 
+		{		
+        if( dataProcessed(System.currentTimeMillis(), new Serializable[] {timestamp, timestamp, deviceId, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[14], data[15], data[16], data[17], data[18]}) )
           ackMessage(timestamp, super.priority);
         else
           logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
