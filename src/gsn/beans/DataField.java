@@ -15,10 +15,13 @@ public final class DataField implements Serializable {
    private byte               dataTypeID       = -1;
    
    private String            type;
+
+   private String            unit = "";
    
    private DataField ( ) {}
-   
-   public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {
+
+
+   public DataField ( final String fieldName , final String type , final String description) throws GSNRuntimeException {
       this.name = fieldName;
       this.type = type;
       this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( type );
@@ -28,7 +31,7 @@ public final class DataField implements Serializable {
    /*
    * Use this constructor only with types which require precision parameter (char, varchar, blob, binary)
    * */
-   public DataField ( final String fieldName , final String type, final int precision , final String description ) throws GSNRuntimeException {
+   public DataField ( final String fieldName , final String type, final int precision , final String description) throws GSNRuntimeException {
       this.name = fieldName;
       this.type = type +"("+precision+")";
       this.dataTypeID = DataTypes.convertTypeNameToGSNTypeID( this.type );
@@ -79,11 +82,13 @@ public final class DataField implements Serializable {
    public int hashCode ( ) {
       return ( this.name != null ? this.name.hashCode( ) : 0 );
    }
-   
+
    public String toString ( ) {
       final StringBuilder result = new StringBuilder( );
-      result.append( "[Field-Name:" ).append( this.name ).append( ", Type:" ).append( DataTypes.TYPE_NAMES[ this.getDataTypeID( ) ] ).append( "[" + this.type + "]" ).append( ", Decription:" )
-            .append( this.description ).append( "]" );
+      result.append( "[Field-Name:" ).append( this.name ).append( ", Type:" ).append( DataTypes.TYPE_NAMES[ this.getDataTypeID( ) ] ).append( "[" + this.type + "]" )
+            .append( ", Decription:" ).append( this.description )
+            .append( ", Unit:" ).append( this.unit )
+            .append( "]" );
       return result.toString( );
    }
    
@@ -94,5 +99,13 @@ public final class DataField implements Serializable {
    public String getType ( ) {
       return this.type;
    }
-   
+
+    public String getUnit() {
+        return unit;
+    }
+
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 }

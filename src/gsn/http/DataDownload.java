@@ -1,7 +1,10 @@
 package gsn.http;
 
 import gsn.Main;
+import gsn.Mappings;
+import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
 import gsn.http.ac.UserUtils;
@@ -10,9 +13,7 @@ import gsn.storage.DataEnumerator;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.KeyValue;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 public class DataDownload extends HttpServlet {
@@ -235,7 +238,7 @@ public class DataDownload extends HttpServlet {
 
                 if (req.getParameter("sql") != null) {
                     res.setContentType("text/html");
-                    respond.println("#" + generated_request_query);
+                    respond.println("# " + generated_request_query);
                     return;
                 }
 
@@ -253,11 +256,36 @@ public class DataDownload extends HttpServlet {
                     respond.println("No data corresponds to your request");
                     return;
                 }
+
+                //get units in hash map
+                Iterator< VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs();
+                HashMap<String, String> fieldToUnitMap = new HashMap<String, String>();
+                VSensorConfig sensorConfig = null;
+                while ( vsIterator.hasNext( ) ) {
+                    VSensorConfig senConfig = vsIterator.next( );
+                    if (vsName.equalsIgnoreCase(senConfig.getName())){
+                        sensorConfig = senConfig;
+                        DataField[] dataFieldArray = senConfig.getOutputStructure();
+                        for (DataField df: dataFieldArray){
+                            String unit = df.getUnit();
+                            if (unit == null || unit.trim().length() == 0)
+                                unit = "";
+
+                            fieldToUnitMap.put(df.getName().toLowerCase(), unit);
+                        }
+                        break;
+                    }
+                }
+
                 line = "";
                 int nbFields = 0;
                 if (responseCVS) {
                     boolean firstLine = true;
-                    respond.println("#" + generated_request_query);
+                    respond.println("# " + generated_request_query);
+                    for ( KeyValue df : sensorConfig.getAddressing()){
+                        respond.println("# " + df.getKey().toString().toLowerCase() + ":" + df.getValue().toString());
+                    }
+                    respond.println("# description:" + sensorConfig.getDescription());
                     while (result.hasMoreElements()) {
                         StreamElement se = result.nextElement();
                         if (firstLine) {
@@ -265,20 +293,41 @@ public class DataDownload extends HttpServlet {
                             if (groupByTimed) {
                                 nbFields--;
                             }
+                            if (wantTimeStamp) {
+                                line += separator + "time";
+                            }
                             for (int i = 0; i < nbFields; i++)
                                 //line += delimiter + se.getFieldNames()[i].toString();
                                 if ((!groupByTimed) || (i != fields.length)) {
                                     line += separator + fields[i];
                                 } else {
-                                    line += separator + "timed";
+                                    line += separator + "time";
                                 }
-                            if (wantTimeStamp) {
-                                line += separator + "timed";
-                            }
+
                             firstLine = false;
+                            respond.println(line.substring(separator.length()));
+
+                            line="";
+
+                            //units (second line)
+                            if (wantTimeStamp) {
+                                line += separator + "";
+                            }
+                            for (int i = 0; i < nbFields; i++){
+                                if ((!groupByTimed) || (i != fields.length)){
+                                    line += separator + fieldToUnitMap.get(fields[i].toLowerCase());
+                                } else {
+                                    line += separator + "";
+                                }
+                            }
+                            respond.println(line.substring(separator.length()));
                         }
-                        respond.println(line.substring(separator.length()));
+
                         line = "";
+                        if (wantTimeStamp) {
+                            Date d = new Date(se.getTimeStamp());
+                            line += separator + sdf.format(d);
+                        }
                         for (int i = 0; i < nbFields; i++)
                             //line += delimiter+se.getData( )[ i ].toString( );
 
@@ -287,14 +336,14 @@ public class DataDownload extends HttpServlet {
                             } else {
                                 line += separator + se.getData()[i].toString();
                             }
-                        if (wantTimeStamp) {
-                            Date d = new Date(se.getTimeStamp());
-                            line += separator + sdf.format(d);
-                        }
                         respond.println(line.substring(separator.length()));
                     }
                 } else {
                     boolean firstLine = true;
+                    for ( KeyValue df : sensorConfig.getAddressing()){
+                        respond.println("\t<!-- " + StringEscapeUtils.escapeXml(df.getKey().toString().toLowerCase()) + ":" + StringEscapeUtils.escapeXml(df.getValue().toString()) + " -->");
+                    }
+                    respond.println("\t<!-- description:" + StringEscapeUtils.escapeXml(sensorConfig.getDescription()) + " -->");
                     respond.println("<data>");
                     while (result.hasMoreElements()) {
                         StreamElement se = result.nextElement();
@@ -304,25 +353,29 @@ public class DataDownload extends HttpServlet {
                             if (groupByTimed) {
                                 nbFields--;
                             }
-                            for (int i = 0; i < nbFields; i++)
-                                //if (commonReq) {
-                                //out.println("\t\t<field>" + se.getFieldNames()[i].toString()+"</field>");
-                                if ((!groupByTimed) || (i != fields.length)) {
-                                    respond.println("\t\t<field>" + fields[i] + "</field>");
+                            if (wantTimeStamp) {
+                                respond.println("\t\t<field unit=\"\">time</field>");
+                            }
+                            for (int i = 0; i < nbFields; i++) {
+                                if ((!groupByTimed) || (i != fields.length)){
+                                    respond.print("\t\t<field unit=\"" + fieldToUnitMap.get(fields[i].toLowerCase()));
+                                    respond.println("\">" + fields[i] + "</field>");
                                 } else {
-                                    respond.println("\t\t<field>timed</field>");
+                                    respond.println("\t\t<field unit=\"\">time</field>");
                                 }
+                            }
                             //} else {
                             //	 out.println("\t\t<field>"+expression+"</field>");
                             //}
-                            if (wantTimeStamp) {
-                                respond.println("\t\t<field>timed</field>");
-                            }
                             respond.println("\t</line>");
                             firstLine = false;
                         }
                         line = "";
                         respond.println("\t<line>");
+                        if (wantTimeStamp) {
+                            Date d = new Date(se.getTimeStamp());
+                            respond.println("\t\t<field>" + sdf.format(d) + "</field>");
+                        }
                         for (int i = 0; i < nbFields; i++) {
 
                             //if ( !commonReq && expression.contains("timed")) {
@@ -334,10 +387,6 @@ public class DataDownload extends HttpServlet {
                                 else
                                     respond.println("\t\t<field>" + se.getData()[i].toString() + "</field>");
                             }
-                        }
-                        if (wantTimeStamp) {
-                            Date d = new Date(se.getTimeStamp());
-                            respond.println("\t\t<field>" + sdf.format(d) + "</field>");
                         }
                         respond.println("\t</line>");
                     }

@@ -2,6 +2,7 @@ package gsn.http;
 
 import gsn.Main;
 import gsn.Mappings;
+import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.HashMap;
 
 //import gsn.http.accesscontrol.User;
 
@@ -43,7 +46,7 @@ public class OneShotQueryHandler implements RequestHandler {
             vsFields += " , pk, timed";
         String windowSize = request.getParameter("window");
         if (windowSize == null || windowSize.trim().length() == 0) windowSize = "1";
-        StringBuilder query = new StringBuilder("select " + vsFields + " from " + "my"+vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0");
+        StringBuilder query = new StringBuilder("select " + vsFields + " from " + vsName + vsCondition + " order by timed DESC limit " + windowSize + " offset 0");
         DataEnumerator result;
         try {
             result = Main.getStorage(vsName).executeQuery(query, true);
@@ -53,12 +56,32 @@ public class OneShotQueryHandler implements RequestHandler {
             logger.error("Query is from " + request.getRemoteAddr() + "- " + request.getRemoteHost());
             return;
         }
+
+        Iterator< VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs();
+        HashMap<String, String> fieldToUnitMap = new HashMap<String, String>();
+        while ( vsIterator.hasNext( ) ) {
+            VSensorConfig sensorConfig = vsIterator.next( );
+            if (vsName.equalsIgnoreCase(sensorConfig.getName())){
+                DataField[] dataFieldArray = sensorConfig.getOutputStructure();
+                for (DataField df: dataFieldArray){
+                    String unit = df.getUnit();
+                    if (unit == null || unit.trim().length() == 0)
+                        unit = "";
+
+                    fieldToUnitMap.put(df.getName().toLowerCase(), unit);
+                }
+                break;
+            }
+        }
+
         StringBuilder sb = new StringBuilder("<result>\n");
         while (result.hasMoreElements()) {
             StreamElement se = result.nextElement();
             sb.append("<stream-element>\n");
+            sb.append("<field name=\"time\" unit=\"\">").append(sdf.format(new Date(se.getTimeStamp()))).append("</field>\n");
             for (int i = 0; i < se.getFieldNames().length; i++) {
-                sb.append("<field name=\"").append(se.getFieldNames()[i]).append("\" >");
+                sb.append("<field name=\"").append(se.getFieldNames()[i]).append("\"");
+                sb.append(" unit=\"").append(fieldToUnitMap.get(se.getFieldNames()[i].toLowerCase())).append("\" >");
                 if (se.getData()[i] != null)
                     if (se.getFieldTypes()[i] == DataTypes.BINARY)
                         sb.append(se.getData()[i].toString());
@@ -66,8 +89,7 @@ public class OneShotQueryHandler implements RequestHandler {
                         sb.append(StringEscapeUtils.escapeXml(se.getData()[i].toString()));
                 sb.append("</field>\n");
             }
-System.out.println("Time = "+se.getTimeStamp());
-            sb.append("<field name=\"timed\" >").append(sdf.format(new Date(se.getTimeStamp()))).append("</field>\n");
+
             sb.append("</stream-element>\n");
         }
         result.close();

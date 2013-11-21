@@ -79,7 +79,7 @@ public class AbstractQuery {
 			sqlQuery.append(partFields);
 			sqlQuery.append("from ").append(vsName).append(" ");
 			sqlQuery.append(partStandardCriteria);
-			if (aggregation == null)	sqlQuery.append("order by timed desc ");
+			if (aggregation == null)	sqlQuery.append("order by timed asc ");
 			else 								sqlQuery.append("group by aggregation_interval desc ");
 
 			logger.debug("SQL Query built >" + sqlQuery.toString() + "<");

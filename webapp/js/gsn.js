@@ -760,7 +760,7 @@ var GSN = {
             var input = $("dl.input",vsdl.get(4));
             dl = dynamic;
 			
-            var name,cat,type,value;
+            var name,cat,type,value,unit;
             var last_cmd,cmd;
             var hiddenclass ="";
             //update the vsbox the first time, when it's empty
@@ -772,6 +772,11 @@ var GSN = {
                     cmd = $(this).attr("command");
                     type = $(this).attr("type");
                     value = $(this).text();
+                    unit = $(this).attr("unit");
+                    if (unit==null)
+                        unit="";
+                    else
+                        unit=" "+unit;
 				
                     if (name=="timed") {
                         //if (value != "") value = GSN.util.printDate(value);
@@ -832,6 +837,12 @@ var GSN = {
                             });
                         } else if (type.indexOf("binary") != -1){
                             value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
+                        } else if (unit==" s"){
+                            value = GSN.vsbox.formatTimeInterval(value);
+                        } else if (unit==" ms"){
+                            value = GSN.vsbox.formatTimeInterval(value / 1000);
+                        } else {
+                            value = value + unit;
                         }
                     } else if (cat == "input") {
                         if (last_cmd != cmd) {
@@ -919,12 +930,17 @@ var GSN = {
             } else {
                 //update the vsbox when the value already exists
                 var dds = $("dd",dl);
-                var dd,field;
+                var dd,field,unit;
                 for (var i = 0; i<dds.size();i++){
                     dd = dds.get(i);
                     field = $("field[@name="+$(dd).attr("class")+"]",vs);
                     type = $(field).attr("type");
                     value = $(field).text();
+                    unit = $(field).attr("unit");
+                    if (unit==null || value=="null")
+                        unit="";
+                    else
+                        unit=" "+unit;
                     if (value!="") {
                         if (type.indexOf("svg") != -1){
                             $("embed",dd).attr("src",value);
@@ -942,8 +958,12 @@ var GSN = {
                             });
                         } else if (type.indexOf("binary") != -1){
                             $("a",dd).attr("href",value);
+                        } else if (unit==" s"){
+                            $(dd).empty().append(GSN.vsbox.formatTimeInterval(value));
+                        } else if (unit==" ms"){
+                            $(dd).empty().append(GSN.vsbox.formatTimeInterval(value / 1000));
                         } else {
-                            $(dd).empty().append(value);
+                            $(dd).empty().append(value + unit);
                         }
                     }
                 }

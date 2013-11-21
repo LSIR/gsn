@@ -73,9 +73,16 @@ public class GetRequestHandler {
 
                 String field_name = df.getName().toLowerCase();
                 String field_type = df.getType().toLowerCase();
+                String field_unit = df.getUnit();
+                if (field_unit == null || field_unit.trim().length() == 0)
+                    field_unit = "";
 
                 if (field_type.indexOf("double") >= 0) {
-                    listOfFields.add(field_name);
+                    //listOfFields.add(field_name);
+                    JSONObject field = new JSONObject();
+                    field.put("name", field_name);
+                    field.put("unit", field_unit);
+                    listOfFields.add(field);
                 }
             }
 
@@ -127,7 +134,7 @@ public class GetRequestHandler {
 
             String vs_name = sensorConfig.getName();
             if (!user.hasReadAccessRight(vs_name) && !user.isAdmin() && DataSource.isVSManaged(vs_name)) {   // if you dont have access to this sensor
-                 continue;
+                continue;
             }
 
             aSensor.put("name", vs_name);
@@ -138,9 +145,16 @@ public class GetRequestHandler {
 
                 String field_name = df.getName().toLowerCase();
                 String field_type = df.getType().toLowerCase();
+                String field_unit = df.getUnit();
+                if (field_unit == null || field_unit.trim().length() == 0)
+                    field_unit = "";
 
                 if (field_type.indexOf("double") >= 0) {
-                    listOfFields.add(field_name);
+                    //listOfFields.add(field_name);
+                    JSONObject field = new JSONObject();
+                    field.put("name", field_name);
+                    field.put("unit", field_unit);
+                    listOfFields.add(field);
                 }
             }
 
@@ -215,7 +229,10 @@ public class GetRequestHandler {
             for (DataField df : sensorConfig.getOutputStructure()) {
                 String field_name = df.getName().toLowerCase();
                 String field_type = df.getType().toLowerCase();
-                out.print(","+field_name+","+field_type);    // add its fields
+                String field_unit = df.getUnit();
+                if (field_unit == null || field_unit.trim().length() == 0)
+                    field_unit = "";
+                out.print(","+field_name+","+field_type+","+field_unit);    // add its fields
             }
             out.println(); // prepare for the new entry
         }
@@ -248,8 +265,13 @@ public class GetRequestHandler {
         ArrayList<Vector<Double>> elements  = new ArrayList<Vector<Double>>();;
         VSensorConfig sensorConfig = Mappings.getConfig(sensor);    // get the configuration for this vs
         ArrayList<String> fields = new ArrayList<String>();
+        ArrayList<String> units = new ArrayList<String>();
         for (DataField df : sensorConfig.getOutputStructure()) {
             fields.add(df.getName().toLowerCase());   // get the field name that is going to be processed
+            String unit = df.getUnit();
+            if (unit == null || unit.trim().length() == 0)
+                unit = "";
+            units.add(unit);
         }
         out.print("#");
         int j;
@@ -257,6 +279,13 @@ public class GetRequestHandler {
             out.print(fields.get(j)+",");
         }
         out.println(fields.get(j));
+
+        //units (second line)
+        out.print("#");
+        for (j=0; j < (fields.size()-1); j++) {
+            out.print(units.get(j)+",");
+        }
+        out.println(units.get(j));
         ///////////////////////   Connection to the DB to get the data
 
         Connection conn = null;
@@ -423,9 +452,32 @@ public class GetRequestHandler {
             return (restResponse);
         }
 
+        //find unit for field
+        Iterator< VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs();
+        String unit = "";
+        boolean found = false;
+        while ( vsIterator.hasNext( ) ) {
+            VSensorConfig sensorConfig = vsIterator.next( );
+            if (sensorConfig.getName().equalsIgnoreCase(sensor)){
+                DataField[] dataFieldArray = sensorConfig.getOutputStructure();
+                for (DataField df: dataFieldArray){
+                    if (field.equalsIgnoreCase(df.getName())){
+                        unit = df.getUnit();
+                        if (unit == null || unit.trim().length() == 0){
+                            unit = "";
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+        }
+
         JSONObject jsonResponse = new JSONObject();
         jsonResponse.put("sensor", sensor);
         jsonResponse.put("field", field);
+        jsonResponse.put("unit", unit);
         jsonResponse.put("from", from);
         jsonResponse.put("to", to);
         JSONArray streamArray = new JSONArray();
@@ -515,7 +567,7 @@ public class GetRequestHandler {
 
     public RestResponse getMeasurementsForSensorField(String sensor, String field, String from, String to) {
 
-      //System.out.println("@@@@@@@MeasurementForSensorField with field ='"+field+"' from = '"+from+"' and to='"+to+"'");
+        //System.out.println("@@@@@@@MeasurementForSensorField with field ='"+field+"' from = '"+from+"' and to='"+to+"'");
 
         RestResponse restResponse = new RestResponse();
 
@@ -546,9 +598,32 @@ public class GetRequestHandler {
             return (restResponse);
         }
 
+        //find unit for field
+        Iterator< VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs();
+        String unit = "";
+        boolean found = false;
+        while ( vsIterator.hasNext( ) ) {
+            VSensorConfig sensorConfig = vsIterator.next( );
+            if (sensorConfig.getName().equalsIgnoreCase(sensor)){
+                DataField[] dataFieldArray = sensorConfig.getOutputStructure();
+                for (DataField df: dataFieldArray){
+                    if (field.equalsIgnoreCase(df.getName())){
+                        unit = df.getUnit();
+                        if (unit == null || unit.trim().length() == 0){
+                            unit = "";
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+        }
+
         JSONObject jsonResponse = new JSONObject();
         jsonResponse.put("sensor", sensor);
         jsonResponse.put("field", field);
+        jsonResponse.put("unit", unit);
         jsonResponse.put("from", from);
         jsonResponse.put("to", to);
         JSONArray streamArray = new JSONArray();

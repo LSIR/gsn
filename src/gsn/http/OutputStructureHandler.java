@@ -26,10 +26,16 @@ public class OutputStructureHandler implements RequestHandler {
         if (logger.isInfoEnabled())
             logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
         StringBuilder sb = new StringBuilder("<virtual-sensor name=\"").append(vsName).append("\">\n");
-        for (DataField df : sensorConfig.getOutputStructure())
+        sb.append("<field name=\"time\" type=\"string\" description=\"The timestamp associated with the stream element\" unit=\"\"/>\n");
+        for (DataField df : sensorConfig.getOutputStructure()){
             sb.append("<field name=\"").append(df.getName()).append("\" ").append("type=\"").append(df.getType()).append("\" ").append("description=\"").append(
-                    StringEscapeUtils.escapeXml(df.getDescription())).append("\" />\n");
-        sb.append("<field name=\"timed\" type=\"string\" description=\"The timestamp associated with the stream element\" />\n");
+                    StringEscapeUtils.escapeXml(df.getDescription()));
+            if (df.getUnit() != null && df.getUnit().trim().length() != 0)
+                sb.append("\" ").append("unit=\"").append(df.getUnit());
+            else
+                sb.append("\" ").append("unit=\"").append("");
+            sb.append("\" />\n");
+        }
         sb.append("</virtual-sensor>");
         response.setHeader("Cache-Control", "no-store");
         response.setDateHeader("Expires", 0);

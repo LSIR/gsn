@@ -21,6 +21,7 @@
             /* Mapping from virtual sensor name to list of fields name */
             var virtual_sensor_to_fields = []
             var field_to_virtual_sensor = []
+            var field_to_unit = []
             $(function(){
                 function csv_to_json(tag,callback,format){
                     callback = callback || function(){};
@@ -37,22 +38,29 @@
                         var keys =[];
                         var nb_elements = 0;
                         var datasets = [];
+                        var units_line_read = false;
                         for (var line_no=0;line_no<lines.length;line_no++){
                             var line = $.trim(lines[line_no]);
                             if (line.length == 0)
                                 continue;
 
-                            if(line[0]=='#'){
-                                if (line.indexOf("##vsname:") >= 0){ //comment lines
+                            if(line[0]=='#'){ //comment lines
+                                if (line.indexOf("# vsname:") >= 0){
                                     vs_name = line.substring(9,line.length);
                                     keys=[];
                                     headers=[];
-                                }
-                                if (line[0]== '#' && line[1]!= '#') { //Header
+                                } else if (line.indexOf("# query:") >= 0) {
+                                } else if (line.indexOf("# geographical:") >= 0) {
+                                } else if (line.indexOf("# latitude:") >= 0) {
+                                } else if (line.indexOf("# longitude:") >= 0) {
+                                } else if (line.indexOf("# altitude:") >= 0) {
+                                } else if (line.indexOf("# description:") >= 0) {
+                                } else if (!units_line_read) { //field name
                                     headers = line.split(',');
                                     for (var i=0;i<headers.length;i++){
                                         headers[i] = headers[i].replace("#","");
-                                        if (headers[i]=='timed') {
+                                        headers[i] = headers[i].replace(" ","");
+                                        if (headers[i]=='time') {
                                             timestamp_idx=i;
                                         } else {
                                             lbl = vs_name+' ('+headers[i]+')';
@@ -60,18 +68,22 @@
                                             keys.push(lbl);
                                         }
                                     }
+                                    units_line_read = true;
+                                } else if (units_line_read){ //unit
+                                    units_line_read = false;
                                 }
                             }else { // data line, at this stage we should have a header varialbe already set.
                                 var data = line.split(',');
                                 var timestamp = data[timestamp_idx];
-                                for (i=0;i<headers.length;i++){
+                                for (i=0, k=0;i<headers.length;i++){
                                     if(i != timestamp_idx && data[i]!=undefined ){
                                         if (format == 'unix') {
-                                            datasets[keys[i]].data.push([parseInt(timestamp),parseFloat(data[i])]);
+                                            datasets[keys[k]].data.push([parseInt(timestamp),parseFloat(data[i])]);
                                         } else {
-                                            datasets[keys[i]].data.push([timestamp,parseFloat(data[i])]);
+                                            datasets[keys[k]].data.push([timestamp,parseFloat(data[i])]);
                                         }
                                         nb_elements++;
+                                        k++;
                                     }
                                 }
                             }
@@ -182,13 +194,14 @@
                     var sk = getSortedKeys(items);
                     var l = sk.length;
                     for (var i = 0 ; i < l ; i++) {
+                        if ("time" == sk[i]) continue;
                         to_return+='<option value="' + sk[i]+'" >'+sk[i]+'</option>';
                     }
                     to_return+='</select>'
                     return to_return;
                 }
 
-                function option_list_value(name,items,all){
+                function option_list_value(name,items,all, units){
                     to_return = '<select name="' + name + '" class="' + name+ '">'
                     if (all!=null){
                         to_return+='<option value="All" >' + all + '</option>';
@@ -196,7 +209,11 @@
                     var sv = getSortedValues(items);
                     var l = sv.length;
                     for (var i = 0 ; i < l ; i++) {
-                        to_return+='<option value="' + items[sv[i]]+'" >'+items[sv[i]]+'</option>';
+                        if ("time" == items[sv[i]]) continue;
+                        if (units[items[sv[i]]]==null || units[items[sv[i]]]=="")
+                            to_return+='<option value="' + items[sv[i]]+'" >'+items[sv[i]]+'</option>';
+                        else
+                            to_return+='<option value="' + items[sv[i]]+'" >'+items[sv[i]] + " [" + units[items[sv[i]]] + "]" +'</option>';
                     }
                     to_return+='</select>'
                     return to_return;
@@ -210,7 +227,7 @@
                             $(this).next("select").replaceWith(option_list_key('fields',field_to_virtual_sensor,"All Fields"));
                         }
                         else {
-                            $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields"));
+                            $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs]));
                         }
                     });
                     $('.remove-criterion').click (function() {
@@ -228,7 +245,7 @@
                             $(this).next("select").replaceWith(option_list_key('fields',field_to_virtual_sensor,"All Fields"));
                         }
                         else {
-                            $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields"));
+                            $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs]));
                         }
                     });
                     $('.remove-criterion').click (function() {
@@ -289,9 +306,18 @@
                         $(this).find('field').each(function(){
                             if ($(this).attr('category') != 'predicate') {
                                 var field_name = $(this).attr('name');
+                                var field_unit = $(this).attr('unit');
                                 virtual_sensor_to_fields[vsname].push(field_name);
                                 field_to_virtual_sensor[field_name] = field_to_virtual_sensor[field_name] || []
                                 field_to_virtual_sensor[field_name].push(vsname)
+
+                                if (!field_to_unit[vsname]){
+                                    field_to_unit[vsname] = [];
+                                }
+                                if (!field_to_unit[vsname][field_name]){
+                                    field_to_unit[vsname][field_name] = [];
+                                }
+                                field_to_unit[vsname][field_name].push(field_unit)
                             }
                         });
                     });
@@ -354,11 +380,11 @@
                 });
 
                 $(".grid").click(function(){
-                    function drawGrid(datasets){
+                    function drawGrid(l_datasets){
                         $("#sensorSelect").empty();
                         $("#sensorSelect").append('<option value="">Select a Virtual Sensor</option>');
                         var displayed = [];
-                        for (var sensor in datasets) {
+                        for (var sensor in l_datasets) {
                             sensor = sensor.split(' ')[0];
                             if ($.inArray(sensor, displayed) < 0) {
                                 displayed.push(sensor);
@@ -366,6 +392,8 @@
                                 $("#sensorSelect").append(option);
                             }
                         }
+
+                        datasets = l_datasets;
 
                         $("#sensorSelect").change(function(){
                             var choice = $("#sensorSelect").val();
@@ -382,7 +410,7 @@
                                 }
                             }
                             var data_length = fields[0]['data'].length;
-                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>timed</th>';
+                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>time</th>';
                             for (var i = 0; i < headers.length; i++) {
                                 grid += '<th>' + headers[i] + '</th>';
                             }
@@ -405,6 +433,7 @@
                             });
                         });
                     }
+                    datasets = {};
                     csv_to_json($(this), drawGrid, 'iso');
                 });
 

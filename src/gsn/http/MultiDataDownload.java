@@ -12,12 +12,8 @@ import gsn.http.datarequest.DownloadReport;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.text.DateFormat;
+import java.util.*;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServlet;
@@ -59,7 +55,17 @@ public class MultiDataDownload extends HttpServlet {
             String downloadFormat = req.getParameter("download_format") == null ? "csv" : req.getParameter("download_format");
 			String downloadMode = req.getParameter("download_mode") == null ? "attachement" : req.getParameter("download_mode");
             Map<String, String[]> parameterMap = parseParameters(req, downloadFormat, sdfWeb);
-			if ("csv".equals(downloadFormat)) {
+
+            String vsName = req.getParameter("vs[0]");
+            String vsName1 = req.getParameter("vs[1]");
+            if (vsName1 != null || "All".equals(vsName)){
+                vsName = "multiple_sensors";
+            }
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            Date currentDate = Calendar.getInstance().getTime();
+            String filename = vsName+"_"+dateFormat.format(currentDate);
+
+            if ("csv".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
                 //
                 if (Main.getContainerConfig().isAcEnabled()) {
@@ -73,7 +79,7 @@ public class MultiDataDownload extends HttpServlet {
                 dd.process();
                 if (! "inline".equals(downloadMode)) {
 				    res.setContentType("application/x-download");
-				    res.setHeader("content-disposition","attachment; filename=data.csv");
+				    res.setHeader("content-disposition","attachment; filename="+filename+".csv");
                 }
                 else
                     res.setContentType("text");
@@ -93,8 +99,8 @@ public class MultiDataDownload extends HttpServlet {
                 //
                 dd.process();
 				res.setContentType("text/xml");
-				if (! "inline".equals(downloadMode)) 
-                    res.setHeader("content-disposition","attachment; filename=data.xml");
+				if (! "inline".equals(downloadMode))
+                    res.setHeader("content-disposition","attachment; filename="+filename+".xml");
 				dd.outputResult(res.getOutputStream());
 				//res.getOutputStream().flush();
 			}
@@ -111,7 +117,7 @@ public class MultiDataDownload extends HttpServlet {
                 //
 				rpd.process();
 				res.setContentType("application/pdf");
-				res.setHeader("content-disposition","attachment; filename=data.pdf");
+                res.setHeader("content-disposition","attachment; filename="+filename+".pdf");
 				rpd.outputResult(res.getOutputStream());
 				res.getOutputStream().flush();
 			}
