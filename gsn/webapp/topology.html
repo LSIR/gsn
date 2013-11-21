@@ -688,7 +688,7 @@ function PacketRate() {
 	if (type == BASESTATION || type == GPSCORESTATION || type == CAMZILLA) {
 	  $.ajax({
 	    type: "GET",
-	    url: "/field?vs="+current_deployment.name+"_camera_pos"+current_deployment.deviceIdMapping[deviceId].position+"__scaled&field=GENERATION_TIME&pk=latest&timeline=GENERATION_TIME",
+	    url: "/field?vs="+current_deployment.name.toLowerCase()+"_camera_pos"+current_deployment.deviceIdMapping[deviceId].position+"__scaled&field=GENERATION_TIME&pk=latest&timeline=GENERATION_TIME",
 	    dataType: "text",
 	    success: function(data){
 	      var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
@@ -713,6 +713,75 @@ function PacketRate() {
 		deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
 		current_deployment.isDeviceInfoMappingUpdating = false;
 	      }
+	    }
+	  });
+	}
+	else if (type == WGPS) {
+	  $.ajax({
+	    type: "GET",
+	    url: "/data?vsName="+current_deployment.name.toLowerCase()+"_dozer_wgps__config&fields=generation_time&fields=gps_sampling_interval&fields=status_sampling_interval&fields=high_power_start_time&fields=high_power_stop_time&fields=low_power_start_time&fields=low_power_stop_time&fields=low_power_entry_voltage&fields=low_power_exit_voltage&fields=bat_voltage_avg_buffer_size&critfield=position&critval="+current_deployment.deviceIdMapping[deviceId].position+"&critop==&neg=&nb=1&orderby=generation_time",
+	    dataType: "text",
+	    success: function(data){
+	      var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
+	      if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined && $("field:eq(10)", data).text()) {
+		var arr = new Array();
+		var unit = ["sec","min"," UTC"," UTC"," UTC"," UTC","V","V",""];
+		for (var i=11; i<20; i++) {
+		  var field = $("field:eq("+i+")", data).text();
+		  if (field.toLowerCase() === "null")
+		    arr[i-11] = "default or unknown";
+		  else {
+		    if (i>=13 && i<=16)
+		      field = (field.length == 1) ? "0"+field+":00": field+":00";
+		    arr[i-11] = field + unit[i-11];
+		  }
+		}
+		current_deployment.deviceIdMapping[id].wgps_schedule = "<br>Configuration ("+formatTime($("field:eq(10)", data).text())+"):<br><div style=\"margin:0 5px 5px 5px\"><table cellpadding=\"2\" cellspacing=\"1\" style=font-size:10px;background-color:#eee\"><colgroup><col width=\"200\"><col width=\"100\"></colgroup>" +
+		  "<tr><th style=\"background-color:#eee;font-size:11px\">Description</th><th style=\"background-color:#eee;font-size:11px\">Value</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">GPS sampling interval</th><th style=\"background-color:#eee\">" + arr[0] + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Status sampling interval</th><th style=\"background-color:#eee\">" + arr[1] + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">High power start time</th><th style=\"background-color:#eee\">" + arr[2] + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">High power stop time</th><th style=\"background-color:#eee\">" + arr[3] + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Low power start time</th><th style=\"background-color:#eee\">" + arr[4] + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Low power stop time</th><th style=\"background-color:#eee\">" + arr[5] + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Low power entry voltage</th><th style=\"background-color:#eee\">" + arr[6] + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Low power exit voltage</th><th style=\"background-color:#eee\">" + arr[7] + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Battery voltage averaging buffer size</th><th style=\"background-color:#eee\">" + arr[8] + "</th></tr></table></div>";
+	      }
+	      deviceInfoUpdateIndex++;
+	      deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
+	      current_deployment.isDeviceInfoMappingUpdating = false;
+	    },
+	    error : function(XMLHttpRequest, textStatus, errorThrown) {
+	      deviceInfoUpdateIndex++;
+	      deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
+	      current_deployment.isDeviceInfoMappingUpdating = false;
+	    }
+	  });
+	}
+	else if (type == POWERSWITCH) {
+	  $.ajax({
+	    type: "GET",
+	    url: "/data?vsName="+current_deployment.name.toLowerCase()+"_dozer_powerswitch__config&fields=generation_time&fields=schedule_power_on_port1&fields=schedule_power_off_port1&fields=schedule_power_on_port2&fields=schedule_power_off_port2&critfield=position&critval="+current_deployment.deviceIdMapping[deviceId].position+"&critop==&neg=&nb=1&orderby=generation_time",
+	    dataType: "text",
+	    success: function(data){
+	      var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
+	      if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined && $("field:eq(5)", data).text()) {
+		current_deployment.deviceIdMapping[id].wgps_schedule = "<br>Configuration ("+formatTime($("field:eq(5)", data).text())+"):<br><div style=\"margin:0 5px 5px 5px\"><table cellpadding=\"2\" cellspacing=\"1\" style=font-size:10px;background-color:#eee\"><colgroup><col width=\"200\"><col width=\"100\"></colgroup>" +
+		  "<tr><th style=\"background-color:#eee;font-size:11px\">Description</th><th style=\"background-color:#eee;font-size:11px\">Value</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Power on port 1</th><th style=\"background-color:#eee\">" + $("field:eq(6)", data).text() + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Power off port 1</th><th style=\"background-color:#eee\">" + $("field:eq(7)", data).text() + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Power on port 2</th><th style=\"background-color:#eee\">" + $("field:eq(8)", data).text() + "</th></tr>" +
+		  "<tr><th style=\"background-color:#eee\">Power off port 2</th><th style=\"background-color:#eee\">" + $("field:eq(9)", data).text() + "</th></tr></table></div>";
+	      }
+	      deviceInfoUpdateIndex++;
+	      deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
+	      current_deployment.isDeviceInfoMappingUpdating = false;
+	    },
+	    error : function(XMLHttpRequest, textStatus, errorThrown) {
+	      deviceInfoUpdateIndex++;
+	      deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
+	      current_deployment.isDeviceInfoMappingUpdating = false;
 	    }
 	  });
 	}
@@ -1002,6 +1071,8 @@ function PacketRate() {
 	  content += "<br>Schedule:<br><div style=\"background-color:#eee;max-width:942px;overflow:auto;white-space:nowrap;margin:0 5px 5px 5px;padding:2px 2px 2px 2px\">" + current_deployment.deviceIdMapping[id].schedule.replace(/(\r\n|\n|\r)/gm,"<br>") + "</div>";
 	if (current_deployment.deviceIdMapping[id].jpeg_timestamp !== undefined)
 	  content += "<br>Last picture from "+formatTime(current_deployment.deviceIdMapping[id].jpeg_timestamp)+":<br><div><img style=\"margin:0 5px 5px 5px;border:solid 1px #222;\" src=\"/field?vs="+current_deployment.name+"_camera_pos"+pos+"__scaled&pk=latest&field=JPEG_SCALED&?"+current_deployment.deviceIdMapping[id].jpeg_timestamp+"\"></div>";
+        if (current_deployment.deviceIdMapping[id].wgps_schedule !== undefined)
+          content += current_deployment.deviceIdMapping[id].wgps_schedule;
       }
       else {
 	nodeinfo.find(".title").empty().append("Position: NOT AVAILABLE");
