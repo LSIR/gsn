@@ -79,6 +79,7 @@ public class DataDownload extends HttpServlet {
                 return;
             }
 
+            vsName = vsName.toLowerCase();
             if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)){
                 if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
                     res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
