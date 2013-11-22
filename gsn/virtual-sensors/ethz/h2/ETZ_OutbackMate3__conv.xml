@@ -95,7 +95,7 @@
 								else if (s[0].compareToIgnoreCase("BATT_V") == 0)
 									PORT3_BATT_V = s[1];
 								else if (s[0].compareToIgnoreCase("BATT_TEMP") == 0)
-									PORT3_BATT_TEMP = s[1];
+									PORT3_BATT_TEMP = s[1].replace("C", "");
 							}
 						}
 					} catch(Throwable e) {
@@ -108,39 +108,39 @@
             <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
 			<field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-			<field name="PORT1_OUT_I" type="VARCHAR(30)" />
-			<field name="PORT1_IN_I" type="VARCHAR(30)" />
-			<field name="PORT1_BATT_V" type="VARCHAR(30)" />
-			<field name="PORT1_IN_V" type="VARCHAR(30)" />
-			<field name="PORT1_OUT_KWH" type="VARCHAR(30)" />
+			<field name="PORT1_OUT_I" type="VARCHAR(30)" unit="A" />
+			<field name="PORT1_IN_I" type="VARCHAR(30)" unit="A" />
+			<field name="PORT1_BATT_V" type="VARCHAR(30)" unit="V" />
+			<field name="PORT1_IN_V" type="VARCHAR(30)" unit="V" />
+			<field name="PORT1_OUT_KWH" type="VARCHAR(30)" unit="kWh" />
 			<field name="PORT1_CC_MODE" type="VARCHAR(30)" />
-			<field name="PORT2_OUT_I" type="VARCHAR(30)" />
-			<field name="PORT2_IN_I" type="VARCHAR(30)" />
-			<field name="PORT2_BATT_V" type="VARCHAR(30)" />
-			<field name="PORT2_IN_V" type="VARCHAR(30)" />
-			<field name="PORT2_OUT_KWH" type="VARCHAR(30)" />
+			<field name="PORT2_OUT_I" type="VARCHAR(30)" unit="A" />
+			<field name="PORT2_IN_I" type="VARCHAR(30)" unit="A" />
+			<field name="PORT2_BATT_V" type="VARCHAR(30)" unit="V" />
+			<field name="PORT2_IN_V" type="VARCHAR(30)" unit="V" />
+			<field name="PORT2_OUT_KWH" type="VARCHAR(30)" unit="kWh" />
 			<field name="PORT2_CC_MODE" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_A_I" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_A_AH" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_A_KWH" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_B_I" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_B_AH" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_B_KWH" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_C_I" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_C_AH" type="VARCHAR(30)" />
-			<field name="PORT3_SHUNT_C_KWH" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_A_I" type="VARCHAR(30)" unit="A" />
+			<field name="PORT3_SHUNT_A_AH" type="VARCHAR(30)" unit="Ah" />
+			<field name="PORT3_SHUNT_A_KWH" type="VARCHAR(30)" unit="kWh" />
+			<field name="PORT3_SHUNT_B_I" type="VARCHAR(30)" unit="A" />
+			<field name="PORT3_SHUNT_B_AH" type="VARCHAR(30)" unit="Ah" />
+			<field name="PORT3_SHUNT_B_KWH" type="VARCHAR(30)" unit="kWh" />
+			<field name="PORT3_SHUNT_C_I" type="VARCHAR(30)" unit="A" />
+			<field name="PORT3_SHUNT_C_AH" type="VARCHAR(30)" unit="Ah" />
+			<field name="PORT3_SHUNT_C_KWH" type="VARCHAR(30)" unit="kWh" />
 			<field name="PORT3_SOC" type="VARCHAR(30)" />
 			<field name="PORT3_MIN_SOC" type="VARCHAR(30)" />
-			<field name="PORT3_DAYS_SINCE_FULL" type="VARCHAR(30)" />
+			<field name="PORT3_DAYS_SINCE_FULL" type="VARCHAR(30)" unit="d" />
 			<field name="PORT3_CHG_PARMS_MET" type="VARCHAR(30)" />
-			<field name="PORT3_IN_AH_TODAY" type="VARCHAR(30)" />
-			<field name="PORT3_OUT_AH_TODAY" type="VARCHAR(30)" />
-			<field name="PORT3_IN_KWH_TODAY" type="VARCHAR(30)" />
-			<field name="PORT3_OUT_KWH_TODAY" type="VARCHAR(30)" />
-			<field name="PORT3_NET_CFC_AH" type="VARCHAR(30)" />
-			<field name="PORT3_NET_CFC_KWH" type="VARCHAR(30)" />
-			<field name="PORT3_BATT_V" type="VARCHAR(30)" />
-			<field name="PORT3_BATT_TEMP" type="VARCHAR(30)" />
+			<field name="PORT3_IN_AH_TODAY" type="VARCHAR(30)" unit="Ah" />
+			<field name="PORT3_OUT_AH_TODAY" type="VARCHAR(30)" unit="Ah" />
+			<field name="PORT3_IN_KWH_TODAY" type="VARCHAR(30)" unit="kWh" />
+			<field name="PORT3_OUT_KWH_TODAY" type="VARCHAR(30)" unit="kWh" />
+			<field name="PORT3_NET_CFC_AH" type="VARCHAR(30)" unit="Ah" />
+			<field name="PORT3_NET_CFC_KWH" type="VARCHAR(30)" unit=""kWh />
+			<field name="PORT3_BATT_V" type="VARCHAR(30)" unit="V" />
+			<field name="PORT3_BATT_TEMP" type="VARCHAR(30)" unit="°C" />
        	</output-structure>
     </processing-class>
     <description>Outback Mate 3 status data for ETZ deployment mapped</description>
