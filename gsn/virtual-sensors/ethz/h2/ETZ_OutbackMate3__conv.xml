@@ -1,0 +1,162 @@
+<virtual-sensor name="ETZ_OutbackMate3__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                   try {
+                        PORT1_OUT_I = PORT1_IN_I = PORT1_BATT_V = PORT1_IN_V = PORT1_OUT_KWH = PORT1_CC_MODE = PORT2_OUT_I = null;
+                        PORT2_IN_I = PORT2_BATT_V = PORT2_IN_V = PORT2_OUT_KWH = PORT2_CC_MODE = PORT3_SHUNT_A_I = PORT3_SHUNT_A_AH = null;
+                        PORT3_SHUNT_A_KWH = PORT3_SHUNT_B_I = PORT3_SHUNT_B_AH = PORT3_SHUNT_B_KWH = PORT3_SHUNT_C_I = PORT3_SHUNT_C_AH = null;
+                        PORT3_SHUNT_C_KWH = PORT3_SOC = PORT3_MIN_SOC = PORT3_DAYS_SINCE_FULL = PORT3_CHG_PARMS_MET = PORT3_IN_AH_TODAY = null;
+                        PORT3_OUT_AH_TODAY = PORT3_IN_KWH_TODAY = PORT3_OUT_KWH_TODAY = PORT3_NET_CFC_AH = PORT3_NET_CFC_KWH = PORT3_BATT_V = PORT3_BATT_TEMP = null;
+                        
+                        def spl = new String(DATA, "UTF-8").replace("\"", "").replace("{", "").replace("}", "").replace(" ", "").split(",");
+                        def port = 0;
+                        
+                        for (def entry : spl) {
+							if (entry.contains("Port:1"))
+								port = 1;
+							else if (entry.contains("Port:2"))
+								port = 2;
+							else if (entry.contains("Port:3"))
+								port = 3;
+							
+							def s = entry.split(":");
+							if (port == 1) {
+								if (s[0].compareToIgnoreCase("OUT_I") == 0)
+									PORT1_OUT_I = s[1];
+								else if (s[0].compareToIgnoreCase("IN_I") == 0)
+									PORT1_IN_I = s[1];
+								else if (s[0].compareToIgnoreCase("BATT_V") == 0)
+									PORT1_BATT_V = s[1];
+								else if (s[0].compareToIgnoreCase("IN_V") == 0)
+									PORT1_IN_V = s[1];
+								else if (s[0].compareToIgnoreCase("OUT_KWH") == 0)
+									PORT1_OUT_KWH = s[1];
+								else if (s[0].compareToIgnoreCase("CC_MODE") == 0)
+									PORT1_CC_MODE = s[1];
+							}
+							else if (port == 2) {
+								if (s[0].compareToIgnoreCase("OUT_I") == 0)
+									PORT2_OUT_I = s[1];
+								else if (s[0].compareToIgnoreCase("IN_I") == 0)
+									PORT2_IN_I = s[1];
+								else if (s[0].compareToIgnoreCase("BATT_V") == 0)
+									PORT2_BATT_V = s[1];
+								else if (s[0].compareToIgnoreCase("IN_V") == 0)
+									PORT2_IN_V = s[1];
+								else if (s[0].compareToIgnoreCase("OUT_KWH") == 0)
+									PORT2_OUT_KWH = s[1];
+								else if (s[0].compareToIgnoreCase("CC_MODE") == 0)
+									PORT2_CC_MODE = s[1];
+							}
+							else if (port == 3) {
+								if (s[0].compareToIgnoreCase("SHUNT_A_I") == 0)
+									PORT3_SHUNT_A_I = s[1];
+								else if (s[0].compareToIgnoreCase("SHUNT_A_AH") == 0)
+									PORT3_SHUNT_A_AH = s[1];
+								else if (s[0].compareToIgnoreCase("SHUNT_A_KWH") == 0)
+									PORT3_SHUNT_A_KWH = s[1];
+								else if (s[0].compareToIgnoreCase("SHUNT_B_I") == 0)
+									PORT3_SHUNT_B_I = s[1];
+								else if (s[0].compareToIgnoreCase("SHUNT_B_AH") == 0)
+									PORT3_SHUNT_B_AH = s[1];
+								else if (s[0].compareToIgnoreCase("SHUNT_B_KWH") == 0)
+									PORT3_SHUNT_B_KWH = s[1];
+								else if (s[0].compareToIgnoreCase("SHUNT_C_I") == 0)
+									PORT3_SHUNT_C_I = s[1];
+								else if (s[0].compareToIgnoreCase("SHUNT_C_AH") == 0)
+									PORT3_SHUNT_C_AH = s[1];
+								else if (s[0].compareToIgnoreCase("SHUNT_C_KWH") == 0)
+									PORT3_SHUNT_C_KWH = s[1];
+								else if (s[0].compareToIgnoreCase("SOC") == 0)
+									PORT3_SOC = s[1];
+								else if (s[0].compareToIgnoreCase("MIN_SOC") == 0)
+									PORT3_MIN_SOC = s[1];
+								else if (s[0].compareToIgnoreCase("DAYS_SINCE_FULL") == 0)
+									PORT3_DAYS_SINCE_FULL = s[1];
+								else if (s[0].compareToIgnoreCase("CHG_PARMS_MET") == 0)
+									PORT3_CHG_PARMS_MET = s[1];
+								else if (s[0].compareToIgnoreCase("IN_AH_TODAY") == 0)
+									PORT3_IN_AH_TODAY = s[1];
+								else if (s[0].compareToIgnoreCase("OUT_AH_TODAY") == 0)
+									PORT3_OUT_AH_TODAY = s[1];
+								else if (s[0].compareToIgnoreCase("IN_KWH_TODAY") == 0)
+									PORT3_IN_KWH_TODAY = s[1];
+								else if (s[0].compareToIgnoreCase("OUT_KWH_TODAY") == 0)
+									PORT3_OUT_KWH_TODAY = s[1];
+								else if (s[0].compareToIgnoreCase("NET_CFC_AH") == 0)
+									PORT3_NET_CFC_AH = s[1];
+								else if (s[0].compareToIgnoreCase("NET_CFC_KWH") == 0)
+									PORT3_NET_CFC_KWH = s[1];
+								else if (s[0].compareToIgnoreCase("BATT_V") == 0)
+									PORT3_BATT_V = s[1];
+								else if (s[0].compareToIgnoreCase("BATT_TEMP") == 0)
+									PORT3_BATT_TEMP = s[1];
+							}
+						}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+       	<output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+			<field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="PORT1_OUT_I" type="VARCHAR(30)" />
+			<field name="PORT1_IN_I" type="VARCHAR(30)" />
+			<field name="PORT1_BATT_V" type="VARCHAR(30)" />
+			<field name="PORT1_IN_V" type="VARCHAR(30)" />
+			<field name="PORT1_OUT_KWH" type="VARCHAR(30)" />
+			<field name="PORT1_CC_MODE" type="VARCHAR(30)" />
+			<field name="PORT2_OUT_I" type="VARCHAR(30)" />
+			<field name="PORT2_IN_I" type="VARCHAR(30)" />
+			<field name="PORT2_BATT_V" type="VARCHAR(30)" />
+			<field name="PORT2_IN_V" type="VARCHAR(30)" />
+			<field name="PORT2_OUT_KWH" type="VARCHAR(30)" />
+			<field name="PORT2_CC_MODE" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_A_I" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_A_AH" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_A_KWH" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_B_I" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_B_AH" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_B_KWH" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_C_I" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_C_AH" type="VARCHAR(30)" />
+			<field name="PORT3_SHUNT_C_KWH" type="VARCHAR(30)" />
+			<field name="PORT3_SOC" type="VARCHAR(30)" />
+			<field name="PORT3_MIN_SOC" type="VARCHAR(30)" />
+			<field name="PORT3_DAYS_SINCE_FULL" type="VARCHAR(30)" />
+			<field name="PORT3_CHG_PARMS_MET" type="VARCHAR(30)" />
+			<field name="PORT3_IN_AH_TODAY" type="VARCHAR(30)" />
+			<field name="PORT3_OUT_AH_TODAY" type="VARCHAR(30)" />
+			<field name="PORT3_IN_KWH_TODAY" type="VARCHAR(30)" />
+			<field name="PORT3_OUT_KWH_TODAY" type="VARCHAR(30)" />
+			<field name="PORT3_NET_CFC_AH" type="VARCHAR(30)" />
+			<field name="PORT3_NET_CFC_KWH" type="VARCHAR(30)" />
+			<field name="PORT3_BATT_V" type="VARCHAR(30)" />
+			<field name="PORT3_BATT_TEMP" type="VARCHAR(30)" />
+       	</output-structure>
+    </processing-class>
+    <description>Outback Mate 3 status data for ETZ deployment mapped</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_OutbackMate3__mapped </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
