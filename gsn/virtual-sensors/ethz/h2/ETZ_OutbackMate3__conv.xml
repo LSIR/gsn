@@ -138,7 +138,7 @@
 			<field name="PORT3_IN_KWH_TODAY" type="VARCHAR(30)" unit="kWh" />
 			<field name="PORT3_OUT_KWH_TODAY" type="VARCHAR(30)" unit="kWh" />
 			<field name="PORT3_NET_CFC_AH" type="VARCHAR(30)" unit="Ah" />
-			<field name="PORT3_NET_CFC_KWH" type="VARCHAR(30)" unit=""kWh />
+			<field name="PORT3_NET_CFC_KWH" type="VARCHAR(30)" unit="kWh" />
 			<field name="PORT3_BATT_V" type="VARCHAR(30)" unit="V" />
 			<field name="PORT3_BATT_TEMP" type="VARCHAR(30)" unit="°C" />
        	</output-structure>
