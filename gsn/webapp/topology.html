@@ -746,7 +746,8 @@ function PacketRate() {
 		  "<tr><th style=\"background-color:#eee\">Low power stop time</th><th style=\"background-color:#eee\">" + arr[5] + "</th></tr>" +
 		  "<tr><th style=\"background-color:#eee\">Low power entry voltage</th><th style=\"background-color:#eee\">" + arr[6] + "</th></tr>" +
 		  "<tr><th style=\"background-color:#eee\">Low power exit voltage</th><th style=\"background-color:#eee\">" + arr[7] + "</th></tr>" +
-		  "<tr><th style=\"background-color:#eee\">Battery voltage averaging buffer size</th><th style=\"background-color:#eee\">" + arr[8] + "</th></tr></table></div>";
+		  "<tr><th style=\"background-color:#eee\">Battery voltage averaging buffer size</th><th style=\"background-color:#eee\">" + arr[8] + "</th></tr></table></div>" +
+		  "<div style=font-size:10px;>(This configuration may not be the one operating on the device.<br>This may happen, if the answer to a new configuration is still in transit.)</div>";
 	      }
 	      deviceInfoUpdateIndex++;
 	      deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
@@ -772,7 +773,8 @@ function PacketRate() {
 		  "<tr><th style=\"background-color:#eee\">Power on port 1</th><th style=\"background-color:#eee\">" + $("field:eq(6)", data).text() + "</th></tr>" +
 		  "<tr><th style=\"background-color:#eee\">Power off port 1</th><th style=\"background-color:#eee\">" + $("field:eq(7)", data).text() + "</th></tr>" +
 		  "<tr><th style=\"background-color:#eee\">Power on port 2</th><th style=\"background-color:#eee\">" + $("field:eq(8)", data).text() + "</th></tr>" +
-		  "<tr><th style=\"background-color:#eee\">Power off port 2</th><th style=\"background-color:#eee\">" + $("field:eq(9)", data).text() + "</th></tr></table></div>";
+		  "<tr><th style=\"background-color:#eee\">Power off port 2</th><th style=\"background-color:#eee\">" + $("field:eq(9)", data).text() + "</th></tr></table></div>" +
+		  "<div style=font-size:10px;>(This configuration may not be the one operating on the device.<br>This may happen, if the answer to a new configuration is still in transit.)</div>";
 	      }
 	      deviceInfoUpdateIndex++;
 	      deviceInfoUpdateTimer = setTimeout("updateDeviceInfo()",timeout);
@@ -1068,9 +1070,9 @@ function PacketRate() {
 	nodeinfo.find(".title").empty().append("Position: "+pos);
 	content += "<br>Device Id: " + id + "<br><br>Info:<br><div style=\"margin:0 5px 5px 5px\">" + current_deployment.deviceIdMapping[id].comment + "</div>";
 	if (current_deployment.deviceIdMapping[id].schedule !== undefined)
-	  content += "<br>Schedule:<br><div style=\"background-color:#eee;max-width:942px;overflow:auto;white-space:nowrap;margin:0 5px 5px 5px;padding:2px 2px 2px 2px\">" + current_deployment.deviceIdMapping[id].schedule.replace(/(\r\n|\n|\r)/gm,"<br>") + "</div>";
+	  content += "<br>Schedule (cron like job scheduling in UTC):<br><div style=\"background-color:#eee;max-width:942px;overflow:auto;white-space:nowrap;margin:0 5px 5px 5px;padding:2px 2px 2px 2px\">" + current_deployment.deviceIdMapping[id].schedule.replace(/(\r\n|\n|\r)/gm,"<br>") + "</div>";
 	if (current_deployment.deviceIdMapping[id].jpeg_timestamp !== undefined)
-	  content += "<br>Last picture from "+formatTime(current_deployment.deviceIdMapping[id].jpeg_timestamp)+":<br><div><img style=\"margin:0 5px 5px 5px;border:solid 1px #222;\" src=\"/field?vs="+current_deployment.name+"_camera_pos"+pos+"__scaled&pk=latest&field=JPEG_SCALED&?"+current_deployment.deviceIdMapping[id].jpeg_timestamp+"\"></div>";
+	  content += "<br>Last picture ("+formatTime(current_deployment.deviceIdMapping[id].jpeg_timestamp)+"):<br><div><img style=\"margin:0 5px 5px 5px;border:solid 1px #222;\" src=\"/field?vs="+current_deployment.name+"_camera_pos"+pos+"__scaled&pk=latest&field=JPEG_SCALED&?"+current_deployment.deviceIdMapping[id].jpeg_timestamp+"\"></div>";
         if (current_deployment.deviceIdMapping[id].wgps_schedule !== undefined)
           content += current_deployment.deviceIdMapping[id].wgps_schedule;
       }
