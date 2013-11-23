@@ -37,7 +37,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">172.31.71.40:9003</predicate>
+                    <predicate key="remote-connection">172.31.71.24:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.B4SensorPlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
