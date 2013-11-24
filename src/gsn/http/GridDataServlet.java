@@ -148,12 +148,9 @@ public class GridDataServlet extends HttpServlet {
                 Set<Long> keySet = (Set<Long>) subgrids.keySet();
 
                 for (Long t : keySet) {
-                    System.out.println(t);
-                    System.out.println("=>");
-                    System.out.println(subgrids.get(t));
-
-                    sbSubGrids.append(t);
-                    sbSubGrids.append("=>");
+                    String fileName = sensor + "_" + t ;
+                    sbSubGrids.append("Filename : " + fileName);
+                    sbSubGrids.append("\n");
                     sbSubGrids.append(subgrids.get(t));
                 }
 
