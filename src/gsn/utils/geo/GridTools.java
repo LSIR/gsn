@@ -66,8 +66,10 @@ public class GridTools {
             deserial = (Double[][]) in.readObject();
             in.close();
 
-            logger.debug("deserial.length" + deserial.length);
-            logger.debug("deserial[0].length" + deserial[0].length);
+            if (logger.isDebugEnabled()) {
+                logger.debug("deserial.length" + deserial.length);
+                logger.debug("deserial[0].length" + deserial[0].length);
+            }
 
             for (int i = 0; i < deserial.length; i++) {
                 StringBuilder sb = new StringBuilder();
@@ -188,9 +190,9 @@ public class GridTools {
                         byte[] bin = (byte[]) o;
                         Double[][] array = GridTools.deSerialize(bin);
                         JSONArray jsonArray = new JSONArray();
-                        for (int i=0;i<array.length;i++) {
+                        for (int i = 0; i < array.length; i++) {
                             JSONArray anArray = new JSONArray();
-                            for (int j=0;j<array[i].length;j++) {
+                            for (int j = 0; j < array[i].length; j++) {
                                 anArray.put(array[i][j]);
                             }
                             jsonArray.put(anArray);
