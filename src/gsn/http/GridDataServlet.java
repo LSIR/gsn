@@ -162,6 +162,27 @@ public class GridDataServlet extends HttpServlet {
             case GET_CELL_AS_TIMESERIES:
                 logger.warn("xcell: " + xcellStr);
                 logger.warn("ycell: " + ycellStr);
+
+                Map<Long, Double> timeSeries = GridTools.executeQueryForCell2TimeSeriesAsListOfDoubles(query, xcell, ycell);
+                Set<Long> keySetTimeSeries = (Set<Long>) timeSeries.keySet();
+
+                StringBuilder sbTimeSeries = new StringBuilder();
+
+                String fileName = sensor;
+                sbTimeSeries.append("Filename : " + fileName);
+                sbTimeSeries.append("\n");
+                sbTimeSeries.append("\n");
+
+                for (Long t : keySetTimeSeries) {
+                    sbTimeSeries.append(t);
+                    sbTimeSeries.append(", ");
+                    sbTimeSeries.append(timeSeries.get(t));
+                    sbTimeSeries.append("\n");
+                }
+
+                System.out.println(sbTimeSeries);
+
+                response.getWriter().write(sbTimeSeries.toString());
                 break;
 
         }
