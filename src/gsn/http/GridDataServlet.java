@@ -22,6 +22,10 @@ public class GridDataServlet extends HttpServlet {
     private static final String DEFAULT_TIMEFORMAT = "yyyyMMddHHmmss";
     private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
+    private static final int GET_GRIDS = 0;
+    private static final int GET_SUB_GRIDS = 1;
+    private static final int GET_CELL_AS_TIMESERIES = 2;
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         /*
         User user = null;
@@ -35,15 +39,45 @@ public class GridDataServlet extends HttpServlet {
         */
 
         String sensor = HttpRequestUtils.getStringParameter("sensor", null, request);
+
         String from = HttpRequestUtils.getStringParameter("from", null, request);
         String to = HttpRequestUtils.getStringParameter("to", null, request);
-        String xcol = HttpRequestUtils.getStringParameter("xcol", null, request);
-        String ycol = HttpRequestUtils.getStringParameter("ycol", null, request);
+
+        String xminStr = HttpRequestUtils.getStringParameter("xmin", null, request);
+        String yminStr = HttpRequestUtils.getStringParameter("ymin", null, request);
+        String xmaxStr = HttpRequestUtils.getStringParameter("xmax", null, request);
+        String ymaxStr = HttpRequestUtils.getStringParameter("ymax", null, request);
+
+        int xmin, ymin, xmax, ymax;
+
+        String xcellStr = HttpRequestUtils.getStringParameter("xcell", null, request);
+        String ycellStr = HttpRequestUtils.getStringParameter("ycell", null, request);
+
+        int xcell, ycell;
+
         String timeformat = HttpRequestUtils.getStringParameter("timeformat", null, request);
         String view = HttpRequestUtils.getStringParameter("view", null, request); // files or stream
+
         String debug = HttpRequestUtils.getStringParameter("debug", "false", request); // show debug information or not
 
+        int request_id = GET_GRIDS;
+
+        boolean hasBoundaries = false;
         boolean errorFlag = false;
+
+        if (xminStr != null && xmaxStr != null && yminStr != null && ymaxStr != null)   {
+            request_id = GET_SUB_GRIDS;
+            xmin =  Integer.parseInt(xminStr);
+            xmax =  Integer.parseInt(xmaxStr);
+            ymin =  Integer.parseInt(yminStr);
+            ymax =  Integer.parseInt(ymaxStr);
+        }
+        else if (xcellStr != null && ycellStr != null) {
+            request_id = GET_CELL_AS_TIMESERIES;
+            xcell = Integer.parseInt(xcellStr);
+            ycell = Integer.parseInt(ycellStr);
+        }
+        else request_id = GET_GRIDS;
 
         long fromAsLong = 0;
         long toAsLong = 0;
@@ -80,13 +114,35 @@ public class GridDataServlet extends HttpServlet {
             response.getWriter().flush();
         }
 
-        List<String> l = GridTools.executeQueryForGridAsListOfStrings(query);
+        switch (request_id) {
 
-        System.out.println(l.size());
-        for (int i=0; i< l.size();i++)
-            System.out.println(l.get(i));
+            case GET_GRIDS:
+                List<String> grids = GridTools.executeQueryForGridAsListOfStrings(query);
 
-        response.getWriter().write(GridTools.executeQueryForGridAsString(query));
+                System.out.println(grids.size());
+                for (int i = 0; i < grids.size(); i++)
+                    System.out.println(grids.get(i));
+
+                response.getWriter().write(GridTools.executeQueryForGridAsString(query));
+                break;
+
+            case GET_SUB_GRIDS:
+                logger.warn("xmin: " + xminStr);
+                logger.warn("xmax: " + xmaxStr);
+                logger.warn("ymin: " + yminStr);
+                logger.warn("ymax: " + ymaxStr);
+
+                //List<String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query);
+
+                break;
+
+            case GET_CELL_AS_TIMESERIES:
+                logger.warn("xcell: "+ xcellStr);
+                logger.warn("ycell: "+ ycellStr);
+                break;
+
+        }
+
 
         /*
         for (String vsName : sensors) {
