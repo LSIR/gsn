@@ -134,7 +134,7 @@ public class GridDataServlet extends HttpServlet {
                     sbGrids.append(grids.get(t));
                 }
 
-                System.out.println(sbGrids);
+                //System.out.println(sbGrids);
 
                 response.getWriter().write(sbGrids.toString());
                 break;
@@ -157,7 +157,7 @@ public class GridDataServlet extends HttpServlet {
                     sbSubGrids.append(subgrids.get(t));
                 }
 
-                System.out.println(sbSubGrids);
+                //System.out.println(sbSubGrids);
 
                 response.getWriter().write(sbSubGrids.toString());
                 break;
@@ -183,7 +183,7 @@ public class GridDataServlet extends HttpServlet {
                     sbTimeSeries.append("\n");
                 }
 
-                System.out.println(sbTimeSeries);
+                //System.out.println(sbTimeSeries);
 
                 response.getWriter().write(sbTimeSeries.toString());
                 break;
