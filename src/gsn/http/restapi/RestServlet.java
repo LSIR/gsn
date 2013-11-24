@@ -47,7 +47,7 @@ public class RestServlet extends HttpServlet {
         String str_user = null;
         String str_pass = null;
         User user = null;
-        boolean isJason = true;
+        boolean isJSON = true;
         int returnedCSVStatus = RestResponse.HTTP_STATUS_OK;
 
         if (Main.getContainerConfig().isAcEnabled()) {     // added
@@ -64,14 +64,14 @@ public class RestServlet extends HttpServlet {
 
             case REQUEST_GET_ALL_SENSORS:
                 if (Main.getContainerConfig().isAcEnabled() && (user == null)) { // if there is no user with these credentials
-                    isJason = false;
+                    isJSON = false;
                     response.setContentType("text/csv");
                     response.setHeader("Content-Disposition", "attachment;filename=\"error_no_user.csv\"");
                     out.print("## There is no user with the provided username and password");
                     returnedCSVStatus = HTTP_STATUS_BAD;
                 } else if (Main.getContainerConfig().isAcEnabled() && (user != null)) {
                     // restResponse = getRequestHandler.getSensors(user);
-                    isJason = false;
+                    isJSON = false;
                     response.setContentType("text/csv");
                     response.setHeader("Content-Disposition", "attachment;filename=\"sensors.csv\"");
                     getRequestHandler.getSensorsInfo(user, out);
@@ -98,13 +98,13 @@ public class RestServlet extends HttpServlet {
                             returnedCSVStatus = getRequestHandler.getMeasurementsForSensorField(sensor, field, str_from, str_to, size, out);
                             if (returnedCSVStatus != RestResponse.HTTP_STATUS_OK) returnedCSVStatus = HTTP_STATUS_BAD;  // adapt to this error msg
                         }
-                        isJason = false;
+                        isJSON = false;
                     } else if (Main.getContainerConfig().isAcEnabled() && (user == null)) { // if there is no user with these credentials
                         response.setContentType("text/csv");
                         response.setHeader("Content-Disposition", "attachment;filename=\"error_no_user.csv\"");
                         out.print("## There is no user with the provided username and password");
                         returnedCSVStatus = HTTP_STATUS_BAD;
-                        isJason = false;
+                        isJSON = false;
                     }  else {    // do execution without AC
                         restResponse = getRequestHandler.getMeasurementsForSensorField(sensor, field, str_from, str_to);
                     }
@@ -113,7 +113,7 @@ public class RestServlet extends HttpServlet {
                     response.setHeader("Content-Disposition", "attachment;filename=\"error_no_such_sensor.csv\"");
                     out.print("## The virtual sensor '"+sensor+"' doesn't exist in GSN!");
                     returnedCSVStatus = HTTP_STATUS_BAD;
-                    isJason = false;
+                    isJSON = false;
                 }
                 break;
             case REQUEST_GET_MEASUREMENTS_FOR_SENSOR:
@@ -134,20 +134,20 @@ public class RestServlet extends HttpServlet {
                             returnedCSVStatus = getRequestHandler.getSensorFields(sensor, str_from, str_to, size, out);
                             if (returnedCSVStatus != RestResponse.HTTP_STATUS_OK) returnedCSVStatus = HTTP_STATUS_BAD;  // adapt to this error msg
                         }
-                        isJason = false;
+                        isJSON = false;
                     } else if (Main.getContainerConfig().isAcEnabled() && (user == null)) { // if there is no user with these credentials
                         response.setContentType("text/csv");
                         response.setHeader("Content-Disposition", "attachment;filename=\"error_no_user.csv\"");
                         out.print("## There is no user with the provided username and password");
                         returnedCSVStatus = HTTP_STATUS_BAD;
-                        isJason = false;
+                        isJSON = false;
                     }  // else do nothing for now
                 } else {
                     response.setContentType("text/csv");
                     response.setHeader("Content-Disposition", "attachment;filename=\"error_no_such_sensor.csv\"");
                     out.print("## The virtual sensor '"+sensor+"' doesn't exist in GSN!");
                     returnedCSVStatus = HTTP_STATUS_BAD;
-                    isJason = false;
+                    isJSON = false;
                 }
                 break;
             case REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD:
@@ -165,14 +165,14 @@ public class RestServlet extends HttpServlet {
                 break;
             default:
                 //restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Cannot interpret request.");
-                isJason = false;
+                isJSON = false;
                 response.setContentType("text/csv");
                 response.setHeader("Content-Disposition", "attachment;filename=\"error_unknown_request.csv\"");
                 out.print("## Cannot interpret request.");
                 break;
         }
 
-        if ( (isJason) && (restResponse != null) ) {
+        if ( (isJSON) && (restResponse != null) ) {
             response.setContentType(restResponse.getType());
             response.setStatus(restResponse.getHttpStatus());
             response.getWriter().write(restResponse.getResponse());
