@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.*;
 
 
@@ -138,12 +140,22 @@ public class GridDataServlet extends HttpServlet {
                 logger.warn("ymin: " + yminStr);
                 logger.warn("ymax: " + ymaxStr);
 
-                List<String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query, xmin, xmax, ymin, ymax);
+                Map<Long, String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query, xmin, xmax, ymin, ymax);
                 StringBuilder sbSubGrids = new StringBuilder();
 
                 System.out.println(subgrids.size());
-                for (int i = 0; i < subgrids.size(); i++)
-                    sbSubGrids.append(subgrids.get(i));
+
+                Set<Long> keySet = (Set<Long>) subgrids.keySet();
+
+                for (Long t : keySet) {
+                    System.out.println(t);
+                    System.out.println("=>");
+                    System.out.println(subgrids.get(t));
+
+                    sbSubGrids.append(t);
+                    sbSubGrids.append("=>");
+                    sbSubGrids.append(subgrids.get(t));
+                }
 
                 System.out.println(sbSubGrids);
 
