@@ -48,12 +48,16 @@ public class GridDataServlet extends HttpServlet {
         String xmaxStr = HttpRequestUtils.getStringParameter("xmax", null, request);
         String ymaxStr = HttpRequestUtils.getStringParameter("ymax", null, request);
 
-        int xmin, ymin, xmax, ymax;
+        int xmin = 0;
+        int ymin = 0;
+        int xmax = 0;
+        int ymax = 0;
 
         String xcellStr = HttpRequestUtils.getStringParameter("xcell", null, request);
         String ycellStr = HttpRequestUtils.getStringParameter("ycell", null, request);
 
-        int xcell, ycell;
+        int xcell = 0;
+        int ycell = 0;
 
         String timeformat = HttpRequestUtils.getStringParameter("timeformat", null, request);
         String view = HttpRequestUtils.getStringParameter("view", null, request); // files or stream
@@ -65,19 +69,17 @@ public class GridDataServlet extends HttpServlet {
         boolean hasBoundaries = false;
         boolean errorFlag = false;
 
-        if (xminStr != null && xmaxStr != null && yminStr != null && ymaxStr != null)   {
+        if (xminStr != null && xmaxStr != null && yminStr != null && ymaxStr != null) {
             request_id = GET_SUB_GRIDS;
-            xmin =  Integer.parseInt(xminStr);
-            xmax =  Integer.parseInt(xmaxStr);
-            ymin =  Integer.parseInt(yminStr);
-            ymax =  Integer.parseInt(ymaxStr);
-        }
-        else if (xcellStr != null && ycellStr != null) {
+            xmin = Integer.parseInt(xminStr);
+            xmax = Integer.parseInt(xmaxStr);
+            ymin = Integer.parseInt(yminStr);
+            ymax = Integer.parseInt(ymaxStr);
+        } else if (xcellStr != null && ycellStr != null) {
             request_id = GET_CELL_AS_TIMESERIES;
             xcell = Integer.parseInt(xcellStr);
             ycell = Integer.parseInt(ycellStr);
-        }
-        else request_id = GET_GRIDS;
+        } else request_id = GET_GRIDS;
 
         long fromAsLong = 0;
         long toAsLong = 0;
@@ -119,11 +121,15 @@ public class GridDataServlet extends HttpServlet {
             case GET_GRIDS:
                 List<String> grids = GridTools.executeQueryForGridAsListOfStrings(query);
 
+                StringBuilder sbGrids = new StringBuilder();
+
                 System.out.println(grids.size());
                 for (int i = 0; i < grids.size(); i++)
-                    System.out.println(grids.get(i));
+                    sbGrids.append(grids.get(i));
 
-                response.getWriter().write(GridTools.executeQueryForGridAsString(query));
+                System.out.println(sbGrids);
+
+                response.getWriter().write(sbGrids.toString());
                 break;
 
             case GET_SUB_GRIDS:
@@ -132,13 +138,21 @@ public class GridDataServlet extends HttpServlet {
                 logger.warn("ymin: " + yminStr);
                 logger.warn("ymax: " + ymaxStr);
 
-                //List<String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query);
+                List<String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query, xmin, xmax, ymin, ymax);
+                StringBuilder sbSubGrids = new StringBuilder();
 
+                System.out.println(subgrids.size());
+                for (int i = 0; i < subgrids.size(); i++)
+                    sbSubGrids.append(subgrids.get(i));
+
+                System.out.println(sbSubGrids);
+
+                response.getWriter().write(sbSubGrids.toString());
                 break;
 
             case GET_CELL_AS_TIMESERIES:
-                logger.warn("xcell: "+ xcellStr);
-                logger.warn("ycell: "+ ycellStr);
+                logger.warn("xcell: " + xcellStr);
+                logger.warn("ycell: " + ycellStr);
                 break;
 
         }

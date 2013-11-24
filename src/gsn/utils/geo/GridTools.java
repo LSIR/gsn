@@ -52,6 +52,41 @@ public class GridTools {
         return sb.toString();
     }
 
+    public static String deSerializeToStringWithBoundaries(byte[] bytes, int xmin, int xmax, int ymin, int ymax) {
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+            ObjectInputStream in = null;
+
+            in = new ObjectInputStream(bis);
+
+            Double deserial[][] = new Double[0][];
+
+            deserial = (Double[][]) in.readObject();
+            in.close();
+
+            logger.debug("deserial.length" + deserial.length);
+            logger.debug("deserial[0].length" + deserial[0].length);
+
+            for (int i = ymin; i <= ymax; i++) {
+
+                for (int j = xmin; j <= xmax; j++) {
+                    sb.append(deserial[i][j]).append(" ");
+                }
+                sb.append("\n");
+            }
+
+        } catch (IOException e) {
+            logger.warn(e);
+        } catch (ClassNotFoundException e) {
+            logger.warn(e);
+        }
+
+        return sb.toString();
+    }
+
     /*
     * deserialization
     * */
@@ -151,6 +186,79 @@ public class GridTools {
         }
 
         return sb.toString();
+    }
+
+    public static List<String> executeQueryForSubGridAsListOfStrings(String query, int xmin, int xmax, int ymin, int ymax) {
+
+        List<String> listOfStrings = new ArrayList<String>();
+        Connection connection = null;
+        StringBuilder sb = new StringBuilder();
+        ResultSet results = null;
+
+        try {
+            connection = Main.getDefaultStorage().getConnection();
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            results = statement.executeQuery(query);
+            ResultSetMetaData metaData;    // Additional information about the results
+            int numCols, numRows;          // How many rows and columns in the table
+            metaData = results.getMetaData();       // Get metadata on them
+            numCols = metaData.getColumnCount();    // How many columns?
+            results.last();                         // Move to last row
+            numRows = results.getRow();             // How many rows?
+
+            String s;
+
+            sb = new StringBuilder("");
+
+
+            byte typ[] = new byte[numCols];
+            String columnLabel[] = new String[numCols];
+
+            for (int col = 0; col < numCols; col++) {
+                columnLabel[col] = metaData.getColumnLabel(col + 1);
+                typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
+            }
+
+            for (int row = 0; row < numRows; row++) {
+                results.absolute(row + 1);                // Go to the specified row
+                for (int col = 0; col < numCols; col++) {
+                    Object o = results.getObject(col + 1); // Get value of the column
+                    if (o == null)
+                        s = "null";
+                    else
+                        s = o.toString();
+                    if (typ[col] == DataTypes.BINARY) {
+                        byte[] bin = (byte[]) o;
+                        sb.append(GridTools.deSerializeToStringWithBoundaries(bin, xmin, xmax, ymin, ymax));
+                    } else {
+                        String fieldName = columnLabel[col];
+                        String fieldValue = s;
+                        if (fieldName.equalsIgnoreCase("ncols")) {
+                            int nCols = xmax - xmin + 1;
+                            fieldValue = Integer.toString(nCols);
+                        } else if (fieldName.equalsIgnoreCase("nrows")) {
+                            int nRows = ymax - ymin + 1;
+                            fieldValue = Integer.toString(nRows);
+                        }
+                        sb.append(fieldName + " " + fieldValue + "\n");
+                    }
+                }
+                sb.append("\n");
+            }
+            listOfStrings.add(sb.toString());
+        } catch (SQLException e) {
+            sb.append("ERROR in execution of query: " + e.getMessage());
+        } finally {
+            if (results != null)
+                try {
+                    results.close();
+                } catch (SQLException e) {
+                    logger.warn(e.getMessage(), e);
+                }
+            Main.getDefaultStorage().close(connection);
+        }
+
+        return listOfStrings;
     }
 
     public static List<String> executeQueryForGridAsListOfStrings(String query) {
