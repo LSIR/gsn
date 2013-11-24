@@ -28,6 +28,7 @@ public class RestServlet extends HttpServlet {
     private static final int REQUEST_GET_GEO_DATA_FOR_SENSOR = 3;
     private static final int REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD = 4;
     private static final int REQUEST_GET_GRIDS = 5;
+    private static final int REQUEST_GET_GRID2CELLS = 6;
 
     private static final int HTTP_STATUS_BAD = 203;
 
