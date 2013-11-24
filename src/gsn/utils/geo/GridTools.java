@@ -73,7 +73,7 @@ public class GridTools {
             logger.debug("deserial.length" + deserial.length);
             logger.debug("deserial[0].length" + deserial[0].length);
 
-            value = deserial[ycell][ycell];
+            value = deserial[ycell][xcell];
 
         } catch (IOException e) {
             logger.warn(e);
