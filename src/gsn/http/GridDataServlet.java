@@ -121,13 +121,18 @@ public class GridDataServlet extends HttpServlet {
         switch (request_id) {
 
             case GET_GRIDS:
-                List<String> grids = GridTools.executeQueryForGridAsListOfStrings(query);
+                Map<Long,String> grids = GridTools.executeQueryForGridAsListOfStrings(query);
 
                 StringBuilder sbGrids = new StringBuilder();
 
-                System.out.println(grids.size());
-                for (int i = 0; i < grids.size(); i++)
-                    sbGrids.append(grids.get(i));
+                Set<Long> keySetGrid = (Set<Long>) grids.keySet();
+
+                for (Long t : keySetGrid) {
+                    String fileName = sensor + "_" + t ;
+                    sbGrids.append("Filename : " + fileName);
+                    sbGrids.append("\n");
+                    sbGrids.append(grids.get(t));
+                }
 
                 System.out.println(sbGrids);
 
@@ -143,11 +148,9 @@ public class GridDataServlet extends HttpServlet {
                 Map<Long, String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query, xmin, xmax, ymin, ymax);
                 StringBuilder sbSubGrids = new StringBuilder();
 
-                System.out.println(subgrids.size());
+                Set<Long> keySetSubGrids = (Set<Long>) subgrids.keySet();
 
-                Set<Long> keySet = (Set<Long>) subgrids.keySet();
-
-                for (Long t : keySet) {
+                for (Long t : keySetSubGrids) {
                     String fileName = sensor + "_" + t ;
                     sbSubGrids.append("Filename : " + fileName);
                     sbSubGrids.append("\n");

@@ -374,9 +374,9 @@ public class GridTools {
         return listOfStrings;
     }
 
-    public static List<String> executeQueryForGridAsListOfStrings(String query) {
+    public static Map<Long, String> executeQueryForGridAsListOfStrings(String query) {
 
-        List<String> listOfStrings = new ArrayList<String>();
+        Map<Long, String> listOfStrings = new HashMap<Long, String>();
         Connection connection = null;
         StringBuilder sb = new StringBuilder();
         ResultSet results = null;
@@ -394,7 +394,7 @@ public class GridTools {
 
             String s;
 
-            sb = new StringBuilder("");
+
 
 
             byte typ[] = new byte[numCols];
@@ -405,7 +405,10 @@ public class GridTools {
                 typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
             }
 
+            Long timed = 0L;
+
             for (int row = 0; row < numRows; row++) {
+                sb = new StringBuilder("");
                 results.absolute(row + 1);                // Go to the specified row
                 for (int col = 0; col < numCols; col++) {
                     Object o = results.getObject(col + 1); // Get value of the column
@@ -413,16 +416,27 @@ public class GridTools {
                         s = "null";
                     else
                         s = o.toString();
+                    if (columnLabel[col].equalsIgnoreCase("pk"))
+                        continue; // skip PK field
+                    if (columnLabel[col].equalsIgnoreCase("timed")) {
+                        timed = Long.valueOf(s);
+                        continue;
+                    }
                     if (typ[col] == DataTypes.BINARY) {
                         byte[] bin = (byte[]) o;
                         sb.append(GridTools.deSerializeToString(bin));
                     } else {
-                        sb.append(columnLabel[col] + " " + s + "\n");
+                        String fieldName = columnLabel[col];
+                        String fieldValue = s;
+
+                        sb.append(fieldName + " " + fieldValue + "\n");
                     }
                 }
                 sb.append("\n");
+                listOfStrings.put(timed, sb.toString());
             }
-            listOfStrings.add(sb.toString());
+
+            //.add(sb.toString());
         } catch (SQLException e) {
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
