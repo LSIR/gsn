@@ -10,6 +10,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GridTools {
 
@@ -149,6 +151,70 @@ public class GridTools {
         }
 
         return sb.toString();
+    }
+
+    public static List<String> executeQueryForGridAsListOfStrings(String query) {
+
+        List<String> listOfStrings = new ArrayList<String>();
+        Connection connection = null;
+        StringBuilder sb = new StringBuilder();
+        ResultSet results = null;
+
+        try {
+            connection = Main.getDefaultStorage().getConnection();
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            results = statement.executeQuery(query);
+            ResultSetMetaData metaData;    // Additional information about the results
+            int numCols, numRows;          // How many rows and columns in the table
+            metaData = results.getMetaData();       // Get metadata on them
+            numCols = metaData.getColumnCount();    // How many columns?
+            results.last();                         // Move to last row
+            numRows = results.getRow();             // How many rows?
+
+            String s;
+
+            sb = new StringBuilder("");
+
+
+            byte typ[] = new byte[numCols];
+            String columnLabel[] = new String[numCols];
+
+            for (int col = 0; col < numCols; col++) {
+                columnLabel[col] = metaData.getColumnLabel(col + 1);
+                typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
+            }
+
+            for (int row = 0; row < numRows; row++) {
+                results.absolute(row + 1);                // Go to the specified row
+                for (int col = 0; col < numCols; col++) {
+                    Object o = results.getObject(col + 1); // Get value of the column
+                    if (o == null)
+                        s = "null";
+                    else
+                        s = o.toString();
+                    if (typ[col] == DataTypes.BINARY) {
+                        byte[] bin = (byte[]) o;
+                        sb.append(GridTools.deSerializeToString(bin));
+                    } else {
+                        sb.append(columnLabel[col] + " " + s + "\n");
+                    }
+                }
+                sb.append("\n");
+            }
+            listOfStrings.add(sb.toString());
+        } catch (SQLException e) {
+            sb.append("ERROR in execution of query: " + e.getMessage());
+        } finally {
+            if (results != null)
+                try {
+                    results.close();
+                } catch (SQLException e) {
+                    logger.warn(e.getMessage(), e);
+                }
+            Main.getDefaultStorage().close(connection);
+        }
+
+        return listOfStrings;
     }
 
     public static String executeQueryForGridAsJSON(String sensor, long timestamp) {

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.*;
+import java.util.List;
 import java.util.zip.*;
 
 
@@ -19,6 +20,7 @@ public class GridDataServlet extends HttpServlet {
 
     private static transient Logger logger = Logger.getLogger(GridDataServlet.class);
     private static final String DEFAULT_TIMEFORMAT = "yyyyMMddHHmmss";
+    private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         /*
@@ -41,7 +43,19 @@ public class GridDataServlet extends HttpServlet {
         String view = HttpRequestUtils.getStringParameter("view", null, request); // files or stream
         String debug = HttpRequestUtils.getStringParameter("debug", "false", request); // show debug information or not
 
-        String timeBounds = (from != null && to != null) ? " where timed >= " + from + " and timed <= " + to : "";
+        boolean errorFlag = false;
+
+        long fromAsLong = 0;
+        long toAsLong = 0;
+        try {
+            fromAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(from).getTime();
+            toAsLong = new java.text.SimpleDateFormat(ISO_FORMAT).parse(to).getTime();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            errorFlag = true;
+        }
+
+        String timeBounds = (from != null && to != null) ? " where timed >= " + fromAsLong + " and timed <= " + toAsLong : "";
 
         logger.warn("from: " + from);
         logger.warn("to:" + to);
@@ -66,6 +80,11 @@ public class GridDataServlet extends HttpServlet {
             response.getWriter().flush();
         }
 
+        List<String> l = GridTools.executeQueryForGridAsListOfStrings(query);
+
+        System.out.println(l.size());
+        for (int i=0; i< l.size();i++)
+            System.out.println(l.get(i));
 
         response.getWriter().write(GridTools.executeQueryForGridAsString(query));
 
