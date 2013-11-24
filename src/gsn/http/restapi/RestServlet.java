@@ -27,7 +27,7 @@ public class RestServlet extends HttpServlet {
     private static final int REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD = 2;
     private static final int REQUEST_GET_GEO_DATA_FOR_SENSOR = 3;
     private static final int REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD = 4;
-    private static final int REQUEST_GET_GRID = 5;
+    private static final int REQUEST_GET_GRIDS = 5;
 
     private static final int HTTP_STATUS_BAD = 203;
 
@@ -158,7 +158,7 @@ public class RestServlet extends HttpServlet {
                 str_size = request.getParameter("size");
                 restResponse = getRequestHandler.getPreviewMeasurementsForSensorField(sensor, field, str_from, str_to, str_size);
                 break;
-            case REQUEST_GET_GRID:
+            case REQUEST_GET_GRIDS:
                 sensor = parseURI(request.getRequestURI())[3];
                 str_date = request.getParameter("date");
                 restResponse = getRequestHandler.getGridData(sensor, str_date);
@@ -226,7 +226,7 @@ public class RestServlet extends HttpServlet {
         if (parsedURI.length == 5 && parsedURI[2].equalsIgnoreCase("preview"))
             return REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD;
         if (parsedURI.length == 4 && parsedURI[2].equalsIgnoreCase("grid"))
-            return REQUEST_GET_GRID;
+            return REQUEST_GET_GRIDS;
 
         return REQUEST_UNKNOWN;
     }
