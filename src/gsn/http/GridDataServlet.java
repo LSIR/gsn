@@ -2,6 +2,10 @@ package gsn.http;
 
 import gsn.Main;
 import gsn.beans.DataTypes;
+import gsn.http.ac.DataSource;
+import gsn.http.ac.User;
+import gsn.http.ac.UserUtils;
+import gsn.http.restapi.RestResponse;
 import gsn.utils.Helpers;
 import gsn.utils.geo.GridTools;
 import org.apache.log4j.Logger;
@@ -29,16 +33,10 @@ public class GridDataServlet extends HttpServlet {
     private static final int GET_CELL_AS_TIMESERIES = 2;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        /*
+
+        String str_user = null;
+        String str_pass = null;
         User user = null;
-        if (Main.getContainerConfig().isAcEnabled()) {
-            HttpSession session = request.getSession();
-            user = (User) session.getAttribute("user");
-            response.setHeader("Cache-Control", "no-store");
-            response.setDateHeader("Expires", 0);
-            response.setHeader("Pragma", "no-cache");
-        }
-        */
 
         String sensor = HttpRequestUtils.getStringParameter("sensor", null, request);
 
@@ -49,6 +47,31 @@ public class GridDataServlet extends HttpServlet {
         String yminStr = HttpRequestUtils.getStringParameter("ymin", null, request);
         String xmaxStr = HttpRequestUtils.getStringParameter("xmax", null, request);
         String ymaxStr = HttpRequestUtils.getStringParameter("ymax", null, request);
+
+        if (Main.getContainerConfig().isAcEnabled()) {
+            str_user = request.getParameter("username");
+            str_pass = request.getParameter("password");
+            if ((str_user != null) && (str_pass != null)) {
+                user = UserUtils.allowUserToLogin(str_user, str_pass);
+            }
+        }
+
+        if (Main.getContainerConfig().isAcEnabled() && (user != null)) { // if the AC is enabled and there is an user  // added
+
+            if (!user.hasReadAccessRight(sensor) && !user.isAdmin() && DataSource.isVSManaged(sensor)) {  // if the user doesn't have access to this sensor
+                response.setHeader("Content-Disposition", "attachment;filename=\"error_no_sensor_access.csv\"");
+                response.getWriter().write("## The user '" + user.getUserName() + "' doesn't have access to the sensor '" + sensor + "'");
+                response.getWriter().flush();
+                return;
+            }
+        } else if (Main.getContainerConfig().isAcEnabled() && (user == null)) { // if there is no user with these credentials
+            response.setContentType("text/csv");
+            response.setHeader("Content-Disposition", "attachment;filename=\"error_no_user.csv\"");
+            response.getWriter().write("## There is no user with the provided username and password");
+            response.getWriter().flush();
+            return;
+        }
+
 
         int xmin = 0;
         int ymin = 0;
@@ -121,14 +144,14 @@ public class GridDataServlet extends HttpServlet {
         switch (request_id) {
 
             case GET_GRIDS:
-                Map<Long,String> grids = GridTools.executeQueryForGridAsListOfStrings(query);
+                Map<Long, String> grids = GridTools.executeQueryForGridAsListOfStrings(query);
 
                 StringBuilder sbGrids = new StringBuilder();
 
                 Set<Long> keySetGrid = (Set<Long>) grids.keySet();
 
                 for (Long t : keySetGrid) {
-                    String fileName = sensor + "_" + t ;
+                    String fileName = sensor + "_" + t;
                     sbGrids.append("Filename : " + fileName);
                     sbGrids.append("\n");
                     sbGrids.append(grids.get(t));
@@ -151,7 +174,7 @@ public class GridDataServlet extends HttpServlet {
                 Set<Long> keySetSubGrids = (Set<Long>) subgrids.keySet();
 
                 for (Long t : keySetSubGrids) {
-                    String fileName = sensor + "_" + t ;
+                    String fileName = sensor + "_" + t;
                     sbSubGrids.append("Filename : " + fileName);
                     sbSubGrids.append("\n");
                     sbSubGrids.append(subgrids.get(t));
