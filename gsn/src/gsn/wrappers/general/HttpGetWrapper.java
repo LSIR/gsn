@@ -218,7 +218,7 @@ public class HttpGetWrapper extends AbstractWrapper {
 						postStreamElement(new Serializable[]{deviceId, timestamp, size, arrayOutputStream.toByteArray()});
 				}
 			} catch (IOException e) {
-				logger.error( e.getMessage( ) + " (host=" + url.getHost() + ")" );
+				logger.warn( e.getMessage( ) + " (host=" + url.getHost() + ")" );
 			}
 			try {
 				Thread.sleep( rate );
