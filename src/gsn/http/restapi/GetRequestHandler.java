@@ -194,8 +194,8 @@ public class GetRequestHandler {
     public void getSensorsInfo(User user, PrintWriter out) {
         int is_public;
         Iterator<VSensorConfig> vsIterator = Mappings.getAllVSensorConfigs();
-        out.println("## is_public == 1 if the VS is publicly accessed and 0, otherwise");
-        out.println("##vsname,is_public,altitude,longitude,latitude,List(attribute_name,attribute_type)");
+        out.println("# is_public == 1 if the VS is publicly accessed and 0, otherwise");
+
         while (vsIterator.hasNext()) {
 
             VSensorConfig sensorConfig = vsIterator.next();
@@ -205,36 +205,39 @@ public class GetRequestHandler {
                 continue;
             }
 
-            String alt = "0";
-            String lat = "0";
-            String lon = "0";
-
-            for (KeyValue df : sensorConfig.getAddressing()) {
-
-                String adressing_key = df.getKey().toString().toLowerCase().trim();
-                String adressing_value = df.getValue().toString().toLowerCase().trim();
-
-                if (adressing_key.indexOf("altitude") >= 0)
-                    alt = adressing_value;
-
-                if (adressing_key.indexOf("longitude") >= 0)
-                    lon = adressing_value;
-
-                if (adressing_key.indexOf("latitude") >= 0)
-                    lat = adressing_value;
-            }
+            out.println("# vsname:"+vs_name);
             is_public = (DataSource.isVSManaged(vs_name)) ? 0 : 1;
-            out.print(vs_name+","+is_public+","+alt+","+lon+","+lat);  // add the coords of the VS
+            out.println("# is_public:"+is_public);
+            for ( KeyValue df : sensorConfig.getAddressing()){
+                out.println("# " + df.getKey().toString().toLowerCase().trim() + ":" + df.getValue().toString().trim());
+            }
 
+            String fieldNames = "";
+            String fieldUnits = "";
+            String fieldTypes = "";
+            boolean  first = true;
             for (DataField df : sensorConfig.getOutputStructure()) {
                 String field_name = df.getName().toLowerCase();
                 String field_type = df.getType().toLowerCase();
                 String field_unit = df.getUnit();
                 if (field_unit == null || field_unit.trim().length() == 0)
                     field_unit = "";
-                out.print(","+field_name+","+field_type+","+field_unit);    // add its fields
+                if (first) {
+                    fieldNames += field_name;
+                    fieldTypes += field_type;
+                    fieldUnits += field_unit;
+
+                    first = false;
+                } else {
+                    fieldNames += ","+field_name;
+                    fieldTypes += ","+field_type;
+                    fieldUnits += ","+field_unit;
+                }
+
             }
-            out.println(); // prepare for the new entry
+            out.println(fieldNames);
+            out.println(fieldUnits);
+            out.println(fieldTypes);
         }
     }
 
@@ -253,7 +256,7 @@ public class GetRequestHandler {
         }
 
         if (errorFlag) {
-            out.print("## Malformed date for from or to field.");
+            out.print("# Malformed date for from or to field.");
             return HTTP_STATUS_BAD_REQUEST;
         }
 
@@ -266,6 +269,8 @@ public class GetRequestHandler {
         VSensorConfig sensorConfig = Mappings.getConfig(sensor);    // get the configuration for this vs
         ArrayList<String> fields = new ArrayList<String>();
         ArrayList<String> units = new ArrayList<String>();
+
+
         for (DataField df : sensorConfig.getOutputStructure()) {
             fields.add(df.getName().toLowerCase());   // get the field name that is going to be processed
             String unit = df.getUnit();
@@ -273,7 +278,13 @@ public class GetRequestHandler {
                 unit = "";
             units.add(unit);
         }
-        out.print("#");
+
+        out.println("# vsname:"+sensor);
+        for ( KeyValue df : sensorConfig.getAddressing()){
+            out.println("# " + df.getKey().toString().toLowerCase().trim() + ":" + df.getValue().toString().trim());
+        }
+
+        out.print("# ");
         int j;
         for (j=0; j < (fields.size()-1); j++) {
             out.print(fields.get(j)+",");
@@ -281,7 +292,7 @@ public class GetRequestHandler {
         out.println(fields.get(j));
 
         //units (second line)
-        out.print("#");
+        out.print("# ");
         for (j=0; j < (fields.size()-1); j++) {
             out.print(units.get(j)+",");
         }
@@ -308,7 +319,7 @@ public class GetRequestHandler {
                         .append(fromAsLong)
                         .append(" and timed <=")
                         .append(toAsLong)
-                        .append(" order by timed desc")
+                        .append(" order by timed asc")
                         .append(" limit 0,"+(window+1));
             } else {
                 query = new StringBuilder("select * from ")
@@ -662,9 +673,28 @@ public class GetRequestHandler {
         }
 
         if (errorFlag) {
-            out.print("## Malformed date for from or to field.");
+            out.print("# Malformed date for from or to field.");
             return HTTP_STATUS_BAD_REQUEST;
         }
+
+        VSensorConfig sensorConfig = Mappings.getConfig(sensor);
+        out.println("# vsname:"+sensor);
+        for ( KeyValue df : sensorConfig.getAddressing()){
+            out.println("# " + df.getKey().toString().toLowerCase().trim() + ":" + df.getValue().toString().trim());
+        }
+        out.println("# "+field);
+        DataField[] dataFieldArray = sensorConfig.getOutputStructure();
+        for (DataField df: dataFieldArray){
+            if (field.equalsIgnoreCase(df.getName())){
+                String unit = df.getUnit();
+                if (unit == null || unit.trim().length() == 0){
+                    unit = "";
+                }
+                out.println("# "+unit);
+                break;
+            }
+        }
+
 
         if (size != null)  {
             Integer window = new Integer(size);
@@ -682,7 +712,7 @@ public class GetRequestHandler {
                         .append(fromAsLong)
                         .append(" and timed <=")
                         .append(toAsLong)
-                        .append(" order by timed desc")
+                        .append(" order by timed asc")
                         .append(" limit 0,"+(window+1));
 
                 resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
@@ -717,7 +747,7 @@ public class GetRequestHandler {
         }
 
         if (errorFlag) {
-            out.print("## Error in request.");
+            out.print("# Error in request.");
             return HTTP_STATUS_BAD_REQUEST;
         }
 
