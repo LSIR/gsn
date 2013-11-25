@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_Camera_pos11_Position5__scaled" priority="10" >
+<virtual-sensor name="Dirruhorn_Camera_pos7__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -10,7 +10,7 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>camera pictures from position 11 at Dirruhorn deployment showing Position5 as thumbnail</description>
+    <description>camera pictures (position 11) pointing at position 7 at Dirruhorn deployment as thumbnail</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
@@ -18,7 +18,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from Dirruhorn_Binary__mapped where RELATIVE_FILE like 'webcam1/%Position5%'</predicate>
+                    <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from Dirruhorn_Binary__mapped where RELATIVE_FILE like 'webcam1/%Position7%'</predicate>
                 </address>
                 <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 11</query>
             </source>

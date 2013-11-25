@@ -10,7 +10,7 @@
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
-    <description>CamZilla camera pictures from position 59 at Dirruhorn deployment as thumbnail</description>
+    <description>Ubiquiti camera pictures (position 61) pointing at position 59 at Dirruhorn deployment as thumbnail</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
@@ -18,9 +18,9 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from Dirruhorn_Binary__mapped where RELATIVE_FILE like 'camera1/%'</predicate>
+                    <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from Dirruhorn_Binary__mapped where RELATIVE_FILE like 'webcam2/%'</predicate>
                 </address>
-                <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 59</query>
+                <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 61</query>
             </source>
             <query> select * from source </query>
         </stream>
