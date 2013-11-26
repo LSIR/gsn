@@ -100,7 +100,11 @@ public class DataEnumerator implements DataEnumeratorIF {
 					indexOfTimedField = i;
 				} else {
 					fieldNames.add( colName );
-					fieldTypes.add( storageManager.convertLocalTypeToGSN(colTypeInJDBCFormat,colScale ) );
+                    byte gsnType = storageManager.convertLocalTypeToGSN(colTypeInJDBCFormat,colScale );
+                    if (gsnType == -100){
+                        logger.error("The type can't be converted to GSN form - error description: virtual sensor name is: "+tableName+", field name is: "+colName + ", query is: " + preparedStatement.toString());
+                    }
+					fieldTypes.add( gsnType );
 				}
 			}
 			dataFieldNames = fieldNames.toArray( new String [ ] {} );

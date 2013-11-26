@@ -74,7 +74,12 @@ public class MySQLStorageManager extends StorageManager {
             case Types.LONGVARBINARY:
                 return DataTypes.BINARY;
             default:
-                logger.error("The type can't be converted to GSN form : " + jdbcType);
+                if (jdbcType == Types.NULL){
+                    logger.error("The type can't be converted to GSN form : 0. (Found  type in JDBC format is \"Null\")");
+                }
+                else {
+                    logger.error("The type can't be converted to GSN form : " + jdbcType);
+                }
                 break;
         }
         return -100;

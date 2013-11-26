@@ -186,6 +186,9 @@ public class GridTools {
             for (int col = 0; col < numCols; col++) {
                 columnLabel[col] = metaData.getColumnLabel(col + 1);
                 typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
+                if (typ[col] == -100){
+                    logger.error("The type can't be converted to GSN form - error description: column label is:"+columnLabel[col]+", query is: " + query);
+                }
             }
 
             for (int row = 0; row < numRows; row++) {
@@ -247,6 +250,9 @@ public class GridTools {
             for (int col = 0; col < numCols; col++) {
                 columnLabel[col] = metaData.getColumnLabel(col + 1);
                 typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
+                if (typ[col] == -100){
+                    logger.error("The type can't be converted to GSN form - error description: column label is: "+columnLabel[col]+", query is: " + query);
+                }
             }
 
             Long timed = 0L;
@@ -319,6 +325,9 @@ public class GridTools {
             for (int col = 0; col < numCols; col++) {
                 columnLabel[col] = metaData.getColumnLabel(col + 1);
                 typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
+                if (typ[col] == -100){
+                    logger.error("The type can't be converted to GSN form - error description: column label is:"+columnLabel[col]+", query is: " + query);
+                }
             }
 
             Long timed = 0L;
@@ -403,6 +412,9 @@ public class GridTools {
             for (int col = 0; col < numCols; col++) {
                 columnLabel[col] = metaData.getColumnLabel(col + 1);
                 typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
+                if (typ[col] == -100){
+                    logger.error("The type can't be converted to GSN form - error description:  column label is:"+columnLabel[col]+", query is: " + query);
+                }
             }
 
             Long timed = 0L;
@@ -480,6 +492,9 @@ public class GridTools {
             for (int col = 0; col < numCols; col++) {
                 columnLabel[col] = metaData.getColumnLabel(col + 1);
                 typ[col] = Main.getDefaultStorage().convertLocalTypeToGSN(metaData.getColumnType(col + 1));
+                if (typ[col] == -100){
+                    logger.error("The type can't be converted to GSN form - error description: virtual sensor name is: "+sensor+", column label is:"+columnLabel[col]+", query is: " + query);
+                }
             }
 
             for (int row = 0; row < numRows; row++) {

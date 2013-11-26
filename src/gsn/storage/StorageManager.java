@@ -134,6 +134,9 @@ public abstract class StorageManager {
                 if (colName.equalsIgnoreCase("pk")) continue;
                 int colType = structure.getColumnType(i);
                 byte colTypeInGSN = convertLocalTypeToGSN(colType);
+                if (colTypeInGSN == -100){
+                    logger.error("The type can't be converted to GSN form - error description: virtual sensor name is: "+tableName+", field name is: "+colName + ", query is: " + sb);
+                }
                 toReturnArr.add(new DataField(colName, colTypeInGSN));
             }
             toReturn = toReturnArr.toArray(new DataField[]{});
@@ -164,6 +167,9 @@ public abstract class StorageManager {
                 String colTypeName = structure.getColumnTypeName(i);
                 int precision = structure.getPrecision(i);
                 byte colTypeInGSN = convertLocalTypeToGSN(colType);
+                if (colTypeInGSN == -100){
+                    logger.error("The type can't be converted to GSN form - error description: virtual sensor name is: "+tableName+", field name is: "+colName + ", query is: " + sb);
+                }
                 if ((colTypeInGSN == DataTypes.VARCHAR) || (colTypeInGSN == DataTypes.CHAR))
                     toReturnArr.add(new DataField(colName, colTypeName, precision, colName));
                 else
@@ -206,8 +212,12 @@ public abstract class StorageManager {
                         String colName = structure.getColumnLabel(i);
                         int colType = structure.getColumnType(i);
                         int colTypeScale = structure.getScale(i);
-                        if (field.getName().equalsIgnoreCase(colName))
-                            if (field.getDataTypeID() == convertLocalTypeToGSN(colType, colTypeScale))
+                        if (field.getName().equalsIgnoreCase(colName)){
+                            byte gsnType = convertLocalTypeToGSN(colType, colTypeScale);
+                            if (gsnType == -100){
+                                logger.error("The type can't be converted to GSN form - error description: virtual sensor name is: "+tableName+", field name is: "+colName + ", query is: " + sb);
+                            }
+                            if (field.getDataTypeID() == gsnType)
                                 continue nextField;
                             else
                                 throw new GSNRuntimeException("The column : "
@@ -215,6 +225,7 @@ public abstract class StorageManager {
                                         + "< table is not compatible with type : "
                                         + field.getType()
                                         + ". The actual type for this table (currently in the database): " + colType);
+                        }
                     }
                     throw new GSNRuntimeException("The table " + tableName
                             + " in the database, doesn't have the >" + field.getName()
