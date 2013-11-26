@@ -38,7 +38,6 @@
                         var keys =[];
                         var nb_elements = 0;
                         var datasets = [];
-                        var units_line_read = false;
                         for (var line_no=0;line_no<lines.length;line_no++){
                             var line = $.trim(lines[line_no]);
                             if (line.length == 0)
@@ -49,13 +48,7 @@
                                     vs_name = line.substring(9,line.length);
                                     keys=[];
                                     headers=[];
-                                } else if (line.indexOf("# query:") >= 0) {
-                                } else if (line.indexOf("# geographical:") >= 0) {
-                                } else if (line.indexOf("# latitude:") >= 0) {
-                                } else if (line.indexOf("# longitude:") >= 0) {
-                                } else if (line.indexOf("# altitude:") >= 0) {
-                                } else if (line.indexOf("# description:") >= 0) {
-                                } else if (!units_line_read) { //field name
+                                } else if (line.indexOf("# time") >= 0) { //field name
                                     headers = line.split(',');
                                     for (var i=0;i<headers.length;i++){
                                         headers[i] = headers[i].replace("#","");
@@ -68,9 +61,7 @@
                                             keys.push(lbl);
                                         }
                                     }
-                                    units_line_read = true;
-                                } else if (units_line_read){ //unit
-                                    units_line_read = false;
+                                } else{
                                 }
                             }else { // data line, at this stage we should have a header varialbe already set.
                                 var data = line.split(',');
