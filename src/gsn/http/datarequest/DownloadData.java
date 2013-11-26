@@ -12,8 +12,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.*;
 
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -133,11 +134,15 @@ public class DownloadData extends AbstractDataRequest {
                 FieldsCollection fc = qbuilder.getVsnamesAndStreams().get(nextSqlQuery.getKey());
                 boolean wantTimed = true;
                 boolean firstLine = true;
+                LinkedList<StreamElement> streamElements = new LinkedList<StreamElement>();
                 while (de.hasMoreElements()) {
+                    streamElements.add(de.nextElement());
+                }
+                while (!streamElements.isEmpty()) {
                     if (ot == AllowedOutputType.csv) {
-                        formatCSVElement(respond, de.nextElement(), wantTimed, csvDelimiter, firstLine, fieldToUnitMap);
+                        formatCSVElement(respond, streamElements.removeLast(), wantTimed, csvDelimiter, firstLine, fieldToUnitMap);
                     } else if (ot == AllowedOutputType.xml) {
-                        formatXMLElement(respond, de.nextElement(), wantTimed, firstLine, fieldToUnitMap);
+                        formatXMLElement(respond, streamElements.removeLast(), wantTimed, firstLine, fieldToUnitMap);
                     }
                     firstLine = false;
                 }

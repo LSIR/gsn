@@ -284,19 +284,19 @@ public class GetRequestHandler {
             out.println("# " + df.getKey().toString().toLowerCase().trim() + ":" + df.getValue().toString().trim());
         }
 
-        out.print("# ");
+        out.print("# ,");
         int j;
         for (j=0; j < (fields.size()-1); j++) {
-            out.print(fields.get(j)+",");
+            out.print(","+fields.get(j));
         }
-        out.println(fields.get(j));
+        out.println(","+fields.get(j));
 
         //units (second line)
-        out.print("# ");
+        out.print("# ,");
         for (j=0; j < (fields.size()-1); j++) {
-            out.print(units.get(j)+",");
+            out.print(","+units.get(j));
         }
-        out.println(units.get(j));
+        out.println(","+units.get(j));
         ///////////////////////   Connection to the DB to get the data
 
         Connection conn = null;
@@ -319,7 +319,7 @@ public class GetRequestHandler {
                         .append(fromAsLong)
                         .append(" and timed <=")
                         .append(toAsLong)
-                        .append(" order by timed asc")
+                        .append(" order by timed desc")
                         .append(" limit 0,"+(window+1));
             } else {
                 query = new StringBuilder("select * from ")
@@ -330,7 +330,6 @@ public class GetRequestHandler {
                         .append(toAsLong);
             }
             resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
-
             while (resultSet.next()) {
                 if (restrict) {
                     Vector<Double> stream2 = new Vector<Double>();
@@ -342,23 +341,25 @@ public class GetRequestHandler {
                 } else {
                     long timestamp = resultSet.getLong("timed");
 
+                    out.print((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp);
                     for (String fieldname : fields) {
                         stream.add(resultSet.getDouble(fieldname));
                     }
                     for (int i = 0; i < stream.size(); i++) {
-                        out.print(stream.get(i)+",");
+                        out.print(","+stream.get(i));
                     }
-                    out.println((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp);
+                    out.println();
                     stream.clear();
                 }
             }
             if (restrict) {
                 for (int k = elements.size()-1; k > 0; k--) {       // for each one of the results
                     Vector<Double> streamTemp = elements.get(k);
+                    out.print((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(k)))).toString().replace('T', ' ')+","+ timestamps.get(k));
                     for (int i = 0; i < streamTemp.size(); i++)  {
-                        out.print(streamTemp.get(i)+",");
+                        out.print(","+streamTemp.get(i));
                     }
-                    out.println((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(k)))).toString().replace('T', ' ')+","+ timestamps.get(k));
+                    out.println();
                 }
 
             }
@@ -712,10 +713,11 @@ public class GetRequestHandler {
                         .append(fromAsLong)
                         .append(" and timed <=")
                         .append(toAsLong)
-                        .append(" order by timed asc")
+                        .append(" order by timed desc")
                         .append(" limit 0,"+(window+1));
 
                 resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
+
                 while (resultSet.next()) {
                     timestamps.add(resultSet.getLong(1));
                     stream.add(resultSet.getDouble(2));
@@ -725,7 +727,7 @@ public class GetRequestHandler {
                 }
                 for (int i=stream.size()-1; i > 0; i--) {
                     long timestamp = timestamps.get(i);
-                    out.println(stream.get(i)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp);
+                    out.println((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp+","+stream.get(i));
                 }
                 timestamps.clear();stream.clear();
             } catch (SQLException e) {
@@ -741,8 +743,7 @@ public class GetRequestHandler {
         out.println("##field: "+field);
         out.println("##value,timestamp,epoch");   */
             for (int i = 0; i < stream.size(); i++) {
-                out.print(stream.get(i)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' ')+","+timestamps.get(i));
-                out.println();
+                out.println((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' ')+","+timestamps.get(i)+","+stream.get(i));
             }
         }
 
@@ -774,6 +775,7 @@ public class GetRequestHandler {
                     .append(to);
 
             resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, conn);
+
             while (resultSet.next()) {
                 //int ncols = resultSet.getMetaData().getColumnCount();
                 long timestamp = resultSet.getLong(1);

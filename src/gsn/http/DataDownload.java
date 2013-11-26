@@ -12,6 +12,7 @@ import gsn.storage.DataEnumerator;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -79,6 +80,10 @@ public class DataDownload extends HttpServlet {
                 res.sendError(WebConstants.MISSING_VSNAME_ERROR, "The virtual sensor name is missing");
                 return;
             }
+
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            Date currentDate = Calendar.getInstance().getTime();
+            String filename = vsName+"_"+dateFormat.format(currentDate);
 
             if (Main.getContainerConfig().isAcEnabled() == true) {
             if (user != null) // meaning, that a login session is active, otherwise we couldn't get there
@@ -281,13 +286,18 @@ public class DataDownload extends HttpServlet {
                 int nbFields = 0;
                 if (responseCVS) {
                     boolean firstLine = true;
+                    res.setHeader("content-disposition","attachment; filename="+filename+".csv");
                     respond.println("# " + generated_request_query);
                     for ( KeyValue df : sensorConfig.getAddressing()){
                         respond.println("# " + df.getKey().toString().toLowerCase() + ":" + df.getValue().toString());
                     }
                     respond.println("# description:" + sensorConfig.getDescription());
+                    LinkedList<StreamElement> streamElements = new LinkedList<StreamElement>();
                     while (result.hasMoreElements()) {
-                        StreamElement se = result.nextElement();
+                        streamElements.add(result.nextElement());
+                    }
+                    while (!streamElements.isEmpty()) {
+                        StreamElement se = streamElements.removeLast();
                         if (firstLine) {
                             nbFields = se.getFieldNames().length;
                             if (groupByTimed) {
@@ -340,13 +350,18 @@ public class DataDownload extends HttpServlet {
                     }
                 } else {
                     boolean firstLine = true;
+                    res.setHeader("content-disposition","attachment; filename="+filename+".xml");
                     for ( KeyValue df : sensorConfig.getAddressing()){
                         respond.println("\t<!-- " + StringEscapeUtils.escapeXml(df.getKey().toString().toLowerCase()) + ":" + StringEscapeUtils.escapeXml(df.getValue().toString()) + " -->");
                     }
                     respond.println("\t<!-- description:" + StringEscapeUtils.escapeXml(sensorConfig.getDescription()) + " -->");
                     respond.println("<data>");
+                    LinkedList<StreamElement> streamElements = new LinkedList<StreamElement>();
                     while (result.hasMoreElements()) {
-                        StreamElement se = result.nextElement();
+                        streamElements.add(result.nextElement());
+                    }
+                    while (!streamElements.isEmpty()) {
+                        StreamElement se = streamElements.removeLast();
                         if (firstLine) {
                             respond.println("\t<line>");
                             nbFields = se.getFieldNames().length;
