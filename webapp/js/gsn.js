@@ -894,7 +894,7 @@ var GSN = {
                     }
                     if (GSN.protect[i][1] == " ") {
                          value2 =  $(vs).attr("description");
-                         $("dl.description", vsd).empty().append('<p> Bla').append($.DD({}, value2)).append('</p>');
+                         $("dl.description", vsd).empty().append('<p> Description:').append($.DD({}, value2)).append('</p>');
                          logIvo("Iter = "+$(vs).attr("description"));
                     } else  {
                         // $("dl.description", vsd).empty().append($.DD({},$(vs).attr("description")));
@@ -914,7 +914,7 @@ var GSN = {
                         //logIvo("Vals = "+res);
                         var dummy=" Privately Owned Sensor ";
                         $("dl.description", vsd).empty().append(res).append('<dl> <dt> Visibility: </dt> </dl>').append($.DD({}, dummy));
-                        //$("dl.description", vsd).empty().append('<dl> <dt> Bla: </dt> <dd>').append($.DD({}, value2)).append('</dd> </dl>');
+                        //$("dl.description", vsd).empty().append('<dl> <dt> Description: </dt> <dd>').append($.DD({}, value2)).append('</dd> </dl>');
                     }
                     $("a.tabdescription", vsd).show();
                     if (!gotStatic) {
