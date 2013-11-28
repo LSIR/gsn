@@ -655,7 +655,7 @@ var GSN = {
             })),
             $.SPAN({
                 "class":"timed"
-            },"loading...")
+            },"")
             ),$.UL({
                 "class":"tabnav"
             },
