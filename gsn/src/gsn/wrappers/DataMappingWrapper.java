@@ -118,7 +118,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 					+ outputStructure[1].getName() + " " + outputStructure[1].getType() + " NOT NULL, "
 					+ outputStructure[2].getName() + " " + outputStructure[2].getType() + " NULL, "
 					+ outputStructure[3].getName() + " " + outputStructure[3].getType() + " NOT NULL, "
-					+ outputStructure[4].getName() + " " + outputStructure[4].getType() + " NOT NULL, "
+					+ outputStructure[4].getName() + " " + outputStructure[4].getType() + " NULL, "
 					+ outputStructure[5].getName() + " " + outputStructure[5].getType() + ")";
 			createIndexStatement = "CREATE INDEX ON " + deployment + "_sensor (position, begin, end, sensortype)";
 		}
@@ -268,13 +268,16 @@ public class DataMappingWrapper extends AbstractWrapper {
 								Long end = rs.getLong(outputStructure[2].getName());
 								if (rs.wasNull())
 									end = null;
+								Long sensortyp_args = rs.getLong(outputStructure[4].getName());
+								if (rs.wasNull())
+									sensortyp_args = null;
 								mapping.executeSensorInsert(
 										getActiveAddressBean().getVirtualSensorName(),
 										rs.getInt(outputStructure[0].getName()),
 										rs.getLong(outputStructure[1].getName()),
 										end,
 										rs.getString(outputStructure[3].getName()),
-										rs.getLong(outputStructure[4].getName()),
+										sensortyp_args,
 										rs.getString(outputStructure[5].getName()),
 										false);
 							}
@@ -1175,7 +1178,10 @@ public class DataMappingWrapper extends AbstractWrapper {
 					else
 						sensor_insert.setLong(3, end);
 					sensor_insert.setString(4, type);
-					sensor_insert.setLong(5, typeArgs);
+					if (typeArgs == null)
+						sensor_insert.setNull(5, java.sql.Types.BIGINT);
+					else
+						sensor_insert.setLong(5, typeArgs);
 					sensor_insert.setString(6, comment);
 					sensor_insert.executeUpdate();
 					ret.add(new Serializable[] {pos, begin, end, type, typeArgs, comment});
