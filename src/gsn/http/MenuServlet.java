@@ -37,7 +37,7 @@ public class MenuServlet extends HttpServlet {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user");
         if (user == null)
-            name = "<li><a href=/gsn/MyLoginHandlerServlet> login</a></li>";
+            name = "<li><a href=/gsn/MyLoginHandlerServlet> login</a></li>" + "<li><a href=/gsn/MyUserCandidateRegistrationServlet>register</a></li>";
         else {
             name = "<li><a href=/gsn/MyLogoutHandlerServlet> logout </a></li>" + "<li><div id=logintextprime >logged in as: " + user.getUserName() + "&nbsp" + "</div></li>";
         }
