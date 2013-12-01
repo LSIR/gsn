@@ -140,8 +140,14 @@ public class CSVWrapper extends AbstractWrapper {
                     output = handler.work(reader, checkPointDir);
                     for (TreeMap<String, Serializable> se : output) {
                         StreamElement streamElement = new StreamElement(se, getOutputFormat());
+                        String [] ses = streamElement.getFieldNames();
                         processedLineCounter++;
-                        //logger.warn(se);
+                        for (int i=0;i<ses.length; i++){
+                            if ("anetz_snow_height".equalsIgnoreCase(ses[i]) || "mst_surface_temp".equalsIgnoreCase(ses[i])){
+                                logger.warn(dataFile+" : "+se);
+                                break;
+                            }
+                        }
                         boolean insertionSuccess = postStreamElement(streamElement);
 
                         if (!useCounterForCheckPoint)
