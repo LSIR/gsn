@@ -2,6 +2,7 @@
     <processing-class>
         <class-name>gsn.vsensor.TopologyVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
             <param name="dozer-command-vs">Thur_Dozer_Command</param>
             
             <param name="nodehealth-stream-name">data9</param>
