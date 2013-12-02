@@ -48,6 +48,7 @@ public class SensorNode {
 	public Integer uptime;
 	public Boolean corestation_running;
 	public Boolean iscorestation;
+	public Integer db_entries;
 	
 	public SensorNodeConfiguration configuration;
 	public SensorNodeConfiguration pendingConfiguration;
@@ -313,7 +314,6 @@ public class SensorNode {
 
 	public void setCorestation() {
 		iscorestation = true;
-		corestation_running = true;
 	}
 
 	public boolean isDozerSink() {
@@ -338,6 +338,7 @@ public class SensorNode {
 		this.uptime = node.uptime;
 		this.corestation_running = node.corestation_running;
 		this.iscorestation = node.iscorestation;
+		this.db_entries = node.db_entries;
 		
 		this.configuration = node.configuration;
 		this.pendingConfiguration = node.pendingConfiguration;

@@ -62,32 +62,35 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	private final transient Logger logger = Logger.getLogger( this.getClass() );
 	
 	private static final String[] configurationParameters = {
-		"node-id-field",
-		"parent-id-field",
-		"timestamp-field",
-		"generation-time-field",
-		"vsys-field",
-		"current-field",
-		"temperature-field",
-		"humidity-field",
-		"flash-count-field",
-		"uptime-field",
-		"access-node-stream-name",
-		"powerswitch-stream-name",
-		"rssi-stream-name", // this stream does not count to the packetcount
-		"rssi-node-id-field",
-		"rssi-field",
-		"evenlogger-stream-name",// this stream does not count to the packetcount
-		"evenlogger-id-field",
-		"evenlogger-value-field",
-		"valid-field",
-		"powerswitch-p1-field",
-		"powerswitch-p2-field",
-		"sdivoltage-field",
-		"ae-stream-name",
-		"corestation-statistics-stream-name",
-		"wgps-stream-name",
-		"nodehealth-stream-name",
+		"node-id-field",						// 0
+		"parent-id-field",						// 1
+		"timestamp-field",						// 2
+		"generation-time-field",				// 3
+		"vsys-field",							// 4
+		"current-field",						// 5
+		"temperature-field",					// 6
+		"humidity-field",						// 7
+		"flash-count-field",					// 8
+		"uptime-field",							// 9
+		"access-node-stream-name",				// 10
+		"powerswitch-stream-name",				// 11
+		"rssi-stream-name",						// 12: this stream does not count to the packetcount
+		"rssi-node-id-field",					// 13
+		"rssi-field",							// 14
+		"eventlogger-stream-name",				// 15: this stream does not count to the packetcount
+		"eventlogger-id-field",					// 16
+		"eventlogger-value-field",				// 17
+		"valid-field",							// 18
+		"powerswitch-p1-field",					// 19
+		"powerswitch-p2-field",					// 20
+		"sdivoltage-field",						// 21
+		"ae-stream-name",						// 22
+		"corestation-statistics-stream-name",	// 23: this stream does not count to the packetcount
+		"wgps-stream-name",						// 24
+		"nodehealth-stream-name",				// 25
+		"corestation-connected-field",			// 26
+        "backlogstatus-dynamic-stream-name",	// 27: this stream does not count to the packetcount
+        "backlogstatus-db-entries-field",		// 28
 	};
 	
 	private static final String commandConfigurationParameter = "dozer-command-vs";
@@ -236,12 +239,28 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				}
 				// do not count events to packets
 			}
-			else if (inputStreamName.startsWith(configuration[23])) {
+			// CoreStation Statistics
+			else if (inputStreamName.equals(configuration[23])) {
 				if (node.iscorestation == null || !node.iscorestation)
-				// corestation statistics
 					node.setCorestation();
+				Byte connected = null;
+				s = data.getData(configuration[26]);
+				if (s instanceof Byte) {
+					connected = (Byte)s;
+				}
+				if (connected == 1)
+					node.corestation_running = new Boolean(true);
 				else
-					return;
+					node.corestation_running = new Boolean(false);
+			}
+			// BackLogStatus Dynamic
+			else if (inputStreamName.equals(configuration[27])) {
+				Integer dbEntries = null;
+				s = data.getData(configuration[28]);
+				if (s instanceof Integer) {
+					dbEntries = (Integer)s;
+				}
+				node.db_entries = dbEntries;
 			}
 			else {
 				node.packet_count++;
@@ -306,7 +325,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	
 				// health
 				// save always latest health information
-				if (inputStreamName.startsWith(configuration[25]) || node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+				if (inputStreamName.equals(configuration[25]) || node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
 					// Vsys
 					s = data.getData(configuration[4]);
 					if (s instanceof Integer)

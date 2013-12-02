@@ -3,6 +3,9 @@
         <class-name>gsn.vsensor.TopologyVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
+            <param name="dozer-command-vs">ETZ_Dozer_Command</param>
+            
+            <param name="nodehealth-stream-name">data9</param>
             <param name="node-id-field">HEADER_ORIGINATORID</param>
             <param name="parent-id-field">PAYLOAD_PARENTID</param>
             <param name="timestamp-field">TIMESTAMP</param>
@@ -16,23 +19,28 @@
             <param name="uptime-field">PAYLOAD_UPTIME</param>
             <param name="valid-field">PAYLOAD_SAMPLE_VALID</param>
             
-            <param name="access-node-stream-name">data4</param>
             <param name="powerswitch-stream-name">data11</param>
             <param name="powerswitch-p1-field">PAYLOAD_PORT1ON</param>
             <param name="powerswitch-p2-field">PAYLOAD_PORT2ON</param>
+            
             <param name="rssi-stream-name">data_rssi</param>
             <param name="rssi-node-id-field">RSSI_NODEID</param>
             <param name="rssi-field">RSSI</param>
             
-            <param name="evenlogger-stream-name">data_eventlogger</param>
-            <param name="evenlogger-id-field">EVENT_ID</param>
-            <param name="evenlogger-value-field">EVENT_VALUE</param>
+            <param name="eventlogger-stream-name">data_eventlogger</param>
+            <param name="eventlogger-id-field">EVENT_ID</param>
+            <param name="eventlogger-value-field">EVENT_VALUE</param>
             
-            <param name="dozer-command-vs">ETZ_Dozer_Command</param>
+            <param name="access-node-stream-name">data4</param>
             <param name="ae-stream-name">data18</param>
-            <param name="corestation-statistics-stream-name">data25</param>
             <param name="wgps-stream-name">data26</param>
-            <param name="nodehealth-stream-name">data9</param>
+            
+            <param name="corestation-statistics-stream-name">data25</param>
+            <param name="corestation-connected-field">CONNECTED</param>
+            
+            <param name="backlogstatus-dynamic-stream-name">data27</param>
+            <param name="backlogstatus-db-entries-field">DB_ENTRIES</param>
+            
         </init-params>
         <web-input>
             <command name="dataconfiguration">
@@ -551,11 +559,11 @@
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
-            select DEVICE_ID, GENERATION_TIME
-            from etz_statistics WHERE connected = 1
+            select DEVICE_ID, GENERATION_TIME, CONNECTED
+            from etz_statistics
           </predicate>
         </address>
-        <query>select DEVICE_ID as HEADER_ORIGINATORID, GENERATION_TIME as TIMESTAMP, GENERATION_TIME from wrapper</query>
+        <query>select DEVICE_ID as HEADER_ORIGINATORID, GENERATION_TIME as TIMESTAMP, GENERATION_TIME, CONNECTED from wrapper</query>
       </source>
       <query> select * from source </query>
     </stream>
@@ -568,6 +576,18 @@
           </predicate>
         </address>
         <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data27">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select  DEVICE_ID, TIMESTAMP, GENERATION_TIME, DB_ENTRIES
+            from etz_backlog_dynamic
+          </predicate>
+        </address>
+        <query>select DEVICE_ID as HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, DB_ENTRIES from wrapper</query>
       </source>
       <query> select * from source </query>
     </stream>

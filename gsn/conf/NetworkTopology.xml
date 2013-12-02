@@ -27,6 +27,7 @@
   	   <value name="batterylevel" style="attribute" get-method="getBatteryLevel" set-method="setBatteryLevel" usage="optional"/>
   	   <value name="corestation_running" field="corestation_running" style="attribute" usage="optional"/>
   	   <value name="iscorestation" field="iscorestation" style="attribute" usage="optional"/>
+  	   <value name="db_entries" field="db_entries" style="attribute" usage="optional"/>
   	   
   	   <collection name="links" field="links" item-type="gsn.beans.Link" />
   	   
