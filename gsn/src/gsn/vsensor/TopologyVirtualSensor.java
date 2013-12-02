@@ -255,6 +255,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			}
 			// BackLogStatus Dynamic
 			else if (inputStreamName.equals(configuration[27])) {
+				if (!node.corestation_online)
+					node.corestation_online = new Boolean(true);
 				Integer dbEntries = null;
 				s = data.getData(configuration[28]);
 				if (s instanceof Integer) {
