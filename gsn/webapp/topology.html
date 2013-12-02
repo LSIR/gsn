@@ -42,7 +42,7 @@ var deviceInfoUpdateTimer;
 var deviceInfoUpdateIndex = 0;
 var unmarkTimer;
 var configitems=new Array("info","health","adcmux","adccomdiff","dcx","drift","events","rssi","statecounter","decagonmux","vaisala_wxt520","th3","enviroscan","modbus","wgps","powerswitch","powerswitch_p1","powerswitch_p2","timestamp");
-var healthitems=new Array("packet_count", "vsys", "vsdi", "current", "temperature", "humidity","flash_count","uptime","generation_time","timestamp");
+var healthitems=new Array("packet_count", "vsys", "vsdi", "current", "temperature", "humidity","db_entries","flash_count","uptime","generation_time","timestamp");
 var SIB = 1;
 var WGPS = 2;
 var POWERSWITCH = 3;
@@ -158,14 +158,14 @@ function PacketRate() {
       var id = $(this).attr("node_id");
       var index = nodeindex(id);
       if (index < 0) {
-        current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true, nodetype: $(this).attr("nodetype"), iscorestation: $(this).attr("iscorestation") == "true", corestation_running: $(this).attr("corestation_running") });
+        current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true, nodetype: $(this).attr("nodetype"), iscorestation: $(this).attr("iscorestation") == "true", corestation_online: $(this).attr("corestation_online") });
         topology_change = true;
       }
       else {
         current_deployment.sensornodes[index].timestamp = $(this).attr("timestamp");
         current_deployment.sensornodes[index].touched = true;
         current_deployment.sensornodes[index].nodetype = $(this).attr("nodetype");
-        current_deployment.sensornodes[index].corestation_running = $(this).attr("corestation_running");
+        current_deployment.sensornodes[index].corestation_online = $(this).attr("corestation_online");
       }
     });
     if (current_deployment.deploymentHasMapping) {
@@ -173,7 +173,7 @@ function PacketRate() {
         if (deviceTypeIsDozer(current_deployment.deviceIdMapping[id].type)) {
 	  var index = nodeindex(id);
 	  if (index < 0) {
-	    current_deployment.sensornodes.push({node_id : id, timestamp :  undefined, touched : true, nodetype: current_deployment.deviceIdMapping[id].type, iscorestation: deviceTypeIsCoreStation(current_deployment.deviceIdMapping[id].type), corestation_running: undefined });
+	    current_deployment.sensornodes.push({node_id : id, timestamp :  undefined, touched : true, nodetype: current_deployment.deviceIdMapping[id].type, iscorestation: deviceTypeIsCoreStation(current_deployment.deviceIdMapping[id].type), corestation_online: undefined });
 	    topology_change = true;
 	  }
 	  else
@@ -358,14 +358,15 @@ function PacketRate() {
           case 5:
           case 6:
           case 7:
+          case 8:
 	    if (current_deployment.deploymentHasMapping)
 	      $(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
             break;
-          case 10:
           case 11:
+          case 12:
             $(this).text(formatTime($(data).attr(healthitems[index-2])));
             break;
-          case 12:
+          case 13:
             break;
           default:
             $(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
@@ -932,7 +933,7 @@ function PacketRate() {
 	  google.maps.event.addListener(current_deployment.geoMarkers[pos], 'click', function() {
 	    var id = current_deployment.positionToDeviceIdMap[pos];
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] !== undefined)
-	      showNodeInfoTab(id, current_deployment.deviceIdMapping[id].type, current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].corestation_running);
+	      showNodeInfoTab(id, current_deployment.deviceIdMapping[id].type, current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].corestation_online);
 	    else
 	      showNodeInfoTab(id, current_deployment.deviceIdMapping[id].type, "?");
 	  });
@@ -1101,8 +1102,8 @@ function PacketRate() {
   	return day + "." + month + "." + d.getFullYear();
   }
   
-  function showNodeInfoTab(id, type, corestationrunning) {
-    var content = "Type: "+nodetypes[type]+ ((type==5 || type==6)?("<br>Gumstix running: "+corestationrunning):"");
+  function showNodeInfoTab(id, type, corestationonline) {
+    var content = "Type: "+nodetypes[type]+ ((type==5 || type==6)?("<br>Gumstix online: "+corestationonline):"");
     var nodeinfo = $("#topology_"+current_deployment.name+" .nodeinfo");
     if (current_deployment.deploymentHasMapping) {
       if (current_deployment.deviceIdMapping[id] !== undefined) {
@@ -1342,18 +1343,18 @@ $(document).ready(function() {
 	      }
             })
             .strokeStyle(function() {return this.fillStyle().darker()})
-            .lineWidth(function(d) { return d.corestation_running=="true"?5:1; })
+            .lineWidth(function(d) { return d.corestation_online=="true"?5:1; })
 	    .cursor(function() {return "pointer";})
 	    .title(function(d) {
 	      var content = "";
 	      if (current_deployment.deploymentHasMapping) {
 		if (current_deployment.deviceIdMapping[d.node_id] !== undefined)
-		  content = "Position: "+current_deployment.deviceIdMapping[d.node_id].position + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"") + "\nDevice Id: " + d.node_id + "\n\nInfo:\n" + current_deployment.deviceIdMapping[d.node_id].comment;
+		  content = "Position: "+current_deployment.deviceIdMapping[d.node_id].position + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix online: "+d.corestation_online):"") + "\nDevice Id: " + d.node_id + "\n\nInfo:\n" + current_deployment.deviceIdMapping[d.node_id].comment;
 		else
-		  content = "Position: NOT AVAILABLE" + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"") + "\nDevice Id: " + d.node_id;
+		  content = "Position: NOT AVAILABLE" + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix online: "+d.corestation_online):"") + "\nDevice Id: " + d.node_id;
 	      }
 	      else 
-		content = "Node ID: " + d.node_id + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix running: "+d.corestation_running):"");
+		content = "Node ID: " + d.node_id + "\n\nType: "+nodetypes[d.nodetype]+ ((d.nodetype==5 || d.nodetype==6)?("\nGumstix online: "+d.corestation_online):"");
 	      return content;
 	    })
             .event("mouseover", function(d) {
@@ -1379,7 +1380,7 @@ $(document).ready(function() {
 	      this.render();
 	    })
             .event("click", function(d) {
-	      showNodeInfoTab(d.node_id, d.nodetype, d.corestation_running);
+	      showNodeInfoTab(d.node_id, d.nodetype, d.corestation_online);
             }); /*
             .event("mousedown", pv.Behavior.drag())
             .event("drag", deployment_data[deployment_data.length-1].force);*/
@@ -1426,6 +1427,7 @@ $(document).ready(function() {
             "<th class=\"header\" style=\"width:15px\">I</th>"+
             "<th class=\"header\" style=\"width:43px\">Temp</th>"+
             "<th class=\"header\" style=\"width:39px\">Hum</th>"+
+            "<th class=\"header\">DB<br>entries</th>"+
             "<th class=\"header\">Flash<br>Count</th>"+
             "<th class=\"header\">Uptime</th>"+
             "<th class=\"header\">Generation Time</th>"+
