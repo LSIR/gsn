@@ -46,7 +46,7 @@ public class SensorNode {
 	public Double humidity;
 	public Integer flash_count;
 	public Integer uptime;
-	public Boolean corestation_running;
+	public Boolean corestation_online;
 	public Boolean iscorestation;
 	public Integer db_entries;
 	
@@ -336,7 +336,7 @@ public class SensorNode {
 		this.humidity = node.humidity;
 		this.flash_count = node.flash_count;
 		this.uptime = node.uptime;
-		this.corestation_running = node.corestation_running;
+		this.corestation_online = node.corestation_online;
 		this.iscorestation = node.iscorestation;
 		this.db_entries = node.db_entries;
 		

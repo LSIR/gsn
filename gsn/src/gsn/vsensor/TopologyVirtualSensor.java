@@ -233,9 +233,9 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				}
 				else if (event_id == EVENT_BB_POWER_ON || event_id == EVENT_BB_POWER_OFF) {
 					if (event_id == EVENT_BB_POWER_ON)
-						node.corestation_running = new Boolean(true);
+						node.corestation_online = new Boolean(true);
 					else
-						node.corestation_running = new Boolean(false);
+						node.corestation_online = new Boolean(false);
 				}
 				// do not count events to packets
 			}
@@ -249,9 +249,9 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					connected = (Byte)s;
 				}
 				if (connected == 1)
-					node.corestation_running = new Boolean(true);
+					node.corestation_online = new Boolean(true);
 				else
-					node.corestation_running = new Boolean(false);
+					node.corestation_online = new Boolean(false);
 			}
 			// BackLogStatus Dynamic
 			else if (inputStreamName.equals(configuration[27])) {

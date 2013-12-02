@@ -584,7 +584,7 @@
         <address wrapper="local">
           <predicate key="query">
             select  DEVICE_ID, TIMESTAMP, GENERATION_TIME, DB_ENTRIES
-            from etz_backlog_dynamic
+            from etz_backlogstatus_dynamic
           </predicate>
         </address>
         <query>select DEVICE_ID as HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, DB_ENTRIES from wrapper</query>
