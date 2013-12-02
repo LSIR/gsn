@@ -640,19 +640,19 @@ function PacketRate() {
     });
   }
   
-  function checkSchedule(deviceId) {
+  function checkBackLogConfig(deviceId) {
     $.ajax({
       type: "GET",
-      url: "/field?vs="+current_deployment.name+"_schedule__mapped&field=SCHEDULE&position="+current_deployment.deviceIdMapping[deviceId].position+"&timeline=generation_time",
+      url: "/field?vs="+current_deployment.name+"_backlogconfig__mapped&field=CONFIGURATION&position="+current_deployment.deviceIdMapping[deviceId].position+"&timeline=generation_time",
       dataType: "text",
       success: function(data){
 	try {
 	  var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
 	  if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined) {
 	    if ($.trim(data))
-	      current_deployment.deviceIdMapping[id].schedule = data;
+	      current_deployment.deviceIdMapping[id].configuration = data;
 	    else
-	      current_deployment.deviceIdMapping[id].schedule = "<empty schedule>";
+	      current_deployment.deviceIdMapping[id].configuration = "<empty configuration>";
 	  }
 	  deviceInfoUpdateIndex++;
 	  updateDeviceInfo();
@@ -666,9 +666,54 @@ function PacketRate() {
 	try {
 	  var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
 	  if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined)
-	    current_deployment.deviceIdMapping[id].schedule = "<no schedule available>";
+	    current_deployment.deviceIdMapping[id].configuration = "<no configuration available>";
 	  deviceInfoUpdateIndex++;
 	  updateDeviceInfo();
+	}
+	catch (err) {
+	  console.log(err);
+	  restartTimer();
+	}
+      }
+    });
+  }
+  
+  function checkSchedule(deviceId) {
+    $.ajax({
+      type: "GET",
+      url: "/field?vs="+current_deployment.name+"_schedule__mapped&field=SCHEDULE&position="+current_deployment.deviceIdMapping[deviceId].position+"&timeline=generation_time",
+      dataType: "text",
+      success: function(data){
+	try {
+	  var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
+	  if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined) {
+	    if ($.trim(data))
+	      current_deployment.deviceIdMapping[id].schedule = data;
+	    else
+	      current_deployment.deviceIdMapping[id].schedule = "<empty schedule>";
+	    checkBackLogConfig(id);
+	  }
+	  else {
+	    deviceInfoUpdateIndex++;
+	    updateDeviceInfo();
+	  }
+	}
+	catch (err) {
+	  console.log(err);
+	  restartTimer();
+	}
+      },
+      error : function(XMLHttpRequest, textStatus, errorThrown) {
+	try {
+	  var id = Object.keys(current_deployment.deviceIdMapping).sort()[deviceInfoUpdateIndex];
+	  if (id !== undefined && current_deployment.deviceIdMapping[id] !== undefined) {
+	    current_deployment.deviceIdMapping[id].schedule = "<no schedule available>";
+	    checkBackLogConfig(id);
+	  }
+	  else {
+	    deviceInfoUpdateIndex++;
+	    updateDeviceInfo();
+	  }
 	}
 	catch (err) {
 	  console.log(err);
@@ -1110,7 +1155,9 @@ function PacketRate() {
 	nodeinfo.find(".title").empty().append("Position: "+pos);
 	content += "<br>Device Id: " + id + "<br><br>Info:<br><div style=\"margin:0 5px 5px 5px\">" + current_deployment.deviceIdMapping[id].comment + "</div>";
 	if (current_deployment.deviceIdMapping[id].schedule !== undefined)
-	  content += "<br>Schedule (cron like job scheduling in UTC):<br><div style=\"background-color:#eee;max-width:942px;overflow:auto;white-space:nowrap;margin:0 5px 5px 5px;padding:2px 2px 2px 2px\">" + current_deployment.deviceIdMapping[id].schedule.replace(/(\r\n|\n|\r)/gm,"<br>") + "</div>";
+	  content += "<br>Schedule (cron like job scheduling in UTC):<br><div style=\"background-color:#eee;max-width:942px;max-height:250px;overflow:auto;white-space:nowrap;margin:0 5px 5px 5px;padding:2px 2px 2px 2px\">" + current_deployment.deviceIdMapping[id].schedule.replace(/(\r\n|\n|\r)/gm,"<br>") + "</div>";
+	if (current_deployment.deviceIdMapping[id].configuration !== undefined)
+	  content += "<br>BackLog configuration file:<br><div style=\"background-color:#eee;max-width:942px;max-height:250px;overflow:auto;white-space:nowrap;margin:0 5px 5px 5px;padding:2px 2px 2px 2px\">" + current_deployment.deviceIdMapping[id].configuration.replace(/(\r\n|\n|\r)/gm,"<br>") + "</div>";
 	if (current_deployment.deviceIdMapping[id].jpeg_timestamp !== undefined)
 	  content += "<br>Last picture ("+formatTime(current_deployment.deviceIdMapping[id].jpeg_timestamp)+"):<br><div><img style=\"margin:0 5px 5px 5px;border:solid 1px #222;\" src=\"/field?vs="+current_deployment.name+"_camera_pos"+pos+"__scaled&pk=latest&field=JPEG_SCALED&?"+current_deployment.deviceIdMapping[id].jpeg_timestamp+"\"></div>";
         if (current_deployment.deviceIdMapping[id].wgps_schedule !== undefined)
