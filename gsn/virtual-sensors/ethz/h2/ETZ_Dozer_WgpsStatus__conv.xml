@@ -59,8 +59,8 @@
                 cast(round(PAYLOAD_TN_PER_CURRENT * (1.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as TN_PER_CURRENT,
                 PAYLOAD_SAM7_POWER as SAM7_POWER,
                 PAYLOAD_SAM7_VALID as SAM7_VALID,
-                cast(round((PAYLOAD_INCLINOMETER_X / 32768.0) * 90.0, 3) as CHAR(30)) as INCLINOMETER_X,
-                cast(round((PAYLOAD_INCLINOMETER_Y / 32768.0) * 90.0 , 3) as CHAR(30)) as INCLINOMETER_Y,
+                cast(round(ASIN(PAYLOAD_INCLINOMETER_X / 32000.0) * 180.0/PI(), 3) as CHAR(30)) as INCLINOMETER_X,
+                cast(round(ASIN(PAYLOAD_INCLINOMETER_Y / 32000.0) * 180.0/PI(), 3) as CHAR(30)) as INCLINOMETER_Y,
                 PAYLOAD_SAM7_UNIXTIME*1000 as SAM7_UNIXTIME, PAYLOAD_GPS_SV_QUEUE as GPS_SV_QUEUE from wrapper </query>
             </source>
             <query> select * from source </query>
