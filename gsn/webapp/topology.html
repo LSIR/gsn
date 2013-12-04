@@ -1236,14 +1236,16 @@ $(document).ready(function() {
 	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
 	            "<div style=\"position:absolute;z-index:100;margin-top:60px;text-align:left;background-color:#ddd;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
 	            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
-	            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div id=\"geo_graph_"+deployments[i]+"\" style=\"display:none; width:100%; height:500px\"></div><div id=\"mapping_graph_"+deployments[i]+"\" style=\"display:none\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
-	            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"geotab\" href=\"\">Map</a></li><li><a class =\"posmappingtab\" href=\"\">Position Mapping</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
+	            "<div id=\"topology_graph_"+deployments[i]+"\"></div>"+
+	            "<ul class=\"tabnav\" style=\"padding-bottom:0px;margin-top:10px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"geotab\" href=\"\">Map</a></li><li><a class =\"posmappingtab\" href=\"\">Position Mapping</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul>"+
+	            "<div class=\"healthtable\"></div><div id=\"geo_graph_"+deployments[i]+"\" style=\"display:none; width:100%; height:500px\"></div><div id=\"mapping_graph_"+deployments[i]+"\" style=\"display:none\"></div><div class=\"configtable\" style=\"display:none\"></div></div>");
         else
 	        $("#topologycontainer").append("<div style=\"position:relative\" id=\"topology_"+deployments[i]+"\"><div style=\"position:absolute;text-align:left\" class=\"statusbar\"></div>"+
-		            "<div style=\"position:absolute;z-index:100;margin-top:60px;text-align:left;background-color:#ddd;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
-		            "<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
-		            "<div id=\"topology_graph_"+deployments[i]+"\"></div><div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div>"+
-		            "<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul></div>");
+				"<div style=\"position:absolute;z-index:100;margin-top:60px;text-align:left;background-color:#ddd;border:solid 1px #222;display:none\" class=\"nodeinfo\">"+
+				"<div style=\"height:19px;background-color:#aaa\"><span style=\"font-weight:bold\" class=\"title\"></span><img style=\"float:right;margin-right:2px;\" src=\"img/button_cancel.png\"/></div><div style=\"font-color:#000\" class=\"infocontainer\"></div></div>"+
+				"<div id=\"topology_graph_"+deployments[i]+"\"></div>"+
+				"<ul class=\"tabnav\" style=\"padding-top:0px\"><li><a class =\"active healthtab\" href=\"\">Health</a></li><li><a class =\"configtab\" href=\"\">Configuration</a></li></ul>"+
+				"<div class=\"healthtable\"></div><div class=\"configtable\" style=\"display:none\"></div></div>");
         //$("#topology_"+deployments[i]+" .nodeinfo").show();
         $("#topology_"+deployments[i]+" .nodeinfo img").bind("click", function() { $(this).parent().parent().hide();});
         if (deployments[i]!=visible)

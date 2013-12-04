@@ -922,6 +922,10 @@ div.full-page {
     padding: 4px;
 }
 
+#gridContainer {
+    padding-top: 10px;
+}
+
 #gridContainer table th {
     background-color: #b8caf7;
 }
@@ -1114,8 +1118,8 @@ ul.subnav li{
 }
 
 #topologycontainer .tabnav a:link, #topologycontainer .tabnav a:visited {
-    border-top:0px;
-    border-bottom:1px solid #b8caf7;
+    border-bottom:0px;
+    border-top:1px solid #b8caf7;
 }
 
 #topologycontainer table input {
@@ -1128,7 +1132,6 @@ ul.subnav li{
 }
 
 #topologycontainer .mapping_graph_ {
-	margin: 10px 0 0;
 	border:1px #CBCBCB;
 	border:1px solid #CBCBCB;
 }
@@ -1139,7 +1142,6 @@ ul.subnav li{
 }
 
 *[id*='mapping_graph_'] {
-	margin: 10px 0 0;
 	border:1px solid #CBCBCB;
 }
 
@@ -1149,7 +1151,6 @@ ul.subnav li{
 }
 
 *[id*='geo_graph_'] {
-	margin: 10px 0 0;
 	border:1px solid #CBCBCB;
 }
 
