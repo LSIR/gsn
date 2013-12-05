@@ -247,7 +247,6 @@ class BackLogMainClass(Thread, Statistics):
         self.jobsobserver.start()
         if self._tospeer and not self._tospeer.isAlive():
             self._tospeer.start()
-        self.schedulehandler.start()
         self.confighandler.start()
         if self.powerMonitor:
             self.powerMonitor.start()
@@ -260,6 +259,8 @@ class BackLogMainClass(Thread, Statistics):
             except Exception, e:
                 self.incrementExceptionCounter()
                 self._logger.exception(e)
+                
+        self.schedulehandler.start()
             
         self._stopEvent.wait()
         
