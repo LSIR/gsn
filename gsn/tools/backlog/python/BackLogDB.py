@@ -222,6 +222,10 @@ class BackLogDBClass(Thread, Statistics):
             self.exception(e)
             
             
+    def getDBNumberOfEntries(self):
+        return self.getCounterValue(self._dbNumberOfEntriesId)
+            
+            
     def getStatus(self, intervalSec):
         '''
         Returns the status of the backlog database as list:
@@ -239,7 +243,7 @@ class BackLogDBClass(Thread, Statistics):
                                                  average remove time, 
                                                  maximum remove time]
         '''
-        stat = [self.getCounterValue(self._dbNumberOfEntriesId), \
+        stat = [self.getDBNumberOfEntries(), \
                 int(os.path.getsize(self._dbname)/1024), \
                 self.getCounterValue(self._storeCounterId), \
                 self.getCounterValue(self._removeCounterId), \

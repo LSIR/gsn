@@ -229,6 +229,10 @@ class GSNPeerClass(Thread, Statistics):
         self._pingtimer.pause()
         
         
+    def wlanTurnedOff(self):
+        self._gsnlistener.disconnect()
+        
+        
     def watchdogdisconnect(self):
         self._gsnlistener.disconnect()
         

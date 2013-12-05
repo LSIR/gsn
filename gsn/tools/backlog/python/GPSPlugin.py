@@ -18,7 +18,7 @@ stdlib imports
 import struct
 from time import gmtime, time, strftime
 from threading import Event, Thread
-from SpecialAPI import PowerControl, Statistics
+from SpecialAPI import Statistics
 import os.path
 import serial
 import logging
@@ -74,23 +74,6 @@ class GPSPluginClass(AbstractPluginClass):
         # GPS configuration file as produced by u-center
         self._config_file = str(self.getOptionValue('gps_config_file'))
         self.info('using GPS configuration file: %s' % (self._config_file,))
-        
-        self._WlanThread = None
-        if int(self.getOptionValue('dc_wlan')) == 1:
-            self.info("WLAN duty-cycle enabled!")
-            wlan_ontime = int(self.getOptionValue('wlan_on_time'))
-            self.info('wlan on-time: %d minutes' % (wlan_ontime,))
-            wlan_offtime = int(self.getOptionValue('wlan_off_time'))
-            self.info('wlan off-time: %d minutes' % (wlan_offtime,))
-            if int(self.getOptionValue('stay_online_for_db_resend')) == 1:
-                stay_online = True
-                self.info('wlan will not be turned off while db is resending')
-            else:
-                stay_online = False
-                self.info('wlan can be turned off while db is resending')
-            self._WlanThread = WlanThread(self,wlan_ontime, wlan_offtime,stay_online)
-        else:
-            self.info("WLAN duty-cycle disabled!")
 
         self._cnt_file = str(self.getOptionValue('cnt_file'))
         self.info('using GPS sample count file: %s' % (self._cnt_file,))
@@ -137,9 +120,6 @@ class GPSPluginClass(AbstractPluginClass):
         self.name = 'GPSPlugin-Thread'
         self.info('started')
 
-        if (self._WlanThread is not None and not self._WlanThread.isAlive()):
-            self._WlanThread.start()
-
         while not self._stopped:
             if (self.gps is not None and self.gps.isInitialized()):
                 self.debug('Reading raw at %s' %(strftime("%H:%M:%S +0000", gmtime())))
@@ -185,8 +165,6 @@ class GPSPluginClass(AbstractPluginClass):
             self.gps.stop()
         except Exception as e:
             self.debug("GPSDriver already stopped\n" + str(e))
-        if (self._WlanThread is not None):
-            self._WlanThread.stop()
         self._busy = False
         self._stopped = True
         self.info('GPSPlugin stopped')
@@ -561,69 +539,3 @@ class GPSDriver():
         fp.close()
         self._logger.info("GPS receiver successfully configured!")
         return True
-
-#############################################################
-# Class WlanThread
-#############################################################
-class WlanThread(Thread):
-
-    #*********************************************************
-    # init()
-    #*********************************************************
-    def __init__(self,parent,uptime=10,downtime=40,stay_online=True):
-        Thread.__init__(self, name='Wlan-Thread')
-        self._logger = logging.getLogger(self.__class__.__name__)
-        self._uptime=uptime*60
-        self._downtime=downtime*60
-        self._parent = parent
-        self._work = Event()
-        self._stopped = False
-        self._stay_online = stay_online
-
-
-    #*********************************************************
-    # run()
-    #*********************************************************
-    def run(self):
-        self._logger.info('started')
-
-        try:
-            while not self._stopped:
-                self._logger.info('Waiting for %d secs before cycling WLAN' % (self._uptime,))
-                self._work.wait(self._uptime-30)
-                if not self._stopped and self._parent.getPowerControlObject().getWlanStatus(): #is WLAN on?
-
-                    start = time()
-                    while not self._stopped and self._stay_online and self._parent.isResendingDB():
-                        self._logger.debug('We are flushing DB... NOT power cycling WLAN!')
-                        self._logger.debug('Waiting for 10 sec')
-                        self._work.wait(10)
-
-                    if not self._stopped:
-                        duration = time() - start
-                        if self._downtime - duration > 0:
-                            self._logger.info('Will cut Wlan connection in 30 seconds for ' + str(self._downtime) + ' seconds!')
-                            self._work.wait(30)
-                            self._logger.info("Cutting power to WLAN Now!!")
-                            self._parent.getPowerControlObject().wlanOff()
-                            self._logger.debug('Waiting for %d secs' % (self._downtime-duration,))
-                            self._work.wait(self._downtime - duration)
-                #If WLAN is off, turn it on
-                if not self._stopped and not self._parent.getPowerControlObject().getWlanStatus():
-                    self._logger.info("We are not online, so turn on wlan")
-                    self._parent.getPowerControlObject().wlanOn()
-        except Exception, e:
-            self._parent.exception(e)
-
-        if not self._parent._backlogMain.shutdown:
-            self._parent.getPowerControlObject().wlanOn()
-        self._logger.info('died')
-
-    #*********************************************************
-    # stop()
-    #*********************************************************
-    def stop(self):
-        self._logger.info('stopping...')
-        self._stopped = True
-        self._work.set()
-        self._logger.info('stopped')

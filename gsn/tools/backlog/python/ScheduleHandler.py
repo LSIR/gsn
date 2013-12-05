@@ -55,6 +55,9 @@ WATCHDOG_TIMEOUT_SEC = 300
 # Schedule file format
 SCHEDULE_TYPE_PLUGIN = 'plugin'
 SCHEDULE_TYPE_SCRIPT = 'script'
+SCHEDULE_TYPE_WLAN = 'wlan'
+SCHEDULE_WLAN_ON = 'on'
+SCHEDULE_WLAN_OFF = 'off'
 BACKWARD_TOLERANCE_NAME = 'backward_tolerance_minutes'
 MAX_RUNTIME_NAME = 'max_runtime_minutes'
 MIN_RUNTIME_NAME = 'min_runtime_minutes'
@@ -106,7 +109,7 @@ class ScheduleHandlerClass(Thread, Statistics):
     _pingThread
     _config
     _beacon
-    _servicewindow
+    _isservicewindow
     _logger
     _scheduleHandlerStop
     _tosMessageLock
@@ -130,9 +133,6 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._logger.info('max_gsn_get_schedule_wait_minutes: %s' % (self._getOptionValue('max_gsn_get_schedule_wait_minutes', self._config),))
         
         if dutycyclemode:
-            self._logger.info('service_wakeup_schedule: %s' % (self._getOptionValue('service_wakeup_schedule', self._config),))
-            self._logger.info('service_wakeup_minutes: %s' % (self._getOptionValue('service_wakeup_minutes', self._config),))
-            
             self._service_wakeup_disabled = False
             service_wakeup_disable = self._getOptionValue('service_wakeup_disable', self._config)
             if service_wakeup_disable == None or int(service_wakeup_disable) == 0:
@@ -177,7 +177,7 @@ class ScheduleHandlerClass(Thread, Statistics):
         self._newSchedule = False
         self._scheduleHandlerStop = False
         self._beacon = False
-        self._servicewindow = False
+        self._isservicewindow = False
         
         self._pluginScheduleCounterId = self.createCounter()
         self._scriptScheduleCounterId = self.createCounter()
@@ -213,22 +213,6 @@ class ScheduleHandlerClass(Thread, Statistics):
             raise TypeError('max_gsn_get_schedule_wait_minutes has to be a positive integer')
         
         if dutycyclemode:
-            service_wakeup_schedule = ScheduleHandlerClass._getOptionValue('service_wakeup_schedule', config)
-            if service_wakeup_schedule is None:
-                raise TypeError('service_wakeup_schedule not specified in config file')
-            try:
-                hour, minute = service_wakeup_schedule.split(':')
-                hour = int(hour)
-                minute = int(minute)
-            except:
-                raise TypeError('service_wakeup_schedule is not in the format HOUR:MINUTE')
-            
-            service_wakeup_minutes = ScheduleHandlerClass._getOptionValue('service_wakeup_minutes', config)
-            if service_wakeup_minutes is None:
-                raise TypeError('service_wakeup_minutes not specified in config file')
-            elif not service_wakeup_minutes.isdigit() or int(service_wakeup_minutes) < 0:
-                raise TypeError('service_wakeup_minutes has to be a positive integer')
-            
             service_wakeup_disable = ScheduleHandlerClass._getOptionValue('service_wakeup_disable', config)
             if service_wakeup_disable is not None and int(service_wakeup_disable) != 0 and int(service_wakeup_disable) != 1:
                 raise TypeError('service_wakeup_disable has to be set to 1 or 0 in config file')
@@ -310,7 +294,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                     for e in error:
                         self.error('error while parsing the schedule file: %s' % (e,))
                 if nextschedule:
-                    nextdt, pluginclassname, commandstring, runtimemax, runtimemin = nextschedule[0]
+                    nextdt, scheduletype, pluginclassname, commandstring, runtimemax, runtimemin = nextschedule[0]
                     self._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
                     
             if self._schedule:
@@ -350,15 +334,15 @@ class ScheduleHandlerClass(Thread, Statistics):
                         self._newScheduleEvent.wait()
                         continue
                 
-                for nextdt, pluginclassname, commandstring, runtimemax, runtimemin in nextschedules:
+                for nextdt, scheduletype, pluginclassname, commandstring, runtimemax, runtimemin in nextschedules:
                     if self._logger.isEnabledFor(logging.DEBUG):
-                        self._logger.debug('(%s,%s,%s,%s,%s)' % (nextdt, pluginclassname, commandstring, runtimemax, runtimemin))
+                        self._logger.debug('(%s,%s,%s,%s,%s,%s)' % (nextdt, scheduletype, pluginclassname, commandstring, runtimemax, runtimemin))
                     dtnow = datetime.utcnow()
                     timediff = nextdt - dtnow
                     
                     
                     if self._duty_cycle_mode and not self._beacon:
-                        if self._service_wakeup_disabled and not self._servicewindow:
+                        if self._service_wakeup_disabled and not self._isservicewindow:
                             service_time = timedelta()
                         else:
                             service_time = self._serviceTime()
@@ -374,18 +358,20 @@ class ScheduleHandlerClass(Thread, Statistics):
                             self._shutdownThread.start()
                         
                     if nextdt > dtnow:
-                        if pluginclassname:
+                        if scheduletype == SCHEDULE_TYPE_PLUGIN:
                             if self._duty_cycle_mode:
                                 self._logger.info('executing >%s.action("%s")< in %f seconds if not shutdown before' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                             else:
                                 if self._logger.isEnabledFor(logging.DEBUG):
                                     self._logger.debug('executing >%s.action("%s")< in %f seconds' % (pluginclassname, commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
-                        else:
+                        elif scheduletype == SCHEDULE_TYPE_SCRIPT:
                             if self._duty_cycle_mode:
                                 self._logger.info('executing >%s< in %f seconds if not shutdown before' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                             else:
                                 if self._logger.isEnabledFor(logging.DEBUG):
                                     self._logger.debug('executing >%s< in %f seconds' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
+                        elif scheduletype == SCHEDULE_TYPE_WLAN:
+                            self._logger.info('turning wlan %s in %f seconds if not shutdown before' % (commandstring, timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0))
                         self._waitForNextJob.wait(timediff.seconds + timediff.days * 86400 + timediff.microseconds/1000000.0)
                         if self._waitForNextJob.isSet():
                             self._waitForNextJob.clear()
@@ -394,7 +380,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                                 self._newSchedule = False
                             break
                     
-                    if pluginclassname:
+                    if scheduletype == SCHEDULE_TYPE_PLUGIN:
                         if self._duty_cycle_mode:
                             self._logger.info('executing >%s.action("%s")< now' % (pluginclassname, commandstring))
                         else:
@@ -406,7 +392,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                             self.error('error in scheduled plugin >%s %s<: %s' % (pluginclassname, commandstring, e))
                         else:
                             self.counterAction(self._pluginScheduleCounterId)
-                    else:
+                    elif scheduletype == SCHEDULE_TYPE_SCRIPT:
                         if self._duty_cycle_mode:
                             self._logger.info('executing >%s< now' % (commandstring,))
                         else:
@@ -419,6 +405,14 @@ class ScheduleHandlerClass(Thread, Statistics):
                         else:
                             self._backlogMain.jobsobserver.observeJob(job, commandstring, False, runtimemax)
                             self.counterAction(self._scriptScheduleCounterId)
+                    elif scheduletype == SCHEDULE_TYPE_WLAN:
+                        try:
+                            if commandstring == SCHEDULE_WLAN_ON:
+                                self._backlogMain.powerControl.wlanOn()
+                            elif commandstring == SCHEDULE_WLAN_OFF:
+                                self._backlogMain.powerControl.wlanOff()
+                        except Exception, e:
+                            self.error('error in turning %s wlan: %s' % (commandstring, e))
                 
             if self._duty_cycle_mode:
                 self._pingThread.join()
@@ -515,7 +509,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                     s += 'POWER_ON '
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE) == TOSTypes.CONTROL_WAKEUP_TYPE_SERVICE:
                     s += 'SERVICE '
-                    self._servicewindow = True
+                    self._isservicewindow = True
                 if (node_state & TOSTypes.CONTROL_WAKEUP_TYPE_BEACON) == TOSTypes.CONTROL_WAKEUP_TYPE_BEACON:
                     self._beacon = True
                     if self._shutdownThread:
@@ -746,23 +740,11 @@ class ScheduleHandlerClass(Thread, Statistics):
         
     def _serviceTime(self):
         now = datetime.utcnow()
-        start, end = self._getNextServiceWindowRange()
+        start, end = self._backlogMain.getNextServiceWindowRange()
         if start < (now + self._max_next_schedule_wait_delta):
             return end - now
         else:
             return timedelta()
-    
-    
-    def _getNextServiceWindowRange(self):
-        wakeup_minutes = timedelta(minutes=int(self._getOptionValue('service_wakeup_minutes', self._config)))
-        hour, minute = self._getOptionValue('service_wakeup_schedule', self._config).split(':')
-        now = datetime.utcnow()
-        service_time = datetime(now.year, now.month, now.day, int(hour), int(minute))
-        if (service_time + wakeup_minutes) < now:
-            twentyfourhours = timedelta(hours=24)
-            return (service_time + twentyfourhours, service_time + twentyfourhours + wakeup_minutes)
-        else:
-            return (service_time, service_time + wakeup_minutes)
         
         
     def _scheduleNextDutyWakeup(self, time_delta, schedule_name):
@@ -776,26 +758,30 @@ class ScheduleHandlerClass(Thread, Statistics):
 
 class ShutdownThread(Thread):
     
-    def __init__(self, parent, sleepdelta=timedelta()):
+    def __init__(self, parent):
         Thread.__init__(self, name='%s-Thread' % (self.__class__.__name__,))
         self._logger = logging.getLogger(self.__class__.__name__)
         self._scheduleHandler = parent
-        self._sleepdelta = sleepdelta
         self._stopShutdown = Event()
         self._shutdownThreadStop = False
         
         
-    def run(self):
-        self._logger.info('starting shutdown thread')
+    def _checkAndWaitServiceWindow(self):
         now = datetime.utcnow()
-        if now + self._sleepdelta > now:
-            waitfor = self._sleepdelta.seconds + self._sleepdelta.days * 86400 + self._sleepdelta.microseconds/1000000.0
+        sleepdelta = self._scheduleHandler._serviceTime()
+        if now + sleepdelta > now:
+            waitfor = sleepdelta.seconds + sleepdelta.days * 86400 + sleepdelta.microseconds/1000000.0
             self._logger.info('waiting %f minutes for service window to finish' % (waitfor/60.0,))
             self._stopShutdown.wait(waitfor)
             if self._shutdownThreadStop:
                 return
             else:
                 self._logger.info('service window finished')
+        
+        
+    def run(self):
+        self._logger.info('starting shutdown thread')
+        self._checkAndWaitServiceWindow()
         
         # wait for jobs to finish
         maxruntime = self._scheduleHandler._backlogMain.jobsobserver.getOverallJobsMaxRuntimeSec()
@@ -810,10 +796,14 @@ class ShutdownThread(Thread):
                 return
             if not self._scheduleHandler._allJobsFinished.isSet():
                 self.error('not all jobs have been killed (should not happen)')
+            self._checkAndWaitServiceWindow()
                 
         if not self._scheduleHandler._waitForGSNFinished.isSet():
             self._logger.info('waiting for GSN')
             self._scheduleHandler._waitForGSNFinished.wait()
+            if self._shutdownThreadStop:
+                return
+            self._checkAndWaitServiceWindow()
                 
         # wait for backlog to finish resend data
         max_wait = int(self._scheduleHandler._getOptionValue('max_db_resend_runtime', self._scheduleHandler._config))*60.0
@@ -826,6 +816,7 @@ class ShutdownThread(Thread):
                 self._logger.warning('backlog database is not finish with resending')
             else:
                 self._logger.warning('backlog database finished resending')
+            self._checkAndWaitServiceWindow()
                 
         if self._scheduleHandler._schedule:
             dtnow = datetime.utcnow()
@@ -835,7 +826,7 @@ class ShutdownThread(Thread):
                 return
 
         # Synchronize Service Wakeup Time
-        time_delta = self._scheduleHandler._getNextServiceWindowRange()[0] - datetime.utcnow()
+        time_delta = self._scheduleHandler._backlogMain.getNextServiceWindowRange()[0] - datetime.utcnow()
         time_to_service = time_delta.seconds + time_delta.days * 86400 - int(self._scheduleHandler._getOptionValue('approximate_startup_seconds', self._scheduleHandler._config))
         if time_to_service < 0-int(self._scheduleHandler._getOptionValue('approximate_startup_seconds', self._scheduleHandler._config)):
             time_to_service += 86400
@@ -861,7 +852,7 @@ class ShutdownThread(Thread):
             for e in error:
                 self.error('error while parsing the schedule file: %s' % (e,))
             if nextschedule:
-                nextdt, pluginclassname, commandstring, runtimemax, runtimemin = nextschedule[0]
+                nextdt, scheduletype, pluginclassname, commandstring, runtimemax, runtimemin = nextschedule[0]
                 self._logger.info('schedule next duty wake-up')
                 self._scheduleHandler._scheduleNextDutyWakeup(nextdt - datetime.utcnow(), '%s %s' % (pluginclassname, commandstring))
             if self._shutdownThreadStop:
@@ -972,22 +963,27 @@ class ScheduleCron(CronTab):
                 error.append(e)
             
             splited = commandstring.split(None, 1)
-            type = splited[0]
+            type = splited[0].lower()
             try:
                 commandstring = splited[1]
             except IndexError:
-                error.append('PLUGIN or SCRIPT definition is missing in the current schedule >%s<' % (schedule,))
+                error.append('PLUGIN, SCRIPT or WLAN definition is missing in the current schedule >%s<' % (schedule,))
                 continue
             pluginclassname = ''
-            if type.lower() == SCHEDULE_TYPE_PLUGIN:
+            if type == SCHEDULE_TYPE_PLUGIN:
                 splited = commandstring.split(None, 1)
                 pluginclassname = splited[0]
                 try:
                     commandstring = splited[1]
                 except IndexError:
                     commandstring = ''
-            elif type.lower() != SCHEDULE_TYPE_SCRIPT:
-                error.append('PLUGIN or SCRIPT definition is missing in the current schedule >%s<' % (schedule,))
+            elif type == SCHEDULE_TYPE_WLAN:
+                commandstring = commandstring.lower()
+                if commandstring != SCHEDULE_WLAN_ON and commandstring != SCHEDULE_WLAN_OFF:
+                    error.append('WLAN parameter has to be ON or OFF which is not the case in the current schedule >%s<' % (schedule,))
+                    continue
+            elif type != SCHEDULE_TYPE_SCRIPT:
+                error.append('PLUGIN, SCRIPT or WLAN definition is missing in the current schedule >%s<' % (schedule,))
                 continue
             
             if look_backward and backwardmin:
@@ -999,14 +995,14 @@ class ScheduleCron(CronTab):
                         runtimemax = runtimemax - (d.seconds / 60 + d.days * 1440)
                         if runtimemin is not None and runtimemax < runtimemin:
                             runtimemax = runtimemin+1
-                    backward_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
+                    backward_schedules.append((nextdt, type, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
                 
             nextdt = self._getNextSchedule(date_time, schedule)
             if not future_schedules or nextdt < future_schedules[0][0]:
                 future_schedules = []
-                future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
+                future_schedules.append((nextdt, type, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
             elif nextdt == future_schedules[0][0]:
-                future_schedules.append((nextdt, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
+                future_schedules.append((nextdt, type, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
             
         return ((backward_schedules + future_schedules), error)
 
@@ -1126,7 +1122,7 @@ class ScheduleCron(CronTab):
         try:
             commandstring = splited[1].strip()
         except IndexError:
-            raise ValueError('PLUGIN or SCRIPT definition is missing in the current schedule >%s<' % (schedule,))
+            raise ValueError('PLUGIN, SCRIPT or WLAN definition is missing in the current schedule >%s<' % (schedule,))
         
         pluginclassname = ''
         if type.lower() == SCHEDULE_TYPE_PLUGIN:
@@ -1137,8 +1133,14 @@ class ScheduleCron(CronTab):
         elif type.lower() == SCHEDULE_TYPE_SCRIPT:
             ret[0] = SCHEDULE_TYPE_SCRIPT
             ret[1] = commandstring
+        elif type.lower() == SCHEDULE_TYPE_WLAN:
+            ret[0] = SCHEDULE_TYPE_WLAN
+            commandstring = commandstring.lower()
+            if commandstring != SCHEDULE_WLAN_ON and commandstring != SCHEDULE_WLAN_OFF:
+                raise ValueError('WLAN parameter has to be ON or OFF which is not the case in the current schedule >%s<' % (schedule,))
+            ret[1] = commandstring
         else:
-            raise ValueError('PLUGIN or SCRIPT definition is missing in the current schedule >%s<' % (schedule,))
+            raise ValueError('PLUGIN, SCRIPT or WLAN definition is missing in the current schedule >%s<' % (schedule,))
         ret[2] = schedule.render().encode('utf8')
         
         return ret

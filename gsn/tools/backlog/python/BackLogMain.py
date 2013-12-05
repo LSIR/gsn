@@ -18,9 +18,11 @@ import time
 import logging
 import logging.config
 import thread
+from datetime import datetime, timedelta
 from threading import Thread, Lock, Event
 
-from SpecialAPI import Statistics, PowerControl
+from SpecialAPI import Statistics
+from PowerControl import PowerControlClass
 from ConfigurationHandler import ConfigurationHandlerClass
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
@@ -85,6 +87,7 @@ class BackLogMainClass(Thread, Statistics):
         
         @param options: options from the OptionParser
         '''
+        self.powerControl = None
         Thread.__init__(self, name='BackLogMain-Thread')
         Statistics.__init__(self)
         
@@ -128,6 +131,9 @@ class BackLogMainClass(Thread, Statistics):
         os.chdir(os.path.dirname(self.confighandler.getParsedConfig()['backlog_db']))
                 
         self._logger.info('backlog_db_resend_hr: %s' % (self.confighandler.getParsedConfig()['backlog_db_resend_hr'],))
+        self._logger.info('service_wakeup_schedule: %s' % (self.confighandler.getParsedConfig()['service_wakeup_schedule'],))
+        self._logger.info('service_wakeup_minutes: %s' % (self.confighandler.getParsedConfig()['service_wakeup_minutes'],))
+        self._serviceWindow = {'wakeup_minutes': timedelta(minutes=self.confighandler.getParsedConfig()['service_wakeup_minutes']), 'hour': int(self.confighandler.getParsedConfig()['service_wakeup_schedule'].split(':')[0]), 'minute': int(self.confighandler.getParsedConfig()['service_wakeup_schedule'].split(':')[1])}
         
         self.duty_cycle_mode = self.confighandler.getParsedConfig()['duty_cycle_mode']
         if self.duty_cycle_mode:
@@ -150,6 +156,10 @@ class BackLogMainClass(Thread, Statistics):
             else:
                 self._logger.warning('BackLog is running on a unknown platform')
         
+        dutycyclewhileresending = self.confighandler.getParsedConfig()['wlan_duty_cycle_while_resending']
+        if dutycyclewhileresending:
+            self._logger.info('wlan can be duty-cycled while messages are resent from DB')
+        
         # check for proper shutdown
         self._last_clean_shutdown = None
         if os.path.exists(self.confighandler.getParsedConfig()['shutdown_check_file']):
@@ -169,6 +179,8 @@ class BackLogMainClass(Thread, Statistics):
         self._tosPeerLock = Lock()
         self._tosListeners = {}
         
+        self.powerControl = PowerControlClass(self, self.confighandler.getParsedConfig()['wlan_port'], dutycyclewhileresending, platform)
+        self._logger.info('loaded PowerControl class')
         self.gsnpeer = GSNPeerClass(self, self.device_id, self.confighandler.getParsedConfig()['gsn_port'])
         self._logger.info('loaded GSNPeerClass')
         self.backlog = BackLogDBClass(self, self.confighandler.getParsedConfig()['backlog_db'], self.confighandler.getParsedConfig()['backlog_db_resend_hr'])
@@ -176,9 +188,6 @@ class BackLogMainClass(Thread, Statistics):
             
         self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, self.confighandler.getParsedConfig()['config_schedule'])
         self._msgtypetoplugin.update({self.schedulehandler.getMsgType(): [self.schedulehandler]})
-        
-        self.powerControl = PowerControl(self, self.confighandler.getParsedConfig()['wlan_port'], platform)
-        self._logger.info('loaded PowerControl class')
         
         self.powerMonitor = None
         try:
@@ -232,6 +241,7 @@ class BackLogMainClass(Thread, Statistics):
         @param plugins: all plugins tuple as specified in the plugin configuration file under the [plugins] section
         '''
 
+        self.powerControl.start()
         self.backlog.start()
         self.gsnpeer.start()
         self.jobsobserver.start()
@@ -272,6 +282,8 @@ class BackLogMainClass(Thread, Statistics):
         self._logger.info('BackLogDBClass joined')
         self.gsnpeer.join()
         self._logger.info('GSNPeerClass joined')
+        self.powerControl.join()
+        self._logger.info('PowerControlClass joined')
         
         self._logger.info('died')
 
@@ -284,13 +296,6 @@ class BackLogMainClass(Thread, Statistics):
         except Exception, e:
             self.incrementExceptionCounter()
             self._logger.exception(e)
-            
-        if self.powerControl:
-            try:
-                self.powerControl.stop()
-            except Exception, e:
-                self.incrementExceptionCounter()
-                self._logger.exception(e)
         
         if self.powerMonitor:
             try:
@@ -335,6 +340,12 @@ class BackLogMainClass(Thread, Statistics):
             
         try:
             self.gsnpeer.stop()
+        except Exception, e:
+            self.incrementExceptionCounter()
+            self._logger.exception(e)
+        
+        try:
+            self.powerControl.stop()
         except Exception, e:
             self.incrementExceptionCounter()
             self._logger.exception(e)
@@ -602,7 +613,17 @@ class BackLogMainClass(Thread, Statistics):
             self._logger.exception(e)
     
     
-    def wlanNeeded(self):
+    def getNextServiceWindowRange(self):
+        now = datetime.utcnow()
+        service_time = datetime(now.year, now.month, now.day, self._serviceWindow['hour'], self._serviceWindow['minute'])
+        if (service_time + self._serviceWindow['wakeup_minutes']) < now:
+            twentyfourhours = timedelta(hours=24)
+            return (service_time + twentyfourhours, service_time + twentyfourhours + self._serviceWindow['wakeup_minutes'])
+        else:
+            return (service_time, service_time + self._serviceWindow['wakeup_minutes'])
+    
+    
+    def wlanNeededByPlugins(self):
         # check if one of the plugins still needs the wlan
         for plugin_name, plugin in self.plugins.items():
             try:
@@ -775,9 +796,14 @@ def main():
         fd.write(str(long(time.time()*1000)))
         fd.close()
     
-    if backlog and  backlog.shutdown:
-        print 'shutdown now'
-        subprocess.Popen(['shutdown', '-h', 'now'])
+    if backlog:
+        if backlog.shutdown:
+            print 'shutdown now'
+            subprocess.Popen(['shutdown', '-h', 'now'])
+        elif backlog.powerControl and not backlog.powerControl.getWlanStatus():
+            print 'turn wlan on'
+            backlog.powerControl.wlanOn()
+            
 
 
 if __name__ == '__main__':

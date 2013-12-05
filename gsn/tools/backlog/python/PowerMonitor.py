@@ -16,7 +16,6 @@ import itertools
 import logging
 import logging.config
 from threading import Thread, Lock, Event, Timer
-from SpecialAPI import PowerControl
 
 #############
 # CONSTANTS #

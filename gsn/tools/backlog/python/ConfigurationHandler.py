@@ -25,9 +25,13 @@ from BackLogMessage import CONFIG_MESSAGE_TYPE
 ############################################
 # Some Constants
 
+MINIMUM_SERVICE_WAKEUP_MINUTES = 10
+
 MESSAGE_PRIORITY = 5
 
 DEFAULT_CONFIG_HASH_FILE = '/media/card/backlog/.backlog_config_hash'
+DEFAULT_WLAN_DUTY_CYCLE_WHILE_RESENDING = False
+
 ############################################
 
 
@@ -163,12 +167,16 @@ class ConfigurationHandlerClass():
         folder_to_check_size = None
         folder_min_free_mb = None
         wlanport = None
+        servicewakeupschedule = None
+        servicewakeupminutes = None
+        wlandutycyclewhileresending = None
         platformVersion = None
 
         try:
             # readout options from config
             for name, value in config.items('options'):
-                if value.strip() != '':
+                value = value.strip()
+                if value != '':
                     if name == 'gsn_port':
                         gsn_port = int(value)
                     elif name == 'device_id':
@@ -189,6 +197,12 @@ class ConfigurationHandlerClass():
                         folder_min_free_mb = int(value)
                     elif name == 'wlan_port':
                         wlanport = int(value)
+                    elif name == 'service_wakeup_schedule':
+                        servicewakeupschedule = value
+                    elif name == 'service_wakeup_minutes':
+                        servicewakeupminutes = int(value)
+                    elif name == 'wlan_duty_cycle_while_resending':
+                        wlandutycyclewhileresending = value
                     elif name == 'shutdown_check_file':
                         shutdownCheckFile = value
                     elif name == 'config_hash_file':
@@ -261,6 +275,34 @@ class ConfigurationHandlerClass():
                 raise TypeError('wlan_port has to be set to 1, 2 or 3 in config file')
         else:
             ret.update(wlan_port=None)
+                
+        if not servicewakeupschedule:
+            raise TypeError('service_wakeup_schedule has to be specified in the configuration file')
+        else:
+            try:
+                spl = servicewakeupschedule.split(':')
+                hour = int(spl[0])
+                minute = int(spl[1])
+            except Exception:
+                raise TypeError('service_wakeup_schedule has to be in the format HOUR:MINUTES')
+        ret.update(service_wakeup_schedule=servicewakeupschedule)
+                
+        if not servicewakeupminutes:
+            raise TypeError('service_wakeup_minutes has to be specified in the configuration file')
+        elif servicewakeupminutes < MINIMUM_SERVICE_WAKEUP_MINUTES:
+            raise TypeError('service_wakeup_minutes has to be at least %s minutes' % (MINIMUM_SERVICE_WAKEUP_MINUTES,))
+        ret.update(service_wakeup_minutes=servicewakeupminutes)
+            
+        if wlandutycyclewhileresending is not None:
+            if wlandutycyclewhileresending == '0' or wlandutycyclewhileresending.lower() == 'false':
+                wlandutycyclewhileresending = False
+            elif wlandutycyclewhileresending == '1' or wlandutycyclewhileresending.lower() == 'true':
+                wlandutycyclewhileresending = True
+            else:
+                raise TypeError('wlan_duty_cycle_while_resending has to be true/1 or false/0')
+        else:
+            wlandutycyclewhileresending = DEFAULT_WLAN_DUTY_CYCLE_WHILE_RESENDING
+        ret.update(wlan_duty_cycle_while_resending=wlandutycyclewhileresending)
         
         if not os.path.isdir(os.path.dirname(shutdownCheckFile)):
             raise TypeError('the folder %s for the shutdown_check_file does not exist' % (os.path.dirname(shutdownCheckFile),))
