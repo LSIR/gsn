@@ -243,26 +243,38 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			else if (inputStreamName.equals(configuration[23])) {
 				if (node.iscorestation == null || !node.iscorestation)
 					node.setCorestation();
-				Byte connected = null;
-				s = data.getData(configuration[26]);
-				if (s instanceof Byte) {
-					connected = (Byte)s;
+				// save always latest CoreStation information
+				if (node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+					Byte connected = null;
+					s = data.getData(configuration[26]);
+					if (s instanceof Byte) {
+						connected = (Byte)s;
+					}
+					if (connected == 1 && (node.corestation_online == null || !node.corestation_online))
+						node.corestation_online = new Boolean(true);
+					else if  (connected == 0 && (node.corestation_online == null || node.corestation_online))
+						node.corestation_online = new Boolean(false);
+					else
+						return;
 				}
-				if (connected == 1)
-					node.corestation_online = new Boolean(true);
 				else
-					node.corestation_online = new Boolean(false);
+					return;
 			}
 			// BackLogStatus Dynamic
 			else if (inputStreamName.equals(configuration[27])) {
 				if (!node.corestation_online)
 					node.corestation_online = new Boolean(true);
-				Integer dbEntries = null;
-				s = data.getData(configuration[28]);
-				if (s instanceof Integer) {
-					dbEntries = (Integer)s;
+				// save always latest BackLog DB information
+				if (node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+					Integer dbEntries = null;
+					s = data.getData(configuration[28]);
+					if (s instanceof Integer) {
+						dbEntries = (Integer)s;
+					}
+					node.db_entries = dbEntries;
 				}
-				node.db_entries = dbEntries;
+				else
+					return;
 			}
 			else {
 				node.packet_count++;
