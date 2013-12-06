@@ -782,9 +782,9 @@ class CamZillaPluginClass(AbstractPluginClass):
             ret[3] = 1
         if ret[4] is None:
             ret[4] = 1
-        if ret[5] is None and ret[3] > 1:
+        if ret[5] is None and ret[3] > 1 and self._robotAvailable:
             raise TypeError('x-rotation has to be specified if more than one picture has to be taken in x-direction')
-        if ret[6] is None and ret[4] > 1:
+        if ret[6] is None and ret[4] > 1 and self._robotAvailable:
             raise TypeError('y-rotation has to be specified if more than one picture has to be taken in y-direction')
         if ret[5] is None:
             ret[5] = 1.0
