@@ -532,8 +532,6 @@ class PowerControlClass(Thread):
         else:
             if self._backlogMain.backlog.isBusy() and not self._dutycyclewhileresending:
                 self._logger.info('can not turn off wlan, still %s messages to resend' % (self._backlogMain.backlog.getDBNumberOfEntries()))
-            else:
-                self._logger.info('wlan still needed by plugins')
             return False
         
         
