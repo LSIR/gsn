@@ -93,7 +93,7 @@ public class BackLogStatsWrapper extends AbstractWrapper implements StatisticLis
 					for (; iter.hasNext();) {
 						int deviceid = iter.next();
 						
-						generateStreamElement(timestamp, deviceid);
+						generateStreamElement(timestamp, deviceid, connected);
 					}
 				}
 			}
@@ -109,12 +109,12 @@ public class BackLogStatsWrapper extends AbstractWrapper implements StatisticLis
 	}
 	
 	
-	private void generateStreamElement(long timestamp, int deviceid) {
+	private void generateStreamElement(long timestamp, int deviceid, Map<Integer, Boolean> connectedList) {
 		Serializable[] output = new Serializable[outputStructure.length];
 		output[0] = timestamp;
 		output[1] = deviceid;
 		
-		if (stats.isConnectedList().get(deviceid))
+		if (connectedList.get(deviceid))
 			output[2] = (byte)1;
 		else
 			output[2] = (byte)0;
@@ -123,7 +123,7 @@ public class BackLogStatsWrapper extends AbstractWrapper implements StatisticLis
 		for (Iterator<Map<Integer, Long>> it = getStatsList().iterator(); it.hasNext();)
 			output[counter++] = it.next().get(deviceid);
 		
-		postStreamElement(new StreamElement(outputStructure, output, timestamp));
+		postStreamElement(new StreamElement(outputStructure, output));
 	}
 	
 	
@@ -159,7 +159,7 @@ public class BackLogStatsWrapper extends AbstractWrapper implements StatisticLis
 
 	@Override
 	public void connectionStatusChanged(int deviceId) {
-		generateStreamElement(System.currentTimeMillis(), deviceId);
+		generateStreamElement(System.currentTimeMillis(), deviceId, stats.isConnectedList());
 	}
 
 	
