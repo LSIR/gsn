@@ -45,7 +45,7 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 				try {
 					Serializable s = streamElement.getData("data");
 					if (s instanceof byte[]) {
-						HashMap<Integer, MappedEntry> allMappedPositions = DataMappingWrapper.getAllMappedPositions(now, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
+						HashMap<Integer, MappedEntry> allPositions = DataMappingWrapper.getAllPositions(deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 						bfact = BindingDirectory.getFactory(NetworkTopology.class);
 						IUnmarshallingContext uctx = bfact.createUnmarshallingContext();		
 						topology = (NetworkTopology) uctx.unmarshalDocument(new ByteArrayInputStream(
@@ -57,10 +57,10 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 
 								n.position = DataMappingWrapper.getPosition(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName, false);
 								if (n.position != null) {
-									MappedEntry mappedEntry = allMappedPositions.get(n.position);
+									MappedEntry mappedEntry = allPositions.get(n.position);
 									if (mappedEntry != null) {
 										mappedEntry.spotted = true;
-										allMappedPositions.put(n.position, mappedEntry);
+										allPositions.put(n.position, mappedEntry);
 									}
 									n.nodetype = DataMappingWrapper.getDeviceType(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 									n.coordinate = DataMappingWrapper.getCoordinate(n.position.intValue(), deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
@@ -154,7 +154,7 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 							}
 						}
 						
-						Iterator<Entry<Integer, MappedEntry>> iter = allMappedPositions.entrySet().iterator();
+						Iterator<Entry<Integer, MappedEntry>> iter = allPositions.entrySet().iterator();
 						while(iter.hasNext()) {
 							Entry<Integer, MappedEntry> entry = iter.next();
 							if (!entry.getValue().spotted) {

@@ -135,12 +135,6 @@ function PacketRate() {
     return false;
   }
   
-  function deviceTypeIsDozer(type) {
-    if (type > 0 && type < 7)
-      return true;
-    return false;
-  }
-  
   function deviceTypeIsCoreStation(type) {
     if (type > 3 && type < 7)
       return true;
@@ -156,31 +150,26 @@ function PacketRate() {
     });
     $("sensornode",network).each(function(){
       var id = $(this).attr("node_id");
-      var index = nodeindex(id);
-      if (index < 0) {
-        current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true, nodetype: $(this).attr("nodetype"), iscorestation: $(this).attr("iscorestation") == "true", corestation_online: $(this).attr("corestation_online") });
-        topology_change = true;
-      }
-      else {
-        current_deployment.sensornodes[index].timestamp = $(this).attr("timestamp");
-        current_deployment.sensornodes[index].touched = true;
-        current_deployment.sensornodes[index].nodetype = $(this).attr("nodetype");
-        current_deployment.sensornodes[index].corestation_online = $(this).attr("corestation_online");
-      }
-    });
-    if (current_deployment.deploymentHasMapping) {
-      for(var id in current_deployment.deviceIdMapping) {
-        if (deviceTypeIsDozer(current_deployment.deviceIdMapping[id].type)) {
-	  var index = nodeindex(id);
-	  if (index < 0) {
-	    current_deployment.sensornodes.push({node_id : id, timestamp :  undefined, touched : true, nodetype: current_deployment.deviceIdMapping[id].type, iscorestation: deviceTypeIsCoreStation(current_deployment.deviceIdMapping[id].type), corestation_online: undefined });
-	    topology_change = true;
-	  }
-	  else
-	    current_deployment.sensornodes[index].touched = true;
+      
+      var positionActive = true;
+      if (current_deployment.deploymentHasMapping && $(this).attr("position") !== undefined && current_deployment.positionToDeviceIdMap[$(this).attr("position")] === undefined)
+	positionActive = false;
+      
+      if (positionActive) {
+	var index = nodeindex(id);
+	if (index < 0) {
+	  current_deployment.sensornodes.push({node_id : $(this).attr("node_id"), timestamp :  $(this).attr("timestamp"), touched : true, nodetype: $(this).attr("nodetype"), iscorestation: $(this).attr("iscorestation") == "true", corestation_online: $(this).attr("corestation_online") });
+	  topology_change = true;
+	}
+	else {
+	  current_deployment.sensornodes[index].timestamp = $(this).attr("timestamp");
+	  current_deployment.sensornodes[index].touched = true;
+	  current_deployment.sensornodes[index].nodetype = $(this).attr("nodetype");
+	  current_deployment.sensornodes[index].corestation_online = $(this).attr("corestation_online");
 	}
       }
-    }
+    });
+    
     var tmp = new Array();
     $(current_deployment.sensornodes).each(function(index,value) {
       if (this.touched)
@@ -310,81 +299,88 @@ function PacketRate() {
     var now=new Date().getTime();
     $("sensornode",network).each(function(){
       var id = $(this).attr("node_id");
-      var index = nodeindex(id);
-      if (index < 0) {
-        var cols='';
-        for (i=0;i<healthitems.length;i++)
-          cols+='<td></td>';
-        table.append("<tr>"+
-          "<td style=\"display:none\"></td><td>"+parseInt($(this).attr("node_id"))+'</td>'+cols+'<td></td>'+
-          "</tr>");
-      }
-      var row = $("td:nth-child(2)", table).filter(function(index) { return $(this).text()==id;}).parent();
-      var data = this;
-      if (index < 0 || ($(this).attr("timestamp") !== undefined && $(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
-        $("td", row).each(function(index,value) {
-          switch (index) {
-          case 0:
-            if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[$(data).attr("node_id")] !== undefined && current_deployment.deviceIdMapping[$(data).attr("node_id")].position !== undefined)
-	      		$(this).empty().text(current_deployment.deviceIdMapping[$(data).attr("node_id")].position);
-            else if ($(data).attr("position") !== undefined)
-            	$(this).empty().text($(data).attr("position"));
-		    else
-		      $(this).empty().text("?");
-	            break;
-          case 1: break; // node id
-          case 3:
-	    var img;
-	    $(this).empty();
-            if (current_deployment.deploymentHasMapping) {
-	      if (!$(data).attr('batterylevel'))
-		img = 'none';
-	      else if ($(data).attr('batterylevel')<=5)
-		img = 'empty';
-	      else if ($(data).attr('batterylevel')<=25)
-		img = 'quarter';
-	      else if ($(data).attr('batterylevel')<=50)
-		img = 'half';
+      
+      var positionActive = true;
+      if (current_deployment.deploymentHasMapping && $(this).attr("position") !== undefined && current_deployment.positionToDeviceIdMap[$(this).attr("position")] === undefined)
+	positionActive = false;
+      
+      if (positionActive) {
+	var index = nodeindex(id);
+	if (index < 0) {
+	  var cols='';
+	  for (i=0;i<healthitems.length;i++)
+	    cols+='<td></td>';
+	  table.append("<tr>"+
+	    "<td style=\"display:none\"></td><td>"+parseInt($(this).attr("node_id"))+'</td>'+cols+'<td></td>'+
+	    "</tr>");
+	}
+	var row = $("td:nth-child(2)", table).filter(function(index) { return $(this).text()==id;}).parent();
+	var data = this;
+	if (index < 0 || ($(this).attr("timestamp") !== undefined && $(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
+	  $("td", row).each(function(index,value) {
+	    switch (index) {
+	    case 0:
+	      if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[$(data).attr("node_id")] !== undefined && current_deployment.deviceIdMapping[$(data).attr("node_id")].position !== undefined)
+		$(this).empty().text(current_deployment.deviceIdMapping[$(data).attr("node_id")].position);
+	      else if ($(data).attr("position") !== undefined)
+		$(this).empty().text($(data).attr("position"));
 	      else
-		img = 'full';
+		$(this).empty().text("?");
+	      break;
+	    case 1: break; // node id
+	    case 3:
+	      var img;
+	      $(this).empty();
+	      if (current_deployment.deploymentHasMapping) {
+		if (!$(data).attr('batterylevel'))
+		  img = 'none';
+		else if ($(data).attr('batterylevel')<=5)
+		  img = 'empty';
+		else if ($(data).attr('batterylevel')<=25)
+		  img = 'quarter';
+		else if ($(data).attr('batterylevel')<=50)
+		  img = 'half';
+		else
+		  img = 'full';
+		$(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
+	      }
+	      else
+		img = 'none';
+	      $(this).append('<img style="margin:0px 0px 0px 5px;vertical-align:middle;" src="img/batterylevels/battery_'+img+'.png">');
+	      break;
+	    case 4:
+	    case 5:
+	    case 6:
+	    case 7:
+	      if (current_deployment.deploymentHasMapping)
+		$(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
+	      break;
+	    case 11:
+	    case 12:
+	      $(this).text(formatTime($(data).attr(healthitems[index-2])));
+	      break;
+	    case 13:
+	      break;
+	    default:
 	      $(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
+	      break;
 	    }
-	    else
-	      img = 'none';
-	    $(this).append('<img style="margin:0px 0px 0px 5px;vertical-align:middle;" src="img/batterylevels/battery_'+img+'.png">');
-            break;
-          case 4:
-          case 5:
-          case 6:
-          case 7:
-	    if (current_deployment.deploymentHasMapping)
-	      $(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
-            break;
-          case 11:
-          case 12:
-            $(this).text(formatTime($(data).attr(healthitems[index-2])));
-            break;
-          case 13:
-            break;
-          default:
-            $(this).text($(data).attr(healthitems[index-2])?$(data).attr(healthitems[index-2]):"");
-            break;
-          }
-        });
-        $(row).addClass("newdata");
-        $(row).removeClass("offline");
-        $("td:nth-child(2)", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().removeClass("offline");
-        tableChanged = true;
-      }
-      if ($(this).attr("packet_count")) {
-        if (!$(row).data("packetrate"))
-          $(row).data("packetrate", new PacketRate());
-        $(row).data("packetrate").update($(this).attr("packet_count"));
-        $("td:last-child",row).text($(row).data("packetrate").rate);
-      }
-      if ($(this).attr("timestamp") === undefined || now - $(data).attr("timestamp") > STANDBY_TIMEOUT_MS) {
-        $(row).addClass("offline");
-        $("td:nth-child(2)", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().addClass("offline");
+	  });
+	  $(row).addClass("newdata");
+	  $(row).removeClass("offline");
+	  $("td:nth-child(2)", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().removeClass("offline");
+	  tableChanged = true;
+	}
+	if ($(this).attr("packet_count")) {
+	  if (!$(row).data("packetrate"))
+	    $(row).data("packetrate", new PacketRate());
+	  $(row).data("packetrate").update($(this).attr("packet_count"));
+	  $("td:last-child",row).text($(row).data("packetrate").rate);
+	}
+	if ($(this).attr("timestamp") === undefined || now - $(data).attr("timestamp") > STANDBY_TIMEOUT_MS) {
+	  $(row).addClass("offline");
+	  $("td:nth-child(2)", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().addClass("offline");
+	}
       }
     });
     
@@ -416,70 +412,77 @@ function PacketRate() {
     
     $("sensornode",network).each(function(){
       var id = $(this).attr("node_id");
-      var index = nodeindex(id);
-      if (index < 0) {
-        table.append("<tr class=\"disabled\">"+
-          "<td style=\"display:none\">"+($(this).attr("position")?$(this).attr("position"):"")+"</td><td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
-          "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-        if (isConfigurable)
-        $("tr:last", table).bind("click",function() {
-          if (!$(this).hasClass("disabled"))
-            return;
-          $("input",this).each(function(){
-            $(this).removeAttr("disabled");
-          });
-          $(this).removeClass("disabled");
-          if ($(".configtab input", "#topology_"+current_deployment.name).length==0) {
-            // add config form
-            var configtab = $(".configtab", "#topology_"+current_deployment.name);
-            configtab.append("<form action=\"/upload\" method=\"post\" enctype=\"multipart/form-data\" target=\"webupload\">"+
-                "<input type=\"submit\" value=\"apply\">"+
-                "<input type=\"button\" value=\"reset\">"+
-                "<input type=\"hidden\" name=\"vsname\" value=\""+current_deployment.topology_vs_name+"\">"+
-                "<input type=\"hidden\" name=\"cmd\" value=\"dataconfiguration\">"+
-                "<input type=\"hidden\" name=\"dataconfiguration;configuration\" value=\"\">"+
-                "</form>"
-            );
-            $("input:first", configtab).bind("click", function () {
-              // generate xml configuration
-              var generated_config="<?xml version=\"1.0\" encoding=\"UTF-8\"?><network><sensornodes>";
-              $(".configtable tbody>tr", "#topology_"+current_deployment.name).each(function() {
-                if (!$(this).hasClass("disabled")) {
-                  generated_config=generated_config+"<sensornode node_id=\""+$("td:nth-child(2)",this).text()+"\"><links />";
-                  var c = "";
-                  $("td", this).each(function(index,value) {
-                    switch (index) {
-                    case 0:
-                    case 1: break;
-                    case 3: // always enable health ..
-                    case 8: //  .. and event packets
-                      c = c + " "+configitems[index-2]+"=\"true\"";
-                      break;
-                    case 20: break;
-                    default:
-                      if ($(this).children().length > 0)
-                        c = c + " "+configitems[index-2]+"=\"" + ($("input:first", this).attr("checked")?"true":"false")+"\"";
-                    }
-                  });
-                  if (c.length>0)
-                    generated_config=generated_config+"<configuration "+$.trim(c)+" />";
-                  generated_config=generated_config+"</sensornode>";
-                }
-              });
-              generated_config=generated_config+"</sensornodes></network>";
-              $("#debug").append(generated_config);
-              $("input[name='dataconfiguration;configuration']", configtab).attr("value", generated_config);
-              // submit
-              $("form", configtab).submit();
-            });
-            // bind reset button
-            $("input[type='button']", configtab).bind("click", function () {
-              resetconfigurations(false);
-            });
-          }
-          
-        });
-        $("tr:last", table).hover(function() { $(this).parent().children().each(function(){$(this).removeClass("selected")});$(this).addClass("selected"); }, function() { $(this).removeClass("selected"); });
+      
+      var positionActive = true;
+      if (current_deployment.deploymentHasMapping && $(this).attr("position") !== undefined && current_deployment.positionToDeviceIdMap[$(this).attr("position")] === undefined)
+	positionActive = false;
+      
+      if (positionActive) {
+	var index = nodeindex(id);
+	if (index < 0) {
+	  table.append("<tr class=\"disabled\">"+
+	    "<td style=\"display:none\">"+($(this).attr("position")?$(this).attr("position"):"")+"</td><td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
+	    "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
+	  if (isConfigurable)
+	  $("tr:last", table).bind("click",function() {
+	    if (!$(this).hasClass("disabled"))
+	      return;
+	    $("input",this).each(function(){
+	      $(this).removeAttr("disabled");
+	    });
+	    $(this).removeClass("disabled");
+	    if ($(".configtab input", "#topology_"+current_deployment.name).length==0) {
+	      // add config form
+	      var configtab = $(".configtab", "#topology_"+current_deployment.name);
+	      configtab.append("<form action=\"/upload\" method=\"post\" enctype=\"multipart/form-data\" target=\"webupload\">"+
+		  "<input type=\"submit\" value=\"apply\">"+
+		  "<input type=\"button\" value=\"reset\">"+
+		  "<input type=\"hidden\" name=\"vsname\" value=\""+current_deployment.topology_vs_name+"\">"+
+		  "<input type=\"hidden\" name=\"cmd\" value=\"dataconfiguration\">"+
+		  "<input type=\"hidden\" name=\"dataconfiguration;configuration\" value=\"\">"+
+		  "</form>"
+	      );
+	      $("input:first", configtab).bind("click", function () {
+		// generate xml configuration
+		var generated_config="<?xml version=\"1.0\" encoding=\"UTF-8\"?><network><sensornodes>";
+		$(".configtable tbody>tr", "#topology_"+current_deployment.name).each(function() {
+		  if (!$(this).hasClass("disabled")) {
+		    generated_config=generated_config+"<sensornode node_id=\""+$("td:nth-child(2)",this).text()+"\"><links />";
+		    var c = "";
+		    $("td", this).each(function(index,value) {
+		      switch (index) {
+		      case 0:
+		      case 1: break;
+		      case 3: // always enable health ..
+		      case 8: //  .. and event packets
+			c = c + " "+configitems[index-2]+"=\"true\"";
+			break;
+		      case 20: break;
+		      default:
+			if ($(this).children().length > 0)
+			  c = c + " "+configitems[index-2]+"=\"" + ($("input:first", this).attr("checked")?"true":"false")+"\"";
+		      }
+		    });
+		    if (c.length>0)
+		      generated_config=generated_config+"<configuration "+$.trim(c)+" />";
+		    generated_config=generated_config+"</sensornode>";
+		  }
+		});
+		generated_config=generated_config+"</sensornodes></network>";
+		$("#debug").append(generated_config);
+		$("input[name='dataconfiguration;configuration']", configtab).attr("value", generated_config);
+		// submit
+		$("form", configtab).submit();
+	      });
+	      // bind reset button
+	      $("input[type='button']", configtab).bind("click", function () {
+		resetconfigurations(false);
+	      });
+	    }
+	    
+	  });
+	  $("tr:last", table).hover(function() { $(this).parent().children().each(function(){$(this).removeClass("selected")});$(this).addClass("selected"); }, function() { $(this).removeClass("selected"); });
+	}
       }
       var row = $("td:nth-child(2)", table).filter(function(index) { return $(this).text()==id;}).parent();
       var hasConfig = $("configuration", this).length>0;
