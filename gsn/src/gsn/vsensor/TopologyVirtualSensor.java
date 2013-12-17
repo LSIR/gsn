@@ -140,15 +140,17 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			SensorNode node = nodes.get(node_id);
 			
 			// save always latest timestamp
+			boolean isLatest = false;
 			if (node.timestamp==null || node.timestamp.compareTo(timestamp) < 0) {
 				node.timestamp = timestamp;
 				node.generation_time = generation_time;
+				isLatest = true;
 			}
 				
 			// RSSI
 			if (inputStreamName.startsWith(configuration[12])) {
 				// save always latest rssi information
-				if (node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+				if (isLatest) {
 					logger.debug( "got rssi info:" + data.getData("HEADER_ORIGINATORID") + " " + data.getData("RSSI_NODEID") + " " + data.getData("RSSI"));
 					Link newlink=null;
 					Integer rssi_node_id;
@@ -244,7 +246,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				if (node.iscorestation == null || !node.iscorestation)
 					node.setCorestation();
 				// save always latest CoreStation information
-				if (node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+				if (isLatest) {
 					Byte connected = null;
 					s = data.getData(configuration[26]);
 					if (s instanceof Byte) {
@@ -265,7 +267,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				if (!node.corestation_online)
 					node.corestation_online = new Boolean(true);
 				// save always latest BackLog DB information
-				if (node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+				if (isLatest) {
 					Integer dbEntries = null;
 					s = data.getData(configuration[28]);
 					if (s instanceof Integer) {
@@ -339,7 +341,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	
 				// health
 				// save always latest health information
-				if (inputStreamName.equals(configuration[25]) || node.timestamp==null || node.timestamp.compareTo(timestamp) == 0) {
+				if (inputStreamName.equals(configuration[25]) && isLatest) {
 					// Vsys
 					s = data.getData(configuration[4]);
 					if (s instanceof Integer)
@@ -544,7 +546,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 	
 	synchronized void generateData() {
 		NetworkTopology net = new NetworkTopology(configurable); 
-		net.sensornodes = (SensorNode[])nodes.values().toArray(new SensorNode[nodes.size()]);
+		net.sensornodes = new ArrayList<SensorNode>(nodes.values());
 		try {
 			IBindingFactory bfact = BindingDirectory.getFactory(NetworkTopology.class);
 			IMarshallingContext mctx = bfact.createMarshallingContext();

@@ -1,5 +1,7 @@
 package gsn.beans;
 
+import java.util.ArrayList;
+
 /**
 * @author Roman Lim
 */
@@ -12,7 +14,7 @@ public class NetworkTopology {
 	
 	public NetworkTopology() {}
 
-	public SensorNode[] sensornodes;
+	public ArrayList<SensorNode> sensornodes;
 	
 	@SuppressWarnings("unused")
 	private boolean configurable = false;

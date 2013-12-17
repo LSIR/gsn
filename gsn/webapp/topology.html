@@ -310,7 +310,6 @@ function PacketRate() {
     var now=new Date().getTime();
     $("sensornode",network).each(function(){
       var id = $(this).attr("node_id");
-      current_deployment.idsInHealthTable[id] = true;
       var index = nodeindex(id);
       if (index < 0) {
         var cols='';
@@ -322,7 +321,7 @@ function PacketRate() {
       }
       var row = $("td:nth-child(2)", table).filter(function(index) { return $(this).text()==id;}).parent();
       var data = this;
-      if (index < 0 || ($(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
+      if (index < 0 || ($(this).attr("timestamp") !== undefined && $(this).attr("timestamp") > current_deployment.sensornodes[index].timestamp)) {
         $("td", row).each(function(index,value) {
           switch (index) {
           case 0:
@@ -383,24 +382,12 @@ function PacketRate() {
         $(row).data("packetrate").update($(this).attr("packet_count"));
         $("td:last-child",row).text($(row).data("packetrate").rate);
       }
-      if (now - $(data).attr("timestamp") > STANDBY_TIMEOUT_MS) {
+      if ($(this).attr("timestamp") === undefined || now - $(data).attr("timestamp") > STANDBY_TIMEOUT_MS) {
         $(row).addClass("offline");
         $("td:nth-child(2)", $("#topology_"+current_deployment.name).find(".configtable tbody")).filter(function(index) { return $(this).text()==id;}).parent().addClass("offline");
       }
     });
-    if (current_deployment.deploymentHasMapping) {
-      for (var id in current_deployment.deviceIdMapping) {
-	if (deviceTypeIsDozer(current_deployment.deviceIdMapping[id].type) && !current_deployment.idsInHealthTable[id]) {
-	  var cols='';
-	  for (i=0;i<healthitems.length;i++)
-	    cols+='<td></td>';
-	  table.append("<tr class=\"offline\">"+
-	    "<td style=\"display:none\">"+current_deployment.deviceIdMapping[id].position+"</td><td>"+id+'</td>'+cols+'<td></td>'+
-	    "</tr>");
-	  current_deployment.idsInHealthTable[id] = true;
-        }
-      }
-    }
+    
     if ($(network).parent().attr("mapped")=='true') {
       $("td:first-child", table).each(function() {
         $(this).css('display', '');
@@ -430,7 +417,6 @@ function PacketRate() {
     $("sensornode",network).each(function(){
       var id = $(this).attr("node_id");
       var index = nodeindex(id);
-      current_deployment.idsInConfigTable[id] = true;
       if (index < 0) {
         table.append("<tr class=\"disabled\">"+
           "<td style=\"display:none\">"+($(this).attr("position")?$(this).attr("position"):"")+"</td><td>"+parseInt($(this).attr("node_id"))+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
@@ -575,16 +561,6 @@ function PacketRate() {
       }
     });
     
-    if (current_deployment.deploymentHasMapping) {
-      for (var id in current_deployment.deviceIdMapping) {
-	if (deviceTypeIsDozer(current_deployment.deviceIdMapping[id].type) && !current_deployment.idsInConfigTable[id]) {
-	  table.append("<tr class=\"disabled offline\">"+
-	    "<td style=\"display:none\">"+current_deployment.deviceIdMapping[id].position+"</td><td>"+id+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>"+
-	    "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-	  current_deployment.idsInConfigTable[id] = true;
-	}
-      }
-    }
     if ($(network).parent().attr("mapped")=='true') {
       $("td:first-child", table).each(function() {
         $(this).css('display', '');
@@ -1259,8 +1235,6 @@ $(document).ready(function() {
           topology_vs_name : topology_vs_name[i],
           sensornodes : new Array(),
           links : new Array(),
-          idsInHealthTable : new Object(),
-          idsInConfigTable : new Object(),
           isTopologyUpdating : false,
           deploymentHasMapping : deploymentHasMapping[i],
           packethistory : new PacketRate(),

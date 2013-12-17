@@ -4,8 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.jibx.runtime.BindingDirectory;
@@ -20,6 +23,7 @@ import gsn.beans.SensorNode;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.wrappers.DataMappingWrapper;
+import gsn.wrappers.DataMappingWrapper.MappedEntry;
 
 public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 	
@@ -41,17 +45,23 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 				try {
 					Serializable s = streamElement.getData("data");
 					if (s instanceof byte[]) {
+						HashMap<Integer, MappedEntry> allMappedPositions = DataMappingWrapper.getAllMappedPositions(now, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 						bfact = BindingDirectory.getFactory(NetworkTopology.class);
 						IUnmarshallingContext uctx = bfact.createUnmarshallingContext();		
 						topology = (NetworkTopology) uctx.unmarshalDocument(new ByteArrayInputStream(
 							(byte[])s), "UTF-8");
 						
-						for (int i=0; i<topology.sensornodes.length; i++) {
-							SensorNode n = topology.sensornodes[i];
+						for (int i=0; i<topology.sensornodes.size(); i++) {
+							SensorNode n = topology.sensornodes.get(i);
 							if (n.node_id !=null && n.generation_time != null) {
 
 								n.position = DataMappingWrapper.getPosition(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName, false);
 								if (n.position != null) {
+									MappedEntry mappedEntry = allMappedPositions.get(n.position);
+									if (mappedEntry != null) {
+										mappedEntry.spotted = true;
+										allMappedPositions.put(n.position, mappedEntry);
+									}
 									n.nodetype = DataMappingWrapper.getDeviceType(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 									n.coordinate = DataMappingWrapper.getCoordinate(n.position.intValue(), deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
 									n.iscorestation = false;
@@ -126,25 +136,36 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 								if (nodes.containsKey(n.node_id)) {
 									SensorNode node = nodes.get(n.node_id);
 									node.updateNode(n);
-									topology.sensornodes[i] = node;
+									topology.sensornodes.set(i, node);
 								}
-								nodes.put(n.node_id, topology.sensornodes[i]);
+								nodes.put(n.node_id, topology.sensornodes.get(i));
 							}
 						}
 						if (!nodesToBeRemoved.isEmpty()) {
-							ArrayList<SensorNode> newsensornodes = new ArrayList<SensorNode>();
-							for (int i=0; i<topology.sensornodes.length; i++) {
-								int id = topology.sensornodes[i].node_id;
-								if (nodesToBeRemoved.contains(id)) {
-									logger.debug("remove node with id " + id);
-									nodes.remove(id);
+							Iterator<SensorNode> iter = topology.sensornodes.iterator();
+							while (iter.hasNext()) {
+								SensorNode n = iter.next();
+								if (nodesToBeRemoved.contains(n.node_id)) {
+									logger.debug("remove node with id " + n.node_id);
+									nodes.remove(n.node_id);
+									iter.remove();
 								}
-								else
-									newsensornodes.add(topology.sensornodes[i]);
 									
 							}
-							topology.sensornodes = newsensornodes.toArray(new SensorNode[newsensornodes.size()]);;
 						}
+						
+						Iterator<Entry<Integer, MappedEntry>> iter = allMappedPositions.entrySet().iterator();
+						while(iter.hasNext()) {
+							Entry<Integer, MappedEntry> entry = iter.next();
+							if (!entry.getValue().spotted) {
+								SensorNode node = new SensorNode(entry.getValue().deviceId);
+								node.setNodeType(entry.getValue().deviceType);
+								node.position = entry.getKey();
+								if (node.isDozerNode())
+									topology.sensornodes.add(node);
+							}
+						}
+						
 						topology.mapped = true;
 						logger.debug("successfully imported network topology.");
 					}

@@ -96,6 +96,10 @@ public class SensorNode {
 	public boolean isWGPSNode() {
 		return nodetype == WGPS_TINYNODE;
 	}
+
+	public boolean isDozerNode() {
+		return isBBControl() || isAccessNode() || isAENode() || isWGPSNode() || isSibNode() || isPowerSwitch();
+	}
 	
 	public boolean hasSHT21() {
 		return isBBControl() || isAccessNode() || isAENode() || isWGPSNode();

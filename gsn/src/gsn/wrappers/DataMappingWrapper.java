@@ -335,6 +335,31 @@ public class DataMappingWrapper extends AbstractWrapper {
 	}
 	
 	// mapping queries
+	public static HashMap<Integer, MappedEntry> getAllMappedPositions(long generationTime, String deployment, String vsName, String inputStreamName) {
+		HashMap<Integer, MappedEntry> allMappedPositions = null;
+		long start = -1;
+		if (logger.isDebugEnabled())
+			start = System.nanoTime();
+
+		Mappings m = deployments.get(deployment);
+		
+		if (m == null || !m.isPositionAvailable()) {
+			logger.error(vsName+"[source="+inputStreamName+"]: Position mapping data not available for deployment "+deployment);
+			return null;
+		}
+		
+		try {
+			allMappedPositions = m.executeAllMappedPositionsSelect(generationTime);
+		} catch (SQLException e) {
+			logger.warn(e.getMessage(), e);
+		}
+		
+		if (logger.isDebugEnabled())
+			logger.debug(vsName+"[source="+inputStreamName+"]: getAllMappedPositions: " + Long.toString((System.nanoTime() - start) / 1000) + " us");
+		return allMappedPositions;
+	}
+	
+	// mapping queries
 	public static Short getDeviceType(int device_id, long generationTime, String deployment, String vsName, String inputStreamName) {
 		Short deviceType = null;
 		long start = -1;
@@ -712,6 +737,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 	class Mappings {
 		private PreparedStatement position_select = null;
 		private PreparedStatement position_insert = null;
+		private PreparedStatement all_mapped_positions_select = null;
 		private PreparedStatement geo_select = null;
 		private PreparedStatement geo_insert = null;
 		private PreparedStatement sensor_select = null;
@@ -722,10 +748,11 @@ public class DataMappingWrapper extends AbstractWrapper {
 		public synchronized void setPositionQueries() throws SQLException {
 			position_select = h2DBconn.prepareStatement("SELECT position, device_type FROM " + deployment + "_position WHERE device_id = ? AND ((end is null AND begin <= ?) OR (? BETWEEN begin AND end)) LIMIT 1");
 			position_insert = h2DBconn.prepareStatement("INSERT INTO " + deployment + "_position (device_id, device_type, begin, end, position, comment) VALUES (?,?,?,?,?,?)");
+			all_mapped_positions_select = h2DBconn.prepareStatement("SELECT position, device_id, device_type FROM " + deployment + "_position WHERE (end is null AND begin <= ?) OR (? BETWEEN begin AND end)");
 		}
 		
 		public synchronized void resetPositionQueries() {
-			position_select = position_insert = null;
+			position_select = position_insert = all_mapped_positions_select = null;
 		}
 		
 		public boolean isPositionAvailable() {
@@ -923,6 +950,21 @@ public class DataMappingWrapper extends AbstractWrapper {
 				}
 			}
 			return pos;
+		}
+		
+		public HashMap<Integer, MappedEntry> executeAllMappedPositionsSelect(long generationTime) throws SQLException {
+			HashMap<Integer, MappedEntry> allMappedPositions = new HashMap<Integer, MappedEntry>();
+			if (all_mapped_positions_select != null) {
+				synchronized (all_mapped_positions_select){
+					all_mapped_positions_select.setLong(1, generationTime);
+					all_mapped_positions_select.setLong(2, generationTime);
+					ResultSet rs = all_mapped_positions_select.executeQuery();
+					while (rs.next()) {
+						allMappedPositions.put(rs.getInt(1), new MappedEntry(rs.getInt(2), rs.getShort(3)));
+					}
+				}
+			}
+			return allMappedPositions;
 		}
 		
 		public Short executeDeviceTypeSelect(int deviceId, long generationTime) throws SQLException {
@@ -1265,6 +1307,18 @@ public class DataMappingWrapper extends AbstractWrapper {
 				return false;
 			else
 				return true;
+		}
+	}
+	
+	public class MappedEntry {
+		public Integer deviceId;
+		public Short deviceType;
+		public boolean spotted;
+		
+		public MappedEntry(Integer id, Short type) {
+			deviceId = id;
+			deviceType = type;
+			spotted = false;
 		}
 	}
 	
