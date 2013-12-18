@@ -411,25 +411,25 @@ $(document).ready(function() {
           select:"sensornode[position][iscorestation='true']"
         }]
       },
-      { title:"Binary Queue",
+      { title:"CamZilla Binary Queue",
           signals: [{
-          vsensor:".*_binary__mapped",
+          vsensor:".*[^_]_binary__mapped",
           field:["file_queue_length","file_queue_size"],
-          select:"sensornode[position=][iscorestation='true']"
+          select:"sensornode[nodetype=6]"
         }]
       },
-      { title:"Binary Files",
+      { title:"CamZilla Binary Files",
         signals: [{
-          vsensor:".*_binary__mapped",
+          vsensor:".*[^_]_binary__mapped",
           field:["file_size","transmitted"],
-          select:"sensornode[position][iscorestation='true']"
+          select:"sensornode[nodetype=6]"
         }]
       },
-      { title:"Binary Transmission Time",
+      { title:"CamZilla Binary Transmission Time",
         signals: [{
-          vsensor:".*_binary__mapped",
+          vsensor:".*[^_]_binary__mapped",
           field:["transmission_time_eff","transmission_time_tot"],
-          select:"sensornode[position][iscorestation='true']"
+          select:"sensornode[nodetype=6]"
         }]
       },
     ]);
