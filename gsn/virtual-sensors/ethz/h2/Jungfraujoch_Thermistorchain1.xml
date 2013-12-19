@@ -17,15 +17,15 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TC_REF1" type="VARCHAR(30)" />
-            <field name="TC_REF2" type="VARCHAR(30)" />
-            <field name="TC_T1" type="VARCHAR(30)" />
-            <field name="TC_T2" type="VARCHAR(30)" />
-            <field name="TC_T3" type="VARCHAR(30)" />
-            <field name="TC_T4" type="VARCHAR(30)" />
-            <field name="TC_REF3" type="VARCHAR(30)" />
-            <field name="TC_REF4" type="VARCHAR(30)" />
-            <field name="TC_T5" type="VARCHAR(30)" />
+            <field name="TC_REF1" type="VARCHAR(30)" unit="°C" />
+            <field name="TC_REF2" type="VARCHAR(30)" unit="°C" />
+            <field name="TC_T1" type="VARCHAR(30)" unit="°C" />
+            <field name="TC_T2" type="VARCHAR(30)" unit="°C" />
+            <field name="TC_T3" type="VARCHAR(30)" unit="°C" />
+            <field name="TC_T4" type="VARCHAR(30)" unit="°C" />
+            <field name="TC_REF3" type="VARCHAR(30)" unit="°C" />
+            <field name="TC_REF4" type="VARCHAR(30)" unit="°C" />
+            <field name="TC_T5" type="VARCHAR(30)" unit="°C" />
         </output-structure>
     </processing-class>
     <description>Thermistorchain/TC data (part 1) from Jungfraujoch deployment</description>

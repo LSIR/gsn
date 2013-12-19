@@ -17,16 +17,16 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="SR_R2" type="VARCHAR(30)" />
-            <field name="SR_R3" type="VARCHAR(30)" />
-            <field name="SR_R4" type="VARCHAR(30)" />
-            <field name="SR_R12" type="VARCHAR(30)" />
-            <field name="SR_R23" type="VARCHAR(30)" />
-            <field name="SR_R34" type="VARCHAR(30)" />
-            <field name="SR_R31" type="VARCHAR(30)" />
-            <field name="SR_R42" type="VARCHAR(30)" />
-            <field name="SR_R41" type="VARCHAR(30)" />
-            <field name="SR_REF6" type="VARCHAR(30)" />
+            <field name="SR_R2" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R3" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R4" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R12" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R23" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R34" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R31" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R42" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R41" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_REF6" type="VARCHAR(30)" unit="MΩ" />
         </output-structure>
     </processing-class>
     <description>Sensorrod/SR data (part 2) from Jungfraujoch deployment</description>

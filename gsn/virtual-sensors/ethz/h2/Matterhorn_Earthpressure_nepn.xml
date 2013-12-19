@@ -17,8 +17,8 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="NEPN_P1" type="VARCHAR(30)" />
-            <field name="NEPN_T1" type="VARCHAR(30)" />
+            <field name="NEPN_P1" type="VARCHAR(30)" unit="mBar" />
+            <field name="NEPN_T1" type="VARCHAR(30)" unit="°C" />
         </output-structure>
     </processing-class>
     <description>Earthpressure/NEPN data from Matterhorn deployment</description>

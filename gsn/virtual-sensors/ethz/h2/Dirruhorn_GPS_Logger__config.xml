@@ -30,8 +30,8 @@
 			<field name="CONFIG_USED" type="SMALLINT" />
 			<field name="CONFIG_TOTAL" type="SMALLINT" />
 			<field name="CONFIG_STRING" type="BINARY" />
-			<field name="MAST_ORIENTATION_START" type="SMALLINT" />
-			<field name="MAST_ORIENTATION_END" type="SMALLINT" />
+			<field name="MAST_ORIENTATION_START" type="SMALLINT" unit="°" />
+			<field name="MAST_ORIENTATION_END" type="SMALLINT" unit="°" />
 			<field name="DATA_PAGES" type="INTEGER" />
 			<field name="EVENT_PAGES" type="INTEGER" />
 			<field name="HIGH_POWER_MEASUREMENT" type="SMALLINT" />
