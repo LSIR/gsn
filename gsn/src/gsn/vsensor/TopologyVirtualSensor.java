@@ -384,8 +384,6 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					if (s instanceof Integer)
 						node.vsdi = new Double((Integer)s);
 				}
-				else
-					return;
 			}
 			// remove outdated information
 			Long now = System.currentTimeMillis();
