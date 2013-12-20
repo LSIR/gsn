@@ -88,6 +88,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 			// Also setting the values for <code> hasTimedFieldInResultSet</code>
 			// if the timed field is present in the result set.
 			String tableName = null;
+            int problematicColumn = -1;
             for ( int i = 1 ; i <= resultSet.getMetaData( ).getColumnCount( ) ; i++ ) {
 				if (i == 1)
                     tableName = resultSet.getMetaData().getTableName(1);
@@ -102,11 +103,23 @@ public class DataEnumerator implements DataEnumeratorIF {
 					fieldNames.add( colName );
                     byte gsnType = storageManager.convertLocalTypeToGSN(colTypeInJDBCFormat,colScale );
                     if (gsnType == -100){
-                        logger.error("The type can't be converted to GSN form - error description: virtual sensor name is: "+tableName+", field name is: "+colName + ", query is: " + preparedStatement.toString());
+                        logger.error("The type can't be converted to GSN form - error description: ");
+                        logger.warn("Table name: " + tableName);
+                        logger.warn("Column name: " +colName);
+                        logger.warn("Column type name: " +resultSet.getMetaData().getColumnTypeName(i));
+                        logger.warn("Query result: " +preparedStatement.toString());
+                        problematicColumn = i;
                     }
 					fieldTypes.add( gsnType );
 				}
 			}
+            if (problematicColumn != -1){
+                while(true){
+                    logger.warn("Values of the column: " + resultSet.getObject(problematicColumn));
+                    if (resultSet.isLast()) break;
+                    resultSet.next();
+                }
+            }
 			dataFieldNames = fieldNames.toArray( new String [ ] {} );
 			dataFieldTypes = fieldTypes.toArray( new Byte [ ] {} );
 			if ( indexofPK == -1 && linkBinaryData ) throw new RuntimeException( "The specified query can't be used with binaryLinked paramter set to true." );

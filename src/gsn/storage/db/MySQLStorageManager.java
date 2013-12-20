@@ -144,6 +144,7 @@ public class MySQLStorageManager extends StorageManager {
         }
         result.delete(result.length() - 2, result.length());
         result.append(")");
+        if (tableName.contains("_")) logger.warn(result);
         return result;
     }
 
