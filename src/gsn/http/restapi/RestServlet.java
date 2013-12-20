@@ -165,8 +165,35 @@ public class RestServlet extends HttpServlet {
                 break;
             case REQUEST_GET_GRIDS:
                 sensor = parseURI(request.getRequestURI())[3];
-                str_date = request.getParameter("date");
-                restResponse = getRequestHandler.getGridData(sensor, str_date);
+                if ( Mappings.getConfig(sensor) != null ) {
+                    str_date = request.getParameter("date");
+                    if ( Main.getContainerConfig().isAcEnabled() && (user != null) )  { // if the AC is enabled and there is an user  // added
+                        if ( !user.hasReadAccessRight(sensor) && !user.isAdmin() && DataSource.isVSManaged(sensor)) {  // if the user doesn't have access to this sensor
+                            response.setContentType("text/csv");
+                            response.setHeader("Content-Disposition", "attachment;filename=\"error_no_sensor_access.csv\"");
+                            out.print("# The user '"+user.getUserName()+"' doesn't have access to the sensor '"+sensor+"'");
+                            returnedCSVStatus = HTTP_STATUS_BAD;
+                            isJSON = false;
+                        } else {
+                            //user authenticated
+                            restResponse = getRequestHandler.getGridData(sensor, str_date);
+                        }
+                    } else if (Main.getContainerConfig().isAcEnabled() && (user == null)) { // if there is no user with these credentials
+                        response.setContentType("text/csv");
+                        response.setHeader("Content-Disposition", "attachment;filename=\"error_no_user.csv\"");
+                        out.print("# There is no user with the provided username and password");
+                        returnedCSVStatus = HTTP_STATUS_BAD;
+                        isJSON = false;
+                    } else {    // do execution without AC
+                        restResponse = getRequestHandler.getGridData(sensor, str_date);
+                    }
+                } else {
+                    response.setContentType("text/csv");
+                    response.setHeader("Content-Disposition", "attachment;filename=\"error_no_such_sensor.csv\"");
+                    out.print("# The virtual sensor '"+sensor+"' doesn't exist in GSN!");
+                    returnedCSVStatus = HTTP_STATUS_BAD;
+                    isJSON = false;
+                }
                 break;
             default:
                 //restResponse = RestResponse.CreateErrorResponse(RestResponse.HTTP_STATUS_BAD_REQUEST, "Cannot interpret request.");

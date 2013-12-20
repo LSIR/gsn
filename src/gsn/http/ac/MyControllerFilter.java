@@ -75,6 +75,10 @@ public class MyControllerFilter implements Filter {
                         reqVirtualSensorName = req.getParameter("vsName");
                 }
 
+                if ("/griddata".equals(req.getServletPath())) {   // /griddata request uses sensor instead of name
+                    reqVirtualSensorName = req.getParameter("sensor");
+                }
+
                 if ((reqUsername == null) && (reqPassword == null) && (user == null) && ("/multidata".equals(req.getServletPath()))) { // generally request from web client for plotting
                     List<String> listOfVirtualSensors = createListOfVirtualSensorsFromRequest(req);
                     boolean flag = UserUtils.userHasAccessToAllVirtualSensorsInList(reqUsername, reqPassword, listOfVirtualSensors) || DataSource.allVirtualSensorsInListAreNotManaged(listOfVirtualSensors);
