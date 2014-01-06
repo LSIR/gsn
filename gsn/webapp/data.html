@@ -59,7 +59,7 @@
                                     headers = line.split(',');
                                     for (var i=0;i<headers.length;i++){
                                         headers[i] = headers[i].replace("#","");
-                                        if (headers[i]==$('#timeline').val()) {
+                                        if (headers[i]==$('.timeline').val()) {
                                             timestamp_idx=i;
                                         } else {
                                             lbl = vs_name+' ('+headers[i]+')';
@@ -138,7 +138,7 @@
                                     headers = line.split(',');
                                     for (var i=0;i<headers.length;i++){
                                         headers[i] = headers[i].replace("#","");
-                                        if (headers[i]==$('#timeline').val()) {
+                                        if (headers[i]==$('.timeline').val()) {
                                             timestamp_idx=i;
                                         } else {
                                             lbl = vs_name+' ('+headers[i]+')';
@@ -280,6 +280,10 @@
                 }
 
                 function option_list_value(name,items,all){
+		    		option_list_value(name,items,all, null);
+				}
+
+                function option_list_value(name,items,all,selected){
                     to_return = '<select name="' + name + '" class="' + name+ '">'
                     if (all!=null){
                         to_return+='<option value="All" >' + all + '</option>';
@@ -287,10 +291,25 @@
                     var sv = getSortedValues(items);
                     var l = sv.length;
                     for (var i = 0 ; i < l ; i++) {
-                        to_return+='<option value="' + items[sv[i]]+'" >'+items[sv[i]]+'</option>';
+						var sel = '';
+						if (selected != null && items[sv[i]] == selected)
+			    			sel = ' selected="selected"';
+                        to_return+='<option value="' + items[sv[i]]+'"' +sel+ '>'+items[sv[i]]+'</option>';
                     }
                     to_return+='</select>'
                     return to_return;
+                }
+                
+                function timeline(items) {
+				    to_return = new Array();
+				    for (var i = 0; i < items.length; i++) {
+						if (items[i] == "generation_time" || items[i] == "timestamp") {
+						    to_return.push(items[i]);
+						}
+				    }
+				    to_return.sort();
+				    to_return.push("timed");
+				    return to_return;
                 }
 
                 function auto_add_condition(vs) {
@@ -338,9 +357,11 @@
                     $('.vss').change(function(){
                         var vs = $(this).val();
                         if (vs == 'All') {
+                            $('.timeline').replaceWith(option_list_value('timeline',["generation_time", "timestamp", "timed"],null,$('.timeline :selected').text()));
                             $(this).next("select").replaceWith(option_list_key('fields',field_to_virtual_sensor,"All Fields"));
                         }
                         else {
+                            $('.timeline').replaceWith(option_list_value('timeline',timeline(virtual_sensor_to_fields[vs]),null,$('.timeline :selected').text()));
                             $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields"));
                             auto_add_condition(vs);
                         }
@@ -363,9 +384,11 @@
                     $('.vss').change(function(){
                         var vs = $(this).val();
                         if (vs == 'All') {
+                            $('.timeline').replaceWith(option_list_value('timeline',["generation_time", "timestamp", "timed"],null,$('.timeline :selected').text()));
                             $(this).next("select").replaceWith(option_list_key('fields',field_to_virtual_sensor,"All Fields"));
                         }
                         else {
+                            $('.timeline').replaceWith(option_list_value('timeline',timeline(virtual_sensor_to_fields[vs]),null,$('.timeline :selected').text()));
                             $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields"));
                         }
                     });
@@ -555,7 +578,7 @@
                                 }
                             }
                             var data_length = fields[0]['data'].length;
-                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>'+($('#timeline').val())+'</th>';
+                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>'+($('.timeline').val())+'</th>';
                             for (var i = 0; i < headers.length; i++) {
                                 grid += '<th>' + headers[i] + '</th>';
                             }
@@ -630,7 +653,7 @@
                                             </p>
                                             <p>
                                                 <span>Timeline</span>
-                                                <select id="timeline" name="timeline"><option value="generation_time">generation_time</option><option value="timestamp">timestamp</option><option value="timed">timed</option></select>
+                                                <select class="timeline" name="timeline"><option value="generation_time">generation_time</option><option value="timestamp">timestamp</option><option value="timed">timed</option></select>
                                             </p>
                                         </div>
                                         <div class="data-outputs-container">
