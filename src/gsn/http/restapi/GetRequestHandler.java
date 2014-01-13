@@ -212,9 +212,9 @@ public class GetRequestHandler {
                 out.println("# " + df.getKey().toString().toLowerCase().trim() + ":" + df.getValue().toString().trim());
             }
 
-            String fieldNames = "";
-            String fieldUnits = "";
-            String fieldTypes = "";
+            String fieldNames = "# fields:time,timestamp,";
+            String fieldUnits = "# units:,,";
+            String fieldTypes = "# types:string,long,";
             boolean  first = true;
             for (DataField df : sensorConfig.getOutputStructure()) {
                 String field_name = df.getName().toLowerCase();
@@ -284,7 +284,7 @@ public class GetRequestHandler {
             out.println("# " + df.getKey().toString().toLowerCase().trim() + ":" + df.getValue().toString().trim());
         }
 
-        out.print("# fields: ,");
+        out.print("# fields:time,timestamp");
         int j;
         for (j=0; j < (fields.size()-1); j++) {
             out.print(","+fields.get(j));
@@ -335,7 +335,7 @@ public class GetRequestHandler {
                     Vector<Double> stream2 = new Vector<Double>();
                     timestamps.add(resultSet.getLong("timed"));
                     for (String fieldname : fields) {
-                        stream2.add(resultSet.getDouble(fieldname));
+                        stream2.add(getDouble(resultSet,fieldname));
                     }
                     elements.add(stream2);
                 } else {
@@ -343,7 +343,7 @@ public class GetRequestHandler {
 
                     out.print((new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp);
                     for (String fieldname : fields) {
-                        stream.add(resultSet.getDouble(fieldname));
+                        stream.add(getDouble(resultSet,fieldname));
                     }
                     for (int i = 0; i < stream.size(); i++) {
                         out.print(","+stream.get(i));
@@ -373,6 +373,13 @@ public class GetRequestHandler {
         return HTTP_STATUS_OK;
     }
 
+    private Double getDouble(ResultSet rs,String fieldName) throws SQLException{
+    	Double d=rs.getDouble(fieldName);
+    	if (rs.wasNull()) return null;
+    	//if (o!=null) return rs.getDouble(fieldName);
+    	else return d;
+    }
+    
     public RestResponse getGeoDataForSensor() {
         RestResponse restResponse = new RestResponse();
 
@@ -683,7 +690,7 @@ public class GetRequestHandler {
         for ( KeyValue df : sensorConfig.getAddressing()){
             out.println("# " + df.getKey().toString().toLowerCase().trim() + ":" + df.getValue().toString().trim());
         }
-        out.println("# "+field);
+        out.println("# fields:time,timestamp,"+field);
         DataField[] dataFieldArray = sensorConfig.getOutputStructure();
         for (DataField df: dataFieldArray){
             if (field.equalsIgnoreCase(df.getName())){
@@ -691,7 +698,7 @@ public class GetRequestHandler {
                 if (unit == null || unit.trim().length() == 0){
                     unit = "";
                 }
-                out.println("# "+unit);
+                out.println("# units:,,"+unit);
                 break;
             }
         }
@@ -720,7 +727,7 @@ public class GetRequestHandler {
 
                 while (resultSet.next()) {
                     timestamps.add(resultSet.getLong(1));
-                    stream.add(resultSet.getDouble(2));
+                    stream.add(getDouble(resultSet,field));
                     /*long timestamp = resultSet.getLong(1);
                     out.println(resultSet.getDouble(2)+","+(new java.text.SimpleDateFormat(ISO_FORMAT).format(new java.util.Date(timestamp))).toString().replace('T', ' ')+","+timestamp);
 */
@@ -779,7 +786,7 @@ public class GetRequestHandler {
             while (resultSet.next()) {
                 //int ncols = resultSet.getMetaData().getColumnCount();
                 long timestamp = resultSet.getLong(1);
-                double value = resultSet.getDouble(2);
+                Double value = getDouble(resultSet,field);
                 stream.add(value);
                 timestamps.add(timestamp);
             }
