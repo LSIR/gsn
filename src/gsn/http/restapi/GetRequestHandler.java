@@ -284,7 +284,7 @@ public class GetRequestHandler {
             out.println("# " + df.getKey().toString().toLowerCase().trim() + ":" + df.getValue().toString().trim());
         }
 
-        out.print("# ,");
+        out.print("# fields: ,");
         int j;
         for (j=0; j < (fields.size()-1); j++) {
             out.print(","+fields.get(j));
@@ -292,7 +292,7 @@ public class GetRequestHandler {
         out.println(","+fields.get(j));
 
         //units (second line)
-        out.print("# ,");
+        out.print("# units:,");
         for (j=0; j < (fields.size()-1); j++) {
             out.print(","+units.get(j));
         }
