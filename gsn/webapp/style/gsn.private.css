@@ -59,7 +59,7 @@ body, html
 {
 	margin:0;
 	padding:0;
-	background:#F5F5F5;
+	background:#E3E7EA;
 	color:#333;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size:12px;
@@ -79,13 +79,14 @@ body
 
 #container 
 {
-	margin:10px auto;
+	margin:auto;
 	/*padding:1px;*/
 	width:1000px;
 	background:#FFFFFF;
 }
 #header, #headerfm 
 {
+	position:relative;
 	margin:0;
 	padding:0;
 }
@@ -98,15 +99,20 @@ body
 
 #header h1 
 {
-	padding:95px 60px;
+	position:absolute;
+	top: 95px;
+	left: 60px;
 	margin:0;
 	color:white;
 }
 
 #headerfm h1 
 {
+	position:absolute;
+	top: 32px;
+	left: 90px;
+	padding-bottom:32px;
 	margin:0;
-	padding:32px 0 32px 90px;
 	font-size:1.7em;
 	color:white;
 }
@@ -115,6 +121,22 @@ body
 	text-decoration:none;
 	color:white;
 }
+#breadcrumbnav
+{
+	position:absolute;
+	top: 0;
+	left: 0;
+	padding-top: 8px;
+	padding-left: 21px;
+	font-size:0.9em;
+	color:#7b828a;
+}
+#breadcrumbnav a
+{
+	text-decoration:none;
+	color:#7b828a;
+}
+
 #navigation
 {
 	height:2.2em;
