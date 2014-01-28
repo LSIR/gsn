@@ -3,7 +3,7 @@ body, html
 {
 	margin:0;
 	padding:0;
-	background:#F5F5F5;
+	background:#E3E7EA;
 	color:#333;
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 	font-size:12px;
@@ -33,9 +33,11 @@ text-align:left;
 
 /***********************************Headings***********************************************/
 h1 {
-color:white;
+position:absolute;
+top: 95px;
+left: 60px;
 margin:0;
-padding:95px 60px;
+color:white;
 }
 
 h2 {
@@ -94,7 +96,7 @@ font-weight:bold;
 /*********************************layout structure ***************************************/
 
 #container {
-margin:10px auto;
+margin:auto;
 /*padding:1px;*/
 width:1000px;
 background:#FFFFFF;
@@ -128,8 +130,25 @@ padding: 20px;
 
 
 #masthead {
+position:relative;
 background-image:url("permasense-header.jpg");
 height:150px;
+}
+
+#breadcrumbnav
+{
+	position:absolute;
+	top: 0;
+	left: 0;
+	padding-top: 8px;
+	padding-left: 21px;
+	font-size:0.9em;
+	color:#7b828a;
+}
+#breadcrumbnav a
+{
+	text-decoration:none;
+	color:#7b828a;
 }
 
 #gsn-name {

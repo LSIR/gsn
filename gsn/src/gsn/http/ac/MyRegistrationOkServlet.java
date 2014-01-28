@@ -45,7 +45,7 @@ public class MyRegistrationOkServlet  extends HttpServlet
         //For Java Script!!
         //this.printEmbeddedJS(out);
         out.println("<script type=\"text/javascript\" src=\"/js/acjavascript.js\"></script>");
-		out.println("<TITLE>Sign Up Form</TITLE>");
+		out.println("<TITLE>Registration Request</TITLE>");
         out.println(" <link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" href=\"/style/acstyle.css\"/>");
         //printStyle(out);
         out.println("</HEAD>");
@@ -59,6 +59,7 @@ public class MyRegistrationOkServlet  extends HttpServlet
    {
        out.println("<div id=\"masthead\">");
        out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
+       out.println("<div id=\"breadcrumbnav\"><a href=\"http://www.permasense.ch\">PermaSense</a> > <a id=\"gsn-name\" style=\"\" href=\"/\">GSN</a> > <a href=/gsn/MyAccessRightsManagementServlet>Access Rights</a> > Registration Request</div>");
 
        out.println("</div>");
        out.println("<div id=\"navigation\">");

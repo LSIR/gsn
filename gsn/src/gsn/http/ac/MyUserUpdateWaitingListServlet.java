@@ -123,6 +123,7 @@ public class MyUserUpdateWaitingListServlet  extends HttpServlet
     {
         out.println("<div id=\"masthead\">");
         out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
+        out.println("<div id=\"breadcrumbnav\"><a href=\"http://www.permasense.ch\">PermaSense</a> > <a id=\"gsn-name\" style=\"\" href=\"/\">GSN</a> > <a href=/gsn/MyAccessRightsManagementServlet>Access Rights</a> > <a href=/gsn/MyAdminManagementServlet>Admin</a> > User Updates</div>");
 
         out.println("</div>");
         out.println("<div id=\"navigation\">");

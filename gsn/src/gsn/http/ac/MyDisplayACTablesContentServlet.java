@@ -80,6 +80,7 @@ public class MyDisplayACTablesContentServlet extends HttpServlet
     {
         out.println("<div id=\"masthead\">");
         out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
+        out.println("<div id=\"breadcrumbnav\"><a href=\"http://www.permasense.ch\">PermaSense</a> > <a id=\"gsn-name\" style=\"\" href=\"/\">GSN</a> > <a href=/gsn/MyAccessRightsManagementServlet>Access Rights</a> > <a href=/gsn/MyAdminManagementServlet>Admin</a> > AC Tables</div>");
 
         out.println("</div>");
         out.println("<div id=\"navigation\">");
@@ -116,7 +117,7 @@ public class MyDisplayACTablesContentServlet extends HttpServlet
         out.println("<li><a href=\"/\">Home</a></li>");
         out.println("<li><a href=/gsn/MyAccessRightsManagementServlet>access rights</a></li>");
         out.println("<li><a href=/gsn/MyAdminManagementServlet>admin</a></li>");
-        out.println("<li class=\"selected\"><a href=/gsn/MyDisplayACTablesContentServlet>ac table</a></li>");
+        out.println("<li class=\"selected\"><a href=/gsn/MyDisplayACTablesContentServlet>ac tables</a></li>");
     }
     private void printUserName(PrintWriter out, User user)
     {

@@ -64,7 +64,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         //For Java Script!!
         //this.printEmbeddedJS(out);
         out.println("<script type=\"text/javascript\" src=\"/js/acjavascript.js\"></script>");
-        out.println("<TITLE>User Update</TITLE>");
+        out.println("<TITLE>Update Access Rights</TITLE>");
         out.println(" <link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" href=\"/style/acstyle.css\"/>");
         //printStyle(out);
         out.println("</HEAD>");
@@ -76,6 +76,7 @@ public class MyUserUpdateServlet  extends HttpServlet
     {
         out.println("<div id=\"masthead\">");
         out.println("<h1><a id=\"gsn-name\" style=\"\" href=\"/\">" + Main.getContainerConfig( ).getWebName( ) + "</a></h1>");
+        out.println("<div id=\"breadcrumbnav\"><a href=\"http://www.permasense.ch\">PermaSense</a> > <a id=\"gsn-name\" style=\"\" href=\"/\">GSN</a> > <a href=/gsn/MyAccessRightsManagementServlet>Access Rights</a> > <a href=/gsn/MyUserAccountManagementServlet>User Account</a> > Update Access Rights</div>");
 
         out.println("</div>");
         out.println("<div id=\"navigation\">");
