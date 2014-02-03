@@ -130,7 +130,14 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
     				}
                 }
                 
-                RestDelivery deliverySystem = new RestDelivery(continuation, request.getRemoteHost(), parser.getLimit());
+                String remoteHost = request.getHeader("x-forwarded-for");
+                if (remoteHost == null) {
+                    remoteHost = request.getHeader("X_FORWARDED_FOR");
+                    if (remoteHost == null) {
+                        remoteHost = request.getRemoteHost();
+                    }
+                }
+                RestDelivery deliverySystem = new RestDelivery(continuation, remoteHost, parser.getLimit());
                 streamingReq = DefaultDistributionRequest.create(deliverySystem, parser.getVSensorConfig(), parser.getQuery(), startTime, parser.isContinuous());
                 DataDistributer.getInstance(deliverySystem.getClass()).addListener(streamingReq);
 			}catch (Exception e) {

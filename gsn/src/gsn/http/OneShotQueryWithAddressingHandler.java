@@ -49,9 +49,16 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler {
         try {
             result = Main.getStorage(vsName).executeQuery(query, true);
         } catch (SQLException e) {
+            String remoteHost = request.getHeader("x-forwarded-for");
+            if (remoteHost == null) {
+                remoteHost = request.getHeader("X_FORWARDED_FOR");
+                if (remoteHost == null) {
+                    remoteHost = request.getRemoteHost();
+                }
+            }
             logger.error("ERROR IN EXECUTING, query: " + query);
             logger.error(e.getMessage(), e);
-            logger.error("Query is from " + request.getRemoteAddr() + "- " + request.getRemoteHost());
+            logger.error("Query is from " + request.getRemoteAddr() + "- " + remoteHost);
             return;
         }
         StringBuilder sb = new StringBuilder("<result>\n");

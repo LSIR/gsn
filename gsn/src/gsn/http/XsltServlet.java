@@ -93,6 +93,14 @@ public class XsltServlet extends HttpServlet {
         	// 	TODO : Check to see if the requested column exists.
         	Connection conn = null;
             ResultSet rs = null;
+            
+            String remoteHost = req.getHeader("x-forwarded-for");
+            if (remoteHost == null) {
+                remoteHost = req.getHeader("X_FORWARDED_FOR");
+                if (remoteHost == null) {
+                    remoteHost = req.getRemoteHost();
+                }
+            }
         	try {
         		conn = Main.getStorage(vsName).getConnection();
         		rs = Main.getStorage(vsName).getBinaryFieldByQuery( query , colName , null , null ,conn);
@@ -123,11 +131,11 @@ public class XsltServlet extends HttpServlet {
         	} catch (NumberFormatException e1) {
         		logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName);
         		logger.error(e1.getMessage(),e1);
-        		logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
+        		logger.error("Query is from "+req.getRemoteAddr()+"- "+remoteHost);
         	} catch (SQLException e1) {
         		logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName);
         		logger.error(e1.getMessage(),e1);
-        		logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
+        		logger.error("Query is from "+req.getRemoteAddr()+"- "+remoteHost);
         	}finally{
         		Main.getStorage(vsName).close(rs);
         		Main.getStorage(vsName).close(conn);

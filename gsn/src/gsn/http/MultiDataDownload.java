@@ -54,6 +54,14 @@ public class MultiDataDownload extends HttpServlet {
 
         SimpleDateFormat sdfWeb = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss") ; // 29/10/2008 22:25:07
         sdfWeb.setTimeZone(Main.getContainerConfig().getTimeZone());
+        
+        String remoteHost = req.getHeader("x-forwarded-for");
+        if (remoteHost == null) {
+            remoteHost = req.getHeader("X_FORWARDED_FOR");
+            if (remoteHost == null) {
+                remoteHost = req.getRemoteHost();
+            }
+        }
         try {
 			logger.debug("Query string: " + req.getQueryString());
 
@@ -139,11 +147,11 @@ public class MultiDataDownload extends HttpServlet {
 				throw new DataRequestException("Unknown download_format >" + downloadFormat + "<");
 			}
 		} catch (DataRequestException e) {
-			logger.error("[Host: " + req.getRemoteHost() + "] " + e.getMessage());
+			logger.error("[Host: " + remoteHost + "] " + e.getMessage());
 			res.sendError(WebConstants.ERROR_INVALID_VSNAME, e.getMessage());
 			return;
 		} catch (Exception e) {
-			logger.error("[Host: " + req.getRemoteHost() + "] " + e.getMessage());
+			logger.error("[Host: " + remoteHost + "] " + e.getMessage());
 			res.sendError(WebConstants.UNSUPPORTED_REQUEST_ERROR, e.getMessage());
 			return;
 		}

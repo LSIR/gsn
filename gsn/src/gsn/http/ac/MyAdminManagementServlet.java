@@ -161,7 +161,15 @@ public class MyAdminManagementServlet extends HttpServlet
             {
                 req.getSession().setAttribute("scheme","http");
             }
-            res.sendRedirect("https://"+req.getServerName()+":"+ Main.getContainerConfig().getSSLPort()+"/gsn/MyAdminManagementServlet");
+             
+            String remoteHost = req.getHeader("x-forwarded-for");
+            if (remoteHost == null) {
+                remoteHost = req.getHeader("X_FORWARDED_FOR");
+                if (remoteHost == null) {
+                    remoteHost = req.getRemoteHost();
+                }
+            }
+            res.sendRedirect("https://"+remoteHost+"/gsn/MyAdminManagementServlet");
 
         }
     }

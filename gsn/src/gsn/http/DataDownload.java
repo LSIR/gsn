@@ -251,7 +251,15 @@ public class DataDownload extends HttpServlet {
                 } catch (SQLException e) {
                     logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
                     logger.error(e.getMessage(), e);
-                    logger.error("Query is from " + req.getRemoteAddr() + "- " + req.getRemoteHost());
+                    
+                    String remoteHost = req.getHeader("x-forwarded-for");
+                    if (remoteHost == null) {
+                        remoteHost = req.getHeader("X_FORWARDED_FOR");
+                        if (remoteHost == null) {
+                            remoteHost = req.getRemoteHost();
+                        }
+                    }
+                    logger.error("Query is from " + req.getRemoteAddr() + "- " + remoteHost);
                     return;
                 }
                 if (!result.hasMoreElements()) {
