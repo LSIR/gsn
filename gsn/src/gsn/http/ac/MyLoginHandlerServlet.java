@@ -150,15 +150,7 @@ public class MyLoginHandlerServlet extends HttpServlet
             {
                 req.getSession().setAttribute("scheme","http");
             }
-             
-            String remoteHost = req.getHeader("x-forwarded-for");
-            if (remoteHost == null) {
-                remoteHost = req.getHeader("X_FORWARDED_FOR");
-                if (remoteHost == null) {
-                    remoteHost = req.getRemoteHost();
-                }
-            }
-            res.sendRedirect("https://"+remoteHost+"/gsn/MyLoginHandlerServlet");
+            res.sendRedirect("https://"+req.getServerName()+"/gsn/MyLoginHandlerServlet");
 
         }
     }
