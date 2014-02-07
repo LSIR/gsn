@@ -2,6 +2,7 @@ package gsn.http.rest;
 
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.utils.models.AbstractModel;
 
 public interface DistributionRequest {
 
@@ -22,5 +23,7 @@ public interface DistributionRequest {
     public abstract boolean isClosed();
 
     public abstract DeliverySystem getDeliverySystem();
+    
+    public abstract AbstractModel getModel();
 
 }

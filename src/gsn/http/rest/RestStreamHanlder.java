@@ -3,6 +3,8 @@ package gsn.http.rest;
 import gsn.DataDistributer;
 import gsn.Main;
 import gsn.Mappings;
+import gsn.ModelDistributer;
+import gsn.VirtualSensor;
 import gsn.beans.VSensorConfig;
 import gsn.http.WebConstants;
 import gsn.http.ac.DataSource;
@@ -11,6 +13,9 @@ import gsn.http.ac.User;
 import gsn.storage.SQLUtils;
 import gsn.storage.SQLValidator;
 import gsn.utils.Helpers;
+import gsn.utils.models.AbstractModel;
+import gsn.vsensor.AbstractVirtualSensor;
+import gsn.vsensor.ModellingVirtualSensor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -22,7 +27,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
@@ -146,6 +150,7 @@ public class RestStreamHanlder extends HttpServlet {
 				return;
 			}
 			//checking to see if there is an already registered notification id, in that case, we ignore (re)registeration.
+			
 			DeliverySystem delivery;
 			if (parser.pushType.equals("wp"))
 				delivery = new WPPushDelivery(localContactPoint,notificationId,response.getWriter(),parser.nClass,parser.nMessage);
@@ -159,11 +164,18 @@ public class RestStreamHanlder extends HttpServlet {
 				delivery.close();
 				return;
 			}
-
-			DefaultDistributionRequest distributionReq = DefaultDistributionRequest.create(delivery, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
-			logger.debug("Rest request received: "+distributionReq.toString());
-			DataDistributer.getInstance(delivery.getClass()).addListener(distributionReq);
-			logger.debug("Streaming request received and registered:"+distributionReq.toString());
+			if (parser.getModelClass()==null){ //query on the database
+				DefaultDistributionRequest distributionReq = DefaultDistributionRequest.create(delivery, parser.getVSensorConfig(), parser.getQuery(), parser.getStartTime());
+				logger.debug("Rest request received: "+distributionReq.toString());
+				DataDistributer.getInstance(delivery.getClass()).addListener(distributionReq);
+				logger.debug("Streaming request received and registered:"+distributionReq.toString());
+			}else{ // query on a model
+				ModelDistributionRequest distributionReq = ModelDistributionRequest.create(delivery, parser.getVSensorConfig(), parser.getQuery(), parser.getModelClass());
+				logger.warn("Rest request received: "+distributionReq.toString());
+				ModelDistributer.getInstance(delivery.getClass()).addListener(distributionReq);
+				logger.warn("Streaming request received and registered:"+distributionReq.toString());
+			}
+		
 		}catch (Exception e) {
 			logger.warn(e.getMessage(),e);
 			return ;
@@ -203,13 +215,19 @@ public class RestStreamHanlder extends HttpServlet {
             String[] ahs = authHeader.split(" ");
             if (ahs.length == 2) {
                 String b64UsernamPassword = ahs[1]; // we get: d2VibWFzdGVyOnRyeTJndWVTUw
-                String userPass = new String(DatatypeConverter.parseBase64Binary(b64UsernamPassword)); // form: username:passsword
-                String[] ups;
-                if ((ups = userPass.split(":")).length == 2) {
-                    return new String[]{
-                            ups[0], // username
-                            ups[1]  // password
-                    };
+                sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
+                try {
+                    String userPass = new String(decoder.decodeBuffer(b64UsernamPassword)); // form: username:passsword
+                    String[] ups;
+                    if ((ups = userPass.split(":")).length == 2) {
+                        return new String[]{
+                                ups[0], // username
+                                ups[1]  // password
+                        };
+                    }
+                }
+                catch (IOException e) {
+                    logger.debug(e.getMessage(), e);
                 }
             }
         }
@@ -217,9 +235,13 @@ public class RestStreamHanlder extends HttpServlet {
     }
 
 	class URLParser{
-		private String query,tableName,pushType,nMessage;
-		private int nClass;
+		private String query,tableName;
+		private String cName = null;
+		private AbstractModel modelClass = null;
+		private String pushType = "";
+		private int nClass = 0;
 		private long startTime;
+		private String nMessage = "";
 		private VSensorConfig config;
 		public URLParser(HttpServletRequest request) throws UnsupportedEncodingException, Exception {
 			String requestURI = request.getRequestURI().substring(request.getRequestURI().toLowerCase().indexOf(STREAMING)+STREAMING.length());
@@ -235,8 +257,14 @@ public class RestStreamHanlder extends HttpServlet {
 				query = first;
 			}
 			query = URLDecoder.decode(query,"UTF-8");
-			if (tokens.hasMoreTokens()) 
-				startTime= Helpers.convertTimeFromIsoToLong(URLDecoder.decode(tokens.nextToken(),"UTF-8"));
+			while (tokens.hasMoreTokens()) {
+				String nt = tokens.nextToken();
+			    if (nt.startsWith("using")){
+			    	cName = nt.substring(6);
+			    }else{
+			    	startTime= Helpers.convertTimeFromIsoToLong(URLDecoder.decode(nt,"UTF-8"));
+			    }
+			}
 			tableName = SQLValidator.getInstance().validateQuery(query);
 			if (tableName==null)
 				throw new RuntimeException("Bad Table name in the query:"+query);
@@ -246,6 +274,18 @@ public class RestStreamHanlder extends HttpServlet {
 			query = SQLUtils.newRewrite(query, tableName, tableName.toLowerCase()).toString();
 			tableName=tableName.toLowerCase();
 			config = Mappings.getConfig(tableName);
+			int modelNB=0;
+			try{
+				modelNB = Integer.parseInt(cName);
+			}catch(Exception e){}
+			VirtualSensor vs = Mappings.getVSensorInstanceByFileName(config.getFileName());
+			AbstractVirtualSensor avs = vs.borrowVS();
+			if (avs instanceof ModellingVirtualSensor){
+				modelClass = ((ModellingVirtualSensor)avs).getModel(modelNB);
+			}
+			vs.returnVS(avs);
+			
+			
 		}
 		public VSensorConfig getVSensorConfig() {
 			return config;
@@ -256,6 +296,10 @@ public class RestStreamHanlder extends HttpServlet {
 		public long getStartTime() {
 			return startTime;
 		}
+		public AbstractModel getModelClass(){
+			return modelClass;
+		}
+		
 
 	}
 

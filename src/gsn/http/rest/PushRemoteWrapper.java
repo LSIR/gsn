@@ -36,13 +36,13 @@ import org.apache.log4j.Logger;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 
-public class PushRemoteWrapper extends AbstractWrapper {
+public class PushRemoteWrapper extends AbstractWrapper{
 
     private static final int KEEP_ALIVE_PERIOD = 5000;
 
     private final transient Logger logger = Logger.getLogger(PushRemoteWrapper.class);
 
-    private final XStream XSTREAM = StreamElement4Rest.getXstream();
+    protected final XStream XSTREAM = StreamElement4Rest.getXstream();
 
     private double uid = -1; //only set for push based delivery(default)
 

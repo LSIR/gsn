@@ -4,6 +4,7 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.storage.SQLValidator;
+import gsn.utils.models.AbstractModel;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -119,5 +120,10 @@ public class DefaultDistributionRequest implements DistributionRequest {
         result = 31 * result + (vSensorConfig != null ? vSensorConfig.hashCode() : 0);
         return result;
     }
+
+	@Override
+	public AbstractModel getModel() {
+		return null;
+	}
 }
 	
