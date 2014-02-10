@@ -80,7 +80,7 @@ public class GSNController extends Thread {
 
 				public void run() {
 					try {
-						Thread.sleep(30000);
+						Thread.sleep(7000);
 					} catch (InterruptedException e) {
 
 					}finally {
