@@ -25,8 +25,6 @@ public class GSNController extends Thread {
 	public static transient Logger logger = Logger.getLogger(GSNController.class);
 
 	private VSensorLoader vsLoader;
-	
-	private StopManager stopManager;
 
 	public GSNController(VSensorLoader vsLoader, int gsnControllerPort) throws UnknownHostException, IOException {
 		this.vsLoader = vsLoader;
@@ -36,8 +34,6 @@ public class GSNController extends Thread {
 	}
 
 	public void run() {
-		stopManager = new StopManager();
-		Runtime.getRuntime().addShutdownHook(stopManager);
 		logger.info("Started GSN Controller on port " + gsnControllerPort);
 		while (true) {
 			try {
@@ -56,7 +52,7 @@ public class GSNController extends Thread {
 					}
 					continue;
 				}
-				stopManager.start();
+				new StopManager().start();
 			} catch (SocketTimeoutException e) {
 				if (logger.isDebugEnabled())
 					logger.debug("Connection timed out. Message was: " + e.getMessage());
@@ -79,7 +75,6 @@ public class GSNController extends Thread {
 	private class StopManager extends Thread {
 
 		public void run() {
-			Runtime.getRuntime().removeShutdownHook(stopManager);
 
 			new Thread(new Runnable() {
 
