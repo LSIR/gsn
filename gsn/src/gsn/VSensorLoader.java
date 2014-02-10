@@ -470,8 +470,6 @@ public class VSensorLoader extends Thread {
             }
 		} catch ( SQLException e ) {
 			logger.error(e.getMessage(),e);
-		}finally {
-			System.exit(0);
 		}
 	}
 }
