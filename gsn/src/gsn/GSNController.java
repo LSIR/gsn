@@ -53,7 +53,7 @@ public class GSNController extends Thread {
 					}
 					continue;
 				}
-				new StopManager().start();
+				System.exit(0);
 			} catch (SocketTimeoutException e) {
 				if (logger.isDebugEnabled())
 					logger.debug("Connection timed out. Message was: " + e.getMessage());
@@ -96,7 +96,6 @@ public class GSNController extends Thread {
 				if (vsLoader != null) {
 					vsLoader.stopLoading();
 					logger.info("All virtual sensors have been stopped, shutting down virtual machine.");
-					System.exit(0);
 				} else {
 					logger.warn("Could not shut down virtual sensors properly. We are probably exiting GSN before it has been completely initialized.");
 				}
