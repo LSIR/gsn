@@ -34,6 +34,7 @@ public class GSNController extends Thread {
 	}
 
 	public void run() {
+		Runtime.getRuntime().addShutdownHook(new StopManager());
 		logger.info("Started GSN Controller on port " + gsnControllerPort);
 		while (true) {
 			try {
