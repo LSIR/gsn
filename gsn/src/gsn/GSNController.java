@@ -25,6 +25,8 @@ public class GSNController extends Thread {
 	public static transient Logger logger = Logger.getLogger(GSNController.class);
 
 	private VSensorLoader vsLoader;
+	
+	private StopManager stopManager;
 
 	public GSNController(VSensorLoader vsLoader, int gsnControllerPort) throws UnknownHostException, IOException {
 		this.vsLoader = vsLoader;
@@ -34,7 +36,8 @@ public class GSNController extends Thread {
 	}
 
 	public void run() {
-		Runtime.getRuntime().addShutdownHook(new StopManager());
+		stopManager = new StopManager();
+		Runtime.getRuntime().addShutdownHook(stopManager);
 		logger.info("Started GSN Controller on port " + gsnControllerPort);
 		while (true) {
 			try {
@@ -53,7 +56,7 @@ public class GSNController extends Thread {
 					}
 					continue;
 				}
-				System.exit(0);
+				stopManager.start();
 			} catch (SocketTimeoutException e) {
 				if (logger.isDebugEnabled())
 					logger.debug("Connection timed out. Message was: " + e.getMessage());
@@ -76,6 +79,7 @@ public class GSNController extends Thread {
 	private class StopManager extends Thread {
 
 		public void run() {
+			Runtime.getRuntime().removeShutdownHook(stopManager);
 
 			new Thread(new Runnable() {
 
@@ -96,6 +100,7 @@ public class GSNController extends Thread {
 				if (vsLoader != null) {
 					vsLoader.stopLoading();
 					logger.info("All virtual sensors have been stopped, shutting down virtual machine.");
+					System.exit(0);
 				} else {
 					logger.warn("Could not shut down virtual sensors properly. We are probably exiting GSN before it has been completely initialized.");
 				}
