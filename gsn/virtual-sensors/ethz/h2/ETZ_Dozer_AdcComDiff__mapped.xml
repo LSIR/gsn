@@ -37,7 +37,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
                     <predicate key="query"> select * from ETZ_Dozer_AdcComDiff</predicate>
-                    <predicate key="remote-contact-point">http://whymper.ethz.ch:23001/streaming/</predicate>
+                    <predicate key="remote-contact-point">http://whymper.ethz.ch:23080/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

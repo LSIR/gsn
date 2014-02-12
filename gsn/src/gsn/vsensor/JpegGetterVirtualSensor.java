@@ -27,7 +27,7 @@ public class JpegGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 	
 	private static final String DEFAULT_NEF_EXTRACTION_TYPE = "thumbnail";
 	
-	private static final String DCRAW = "/home/perma/bin/dcraw-x64/dcraw";
+	private static final String DCRAW = "dcraw";
 
 	private static final transient Logger logger = Logger.getLogger(JpegGetterVirtualSensor.class);
 

@@ -14,10 +14,19 @@ var GsnPlots = {
     // array of { signals [{vsensor, field[], select, position, deviceId}], "title"},
     var a = document.createElement('a');
     a.href="/";
-    if (a.host.match(/tik41x.*:22001/) || a.host.match(/data.permasense.ch:22001/) || a.host.match(/data.permasense.ch:8443/) || a.host.match(/data.permasense.ch:443/) || a.host.match(/tik41x.*:8443/) || a.host.match(/tik41x.*:443/) )
+    if (a.host.match(/pbl.permasense.*/) ||
+    	a.host.match(/croz.*:22080/) ||
+    	a.host.match(/croz.*:22443/) ||
+    	a.host.match(/data.permasense.ch:80/) ||
+    	a.host.match(/data.permasense.ch:22080/) ||
+    	a.host.match(/data.permasense.ch:22443/) ||
+    	a.host.match(/data.permasense.ch:443/) )
+    	
       GsnPlots.gsnserver = "data.permasense.ch";
-    else if (a.host.match(/tik51x.*:22001/) || a.host.match(/tik51x.*:8443/))
-    	GsnPlots.gsnserver = "tik51x.ee.ethz.ch:22001";
+    else if (a.host.match(/tpbl.permasense.*/) ||
+    		 a.host.match(/croz.*:23080/) ||
+    		 a.host.match(/croz.*:23433/) )
+    	GsnPlots.gsnserver = "tpbl.permasense.ethz.ch";
     else
       GsnPlots.gsnserver = a.host;
     GsnPlots.config = GsnPlots.config.concat(config);
@@ -166,7 +175,7 @@ var GsnPlots = {
                 "showForm": true
               },
               "inittimerange": 2592000000,
-              "appUrl": "http://whymper.ethz.ch:24001/vizzly?",
+              "appUrl": "http://vizzly.ethz.ch/vizzly?",
               "signals": [],
           };
           $(this.signals).each(function() {

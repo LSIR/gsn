@@ -35,7 +35,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
                     <predicate key="query"> select * from Jungfraujoch_Dozer_Th3Temp</predicate>
-                    <predicate key="remote-contact-point">http://whymper.ethz.ch:22001/streaming/</predicate>
+                    <predicate key="remote-contact-point">http://whymper.ethz.ch:22080/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
