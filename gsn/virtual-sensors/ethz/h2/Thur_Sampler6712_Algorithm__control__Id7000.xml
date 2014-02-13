@@ -17,11 +17,11 @@
             <param name="sampling_scheme">1,6,10,1000;7,12,30,1000;13,24,60,1000</param>
 
             <!-- settings for sending new schedule to core station (http post) -->
-            <param name="schedule_host_name">http://whymper.ethz.ch:23080/</param> <!-- host name of schedule VS location: PermaSense :: GSN - Test - Private -->
+            <param name="schedule_host_name">http://tpvt.permasense.ethz.ch/</param> <!-- host name of schedule VS location: PermaSense :: GSN - Test - Private -->
             <param name="schedule_vs_name">thur_schedule</param> <!-- VS name of schedule VS -->
 
             <!-- settings for wake up of core station (http post) -->
-            <param name="dozer_command_host_name">http://whymper.ethz.ch:22080/</param> <!-- host name of dozer command VS location: PermaSense :: GSN - Private -->
+            <param name="dozer_command_host_name">http://pvt.permasense.ethz.ch/</param> <!-- host name of dozer command VS location: PermaSense :: GSN - Private -->
             <param name="dozer_command_vs_name">thur_dozer_command</param> <!-- VS name of dozer command VS -->
         </init-params>
 
@@ -89,7 +89,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
                     <predicate key="query"> select * from Thur_Dozer_Command where device_id = 7000 </predicate>
-                    <predicate key="remote-contact-point">http://whymper.ethz.ch:22080/streaming/</predicate> <!-- PermaSense :: GSN - Private -->
+                    <predicate key="remote-contact-point">http://pvt.permasense.ethz.ch/streaming/</predicate> <!-- PermaSense :: GSN - Private -->
                 </address>
                 <query> select * from wrapper 
                 </query>
