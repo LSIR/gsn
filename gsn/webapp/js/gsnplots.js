@@ -14,18 +14,18 @@ var GsnPlots = {
     // array of { signals [{vsensor, field[], select, position, deviceId}], "title"},
     var a = document.createElement('a');
     a.href="/";
-    if (a.host.match(/pbl.permasense.*/) ||
-    	a.host.match(/croz.*:22080/) ||
-    	a.host.match(/croz.*:22443/) ||
-    	a.host.match(/data.permasense.ch:80/) ||
-    	a.host.match(/data.permasense.ch:22080/) ||
-    	a.host.match(/data.permasense.ch:22443/) ||
-    	a.host.match(/data.permasense.ch:443/) )
+    if (a.host.match(/^pbl.permasense.*/) ||
+    	a.host.match(/^croz.*:22080/) ||
+    	a.host.match(/^croz.*:22443/) ||
+    	a.host.match(/^data.permasense.ch:80/) ||
+    	a.host.match(/^data.permasense.ch:22080/) ||
+    	a.host.match(/^data.permasense.ch:22443/) ||
+    	a.host.match(/^data.permasense.ch:443/) )
     	
       GsnPlots.gsnserver = "data.permasense.ch";
-    else if (a.host.match(/tpbl.permasense.*/) ||
-    		 a.host.match(/croz.*:23080/) ||
-    		 a.host.match(/croz.*:23433/) )
+    else if (a.host.match(/^tpbl.permasense.*/) ||
+    		 a.host.match(/^croz.*:23080/) ||
+    		 a.host.match(/^croz.*:23433/) )
     	GsnPlots.gsnserver = "tpbl.permasense.ethz.ch";
     else
       GsnPlots.gsnserver = a.host;
