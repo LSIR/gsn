@@ -1,4 +1,0 @@
-gsn
-===
-
-Global Sensor Networks
