@@ -1,4 +1,4 @@
-## GSN Changelog
+## GSN Change log
 
 ### r1.1.3
 [commits] (https://github.com/LSIR/gsn/commits/gsn-release-1.1.2)
