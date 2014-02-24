@@ -5,7 +5,7 @@ GSN is a software middleware designed to facilitate the deployment and programmi
 ## Online Documentation
 
 You can find the latest GSN documentation, including a deployment, installation, and programming
-guide, on the project webpage at <http://sourceforge.net/apps/trac/gsn/>.
+guide, on the project [wiki](https://github.com/LSIR/gsn/wiki).
 This README file only contains basic setup instructions.
 
 ## Building
