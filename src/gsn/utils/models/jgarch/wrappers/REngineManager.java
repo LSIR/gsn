@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/jgarch/wrappers/REngineManager.java
 *
+* @author Saket Sathe
 * @author Sofiane Sarni
 * @author Julien Eberle
 *
