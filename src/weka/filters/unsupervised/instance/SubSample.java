@@ -19,6 +19,7 @@
 * 
 * File: src/weka/filters/unsupervised/instance/SubSample.java
 *
+* @author Julien Eberle
 * @author Sofiane Sarni
 *
 */
