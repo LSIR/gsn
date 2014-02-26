@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/helper/Segmenter.java
 *
+* @author Juelien Eberle
 * @author Sofiane Sarni
 *
 */
