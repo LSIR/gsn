@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/jgarch/util/ArrayUtils.java
 *
+* @author Saket Sathe
 * @author Sofiane Sarni
 *
 */
