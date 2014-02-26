@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/http/GMLHandler.java
 *
+* @author Ionut Iosifescu
 * @author Ali Salehi
 * @author Timotee Maret
 * @author Sofiane Sarni
