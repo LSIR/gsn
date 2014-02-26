@@ -20,6 +20,7 @@
 * File: src/gsn/utils/models/ModelFitting.java
 *
 * @author Sofiane Sarni
+* @author Alexandru Arion
 *
 */
 
