@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/IModel.java
 *
+* @author Alexandru Arion
 * @author Sofiane Sarni
 *
 */
