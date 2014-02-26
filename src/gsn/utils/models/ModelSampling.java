@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/ModelSampling.java
 *
+* @author Alexandru Arion
 * @author Sofiane Sarni
 *
 */
