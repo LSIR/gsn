@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/helper/Tools.java
 *
+* @author Julien Eberle
 * @author Sofiane Sarni
 *
 */
@@ -35,7 +36,6 @@ import weka.core.SelectedTag;
 
 /**
  * some useful tools for working with the results of a classifier
- * @author jeberle
  *
  */
 public class Tools {
