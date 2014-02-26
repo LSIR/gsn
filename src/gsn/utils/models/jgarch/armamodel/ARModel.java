@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/jgarch/armamodel/ARModel.java
 *
+* @author Saket Sathe
 * @author Sofiane Sarni
 *
 */
