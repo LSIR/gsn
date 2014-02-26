@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/ChebyshevPolynomialModel.java
 *
+* @author Alexandru Arion
 * @author Sofiane Sarni
 *
 */
