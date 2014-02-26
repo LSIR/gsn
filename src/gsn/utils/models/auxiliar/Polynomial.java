@@ -19,6 +19,7 @@
 * 
 * File: src/gsn/utils/models/auxiliar/Polynomial.java
 *
+* @author Alexandru Arion
 * @author Sofiane Sarni
 *
 */
