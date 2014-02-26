@@ -22,13 +22,13 @@ GSN requires the following software for building:
 To build GSN follow these steps:
 * Add ANT_HOME/bin folder to your PATH
 * Execute ant with the build task:
-	ant build
+	``ant build``
 
 To run GSN from the source code, you can run the following ant task:
-	ant gsn
+	``ant gsn``
 
 To stop GSN:
-	ant stop
+	``ant stop``
 
 ## Download Installer
 
