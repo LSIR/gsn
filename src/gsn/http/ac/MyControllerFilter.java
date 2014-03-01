@@ -151,8 +151,8 @@ public class MyControllerFilter implements Filter {
                     }
                 }
 
-                // support for request 114
-                if ("/gsn".equals(req.getServletPath()) && (requestType == 114)) {
+                // support for request 114, 113 and griddata
+                if (("/gsn".equals(req.getServletPath()) && (requestType == 114 || requestType == 113)) || "/griddata".equals(req.getServletPath())) {
                     if ((reqUsername != null) && (reqPassword != null) && (reqVirtualSensorName != null)) {
                         User userByURL = UserUtils.allowUserToLogin(reqUsername, reqPassword);
 
