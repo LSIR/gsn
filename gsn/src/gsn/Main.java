@@ -357,6 +357,7 @@ public final class Main implements UncaughtExceptionHandler {
         requestLog.setRetainDays(90);
         requestLog.setAppend(true);
         requestLog.setExtended(true);
+        requestLog.setPreferProxiedForAddress(true);
         //requestLog.setLogTimeZone("GMT");
         requestLogHandler.setRequestLog(requestLog);
 
