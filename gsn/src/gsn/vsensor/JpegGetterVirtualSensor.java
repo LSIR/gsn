@@ -145,6 +145,7 @@ public class JpegGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 					new Serializable[]{os.toByteArray()});
 			
 			try {
+				s.close();
 				is.close();
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
