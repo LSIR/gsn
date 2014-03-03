@@ -142,8 +142,6 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			// save always latest timestamp
 			boolean isLatest = false;
 			if (node.timestamp==null || node.timestamp.compareTo(timestamp) < 0) {
-				node.timestamp = timestamp;
-				node.generation_time = generation_time;
 				isLatest = true;
 			}
 				
@@ -186,10 +184,16 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					newlink.rssi=rssi;
 					newlink.timestamp=timestamp;
 					// do not count rssi info to packets
+					node.timestamp = timestamp;
+					node.generation_time = generation_time;
 				}
 			}
 			// events
 			else if (inputStreamName.startsWith(configuration[15])) {
+				if (isLatest) {
+					node.timestamp = timestamp;
+					node.generation_time = generation_time;
+				}
 				// eventlogger
 				s = data.getData(configuration[16]);
 				if (s instanceof Short) {
@@ -252,10 +256,17 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					if (s instanceof Byte) {
 						connected = (Byte)s;
 					}
-					if (connected == 1 && (node.corestation_online == null || !node.corestation_online))
+					
+					if (connected == 1 && (node.corestation_online == null || !node.corestation_online)) {
+						node.timestamp = timestamp;
+						node.generation_time = generation_time;
 						node.corestation_online = new Boolean(true);
-					else if  (connected == 0 && (node.corestation_online == null || node.corestation_online))
+					}
+					else if  (connected == 0 && (node.corestation_online == null || node.corestation_online)) {
+						node.timestamp = timestamp;
+						node.generation_time = generation_time;
 						node.corestation_online = new Boolean(false);
+					}
 					else
 						return;
 				}
@@ -274,11 +285,17 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						dbEntries = (Integer)s;
 					}
 					node.db_entries = dbEntries;
+					node.timestamp = timestamp;
+					node.generation_time = generation_time;
 				}
 				else
 					return;
 			}
 			else {
+				if (isLatest) {
+					node.timestamp = timestamp;
+					node.generation_time = generation_time;
+				}
 				node.packet_count++;
 				if (inputStreamName.equals(configuration[10]) && !node.isAccessNode()) {
 					node.setNodeType(SensorNode.BASESTATION);
