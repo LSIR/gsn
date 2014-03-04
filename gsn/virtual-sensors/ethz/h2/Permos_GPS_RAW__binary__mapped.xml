@@ -1,0 +1,40 @@
+<virtual-sensor name="Permos_GPS_RAW__binary__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" index="true" />
+            <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+            <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
+		    <field name="GPS_SATS" type="INTEGER"/>
+		    <field name="GPS_MISSING_SV" type="INTEGER"/>
+            <field name="GPS_RAW_DATA" type="binary"/>
+            
+        </output-structure>
+    </processing-class>
+    <description>GPS RAW data in UBX binary format from Permos deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data0">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Permos_GPS_Logger__data__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, 0 as GPS_UNIXTIME, 0 as GPS_MISSING_SV, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

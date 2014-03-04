@@ -154,6 +154,7 @@ Matterhorn_Statistics.xml
 Matterhorn_SyslogNg.xml
 Matterhorn_VaisalaWXT520.xml
 Matterhorn_Topology.xml
+Permos_GPS_Logger__files.xml
 Statistics_MySQL.xml
 Statistics_GSN.xml
 Statistics_Sensorviz.xml
