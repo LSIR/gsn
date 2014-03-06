@@ -18,7 +18,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam4/current.jpg</predicate>
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam04/currentR.jpg</predicate>
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam1</predicate>
                     <predicate key="device-id">6003</predicate>
@@ -30,7 +30,7 @@
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam5/current.jpg</predicate>
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam05/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam2</predicate>
                     <predicate key="device-id">6004</predicate>
@@ -42,7 +42,7 @@
         <stream name="data3">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam2/current.jpg</predicate>
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam02/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam3</predicate>
                     <predicate key="device-id">6005</predicate>
@@ -54,7 +54,7 @@
         <stream name="data4">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam7/current.jpg</predicate>
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam07/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam4</predicate>
                     <predicate key="device-id">6006</predicate>
@@ -66,7 +66,7 @@
         <stream name="data5">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam15/current.jpg</predicate>
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam15/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam5</predicate>
                     <predicate key="device-id">6014</predicate>
@@ -78,7 +78,7 @@
         <stream name="data6">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam3/current.jpg</predicate>
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam03/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam6</predicate>
                     <predicate key="device-id">6008</predicate>
@@ -90,7 +90,7 @@
         <stream name="data7">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.idelec.ch/webcam/unifr/wcam8/current.jpg</predicate>
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam08/current.jpg</predicate>
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam7</predicate>
                     <predicate key="device-id">6009</predicate>
@@ -99,7 +99,31 @@
             </source>
             <query> select * from source </query>
         </stream>
-        <stream name="data8">
+        <stream name="data9">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam14/current.jpg</predicate>
+                    <predicate key="rate">900000</predicate>
+                    <predicate key="subdirectory-name">webcam9</predicate>
+                    <predicate key="device-id">6012</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data10">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://people.ee.ethz.ch/~jbeutel/pics/unifr_webcams/ftp.unifr.ch/wcam04/currentL.jpg</predicate>
+                    <predicate key="rate">900000</predicate>
+                    <predicate key="subdirectory-name">webcam10</predicate>
+                    <predicate key="device-id">6013</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data11">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
                     <predicate key="url">http://permasense-rd-cam01/record/current.jpg</predicate>
