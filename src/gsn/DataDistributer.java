@@ -29,13 +29,18 @@ package gsn;
 
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.http.rest.DefaultDistributionRequest;
 import gsn.http.rest.DeliverySystem;
 import gsn.http.rest.DistributionRequest;
+import gsn.http.rest.LocalDeliveryWrapper;
+import gsn.networking.zeromq.ZeroMQDelivery;
+import gsn.networking.zeromq.ZeroMQWrapper;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLValidator;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -47,6 +52,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import gsn.storage.StorageManager;
 import org.apache.log4j.Logger;
+import org.joda.time.format.ISODateTimeFormat;
 
 public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
 
@@ -260,6 +266,18 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     }
 
     public boolean vsLoading(VSensorConfig config) {
+    	synchronized (listeners) {
+    		if (getInstance(ZeroMQDelivery.class) == this){
+    			try {
+    				DeliverySystem delivery = new ZeroMQDelivery(config);
+					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(),System.currentTimeMillis()));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+    		}
+    	}
         return true;
     }
 

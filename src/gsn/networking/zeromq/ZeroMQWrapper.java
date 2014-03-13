@@ -7,6 +7,8 @@ import org.zeromq.ZMQ;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
+
+import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -24,7 +26,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	@Override
 	public DataField[] getOutputFormat() {
 		DataField[] s = getActiveAddressBean().getOutputStructure();
-    	if (s == null){throw new RuntimeException("Direct Push wrapper has an undefined output structure.");}
+    	if (s == null){throw new RuntimeException("ZeroMQ wrapper has an undefined output structure.");}
     	return s;
 	}
 
@@ -35,17 +37,11 @@ public class ZeroMQWrapper extends AbstractWrapper {
 
 		AddressBean addressBean = getActiveAddressBean();
 
-		String host = addressBean.getPredicateValue ( "host" );
+		String address = addressBean.getPredicateValue ( "address" );
 		vsensor = addressBean.getPredicateValue ( "vsensor" );
-		if ( host == null || host.trim().length() == 0 ) 
-			throw new RuntimeException( "The >host< parameter is missing from the ZeroMQWrapper wrapper." );
-		int port = addressBean.getPredicateValueAsInt("port",6001);
-		int syncport = addressBean.getPredicateValueAsInt("syncport",6002);
-		if ( port > 65000 || port <= 0 || syncport > 65000 || syncport <= 0 ) 
-			throw new RuntimeException("ZeroMQ wrapper initialization failed, bad port number: "+port);
-		remoteContactPoint = ("tcp://" + host +":"+port).trim();
-		
-		System.out.println("init");
+		if ( address == null || address.trim().length() == 0 ) 
+			throw new RuntimeException( "The >address< parameter is missing from the ZeroMQWrapper wrapper." );
+		remoteContactPoint = (address).trim();
 
 		/*try{
 			ZMQ.Context context = ZMQ.context(1);
@@ -74,7 +70,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	
 	@Override
 	public void run(){
-		ZMQ.Context context = ZMQ.context(1);
+		ZMQ.Context context = Main.getZmqContext();
 
 		ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
 		subscriber.connect(remoteContactPoint);
@@ -86,17 +82,16 @@ public class ZeroMQWrapper extends AbstractWrapper {
 			try{
 				ByteArrayInputStream bais = new ByteArrayInputStream(subscriber.recv());
 				bais.skip(vsensor.getBytes().length + 1);
-				StreamElement4Rest se = kryo.readObjectOrNull(new Input(bais),StreamElement4Rest.class);
-		        StreamElement streamElement = se.toStreamElement();
+				System.out.println("read");
+				StreamElement se = kryo.readObjectOrNull(new Input(bais),StreamElement.class);
 		        //maybe queuing would be better here...
-		        boolean status = postStreamElement(streamElement);
+		        boolean status = postStreamElement(se);
 			}catch (Exception e)
 			{
 				logger.error(e.getMessage());
 			}
 		}
 		subscriber.close();
-		context.term();
 	}
 
 }

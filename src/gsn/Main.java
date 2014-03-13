@@ -108,6 +108,8 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Context;
 import org.eclipse.jetty.server.AbstractConnector;
 
 
@@ -171,7 +173,7 @@ public final class Main {
 		}
 		
 		//start the 0MQ proxy
-		new ZeroMQProxy(6003,6001);
+		//new ZeroMQProxy(6001);
 		
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
@@ -266,6 +268,8 @@ public final class Main {
     private static StorageManager windowStorage = null;
 
     private static StorageManager validationStorage = null;
+    
+    private static Context zmqContext = ZMQ.context(1);
 
 	private GSNController controlSocket;
 
@@ -359,7 +363,7 @@ public final class Main {
 	public static Properties getWrappers()  {
 		if (singleton==null )
 			return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
-		return singleton.wrappers;
+		return Main.wrappers;
 	}
     
 	//FIXME: COPIED_FOR_SAFE_STOAGE
@@ -523,4 +527,9 @@ public final class Main {
     public static StorageManager getWindowStorage() {
         return windowStorage;
     }
+    
+    public static Context getZmqContext(){
+    	return zmqContext;
+    }
 }
+

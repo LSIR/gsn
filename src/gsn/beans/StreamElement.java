@@ -72,6 +72,10 @@ public final class StreamElement implements Serializable {
 		this.timeStamp=other.timeStamp;
 		this.internalPrimayKey = other.internalPrimayKey;
 	}
+	
+	public StreamElement(){ //constructor for serialization
+		
+	}
 	public StreamElement ( DataField [ ] outputStructure , final Serializable [ ] data  ) {
 		this(outputStructure,data,System.currentTimeMillis());
 	}

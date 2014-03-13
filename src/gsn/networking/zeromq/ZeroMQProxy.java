@@ -1,5 +1,7 @@
 package gsn.networking.zeromq;
 
+import gsn.Main;
+
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 
@@ -12,11 +14,11 @@ public class ZeroMQProxy extends Thread implements Runnable {
 	private ZMQ.Socket publisherX;
 	
 
-	public ZeroMQProxy (final int portIN, final int portOUT){
-		ctx =  ZMQ.context(1);
+	public ZeroMQProxy (final int portOUT){
+		ctx = Main.getZmqContext();
 		
 		subscriberX = ctx.socket(ZMQ.XSUB);
-	    subscriberX.connect("tcp://127.0.0.1:"+portIN);
+	    subscriberX.connect("inproc://stream");
 	    publisherX = ctx.socket(ZMQ.XPUB);
 	    publisherX.bind("tcp://*:"+portOUT);
 	    
