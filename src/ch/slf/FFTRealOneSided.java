@@ -150,8 +150,8 @@ public class FFTRealOneSided extends WindowAwareVS {
 			logger.error("Unable to compute the FFT: " + e.getMessage());
 		} 
 		
-		//catch (MathException e) {
-		//	logger.error("Unable to compute the FFT: " + e.getMessage());
-		//}
+		catch (Exception e) {
+			logger.error("Unable to compute the FFT: " + e.getMessage());
+		}
 	}
 }
