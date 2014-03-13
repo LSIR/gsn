@@ -41,6 +41,8 @@ import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.WPPushDelivery;
 import gsn.http.rest.RestDelivery;
+import gsn.networking.zeromq.ZeroMQDelivery;
+import gsn.networking.zeromq.ZeroMQProxy;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.storage.StorageManagerFactory;
@@ -167,6 +169,10 @@ public final class Main {
 		} catch ( Exception e ) {
 			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
 		}
+		
+		//start the 0MQ proxy
+		new ZeroMQProxy(6003,6001);
+		
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
 
@@ -183,12 +189,14 @@ public final class Main {
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(WPPushDelivery.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
 		vsloader.addVSensorStateChangeListener(ModelDistributer.getInstance(WPPushDelivery.class));
+		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDelivery.class));
 
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(WPPushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(ModelDistributer.getInstance(WPPushDelivery.class));
+		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(ZeroMQDelivery.class));
 		vsloader.startLoading();
 
 
