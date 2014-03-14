@@ -74,18 +74,24 @@ public class ZeroMQWrapper extends AbstractWrapper {
 
 		ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
 		subscriber.connect(remoteContactPoint);
+		subscriber.setReceiveTimeOut(10000);
 		subscriber.subscribe(vsensor.getBytes());
-		
 		System.out.println("connected to Queue: "+ remoteContactPoint);
 
 		while (isActive()) {
 			try{
-				ByteArrayInputStream bais = new ByteArrayInputStream(subscriber.recv());
-				bais.skip(vsensor.getBytes().length + 1);
-				System.out.println("read");
-				StreamElement se = kryo.readObjectOrNull(new Input(bais),StreamElement.class);
-		        //maybe queuing would be better here...
-		        boolean status = postStreamElement(se);
+				byte[] rec = subscriber.recv();
+				if (rec != null){
+					System.out.println("read");
+					ByteArrayInputStream bais = new ByteArrayInputStream(rec);
+					bais.skip(vsensor.getBytes().length + 1);
+					StreamElement se = kryo.readObjectOrNull(new Input(bais),StreamElement.class);
+			        //maybe queuing would be better here...
+			        boolean status = postStreamElement(se);
+				}else{
+					System.out.println("timeout");
+					subscriber.subscribe(vsensor.getBytes());
+				}
 			}catch (Exception e)
 			{
 				logger.error(e.getMessage());

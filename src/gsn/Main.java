@@ -123,6 +123,8 @@ public final class Main {
 	private static Main singleton ;
 
 	private static int gsnControllerPort;
+	
+	private static ZeroMQProxy zmqproxy;
 
     private Main() throws Exception {
 
@@ -173,7 +175,7 @@ public final class Main {
 		}
 		
 		//start the 0MQ proxy
-		//new ZeroMQProxy(6001);
+		zmqproxy = new ZeroMQProxy(6001);
 		
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
@@ -530,6 +532,10 @@ public final class Main {
     
     public static Context getZmqContext(){
     	return zmqContext;
+    }
+    
+    public static ZeroMQProxy getZmqProxy(){
+    	return zmqproxy;
     }
 }
 
