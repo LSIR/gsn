@@ -1,6 +1,8 @@
 package gsn.networking.zeromq;
 
 import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
 import org.zeromq.ZMQ;
@@ -71,25 +73,39 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	@Override
 	public void run(){
 		ZMQ.Context context = Main.getZmqContext();
-
 		ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
-		subscriber.connect(remoteContactPoint);
-		subscriber.setReceiveTimeOut(10000);
+		
+        boolean isLocal = false;
+        boolean connected = true;
+        try {
+            isLocal = new URI(remoteContactPoint).getScheme().equals("inproc");
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+        connected = subscriber.base().connect(remoteContactPoint);
+
+		subscriber.setReceiveTimeOut(3000);
+
 		subscriber.subscribe(vsensor.getBytes());
-		System.out.println("connected to Queue: "+ remoteContactPoint);
+		//System.out.println("connected to Queue: "+ remoteContactPoint + " and subscribe to " + vsensor);
 
 		while (isActive()) {
 			try{
 				byte[] rec = subscriber.recv();
 				if (rec != null){
-					System.out.println("read");
+					//System.out.println("read from wrapper");
 					ByteArrayInputStream bais = new ByteArrayInputStream(rec);
 					bais.skip(vsensor.getBytes().length + 1);
 					StreamElement se = kryo.readObjectOrNull(new Input(bais),StreamElement.class);
 			        //maybe queuing would be better here...
 			        boolean status = postStreamElement(se);
 				}else{
-					System.out.println("timeout");
+					if (isLocal && !connected){
+						subscriber.disconnect(remoteContactPoint);
+						connected = subscriber.base().connect(remoteContactPoint);
+					}
+					//System.out.println("timeout on wrapper, subscribing to "+ vsensor);
 					subscriber.subscribe(vsensor.getBytes());
 				}
 			}catch (Exception e)

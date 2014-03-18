@@ -21,6 +21,7 @@ public class ZeroMQDelivery implements DeliverySystem{
 	
 	private Context context;
 	private Socket publisher;
+	private Socket internal;
 	private boolean closed = true;
 	private DataField[] structure;
 	private Kryo kryo = new Kryo();
@@ -29,14 +30,14 @@ public class ZeroMQDelivery implements DeliverySystem{
 	public ZeroMQDelivery(VSensorConfig config){
         this.config = config;
         
-        Main.getZmqProxy().listenTo(config.getName());
 		context = Main.getZmqContext();
 		// Socket to talk to clients
 		publisher = context.socket(ZMQ.PUB);
 		publisher.setLinger(5000);
-		// In 0MQ 3.x pub socket could drop messages if sub can follow the generation of pub messages
 		publisher.setSndHWM(0);
-		publisher.connect("inproc://stream/"+config.getName());		
+		publisher.bind("inproc://stream/"+config.getName());
+		//System.out.println("Delivery bind on inproc://stream/"+config.getName());
+		Main.getZmqProxy().connectTo(config.getName());
 		closed = false;
 	}
 
@@ -53,7 +54,9 @@ public class ZeroMQDelivery implements DeliverySystem{
             Output o = new Output(bais);
             kryo.writeObjectOrNull(o,se,StreamElement.class);
             o.close();
-            return publisher.send(bais.toByteArray());
+            byte[] b = bais.toByteArray();
+            //System.out.println(config.getName()+" sending on Delivery");
+            return publisher.send(b);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
