@@ -54,11 +54,12 @@ $(document).ready(function() {
     });
     $("#vssearch").keyup(function(event) {
 		if ($("#vssearch").val() != "" && $("#vssearch").val() != "search vs") {
-        	GSN.util.filterVs($("#vssearch").val());
+			GSN.util.filterVs($("#vssearch").val());
 			$("#vssearch").css("color", "#000000");
 			$("#vssearch_clear").attr("src", "img/button_cancel.png");
 		}
 		else {
+			GSN.util.filterVs("");
 			$("#vssearch_clear").attr("src", "img/button_cancel_grey.png");
 	    	if (13 == (event.keyCode || event.which))
 				$("#vssearch").css("color", "#bbbbbb");
@@ -75,17 +76,20 @@ $(document).ready(function() {
     	}
     });
     $("#vssearch").blur(function(event) {
-		if ($("#vssearch").val() == "") {
+		if ($("#vssearch").val() == "" || $("#vssearch").val() == "search vs") {
 			$("#vssearch").css("color", "#bbbbbb");
 	      	$("#vssearch").val("search vs");
 		}
     });
     
     $("#vssearch_clear").click(function() {
-		$("#vssearch").css("color", "#bbbbbb");
+	$("#vssearch").css("color", "#bbbbbb");
       	$("#vssearch").val("search vs");
-		$("#vssearch_clear").attr("src", "img/button_cancel_grey.png");
-      	GSN.util.filterVs($("#vssearch").val());
+	$("#vssearch_clear").attr("src", "img/button_cancel_grey.png");
+	if ($("#vssearch").val() != "" && $("#vssearch").val() != "search vs")
+	    GSN.util.filterVs($("#vssearch").val());
+	else
+	    GSN.util.filterVs("");
     });
 });	
 //]]>-->
