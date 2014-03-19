@@ -21,9 +21,11 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	
 	private transient Logger logger = Logger.getLogger( this.getClass() );
 	private DataField[] structure;
-	private String remoteContactPoint;
+	private String remoteContactPoint_DATA;
+	private String remoteContactPoint_META;
 	private String vsensor;
 	private Kryo kryo = new Kryo();
+	private boolean isLocal = false;
 
 	@Override
 	public DataField[] getOutputFormat() {
@@ -36,27 +38,46 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	public boolean initialize() {
 		
 		kryo.register(StreamElement4Rest.class);
+		kryo.register(DataField[].class);
 
 		AddressBean addressBean = getActiveAddressBean();
 
 		String address = addressBean.getPredicateValue ( "address" );
+		int dport = addressBean.getPredicateValueAsInt("data_port",0);
+		int mport = addressBean.getPredicateValueAsInt("meta_port", 0);
 		vsensor = addressBean.getPredicateValue ( "vsensor" );
 		if ( address == null || address.trim().length() == 0 ) 
 			throw new RuntimeException( "The >address< parameter is missing from the ZeroMQWrapper wrapper." );
-		remoteContactPoint = (address).trim();
-
-		/*try{
-			ZMQ.Context context = ZMQ.context(1);
-			Socket syncclient = context.socket(ZMQ.REQ);
-			syncclient.connect(("tcp://" + host +":"+syncport).trim());
-			syncclient.send("structure");
-			structure = (DataField[]) XSTREAM.fromXML(syncclient.recvStr());
-			syncclient.close();
-			context.term();
-		}catch(Exception e){
-			
+		
+		try {
+            isLocal = new URI(address).getScheme().equals("inproc");
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+		if (! isLocal ){
+			remoteContactPoint_DATA = address.trim() + ":" + dport;
+			remoteContactPoint_META = address.trim() + ":" + mport;
+		}else{
+			remoteContactPoint_DATA = address.trim();
+			remoteContactPoint_META = "tcp://127.0.0.1:" + mport;
 		}
-*/
+		
+		
+
+		ZMQ.Context ctx = Main.getZmqContext();
+		ZMQ.Socket requester = ctx.socket(ZMQ.REQ);
+		requester.setReceiveTimeOut(1000);
+		requester.setSendTimeOut(1000);
+		requester.connect((remoteContactPoint_META).trim());
+		System.out.println("connect to "+(remoteContactPoint_META).trim());
+		if (requester.send(vsensor)){
+		    byte[] rec = requester.recv();
+		    if (rec != null){
+		        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
+		    }
+		}
+		requester.close();
+
         return true;
 	}
 
@@ -75,16 +96,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 		ZMQ.Context context = Main.getZmqContext();
 		ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
 		
-        boolean isLocal = false;
-        boolean connected = true;
-        try {
-            isLocal = new URI(remoteContactPoint).getScheme().equals("inproc");
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
-
-        connected = subscriber.base().connect(remoteContactPoint);
-
+        boolean connected = subscriber.base().connect(remoteContactPoint_DATA);
 		subscriber.setReceiveTimeOut(3000);
 
 		subscriber.subscribe(vsensor.getBytes());
@@ -102,8 +114,8 @@ public class ZeroMQWrapper extends AbstractWrapper {
 			        boolean status = postStreamElement(se);
 				}else{
 					if (isLocal && !connected){
-						subscriber.disconnect(remoteContactPoint);
-						connected = subscriber.base().connect(remoteContactPoint);
+						subscriber.disconnect(remoteContactPoint_DATA);
+						connected = subscriber.base().connect(remoteContactPoint_DATA);
 					}
 					//System.out.println("timeout on wrapper, subscribing to "+ vsensor);
 					subscriber.subscribe(vsensor.getBytes());

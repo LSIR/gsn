@@ -175,7 +175,7 @@ public final class Main {
 		}
 		
 		//start the 0MQ proxy
-		zmqproxy = new ZeroMQProxy(6001);
+		zmqproxy = new ZeroMQProxy(22022,22023);
 		
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
