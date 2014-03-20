@@ -26,11 +26,9 @@
 package gsn.http;
 
 import gsn.Main;
-import gsn.beans.DataTypes;
 import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
 import gsn.http.ac.UserUtils;
-import gsn.http.restapi.RestResponse;
 import gsn.utils.Helpers;
 import gsn.utils.geo.GridTools;
 import org.apache.log4j.Logger;
@@ -40,11 +38,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.sql.*;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 public class GridDataServlet extends HttpServlet {
@@ -169,8 +166,7 @@ public class GridDataServlet extends HttpServlet {
         switch (request_id) {
 
             case GET_GRIDS:
-                Map<Long, String> grids = GridTools.executeQueryForGridAsListOfStrings(query);
-
+                Map<Long, String> grids = GridTools.executeQueryForGridAsListOfStrings(query, sensor);
                 StringBuilder sbGrids = new StringBuilder();
 
                 Set<Long> keySetGrid = (Set<Long>) grids.keySet();
@@ -181,7 +177,6 @@ public class GridDataServlet extends HttpServlet {
                     sbGrids.append("\n");
                     sbGrids.append(grids.get(t));
                 }
-
                 //System.out.println(sbGrids);
 
                 response.getWriter().write(sbGrids.toString());
@@ -193,7 +188,7 @@ public class GridDataServlet extends HttpServlet {
                 logger.warn("ymin: " + yminStr);
                 logger.warn("ymax: " + ymaxStr);
 
-                Map<Long, String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query, xmin, xmax, ymin, ymax);
+                Map<Long, String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query, xmin, xmax, ymin, ymax, sensor);
                 StringBuilder sbSubGrids = new StringBuilder();
 
                 Set<Long> keySetSubGrids = (Set<Long>) subgrids.keySet();
@@ -214,7 +209,7 @@ public class GridDataServlet extends HttpServlet {
                 logger.warn("xcell: " + xcellStr);
                 logger.warn("ycell: " + ycellStr);
 
-                Map<Long, Double> timeSeries = GridTools.executeQueryForCell2TimeSeriesAsListOfDoubles(query, xcell, ycell);
+                Map<Long, Double> timeSeries = GridTools.executeQueryForCell2TimeSeriesAsListOfDoubles(query, xcell, ycell, sensor);
                 Set<Long> keySetTimeSeries = (Set<Long>) timeSeries.keySet();
 
                 StringBuilder sbTimeSeries = new StringBuilder();
