@@ -46,7 +46,7 @@ public class ZeroMQProxy extends Thread implements Runnable {
 	            ZMQ.proxy(subscriberX, publisherX,null);
 			}
 	    });
-
+	    dataProxy.setName("ZMQ-PROXY-Thread");
 	    dataProxy.start();
 	    
 	    Thread metaResponder =  new Thread(new Runnable(){
@@ -64,7 +64,7 @@ public class ZeroMQProxy extends Thread implements Runnable {
 				}
 			}
 		});
-
+	    metaResponder.setName("ZMQ-META-Thread");
         metaResponder.start();
 
 	}

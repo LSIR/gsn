@@ -79,7 +79,7 @@ public class TestDataPropogation {
 	//		Main.loadWrapperList(propertiesConfiguration);
 		VSensorLoader loader = new VSensorLoader();
 		AddressBean addressBean= new AddressBean("mock-test");
-		wrapper = (MockWrapper) loader.findWrapper(addressBean);
+		wrapper = (MockWrapper) loader.createWrapper(addressBean);
 		InputStream is = new InputStream();
 		streamSource= createMock(StreamSource.class, new Method[] {StreamSource.class.getMethod("windowSlided",new Class[] {})});
 		streamSource.setAlias("test");
