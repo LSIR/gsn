@@ -50,52 +50,82 @@ import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
 
 public class ContainerConfig {
+	
+	public static final String [ ]      LOGGING_LEVELS                     = { "DEBUG" , "INFO" , "WARN" , "ERROR" };
+	public static final String [ ]      JDBC_SYSTEMS                       = { "H2 in Memory" , "H2 in File" , "MySql", "SQL Server" };
+	public static final String [ ]      JDBC_URLS                          = new String [ ] { "jdbc:h2:mem:." , "jdbc:h2:file:/path/to/file" , "jdbc:mysql://localhost:3306/gsn", "jdbc:jtds:sqlserver://localhost/gsn" };
+	public static final String [ ]      JDBC_DRIVERS                       = new String [ ] { "org.h2.Driver" , "org.h2.Driver" , "com.mysql.jdbc.Driver", "net.sourceforge.jtds.jdbc.Driver" };
+	public static final String [ ]      JDBC_URLS_PREFIX                   = new String [ ] { "jdbc:h2:mem:" , "jdbc:h2:file:" , "jdbc:mysql:", "jdbc:jtds:sqlserver:" };
 
 	public static final String            NOT_PROVIDED                     = "Not Provided";
-
 	public static final int               DEFAULT_GSN_PORT                 = 22001;
-
     public static final int               DEFAULT_SSL_PORT                 = 8443;
+	public static final int               DEFAULT_ZMQ_PROXY_PORT           = 22022;
+	public static final int               DEFAULT_ZMQ_META_PORT            = 22023;
+	public static final String            DEFAULT_LOGGING_LEVEL            = ContainerConfig.LOGGING_LEVELS[ 3 ];
+	public static final String            DEFAULT_WEB_NAME                 = "NoName.";
+	public static final String            DEFAULT_WEB_AUTHOR               = "Author not specified.";
+	public static final String            DEFAULT_WEB_EMAIL                = "Email not specified.";
+	public static final String            DEFAULT_DIRECTORY_LOG_FILENAME   = "gsn-dir.log";
+	public static final String            DEFAULT_GSN_LOG_FILENAME         = "gsn.log";
+	public static final int               DEFAULT_DIRECTORY_PORT           = 1882;  //really used ??
+	/**
+	 * One Megabyte;
+	 */
+	public static final long              DEFAULT_GSN_LOG_SIZE             = 10 * 1024 * 1024;
+    private static final String           DEFAULT_SSL_KEYSTORE_PWD         = "changeit";
+    private static final String           DEFAULT_SSL_KEY_PWD              = "changeit";
 
-	protected String                      webName;
-
+	public static final String            FIELD_NAME_gsnPortNo             = "containerPort";
+	public static final String            FIELD_NAME_zmqProxyPort          = "zmqProxyPort";
+	public static final String            FIELD_NAME_zmqMetaPort           = "zmqMetaPort";
 	public static final String            FIELD_NAME_webName               = "webName";
-
-	protected String                      webAuthor;
-
 	public static final String            FIELD_NAME_webAuthor             = "webAuthor";
-
-	protected String                      webDescription;
-
 	public static final String            FIELD_NAME_webDescription        = "webDescription";
-
-	protected String                      webEmail;
-
 	public static final String            FIELD_NAME_webEmail              = "webEmail";
+	public static final String            FIELD_NAME_directoryLoggingLevel = "directoryLoggingLevel";
+	public static final String          FIELD_NAME_maxDirectoryLogSizeInMB = "maxDirectoryLogSizeInMB";
+	public static final String          FIELD_NAME_gsnLoggingLevel         = "gsnLoggingLevel";
+	public static final String          FIELD_NAME_maxGSNLogSizeInMB       = "maxGSNLogSizeInMB";
+	public static final String          FIELD_NAME_directoryLogFileName    = "directoryLogFileName";
+	public static final String          FIELD_NAME_directoryPortNo         = "directoryPortNo";
+	public static final String          FIELD_NAME_gsnLogFileName          = "gsnLogFileName";
+	public static final String          FIELD_NAME_directoryServiceHost    = "directoryServiceHost";
+	public static final String          FIELD_NAME_databaseSystem          = "databaseSystem";
 
+	
+	protected String                      webName                          = DEFAULT_WEB_NAME;
+    protected String                      webAuthor                        = DEFAULT_WEB_AUTHOR;
+    protected String                      webDescription;
+	protected String                      webEmail                         = DEFAULT_WEB_EMAIL;
 	protected String                      mailServer;
-
 	protected String                      smsServer;
-
 	protected String                      smsPassword;
-
 	protected int                         containerPort                    = DEFAULT_GSN_PORT;
-
+	protected int                         zmqProxyPort                     = DEFAULT_ZMQ_PROXY_PORT;
+	protected int                         zmqMetaPort                      = DEFAULT_ZMQ_META_PORT;
 	protected String                      containerFileName;
+	protected int                         storagePoolSize                  = -1;
 
-	protected int                         storagePoolSize    =-1              ;
+	private int                           sslPort                          = -1;
+    private boolean                       acEnabled                        = false;
+	private String                        sslKeyStorePassword;
+	private String                        sslKeyPassword;
+    private StorageConfig                 storage ;
+    private SlidingConfig                 sliding;
+	private String                        directoryLoggingLevel            = DEFAULT_LOGGING_LEVEL;
+	private long                          maxDirectoryLogSizeInMB          = DEFAULT_GSN_LOG_SIZE;
+	private String                        gsnLoggingLevel                  = DEFAULT_LOGGING_LEVEL;
+	private long                          maxGSNLogSizeInMB                = DEFAULT_GSN_LOG_SIZE;
+	private String                        directoryLogFileName             = DEFAULT_DIRECTORY_LOG_FILENAME;
+	private String                        gsnLogFileName                   = DEFAULT_GSN_LOG_FILENAME;
+	private String                        gsnLog4jFile;
+	private String                        gsnConfigurationFileName;
+	private Properties                    gsnLog4JProperties;
+	private String                        databaseSystem;
+	private boolean                       isdatabaseSystemInitialzied      = false;
+	private String                        timeFormat                       = "";
 
-	private int                           sslPort                           = -1;
-
-    private boolean                       acEnabled                     = false;
-
-	private String sslKeyStorePassword;
-
-	private String sslKeyPassword;
-
-    private StorageConfig storage ;
-
-    private SlidingConfig sliding;
 
     public boolean isAcEnabled() {
         return acEnabled;
@@ -126,7 +156,6 @@ public class ContainerConfig {
 		else
 			this.webAuthor = this.webAuthor.trim( );
 		return this.webAuthor;
-
 	}
 
 	/**
@@ -135,12 +164,23 @@ public class ContainerConfig {
 	public int getContainerPort ( ) {
 		return this.containerPort;
 	}
-
-	public static final String FIELD_NAME_gsnPortNo = "containerPort";
-
+	
 	public void setContainerPort ( int newValue ) {
-		int oldValue = this.containerPort;
 		this.containerPort = newValue;
+	}
+	
+	/**
+	 * @return Returns the ZeroMQ stream proxy port.
+	 */
+	public int getZMQProxyPort ( ) {
+		return this.zmqProxyPort;
+	}
+	
+	/**
+	 * @return Returns the ZeroMQ meta information port.
+	 */
+	public int getZMQMetaPort ( ) {
+		return this.zmqMetaPort;
 	}
 
 	/**
@@ -169,26 +209,16 @@ public class ContainerConfig {
 	}
 
 	public void setWebEmail ( String newValue ) {
-		String oldValue = this.webEmail;
 		this.webEmail = newValue;
 	}
 
 	public void setWebAuthor ( String newValue ) {
-		String oldValue = this.webAuthor;
 		this.webAuthor = newValue;
 	}
 
 	public void setWebName ( String newValue ) {
-		String oldValue = this.webName;
 		this.webName = newValue;
 	}
-
-	/**
-	 * @return Returns the registryBootstrapAddr.
-	 */
-	private boolean isRegistryBootStrapAddrInitialized = false;
-
-
 
 	/**
 	 * @return Returns the storagePoolSize.
@@ -198,80 +228,10 @@ public class ContainerConfig {
 	}
 
 	public String toString ( ) {
-		final StringBuilder builder = new StringBuilder( );
-		builder.append( this.getClass( ).getName( ) ).append( " class [" ).append( "name=" ).append( this.webName ).append( "," );
-		return builder.append( "]" ).toString( );
+		return this.getClass().getName() + " class [name=" + this.webName + "]";
 	}
 
-	/****************************************************************************
-	 * UTILITY METHODS, Used by the GUI mainly.
-	 ***************************************************************************/
-
-    private static final String   DEFAULT_SSL_KEYSTORE_PWD = "changeit";
-
-    private static final String   DEFAULT_SSL_KEY_PWD = "changeit";
-
-	private String                 directoryLoggingLevel;
-
-	public static final String     FIELD_NAME_directoryLoggingLevel   = "directoryLoggingLevel";
-
-	private long                   maxDirectoryLogSizeInMB;
-
-	public static final String     FIELD_NAME_maxDirectoryLogSizeInMB = "maxDirectoryLogSizeInMB";
-
-	private String                 gsnLoggingLevel;
-
-	public static final String     FIELD_NAME_gsnLoggingLevel         = "gsnLoggingLevel";
-
-	private long                   maxGSNLogSizeInMB;
-
-	public static final String     FIELD_NAME_maxGSNLogSizeInMB       = "maxGSNLogSizeInMB";
-
-	public static final String     FIELD_NAME_directoryPortNo         = "directoryPortNo";
-
-	public static final int        DEFAULT_DIRECTORY_PORT             = 1882;
-
-	private String                 directoryLogFileName;
-
-	public static final String     FIELD_NAME_directoryLogFileName    = "directoryLogFileName";
-
-	private String                 gsnLogFileName;
-
-	public static final String     FIELD_NAME_gsnLogFileName          = "gsnLogFileName";
-
-	private String                 gsnLog4jFile;
-
-	private String                 gsnConfigurationFileName;
-
-	private Properties             gsnLog4JProperties;
-
-	public static final String     FIELD_NAME_directoryServiceHost    = "directoryServiceHost";
-
-	public static final String [ ] LOGGING_LEVELS                     = { "DEBUG" , "INFO" , "WARN" , "ERROR" };
-
-	public static final String [ ] JDBC_SYSTEMS                       = { "H2 in Memory" , "H2 in File" , "MySql", "SQL Server" };
-
-	public static final String [ ] JDBC_URLS                          = new String [ ] { "jdbc:h2:mem:." , "jdbc:h2:file:/path/to/file" , "jdbc:mysql://localhost:3306/gsn", "jdbc:jtds:sqlserver://localhost/gsn" };
-
-	public static final String [ ] JDBC_DRIVERS                       = new String [ ] { "org.h2.Driver" , "org.h2.Driver" , "com.mysql.jdbc.Driver", "net.sourceforge.jtds.jdbc.Driver" };
-
-	public static final String [ ] JDBC_URLS_PREFIX                   = new String [ ] { "jdbc:h2:mem:" , "jdbc:h2:file:" , "jdbc:mysql:", "jdbc:jtds:sqlserver:" };
-
-	public static final String     DEFAULT_LOGGING_LEVEL              = ContainerConfig.LOGGING_LEVELS[ 3 ];
-
-	private String                 databaseSystem;
-
-	public static final String     FIELD_NAME_databaseSystem          = "databaseSystem";
-
-	/**
-	 * One Megabyte;
-	 */
-	public static final long       DEFAULT_GSN_LOG_SIZE               = 1 * 1024 * 1024;
-
-	private boolean                isdatabaseSystemInitialzied        = false;
-
 	public void setDirectoryLoggingLevel ( String newValue ) {
-		String oldValue = this.directoryLoggingLevel;
 		this.directoryLoggingLevel = newValue;
 	}
 
@@ -280,7 +240,6 @@ public class ContainerConfig {
 	}
 
 	public void setMaxDirectoryLogSizeInMB ( long newValue ) {
-		long oldValue = this.maxDirectoryLogSizeInMB;
 		this.maxDirectoryLogSizeInMB = newValue;
 	}
 
@@ -289,7 +248,6 @@ public class ContainerConfig {
 	}
 
 	public void setGsnLoggingLevel ( String newValue ) {
-		String oldValue = this.gsnLoggingLevel;
 		this.gsnLoggingLevel = newValue;
 	}
 
@@ -298,7 +256,6 @@ public class ContainerConfig {
 	}
 
 	public void setMaxGSNLogSizeInMB ( long newValue ) {
-		long oldValue = this.maxGSNLogSizeInMB;
 		this.maxGSNLogSizeInMB = newValue;
 	}
 
@@ -307,7 +264,6 @@ public class ContainerConfig {
 	}
 
 	public void setDirectoryLogFileName ( String newValue ) {
-		String oldValue = this.directoryLogFileName;
 		this.directoryLogFileName = newValue;
 	}
 
@@ -316,24 +272,12 @@ public class ContainerConfig {
 	}
 
 	public void setGsnLogFileName ( String newValue ) {
-		String oldValue = this.gsnLogFileName;
 		this.gsnLogFileName = newValue;
 	}
 
 	public String getGsnLogFileName ( ) {
 		return this.gsnLogFileName;
 	}
-
-
-
-    /*
-	static {
-		int i = 0;
-		NETWORK_ADDRESSES = new String [ ValidityTools.NETWORK_LOCAL_ADDRESS.size( ) ];
-		for ( String address : ValidityTools.NETWORK_LOCAL_ADDRESS )
-			NETWORK_ADDRESSES[ i++ ] = address + ":" + DEFAULT_DIRECTORY_PORT;
-	}
-	*/
 
 	private static String extractLoggingLevel ( String property , String [ ] setOfPossibleValues , String defaultValue ) {
 		String toReturn = defaultValue;
@@ -384,7 +328,6 @@ public class ContainerConfig {
 
 	public void setdatabaseSystem ( String newValue ) {
 		isdatabaseSystemInitialzied = true;
-		String oldValue = this.databaseSystem;
 		databaseSystem = newValue;
         storage = new StorageConfig();
         storage.setJdbcDriver(convertToDriver( newValue ));
@@ -450,21 +393,11 @@ public class ContainerConfig {
 
 	public static ContainerConfig getDefaultConfiguration ( ) {
 		ContainerConfig bean = new ContainerConfig( );
-		bean.setContainerPort( ContainerConfig.DEFAULT_GSN_PORT );
 		bean.storage = new StorageConfig();
         bean.storage.setJdbcDriver( ContainerConfig.JDBC_SYSTEMS[ 0 ] );
 		bean.storage.setJdbcPassword( "" );
 		bean.storage.setJdbcURL( "sa" );
 		bean.storage.setJdbcURL( ContainerConfig.JDBC_URLS[ 0 ] );
-		bean.setWebName( "NoName." );
-		bean.setWebAuthor( "Author not specified." );
-		bean.setWebEmail( "Email not specified." );
-		bean.setDirectoryLogFileName( "gsn-dir.log" );
-		bean.setDirectoryLoggingLevel( LOGGING_LEVELS[ 3 ] );
-		bean.setGsnLogFileName( "gsn.log" );
-		bean.setGsnLoggingLevel( LOGGING_LEVELS[ 3 ] );
-		bean.setMaxDirectoryLogSizeInMB( 1 );
-		bean.setMaxGSNLogSizeInMB( 10 );
 		return bean;
 	}
 
@@ -493,8 +426,6 @@ public class ContainerConfig {
 		}
 		return msrMapCached;
 	}
-
-	private String timeFormat = "";
 
 	public String getTimeFormat() {
 		return timeFormat;

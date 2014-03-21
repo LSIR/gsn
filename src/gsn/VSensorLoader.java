@@ -166,7 +166,12 @@ public class VSensorLoader extends Thread {
             removeVirtualSensor(configFile);
         }
         for (VSensorConfig vs : addIt) {
-            loadPlugin(vs);
+        	try{
+                loadPlugin(vs);
+        	}catch(Exception e){
+        		logger.error("Unable to load VSensor " + vs.getName() + ", retrying later...");
+        		e.printStackTrace();
+        	}
         }
     }
 

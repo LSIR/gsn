@@ -26,12 +26,24 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	private String vsensor;
 	private Kryo kryo = new Kryo();
 	private boolean isLocal = false;
+	ZMQ.Socket requester = null;
 
 	@Override
 	public DataField[] getOutputFormat() {
-		DataField[] s = getActiveAddressBean().getOutputStructure();
-    	if (s == null){throw new RuntimeException("ZeroMQ wrapper has an undefined output structure.");}
-    	return s;
+		if (structure == null){
+			if (requester.send(vsensor)){
+			    byte[] rec = requester.recv();
+			    if (rec != null){
+			        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
+			        requester.close();
+			        return structure;
+			    }
+			}
+		}
+		//if user defined structure is used... maybe
+		//DataField[] s = getActiveAddressBean().getOutputStructure();
+    	//if (s == null){throw new RuntimeException("ZeroMQ wrapper has an undefined output structure.");}
+    	return structure;
 	}
 
 	@Override
@@ -59,25 +71,23 @@ public class ZeroMQWrapper extends AbstractWrapper {
 			remoteContactPoint_META = address.trim() + ":" + mport;
 		}else{
 			remoteContactPoint_DATA = address.trim();
-			remoteContactPoint_META = "tcp://127.0.0.1:" + mport;
+			remoteContactPoint_META = "tcp://127.0.0.1:" + Main.getContainerConfig().getZMQMetaPort();
 		}
 		
-		
-
 		ZMQ.Context ctx = Main.getZmqContext();
 		ZMQ.Socket requester = ctx.socket(ZMQ.REQ);
 		requester.setReceiveTimeOut(1000);
 		requester.setSendTimeOut(1000);
 		requester.connect((remoteContactPoint_META).trim());
-		System.out.println("connect to "+(remoteContactPoint_META).trim());
+		//System.out.println("connect to "+(remoteContactPoint_META).trim());
 		if (requester.send(vsensor)){
 		    byte[] rec = requester.recv();
 		    if (rec != null){
 		        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
+		        requester.close();
 		    }
 		}
-		requester.close();
-
+		
         return true;
 	}
 

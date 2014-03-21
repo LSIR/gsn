@@ -15,14 +15,12 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.rest.DeliverySystem;
-import gsn.http.rest.StreamElement4Rest;
 
 public class ZeroMQDelivery implements DeliverySystem{
 	
 	private Context context;
 	private Socket publisher;
 	private boolean closed = true;
-	private DataField[] structure;
 	private Kryo kryo = new Kryo();
 	private VSensorConfig config;
 	
@@ -35,7 +33,7 @@ public class ZeroMQDelivery implements DeliverySystem{
 		publisher.setLinger(5000);
 		publisher.setSndHWM(0);
 		publisher.bind("inproc://stream/"+config.getName());
-		System.out.println("Delivery bind on inproc://stream/"+config.getName());
+		//System.out.println("Delivery bind on inproc://stream/"+config.getName());
 		Main.getZmqProxy().connectTo(config.getName());
 		closed = false;
 		
@@ -43,7 +41,6 @@ public class ZeroMQDelivery implements DeliverySystem{
 
 	@Override
 	public void writeStructure(DataField[] fields) throws IOException {
-        structure = fields;
         Main.getZmqProxy().registerStructure(config.getName(),fields);
 	}
 
@@ -56,7 +53,7 @@ public class ZeroMQDelivery implements DeliverySystem{
             kryo.writeObjectOrNull(o,se,StreamElement.class);
             o.close();
             byte[] b = bais.toByteArray();
-            System.out.println(config.getName()+" sending on Delivery");
+            //System.out.println(config.getName()+" sending on Delivery");
             return publisher.send(b);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -20,13 +20,12 @@ public class ZeroMQProxy extends Thread implements Runnable {
 	private ZMQ.Socket publisherX;
 	private ZMQ.Socket clients;
 	private Kryo kryo = new Kryo();
-	private HashMap<String,DataField[]> structures = new HashMap<String,DataField[]>();
+	private HashMap<String,DataField[]> structures = new HashMap<String,DataField[]>(); //maybe put into mappings...
 	
 
 	public ZeroMQProxy (final int portOUT,final int portMETA){
 		kryo.register(DataField[].class);
 		ctx = Main.getZmqContext();
-		
 		
 		subscriberX = ctx.socket(ZMQ.XSUB);
 	    publisherX = ctx.socket(ZMQ.XPUB);
@@ -35,10 +34,8 @@ public class ZeroMQProxy extends Thread implements Runnable {
 	    
 	    clients = ctx.socket(ZMQ.REP);
 	    clients.bind ("tcp://*:"+portMETA);
-	   
-	    System.out.println("Proxy binding to tcp://*:"+portOUT+" and tcp://*:"+portMETA);
+	   // System.out.println("Proxy binding to tcp://*:"+portOUT+" and tcp://*:"+portMETA);
 	    
-
 	    Thread dataProxy = new Thread(new Runnable(){
 
 			@Override
@@ -66,19 +63,15 @@ public class ZeroMQProxy extends Thread implements Runnable {
 		});
 	    metaResponder.setName("ZMQ-META-Thread");
         metaResponder.start();
-
 	}
-
 	
 	public void connectTo(String vsName){
-		System.out.println("Proxy connect to inproc://[stream|meta]/"+vsName);
+		//System.out.println("Proxy connect to inproc://[stream|meta]/"+vsName);
 		subscriberX.connect("inproc://stream/"+vsName);
 	}
 
-
 	public void registerStructure(String name, DataField[] fields) {
-		structures.put(name, fields);
-		
+		structures.put(name, fields);		
 	}
 
 }
