@@ -234,12 +234,12 @@ public class GridDataServlet extends HttpServlet {
 
             }
         } catch (OutOfMemoryError e){
-            logger.warn("OutOfMemoryError: " + e.getMessage());
-
             response.setContentType("text/csv");
             response.setHeader("Content-Disposition", "attachment;filename=\"error_out_of_memory.csv\"");
             response.getWriter().write("## The query consumed too many server resources.");
             response.getWriter().flush();
+
+            logger.warn("OutOfMemoryError: " + e.getMessage());
         }
 
 
