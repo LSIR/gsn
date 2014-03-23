@@ -162,75 +162,84 @@ public class GridDataServlet extends HttpServlet {
             response.getWriter().write(debugInformation.toString());
             response.getWriter().flush();
         }
+        try{
 
-        switch (request_id) {
+            switch (request_id) {
 
-            case GET_GRIDS:
-                Map<Long, String> grids = GridTools.executeQueryForGridAsListOfStrings(query, sensor);
-                StringBuilder sbGrids = new StringBuilder();
+                case GET_GRIDS:
+                    Map<Long, String> grids = GridTools.executeQueryForGridAsListOfStrings(query, sensor);
+                    StringBuilder sbGrids = new StringBuilder();
 
-                Set<Long> keySetGrid = (Set<Long>) grids.keySet();
+                    Set<Long> keySetGrid = (Set<Long>) grids.keySet();
 
-                for (Long t : keySetGrid) {
-                    String fileName = sensor + "_" + t;
-                    sbGrids.append("Filename : " + fileName);
-                    sbGrids.append("\n");
-                    sbGrids.append(grids.get(t));
-                }
-                //System.out.println(sbGrids);
+                    for (Long t : keySetGrid) {
+                        String fileName = sensor + "_" + t;
+                        sbGrids.append("Filename : " + fileName);
+                        sbGrids.append("\n");
+                        sbGrids.append(grids.get(t));
+                    }
+                    //System.out.println(sbGrids);
 
-                response.getWriter().write(sbGrids.toString());
-                break;
+                    response.getWriter().write(sbGrids.toString());
+                    break;
 
-            case GET_SUB_GRIDS:
-                logger.warn("xmin: " + xminStr);
-                logger.warn("xmax: " + xmaxStr);
-                logger.warn("ymin: " + yminStr);
-                logger.warn("ymax: " + ymaxStr);
+                case GET_SUB_GRIDS:
+                    logger.warn("xmin: " + xminStr);
+                    logger.warn("xmax: " + xmaxStr);
+                    logger.warn("ymin: " + yminStr);
+                    logger.warn("ymax: " + ymaxStr);
 
-                Map<Long, String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query, xmin, xmax, ymin, ymax, sensor);
-                StringBuilder sbSubGrids = new StringBuilder();
+                    Map<Long, String> subgrids = GridTools.executeQueryForSubGridAsListOfStrings(query, xmin, xmax, ymin, ymax, sensor);
+                    StringBuilder sbSubGrids = new StringBuilder();
 
-                Set<Long> keySetSubGrids = (Set<Long>) subgrids.keySet();
+                    Set<Long> keySetSubGrids = (Set<Long>) subgrids.keySet();
 
-                for (Long t : keySetSubGrids) {
-                    String fileName = sensor + "_" + t;
-                    sbSubGrids.append("Filename : " + fileName);
-                    sbSubGrids.append("\n");
-                    sbSubGrids.append(subgrids.get(t));
-                }
+                    for (Long t : keySetSubGrids) {
+                        String fileName = sensor + "_" + t;
+                        sbSubGrids.append("Filename : " + fileName);
+                        sbSubGrids.append("\n");
+                        sbSubGrids.append(subgrids.get(t));
+                    }
 
-                //System.out.println(sbSubGrids);
+                    //System.out.println(sbSubGrids);
 
-                response.getWriter().write(sbSubGrids.toString());
-                break;
+                    response.getWriter().write(sbSubGrids.toString());
+                    break;
 
-            case GET_CELL_AS_TIMESERIES:
-                logger.warn("xcell: " + xcellStr);
-                logger.warn("ycell: " + ycellStr);
+                case GET_CELL_AS_TIMESERIES:
+                    logger.warn("xcell: " + xcellStr);
+                    logger.warn("ycell: " + ycellStr);
 
-                Map<Long, Double> timeSeries = GridTools.executeQueryForCell2TimeSeriesAsListOfDoubles(query, xcell, ycell, sensor);
-                Set<Long> keySetTimeSeries = (Set<Long>) timeSeries.keySet();
+                    Map<Long, Double> timeSeries = GridTools.executeQueryForCell2TimeSeriesAsListOfDoubles(query, xcell, ycell, sensor);
+                    Set<Long> keySetTimeSeries = (Set<Long>) timeSeries.keySet();
 
-                StringBuilder sbTimeSeries = new StringBuilder();
+                    StringBuilder sbTimeSeries = new StringBuilder();
 
-                String fileName = sensor;
-                sbTimeSeries.append("Filename : " + fileName);
-                sbTimeSeries.append("\n");
-                sbTimeSeries.append("\n");
-
-                for (Long t : keySetTimeSeries) {
-                    sbTimeSeries.append(t);
-                    sbTimeSeries.append(", ");
-                    sbTimeSeries.append(timeSeries.get(t));
+                    String fileName = sensor;
+                    sbTimeSeries.append("Filename : " + fileName);
                     sbTimeSeries.append("\n");
-                }
+                    sbTimeSeries.append("\n");
 
-                //System.out.println(sbTimeSeries);
+                    for (Long t : keySetTimeSeries) {
+                        sbTimeSeries.append(t);
+                        sbTimeSeries.append(", ");
+                        sbTimeSeries.append(timeSeries.get(t));
+                        sbTimeSeries.append("\n");
+                    }
 
-                response.getWriter().write(sbTimeSeries.toString());
-                break;
+                    //System.out.println(sbTimeSeries);
 
+                    response.getWriter().write(sbTimeSeries.toString());
+                    break;
+
+            }
+        } catch (OutOfMemoryError e){
+            logger.warn("OutOfMemoryError: " + e.getMessage());
+
+            response.setContentType("text/csv");
+            response.setHeader("Content-Disposition", "attachment;filename=\"error_out_of_memory.csv\"");
+            response.getWriter().write("## The query consumed too many server resources.");
+            response.getWriter().flush();
         }
 
 
