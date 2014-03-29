@@ -30,7 +30,6 @@ package gsn.http.ac;
 
 import gsn.Main;
 import gsn.Mappings;
-import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
 import gsn.http.WebConstants;
 import org.apache.log4j.Logger;
@@ -151,8 +150,8 @@ public class MyControllerFilter implements Filter {
                     }
                 }
 
-                // support for request 114, 113 and griddata
-                if (("/gsn".equals(req.getServletPath()) && (requestType == 114 || requestType == 113)) || "/griddata".equals(req.getServletPath())) {
+                // support for request 114 and griddata
+                if (("/gsn".equals(req.getServletPath()) && requestType == 114) || "/griddata".equals(req.getServletPath())) {
                     if ((reqUsername != null) && (reqPassword != null) && (reqVirtualSensorName != null)) {
                         User userByURL = UserUtils.allowUserToLogin(reqUsername, reqPassword);
 
@@ -185,9 +184,10 @@ public class MyControllerFilter implements Filter {
 
                 // bypass if servlet is gsn and request is for ContainerInfoHandler
 
-                if (("/gsn".equals(req.getServletPath()) && (requestType == 0 || requestType == 901))
+                if (("/gsn".equals(req.getServletPath()) && (requestType == 0 || requestType == 901 || requestType == 113))
                         || ("/field".equals(req.getServletPath()))
                         ) {
+
                     chain.doFilter(request, response);
                     return;
                 }
