@@ -29,7 +29,6 @@
 package gsn;
 
 import gsn.beans.StreamElement;
-import gsn.http.rest.StreamElement4Rest;
 import gsn.storage.StorageManager;
 import gsn.vsensor.AbstractVirtualSensor;
 
@@ -37,11 +36,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
-import org.zeromq.ZMQ.Socket;
-
-import com.thoughtworks.xstream.XStream;
 
 public class ContainerImpl  {
 
@@ -61,12 +55,10 @@ public class ContainerImpl  {
 	private static ContainerImpl singleton;
 	
 	private static final Object                                          psLock                             = new Object( );
-	
 
 	private ContainerImpl() {
-	
-	}
 
+	}
 
 	public static ContainerImpl getInstance() {
 		if (singleton == null)
