@@ -1,3 +1,31 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/MultiDataDownload.java
+*
+* @author charliend
+* @author Ali Salehi
+* @author Timotee Maret
+* @author Milos Stojanovic
+*
+*/
+
 package gsn.http;
 
 import gsn.Main;
@@ -12,12 +40,8 @@ import gsn.http.datarequest.DownloadReport;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.text.DateFormat;
+import java.util.*;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServlet;
@@ -59,7 +83,17 @@ public class MultiDataDownload extends HttpServlet {
             String downloadFormat = req.getParameter("download_format") == null ? "csv" : req.getParameter("download_format");
 			String downloadMode = req.getParameter("download_mode") == null ? "attachement" : req.getParameter("download_mode");
             Map<String, String[]> parameterMap = parseParameters(req, downloadFormat, sdfWeb);
-			if ("csv".equals(downloadFormat)) {
+
+            String vsName = req.getParameter("vs[0]");
+            String vsName1 = req.getParameter("vs[1]");
+            if (vsName1 != null || "All".equals(vsName)){
+                vsName = "multiple_sensors";
+            }
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            Date currentDate = Calendar.getInstance().getTime();
+            String filename = vsName+"_"+dateFormat.format(currentDate);
+
+            if ("csv".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
                 //
                 if (Main.getContainerConfig().isAcEnabled()) {
@@ -73,7 +107,7 @@ public class MultiDataDownload extends HttpServlet {
                 dd.process();
                 if (! "inline".equals(downloadMode)) {
 				    res.setContentType("application/x-download");
-				    res.setHeader("content-disposition","attachment; filename=data.csv");
+				    res.setHeader("content-disposition","attachment; filename="+filename+".csv");
                 }
                 else
                     res.setContentType("text");
@@ -93,8 +127,8 @@ public class MultiDataDownload extends HttpServlet {
                 //
                 dd.process();
 				res.setContentType("text/xml");
-				if (! "inline".equals(downloadMode)) 
-                    res.setHeader("content-disposition","attachment; filename=data.xml");
+				if (! "inline".equals(downloadMode))
+                    res.setHeader("content-disposition","attachment; filename="+filename+".xml");
 				dd.outputResult(res.getOutputStream());
 				//res.getOutputStream().flush();
 			}
@@ -111,7 +145,7 @@ public class MultiDataDownload extends HttpServlet {
                 //
 				rpd.process();
 				res.setContentType("application/pdf");
-				res.setHeader("content-disposition","attachment; filename=data.pdf");
+                res.setHeader("content-disposition","attachment; filename="+filename+".pdf");
 				rpd.outputResult(res.getOutputStream());
 				res.getOutputStream().flush();
 			}

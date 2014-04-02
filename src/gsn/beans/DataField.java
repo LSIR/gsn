@@ -1,3 +1,31 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/beans/DataField.java
+*
+* @author Timotee Maret
+* @author Ali Salehi
+* @author Sofiane Sarni
+* @author Milos Stojanovic
+*
+*/
+
 package gsn.beans;
 
 import gsn.utils.GSNRuntimeException;
@@ -16,10 +44,13 @@ public final class DataField implements Serializable {
    
    private String            type;
 
+   private String            unit = "";
+   
    private boolean index=false;   
 
    private DataField ( ) {}
    
+
    public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {
       this.name = fieldName;
       this.type = type;
@@ -84,8 +115,10 @@ public final class DataField implements Serializable {
    
    public String toString ( ) {
       final StringBuilder result = new StringBuilder( );
-      result.append( "[Field-Name:" ).append( this.name ).append( ", Type:" ).append( DataTypes.TYPE_NAMES[ this.getDataTypeID( ) ] ).append( "[" + this.type + "]" ).append( ", Decription:" )
-            .append( this.description ).append( "]" );
+      result.append( "[Field-Name:" ).append( this.name ).append( ", Type:" ).append( DataTypes.TYPE_NAMES[ this.getDataTypeID( ) ] ).append( "[" + this.type + "]" )
+            .append( ", Decription:" ).append( this.description )
+            .append( ", Unit:" ).append( this.unit )
+            .append( "]" );
       return result.toString( );
    }
    
@@ -97,4 +130,12 @@ public final class DataField implements Serializable {
       return this.type;
    }
    
+    public String getUnit() {
+        return unit;
+}
+
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 }

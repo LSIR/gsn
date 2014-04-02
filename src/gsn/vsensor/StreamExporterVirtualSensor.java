@@ -1,23 +1,51 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/vsensor/StreamExporterVirtualSensor.java
+*
+* @author Jerome Rousselot
+* @author Ali Salehi
+* @author Mehdi Riahi
+* @author Timotee Maret
+* @author Ivo Dimitrov
+*
+*/
+
 package gsn.vsensor;
 
 import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.GSNRuntimeException;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-
 /**
  * This virtual sensor saves its input stream to any JDBC accessible source.
  */
 public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 
-	public static final String            PARAM_USER    = "user" , PARAM_PASSWD = "password" , PARAM_URL = "url" , TABLE_NAME = "table",PARAM_DRIVER="driver";
+	public static final String            PARAM_USER    = "user" , PARAM_PASSWD = "password" , PARAM_URL = "url" , TABLE_NAME = "table",PARAM_DRIVER="driver",PARAM_ENTRIES="entries";
 
 	public static final String[] OBLIGATORY_PARAMS = new String[] {PARAM_USER,PARAM_URL,PARAM_DRIVER};
 
@@ -33,6 +61,12 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 	
 	private String url;
 
+    private String entries;      //
+    private long startTime;
+    private long estimatedTime;
+    private int counter = 0;
+    private int limit;
+
 	public boolean initialize ( ) {
 		VSensorConfig vsensor = getVirtualSensorConfiguration( );
 		TreeMap < String , String > params = vsensor.getMainClassInitialParams();
@@ -46,6 +80,9 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 		user = params.get(PARAM_USER);
 		password = params.get(PARAM_PASSWD);
 		url = params.get(PARAM_URL);
+        entries = params.get(PARAM_ENTRIES);   //
+        limit = Integer.parseInt(entries);       //
+        estimatedTime = 0;
 		try {
 			Class.forName(params.get(PARAM_DRIVER));
 			connection = getConnection();
@@ -72,7 +109,21 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 		StringBuilder query = Main.getStorage(table_name.toString()).getStatementInsert(table_name, getVirtualSensorConfiguration().getOutputStructure());
 		
 		try {
-			Main.getStorage(table_name.toString()).executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),streamElement,getConnection() );
+            counter++;        //
+            startTime = System.nanoTime();
+            Main.getStorage(table_name.toString()).executeInsert(table_name ,getVirtualSensorConfiguration().getOutputStructure(),streamElement,getConnection() );
+            estimatedTime += (System.nanoTime() - startTime);
+            if (counter >= limit) {
+                double seconds = (double)estimatedTime / 1000000000.0;
+                System.out.println("The estimated time (sec) is = "+seconds);
+		logger.warn("*** ESTIMATED TIME (SEC) IS "+seconds);
+            }
+	    if ((counter % 1000) == 0) {
+                System.out.println("Up until the Entry = "+counter);
+		double seconds = (double)estimatedTime / 1000000000.0;
+                System.out.println("The estimated time (sec) is = "+seconds);
+                logger.warn("*** ESTIMATED TIME (SEC) for counter = "+counter+" IS "+seconds);
+            }
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 			logger.error("Insertion failed! ("+ query+")");

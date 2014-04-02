@@ -1,3 +1,34 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/storage/DataEnumerator.java
+*
+* @author parobert
+* @author Ali Salehi
+* @author Mehdi Riahi
+* @author Timotee Maret
+* @author Sofiane Sarni
+* @author Julien Eberle
+* @author Milos Stojanovic
+*
+*/
+
 package gsn.storage;
 
 import gsn.Main;
@@ -88,6 +119,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 			// Also setting the values for <code> hasTimedFieldInResultSet</code>
 			// if the timed field is present in the result set.
 			String tableName = null;
+            int problematicColumn = -1;
             for ( int i = 1 ; i <= resultSet.getMetaData( ).getColumnCount( ) ; i++ ) {
 				if (i == 1)
                     tableName = resultSet.getMetaData().getTableName(1);
@@ -100,9 +132,25 @@ public class DataEnumerator implements DataEnumeratorIF {
 					indexOfTimedField = i;
 				} else {
 					fieldNames.add( colName );
-					fieldTypes.add( storageManager.convertLocalTypeToGSN(colTypeInJDBCFormat,colScale ) );
+                    byte gsnType = storageManager.convertLocalTypeToGSN(colTypeInJDBCFormat,colScale );
+                    if (gsnType == -100){
+                        logger.error("The type can't be converted to GSN form - error description: ");
+                        logger.warn("Table name: " + tableName);
+                        logger.warn("Column name: " +colName);
+                        logger.warn("Column type name: " +resultSet.getMetaData().getColumnTypeName(i));
+                        logger.warn("Query result: " +preparedStatement.toString());
+                        problematicColumn = i;
+                    }
+					fieldTypes.add( gsnType );
 				}
 			}
+            if (problematicColumn != -1){
+                while(true){
+                    logger.warn("Values of the column: " + resultSet.getObject(problematicColumn));
+                    if (resultSet.isLast()) break;
+                    resultSet.next();
+                }
+            }
 			dataFieldNames = fieldNames.toArray( new String [ ] {} );
 			dataFieldTypes = fieldTypes.toArray( new Byte [ ] {} );
 			if ( indexofPK == -1 && linkBinaryData ) throw new RuntimeException( "The specified query can't be used with binaryLinked paramter set to true." );

@@ -39,7 +39,7 @@
 			//vs height
 			$("#vs").height($(window).height() - $("#vs").offset().top - 10);
 			$(window).resize( function() { $("#vs").height($(window).height() - $("#vs").offset().top - 10) } );
-			$("#vsmap").css("width",$(window).width()-330+"px");
+			$("#vsmap").css("width",$(window).width()-500+"px");
 			
 			mapProvider = GSN.util.getURLParam("mapProvider");
 			if(mapProvider.indexOf("#")!=-1){ //remove hash if any
@@ -69,8 +69,8 @@
 </script>
 </head>
 <body style="margin:0;padding:0;width:100%;height:100%;background:#fff;overflow:hidden;" onunload="">
-<div id="vsmap" style="position: relative; height: 100%; margin: 0 330px 0 0;"></div>
-<div style="position: absolute; right: 0; top: 0; width: 330px; height:100%;">
+<div id="vsmap" style="position: relative; height: 100%; margin: 0 500px 0 0;"></div>
+<div style="position: absolute; right: 0; top: 0; width: 500px; height:100%;">
 	<div id="headerfm"><h1><a href="." id="gsn-name">GSN</a></h1></div>
     <div id="navigation">
 	</div>
@@ -86,11 +86,11 @@
 		<select id="refreshall_timeout" >
 		<option value="3600000">1hour</option> 
 		<option value="600000">10min</option> 
-		<option value="60000" selected="selected">1min</option> 
+		<option value="60000">1min</option> 
 		<option value="30000">30sec</option> 
 		<option value="5000">5sec</option> 
 		<option value="1000">1sec</option> 
-		<option value="0">disable</option> 
+		<option value="0" selected="selected">disabled</option> 
 		</select>
 		<input id="refreshall" type="button" value="refresh" />
 		<span class="refreshing"><img src="style/ajax-loader.gif" alt="loading" title="" /></span>

@@ -1,3 +1,30 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/ac/MyUserUpdateServlet.java
+*
+* @author Behnaz Bostanipour
+* @author Timotee Maret
+* @author Julien Eberle
+*
+*/
+
 package gsn.http.ac;
 
 import gsn.Main;
@@ -319,7 +346,7 @@ public class MyUserUpdateServlet  extends HttpServlet
         {
             out.println("<table>");
             out.println("<tr><th> virtual sensor name </th>");
-            out.println("<th> access right</th></tr>");
+            out.println("<th> access right</th><th> time limitation</th></tr>");
             for(int j=0;j<user.getDataSourceList().size();j++)
             {
                 dataSource=(DataSource)user.getDataSourceList().get(j);
@@ -328,7 +355,7 @@ public class MyUserUpdateServlet  extends HttpServlet
                 if(dataSourceType.equals("4"))
                 {
                     out.println("<tr><td>" + dataSourceName + " </td>");
-                    out.println("<td>own</td></tr>");
+                    out.println("<td>own</td><td> unlimited </td></tr>");
                 }
                 else
                 {
@@ -370,10 +397,15 @@ public class MyUserUpdateServlet  extends HttpServlet
                     else
                     {
 
-                        out.println("&nbsp&nbsp&nbsp<INPUT TYPE=SUBMIT class= buttonstyle VALUE=\"update\"></td></tr>");
+                        out.println("&nbsp&nbsp&nbsp<INPUT TYPE=SUBMIT class= buttonstyle VALUE=\"update\"></td>");
                         out.println("</FORM>");
                     }
+                    // get the time limitation for this datasource
+                    String time = ctdb.getValueForOneColumnUnderTwoConditions(new Column("DEADLINE"), new Column("USERNAME", user.getUserName()), new Column("DATASOURCENAME", dataSourceName), "ACACCESS_DURATION");
+                    if (time == null) time = "unlimited";
+                    out.println("<td>" +time+"</tr></td>");
                 }
+
             }
         out.println("</table>");
         }

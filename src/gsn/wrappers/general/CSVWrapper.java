@@ -1,3 +1,32 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/wrappers/general/CSVWrapper.java
+*
+* @author Mehdi Riahi
+* @author Ali Salehi
+* @author Timotee Maret
+* @author Sofiane Sarni
+* @author Milos Stojanovic
+*
+*/
+
 package gsn.wrappers.general;
 
 import gsn.beans.AddressBean;
@@ -140,8 +169,14 @@ public class CSVWrapper extends AbstractWrapper {
                     output = handler.work(reader, checkPointDir);
                     for (TreeMap<String, Serializable> se : output) {
                         StreamElement streamElement = new StreamElement(se, getOutputFormat());
+                        String [] ses = streamElement.getFieldNames();
                         processedLineCounter++;
-                        //logger.warn(se);
+                        for (int i=0;i<ses.length; i++){
+                            if ("anetz_snow_height".equalsIgnoreCase(ses[i]) || "mst_surface_temp".equalsIgnoreCase(ses[i])){
+                                logger.warn(dataFile+" : "+se);
+                                break;
+                            }
+                        }
                         boolean insertionSuccess = postStreamElement(streamElement);
 
                         if (!useCounterForCheckPoint)

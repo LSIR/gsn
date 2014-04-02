@@ -1,7 +1,35 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/ac/MyOwnerWaitingListServlet.java
+*
+* @author Behnaz Bostanipour
+* @author Timotee Maret
+* @author Julien Eberle
+*
+*/
+
 package gsn.http.ac;
 
 import gsn.Main;
 import gsn.beans.ContainerConfig;
+import org.apache.log4j.Logger;
 
 
 import javax.servlet.ServletException;
@@ -10,6 +38,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,6 +51,7 @@ public class MyOwnerWaitingListServlet extends HttpServlet
 {
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/
+    private static transient Logger logger = Logger.getLogger( MyOwnerWaitingListServlet.class );
 
     public void doGet(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
     {
@@ -181,20 +211,26 @@ public class MyOwnerWaitingListServlet extends HttpServlet
     {
         out.println("<B>&nbsp Do you agree that this candidate register for this virtual sensor? </B><br><br>");
         out.println("<table class=\"transparenttable\">");
-        printYesForm(out, user);
-        printNoForm(out, user);
+        printForm(out, user);
+        //printNoForm(out, user);
         out.println("</table>");
 
      }
-    private void printYesForm(PrintWriter out, User user)
+
+
+    private void printForm(PrintWriter out, User user)
     {
         String username=user.getUserName();
         String datasourcename= user.getDataSource().getDataSourceName();
         out.println("<FORM METHOD=POST>");
+        out.println("Time limitation (Month/Day/Year): <INPUT TYPE=\"date\" name=\"deadline\">");
+        out.println("<INPUT TYPE=\"checkbox\" name=\"unlimited\" >Unlimited Access");
+        out.println("<p>For Mozilla, please specify: Year/Month/Day</p>");
         out.println("<INPUT TYPE=HIDDEN NAME=username VALUE="+username+">");
         out.println("<INPUT TYPE=HIDDEN NAME=datasourcename VALUE="+datasourcename+">");
-        out.println("<INPUT TYPE=HIDDEN NAME=register VALUE= Yes>");
-        out.println("<tr><td><INPUT TYPE=SUBMIT class= buttonstyle VALUE=Yes></td>");
+        //out.println("<INPUT TYPE=HIDDEN NAME=register VALUE= Yes>");
+        out.println("<tr><td><INPUT TYPE=SUBMIT class= buttonstyle NAME=register VALUE=Yes></td>");
+        out.println("<td><INPUT TYPE=SUBMIT class= buttonstyle NAME=register VALUE=No></td></tr>");
         out.println("</FORM>");
 
     }
@@ -261,8 +297,9 @@ public class MyOwnerWaitingListServlet extends HttpServlet
 
     void handleForm(HttpServletRequest req, HttpServletResponse res)
     {
-        User temp=null;
+
         HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user"); ////////
         PrintWriter out = (PrintWriter) session.getAttribute("out");
 
         ParameterSet pm = new ParameterSet(req);
@@ -270,6 +307,7 @@ public class MyOwnerWaitingListServlet extends HttpServlet
         ConnectToDB ctdb =null;
         try
         {
+            String decision = null;   ///////////////
             ctdb= new ConnectToDB();
             if(pm.valueForName("register")==null)
             {
@@ -278,15 +316,42 @@ public class MyOwnerWaitingListServlet extends HttpServlet
 
             else if(pm.valueForName("register").equals("Yes"))
             {
+                //pm.valueForName("unlimited")
+                           // if the user has not specified a date and not unlimited access is set
+                if (( pm.valueForName("unlimited") == null) && pm.valueForName("deadline").length() < 2) {     // The user should have defined a limitation date
+                    this.manageUserAlert(out, "Please, specify the Time limitations!");    // print an error message
 
-                ctdb.updateOwnerDecision("has accepted the registration",pm.valueForName("username"), pm.valueForName("datasourcename") );
+                } else {
+                    if ( pm.valueForName("unlimited") == null) {   // if the user has provided a time limitation
+                        ctdb.insertThreeColumnsValuesStrings(pm.valueForName("username"), pm.valueForName("datasourcename"), pm.valueForName("deadline"), "ACACCESS_DURATION");
+                    }
+                    ctdb.updateOwnerDecision("has accepted the registration",pm.valueForName("username"), pm.valueForName("datasourcename") );
+                    decision = "has been accepted by its owner.\n";  ////////////////
+                }
             }
-
             else if(pm.valueForName("register").equals("No"))
             {
                 ctdb.updateOwnerDecision("has refused the registration",pm.valueForName("username"), pm.valueForName("datasourcename") );
-
+                decision = "has been refused by its owner.\n"; ///////////////
             }
+            if (decision != null) {
+                Emailer email = new Emailer();
+                User userFromBD = ctdb.getUserForUserName("Admin"); // get the details for the Admin account
+                String msgHead = "Dear "+userFromBD.getFirstName() +", "+"\n"+"\n";
+                String msgTail = "Best Regards,"+"\n"+"GSN Team";
+                String msgBody = "A request for a Virtual Sensor " + decision
+                        +"The Virtual Sensor is: " + pm.valueForName("datasourcename")+
+                        "\nThe details of its owner are as follows: \n" +
+                        "First name: " + user.getFirstName() + "\n"+
+                        "Last name: " + user.getLastName() + "\n"+
+                        "Email address: " + user.getEmail() + "\n\n"+
+                        "You can manage this change by choosing the following options in GSN:\n"+
+                        "Access Rights Management -> Admin Only -> Users Updates Waiting List\n"+
+                        "or via the URL: "+req.getServerName()+":"+req.getServerPort()+"/gsn/MyUserUpdateWaitingListServlet\n\n";
+                // first change Emailer class params to use sendEmail
+                email.sendEmail( "GSN ACCESS ", "GSN USER",userFromBD.getEmail(),"Update for a Virtual Sensor access", msgHead, msgBody, msgTail);
+            }
+
         }
         catch(Exception e)
         {
@@ -301,6 +366,43 @@ public class MyOwnerWaitingListServlet extends HttpServlet
             }
         }
     }
+
+
+    private void manageUserAlert(PrintWriter out, String alertMessage)
+    {
+        this.createAlertBox(out, alertMessage);
+        this.callAlertBox(out);
+    }
+
+    private void createAlertBox(PrintWriter out, String alertMessage)
+    {
+
+        out.println("<div id=\"AlertBox\" class=\"alert\">");
+        out.println("<p>");
+        out.println(alertMessage );
+        out.println("</p>");
+        out.println("<form style=\"text-align:right\">");
+        out.println("<input");
+        out.println("type=\"button\"");
+        out.println("class= alertbuttonstyle");
+        out.println("value=\"OK\"");
+        out.println("style=\"width:75px;\"");
+        out.println("onclick=\"document.getElementById('AlertBox').style.display='none'\">");
+        out.println("</form>");
+        out.println("</div>");
+    }
+    private void callAlertBox(PrintWriter out)
+    {
+        out.println("<SCRIPT LANGUAGE=\"JavaScript\" TYPE=\"TEXT/JAVASCRIPT\">");
+        out.println("function DisplayAlert(id,left,top) {");
+        out.println("document.getElementById(id).style.left=left+'px';");
+        out.println("document.getElementById(id).style.top=top+'px';");
+        out.println("document.getElementById(id).style.display='block';");
+        out.println("}");
+        out.println("DisplayAlert('AlertBox',500,200);");
+        out.println("</SCRIPT>");
+    }
+
 
     /****************************************** Client Session related Methods*******************************************/
     /********************************************************************************************************************/
@@ -336,3 +438,4 @@ public class MyOwnerWaitingListServlet extends HttpServlet
 
 
 }
+

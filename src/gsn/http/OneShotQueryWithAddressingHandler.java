@@ -1,7 +1,37 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/OneShotQueryWithAddressingHandler.java
+*
+* @author Ali Salehi
+* @author Timotee Maret
+* @author Behnaz Bostanipour
+* @author Sofiane Sarni
+* @author Milos Stojanovic
+*
+*/
+
 package gsn.http;
 
 import gsn.Main;
 import gsn.Mappings;
+import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
@@ -13,6 +43,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,16 +85,37 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler {
             logger.error("Query is from " + request.getRemoteAddr() + "- " + request.getRemoteHost());
             return;
         }
+
+        Iterator< VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs();
+        HashMap<String, String> fieldToUnitMap = new HashMap<String, String>();
+        while ( vsIterator.hasNext( ) ) {
+            VSensorConfig sensorConfig = vsIterator.next( );
+            if (vsName.equalsIgnoreCase(sensorConfig.getName())){
+                DataField[] dataFieldArray = sensorConfig.getOutputStructure();
+                for (DataField df: dataFieldArray){
+                    String unit = df.getUnit();
+                    if (unit == null || unit.trim().length() == 0)
+                        unit = "";
+
+                    fieldToUnitMap.put(df.getName().toLowerCase(), unit);
+                }
+                break;
+            }
+        }
+
         StringBuilder sb = new StringBuilder("<result>\n");
         while (result.hasMoreElements()) {
             StreamElement se = result.nextElement();
             sb.append("<stream-element>\n");
-            for (int i = 0; i < se.getFieldNames().length; i++)
+            sb.append("<field name=\"time\" unit=\"\">").append(sdf.format(new Date(se.getTimeStamp()))).append("</field>\n");
+            for (int i = 0; i < se.getFieldNames().length; i++){
+                sb.append("<field name=\"").append(se.getFieldNames()[i]).append("\"");
+                sb.append(" unit=\"").append(fieldToUnitMap.get(se.getFieldNames()[i].toLowerCase())).append("\" >");
                 if (se.getFieldTypes()[i] == DataTypes.BINARY)
-                    sb.append("<field name=\"").append(se.getFieldNames()[i]).append("\">").append(se.getData()[i].toString()).append("</field>\n");
+                    sb.append(se.getData()[i].toString()).append("</field>\n");
                 else
-                    sb.append("<field name=\"").append(se.getFieldNames()[i]).append("\">").append(StringEscapeUtils.escapeXml(se.getData()[i].toString())).append("</field>\n");
-            sb.append("<field name=\"timed\" >").append(sdf.format(new Date(se.getTimeStamp()))).append("</field>\n");
+                    sb.append(StringEscapeUtils.escapeXml(se.getData()[i].toString())).append("</field>\n");
+            }
             VSensorConfig sensorConfig = Mappings.getVSensorConfig(vsName);
             if (logger.isInfoEnabled())
                 logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());

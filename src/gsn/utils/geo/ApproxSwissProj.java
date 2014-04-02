@@ -1,3 +1,28 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/utils/geo/ApproxSwissProj.java
+*
+* @author Sofiane Sarni
+*
+*/
+
 /*
 source: http://www.swisstopo.admin.ch/internet/swisstopo/en/home/products/software/products/skripts.html
 WGS84<->CH1903 (05.1999)
@@ -13,7 +38,7 @@ Map projection
     Oblique, conformal cylindrical projection (Mercator projection)
     Bessel ellipsoid 1841
     The projection center is the fundamental point at the old observatory in Bern
-    (Longitude 7 ° 26 '22:50 "/ latitude 46 ° 57' 08.66" -> coordinates 600'000 .000 East / North 200'000 .000)
+    (Longitude 7  26 '22:50 "/ latitude 46  57' 08.66" -> coordinates 600'000 .000 East / North 200'000 .000)
     Approximation (accuracy on the 1-meter level)
  */
 
@@ -148,7 +173,7 @@ public class ApproxSwissProj {
 		return d;
 	}
 
-	// Convert WGS lat/long (° dec) and height to CH h
+	// Convert WGS lat/long (ï¿½ dec) and height to CH h
 	private static double WGStoCHh(double lat, double lng, double h) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);
@@ -168,7 +193,7 @@ public class ApproxSwissProj {
 		return h;
 	}
 
-	// Convert WGS lat/long (° dec) to CH x
+	// Convert WGS lat/long (ï¿½ dec) to CH x
 	private static double WGStoCHx(double lat, double lng) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);
@@ -191,7 +216,7 @@ public class ApproxSwissProj {
 		return x;
 	}
 
-	// Convert WGS lat/long (° dec) to CH y
+	// Convert WGS lat/long (ï¿½ dec) to CH y
 	private static double WGStoCHy(double lat, double lng) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);

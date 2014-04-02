@@ -1,3 +1,32 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/OutputStructureHandler.java
+*
+* @author Timotee Maret
+* @author Ali Salehi
+* @author Behnaz Bostanipour
+* @author Sofiane Sarni
+* @author Milos Stojanovic
+*
+*/
+
 package gsn.http;
 
 import gsn.Main;
@@ -26,10 +55,16 @@ public class OutputStructureHandler implements RequestHandler {
         if (logger.isInfoEnabled())
             logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
         StringBuilder sb = new StringBuilder("<virtual-sensor name=\"").append(vsName).append("\">\n");
-        for (DataField df : sensorConfig.getOutputStructure())
+        sb.append("<field name=\"time\" type=\"string\" description=\"The timestamp associated with the stream element\" unit=\"\"/>\n");
+        for (DataField df : sensorConfig.getOutputStructure()){
             sb.append("<field name=\"").append(df.getName()).append("\" ").append("type=\"").append(df.getType()).append("\" ").append("description=\"").append(
-                    StringEscapeUtils.escapeXml(df.getDescription())).append("\" />\n");
-        sb.append("<field name=\"timed\" type=\"string\" description=\"The timestamp associated with the stream element\" />\n");
+                    StringEscapeUtils.escapeXml(df.getDescription()));
+            if (df.getUnit() != null && df.getUnit().trim().length() != 0)
+                sb.append("\" ").append("unit=\"").append(df.getUnit());
+            else
+                sb.append("\" ").append("unit=\"").append("");
+            sb.append("\" />\n");
+        }
         sb.append("</virtual-sensor>");
         response.setHeader("Cache-Control", "no-store");
         response.setDateHeader("Expires", 0);

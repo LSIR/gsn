@@ -1,3 +1,30 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/ac/MyControllerFilter.java
+*
+* @author Behnaz Bostanipour
+* @author Sofiane Sarni
+* @author Milos Stojanovic
+*
+*/
+
 package gsn.http.ac;
 
 
@@ -75,6 +102,10 @@ public class MyControllerFilter implements Filter {
                         reqVirtualSensorName = req.getParameter("vsName");
                 }
 
+                if ("/griddata".equals(req.getServletPath())) {   // /griddata request uses sensor instead of name
+                    reqVirtualSensorName = req.getParameter("sensor");
+                }
+
                 if ((reqUsername == null) && (reqPassword == null) && (user == null) && ("/multidata".equals(req.getServletPath()))) { // generally request from web client for plotting
                     List<String> listOfVirtualSensors = createListOfVirtualSensorsFromRequest(req);
                     boolean flag = UserUtils.userHasAccessToAllVirtualSensorsInList(reqUsername, reqPassword, listOfVirtualSensors) || DataSource.allVirtualSensorsInListAreNotManaged(listOfVirtualSensors);
@@ -120,8 +151,8 @@ public class MyControllerFilter implements Filter {
                     }
                 }
 
-                // support for request 114
-                if ("/gsn".equals(req.getServletPath()) && (requestType == 114)) {
+                // support for request 114, 113 and griddata
+                if (("/gsn".equals(req.getServletPath()) && (requestType == 114 || requestType == 113)) || "/griddata".equals(req.getServletPath())) {
                     if ((reqUsername != null) && (reqPassword != null) && (reqVirtualSensorName != null)) {
                         User userByURL = UserUtils.allowUserToLogin(reqUsername, reqPassword);
 

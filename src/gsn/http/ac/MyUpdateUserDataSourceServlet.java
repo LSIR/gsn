@@ -1,3 +1,30 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/ac/MyUpdateUserDataSourceServlet.java
+*
+* @author Behnaz Bostanipour
+* @author Timotee Maret
+* @author Julien Eberle
+*
+*/
+
 package gsn.http.ac;
 
 import gsn.Main;
@@ -60,14 +87,31 @@ public class MyUpdateUserDataSourceServlet  extends HttpServlet
                try
                {
                    ctdb = new ConnectToDB();
-                   User waitingUser = new User(pm.valueForName("username"));
+
+                   User waitingUser = ctdb.getUserForUserName(pm.valueForName("username"));
                    //String updatedType=null;
+                   String userMessage = null;
+                   String label = null;
+
+                   if(pm.valueForName("datasourcetype").charAt(1)=='1')
+                   {
+                       label="read";
+                   }
+                   else if(pm.valueForName("datasourcetype").charAt(1)=='2')
+                   {
+                       label="write";
+                   }
+                   else if(pm.valueForName("datasourcetype").charAt(1)=='3')
+                   {
+                       label="read/write";
+                   }
 
                    if(pm.valueForName("update").equals("yes"))
                    {
                        if(pm.valueForName("datasourcetype").charAt(1)=='0')
                        {
                           ctdb.deleteDataSourceForUser(new DataSource(pm.valueForName("datasourcename")), waitingUser);
+                          userMessage="Your access to the Virtual Sensor '"+ pm.valueForName("datasourcename") +"' has been removed.";
                        }
                        else
                        {
@@ -75,24 +119,41 @@ public class MyUpdateUserDataSourceServlet  extends HttpServlet
                            waitingUser.setIsWaiting("no");
                            ctdb.updateDataSourceForUser(waitingUser,new DataSource(pm.valueForName("datasourcename"),pm.valueForName("datasourcetype").substring(1,2)));
                            ctdb.updateOwnerDecision("notreceived",pm.valueForName("username"), pm.valueForName("datasourcename") );
+                           userMessage = "Congratulations, you have '"+ label +"' access to the Virtual Sensor: "+ pm.valueForName("datasourcename");
                        }
                    }
                    else if(pm.valueForName("update").equals("no"))
                    {
                        if(pm.valueForName("datasourcetype").charAt(0)=='5')
                        {
+                           userMessage="Unfortunately, your request to have '"+ label +"' access rights to the Virtual Sensor '"+ pm.valueForName("datasourcename") +"' has been rejected.";
+                           Column column1 = new Column("USERNAME", waitingUser.getUserName());
+                           Column column2 = new Column("DATASOURCENAME", pm.valueForName("datasourcename"));
+                           ctdb.deleteUnderTwoConditions(column1, column2,"ACACCESS_DURATION"); // remove this from the Duration Table
                            ctdb.deleteDataSourceForUser(new DataSource(pm.valueForName("datasourcename")), waitingUser);
                        }
                        else
                        {
-                            //updatedType=pm.valueForName("datasourcetype").substring(1,2);
+                           userMessage="Unfortunately, your request for changing access rights to the Virtual Sensor '"+ pm.valueForName("datasourcename") +"' has been rejected.";
+                           Column column1 = new Column("USERNAME", waitingUser.getUserName());
+                           Column column2 = new Column("DATASOURCENAME", pm.valueForName("datasourcename"));
+                           ctdb.deleteUnderTwoConditions(column1, column2,"ACACCESS_DURATION"); // remove this from the Duration Table
                            waitingUser.setIsWaiting("no");
                            ctdb.updateDataSourceForUser(waitingUser,new DataSource(pm.valueForName("datasourcename"),pm.valueForName("datasourcetype").substring(0,1)));
                            ctdb.updateOwnerDecision("notreceived",pm.valueForName("username"), pm.valueForName("datasourcename") );
                        }
                    }
 
+                   Emailer email = new Emailer();
+                   String msgHead = "Dear "+waitingUser.getFirstName()+" "+waitingUser.getLastName()+", "+"\n"+"\n";
+                   String msgTail = "Best Regards,"+"\n"+"GSN Team";
+                   String msgBody = userMessage+"\n"
+                           +"You can view your available sensors by going to:\n\n"+
+                           "User Account Management -> Update Access Rights Form\n"+
+                           "or via the URL: "+req.getServerName()+":"+req.getServerPort()+"/gsn/MyUserUpdateServlet\n\n";
 
+                   // first change Emailer class params to use sendEmail
+                   email.sendEmail( "GSN ACCESS ", "GSN USER",waitingUser.getEmail(),"Access to a Virtual Sensor", msgHead, msgBody, msgTail);
 
 
                     res.sendRedirect("/gsn/MyUserUpdateWaitingListServlet");

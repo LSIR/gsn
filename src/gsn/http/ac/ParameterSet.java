@@ -1,3 +1,28 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/ac/ParameterSet.java
+*
+* @author Behnaz Bostanipour
+*
+*/
+
 package gsn.http.ac;
 /**
  * Created by IntelliJ IDEA.
@@ -9,12 +34,14 @@ package gsn.http.ac;
 
 import com.oreilly.servlet.MultipartRequest;
 import org.apache.log4j.Logger;
-
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.*;
 
 import javax.servlet.http.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /* this is a  class for using and processing the parameters of a http form */
 
@@ -133,16 +160,28 @@ public class ParameterSet
                 filename = this.multipartreq.getFilesystemName(name);
                 filetype = this.multipartreq.getContentType(name);
                 file = this.multipartreq.getFile(name);
+
                 if(filename!=null && filetype!=null )
-                {
-                    ds = new DataSource(vsname,"4",filename,filetype,saveDirectory);
+                {     //rename the name of the Virtual Sensor to the unique name
+                    //logger.info("filename " + filename);
+                    //logger.info("name " + name);
+                    //logger.info("abs path " + file.getAbsolutePath());
+                    changeSensorName(file.getAbsolutePath(), vsname);
+                    String newFilePath = file.getAbsolutePath().replace(file.getName(), "") + vsname+".xml";
+                    File newFile = new File(newFilePath);
+
+                    try {
+                        FileUtils.moveFile(file, newFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    ds = new DataSource(vsname,"4",vsname+".xml",filetype,saveDirectory);
                 }
                 if (file != null)
                 {
                     logger.info("length: " + file.length());
                 }
             }
-
         }
         catch(Exception e)
         {
@@ -152,7 +191,55 @@ public class ParameterSet
 
         }
         return ds;
+    }
 
+    private static void changeSensorName(String filepath, String name) {
+        File f=new File(filepath);
+
+        Pattern pat = Pattern.compile("name[\\s]*=[\\s]*\"[\\s]*[\\S]+[\\s]*\"");
+        Matcher match;
+        FileInputStream fs = null;
+        InputStreamReader in = null;
+        BufferedReader br = null;
+
+        StringBuffer sb = new StringBuffer();
+        String textinLine;
+
+        try {
+            fs = new FileInputStream(f);
+            in = new InputStreamReader(fs);
+            br = new BufferedReader(in);
+
+            while(true)
+            {
+                textinLine=br.readLine();
+                if(textinLine==null)
+                    break;
+                if ( textinLine.contains("<virtual-sensor") ) {
+                    match = pat.matcher(textinLine);
+                    match.find();
+                    textinLine=match.replaceFirst("name=\""+name+"\"");
+                }
+                sb.append(textinLine+"\n");
+            }
+            fs.close();
+            in.close();
+            br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try{
+            FileWriter fstream = new FileWriter(f);              // write file again
+            BufferedWriter outobj = new BufferedWriter(fstream);
+            outobj.write(sb.toString());
+            outobj.close();
+
+        }catch (Exception e){
+            System.err.println("Error: " + e.getMessage());
+        }
     }
 
 }

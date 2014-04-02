@@ -1,3 +1,29 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/ac/MyUserCandidateRegistrationServlet.java
+*
+* @author Behnaz Bostanipour
+* @author Timotee Maret
+*
+*/
+
 package gsn.http.ac;
 
 import gsn.Main;
@@ -292,15 +318,49 @@ public class MyUserCandidateRegistrationServlet extends HttpServlet
         //groupVectorForGroupNames(pm.getValuesForParam("groupname",req));
         User user=allowUserToRegister(pm, out,groupVectorForGroupNames(pm.getValuesForParam("groupname",req)));
         if(user!= null)
-        {
+        {   ConnectToDB ctdb = null;  // used to retrieve admin data
             try
 			{     //printRegistrationOk(out);
+                // send a confirmation email to the user
+                Emailer email = new Emailer();
+                String msgHead = "Dear "+user.getFirstName() +", "+"\n"+"\n";
+                String msgTail = "Best Regards,"+"\n"+"GSN Team";
+                String msgBody = "Welcome to GSN, we would like to confirm your request for a new Account."+"\n"
+                       +"You will receive another email confirming the activation of your account.\n\n";
+                // first change Emailer class params to use sendEmail
+                email.sendEmail( "GSN ACCESS ", "GSN USER",user.getEmail(),"Your registration to GSN ", msgHead, msgBody, msgTail);
+
+				// send email to Administrator
+                ctdb = new ConnectToDB();
+                User userFromBD = ctdb.getUserForUserName("Admin"); // get the details for the Admin account
+                msgHead = "Dear "+userFromBD.getFirstName() +", "+"\n"+"\n";
+                msgTail = "Best Regards,"+"\n"+"GSN Team";
+                msgBody = "A new Account has been created and awaits your confirmation."+"\n"
+                        +"The account details are the following:\n"+
+                          "First name: " + user.getFirstName() + "\n"+
+                          "Last name: " + user.getLastName() + "\n"+
+                          "Email address: " + user.getEmail() + "\n\n"+
+                        "You can manage this change by choosing the following options in GSN:\n"+
+                        "Access Rights Management -> Admin Only -> User Registration Waiting List\n"+
+                        "or via the URL: "+req.getServerName()+":"+req.getServerPort()+"/gsn/MyUserCandidateWaitingListServlet\n\n";
+                // first change Emailer class params to use sendEmail
+                email.sendEmail( "GSN ACCESS ", "GSN USER",userFromBD.getEmail(),"Request for new GSN Account", msgHead, msgBody, msgTail);
+                //logger.warn("The email address of the Admin is: " + userFromBD.getEmail());
+                // redirect them to the page
 				res.sendRedirect("/gsn/MyRegistrationOkServlet");
 			}
 			catch (Exception ignored)
 			{
 				out.println("problem with redirecting to the target !");
 			}
+            finally
+            {
+                if(ctdb!=null)
+                {
+                    ctdb.closeStatement();
+                    ctdb.closeConnection();
+                }
+            }
         }
         else
         {

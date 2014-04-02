@@ -1,3 +1,30 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/storage/db/MySQLStorageManager.java
+*
+* @author Timotee Maret
+* @author Mehdi Riahi
+* @author Milos Stojanovic
+*
+*/
+
 package gsn.storage.db;
 
 import gsn.beans.DataField;
@@ -74,7 +101,12 @@ public class MySQLStorageManager extends StorageManager {
             case Types.LONGVARBINARY:
                 return DataTypes.BINARY;
             default:
-                logger.error("The type can't be converted to GSN form : " + jdbcType);
+                if (jdbcType == Types.NULL){
+                    logger.error("The type can't be converted to GSN form : 0. (Found  type in JDBC format is \"Null\")");
+                }
+                else {
+                    logger.error("The type can't be converted to GSN form : " + jdbcType);
+                }
                 break;
         }
         return -100;
@@ -139,6 +171,7 @@ public class MySQLStorageManager extends StorageManager {
         }
         result.delete(result.length() - 2, result.length());
         result.append(")");
+        if (tableName.contains("_")) logger.warn(result);
         return result;
     }
 

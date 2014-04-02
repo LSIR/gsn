@@ -1,3 +1,29 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/MenuServlet.java
+*
+* @author Timotee Maret
+* @author ndawes
+*
+*/
+
 package gsn.http;
 
 import gsn.Main;
@@ -37,7 +63,7 @@ public class MenuServlet extends HttpServlet {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user");
         if (user == null)
-            name = "<li><a href=/gsn/MyLoginHandlerServlet> login</a></li>";
+            name = "<li><a href=/gsn/MyLoginHandlerServlet> login</a></li>" + "<li><a href=/gsn/MyUserCandidateRegistrationServlet>register</a></li>";
         else {
             name = "<li><a href=/gsn/MyLogoutHandlerServlet> logout </a></li>" + "<li><div id=logintextprime >logged in as: " + user.getUserName() + "&nbsp" + "</div></li>";
         }

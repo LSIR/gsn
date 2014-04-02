@@ -1,3 +1,29 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/http/ac/MyLoginHandlerServlet.java
+*
+* @author Behnaz Bostanipour
+* @author Timotee Maret
+*
+*/
+
 package gsn.http.ac;
 
 import gsn.Main;
@@ -178,7 +204,7 @@ public class MyLoginHandlerServlet extends HttpServlet
                 if(req.getHeader("client").equals("apache"))
                 {
                     res.setHeader("logedin","no");
-                     return;
+                    return;
                 }
             }
 
@@ -213,6 +239,9 @@ public class MyLoginHandlerServlet extends HttpServlet
                     }
                     else
                     {
+                        // Check if any of the VS that the user uses has expired and has to be removed.
+                        ctdb.checkVSDuration(pm.valueForName("username"));
+
                         out.println("You are allowed to see the target!"+"<br>");
                         user = new User(pm.valueForName("username"),enc,ctdb.getDataSourceListForUserLogin(pm.valueForName("username")),ctdb.getGroupListForUser(pm.valueForName("username")));
                         User userFromBD = ctdb.getUserForUserName(pm.valueForName("username"));

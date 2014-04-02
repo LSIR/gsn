@@ -1,21 +1,38 @@
-package gsn.vsensor;
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: src/gsn/vsensor/GridModelVS.java
+*
+* @author Julien Eberle
+*
+*/
 
+package gsn.vsensor;
 
 import gsn.Mappings;
 import gsn.VirtualSensor;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.utils.geo.ApproxSwissProj;
 import gsn.utils.models.AbstractModel;
-import gsn.utils.models.ModelLoader;
 
 import org.apache.log4j.Logger;
-
-import weka.core.Attribute;
-import weka.core.FastVector;
-import weka.core.Instance;
-import weka.core.Instances;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -62,8 +79,7 @@ public class GridModelVS extends AbstractVirtualSensor {
             return false;
         }
         if (model_i_str == null) {
-            logger.warn("Parameter \"" + PARAM_MODEL + "\" not provided in Virtual Sensor file");
-            return false;
+            model_i_str = "0";
         }
 
     	try {
@@ -89,7 +105,7 @@ public class GridModelVS extends AbstractVirtualSensor {
 			return false;
 		}
 
-        //get the field to query to build the grid (integer fields are converted to double)
+        //get the field to query to build the grid (fields are converted to double)
         field = params.get(PARAM_FIELD);
 
         if (field == null) {
@@ -184,10 +200,11 @@ public class GridModelVS extends AbstractVirtualSensor {
 			DataField []fields = new DataField[]{new DataField("latitude","double"),new DataField("longitude","double")};
 			
 			//filling the grid with predictions/extrapolations
+			//if the model is slow to query this loop may take some time
 			Double[][] rawData = new Double[gridSize][gridSize];
 			for (int j=0;j<gridSize;j++){
 				for(int k=0;k<gridSize;k++){
-					double[] pos = new double[]{(y_BL+YCellSize * j)*60+1880, (x_BL+XCellSize * k)*60+320};
+					double[] pos = new double[]{y_BL+YCellSize * j, x_BL+XCellSize * k};
 					StreamElement se = new StreamElement(fields, new Serializable[]{pos[0],pos[1]});
 					StreamElement r = modelVS.query(se)[0];
 					Serializable s = r.getData(field);
@@ -195,9 +212,12 @@ public class GridModelVS extends AbstractVirtualSensor {
 					    rawData[gridSize-j-1][k] = (Double) r.getData(field);
 					}else if(s instanceof Integer){
 						rawData[gridSize-j-1][k] = ((Integer) r.getData(field)).doubleValue();
+					}else if(s instanceof Boolean){
+						rawData[gridSize-j-1][k] = ((Boolean) r.getData(field)) ? 1.0 : 0.0;
+					}else {
+						rawData[gridSize-j-1][k] = 0.0;
 					}
 				}
-                         //logger.warn("line "+j+" of "+gridSize);
 			}
 
 			//preparing the output
