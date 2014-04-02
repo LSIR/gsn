@@ -626,6 +626,49 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 										case 0x000C:
 											event = "fatal measurement failure";
 											break;
+										case 0x000D:
+											switch (eventData) {
+											case 0x0000:
+												event = "SD card initialized and ready for use";
+												break;
+											case 0x0001:
+												event = "SD card not present";
+												break;
+											case 0x0002:
+												event = "SD card present, but currently not available";
+												break;
+											case 0x0003:
+												event = "SD card size not supported (1GB to 2GB expected)";
+												break;
+											case 0x0004:
+												event = "SD card operation not allowed (e.g. write to block in file system area)";
+												break;
+											case 0x0005:
+												event = "SD card init error";
+												break;
+											case 0x0006:
+												event = "SD card busy";
+												break;
+											case 0x0007:
+												event = "SD card is full";
+												break;
+											default:
+												logger.warn("self-test result data " + eventData + " unknown");
+												break;
+											}
+											break;
+										case 0x000E:
+											event = "GPS checksum match failure";
+											break;
+										case 0x000F:
+											event = "TinyNode status buffer overflow (" + eventData + " status packets dropped)";
+											break;
+										case 0x0010:
+											event = "TinyNode space vehicle buffer overflow (" + eventData + " vehicle packets dropped)";
+											break;
+										case 0x0011:
+											event = "TinyNode event buffer overflow (" + eventData + " events dropped)";
+											break;
 										case 0x1000:
 											event = "repeated last event " + eventData;
 											break;
