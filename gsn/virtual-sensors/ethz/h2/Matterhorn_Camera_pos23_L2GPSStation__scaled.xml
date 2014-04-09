@@ -6,7 +6,11 @@
             <param name="jpeg_scaled">JPEG_SCALED</param>
         </init-params>
         <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="RELATIVE_FILE" type="VARCHAR(255)" />
+            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE" />
             <field name="JPEG_SCALED" type="binary:image/jpeg" />
         </output-structure>
     </processing-class>
@@ -20,7 +24,7 @@
                 <address wrapper="local">
                     <predicate key="query">select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE, FILE_COMPLETE from Matterhorn_Binary__mapped where RELATIVE_FILE like 'webcam2/%L2GPSStation\_%'</predicate>
                 </address>
-                <query> select timed, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 23</query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where FILE_COMPLETE = 1 and POSITION = 23</query>
             </source>
             <query> select * from source </query>
         </stream>

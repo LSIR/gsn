@@ -168,12 +168,12 @@ function addDeployments() {
     $(deployment_cameras[i]).each(function() {
       if ($(webcam_div).attr("class").indexOf("nodate")>0)
         $(webcam_div).append('<div style="float:left;position:relative;margin:2px;padding:0;width:300px;height:250px">'
-                            +'<a href="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest">'
+                            +'<a href="field?vs='+this+'&amp;field=DATA&amp;pk=latest">'
                             +'<img src="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"></a></div>');
       else
         $(webcam_div).append('<div style="float:left;position:relative;margin:2px;padding:0;width:300px;height:250px">'
-                            +'<div style="position:absolute;bottom:0px;width:171px;height:12px;background:url(field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest);background-position: -63px top;margin:0;padding:0">'
-                            +'</div><a href="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest">'
+                            +'<div style="position:absolute;bottom:0px;width:171px;height:12px;background:url(field?vs='+this+'&amp;field=DATA&amp;pk=latest);background-position: -63px top;margin:0;padding:0">'
+                            +'</div><a href="field?vs='+this+'&amp;field=DATA&amp;pk=latest">'
                             +'<img src="field?vs='+this+'&amp;field=JPEG_SCALED&amp;pk=latest" width="300" height="250" alt="webcam image"></a></div>');
     });
   }
