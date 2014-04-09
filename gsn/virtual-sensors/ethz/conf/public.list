@@ -158,7 +158,6 @@ Glaciers_BackLogStatus_Revision__mapped.xml
 Glaciers_BackLogStatus_Static__mapped.xml
 Glaciers_Binary__mapped.xml
 Glaciers_Camera_Rhone__scaled.xml
-Glaciers_Camera_Rhone.xml
 Glaciers_CoreStationStatus_Hardware__conv.xml
 Glaciers_CoreStationStatus_Hardware__mapped.xml
 Glaciers_CoreStationStatus_Software__mapped.xml
@@ -260,7 +259,6 @@ Matterhorn_BackLogStatus_Static__mapped.xml
 Matterhorn_Binary__mapped.xml
 #Matterhorn_Binary_Http__mapped.xml
 Matterhorn_Camera_pos19__scaled.xml
-Matterhorn_Camera_pos19.xml
 Matterhorn_Camera_pos23_DetachmentAEExperiment__scaled.xml
 Matterhorn_Camera_pos23_DetachmentBottom__scaled.xml
 Matterhorn_Camera_pos23_DetachmentTop__scaled.xml
