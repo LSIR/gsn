@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_Camera_pos59__scaled" priority="10" >
+<virtual-sensor name="Dirruhorn_Camera_pos61__scaled" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
