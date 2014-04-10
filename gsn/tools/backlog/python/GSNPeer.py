@@ -708,7 +708,7 @@ class GSNWriter(Thread):
             try:
                 self._sendqueue.put_nowait((priority, msg))
             except Queue.Full:
-                self._logger.warning('send queue is full')
+                pass
             except Exception, e:
                 self.exception(e)
             else:
@@ -727,7 +727,6 @@ class GSNWriter(Thread):
                 self._sendqueue.put_nowait((priority, msg))
                 return True
             except Queue.Full:
-                self._logger.warning('send queue is full')
                 return True
             except Exception, e:
                 self.exception(e)
