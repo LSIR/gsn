@@ -1,7 +1,7 @@
 ## GSN Change log
 
 ### r1.1.3
-[commits] (https://github.com/LSIR/gsn/commits/gsn-release-1.1.2)
+[commits] (https://github.com/LSIR/gsn/commits/gsn-release-1.1.3)
 * Added support for HBase storage
 * Updated REST API for accessing data
 * Added access control support for REST PAI
