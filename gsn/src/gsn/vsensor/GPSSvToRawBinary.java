@@ -129,7 +129,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 				svContainerMap.put(gps_unixtime, svContainer);
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Device Id: " + deviceId + ": " + e.getMessage());
 		}
 		
 		if (refTime != null) {
