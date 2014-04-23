@@ -93,6 +93,8 @@ public class MySQLStorageManager extends StorageManager {
             case Types.CHAR:
                 return DataTypes.CHAR;
             case Types.DOUBLE:
+            case Types.FLOAT:      // for compatibility reason
+            case Types.REAL:      // for compatibility reason
             case Types.DECIMAL:    // This is needed for doing aggregates in datadownload servlet.
                 return DataTypes.DOUBLE;
             case Types.BINARY:
