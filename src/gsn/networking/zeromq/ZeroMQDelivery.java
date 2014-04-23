@@ -15,6 +15,7 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.rest.DeliverySystem;
+import gsn.http.rest.StreamElement4Rest;
 
 public class ZeroMQDelivery implements DeliverySystem{
 	
@@ -49,6 +50,7 @@ public class ZeroMQDelivery implements DeliverySystem{
 		try {
 			ByteArrayOutputStream bais = new ByteArrayOutputStream();
             bais.write((config.getName() + " ").getBytes());
+            //StreamElement4Rest.getXstream().toXML(se.toRest(),bais);
             Output o = new Output(bais);
             kryo.writeObjectOrNull(o,se,StreamElement.class);
             o.close();

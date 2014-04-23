@@ -119,6 +119,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 					//System.out.println("read from wrapper");
 					ByteArrayInputStream bais = new ByteArrayInputStream(rec);
 					bais.skip(vsensor.getBytes().length + 1);
+					//StreamElement se = ((StreamElement4Rest)(StreamElement4Rest.getXstream().fromXML(bais))).toStreamElement();
 					StreamElement se = kryo.readObjectOrNull(new Input(bais),StreamElement.class);
 			        //maybe queuing would be better here...
 			        boolean status = postStreamElement(se);
@@ -137,5 +138,10 @@ public class ZeroMQWrapper extends AbstractWrapper {
 		}
 		subscriber.close();
 	}
+	
+	   @Override
+	   public boolean isTimeStampUnique(){
+		   return false;
+	   }
 
 }
