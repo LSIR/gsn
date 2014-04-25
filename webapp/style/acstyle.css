@@ -25,14 +25,14 @@ font-size:15px;
 /*color: #0000FF;*/
 /*background-color:#DFDFDF;*/
 color: #000000;
-background:#EEEEE0;
+background:#E0EEE0;
 padding:0.3em;
 }
 
 h3 {
 font-size:14px;
 /*color:#66CC66;*/
-color:#CD853F;
+color:#3FCD3F;
 }
 
 .registerli
@@ -51,9 +51,9 @@ font-weight:bold;
 font-size:17px;
 /*color: #0000FF;*/
 /*background-color:#DFDFDF;*/
-border-top: 2px solid #FFA84C;
-border-bottom: 2px solid #FFA84C;
-background: #FFE0BF;
+border-top: 2px solid #7c6;
+border-bottom: 2px solid #7c6;
+background: #9d8;
 margin: 5px 0;
 padding:0.3em;
 font-weight:bold;
@@ -81,7 +81,7 @@ width: 1200px;
 margin: 10px auto 10px auto;
 padding: none;
 border: none;
-background-color:#FCFDDC;
+background-color:#DCFFDC;
 }
 
 
@@ -92,7 +92,7 @@ width: 600px;
 margin: 10px;
 padding: none;
 border: none;
-background-color:#FCFDDC;
+background-color:#DCFFDC;
 }
 
 #loginhandlercontainer {
@@ -114,40 +114,40 @@ border: 2px ridge #DFDFDF;
 margin:0;
 padding:10px;
 border:1px solid #FFF;
-background-color:#FFEE00;
+background-color:#11EE11;
 }
 
 #groupmasthead {
 margin:none;
 padding:none;
 border:none;
-background-color:#FFEE00;
+background-color:#11EE11;
 }
 
 #mastheadborder {
 margin:0 0 10px 0;
 padding:10px;
 border:1px solid #FFF;
-background-color:#FFA84C;
+background-color:#7c6;
 }
 
 #groupmastheadborder {
 margin:none;
 padding:none;
 border:none;
-background-color:#FFA84C;
+background-color:#7c6;
 }
 
 #content {
 margin-bottom:10px;
 padding:10px;
-background-color:#FCFDDC;
+background-color:#DCFFDC;
 }
 
 #groupcontent {
 margin-bottom:none;
 padding:none;
-background-color:#FCFDDC;
+background-color:#DCFFDC;
 }
 
 #twocolumnscontent {
@@ -156,7 +156,7 @@ width:34%;
 margin-bottom:10px;
 padding:10px;
 border:1px solid transparent;
-background-color:#FCFDDC;
+background-color:#DCFFDC;
 }
 
 
@@ -166,26 +166,26 @@ width:56%;
 margin-bottom:10px;
 padding:10px;
 border:1px solid transparent;
-background-color:#FCFDDC;
+background-color:#DCFFDC;
 }
 
 #footer {
 padding:10px;
 border:1px solid #FFF;
-background-color:#FFA84C;
+background-color:#7c6;
 }
 
 #groupfooter {
 padding:10px;
 border:1px solid #FFF;
-background-color:#FFA84C;
+background-color:#7c6;
 }
 
 #twocolumnsfooter {
 clear:both;
 padding:10px;
 border:1px solid #FFF;
-background-color:#FFA84C;
+background-color:#7c6;
 }
 
 p {
@@ -203,7 +203,7 @@ font: bold 12px 'Lucida Grande',Verdana,sans-serif;
 
 
 .linklistli {
-background: #EEEEE0;
+background: #E0EEE0;
 margin: 0; padding: 2px 10px;
 border-left: 1px solid #fff;
 border-top: 1px solid #fff;
@@ -225,7 +225,7 @@ color:#666;
 }
 
 ul a:hover {
-color:#0000FF;
+color:#0022FF;
 background:#FFF;
 }
 
@@ -233,13 +233,13 @@ ul a:active {
 color:#333;
 }
 .linkclass {
-background: #FFE0BF;
+background: #9d8;
 font-size: 10px;
 line-height: 14px;
 font-weight: bold;
 padding: 2px 10px 2px 10px;
 margin-right: 4px;
-border: 1px solid #FFE0BF;
+border: 1px solid #9d8;
 text-decoration: none;
 color: #666;
 }
@@ -258,7 +258,7 @@ text-align:center;
 }
 
 .displaylinkli {
-background: #EEEEE0;
+background: #E0EEE0;
 font :12px 'Lucida Grande',Verdana,sans-serif;
 margin: 0; padding: 2px 10px;
 border-left: 1px solid #fff;
@@ -291,12 +291,12 @@ color:#000000;
 }
 
 .displaylinkli a:hover {
-color:#0000FF;
+color:#0022FF;
 background:#FFFFFF;
 }
 
 .displaylinkli a:active {
-color:#0000FF;
+color:#0022FF;
 }
 
 
@@ -332,7 +332,7 @@ width:250px;
 text-decoration:none;
 display:block; padding: 2px 10px;
 color:#858585;
-background-color: #EEEEE0;
+background-color: #E0EEE0;
 font: bold 12px 'Lucida Grande',Verdana,sans-serif;
 margin:5px;
 }
@@ -345,13 +345,13 @@ text-decoration:none;
 }
 
 .linkclass {
-background: #FFE0BF;
+background: #9d8;
 font-size: 10px;
 line-height: 14px;
 font-weight: bold;
 padding: 2px 10px 2px 10px;
 margin-right: 4px;
-border: 1px solid #FFE0BF;
+border: 1px solid #9d8;
 text-decoration: none; color: #666;
 }
 
@@ -407,9 +407,9 @@ margin-bottom:10px;
 table
 {
 /*border: 1px solid transparent;*/
-border: 1px solid #FFA84C;
+border: 1px solid #7c6;
 font: normal 12px 'Lucida Grande',Verdana,sans-serif;
-font-color:#515435;
+font-color:#355435;
 /*background-color:#D1A695;*/
 /*background-color:#A28C75;*/
 background-color:transparent;
@@ -427,13 +427,13 @@ th {
 
 color:#000;
 /*background-color:#515435;*/
-background-color:#FFA84C;
+background-color:#7c6;
 border-style:solid; border-width:1px;
 border-color:transparent;
 }
 
 td {
-background-color:#FFE0BF;
+background-color:#9d8;
 border-style:solid;
 border-width:1px;
 border-color:transparent;
@@ -451,7 +451,7 @@ font: normal 12px 'Lucida Grande',Verdana,sans-serif;
 }
 
 .invisibletable td {
-background-color:#FCFDDC;
+background-color:#DCFFDC;
 border:none;
 }
 
@@ -494,15 +494,15 @@ padding:0;
 font: normal 12px 'Lucida Grande',Verdana,sans-serif;
 margin:0 0 10px 0;
 padding:5px;
-border:1px solid #FFA84C;
+border:1px solid #7c6;
 
 }
 
 .loginhandlerfieldset p {
 margin:3px 0 2px 0;
 padding:5px;
-border:1px solid #FFA84C;
-background-color:#FFE0BF;
+border:1px solid #7c6;
+background-color:#9d8;
 }
 label {
 font-weight:bold;
@@ -519,12 +519,12 @@ border:1px solid #8A8A8A;
 fieldset p {
 margin:3px 0 2px 0;
 padding:5px;
-border:1px solid #FFA84C;
-background-color:#FFEE00;
+border:1px solid #7c6;
+background-color:#11EE11;
 }
 
 legend {
-background-color:#EEEEE0 ;
+background-color:#E0EEE0 ;
 margin: 0;
 padding:5px;
 border-style:solid;
@@ -535,17 +535,17 @@ border-color:#FFF #AAA #666 #FFF;
 
 .inputclass{
 margin:5px 0 5px 0;
-border:3px double #FFA84C;
+border:3px double #7c6;
 }
 
 .checkboxclass{
 margin:5px 0 5px 0;
-border:3px double #FFA84C;
+border:3px double #7c6;
 }
 
 .textarea {
 margin:5px 0 5px 0;
-border:3px double #FFA84C;
+border:3px double #7c6;
 }
 
 #vsname {
@@ -564,7 +564,7 @@ width:100%;
 /********************************* button ***************************************/
 .buttonstyle {
 color: #000;
-background:#D8E3CA;
+background:#CAE3CA;
 border: 2px outset #d7b9c9;
 width:50px;
 text-align:center;
@@ -573,7 +573,7 @@ width:100px;
 
 .fileuploaderbuttonstyle {
 color: #000;
-background:#D8E3CA;
+background:#CAE3CA;
 border: 2px outset #d7b9c9;
 width:50px;
 text-align:center;
@@ -582,7 +582,7 @@ height:30px;
 }
 
 .loginhandlerbuttonstyle {
-background:#EEEEE0;
+background:#E0EEE0;
 margin:5px 0 5px 0;
 border:1px double #8A8A8A;
 /*border-color:#FFF #AAA #666 #FFF;*/
@@ -594,7 +594,7 @@ text-align:center;
 
 .bigsumitbuttonstyle{
 color: #000;
-background: #D8E3CA;
+background: #CAE3CA;
 border: 2px outset #d7b9c9;
 width:160px;
 height:40px;
@@ -605,7 +605,7 @@ padding:10px;
 
 .sumitbuttonstyle{
 color: #000;
-background:#D8E3CA;
+background:#CAE3CA;
 border: 2px outset #d7b9c9;
 width:50px;
 text-align:center;
@@ -616,7 +616,7 @@ height:30px;
 
 .halfsumitbuttonstyle{
 color: #000;
-background: #D8E3CA;
+background: #CAE3CA;
 border: 2px outset #d7b9c9;
 width:100px;
 height:40px;
@@ -628,7 +628,7 @@ padding:10px;
 
 .changegroupbuttonstyle {
 color: #000;
-background: #FFA84C;
+background: #7c6;
 border: 2px outset #d7b9c9;
 width:180px;
 text-align:center;
@@ -638,7 +638,7 @@ font-weight:bold;
 
 .creategroupbuttonstyle {
 color: #000;
-background: #D8E3CA;
+background: #CAE3CA;
 border: 2px outset #d7b9c9;
 width:180px;
 text-align:center;

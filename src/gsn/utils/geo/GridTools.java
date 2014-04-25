@@ -36,9 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GridTools {
@@ -183,14 +181,14 @@ public class GridTools {
         return deserial;
     }
 
-    public static String executeQueryForGridAsString(String query) {
+    public static String executeQueryForGridAsString(String query, String sensor) {
 
         Connection connection = null;
         StringBuilder sb = new StringBuilder();
         ResultSet results = null;
 
         try {
-            connection = Main.getDefaultStorage().getConnection();
+            connection = Main.getStorage(sensor).getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             results = statement.executeQuery(query);
             ResultSetMetaData metaData;    // Additional information about the results
@@ -235,6 +233,7 @@ public class GridTools {
                 sb.append("\n");
             }
         } catch (SQLException e) {
+        	logger.warn("SQLException: " + e.getMessage());
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
             if (results != null)
@@ -243,14 +242,14 @@ public class GridTools {
                 } catch (SQLException e) {
                     logger.warn(e.getMessage(), e);
                 }
-            Main.getDefaultStorage().close(connection);
+            Main.getStorage(sensor).close(connection);
         }
 
         return sb.toString();
     }
 
 
-    public static Map<Long, Double> executeQueryForCell2TimeSeriesAsListOfDoubles(String query, int xcell, int ycell) {
+    public static Map<Long, Double> executeQueryForCell2TimeSeriesAsListOfDoubles(String query, int xcell, int ycell, String sensor) {
 
         Map<Long, Double> listOfDoubles = new HashMap<Long, Double>();
         Connection connection = null;
@@ -258,7 +257,7 @@ public class GridTools {
         ResultSet results = null;
 
         try {
-            connection = Main.getDefaultStorage().getConnection();
+        	connection = Main.getStorage(sensor).getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             results = statement.executeQuery(query);
             ResultSetMetaData metaData;    // Additional information about the results
@@ -308,6 +307,7 @@ public class GridTools {
 
             //.add(sb.toString());
         } catch (SQLException e) {
+        	logger.warn("SQLException: " + e.getMessage());
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
             if (results != null)
@@ -316,13 +316,13 @@ public class GridTools {
                 } catch (SQLException e) {
                     logger.warn(e.getMessage(), e);
                 }
-            Main.getDefaultStorage().close(connection);
+            Main.getStorage(sensor).close(connection);
         }
 
         return listOfDoubles;
     }
 
-    public static Map<Long, String> executeQueryForSubGridAsListOfStrings(String query, int xmin, int xmax, int ymin, int ymax) {
+    public static Map<Long, String> executeQueryForSubGridAsListOfStrings(String query, int xmin, int xmax, int ymin, int ymax, String sensor) {
 
         Map<Long, String> listOfStrings = new HashMap<Long, String>();
         Connection connection = null;
@@ -330,7 +330,7 @@ public class GridTools {
         ResultSet results = null;
 
         try {
-            connection = Main.getDefaultStorage().getConnection();
+        	connection = Main.getStorage(sensor).getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             results = statement.executeQuery(query);
             ResultSetMetaData metaData;    // Additional information about the results
@@ -395,6 +395,7 @@ public class GridTools {
 
             //.add(sb.toString());
         } catch (SQLException e) {
+        	logger.warn("SQLException: " + e.getMessage());
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
             if (results != null)
@@ -403,13 +404,13 @@ public class GridTools {
                 } catch (SQLException e) {
                     logger.warn(e.getMessage(), e);
                 }
-            Main.getDefaultStorage().close(connection);
+            Main.getStorage(sensor).close(connection);
         }
 
         return listOfStrings;
     }
 
-    public static Map<Long, String> executeQueryForGridAsListOfStrings(String query) {
+    public static Map<Long, String> executeQueryForGridAsListOfStrings(String query, String sensor) {
 
         Map<Long, String> listOfStrings = new HashMap<Long, String>();
         Connection connection = null;
@@ -417,7 +418,7 @@ public class GridTools {
         ResultSet results = null;
 
         try {
-            connection = Main.getDefaultStorage().getConnection();
+            connection = Main.getStorage(sensor).getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             results = statement.executeQuery(query);
             ResultSetMetaData metaData;    // Additional information about the results
@@ -477,6 +478,7 @@ public class GridTools {
             //.add(sb.toString());
         } catch (SQLException e) {
             sb.append("ERROR in execution of query: " + e.getMessage());
+            logger.warn("SQLException: " + e.getMessage());
         } finally {
             if (results != null)
                 try {
@@ -484,9 +486,9 @@ public class GridTools {
                 } catch (SQLException e) {
                     logger.warn(e.getMessage(), e);
                 }
-            Main.getDefaultStorage().close(connection);
+            Main.getStorage(sensor).close(connection);
         }
-
+   
         return listOfStrings;
     }
 
@@ -502,7 +504,7 @@ public class GridTools {
         jsonResponse.put("epoch", timestamp);
 
         try {
-            connection = Main.getDefaultStorage().getConnection();
+        	connection = Main.getStorage(sensor).getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             results = statement.executeQuery(query);
             ResultSetMetaData metaData;    // Additional information about the results
@@ -546,6 +548,7 @@ public class GridTools {
                 }
             }
         } catch (SQLException e) {
+        	logger.warn("SQLException: " + e.getMessage());
             sb.append("ERROR in execution of query: " + e.getMessage());
         } finally {
             if (results != null)
@@ -554,7 +557,7 @@ public class GridTools {
                 } catch (SQLException e) {
                     logger.warn(e.getMessage(), e);
                 }
-            Main.getDefaultStorage().close(connection);
+            Main.getStorage(sensor).close(connection);
         }
 
         return jsonResponse.toJSONString();

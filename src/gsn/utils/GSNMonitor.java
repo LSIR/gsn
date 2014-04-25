@@ -389,7 +389,7 @@ public class GSNMonitor {
                     Element line = (Element) listOfField.item(j);
 
                     if (line.getAttribute("name").indexOf("timed") >= 0) {
-                        String last_updated_as_string = line.getTextContent();
+                        String last_updated_as_string = line.getTextContent();                       
 
                         try {
                             Long last_updated_as_Long = GregorianCalendar.getInstance().getTimeInMillis() - VSensorMonitorConfig.datetime2timestamp(last_updated_as_string);

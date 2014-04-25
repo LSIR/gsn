@@ -4,6 +4,9 @@
    <email>my email address</email>
    <description>Not Provided</description>
    <port>22001</port>
+   <zmq-enable>true</zmq-enable>
+   <zmqproxy>22022</zmqproxy>
+   <zmqmeta>22023</zmqmeta>
 
 
 <!-- SSL Support, Optional -->

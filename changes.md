@@ -1,7 +1,16 @@
 ## GSN Change log
 
+### r1.1.4
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.4)
+* Updated the logo and color scheme accordingly
+* Added zeromq wrapper and distribution system
+* Fixed GriddData out of memory
+* Adding support for request 113 in REST API and some refactoring
+* Filtering empty VS in multidata download
+
+
 ### r1.1.3
-[commits] (https://github.com/LSIR/gsn/commits/gsn-release-1.1.2)
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.3)
 * Added support for HBase storage
 * Updated REST API for accessing data
 * Added access control support for REST PAI

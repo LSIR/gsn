@@ -29,6 +29,7 @@
                     $('#download_format').val('csv');
                     format = format || 'unix';
                     $('#time_format').val(format);
+                    if ($("#ifexists").is("checked")) $("#ifexists").val("true");
                     prepare_form_for_submission(tag);
                     $.post('multidata', tag.parents('form').serializeArray(), function(response, text_status, request){
                         var lines = response.split("\n");
@@ -485,8 +486,9 @@
                                         <div class="time-range">
                                             <div>
                                                 <br />
-                                            <span>From</span><input id="datepicker_from" name="from" size="16" type="text" value="" /><span>To</span><input id="datepicker_to" name="to" size="16" type="text" value="" /></div>
-                                            <br />
+                                                <span>From</span><input id="datepicker_from" name="from" size="16" type="text" value="" /><span>To</span><input id="datepicker_to" name="to" size="16" type="text" value="" /></div>
+                                            <input id="ifexists" type="checkbox" name="ifexists" value="true"><span>Add virtual sensor only if it has data in the given time period</span>
+                                            <br/> <br/>
                                         </div>
                                         <div class="conditions-container">
                                             <a id="add-condition" href="#">Add Condition</a>
@@ -539,7 +541,7 @@
                 </div>
             </div>
             <div id="footer">
-                <p>Powered by <a href="http://globalsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</p>
+                <p>Powered by <a href="https://github.com/LSIR/gsn">GSN</a>,  Distributed Information Systems Lab, EPFL 2014</p>
                 <p>
                     <a href="http://validator.w3.org/check?uri=referer"><img src="./img/html_valid.bmp"/></a>
                     <a href="http://jigsaw.w3.org/css-validator/check?uri=referer"><img src="./img/css_valid.bmp"/></a>

@@ -38,11 +38,15 @@ import java.io.IOException;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Properties;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
-import sun.misc.*;
+import org.apache.commons.codec.binary.*;
+
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 
 /* This class helps to encrypt user posswords using AES encryption algo, we use a salt for a more robust encryption, salt is stored in a property file "acuserpassword.properties"*/
@@ -70,6 +74,7 @@ public class Protector
             valueToEnc = salt + eValue;
             byte[] encValue = c.doFinal(valueToEnc.getBytes());
             eValue = new BASE64Encoder().encode(encValue);
+            //eValue = Base64.encodeBase64(encValue);
         }
         return eValue;
     }

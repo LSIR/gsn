@@ -44,9 +44,9 @@ input[type=button],input[type=submit]
 	
 	margin:1px;
 	
-	border: 1px solid #FFA84C;
-	border-left: 10px solid #FFA84C;
-	background-color: #FCFDDC;
+	border: 1px solid #7c6;
+	border-left: 10px solid #7c6;
+	background-color: #DCFFDC;
 }
 
 
@@ -54,7 +54,7 @@ input[type=button],input[type=submit]
 
 input[type=button]:active,input[type=button]:hover,input[type=submit]:active,input[type=submit]:hover
 {
-	color: #FFA84C;
+	color: #7c6;
 	background-color: white;
 }
 
@@ -88,22 +88,23 @@ body
 }
 #header, #headerfm 
 {
-	background:url("gsn-mark.png") no-repeat;
-	background-color:#FFEE00;
-	margin:0;
+	background:url("GSN_green_tiny.png") no-repeat;
+	background-position: left center;
+	background-color:#FFF;
+	margin:0 0 0 10px;
 	padding:0;
 }
 
 #header h1 
 {
-	padding:32px 90px;
+	padding:32px 130px;
 	margin:0;
 }
 
 #headerfm h1 
 {
 	margin:0;
-	padding:32px 0 32px 90px;
+	padding:32px 0 32px 130px;
 	font-size:1.7em;
 }
 #header a,#headerfm a 
@@ -117,7 +118,7 @@ body
 	line-height:2.2em;
 	margin:0;
 	padding:0;
-	background:#ffa84c;
+	background:#7c6;
 	color:#9e9e9e;
 }
 
@@ -222,7 +223,7 @@ body
 {
 	/*background:#80b0da;*/
 	/*color:#ffffff;*/
-	background:#FFEE00; /*#ff6f00;*/
+	background:#9D8; /*#ff6f00;*/
 	color:#000000;
 	text-decoration:none;
 }
@@ -238,17 +239,17 @@ body
 	text-align:left;
 	margin-left:5%	;
 	width:90%;
-	background-color:#FFE0BF;
-	border: 1px solid #FFA84C;
+	background-color:#9d8;
+	border: 1px solid #7c6;
 }
 
 #datechooser 
 {
 	clear:both;
 	margin:1px;
-	border: 1px solid #FFA84C;
+	border: 1px solid #7c6;
 	margin-bottom:8px;
-	background:#FFA84C;
+	background:#7c6;
 }
 
 #datachooser table 
@@ -258,7 +259,7 @@ body
 
 .step
 {
-	background-color:#ffa84c;
+	background-color:#7c6;
 	color:#000000;
 }
 
@@ -338,17 +339,17 @@ body
 	display: block;
 	margin: 1px;
 	padding: 5px 5px 5px 0.5em;
-	border-left: 10px solid #FFC29F;
-	background-color: #FCFDDC;
-	color: #FFA84C;
+	border-left: 10px solid #F0FFCF;
+	background-color: #DCFFDC;
+	color: #7c6;
 	text-decoration: none;
 }
 
 .rubric:hover
 {
 	display: block;
-	border-left-color: #FFC29F;
-	background-color: #FCFDDC;
+	border-left-color: #F0FFCF;
+	background-color: #DCFFDC;
 	color: black;
 }
 
@@ -357,9 +358,9 @@ body
 	display: block;	
 	margin: 1px;
 	padding: 5px 5px 5px 29px;
-	border-left: 10px solid #FFE2BF;
-	background-color: #FCFDDC;
-	color: #FFA84C;
+	border-left: 10px solid #F0FFCF;
+	background-color: #DCFFDC;
+	color: #7c6;
 	text-decoration: none;
 }
 
@@ -367,13 +368,13 @@ body
 #dropArea .sensorName:hover
 {
 	background-color: white;/*#F0F000;*/
-	border-left-color: #FFE2BF;
+	border-left-color: #F0FFCF;
 }
 
 #dropArea
 {
-	border: thin double #FFA84C;
-	background-color: #FFE0BF;
+	border: thin double #7c6;
+	background-color: #9d8;
 	height: 220px;
 	text-align:left;
 }
@@ -389,8 +390,8 @@ body
 
 #titleDropArea
 {
-	background-color: #FFA84C;
-	border: thin double #FFA84C;
+	background-color: #7c6;
+	border: thin double #7c6;
 	text-align:center;
 }
 
@@ -403,8 +404,8 @@ html>body #vsmenu div a
 
 #vsmenu a:hover, #vsmenu div span:hover
 {
-	border-left: 10px solid #FFA84C;
-	background-color: #FFB25F;
+	border-left: 10px solid #7c6;
+	background-color: #F0FFCF;
 	color: #fff;
 }
 
@@ -420,9 +421,9 @@ html>body #vsmenu div a
 
 #msg 
 {
-	border-top: 2px solid #FFA84C;
-	border-bottom: 2px solid #FFA84C;
-	background: #FFE0BF;
+	border-top: 2px solid #7c6;
+	border-bottom: 2px solid #7c6;
+	background: #9d8;
 	margin: 5px 0;
 	padding:5px;
 }
@@ -441,9 +442,9 @@ html>body #vsmenu div a
 /* specific style for vsbox and core bellow */
 .tooltip 
 {
-	border: 1px solid #FFA84C;
+	border: 1px solid #7c6;
 	padding: 2px;
-	background: #FFE0BF;
+	background: #9d8;
 	color: black;
 }
 
@@ -451,14 +452,14 @@ html>body #vsmenu div a
 {
 	clear:both;
 	margin:1px;
-	border: 1px solid #FFA84C;
+	border: 1px solid #7c6;
 	margin-bottom:8px;
-	background:#FFA84C;
+	background:#7c6;
 }
 .followed 
 {
-	background:#FF8400;
-	border: 1px solid #FF8400;
+	background:#84FF84;
+	border: 1px solid #84FF84;
 }
 
 .vsbox h3 
@@ -598,13 +599,13 @@ html>body #vsmenu div a
 .tabnav a:link, .tabnav a:visited
 {
 	float: left;
-	background: #FFE0BF;
+	background: #9d8;
 	font-size: 10px;
 	line-height: 14px;
 	font-weight: bold;
 	padding: 2px 10px 2px 10px;
 	margin-right: 4px;
-	border: 1px solid #FFE0BF;
+	border: 1px solid #9d8;
 	text-decoration: none;
 	color: #666;
 }
@@ -675,7 +676,7 @@ div.popup-calendar
 	top: 0;
 	left: -16px; /* value for IE */
 	padding: 4px;
-	border: 2px solid #FFA84C;
+	border: 2px solid #7c6;
 	background: #fff;
 	color: #000;
 	overflow:hidden;
@@ -717,7 +718,7 @@ div.popup-calendar div a
 
 div.popup-calendar div a:hover 
 {
-	background-color: #FFA84C;
+	background-color: #7c6;
 	color: #fff;
 }
 
@@ -767,7 +768,7 @@ div.popup-calendar table td.today a
 
 div.popup-calendar table td a.selected, div.popup-calendar table td a:hover 
 {
-	background: #FFA84C; 
+	background: #7c6; 
 	color: #fff;
 }
 
@@ -791,14 +792,14 @@ input.date-picker
 
 #dataSet
 {
-	border: thin double #FFA84C;
-	background-color: #FFE0BF;
+	border: thin double #7c6;
+	background-color: #9d8;
 }
 
 .stepContainer .step
 {
-	border: thin double #FFA84C;
-	background-color: #FFE0BF;
+	border: thin double #7c6;
+	background-color: #9d8;
 	margin-bottom: 1px;
 	padding: 1px;
 	cursor:pointer;
@@ -806,14 +807,14 @@ input.date-picker
 
 .stepContainer .step:hover
 {
-	background-color: #FFF0CF;
+	background-color: #F0FFCF;
 }
 
 #colorDiv
 {
 	float: left;
 	width: 300px;
-	border: thin double #FFA84C;
+	border: thin double #7c6;
 }
 
 #fieldsDiv
@@ -833,7 +834,7 @@ div.full-page {
 
 .ui-accordion {
     height: 474px;
-    border: 1px solid #FFA84C;
+    border: 1px solid #7c6;
 }
 
 .ui-accordion-content {
@@ -849,7 +850,7 @@ div.full-page {
     font-weight: bold;
     font-size: 11px;
     color: black;
-    background-color: #FFA84C;
+    background-color: #7c6;
 }
 
 .drawer-handle {
@@ -876,7 +877,7 @@ div.full-page {
     display: block;
     width: auto;
     height: 20px;
-    border-bottom: 1px solid #FFA84C;
+    border-bottom: 1px solid #7c6;
     padding: 0;
 }
 
@@ -886,7 +887,7 @@ div.full-page {
 }
 
 .ui-tabs-nav-item a {
-    border: 1px solid #FFA84C;
+    border: 1px solid #7c6;
     border-bottom: none;
     text-align: center;
     display: block;
@@ -895,11 +896,11 @@ div.full-page {
     padding: 2px;
     margin-right: 4px;
     font-weight: bold;
-    background-color: #FFE0BF;
+    background-color: #9d8;
 }
 
 .ui-tabs-selected a {
-    background-color: #FFA84C;
+    background-color: #7c6;
 }
 
 .clear-both {
@@ -913,7 +914,7 @@ div.full-page {
 }
 
 #gridContainer table th {
-    background-color: #FFE0BF;
+    background-color: #9d8;
 }
 
 /* dialog - zomming - plotting */
