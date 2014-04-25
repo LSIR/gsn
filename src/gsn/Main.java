@@ -387,10 +387,10 @@ public final class Main {
             System.out.println("SSL is Starting on port "+sslPort+"...");
 			sslSocketConnector = new SslSocketConnector();
             sslSocketConnector.setPort(getContainerConfig().getSSLPort());
-            sslSocketConnector.setKeystore("conf/servertestkeystore");
+            sslSocketConnector.setKeystore(getContainerConfig().getSSLKeystore());
             sslSocketConnector.setPassword(getContainerConfig().getSSLKeyPassword());
             sslSocketConnector.setKeyPassword(getContainerConfig().getSSLKeyStorePassword());
-            sslSocketConnector.setTruststore("conf/servertestkeystore");
+            sslSocketConnector.setTruststore(getContainerConfig().getSSLKeystore());
             sslSocketConnector.setTrustPassword(getContainerConfig().getSSLKeyStorePassword());
         }
         else if (getContainerConfig().isAcEnabled())
