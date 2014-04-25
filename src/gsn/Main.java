@@ -41,6 +41,8 @@ import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.WPPushDelivery;
 import gsn.http.rest.RestDelivery;
+import gsn.networking.zeromq.ZeroMQDelivery;
+import gsn.networking.zeromq.ZeroMQProxy;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.storage.StorageManagerFactory;
@@ -59,28 +61,15 @@ import java.awt.SplashScreen;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
 
@@ -106,6 +95,8 @@ import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Context;
 import org.eclipse.jetty.server.AbstractConnector;
 
 
@@ -115,10 +106,33 @@ import org.eclipse.jetty.server.AbstractConnector;
  * GSN: http://localhost:22001/services/GSNWebService?wsdl
  */
 public final class Main {
+	
+    public static final int        DEFAULT_MAX_DB_CONNECTIONS       = 8;
+	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
+	public static final String     DEFAULT_GSN_CONF_FILE            = "conf/gsn.xml";
+	public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
+	public static final String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
+	public static transient Logger logger                           = Logger.getLogger ( Main.class );
 
-	private static Main singleton ;
-
-	private static int gsnControllerPort;
+	/**
+	 * Mapping between the wrapper name (used in addressing of stream source)
+	 * into the class implementing DataSource.
+	 */
+	private static  Properties                            wrappers ;
+	private static final int                              DEFAULT_JETTY_SERVLETS  = 100;
+	private static Main                                   singleton ;
+	private static int                                    gsnControllerPort;
+	private static ZeroMQProxy                            zmqproxy;
+	private static StorageManager                         mainStorage;
+    private static StorageManager                         windowStorage;
+    private static StorageManager                         validationStorage;
+    private static Context                                zmqContext              = ZMQ.context(1);
+    private static HashMap<Integer, StorageManager>       storages                = new HashMap<Integer, StorageManager>();
+    private static HashMap<VSensorConfig, StorageManager> storagesConfigs         = new HashMap<VSensorConfig, StorageManager>();
+    private GSNController                                 controlSocket;
+    private ContainerConfig                               containerConfig;
+    
+    
 
     private Main() throws Exception {
 
@@ -134,7 +148,7 @@ public final class Main {
             System.out.println("The logs of GSN server are available in logs/gsn.log file.");
 			System.out.println("To Stop GSN execute the gsn-stop script.");
 		} catch ( FileNotFoundException e ) {
-			logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
+			logger.error ( "The the configuration file : conf/gsn.xml doesn't exist.");
 			logger.error ( e.getMessage ( ) );
 			logger.error ( "Check the path of the configuration file and try again." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
@@ -151,10 +165,10 @@ public final class Main {
         }
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getStorage().getJdbcDriver ( ) , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) , maxDBConnections);
-        //
+        
         StorageConfig sc = containerConfig.getSliding() != null ? containerConfig.getSliding().getStorage() : containerConfig.getStorage() ;
         windowStorage = StorageManagerFactory.getInstance(sc.getJdbcDriver ( ) , sc.getJdbcUsername ( ) , sc.getJdbcPassword ( ) , sc.getJdbcURL ( ), maxSlidingDBConnections);
-        //
+        
         validationStorage = StorageManagerFactory.getInstance("org.h2.Driver", "sa", "", "jdbc:h2:mem:validator", Main.DEFAULT_MAX_DB_CONNECTIONS);
 
         if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
@@ -167,6 +181,12 @@ public final class Main {
 		} catch ( Exception e ) {
 			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
 		}
+		
+		if (containerConfig.isZMQEnabled()){
+			//start the 0MQ proxy
+			zmqproxy = new ZeroMQProxy(containerConfig.getZMQProxyPort(),containerConfig.getZMQMetaPort());
+		}
+		
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
 
@@ -183,14 +203,16 @@ public final class Main {
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(WPPushDelivery.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
 		vsloader.addVSensorStateChangeListener(ModelDistributer.getInstance(WPPushDelivery.class));
+		if (containerConfig.isZMQEnabled())
+			vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDelivery.class));
 
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(WPPushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(ModelDistributer.getInstance(WPPushDelivery.class));
+		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(ZeroMQDelivery.class));
 		vsloader.startLoading();
-
 
 	}
 
@@ -205,7 +227,6 @@ public final class Main {
 		if (splash.isVisible())
 			splash.close();
 	}
-
 
 
 	private static void updateSplashIfNeeded(String message[]) {
@@ -237,9 +258,7 @@ public final class Main {
 	}
 
 	private static boolean isHeadless() {
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		boolean headless_check = ge.isHeadless();
-		return headless_check;
+		return GraphicsEnvironment.isHeadless();
 	}
 
 	public synchronized static Main getInstance() {
@@ -252,28 +271,6 @@ public final class Main {
 			}
 			return singleton;
 	}
-
-    private static StorageManager mainStorage = null;
-
-    private static StorageManager windowStorage = null;
-
-    private static StorageManager validationStorage = null;
-
-	private GSNController controlSocket;
-
-    private static final int DEFAULT_JETTY_SERVLETS = 100;
-
-    public static final int DEFAULT_MAX_DB_CONNECTIONS = 8;
-
-	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
-
-	public static transient Logger logger= Logger.getLogger ( Main.class );
-
-	public static final String     DEFAULT_GSN_CONF_FILE            = "conf/gsn.xml";
-
-	public static String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
-
-	public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
 
 	public static void main ( String [ ]  args)  {
 		Main.gsnControllerPort = Integer.parseInt(args[0]) ;
@@ -291,14 +288,6 @@ public final class Main {
 		closeSplashIfneeded();
 	}
 
-	/**
-	 * Mapping between the wrapper name (used in addressing of stream source)
-	 * into the class implementing DataSource.
-	 */
-	private static  Properties wrappers ;
-
-	private  ContainerConfig                       containerConfig;
-
 	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
 		ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
@@ -307,17 +296,17 @@ public final class Main {
 		try {
 			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FILE );
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
-			if ( logger.isInfoEnabled ( ) ) logger.info ( new StringBuilder ( ).append ( "Loading wrappers.properties at : " ).append ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE ).toString ( ) );
+			if ( logger.isInfoEnabled ( ) ) logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
 			if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
 		} catch ( JiBXException e ) {
 			logger.error ( e.getMessage ( ) );
-			logger.error ( new StringBuilder ( ).append ( "Can't parse the GSN configuration file : conf/gsn.xml" ).toString ( ) );
+			logger.error ( "Can't parse the GSN configuration file : " + Main.DEFAULT_GSN_CONF_FILE );
 			logger.error ( "Please check the syntax of the file to be sure it is compatible with the requirements." );
 			logger.error ( "You can find a sample configuration file from the GSN release." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
 			System.exit ( 1 );
 		} catch ( FileNotFoundException e ) {
-			logger.error ( new StringBuilder ( ).append ( "The the configuration file : conf/gsn.xml").append ( " doesn't exist." ).toString ( ) );
+			logger.error ("The the configuration file : " + Main.DEFAULT_GSN_CONF_FILE + " doesn't exist.");
 			logger.error ( e.getMessage ( ) );
 			logger.error ( "Check the path of the configuration file and try again." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
@@ -351,7 +340,7 @@ public final class Main {
 	public static Properties getWrappers()  {
 		if (singleton==null )
 			return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
-		return singleton.wrappers;
+		return Main.wrappers;
 	}
     
 	//FIXME: COPIED_FOR_SAFE_STOAGE
@@ -465,8 +454,6 @@ public final class Main {
         return validationStorage;
     }
 
-    private static HashMap<Integer, StorageManager> storages = new HashMap<Integer, StorageManager>();
-    private static HashMap<VSensorConfig, StorageManager> storagesConfigs = new HashMap<VSensorConfig, StorageManager>();
     public static StorageManager getStorage(VSensorConfig config) {
         //StringBuilder sb = new StringBuilder("get storage for: ").append(config == null ? null : config.getName()).append(" -> use ");
         StorageManager sm = storagesConfigs.get(config == null ? null : config);
@@ -515,4 +502,13 @@ public final class Main {
     public static StorageManager getWindowStorage() {
         return windowStorage;
     }
+    
+    public static Context getZmqContext(){
+    	return zmqContext;
+    }
+    
+    public static ZeroMQProxy getZmqProxy(){
+    	return zmqproxy;
+    }
 }
+

@@ -37,17 +37,11 @@ import java.sql.SQLException;
 public class VirtualSensor {
 
     private static final transient Logger logger = Logger.getLogger(VirtualSensor.class);
-
     private static final int GARBAGE_COLLECTOR_INTERVAL = 2;
 
-    private String processingClassName;
-
     private AbstractVirtualSensor virtualSensor = null;
-
     private VSensorConfig config = null;
-
     private long lastModified = -1;
-
     private int noOfCallsToReturnVS = 0;
 
     public VirtualSensor(VSensorConfig config) {
@@ -68,7 +62,7 @@ public class VirtualSensor {
                 throw new VirtualSensorInitializationFailedException();
             }
             if (logger.isDebugEnabled())
-                logger.debug(new StringBuilder().append("Created a new instance for VS ").append(config.getName()));
+                logger.debug("Created a new instance for VS " + config.getName());
         }
         return virtualSensor;
     }
@@ -88,9 +82,9 @@ public class VirtualSensor {
         if (virtualSensor != null) {
             virtualSensor.dispose();
             if (logger.isDebugEnabled())
-                logger.debug(new StringBuilder().append("VS ").append(config.getName()).append(" is now released."));
+                logger.debug("VS " + config.getName() + " is now released.");
         } else if (logger.isDebugEnabled())
-            logger.debug(new StringBuilder().append("VS ").append(config.getName()).append(" was already released."));
+            logger.debug("VS " + config.getName() + " was already released.");
     }
 
     public void start() throws VirtualSensorInitializationFailedException {
@@ -134,14 +128,14 @@ public class VirtualSensor {
         int effected = 0;
         try {
             if (logger.isDebugEnabled())
-                logger.debug(new StringBuilder().append("Enforcing the limit size on the VS table by : ").append(query).toString());
+                logger.debug("Enforcing the limit size on the VS table by : " + query);
             effected = Main.getStorage(config.getName()).executeUpdate(query);
         } catch (SQLException e) {
             logger.error("Error in executing: " + query);
             logger.error(e.getMessage(), e);
         }
         if (logger.isDebugEnabled())
-            logger.debug(new StringBuilder().append(effected).append(" old rows dropped from ").append(config.getName()).toString());
+            logger.debug("There were " + effected + " old rows dropped from " + config.getName());
     }
 }
 

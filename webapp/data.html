@@ -29,6 +29,7 @@
                     $('#download_format').val('csv');
                     format = format || 'unix';
                     $('#time_format').val(format);
+                    if ($("#ifexists").is("checked")) $("#ifexists").val("true");
                     prepare_form_for_submission(tag);
                     $.post('multidata', tag.parents('form').serializeArray(), function(response, text_status, request){
                         var lines = response.split("\n");
@@ -485,8 +486,9 @@
                                         <div class="time-range">
                                             <div>
                                                 <br />
-                                            <span>From</span><input id="datepicker_from" name="from" size="16" type="text" value="" /><span>To</span><input id="datepicker_to" name="to" size="16" type="text" value="" /></div>
-                                            <br />
+                                                <span>From</span><input id="datepicker_from" name="from" size="16" type="text" value="" /><span>To</span><input id="datepicker_to" name="to" size="16" type="text" value="" /></div>
+                                            <input id="ifexists" type="checkbox" name="ifexists" value="true"><span>Add virtual sensor only if it has data in the given time period</span>
+                                            <br/> <br/>
                                         </div>
                                         <div class="conditions-container">
                                             <a id="add-condition" href="#">Add Condition</a>

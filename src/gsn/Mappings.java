@@ -48,7 +48,7 @@ public final class Mappings {
    
    public static boolean addVSensorInstance ( VirtualSensor sensorPool ) {
       try {
-         if ( logger.isInfoEnabled( ) ) logger.info( ( new StringBuilder( "Testing the pool for :" ) ).append( sensorPool.getConfig( ).getName( ) ).toString( ) );
+         if ( logger.isInfoEnabled( ) ) logger.info("Testing the pool for :" + sensorPool.getConfig( ).getName( ));
          sensorPool.returnVS( sensorPool.borrowVS( ) );
       } catch ( Exception e ) {
          logger.error( e.getMessage( ) , e );
