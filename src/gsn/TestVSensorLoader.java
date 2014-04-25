@@ -86,7 +86,7 @@ public class TestVSensorLoader {
 	@Test
 	public void testPrepareWrapper() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		VSensorLoader loader = new VSensorLoader();
-		MockWrapper wrapper = (MockWrapper) loader.findWrapper(addressing[0]);
+		MockWrapper wrapper = (MockWrapper) loader.createWrapper(addressing[0]);
 		assertNotNull(wrapper);
 	}
 
