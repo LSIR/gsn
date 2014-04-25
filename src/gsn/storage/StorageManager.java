@@ -100,6 +100,10 @@ public abstract class StorageManager {
         return convertLocalTypeToGSN(jdbcType, 0,true);
     }
     
+    public byte convertLocalTypeToGSN(int jdbcType,int precision) {
+        return convertLocalTypeToGSN(jdbcType, precision, true);
+    }
+    
     public byte convertLocalTypeToGSN(int jdbcType,boolean signed){
     	return convertLocalTypeToGSN(jdbcType,0,signed);
     }
