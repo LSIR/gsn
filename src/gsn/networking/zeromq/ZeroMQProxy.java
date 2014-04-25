@@ -51,7 +51,6 @@ public class ZeroMQProxy extends Thread implements Runnable {
 			public void run() {
 				while (true) {
 					String request = clients.recvStr (0);
-					System.out.println("proxy replier received " + request);
 					ByteArrayOutputStream bais = new ByteArrayOutputStream();
 		            Output o = new Output(bais);
 		            kryo.writeObjectOrNull(o,structures.get(request),DataField[].class);

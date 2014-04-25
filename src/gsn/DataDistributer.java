@@ -267,7 +267,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     public boolean vsLoading(VSensorConfig config) {
     	synchronized (listeners) {
-    		if (getInstance(ZeroMQDelivery.class) == this){
+    		if (Main.getContainerConfig().isZMQEnabled() && getInstance(ZeroMQDelivery.class) == this){
     			try {
     				DeliverySystem delivery = new ZeroMQDelivery(config);
 					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(),System.currentTimeMillis()));

@@ -35,7 +35,8 @@ public class ZeroMQWrapper extends AbstractWrapper {
 			    byte[] rec = requester.recv();
 			    if (rec != null){
 			        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
-			        requester.close();
+			        if (structure != null)
+			            requester.close();
 			        return structure;
 			    }
 			}
@@ -55,8 +56,8 @@ public class ZeroMQWrapper extends AbstractWrapper {
 		AddressBean addressBean = getActiveAddressBean();
 
 		String address = addressBean.getPredicateValue ( "address" );
-		int dport = addressBean.getPredicateValueAsInt("data_port",0);
-		int mport = addressBean.getPredicateValueAsInt("meta_port", 0);
+		int dport = addressBean.getPredicateValueAsInt("data_port",Main.getContainerConfig().getZMQProxyPort());
+		int mport = addressBean.getPredicateValueAsInt("meta_port", Main.getContainerConfig().getZMQMetaPort());
 		vsensor = addressBean.getPredicateValue ( "vsensor" );
 		if ( address == null || address.trim().length() == 0 ) 
 			throw new RuntimeException( "The >address< parameter is missing from the ZeroMQWrapper wrapper." );
@@ -70,21 +71,24 @@ public class ZeroMQWrapper extends AbstractWrapper {
 			remoteContactPoint_DATA = address.trim() + ":" + dport;
 			remoteContactPoint_META = address.trim() + ":" + mport;
 		}else{
+			if(!Main.getContainerConfig().isZMQEnabled()){
+				throw new IllegalArgumentException("The \"inproc\" communication can only be used if the current GSN server has zeromq enabled. Please add <zmq-enable>true</zmq-enable> to conf/gsn.xml.");
+			}
 			remoteContactPoint_DATA = address.trim();
 			remoteContactPoint_META = "tcp://127.0.0.1:" + Main.getContainerConfig().getZMQMetaPort();
 		}
 		
 		ZMQ.Context ctx = Main.getZmqContext();
-		ZMQ.Socket requester = ctx.socket(ZMQ.REQ);
+		requester = ctx.socket(ZMQ.REQ);
 		requester.setReceiveTimeOut(1000);
 		requester.setSendTimeOut(1000);
 		requester.connect((remoteContactPoint_META).trim());
-		//System.out.println("connect to "+(remoteContactPoint_META).trim());
 		if (requester.send(vsensor)){
 		    byte[] rec = requester.recv();
 		    if (rec != null){
 		        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
-		        requester.close();
+		        if (structure != null)
+		            requester.close();
 		    }
 		}
 		

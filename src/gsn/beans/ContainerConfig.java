@@ -62,6 +62,7 @@ public class ContainerConfig {
     public static final int               DEFAULT_SSL_PORT                 = 8443;
 	public static final int               DEFAULT_ZMQ_PROXY_PORT           = 22022;
 	public static final int               DEFAULT_ZMQ_META_PORT            = 22023;
+	public static final boolean           DEFAULT_ZMQ_ENABLED               = false;
 	public static final String            DEFAULT_LOGGING_LEVEL            = ContainerConfig.LOGGING_LEVELS[ 3 ];
 	public static final String            DEFAULT_WEB_NAME                 = "NoName.";
 	public static final String            DEFAULT_WEB_AUTHOR               = "Author not specified.";
@@ -77,6 +78,7 @@ public class ContainerConfig {
     private static final String           DEFAULT_SSL_KEY_PWD              = "changeit";
 
 	public static final String            FIELD_NAME_gsnPortNo             = "containerPort";
+	public static final String            FIELD_NAME_zmqEnabled             = "zmqEnabled";
 	public static final String            FIELD_NAME_zmqProxyPort          = "zmqProxyPort";
 	public static final String            FIELD_NAME_zmqMetaPort           = "zmqMetaPort";
 	public static final String            FIELD_NAME_webName               = "webName";
@@ -102,6 +104,7 @@ public class ContainerConfig {
 	protected String                      smsServer;
 	protected String                      smsPassword;
 	protected int                         containerPort                    = DEFAULT_GSN_PORT;
+	protected boolean                     zmqEnabled                       = DEFAULT_ZMQ_ENABLED;
 	protected int                         zmqProxyPort                     = DEFAULT_ZMQ_PROXY_PORT;
 	protected int                         zmqMetaPort                      = DEFAULT_ZMQ_META_PORT;
 	protected String                      containerFileName;
@@ -167,6 +170,13 @@ public class ContainerConfig {
 	
 	public void setContainerPort ( int newValue ) {
 		this.containerPort = newValue;
+	}
+	
+	/**
+	 * @return true if the zmq data distribution is enabled.
+	 */
+	public boolean isZMQEnabled() {
+		return this.zmqEnabled;
 	}
 	
 	/**

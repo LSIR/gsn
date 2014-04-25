@@ -17,8 +17,8 @@
 		<stream name="input1">
 			<source alias="source1" sampling-rate="1" storage-size="1">
 				<address wrapper="zeromq">
-					<predicate key="host">192.168.56.101</predicate>
-					<predicate key="vsensor">test</predicate>
+					<predicate key="address">tcp://127.0.0.1</predicate>
+					<predicate key="vsensor">MemoryMonitorVS</predicate>
 					<output-structure>
 						<field name="HEAP" type="double" />
 			<field name="NON_HEAP" type="double" />

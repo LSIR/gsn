@@ -182,8 +182,10 @@ public final class Main {
 			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
 		}
 		
-		//start the 0MQ proxy
-		zmqproxy = new ZeroMQProxy(containerConfig.getZMQProxyPort(),containerConfig.getZMQMetaPort());
+		if (containerConfig.isZMQEnabled()){
+			//start the 0MQ proxy
+			zmqproxy = new ZeroMQProxy(containerConfig.getZMQProxyPort(),containerConfig.getZMQMetaPort());
+		}
 		
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
@@ -201,7 +203,8 @@ public final class Main {
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(WPPushDelivery.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
 		vsloader.addVSensorStateChangeListener(ModelDistributer.getInstance(WPPushDelivery.class));
-		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDelivery.class));
+		if (containerConfig.isZMQEnabled())
+			vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDelivery.class));
 
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
