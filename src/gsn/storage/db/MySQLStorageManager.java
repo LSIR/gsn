@@ -77,14 +77,17 @@ public class MySQLStorageManager extends StorageManager {
     }
 
     @Override
-    public byte convertLocalTypeToGSN(int jdbcType, int precision) {
+    public byte convertLocalTypeToGSN(int jdbcType, int precision,boolean signed) {
         switch (jdbcType) {
             case Types.BIGINT:
                 return DataTypes.BIGINT;
             case Types.INTEGER:
                 return DataTypes.INTEGER;
             case Types.SMALLINT:
-                return DataTypes.SMALLINT;
+            	if (signed)
+                    return DataTypes.SMALLINT;
+            	else
+            		return DataTypes.INTEGER;
             case Types.TINYINT:
                 return DataTypes.TINYINT;
             case Types.VARCHAR:

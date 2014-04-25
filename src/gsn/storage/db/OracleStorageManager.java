@@ -79,7 +79,7 @@ public class OracleStorageManager extends StorageManager {
     }
 
     @Override
-    public byte convertLocalTypeToGSN(int jdbcType, int precision) {
+    public byte convertLocalTypeToGSN(int jdbcType, int precision, boolean signed) {
         switch (jdbcType) {
             case Types.NUMERIC:
                 if (precision == 0)

@@ -84,7 +84,7 @@ public abstract class StorageManager {
 
     public void initDatabaseAccess(Connection con) throws Exception {}
 
-    public abstract byte convertLocalTypeToGSN(int jdbcType, int precision);
+    public abstract byte convertLocalTypeToGSN(int jdbcType, int precision,boolean signed);
 
     public abstract String getStatementDropIndex();
 
@@ -97,7 +97,11 @@ public abstract class StorageManager {
     public abstract StringBuilder getStatementUselessDataRemoval(String virtualSensorName, long storageSize);
 
     public byte convertLocalTypeToGSN(int jdbcType) {
-        return convertLocalTypeToGSN(jdbcType, 0);
+        return convertLocalTypeToGSN(jdbcType, 0,true);
+    }
+    
+    public byte convertLocalTypeToGSN(int jdbcType,boolean signed){
+    	return convertLocalTypeToGSN(jdbcType,0,signed);
     }
 
 
@@ -197,9 +201,10 @@ public abstract class StorageManager {
                 if (colName.equalsIgnoreCase("pk")) continue;
                 if (colName.equalsIgnoreCase("timed")) continue;
                 int colType = structure.getColumnType(i);
+                boolean signed = structure.isSigned(i);
                 String colTypeName = structure.getColumnTypeName(i);
                 int precision = structure.getPrecision(i);
-                byte colTypeInGSN = convertLocalTypeToGSN(colType);
+                byte colTypeInGSN = convertLocalTypeToGSN(colType,signed);
                 if (colTypeInGSN == -100){
                     logger.error("The type can't be converted to GSN form - error description: virtual sensor name is: "+tableName+", field name is: "+colName + ", query is: " + sb);
                 }
