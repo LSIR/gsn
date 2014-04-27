@@ -82,14 +82,20 @@ public class MySQLStorageManager extends StorageManager {
             case Types.BIGINT:
                 return DataTypes.BIGINT;
             case Types.INTEGER:
-                return DataTypes.INTEGER;
+                if (signed)
+                    return DataTypes.INTEGER;
+                else
+                    return DataTypes.BIGINT;
             case Types.SMALLINT:
             	if (signed)
                     return DataTypes.SMALLINT;
             	else
             		return DataTypes.INTEGER;
             case Types.TINYINT:
-                return DataTypes.TINYINT;
+                if (signed)
+                    return DataTypes.TINYINT;
+                else
+                    return DataTypes.SMALLINT;
             case Types.VARCHAR:
             case Types.LONGVARCHAR: // This is needed because of the string type in CSV wrapper. 	
                 return DataTypes.VARCHAR;
