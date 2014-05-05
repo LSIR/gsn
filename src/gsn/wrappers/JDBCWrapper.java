@@ -53,8 +53,8 @@ import java.util.regex.Matcher;
  */
 public class JDBCWrapper extends AbstractWrapper {
 
-    private static long DEFAULT_RATE = 1000;   // 1 second in milliseconds
-    private static long DEFAULT_BUFFER_SIZE = 100;
+    private static long DEFAULT_RATE = 500;   // 1 second in milliseconds
+    private static long DEFAULT_BUFFER_SIZE = 1000;
 
     private transient Logger logger = Logger.getLogger(this.getClass());
     private DataField[] outputFormat;
