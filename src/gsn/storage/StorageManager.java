@@ -63,7 +63,7 @@ public abstract class StorageManager {
         pool.setMaxActive(maxDBConnections);
         pool.setMaxIdle(maxDBConnections);
 
-        pool.setRemoveAbandoned(true);    // removing unused connections, used to clean after poorly written code
+        pool.setRemoveAbandoned(false);    // removing unused connections, used to clean after poorly written code
         pool.setRemoveAbandonedTimeout(300);    // 5 minutes
         //
         Connection con = null;

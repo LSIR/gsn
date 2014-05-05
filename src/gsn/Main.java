@@ -107,7 +107,7 @@ import org.eclipse.jetty.server.AbstractConnector;
  */
 public final class Main {
 	
-    public static final int        DEFAULT_MAX_DB_CONNECTIONS       = 8;
+    public static final int        DEFAULT_MAX_DB_CONNECTIONS       = 50;
 	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 	public static final String     DEFAULT_GSN_CONF_FILE            = "conf/gsn.xml";
 	public static final String     DEFAULT_WEB_APP_PATH             = "webapp";
