@@ -68,6 +68,7 @@ public class RestServlet extends HttpServlet {
 
     public static final String FORMAT_JSON = "json";
     public static final String FORMAT_CSV = "csv";
+    public static final String FORMAT_GEOJSON = "geojson";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -85,8 +86,8 @@ public class RestServlet extends HttpServlet {
         User user = null;
 
         String format = request.getParameter(PARAMETER_FORMAT);
-        if (format == null || !FORMAT_CSV.equals(format)){
-            format = FORMAT_JSON;
+        if (format == null || (!FORMAT_CSV.equals(format) && !FORMAT_JSON.equals(format))){
+            format = FORMAT_GEOJSON;
         }
        
         RequestHandler requestHandler = new RequestHandler(format);

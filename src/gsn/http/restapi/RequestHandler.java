@@ -64,7 +64,7 @@ public class RequestHandler {
 
     public static enum ErrorType {NO_SUCH_SENSOR, NO_SUCH_USER, NO_SENSOR_ACCESS, UNKNOWN_REQUEST, MALFORMED_DATE_FROM_TO, MALFORMED_DATE_DATE_FIELD, MALFORMED_SIZE, ERROR_IN_REQUEST, OUT_OF_MEMORY_ERROR}
 
-    private String format = RestServlet.FORMAT_JSON;
+    private String format = RestServlet.FORMAT_GEOJSON;
     
     
     
@@ -398,7 +398,7 @@ public class RequestHandler {
 
     	
     	if (RestServlet.FORMAT_CSV.equals(format)) return errorResponseCSV(filename, errorMessage);
-        else if (RestServlet.FORMAT_JSON.equals(format)) return errorResponseJSON(errorMessage);
+        else if (RestServlet.FORMAT_JSON.equals(format) || RestServlet.FORMAT_GEOJSON.equals(format)) return errorResponseJSON(errorMessage);
         else return null;
     }
     
@@ -502,7 +502,7 @@ public class RequestHandler {
     		restResponse.setType(RestResponse.CSV_CONTENT_TYPE);
             restResponse.addHeader(RestResponse.RESPONSE_HEADER_CONTENT_DISPOSITION_NAME, String.format(RestResponse.RESPONSE_HEADER_CONTENT_DISPOSITION_VALUE, filename + ".csv"));
     	}
-        else if (RestServlet.FORMAT_JSON.equals(format)) {
+        else if (RestServlet.FORMAT_JSON.equals(format) || RestServlet.FORMAT_GEOJSON.equals(format)) {
         	restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
         }
     	restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
@@ -719,8 +719,8 @@ public class RequestHandler {
     private static final String STRING_CONSTANTS_PROPERTIES_FILENAME = "conf/RestApiConstants.properties";
     private static Properties stringConstantsProperties = new Properties();
     private FileInputStream stringConstantsPropertiesFileInputStream= null;
- 
-    public static Properties getStringConstantsPropertiesFile(){
-    	return stringConstantsProperties;
+
+    public static String getConst(String key){
+        return stringConstantsProperties.getProperty(key);
     }
 }

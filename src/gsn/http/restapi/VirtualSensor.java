@@ -102,6 +102,7 @@ public class VirtualSensor {
 	public static String generateFileContent(List<VirtualSensor> listSens, String format){
     	if (RestServlet.FORMAT_CSV.equals(format)) return generateCSVFileContent(listSens);
         else if (RestServlet.FORMAT_JSON.equals(format)) return generateJSONFileContent(listSens);
+        else if (RestServlet.FORMAT_GEOJSON.equals(format)) return generateGeoJSONFileContent(listSens);
         else return null;
     }
 	
@@ -124,12 +125,12 @@ public class VirtualSensor {
     			if (unit == null || unit.trim().length() == 0) unit = "";
     			
     			JSONObject fieldInfo = new JSONObject();
-    			fieldInfo.put(RequestHandler.getStringConstantsPropertiesFile().getProperty("NAME"), field.getName().toLowerCase());
-    			fieldInfo.put(RequestHandler.getStringConstantsPropertiesFile().getProperty("UNIT"), unit);
-    			fieldInfo.put(RequestHandler.getStringConstantsPropertiesFile().getProperty("TYPE"), field.getType().toLowerCase());
+    			fieldInfo.put(RequestHandler.getConst("NAME"), field.getName().toLowerCase());
+    			fieldInfo.put(RequestHandler.getConst("UNIT"), unit);
+    			fieldInfo.put(RequestHandler.getConst("TYPE"), field.getType().toLowerCase());
     			setOfFields.add(fieldInfo);
     		}
-    		sensorInfo.put(RequestHandler.getStringConstantsPropertiesFile().getProperty("FIELDS"), setOfFields);
+    		sensorInfo.put(RequestHandler.getConst("FIELDS"), setOfFields);
     		
     		//values
     		JSONArray setOfValues = new JSONArray();
@@ -138,14 +139,14 @@ public class VirtualSensor {
     		if (timestamps.size() > 0){    			
 	    		for (int i = 0; i < timestamps.size(); i++){
 	    			JSONArray valuesForOneField = new JSONArray();
-	    			valuesForOneField.add((new java.text.SimpleDateFormat(RequestHandler.getStringConstantsPropertiesFile().getProperty("ISO_FORMAT")).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' '));
+	    			valuesForOneField.add((new java.text.SimpleDateFormat(RequestHandler.getConst("ISO_FORMAT")).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' '));
 	    			valuesForOneField.add(timestamps.get(i));
 	    			for (Double value: values.get(i)){
 	    				valuesForOneField.add(value);
 	    			}
 	    			setOfValues.add(valuesForOneField);
 	    		}
-	    		sensorInfo.put(RequestHandler.getStringConstantsPropertiesFile().getProperty("VALUES"), setOfValues);
+	    		sensorInfo.put(RequestHandler.getConst("VALUES"), setOfValues);
     		}
     		
     		sensorsInfo.add(sensorInfo);
@@ -165,9 +166,9 @@ public class VirtualSensor {
     		}
     		
     		//fields, units, types
-    		StringBuilder field_names = new StringBuilder("# " + RequestHandler.getStringConstantsPropertiesFile().getProperty("FIELDS") + ":");
-    		StringBuilder field_units = new StringBuilder("# " + RequestHandler.getStringConstantsPropertiesFile().getProperty("UNITS") + ":");
-    		StringBuilder field_types = new StringBuilder("# " + RequestHandler.getStringConstantsPropertiesFile().getProperty("TYPES") + ":");
+    		StringBuilder field_names = new StringBuilder("# " + RequestHandler.getConst("FIELDS") + ":");
+    		StringBuilder field_units = new StringBuilder("# " + RequestHandler.getConst("UNITS") + ":");
+    		StringBuilder field_types = new StringBuilder("# " + RequestHandler.getConst("TYPES") + ":");
     		for (DataField field: sensor.getFields()){
     		
     			String unit = field.getUnit();
@@ -188,7 +189,7 @@ public class VirtualSensor {
     		List<Vector<Double>> values = sensor.getValues();
     		Vector<Long> timestamps = sensor.getTimestamps();
     		for (int i = 0; i < timestamps.size(); i++){
-    			file.append((new java.text.SimpleDateFormat(RequestHandler.getStringConstantsPropertiesFile().getProperty("ISO_FORMAT")).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' ') + "," + timestamps.get(i));
+    			file.append((new java.text.SimpleDateFormat(RequestHandler.getConst("ISO_FORMAT")).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' ') + "," + timestamps.get(i));
     			for (Double value: values.get(i)){
     				file.append("," + value);
     			}
@@ -196,5 +197,78 @@ public class VirtualSensor {
     		}
     	}
     	return file.toString();
+    }
+
+
+    private static String generateGeoJSONFileContent(List<VirtualSensor> listOfSensors){
+        JSONObject featureCollection = new JSONObject();
+        featureCollection.put(RequestHandler.getConst("TYPE_GEOJSON"), RequestHandler.getConst("FEATURE_COLLECTION"));
+        JSONArray features = new JSONArray();
+
+        for (VirtualSensor sensor: listOfSensors){
+            JSONObject feature = new JSONObject();
+            feature.put(RequestHandler.getConst("TYPE_GEOJSON"), RequestHandler.getConst("FEATURE"));
+            JSONObject geometry = new JSONObject();
+            geometry.put(RequestHandler.getConst("TYPE_GEOJSON"), RequestHandler.getConst("POINT"));
+            JSONArray coordinates = new JSONArray();
+            JSONObject properties = new JSONObject();
+
+            double longitude = 0;
+            double latitude = 0;
+            double altitude = -1;
+            Iterator<Map.Entry<String, String>> metadataIterator = sensor.getMetadata().entrySet().iterator();
+            while (metadataIterator.hasNext()){
+                Map.Entry<String, String> elem = metadataIterator.next();
+                if (RequestHandler.getConst("LONGITUDE").equalsIgnoreCase(elem.getKey())) longitude = Double.parseDouble(elem.getValue());
+                else if (RequestHandler.getConst("LATITUDE").equalsIgnoreCase(elem.getKey())) latitude = Double.parseDouble(elem.getValue());
+                else if (RequestHandler.getConst("ALTITUDE").equalsIgnoreCase(elem.getKey())) altitude = Double.parseDouble(elem.getValue());
+                else properties.put(elem.getKey(), elem.getValue());
+            }
+            coordinates.add(longitude);
+            coordinates.add(latitude);
+            if (altitude != -1) coordinates.add(altitude);
+
+            //fields, units, types
+            JSONArray setOfFields = new JSONArray();
+            for (DataField field: sensor.getFields()){
+                String unit = field.getUnit();
+                if (unit == null || unit.trim().length() == 0) unit = "";
+
+                JSONObject fieldInfo = new JSONObject();
+                fieldInfo.put(RequestHandler.getConst("NAME"), field.getName().toLowerCase());
+                fieldInfo.put(RequestHandler.getConst("UNIT"), unit);
+                fieldInfo.put(RequestHandler.getConst("TYPE"), field.getType().toLowerCase());
+                setOfFields.add(fieldInfo);
+            }
+            properties.put(RequestHandler.getConst("FIELDS"), setOfFields);
+
+            //values
+            JSONArray setOfValues = new JSONArray();
+            List<Vector<Double>> values = sensor.getValues();
+            Vector<Long> timestamps = sensor.getTimestamps();
+            if (timestamps.size() > 0){
+                for (int i = 0; i < timestamps.size(); i++){
+                    JSONArray valuesForOneField = new JSONArray();
+                    valuesForOneField.add((new java.text.SimpleDateFormat(RequestHandler.getConst("ISO_FORMAT")).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' '));
+                    valuesForOneField.add(timestamps.get(i));
+                    for (Double value: values.get(i)){
+                        valuesForOneField.add(value);
+                    }
+                    setOfValues.add(valuesForOneField);
+                }
+                properties.put(RequestHandler.getConst("VALUES"), setOfValues);
+            }
+
+            geometry.put(RequestHandler.getConst("COORDINATES"), coordinates);
+            feature.put(RequestHandler.getConst("GEOMETRY"), geometry);
+            feature.put(RequestHandler.getConst("PROPERTIES"), properties);
+
+            features.add(feature);
+        }
+
+
+        featureCollection.put(RequestHandler.getConst("FEATURES"), features);
+
+        return featureCollection.toJSONString();
     }
 }
