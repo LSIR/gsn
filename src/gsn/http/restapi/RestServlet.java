@@ -65,6 +65,7 @@ public class RestServlet extends HttpServlet {
     private static final String PARAMETER_FROM = "from";
     private static final String PARAMETER_TO = "to";
     private static final String PARAMETER_SIZE = "size";
+    private static final String PARAMETER_LATEST_VALS = "latest_values";//default without, possible values "true"  or "false"
 
     public static final String FORMAT_JSON = "json";
     public static final String FORMAT_CSV = "csv";
@@ -82,6 +83,7 @@ public class RestServlet extends HttpServlet {
         String str_user = null;
         String str_pass = null;
         String str_date = null;
+        String str_latest_vals = null;
 
         User user = null;
 
@@ -91,6 +93,8 @@ public class RestServlet extends HttpServlet {
         }
        
         RequestHandler requestHandler = new RequestHandler(format);
+
+        Caching.enable();
 
         if (Main.getContainerConfig().isAcEnabled()) {     // added
             str_user = request.getParameter(PARAMETER_USERNAME);
@@ -102,7 +106,8 @@ public class RestServlet extends HttpServlet {
 
         switch (determineRequest(request.getRequestURI())) {
             case REQUEST_GET_ALL_SENSORS:
-                restResponse = requestHandler.getAllSensors(user);
+                str_latest_vals = request.getParameter(PARAMETER_LATEST_VALS);
+                restResponse = requestHandler.getAllSensors(user, str_latest_vals);
                 break;
             case REQUEST_GET_MEASUREMENTS_FOR_SENSOR:
                 sensor = parseURI(request.getRequestURI())[3];

@@ -31,29 +31,23 @@ package gsn.http.restapi;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
+import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
+import gsn.storage.DataEnumerator;
 import gsn.utils.geo.GridTools;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
@@ -69,13 +63,16 @@ public class RequestHandler {
     
     
     //request handling
-    public RestResponse getAllSensors(User user) {
+    public RestResponse getAllSensors(User user, String latestVals) {
     	/* open
     	RestResponse restResponse = userExists(user);
         if (restResponse != null) {
             return restResponse;
         }
         */
+
+        boolean includeLatestVals = false;
+        if ("true".equalsIgnoreCase(latestVals)) includeLatestVals = true;
 
         RestResponse restResponse = new RestResponse();
 
@@ -96,6 +93,28 @@ public class RequestHandler {
             	continue;
             }
             */
+            if (includeLatestVals){
+                if (Caching.isEnabled()){
+                    if (!Caching.isCacheValid(sensorConfig.getName())){
+                        Map<String, Double> se = getMostRecentValueFor(sensorConfig.getName());
+                        List<Double> latestValsList = new ArrayList<Double>();
+                        if (se != null){
+                            for (DataField df: sensorConfig.getOutputStructure()){
+                                latestValsList.add(se.get(df.getName().toLowerCase()));
+                            }
+                        }
+                        Caching.setLatestValsForSensor(sensorConfig.getName(), latestValsList);
+                    }
+                    sensor.setLatestValues(Caching.getLatestValsForSensor(sensorConfig.getName()));
+                } else {
+                    Map<String, Double> se = getMostRecentValueFor(sensorConfig.getName());
+                    if (se != null){
+                        for (DataField df: sensorConfig.getOutputStructure()){
+                            sensor.addLatestValue(se.get(df.getName().toLowerCase()));
+                        }
+                    }
+                }
+            }
             
             sensor.setMetadata(createHeaderMap(sensorConfig));
             sensor.appendFields(sensorConfig.getOutputStructure());
@@ -564,6 +583,25 @@ public class RequestHandler {
         }
 
         return result;
+    }
+
+    public static Map<String, Double> getMostRecentValueFor(String virtual_sensor_name) {
+        StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(")");
+        Map<String, Double> toReturn=new HashMap<String, Double>() ;
+        try {
+            DataEnumerator result = Main.getStorage(virtual_sensor_name).executeQuery( query , true );
+            if ( result.hasMoreElements( ) ){
+                StreamElement se = result.nextElement();
+                for (String fn: se.getFieldNames()){
+                    toReturn.put(fn.toLowerCase(), (Double)se.getData(fn));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("ERROR IN EXECUTING, query: "+query);
+            logger.error(e.getMessage(),e);
+            return null;
+        }
+        return toReturn;
     }
 
     private boolean getDataPreview(String sensor, String field, long from, long to, List<Vector<Double>> elements, Vector<Long> timestamps, long size) {

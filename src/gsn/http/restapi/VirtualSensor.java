@@ -46,6 +46,7 @@ public class VirtualSensor {
 	private List<DataField> fields = new ArrayList<DataField>();
 	private List<Vector<Double>> values = new ArrayList<Vector<Double>>();
 	private Vector<Long> timestamps = new Vector<Long>();
+    private List<Double> latestValues = new ArrayList<Double>();
 	
 	public void addMetadata(String name, String value){
 		metadata.put(name, value);
@@ -88,6 +89,16 @@ public class VirtualSensor {
 	public Vector<Long> getTimestamps() {
 		return timestamps;
 	}
+
+    public List<Double> getLatestValues() { return latestValues; }
+
+    public void setLatestValues(List<Double> latestValues) {
+        this.latestValues = latestValues;
+    }
+
+    public void addLatestValue(Double latestValue) {
+        latestValues.add(latestValue);
+    }
 
 	public void setValues(List<Vector<Double>> values, Vector<Long> timestamps) {
 		this.values = values;
@@ -133,10 +144,10 @@ public class VirtualSensor {
     		sensorInfo.put(RequestHandler.getConst("FIELDS"), setOfFields);
     		
     		//values
-    		JSONArray setOfValues = new JSONArray();
-    		List<Vector<Double>> values = sensor.getValues();
     		Vector<Long> timestamps = sensor.getTimestamps();
-    		if (timestamps.size() > 0){    			
+    		if (timestamps.size() > 0){
+                JSONArray setOfValues = new JSONArray();
+                List<Vector<Double>> values = sensor.getValues();
 	    		for (int i = 0; i < timestamps.size(); i++){
 	    			JSONArray valuesForOneField = new JSONArray();
 	    			valuesForOneField.add((new java.text.SimpleDateFormat(RequestHandler.getConst("ISO_FORMAT")).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' '));
@@ -148,6 +159,18 @@ public class VirtualSensor {
 	    		}
 	    		sensorInfo.put(RequestHandler.getConst("VALUES"), setOfValues);
     		}
+
+            //latest values
+            List<Double> latestValues = sensor.getLatestValues();
+            if (latestValues.size() > 0){
+                JSONArray setOfValues = new JSONArray();
+                JSONArray valueForOneField = new JSONArray();
+                for (Double value: latestValues){
+                    valueForOneField.add(value);
+                }
+                setOfValues.add(valueForOneField);
+                sensorInfo.put(RequestHandler.getConst("VALUES"), setOfValues);
+            }
     		
     		sensorsInfo.add(sensorInfo);
     	}
@@ -190,11 +213,26 @@ public class VirtualSensor {
     		Vector<Long> timestamps = sensor.getTimestamps();
     		for (int i = 0; i < timestamps.size(); i++){
     			file.append((new java.text.SimpleDateFormat(RequestHandler.getConst("ISO_FORMAT")).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' ') + "," + timestamps.get(i));
-    			for (Double value: values.get(i)){
-    				file.append("," + value);
+    			boolean first = true;
+                for (Double value: values.get(i)){
+                    if (first){
+                        first = false;
+                    } else {
+                        file.append(",");
+                    }
+                    file.append("," + value);
     			}
     			file.append("\n");
     		}
+
+            //latest values
+            List<Double> latestValues = sensor.getLatestValues();
+            if (latestValues.size() > 0){
+                for (Double value: latestValues){
+                    file.append("," + value);
+                }
+                file.append("\n");
+            }
     	}
     	return file.toString();
     }
@@ -243,10 +281,10 @@ public class VirtualSensor {
             properties.put(RequestHandler.getConst("FIELDS"), setOfFields);
 
             //values
-            JSONArray setOfValues = new JSONArray();
-            List<Vector<Double>> values = sensor.getValues();
             Vector<Long> timestamps = sensor.getTimestamps();
             if (timestamps.size() > 0){
+                JSONArray setOfValues = new JSONArray();
+                List<Vector<Double>> values = sensor.getValues();
                 for (int i = 0; i < timestamps.size(); i++){
                     JSONArray valuesForOneField = new JSONArray();
                     valuesForOneField.add((new java.text.SimpleDateFormat(RequestHandler.getConst("ISO_FORMAT")).format(new java.util.Date(timestamps.get(i)))).toString().replace('T', ' '));
@@ -264,6 +302,18 @@ public class VirtualSensor {
             feature.put(RequestHandler.getConst("PROPERTIES"), properties);
 
             features.add(feature);
+
+            //latest values
+            List<Double> latestValues = sensor.getLatestValues();
+            if (latestValues.size() > 0){
+                JSONArray setOfValues = new JSONArray();
+                JSONArray valueForOneField = new JSONArray();
+                for (Double value: latestValues){
+                    valueForOneField.add(value);
+                }
+                setOfValues.add(valueForOneField);
+                properties.put(RequestHandler.getConst("VALUES"), setOfValues);
+            }
         }
 
 
