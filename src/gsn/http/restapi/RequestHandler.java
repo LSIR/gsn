@@ -40,7 +40,6 @@ import gsn.utils.geo.GridTools;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -657,7 +656,7 @@ public class RequestHandler {
         Connection conn = null;
         ResultSet resultSet = null;
 
-        boolean result = true;
+        //boolean result = true;
         long timestamp = -1;
 
         try {
@@ -673,7 +672,7 @@ public class RequestHandler {
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
-            result = false;
+            //result = false;
         } finally {
             Main.getStorage(sensor).close(resultSet);
             Main.getStorage(sensor).close(conn);
@@ -701,7 +700,7 @@ public class RequestHandler {
         Connection conn = null;
         ResultSet resultSet = null;
 
-        boolean result = true;
+        //boolean result = true;
         long timestamp = -1;
 
         try {
@@ -717,7 +716,7 @@ public class RequestHandler {
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
-            result = false;
+            //result = false;
         } finally {
             Main.getStorage(sensor).close(resultSet);
             Main.getStorage(sensor).close(conn);

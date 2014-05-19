@@ -32,9 +32,6 @@ import gsn.http.ac.User;
 import gsn.http.ac.UserUtils;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,7 +42,9 @@ import org.apache.log4j.Logger;
 
 public class RestServlet extends HttpServlet {
 
-    private static transient Logger logger = Logger.getLogger(RestServlet.class);
+	private static final long serialVersionUID = 1L;
+
+	private static transient Logger logger = Logger.getLogger(RestServlet.class);
 
     private static final int REQUEST_UNKNOWN = -1;
     private static final int REQUEST_GET_ALL_SENSORS = 0;
@@ -200,7 +199,8 @@ public class RestServlet extends HttpServlet {
 
         return REQUEST_UNKNOWN;
     }
-
+    
+/*
     public String debugRequest(HttpServletRequest request, HttpServletResponse response) {
         StringBuilder sb = new StringBuilder();
         sb.append("REST GET"
@@ -217,5 +217,5 @@ public class RestServlet extends HttpServlet {
                 sb.append(request.getParameterValues(parameterName)[i] + "\n");
         }
         return sb.toString();
-    }
+    }*/
 }

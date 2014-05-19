@@ -35,7 +35,7 @@ public class Caching {
     private static HashMap<String, List<Double>> sensorToLatestVals = new HashMap<String, List<Double>>();
     private static HashMap<String, Long> sensorToTimestamp = new HashMap<String, Long>();
     //TODO use specific diff per sensor
-    private static HashMap<String, Long> sensorToTimeDiff = new HashMap<String, Long>();
+    //private static HashMap<String, Long> sensorToTimeDiff = new HashMap<String, Long>();
     private static boolean isEnabled = false;
 
     public static List<Double> getLatestValsForSensor(String sensor){
