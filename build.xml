@@ -54,9 +54,10 @@
         <mkdir dir="${reports}/javadoc"/>
         <mkdir dir="${reports}/junit"/>
         <mkdir dir="${jars}"/>
-        <condition property="java6">
+    	<echo>${ant.java.version}</echo>
+        <!--<condition property="java6">
             <equals arg1="${ant.java.version}" arg2="1.6"/>
-        </condition>
+        </condition>-->
     </target>
 
     <target name="build" depends="setup" description="Compile the cource code.">

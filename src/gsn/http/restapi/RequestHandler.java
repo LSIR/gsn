@@ -37,6 +37,7 @@ import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
 import gsn.utils.geo.GridTools;
+import gsn.xpr.XprConditions;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,10 +53,14 @@ import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
+import scala.util.Try;
+
 public class RequestHandler {
     private static transient Logger logger = Logger.getLogger(RequestHandler.class);
 
-    public static enum ErrorType {NO_SUCH_SENSOR, NO_SUCH_USER, NO_SENSOR_ACCESS, UNKNOWN_REQUEST, MALFORMED_DATE_FROM_TO, MALFORMED_DATE_DATE_FIELD, MALFORMED_SIZE, ERROR_IN_REQUEST, OUT_OF_MEMORY_ERROR}
+    public static enum ErrorType {NO_SUCH_SENSOR, NO_SUCH_USER, NO_SENSOR_ACCESS, UNKNOWN_REQUEST, 
+    	MALFORMED_DATE_FROM_TO, MALFORMED_DATE_DATE_FIELD, MALFORMED_SIZE, MALFORMED_FILTER, 
+    	ERROR_IN_REQUEST, OUT_OF_MEMORY_ERROR}
 
     private String format = RestServlet.FORMAT_GEOJSON;
     
@@ -126,7 +131,7 @@ public class RequestHandler {
         return restResponse;
     }
     
-    public RestResponse getMeasurementsForSensor(User user, String sensor, String from, String to, String size) {
+    public RestResponse getMeasurementsForSensor(User user, String sensor, String from, String to, String size, String filter) {
         RestResponse restResponse = userHasAccessToVirtualSensor(user, sensor);
         if (restResponse != null) { //error occured
             return restResponse;
@@ -153,7 +158,19 @@ public class RequestHandler {
             restResponse = errorResponse(ErrorType.MALFORMED_DATE_FROM_TO, user, sensor);
             return restResponse;
         }
-        
+                
+        String[] conditionList=null;
+        if (filter!=null){
+        	String[] filters=filter.split(",");
+        	Try<String[]> conditions=XprConditions.serializeConditions(filters);
+        	if (conditions.isFailure()){
+                logger.error(conditions.failed().toString(), conditions.failed().get());
+                return errorResponse(ErrorType.MALFORMED_FILTER, user, sensor);
+        	}
+        	else {
+        		conditionList=conditions.get();	        	  	
+        	}
+        }
         VSensorConfig sensorConfig = Mappings.getConfig(sensor);
         VirtualSensor sensorObj = new VirtualSensor();
         
@@ -171,7 +188,7 @@ public class RequestHandler {
             sensorObj.appendField(df);
         }
         
-        boolean errorFlag = !getData(sensor, fields, fromAsLong, toAsLong, window, elements, timestamps);
+        boolean errorFlag = !getData(sensor, fields, fromAsLong, toAsLong, window, elements, timestamps,conditionList);
         
         if (errorFlag){
         	return errorResponse(ErrorType.ERROR_IN_REQUEST, user, sensor);
@@ -186,7 +203,7 @@ public class RequestHandler {
 
         return restResponse;
     }
-
+    
     public RestResponse getMeasurementsForSensorField(User user, String sensor, String field, String from, String to, String size) {
         RestResponse restResponse = userHasAccessToVirtualSensor(user, sensor);
         if (restResponse != null) { //error occured
@@ -404,6 +421,10 @@ public class RequestHandler {
             	errorMessage = stringConstantsProperties.getProperty("ERROR_MALFORMED_SIZE_MSG");
                 filename = stringConstantsProperties.getProperty("ERROR_MALFORMED_SIZE_FILENAME");
                 break;
+            case MALFORMED_FILTER:
+            	errorMessage = stringConstantsProperties.getProperty("ERROR_MALFORMED_FILTER_MSG");
+                filename = stringConstantsProperties.getProperty("ERROR_MALFORMED_FILTER_FILENAME");
+                break;
             case ERROR_IN_REQUEST:
                 errorMessage = stringConstantsProperties.getProperty("ERROR_ERROR_IN_REQUEST_MSG");
                 filename = stringConstantsProperties.getProperty("ERROR_ERROR_IN_REQUEST_FILENAME");
@@ -525,8 +546,14 @@ public class RequestHandler {
         }
     	restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
     }
-    
-    private boolean getData(String sensor, List<String> fields, long from, long to, int size, List<Vector<Double>> elements, Vector<Long> timestamps){
+
+    private boolean getData(String sensor, List<String> fields, long from, long to, int size, 
+            List<Vector<Double>> elements, Vector<Long> timestamps){
+    	return getData(sensor,fields,from,to,size,elements,timestamps,new String[]{});
+    }
+
+    private boolean getData(String sensor, List<String> fields, long from, long to, int size, 
+        List<Vector<Double>> elements, Vector<Long> timestamps, String[] conditions){
     	Connection connection = null;
         ResultSet resultSet = null;
 
@@ -545,6 +572,11 @@ public class RequestHandler {
             	.append(from)
             	.append(" and timed <=")
             	.append(to);
+            if (conditions!=null){
+            	for (String cond:conditions){
+            		query.append(" and "+cond);
+            	}
+            }
             
             if (size > 0) {
             	query.append(" order by timed desc")
