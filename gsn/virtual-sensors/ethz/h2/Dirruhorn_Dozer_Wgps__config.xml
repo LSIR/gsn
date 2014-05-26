@@ -62,8 +62,8 @@
 								value = pwrCmd & ADVANCED_CMD_VALUE_MASK;
 								switch (pwrCmd & ADVANCED_CMD_TYPE_MASK) {
 									case ADVANCED_CMD_VOLTAGE:
-										element[6] = 11.5 + 0.1 * ((ADVANCED_CMD_LP_ENTRY_MASK&value) >> ADVANCED_CMD_LP_ENTRY_RIGHT_SHIFT);
-										element[7] = 11.5 + 0.1 * (ADVANCED_CMD_LP_EXIT_MASK&value);
+										element[6] = 11.5 + 0.1 * ((ADVANCED_CMD_LP_ENTRY_MASK&value) >> ADVANCED_CMD_LP_ENTRY_RIGHT_SHIFT).toDouble();
+										element[7] = 11.5 + 0.1 * (ADVANCED_CMD_LP_EXIT_MASK&value).toDouble();
 										break;
 									case ADVANCED_CMD_AVERAGE:
 										element[8] = value;
