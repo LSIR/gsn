@@ -604,13 +604,16 @@ function PacketRate() {
       success: function(data){
 	try {
 	  updateConfigTable($("sensornodes",data), $("network", data).attr("configurable")=="true");
+	} catch (err) { console.log(err); }
+	try {
 	  updateHealthTable($("sensornodes",data));
+	} catch (err) { console.log(err); }
+	try {
 	  updateTopologyGraph($("sensornodes",data));
+	} catch (err) { console.log(err); }
+	try {
 	  updateStatusBar($("sensornodes",data));
-	}
-	catch (err) {
-	  console.log(err);
-	}
+	} catch (err) { console.log(err); }
 	restartTimer();
       },
       error : function(XMLHttpRequest, textStatus, errorThrown) {
