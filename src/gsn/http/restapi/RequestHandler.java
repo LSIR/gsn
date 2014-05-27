@@ -59,7 +59,7 @@ public class RequestHandler {
     private static transient Logger logger = Logger.getLogger(RequestHandler.class);
 
     public static enum ErrorType {NO_SUCH_SENSOR, NO_SUCH_USER, NO_SENSOR_ACCESS, UNKNOWN_REQUEST, 
-    	MALFORMED_DATE_FROM_TO, MALFORMED_DATE_DATE_FIELD, MALFORMED_SIZE, MALFORMED_FILTER, 
+    	MALFORMED_DATE_FROM_TO, MALFORMED_DATE_DATE_FIELD, MALFORMED_SIZE, MALFORMED_FILTER,MALFORMED_FIELD_SELECT, 
     	ERROR_IN_REQUEST, OUT_OF_MEMORY_ERROR}
 
     private String format = RestServlet.FORMAT_GEOJSON;
@@ -131,7 +131,8 @@ public class RequestHandler {
         return restResponse;
     }
     
-    public RestResponse getMeasurementsForSensor(User user, String sensor, String from, String to, String size, String filter) {
+    public RestResponse getMeasurementsForSensor(User user, String sensor, 
+    		String from, String to, String size, String filter,String selectedFields) {
         RestResponse restResponse = userHasAccessToVirtualSensor(user, sensor);
         if (restResponse != null) { //error occured
             return restResponse;
@@ -181,11 +182,33 @@ public class RequestHandler {
         Vector<Long> timestamps = new Vector<Long>();
         ArrayList<Vector<Double>> elements  = new ArrayList<Vector<Double>>();
         ArrayList<String> fields = new ArrayList<String>();
+        ArrayList<String> allfields = new ArrayList<String>();
 
+        for (DataField df : sensorConfig.getOutputStructure()) {        	
+            allfields.add(df.getName().toLowerCase());
+            if (selectedFields==null){
+            	sensorObj.appendField(df);
+            	fields.add(df.getName().toLowerCase());
+            }            	
+        }
 
+        String[] fieldNames=null;
+        if (selectedFields!=null){
+        	fieldNames=selectedFields.toLowerCase().split(",");
+        	for (String f:fieldNames){
+        		if (!allfields.contains(f)){
+        			 logger.error("Invalid field name in selection: "+f);
+                     return errorResponse(ErrorType.MALFORMED_FIELD_SELECT, user, sensor);
+        		}
+                fields.add(f);
+        	}
+        }
+        
         for (DataField df : sensorConfig.getOutputStructure()) {
-            fields.add(df.getName().toLowerCase());
-            sensorObj.appendField(df);
+        	String fieldName=df.getName().toLowerCase();
+        	if (selectedFields!=null && fields.contains(fieldName)){
+                sensorObj.appendField(df);        		
+        	}
         }
         
         boolean errorFlag = !getData(sensor, fields, fromAsLong, toAsLong, window, elements, timestamps,conditionList);
@@ -423,6 +446,10 @@ public class RequestHandler {
                 break;
             case MALFORMED_FILTER:
             	errorMessage = stringConstantsProperties.getProperty("ERROR_MALFORMED_FILTER_MSG");
+                filename = stringConstantsProperties.getProperty("ERROR_MALFORMED_FILTER_FILENAME");
+                break;
+            case MALFORMED_FIELD_SELECT:
+            	errorMessage = stringConstantsProperties.getProperty("ERROR_MALFORMED_FIELD_SELECT_MSG");
                 filename = stringConstantsProperties.getProperty("ERROR_MALFORMED_FILTER_FILENAME");
                 break;
             case ERROR_IN_REQUEST:

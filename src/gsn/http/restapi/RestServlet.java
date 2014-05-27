@@ -65,7 +65,8 @@ public class RestServlet extends HttpServlet {
     private static final String PARAMETER_TO = "to";
     private static final String PARAMETER_SIZE = "size";
     private static final String PARAMETER_LATEST_VALS = "latest_values";//default without, possible values "true"  or "false"
-    private static final String PARAMETER_FILTER = "filter";//default without, possible values "true"  or "false"
+    private static final String PARAMETER_FILTER = "filter";
+    private static final String PARAMETER_FIELDS = "fields";
     
 
     public static final String FORMAT_JSON = "json";
@@ -116,8 +117,9 @@ public class RestServlet extends HttpServlet {
                 str_to = request.getParameter(PARAMETER_TO);
                 str_size = request.getParameter(PARAMETER_SIZE);
                 String filter=request.getParameter(PARAMETER_FILTER);
+                String fields=request.getParameter(PARAMETER_FIELDS);                
                 
-                restResponse = requestHandler.getMeasurementsForSensor(user, sensor, str_from, str_to, str_size,filter);
+                restResponse = requestHandler.getMeasurementsForSensor(user, sensor, str_from, str_to, str_size,filter,fields);
                 break;
             case REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD:
                 sensor = parseURI(request.getRequestURI())[3];

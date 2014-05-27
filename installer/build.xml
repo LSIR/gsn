@@ -77,6 +77,7 @@
         <copy file="${basedir}/conf/keystore" todir="${dist}/conf/"/>
         <copy file="${basedir}/conf/servertestcer.cer" todir="${dist}/conf/"/>
         <copy file="${basedir}/conf/servertestkeystore" todir="${dist}/conf/"/>
+        <copy file="${basedir}/conf/RestApiConstants.properties" todir="${dist}/conf/"/>
         <copy file="${basedir}/installer/log4j.properties" todir="${dist}/conf/"/>
         <copy file="${basedir}/installer/gsn.xml" todir="${dist}/conf/"/>
         <copy file="${basedir}/icons/GSN_green_medium.png" todir="${dist}/lib/"/>
