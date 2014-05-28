@@ -991,11 +991,15 @@ class ScheduleCron(CronTab):
                 nextdt = self._getNextSchedule(date_time - td, schedule)
                 if nextdt < now:
                     d = now-nextdt
+                    addSchedule = True
                     if runtimemax is not None:
                         runtimemax = runtimemax - (d.seconds / 60 + d.days * 1440)
+                        if runtimemax <= (int(self._getOptionValue('approximate_startup_seconds', self._config))/60+int(self._getOptionValue('hard_shutdown_offset_minutes', self._config))):
+                            addSchedule = False
                         if runtimemin is not None and runtimemax < runtimemin:
                             runtimemax = runtimemin+1
-                    backward_schedules.append((nextdt, type, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
+                    if addSchedule:
+                        backward_schedules.append((nextdt, type, pluginclassname, commandstring.strip(), runtimemax, runtimemin))
                 
             nextdt = self._getNextSchedule(date_time, schedule)
             if not future_schedules or nextdt < future_schedules[0][0]:
