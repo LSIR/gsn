@@ -312,7 +312,7 @@ class ScheduleHandlerClass(Thread, Statistics):
                 if self._schedule:
                     # get the next schedule(s) in time
                     self._scheduleLock.acquire()
-                    nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback)
+                    nextschedules, error = self._schedule.getNextSchedules(dtnow, lookback, (int(self._getOptionValue('approximate_startup_seconds', self._config))/60+int(self._getOptionValue('hard_shutdown_offset_minutes', self._config))))
                     for e in error:
                         self.error('error while parsing the schedule file: %s' % (e,))
                     self._newScheduleEvent.clear()
@@ -945,7 +945,7 @@ class ScheduleCron(CronTab):
         return self._schedules
         
     
-    def getNextSchedules(self, date_time, look_backward=False):
+    def getNextSchedules(self, date_time, look_backward=False, minPossibleMaxRuntime=2):
         future_schedules = []
         backward_schedules = []
         now = datetime.utcnow()
@@ -994,7 +994,7 @@ class ScheduleCron(CronTab):
                     addSchedule = True
                     if runtimemax is not None:
                         runtimemax = runtimemax - (d.seconds / 60 + d.days * 1440)
-                        if runtimemax <= (int(self._getOptionValue('approximate_startup_seconds', self._config))/60+int(self._getOptionValue('hard_shutdown_offset_minutes', self._config))):
+                        if runtimemax <= minPossibleMaxRuntime:
                             addSchedule = False
                         if runtimemin is not None and runtimemax < runtimemin:
                             runtimemax = runtimemin+1
