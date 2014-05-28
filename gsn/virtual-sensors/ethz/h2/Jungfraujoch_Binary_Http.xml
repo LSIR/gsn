@@ -15,23 +15,7 @@
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
     <streams>
-<!-- 
         <stream name="data1">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="http-get">
-                    <predicate key="url">http://permasense-jj-cam01/record/current.jpg</predicate>
-                    <predicate key="rate">900000</predicate>
-                    <predicate key="subdirectory-name">webcam1</predicate>
-                    <predicate key="device-id">6010</predicate>
-                    <predicate key="username">root</predicate>
-                    <predicate key="password">perma.PW</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
--->
-        <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
                     <predicate key="url">http://www.swisspanorama.com/assets/images/jungfraujoch.jpg</predicate>
