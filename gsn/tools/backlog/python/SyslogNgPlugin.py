@@ -2,10 +2,9 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 2907 $"
-__date__        = "$Date: 2011-03-22 15:34:20 +0100 (Die, 22. Mär 2011) $"
-__id__          = "$Id: BackLogStatusPlugin.py 2907 2011-03-22 14:34:20Z tgsell $"
-__source__      = "$URL: https://gsn.svn.sourceforge.net/svnroot/gsn/branches/permasense/gsn/tools/backlog/python/BackLogStatusPlugin.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
 
 import os
 import socket

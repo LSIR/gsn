@@ -2,10 +2,9 @@
 __author__      = "Tonio Gsell <tgsell@tik.ee.ethz.ch>"
 __copyright__   = "Copyright 2010, ETH Zurich, Switzerland, Tonio Gsell"
 __license__     = "GPL"
-__version__     = "$Revision: 4179 $"
-__date__        = "$Date: 2012-07-02 18:33:26 +0200 (Mo, 02. Jul 2012) $"
-__id__          = "$Id: PowerControl.py 4179 2012-07-02 16:33:26Z tgsell $"
-__source__      = "$URL: svn+ssh://tgsell@svn.code.sf.net/p/gsn/svn/branches/permasense/gsn/tools/backlog/python/PowerControl.py $"
+__version__     = "$Revision$"
+__date__        = "$Date$"
+__id__          = "$Id$"
 
 
 import sys

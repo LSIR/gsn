@@ -5,7 +5,6 @@ __license__     = "GPL"
 __version__     = "$Revision$"
 __date__        = "$Date$"
 __id__          = "$Id$"
-__source__      = "$URL$"
 
 
 # as soon as the subprocess.Popen() bug has been fixed the functionality related
