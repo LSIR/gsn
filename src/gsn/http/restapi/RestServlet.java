@@ -32,9 +32,6 @@ import gsn.http.ac.User;
 import gsn.http.ac.UserUtils;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,7 +42,9 @@ import org.apache.log4j.Logger;
 
 public class RestServlet extends HttpServlet {
 
-    private static transient Logger logger = Logger.getLogger(RestServlet.class);
+	private static final long serialVersionUID = 1L;
+
+	private static transient Logger logger = Logger.getLogger(RestServlet.class);
 
     private static final int REQUEST_UNKNOWN = -1;
     private static final int REQUEST_GET_ALL_SENSORS = 0;
@@ -65,9 +64,14 @@ public class RestServlet extends HttpServlet {
     private static final String PARAMETER_FROM = "from";
     private static final String PARAMETER_TO = "to";
     private static final String PARAMETER_SIZE = "size";
+    private static final String PARAMETER_LATEST_VALS = "latest_values";//default without, possible values "true"  or "false"
+    private static final String PARAMETER_FILTER = "filter";
+    private static final String PARAMETER_FIELDS = "fields";
+    
 
     public static final String FORMAT_JSON = "json";
     public static final String FORMAT_CSV = "csv";
+    public static final String FORMAT_GEOJSON = "geojson";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -81,15 +85,18 @@ public class RestServlet extends HttpServlet {
         String str_user = null;
         String str_pass = null;
         String str_date = null;
+        String str_latest_vals = null;
 
         User user = null;
 
         String format = request.getParameter(PARAMETER_FORMAT);
-        if (format == null || !FORMAT_CSV.equals(format)){
-            format = FORMAT_JSON;
+        if (format == null || (!FORMAT_CSV.equals(format) && !FORMAT_JSON.equals(format))){
+            format = FORMAT_GEOJSON;
         }
        
         RequestHandler requestHandler = new RequestHandler(format);
+
+        Caching.enable();
 
         if (Main.getContainerConfig().isAcEnabled()) {     // added
             str_user = request.getParameter(PARAMETER_USERNAME);
@@ -101,15 +108,18 @@ public class RestServlet extends HttpServlet {
 
         switch (determineRequest(request.getRequestURI())) {
             case REQUEST_GET_ALL_SENSORS:
-                restResponse = requestHandler.getAllSensors(user);
+                str_latest_vals = request.getParameter(PARAMETER_LATEST_VALS);
+                restResponse = requestHandler.getAllSensors(user, str_latest_vals);
                 break;
             case REQUEST_GET_MEASUREMENTS_FOR_SENSOR:
                 sensor = parseURI(request.getRequestURI())[3];
                 str_from = request.getParameter(PARAMETER_FROM);
                 str_to = request.getParameter(PARAMETER_TO);
                 str_size = request.getParameter(PARAMETER_SIZE);
-
-                restResponse = requestHandler.getMeasurementsForSensor(user, sensor, str_from, str_to, str_size);
+                String filter=request.getParameter(PARAMETER_FILTER);
+                String fields=request.getParameter(PARAMETER_FIELDS);                
+                
+                restResponse = requestHandler.getMeasurementsForSensor(user, sensor, str_from, str_to, str_size,filter,fields);
                 break;
             case REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD:
                 sensor = parseURI(request.getRequestURI())[3];
@@ -194,7 +204,8 @@ public class RestServlet extends HttpServlet {
 
         return REQUEST_UNKNOWN;
     }
-
+    
+/*
     public String debugRequest(HttpServletRequest request, HttpServletResponse response) {
         StringBuilder sb = new StringBuilder();
         sb.append("REST GET"
@@ -211,5 +222,5 @@ public class RestServlet extends HttpServlet {
                 sb.append(request.getParameterValues(parameterName)[i] + "\n");
         }
         return sb.toString();
-    }
+    }*/
 }

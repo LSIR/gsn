@@ -34,7 +34,6 @@ import gsn.Mappings;
 import gsn.ModelDistributer;
 import gsn.VirtualSensor;
 import gsn.beans.VSensorConfig;
-import gsn.http.WebConstants;
 import gsn.http.ac.DataSource;
 import gsn.http.ac.GeneralServicesAPI;
 import gsn.http.ac.User;
@@ -56,12 +55,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 
 public class RestStreamHanlder extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
 
 	public static final int SUCCESS_200 = 200;
 
@@ -243,9 +245,9 @@ public class RestStreamHanlder extends HttpServlet {
             String[] ahs = authHeader.split(" ");
             if (ahs.length == 2) {
                 String b64UsernamPassword = ahs[1]; // we get: d2VibWFzdGVyOnRyeTJndWVTUw
-                sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
+                //sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
                 try {
-                    String userPass = new String(decoder.decodeBuffer(b64UsernamPassword)); // form: username:passsword
+                    String userPass = new String(Base64.decodeBase64(b64UsernamPassword)); // form: username:passsword
                     String[] ups;
                     if ((ups = userPass.split(":")).length == 2) {
                         return new String[]{
@@ -254,7 +256,7 @@ public class RestStreamHanlder extends HttpServlet {
                         };
                     }
                 }
-                catch (IOException e) {
+                catch (Exception e) {
                     logger.debug(e.getMessage(), e);
                 }
             }

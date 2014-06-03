@@ -31,10 +31,13 @@ package gsn.http.restapi;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
+import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
+import gsn.storage.DataEnumerator;
 import gsn.utils.geo.GridTools;
+import gsn.xpr.XprConditions;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,38 +47,36 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 
 import org.apache.commons.collections.KeyValue;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
+import scala.util.Try;
+
 public class RequestHandler {
     private static transient Logger logger = Logger.getLogger(RequestHandler.class);
 
-    public static enum ErrorType {NO_SUCH_SENSOR, NO_SUCH_USER, NO_SENSOR_ACCESS, UNKNOWN_REQUEST, MALFORMED_DATE_FROM_TO, MALFORMED_DATE_DATE_FIELD, MALFORMED_SIZE, ERROR_IN_REQUEST, OUT_OF_MEMORY_ERROR}
+    public static enum ErrorType {NO_SUCH_SENSOR, NO_SUCH_USER, NO_SENSOR_ACCESS, UNKNOWN_REQUEST, 
+    	MALFORMED_DATE_FROM_TO, MALFORMED_DATE_DATE_FIELD, MALFORMED_SIZE, MALFORMED_FILTER,MALFORMED_FIELD_SELECT, 
+    	ERROR_IN_REQUEST, OUT_OF_MEMORY_ERROR}
 
-    private String format = RestServlet.FORMAT_JSON;
+    private String format = RestServlet.FORMAT_GEOJSON;
     
     
     
     //request handling
-    public RestResponse getAllSensors(User user) {
+    public RestResponse getAllSensors(User user, String latestVals) {
     	/* open
     	RestResponse restResponse = userExists(user);
         if (restResponse != null) {
             return restResponse;
         }
         */
+
+        boolean includeLatestVals = false;
+        if ("true".equalsIgnoreCase(latestVals)) includeLatestVals = true;
 
         RestResponse restResponse = new RestResponse();
 
@@ -96,6 +97,28 @@ public class RequestHandler {
             	continue;
             }
             */
+            if (includeLatestVals){
+                if (Caching.isEnabled()){
+                    if (!Caching.isCacheValid(sensorConfig.getName())){
+                        Map<String, Double> se = getMostRecentValueFor(sensorConfig.getName());
+                        List<Double> latestValsList = new ArrayList<Double>();
+                        if (se != null){
+                            for (DataField df: sensorConfig.getOutputStructure()){
+                                latestValsList.add(se.get(df.getName().toLowerCase()));
+                            }
+                        }
+                        Caching.setLatestValsForSensor(sensorConfig.getName(), latestValsList);
+                    }
+                    sensor.setLatestValues(Caching.getLatestValsForSensor(sensorConfig.getName()));
+                } else {
+                    Map<String, Double> se = getMostRecentValueFor(sensorConfig.getName());
+                    if (se != null){
+                        for (DataField df: sensorConfig.getOutputStructure()){
+                            sensor.addLatestValue(se.get(df.getName().toLowerCase()));
+                        }
+                    }
+                }
+            }
             
             sensor.setMetadata(createHeaderMap(sensorConfig));
             sensor.appendFields(sensorConfig.getOutputStructure());
@@ -108,7 +131,8 @@ public class RequestHandler {
         return restResponse;
     }
     
-    public RestResponse getMeasurementsForSensor(User user, String sensor, String from, String to, String size) {
+    public RestResponse getMeasurementsForSensor(User user, String sensor, 
+    		String from, String to, String size, String filter,String selectedFields) {
         RestResponse restResponse = userHasAccessToVirtualSensor(user, sensor);
         if (restResponse != null) { //error occured
             return restResponse;
@@ -135,7 +159,19 @@ public class RequestHandler {
             restResponse = errorResponse(ErrorType.MALFORMED_DATE_FROM_TO, user, sensor);
             return restResponse;
         }
-        
+                
+        String[] conditionList=null;
+        if (filter!=null){
+        	String[] filters=filter.split(",");
+        	Try<String[]> conditions=XprConditions.serializeConditions(filters);
+        	if (conditions.isFailure()){
+                logger.error(conditions.failed().toString(), conditions.failed().get());
+                return errorResponse(ErrorType.MALFORMED_FILTER, user, sensor);
+        	}
+        	else {
+        		conditionList=conditions.get();	        	  	
+        	}
+        }
         VSensorConfig sensorConfig = Mappings.getConfig(sensor);
         VirtualSensor sensorObj = new VirtualSensor();
         
@@ -146,14 +182,36 @@ public class RequestHandler {
         Vector<Long> timestamps = new Vector<Long>();
         ArrayList<Vector<Double>> elements  = new ArrayList<Vector<Double>>();
         ArrayList<String> fields = new ArrayList<String>();
+        ArrayList<String> allfields = new ArrayList<String>();
 
+        for (DataField df : sensorConfig.getOutputStructure()) {        	
+            allfields.add(df.getName().toLowerCase());
+            if (selectedFields==null){
+            	sensorObj.appendField(df);
+            	fields.add(df.getName().toLowerCase());
+            }            	
+        }
 
-        for (DataField df : sensorConfig.getOutputStructure()) {
-            fields.add(df.getName().toLowerCase());
-            sensorObj.appendField(df);
+        String[] fieldNames=null;
+        if (selectedFields!=null){
+        	fieldNames=selectedFields.toLowerCase().split(",");
+        	for (String f:fieldNames){
+        		if (!allfields.contains(f)){
+        			 logger.error("Invalid field name in selection: "+f);
+                     return errorResponse(ErrorType.MALFORMED_FIELD_SELECT, user, sensor);
+        		}
+                fields.add(f);
+        	}
         }
         
-        boolean errorFlag = !getData(sensor, fields, fromAsLong, toAsLong, window, elements, timestamps);
+        for (DataField df : sensorConfig.getOutputStructure()) {
+        	String fieldName=df.getName().toLowerCase();
+        	if (selectedFields!=null && fields.contains(fieldName)){
+                sensorObj.appendField(df);        		
+        	}
+        }
+        
+        boolean errorFlag = !getData(sensor, fields, fromAsLong, toAsLong, window, elements, timestamps,conditionList);
         
         if (errorFlag){
         	return errorResponse(ErrorType.ERROR_IN_REQUEST, user, sensor);
@@ -168,7 +226,7 @@ public class RequestHandler {
 
         return restResponse;
     }
-
+    
     public RestResponse getMeasurementsForSensorField(User user, String sensor, String field, String from, String to, String size) {
         RestResponse restResponse = userHasAccessToVirtualSensor(user, sensor);
         if (restResponse != null) { //error occured
@@ -386,6 +444,14 @@ public class RequestHandler {
             	errorMessage = stringConstantsProperties.getProperty("ERROR_MALFORMED_SIZE_MSG");
                 filename = stringConstantsProperties.getProperty("ERROR_MALFORMED_SIZE_FILENAME");
                 break;
+            case MALFORMED_FILTER:
+            	errorMessage = stringConstantsProperties.getProperty("ERROR_MALFORMED_FILTER_MSG");
+                filename = stringConstantsProperties.getProperty("ERROR_MALFORMED_FILTER_FILENAME");
+                break;
+            case MALFORMED_FIELD_SELECT:
+            	errorMessage = stringConstantsProperties.getProperty("ERROR_MALFORMED_FIELD_SELECT_MSG");
+                filename = stringConstantsProperties.getProperty("ERROR_MALFORMED_FILTER_FILENAME");
+                break;
             case ERROR_IN_REQUEST:
                 errorMessage = stringConstantsProperties.getProperty("ERROR_ERROR_IN_REQUEST_MSG");
                 filename = stringConstantsProperties.getProperty("ERROR_ERROR_IN_REQUEST_FILENAME");
@@ -398,7 +464,7 @@ public class RequestHandler {
 
     	
     	if (RestServlet.FORMAT_CSV.equals(format)) return errorResponseCSV(filename, errorMessage);
-        else if (RestServlet.FORMAT_JSON.equals(format)) return errorResponseJSON(errorMessage);
+        else if (RestServlet.FORMAT_JSON.equals(format) || RestServlet.FORMAT_GEOJSON.equals(format)) return errorResponseJSON(errorMessage);
         else return null;
     }
     
@@ -502,13 +568,19 @@ public class RequestHandler {
     		restResponse.setType(RestResponse.CSV_CONTENT_TYPE);
             restResponse.addHeader(RestResponse.RESPONSE_HEADER_CONTENT_DISPOSITION_NAME, String.format(RestResponse.RESPONSE_HEADER_CONTENT_DISPOSITION_VALUE, filename + ".csv"));
     	}
-        else if (RestServlet.FORMAT_JSON.equals(format)) {
+        else if (RestServlet.FORMAT_JSON.equals(format) || RestServlet.FORMAT_GEOJSON.equals(format)) {
         	restResponse.setType(RestResponse.JSON_CONTENT_TYPE);
         }
     	restResponse.setHttpStatus(RestResponse.HTTP_STATUS_OK);
     }
-    
-    private boolean getData(String sensor, List<String> fields, long from, long to, int size, List<Vector<Double>> elements, Vector<Long> timestamps){
+
+    private boolean getData(String sensor, List<String> fields, long from, long to, int size, 
+            List<Vector<Double>> elements, Vector<Long> timestamps){
+    	return getData(sensor,fields,from,to,size,elements,timestamps,new String[]{});
+    }
+
+    private boolean getData(String sensor, List<String> fields, long from, long to, int size, 
+        List<Vector<Double>> elements, Vector<Long> timestamps, String[] conditions){
     	Connection connection = null;
         ResultSet resultSet = null;
 
@@ -527,6 +599,11 @@ public class RequestHandler {
             	.append(from)
             	.append(" and timed <=")
             	.append(to);
+            if (conditions!=null){
+            	for (String cond:conditions){
+            		query.append(" and "+cond);
+            	}
+            }
             
             if (size > 0) {
             	query.append(" order by timed desc")
@@ -564,6 +641,25 @@ public class RequestHandler {
         }
 
         return result;
+    }
+
+    public static Map<String, Double> getMostRecentValueFor(String virtual_sensor_name) {
+        StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(")");
+        Map<String, Double> toReturn=new HashMap<String, Double>() ;
+        try {
+            DataEnumerator result = Main.getStorage(virtual_sensor_name).executeQuery( query , true );
+            if ( result.hasMoreElements( ) ){
+                StreamElement se = result.nextElement();
+                for (String fn: se.getFieldNames()){
+                    toReturn.put(fn.toLowerCase(), (Double)se.getData(fn));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("ERROR IN EXECUTING, query: "+query);
+            logger.error(e.getMessage(),e);
+            return null;
+        }
+        return toReturn;
     }
 
     private boolean getDataPreview(String sensor, String field, long from, long to, List<Vector<Double>> elements, Vector<Long> timestamps, long size) {
@@ -619,7 +715,7 @@ public class RequestHandler {
         Connection conn = null;
         ResultSet resultSet = null;
 
-        boolean result = true;
+        //boolean result = true;
         long timestamp = -1;
 
         try {
@@ -635,7 +731,7 @@ public class RequestHandler {
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
-            result = false;
+            //result = false;
         } finally {
             Main.getStorage(sensor).close(resultSet);
             Main.getStorage(sensor).close(conn);
@@ -663,7 +759,7 @@ public class RequestHandler {
         Connection conn = null;
         ResultSet resultSet = null;
 
-        boolean result = true;
+        //boolean result = true;
         long timestamp = -1;
 
         try {
@@ -679,7 +775,7 @@ public class RequestHandler {
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
-            result = false;
+            //result = false;
         } finally {
             Main.getStorage(sensor).close(resultSet);
             Main.getStorage(sensor).close(conn);
@@ -719,8 +815,8 @@ public class RequestHandler {
     private static final String STRING_CONSTANTS_PROPERTIES_FILENAME = "conf/RestApiConstants.properties";
     private static Properties stringConstantsProperties = new Properties();
     private FileInputStream stringConstantsPropertiesFileInputStream= null;
- 
-    public static Properties getStringConstantsPropertiesFile(){
-    	return stringConstantsProperties;
+
+    public static String getConst(String key){
+        return stringConstantsProperties.getProperty(key);
     }
 }
