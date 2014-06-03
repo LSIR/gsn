@@ -68,8 +68,8 @@ public class Protector
         {
             valueToEnc = salt + eValue;
             byte[] encValue = c.doFinal(valueToEnc.getBytes());
-            //eValue = new BASE64Encoder().encode(encValue);
-            eValue = Base64.encodeBase64String(encValue);
+            eValue = new sun.misc.BASE64Encoder().encode(encValue);
+            //eValue = Base64.encodeBase64String(encValue);
         }
         return eValue;
     }
@@ -85,8 +85,8 @@ public class Protector
         String valueToDecrypt = value;
         for (int i = 0; i < ITERATIONS; i++)
         {
-            //byte[] decordedValue = new BASE64Decoder().decodeBuffer(valueToDecrypt);
-        	byte[] decordedValue = Base64.decodeBase64(valueToDecrypt);
+            byte[] decordedValue = new sun.misc.BASE64Decoder().decodeBuffer(valueToDecrypt);
+        	//byte[] decordedValue = Base64.decodeBase64(valueToDecrypt);
             byte[] decValue = c.doFinal(decordedValue);
             dValue = new String(decValue).substring(salt.length());
             valueToDecrypt = dValue;
