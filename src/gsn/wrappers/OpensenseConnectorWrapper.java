@@ -78,6 +78,11 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	}
 	
 	@Override
+	public boolean isTimeStampUnique() {
+		return false;
+	}
+	
+	@Override
 	public boolean sendToWrapper(String action, String[] paramNames,
 			Object[] paramValues) throws OperationNotSupportedException
 		{
@@ -125,6 +130,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 					   int ctr = 0;
 					   int err = 0;
 					   int pub = 0;
+					   int last = 0;
 
 						@Override
 						public void run() {
@@ -218,6 +224,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									}
 									pub ++;
 									sd.publish();
+									last = next;
 									break;
 								case 35:
 									byte[] b = new byte[3];
@@ -254,12 +261,12 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								}
 							}catch(IOException e){
 								err ++;
-								logger.warn("packet reading error",e);
+								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"]",e);
 							}
 						}
 					   
 					   });
-
+               t.setName("Opensense-connector");
 			   t.start();
 			   } catch(SocketTimeoutException ste){
 				   continue;
