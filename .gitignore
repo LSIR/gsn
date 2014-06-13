@@ -10,5 +10,6 @@ dist/
 bin/
 output/
 project/boot/
-
+virtual-sensors/*.xml
+*.db
 

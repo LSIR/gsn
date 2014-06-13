@@ -1,12 +1,15 @@
+import com.typesafe.sbt.SbtNativePackager._
+import NativePackagerKeys._
+
 packageArchetype.java_application
 
 name := "gsn"
 
 organization := "ch.epfl.lsir"
 
-version := "1.1.3"
+version := "1.1.5"
 
-scalaVersion := "2.10.1"
+scalaVersion := "2.10.4"
 
 crossPaths := false
 
@@ -31,10 +34,11 @@ libraryDependencies ++= Seq(
   "org.antlr" % "stringtemplate" % "3.0",
   "org.apache.mina" % "mina-core" % "1.1.7",
   "rome" % "rome" % "1.0",
+  "org.glassfish.jersey.containers" % "jersey-container-servlet-core" % "2.8",
+  "org.glassfish.jersey.core" % "jersey-client" % "2.8",
   "junit" % "junit" % "4.11",
   "org.easymock" % "easymockclassextension" % "3.2",
   "org.httpunit" % "httpunit" % "1.7.2" intransitive
-//  "org.jibx" % "jibx-bind" % "1.2.2",
 )
 
 resolvers ++= Seq(

@@ -47,6 +47,10 @@ public final class AddressBean implements Serializable{
 
 	private double random = Math.random();
 
+	public AddressBean () {
+		this.predicates=EMPTY_PREDICATES;
+	}
+
 	public AddressBean ( final String wrapper , KeyValue... newPredicates ) {
 		this.wrapper = wrapper;
 		if (newPredicates==null)

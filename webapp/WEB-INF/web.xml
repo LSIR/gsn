@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
-
-<web-app>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+     version="2.5">     
+<!-- <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>-->
     <display-name>GSN Server</display-name>
 <!-- 
      *******************************************************************************     
@@ -66,11 +69,10 @@
     </servlet>
 
     <servlet>
-            <servlet-name>DynamicGeoData</servlet-name>
-            <display-name>Dynamic Sensor Data with Geo Location</display-name>
-            <servlet-class>gsn.http.DynamicGeoDataServlet</servlet-class>
+    	<servlet-name>DynamicGeoData</servlet-name>
+        <display-name>Dynamic Sensor Data with Geo Location</display-name>
+        <servlet-class>gsn.http.DynamicGeoDataServlet</servlet-class>
     </servlet>
-
 
     <servlet>
         <servlet-name>MenuServlet</servlet-name>
@@ -299,33 +301,33 @@
     </servlet-mapping>
 
      <servlet-mapping>
-            <servlet-name>MyCreateGroupServlet</servlet-name>
-            <url-pattern>/gsn/MyCreateGroupServlet</url-pattern>
+     	<servlet-name>MyCreateGroupServlet</servlet-name>
+        <url-pattern>/gsn/MyCreateGroupServlet</url-pattern>
      </servlet-mapping>
 
      <servlet-mapping>
-            <servlet-name>MyUserDetailUpdateServlet</servlet-name>
-            <url-pattern>/gsn/MyUserDetailUpdateServlet</url-pattern>
+        <servlet-name>MyUserDetailUpdateServlet</servlet-name>
+        <url-pattern>/gsn/MyUserDetailUpdateServlet</url-pattern>
      </servlet-mapping>
 
      <servlet-mapping>
-            <servlet-name>MyLoginHandlerServlet</servlet-name>
-            <url-pattern>/gsn/MyLoginHandlerServlet</url-pattern>
+        <servlet-name>MyLoginHandlerServlet</servlet-name>
+        <url-pattern>/gsn/MyLoginHandlerServlet</url-pattern>
      </servlet-mapping>
 
      <servlet-mapping>
-            <servlet-name>MyLogoutHandlerServlet</servlet-name>
-            <url-pattern>/gsn/MyLogoutHandlerServlet</url-pattern>
+        <servlet-name>MyLogoutHandlerServlet</servlet-name>
+        <url-pattern>/gsn/MyLogoutHandlerServlet</url-pattern>
      </servlet-mapping>
 
      <servlet-mapping>
-            <servlet-name>MyDisplayACTablesContentServlet</servlet-name>
-            <url-pattern>/gsn/MyDisplayACTablesContentServlet</url-pattern>
+        <servlet-name>MyDisplayACTablesContentServlet</servlet-name>
+        <url-pattern>/gsn/MyDisplayACTablesContentServlet</url-pattern>
      </servlet-mapping>
 
-      <servlet-mapping>
-            <servlet-name>MyUserCandidateRegistrationServlet</servlet-name>
-            <url-pattern>/gsn/MyUserCandidateRegistrationServlet</url-pattern>
+	 <servlet-mapping>
+      	<servlet-name>MyUserCandidateRegistrationServlet</servlet-name>
+        <url-pattern>/gsn/MyUserCandidateRegistrationServlet</url-pattern>
      </servlet-mapping>
 
       <servlet-mapping>
@@ -462,8 +464,8 @@
     sensormap.org IP: 131.107.151.211
      -->
     <filter>
-        <display-name>Microsoft SensorMap Webservice IP Source Filter</display-name>
         <filter-name>MSRIPSourceFilter</filter-name>
+        <display-name>Microsoft SensorMap Webservice IP Source Filter</display-name>
         <filter-class>gsn.http.IPSourceFilter</filter-class>
         <init-param>
             <param-name>allowedIps</param-name>
@@ -488,8 +490,8 @@
 
 
      <filter>
-        <display-name>MyControllerFilter</display-name>
-        <filter-name>MyControllerFilter</filter-name>
+        <filter-name>AcControllerFilter</filter-name>
+        <display-name>AcControllerFilter</display-name>
         <filter-class>gsn.http.ac.MyControllerFilter</filter-class>
          <init-param>
             <param-name>logIPs</param-name>
@@ -498,7 +500,7 @@
     </filter>
 
    <filter-mapping>
-     <filter-name>MyControllerFilter</filter-name>
+       <filter-name>AcControllerFilter</filter-name>
        <url-pattern>/gsn</url-pattern>
        <url-pattern>/field</url-pattern>
        <url-pattern>/data</url-pattern>

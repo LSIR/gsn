@@ -33,11 +33,7 @@ package gsn.http.ac;
  * Time: 4:39:13 PM
  * To change this template use File | Settings | File Templates.
  */
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Properties;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -45,23 +41,22 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.log4j.Logger;
 import org.apache.commons.codec.binary.*;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 
-/* This class helps to encrypt user posswords using AES encryption algo, we use a salt for a more robust encryption, salt is stored in a property file "acuserpassword.properties"*/
+/* This class helps to encrypt user passwords using AES encryption algo, we use a salt for a more robust encryption, salt is stored in a property file "acuserpassword.properties"*/
 public class Protector
 {
-    private static transient Logger logger                             = Logger.getLogger( Protector.class );
+    private static transient Logger logger = Logger.getLogger( Protector.class );
 
     private static final String ALGORITHM = "AES";
     private static final int ITERATIONS = 2;
-
+    private static final String DEFAULT_SALT ="this is a simple clear salt";
 
     private static final byte[] keyValue =new byte[] { 'T', 'h', 'i', 's', 'I', 's', 'A', 'S', 'e', 'c', 'r', 'e', 't', 'K', 'e', 'y'};
-
+    
     public static String encrypt(String value) throws Exception
     {
+    	logger.debug("Encrypt key");
         Key key = generateKey();
         String salt=getSalt();
         Cipher c = Cipher.getInstance(ALGORITHM);
@@ -73,8 +68,8 @@ public class Protector
         {
             valueToEnc = salt + eValue;
             byte[] encValue = c.doFinal(valueToEnc.getBytes());
-            eValue = new BASE64Encoder().encode(encValue);
-            //eValue = Base64.encodeBase64(encValue);
+            eValue = new sun.misc.BASE64Encoder().encode(encValue);
+            //eValue = Base64.encodeBase64String(encValue);
         }
         return eValue;
     }
@@ -90,23 +85,24 @@ public class Protector
         String valueToDecrypt = value;
         for (int i = 0; i < ITERATIONS; i++)
         {
-            byte[] decordedValue = new BASE64Decoder().decodeBuffer(valueToDecrypt);
+            byte[] decordedValue = new sun.misc.BASE64Decoder().decodeBuffer(valueToDecrypt);
+        	//byte[] decordedValue = Base64.decodeBase64(valueToDecrypt);
             byte[] decValue = c.doFinal(decordedValue);
             dValue = new String(decValue).substring(salt.length());
             valueToDecrypt = dValue;
         }
         return dValue;
     }
-    private static Key generateKey() throws Exception
-    {
+    private static Key generateKey() throws Exception{
         Key key = new SecretKeySpec(keyValue, ALGORITHM);
         return key;
     }
-    private static String getSalt()
-    {
-        
-        return System.getProperty("salt");
-       
+    private static String getSalt(){
+    	String s = System.getProperty("salt");
+    	if (s==null)
+    		return DEFAULT_SALT;
+    	else 
+    		return s;
     }
 }
 

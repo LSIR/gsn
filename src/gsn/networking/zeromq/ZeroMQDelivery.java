@@ -27,7 +27,7 @@ public class ZeroMQDelivery implements DeliverySystem{
 	
 	public ZeroMQDelivery(VSensorConfig config){
         this.config = config;
-        
+        System.out.println("connecting");
 		context = Main.getZmqContext();
 		// Socket to talk to clients
 		publisher = context.socket(ZMQ.PUB);
@@ -35,14 +35,14 @@ public class ZeroMQDelivery implements DeliverySystem{
 		publisher.setSndHWM(0);
 		publisher.bind("inproc://stream/"+config.getName());
 		//System.out.println("Delivery bind on inproc://stream/"+config.getName());
-		Main.getZmqProxy().connectTo(config.getName());
+		//Main.getZmqProxy().connectTo(config.getName());
 		closed = false;
 		
 	}
 
 	@Override
 	public void writeStructure(DataField[] fields) throws IOException {
-        Main.getZmqProxy().registerStructure(config.getName(),fields);
+       // Main.getZmqProxy().registerStructure(config.getName(),fields);
 	}
 
 	@Override

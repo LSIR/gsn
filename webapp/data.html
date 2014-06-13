@@ -290,7 +290,7 @@
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
-                $.get("gsn?REQUEST=0", function(xml){
+                $.get("gsn?REQUEST=0&omit_latest_values=true", function(xml){
                     lovs = xml
                     $('virtual-sensor',xml).each(function(){
                         var vsname = $(this).attr('name');

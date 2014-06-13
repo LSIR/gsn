@@ -36,7 +36,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 public class SensorMapIntegration implements VSensorStateChangeListener{
-	private static transient Logger                                logger                              = Logger.getLogger ( SensorMapIntegration.class );
+	private static transient Logger logger = Logger.getLogger ( SensorMapIntegration.class );
 	
 	public boolean vsLoading(VSensorConfig config) {
 		if (config.getPublishToSensorMap())
@@ -94,8 +94,6 @@ public class SensorMapIntegration implements VSensorStateChangeListener{
 		try {
 			LoginToMSRSense.delete_sensor(userName, password, config);
 		} catch (RemoteException e) {
-			logger.error(e.getMessage(),e);
-		} catch (IOException e) {
 			logger.error(e.getMessage(),e);
 		}
 	}

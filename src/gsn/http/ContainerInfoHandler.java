@@ -74,16 +74,22 @@ public class ContainerInfoHandler implements RequestHandler {
         response.setDateHeader("Expires", 0);
         response.setHeader("Pragma","no-cache");
 
+      String omitLatestValuesPar = request.getParameter ( "omit_latest_values" );
+      boolean omitLatestValues = false;
+      if (omitLatestValuesPar != null && "true".equals(omitLatestValuesPar)){
+          omitLatestValues = true;
+      }
+
   //System.out.println( "The handle was called" );
  // if (reqName != null) System.out.println("requst " + reqName);
  // if (user != null) System.out.println("User " + user.getUserName());
-        response.getWriter( ).write( buildOutput(reqName,user));
+        response.getWriter( ).write( buildOutput(reqName,user, omitLatestValues));
   }
-  
+
   
   //return only the requested sensor if specified (otherwise use null)
   //Added by Behnaz. New parameter User user to method buildOutput.
-  public String buildOutput (String reqName, User user) {
+  public String buildOutput (String reqName, User user, boolean omitLatestValues) {
 	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
 	  
 	  
@@ -109,7 +115,7 @@ public class ContainerInfoHandler implements RequestHandler {
               if ( (reqName != null && !sensorConfig.getName().equals(reqName) )|| ( user.hasReadAccessRight(sensorConfig.getName())== false && user.isAdmin()==false) ) {//continue;
                                    access = false;
                   //System.out.println("Source = "+sensorConfig.getName()+" has access = "+ access);
-          }
+              }
           }
           else {
               //System.out.println("Datasource - "+DataSource.isVSManaged(sensorConfig.getName()));
@@ -118,7 +124,7 @@ public class ContainerInfoHandler implements RequestHandler {
                   access = false;
                   // continue;
               }
-      }
+          }
       }
       else
       {
@@ -126,50 +132,47 @@ public class ContainerInfoHandler implements RequestHandler {
       }
 
       if (access == true) {
-      sb.append("<virtual-sensor");
-      sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
+          sb.append("<virtual-sensor");
+          sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
           sb.append(" protected=\"").append(" \"" );
-      sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
-      if (sensorConfig.getDescription() != null) {
-        sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
-      }
-      sb.append( ">\n" );
-      ArrayList<StreamElement> ses = getMostRecentValueFor(sensorConfig.getName());
-      int counter = 1;
-      if (ses!=null ) {
-        for (StreamElement se:ses){
+          sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
+          if (sensorConfig.getDescription() != null) {
+              sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
+          }
+          sb.append( ">\n" );
+          ArrayList<StreamElement> ses = null;
+          if (omitLatestValues == false) ses = getMostRecentValueFor(sensorConfig.getName());
+          int counter = 1;
+          if (ses!=null ) {
+              for (StreamElement se:ses){
                   SimpleDateFormat fsdf = sensorConfig.getSDF() != null ? sensorConfig.getSDF() : sdf ;
                   sb.append("\t<field name=\"time\" type=\"string\" description=\"The timestamp associated with the stream element\" unit=\"\">" ).append( se == null ? "" : fsdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
-          for ( DataField df : sensorConfig.getOutputStructure( ) ) {
-            sb.append("\t<field");
-            sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
-            sb.append(" type=\"").append(df.getType()).append("\"");
-            if (df.getDescription() != null && df.getDescription().trim().length() != 0)
-              sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
+                  for ( DataField df : sensorConfig.getOutputStructure( ) ) {
+                      sb.append("\t<field");
+                      sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
+                      sb.append(" type=\"").append(df.getType()).append("\"");
+                      if (df.getDescription() != null && df.getDescription().trim().length() != 0)
+                          sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
 
                       if (df.getUnit() != null && df.getUnit().trim().length() != 0)
                           sb.append(" unit=\"").append(df.getUnit()).append("\"");
                       else
                           sb.append(" unit=\"").append("").append("\"");
-            sb.append(">");
-            if (se!= null ) 
-              if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
-                sb.append( se.getData( df.getName( ) ) );
-              else
-                sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
-            sb.append("</field>\n");
-          }
-          for ( KeyValue df : sensorConfig.getAddressing( )){
-            sb.append("\t<field");
-            sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
-            sb.append(" category=\"predicate\">");
-            sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
-            sb.append("</field>\n" );
-
-          }
-          counter++;
-        }
-      }
+                      sb.append(">");
+                      if (se!= null )
+                          if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
+                              sb.append( se.getData( df.getName( ) ) );
+                          else
+                              sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
+                      sb.append("</field>\n");
+                  }
+                  for ( KeyValue df : sensorConfig.getAddressing( )){
+                      sb.append("\t<field");
+                      sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
+                      sb.append(" category=\"predicate\">");
+                      sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
+                      sb.append("</field>\n" );
+                  }
                   if (sensorConfig.getWebinput( )!=null){
                       for ( WebInput wi : sensorConfig.getWebinput( ) ) {
                           for ( DataField df : wi.getParameters ( ) ) {
@@ -189,7 +192,52 @@ public class ContainerInfoHandler implements RequestHandler {
                           }
                       }
                   }
+                  counter++;
+              }
+          } else {
+              SimpleDateFormat fsdf = sensorConfig.getSDF() != null ? sensorConfig.getSDF() : sdf ;
+              sb.append("\t<field name=\"time\" type=\"string\" description=\"The timestamp associated with the stream element\" unit=\"\">" ).append(  ""  ).append( "</field>\n" );
+              for ( DataField df : sensorConfig.getOutputStructure( ) ) {
+                  sb.append("\t<field");
+                  sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
+                  sb.append(" type=\"").append(df.getType()).append("\"");
+                  if (df.getDescription() != null && df.getDescription().trim().length() != 0)
+                      sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
 
+                  if (df.getUnit() != null && df.getUnit().trim().length() != 0)
+                      sb.append(" unit=\"").append(df.getUnit()).append("\"");
+                  else
+                      sb.append(" unit=\"").append("").append("\"");
+                  sb.append(">");
+                  sb.append("</field>\n");
+              }
+              for ( KeyValue df : sensorConfig.getAddressing( )){
+                  sb.append("\t<field");
+                  sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
+                  sb.append(" category=\"predicate\">");
+                  sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
+                  sb.append("</field>\n" );
+              }
+              if (sensorConfig.getWebinput( )!=null){
+                  for ( WebInput wi : sensorConfig.getWebinput( ) ) {
+                      for ( DataField df : wi.getParameters ( ) ) {
+                          sb.append( "\t<field");
+                          sb.append(" command=\"").append( wi.getName( ) ).append( "\"" );
+                          sb.append(" name=\"" ).append( df.getName( ).toLowerCase()).append( "\"" );
+                          sb.append(" category=\"input\"");
+                          sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
+                          if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
+                              sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
+
+                          if ( df.getUnit( ) != null && df.getUnit( ).trim( ).length( ) != 0 )
+                              sb.append( " unit=\"" ).append( df.getUnit( ) ).append( "\"" );
+                          else
+                              sb.append( " unit=\"" ).append("").append( "\"" );
+                          sb.append( "></field>\n" );
+                      }
+                  }
+              }
+          }
       } else {
           sb.append("<virtual-sensor");
           sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );  // (protected)
@@ -199,6 +247,9 @@ public class ContainerInfoHandler implements RequestHandler {
           fields.append("Fields:@ ");
           for ( DataField df : sensorConfig.getOutputStructure( ) ) {
                fields.append("name = ").append(df.getName().toLowerCase()).append(", ");
+               String unit = df.getUnit();
+               if (unit == null) unit = "";
+               fields.append("unit = ").append(unit.toLowerCase()).append(", ");
                fields.append("type = ").append(df.getType()).append(" | ");
           }
 

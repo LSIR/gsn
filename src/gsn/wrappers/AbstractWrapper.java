@@ -281,7 +281,7 @@ public abstract class AbstractWrapper extends Thread {
 		Connection conn = null;
 		try {
             if (isOutOfOrder(se)) {
-				logger.debug("Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
+				logger.warn("Out of order data item detected, it is not propagated into the system : ["+lastInOrderTimestamp+"][" + se.toString() + "]");
 				return false;
 			}
 			conn = Main.getWindowStorage().getConnection();
@@ -312,7 +312,10 @@ public abstract class AbstractWrapper extends Thread {
 					lastInOrderTimestamp = Long.MIN_VALUE; // Table is empty
 				}
 			}
-            return (se.getTimeStamp() <= lastInOrderTimestamp);
+            if (isTimeStampUnique())
+                return (se.getTimeStamp() <= lastInOrderTimestamp);
+            else
+            	return (se.getTimeStamp() < lastInOrderTimestamp);
 		} finally {
 			Main.getWindowStorage().close(conn);
 		}
@@ -444,11 +447,11 @@ public abstract class AbstractWrapper extends Thread {
 	}
 
 	/**
-	 * Returns true if the wrapper can produce multiple different data items
-	 * [stream elements] with the same timestamp. If this is true, then all the
+	 * Returns false if the wrapper can produce multiple different data items
+	 * [stream elements] with the same timestamp. If this is false, then all the
 	 * stream elements with the same timestamp will be accepted. If this method
-	 * returns false (default value), duplicates override each other and the
-	 * latest received duplicate is the one which is going to be persisted.
+	 * returns true (default value), duplicates are discarded and only the first
+	 *  one is kept.
 	 */
 	public boolean isTimeStampUnique() {
 		return true;
