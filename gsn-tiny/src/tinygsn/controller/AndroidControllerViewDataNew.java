@@ -17,9 +17,9 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn\controller\AndroidControllerViewDataNew.java
+* File: gsn-tiny/src/tinygsn/controller/AndroidControllerViewDataNew.java
 *
-* @author Đỗ Ngọc Hoan
+* @author Do Ngoc Hoan
 */
 
 

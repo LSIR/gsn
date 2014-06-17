@@ -19,7 +19,7 @@
 *
 * File: gsn-tiny/src/gsn/http/rest/Field4RestConverter.java
 *
-* @author Đỗ Ngọc Hoan
+* @author Do Ngoc Hoan
 */
 
 

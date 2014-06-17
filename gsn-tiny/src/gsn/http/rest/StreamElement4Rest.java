@@ -19,7 +19,7 @@
 *
 * File: gsn-tiny/src/gsn/http/rest/StreamElement4Rest.java
 *
-* @author Đỗ Ngọc Hoan
+* @author Do Ngoc Hoan
 */
 
 

@@ -17,9 +17,9 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn\model\wrappers\AndroidGyroscopeWrapper.java
+* File: gsn-tiny/src/tinygsn/model/wrappers/AndroidGyroscopeWrapper.java
 *
-* @author Đỗ Ngọc Hoan
+* @author Do Ngoc Hoan
 */
 
 

@@ -19,7 +19,7 @@
 *
 * File: gsn-tiny/src/gsn/http/rest/PushDelivery.java
 *
-* @author Đỗ Ngọc Hoan
+* @author Do Ngoc Hoan
 */
 
 

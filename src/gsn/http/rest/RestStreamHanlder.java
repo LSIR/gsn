@@ -70,6 +70,7 @@ public class RestStreamHanlder extends HttpServlet {
 	private static final int _300 = 300;
 
 	private static final String STREAMING = "/streaming/";
+	private static final String PARAMETER_REG_ID = "regId";
 
 	private static transient Logger       logger     = Logger.getLogger ( RestStreamHanlder.class );
 
@@ -184,6 +185,10 @@ public class RestStreamHanlder extends HttpServlet {
 			DeliverySystem delivery;
 			if (parser.pushType.equals("wp"))
 				delivery = new WPPushDelivery(localContactPoint,notificationId,response.getWriter(),parser.nClass,parser.nMessage);
+            else if (parser.pushType.equals("ad")){
+				String regId = request.getParameter(PARAMETER_REG_ID);
+				delivery = new AndroidPushDelivery(localContactPoint, notificationId,response.getWriter(), parser.nClass, regId);
+			}
 			else
 				delivery = new PushDelivery(localContactPoint,notificationId,response.getWriter());
 
@@ -282,6 +287,9 @@ public class RestStreamHanlder extends HttpServlet {
 				pushType = "wp";
 				nClass = Integer.parseInt(first.substring(2,3));
 				nMessage = URLDecoder.decode(first.substring(3),"UTF-8");
+				query = tokens.nextToken();
+			}else if (first.startsWith("ad")) { // registering from a Android Phone
+				pushType = "ad";
 				query = tokens.nextToken();
 			}else{
 				query = first;

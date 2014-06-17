@@ -17,9 +17,9 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn\storage\StorageManagerFactory.java
+* File: gsn-tiny/src/tinygsn/storage/StorageManagerFactory.java
 *
-* @author Đỗ Ngọc Hoan
+* @author Do Ngoc Hoan
 */
 
 
