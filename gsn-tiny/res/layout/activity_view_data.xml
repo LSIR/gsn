@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android1="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/background"
+    android:textColor="#000000"
+     >
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dip"
+        android:gravity="center" >
+
+        <TextView
+            android1:id="@+id/textView3"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:text="@string/vs"
+            android1:textAppearance="?android:attr/textAppearanceSmall"
+            android1:textColor="#000000" />
+
+        <Spinner
+            android1:id="@+id/spinner_vs"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:prompt="@string/selectVS"
+            android1:textColor="#000000" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRowField"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dip"
+        android:gravity="center" >
+
+        <TextView
+            android1:id="@+id/textViewField"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:text="@string/selectField"
+            android1:textAppearance="?android:attr/textAppearanceSmall"
+            android1:textColor="#000000" />
+
+        <Spinner
+            android1:id="@+id/spinner_field"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:prompt="@string/selectVS"
+            android1:textColor="#000000" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRowViewMode"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dip"
+        android:gravity="center" >
+
+        <TextView
+            android1:id="@+id/textViewMode"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:text="@string/view_mode"
+            android1:textAppearance="?android:attr/textAppearanceSmall"
+            android1:textColor="#000000"
+             />
+
+        <Spinner
+            android1:id="@+id/spinner_view_mode"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:prompt="@string/selectVS"
+            android1:textColor="#000000" />
+    </TableRow>
+
+    <!-- just draw a red line -->
+
+    <!-- <View
+        android:layout_height="2dip"
+        android:background="#61a7db" /> -->
+
+    <TableRow
+        android:id="@+id/tableRow_"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dip"
+        android:gravity="center" >
+
+        <TableLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:android1="http://schemas.android.com/apk/res/android"
+            android:id="@+id/table_view_mode"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_span="2"
+            android:background="@color/background"
+            android:gravity="center"
+            android:textColor="#000000" >
+        </TableLayout>
+    </TableRow>
+
+    <!--
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dip" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/latest_values"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#ffffff" />
+
+        <EditText
+            android:id="@+id/numLatestTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number"
+            android:text="10"
+            android:textColor="#ffffff" >
+
+            <requestFocus />
+        </EditText>
+    </TableRow>
+    -->
+
+
+    <!--
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dip" >
+
+        <Button
+            android1:id="@+id/btnLoad"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:text="@string/load"
+            android1:textColor="#000000" />
+    </TableRow>
+    -->
+
+    <TableRow
+        android:id="@+id/tableRow4"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dip"
+        android:gravity="center" >
+
+        <!--
+             <FrameLayout
+            android:id="@+id/embedded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:padding="6dp"
+            android:layout_span="2"
+            android:background="#ff303030"
+            android:gravity="top|center_horizontal" />
+        -->
+
+        <ScrollView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" 
+            android:layout_span="2">
+
+            <TextView
+                android1:id="@+id/txbViewData"
+                android1:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background"
+                android1:textColor="#000000"
+                />
+        </ScrollView>
+    </TableRow>
+
+    <!--
+    <TableRow
+        android:id="@+id/tableRow5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dip" >
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="customizeStartEnd"
+            android:text="@string/customize"
+            android:textColor="#ffffff" />
+
+        <Button
+            android1:id="@+id/Button01"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:onClick="viewChart"
+            android1:text="@string/view_chart"
+            android1:textColor="#000000" />
+    </TableRow>
+    -->
+
+<!--     <TextView
+        android1:id="@+id/textView1"
+        android1:layout_width="wrap_content"
+        android1:layout_height="wrap_content"
+        android1:text="Small Text"
+        android1:textAppearance="?android:attr/textAppearanceSmall" /> -->
+
+</TableLayout><!--
+ <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    
+
+</ScrollView>
+-->

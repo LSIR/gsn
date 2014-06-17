@@ -1,0 +1,206 @@
+package tinygsn.controller;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import tinygsn.beans.StreamElement;
+import tinygsn.gui.android.ActivitySubscribe;
+import tinygsn.gui.android.gcm.CommonUtilities;
+import tinygsn.storage.StorageManager;
+import tinygsn.storage.db.SqliteStorageManager;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+
+public class AndroidControllerSubscribe extends AbstractController {
+	private static final String TAG = "AndroidControllerPullData";
+
+	private ActivitySubscribe view = null;
+	private Handler handlerVS = null;
+	private Handler handlerData = null;
+
+	private SqliteStorageManager storage = null;
+	
+	public AndroidControllerSubscribe(ActivitySubscribe androidViewer) {
+		this.view = androidViewer;
+		storage = new SqliteStorageManager(view);
+	}
+
+	public void loadListVS(String server) {
+		new GetVSList().execute(server);
+	}
+
+	private class GetVSList extends AsyncTask<String, Void, String> {
+
+		@Override
+		protected String doInBackground(String... params) {
+			String server = params[0];
+
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpContext localContext = new BasicHttpContext();
+			HttpGet httpGet = new HttpGet(server + "/gsn");
+			Log.e(TAG, server + "/gsn");
+
+			String text = "";
+			try {
+				HttpResponse response = httpClient.execute(httpGet, localContext);
+				HttpEntity entity = response.getEntity();
+				text = getASCIIContentFromEntity(entity);
+			}
+			catch (Exception e) {
+				Log.e(TAG, e.toString());
+			}
+
+			// Log.v(TAG, text);
+			return text;
+		}
+
+		protected void onPostExecute(String results) {
+			try {
+				Document doc = stringToDocument(results);
+				ArrayList<String> vsNameList = new ArrayList<String>();
+				doc.getDocumentElement().normalize();
+				NodeList nList = doc.getElementsByTagName("virtual-sensor");
+				for (int i = 0; i < nList.getLength(); i++) {
+					Node nNode = nList.item(i);
+					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement = (Element) nNode;
+						vsNameList.add(eElement.getAttribute("name"));
+					}
+				}
+
+				Message msg = new Message();
+				msg.obj = vsNameList;
+				handlerVS.sendMessage(msg);
+			}
+			catch (SAXException e) {
+				e.printStackTrace();
+			}
+			catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public static String getASCIIContentFromEntity(HttpEntity entity)
+			throws IllegalStateException, IOException {
+		InputStream in = entity.getContent();
+		StringBuffer out = new StringBuffer();
+		int n = 1;
+		while (n > 0) {
+			byte[] b = new byte[4096];
+			n = in.read(b);
+			if (n > 0)
+				out.append(new String(b, 0, n));
+		}
+		return out.toString();
+	}
+
+	public static Document stringToDocument(final String xmlSource)
+			throws SAXException, ParserConfigurationException, IOException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+
+		return builder.parse(new InputSource(new StringReader(xmlSource)));
+	}
+
+	public Handler getHandlerVS() {
+		return handlerVS;
+	}
+
+	public void setHandlerVS(Handler handlerVS) {
+		this.handlerVS = handlerVS;
+	}
+
+	public Handler getHandlerData() {
+		return handlerData;
+	}
+
+	public void setHandlerData(Handler handlerData) {
+		this.handlerData = handlerData;
+	}
+
+	@Override
+	public void startLoadVSList() {
+	}
+
+	public void consume(StreamElement streamElement) {
+	}
+
+	@Override
+	public Activity getActivity() {
+		return view;
+	}
+
+	@Override
+	public StorageManager getStorageManager() {
+		return null;
+	}
+
+	public void pullLatestData(String serverName, String vsName, String numLatest) {
+		new GetVSDataLatest()
+				.execute(new String[] { serverName, vsName, numLatest });
+	}
+
+	private class GetVSDataLatest extends AsyncTask<String, Void, String> {
+		@Override
+		protected String doInBackground(String... params) {
+			String server = params[0];
+			String vsName = params[1];
+			String window = params[2];
+			String query = server + "/gsn?REQUEST=114&name=" + vsName + "&window="
+					+ window;
+
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpContext localContext = new BasicHttpContext();
+			HttpGet httpGet = new HttpGet(query);
+			Log.e(TAG, query);
+
+			String text = "";
+			try {
+				HttpResponse response = httpClient.execute(httpGet, localContext);
+				HttpEntity entity = response.getEntity();
+				text = getASCIIContentFromEntity(entity);
+			}
+			catch (Exception e) {
+				Log.e(TAG, e.toString());
+			}
+
+			Log.v(TAG, text);
+			return text;
+		}
+
+		protected void onPostExecute(String results) {
+			Message msg = new Message();
+			msg.obj = results;
+			handlerData.sendMessage(msg);
+		}
+	}
+
+}
