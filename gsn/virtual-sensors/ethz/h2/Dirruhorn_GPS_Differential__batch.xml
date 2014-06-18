@@ -10,9 +10,9 @@
                 		POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = MIN_GENERATION_TIME = MAX_GENERATION_TIME = null;
                 		MIN_GSN_TIMESTAMP = MAX_GSN_TIMESTAMP = X_ECEF = Y_ECEF = Z_ECEF = SD_X = SD_Y = SD_Z = SD_XY = SD_YZ = null;
                 		SD_ZX = E = N = H = SD_E = SD_N = SD_H = SD_EN = SD_EH = SD_NH = V_E = V_N = V_H = SD_V_E = SD_V_N = SD_V_H = V_3D = SD_V_3D = null;
-                		V_HORIZ = SD_V_HORIZ = VERSION = PROCESSING_TIME = COMMENTS = null;
+                		V_HORIZ = SD_V_HORIZ = VERSION = PROCESSING_TIME = COMMENTS = ROVER_LABEL = REFERFENCE_STATION = RATIO = null;
                 		
-                    	def spl = new String(RAW_PACKET, "UTF-8").split(",", 40);
+                    	def spl = new String(RAW_PACKET, "UTF-8").split(",");
 
                     	if (spl[1].isNumber())
                     		POSITION = spl[1].toInteger();
@@ -20,8 +20,6 @@
                             DEVICE_ID = spl[2].toInteger();
 			            if (spl[3].length()>0)
 				            SENSOR_TYPE = spl[3];
-                    	else
-                    		SENSOR_TYPE = null;
 						
                     	if (spl[4].isNumber())
                     		GENERATION_TIME = spl[4].toLong();
@@ -36,124 +34,72 @@
                     	
                     	if (spl[9].isNumber())
                     		X_ECEF = spl[9].toDouble();
-                    	else
-                    		X_ECEF = null;
                     	if (spl[10].isNumber())
 	                    	Y_ECEF = spl[10].toDouble();
-	                    else
-	                    	Y_ECEF = null;
                     	if (spl[11].isNumber())
                     		Z_ECEF = spl[11].toDouble();
-                    	else
-                    		Z_ECEF = null;
                     	if (spl[12].isNumber())
                     		SD_X = spl[12].toDouble();
-                    	else
-                    		SD_X = null;
                     	if (spl[13].isNumber())
                     		SD_Y = spl[13].toDouble();
-                    	else
-                    		SD_Y = null;
                     	if (spl[14].isNumber())
                     		SD_Z = spl[14].toDouble();
-                    	else
-                    		SD_Z = null;
                     	if (spl[15].isNumber())
                     		SD_XY = spl[15].toDouble();
-                    	else
-                    		SD_XY = null;
                     	if (spl[16].isNumber())
                     		SD_YZ = spl[16].toDouble();
-                    	else
-                    		SD_YZ = null;
                     	if (spl[17].isNumber())
                     		SD_ZX = spl[17].toDouble();
-                    	else
-                    		SD_ZX = null;
                     	if (spl[18].isNumber())
                     		E =  spl[18].toDouble();
-                    	else
-                    		E = null;
                     	if (spl[19].isNumber())
                     		N =  spl[19].toDouble();
-                    	else
-                    		N = null;
                     	if (spl[20].isNumber())
                     		H =  spl[20].toDouble();
-                    	else
-                    		H = null;
                     	if (spl[21].isNumber())
                     		SD_E =  spl[21].toDouble();
-                    	else
-                    		SD_E = null;
                     	if (spl[22].isNumber())
                     		SD_N =  spl[22].toDouble();
-                    	else
-                    		SD_N = null;
                     	if (spl[23].isNumber())
                     		SD_H =  spl[23].toDouble();
-                    	else
-                    		SD_H = null;
                     	if (spl[24].isNumber())
                     		SD_EN =  spl[24].toDouble();
-                    	else
-                    		SD_EN = null;
                     	if (spl[25].isNumber())
                     		SD_EH =  spl[25].toDouble();
-                    	else
-                    		SD_EH = null;
                     	if (spl[26].isNumber())
                     		SD_NH =  spl[26].toDouble();
-                    	else
-                    		SD_NH = null;
                     	if (spl[27].isNumber())
                     		V_E =  spl[27].toDouble();
-                    	else
-                    		V_E = null;
                     	if (spl[28].isNumber())
                     		V_N =  spl[28].toDouble();
-                    	else
-                    		V_N = null;	
                     	if (spl[29].isNumber())
                     		V_H =  spl[29].toDouble();
-                    	else
-                    		V_H = null;
                     	if (spl[30].isNumber())
                     		SD_V_E =  spl[30].toDouble();
-                    	else
-                    		SD_V_E = null;
                     	if (spl[31].isNumber())
                     		SD_V_N =  spl[31].toDouble();
-                    	else
-                    		SD_V_N = null;
                     	if (spl[32].isNumber())
                     		SD_V_H =  spl[32].toDouble();
-                    	else
-                    		SD_V_H = null;
                     	if (spl[33].isNumber())
                     		V_3D =  spl[33].toDouble();
-                    	else
-                    		V_3D = null;
                     	if (spl[34].isNumber())
                     		SD_V_3D =  spl[34].toDouble();
-                    	else
-                    		SD_V_3D = null;
                     	if (spl[35].isNumber())
                     		V_HORIZ =  spl[35].toDouble();
-                    	else
-                    		V_HORIZ = null;
                     	if (spl[36].isNumber())
                     		SD_V_HORIZ =  spl[36].toDouble();
-                    	else
-                    		SD_V_HORIZ = null;
                     	if (spl[37].isNumber())
                     		VERSION = spl[37].toShort();
                     	if (spl[38].isNumber())
                     		PROCESSING_TIME = spl[38].toLong();
 			            if (spl[39].length()>0)
 				            COMMENTS = spl[39];
-                    	else
-                    		COMMENTS = null;
+			            if (spl.length >= 41 && spl[40].length()>0)
+				            ROVER_LABEL = spl[40];
+			            if (spl.length >= 42 && spl[41].length()>0)
+				            REFERFENCE_STATION = spl[41];
+			            if (spl.length >= 43 && spl[42].isNumber())
+				            RATIO = spl[42].toDouble();
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -166,6 +112,8 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			<field name="VERSION" type="SMALLINT" />
+			<field name="ROVER_LABEL" type="VARCHAR(4)" />
+			<field name="REFERENCE_STATION" type="VARCHAR(4)" />
             
 			<field name="X_ECEF" type="DOUBLE" unit="m" />
 			<field name="Y_ECEF" type="DOUBLE" unit="m" />
@@ -199,6 +147,8 @@
 			
 			<field name="V_HORIZ" type="DOUBLE" unit="cm/d" />
 			<field name="SD_V_HORIZ" type="DOUBLE" unit="cm/d" />
+			
+			<field name="RATIO" type="DOUBLE" unit="%" />
 			
 			<field name="COMMENTS" type="VARCHAR(512)" />
 			
