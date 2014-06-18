@@ -9,7 +9,7 @@
                 <![CDATA[
                 	if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
                     // the mail recipients for error and exception counter increase
-                    def mailrecipients = ["gsn-notification@tik.ee.ethz.ch"];
+                    def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
                     
                 	if ( ! isdef('lastErrorCounterMap')) { lastErrorCounterMap = [:]; }
                 	if (lastErrorCounterMap.containsKey(POSITION)) {
@@ -54,7 +54,7 @@
                 	// a list of alarm time per position
                     def timeDifferenceOffsetPositionMap = [:];
                     // the mail recipients
-                    def mailrecipients = ["gsn-notification@tik.ee.ethz.ch"];
+                    def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
                     
                     if ( isdef('positionMap')) {
                     	def rmlist = [];
