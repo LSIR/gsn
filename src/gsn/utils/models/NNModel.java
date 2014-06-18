@@ -111,10 +111,10 @@ public class NNModel extends AbstractModel {
 
 	
 	@Override
-	public StreamElement pushData(StreamElement se) {
+	public StreamElement[] pushData(StreamElement se,String origin) {
 		buffer[ptr] = se;
 		ptr = (ptr + 1) % BUFFER_SIZE;
-		return se;
+		return new StreamElement[]{se};
 	}
 
 	@Override

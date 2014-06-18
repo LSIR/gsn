@@ -1,0 +1,46 @@
+<virtual-sensor name="OSODO_mapped" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.ModellingVirtualSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+    	<init-params>
+            <param name="model">gsn.utils.models.StreamInterpolateJoinModel</param>
+            <param name="model.0.historysize">30</param>
+		</init-params>
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="odometer" type="int" />
+           <field name="latitude" type="double" />
+           <field name="longitude" type="double" />
+           <field name="altitude" type="double" />
+           <field name="HDOP" type="double" />
+		</output-structure>
+	</processing-class>
+	<description>Map GPS onto ODO</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="A">
+			<source alias="A"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq">
+					<predicate key="address">inproc://stream/osgps</predicate>
+					<predicate key="vsensor">osgps</predicate>
+				</address>
+				<query>select latitude,longitude,altitude,HDOP from wrapper</query>
+			</source>
+			<query>select * from A</query>
+		</stream>
+		<stream name="B">
+			<source alias="B"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq">
+					<predicate key="address">inproc://stream/osodo</predicate>
+					<predicate key="vsensor">osodo</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from B</query>
+		</stream>
+	</streams>
+</virtual-sensor>

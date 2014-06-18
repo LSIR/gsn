@@ -1,0 +1,39 @@
+<virtual-sensor name="OSGPS" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.OpensenseSplitterVSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+		<init-params>
+		    <param name="type">GPS</param> 
+		</init-params>
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="latitude" type="double" />
+           <field name="longitude" type="double" />
+           <field name="altitude" type="double" />
+           <field name="azimuth_g" type="double" />
+           <field name="speed" type="double" />
+           <field name="satellites" type="TINYINT" />
+           <field name="HDOP" type="double" />
+           <field name="gyro" type="double" />
+           <field name="ubx_temp" type="double" />
+		</output-structure>
+	</processing-class>
+	<description>Parse GPS packets</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq">
+					<predicate key="address">inproc://stream/osc</predicate>
+					<predicate key="vsensor">osc</predicate>
+				</address>
+				<query>select * from wrapper where type = '0'</query>
+			</source>
+			<query>select * from source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>

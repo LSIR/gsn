@@ -1,0 +1,29 @@
+<virtual-sensor name="OSC" priority="20">
+	<processing-class>
+		<class-name>gsn.vsensor.OpensenseBridgeVirtualSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+		<output-structure>
+                        <field name="timestamp" type="bigint" />
+                        <field name="station" type="smallint" />
+                        <field name="type" type="smallint" />
+                        <field name="payload" type="binary" />
+		</output-structure>
+	</processing-class>
+	<description>Main entry for all data loggers</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="connector">
+			<source alias="connector" sampling-rate="1" storage-size="1">
+				<address wrapper="opensense-connector">
+					<predicate key="port">22025</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from connector</query>
+		</stream>
+	</streams>
+</virtual-sensor>

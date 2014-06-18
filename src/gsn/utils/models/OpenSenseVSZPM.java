@@ -154,7 +154,7 @@ public class OpenSenseVSZPM extends AbstractModel {
 		}
 
 		@Override
-		public StreamElement pushData(StreamElement streamElement) {
+		public StreamElement[] pushData(StreamElement streamElement,String origin) {
 			// TODO Auto-generated method stub
 			return null;
 		}

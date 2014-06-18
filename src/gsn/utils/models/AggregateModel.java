@@ -21,8 +21,8 @@ public class AggregateModel extends AbstractModel {
 	private AbstractModel model_co;
 
 	@Override
-	public StreamElement pushData(StreamElement streamElement) {
-		return streamElement;
+	public StreamElement[] pushData(StreamElement streamElement,String origin) {
+		return new StreamElement[]{streamElement};
 	}
 	
 

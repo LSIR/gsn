@@ -1,0 +1,34 @@
+<virtual-sensor name="OSMICSCO" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.OpensenseSplitterVSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+		<init-params>
+		    <param name="type">MICSCO</param> 
+		</init-params>
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="CO_mics" type="int" />
+           <field name="NO2_mics" type="int" />
+           <field name="temp_mics" type="int" />
+           <field name="RH_mics" type="smallint" />
+		</output-structure>
+	</processing-class>
+	<description>Parse MICS packets</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq">
+					<predicate key="address">inproc://stream/osc</predicate>
+					<predicate key="vsensor">osc</predicate>
+				</address>
+				<query>select * from wrapper where type = '11' or type = '31'</query>
+			</source>
+			<query>select * from source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>

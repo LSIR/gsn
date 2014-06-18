@@ -184,7 +184,7 @@ public final class Main {
 		
 		if (containerConfig.isZMQEnabled()){
 			//start the 0MQ proxy
-			//zmqproxy = new ZeroMQProxy(containerConfig.getZMQProxyPort(),containerConfig.getZMQMetaPort());
+			zmqproxy = new ZeroMQProxy(containerConfig.getZMQProxyPort(),containerConfig.getZMQMetaPort());
 		}
 		
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
