@@ -9,9 +9,9 @@
                         try {
                         POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = GPS_WEEK = GPS_TIME = X_ECEF = Y_ECEF = Z_ECEF = null;
                         SD_X = SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = SD_H = SD_EN = SD_EH = SD_NH = null;
-                        Q = NS = AGE = RATIO = VERSION = COMMENTS = ROVER_LABEL = REFERFENCE_STATION = null;
+                        Q = NS = AGE = RATIO = VERSION = COMMENTS = LABEL = REFERENCE_STATION = null;
                         
-                        def spl = new String(RAW_PACKET, "UTF-8").split(",", 30);
+                        def spl = new String(RAW_PACKET, "UTF-8").split(",");
                         
                         if (spl[1].isNumber())
                                 POSITION = spl[1].toInteger();
@@ -81,9 +81,9 @@
 			            if (spl.length >= 31 && spl[30].length()>0)
 				            COMMENTS = spl[30];
 			            if (spl.length >= 32 && spl[31].length()>0)
-				            ROVER_LABEL = spl[31];
+				            LABEL = spl[31];
 			            if (spl.length >= 33 && spl[32].length()>0)
-				            REFERFENCE_STATION = spl[32];
+				            REFERENCE_STATION = spl[32];
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -92,11 +92,11 @@
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
+			<field name="LABEL" type="VARCHAR(4)" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			<field name="VERSION" type="SMALLINT" />
-			<field name="ROVER_LABEL" type="VARCHAR(4)" />
 			<field name="REFERENCE_STATION" type="VARCHAR(4)" />
 
             <field name="X_ECEF" type="DOUBLE" unit="m" />
@@ -122,7 +122,7 @@
             <field name="Q" type="INTEGER" />
             <field name="NS" type="INTEGER" />
             <field name="AGE" type="DOUBLE" unit="s" />
-            <field name="RATIO" type="DOUBLE" unit="%" />
+            <field name="RATIO" type="DOUBLE" />
 			
 			<field name="COMMENTS" type="VARCHAR(512)" />
 

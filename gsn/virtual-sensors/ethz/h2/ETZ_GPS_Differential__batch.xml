@@ -7,10 +7,11 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                		POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = MIN_GENERATION_TIME = MAX_GENERATION_TIME = null;
-                		MIN_GSN_TIMESTAMP = MAX_GSN_TIMESTAMP = X_ECEF = Y_ECEF = Z_ECEF = SD_X = SD_Y = SD_Z = SD_XY = SD_YZ = null;
-                		SD_ZX = E = N = H = SD_E = SD_N = SD_H = SD_EN = SD_EH = SD_NH = V_E = V_N = V_H = SD_V_E = SD_V_N = SD_V_H = V_3D = SD_V_3D = null;
-                		V_HORIZ = SD_V_HORIZ = VERSION = PROCESSING_TIME = COMMENTS = ROVER_LABEL = REFERFENCE_STATION = RATIO = null;
+                		POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = LABEL = REFERENCE_LABEL = null;
+                		MIN_GENERATION_TIME = MAX_GENERATION_TIME = MIN_GSN_TIMESTAMP = MAX_GSN_TIMESTAMP = null;
+                		X_ECEF = Y_ECEF = Z_ECEF = SD_X = SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = null;
+                		SD_H = SD_EN = SD_EH = SD_NH = V_E = V_N = V_H = SD_V_E = SD_V_N = SD_V_H = V_3D = SD_V_3D = null;
+                		V_HORIZ = SD_V_HORIZ = VERSION = PROCESSING_TIME = RATIO_OF_FIXED_AMBIGUITIES = COMMENTS = null;
                 		
                     	def spl = new String(RAW_PACKET, "UTF-8").split(",");
 
@@ -95,11 +96,11 @@
 			            if (spl[39].length()>0)
 				            COMMENTS = spl[39];
 			            if (spl.length >= 41 && spl[40].length()>0)
-				            ROVER_LABEL = spl[40];
+				            LABEL = spl[40];
 			            if (spl.length >= 42 && spl[41].length()>0)
-				            REFERFENCE_STATION = spl[41];
+				            REFERENCE_LABEL = spl[41];
 			            if (spl.length >= 43 && spl[42].isNumber())
-				            RATIO = spl[42].toDouble();
+				            RATIO_OF_FIXED_AMBIGUITIES = spl[42].toDouble();
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -108,12 +109,12 @@
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
+			<field name="LABEL" type="VARCHAR(4)" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			<field name="VERSION" type="SMALLINT" />
-			<field name="ROVER_LABEL" type="VARCHAR(4)" />
-			<field name="REFERENCE_STATION" type="VARCHAR(4)" />
+			<field name="REFERENCE_LABEL" type="VARCHAR(4)" />
             
 			<field name="X_ECEF" type="DOUBLE" unit="m" />
 			<field name="Y_ECEF" type="DOUBLE" unit="m" />
@@ -148,7 +149,7 @@
 			<field name="V_HORIZ" type="DOUBLE" unit="cm/d" />
 			<field name="SD_V_HORIZ" type="DOUBLE" unit="cm/d" />
 			
-			<field name="RATIO" type="DOUBLE" unit="%" />
+			<field name="RATIO_OF_FIXED_AMBIGUITIES" type="DOUBLE" unit="%" />
 			
 			<field name="COMMENTS" type="VARCHAR(512)" />
 			
