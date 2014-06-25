@@ -30,9 +30,9 @@
 					<predicate key="address">inproc://stream/osgps</predicate>
 					<predicate key="vsensor">osgps</predicate>
 				</address>
-				<query>select latitude,longitude,altitude,HDOP from wrapper</query>
+				<query>select * from wrapper</query>
 			</source>
-			<query>select * from A</query>
+			<query>select latitude,longitude,altitude,HDOP from A</query>
 		</stream>
 		<stream name="B">
 			<source alias="B"  sampling-rate="1" storage-size="1">

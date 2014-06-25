@@ -1,0 +1,27 @@
+<virtual-sensor name="OSGPS_count" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.CounterVS</class-name>
+		<unique-timestamps>false</unique-timestamps>
+		<output-structure>
+           <field name="count" type="bigint" />
+		</output-structure>
+	</processing-class>
+	<description>Map GPS onto Accelerometer</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="A">
+			<source alias="A"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq">
+					<predicate key="address">inproc://stream/osgps</predicate>
+					<predicate key="vsensor">osgps</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select latitude,longitude,altitude,HDOP from A</query>
+		</stream>
+	</streams>
+</virtual-sensor>
