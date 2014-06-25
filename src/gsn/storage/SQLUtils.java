@@ -81,8 +81,9 @@ public class SQLUtils {
 				fromClauseMather.appendReplacement( result , replacement.toString( ) + " ");         
 		}
 		String cleanFromClause = fromClauseMather.appendTail( result ).toString( );
-		String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
-		return new StringBuilder(finalResult);
+		//String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
+		StringBuilder finalResult = new StringBuilder(toReturn.substring(0, indexOfFrom)).append(cleanFromClause).append(toReturn.substring(indexOfWhere));
+		return finalResult;
 	}
 
 	/**
@@ -135,8 +136,9 @@ public class SQLUtils {
 				fromClauseMather.appendReplacement( result , replaceTo.toString( ) + " ");
 		}
 		String cleanFromClause = fromClauseMather.appendTail( result ).toString( );
-		String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
-		return new StringBuilder(finalResult);
+		//String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
+		StringBuilder finalResult = new StringBuilder(toReturn.substring(0, indexOfFrom)).append(cleanFromClause).append(toReturn.substring(indexOfWhere));
+		return finalResult;
 	}
 
 	public static String extractProjection(String pQuery) {
@@ -156,8 +158,8 @@ public class SQLUtils {
 
 	public static void main ( String [ ] args ) {
 		TreeMap < CharSequence , CharSequence > map = new TreeMap < CharSequence , CharSequence >( new CaseInsensitiveComparator( ) );
-		String query ="seLect ali.fd, x.x, fdfd.fdfd, *.r, * from x,x, bla, x whEre k";
-		map.put( "x" , "done" );
+		String query ="select latitude,longitude,altitude,HDOP from A";
+		map.put( "A" , "done" );
 		CharSequence out = newRewrite( query , map );
 		System.out.println( out.toString( ) );
 		System.out.println(extractProjection(query)  		  );

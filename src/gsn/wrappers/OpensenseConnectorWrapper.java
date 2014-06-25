@@ -9,7 +9,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 
 import javax.naming.OperationNotSupportedException;
 import javax.net.ServerSocketFactory;
@@ -37,7 +39,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	private boolean running = true;
 	private int port;
 	private DataField[] df;
-
+	
 	@Override
 	public DataField[] getOutputFormat() {
 		return df;
@@ -127,21 +129,36 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 					   StationData sd;
 					   int retry = 0;
 					   long lastRetry = 0;
+					   long ts;
 					   int ctr = 0;
 					   int err = 0;
 					   int pub = 0;
 					   int last = 0;
+					   PriorityQueue<StreamElement> buffer = new PriorityQueue<StreamElement>(3000,new Comparator<StreamElement>() {
+							@Override
+							public int compare(StreamElement o1, StreamElement o2) {
+								int diff = (int) (((Long)o1.getData("timestamp")) - ((Long)o2.getData("timestamp")));
+								return diff;
+							}
+						});
 
 						@Override
 						public void run() {
 							try{
 								input = new BufferedInputStream(server.getInputStream());
 								output = new BufferedOutputStream(server.getOutputStream());
+								ts = System.currentTimeMillis();
 								while(connected) parse();
-								
 								server.close();
 							}catch (IOException ioe){
 								logger.error("Error while connecting to remote station: " + server.getInetAddress(), ioe);
+							}
+							//publish data even if connection got interrupted as it may be erased on the logger side
+							int c = 0;
+							while (!buffer.isEmpty()){
+								StreamElement p = buffer.poll();
+								p.setTimeStamp(p.getTimeStamp()+(c++));
+								postStreamElement(p);
 							}
 						}
 				
@@ -223,7 +240,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 										throw new IOException("unknown packet: "+next);
 									}
 									pub ++;
-									sd.publish();
+									buffer.add(sd.getStreamElement(ts));
 									last = next;
 									break;
 								case 35:
@@ -420,6 +437,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (_hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+_hh+":"+_mn+":"+_ss+")");
 			}
+			ms = 0;
 			ss = _ss;
 			mn = _mn;
 			hh = _hh;
@@ -439,12 +457,14 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (_mm <= 0 || _yy < 12 || _dd <= 0 || _mm > 12 || _dd > 31 || _hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+_yy+"-"+_mm+"-"+_dd+" "+_hh+":"+_mn+":"+_ss+")");
 			}
+			ms = 0;
 			ss = _ss;
 			mn = _mn;
 			hh = _hh;
 			dd = _dd;
 			mm = _mm;
 			yy = _yy;
+			payload = new byte[0];
 
 		}
 		
@@ -457,6 +477,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (_hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+_hh+":"+_mn+":"+_ss+")");
 			}
+			ms = 0;
 			ss = _ss;
 			mn = _mn;
 			hh = _hh;
@@ -481,19 +502,20 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if ( _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+hh+":"+_mn+":"+_ss+")");
 			}
+			ms = 0;
 			ss = _ss;
 			mn = _mn;
 		}
 		
-		public void publish(){
+		public StreamElement getStreamElement(long ts){
 			Calendar c = Calendar.getInstance();
-			c.set(yy + 2000, mm, dd, hh, mn, ss);
+			c.clear();
+			c.set(yy + 2000, mm - 1, dd, hh, mn, ss);
 			long time = c.getTimeInMillis() + ms;
 			
 			Serializable[] data = new Serializable[]{time, new Short((short) id), new Short((short) type), payload};
 			
-			StreamElement se = new StreamElement(OpensenseConnectorWrapper.this.df,data,System.currentTimeMillis());
-			OpensenseConnectorWrapper.this.postStreamElement(se);
+			return new StreamElement(OpensenseConnectorWrapper.this.df,data,ts);
 		}
 
 	}

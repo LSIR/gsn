@@ -113,7 +113,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
         boolean connected = subscriber.base().connect(remoteContactPoint_DATA);
 		subscriber.setReceiveTimeOut(3000);
 
-		subscriber.subscribe(vsensor.getBytes());
+		subscriber.subscribe((vsensor+":").getBytes());
 		//System.out.println("connected to Queue: "+ remoteContactPoint + " and subscribe to " + vsensor);
 
 		while (isActive()) {
@@ -122,18 +122,19 @@ public class ZeroMQWrapper extends AbstractWrapper {
 				if (rec != null){
 					//System.out.println("read from wrapper");
 					ByteArrayInputStream bais = new ByteArrayInputStream(rec);
-					bais.skip(vsensor.getBytes().length + 1);
+					bais.skip(vsensor.getBytes().length + 2);
 					//StreamElement se = ((StreamElement4Rest)(StreamElement4Rest.getXstream().fromXML(bais))).toStreamElement();
 					StreamElement se = kryo.readObjectOrNull(new Input(bais),StreamElement.class);
 			        //maybe queuing would be better here...
 			        boolean status = postStreamElement(se);
+			        //System.out.println("receiving :" + se);
 				}else{
 					if (isLocal && !connected){
 						subscriber.disconnect(remoteContactPoint_DATA);
 						connected = subscriber.base().connect(remoteContactPoint_DATA);
 					}
 					//System.out.println("timeout on wrapper, subscribing to "+ vsensor);
-					subscriber.subscribe(vsensor.getBytes());
+					subscriber.subscribe((vsensor+":").getBytes());
 				}
 			}catch (Exception e)
 			{

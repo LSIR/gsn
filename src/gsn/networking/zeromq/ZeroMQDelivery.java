@@ -27,7 +27,7 @@ public class ZeroMQDelivery implements DeliverySystem{
 	
 	public ZeroMQDelivery(VSensorConfig config){
         this.config = config;
-        System.out.println("connecting");
+        //System.out.println("connecting");
 		context = Main.getZmqContext();
 		// Socket to talk to clients
 		publisher = context.socket(ZMQ.PUB);
@@ -49,7 +49,8 @@ public class ZeroMQDelivery implements DeliverySystem{
 	public boolean writeStreamElement(StreamElement se) {
 		try {
 			ByteArrayOutputStream bais = new ByteArrayOutputStream();
-            bais.write((config.getName() + " ").getBytes());
+			//System.out.println("sending :" + se);
+            bais.write((config.getName() + ": ").getBytes());
             //StreamElement4Rest.getXstream().toXML(se.toRest(),bais);
             Output o = new Output(bais);
             kryo.writeObjectOrNull(o,se,StreamElement.class);

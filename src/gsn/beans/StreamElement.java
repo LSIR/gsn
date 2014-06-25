@@ -54,7 +54,7 @@ public final class StreamElement implements Serializable {
 
 	private Serializable [ ]                       fieldValues;
 
-	private transient Byte [ ]                               fieldTypes;
+	private Byte [ ]                               fieldTypes;
 
 	private transient long                                   internalPrimayKey = -1;
 

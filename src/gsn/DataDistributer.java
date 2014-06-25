@@ -256,7 +256,9 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                     removeListener(item.getKey());
                 else {
                     if (!item.getValue().hasMoreElements()) {
-                        removeListenerFromCandidates(item.getKey());
+                    	synchronized(listeners){
+                    		removeListenerFromCandidates(item.getKey());
+                    	}
                         // As we are limiting the number of elements returned by the JDBC driver
                         // we consume the eventual remaining items.
                         consume(null, item.getKey().getVSensorConfig());
@@ -271,7 +273,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     		if (Main.getContainerConfig().isZMQEnabled() && getInstance(ZeroMQDelivery.class) == this){
     			try {
     				DeliverySystem delivery = new ZeroMQDelivery(config);
-					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(),System.currentTimeMillis()));
+					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(),0));
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (SQLException e1) {

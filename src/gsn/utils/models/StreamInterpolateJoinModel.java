@@ -39,8 +39,9 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	LinkedList<StreamElement> buffer = new LinkedList<StreamElement>();
 	LinkedList<StreamElement> toProcess = new LinkedList<StreamElement>();
 
+
 	@Override
-	public StreamElement[] pushData(StreamElement streamElement, String origin) {
+	public synchronized StreamElement[] pushData(StreamElement streamElement, String origin) {
 		if(origin.equalsIgnoreCase("A")){
 			buffer.addFirst(streamElement);
 			if (buffer.size() > historySize){
@@ -90,7 +91,8 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		ArrayList<StreamElement> r = new ArrayList<StreamElement>();
 		int i = toProcess.size();
 		while (i>0){
-			StreamElement se = toProcess.pop();
+			StreamElement se = toProcess.removeFirst();
+			i--;
 			if (se.getTimeStamp() <= buffer.getFirst().getTimeStamp()){
 				StreamElement ses = query(se)[0];
 				if (ses != null) r.add(ses);
