@@ -27,9 +27,9 @@
 					<predicate key="address">inproc://stream/osc</predicate>
 					<predicate key="vsensor">osc</predicate>
 				</address>
-				<query>select * from wrapper where type = '2' or type = '3' or type = '4' or type = '5'</query>
+				<query>select * from wrapper</query>
 			</source>
-			<query>select * from source1</query>
+			<query>select * from source1 where type = '2' or type = '3' or type = '4' or type = '5'</query>
 		</stream>
 	</streams>
 </virtual-sensor>
