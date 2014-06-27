@@ -192,8 +192,9 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	        } else if (data_type.equalsIgnoreCase("TL")){
 	        	if(!last_values.containsKey(id) ){
 	        		last_values.put(id,new StreamElement(structure, new Serializable[structure.length]));
-	        	}
-	        	
+	        		last_values.get(id).setData(0,id);
+	        	}	        	
+	        	last_values.get(id).setTimeStamp(time);
 	        	if(s_type == 2){
 	        		last_values.get(id).setData(1,BinaryParser.readNextChar(input, false));
 				 }else if(s_type == 3){
