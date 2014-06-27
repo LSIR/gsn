@@ -9,7 +9,7 @@
                         try {
                         POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = GPS_WEEK = GPS_TIME = X_ECEF = Y_ECEF = Z_ECEF = null;
                         SD_X = SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = SD_H = SD_EN = SD_EH = SD_NH = null;
-                        Q = NS = AGE = RATIO = VERSION = COMMENTS = LABEL = REFERENCE_STATION = null;
+                        Q = NS = AGE = RATIO = VERSION = COMMENTS = LABEL = REFERENCE_LABEL = null;
                         
                         def spl = new String(RAW_PACKET, "UTF-8").split(",");
                         
@@ -83,7 +83,7 @@
 			            if (spl.length >= 32 && spl[31].length()>0)
 				            LABEL = spl[31];
 			            if (spl.length >= 33 && spl[32].length()>0)
-				            REFERENCE_STATION = spl[32];
+				            REFERENCE_LABEL = spl[32];
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -97,7 +97,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			<field name="VERSION" type="SMALLINT" />
-			<field name="REFERENCE_STATION" type="VARCHAR(4)" />
+			<field name="REFERENCE_LABEL" type="VARCHAR(4)" />
 
             <field name="X_ECEF" type="DOUBLE" unit="m" />
             <field name="Y_ECEF" type="DOUBLE" unit="m" />
