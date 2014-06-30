@@ -123,7 +123,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 		}
 	}
 
-	public long getOldestTimestamp() {
+	public String getCuttingCondition() {
 		long timed1 = -1;
 		long timed2 = -1;
 		long maxTupleCount = 0;
@@ -157,7 +157,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 				if (resultSet.next()) {
 					timed1 = resultSet.getLong(1);
 				} else {
-					return -1;
+					return "timed < -1";
 				}
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
@@ -185,7 +185,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 				if (resultSet.next()) {
 					timed2 = resultSet.getLong(1);
 				} else {
-					return -1;
+					return "timed < -1";
 				}
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
@@ -195,9 +195,9 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 		}
 
 		if (timed1 >= 0 && timed2 >= 0) {
-			return Math.min(timed1, timed2);
+			return "timed < " +Math.min(timed1, timed2);
 		}
-		return (timed1 == -1) ? timed2 : timed1;
+		return "timed < " + ((timed1 == -1) ? timed2 : timed1);
 	}
 
 	public boolean isInterestedIn(StreamSource streamSource) {

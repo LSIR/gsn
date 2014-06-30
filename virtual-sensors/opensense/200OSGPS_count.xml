@@ -3,7 +3,7 @@
 		<class-name>gsn.vsensor.CounterVS</class-name>
 		<unique-timestamps>false</unique-timestamps>
 		<output-structure>
-           <field name="count" type="bigint" />
+           <field name="counter" type="bigint" />
 		</output-structure>
 	</processing-class>
 	<description>Map GPS onto Accelerometer</description>
