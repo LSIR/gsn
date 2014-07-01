@@ -1,0 +1,186 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:android1="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:textColor="#000000" >
+
+        <TableRow
+            android:id="@+id/tableRow_vs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dip" >
+
+            <TextView
+                android1:id="@+id/textView_vs"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android:layout_span="2"
+                android:gravity="center"
+                android1:text="@string/Publish_Data"
+                android1:textAppearance="?android:attr/textAppearanceMedium"
+                android1:textColor="#000000" />
+        </TableRow>
+
+        <!-- android:gravity="center" -->
+        
+        <View
+            android:layout_height="2dip"
+            android:background="#61a7db" />
+
+        <!--
+        <TableRow
+            android:id="@+id/tableRow_publish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dip"
+            android:gravity="center" >
+
+            <Button
+                android1:id="@+id/button_selectVS"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:layout_span="2"
+                android:gravity="center"
+                android:textColor="#ffffff"
+                android1:text="@string/select" />
+        </TableRow>
+        -->
+
+        <TableRow
+            android:id="@+id/tableRow_Server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            
+            android:padding="5dip" >
+
+            <TextView
+                android1:id="@+id/textView_server"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:text="@string/server"
+                android1:textAppearance="?android:attr/textAppearanceSmall"
+                android1:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/editText_server"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="5"
+                android:inputType="text"
+                android:textColor="#000000"
+                android1:text="@string/gsnserver" >
+
+                <requestFocus />
+                
+            </EditText>
+            
+            <ImageButton
+                    android:id="@+id/select_server_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="select_server"
+                    android:src="@drawable/track_dropdown_arrow_dark" />
+            
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow_vsName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            
+            android:padding="5dip" >
+
+            <TextView
+                android1:id="@+id/textView_vsName"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:text="Select VS"
+                android1:textAppearance="?android:attr/textAppearanceSmall"
+                android1:textColor="#000000" />
+
+            <Spinner
+                android1:id="@+id/spinner_vsname"
+                style="@layout/spinner_item"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:textColor="#000000" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow_vsType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            
+            android:padding="5dip" >
+
+            <TextView
+                android1:id="@+id/textView_vsType"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:text="@string/strategy"
+                android1:textAppearance="?android:attr/textAppearanceSmall"
+                android1:textColor="#000000" />
+
+            <Spinner
+                android1:id="@+id/spinner_strategy"
+                style="@layout/spinner_item"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:entries="@array/strategy"
+                android1:textColor="#000000" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow_ssWindowSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            
+            android:padding="5dip" >
+
+            <TextView
+                android1:id="@+id/textView_ssWindowSize"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:text="@string/every"
+                android1:textAppearance="?android:attr/textAppearanceSmall"
+                android1:textColor="#000000" />
+
+            <EditText
+                android:id="@+id/editText_ssWindowSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="5"
+                android:inputType="number"
+                android:textColor="#000000"
+                android1:text="@string/sixty" >
+            </EditText>
+        </TableRow>
+
+        <!--
+        <TableRow
+            android:id="@+id/tableRow_publish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dip" >
+
+            <Button
+                android1:id="@+id/button1"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android:layout_span="2"
+                android:textColor="#ffffff"
+                android1:text="@string/publish"
+                android:onClick="publish" />
+        </TableRow>
+        -->
+    </TableLayout>
+
+</ScrollView>
