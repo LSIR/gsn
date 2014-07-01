@@ -145,14 +145,21 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-      { title:"Aiguille du Midi PV Temperatures",
+      { title:"Aiguille du Midi Internal PV Temperature [°C]",
         signals: [{
           vsensor:"adm_cr1000",
           field:["panel_temp"],
           select:"sensornode[position=7],sensornode[position=8],sensornode[position=9]"
         }]
       },
-      { title:"Aiguille du Midi PV Voltages",
+      { title:"Aiguille du Midi Internal PV Voltage Sense [V]",
+        signals: [{
+          vsensor:"adm_cr1000",
+          field:["battery"],
+          select:"sensornode[position=7],sensornode[position=8],sensornode[position=9]"
+        }]
+      },
+      { title:"Aiguille du Midi External PV Voltage Sense [V]",
         signals: [{
           vsensor:"adm_dozer_nodehealth__conv",
           field:["sdivoltage"],
@@ -170,7 +177,7 @@ $(document).ready(function() {
         signals: [{
           vsensor:"dirruhorn_dozer_nodehealth__conv",
           field:["sdivoltage"],
-          select:"sensornode[position=39],sensornode[position=41],sensornode[position=58],sensornode[position=66],sensornode[position=67]"
+          select:"sensornode[position=39],sensornode[position=40],sensornode[position=41],sensornode[position=58],sensornode[position=66],sensornode[position=67]"
         }]
       },
       { title:"Randa PV Voltages",
@@ -179,6 +186,48 @@ $(document).ready(function() {
           field:["v_ext1","v_ext2"],
           select:"sensornode[position=8][iscorestation='true']"
         }]
+      },
+      { title:"Randa PV MATE3 Voltages",
+        signals: [{
+          vsensor:"dirruhorn_outbackmate3__conv",
+          field:["port1_batt_v","port2_batt_v","port3_batt_v"],
+          deviceId: [9000]
+        }]
+      },
+      { title:"Randa PV SOC",
+        signals: [{
+          vsensor:"dirruhorn_outbackmate3__conv",
+          field:["port3_soc"],
+          deviceId: [9000]
+        }]
+      },
+      { title:"Randa PV Currents",
+        signals: [{
+          vsensor:"dirruhorn_outbackmate3__conv",
+          field:["port1_out_i","port1_in_v","port2_out_i","port2_in_v","port3_shunt_a_i","port3_shunt_b_i","port3_shunt_c_i"],
+          deviceId: [9000]
+        }]
+      },
+      { title:"Randa PV Net Balance",
+        signals: [{
+          vsensor:"dirruhorn_outbackmate3__conv",
+          field:["port3_in_ah_today","port3_out_ah_today","port3_in_kwh_today","port3_out_kwh_today","port3_net_cfc_ah","port3_net_cfc_kwh"],
+          deviceId: [9000]
+        }]
+      },
+      {  title:"GPS Logger PV Voltage [mV]",
+         signals: [{
+          vsensor:"dirruhorn_gps_logger__status",
+          field:["v12dc_in"],
+          position: [14,15,16,17,18,19,21,23,25,27,29,31,33,35,40,43,44,55,56,57,62,63,64],
+        }],
+      },
+      {  title:"GPS Logger PV Voltage [mV]",
+         signals: [{
+          vsensor:"permos_gps_logger__status",
+          field:["v12dc_in"],
+          position: [1,2,3,4,5,6,7],
+        }],
       },
       { title:"Matterhorn PV Voltages",
         signals: [{
@@ -208,19 +257,47 @@ $(document).ready(function() {
           select:"sensornode[position=25]"
         }]
       },
-      { title:"Dozer Temperature",
+      { title:"Dozer Temperature [°C]",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
           field:["temperature"],
           select:"sensornode[position]"
         }]
       },
-      { title:"Dozer Humidity",
+      {  title:"GPS Logger Temperature [°C]",
+         signals: [{
+          vsensor:"permos_gps_logger__status",
+          field:["temperature"],
+          position: [1,2,3,4,5,6,7],
+        }],
+      },
+      {  title:"GPS Logger Temperature [°C]",
+         signals: [{
+          vsensor:"dirruhorn_gps_logger__status",
+          field:["temperature"],
+          position: [14,15,16,17,18,19,21,23,25,27,29,31,33,35,40,43,44,55,56,57,62,63,64],
+        }],
+      },
+      { title:"Dozer Humidity [%]",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
           field:["humidity"],
           select:"sensornode[position]"
         }]
+      },
+      {  title:"GPS Logger Humidity [%]",
+         signals: [{
+          vsensor:"permos_gps_logger__status",
+          field:["humidity"],
+          position: [1,2,3,4,5,6,7],
+        }],
+      },
+      {  title:"GPS Logger Humidity [%]",
+         signals: [{
+          vsensor:"dirruhorn_gps_logger__status",
+          field:["humidity"],
+          position: [14,15,16,17,18,19,21,23,25,27,29,31,33,35,40,43,44,55,56,57,62,63,64],
+        }],
       },
       { title:"Dozer Current",
         signals: [{
@@ -233,6 +310,13 @@ $(document).ready(function() {
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
           field:["payload_queuesize"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"Dozer RSSI",
+        signals: [{
+          vsensor:".*_dozer_rssi__conv",
+          field:["rssi"],
           select:"sensornode[position]"
         }]
       },
