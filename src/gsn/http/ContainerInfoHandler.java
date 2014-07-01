@@ -280,13 +280,13 @@ public class ContainerInfoHandler implements RequestHandler {
   }
   /**
    * returns null if there is an error.
-   * 
+   * only return the latest value, in case of non-unique time-stamps, the primary key is used.
    * @param virtual_sensor_name
    * @return
    */
   public static ArrayList<StreamElement> getMostRecentValueFor(String virtual_sensor_name) {
     //System.out.println("GET NEW FOR = "+virtual_sensor_name);
-    StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(")");
+    StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(") order by pk desc limit 1");
     ArrayList<StreamElement> toReturn=new ArrayList<StreamElement>() ;
     try {
       DataEnumerator result = Main.getStorage(virtual_sensor_name).executeQuery( query , true );
