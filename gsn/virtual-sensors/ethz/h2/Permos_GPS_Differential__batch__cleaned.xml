@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_Differential__batch__cleaned" priority="10" >
+<virtual-sensor name="Permos_GPS_Differential__batch__cleaned" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ConditionalDeleteVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -27,7 +27,7 @@
 			<field name="COMMENTS" type="VARCHAR(512)" />
         </output-structure>
     </processing-class>
-    <description>Differential GPS data from batch processing (only newest data points) from ETZ deployment</description>
+    <description>Differential GPS data from batch processing (only newest data points) from Permos deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -35,7 +35,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_Differential__batch</predicate>
+                    <predicate key="query">select * from Permos_GPS_Differential__batch</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

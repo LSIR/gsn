@@ -129,6 +129,7 @@ Dirruhorn_VaisalaWXT520WindPth.xml
 Dirruhorn_VaisalaWXT520Sup.xml
 Dirruhorn_VaisalaWXT520Prec.xml
 Dirruhorn_GPS_Differential__batch.xml
+Dirruhorn_GPS_Differential__batch__cleaned.xml
 Dirruhorn_GPS_Differential__realtime.xml
 Dirruhorn_GPS_Differential__streaming.xml
 Dirruhorn_GPS_Logger__config.xml
@@ -347,6 +348,7 @@ Matterhorn_VaisalaWXT520__muxed__mapped.xml
 Matterhorn_Waterpressure.xml
 Matterhorn_Topology__public.xml
 Permos_GPS_Differential__batch.xml
+Permos_GPS_Differential__batch__cleaned.xml
 Permos_GPS_Differential__realtime.xml
 Permos_GPS_Differential__streaming.xml
 Permos_GPS_Logger__config.xml
