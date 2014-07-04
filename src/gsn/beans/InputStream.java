@@ -291,30 +291,31 @@ public class InputStream implements Serializable{
 						.toString( ) );
 		}
 		int elementCounterForDebugging = 0;
-		if ( queryCached && Main.getWindowStorage().isThereAnyResult( this.rewrittenSQL ) ) {
-			this.currentCount++;
-			AbstractVirtualSensor sensor = null;
-			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
-
-			final Enumeration < StreamElement > resultOfTheQuery = Main.getWindowStorage().executeQuery( this.rewrittenSQL , false );
-			try {
-				sensor = pool.borrowVS( );
-				while ( resultOfTheQuery.hasMoreElements( ) ) {
-					elementCounterForDebugging++;
-					StreamElement element= resultOfTheQuery.nextElement( );
-					sensor.dataAvailable( this.getInputStreamName( ) , element );
+		if (queryCached){
+			final Enumeration < StreamElement > resultOfTheQuery = Main.getWindowStorage().executeQueryIfNotEmpty( this.rewrittenSQL , false );
+			if ( resultOfTheQuery != null ) {
+				this.currentCount++;
+				AbstractVirtualSensor sensor = null;
+				if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
+				try {
+					sensor = pool.borrowVS( );
+					while ( resultOfTheQuery.hasMoreElements( ) ) {
+						elementCounterForDebugging++;
+						StreamElement element= resultOfTheQuery.nextElement( );
+						sensor.dataAvailable( this.getInputStreamName( ) , element );
+					}
+				} catch ( final UnsupportedOperationException e ) {
+					logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
+					logger.warn( e.getMessage( ) , e );
+				} catch ( final VirtualSensorInitializationFailedException e ) {
+					logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
+							+ " because initialization of that virtual sensor failed" );
+					logger.error(e.getMessage(),e);
+				} finally {
+					this.pool.returnVS( sensor );
 				}
-			} catch ( final UnsupportedOperationException e ) {
-				logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
-				logger.warn( e.getMessage( ) , e );
-			} catch ( final VirtualSensorInitializationFailedException e ) {
-				logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
-						+ " because initialization of that virtual sensor failed" );
-				logger.error(e.getMessage(),e);
-			} finally {
-				this.pool.returnVS( sensor );
+	
 			}
-
 		}
 		if ( logger.isDebugEnabled( ) ) {
 			logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );

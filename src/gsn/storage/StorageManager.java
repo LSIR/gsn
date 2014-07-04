@@ -511,6 +511,26 @@ public abstract class StorageManager {
             logger.debug("Executing query: " + query + "( Binary Field Linked:" + binaryFieldsLinked + ")");
         return new DataEnumerator(this, connection.prepareStatement(query.toString()), binaryFieldsLinked);
     }
+    
+    public DataEnumerator executeQueryIfNotEmpty(StringBuilder query, boolean binaryFieldsLinked){
+    	boolean toreturn = false;
+        Connection connection = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getConnection();
+            PreparedStatement prepareStatement = connection.prepareStatement(query.toString());
+            resultSet = prepareStatement.executeQuery();
+            toreturn = resultSet.next();
+        } catch (SQLException error) {
+            logger.error(error.getMessage(), error);
+        }
+        if (toreturn){
+        	return new DataEnumerator(this, resultSet, binaryFieldsLinked,false,true);
+        }else{
+            close(connection);
+            return null;
+        }
+    }
 
     /**
      * Attention: Caller should close the connection.
