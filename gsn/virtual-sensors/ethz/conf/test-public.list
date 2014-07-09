@@ -67,7 +67,7 @@ ETZ_Dozer_EnviroScanParametersA__conv.xml
 ETZ_Dozer_EnviroScanParametersB__conv.xml
 ETZ_Dozer_EnviroScanParametersC__conv.xml
 ETZ_GPS_Differential__batch.xml
-ETZ_GPS_Differential__batch__cleaned.xml
+ETZ_GPS_Differential__batch__daily.xml
 ETZ_GPS_Differential__realtime.xml
 ETZ_GPS_Differential__streaming.xml
 ETZ_GPS_Logger__config.xml

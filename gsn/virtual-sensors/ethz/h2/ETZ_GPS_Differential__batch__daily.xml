@@ -12,7 +12,9 @@
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
 			<field name="LABEL" type="VARCHAR(4)" />
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			
 			<field name="E" type="DOUBLE" unit="m" />
 			<field name="N" type="DOUBLE" unit="m" />
@@ -22,12 +24,13 @@
 			<field name="V_N" type="DOUBLE" unit="cm/d" />
 			<field name="V_H" type="DOUBLE" unit="cm/d" />
 			
+			<field name="V_3D" type="DOUBLE" unit="cm/d" />
+			
 			<field name="REFERENCE_LABEL" type="VARCHAR(4)" />
 			<field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
-			<field name="COMMENTS" type="VARCHAR(512)" />
         </output-structure>
     </processing-class>
-    <description>Differential GPS data from batch processing (only newest data points) from ETZ deployment</description>
+    <description>Daily Differential GPS solutions from batch processing (only newest data points) from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />

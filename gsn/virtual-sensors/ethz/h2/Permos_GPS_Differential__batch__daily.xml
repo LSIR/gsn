@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_GPS_Differential__batch__cleaned" priority="10" >
+<virtual-sensor name="Permos_GPS_Differential__batch__cleaned" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ConditionalDeleteVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -12,7 +12,9 @@
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
 			<field name="LABEL" type="VARCHAR(4)" />
+            <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			
 			<field name="E" type="DOUBLE" unit="m" />
 			<field name="N" type="DOUBLE" unit="m" />
@@ -22,12 +24,13 @@
 			<field name="V_N" type="DOUBLE" unit="cm/d" />
 			<field name="V_H" type="DOUBLE" unit="cm/d" />
 			
+			<field name="V_3D" type="DOUBLE" unit="cm/d" />
+			
 			<field name="REFERENCE_LABEL" type="VARCHAR(4)" />
 			<field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
-			<field name="COMMENTS" type="VARCHAR(512)" />
         </output-structure>
     </processing-class>
-    <description>Differential GPS data from batch processing (only newest data points) from Dirruhorn deployment</description>
+    <description>Daily Differential GPS solutions from batch processing (only newest data points) from Permos deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -35,7 +38,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from Dirruhorn_GPS_Differential__batch</predicate>
+                    <predicate key="query">select * from Permos_GPS_Differential__batch</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
