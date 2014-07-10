@@ -7,8 +7,8 @@
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="door_state" type="tinyint" />
-           <field name="tl_line" type="tinyint" />
+           <field name="door_state" type="smallint" />
+           <field name="tl_line" type="smallint" />
            <field name="tl_destination" type="varchar(20)" />
            <field name="tl_curr_stop" type="varchar(20)" />
            <field name="tl_next_stop" type="varchar(20)" />
