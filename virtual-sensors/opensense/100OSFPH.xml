@@ -8,10 +8,10 @@
 		<output-structure>
            <field name="station" type="smallint" />
            <field name="ufp_temp" type="double" />
-           <field name="ufp_RH" type="tinyint" />
+           <field name="ufp_RH" type="smallint" />
            <field name="ufp_bat" type="double" />
            <field name="ufp_flow" type="double" />
-           <field name="ufp_warning" type="tinyint" />
+           <field name="ufp_warning" type="smallint" />
 		</output-structure>
 	</processing-class>
 	<description>Parse Partector health packets</description>

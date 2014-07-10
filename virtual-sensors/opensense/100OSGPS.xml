@@ -12,7 +12,7 @@
            <field name="altitude" type="double" />
            <field name="azimuth_g" type="double" />
            <field name="speed" type="double" />
-           <field name="satellites" type="TINYINT" />
+           <field name="satellites" type="smallint" />
            <field name="HDOP" type="double" />
            <field name="gyro" type="double" />
            <field name="ubx_temp" type="double" />

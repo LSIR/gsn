@@ -9,7 +9,7 @@
            <field name="station" type="smallint" />
            <field name="O3_res" type="int" />
            <field name="temp" type="double" />
-           <field name="RH" type="tinyint" />
+           <field name="RH" type="smallint" />
 		</output-structure>
 	</processing-class>
 	<description>Parse Ozone packets</description>
