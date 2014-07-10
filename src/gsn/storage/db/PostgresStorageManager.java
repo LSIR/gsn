@@ -175,6 +175,9 @@ public class PostgresStorageManager extends StorageManager {
             case DataTypes.DOUBLE:
                 convertedType = "DOUBLE PRECISION";
                 break;
+            case DataTypes.TINYINT:
+            	convertedType = "SMALLINT";
+            	break;
             default:
                 convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
                 break;
