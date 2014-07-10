@@ -104,12 +104,13 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
             query.append(" set timed=").append(timestamp).append(" where u_id='").append(streamSource.getUIDStr());
             query.append("' ");
             storageManager.executeUpdate(query);
-            if (storageManager.isThereAnyResult(new StringBuilder("select * from ").append(streamSource.getUIDStr()))) {
+            // can be ignored if no queries specified on the view. Every new data-item will then be visible when inserted, so it always returns true.
+           // if (storageManager.isThereAnyResult(new StringBuilder("select * from ").append(streamSource.getUIDStr()))) {
                 if (logger.isDebugEnabled()) {
                     logger.debug(streamSource.getWrapper().getWrapperName() + " - Output stream produced/received from a wrapper " + streamSource.toString());
                 }
                 return streamSource.windowSlided();
-            }
+            //}
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }
