@@ -2,6 +2,47 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    // the mail recipients for Dozer Event errors.
+                    def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+                    if ( ! isdef('idToMessageMap')) {idToMessageMap = [
+                    	5:'Node started after watchdog reset.',
+                    	6:'DAQ lasted for too long, last data source was %s.',
+                    	22:'Dozer: Watchdog triggered.',
+                    	41:'Wxt520 init failed with code %s.',
+                    	50:'Error while mounting SD card.',
+                    	51:'Generic SD card error.',
+                    	60:'EVENT_ERROR_RADIO_GENERIC (not used)',
+                    	61:'SX1211: Radio pattern error %s.',
+                    	82:'WGPS: Sam7 SD card full -> stopped logging to card.',
+                    	84:'WGPS: Enter stop mode.',
+                    	87:'WGPS: Sam7 setting custom configuration failed with error code %s.',
+                    	90:'WGPS: Fatal GPS failure.',
+                    	91:'WGPS: Fatal measurement failure.',
+                    	92:'WGPS: Sam7 card init error with code %s.',
+                    	97:'WGPS: Received command is erroneous (command: %s)',
+                    	98:'WGPS: Modbus communication error (code: %s).',
+                    	100:'WGPS: Time synchronization with Sam7 at start-up failed'];
+                    }
+                    
+                    if (idToMessageMap.containsKey(EVENT_ID.toInteger())) {
+                    	// Notify by email
+                    	def emailTitle = "[PermaSense-GSN-Public] - ERROR: Dozer Event (vs=" + vsname + ", pos=" + POSITION + ")";
+                    	
+                    	def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "] Dozer Event on position " + POSITION + " at " + vsname + ":\n\n" + idToMessageMap.get(EVENT_ID.toInteger());
+                    	if (EVENT_VALUE != null)
+                    		emailContent = emailContent.replaceAll('%s',Integer.toString(EVENT_VALUE));
+                    	
+                    	org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+                    	sendEmail(mailrecipients, emailTitle, emailContent);
+                    }
+                ]]>
+            </param>
+        </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
