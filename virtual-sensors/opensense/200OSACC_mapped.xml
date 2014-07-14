@@ -8,9 +8,7 @@
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="accel_x" type="double" />
-           <field name="accel_y" type="double" />
-           <field name="accel_z" type="double" />
+           <field name="accel" type="binary" />
            <field name="latitude" type="double" />
            <field name="longitude" type="double" />
            <field name="altitude" type="double" />

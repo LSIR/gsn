@@ -3,6 +3,7 @@ package gsn.vsensor;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -41,9 +42,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	        new DataField("RH","tinyint")});
 	    dataFields.put("ACC", new DataField[]{
 			new DataField("station","smallint"),
-	        new DataField("accel_x","double"),
-	        new DataField("accel_y","double"),
-	        new DataField("accel_z","double")});
+	        new DataField("accel","binary")}); //can be read in python by calling: struct.unpack('>d',f.read(8))
 	    dataFields.put("CO", new DataField[]{
 			new DataField("station","smallint"),
 	        new DataField("CO","int"),
@@ -83,9 +82,8 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	private String data_type;
 	private StreamElement temp;
 	private HashMap<Short,StreamElement> last_values;
-
-	
-
+	private HashMap<Short,ArrayList<Double>> last_acc;
+	private HashMap<Short,Long> last_acc_time;
 
 	@Override
 	public boolean initialize() {
@@ -104,7 +102,10 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
         }
         temp = new StreamElement(structure, new Serializable[structure.length]);
         if(data_type.equalsIgnoreCase("TL")){
-        	last_values = new HashMap<Short,StreamElement>();
+        	last_values = new HashMap<Short,StreamElement>(20);
+        }else if(data_type.equalsIgnoreCase("ACC")){
+        	last_acc = new HashMap<Short, ArrayList<Double>>(20);
+        	last_acc_time = new HashMap<Short, Long>(20);
         }
 		return true;
 	}
@@ -151,10 +152,29 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 				 }       	
 	        } else if (data_type.equalsIgnoreCase("ACC")){
 	        	if(s_type == 6){//sss
-	        		temp.setData(1,BinaryParser.readNextShort(input, true)/1000.0);
-	        		temp.setData(2,BinaryParser.readNextShort(input, true)/1000.0);
-	        		temp.setData(3,BinaryParser.readNextShort(input, true)/-1000.0);
-	        		dataProduced(new StreamElement(temp));
+	        		if (!last_acc_time.containsKey(id)){
+	        			last_acc_time.put(id, time / 1000);
+	        			last_acc.put(id, new ArrayList<Double>(4));
+	        		}
+	        		ArrayList<Double> a = last_acc.get(id);
+	        		if (last_acc_time.get(id) != time / 1000){
+	        			byte[] output = new byte[8*a.size()];
+	        			int j = 0;
+	        			for(Double d:a){
+	        				long lng = Double.doubleToLongBits(d);
+	        				for(int i = j; i < j+8; i++) output[i] = (byte)((lng >> ((7 - i) * 8)) & 0xff);
+	        				j += 8;
+	        			}
+	        			temp.setData(1,output);
+	        			temp.setTimeStamp(last_acc_time.get(id)*1000);
+		        		dataProduced(new StreamElement(temp));
+	        			last_acc_time.put(id, time / 1000);
+	        			last_acc.put(id, new ArrayList<Double>(4));
+	        			a = last_acc.get(id);
+	        		}
+	        		a.add(BinaryParser.readNextShort(input, true)/1000.0);
+	        		a.add(BinaryParser.readNextShort(input, true)/1000.0);
+	        		a.add(BinaryParser.readNextShort(input, true)/-1000.0);
 				 }
 	        } else if (data_type.equalsIgnoreCase("CO")){
 	        	if(s_type == 9 || s_type == 29){ //SSS
