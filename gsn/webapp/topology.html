@@ -888,7 +888,7 @@ function PacketRate() {
   }
   
   function generateDeviceIdMapping(positionMaps) {
-    var now = new Date().getTime()*1000;
+    var now = new Date().getTime()
     current_deployment.positionToDeviceIdMap = new Object();
     
     $("positionContainer", positionMaps).each(function() {
@@ -923,7 +923,6 @@ function PacketRate() {
   }
 
   function updateGeoMap(geoMaps) {
-    var now = new Date().getTime()*1000;
     var hasNewMarker = false;
     $("geoMappings", geoMaps).each(function() {
       var pos = parseInt($(this).attr("position"));
