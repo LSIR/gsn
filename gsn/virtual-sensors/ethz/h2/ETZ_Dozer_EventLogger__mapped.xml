@@ -33,7 +33,7 @@
                     	// Notify by email
                     	def emailTitle = "[PermaSense-GSN-Test] - ERROR: Dozer Event (vs=" + vsname + ", pos=" + POSITION + ")";
                     	
-                    	def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "] Dozer Event on position " + POSITION + " at " + vsname + ":\n\n" + idToMessageMap.get(EVENT_ID.toInteger());
+                    	def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "] Dozer Event on position " + POSITION + " (device_id=" + DEVICE_ID + ") at " + vsname + ":\n\n" + idToMessageMap.get(EVENT_ID.toInteger());
                     	if (EVENT_VALUE != null)
                     		emailContent = emailContent.replaceAll('%s',Integer.toString(EVENT_VALUE));
                     	
