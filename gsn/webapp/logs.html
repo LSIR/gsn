@@ -33,8 +33,9 @@
 <script type="text/javascript">
 <!--//<![CDATA[
 
+var CORESTATION_TYPES = [4, 5, 6];
 var LOOK_N_DAYS_BACK = 5;
-var MAX_LOGS_PER_REQUEST = 50;
+var MAX_LOGS_PER_REQUEST = 100;
 var MAX_LOGS_TOTAL = 1000;
 var UPDATE_INTERVAL = 2;
 
@@ -404,12 +405,14 @@ function getAvailableCoreStations(depl) {
 			success: function(data){
 				$("positionContainer",data).each(function(){
 					var pos = $(this).attr("position");
-					$("positionMap[device_type=4]",this).each(function(){
-						now = (new Date()).getTime();
-						end = $(this).attr("end");
-						if (now > parseInt($(this).attr("begin")) && (end == undefined || now < parseInt(end)))
-							deviceIds.push(pos);
-					});
+					for (var i = 0; i < CORESTATION_TYPES.length; i++) {
+						$("positionMap[device_type=" + CORESTATION_TYPES[i] + "]",this).each(function(){
+							now = (new Date()).getTime();
+							end = $(this).attr("end");
+							if (now > parseInt($(this).attr("begin")) && (end == undefined || now < parseInt(end)))
+								deviceIds.push(pos);
+						});
+					}
 				});
 			}
 		});
