@@ -182,7 +182,11 @@ public class DataDownload extends HttpServlet {
                                     Date d = sdf_from_ui.parse(critval[i]);
                                     where += d.getTime();
                                 } catch (Exception e) {
-                                    where += "0";
+                                    try {
+                                        where += new Long(critval[i]);
+                                    } catch (Exception e1) {
+                                        where += "0";
+                                    }
                                 }
                             } else {
                                 where += critval[i];
@@ -200,7 +204,11 @@ public class DataDownload extends HttpServlet {
                                     Date d = sdf_from_ui.parse(critval[i]);
                                     where += d.getTime();
                                 } catch (Exception e) {
-                                    where += "0";
+                                    try {
+                                        where += new Long(critval[i]);
+                                    } catch (Exception e1) {
+                                        where += "0";
+                                    }
                                 }
                             } else {
                                 where += critval[i];

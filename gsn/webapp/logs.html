@@ -360,8 +360,9 @@ var isPublicGSN = false;
 function deployment(name) {
 	this.name = name;
 	this.identifiers = new Array();
-	this.lastLogTime = "";
-	this.lastEventTime = "";
+	this.lastEventTime;
+	this.lastLogTime;
+	this.mappingExists = false;
 	this.topologyExists = false;
 	this.dozerEventsExists = false;
 }
@@ -391,7 +392,29 @@ function getFieldIdentifier() {
 
 function getAvailableCoreStations(depl) {
 	var deviceIds = new Array();
-	if (depl.topologyExists) {
+	if (isPublicGSN && depl.mappingExists) {
+		var tableEnding = "";
+		$.ajax({
+			type: "GET",
+	        url: "/field?vs="+depl.name.toLowerCase() + "_mapping_chart&field=DATA&pk=latest",
+	        dataType: "xml",
+	        async: false,
+	        cache: false,
+	        timeout: 30000,
+			success: function(data){
+				$("positionContainer",data).each(function(){
+					var pos = $(this).attr("position");
+					$("positionMap[device_type=4]",this).each(function(){
+						now = (new Date()).getTime();
+						end = $(this).attr("end");
+						if (now > parseInt($(this).attr("begin")) && (end == undefined || now < parseInt(end)))
+							deviceIds.push(pos);
+					});
+				});
+			}
+		});
+	}
+	else if (depl.topologyExists) {
 		var tableEnding = "";
 		if (isPublicGSN)
 			tableEnding = "__public";
@@ -416,7 +439,7 @@ function getAvailableCoreStations(depl) {
 		var date = new Date((new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000));
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + depl.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=" + getFieldIdentifier() + "&orderby=timestamp&groupby=" + getFieldIdentifier() + "&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime(),
+			url: "/data?vsName=" + depl.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=" + getFieldIdentifier() + "&orderby=generation_time&groupby=" + getFieldIdentifier() + "&critfield=generation_time&neg=&critop=%3E&critval=" + date.getTime(),
 	        async: false,
 	        cache: false,
 	        timeout: 30000,
@@ -449,94 +472,94 @@ function getLastLogs(logContainer) {
 	if (logContainer.identifier === "dozerevents") {
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + deployment.name.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=event_timestamp&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime() + "&nb=" + MAX_LOGS_PER_REQUEST,
+			url: "/data?vsName=" + deployment.name.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=position&fields=device_id&fields=event_id&fields=event_value&fields=timed&orderby=event_timestamp&critfield=event_timestamp&neg=&critop=%3E&critval=" + date.getTime() + "&nb=" + MAX_LOGS_PER_REQUEST,
 	        async: false,
 	        cache: false,
 	        timeout: 30000,
 			success: function(data){
-				var lastEventTime = "";
 				$($("line", data).get().reverse()).each(function(i){
 					if ($("field:eq(0)", this).text() != "event_timestamp") {
 						if (i == 0)
 							logContainer.firstTimestamp = $("field:eq(0)", this).text();
-						lastEventTime = $("field:eq(0)", this).text();
-						$('.jspPane',"#logcontainer_" + logContainer.containerId).append(generateEventMessageDiv(lastEventTime, $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
+						var timed = parseInt($("field:eq(5)", this).text());
+						if (deployment.lastEventTime == undefined || deployment.lastEventTime < timed)
+							deployment.lastEventTime = timed;
+						$('.jspPane',"#logcontainer_" + logContainer.containerId).append(generateEventMessageDiv($("field:eq(0)", this).text(), $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
 					}
 				});
-				deployment.lastEventTime = lastEventTime;
 			}
 		});
 	}
 	else {
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + deployment.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=timestamp&fields=log_message&fieldslinked=false&orderby=timestamp&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&critJoin=and&critfield=timestamp&neg=&critop=%3E&critval=" + date.getTime() + "&nb=" + MAX_LOGS_PER_REQUEST,
+			url: "/data?vsName=" + deployment.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=generation_time&fields=log_message&fields=timed&fieldslinked=false&orderby=generation_time&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&critJoin=and&critfield=generation_time&neg=&critop=%3E&critval=" + date.getTime() + "&nb=" + MAX_LOGS_PER_REQUEST,
 	        async: false,
 	        cache: false,
 	        timeout: 30000,
 			success: function(data){
-				var lastLogTime = "";
 				$($("line", data).get().reverse()).each(function(i){
-					if ($("field:eq(0)", this).text() != "timestamp") {
+					if ($("field:eq(0)", this).text() != "generation_time") {
 						if (i == 0)
 							logContainer.firstTimestamp = $("field:eq(0)", this).text();
-						lastLogTime = $("field:eq(0)", this).text();
-						$('.jspPane',"#logcontainer_" + logContainer.containerId).append(generateSyslogNgMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
+						var timed = parseInt($("field:eq(2)", this).text());
+						if (deployment.lastLogTime == undefined || deployment.lastLogTime < timed)
+							deployment.lastLogTime = timed;
+						$('.jspPane',"#logcontainer_" + logContainer.containerId).append(generateSyslogNgMessageDiv($("field:eq(0)", this).text(), $("field:eq(1)", this).text()));
 					}
 				});
-				deployment.lastLogTime = lastLogTime;
 			}
 		});
 	}
 }
 
-function getMaxLogsRecursive(logContainer, lastTimestamp) {
-	var deplName = deployments[logContainer.deplId].name;
+function getMaxLogsRecursive(logContainer, lastGenerationTime) {
+	var deployment = deployments[logContainer.deplId];
 	if (logContainer.identifier === "dozerevents") {
 		var tmp = "";
-		if (lastTimestamp != "")
-			tmp = "&critJoin=and&critfield=event_timestamp&neg=&critop=<&critval=" + lastTimestamp;
+		if (lastGenerationTime != "")
+			tmp = "&critJoin=and&critfield=event_timestamp&neg=&critop=<&critval=" + lastGenerationTime;
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + deplName.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST + tmp,
+			url: "/data?vsName=" + deployment.name.toLowerCase() + "_dozer_eventlogger__mapped&fields=event_timestamp&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=event_timestamp&nb=" + MAX_LOGS_PER_REQUEST + tmp,
 			async: false,
 			cache: false,
 			timeout: 30000,
 			success: function(data){
-				var lastEventTime = "";
+				var lastGenTime = "";
 				$("line", data).each(function(){
 					if ($("field:eq(0)", this).text() != "event_timestamp") {
-						lastEventTime = $("field:eq(0)", this).text();
-						$('.jspPane',"#logcontainer_" + logContainer.containerId).prepend(generateEventMessageDiv(lastEventTime, $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
+						lastGenTime = $("field:eq(0)", this).text();
+						$('.jspPane',"#logcontainer_" + logContainer.containerId).prepend(generateEventMessageDiv($("field:eq(0)", this).text(), $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
 					}
 				});
 				scrollPane.reinitialise();
-				if (lastEventTime != "" && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
-					getMaxLogsRecursive(logContainer, lastEventTime);
+				if (lastGenTime != "" && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
+					getMaxLogsRecursive(logContainer, lastGenTime);
 			}
 		});
 	}
 	else {
 		var tmp = "";
-		if (lastTimestamp != "")
-			tmp = "&critJoin=and&critfield=timestamp&neg=&critop=<&critval=" + lastTimestamp;
+		if (lastGenerationTime != "")
+			tmp = "&critJoin=and&critfield=generation_time&neg=&critop=<&critval=" + lastGenerationTime;
 		$.ajax({
 			type: "GET",
-			url: "/data?vsName=" + deplName.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=timestamp&fields=log_message&fieldslinked=false&orderby=timestamp&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&nb=" + MAX_LOGS_PER_REQUEST + tmp,
+			url: "/data?vsName=" + deployment.name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=generation_time&fields=log_message&fieldslinked=false&orderby=generation_time&critfield=" + getFieldIdentifier() + "&neg=&critop==&critval=" + logContainer.identifier + "&nb=" + MAX_LOGS_PER_REQUEST + tmp,
 			async: false,
 			cache: false,
 			timeout: 30000,
 			success: function(data){
-				var lastLogTime = "";
+				var lastGenTime = "";
 				$("line", data).each(function(){
-					if ($("field:eq(0)", this).text() != "timestamp") {
-						lastLogTime = $("field:eq(0)", this).text();
-						$('.jspPane',"#logcontainer_" + logContainer.containerId).prepend(generateSyslogNgMessageDiv(lastLogTime, $("field:eq(1)", this).text()));
+					if ($("field:eq(0)", this).text() != "generation_time") {
+						lastGenTime = $("field:eq(0)", this).text();
+						$('.jspPane',"#logcontainer_" + logContainer.containerId).prepend(generateSyslogNgMessageDiv($("field:eq(0)", this).text(), $("field:eq(1)", this).text()));
 					}
 				});
 				scrollPane.reinitialise();
-				if (lastLogTime != "" && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
-					getMaxLogsRecursive(logContainer, lastLogTime);
+				if (lastGenTime != "" && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
+					getMaxLogsRecursive(logContainer, lastGenTime);
 			}
 		});
 	}
@@ -545,33 +568,34 @@ function getMaxLogsRecursive(logContainer, lastTimestamp) {
 function getLogs() {
 	var sdid = selectedDeploymentId;
 	var isEvents = logContainers[selectedLogContainerId].identifier === "dozerevents";
-	var crit = "&nb=1";
-	var firstFieldIdentifier = "timestamp";
-	if (deployments[sdid].lastLogTime != "")
-		crit = "&critfield=" + firstFieldIdentifier + "&neg=&critop=>&critval=" + deployments[sdid].lastLogTime + "&nb=" + MAX_LOGS_TOTAL;	
-	var query = deployments[sdid].name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=" + firstFieldIdentifier + "&fields=" + getFieldIdentifier() + "&fields=log_message&fieldslinked=false&orderby=" + firstFieldIdentifier + crit;
+	var firstFieldIdentifier = "generation_time";
+	if (deployments[sdid].lastLogTime != undefined)
+		var crit = "&critfield=timed&neg=&critop=>&critval=" + deployments[sdid].lastLogTime + "&nb=" + MAX_LOGS_TOTAL;
+	else
+		var crit = "&critfield=timed&neg=&critop=>&critval=" + (new Date()).getTime()-(LOOK_N_DAYS_BACK*86400000) + "&nb=" + MAX_LOGS_TOTAL;
+	var query = deployments[sdid].name.toLowerCase() + "_syslogng" + getTableEnding() + "&fields=" + firstFieldIdentifier + "&fields=" + getFieldIdentifier() + "&fields=log_message&fields=timed&fieldslinked=false" + crit;
 	
 	if (isEvents) {
 		firstFieldIdentifier = "event_timestamp";
-		if (deployments[sdid].lastEventTime != "")
-			crit = "&critfield=" + firstFieldIdentifier + "&neg=&critop=>&critval=" + deployments[sdid].lastEventTime + "&nb=" + MAX_LOGS_TOTAL;
+		if (deployments[sdid].lastEventTime != undefined)
+			crit = "&critfield=timed&neg=&critop=>&critval=" + deployments[sdid].lastEventTime + "&nb=" + MAX_LOGS_TOTAL;
 		
-		query = deployments[sdid].name.toLowerCase() + "_dozer_eventlogger__mapped&fields=" + firstFieldIdentifier + "&fields=position&fields=device_id&fields=event_id&fields=event_value&orderby=" + firstFieldIdentifier + crit;
+		query = deployments[sdid].name.toLowerCase() + "_dozer_eventlogger__mapped&fields=" + firstFieldIdentifier + "&fields=position&fields=device_id&fields=event_id&fields=event_value&fields=timed" + crit;
 	}
 	
 	$.ajax({
 		type: "GET",
 		url: "/data?vsName=" + query,
 		success: function(data){
-			var lastTime = "";
+			var lastTime;
 			$($("line", data).get().reverse()).each(function(){
 				var l = $("field:eq(1)", this).text();
 				if ($("field:eq(0)", this).text() != firstFieldIdentifier && l.toLowerCase() != "null") {
 					var container;
 					if (isEvents) {
 						container = $('.jspPane',"#logcontainer_" + selectedLogContainerId);
-						lastTime = $("field:eq(0)", this).text();
-						container.append(generateEventMessageDiv(lastTime, $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
+						lastTime = parseInt($("field:eq(5)", this).text());
+						container.append(generateEventMessageDiv($("field:eq(0)", this).text(), $("field:eq(1)", this).text(), $("field:eq(2)", this).text(), $("field:eq(3)", this).text(), $("field:eq(4)", this).text()));
 					}
 					else {
 						var id;
@@ -592,8 +616,8 @@ function getLogs() {
 							});
 						}
 						container = $('.jspPane',"#logcontainer_" + id);
-						lastTime = $("field:eq(0)", this).text();
-						container.append(generateSyslogNgMessageDiv(lastTime, $("field:eq(2)", this).text()));
+						lastTime = parseInt($("field:eq(3)", this).text());
+						container.append(generateSyslogNgMessageDiv($("field:eq(0)", this).text(), $("field:eq(2)", this).text()));
 					}
 					
 					$($(container).children().get().reverse()).each(
@@ -604,7 +628,7 @@ function getLogs() {
 					);
 				}
 			});
-			if (lastTime != "") {
+			if (lastTime != undefined) {
 				scrollPane.reinitialise();
 				if (isEvents)
 					deployments[sdid].lastEventTime = lastTime;
@@ -785,7 +809,7 @@ $(document).ready(function() {
 			// iterate over all available virtual sensors
 			$("virtual-sensor",data).each(function(){
 				// are there syslog-ng or eventlogger__mapped vs available?
-				if ($(this).attr("name").indexOf("syslogng") != -1 || $(this).attr("name").indexOf("topology") != -1 || $(this).attr("name").indexOf("_dozer_eventlogger__mapped") != -1) {
+				if ($(this).attr("name").indexOf("syslogng") != -1 || $(this).attr("name").indexOf("topology") != -1 || $(this).attr("name").indexOf("mapping_chart") != -1 || $(this).attr("name").indexOf("_dozer_eventlogger__mapped") != -1) {
 					// private or public?
 					if ($(this).attr("name").indexOf("__mapped") != -1)
 						isPublicGSN = true;
@@ -809,6 +833,10 @@ $(document).ready(function() {
 							// does the deployment offer dozer event logger information?
 							if ($(this).attr("name").indexOf("_dozer_eventlogger__mapped") != -1)
 								depl.dozerEventsExists = true;
+
+							// does the deployment offer mapping_chart information?
+							if ($(this).attr("name").indexOf("mapping_chart") != -1)
+								depl.mappingExists = true;
 
 							// does the deployment offer topology information?
 							if ($(this).attr("name").indexOf("topology") != -1)
