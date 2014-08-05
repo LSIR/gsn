@@ -12,11 +12,11 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="MOISTURE1" type="VARCHAR(30)" unit="mm" />
-            <field name="MOISTURE2" type="VARCHAR(30)" unit="mm" />
-            <field name="MOISTURE3" type="VARCHAR(30)" unit="mm" />
-            <field name="MOISTURE4" type="VARCHAR(30)" unit="mm" />
-            <field name="MOISTURE5" type="VARCHAR(30)" unit="mm" />            
+            <field name="MOISTURE1" type="VARCHAR(30)" unit="%" />
+            <field name="MOISTURE2" type="VARCHAR(30)" unit="%" />
+            <field name="MOISTURE3" type="VARCHAR(30)" unit="%" />
+            <field name="MOISTURE4" type="VARCHAR(30)" unit="%" />
+            <field name="MOISTURE5" type="VARCHAR(30)" unit="%" />            
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerEnviroScanDataMsg) from Jungfraujoch deployment converted to moisture</description>
