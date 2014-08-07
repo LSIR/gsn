@@ -14,6 +14,7 @@ scalaVersion := "2.10.4"
 crossPaths := false
 
 libraryDependencies ++= Seq(
+  "com.typesafe" % "config" % "1.2.1",
   "com.h2database" % "h2" % "1.1.116",
   "mysql" % "mysql-connector-java" % "5.1.29",
   "commons-dbcp" % "commons-dbcp" % "1.4",

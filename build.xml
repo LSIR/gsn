@@ -66,6 +66,9 @@
             <exclude name="**/TCPConnPool.java"/>
             <exclude name="**/NetworkUtility.java"/>
         </javac>
+    	<copy todir="${build.dir}">
+    	    <fileset dir="src" includes="**/*.conf,**/*.properties" />
+    	</copy>
     </target>
 
     <target name="bind" depends="build" description="Compile the JIBX mappings.">

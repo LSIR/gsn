@@ -244,8 +244,15 @@
        <servlet-class>gsn.http.restapi.RestServlet</servlet-class>
    </servlet>
 
-
-
+   <servlet>
+       <servlet-name>SensorServlet</servlet-name>
+       <display-name>SensorServlet</display-name>
+       <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+       <init-param>
+         <param-name>javax.ws.rs.Application</param-name>
+         <param-value>gsn.http.restapi.RestApplication</param-value>
+       </init-param>
+   </servlet>
    
 	<!-- mapping for GSN -->
 	
@@ -294,6 +301,10 @@
     	<url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
 
+   <servlet-mapping>
+     <servlet-name>SensorServlet</servlet-name>
+     <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>MenuServlet</servlet-name>

@@ -650,6 +650,7 @@ public class RequestHandler {
             DataEnumerator result = Main.getStorage(virtual_sensor_name).executeQuery( query , true );
             if ( result.hasMoreElements( ) ){
                 StreamElement se = result.nextElement();
+                //toReturn.put("timed", se.getTimeStamp());
                 for (String fn: se.getFieldNames()){
                     toReturn.put(fn.toLowerCase(), (Double)se.getData(fn));
                 }
