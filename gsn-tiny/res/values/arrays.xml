@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+	<string-array name="vs_type">
+		<item name="bridge">Bridge</item>
+		<item name="gps_vs">Notification</item>		
+	</string-array>
+	
+	<string-array name="vs_type_value">
+		<item name="bridge">Bridge Virtual Sensor</item>
+		<item name="gps_vs">Notification Virtual Sensor</item>		
+	</string-array>
+	
+	<string-array name="wrapper_name">
+		<item name="fake_gps">fake_gps</item>
+		<item name="gps0">gps</item>		
+	</string-array>
+
+	<string-array name="wrapper_name_value">
+		<item name="fake_gps">fake_gps</item>
+		<item name="gps0">gps</item>		
+	</string-array>
+	
+	<string-array name="agg_name">
+		<item name="avg">Average</item>
+		<item name="max">Maximum</item>
+		<item name="min">Minimum</item>		
+	</string-array>
+
+	<string-array name="agg_name_value">
+		<item name="avg">Average</item>
+		<item name="max">Maximum</item>
+		<item name="min">Minimum</item>	
+	</string-array>
+	
+	<string-array name="strategy">
+		<item name="periodically">Periodically (time)</item>
+		<item name="periodically_value">Periodically (values)</item>
+		<item name="on_demand">On demand</item>		
+	</string-array>
+	
+	<string-array name="range_type">
+		<item name="Latest_values">Latest_values</item>
+		<item name="range">Time range</item>		
+	</string-array>
+	
+</resources>

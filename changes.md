@@ -1,5 +1,15 @@
 ## GSN Change log
 
+### r1.1.5
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.5)
+* Added possibility to omit latest values in request '/gsn?REQUEST=0'
+* Added latest values in /sensors response (/service?latest_values=true)
+* Added GeoJSON format for RestApi
+* Updated commons codec, upgraded web xml 2.5
+* Added the tinyGSN Android app, and google cloud messaging support
+* Updated ContainerInfoHandler to support non-unique time-stamps
+
+
 ### r1.1.4
 [commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.4)
 * Updated the logo and color scheme accordingly
