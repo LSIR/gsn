@@ -20,7 +20,7 @@
         <property environment="env"/>
         <property name="conf.dir" value="${basedir}/conf"/>
         <property name="build.dir" value="build/classes"/>
-        <property name="src.dir" value="src"/>
+        <property name="src.dir" value="src/main/java"/>
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
         <property name="reports" value="reports"/>

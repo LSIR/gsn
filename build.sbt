@@ -37,6 +37,7 @@ libraryDependencies ++= Seq(
   "rome" % "rome" % "1.0",
   "org.glassfish.jersey.containers" % "jersey-container-servlet-core" % "2.8",
   "org.glassfish.jersey.core" % "jersey-client" % "2.8",
+  "com.ganyo" % "gcm-server" % "1.0.2",
   "junit" % "junit" % "4.11",
   "org.easymock" % "easymockclassextension" % "3.2",
   "org.httpunit" % "httpunit" % "1.7.2" intransitive
@@ -53,13 +54,13 @@ unmanagedSourceDirectories in Compile <<= (javaSource in Compile)(Seq(_))
 
 unmanagedSourceDirectories in Test <<= (javaSource in Test)(Seq(_))
 
-javaSource in Compile <<= baseDirectory(base => base / "src")
+//javaSource in Compile <<= baseDirectory(base => base / "src")
 
 javaSource in Test :=  baseDirectory.value / "test"
 
-resourceDirectory in Compile := baseDirectory.value / "conf"
+//resourceDirectory in Compile := baseDirectory.value / "conf"
 
-resourceDirectory in Test := baseDirectory.value / "logs"
+//resourceDirectory in Test := baseDirectory.value / "logs"
 
 unmanagedJars in Compile <++= baseDirectory map { base =>
     val libs = base / "lib"
