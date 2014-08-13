@@ -4,34 +4,59 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
-        <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
-        <link rel="stylesheet" href="style/ui.datepicker.css" type="text/css" media="screen,projection" />
-        <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
 
-        <script type="text/javascript" src="js/jquery-1.2.6/jquery-1.2.6.pack.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-core-1.5.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-accordion-1.5.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-tabs-1.5.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.2.6/ui/jquery-ui-datepicker-1.5.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.11/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.11/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.11/jquery.datetimepicker.js"></script>
+        <script type="text/javascript" src="js/combobox/chosen.jquery.min.js"></script>
+        <link rel="stylesheet" href="js/jquery-1.11/jquery-ui.min.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="js/jquery-1.11/jquery-ui.structure.min.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="js/combobox/chosen.min.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="js/jquery-1.11/jquery.datetimepicker.css" type="text/css" media="screen,projection" />
+
+        <script type="text/javascript" src="js/d3plots/histogram.js"></script>
+        <script type="text/javascript" src="js/d3plots/scatterplot.js"></script>
+        <script type="text/javascript" src="js/d3plots/timeseries.js"></script>
+        <link rel="stylesheet" href="js/d3plots/d3plots.css" type="text/css" media="screen,projection" />
+
+        <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="js/jquery-1.11/jquery-ui.theme.min.css" type="text/css" media="screen,projection" />
+
         <script type="text/javascript" src="js/jquery.flot.pack.js"></script>
-        <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+
+
         <script type="text/javascript">
+
             /* XML object loaded from the REQUEST_LIST_OF_VIRTUAL_SENSORS GSN request */
             var lovs = null;
             /* Mapping from virtual sensor name to list of fields name */
             var virtual_sensor_to_fields = []
+            var virtual_sensors = [];
             var field_to_virtual_sensor = []
             var field_to_unit = []
+            var vss_max_id = 0;
+            var fields_max_id = 0;
+
+            var plotIsShown = false;
+
             $(function(){
-                function csv_to_json(tag,callback,format){
+                function csv_to_json(tag,callback,format, plot){
                     callback = callback || function(){};
                     var old_value = $('#time_format').val();
                     $('#download_format').val('csv');
                     format = format || 'unix';
                     $('#time_format').val(format);
-                    if ($("#ifexists").is("checked")) $("#ifexists").val("true");
+                    if ($("#ifexists").prop("checked")) $("#ifexists").val("true");
                     prepare_form_for_submission(tag);
-                    $.post('multidata', tag.parents('form').serializeArray(), function(response, text_status, request){
+                    var params = tag.parents('form').serializeArray();
+
+                    if (plot == true && $("#disablesampling").prop("checked") == false) {
+                        params.push({"name": "sample", "value": "true"});
+                        if (plotIsShown == false){
+                            $("#sampling_percentage").val("-1");
+                        }
+                    }
+                    $.post('multidata', params, function(response, text_status, request){
                         var lines = response.split("\n");
                         var headers = [];
                         var timestamp_idx = -1;
@@ -81,86 +106,50 @@
                             }
                         }
                         $('#time_format').val(old_value);
+                        if (plot == true) {
+                            $('#progressbar').progressbar("disable");
+                            $('#plotContainer').empty();
+
+                            if (plotIsShown == false){
+                                plotIsShown = true;
+                                $(".sampling_percentage").show();
+                                $("#sampling_percentage").val("");
+                            }
+                        }
                         callback(datasets,nb_elements);
                     });
                 }
 
-                /******************************************************/
-                /*                  CHARTING PART                      */
-                /******************************************************/
-                function drawChart(datasets, nbElements){
-                    var full_dataset = datasets;
-                    var selected_datasets = [];
-                    var plot;
-                    var i = 0;
-                    var options = {
-                        legend: { show: false },
-                        lines: { show: true },
-                        points: { show: false },
-                        selection: { mode: "xy" },
-                        xaxis: {mode: "time",timeformat: "%H:%M:%S %y/%m/%d"}
-                    };
+                function parse_minmax_vals_for_slider(sensor, field, slider, min, max){
 
-                    for (var d in datasets){
-                        selected_datasets.push(full_dataset[d]);
-                        full_dataset[d].color=i++;    // hard-code color indices to prevent them from shifting colors dynamically
-                    }
-
-                    function plotAccordingToChoices() {
-                        if (selected_datasets.length > 0){
-                            plot.setData(selected_datasets);
-                            plot.setupGrid();
-                            plot.draw();
+                    $.get('rest/sensors/'+sensor+'/'+field+'/minmax', {}, function(response, text_status, request){
+                        var minVal = response[0]['values'][0][3];
+                        var maxVal = response[0]['values'][0][2];
+                        var disabled = false;
+                        if (minVal == null || maxVal == null){
+                            minVal = 0;
+                            maxVal = 100;
+                            disabled = true;
                         }
-                    }
-                    plot = $.plot($(".gsn_chart"), [], options);
 
-                    var overview = $.plot($(".overview"), selected_datasets, {
-                        lines: { show: true, lineWidth: 1 },
-                        legend: { show: true, container: $(".overviewLegend") },
-                        grid: { color: "#999" },
-                        shadowSize: 0,
-                        xaxis: {ticks: [], mode: "time" },
-                        yaxis: {ticks: [] },
-                        selection: { mode: "xy" }
-                    });
-
-                    // now connect the two
-
-                    $(".gsn_chart").bind("plotselected", function (event, ranges) {
-                        // do the zooming
-
-                        $(".gsn_chart").empty();
-                        plot = $.plot($(".gsn_chart"), selected_datasets,
-
-                        $.extend(true, {}, options, {
-                            xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
-                            yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
-                        }));
-                        // don't fire event on the overview to prevent eternal loop
-                        overview.setSelection(ranges, true);
-                    });
-
-                    $(".overview").bind("plotselected", function (event, ranges) {
-                        plot.setSelection(ranges);
-                    });
-                    $(".legendColorBox").click(function(){
-                        if ($('.miniature').find('.legendColorBox').not('.no-img').length <2 && !$(this).hasClass('no-img'))
-                            return;
-                        $(this).toggleClass('no-img');
-                        selected_datasets = [];
-                        $('.miniature').find('.legendColorBox').not('.no-img').each(function(){
-                            legend = $(this).next('.legendLabel').text();
-                            for(var idx in full_dataset){
-                                if (full_dataset[idx].label == legend){
-                                    selected_datasets.push(full_dataset[idx]);
-                                }
+                        slider.slider({
+                            range: true,
+                            min: minVal,
+                            max: maxVal,
+                            disabled: disabled,
+                            values: [ minVal, maxVal ],
+                            slide: function (event, ui) {
+                                $(this).parent().children(".min").val(ui.values[ 0 ]);
+                                $(this).parent().children(".max").val(ui.values[ 1 ]);
                             }
                         });
-                        plotAccordingToChoices();
+                        //min.val(response[0]['values'][0][3]);
+                        //max.val(response[0]['values'][0][2]);
+
                     });
-                    plotAccordingToChoices();
                 }
+
+
 
                 function getSortedKeys(obj){
                     var keys = [];
@@ -178,11 +167,19 @@
                     return values.sort();
                 }
 
-                function option_list_key(name,items,all){
-                    to_return = '<select name="' + name + '" class="' + name+ '">'
+                function add_auto_complete_one_sensor(name){
+                    to_return = '<select name="' + name + '" class="' + name+ '"></select>';
+                    virtual_sensors.sort();
+                    return to_return;
+                }
+
+                function option_list_key(name,items,all, id){
+                    to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all){
                         to_return+='<option value="All" >' + all + '</option>';
                     }
+
+
                     var sk = getSortedKeys(items);
                     var l = sk.length;
                     for (var i = 0 ; i < l ; i++) {
@@ -193,8 +190,8 @@
                     return to_return;
                 }
 
-                function option_list_value(name,items,all, units){
-                    to_return = '<select name="' + name + '" class="' + name+ '">'
+                function option_list_value(name,items,all, units, id){
+                    to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all!=null){
                         to_return+='<option value="All" >' + all + '</option>';
                     }
@@ -211,17 +208,64 @@
                     return to_return;
                 }
 
+
                 function add_data_output () {
-                    $('#data-outputs').append('<li>' + option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors") + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' <a class="remove-criterion" href="#"> Remove</a></li>');
-                    $('.vss').change(function(){
+
+                    var vss_id = "vss_" + vss_max_id;
+                    var fields_id = "fields_" + fields_max_id;
+                    var fields_div_id  = "fields_div_id_" + fields_max_id;
+                    vss_max_id++; fields_max_id++;
+                    var data_outputs_content = '<li>';
+                    data_outputs_content += option_list_key('vss', virtual_sensor_to_fields, "All Virtual Sensors", vss_id);
+                    data_outputs_content += '<div name="fields" class="fields" style="display: inline-block;" id="' + fields_div_id+ '"></div>';
+                    data_outputs_content += '<div class="condition-slider" style="display: inline-block;"></div>';
+                    data_outputs_content += '<a class="remove-criterion" href="#"> Remove</a></li>';
+                    $('#data-outputs').append(data_outputs_content);
+
+
+                    $('#'+vss_id).chosen({
+                        search_contains: true,
+                        width: "200px"
+                    });
+                    $('#'+vss_id).on('change', function(evt, params){
                         var vs = $(this).val();
-                        if (vs == 'All') {
-                            $(this).next("select").replaceWith(option_list_key('fields',field_to_virtual_sensor,"All Fields"));
+                        if (vs != 'All') {
+                            $('#'+fields_div_id).html("&nbsp " + option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs], fields_id));
+                            $('#'+fields_id).chosen({
+                                search_contains: true,
+                                width: "150px"
+                            });
+                            $('#'+fields_id).on('change', function(evt, params){
+                                if ($(this).val() != 'All' && $('#'+vss_id).val() != 'All') {
+                                    $(this).parent().parent().children('.condition-slider').show();
+                                    var conditions_content = '&nbsp<input type="text" class="min" style="font-weight:bold; width:30px; display: inline-block;"/>';
+                                    conditions_content += '&nbsp &nbsp';
+                                    conditions_content += '<div class="slider-range" style="width: 200px; display: inline-block"></div>';
+                                    conditions_content += '&nbsp &nbsp';
+                                    conditions_content += '<input type="text" class="max" style="font-weight:bold; width:30px;"/>';
+                                    conditions_content += '<input type="text" class="c_vs" style="display: none;"/>';
+                                    conditions_content += '<input type="text" class="c_field" style="display: none;"/>';
+                                    conditions_content += '<input type="text" class="join" value="and" style="display: none;"/>';
+                                    $(this).parent().parent().children('.condition-slider').html(conditions_content);
+                                    parse_minmax_vals_for_slider($('#'+vss_id).val(), $(this).val(),
+                                            $(this).parent().parent().children('.condition-slider').children(".slider-range"),
+                                            $(this).parent().parent().children('.condition-slider').children(".min"),
+                                            $(this).parent().parent().children('.condition-slider').children(".max")
+                                    );
+
+                                    $(this).parent().parent().children('.condition-slider').children(".min").val("-inf");
+                                    $(this).parent().parent().children('.condition-slider').children(".max").val("+inf");
+                                } else {
+                                    $(this).parent().parent().children('.condition-slider').hide();
+                                }
+                            });
                         }
                         else {
-                            $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs]));
+                            $('#'+fields_div_id).html("");
                         }
+                        $(this).parent().children('.condition-slider').hide();
                     });
+
                     $('.remove-criterion').click (function() {
                         if ($(this).parent().parent().children().size() > 1) {
                             $(this).parent().remove();
@@ -229,71 +273,69 @@
                     });
                 }
 
-                function add_condition () {
-                    $('#conditions').append('<li><select class="join" name="join"><option value="and">AND</option><option value="or">OR</option></select>' +  option_list_key('vss',virtual_sensor_to_fields,"All Virtual Sensors") + option_list_key('fields',field_to_virtual_sensor,"All Fields") + ' | Between <input class="min" type="text" size="3" value="-inf" /> and <input class="max" type="text" size="3" value="+inf" /><a class="remove-criterion" href="#"> Remove</a></li>');
-                    $('.vss').change(function(){
-                        var vs = $(this).val();
-                        if (vs == 'All') {
-                            $(this).next("select").replaceWith(option_list_key('fields',field_to_virtual_sensor,"All Fields"));
-                        }
-                        else {
-                            $(this).next("select").replaceWith(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs]));
-                        }
-                    });
-                    $('.remove-criterion').click (function() {
-                        $(this).parent().remove();
-                        $('.join:first').hide();
-                    });
-                    $('.join:first').hide();
-                }
-
                 function prepare_form_for_submission(tag){
                     var counter = 0;
                     tag.parents('form').find('.data-outputs-container li').each(function(){
-                        $(this).find('.vss').each(function(){$(this).attr('name','vs['+counter+']');});
-                        $(this).find('.fields').each(function(){$(this).attr('name','field['+counter+']');});
-                        counter++;
-                    });
-                    counter = 0;
-                    tag.parents('form').find('.conditions-container li').each(function(){
-                        $(this).find('.vss').each(function(){$(this).attr('name','c_vs['+counter+']');});
-                        $(this).find('.fields').each(function(){$(this).attr('name','c_field['+counter+']');});
-                        $(this).find('.join').each(function(){$(this).attr('name','c_join['+counter+']');});
-                        $(this).find('.max').each(function(){$(this).attr('name','c_max['+counter+']');});
-                        $(this).find('.min').each(function(){$(this).attr('name','c_min['+counter+']');});
-                        counter++;
-                    });
-                }
-
-
-                function submit_form(tag,options,callback){
-                    /* THIS IS A HELPER METHOD BUT NOT REALLY USED ANYWHRER ... */
-                    options = options || [];
-                    callback = callback || function(){};
-                    prepare_form_for_submission(tag);
-
-                    var to_send = tag.parents('form').serializeArray();
-                    //  alert(to_send);
-                    for (var format_key in options){
-                        for(var idx in to_send){
-                            //alert(to_send[idx] );
-                            if (to_send[idx].name==format_key){
-                                to_send[idx].value=options[format_key];
+                        $(this).find('.vss').each(function(){
+                            $(this).chosen().attr("name", 'vs['+counter+']');
+                            var vssId = $(this).attr('id');
+                            vssId = parseInt(vssId.split("_")[1]);
+                            if (typeof $("#toDelete") != "undefined") $("#toDelete").remove();
+                            if ($(this).chosen().val() == "All"){
+                                $(this).append('<input id="toDelete" name="field[0]" value="All"/>');
+                                return;
                             }
-                        }
-                    }
-                }
 
-                function customRange(input) {
-                    return {minDate: (input.id == "datepicker_to" ? $("#datepicker_from").datepicker("getDate") : null),
-                        maxDate: (input.id == "datepicker_from" ? $("#datepicker_to").datepicker("getDate") : null)};
+                            $("#fields_" + vssId).chosen().attr("name", 'field['+counter+']');
+                            if (typeof $("#fields_" + vssId).chosen().val() == "undefined"){
+                                $("#fields_" + vssId).chosen().val('All');
+                            }
+                            if ($("#fields_div_id_"+vssId).next().html() != ""){
+
+                                var skip = 0;
+                                $("#fields_div_id_"+vssId).next().find('.min').each(function(){
+                                    if ($(this).val() == "-inf") {
+                                        $("#fields_div_id_"+vssId).next().find('.max').each(function(){
+                                            if ($(this).val() == "+inf") skip  = 1;
+                                        });
+                                    }
+                                });
+
+                                if (skip == 0) {
+
+                                    $("#fields_div_id_" + vssId).next().find('.c_vs').each(function () {
+                                        $(this).attr('name', 'c_vs[' + counter + ']');
+                                        $(this).val($("#vss_" + vssId).chosen().val());
+                                    });
+                                    $("#fields_div_id_" + vssId).next().find('.c_field').each(function () {
+                                        $(this).attr('name', 'c_field[' + counter + ']');
+                                        $(this).val($("#fields_" + vssId).chosen().val());
+                                    });
+                                    $("#fields_div_id_" + vssId).next().find('.min').each(function () {
+                                        $(this).attr('name', 'c_min[' + counter + ']');
+                                    });
+                                    $("#fields_div_id_" + vssId).next().find('.max').each(function () {
+                                        $(this).attr('name', 'c_max[' + counter + ']');
+                                    });
+                                    $("#fields_div_id_" + vssId).next().find('.join').each(function () {
+                                        $(this).attr('name', 'c_join[' + counter + ']');
+                                    });
+                                }
+                            }
+                            counter++;
+                        });
+
+                    });
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
                 $.get("gsn?REQUEST=0&omit_latest_values=true", function(xml){
                     lovs = xml
+                    virtual_sensors.push("All");
+
                     $('virtual-sensor',xml).each(function(){
                         var vsname = $(this).attr('name');
+                        virtual_sensors.push(vsname);
                         virtual_sensor_to_fields[vsname] = virtual_sensor_to_fields[vsname] || []
                         $(this).find('field').each(function(){
                             if ($(this).attr('category') != 'predicate') {
@@ -314,20 +356,19 @@
                         });
                     });
                     add_data_output ();
-                    add_condition ();
                 });
 
                 $('#add-data-output').click(function () {
                     add_data_output();
                 });
 
-                $('#add-condition').click(function () {
-                    add_condition();
-                });
-
                 $('#nb').change(function(){
                     var val = $(this).val();
-                    $('#nb_value').attr('disabled', (val == 'ALL'));
+                    if (val == 'ALL') {
+                        $('#nb_value_div').hide();
+                    } else {
+                        $('#nb_value_div').show();
+                    }
                 });
 
                 $('#agg_function').change(function(){
@@ -335,7 +376,7 @@
                     $('#agg_unit').attr('disabled',$(this).val() == '-1');
                 });
 
-                $("#datepicker_from, #datepicker_to").datepicker({beforeShow: customRange, prevText: "", nextText: "", firstDay: 1, showOn: "both", buttonImage: "/style/calendar.png", buttonImageOnly: true, dateFormat: "dd/mm/yy 00:00:00" });
+                $("#datepicker_from, #datepicker_to").datetimepicker({format: "d/m/Y H:i:s" });
 
                 $('.download_btn_csv').click(function(){
                     $('#download_format').val('csv');
@@ -349,100 +390,49 @@
                     return true;
                 });
 
-                $('.download_btn_pdf').click(function(){
-                    $('#download_format').val('pdf');
-                    var max_limit = 5000 ;
-                    var limit_enabled = $('#nb').val() != 'ALL';
-                    var limit = $('#nb_value').val();
-                    if (!limit_enabled || limit > max_limit) {
-                        $('#nb_value').val(max_limit);
-                        $('#nb_value').attr('disabled',false);
-                        $('#nb').val('SPECIFIED');
-                        alert("The report functionality is limited to " + max_limit + " rows per virtual sensor.");
-                    }
-                    prepare_form_for_submission($(this));
-                    return true;
-                });
-
 
 
                 $(".plot").click(function(){
                     datasets={};
-                    csv_to_json($(this),drawChart);
+                    var choice = $("#plot-type").val();
+                    $('#plotContainer').html('</br><div id="progressbar" style="width: 200px; margin-left: auto; margin-right: auto"></div>');
+                    if (choice == '') return;
+
+
+
+                    $('#progressbar').progressbar({
+                        value: false
+                    });
+                    $('#progressbar').progressbar("enable");
+                    var progressbarValue = $( '#progressbar' ).find( ".ui-progressbar-value" );
+                    progressbarValue.css({
+                        "background": '#77cc66'
+                    });
+
+                    datasets={};
+                    if (choice == 'drawHistogram') csv_to_json($(this),drawHistogram, 'unix', true);
+                    else if (choice == 'drawScatterplot') csv_to_json($(this),drawScatterplot, 'unix', true);
+                    else if (choice == 'drawTimeseries') csv_to_json($(this),drawTimeseries, 'unix', true);
+
+
                 });
 
-                $(".grid").click(function(){
-                    function drawGrid(l_datasets){
-                        $("#sensorSelect").empty();
-                        $("#sensorSelect").append('<option value="">Select a Virtual Sensor</option>');
-                        var displayed = [];
-                        for (var sensor in l_datasets) {
-                            sensor = sensor.split(' ')[0];
-                            if ($.inArray(sensor, displayed) < 0) {
-                                displayed.push(sensor);
-                                option = $("<option value=\"" + sensor + "\">" + sensor + "</option>");
-                                $("#sensorSelect").append(option);
-                            }
+                $(".sampling_percentage").hide();
+                $("#disablesampling").change(function(){
+                    if ($("#disablesampling").prop("checked")){
+                        $(".sampling_percentage").hide();
+                    } else {
+                        if (plotIsShown == true) {
+                            $(".sampling_percentage").show();
                         }
-
-                        datasets = l_datasets;
-
-                        $("#sensorSelect").change(function(){
-                            var choice = $("#sensorSelect").val();
-                            $('#gridContainer').empty();
-                            if (choice == '') return;
-                            // columns
-                            var fields = [];
-                            // column headers
-                            var headers = [];
-                            for (var sensor_field in datasets) {
-                                if (sensor_field.substring(0, choice.length) == choice) {
-                                    fields.push(datasets[sensor_field]);
-                                    headers.push(sensor_field.substring(choice.length + 2, sensor_field.length - 1));
-                                }
-                            }
-                            var data_length = fields[0]['data'].length;
-                            var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>time</th>';
-                            for (var i = 0; i < headers.length; i++) {
-                                grid += '<th>' + headers[i] + '</th>';
-                            }
-                            grid += '</tr></thead><tbody>';
-                            for (var i = 0; i < data_length; i++) {
-                                // bug with the csv_to_json function: the last row is empty
-                                if (fields[0]['data'][i][0]) {
-                                    grid += '<tr><td>' + fields[0]['data'][i][0] + '</td>';
-                                    for (var j = 0; j < fields.length; j++) {
-                                        grid += '<td>' + fields[j]['data'][i][1] + '</td>'
-                                    }
-                                    grid += '</tr>';
-                                }
-                            }
-                            grid += '</tbody></table>';
-                            $('#gridContainer').html(grid);
-                            $('#grid').tablesorter({
-                                widthFixed: true,
-                                widgets: ['zebra']
-                            });
-                        });
                     }
-                    datasets = {};
-                    csv_to_json($(this), drawGrid, 'iso');
                 });
 
-                $('.accordion').accordion({
-                    header: ".ui-accordion-header",
-                    clearStyle: true
-                });
-
-                $('.tabs ul').tabs();
-
-                $('.ui-default-state').hover(
-                function(){$(this).addClass('ui-hover-state');},
-                function(){$(this).removeClass('ui-hover-state');});
 
                 $.get('menu.jsp', {selected: "data"}, function(data) {
                     $('#navigation').html(data);
                 });
+
             });
         </script>
     </head>
@@ -456,86 +446,89 @@
             <div id="main" class="full-page">
                 <noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
                 <!-- data part -->
-                <br/>
+                <br/> <br/> <br/>
                 <div id="datachooser">
                     <div id="data_1" class="clearfix">
                         <form action="multidata" method="post">
-                            <div class="accordion">
-                                <div class="ui-accordion-group">
-                                    <h3 class="ui-accordion-header"><a href="#">Data Output</a></h3>
-                                    <div class="ui-accordion-content">
+
+                                    <div class="data-output-content">
                                         <div class="aggregations">
-                                            <p>
-                                                <select id="nb" name="nb"><option value="ALL">All Data</option><option value="SPECIFIED" selected="selected">Only</option></select>
-                                                <input id="nb_value" name="nb_value" size="3" type="text" value="10" /><span> Values</span>
-                                            </p>
+                                            <div>
+                                                <select id="nb" name="nb" style="display: inline-block">
+                                                    <option value="ALL">All Data</option>
+                                                    <option value="SPECIFIED" selected="selected">Only</option>
+                                                </select>
+                                                <div id="nb_value_div" style="display: inline-block">
+                                                    <input id="nb_value" name="nb_value" size="3" type="text" value="10"/><span> Values</span>
+                                                </div>
+                                            </div>
                                             <p>
                                                 <span>Aggregation</span>
-                                                <select id="agg_function" name="agg_function"><option value="-1">No Aggregation</option><option value="avg">AVG</option><option value="max">MAX</option><option value="min">MIN</option></select><input disabled="disabled" id="agg_period" name="agg_period" size="5" type="text" value="2" /><select disabled="disabled" id="agg_unit" name="agg_unit"><option value="3600000">Hours</option><option value="60000">Minutes</option><option value="1000">Seconds</option><option value="1">Milli Seconds</option></select>
+                                                <select id="agg_function" name="agg_function">
+                                                    <option value="-1">No Aggregation</option>
+                                                    <option value="avg">AVG</option>
+                                                    <option value="max">MAX</option>
+                                                    <option value="min">MIN</option>
+                                                    <option value="sum">SUM</option>
+                                                </select>
+                                                <input disabled="disabled" id="agg_period" name="agg_period" size="5" type="text" value="2" />
+                                                <select disabled="disabled" id="agg_unit" name="agg_unit">
+                                                    <option value="3600000">Hours</option>
+                                                    <option value="60000">Minutes</option>
+                                                    <option value="1000">Seconds</option>
+                                                    <option value="1">Milli Seconds</option>
+                                                </select>
                                             </p>
                                         </div>
+                                        </br> </br>
                                         <div class="data-outputs-container">
                                             <a id="add-data-output" href="#">Add Output</a>
                                             <ul id="data-outputs"></ul>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="ui-accordion-group">
-                                    <h3 class="ui-accordion-header"><a href="#">Conditions</a></h3>
-                                    <div class="ui-accordion-content">
+                                        </br>
                                         <div class="time-range">
                                             <div>
-                                                <br />
-                                                <span>From</span><input id="datepicker_from" name="from" size="16" type="text" value="" /><span>To</span><input id="datepicker_to" name="to" size="16" type="text" value="" /></div>
-                                            <input id="ifexists" type="checkbox" name="ifexists" value="true"><span>Add virtual sensor only if it has data in the given time period</span>
-                                            <br/> <br/>
-                                        </div>
-                                        <div class="conditions-container">
-                                            <a id="add-condition" href="#">Add Condition</a>
-                                            <ul id="conditions"></ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="ui-accordion-group">
-                                    <h3 class="ui-accordion-header"><a href="#">Results</a></h3>
-                                    <div class="ui-accordion-content">
-                                        <div class="tabs">
-                                            <ul>
-                                                <li class="ui-tabs-nav-item"><a href="#fragment-1-1">Download</a></li>
-                                                <li class="ui-tabs-nav-item"><a class="plot" href="#fragment-1-2">Plot</a></li>
-                                                <li class="ui-tabs-nav-item"><a class="grid" href="#fragment-1-3"><span>Table</span></a></li>
-                                            </ul>
-                                            <div id="fragment-1-1">
-                                                <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
-                                                <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
-                                                <input class="ui-default-state download_btn_pdf" name="commit" type="submit" value="Generate PDF" />
-                                                <span>Time Format</span>
-                                                <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
-                                                <input id="download_format" type="hidden" name="download_format" value="csv"></input>
-                                                <input id="reportclass" type="hidden" name="reportclass" value="report-default"></input>
+                                                </br>
+                                                <span>From</span>
+                                                <input id="datepicker_from" name="from" type="text" value=""   style="width: 150px"/>
+                                                &nbsp
+                                                <span>To</span>
+                                                <input id="datepicker_to" name="to" type="text" value=""  style="width: 150px"/>
                                             </div>
-                                            <div id="fragment-1-2">
-                                                <div class="chart_box">
-                                                    <div id="vs_selector" class="dlg_selector" title="Output Selector">
-                                                        <div class="miniature">
-                                                            <div class="overview" ></div>
-                                                            <p class="overviewLegend" ></p>
-                                                        </div>
-                                                        <div class="gsn_chart" > </div>
-                                                        <div class="clear-both"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div id="fragment-1-3">
-                                                <select id="sensorSelect">
-                                                    <option value="">(none)</option>
-                                                </select>
-                                                <div id="gridContainer"></div>
-                                            </div>
+                                            <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
+                                            <span>Add virtual sensor only if it has data in the given time period</span>
+                                            </br> </br>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                    </br></br></br>
+
+                                    <div class="plot-content">
+                                        <span>Plot Type</span>
+                                        <select id="plot-type">
+                                            <option value="drawTimeseries" selected="selected">Timeseries</option>
+                                            <option value="drawScatterplot">Scatterplot</option>
+                                            <option value="drawHistogram">Histogram</option>
+                                        </select>
+                                        <input class="ui-default-state plot" name="commit" type="button" value="Plot" />
+                                        <div style="display: inline-block" class="sampling_percentage" ><span>Sampling rate</span>&nbsp<input id="sampling_percentage" style="width: 30px" type="text" name="sampling_percentage"/><span>%</span></div>
+                                        &nbsp&nbsp&nbsp
+                                        <input id="disablesampling" type="checkbox" name="disablesampling"/><span>Disable sampling</span>
+                                    </div>
+
+                                    </br></br>
+
+                                    <div class="results-content">
+                                        <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
+                                        <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
+                                        <span>Time Format</span>
+                                        <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
+                                        <input id="download_format" type="hidden" name="download_format" value="csv"/>
+                                        <input id="reportclass" type="hidden" name="reportclass" value="report-default"/>
+                                    </div>
+
+                                    <div id="plotContainer">
+                                    </div>
+
                         </form>
                     </div>
                 </div>

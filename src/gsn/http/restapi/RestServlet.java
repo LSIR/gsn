@@ -55,6 +55,7 @@ public class RestServlet extends HttpServlet {
     private static final int REQUEST_GET_PREVIEW_MEASUREMENTS_FOR_SENSOR_FIELD = 4;
     private static final int REQUEST_GET_GRIDS = 5;
     private static final int REQUEST_GET_GRID2CELL = 6;
+    private static final int REQUEST_GET_MINMAX_FOR_SENSOR_FIELD = 7;
 
     private static final int HTTP_STATUS_BAD = 203;
 
@@ -129,6 +130,12 @@ public class RestServlet extends HttpServlet {
 
                 restResponse = requestHandler.getPreviewMeasurementsForSensorField(user, sensor, field, str_from, str_to, str_size);
                 break;
+            case REQUEST_GET_MINMAX_FOR_SENSOR_FIELD:
+                sensor = parseURI(request.getRequestURI())[3];
+                field = parseURI(request.getRequestURI())[4];
+
+                restResponse = requestHandler.getMinAndMaxValuesForSensorField(user, sensor, field);
+                break;
             case REQUEST_GET_GRIDS:
                 sensor = parseURI(request.getRequestURI())[3];
                 str_date = request.getParameter(PARAMETER_DATE);
@@ -183,6 +190,8 @@ public class RestServlet extends HttpServlet {
 
         if (parsedURI.length == 3 && parsedURI[2].equalsIgnoreCase("sensors"))
             return REQUEST_GET_ALL_SENSORS;
+        if (parsedURI.length == 6 && parsedURI[2].equalsIgnoreCase("sensors") && parsedURI[5].equalsIgnoreCase("minmax"))//rest/sensors/multiformattemperaturehandler/temperature/minmax
+            return REQUEST_GET_MINMAX_FOR_SENSOR_FIELD;
         if (parsedURI.length == 5 && parsedURI[2].equalsIgnoreCase("sensors"))
             return REQUEST_GET_MEASUREMENTS_FOR_SENSOR_FIELD;
         if (parsedURI.length == 4 && parsedURI[2].equalsIgnoreCase("sensors"))

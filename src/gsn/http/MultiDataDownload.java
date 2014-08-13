@@ -397,6 +397,14 @@ public class MultiDataDownload extends HttpServlet {
             parameterMap.put("reportclass", new String[] { req_reportclass });
         }
 
+        //SAMPLE FOR PLOTS
+        String req_sample = req.getParameter("sample");
+        String req_sampling_perc = req.getParameter("sampling_percentage");
+        if (req_sample != null) {
+            parameterMap.put("sample", new String[] { req_sample });
+            parameterMap.put("sampling_percentage", new String[] { req_sampling_perc });
+        }
+
         return parameterMap;
     }
 
