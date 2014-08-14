@@ -127,6 +127,7 @@ public class DataStore {
 				for (String cond : conditions) {
 					if (i>0) query.append(" and ");
 					query.append(cond);
+					i++;
 				}
 			}
 

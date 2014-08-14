@@ -19,7 +19,8 @@
         </tstamp>
         <property environment="env"/>
         <property name="conf.dir" value="${basedir}/conf"/>
-        <property name="build.dir" value="build/classes"/>
+        <property name="resources.dir" value="src/main/resources"/>
+        <property name="build.dir" value="build/classes"/>    	
         <property name="src.dir" value="src/main/java"/>
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
@@ -67,7 +68,7 @@
             <exclude name="**/NetworkUtility.java"/>
         </javac>
     	<copy todir="${build.dir}">
-    	    <fileset dir="src" includes="**/*.conf,**/*.properties" />
+    	    <fileset dir="${resources.dir}" includes="**/*.conf,**/*.properties" />
     	</copy>
     </target>
 

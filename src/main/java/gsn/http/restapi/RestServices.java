@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
@@ -233,18 +234,24 @@ public class RestServices {
 			allfields.add(df.getName().toLowerCase());
 		}
 
+		
+        ArrayList<String> filters=new ArrayList<String>();
+        if (filter!=null)
+          filters.addAll(Arrays.asList(filter.split(",")));
 		long fromTime = -1;
 		long toTime = -1;
 		try {
-			fromTime = dateFormat.parse(from).getTime();
-			toTime = dateFormat.parse(to).getTime();
+			if (from!=null)
+				fromTime = dateFormat.parse(from).getTime();
+			if (to!=null)
+				toTime = dateFormat.parse(to).getTime();
 		} catch (ParseException e) {
 			throw exception("Invalid from-to date parameters: " + from + " - " + to);
 		}
 		if (fromTime>0)
-			filter=filter+",timed>="+fromTime;
+			filters.add("timed>="+fromTime);
 		if (toTime>0)
-			filter=filter+",timed<="+toTime;
+			filters.add("timed<="+toTime);
 
 		String[] fieldNames = null;
 		if (fields != null) {
@@ -260,8 +267,7 @@ public class RestServices {
 
 		String[] conditionList = null;
 		if (filter != null) {
-			String[] filters = filter.split(",");
-			Try<String[]> conditions = XprConditions.serializeConditions(filters);
+			Try<String[]> conditions = XprConditions.serializeConditions(filters.toArray(new String[]{}));
 			if (conditions.isFailure()) {
 				logger.error(conditions.failed().toString(), conditions.failed().get());
 				throw exception("Invalid filter condition " + filter);
