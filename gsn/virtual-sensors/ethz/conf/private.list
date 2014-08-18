@@ -145,6 +145,8 @@ Matterhorn_Dozer_NodeInfo.xml
 Matterhorn_Dozer_PowerSwitch.xml
 Matterhorn_Dozer_Rssi.xml
 Matterhorn_Dozer_StateCounter.xml
+Matterhorn_Dozer_WgpsStatus.xml
+Matterhorn_Dozer_WgpsSv.xml
 Matterhorn_Dozer_WXT520Ident.xml
 Matterhorn_Dozer_WXT520Prec.xml
 Matterhorn_Dozer_WXT520Sup.xml

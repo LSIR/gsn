@@ -1,0 +1,91 @@
+<virtual-sensor name="Matterhorn_GPS_RAW__binary__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                		if (GPS_UNIXTIME == 0) {
+							def bbuffer = java.nio.ByteBuffer.wrap((byte[]) GPS_RAW_DATA);
+							bbuffer.order(java.nio.ByteOrder.LITTLE_ENDIAN);
+							// skip header and payload length
+							bbuffer.position(bbuffer.position()+6);
+                			GPS_UNIXTIME = (long)(gsn.utils.Helpers.convertGPSTimeToUnixTime((double)bbuffer.getInt()/1000.0, (short)bbuffer.getShort())*1000.0);
+                		}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+					
+                    if ( ! isdef('positionMap')) { positionMap = [:]; }
+                    if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+                ]]>
+            </param>
+            <param name="period">150000</param>
+            <param name="scriplet-periodic">
+                <![CDATA[
+                	// default alarm time after which an email is sent if no messages have been received
+                    def timeDifferenceOffsetDefault = 86400000;
+                	// a list of alarm time per position
+                    def timeDifferenceOffsetPositionMap = [:];
+                    // the mail recipients
+                    def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+                    
+                    if ( isdef('positionMap')) {
+                    	def rmlist = [];
+                    	for (entry in positionMap) {
+                        	def timeDifference = System.currentTimeMillis() - entry.value;
+                        	def timeDifferenceOffset = timeDifferenceOffsetDefault;
+                        	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
+                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
+                        	}
+                        	if (timeDifference > timeDifferenceOffset) {
+                        		// Notify by email
+                        		def emailTitle = "[PermaSense-GSN-Public] - WARNING: No more " + vsname + " messages received from position " + entry.key;
+                        		def emailContent = "WARNING: No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
+
+								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
+                        		sendEmail(mailrecipients, emailTitle, emailContent);
+                        		rmlist.add(entry.key)
+                        	}
+                        }
+                        positionMap.keySet().removeAll( rmlist as Set );
+                    }
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" index="true" />
+            <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+            <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
+		    <field name="GPS_SATS" type="INTEGER"/>
+		    <field name="GPS_MISSING_SV" type="INTEGER"/>
+            <field name="GPS_RAW_DATA" type="binary"/>
+            
+        </output-structure>
+    </processing-class>
+    <description>GPS RAW data in UBX binary format from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data0">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_GPS_RAW__tobinary__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select *, timed as GSN_TIMESTAMP from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
