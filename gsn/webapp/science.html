@@ -785,8 +785,139 @@
 												select : "sensornode[position=22]"
 											} ]
 										},
+										{
+											title : "GPS Number of Satellites",
+											signals : [ {
+												vsensor : "matterhorn_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 33, 34, 35 ]
+											} ]
+										},
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "matterhorn_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 33, 34, 35 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "matterhorn_gps_raw__tobinary__mapped",
+												field : [ "gps_missing_sv" ],
+												position : [ 33, 34, 35 ]
+											} ]
+										},
+										{
+											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "matterhorn_gps_raw__tobinary__mapped",
+												field : [
+														"current_data_buffer_size",
+														"old_data_buffer_size" ],
+														position : [ 33, 34, 35 ]
+											} ]
+										},
+										{
+											title : "GPS Position East - Realtime [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__realtime",
+												field : [ "e" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Realtime [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__realtime",
+												field : [ "n" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Realtime [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__realtime",
+												field : [ "h" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Position East - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "e" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "n" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "h" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity East - Batch [cm/d]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "v_e" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity North - Batch [cm/d]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "v_n" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity Altitude - Batch [cm/d]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "v_h" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity 3D - Batch [cm/d]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "v_3d" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "matterhorn_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_x" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "matterhorn_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_y" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
 
-										// Jungfraujoch
+// Jungfraujoch
 										{
 											title : "Sensorrod Temperatures Position 1 [°C]",
 											signals : [ {
