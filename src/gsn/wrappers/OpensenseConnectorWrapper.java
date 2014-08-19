@@ -25,12 +25,9 @@ import gsn.utils.Helpers;
 public class OpensenseConnectorWrapper extends AbstractWrapper {
 	
 	
-	public static final Integer[] TEST_STATIONS = {};
-	public static final Integer[] CALIBRATION_STATIONS = {};
-	public static final Integer[] OPERATIONAL_STATIONS = {};
+	public static final Integer[] MOBILE_STATIONS = {};
 	public static final Integer[] STATIC_STATIONS = {};
-	public static final Integer[] DOUBLE_STATIONS = {};
-	
+
 	private final transient Logger logger = Logger.getLogger( OpensenseConnectorWrapper.class );
 	
 	private HashMap<Integer,byte[]> messages = new HashMap<Integer,byte[]>();
@@ -125,6 +122,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
                 	   
 					   BufferedInputStream input;
 					   BufferedOutputStream output;
+					   BinaryParser parser;
 					   boolean connected = true;
 					   StationData sd;
 					   int retry = 0;
@@ -147,6 +145,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 							try{
 								input = new BufferedInputStream(server.getInputStream());
 								output = new BufferedOutputStream(server.getOutputStream());
+								parser = new BinaryParser(input);
 								ts = System.currentTimeMillis();
 								while(connected) parse();
 								server.close();
@@ -157,7 +156,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 							int c = 0;
 							while (!buffer.isEmpty()){
 								StreamElement p = buffer.poll();
-								p.setTimeStamp(p.getTimeStamp()+(c++));
+								p.setTimeStamp(p.getTimeStamp()+(c++)); //timestamp of those SE are a bit artificial but should guarantee ordering
 								postStreamElement(p);
 							}
 						}
@@ -174,11 +173,12 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									retry--;
 									lastRetry = System.currentTimeMillis();
 								}
-								int type = BinaryParser.readNextChar(input,true);
+								parser.resetChecksum();
+								int type = parser.readNextChar(true);
 								switch(type){
 								case 36:
-									int next = BinaryParser.readNextChar(input,false);
-									int id = BinaryParser.readNextShort(input,false);
+									int next = parser.readNextChar(false);
+									int id = parser.readNextShort(false);
 									logger.debug("received packet number :"+next);
 									if (sd == null) sd = create(id);
 									else if (sd.id != id)
@@ -186,71 +186,70 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									sd.type = next;
 									switch(next){
 									case 0:
-										sd.readGPS(input);
+										sd.readGPS(parser);
 										break;
 									case 1:	
-										sd.readODO(input);
+										sd.readODO(parser);
 										break;
 									case 2:	
-										sd.readDoor(input);
+										sd.readDoor(parser);
 										break;
 									case 3:	
-										sd.readBus(input);
+										sd.readBus(parser);
 										break;
 									case 4:	
-										sd.readNextStop(input);
+										sd.readNextStop(parser);
 										break;
 									case 5:	
-										sd.readCurrentStop(input);
+										sd.readCurrentStop(parser);
 										break;
 									case 6:	
-										sd.readAccel(input);
+										sd.readAccel(parser);
 										break;
 									case 7:	
-										sd.readSignalQ(input);
+										sd.readSignalQ(parser);
 										break;
 									case 8:	
-										sd.readDate(input);
+										sd.readDate(parser);
 										break;
 									case 9:	
-										sd.readCO(input);
+										sd.readCO(parser);
 										break;
 									case 10:	
-										sd.readOzone(input);
+										sd.readOzone(parser);
 										break;
-									case 11:	
-										sd.readMicsCO(input);
+									case 14:	
+										sd.readAPM(parser);
 										break;
 									case 12:	
-										sd.readFPM(input);
+										sd.readFPM(parser);
 										break;
 									case 13:	
-										sd.readFPH(input);
+										sd.readFPH(parser);
 										break;
 									case 29:	
-										sd.readSecCO(input);
+										sd.readSecCO(parser);
 										break;
 									case 30:	
-										sd.readSecOzone(input);
-										break;
-									case 31:	
-										sd.readSecMicsCO(input);
+										sd.readSecOzone(parser);
 										break;
 									default:
 										throw new IOException("unknown packet: "+next);
 									}
 									pub ++;
+									if (!parser.checkSum()){
+										throw new IOException("Checksum error reading packet ("+next+") for station "+id);
+									}
 									buffer.add(sd.getStreamElement(ts));
 									last = next;
 									break;
 								case 35:
-									byte[] b = new byte[3];
+									byte[] b = parser.readBytes(3);
 									id = b[0];
-									input.read(b);
 									logger.debug("char:" + b[0] + ", "+ b[1] + ", "+ b[2]);
 									if (sd == null) sd = create(id);
 									else if (sd.id != id) logger.warn("received packet from "+id+", while listening to "+sd.id);
-									next = BinaryParser.readNextChar(input, true);
+									next = parser.readNextChar(true);
 									switch(next){
 									case 65:
 										retry = 0;
@@ -265,8 +264,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 										throw new IOException("unknown command:"+next);
 									}
 								case 43:
-									byte[] buf = new byte[2];
-									input.read(buf);
+									byte[] buf = parser.readBytes(2);
 									if (new String(buf).equals("++")){
 										logger.warn("closed (received "+ctr+" packets, dropped "+err+" packets, published "+pub+" packets)");
 										connected = false;
@@ -297,19 +295,13 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	
 	
 	private StationData create(Integer id){
-		if (Helpers.contains(TEST_STATIONS, id))
-			return new TestStationData(id);
-		else if (Helpers.contains(OPERATIONAL_STATIONS, id))
-			return new OperationStationData(id);
-		else if (Helpers.contains(CALIBRATION_STATIONS, id))
-			return new CalibrationStationData(id);
+		if (Helpers.contains(MOBILE_STATIONS, id))
+			return new MobileStationData(id);
 		if (Helpers.contains(STATIC_STATIONS, id))
 			return new StaticStationData(id);
-		if (Helpers.contains(DOUBLE_STATIONS, id))
-			return new DoubleStationData(id);
 		else{
-			logger.warn("Unknown station ID ("+id+"), assuming operational.");
-			return new OperationStationData(id);
+			logger.warn("Unknown station ID ("+id+"), assuming mobile.");
+			return new MobileStationData(id);
 		}
 	}
 	
@@ -320,117 +312,95 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 		public StationData(int id){
 			this.id = id;
 		}
-		
-		public void readSecMicsCO(BufferedInputStream input) throws IOException {
-			//LSSSC
-			readTimeFromLong(input);
-			payload = new byte[7];
-			input.read(payload);
-		}
 
-		public void readSecOzone(BufferedInputStream input) throws IOException {
+		public void readSecOzone(BinaryParser p) throws IOException {
 			//LCSSC
-			readTimeFromLong(input);
-			payload = new byte[6];
-			input.read(payload);
+			readTimeMsFromShort(p);
+			payload = p.readBytes(5);
+
 		}
 
-		public void readSecCO(BufferedInputStream input) throws IOException {
+		public void readSecCO(BinaryParser p) throws IOException {
 			//LSSS
-			readTimeFromLong(input);
-			payload = new byte[6];
-			input.read(payload);
+			readTimeMsFromShort(p);
+			payload = p.readBytes(6);
 		}
 
-		public void readFPH(BufferedInputStream input) throws IOException {
+		public void readFPH(BinaryParser p) throws IOException {
 			//CsSCCS
-			int _ss = BinaryParser.readNextChar(input, false);
-			if ( _ss < 0 || _ss > 59){
-				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+hh+":"+mn+":"+_ss+")");
-			}
-			ss = _ss;
-			ms = 0;
-			payload = new byte[8];
-			input.read(payload);			
+			readTimeMsFromShort(p);
+			payload = p.readBytes(9);			
 		}
 
-		public void readFPM(BufferedInputStream input) throws IOException {
+		public void readFPM(BinaryParser p) throws IOException {
 			//SLCSs
-			readTimeMsFromShort(input);
-			payload = new byte[9];
-			input.read(payload);
+			readTimeMsFromShort(p);
+			payload = p.readBytes(9);
 		}
 
-		public void readMicsCO(BufferedInputStream input) throws IOException {
+		public void readAPM(BinaryParser p) throws IOException {
 			//SSSSC
-			readTimeMsFromShort(input);
-			payload = new byte[7];
-			input.read(payload);
+			readTimeMsFromShort(p);
+			payload = p.readBytes(4);
 		}
 
-		public void readOzone(BufferedInputStream input) throws IOException {
-			//SCSSC
-			readTimeMsFromShort(input);
-			payload = new byte[6];
-			input.read(payload);
+		public void readOzone(BinaryParser p) throws IOException {
+			//SSSC
+			readTimeMsFromShort(p);
+			payload = p.readBytes(5);
 		}
 
-		public void readCO(BufferedInputStream input) throws IOException {
+		public void readCO(BinaryParser p) throws IOException {
 			//SSSS
-			readTimeMsFromShort(input);
-			payload = new byte[6];
-			input.read(payload);
+			readTimeMsFromShort(p);
+			payload = p.readBytes(6);
 		}
 
-		public void readSignalQ(BufferedInputStream input) throws IOException {
-			payload = new byte[3];
-			input.read(payload);
+		public void readSignalQ(BinaryParser p) throws IOException {
+			payload = p.readBytes(3);
 		}
 
-		public void readAccel(BufferedInputStream input) throws IOException {
+		public void readAccel(BinaryParser p) throws IOException {
 			// Ssss
-			readTimeMsFromShort(input);
-			payload = new byte[6];
-			input.read(payload);
+			readTimeMsFromShort(p);
+			payload = p.readBytes(6);
 		}
 
-		public void readCurrentStop(BufferedInputStream input) throws IOException {
+		public void readCurrentStop(BinaryParser p) throws IOException {
 			// SCCstring
-			readTimeSsFromShort(input);
-			payload = BinaryParser.readNextString(input,20).getBytes();
+			readTimeSsFromShort(p);
+			payload = p.readNextString(20).getBytes();
 		}
 
-		public void readNextStop(BufferedInputStream input) throws IOException {
+		public void readNextStop(BinaryParser p) throws IOException {
 			// SCCstring
-			readTimeSsFromShort(input);
-			payload = BinaryParser.readNextString(input,20).getBytes();
+			readTimeSsFromShort(p);
+			payload = p.readNextString(20).getBytes();
 		}
 
-		public void readBus(BufferedInputStream input) throws IOException {
+		public void readBus(BinaryParser p) throws IOException {
 			// SCCstring
-			readTimeSsFromShort(input);
-			int tl_line = BinaryParser.readNextChar(input, false);
-			String tl_destination = BinaryParser.readNextString(input,20);
+			readTimeSsFromShort(p);
+			int tl_line = p.readNextChar(false);
+			String tl_destination = p.readNextString(20);
 			payload = (tl_line + "," + tl_destination).getBytes();
 		}
 
-		public void readDoor(BufferedInputStream input) throws IOException {
+		public void readDoor(BinaryParser p) throws IOException {
 			// SC
-			readTimeSsFromShort(input);
-			payload = new byte[1];
-			input.read(payload);
+			readTimeSsFromShort(p);
+			payload = p.readBytes(1);
 		}
 
-		public void readODO(BufferedInputStream input) throws IOException {
+		public void readODO(BinaryParser p) throws IOException {
 			// LS
-			readTimeFromLong(input);
-			payload = new byte[2];
-			input.read(payload);
+			readTimeFromLong(p);
+			payload = p.readBytes(2);
 		}
 
-		public void readGPS(BufferedInputStream input) throws IOException {
-			// LLLSSLCSLs
-			long time = BinaryParser.readNextLong(input, false); //not same time format
+		public void readGPS(BinaryParser p) throws IOException {
+			// LLLSLCSL
+			long time = p.readNextLong(false); //not same time format
 			int _hh = (int) (time / 10000);
 			int _ss = (int) (time % 100);
 			int _mn = (int) ((time - _hh*10000 - _ss)/100);
@@ -441,19 +411,18 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			ss = _ss;
 			mn = _mn;
 			hh = _hh;
-			payload = new byte[25];
-			input.read(payload);
+			payload = p.readBytes(21);
 		}
 
-		public void readDate(InputStream input) throws IOException{
+		public void readDate(BinaryParser p) throws IOException{
 			//cccccc
 			
-			int _ss = BinaryParser.readNextChar(input, false);
-			int _mn = BinaryParser.readNextChar(input, false);
-			int _hh = BinaryParser.readNextChar(input, false);
-			int _dd = BinaryParser.readNextChar(input, false);
-			int _mm = BinaryParser.readNextChar(input, false);
-			int _yy = BinaryParser.readNextChar(input, false);
+			int _ss = p.readNextChar(false);
+			int _mn = p.readNextChar(false);
+			int _hh = p.readNextChar(false);
+			int _dd = p.readNextChar(false);
+			int _mm = p.readNextChar(false);
+			int _yy = p.readNextChar(false);
 			if (_mm <= 0 || _yy < 12 || _dd <= 0 || _mm > 12 || _dd > 31 || _hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+_yy+"-"+_mm+"-"+_dd+" "+_hh+":"+_mn+":"+_ss+")");
 			}
@@ -468,8 +437,8 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 
 		}
 		
-		protected void readTimeFromLong(InputStream input) throws IOException{
-			long time = BinaryParser.readNextLong(input, false);
+		protected void readTimeFromLong(BinaryParser p) throws IOException{
+			long time = p.readNextLong(false);
 			int _hh = (int) (time/1000000);
 			int _mn = (int) ((time - _hh*1000000)/10000);
 			int _ss = (int) ((time - _hh*1000000 - _mn*10000)/100);
@@ -484,8 +453,8 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			ms = _ms;
 		}
 		
-		protected void readTimeMsFromShort(InputStream input) throws IOException{
-			int time = BinaryParser.readNextShort(input, false);
+		protected void readTimeMsFromShort(BinaryParser p) throws IOException{
+			int time = p.readNextShort(false);
 			int _ss = time/100;
 			int _ms = (time%100)*10;
 			if ( _ss < 0 || _ss > 59){
@@ -495,8 +464,8 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			ms = _ms;
 		}
 		
-		protected void readTimeSsFromShort(InputStream input) throws IOException{
-			int time = BinaryParser.readNextShort(input, false);
+		protected void readTimeSsFromShort(BinaryParser p) throws IOException{
+			int time = p.readNextShort(false);
 			int _mn = time/100;
 			int _ss = time%100;
 			if ( _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
@@ -520,43 +489,77 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 
 	}
 	
-	private class TestStationData extends StationData{
+	private class MobileStationData extends StationData{
 		
-		public TestStationData(int id){
+		public MobileStationData(int id){
 			super(id);
 		}
 
 	}
 
-	private class OperationStationData extends StationData{
-		
-		public OperationStationData(int id){
-			super(id);
-		}
-			
-	}
-		
-	
-	private class CalibrationStationData extends StationData{
-		
-		public CalibrationStationData(int id){
-			super(id);
-		}
-					
-	}
-	
 	private class StaticStationData extends StationData{
 		
 		public StaticStationData(int id){
 			super(id);
 		}
-
-	}
-	
-	private class DoubleStationData extends StationData{
 		
-		public DoubleStationData(int id){
-			super(id);
+		public void readGPS(BinaryParser p) throws IOException {
+			// LLLSCS
+			long time = p.readNextLong(false); //not same time format
+			int _hh = (int) (time / 10000);
+			int _ss = (int) (time % 100);
+			int _mn = (int) ((time - _hh*10000 - _ss)/100);
+			if (_hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
+				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+_hh+":"+_mn+":"+_ss+")");
+			}
+			ms = 0;
+			ss = _ss;
+			mn = _mn;
+			hh = _hh;
+			payload = p.readBytes(13);
+		}
+		
+		public void readCO(BinaryParser p) throws IOException {
+			//SSSS
+			readTimeFromLong(p);
+			payload = p.readBytes(6);
+		}
+		
+		public void readOzone(BinaryParser p) throws IOException {
+			//SSSC
+			readTimeFromLong(p);
+			payload = p.readBytes(5);
+		}
+		
+		public void readFPM(BinaryParser p) throws IOException {
+			//SLCSs
+			readTimeFromLong(p);
+			payload = p.readBytes(9);
+		}
+		
+		public void readFPH(BinaryParser p) throws IOException {
+			//CsSCCS
+			readTimeFromLong(p);
+			payload = p.readBytes(9);			
+		}
+		
+		public void readAPM(BinaryParser p) throws IOException {
+			//L
+			readTimeFromLong(p);
+			payload = p.readBytes(4);
+		}
+		
+		public void readSecCO(BinaryParser p) throws IOException {
+			//LSSS
+			readTimeFromLong(p);
+			payload = p.readBytes(4);
+		}
+		
+		public void readSecOzone(BinaryParser p) throws IOException {
+			//LCSSC
+			readTimeFromLong(p);
+			payload = p.readBytes(5);
+
 		}
 
 	}

@@ -125,29 +125,30 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 			temp.setData(0,id);
 			temp.setTimeStamp(time);
 			ByteArrayInputStream input = new ByteArrayInputStream((byte[]) streamElement.getData("payload"));
+			BinaryParser p = new BinaryParser(input);
 			if(data_type.equalsIgnoreCase("FPH")){
 				 if(s_type == 12){//sSCCS
-					 temp.setData(1,BinaryParser.readNextShort(input, true)/10.0);
-					 temp.setData(2,BinaryParser.readNextShort(input, false));
-					 temp.setData(4,BinaryParser.readNextChar(input, false) / 100.0);
-					 temp.setData(5,BinaryParser.readNextChar(input, false));
-					 temp.setData(3,BinaryParser.readNextShort(input, false) / 100.0);
+					 temp.setData(1,p.readNextShort(true)/10.0);
+					 temp.setData(2,p.readNextShort(false));
+					 temp.setData(4,p.readNextChar(false) / 100.0);
+					 temp.setData(5,p.readNextChar(false));
+					 temp.setData(3,p.readNextShort(false) / 100.0);
 					 dataProduced(new StreamElement(temp));
 				 } 
 			} else if (data_type.equalsIgnoreCase("FPM")){
 				 if(s_type == 13){ //LCSs
-					 temp.setData(1,BinaryParser.readNextLong(input, false) / 100.0);
-					 temp.setData(2,BinaryParser.readNextChar(input, false) / 10.0);
-					 temp.setData(3,BinaryParser.readNextShort(input, false));
-					 temp.setData(4,BinaryParser.readNextShort(input, true) / 100.0);
+					 temp.setData(1,p.readNextLong(false) / 100.0);
+					 temp.setData(2,p.readNextChar(false) / 10.0);
+					 temp.setData(3,p.readNextShort(false));
+					 temp.setData(4,p.readNextShort(true) / 100.0);
 					 dataProduced(new StreamElement(temp));
 				 }
 	        } else if (data_type.equalsIgnoreCase("OZONE")){
 	        	if(s_type == 10 || s_type == 30){//CSSC
-	        		BinaryParser.readNextChar(input, false);
-	        		temp.setData(1,BinaryParser.readNextShort(input, false));
-	        		temp.setData(2,BinaryParser.readNextShort(input, false)/10.0 - 40);
-	        		temp.setData(3,BinaryParser.readNextChar(input, false));
+	        		p.readNextChar(false);
+	        		temp.setData(1,p.readNextShort(false));
+	        		temp.setData(2,p.readNextShort(false)/10.0 - 40);
+	        		temp.setData(3,p.readNextChar(false));
 	        		dataProduced(new StreamElement(temp));
 				 }       	
 	        } else if (data_type.equalsIgnoreCase("ACC")){
@@ -172,41 +173,41 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	        			last_acc.put(id, new ArrayList<Double>(4));
 	        			a = last_acc.get(id);
 	        		}
-	        		a.add(BinaryParser.readNextShort(input, true)/1000.0);
-	        		a.add(BinaryParser.readNextShort(input, true)/1000.0);
-	        		a.add(BinaryParser.readNextShort(input, true)/-1000.0);
+	        		a.add(p.readNextShort(true)/1000.0);
+	        		a.add(p.readNextShort(true)/1000.0);
+	        		a.add(p.readNextShort(true)/-1000.0);
 				 }
 	        } else if (data_type.equalsIgnoreCase("CO")){
 	        	if(s_type == 9 || s_type == 29){ //SSS
-	        		temp.setData(1,BinaryParser.readNextShort(input, false));
-	        		temp.setData(2,BinaryParser.readNextShort(input, false));
-	        		temp.setData(3,BinaryParser.readNextShort(input, false));
+	        		temp.setData(1,p.readNextShort(false));
+	        		temp.setData(2,p.readNextShort(false));
+	        		temp.setData(3,p.readNextShort(false));
 	        		dataProduced(new StreamElement(temp)); 
 				 }
 	        } else if (data_type.equalsIgnoreCase("ODO")){
 	        	if(s_type == 1){ //S
-	        		temp.setData(1,BinaryParser.readNextShort(input, false));
+	        		temp.setData(1,p.readNextShort(false));
 	        		dataProduced(new StreamElement(temp)); 
 				 }
 	        } else if (data_type.equalsIgnoreCase("MICSCO")){
 	        	if(s_type == 11 || s_type == 31){ //SSSC
-	        		temp.setData(1,BinaryParser.readNextShort(input, false));
-	        		temp.setData(2,BinaryParser.readNextShort(input, false));
-	        		temp.setData(3,BinaryParser.readNextShort(input, false));
-	        		temp.setData(4,BinaryParser.readNextChar(input, false));
+	        		temp.setData(1,p.readNextShort(false));
+	        		temp.setData(2,p.readNextShort(false));
+	        		temp.setData(3,p.readNextShort(false));
+	        		temp.setData(4,p.readNextChar(false));
 	        		dataProduced(new StreamElement(temp)); 
 				 }
 	        } else if (data_type.equalsIgnoreCase("GPS")){
 	        	if(s_type == 0){ //LLSSLCSLs
-	        		temp.setData(1,(BinaryParser.readNextLong(input,false)- 460000000)/6000000.0 + 46);
-	        		temp.setData(2,(BinaryParser.readNextLong(input,false)- 60000000)/6000000.0 + 6);
-	        		temp.setData(3,BinaryParser.readNextShort(input,false) / 10.0);
-	        		temp.setData(4,BinaryParser.readNextShort(input, false)/ 100.0);			
-	        		temp.setData(5,BinaryParser.readNextLong(input, false)/1000.0);
-	        		temp.setData(6,BinaryParser.readNextChar(input, false));
-	        		temp.setData(7,BinaryParser.readNextShort(input, false)/100);
-	        		temp.setData(8,BinaryParser.readNextLong(input,false)/100.0);
-	        		temp.setData(9,BinaryParser.readNextShort(input, true)*0.00390625);
+	        		temp.setData(1,(p.readNextLong(false)- 460000000)/6000000.0 + 46);
+	        		temp.setData(2,(p.readNextLong(false)- 60000000)/6000000.0 + 6);
+	        		temp.setData(3,p.readNextShort(false) / 10.0);
+	        		temp.setData(4,p.readNextShort(false)/ 100.0);			
+	        		temp.setData(5,p.readNextLong(false)/1000.0);
+	        		temp.setData(6,p.readNextChar(false));
+	        		temp.setData(7,p.readNextShort(false)/100);
+	        		temp.setData(8,p.readNextLong(false)/100.0);
+	        		temp.setData(9,p.readNextShort(true)*0.00390625);
 	        		dataProduced(new StreamElement(temp));
 				 }
 	        } else if (data_type.equalsIgnoreCase("TL")){
@@ -216,7 +217,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	        	}	        	
 	        	last_values.get(id).setTimeStamp(time);
 	        	if(s_type == 2){
-	        		last_values.get(id).setData(1,BinaryParser.readNextChar(input, false));
+	        		last_values.get(id).setData(1,p.readNextChar(false));
 				 }else if(s_type == 3){
 					String[] s = new String((byte[]) streamElement.getData("payload")).split(",",2);
 					last_values.get(id).setData(2,Short.parseShort(s[0]));
