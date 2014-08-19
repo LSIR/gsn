@@ -1,0 +1,6 @@
+.deployment, .medium, .quantity, .location, .experiment {
+    border: 2px solid #ccc;
+    width: 350px;
+    height: 200px;
+    overflow-y: scroll;
+}

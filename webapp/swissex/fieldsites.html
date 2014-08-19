@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Fieldsites Search</title>
+
+    <script type="text/javascript" src="../js/jquery-1.11/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-1.11/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCa-8lP665L0lSpNn1sncp24hXz1KeP5TI"></script>
+    <link rel="stylesheet" href="../js/jquery-1.11/jquery-ui.theme.min.css" type="text/css" media="screen,projection" />
+    <link rel="stylesheet" href="../js/jquery-1.11/jquery-ui.structure.min.css" type="text/css" media="screen,projection" />
+    <link rel="stylesheet" href="../js/jquery-1.11/jquery-ui.min.css" type="text/css" media="screen,projection" />
+
+
+    <script type="text/javascript" src="fieldsites/filters/Filter.js"></script>
+    <script type="text/javascript" src="fieldsites/filters/FilterDeploymentName.js"></script>
+    <script type="text/javascript" src="fieldsites/filters/FilterAltitude.js"></script>
+
+
+    <script type="text/javascript" src="fieldsites/FieldsitesSearch.js" ></script>
+    <link rel="stylesheet" href="fieldsites/FieldsitesSearch.css" type="text/css" media="screen,projection" />
+
+
+</head>
+<body>
+    <div>
+        <form method="post" id="pageform" name="pageform">
+            <div id="header" style="width:100%;"> </div>
+            <div>
+                <div style="float:right; width:27%; margin-left:10px;">
+                    <div id="filters">
+                        <h2>Filters</h2>
+                        </br>
+                        <a href="#" id="link_deployment"><h4>Deployment Name</h4></a>
+                        <div class="filter_deployment" style="display: none;">
+                            Search
+                            <input id="search_depl"/>
+                            <div class="deployment"></div>
+                            <input type="button" value="Unselect All" id="fltr_depl_clear_all"/>
+                            <input type="button" value="Select All" id="fltr_depl_check_all"/>
+                        </div>
+                        </br>
+                        <a href="#" id="link_altitude"><h4>Altitude Range</h4></a>
+                        <div class="filter_altitude" style="display: none;">
+                            </br>
+                            <input type="text" id="minAlt" style="font-weight:bold; width:50px;"/>
+                            <input type="text" id="maxAlt" style="font-weight:bold; width:50px;"/>
+                            </br></br>
+                            <div id="slider-range"></div>
+                        </div>
+                    </div>
+                    </br></br>
+                    <div class="options">
+                        <div id="refresh">
+                            <input name="reset" type="submit" value="Reset Filters"/>
+                            <input name="refresh" type="submit" value="Refresh Data" style="display: none;"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="map-canvas" style="float:left; width:72%;height:850px;"></div>
+                <div id="cannotshow" style="float:left; width:72%;"> </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
