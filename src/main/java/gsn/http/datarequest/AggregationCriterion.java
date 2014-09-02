@@ -21,6 +21,7 @@
 *
 * @author Timotee Maret
 * @author Ali Salehi
+* @author Milos Stojanovic
 *
 */
 
@@ -39,8 +40,9 @@ public class AggregationCriterion extends AbstractCriterion {
 	static {
 		allowedGroupOperator = new Hashtable<String, String> () ;
 		allowedGroupOperator.put("max", "max");
-		allowedGroupOperator.put("min","min");
+		allowedGroupOperator.put("min", "min");
 		allowedGroupOperator.put("avg", "avg");
+        allowedGroupOperator.put("sum", "sum");
 	}
 
 	private String critTimeRange 		= null;

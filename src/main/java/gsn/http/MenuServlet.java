@@ -34,17 +34,29 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class MenuServlet extends HttpServlet {
 
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	private static final long serialVersionUID = 1L;
+
+	private Config conf=ConfigFactory.load();
+	private boolean newDataPanel=conf.getBoolean("menu.data.newVersion");
+	
+	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         PrintWriter out = res.getWriter();
         String selected = req.getParameter("selected");
         out.println("<ul id=\"menu\">");
         out.println("<li" + ("index".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"index.html#home\">home</a></li>");
-        out.println("<li" + ("data".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"data.html#data\">data</a></li>");
+        if (newDataPanel)
+        	out.println("<li" + ("data".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"data.html#data\">data</a></li>");
+        else
+        	out.println("<li" + ("data".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"databrowse.html#data\">data</a></li>");
         out.println("<li" + ("map".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"map.html#map\">map</a></li>");
         out.println("<li" + ("fullmap".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"fullmap.html#fullmap\">fullmap</a></li>");
         if (Main.getContainerConfig().isAcEnabled()) {

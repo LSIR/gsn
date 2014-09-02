@@ -20,7 +20,7 @@
         <property environment="env"/>
         <property name="conf.dir" value="${basedir}/conf"/>
         <property name="resources.dir" value="src/main/resources"/>
-        <property name="build.dir" value="build/classes"/>    	
+        <property name="build.dir" value="target/classes"/>    	
         <property name="src.dir" value="src/main/java"/>
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
@@ -33,6 +33,7 @@
         <!--  <property name="jmf.dir"     value="JMF-2.1.1e" /> -->
         <path id="classpath">
             <pathelement location="${build.dir}/jcoverage-classes/"/>
+            <pathelement location="${conf.dir}/"/>
             <pathelement location="${build.dir}/"/>
             <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
             <fileset dir="${libdir}">
@@ -77,8 +78,8 @@
         <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
               failonerror="true">
             <classpath refid="classpath"/>
-            <arg value="conf/containerJIBX.xml"/>
-            <arg value="conf/VirtualSensorDescription.xml"/>
+            <arg value="src/main/resources/containerJIBX.xml"/>
+            <arg value="src/main/resources/VirtualSensorDescription.xml"/>
         </java>
     </target>
 

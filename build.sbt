@@ -15,7 +15,7 @@ crossPaths := false
 
 libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.2.1",
-  "com.h2database" % "h2" % "1.1.116",
+  "com.h2database" % "h2" % "1.4.181",
   "mysql" % "mysql-connector-java" % "5.1.29",
   "commons-dbcp" % "commons-dbcp" % "1.4",
   "org.apache.axis2" % "axis2-adb" % "1.5.5",

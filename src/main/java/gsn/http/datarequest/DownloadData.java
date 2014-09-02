@@ -34,10 +34,12 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.beans.DataField;
 import gsn.http.MultiDataDownload;
+import gsn.reports.beans.Stream;
 import gsn.storage.DataEnumerator;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -53,6 +55,8 @@ public class DownloadData extends AbstractDataRequest {
     private static transient Logger logger = Logger.getLogger(MultiDataDownload.class);
 
     private static final String PARAM_OUTPUT_TYPE = "outputtype";
+
+    private static final double MAX_SAMPLE_VALUES = 20000.0;
 
     public enum AllowedOutputType {
         csv,
@@ -107,6 +111,7 @@ public class DownloadData extends AbstractDataRequest {
 
     @Override
     public void outputResult(OutputStream os) {
+
         PrintWriter respond = new PrintWriter(os);
         Iterator<Entry<String, AbstractQuery>> iter = qbuilder.getSqlQueries().entrySet().iterator();
         Entry<String, AbstractQuery> nextSqlQuery;
@@ -115,6 +120,7 @@ public class DownloadData extends AbstractDataRequest {
             if (ot == AllowedOutputType.xml) {
                 respond.println("<result>");
             }
+
             while (iter.hasNext()) {
                 nextSqlQuery = iter.next();
                 Connection connection = null;
@@ -123,23 +129,15 @@ public class DownloadData extends AbstractDataRequest {
                 de = Main.getStorage(nextSqlQuery.getKey()).streamedExecuteQuery(nextSqlQuery.getValue(), true, connection);
 
                 //get units in hash map
-                Iterator< VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs();
                 HashMap<String, String> fieldToUnitMap = new HashMap<String, String>();
-                VSensorConfig sensorConfig = null;
-                while ( vsIterator.hasNext( ) ) {
-                    VSensorConfig senConfig = vsIterator.next( );
-                    if (nextSqlQuery.getKey().equalsIgnoreCase(senConfig.getName())){
-                        sensorConfig = senConfig;
-                        DataField[] dataFieldArray = senConfig.getOutputStructure();
-                        for (DataField df: dataFieldArray){
-                            String unit = df.getUnit();
-                            if (unit == null || unit.trim().length() == 0)
-                                unit = "";
+                VSensorConfig sensorConfig = Mappings.getVSensorConfig(nextSqlQuery.getKey());
+                DataField[] dataFieldArray = sensorConfig.getOutputStructure();
+                for (DataField df: dataFieldArray){
+                    String unit = df.getUnit();
+                    if (unit == null || unit.trim().length() == 0)
+                        unit = "";
 
-                            fieldToUnitMap.put(df.getName().toLowerCase(), unit);
-                        }
-                        break;
-                    }
+                    fieldToUnitMap.put(df.getName().toLowerCase(), unit);
                 }
 
                 logger.debug("Data Enumerator: " + de);
@@ -166,20 +164,72 @@ public class DownloadData extends AbstractDataRequest {
                 while (de.hasMoreElements()) {
                     streamElements.add(de.nextElement());
                 }
-                while (!streamElements.isEmpty()) {
-                    if (ot == AllowedOutputType.csv) {
-                        formatCSVElement(respond, streamElements.removeLast(), wantTimed, csvDelimiter, firstLine, fieldToUnitMap);
-                    } else if (ot == AllowedOutputType.xml) {
-                        formatXMLElement(respond, streamElements.removeLast(), wantTimed, firstLine, fieldToUnitMap);
+
+                double valsPerVS = MAX_SAMPLE_VALUES / numberOfFieldsInRequest();
+                if (requestParameters.containsKey("sample")
+                        && "true".equalsIgnoreCase(requestParameters.get("sample")[0])
+                        && streamElements.size() > valsPerVS){
+                    //sampling
+                    int numOfVals = streamElements.size();
+                    int left = (int)valsPerVS;
+                    int valsForAvg = (int)Math.ceil(numOfVals / valsPerVS);
+
+                    if (requestParameters.containsKey("sampling_percentage")){
+                        try{
+                            String percentageString = requestParameters.get("sampling_percentage")[0];
+                            int percentage = Integer.parseInt(percentageString);
+
+                            if (percentage > 0 && percentage <= 100 && numOfVals*percentage > 100){
+                                left = numOfVals*percentage/100;
+                                valsForAvg = (int)Math.ceil(numOfVals / left);
+                            }
+                        } catch (Exception e) {}
                     }
-                    firstLine = false;
+
+
+                    while (!streamElements.isEmpty()) {
+
+                        StreamElement se = null;
+                        if (numOfVals > left) {
+                            StreamElement [] seForSampling = new StreamElement[valsForAvg];
+                            for (int i = 0; i < valsForAvg; i++) {
+                                seForSampling[i] = streamElements.removeLast();
+                            }
+                            numOfVals -= valsForAvg;
+                            left--;
+                            se = sampleSkip(seForSampling);
+                        } else {
+                            se = streamElements.removeLast();
+                        }
+
+
+
+                        if (ot == AllowedOutputType.csv) {
+                            formatCSVElement(respond, se, wantTimed, csvDelimiter, firstLine, fieldToUnitMap);
+                        } else if (ot == AllowedOutputType.xml) {
+                            formatXMLElement(respond, se, wantTimed, firstLine, fieldToUnitMap);
+                        }
+                        firstLine = false;
+                    }
+                } else {
+                    while (!streamElements.isEmpty()) {
+                        if (ot == AllowedOutputType.csv) {
+                            formatCSVElement(respond, streamElements.removeLast(), wantTimed, csvDelimiter, firstLine, fieldToUnitMap);
+                        } else if (ot == AllowedOutputType.xml) {
+                            formatXMLElement(respond, streamElements.removeLast(), wantTimed, firstLine, fieldToUnitMap);
+                        }
+                        firstLine = false;
+                    }
                 }
+
+
                 if (ot == AllowedOutputType.xml)
                     respond.println("\t</data>");
             }
             if (ot == AllowedOutputType.xml) {
                 respond.println("</result>");
             }
+
         } catch (SQLException e) {
             logger.debug(e.getMessage());
         } finally {
@@ -189,6 +239,20 @@ public class DownloadData extends AbstractDataRequest {
         }
     }
 
+    private StreamElement sampleSkip (StreamElement [] seForSampling){
+        return seForSampling[seForSampling.length - 1];
+    }
+
+    private int numberOfFieldsInRequest(){
+        int toRet = 0;
+
+        for (String vsname: requestParameters.get("vsname")){
+            String [] vsnameParts = vsname.split(":");
+            toRet += vsnameParts.length - 2;
+        }
+
+        return toRet;
+    }
 
     private void formatCSVElement(PrintWriter respond, StreamElement se, boolean wantTimed, String cvsDelimiter, boolean firstLine, HashMap<String, String> fieldToUnitMap) {
         if (firstLine) {

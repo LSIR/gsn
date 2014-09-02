@@ -290,6 +290,50 @@ public class RequestHandler {
         return restResponse;
     }
 
+    public RestResponse getMinAndMaxValuesForSensorField(User user, String sensor, String field) {
+        RestResponse restResponse = userHasAccessToVirtualSensor(user, sensor);
+        if (restResponse != null) { //error occured
+            return restResponse;
+        }
+
+        restResponse = new RestResponse();
+
+        String filename = String.format(stringConstantsProperties.getProperty("FILENAME_MINMAX_VALS_SENSOR_FIELD"), sensor, field, datetime);
+        setRestResponseParams(restResponse, filename);
+
+
+        VSensorConfig sensorConfig = Mappings.getConfig(sensor);
+        VirtualSensor sensorObj = new VirtualSensor();
+
+        sensorObj.setMetadata(createHeaderMap(sensorConfig));
+        sensorObj.appendField(new DataField(stringConstantsProperties.getProperty("TIME"), "Time"));
+        sensorObj.appendField(new DataField(stringConstantsProperties.getProperty("TIMESTAMP"), "BigInt"));
+        for (DataField df: sensorConfig.getOutputStructure()){
+            if (df.getName().equals(field)){
+                sensorObj.appendField(df);
+                break;
+            }
+        }
+
+        ArrayList<Vector<Double>> elements  = new ArrayList<Vector<Double>>();
+        Vector<Long> timestamps = new Vector<Long>();
+
+        boolean errorFlag = !getMinMaxValForSensor(sensor, field, elements, timestamps);
+
+        if (errorFlag){
+            return errorResponse(ErrorType.ERROR_IN_REQUEST, user, sensor);
+        }
+
+        sensorObj.setValues(elements, timestamps);
+
+        List<VirtualSensor> listSens = new LinkedList<VirtualSensor>();
+        listSens.add(sensorObj);
+
+        restResponse.setResponse(VirtualSensor.generateFileContent(listSens, format));
+
+        return restResponse;
+    }
+
     //TODO implement getGridData for csv format
     
     public RestResponse getGridData(User user, String sensor, String date) {
@@ -631,6 +675,38 @@ public class RequestHandler {
                     }
                     elements.add(stream);
                 }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+            result = false;
+        } finally {
+            Main.getStorage(sensor).close(resultSet);
+            Main.getStorage(sensor).close(connection);
+        }
+
+        return result;
+    }
+
+    private boolean getMinMaxValForSensor(String sensor, String field, ArrayList<Vector<Double>> elements, Vector<Long> timestamps) {
+        Connection connection = null;
+        ResultSet resultSet = null;
+
+        boolean result = true;
+
+        try {
+            connection = Main.getStorage(sensor).getConnection();
+            StringBuilder query = new StringBuilder("select MAX(timed) as tt, MAX(" + field + "), MIN(" + field + ") ");
+            query.append(" from ").append(sensor);
+
+            resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, connection);
+
+
+            while (resultSet.next()) {
+                Vector<Double> stream = new Vector<Double>();
+                timestamps.add(resultSet.getLong("tt"));
+                stream.add(getDouble(resultSet, "MAX(" + field + ")"));
+                stream.add(getDouble(resultSet, "MIN(" + field + ")"));
+                elements.add(stream);
             }
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
