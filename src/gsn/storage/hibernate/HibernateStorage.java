@@ -200,6 +200,8 @@ public class HibernateStorage implements VirtualSensorStorage {
                 return "byte";
             case DataTypes.DOUBLE:
                 return "double";
+            case DataTypes.FLOAT:
+                return "float";
             case DataTypes.BINARY:
                 return "binary";
         }

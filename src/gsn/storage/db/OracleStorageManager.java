@@ -48,6 +48,12 @@ public class OracleStorageManager extends StorageManager {
         return "jdbc:oracle:thin:";
     }
 
+    /**
+     * http://docs.oracle.com/cd/B19306_01/java.102/b14355/oraint.htm
+     * http://docs.oracle.com/cd/E11882_01/java.112/e16548/apxref.htm#JJDBC28906
+     * mapping of double and float should be using the oracle JDBC extension and BINARY_DOUBLE/BINARY_FLOAT
+     * 
+     */
     @Override
     public String convertGSNTypeToLocalType(DataField gsnType) {
         String convertedType = null;
@@ -61,6 +67,8 @@ public class OracleStorageManager extends StorageManager {
             case DataTypes.DOUBLE:
                 convertedType = "number(38,16)";
                 break;
+            case DataTypes.FLOAT:
+            	convertedType = "number(38,8)";
             case DataTypes.CHAR:
             case DataTypes.VARCHAR:
                 // Because the parameter for the varchar is not
@@ -84,8 +92,10 @@ public class OracleStorageManager extends StorageManager {
             case Types.NUMERIC:
                 if (precision == 0)
                     return DataTypes.BIGINT;
-                else
+                else if (precision > 8)
                     return DataTypes.DOUBLE;
+                else
+                	return DataTypes.FLOAT;
             case Types.VARCHAR:
                 return DataTypes.VARCHAR;
             case Types.CHAR:

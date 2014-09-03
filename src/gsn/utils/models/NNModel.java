@@ -95,6 +95,7 @@ public class NNModel extends AbstractModel {
 	            			  compared = true;
 	            			  break;
 	        			  case DataTypes.DOUBLE:
+	        			  case DataTypes.FLOAT:
 	        				  diff = (Double) s2.getData(s) - (Double) s1.getData(s);
 	            			  compared = true;
 	            			  break;

@@ -55,6 +55,7 @@ public class Field4RestConverter implements Converter {
 		case DataTypes.INTEGER:
 		case DataTypes.DOUBLE:
 		case DataTypes.TINYINT:
+		case DataTypes.FLOAT:
 			type="numeric";
 			if (input.getValue() !=null)
 				value = Double.toString(((Number)input.getValue()).doubleValue());

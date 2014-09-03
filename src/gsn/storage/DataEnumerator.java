@@ -212,6 +212,9 @@ public class DataEnumerator implements DataEnumeratorIF {
 					case DataTypes.DOUBLE :
 						output[ innerIndex ] = resultSet.getDouble( actualColIndex );
 						break;
+					case DataTypes.FLOAT :
+						output[ innerIndex ] = resultSet.getFloat( actualColIndex );
+						break;
 					case DataTypes.BIGINT :
 						output[ innerIndex ] = resultSet.getLong( actualColIndex );
 						break;

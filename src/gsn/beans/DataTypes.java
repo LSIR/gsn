@@ -110,23 +110,32 @@ public class DataTypes {
    
    public final static String            SMALLINT_NAME             = "SmallInt";
    
+   // NEXT FIELD
+   public final static String            FLOAT_PATTERN_STRING   = "\\s*FLOAT\\s*";
+   
+   public final static byte               FLOAT                  = 9;
+   
+   public final static String            FLOAT_NAME             = "Float";   
+   
    // FINISH
    public final static Pattern [ ]       ALL_PATTERNS              = new Pattern [ ] { Pattern.compile( VAR_CHAR_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( CHAR_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( INTEGER_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( BIGINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( BINARY_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( DOUBLE_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
          Pattern.compile( TIME_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) ,
-         Pattern.compile( TINYINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( SMALLINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) };
+         Pattern.compile( TINYINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ) , Pattern.compile( SMALLINT_PATTERN_STRING , Pattern.CASE_INSENSITIVE ),
+         Pattern.compile( FLOAT_PATTERN_STRING , Pattern.CASE_INSENSITIVE )};
    
-   public final static StringBuilder     ERROR_MESSAGE             = new StringBuilder( "Acceptable types are (TINYINT, SMALLINT, INTEGER,BIGINT,CHAR(#),BINARY[(#)],VARCHAR(#),DOUBLE,TIME)." );
+   public final static StringBuilder     ERROR_MESSAGE             = new StringBuilder( "Acceptable types are (TINYINT, SMALLINT, INTEGER,BIGINT,CHAR(#),BINARY[(#)],VARCHAR(#),DOUBLE,TIME, FLOAT)." );
    
    public final static String [ ]        TYPE_NAMES                = new String [ ] { VARCHAR_NAME , CHAR_NAME , INTEGER_NAME , BIGINT_NAME , BINARY_NAME , DOUBLE_NAME , 
      TIME_NAME ,
      TINYINT_NAME ,
-         SMALLINT_NAME                                            };
+     SMALLINT_NAME,
+     FLOAT_NAME};
    
    public final static Object [ ]        TYPE_SAMPLE_VALUES        = { "A chain of chars" , 'c' , new Integer( 32 ) , new Integer( 66000 ) , new Byte( ( byte ) 12 ) , new Double( 3.141592 ) ,
-         new Date( ).getTime( ) , new Integer( 1 ) , new Integer( 9 ) };
+         new Date( ).getTime( ) , new Integer( 1 ) , new Integer( 9 ), new Float(2.02) };
    
    public static byte convertTypeNameToGSNTypeID ( final String type ) {
        if ( type == null ) throw new GSNRuntimeException( new StringBuilder( "The type *null* is not recoginzed by GSN." ).append( DataTypes.ERROR_MESSAGE ).toString( ) );

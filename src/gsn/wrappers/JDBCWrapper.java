@@ -260,6 +260,9 @@ public class JDBCWrapper extends AbstractWrapper {
                             case DataTypes.DOUBLE:
                                 output[i] = resultSet.getDouble(i + 3);
                                 break;
+                            case DataTypes.FLOAT:
+                                output[i] = resultSet.getFloat(i + 3);
+                                break;
                             case DataTypes.BIGINT:
                                 output[i] = resultSet.getLong(i + 3);
                                 break;

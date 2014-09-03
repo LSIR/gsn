@@ -60,6 +60,8 @@ public class PostgresStorageManager extends StorageManager {
             case Types.DOUBLE:
             case Types.DECIMAL:    // This is needed for doing aggregates in datadownload servlet.
                 return DataTypes.DOUBLE;
+            case Types.REAL:   //should also be float mapped here ?
+            	return DataTypes.FLOAT;
             case Types.BINARY:
             case Types.BLOB:
             case Types.VARBINARY:
@@ -174,6 +176,9 @@ public class PostgresStorageManager extends StorageManager {
                 break;
             case DataTypes.DOUBLE:
                 convertedType = "DOUBLE PRECISION";
+                break;
+            case DataTypes.FLOAT:
+                convertedType = "REAL";
                 break;
             case DataTypes.TINYINT:
             	convertedType = "SMALLINT";

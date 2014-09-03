@@ -58,6 +58,9 @@ public class SQLServerStorageManager extends StorageManager {
                 // optional.
                 convertedType = gsnType.getType();
                 break;
+            case DataTypes.FLOAT:
+            	convertedType = "REAL";
+            	break;
             default:
                 convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
                 break;
@@ -83,6 +86,8 @@ public class SQLServerStorageManager extends StorageManager {
             case Types.DOUBLE:
             case Types.DECIMAL:    // This is needed for doing aggregates in datadownload servlet.
                 return DataTypes.DOUBLE;
+            case Types.REAL:
+            	return DataTypes.FLOAT;
             case Types.BINARY:
             case Types.BLOB:
             case Types.VARBINARY:

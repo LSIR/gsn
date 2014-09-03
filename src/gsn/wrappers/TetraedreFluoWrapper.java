@@ -257,6 +257,9 @@ public class TetraedreFluoWrapper extends AbstractWrapper {
                             case DataTypes.DOUBLE:
                                 output[i] = resultSet.getDouble(i + 1);
                                 break;
+                            case DataTypes.FLOAT:
+                                output[i] = resultSet.getFloat(i + 1);
+                                break;
                             case DataTypes.BIGINT:
                                 output[i] = resultSet.getLong(i + 1);
                                 break;
