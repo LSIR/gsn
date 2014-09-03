@@ -173,6 +173,7 @@ public abstract class AbstractScheduledVirtualSensor extends AbstractVirtualSens
 				continue;
 			if ( ( (  field.getDataTypeID() == DataTypes.BIGINT ||
 					field.getDataTypeID() == DataTypes.DOUBLE ||
+					field.getDataTypeID() == DataTypes.FLOAT ||
 					field.getDataTypeID() == DataTypes.INTEGER||
 					field.getDataTypeID() == DataTypes.SMALLINT||
 					field.getDataTypeID() == DataTypes.TINYINT ) &&!(value instanceof Number)) 

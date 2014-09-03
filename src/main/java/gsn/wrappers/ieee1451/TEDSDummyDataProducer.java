@@ -160,6 +160,9 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
                case DataTypes.DOUBLE :
                   result[ i ] = Math.random( ) * 255;
                   break;
+               case DataTypes.FLOAT :
+                   result[ i ] = (float) (Math.random( ) * 255);
+                   break;
                case DataTypes.BINARY :
                   result[ i ] = ( byte ) Math.random( ) * 255;
                   break;

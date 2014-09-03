@@ -69,6 +69,9 @@ public class MySQLStorageManager extends StorageManager {
             case DataTypes.DOUBLE:
                 convertedType = "double precision";
                 break;
+            case DataTypes.FLOAT:
+            	convertedType = "FLOAT(23)"; //just to be sure it doesn't map to double
+                break;
             default:
                 convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
                 break;
@@ -92,7 +95,10 @@ public class MySQLStorageManager extends StorageManager {
                 return DataTypes.VARCHAR;
             case Types.CHAR:
                 return DataTypes.CHAR;
-            case Types.DOUBLE:
+            case Types.FLOAT:      
+            case Types.REAL:      
+            	return DataTypes.FLOAT;
+            case Types.DOUBLE:	
             case Types.DECIMAL:    // This is needed for doing aggregates in datadownload servlet.
                 return DataTypes.DOUBLE;
             case Types.BINARY:

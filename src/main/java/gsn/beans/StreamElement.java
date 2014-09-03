@@ -181,6 +181,11 @@ public final class StreamElement implements Serializable {
 					throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ]
 	                                                    + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" );
 				break;
+			case DataTypes.FLOAT :
+				if ( !( data instanceof Float ) )
+					throw new IllegalArgumentException( "The field is defined as " + DataTypes.TYPE_NAMES[ fieldType ]
+	                                                    + " while the actual data in the field is of type : *" + data.getClass( ).getCanonicalName( ) + "*" );
+				break;
 			case DataTypes.BINARY :
 				// if ( data[ i ] instanceof String ) data[ i ] = ( ( String )
 				// data[ i ] ).getBytes( );
@@ -323,6 +328,7 @@ public final class StreamElement implements Serializable {
 			}
 			switch ( fieldTypes[ i ] ) {
 			case DataTypes.DOUBLE :
+			case DataTypes.FLOAT :
 				toReturn[ i ] = fieldValues[ i ];
 				break;
 			case DataTypes.BIGINT :
@@ -374,6 +380,9 @@ public final class StreamElement implements Serializable {
 			case DataTypes.DOUBLE :
 				values[ i ] = Double.parseDouble(fieldValues[ i ]);
 				break;
+			case DataTypes.FLOAT :
+				values[ i ] = Float.parseFloat( ( String ) fieldValues[ i ] );
+				break;
 			case DataTypes.BIGINT :
 				//        case DataTypes.TIME :
 				values[ i ] = Long.parseLong( ( String ) fieldValues[ i ] );
@@ -424,6 +433,9 @@ public final class StreamElement implements Serializable {
 			switch ( findIndexInDataField( outputFormat ,fieldNames[i] ) ) {
 			case DataTypes.DOUBLE :
 				values.add(Double.parseDouble( (String)fieldValues[ i ]));
+				break;
+			case DataTypes.FLOAT :
+				values.add(Float.parseFloat( (String)fieldValues[ i ]));
 				break;
 			case DataTypes.BIGINT :
 				values.add( Long.parseLong( (String)  fieldValues[ i ] ));

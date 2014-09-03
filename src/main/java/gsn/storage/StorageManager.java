@@ -679,6 +679,12 @@ public abstract class StorageManager {
                         else
                             ps.setDouble(counter, ((Number) value).doubleValue());
                         break;
+                    case DataTypes.FLOAT:
+                        if (value == null)
+                            ps.setNull(counter, Types.FLOAT);
+                        else
+                            ps.setFloat(counter, ((Number) value).floatValue());
+                        break;
                     case DataTypes.BIGINT:
                         if (value == null)
                             ps.setNull(counter, Types.BIGINT);
