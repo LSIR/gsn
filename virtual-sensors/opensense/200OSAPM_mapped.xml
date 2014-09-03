@@ -8,14 +8,11 @@
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="CO_mics" type="int" />
-           <field name="NO2_mics" type="int" />
-           <field name="temp_mics" type="int" />
-           <field name="RH_mics" type="smallint" />
+           <field name="pressure" type="int" />
            <field name="latitude" type="double" />
            <field name="longitude" type="double" />
-           <field name="altitude" type="double" />
-           <field name="HDOP" type="double" />
+           <field name="altitude" type="float" />
+           <field name="HDOP" type="float" />
 		</output-structure>
 	</processing-class>
 	<description>Map GPS onto MICSCO</description>
@@ -38,8 +35,8 @@
 		<stream name="B">
 			<source alias="B"  sampling-rate="1" storage-size="1">
 				<address wrapper="zeromq">
-					<predicate key="address">inproc://stream/osmicsco</predicate>
-					<predicate key="vsensor">osmicsco</predicate>
+					<predicate key="address">inproc://stream/osapm</predicate>
+					<predicate key="vsensor">osapm</predicate>
 				</address>
 				<query>select * from wrapper</query>
 			</source>

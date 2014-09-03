@@ -1,19 +1,16 @@
-<virtual-sensor name="OSMICSCO" priority="11">
+<virtual-sensor name="OSAPM" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.OpensenseSplitterVSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
 		<init-params>
-		    <param name="type">MICSCO</param> 
+		    <param name="type">APM</param> 
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="CO_mics" type="int" />
-           <field name="NO2_mics" type="int" />
-           <field name="temp_mics" type="int" />
-           <field name="RH_mics" type="smallint" />
+           <field name="pressure" type="int" />
 		</output-structure>
 	</processing-class>
-	<description>Parse MICS packets</description>
+	<description>Parse APM packets</description>
 	<life-cycle pool-size="100" />
 	<addressing>
 		<predicate key="geographical">Lausanne, Switzerland</predicate>
@@ -28,7 +25,7 @@
 				</address>
 				<query>select * from wrapper</query>
 			</source>
-			<query>select * from source1 where type = '11' or type = '31'</query>
+			<query>select * from source1 where type = '14'</query>
 		</stream>
 	</streams>
 </virtual-sensor>

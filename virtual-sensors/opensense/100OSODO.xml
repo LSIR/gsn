@@ -7,7 +7,7 @@
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="odometer" type="int" />
+           <field name="odometer" type="smallint" />
 		</output-structure>
 	</processing-class>
 	<description>Parse Odometer packets</description>

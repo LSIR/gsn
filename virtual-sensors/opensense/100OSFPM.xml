@@ -7,10 +7,10 @@
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="LDSA" type="double" />
-           <field name="idiff" type="double" />
+           <field name="LDSA" type="float" />
+           <field name="idiff" type="float" />
            <field name="HV" type="smallint" />
-           <field name="EM" type="double" />
+           <field name="EM" type="float" />
 		</output-structure>
 	</processing-class>
 	<description>Parse Partector packets</description>

@@ -9,13 +9,11 @@
            <field name="station" type="smallint" />
            <field name="latitude" type="double" />
            <field name="longitude" type="double" />
-           <field name="altitude" type="double" />
-           <field name="azimuth_g" type="double" />
-           <field name="speed" type="double" />
+           <field name="altitude" type="float" />
+           <field name="speed" type="float" />
            <field name="satellites" type="smallint" />
-           <field name="HDOP" type="double" />
-           <field name="gyro" type="double" />
-           <field name="ubx_temp" type="double" />
+           <field name="HDOP" type="float" />
+           <field name="gyro" type="float" />
 		</output-structure>
 	</processing-class>
 	<description>Parse GPS packets</description>

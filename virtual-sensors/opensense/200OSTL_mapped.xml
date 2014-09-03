@@ -15,8 +15,8 @@
            <field name="tl_next_stop" type="varchar(20)" />
            <field name="latitude" type="double" />
            <field name="longitude" type="double" />
-           <field name="altitude" type="double" />
-           <field name="HDOP" type="double" />
+           <field name="altitude" type="float" />
+           <field name="HDOP" type="float" />
 		</output-structure>
 	</processing-class>
 	<description>Map GPS onto TL</description>

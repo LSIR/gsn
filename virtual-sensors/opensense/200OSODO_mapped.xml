@@ -8,11 +8,11 @@
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="odometer" type="int" />
+           <field name="odometer" type="smallint" />
            <field name="latitude" type="double" />
            <field name="longitude" type="double" />
-           <field name="altitude" type="double" />
-           <field name="HDOP" type="double" />
+           <field name="altitude" type="float" />
+           <field name="HDOP" type="float" />
 		</output-structure>
 	</processing-class>
 	<description>Map GPS onto ODO</description>
