@@ -71,17 +71,17 @@ public class BinaryParser {
 	
 	public void addSum(byte[] b){
 		for(int i=0;i<b.length;i++){
-			s1 = (s1 + b[i]) % 255;
+			s1 = (s1 +(b[i] & 0xFF)) % 255;
 			s2 = (s2 + s1) % 255;
 		}
 	}
 
 	public boolean checkSum() throws IOException {
-		/*byte[] buf = new byte[2];
+		byte[] buf = new byte[2];
 		in.read(buf);
-		if (s1 != buf[1] || s2 != buf[0]){
+		if (s1 != (buf[0] & 0xFF) || s2 != (buf[1] & 0xFF)){
 			return false;
-		}*/
+		}
 		return true;
 	}
 

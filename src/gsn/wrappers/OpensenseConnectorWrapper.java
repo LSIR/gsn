@@ -26,7 +26,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	
 	
 	public static final Integer[] MOBILE_STATIONS = {};
-	public static final Integer[] STATIC_STATIONS = {};
+	public static final Integer[] STATIC_STATIONS = {101};
 
 	private final transient Logger logger = Logger.getLogger( OpensenseConnectorWrapper.class );
 	
@@ -245,7 +245,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									break;
 								case 35:
 									byte[] b = parser.readBytes(3);
-									id = b[0];
+									id = Integer.parseInt(new String(b));
 									logger.debug("char:" + b[0] + ", "+ b[1] + ", "+ b[2]);
 									if (sd == null) sd = create(id);
 									else if (sd.id != id) logger.warn("received packet from "+id+", while listening to "+sd.id);
@@ -263,6 +263,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									default:
 										throw new IOException("unknown command:"+next);
 									}
+									break;
 								case 43:
 									byte[] buf = parser.readBytes(2);
 									if (new String(buf).equals("++")){
@@ -272,7 +273,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									break;
 								default:
 									err++;
-									//throw new IOException("unknown packet type:"+type);
+									throw new IOException("unknown packet type:"+type);
 								}
 							}catch(IOException e){
 								err ++;
@@ -552,7 +553,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 		public void readSecCO(BinaryParser p) throws IOException {
 			//LSSS
 			readTimeFromLong(p);
-			payload = p.readBytes(4);
+			payload = p.readBytes(6);
 		}
 		
 		public void readSecOzone(BinaryParser p) throws IOException {

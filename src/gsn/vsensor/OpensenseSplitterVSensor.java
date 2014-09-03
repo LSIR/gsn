@@ -24,21 +24,21 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	static{
 		dataFields.put("FPM",new DataField[]{
 			new DataField("station","smallint"),
-	        new DataField("LDSA","double"),
-	        new DataField("idiff","double"),
+	        new DataField("LDSA","float"),
+	        new DataField("idiff","float"),
 	        new DataField("HV","smallint"),
-	        new DataField("EM","double")});
+	        new DataField("EM","float")});
 		dataFields.put("FPH", new DataField[]{   
 		    new DataField("station","smallint"),
-	        new DataField("ufp_temp","double"),
-	        new DataField("ufp_RH","tinyint"),
-	        new DataField("ufp_bat","double"),
-	        new DataField("ufp_flow","double"),
-	        new DataField("ufp_warning","tinyint")});
+	        new DataField("ufp_temp","float"),
+	        new DataField("ufp_RH","smallint"),
+	        new DataField("ufp_flow","float"),
+	        new DataField("ufp_warning","tinyint"),
+	        new DataField("ufp_bat","float")});
 	    dataFields.put("OZONE", new DataField[]{
 			new DataField("station","smallint"),
 	        new DataField("O3_res","int"),
-	        new DataField("temp","double"),
+	        new DataField("temp","float"),
 	        new DataField("RH","tinyint")});
 	    dataFields.put("ACC", new DataField[]{
 			new DataField("station","smallint"),
@@ -52,13 +52,11 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 			new DataField("station","smallint"),
 			new DataField("latitude","double"),
 			new DataField("longitude","double"),
-            new DataField("altitude","double"),
-	        new DataField("azimuth_g","double"),
-	        new DataField("speed","double"),
-	        new DataField("satellites","TINYINT"),
-	        new DataField("HDOP","double"),
-	        new DataField("gyro","double"),
-	        new DataField("ubx_temp","double")});
+            new DataField("altitude","float"),
+	        new DataField("speed","float"),
+	        new DataField("satellites","tinyint"),
+	        new DataField("HDOP","float"),
+	        new DataField("gyro","float")});
 	    dataFields.put("TL", new DataField[]{
 			new DataField("station","smallint"),
 	        new DataField("door_state","tinyint"),
@@ -68,13 +66,10 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	        new DataField("tl_next_stop","varchar(20)")});
 	    dataFields.put("ODO", new DataField[]{
 	    	new DataField("station","smallint"),
-	    	new DataField("odometer","int")});
-	    dataFields.put("MICSCO", new DataField[]{
-			new DataField("station","smallint"),
-	        new DataField("CO_mics","int"),
-	        new DataField("NO2_mics","int"),
-	        new DataField("temp_mics","int"),
-	        new DataField("RH_mics","smallint")});
+	    	new DataField("odometer","smallint")});
+	    dataFields.put("APM", new DataField[]{
+	    	new DataField("station","smallint"),
+	    	new DataField("pressure","int")});
 	    
 	}
 	
@@ -128,26 +123,31 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 			BinaryParser p = new BinaryParser(input);
 			if(data_type.equalsIgnoreCase("FPH")){
 				 if(s_type == 12){//sSCCS
-					 temp.setData(1,p.readNextShort(true)/10.0);
+					 temp.setData(1,(float)(p.readNextShort(true)/10.0));
 					 temp.setData(2,p.readNextShort(false));
-					 temp.setData(4,p.readNextChar(false) / 100.0);
-					 temp.setData(5,p.readNextChar(false));
-					 temp.setData(3,p.readNextShort(false) / 100.0);
+					 temp.setData(3,(float)(p.readNextChar(false) / 100.0));
+					 temp.setData(4,p.readNextChar(false));
+					 temp.setData(5,(float)(p.readNextShort(false) / 100.0));
 					 dataProduced(new StreamElement(temp));
 				 } 
 			} else if (data_type.equalsIgnoreCase("FPM")){
 				 if(s_type == 13){ //LCSs
-					 temp.setData(1,p.readNextLong(false) / 100.0);
-					 temp.setData(2,p.readNextChar(false) / 10.0);
-					 temp.setData(3,p.readNextShort(false));
-					 temp.setData(4,p.readNextShort(true) / 100.0);
+					 temp.setData(1,(float)(p.readNextLong(false) / 100.0));
+					 temp.setData(2,(float)(p.readNextChar(false) / 10.0));
+					 temp.setData(3,p.readNextShort(true));
+					 temp.setData(4,(float)(p.readNextShort(true) / 100.0));
 					 dataProduced(new StreamElement(temp));
 				 }
+			} else if (data_type.equalsIgnoreCase("APM")){
+				if(s_type == 14){
+					temp.setData(1, p.readNextLong(true));
+					dataProduced(new StreamElement(temp));
+				}
 	        } else if (data_type.equalsIgnoreCase("OZONE")){
 	        	if(s_type == 10 || s_type == 30){//CSSC
 	        		p.readNextChar(false);
 	        		temp.setData(1,p.readNextShort(false));
-	        		temp.setData(2,p.readNextShort(false)/10.0 - 40);
+	        		temp.setData(2,(float)(p.readNextShort(false)/10.0 - 40));
 	        		temp.setData(3,p.readNextChar(false));
 	        		dataProduced(new StreamElement(temp));
 				 }       	
@@ -186,28 +186,26 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 				 }
 	        } else if (data_type.equalsIgnoreCase("ODO")){
 	        	if(s_type == 1){ //S
-	        		temp.setData(1,p.readNextShort(false));
-	        		dataProduced(new StreamElement(temp)); 
-				 }
-	        } else if (data_type.equalsIgnoreCase("MICSCO")){
-	        	if(s_type == 11 || s_type == 31){ //SSSC
-	        		temp.setData(1,p.readNextShort(false));
-	        		temp.setData(2,p.readNextShort(false));
-	        		temp.setData(3,p.readNextShort(false));
-	        		temp.setData(4,p.readNextChar(false));
+	        		temp.setData(1,p.readNextShort(true));
 	        		dataProduced(new StreamElement(temp)); 
 				 }
 	        } else if (data_type.equalsIgnoreCase("GPS")){
 	        	if(s_type == 0){ //LLSSLCSLs
 	        		temp.setData(1,(p.readNextLong(false)- 460000000)/6000000.0 + 46);
 	        		temp.setData(2,(p.readNextLong(false)- 60000000)/6000000.0 + 6);
-	        		temp.setData(3,p.readNextShort(false) / 10.0);
-	        		temp.setData(4,p.readNextShort(false)/ 100.0);			
-	        		temp.setData(5,p.readNextLong(false)/1000.0);
-	        		temp.setData(6,p.readNextChar(false));
-	        		temp.setData(7,p.readNextShort(false)/100);
-	        		temp.setData(8,p.readNextLong(false)/100.0);
-	        		temp.setData(9,p.readNextShort(true)*0.00390625);
+	        		temp.setData(3,(float)(p.readNextShort(false) / 10.0));
+	        		if (((byte[])(streamElement.getData("payload"))).length > 6){
+		        		temp.setData(4,(float)(p.readNextShort(false)/ 100.0));			
+		        		temp.setData(5,p.readNextChar(false));
+		        		temp.setData(6,(float)(p.readNextShort(false)/100));
+		        		temp.setData(7,(float)(p.readNextLong(false)/100.0));
+	        		}
+	        		else{
+		        		temp.setData(4,null);			
+		        		temp.setData(5,p.readNextChar(false));
+		        		temp.setData(6,(float)(p.readNextShort(false)/100));
+		        		temp.setData(7,null);
+	        		}
 	        		dataProduced(new StreamElement(temp));
 				 }
 	        } else if (data_type.equalsIgnoreCase("TL")){
