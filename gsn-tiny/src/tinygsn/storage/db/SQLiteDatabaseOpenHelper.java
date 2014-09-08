@@ -1,5 +1,5 @@
 /**
-* Global Sensor Networks (GSN) Source Code
+* Global Sensor Networks (GSN) Source Code 
 * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
 *
 * This file is part of GSN.
@@ -25,12 +25,20 @@
 
 package tinygsn.storage.db;
 
+import java.io.Serializable;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper {
+public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4345330326921532L;
 
 	public SQLiteDatabaseOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {
@@ -39,6 +47,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		
 		String createQuery = "CREATE TABLE vsList (_id integer primary key autoincrement,"
 				+ "running, vsname, vstype, "
 				+ "sswindowsize, ssstep, sssamplingrate, ssaggregator, wrappername, "
@@ -50,6 +59,12 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper {
 				+ "SERVER text, VSNAME text, DATA text, READ text"
 				+ ");";
 		db.execSQL(createQuery);
+	
+		createQuery = "CREATE TABLE SAMPLIG_RATE (_id integer primary key,"
+				+ "samplingrate integer, vsname text"
+				+ ");";
+		db.execSQL(createQuery);
+	
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class ActivityAndroidViewer extends Activity implements AbstractViewer {
 	TextView lblOutput = null;
 	Handler handler;
 
-	AndroidControllerDemo controller = new AndroidControllerDemo(this);
+	AndroidControllerDemo controller = new AndroidControllerDemo(this, ActivityAndroidViewer.this);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

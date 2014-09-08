@@ -155,6 +155,7 @@ public abstract class AbstractWrapper extends Thread {
 	}
 
 	public void releaseResources() {
+		Log.i("deactivation", this.toString());
 		isActive = false;
 	}
 

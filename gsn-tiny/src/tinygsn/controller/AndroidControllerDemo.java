@@ -31,6 +31,7 @@ import tinygsn.gui.android.ActivityAndroidViewer;
 import tinygsn.storage.StorageManager;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -41,10 +42,12 @@ public class AndroidControllerDemo extends AbstractController {
 	private VSensorLoader vSensorLoader;
 	private Handler handler = null;
 	private SqliteStorageManager storage = null;
-
+	private Context context = null;
+	
 	private static final String TAG = "AndroidController";
 
-	public AndroidControllerDemo(ActivityAndroidViewer androidViewer) {
+	public AndroidControllerDemo(ActivityAndroidViewer androidViewer, Context context) {
+		this.context = context;
 		this.view = androidViewer;
 		Log.v(TAG, "AndroidController");
 		
@@ -64,12 +67,12 @@ public class AndroidControllerDemo extends AbstractController {
 	}
 
 	public void loadVSConfigLastUsed() {
-		vSensorLoader = new VSensorLoader(this);
+		vSensorLoader = new VSensorLoader(this, context);
 		vSensorLoader.start();
 	}
 
 	public void loadVSConfig(VSensorConfig config) {
-		vSensorLoader = new VSensorLoader(this);
+		vSensorLoader = new VSensorLoader(this, context);
 		vSensorLoader.start();
 	}
 

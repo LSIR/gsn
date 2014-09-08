@@ -47,7 +47,7 @@ import android.util.Log;
 public class AndroidLightWrapper extends AbstractWrapper implements
 		SensorEventListener {
 
-	private static final String[] FIELD_NAMES = new String[] { "Illuminance"};
+	private static final String[] FIELD_NAMES = new String[] {"Illuminance"};
 
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE };
 
@@ -97,7 +97,7 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 		}
 	}
 
-	private void getLastKnownData() {
+	public void getLastKnownData() {
 		if (theLastStreamElement == null) {
 			Log.e(TAG, "There is no signal!");
 		}
@@ -115,6 +115,7 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 
 	@Override
 	public DataField[] getOutputStructure() {
+		Log.i("get called","get called");
 		ArrayList<DataField> output = new ArrayList<DataField>();
 		for (int i = 0; i < FIELD_NAMES.length; i++)
 			output.add(new DataField(FIELD_NAMES[i], FIELD_TYPES_STRING[i],
@@ -135,6 +136,14 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 
 	@Override
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
+	}
+
+	public StreamElement getTheLastStreamElement() {
+		return theLastStreamElement;
+	}
+
+	public void setTheLastStreamElement(StreamElement theLastStreamElement) {
+		this.theLastStreamElement = theLastStreamElement;
 	}
 
 	@Override

@@ -32,6 +32,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
@@ -48,12 +49,14 @@ public class SqliteStorageManager_multipleInstances extends StorageManager {
 	private static final String DB_NAME = "tinygsn11.db";
 	private SQLiteDatabase database;
 	private SQLiteDatabaseOpenHelper dbOpenHelper;
-
+	private Context context;
+	
 	private static final String TAG = "SqliteStorageManager";
 
 	public SqliteStorageManager_multipleInstances(Context context) {
 		super();
 		this.isSQLite = true;
+		this.context = context;
 		dbOpenHelper = new SQLiteDatabaseOpenHelper(context, DB_NAME, null, 1);
 		// dbOpenHelper.close();
 	}
@@ -300,6 +303,7 @@ public class SqliteStorageManager_multipleInstances extends StorageManager {
 			open();
 			Cursor cursor = database.rawQuery(query, new String[] {});
 			while (cursor.moveToNext()) {
+				int id  = cursor.getInt(cursor.getColumnIndex("_id"));
 				int running = cursor.getInt(cursor.getColumnIndex("running"));
 				String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 				double vstype = cursor.getDouble(cursor.getColumnIndex("vstype"));
@@ -335,12 +339,13 @@ public class SqliteStorageManager_multipleInstances extends StorageManager {
 				else
 					processingClass = AbstractVirtualSensor.PROCESSING_CLASS_NOTIFICATION;
 
-				VSensorConfig vs = new VSensorConfig(processingClass, vsname,
+				VSensorConfig vs = new VSensorConfig(id, processingClass, vsname,
 						wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep,
 						aggregator, running == 1, notify_field, notify_condition,
 						notify_value, notify_action, notify_contact, save_to_db);
 
-				vsList.add(new VirtualSensor(vs));
+				vsList.add(new VirtualSensor(vs, context));
+				StaticData.addConfig(id, vs);
 			}
 		}
 		catch (SQLException e) {

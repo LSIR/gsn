@@ -40,7 +40,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 
-public class AndroidGPSWrapper extends AbstractWrapper {
+public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListener {
 
 	private static final String[] FIELD_NAMES = new String[] { "latitude",
 			"longitude" };
@@ -129,7 +129,7 @@ public class AndroidGPSWrapper extends AbstractWrapper {
 //		}
 //	}
 
-	private void getLastKnownLocation() {
+	public void getLastKnownLocation() {
 		if (theLastStreamElement == null){
 			Log.e(TAG, "There is no signal!");
 		}
@@ -199,6 +199,33 @@ public class AndroidGPSWrapper extends AbstractWrapper {
 	@Override
 	public Byte[] getFieldType() {
 		return FIELD_TYPES;
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void setTheLastStreamElement(StreamElement theLastStreamElement) {
+		this.theLastStreamElement = theLastStreamElement;
 	}
 
 }

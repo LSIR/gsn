@@ -39,32 +39,46 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-public class AndroidGyroscopeWrapper extends AbstractWrapper implements
+public class WifiWrapper extends AbstractWrapper implements
 		SensorEventListener {
 
-	private static final String[] FIELD_NAMES = new String[] { "x", "y", "z" };
+	private static final String[] FIELD_NAMES = new String[] { "mac1", "mac2", "level" };
 
-	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE,
-			DataTypes.DOUBLE, DataTypes.DOUBLE };
+	public StreamElement getTheLastStreamElement() {
+		return theLastStreamElement;
+	}
 
-	private static final String[] FIELD_DESCRIPTION = new String[] { "x", "y",
-			"z" };
+	public void setTheLastStreamElement(StreamElement theLastStreamElement) {
+		this.theLastStreamElement = theLastStreamElement;
+	}
 
-	private static final String[] FIELD_TYPES_STRING = new String[] { "double",
-			"double", "double" };
+	
+	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE };
 
-	private static final String TAG = "AndroidGyroscopeWrapper";
+	private static final String[] FIELD_DESCRIPTION = new String[] { "mac1", "mac2", "level" };
 
-	private SensorManager mSensorManager;
-	private Sensor mSensor;
+	private static final String[] FIELD_TYPES_STRING = new String[] { "double", "double", "double" };
+
+	private static final String TAG = "AndroidWifiWrapper";
 
 	public StreamElement theLastStreamElement = null;
+	public ArrayList<StreamElement> queuedStreamElements = new ArrayList<StreamElement>();
 
-	public AndroidGyroscopeWrapper() {
+	
+	public ArrayList<StreamElement> getQueuedStreamElements() {
+		return queuedStreamElements;
+	}
+
+	public void setQueuedStreamElements(
+			ArrayList<StreamElement> queuedStreamElements) {
+		this.queuedStreamElements = queuedStreamElements;
+	}
+
+	public WifiWrapper() {
 		super();
 	}
 
-	public AndroidGyroscopeWrapper(Queue queue) {
+	public WifiWrapper(Queue queue) {
 		super(queue);
 		initialize();
 	}
@@ -74,27 +88,23 @@ public class AndroidGyroscopeWrapper extends AbstractWrapper implements
 	}
 
 	public void run() {
-//		Log.i("Gyroscop", "starrrrrrrrrrrrrted");
-//		Log.i("Gyroscop",getConfig().toString());
-//		Log.i("Gyroscop",getConfig().getController().toString());
-//		Log.i("Gyroscop",getConfig().getController().toString());
-//		
-		Activity activity = getConfig().getController().getActivity();
-		mSensorManager = (SensorManager) activity
-				.getSystemService(Context.SENSOR_SERVICE);
-		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-		mSensorManager.registerListener(this, mSensor,
-				SensorManager.SENSOR_DELAY_NORMAL);
-
-		while (isActive()) {
-			try {
-				Thread.sleep(samplingRate);
-				getLastKnownData();
-			}
-			catch (InterruptedException e) {
-				Log.e(e.getMessage(), e.toString());
-			}
-		}
+		
+//		Activity activity = getConfig().getController().getActivity();
+//		mSensorManager = (SensorManager) activity
+//				.getSystemService(Context.SENSOR_SERVICE);
+//		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+//		mSensorManager.registerListener(this, mSensor,
+//				SensorManager.SENSOR_DELAY_NORMAL);
+//
+//		while (isActive()) {
+//			try {
+//				Thread.sleep(samplingRate);
+//				getLastKnownData();
+//			}
+//			catch (InterruptedException e) {
+//				Log.e(e.getMessage(), e.toString());
+//			}
+//		}
 	}
 
 	public void getLastKnownData() {

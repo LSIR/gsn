@@ -31,6 +31,7 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.Queue;
 import tinygsn.beans.StreamElement;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -39,8 +40,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-public class AndroidAccelerometerWrapper extends AbstractWrapper implements
-		SensorEventListener {
+public class AndroidAccelerometerWrapper extends AbstractWrapper implements SensorEventListener  {
 
 	private static final String[] FIELD_NAMES = new String[] { "x", "y", "z" };
 
@@ -75,6 +75,9 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements
 
 	public void run() {
 		Activity activity = getConfig().getController().getActivity();
+		
+		SqliteStorageManager storage = new SqliteStorageManager(getConfig().getController().getActivity());
+		
 		mSensorManager = (SensorManager) activity
 				.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -82,22 +85,24 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements
 				SensorManager.SENSOR_DELAY_NORMAL);
 
 		while (isActive()) {
+			int samplingRate = storage.getSamplingRateByName("");
 			try {
 				Thread.sleep(samplingRate);
 				getLastKnownData();
 			}
 			catch (InterruptedException e) {
+			
 				Log.e(e.getMessage(), e.toString());
 			}
 		}
 	}
 
-	private void getLastKnownData() {
-		if (theLastStreamElement == null) {
+	public void getLastKnownData() {
+		if (getTheLastStreamElement() == null) {
 			Log.e(TAG, "There is no signal!");
 		}
 		else {
-			postStreamElement(theLastStreamElement);
+			postStreamElement(getTheLastStreamElement());
 		}
 	}
 
@@ -134,14 +139,19 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		double x = event.values[0];
-		double y = event.values[1];
-		double z = event.values[2];
+	
+	}
+	public void  onSensorChanged (int sensor, float[] values)
+	{
+		//Log.i("heror", "heeeeeeeeeereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+	}
 
-		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
-				new Serializable[] { x, y, z });
+	public StreamElement getTheLastStreamElement() {
+		return theLastStreamElement;
+	}
 
-		theLastStreamElement = streamElement;
+	public void setTheLastStreamElement(StreamElement theLastStreamElement) {
+		this.theLastStreamElement = theLastStreamElement;
 	}
 
 }

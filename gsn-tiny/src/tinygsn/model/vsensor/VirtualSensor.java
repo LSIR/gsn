@@ -24,18 +24,32 @@
 
 
 package tinygsn.model.vsensor;
+import java.io.Serializable;
 
 import tinygsn.beans.InputStream;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
-import tinygsn.model.wrappers.AbstractWrapper;
-import android.app.Activity;
+import tinygsn.services.AccelometerService;
+import tinygsn.services.ActivityRecognitionService;
+import tinygsn.services.GyroscopeService;
+import tinygsn.services.LightSensorService;
+import tinygsn.services.LocationService;
+import tinygsn.services.WifiService;
+import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
+import android.content.Context;
 
-public class VirtualSensor {
+public class VirtualSensor implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5273593293715944940L;
+
+	public Context context;
+	
 	private AbstractVirtualSensor virtualSensor = null;
 
 	private VSensorConfig config = null;
@@ -43,16 +57,18 @@ public class VirtualSensor {
 	public VSensorConfig getConfig() {
 		return config;
 	}
-
+	
 	public void setConfig(VSensorConfig config) {
 		this.config = config;
+		
 	}
 
 	private static final String TAG = "VirtualSensor";
 
-	public VirtualSensor(VSensorConfig originalConfig) {
+	public VirtualSensor(VSensorConfig originalConfig, Context context) {
 		this.config = originalConfig;
-
+		this.context = context;
+		
 		for (InputStream is : config.getInputStreams()) {
 			is.setPool(this);
 		}
@@ -78,36 +94,77 @@ public class VirtualSensor {
 	}
 
 	public void start() {
-		Log.v(TAG, "Starts VS: " + config.toString());
-
-		config.setRunning(true);
 		
-		for (InputStream inputStream : config.getInputStreams()) {
-			for (StreamSource streamSource : inputStream.getSources()) {
-				AbstractWrapper w = streamSource.getWrapper();
-				Log.v(TAG, w.toString());
-				w.start();
-			}
-		}
-		Log.v(TAG, config.toString() + " started.");
+		Log.i("start Called", "startCalled");
+		StackTraceElement test[] = Thread.currentThread().getStackTrace();
+//		for(int i = 0; i < test.length;  i++)
+//		{
+//			Log.e("stack trace", test[i].getMethodName());
+//			Log.e("stack trace class", test[i].getClassName());
+//		}
+		Log.i("In VSensor put data", "startiiiiiiiiing");
+		Log.i("wrapper type:::::  ",config.getWrapperName());
+		// Context sContext =  getApplicationContext();
+		Intent serviceIntent = null;
+		if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidGyroscopeWrapper"))
+			serviceIntent = new Intent(this.context, GyroscopeService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidAccelerometerWrapper"))
+			serviceIntent = new Intent(this.context, AccelometerService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidGPSWrapper"))
+			serviceIntent = new Intent(this.context, LocationService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidLightWrapper"))
+			serviceIntent = new Intent(this.context, LightSensorService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidActivityRecognitionWrapper"))
+			serviceIntent = new Intent(this.context, ActivityRecognitionService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.WifiWrapper"))
+			serviceIntent = new Intent(this.context, WifiService.class);
+		
+		
+		
+		config.setRunning(true);
+		Log.v(TAG, "Starts VS: controller" + config.getController().toString());
+		
+		
+		serviceIntent.putExtra("tinygsn.beans.config", config);
+		
+		StaticData.addRunningService(config.getName(), serviceIntent);
+		context.startService(serviceIntent);
 	}
 
 	public void stop() {
+		
+		config = StaticData.findConfig(config.getId());
 		config.setRunning(false);
+		
+	
 		
 		for (InputStream inputStream : config.getInputStreams()) {
 			for (StreamSource streamSource : inputStream.getSources()) {
+				Log.i("qqqqqqqqqqqqq", streamSource.getWrapper().toString());
 				streamSource.getWrapper().releaseResources();
 			}
 		}
 		
-		config = config.clone();
-		Log.v(TAG, "VS: " + config.toString() + " stopped.");
+		Log.e("name", config.getName());
+		Intent serviceIntent = StaticData.getRunningIntentByName(config.getName());
+		Log.d("to compare", "cmp "+ serviceIntent);
+		if(serviceIntent != null)
+		{
+			Log.i("serviceIntent", serviceIntent.getClass().getName());
+			//context.startService(serviceIntent);
+			serviceIntent.removeExtra("config");
+			serviceIntent.putExtra("config", config);
+			context.startService(serviceIntent);
+			//StaticData.IntentStopped(config.getName());
+			//TODO why do we need to clone the config here??
+			//config = config.clone();
+			Log.v(TAG, "VS: " + config.toString() + " stopped.");
+		}
 	}
 
 	public void dataAvailable(StreamElement se) {
+		//Log.i("in data Avale",se.toString());
 		virtualSensor.dataAvailable(null, se);
-		Activity a = getConfig().getController().getActivity();
 //		showLog(a, "VirtualSensor: " + se.toString());
 	}
 
@@ -131,7 +188,6 @@ public class VirtualSensor {
 	// throw new VirtualSensorInitializationFailedException(e.getMessage(), e);
 	// }
 	// if (virtualSensor.initialize() == false) {
-	// virtualSensor = null;
 	// throw new VirtualSensorInitializationFailedException();
 	// }
 	// if (logger.isDebugEnabled())
