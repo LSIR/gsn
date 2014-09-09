@@ -27,6 +27,7 @@ package tinygsn.gui.android;
 
 import gsn.http.rest.PushDelivery;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import tinygsn.beans.StreamElement;
 import tinygsn.controller.AndroidControllerPublishData;
@@ -53,7 +54,8 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	public static String[] STRATEGY = { "On demand", "Periodically (time)",
 			"Periodically (values)" };
 	static int TEXT_SIZE = 10;
-	public static String DEFAULT_SERVER = "http://10.0.2.2:22001";
+	public static String DEFAULT_SERVER = "http://lsir-cloud.epfl.ch/gsn";
+	public static Hashtable<String,Double> SENSORS_IDS = new Hashtable<String, Double>();
 
 	private Context context = null;
 	private AndroidControllerPublishData controller;
@@ -64,11 +66,19 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	private Handler handlerVS;
 	private ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
 
-	private PushDelivery push;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		SENSORS_IDS.put("Accelerometer", 100001.0);
+		SENSORS_IDS.put("GPS", 100002.0);
+		SENSORS_IDS.put("Activity", 100003.0);
+		SENSORS_IDS.put("Gyroscope", 100004.0);
+		SENSORS_IDS.put("Light", 100005.0);
+		SENSORS_IDS.put("WIFI", 100006.0);
+		
+		
 		setContentView(R.layout.activity_publish_data);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		registerForContextMenu(findViewById(R.id.select_server_btn));
@@ -79,7 +89,6 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 
 		setUpController();
 		renderStrategyList();
-		registerPush();
 	}
 
 	public void setUpController() {
@@ -186,25 +195,29 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 		}
 		return true;
 	}
-
-	public void registerPush() {
-		push = new PushDelivery(DEFAULT_SERVER + "/streaming/", 1.235813);
-	}
-
+	
 	public void publish(View view) {
-		StreamElement se = controller.loadLatestData(spinner_vsName
-				.getSelectedItem().toString());
-
-		if (se != null) {
-			new PublishDataTask().execute(se);
-		}
-		else {
-			Toast.makeText(this, "VS has no data to publish", Toast.LENGTH_SHORT)
-					.show();
+		for (String vs_name : SENSORS_IDS.keySet()){
+			StreamElement se = controller.loadLatestData(spinner_vsName
+					.getSelectedItem().toString());
+	
+			if (se != null) {
+				new PublishDataTask(new PushDelivery(serverEditText.getText() + "/streaming/", SENSORS_IDS.get(vs_name))).execute(se);
+			}
+			else {
+				Toast.makeText(this, "VS has no data to publish", Toast.LENGTH_SHORT)
+						.show();
+			}
 		}
 	}
 
 	private class PublishDataTask extends AsyncTask<StreamElement, Void, Boolean> {
+		
+		PushDelivery push;
+		
+		public PublishDataTask (PushDelivery p){
+			push = p;
+		}
 
 		private StreamElement se = null;
 
@@ -239,6 +252,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 		menu.add("http://gsn.ijs.si");
 		menu.add("http://montblanc.slf.ch:22001");
 		menu.add("http://data.permasense.ch");
+		menu.add("http://lsir-cloud.epfl.ch/gsn");
 	}
 
 	@Override
