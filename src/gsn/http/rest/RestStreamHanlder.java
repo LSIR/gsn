@@ -224,7 +224,10 @@ public class RestStreamHanlder extends HttpServlet {
 		PushRemoteWrapper notification = NotificationRegistry.getInstance().getNotification(notificationId);
 		try {
 			if (notification!=null) {
-				boolean status = notification.manualDataInsertion(request.getParameter(PushDelivery.DATA));
+				boolean status = true;
+				for (String s:request.getParameterValues(PushDelivery.DATA)){
+				     status = status && notification.manualDataInsertion(s);
+				}
                 if (status)
                     response.setStatus(SUCCESS_200);
                 else
