@@ -38,6 +38,10 @@ import com.thoughtworks.xstream.XStream;
 public class StreamElement4Rest {
 	
 	private List<Field4Rest> fields = new ArrayList<Field4Rest>();
+	
+	public StreamElement4Rest(){
+		
+	}
 
 	public StreamElement4Rest(StreamElement se) {
 		this.timestamp=new Date(se.getTimeStamp());
