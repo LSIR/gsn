@@ -711,5 +711,6 @@ class BinaryChangedProcessing(ProcessEvent):
                 self._binaryPlugin._isBusy = True
                 self._binaryPlugin._getInitialBinaryPacket()
         except Exception, e:
+            self._binaryPlugin._filedequelock.release()
             self._binaryPlugin._backlogMain.incrementExceptionCounter()
             self._logger.exception(str(e))
