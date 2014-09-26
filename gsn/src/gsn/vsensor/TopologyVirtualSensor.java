@@ -252,21 +252,18 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				// save always latest CoreStation information
 				if (isLatest) {
 					Byte connected = null;
+					node.timestamp = timestamp;
+					node.generation_time = generation_time;
+					
 					s = data.getData(configuration[26]);
 					if (s instanceof Byte) {
 						connected = (Byte)s;
 					}
 					
-					if (connected == 1 && (node.corestation_online == null || !node.corestation_online)) {
-						node.timestamp = timestamp;
-						node.generation_time = generation_time;
+					if (connected == 1 && (node.corestation_online == null || !node.corestation_online))
 						node.corestation_online = new Boolean(true);
-					}
-					else if  (connected == 0 && (node.corestation_online == null || node.corestation_online)) {
-						node.timestamp = timestamp;
-						node.generation_time = generation_time;
+					else if  (connected == 0 && (node.corestation_online == null || node.corestation_online))
 						node.corestation_online = new Boolean(false);
-					}
 					else
 						return;
 				}
