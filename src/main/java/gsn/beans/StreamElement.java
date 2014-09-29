@@ -262,7 +262,7 @@ public final class StreamElement implements Serializable {
 	 * negative, it is considered non valid and zero will be placed.
 	 */
 	public void setTimeStamp ( long timeStamp ) {
-		if ( this.timeStamp <= 0 )
+		if ( timeStamp <= 0 )
 			timeStamp = 0;
 		else
 			this.timeStamp = timeStamp;
