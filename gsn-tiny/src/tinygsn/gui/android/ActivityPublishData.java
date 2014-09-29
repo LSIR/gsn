@@ -77,8 +77,6 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 
 		context = this;
 
-		setUpController();
-		renderStrategyList();
 		registerPush();
 	}
 
@@ -98,7 +96,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	}
 
 	public void renderVSList() {
-		spinner_vsName = (Spinner) findViewById(R.id.spinner_vsname);
+	
 		List<String> list = new ArrayList<String>();
 
 		for (VirtualSensor vs : vsList) {
@@ -127,7 +125,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	}
 
 	public void renderStrategyList() {
-		spinner_strategy = (Spinner) findViewById(R.id.spinner_strategy);
+	
 		List<String> list = new ArrayList<String>();
 
 		for (String s : STRATEGY) {
