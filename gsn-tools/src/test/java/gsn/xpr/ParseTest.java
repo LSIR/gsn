@@ -2,7 +2,7 @@ package gsn.xpr;
 
 import scala.util.Try;
 import gsn.xpr.parser.XprParser;
-import gsn.xpr.parser.XprParser$;
+//import gsn.xpr.parser.XprParser$;
 
 public class ParseTest {
   public static void main(String[] args){
