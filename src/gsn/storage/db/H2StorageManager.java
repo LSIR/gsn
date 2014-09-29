@@ -65,6 +65,7 @@ public class H2StorageManager extends StorageManager {
                         break;
                     case DataTypes.FLOAT:
                     	convertedType = "REAL"; // Warning! The type FLOAT in H2 is a synonym of DOUBLE !!
+                    	break;
                     default:
                         convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
                         break;

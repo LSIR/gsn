@@ -69,6 +69,7 @@ public class OracleStorageManager extends StorageManager {
                 break;
             case DataTypes.FLOAT:
             	convertedType = "number(38,8)";
+            	break;
             case DataTypes.CHAR:
             case DataTypes.VARCHAR:
                 // Because the parameter for the varchar is not

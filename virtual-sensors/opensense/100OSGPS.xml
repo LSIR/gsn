@@ -25,7 +25,7 @@
 	<streams>
 		<stream name="input1">
 			<source alias="source1"  sampling-rate="1" storage-size="1">
-				<address wrapper="zeromq">
+				<address wrapper="zeromq" partial-order-key="station">
 					<predicate key="address">inproc://stream/osc</predicate>
 					<predicate key="vsensor">osc</predicate>
 				</address>

@@ -2,6 +2,7 @@ package gsn.wrappers;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -25,8 +26,11 @@ import gsn.utils.Helpers;
 public class OpensenseConnectorWrapper extends AbstractWrapper {
 	
 	
-	public static final Integer[] MOBILE_STATIONS = {};
-	public static final Integer[] STATIC_STATIONS = {101};
+	public static final Integer[] MOBILE_STATIONS = {43,47,48};
+	public static final Integer[] STATIC_STATIONS = {101,102};
+	
+	private static final Object timerLock = new Object();
+	private static Long timer = System.currentTimeMillis();
 
 	private final transient Logger logger = Logger.getLogger( OpensenseConnectorWrapper.class );
 	
@@ -125,9 +129,9 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 					   BinaryParser parser;
 					   boolean connected = true;
 					   StationData sd;
+					   boolean resync = false;
 					   int retry = 0;
 					   long lastRetry = 0;
-					   long ts;
 					   int ctr = 0;
 					   int err = 0;
 					   int pub = 0;
@@ -146,18 +150,23 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								input = new BufferedInputStream(server.getInputStream());
 								output = new BufferedOutputStream(server.getOutputStream());
 								parser = new BinaryParser(input);
-								ts = System.currentTimeMillis();
-								while(connected) parse();
+								while(connected && ! server.isClosed()) parse();
 								server.close();
 							}catch (IOException ioe){
 								logger.error("Error while connecting to remote station: " + server.getInetAddress(), ioe);
 							}
 							//publish data even if connection got interrupted as it may be erased on the logger side
-							int c = 0;
-							while (!buffer.isEmpty()){
-								StreamElement p = buffer.poll();
-								p.setTimeStamp(p.getTimeStamp()+(c++)); //timestamp of those SE are a bit artificial but should guarantee ordering
-								postStreamElement(p);
+							
+							synchronized (timerLock) {
+								timer = Math.max(timer,System.currentTimeMillis());
+								while (!buffer.isEmpty()){
+									StreamElement p = buffer.poll();
+									p.setTimeStamp(++timer); //timestamp of those SE are a bit artificial but should guarantee ordering
+									postStreamElement(p);
+								}
+								try {
+									Thread.sleep(5000); //guarantee that there is at least 2s between the generation of the groups of stream elements (< 2000 SE)
+								} catch (InterruptedException e) {} 
 							}
 						}
 				
@@ -181,8 +190,9 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									int id = parser.readNextShort(false);
 									logger.debug("received packet number :"+next);
 									if (sd == null) sd = create(id);
-									else if (sd.id != id)
+									else if (sd.id != id){
 										throw new IOException("received packet from "+id+", while listening to "+sd.id);
+									}
 									sd.type = next;
 									switch(next){
 									case 0:
@@ -240,13 +250,14 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									if (!parser.checkSum()){
 										throw new IOException("Checksum error reading packet ("+next+") for station "+id);
 									}
-									buffer.add(sd.getStreamElement(ts));
+									buffer.add(sd.getStreamElement());
 									last = next;
+									resync = false;
 									break;
 								case 35:
 									byte[] b = parser.readBytes(3);
-									id = Integer.parseInt(new String(b));
 									logger.debug("char:" + b[0] + ", "+ b[1] + ", "+ b[2]);
+									id = Integer.parseInt(new String(b));
 									if (sd == null) sd = create(id);
 									else if (sd.id != id) logger.warn("received packet from "+id+", while listening to "+sd.id);
 									next = parser.readNextChar(true);
@@ -263,34 +274,49 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									default:
 										throw new IOException("unknown command:"+next);
 									}
+									resync = false;
 									break;
 								case 43:
 									byte[] buf = parser.readBytes(2);
 									if (new String(buf).equals("++")){
-										logger.warn("closed (received "+ctr+" packets, dropped "+err+" packets, published "+pub+" packets)");
+										logger.warn("closed (received "+ctr+" packets, dropped "+err+" bytes, published "+pub+" packets)");
 										connected = false;
+										resync = false;
 									}
 									break;
 								default:
-									err++;
 									throw new IOException("unknown packet type:"+type);
 								}
+							}catch(EOFException e){
+								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								connected = false;
+								resync = false;
 							}catch(IOException e){
 								err ++;
-								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"]",e);
+								if (! resync){
+								    logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								}
+								resync = true;
+							}catch(NumberFormatException e){
+								err ++;
+								if (! resync){
+								    logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								}
+								resync = true;
 							}
 						}
 					   
 					   });
                t.setName("Opensense-connector");
 			   t.start();
-			   } catch(SocketTimeoutException ste){
+			   
+			} catch(SocketTimeoutException ste){
 				   continue;
-			   } catch(IOException ioe){
+			} catch(IOException ioe){
 				   logger.error("Error while connecting to some remote station.", ioe);
-			   }
+			}
 			    
-		   }
+		}
 		
 	}
 	
@@ -329,8 +355,12 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 
 		public void readFPH(BinaryParser p) throws IOException {
 			//CsSCCS
-			readTimeMsFromShort(p);
-			payload = p.readBytes(9);			
+			int _ss = p.readNextChar(false);
+			if (_ss < 0 || _ss > 59){
+				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+hh+":"+mn+":"+_ss+")");
+			}
+			ss = _ss;
+			payload = p.readBytes(8);			
 		}
 
 		public void readFPM(BinaryParser p) throws IOException {
@@ -477,7 +507,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			mn = _mn;
 		}
 		
-		public StreamElement getStreamElement(long ts){
+		public StreamElement getStreamElement(){
 			Calendar c = Calendar.getInstance();
 			c.clear();
 			c.set(yy + 2000, mm - 1, dd, hh, mn, ss);
@@ -485,7 +515,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			
 			Serializable[] data = new Serializable[]{time, new Short((short) id), new Short((short) type), payload};
 			
-			return new StreamElement(OpensenseConnectorWrapper.this.df,data,ts);
+			return new StreamElement(OpensenseConnectorWrapper.this.df,data,0);
 		}
 
 	}

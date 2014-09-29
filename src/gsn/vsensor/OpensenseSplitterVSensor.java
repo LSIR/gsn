@@ -145,7 +145,6 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 				}
 	        } else if (data_type.equalsIgnoreCase("OZONE")){
 	        	if(s_type == 10 || s_type == 30){//CSSC
-	        		p.readNextChar(false);
 	        		temp.setData(1,p.readNextShort(false));
 	        		temp.setData(2,(float)(p.readNextShort(false)/10.0 - 40));
 	        		temp.setData(3,p.readNextChar(false));

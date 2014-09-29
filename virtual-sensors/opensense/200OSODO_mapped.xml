@@ -24,7 +24,7 @@
 	<streams>
 		<stream name="A">
 			<source alias="A"  sampling-rate="1" storage-size="1">
-				<address wrapper="zeromq">
+				<address wrapper="zeromq" partial-order-key="station">
 					<predicate key="address">inproc://stream/osgps</predicate>
 					<predicate key="vsensor">osgps</predicate>
 				</address>
@@ -34,7 +34,7 @@
 		</stream>
 		<stream name="B">
 			<source alias="B"  sampling-rate="1" storage-size="1">
-				<address wrapper="zeromq">
+				<address wrapper="zeromq" partial-order-key="station">
 					<predicate key="address">inproc://stream/osodo</predicate>
 					<predicate key="vsensor">osodo</predicate>
 				</address>

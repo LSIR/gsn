@@ -54,6 +54,7 @@
                 <collection field="addressing">
                       <structure name="address" type="gsn.beans.AddressBean">
                          <value name="wrapper"  field="wrapper" style="attribute"/>
+                         <value name="partial-order-key"  field="partialOrderKey" style="attribute" usage="optional"/>
                            <collection  field="predicates"  >
                                <structure name="predicate" type="gsn.utils.KeyValueImp">
                                    <value name="key"   field="key"   style="attribute"/>

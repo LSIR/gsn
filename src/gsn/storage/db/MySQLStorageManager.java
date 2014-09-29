@@ -71,6 +71,7 @@ public class MySQLStorageManager extends StorageManager {
                 break;
             case DataTypes.FLOAT:
             	convertedType = "FLOAT(23)"; //just to be sure it doesn't map to double
+            	break;
             default:
                 convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
                 break;

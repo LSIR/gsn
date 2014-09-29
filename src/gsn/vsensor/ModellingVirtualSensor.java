@@ -110,6 +110,9 @@ public class ModellingVirtualSensor extends AbstractVirtualSensor {
 		if (am.length > 0){
 		    out = am[0].pushData(streamElement,inputStreamName); //by default returns the result from the first model
 		}
+		if (inputStreamName.equals("A")){
+			out = null;
+		}
 		for(int i=1;i<am.length;i++){
 			if (am[i] != null){
 				am[i].pushData(streamElement,inputStreamName);//push the data to all other models too

@@ -48,6 +48,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
@@ -74,7 +75,7 @@ public abstract class AbstractWrapper extends Thread {
 
 	private boolean usingRemoteTimestamp = false;
 
-	private Long lastInOrderTimestamp;
+	private Hashtable<Object,Long> lastInOrderTimestamp = new Hashtable<Object, Long>();
 
 	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 5;
 
@@ -285,7 +286,11 @@ public abstract class AbstractWrapper extends Thread {
 			}
 			conn = Main.getWindowStorage().getConnection();
 			Main.getWindowStorage().executeInsert(aliasCodeS, getOutputFormat(), se, conn);
-            lastInOrderTimestamp = se.getTimeStamp();
+			if (getPartialOrdersKey() != null){
+                lastInOrderTimestamp.put(se.getData(getPartialOrdersKey()), se.getTimeStamp());
+			}else{
+				lastInOrderTimestamp.put(0,se.getTimeStamp()); 
+			}
             return true;
 		} finally {
 			Main.getWindowStorage().close(conn);
@@ -296,25 +301,31 @@ public abstract class AbstractWrapper extends Thread {
         if (listeners.size() == 0)
 			return false;
         Connection conn = null;
+        Object key = 0;
+        if (getPartialOrdersKey() != null){
+        	key = se.getData(getPartialOrdersKey());
+        }
 		try {
 			// Checks if the stream element is out of order
-            if (lastInOrderTimestamp == null) {
+            if (lastInOrderTimestamp.contains(key) || lastInOrderTimestamp.get(key) == null) {
                 conn = Main.getWindowStorage().getConnection();
                 StringBuilder query = new StringBuilder();
 				query.append("select max(timed) from ").append(aliasCodeS);
-
+				if (getPartialOrdersKey() != null){
+					query.append(" where "+getPartialOrdersKey()+"="+key); // code injection !!!
+				}
 				ResultSet rs = Main.getWindowStorage().executeQueryWithResultSet(query,
 						conn);
 				if (rs.next()) {
-					lastInOrderTimestamp = rs.getLong(1);
+					lastInOrderTimestamp.put(key, rs.getLong(1));
 				} else {
-					lastInOrderTimestamp = Long.MIN_VALUE; // Table is empty
+					lastInOrderTimestamp.put(key,Long.MIN_VALUE); // Table is empty
 				}
 			}
             if (isTimeStampUnique())
-                return (se.getTimeStamp() <= lastInOrderTimestamp);
+                return (se.getTimeStamp() <= lastInOrderTimestamp.get(key));
             else
-            	return (se.getTimeStamp() < lastInOrderTimestamp);
+            	return (se.getTimeStamp() < lastInOrderTimestamp.get(key));
 		} finally {
 			Main.getWindowStorage().close(conn);
 		}
@@ -445,6 +456,15 @@ public abstract class AbstractWrapper extends Thread {
 	 */
 	public boolean isTimeStampUnique() {
 		return true;
+	}
+	
+	/**
+	 * Allows for having partial ordering by only checking the time stamp order of
+	 * stream elements having the same key.
+	 * null is total ordering should be applied
+	 */
+	public String getPartialOrdersKey(){
+		return activeAddressBean.getPartialOrderKey();
 	}
 
 	public boolean manualDataInsertion(StreamElement se) {
