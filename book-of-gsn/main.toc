@@ -8,8 +8,6 @@
 \contentsline {subsection}{\numberline {2.1.1}\textit {GSN}\xspace Wrappers }{4}{subsection.2.1.1}
 \contentsline {section}{\numberline {2.2}Data Filtering and Processing}{5}{section.2.2}
 \contentsline {subsection}{\numberline {2.2.1}Virtual Sensors}{5}{subsection.2.2.1}
-\contentsline {subsection}{\numberline {2.2.2}Graphical Representation}{9}{subsection.2.2.2}
-\contentsline {subsubsection}{\numberline {2.2.2.1}SQL Syntax}{9}{subsubsection.2.2.2.1}
 \contentsline {section}{\numberline {2.3}Data publishing}{9}{section.2.3}
 \contentsline {subsection}{\numberline {2.3.1}Web Interface}{9}{subsection.2.3.1}
 \contentsline {subsubsection}{\numberline {2.3.1.1}GoogleMaps integration}{9}{subsubsection.2.3.1.1}
@@ -17,20 +15,14 @@
 \contentsline {section}{\numberline {2.5}GSN to GSN communication Protocol}{14}{section.2.5}
 \contentsline {subsection}{\numberline {2.5.1}\texttt {remote} wrapper}{14}{subsection.2.5.1}
 \contentsline {subsection}{\numberline {2.5.2}\texttt {local} wrapper}{16}{subsection.2.5.2}
-\contentsline {section}{\numberline {2.6}GSN Notifications}{16}{section.2.6}
-\contentsline {subsubsection}{\numberline {2.6.0.1}Introduction}{16}{subsubsection.2.6.0.1}
+\contentsline {section}{\numberline {2.6}GSN Notifications}{17}{section.2.6}
+\contentsline {subsubsection}{\numberline {2.6.0.1}Introduction}{17}{subsubsection.2.6.0.1}
 \contentsline {section}{\numberline {2.7}Implementation}{17}{section.2.7}
 \contentsline {subsection}{\numberline {2.7.1}Adding new sensor platforms}{17}{subsection.2.7.1}
 \contentsline {subsection}{\numberline {2.7.2}Dynamic resource management}{18}{subsection.2.7.2}
 \contentsline {subsection}{\numberline {2.7.3}Query planning and execution}{19}{subsection.2.7.3}
-\contentsline {section}{\numberline {2.8}Notes}{20}{section.2.8}
-\contentsline {subsubsection}{\numberline {2.8.0.1}Where is the DTD for the virtual sensor?}{20}{subsubsection.2.8.0.1}
-\contentsline {subsubsection}{\numberline {2.8.0.2}Which databases we support ?}{20}{subsubsection.2.8.0.2}
-\contentsline {subsubsection}{\numberline {2.8.0.3}Which projects are using GSN ?}{20}{subsubsection.2.8.0.3}
-\contentsline {subsubsection}{\numberline {2.8.0.4}GSN.XML file}{20}{subsubsection.2.8.0.4}
-\contentsline {subsection}{\numberline {2.8.1}GeoRSS}{20}{subsection.2.8.1}
-\contentsline {subsection}{\numberline {2.8.2}Network communication}{20}{subsection.2.8.2}
-\contentsline {subsubsection}{\numberline {2.8.2.1}Reusing Data Streams}{21}{subsubsection.2.8.2.1}
+\contentsline {subsection}{\numberline {2.7.4}Network communication}{20}{subsection.2.7.4}
+\contentsline {subsubsection}{\numberline {2.7.4.1}Reusing Data Streams}{20}{subsubsection.2.7.4.1}
 \contentsline {chapter}{\numberline {A}Quick Reference Guide}{27}{appendix.A}
 \contentsline {section}{\numberline {A.1}Virtual Sensors (\textit {VS}\xspace )}{27}{section.A.1}
 \contentsline {subsection}{\numberline {A.1.1}\textit {VSD}\xspace DTD }{27}{subsection.A.1.1}
@@ -52,4 +44,3 @@
 \contentsline {subsection}{\numberline {C.1.2}Scalability in the number of queries and clients}{40}{subsection.C.1.2}
 \contentsline {section}{\numberline {C.2}Related work}{42}{section.C.2}
 \contentsline {section}{\numberline {C.3}Conclusions}{43}{section.C.3}
-\contentsline {chapter}{\numberline {D}{\LaTeX } Examples}{44}{appendix.D}

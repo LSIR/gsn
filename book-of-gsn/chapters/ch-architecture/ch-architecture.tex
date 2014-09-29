@@ -122,7 +122,7 @@ the monitored device. This method will extract the interesting data, optionally
 parse it, and create one or more StreamElement(s) with one or more columns.
 From this point on, the received data has been mapped to a SQL data structure
 with fields that have a name and a type. \gsn is then able to filter this using
-its enhanced SQL-like syntax. You will learn more about that in section \todo{TODO: Add proper reference}
+its enhanced SQL-like syntax. You will learn more about that in section \ref{sec:query-proc-optim}. 
 A wrapper is implemented in a Java class. For simplicity, \gsn uses short
 names to refer to these wrappers. These associations are defined in the file
 \texttt{conf/wrappers.properties}. For now on it is assumed that you use the default
@@ -367,9 +367,9 @@ should be used carefully as unloading a virtual sensor may have undesired
 (cascading) effects. 
 
 
-\subsection{Graphical Representation}
+%\subsection{Graphical Representation}
 
-\subsubsection{SQL Syntax}
+%\subsubsection{SQL Syntax}
 
 \section{Data publishing}
 
@@ -449,7 +449,7 @@ be changed to be explicit in respect to the time dimension.
 In order to concretely show the time management inside GSN, we would like to
 simulate above scenario through two different virtual sensors (only the input stream parts presented).
 Say there exist a virtual sensor called \emph{camera-vs} hosted on a GSN server which listens to port \texttt{80} on a machine with IP address of \texttt{1.2.3.4}.
-The virtual sensor used by the police and the one used by the insurance are depicted in figures \ref{vs:police} and \ref{vs:insurance}.
+The virtual sensor used by the insurance and the one used by the police are depicted in figures \ref{vs:police} and \ref{vs:insurance}.
 The stream specified in figure \ref{vs:police} has a query in line 7 for retrieving both the picture and the time stamp from the remote virtual sensor therefore
 the remote timestamp is used by GSN for the internal calculations. Now consider the stream specified in figure \ref{vs:insurance} which has a small change compared to the one in figure \ref{vs:police}, the latter is not selecting the timestamp field hence GSN automatically adds the local reception time to every tuple it receives from the remote source.
 
@@ -995,21 +995,21 @@ it from the database, for example, periodically at regular intervals. In
 practice the former can be implemented using views or triggers and the latter
 can be implemented using inner selects or stored procedures.
 
-\section{Notes}
+%\section{Notes}
 
 
-\subsubsection{Where is the DTD for the virtual sensor?}
-We are using JiBX Java-XML binding project. The structure of the virtual sensor descriptor file is defined in \texttt{conf/VirtualSensorDescription.xml}.
+%\subsubsection{Where is the DTD for the virtual sensor?}
+%We are using JiBX Java-XML binding project. The structure of the virtual sensor descriptor file is defined in \texttt{conf/VirtualSensorDescription.xml}.
 
-Have a look to the \chapref{quickref_vsd_dtd}.
+%Have a look to the \chapref{quickref_vsd_dtd}.
 
-\subsubsection{Which databases we support ?}
-At the moment we are supporting HSqlDB and MySQL. Checkout the mailing list for the latest issues regarding the other databases and their
-support status.
-\subsubsection{Which projects are using GSN ?}
-There are over 10 EU/Swiss funding research projects using GSN as their core technology.
-\subsubsection{GSN.XML file}
-\subsection{GeoRSS}
+%\subsubsection{Which databases we support ?}
+%At the moment we are supporting HSqlDB and MySQL. Checkout the mailing list for the latest issues regarding the other databases and their
+%support status.
+%\subsubsection{Which projects are using GSN ?}
+%There are over 10 EU/Swiss funding research projects using GSN as their core technology.
+%\subsubsection{GSN.XML file}
+%\subsection{GeoRSS}
 \subsection{Network communication}
 Looking inside the GSN infrastructure, there are at least half a dozen difference network communication channels are used. In this section I would like to dive in to the details
 of the some major communication protocols designed and implemented in GSN. 

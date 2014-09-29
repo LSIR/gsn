@@ -1,16 +1,19 @@
 \relax 
-\ifx\hyper@anchor\@undefined
-\global \let \oldcontentsline\contentsline
-\gdef \contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
-\global \let \oldnewlabel\newlabel
-\gdef \newlabel#1#2{\newlabelxx{#1}#2}
-\gdef \newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
-\AtEndDocument{\let \contentsline\oldcontentsline
-\let \newlabel\oldnewlabel}
-\else
-\global \let \hyper@last\relax 
-\fi
-
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
 \@writefile{toc}{\contentsline {chapter}{Abstract}{i}{chapter*.1}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
@@ -32,63 +35,55 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces GSN Server architecture}}{4}{figure.2.1}}
 \newlabel{fig:NodeArchitecture}{{2.1}{4}{GSN Server architecture\relax }{figure.2.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.1}Data Acquisition}{4}{section.2.1}}
-\newlabel{gsn_wrappers}{{2.1.1}{4}{\gsn Wrappers \label {gsn_wrappers}\relax }{subsection.2.1.1}{}}
+\newlabel{gsn_wrappers}{{2.1.1}{4}{\gsn Wrappers\relax }{subsection.2.1.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}\textit  {GSN}\xspace  Wrappers }{4}{subsection.2.1.1}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.2}Data Filtering and Processing}{5}{section.2.2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2.1}Virtual Sensors}{5}{subsection.2.2.1}}
 \newlabel{sec:virt-sens-spec}{{2.2.1}{5}{Virtual Sensors\relax }{subsection.2.2.1}{}}
-\newlabel{fig:ComplexVS}{{2.1}{5}{Virtual Sensors\relax }{lstlisting.2.1}{}}
+\newlabel{fig:ComplexVS}{{2.1}{5}{A virtual sensor definition\relax }{lstlisting.2.1}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {2.1}A virtual sensor definition}{5}{lstlisting.2.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.2}Graphical Representation}{9}{subsection.2.2.2}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2.1}SQL Syntax}{9}{subsubsection.2.2.2.1}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.3}Data publishing}{9}{section.2.3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Web Interface}{9}{subsection.2.3.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.1.1}GoogleMaps integration}{9}{subsubsection.2.3.1.1}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.4}Data stream processing and time model}{9}{section.2.4}}
 \newlabel{sec:data-stre-proc}{{2.4}{9}{Data stream processing and time model\relax }{section.2.4}{}}
-\newlabel{vs:police}{{2.2}{10}{Data stream processing and time model\relax }{lstlisting.2.2}{}}
+\newlabel{vs:police}{{2.2}{10}{A stream using the remote timestamp}{lstlisting.2.2}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {2.2}A stream using the remote timestamp.}{10}{lstlisting.2.2}}
-\newlabel{vs:insurance}{{2.3}{11}{Data stream processing and time model\relax }{lstlisting.2.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces Illustration of the different sample sliding and window values.}}{11}{figure.2.2}}
+\newlabel{fig:sliding-window-visually}{{2.2}{11}{Illustration of the different sample sliding and window values}{figure.2.2}{}}
+\newlabel{vs:insurance}{{2.3}{11}{A stream using the local (arrival) timestamp}{lstlisting.2.3}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {2.3}A stream using the local (arrival) timestamp.}{11}{lstlisting.2.3}}
-\newlabel{vs:complex-time}{{2.4}{11}{Data stream processing and time model\relax }{lstlisting.2.4}{}}
+\newlabel{vs:complex-time}{{2.4}{11}{A stream using both local and remote timestamps}{lstlisting.2.4}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {2.4}A stream using both local and remote timestamps.}{11}{lstlisting.2.4}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces Illustration of the different sample sliding and window values.}}{12}{figure.2.2}}
-\newlabel{fig:sliding-window-visually}{{2.2}{12}{Illustration of the different sample sliding and window values}{figure.2.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces Conceptual data flow in a GSN node}}{13}{figure.2.3}}
 \newlabel{fig:ConceptualDataFlow}{{2.3}{13}{Conceptual data flow in a GSN node\relax }{figure.2.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.5}GSN to GSN communication Protocol}{14}{section.2.5}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.5.1}\texttt  {remote} wrapper}{14}{subsection.2.5.1}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces Experimental setup}}{15}{figure.2.4}}
 \newlabel{fig:gsn-network-firewall}{{2.4}{15}{Experimental setup\relax }{figure.2.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces Simple GSN to GSN communication}}{15}{figure.2.5}}
-\newlabel{gsn2gsn-simple-figure}{{2.5}{15}{Simple GSN to GSN communication\relax }{figure.2.5}{}}
-\newlabel{gsn2gsn-simple}{{2.5}{15}{\texttt {remote} wrapper\relax }{lstlisting.2.5}{}}
+\newlabel{gsn2gsn-simple}{{2.5}{15}{Source configuration for simple GSN to GSN communication}{lstlisting.2.5}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {2.5}Source configuration for simple GSN to GSN communication.}{15}{lstlisting.2.5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces Simple GSN to GSN communication}}{16}{figure.2.5}}
+\newlabel{gsn2gsn-simple-figure}{{2.5}{16}{Simple GSN to GSN communication\relax }{figure.2.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces GSN to GSN communication with NAT}}{16}{figure.2.6}}
 \newlabel{gsn2gsn-nat-figure}{{2.6}{16}{GSN to GSN communication with NAT\relax }{figure.2.6}{}}
-\newlabel{listing:xml:nat_remote_vsd}{{2.6}{16}{\texttt {remote} wrapper\relax }{lstlisting.2.6}{}}
+\newlabel{listing:xml:nat_remote_vsd}{{2.6}{16}{Source configuration for NATed GSN to GSN communication}{lstlisting.2.6}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {2.6}Source configuration for NATed GSN to GSN communication.}{16}{lstlisting.2.6}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.5.2}\texttt  {local} wrapper}{16}{subsection.2.5.2}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.6}GSN Notifications}{16}{section.2.6}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.0.1}Introduction}{16}{subsubsection.2.6.0.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.6}GSN Notifications}{17}{section.2.6}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.0.1}Introduction}{17}{subsubsection.2.6.0.1}}
 \@writefile{toc}{\contentsline {section}{\numberline {2.7}Implementation}{17}{section.2.7}}
 \newlabel{sec:implementation}{{2.7}{17}{Implementation\relax }{section.2.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.7.1}Adding new sensor platforms}{17}{subsection.2.7.1}}
 \newlabel{sec:adding-new-sensor}{{2.7.1}{17}{Adding new sensor platforms\relax }{subsection.2.7.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.7}{\ignorespaces Hierarchical resource sharing in GSN}}{18}{figure.2.7}}
-\newlabel{fig:resource-layers}{{2.7}{18}{Hierarchical resource sharing in GSN\relax }{figure.2.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.7.2}Dynamic resource management}{18}{subsection.2.7.2}}
 \newlabel{sec:dynam-reso-manag}{{2.7.2}{18}{Dynamic resource management\relax }{subsection.2.7.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.7}{\ignorespaces Hierarchical resource sharing in GSN}}{19}{figure.2.7}}
+\newlabel{fig:resource-layers}{{2.7}{19}{Hierarchical resource sharing in GSN\relax }{figure.2.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.7.3}Query planning and execution}{19}{subsection.2.7.3}}
 \newlabel{sec:query-proc-optim}{{2.7.3}{19}{Query planning and execution\relax }{subsection.2.7.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.8}Notes}{20}{section.2.8}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.8.0.1}Where is the DTD for the virtual sensor?}{20}{subsubsection.2.8.0.1}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.8.0.2}Which databases we support ?}{20}{subsubsection.2.8.0.2}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.8.0.3}Which projects are using GSN ?}{20}{subsubsection.2.8.0.3}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.8.0.4}GSN.XML file}{20}{subsubsection.2.8.0.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.8.1}GeoRSS}{20}{subsection.2.8.1}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.8.2}Network communication}{20}{subsection.2.8.2}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.8.2.1}Reusing Data Streams}{21}{subsubsection.2.8.2.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.7.4}Network communication}{20}{subsection.2.7.4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.7.4.1}Reusing Data Streams}{20}{subsubsection.2.7.4.1}}
 \bibstyle{plain}
 \bibdata{references}
 \bibcite{Abadi05}{1}
@@ -108,13 +103,13 @@
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \@writefile{toc}{\contentsline {section}{\numberline {A.1}Virtual Sensors (\textit  {VS}\xspace  )}{27}{section.A.1}}
-\newlabel{quickref_vsd_dtd}{{A.1.1}{27}{\vsd DTD \label {quickref_vsd_dtd}\relax }{subsection.A.1.1}{}}
+\newlabel{quickref_vsd_dtd}{{A.1.1}{27}{\vsd DTD\relax }{subsection.A.1.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A.1.1}\textit  {VSD}\xspace  DTD }{27}{subsection.A.1.1}}
 \@writefile{lof}{\contentsline {figure}{\numberline {A.1}{\ignorespaces  \textit  {VSD}\xspace  DTD Quick Reference Card}}{28}{figure.A.1}}
-\newlabel{figure:vsd_dtd}{{A.1}{28}{\label {figure:vsd_dtd} \vsd DTD Quick Reference Card\relax }{figure.A.1}{}}
+\newlabel{figure:vsd_dtd}{{A.1}{28}{\vsd DTD Quick Reference Card\relax }{figure.A.1}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {A.1}{\ignorespaces \textit  {VSD}\xspace  DTD Quick Reference Card Description}}{29}{table.A.1}}
 \newlabel{table:vsd_dtd}{{A.1}{29}{\vsd DTD Quick Reference Card Description\relax }{table.A.1}{}}
-\newlabel{quickref_ant_task}{{A.2}{30}{GSN ANT Tasks \label {quickref_ant_task}\relax }{section.A.2}{}}
+\newlabel{quickref_ant_task}{{A.2}{30}{GSN ANT Tasks\relax }{section.A.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {A.2}GSN ANT Tasks }{30}{section.A.2}}
 \@writefile{lot}{\contentsline {table}{\numberline {A.2}{\ignorespaces GSN ANT Tasks}}{30}{table.A.2}}
 \newlabel{table:gsn_ant_tasks}{{A.2}{30}{GSN ANT Tasks\relax }{table.A.2}{}}
@@ -122,14 +117,15 @@
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \@writefile{toc}{\contentsline {section}{\numberline {B.1}Understanding GSN Virtual Sensors}{31}{section.B.1}}
+\newlabel{sec:vsp}{{B.1}{31}{Understanding GSN Virtual Sensors\relax }{section.B.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {B.1}{\ignorespaces }}{32}{figure.B.1}}
 \newlabel{fig:tutorial-vs}{{B.1}{32}{\relax }{figure.B.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B.1.1}The multiFormatSample Virtual Sensor.}{32}{subsection.B.1.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B.1.2}Virtual Sensor Description File }{32}{subsection.B.1.2}}
-\newlabel{listing:mfs-vs}{{B.1}{32}{Virtual Sensor Description File \relax }{lstlisting.B.1}{}}
+\newlabel{listing:mfs-vs}{{B.1}{32}{multiFormatSample.xml\relax }{lstlisting.B.1}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {B.1}multiFormatSample.xml}{32}{lstlisting.B.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B.1.3}Wrapper}{33}{subsection.B.1.3}}
-\newlabel{listing:xml:data-field}{{B.2}{33}{Wrapper\relax }{lstlisting.B.2}{}}
+\newlabel{listing:xml:data-field}{{B.2}{33}{DataField declaration in multiFormatWrapper.java\relax }{lstlisting.B.2}{}}
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {B.2}DataField declaration in multiFormatWrapper.java}{33}{lstlisting.B.2}}
 \@writefile{lot}{\contentsline {table}{\numberline {B.1}{\ignorespaces multiFormat Wrapper data table}}{34}{table.B.1}}
 \newlabel{table:wrapper-table}{{B.1}{34}{multiFormat Wrapper data table\relax }{table.B.1}{}}
@@ -188,17 +184,6 @@
 \@writefile{brf}{\backcite{Gray05}{{43}{C.2}{section.C.2}}}
 \@writefile{toc}{\contentsline {section}{\numberline {C.3}Conclusions}{43}{section.C.3}}
 \newlabel{sec:conclusions}{{C.3}{43}{Conclusions\relax }{section.C.3}{}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {D}{\LaTeX  } Examples}{44}{appendix.D}}
-\@writefile{lof}{\addvspace {10\p@ }}
-\@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{lot}{\contentsline {table}{\numberline {D.1}{\ignorespaces Parameters for example Wrapper (that support safe storage)}}{44}{table.D.1}}
-\newlabel{table:parameters_example_wrapper}{{D.1}{44}{Parameters for example Wrapper (that support safe storage)\relax }{table.D.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {D.2}{\ignorespaces Parameters for example Wrapper (that doensn't support safe storage)}}{44}{table.D.2}}
-\newlabel{table:parameters_example_no_wrapper}{{D.2}{44}{Parameters for example Wrapper (that doensn't support safe storage)\relax }{table.D.2}{}}
-\newlabel{listing:ruby:example}{{D.1}{44}{{\LaTeX } Examples\relax }{lstlisting.D.1}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {D.1}Ruby Code Example}{44}{lstlisting.D.1}}
-\newlabel{listing:xml:example}{{D.2}{44}{{\LaTeX } Examples\relax }{lstlisting.D.2}{}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {D.2}XML Code Example}{44}{lstlisting.D.2}}
-\citation{dummyarticle}
-\@writefile{brf}{\backcite{dummyarticle}{{45}{D}{lstnumber.-8.9}}}
-\newlabel{LastPage}{{}{45}{}{page.45}{}}
+\newlabel{LastPage}{{}{43}{}{page.43}{}}
+\xdef\lastpage@lastpage{43}
+\xdef\lastpage@lastpageHy{43}

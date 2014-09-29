@@ -6,5 +6,3 @@
 \contentsline {lstlisting}{\numberline {2.6}Source configuration for NATed GSN to GSN communication.}{16}{lstlisting.2.6}
 \contentsline {lstlisting}{\numberline {B.1}multiFormatSample.xml}{32}{lstlisting.B.1}
 \contentsline {lstlisting}{\numberline {B.2}DataField declaration in multiFormatWrapper.java}{33}{lstlisting.B.2}
-\contentsline {lstlisting}{\numberline {D.1}Ruby Code Example}{44}{lstlisting.D.1}
-\contentsline {lstlisting}{\numberline {D.2}XML Code Example}{44}{lstlisting.D.2}
