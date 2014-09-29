@@ -48,6 +48,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -490,7 +491,10 @@ public class ActivityVSConfig extends SherlockActivity {
 				w = (AbstractWrapper) Class.forName(wrapperName).newInstance();
 				DataField[] outputStructure = w.getOutputStructure();
 				storage.createTable("vs_" + vsName, outputStructure);
-				StaticData.saveName(vsName, "tinygsn.model.wrappers.AndroidAccelerometerWrapper");
+				storage.executeInsertSamplingRate(wrapperName, 0);
+				Log.i("WrapperName", wrapperName);
+				Log.i("vsName", vsName);
+				StaticData.saveName(vsName, wrapperName);
 				
 				//TODO I though this might be a good place to call this function
 //				VirtualSensor VS = storage.getVSByName(vsName);

@@ -28,10 +28,9 @@ public class MyLocationListener implements LocationListener{
 	public void onLocationChanged(Location location) {
 		
 		
-		Log.i("onLocationChanged","onLocationChangedddddddddddddddddddddddddddddddddd");
 		StreamElement streamElement = new StreamElement(w.getFieldList(),
 				w.getFieldType(), new Serializable[] {location.getLatitude(),location.getLongitude()});
-
+		
 		((AndroidGPSWrapper) w).setTheLastStreamElement(streamElement);
 		((AndroidGPSWrapper) w).getLastKnownLocation();
 	}

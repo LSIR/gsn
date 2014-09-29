@@ -89,22 +89,7 @@ public class WifiWrapper extends AbstractWrapper implements
 
 	public void run() {
 		
-//		Activity activity = getConfig().getController().getActivity();
-//		mSensorManager = (SensorManager) activity
-//				.getSystemService(Context.SENSOR_SERVICE);
-//		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-//		mSensorManager.registerListener(this, mSensor,
-//				SensorManager.SENSOR_DELAY_NORMAL);
-//
-//		while (isActive()) {
-//			try {
-//				Thread.sleep(samplingRate);
-//				getLastKnownData();
-//			}
-//			catch (InterruptedException e) {
-//				Log.e(e.getMessage(), e.toString());
-//			}
-//		}
+
 	}
 
 	public void getLastKnownData() {

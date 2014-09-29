@@ -9,6 +9,7 @@ import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AndroidControllerListVSNew;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.wrappers.AndroidGyroscopeWrapper;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.app.IntentService;
 import android.content.Context;
@@ -27,7 +28,9 @@ public class GyroscopeService  extends IntentService implements SensorEventListe
 	public AbstractWrapper w;
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
-	
+	SqliteStorageManager storage = null;
+	int samplingRate = -1;
+		
 	
 	public GyroscopeService()
 	{
@@ -43,12 +46,13 @@ public class GyroscopeService  extends IntentService implements SensorEventListe
 	  {
 		  
 			Bundle b = intent.getExtras();
-			Log.d("in service", "on handle intent" + intent);
 			config = (VSensorConfig) b.get("tinygsn.beans.config");
+			storage = new SqliteStorageManager(config.getController().getActivity());
+			samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGPSWrapper");
+			
 			for (InputStream inputStream : config.getInputStreams()) {
 				for (StreamSource streamSource : inputStream.getSources()) {
 					w = streamSource.getWrapper();	
-					Log.i("wwwwwwwwwwwwwww", w.toString());
 					Activity activity = config.getController().getActivity();
 					mSensorManager = (SensorManager) activity
 							.getSystemService(Context.SENSOR_SERVICE);
@@ -56,13 +60,10 @@ public class GyroscopeService  extends IntentService implements SensorEventListe
 					mSensorManager.registerListener(this, mSensor,
 							SensorManager.SENSOR_DELAY_NORMAL);
 
-//					while (w.isActive()) {
 					while(w.isActive())
 					{
-						Log.i("isActive", Boolean.toString(w.isActive()));
-						Log.i("isActive", w.toString());
 						try {
-							Thread.sleep(w.getSamplingRate());
+							Thread.sleep(w.getSamplingRate()/(1+ samplingRate));
 							((AndroidGyroscopeWrapper) w).getLastKnownData();
 						}
 						catch (InterruptedException e) {

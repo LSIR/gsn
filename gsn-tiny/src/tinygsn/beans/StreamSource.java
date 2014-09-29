@@ -75,7 +75,7 @@ public class StreamSource implements Serializable, QueueListener {
 	public void notifyMe(ArrayList<StreamElement> data) {
 		// Use Aggregator to process data s
 		StreamElement se = data.get(0);
-		Log.i("StreamElement se = data.get(0);" , se.getData()[0].toString());
+	//	Log.i("StreamElement se = data.get(0);" , se.getData()[0].toString());
 
 		if (inputStream == null) {
 			Log.e(TAG, "inputStream is null");

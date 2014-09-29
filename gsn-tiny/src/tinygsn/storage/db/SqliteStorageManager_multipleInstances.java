@@ -346,6 +346,7 @@ public class SqliteStorageManager_multipleInstances extends StorageManager {
 
 				vsList.add(new VirtualSensor(vs, context));
 				StaticData.addConfig(id, vs);
+				StaticData.saveNameID(id, vsname);
 			}
 		}
 		catch (SQLException e) {

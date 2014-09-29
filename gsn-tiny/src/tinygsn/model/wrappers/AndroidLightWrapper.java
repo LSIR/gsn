@@ -115,7 +115,6 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 
 	@Override
 	public DataField[] getOutputStructure() {
-		Log.i("get called","get called");
 		ArrayList<DataField> output = new ArrayList<DataField>();
 		for (int i = 0; i < FIELD_NAMES.length; i++)
 			output.add(new DataField(FIELD_NAMES[i], FIELD_TYPES_STRING[i],

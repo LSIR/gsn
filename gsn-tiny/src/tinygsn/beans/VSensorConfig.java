@@ -37,6 +37,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+
 public class VSensorConfig implements Parcelable  {
 
 	
@@ -94,7 +95,6 @@ public class VSensorConfig implements Parcelable  {
 	}
 	public VSensorConfig(Parcel source)
 	{
-		Log.i("should not repeat alot", "heeeeeeeeeeeeeeeeee");
 		int idid = Integer.parseInt(source.readString());
 		String processingClass = source.readString();
 		String vsName = source.readString();
@@ -170,8 +170,6 @@ public class VSensorConfig implements Parcelable  {
 		this.inputStreams = new InputStream[1];
 		this.inputStreams[0] = is;
 		this.wrapperName = wrapperN;
-		
-		Log.v(TAG, "VSensorConfig initiated successfully!");
 			
 	}
 
@@ -180,7 +178,6 @@ public class VSensorConfig implements Parcelable  {
 			int aggregator, boolean running, String notify_field,
 			String notify_condition, Double notify_value, String notify_action,
 			String notify_contact, boolean save_to_db) {
-		Log.v(TAG, "VSensorConfig is initiating...");
 
 		this.id = id;
 		this.name = vsName;
@@ -238,7 +235,6 @@ public class VSensorConfig implements Parcelable  {
 		this.inputStreams[0] = is;
 		this.wrapperName = wrapperName;
 
-		Log.v(TAG, "VSensorConfig initiated successfully!");
 	}
 
 	// public void createTableIfNotExist(){
@@ -266,8 +262,8 @@ public class VSensorConfig implements Parcelable  {
 		vsConfig.setController(controller);
 		
 		StaticData.addConfig(id, vsConfig);
-		
-		Log.v(TAG, "Cloned: " + vsConfig.toString());
+		StaticData.saveNameID(id, name);
+
 
 		return vsConfig;
 	}
@@ -716,7 +712,6 @@ public class VSensorConfig implements Parcelable  {
 
 	public void setController(AbstractController controller) {
 		this.controller = controller;
-		Log.i("set Controller in config:::" , this.getWrapperName() +"  "+ Integer.toString(id)+"  "+controller.toString());
 		this.controller.setId(id);
 		
 	}
@@ -792,10 +787,7 @@ public class VSensorConfig implements Parcelable  {
 		dest.writeString(getNotify_action());
 		dest.writeString(getNotify_contact());
 		dest.writeString(Boolean.toString(isSave_to_db()));
-		Log.i("finding information", getController().getClass().getName());
-		//if(getController().getClass().getName().contains("AndroidControllerListVSNew"))
 		StaticData.addController((AndroidControllerListVSNew) getController());
-		//dest.writeSerializable(getController());
 		StaticData.is = getInputStreams()[0];
 	}
 	public static final Parcelable.Creator<VSensorConfig> CREATOR  = new Creator<VSensorConfig>() {
@@ -804,6 +796,7 @@ public class VSensorConfig implements Parcelable  {
 
 	    	VSensorConfig vs = new VSensorConfig(source);
 	    	StaticData.addConfig(vs.id, vs);
+	    	StaticData.saveNameID(vs.id, vs.getName());
 			return vs;
 	    }
 

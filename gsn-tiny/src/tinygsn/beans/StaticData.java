@@ -3,11 +3,8 @@ package tinygsn.beans;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import android.content.Intent;
-import android.util.Log;
-
 
 import tinygsn.controller.AndroidControllerListVSNew;
 
@@ -18,7 +15,22 @@ public class StaticData {
 	private static Map<String, Intent> runningServices = new HashMap<String, Intent>();
 	private static Map<Integer, VSensorConfig> configMap = new HashMap<Integer, VSensorConfig>();
 	public static Map<String, String> vsNames = new HashMap<String, String>();
+	public static Map<String, Integer> IDMap = new HashMap<String, Integer>();
 	
+	public static void saveNameID(int id, String name)
+	{
+		IDMap.put(name, id);
+	}
+	public static int retrieveIDByName(String Name)
+	{
+		for(Map.Entry<String, Integer> item: IDMap.entrySet())
+		{
+			if(item.getKey().equals(Name))
+				return item.getValue();
+		}
+		return -1;
+	
+	}
 	public static void saveName(String vsName, String vsType)
 	{
 		vsNames.put(vsType, vsName);
@@ -41,27 +53,9 @@ public class StaticData {
 	{
 		configMap.put(id, config);
 	}
-//	private static Map<String, Integer> VirtualSensorIDs = new HashMap<String, Integer>();
-//	
-//	synchronized static public int getVSID(String VSName)
-//	{
-//		for(Map.Entry<String, Integer> item: VirtualSensorIDs.entrySet())
-//		{
-//			if(item.getKey().equals(VSName))
-//				return item.getValue();
-//
-//		}
-//		return -1;
-//	}
-//	
-//	synchronized static public void addVs(String VSName, int id )
-//	{
-//		VirtualSensorIDs.put(VSName, id);
-//	}
+
 	synchronized static public Intent getRunningIntentByName(String name)
 	{
-		for(Map.Entry<String, Intent> item: runningServices.entrySet())
-			Log.e("in while", "in while");
 			
 		for(Map.Entry<String, Intent> item: runningServices.entrySet())
 		{

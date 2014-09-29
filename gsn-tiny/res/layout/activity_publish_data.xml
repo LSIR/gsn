@@ -1,10 +1,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+        xmlns:android1="http://schemas.android.com/apk/res/android" >
 
     <TableLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:android1="http://schemas.android.com/apk/res/android"
+ 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/background"
@@ -101,7 +101,7 @@
                 android1:id="@+id/textView_vsName"
                 android1:layout_width="wrap_content"
                 android1:layout_height="wrap_content"
-                android1:text="Select VS"
+                android1:text="From"
                 android1:textAppearance="?android:attr/textAppearanceSmall"
                 android1:textColor="#000000" />
 
@@ -124,7 +124,7 @@
                 android1:id="@+id/textView_vsType"
                 android1:layout_width="wrap_content"
                 android1:layout_height="wrap_content"
-                android1:text="@string/strategy"
+                android1:text="Until"
                 android1:textAppearance="?android:attr/textAppearanceSmall"
                 android1:textColor="#000000" />
 
@@ -151,16 +151,6 @@
                 android1:text="@string/every"
                 android1:textAppearance="?android:attr/textAppearanceSmall"
                 android1:textColor="#000000" />
-
-            <EditText
-                android:id="@+id/editText_ssWindowSize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="5"
-                android:inputType="number"
-                android:textColor="#000000"
-                android1:text="@string/sixty" >
-            </EditText>
         </TableRow>
 
         <!--

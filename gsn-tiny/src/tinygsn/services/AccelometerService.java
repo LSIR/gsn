@@ -83,13 +83,11 @@ public class AccelometerService extends IntentService implements SensorEventList
 				
 				
 				while (w.isActive()) 
-//				while(true)
 				{
 					storage = new SqliteStorageManager(config.getController().getActivity());
 					int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidAccelerometerWrapper");
 					try {
-						Log.i(TAG+"sampling Raaaaate", samplingRate+"");
-						Thread.sleep(w.getSamplingRate());
+						Thread.sleep(w.getSamplingRate()/(1+samplingRate));
 						((AndroidAccelerometerWrapper) w).getLastKnownData();
 					}
 					catch (InterruptedException e) {

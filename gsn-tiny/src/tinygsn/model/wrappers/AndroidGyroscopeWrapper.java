@@ -74,11 +74,6 @@ public class AndroidGyroscopeWrapper extends AbstractWrapper implements
 	}
 
 	public void run() {
-//		Log.i("Gyroscop", "starrrrrrrrrrrrrted");
-//		Log.i("Gyroscop",getConfig().toString());
-//		Log.i("Gyroscop",getConfig().getController().toString());
-//		Log.i("Gyroscop",getConfig().getController().toString());
-//		
 		Activity activity = getConfig().getController().getActivity();
 		mSensorManager = (SensorManager) activity
 				.getSystemService(Context.SENSOR_SERVICE);

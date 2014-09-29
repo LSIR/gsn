@@ -76,8 +76,7 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
 	}
 
 	public void run() {
-		Log.v(TAG, TAG + " is waiting for data");
-
+	
 		Activity activity = getConfig().getController().getActivity();
 		Looper.prepare();
 		

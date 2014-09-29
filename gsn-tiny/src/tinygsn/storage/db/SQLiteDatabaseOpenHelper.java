@@ -25,13 +25,14 @@
 
 package tinygsn.storage.db;
 
+import java.io.File;
 import java.io.Serializable;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+import android.os.Environment;
 
 public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serializable {
 
@@ -42,7 +43,8 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 
 	public SQLiteDatabaseOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {
-		super(context, name, factory, version);
+		super(context, Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/Android/data/tinygsn/"+ name, factory, version);
 	}
 
 	@Override
@@ -62,6 +64,15 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 	
 		createQuery = "CREATE TABLE SAMPLIG_RATE (_id integer primary key,"
 				+ "samplingrate integer, vsname text"
+				+ ");";
+		db.execSQL(createQuery);
+		
+		createQuery = "CREATE TABLE WifiFrequency (_id integer primary key,"
+				+ "frequency integer, mac text"
+				+ ");";
+		db.execSQL(createQuery);
+		createQuery = "CREATE TABLE Samples (_id integer primary key,"
+				+ "sample integer"
 				+ ");";
 		db.execSQL(createQuery);
 	

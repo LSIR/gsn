@@ -158,7 +158,7 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+
 
 import java.text.SimpleDateFormat;
 
@@ -168,6 +168,7 @@ import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.wrappers.AndroidActivityRecognitionWrapper;
+import tinygsn.storage.db.SqliteStorageManager;
 
 /**
  * Service that receives ActivityRecognition updates. It receives updates
@@ -186,6 +187,10 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
 	private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss.SSSZ";
 
     private SimpleDateFormat mDateFormat;
+    
+    SqliteStorageManager storage = null;
+    int samplingRate = -1;
+	
 
     public ActivityRecognitionService() {
         super("ActivityRecognitionIntentService");
@@ -197,27 +202,16 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)  {
-    	
-//    	setIntentRedelivery(false);
-
-		StackTraceElement test[] = Thread.currentThread().getStackTrace();
-//    	for(int i = 0; i < test.length;  i++)
-//		{
-//			Log.e("stack trace recognitiontace", test[i].getMethodName());
-//			Log.e("stack trace recognitiontace class", test[i].getClassName());
-//		+++}
-			
+    
     	VSensorConfig tempConfig = null;
-		Log.i("Rocognition", "Recognition");
-    	Bundle b = intent.getExtras();
+		Bundle b = intent.getExtras();
     	tempConfig = (VSensorConfig) b.get("tinygsn.beans.config");
+    	
+    	storage = new SqliteStorageManager(config.getController().getActivity());
+		samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGPSWrapper");
+		
 		if(tempConfig != null)
 			config = tempConfig;
-		if(config != null)
-			Log.i("connnnfiiiiiiig is not null here", config.toString());
-		else
-			Log.i("connnnfiiiiiiig is null here","connnnfiiiiiiig is null here");
-		
 		 for (InputStream inputStream : config.getInputStreams()) {
  			for (StreamSource streamSource : inputStream.getSources()) {
  				w = streamSource.getWrapper();
@@ -228,7 +222,7 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
 	        try {
             mDateFormat = (SimpleDateFormat) DateFormat.getDateTimeInstance();
         } catch (Exception e) {
-           // Log.e(ActivityUtils.APPTAG, getString(R.string.date_format_error));
+
         }
 
         mDateFormat.applyPattern(DATE_FORMAT_PATTERN);
@@ -246,7 +240,6 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
         
         if (ActivityRecognitionResult.hasResult(intent)) {
    
-    		
         	ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 		    DetectedActivity mostProbableActivity = result.getMostProbableActivity();
             Double confidence = (double) mostProbableActivity.getConfidence();
@@ -288,7 +281,10 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
 	public void onConnected(Bundle arg0) {
 		Intent intent = new Intent(this, ActivityRecognitionService.class);
 		pIntent = PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
-		arclient.requestActivityUpdates(100, pIntent);   
+		if(samplingRate == 2)	
+			arclient.requestActivityUpdates(100, pIntent); 
+		else 
+			arclient.removeActivityUpdates(pIntent);
 	}
 
 	@Override

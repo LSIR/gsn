@@ -25,17 +25,13 @@
 
 package tinygsn.gui.android;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import tinygsn.services.GyroscopeService;
 import tinygsn.services.schedular;
 import tinygsn.storage.db.SqliteStorageManager;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -63,7 +59,6 @@ public class ActivityHome extends SherlockActivity {
 		badge.show();
 		
 		//my code		
-		storage.executeInsertSamplingRate("tinygsn.model.wrappers.AndroidAccelerometerWrapper", 0);
 		Intent serviceIntent = null;
 		serviceIntent = new Intent(this, schedular.class);
 		this.startService(serviceIntent);

@@ -25,6 +25,7 @@
 
 package tinygsn.storage.db;
 
+import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -48,7 +49,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+import android.os.Environment;
 
 /**
  * 
@@ -74,6 +75,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		this.isSQLite = true;
 		this.context = context;
 		dbOpenHelper = getInstance(context);
+		File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/Android/data/tinygsn" );
+		myFilesDir.mkdirs();
 		database = dbOpenHelper.getWritableDatabase();
 	}
 
@@ -97,15 +101,12 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	// }
 
 	public void createTable(String vsName, DataField[] outputStructure) {
-		Log.i("Creation of the table", Integer.toString(outputStructure.length));
-		Log.i("Creation of the table", vsName);
 		
 		ArrayList<String> fields = new ArrayList<String>();
 		
 		//mycode
 		//fields.add("vid");
 		for (DataField f : outputStructure) {
-			Log.i("Creation of the table", f.getName());
 			fields.add(f.getName());
 		}
 		fields.add("timed");
@@ -126,6 +127,24 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		// close();
 	}
 
+	public void executeInsertWifiFrequency(String macAdr)
+	{
+		ContentValues newCon = new ContentValues();
+		newCon.put("frequency", 1);
+		newCon.put("mac", macAdr);
+		
+		database.insert("WifiFrequency", null, newCon);
+
+	}
+	
+	public void executeInsertSamples(int sample)
+	{
+		ContentValues newCon = new ContentValues();
+		newCon.put("sample", sample);
+		
+		database.insert("Samples", null, newCon);
+	}
+	
 	public void executeInsertSamplingRate(String vsName, int samplingRate)
 	{
 		ContentValues newCon = new ContentValues();
@@ -228,7 +247,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			fieldValues = new Serializable[FIELD_NAMES.length];
 
 			for (int i = 0; i < FIELD_NAMES.length; i++) {
-				Log.i("FILED_NAME[i]" , FIELD_NAMES[i]);
+			//	Log.i("FILED_NAME[i]" , FIELD_NAMES[i]);
 				fieldValues[i] = cursor.getDouble(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase()));
 						//.getDouble(cursor.getColumnIndex(FIELD_NAMES[i]));
 			}
@@ -329,9 +348,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		Cursor cursor = database.rawQuery(query, new String[] { vsName });
 		
 		while (cursor.moveToNext()) {
-			Log.i("vid","vid");
 			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
-			Log.i("vid",id+"");
 			int running = cursor.getInt(cursor.getColumnIndex("running"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			double vstype = cursor.getDouble(cursor.getColumnIndex("vstype"));
@@ -372,6 +389,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 					notify_value, notify_action, notify_contact, save_to_db);
 			
 			StaticData.addConfig(id, vs);
+			StaticData.saveNameID(id, vsname);
 			return new VirtualSensor(vs, context);
 			
 		}
@@ -393,14 +411,14 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	}
 	public int getSamplingRateByName(String vsname)
 	{
-		String query = "Select * from SAMPLIG_RATE  where vsname = ?;";
+		String query = "Select * from SAMPLIG_RATE WHERE vsname = ?;";
 		Cursor cursor = database.rawQuery(query, new String[]{vsname});
 		
 		while (cursor.moveToNext()) {
 			int samplingRate = cursor.getInt(cursor.getColumnIndex("samplingrate"));
-			String vsName = cursor.getString(cursor.getColumnIndex("vsname"));
-			return samplingRate;
-			
+			String vsName = cursor.getString(cursor.getColumnIndex("vsname"));	
+			if(vsName.equals(vsname))
+				return samplingRate;			
 		}
 		return -1;
 
@@ -454,6 +472,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 			vsList.add(new VirtualSensor(vs, context));
 			StaticData.addConfig(id, vs);
+			StaticData.saveNameID(id, vsname);
 		}
 
 		return vsList;
@@ -473,12 +492,56 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return false;
 	}
 	
+	public boolean updateWifiFrequency(String macAdr)
+	{
+		int frequency = getFrequencyByMac(macAdr);
+		if(frequency != -1)
+		{
+			String query = "UPDATE WifiFrequency SET frequency = ? WHERE mac = ?;";
+			//Log.i(TAG+"fieeeeeld",macAdr);
+			Cursor cursor = database.rawQuery(query, new String[] {(frequency+1)+"", macAdr});
+			//Log.v(TAG, cursor.toString());
+			if(cursor.moveToNext())
+				return true;
+		}
+		else 
+			executeInsertWifiFrequency(macAdr);
+		return false;
+	}
+	
+	public Map<String, Integer> getFrequencies()
+	{
+		Map<String, Integer> freqs = new HashMap<String, Integer>();
+		String query = "Select * from WifiFrequency;";
+		Cursor cursor = database.rawQuery(query, new String[]{});
+		while (cursor.moveToNext())
+		{
+			int frequency = cursor.getInt(cursor.getColumnIndex("frequency"));
+			String mac = cursor.getString(cursor.getColumnIndex("mac"));
+			freqs.put(mac, frequency);
+		}
+		return freqs;
+	}
+
+	
+	private int getFrequencyByMac(String macAdr) {
+		String query = "Select * from WifiFrequency;";
+		Cursor cursor = database.rawQuery(query, new String[]{});
+		while (cursor.moveToNext())
+		{
+			int frequency = cursor.getInt(cursor.getColumnIndex("frequency"));
+			String mac = cursor.getString(cursor.getColumnIndex("mac"));
+			if(mac.equals(macAdr))
+				return frequency;
+		}
+		return -1;
+	}
+
 	public boolean updateSamplingRate(String feild, int i) //for updating sampling rates from the activity for the schedular
 	{
 		String query = "UPDATE SAMPLIG_RATE SET samplingrate = ? WHERE vsname = ?;";
-		Log.i(TAG+"fieeeeeld",feild);
+		//Log.i(TAG+"fieeeeeld",feild);
 		Cursor cursor = database.rawQuery(query, new String[] {i+"", feild});
-		Log.v(TAG, cursor.toString());
 		if(cursor.moveToNext())
 			return true;
 		return false;
@@ -491,8 +554,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 				+ " WHERE vsname = ?;";
 		// open();
 		Cursor cursor = database.rawQuery(query, new String[] { value, vsName });
-		Log.v(TAG, cursor.toString());
-
+		
 		if (cursor.moveToNext()) {
 			return true;
 		}
@@ -706,6 +768,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 				
 				vsList.add(new VirtualSensor(vs, context));
 				StaticData.addConfig(id, vs);
+				StaticData.saveNameID(id, vsname);
 			}
 		}
 
