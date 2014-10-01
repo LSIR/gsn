@@ -26,7 +26,11 @@
 package tinygsn.gui.android;
 
 import gsn.http.rest.PushDelivery;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import tinygsn.beans.StreamElement;
@@ -51,19 +55,21 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 public class ActivityPublishData extends SherlockFragmentActivity {
-	public static String[] STRATEGY = { "On demand", "Periodically (time)",
-			"Periodically (values)" };
+	//public static String[] STRATEGY = { "On demand", "Periodically (time)", "Periodically (values)" };
 	static int TEXT_SIZE = 10;
-	public static String DEFAULT_SERVER = "http://lsir-cloud.epfl.ch/gsn";
+	public static String DEFAULT_SERVER = "";
 	public static Hashtable<String,Double> SENSORS_IDS = new Hashtable<String, Double>();
 
 	private Context context = null;
 	private AndroidControllerPublishData controller;
-	private Spinner spinner_vsName;
-	private Spinner spinner_strategy;
+	//private Spinner spinner_vsName;
+	//private Spinner spinner_strategy;
 	private EditText serverEditText = null;
-
-	private Handler handlerVS;
+    private EditText fromdateEditText = null;
+    private EditText fromtimeEditText = null;
+    private EditText totimeEditText = null;
+    private EditText todateEditText = null;
+    private Handler handlerVS;
 	private ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
 
 
@@ -71,12 +77,12 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		SENSORS_IDS.put("Accelerometer", 100001.0);
-		SENSORS_IDS.put("GPS", 100002.0);
-		SENSORS_IDS.put("Activity", 100003.0);
-		SENSORS_IDS.put("Gyroscope", 100004.0);
-		SENSORS_IDS.put("Light", 100005.0);
-		SENSORS_IDS.put("WIFI", 100006.0);
+		SENSORS_IDS.put("acc", 100001.0);
+		SENSORS_IDS.put("gps", 100002.0);
+		SENSORS_IDS.put("activity", 100003.0);
+		SENSORS_IDS.put("gyroscope", 100004.0);
+		SENSORS_IDS.put("light", 100005.0);
+		SENSORS_IDS.put("wifi", 100006.0);
 		
 		
 		setContentView(R.layout.activity_publish_data);
@@ -84,10 +90,21 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 		registerForContextMenu(findViewById(R.id.select_server_btn));
 
 		serverEditText = (EditText) findViewById(R.id.editText_server);
-
+		fromdateEditText = (EditText) findViewById(R.id.fromdate);
+		todateEditText = (EditText) findViewById(R.id.todate);
+		totimeEditText = (EditText) findViewById(R.id.totime);
+		fromtimeEditText = (EditText) findViewById(R.id.fromtime);
+		
+		Date date = new Date();
+		Calendar cal = Calendar.getInstance();
+		totimeEditText.setText(new SimpleDateFormat("HH:mm").format(date));
+		todateEditText.setText(new SimpleDateFormat("dd.MM.yyyy").format(date));
+		fromtimeEditText.setText(new SimpleDateFormat("HH:mm").format(date));
+		cal.add(Calendar.DATE, -1);
+		fromdateEditText.setText(new SimpleDateFormat("dd.MM.yyyy").format(cal.getTime()));
+		serverEditText.setText(DEFAULT_SERVER);
 		context = this;
-
-		registerPush();
+		setUpController();
 	}
 
 	public void setUpController() {
@@ -96,7 +113,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 			@Override
 			public void handleMessage(Message msg) {
 				vsList = (ArrayList<VirtualSensor>) msg.obj;
-				renderVSList();
+				//renderVSList();
 			};
 		};
 
@@ -105,6 +122,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 		controller.loadListVS();
 	}
 
+	/*
 	public void renderVSList() {
 	
 		List<String> list = new ArrayList<String>();
@@ -133,7 +151,9 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 			}
 		});
 	}
-
+*/
+	
+/*	
 	public void renderStrategyList() {
 	
 		List<String> list = new ArrayList<String>();
@@ -172,7 +192,8 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 			}
 		});
 	}
-
+*/
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add("Publish").setShowAsAction(
@@ -197,20 +218,19 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	
 	public void publish(View view) {
 		for (String vs_name : SENSORS_IDS.keySet()){
-			StreamElement se = controller.loadLatestData(spinner_vsName
-					.getSelectedItem().toString());
+			StreamElement[] se = controller.loadRangeData(vs_name,fromdateEditText.getText().toString(),fromtimeEditText.getText().toString(),todateEditText.getText().toString(),totimeEditText.getText().toString());
 	
-			if (se != null) {
+			if (se.length > 0) {
 				new PublishDataTask(new PushDelivery(serverEditText.getText() + "/streaming/", SENSORS_IDS.get(vs_name))).execute(se);
 			}
 			else {
-				Toast.makeText(this, "VS has no data to publish", Toast.LENGTH_SHORT)
+				Toast.makeText(this, "No data to publish", Toast.LENGTH_SHORT)
 						.show();
 			}
 		}
 	}
 
-	private class PublishDataTask extends AsyncTask<StreamElement, Void, Boolean> {
+	private class PublishDataTask extends AsyncTask<StreamElement[], Void, Boolean> {
 		
 		PushDelivery push;
 		
@@ -218,20 +238,20 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 			push = p;
 		}
 
-		private StreamElement se = null;
+		private StreamElement[] se = null;
 
 		@Override
-		protected Boolean doInBackground(StreamElement... params) {
+		protected Boolean doInBackground(StreamElement[]... params) {
 			se = params[0];
-			return push.writeStreamElement(se);
+			return push.writeStreamElements(se);
 		}
 
 		protected void onPostExecute(Boolean results) {
 			if (results == true)
-				Toast.makeText(context, "Published: " + se.toString(),
+				Toast.makeText(context, "Published: " + se.length,
 						Toast.LENGTH_SHORT).show();
 			else
-				Toast.makeText(context, "Publish fail: " + se.toString(),
+				Toast.makeText(context, "Publish fail: " + se.length,
 						Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -248,17 +268,17 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenu.ContextMenuInfo menuInfo) {
 		menu.add("http://10.0.2.2:22001");
-		menu.add("http://gsn.ijs.si");
-		menu.add("http://montblanc.slf.ch:22001");
-		menu.add("http://data.permasense.ch");
-		menu.add("http://lsir-cloud.epfl.ch/gsn");
+		//menu.add("http://gsn.ijs.si");
+		//menu.add("http://montblanc.slf.ch:22001");
+		//menu.add("http://data.permasense.ch");
+		//menu.add("http://lsir-cloud.epfl.ch/gsn");
 	}
 
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
 		// Note how this callback is using the fully-qualified class name
-		Toast.makeText(this, "Got click: " + item.toString(), Toast.LENGTH_SHORT)
-				.show();
+		//Toast.makeText(this, "Got click: " + item.toString(), Toast.LENGTH_SHORT)
+		//		.show();
 		serverEditText.setText(item.toString());
 		return true;
 	}

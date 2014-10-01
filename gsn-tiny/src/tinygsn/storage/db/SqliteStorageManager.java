@@ -302,32 +302,32 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	public ArrayList<StreamElement> executeQueryGetRangeData(String vsName,
 			long start, long end, String[] FIELD_NAMES, Byte[] FIELD_TYPES) {
 		Serializable[] fieldValues;
-
-		// try {
-		// open();
-		// }
-		// catch (SQLException e) {
-		// e.printStackTrace();
-		// }
+		String[] fieldNames;
+		Byte[] fieldTypes;
 
 		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
 
 		String query = "Select * from " + vsName
-				+ " where CAST(timed AS NUMERIC) >= ? AND CAST(timed AS NUMERIC) <= ?";
+				+ " where CAST(timed AS NUMERIC) >= ? AND CAST(timed AS NUMERIC) <= ? ORDER BY timed ASC";
 
 		Cursor cursor = database.rawQuery(query, new String[] { start + "",
 				end + "" });
 
 		while (cursor.moveToNext()) {
-			fieldValues = new Serializable[FIELD_NAMES.length];
-
+			fieldValues = new Serializable[FIELD_NAMES.length+1];
+			fieldNames = new String[FIELD_NAMES.length+1];
+			fieldTypes = new Byte[FIELD_NAMES.length+1];
 			for (int i = 0; i < FIELD_NAMES.length; i++) {
 				fieldValues[i] = cursor
 						.getDouble(cursor.getColumnIndex(FIELD_NAMES[i]));
+				fieldNames[i] = FIELD_NAMES[i];
+				fieldTypes[i] = FIELD_TYPES[i];
 			}
 			long time = cursor.getLong(cursor.getColumnIndex("timed"));
-
-			StreamElement se = new StreamElement(FIELD_NAMES, FIELD_TYPES,
+			fieldNames[fieldNames.length-1] = "userid";
+			fieldTypes[fieldTypes.length-1] = DataTypes.INTEGER;
+			fieldValues[fieldValues.length-1] = new Integer(123);
+			StreamElement se = new StreamElement(fieldNames, fieldTypes,
 					fieldValues, time);
 			// Log.v(TAG, se.toString());
 

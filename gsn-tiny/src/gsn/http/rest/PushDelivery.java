@@ -84,6 +84,16 @@ public class PushDelivery {
 	 */
 	public boolean writeStreamElement(StreamElement se) {
 		String xml = xstream.toXML(new StreamElement4Rest(se));
+		int success = sendData(new String[]{xml});
+		isClosed = success == 200;
+		return isClosed;
+	}
+	
+	public boolean writeStreamElements(StreamElement[] se) {
+		String[] xml = new String[se.length];
+		for (int i=0;i<se.length;i++){
+			xml[i] = xstream.toXML(new StreamElement4Rest(se[i]));
+		}
 		int success = sendData(xml);
 		isClosed = success == 200;
 		return isClosed;
@@ -127,12 +137,14 @@ public class PushDelivery {
 		}
 	}
 
-	private int sendData(String xml) {
+	private int sendData(String[] xmls) {
 		try {
 			ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 			postParameters.add(new BasicNameValuePair(
 					PushDelivery.NOTIFICATION_ID_KEY, Double.toString(notificationId)));
-			postParameters.add(new BasicNameValuePair(PushDelivery.DATA, xml));
+			for (String xml : xmls){
+			    postParameters.add(new BasicNameValuePair(PushDelivery.DATA, xml));
+			}
 
 			httpPut.setEntity(new UrlEncodedFormEntity(postParameters, HTTP.UTF_8));
 
@@ -142,7 +154,7 @@ public class PushDelivery {
 			response.getEntity().getContent().close(); // releasing the connection to
 																									// the http client's pool
 
-			Log.v("PushDelivery", "sendData: xml=" + xml);
+			Log.v("PushDelivery", "sendData: xml=" + xmls.length);
 
 			return statusCode;
 		}

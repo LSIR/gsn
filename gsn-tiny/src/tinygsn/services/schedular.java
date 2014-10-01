@@ -30,7 +30,7 @@ public class schedular extends IntentService {
 	}
 	public schedular()
 	{
-		super("schedulat");
+		super("scheduler");
 	}
 
 	//constants:

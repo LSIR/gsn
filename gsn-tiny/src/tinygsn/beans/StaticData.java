@@ -9,6 +9,7 @@ import android.content.Intent;
 import tinygsn.controller.AndroidControllerListVSNew;
 
 public class StaticData {
+	public static final int USER_ID = 123;
 	private static int LastIdUsed = 1;
 	public static InputStream is;
 	private static Map<Integer, AndroidControllerListVSNew> controllerMap = new HashMap< Integer, AndroidControllerListVSNew>();

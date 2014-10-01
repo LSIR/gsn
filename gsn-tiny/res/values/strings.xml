@@ -3,7 +3,7 @@
     <string name="app_name">TinyGSN</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_tinygsn_main">TinyGSN v2.6</string>
+    <string name="title_activity_tinygsn_main">TinyGSN</string>
     <string name="time_text">time_text</string>
     <string name="set_date">Set Date</string>
     <string name="set_time">Set Time</string>
