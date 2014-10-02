@@ -27,7 +27,9 @@ package tinygsn.gui.android;
 
 import java.util.ArrayList;
 import tinygsn.controller.AndroidControllerListVS;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -73,7 +75,9 @@ public class ActivityListVS extends Activity{
 //				.detectAll().penaltyLog().penaltyDeath().build());
 //		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll()
 //				.penaltyLog().penaltyDeath().build());
+		
 
+		
 		AbstractWrapper.getWrapperList(this);
 		
 		renderLayout();
@@ -150,7 +154,7 @@ public class ActivityListVS extends Activity{
 		runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				controller.startStopVS(vsName, runningSwitch.isChecked());
+				controller.startStopVS(vsName, runningSwitch.isChecked(), ActivityListVS.this);
 				String state = "enabled";
 				if (runningSwitch.isChecked() == false)
 					state = "disabled";

@@ -25,13 +25,19 @@
 
 package tinygsn.controller;
 
+
 import tinygsn.beans.StreamElement;
 import tinygsn.storage.StorageManager;
 import android.app.Activity;
 
-public abstract class AbstractController {
+public abstract class AbstractController  {
 
-  public abstract void startLoadVSList();
+  /**
+	 * 
+	 */
+	private int id;
+
+public abstract void startLoadVSList();
 //
 //  public abstract void tinygsnStop();
 //
@@ -40,4 +46,11 @@ public abstract class AbstractController {
 	public abstract StorageManager getStorageManager();
 	
 	public abstract Activity getActivity();
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 }

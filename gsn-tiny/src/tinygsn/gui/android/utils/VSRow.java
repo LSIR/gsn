@@ -25,12 +25,18 @@
 
 package tinygsn.gui.android.utils;
 
+import java.io.Serializable;
+
 /**
  * A Virtual Sensor row in the List of VS activity  
  * @author Do Ngoc Hoan (hoan.do@epfl.ch)
  *
  */
-public class VSRow {
+public class VSRow implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8585186135377493021L;
 	private String name;
 	private boolean isRunning;
 	private String latestValue;

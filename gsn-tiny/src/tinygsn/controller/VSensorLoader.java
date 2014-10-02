@@ -23,14 +23,18 @@
 */
 
 
+//TODO vsconfig darim vali meghdar dehi nemishe 
+
 package tinygsn.controller;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import tinygsn.beans.VSensorConfig;
+import tinygsn.gui.android.ActivityHome;
 import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.storage.db.SqliteStorageManager;
+import android.content.Context;
 import android.util.Log;
 
 public class VSensorLoader extends Thread {
@@ -42,7 +46,8 @@ public class VSensorLoader extends Thread {
 	private AbstractController controller = null;
 	private VSensorConfig config = null;
 	private VirtualSensor vs = null;
-
+	Context context = null;
+	
 	// public static final String VSENSOR_POOL = "VSENSOR-POOL";
 	// public static final String STREAM_SOURCE = "STREAM-SOURCE";
 	// public static final String INPUT_STREAM = "INPUT-STREAM";
@@ -56,14 +61,16 @@ public class VSensorLoader extends Thread {
 	// private ArrayList<VSensorStateChangeListener> changeListeners = new
 	// ArrayList<VSensorStateChangeListener>();
 
-	public VSensorLoader(AbstractController androidController) {
+	public VSensorLoader(AbstractController androidController, Context context) {
 		this.controller = androidController;
+		this.context = context;
 	}
 
 	public VSensorLoader(AbstractController androidControllerListVS,
-			SqliteStorageManager storage) {
+			SqliteStorageManager storage, Context context) {
 		this.controller = androidControllerListVS;
 		this.storage = storage;
+		this.context = context;
 	}
 
 	public void run() {
@@ -103,7 +110,7 @@ public class VSensorLoader extends Thread {
 //				"tinygsn.wrappers.AndroidFakeTemperatureWrapper", 200, 1, 1, 0, true);
 		config.setController(controller);
 
-		vs = new VirtualSensor(config);
+		vs = new VirtualSensor(config, context);
 		vs.start();
 	}
 
@@ -115,6 +122,8 @@ public class VSensorLoader extends Thread {
 		Log.v(TAG, "OK");
 	}
 
+	
+	//Is this code usefull??
 	private void insertNewVS() {
 		try {
 			controller.getStorageManager().executeInsert(

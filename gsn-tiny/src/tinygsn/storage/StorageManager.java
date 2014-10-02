@@ -1027,7 +1027,7 @@ public abstract class StorageManager {
 			StreamElement se) throws SQLException {
 	}
 
-	public ArrayList<VirtualSensor> getListofVS() {
+	public ArrayList<VirtualSensor> getListofVS() { //TODO why does it return null?
 		return null;
 	};
 }

@@ -46,11 +46,9 @@ public class ActivityAboutUs extends SherlockActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         ((TextView)findViewById(R.id.text)).setText("About us: " 
-        + "\n\n\tThis application is developed in a semester project of my Master study at EPFL."
-        		+ "\n\t\t\t* Developer: Do Ngoc Hoan \n\t\t\t\t(hoan.do@epfl.ch)"
-        		+ "\n\t\t\t* Supervisor: Sofiane Sarni \n\t\t\t\t(sofiane.sarni@epfl.ch)"
-        		+ "\n\n\tSource code of this project is publicly available at https://code.google.com/p/tinygsn/");
-        
+        + "\n\n\tThis application is part of Global Sensor Networks (GSN)."
+        		+ "\n\t\t\t* Developers: Do Ngoc Hoan, Aida Amini, Julien Eberle \n\t\t\t\t"
+        		+ "\n\n\tSource code available at https://github.com/LSIR/gsn/"); 
     }
     
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
