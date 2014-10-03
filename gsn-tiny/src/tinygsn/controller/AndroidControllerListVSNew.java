@@ -25,6 +25,7 @@
 
 package tinygsn.controller;
 
+
 import java.util.ArrayList;
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityListVSNew;
@@ -32,16 +33,20 @@ import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.storage.StorageManager;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 public class AndroidControllerListVSNew extends AbstractController {
 
+	/**
+	 * 
+	 */
+
 	private ActivityListVSNew view = null;
 
 	private Handler handlerVS = null;
-	private Handler handlerData = null;
 	private SqliteStorageManager storage = null;
 	
 	private ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
@@ -55,6 +60,13 @@ public class AndroidControllerListVSNew extends AbstractController {
 		Log.v(TAG, "Construction.");
 	}
 
+//	public AndroidControllerListVSNew() {
+//		ActivityListVS activity = new ActivityListVS();
+//		this.view = activity;
+//		Log.v(TAG, "Construction.");
+//		// TODO Auto-generated constructor stub
+//	}
+
 	public void consume(StreamElement streamElement) {
 		// view.showDataDemo(streamElement);
 		// Message msg = new Message();
@@ -64,10 +76,14 @@ public class AndroidControllerListVSNew extends AbstractController {
 
 	public void loadListVS() {
 		SqliteStorageManager storage = new SqliteStorageManager(view);
-		vsList = storage.getListofVS();
+		if(vsList != null)
+			vsList = storage.completeListVS(vsList);
+		else
+			vsList = storage.getListofVS();
 //		ArrayList<String> vsListName = new ArrayList<String>();
 		for (VirtualSensor vs : vsList) {
 			vs.getConfig().setController(this);
+//			vs.getConfig().VSNewController = this;
 //			vsListName.add(vs.getConfig().getName());
 		}
 
@@ -124,7 +140,9 @@ public class AndroidControllerListVSNew extends AbstractController {
 	public void tinygsnStop() {
 		for (VirtualSensor vs : vsList) {
 			if (vs.getConfig().getRunning() == true) {
-				vs.stop();
+				//vs.stop();
+				//TODO En jahaye baD call mishod felan cmt shode ta bad 
+				
 			}
 		}
 	}
@@ -142,9 +160,12 @@ public class AndroidControllerListVSNew extends AbstractController {
 		this.handlerVS = handlerVS;
 	}
 
-	public void startStopVS(String vsName, boolean running) {
+	public void startStopVS(String vsName, boolean running, Context context) {
 		for (VirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().equals(vsName)) {
+				AndroidControllerListVSNew controllerListVSNew  = new AndroidControllerListVSNew((ActivityListVSNew) this.getActivity());
+				vs.getConfig().setController(controllerListVSNew);
+				
 				if (running == true) {
 					vs.start();
 					SqliteStorageManager storage = new SqliteStorageManager(view);
@@ -154,7 +175,8 @@ public class AndroidControllerListVSNew extends AbstractController {
 					SqliteStorageManager storage = new SqliteStorageManager(view);
 					storage.update("vsList", vsName, "running", "0");
 					vs.stop();
-					vs = new VirtualSensor(vs.getConfig());
+					//TODO check if this needs change or check why do we need new VS after stopping one
+					//vs = new VirtualSensor(vs.getConfig(), context);
 				}
 				break;
 			}

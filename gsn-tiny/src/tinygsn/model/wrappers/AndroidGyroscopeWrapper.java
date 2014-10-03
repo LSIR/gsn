@@ -58,7 +58,7 @@ public class AndroidGyroscopeWrapper extends AbstractWrapper implements
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 
-	private StreamElement theLastStreamElement = null;
+	public StreamElement theLastStreamElement = null;
 
 	public AndroidGyroscopeWrapper() {
 		super();
@@ -92,7 +92,7 @@ public class AndroidGyroscopeWrapper extends AbstractWrapper implements
 		}
 	}
 
-	private void getLastKnownData() {
+	public void getLastKnownData() {
 		if (theLastStreamElement == null) {
 			Log.e(TAG, "There is no signal!");
 		}

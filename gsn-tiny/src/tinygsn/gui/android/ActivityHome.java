@@ -25,11 +25,10 @@
 
 package tinygsn.gui.android;
 
-import java.util.ArrayList;
-import java.util.List;
-import tinygsn.controller.AndroidControllerListVSNew;
-import tinygsn.gui.android.utils.VSRow;
-import tinygsn.model.vsensor.VirtualSensor;
+
+import tinygsn.services.schedular;
+import tinygsn.storage.db.SqliteStorageManager;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -44,9 +43,6 @@ import com.readystatesoftware.viewbadger.BadgeView;
 public class ActivityHome extends SherlockActivity {
 
 	Handler handlerVS;
-	AndroidControllerListVSNew controller;
-	List<VSRow> vsRowList;
-	ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
 	TextView numVS = null;
 
 	@Override
@@ -54,13 +50,18 @@ public class ActivityHome extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.home);
 		getSupportActionBar().hide();
-		
+		SqliteStorageManager storage = new SqliteStorageManager(this);
 //		ImageView subscribe = (ImageView) findViewById(R.id.imageViewSubscribe);
 		TextView subscribe = (TextView) findViewById(R.id.tvSubscribe);
 		BadgeView badge = new BadgeView(this, subscribe);
 		badge.setBadgePosition(BadgeView.POSITION_BOTTOM_RIGHT); 
 		badge.setText("2");
 		badge.show();
+		
+		//my code		
+		Intent serviceIntent = null;
+		serviceIntent = new Intent(this, schedular.class);
+		this.startService(serviceIntent);
 	}
 
 	@Override

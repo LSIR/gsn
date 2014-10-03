@@ -7,8 +7,6 @@
         android:layout_height="fill_parent" >
 
         <TableLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:android1="http://schemas.android.com/apk/res/android"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@color/background"
@@ -22,18 +20,18 @@
                 android:padding="5dip" >
 
                 <TextView
-                    android1:id="@+id/textView_vs"
-                    android1:layout_width="wrap_content"
-                    android1:layout_height="wrap_content"
+                    android:id="@+id/textView_vs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_span="2"
                     android:gravity="center"
-                    android1:text="Pull data from GSN"
-                    android1:textAppearance="?android:attr/textAppearanceMedium"
-                    android1:textColor="#000000" />
+                    android:text="Pull data from GSN"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#000000" />
             </TableRow>
 
             <View
-                android1:layout_width="wrap_content"
+                android:layout_width="wrap_content"
                 android:layout_height="2dip"
                 android:background="#61a7db" />
 
@@ -46,12 +44,12 @@
                 android:padding="5dip" >
 
                 <TextView
-                    android1:id="@+id/textView_serverName"
-                    android1:layout_width="wrap_content"
-                    android1:layout_height="wrap_content"
-                    android1:text="GSN Server"
-                    android1:textAppearance="?android:attr/textAppearanceSmall"
-                    android1:textColor="#000000" />
+                    android:id="@+id/textView_serverName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GSN Server"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#000000" />
 
                 <!--
                  <Spinner
@@ -69,9 +67,9 @@
                     android:ems="5"
                     android:inputType="text"
                     android:textColor="#000000"
-                    android1:text="@string/gsnserver" >
+                    android:text="@string/gsnserver" >
 
-                    <requestFocus android1:layout_width="wrap_content" />
+                    <requestFocus android:layout_width="wrap_content" />
                 </EditText>
 
                 <ImageButton
@@ -91,19 +89,19 @@
                 android:padding="5dip" >
 
                 <TextView
-                    android1:id="@+id/textView_vsName"
-                    android1:layout_width="wrap_content"
-                    android1:layout_height="wrap_content"
-                    android1:text="Select VS"
-                    android1:textAppearance="?android:attr/textAppearanceSmall"
-                    android1:textColor="#000000" />
+                    android:id="@+id/textView_vsName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select VS"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#000000" />
 
                 <Spinner
-                    android1:id="@+id/spinner_pull_vsname"
+                    android:id="@+id/spinner_pull_vsname"
                     style="@layout/spinner_item"
-                    android1:layout_width="190dip"
-                    android1:layout_height="wrap_content"
-                    android1:textColor="#000000" />
+                    android:layout_width="190dip"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000000" />
             </TableRow>
 
             <TableRow
@@ -113,20 +111,20 @@
                 android:padding="5dip" >
 
                 <TextView
-                    android1:id="@+id/textView_RangeType"
-                    android1:layout_width="wrap_content"
-                    android1:layout_height="wrap_content"
-                    android1:text="Range"
-                    android1:textAppearance="?android:attr/textAppearanceSmall"
-                    android1:textColor="#000000" />
+                    android:id="@+id/textView_RangeType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Range"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#000000" />
 
                 <Spinner
-                    android1:id="@+id/spinner_range_type"
+                    android:id="@+id/spinner_range_type"
                     style="@layout/spinner_item"
-                    android1:layout_width="wrap_content"
-                    android1:layout_height="wrap_content"
-                    android1:entries="@array/range_type"
-                    android1:textColor="#000000" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/range_type"
+                    android:textColor="#000000" />
             </TableRow>
 
             <TableRow
@@ -136,12 +134,12 @@
                 android:padding="5dip" >
 
                 <TextView
-                    android1:id="@+id/textView_numLatest"
-                    android1:layout_width="wrap_content"
-                    android1:layout_height="wrap_content"
-                    android1:text=" # latest data"
-                    android1:textAppearance="?android:attr/textAppearanceSmall"
-                    android1:textColor="#000000" />
+                    android:id="@+id/textView_numLatest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" # latest data"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#000000" />
 
                 <EditText
                     android:id="@+id/editText_numLatest"
@@ -150,7 +148,7 @@
                     android:ems="8"
                     android:inputType="number"
                     android:textColor="#000000"
-                    android1:text="10" >
+                    android:text="10" >
                 </EditText>
             </TableRow>
 
@@ -161,16 +159,15 @@
                 android:padding="5dip" >
 
                 <ScrollView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_span="2" >
 
                     <TextView
-                        android1:id="@+id/txbPulledData"
-                        android1:layout_width="fill_parent"
+                        android:id="@+id/txbPulledData"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android1:textColor="#000000" />
+                        android:textColor="#000000" />
                 </ScrollView>
             </TableRow>
         </TableLayout>

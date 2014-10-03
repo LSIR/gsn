@@ -33,8 +33,12 @@ import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AbstractController;
 import android.util.Log;
 
-public abstract class AbstractVirtualSensor {
+public abstract class AbstractVirtualSensor implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -94046553047097162L;
 	public static String[] VIRTUAL_SENSOR_LIST = { "bridge", "notification" };
 	private static final String TAG = "AbstractVirtualSensor";
 
@@ -56,8 +60,8 @@ public abstract class AbstractVirtualSensor {
 		try {
 			controller.getStorageManager().executeInsert("vs_" + config.getName(),
 					null, streamElement);
-			Log.v(TAG,
-					"Inserted: " + streamElement.toString() + " to " + config.getName());
+			//Log.v(TAG,
+				//	"Inserted: " + streamElement.toString() + " to " + config.getName());
 		}
 		catch (SQLException e) {
 			e.printStackTrace();

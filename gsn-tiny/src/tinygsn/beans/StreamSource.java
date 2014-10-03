@@ -75,6 +75,8 @@ public class StreamSource implements Serializable, QueueListener {
 	public void notifyMe(ArrayList<StreamElement> data) {
 		// Use Aggregator to process data s
 		StreamElement se = data.get(0);
+	//	Log.i("StreamElement se = data.get(0);" , se.getData()[0].toString());
+
 		if (inputStream == null) {
 			Log.e(TAG, "inputStream is null");
 			return;
@@ -84,6 +86,7 @@ public class StreamSource implements Serializable, QueueListener {
 			// Average
 			
 			//TODO replace with constant. Add SQL filter 
+			
 			
 			// 1. Get sum
 			for (int i = 1; i < data.size(); i++) {
@@ -113,7 +116,8 @@ public class StreamSource implements Serializable, QueueListener {
 		}
 		;
 
-		Log.v(TAG, se.toString());
+		//Log.v(TAG, se.toString());
+	//	Log.i(TAG+"my Log", inputStream.getVirtualSensor().toString());
 		inputStream.getVirtualSensor().dataAvailable(se);
 		
 	}
@@ -240,6 +244,10 @@ public class StreamSource implements Serializable, QueueListener {
 
 	}
 
+	public AddressBean getActiveAddressBean() {
+		return activeAddressBean;
+	}
+
 	public StreamSource setInputStream(InputStream is) throws GSNRuntimeException {
 		// if (alias == null)
 		// throw new NullPointerException("Alias can't be null!");
@@ -253,10 +261,6 @@ public class StreamSource implements Serializable, QueueListener {
 		inputStream = is;
 
 		return this;
-	}
-
-	public AddressBean getActiveAddressBean() {
-		return activeAddressBean;
 	}
 
 	public String toString() {

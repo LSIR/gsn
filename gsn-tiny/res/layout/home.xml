@@ -43,7 +43,7 @@
         android:layout_height="30dip" >
 
         <ImageView
-            android:id="@+id/tableRowBreak0"
+            android:id="@+id/tableRowBreak"
             android:layout_width="fill_parent"
             android:layout_height="30dip" />
     </TableRow>
@@ -57,7 +57,7 @@
         android:gravity="center" >
 
         <ImageView
-            android:id="@+id/imageViewListVS"
+            android:id="@+id/imageViewListVS0"
             android:layout_width="60dip"
             android:layout_height="60dip"
             android:gravity="center"
@@ -146,7 +146,7 @@
             android:src="@drawable/download2" />
 
         <ImageView
-            android:id="@+id/imageView1_1"
+            android:id="@+id/imageView1_10"
             android:layout_width="25dip"
             android:layout_height="fill_parent" />
 
@@ -181,7 +181,7 @@
             android:textColor="#000000" />
 
         <ImageView
-            android:id="@+id/t1_2"
+            android:id="@+id/t1_20"
             android:layout_width="25dip"
             android:layout_height="fill_parent" />
 

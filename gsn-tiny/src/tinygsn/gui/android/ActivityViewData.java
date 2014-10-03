@@ -227,6 +227,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 	private void loadLatestData() {
 		if (vsName == null)
 			return;
+		//TODO check for calling and caller of this method
 		controller.loadData(numLatest, vsName);
 	}
 
