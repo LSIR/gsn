@@ -140,6 +140,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	public void executeInsertSamples(int sample)
 	{
 		ContentValues newCon = new ContentValues();
+		newCon.put("time", System.currentTimeMillis());
 		newCon.put("sample", sample);
 		
 		database.insert("Samples", null, newCon);
@@ -148,6 +149,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	public void executeInsertSamplingRate(String vsName, int samplingRate)
 	{
 		ContentValues newCon = new ContentValues();
+		newCon.put("time", System.currentTimeMillis());
 		newCon.put("samplingrate", samplingRate);
 		newCon.put("vsname", vsName);
 		

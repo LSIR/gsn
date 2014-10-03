@@ -30,7 +30,7 @@ public class schedular extends IntentService {
 	}
 	public schedular()
 	{
-		super("scheduler");
+		super("schedular");
 	}
 
 	//constants:
@@ -40,23 +40,23 @@ public class schedular extends IntentService {
 	int SchedulerSleepingTime = 1000*60;
 	int SamplingRateAccelometerMoving = 1;
 	int SamplingRateAccelometerStationary = 2;
-    int SamplingRateAccelometerLost = 0;
+    int SamplingRateAccelometerLost = 1;
     
 
 	int SamplingRateGyroscopeMoving = 1;
 	int SamplingRateGyroscopeStationary = 2;
-    int SamplingRateGyroscopeLost = 0;
+    int SamplingRateGyroscopeLost = 1;
 
 	int SamplingRateGPSMoving = 1;
-	int SamplingRateGPSStationary = 2;
-    int SamplingRateGPSLost = 0;
+	int SamplingRateGPSStationary = 0;
+    int SamplingRateGPSLost = 2;
 
-	int SamplingRateWifiMoving = 1;
+	int SamplingRateWifiMoving = 0;
 	int SamplingRateWifiStationary = 2;
-    int SamplingRateWifiLost = 0;
+    int SamplingRateWifiLost = 1;
 
-	int SamplingRateActivityMoving = 1;
-	int SamplingRateActivityStationary = 2;
+	int SamplingRateActivityMoving = 0;
+	int SamplingRateActivityStationary = 1;
     int SamplingRateActivityLost = 0;
 	
     
@@ -64,8 +64,8 @@ public class schedular extends IntentService {
     
 	private VSensorConfig config = null;
 	Context context = new ActivityListVSNew(); //TODO set this parameter
-	int machineState = 1; //0 = lost, 1= moving 2= stationary
-	int priMachineState = -1;
+	int machineState = 0; //0 = lost, 1= moving 2= stationary
+	int priMachineState = 1;
 	SqliteStorageManager storage = new SqliteStorageManager(this.context);
 	
 	
@@ -155,32 +155,33 @@ public class schedular extends IntentService {
 			wifiResult = storage.executeQueryGetLatestValues("vs_"+ wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest);
 			isInKnownWifiAccess = ContainsFamiliarWifis(wifiResult, curTime);
 		}
-		if(StaticData.findNameVs(gpsType) != null)
+		if(gpsVsName != null)
 		{
-			gpsResult = storage.executeQueryGetLatestValues("vs_"+StaticData.findNameVs(gpsType), gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), numLatest);
+			gpsResult = storage.executeQueryGetLatestValues("vs_"+gpsVsName, gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), numLatest);
 			if(gpsResult != null && gpsResult.size() != 0)
 			{
-				double longitude = Double.parseDouble(gpsResult.get(0).getData("longitude").toString());
-				double latitude = Double.parseDouble(gpsResult.get(0).getData("latitude").toString());
+				long longitude = Math.round(((Double)(gpsResult.get(0).getData("longitude")) * 1000));
+				long latitude = Math.round(((Double)(gpsResult.get(0).getData("latitude")) * 1000));
 				for(int i = 0; i < gpsResult.size(); i++)
 				{
-					if(Double.parseDouble(gpsResult.get(i).getData("longitude").toString()) != longitude || Double.parseDouble(gpsResult.get(0).getData("latitude").toString()) != latitude)
+					if(Math.round(((Double)(gpsResult.get(i).getData("longitude")) * 1000)) != longitude || 
+							Math.round(((Double)(gpsResult.get(i).getData("latitude")) * 1000)) != latitude)
 						gpsConstant = false;
 				}
 			}
 			else
 				gpsConstant = false;
 		}
-		if(StaticData.findNameVs(gyroscopeType) != null)
+		if(gyroscopeVsName != null)
 		{
-			gyroscopeResult = storage.executeQueryGetLatestValues("vs_"+StaticData.findNameVs(gyroscopeType), gyroscopeWrapper.getFieldList(), gyroscopeWrapper.getFieldType(), numLatest);
+			gyroscopeResult = storage.executeQueryGetLatestValues("vs_"+gyroscopeVsName, gyroscopeWrapper.getFieldList(), gyroscopeWrapper.getFieldType(), numLatest);
 			if(gyroscopeResult.size() != 0)
 			{
 				for(int i = 0; i < gyroscopeResult.size(); i++)
 				{
-					avgXChangedGyroscope += Math.abs(Double.parseDouble(gyroscopeResult.get(i).getData("x").toString()));
-					avgYChangedGyroscope += Math.abs(Double.parseDouble(gyroscopeResult.get(i).getData("y").toString()));
-					avgZChangedGyroscope += Math.abs(Double.parseDouble(gyroscopeResult.get(i).getData("z").toString()));
+					avgXChangedGyroscope += Math.abs((Double)(gyroscopeResult.get(i).getData("x")));
+					avgYChangedGyroscope += Math.abs((Double)(gyroscopeResult.get(i).getData("y")));
+					avgZChangedGyroscope += Math.abs((Double)(gyroscopeResult.get(i).getData("z")));
 				}
 				avgXChangedGyroscope = avgXChangedGyroscope/gyroscopeResult.size();
 				avgYChangedGyroscope = avgYChangedGyroscope/gyroscopeResult.size();
@@ -194,9 +195,9 @@ public class schedular extends IntentService {
 			{
 				for(int i = 0; i < accelometerResult.size(); i++)
 				{
-					avgXChangedAccelometer += Math.abs(Double.parseDouble(accelometerResult.get(i).getData("x").toString()));
-					avgYChangedAccelometer += Math.abs(Double.parseDouble(accelometerResult.get(i).getData("y").toString()));
-					avgZChangedAccelometer += Math.abs(Double.parseDouble(accelometerResult.get(i).getData("z").toString()));
+					avgXChangedAccelometer += Math.abs((Double)(accelometerResult.get(i).getData("x")));
+					avgYChangedAccelometer += Math.abs((Double)(accelometerResult.get(i).getData("y")));
+					avgZChangedAccelometer += Math.abs((Double)(accelometerResult.get(i).getData("z")));
 				}
 				avgXChangedAccelometer = avgXChangedAccelometer/accelometerResult.size();
 				avgYChangedAccelometer = avgYChangedAccelometer/accelometerResult.size();
@@ -453,7 +454,7 @@ public class schedular extends IntentService {
 		{
 			for(int j = 0; j < numOfFamiliarplaces; j++)
 			{
-				if( converTingBSSID(macAdr.get(j).substring(0, 8)) == Double.parseDouble(wifiResult.get(i).getData("mac1").toString()) && converTingBSSID(macAdr.get(j).substring(8)) == Double.parseDouble(wifiResult.get(i).getData("mac2").toString()) )
+				if( converTingBSSID(macAdr.get(j).substring(0, 8)) == (Double)(wifiResult.get(i).getData("mac1")) && converTingBSSID(macAdr.get(j).substring(8)) == (Double)(wifiResult.get(i).getData("mac2")) )
 				{
 					return true;
 				}
@@ -465,7 +466,7 @@ public class schedular extends IntentService {
 		{
 			for(int i = 0; i < wifiResult.size(); i++)
 			{
-				if( converTingBSSID(macAdr.get(j).substring(0, 8)) == Double.parseDouble(wifiResult.get(i).getData("mac1").toString()) && converTingBSSID(macAdr.get(j).substring(8)) == Double.parseDouble(wifiResult.get(i).getData("mac2").toString()) )
+				if( converTingBSSID(macAdr.get(j).substring(0, 8)) == (Double)(wifiResult.get(i).getData("mac1")) && converTingBSSID(macAdr.get(j).substring(8)) == (Double)(wifiResult.get(i).getData("mac2")) )
 				{
 					return true;
 				}

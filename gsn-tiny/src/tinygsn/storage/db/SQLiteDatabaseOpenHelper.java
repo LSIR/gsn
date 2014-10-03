@@ -62,7 +62,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 				+ ");";
 		db.execSQL(createQuery);
 	
-		createQuery = "CREATE TABLE SAMPLIG_RATE (_id integer primary key,"
+		createQuery = "CREATE TABLE SAMPLIG_RATE (_id integer primary key, time bigint,"
 				+ "samplingrate integer, vsname text"
 				+ ");";
 		db.execSQL(createQuery);
@@ -71,7 +71,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 				+ "frequency integer, mac text"
 				+ ");";
 		db.execSQL(createQuery);
-		createQuery = "CREATE TABLE Samples (_id integer primary key,"
+		createQuery = "CREATE TABLE Samples (_id integer primary key, time bigint, "
 				+ "sample integer"
 				+ ");";
 		db.execSQL(createQuery);
