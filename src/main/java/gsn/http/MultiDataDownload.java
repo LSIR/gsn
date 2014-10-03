@@ -186,7 +186,7 @@ public class MultiDataDownload extends HttpServlet {
                 String from = req.getParameter("from");
                 String to = req.getParameter("to");
 
-                if (from != null && to != null){
+                if (from != null && to != null && from != "" && to != ""){
 
                     Date date_from = sdfWeb.parse(from);
                     Date date_to = sdfWeb.parse(to);
