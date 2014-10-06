@@ -1,4 +1,4 @@
-<virtual-sensor name="OSMICSCO_mapped" priority="11">
+<virtual-sensor name="OSAPM_mapped" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.ModellingVirtualSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
@@ -15,7 +15,7 @@
            <field name="HDOP" type="float" />
 		</output-structure>
 	</processing-class>
-	<description>Map GPS onto MICSCO</description>
+	<description>Map GPS onto APM</description>
 	<life-cycle pool-size="100" />
 	<addressing>
 		<predicate key="geographical">Lausanne, Switzerland</predicate>

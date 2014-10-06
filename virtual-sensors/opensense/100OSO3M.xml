@@ -1,18 +1,18 @@
-<virtual-sensor name="OSACC" priority="11">
+<virtual-sensor name="OSO3M" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.OpensenseSplitterVSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
 		<init-params>
-		    <param name="type">ACC</param> 
+		    <param name="type">O3M</param> 
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="x" type="smallint" />
-           <field name="y" type="smallint" />
-           <field name="z" type="smallint" />
+           <field name="O3_res" type="smallint" />
+           <field name="temp" type="float" />
+           <field name="RH" type="smallint" />
 		</output-structure>
 	</processing-class>
-	<description>Parse Accelerometer packets</description>
+	<description>Parse O3M packets</description>
 	<life-cycle pool-size="100" />
 	<addressing>
 		<predicate key="geographical">Lausanne, Switzerland</predicate>
@@ -27,7 +27,7 @@
 				</address>
 				<query>select * from wrapper</query>
 			</source>
-			<query>select * from source1 where type = '6'</query>
+			<query>select * from source1 where type = '10' or type = '30'</query>
 		</stream>
 	</streams>
 </virtual-sensor>

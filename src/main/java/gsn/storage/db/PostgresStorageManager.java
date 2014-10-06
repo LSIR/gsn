@@ -51,7 +51,7 @@ public class PostgresStorageManager extends StorageManager {
                 return DataTypes.INTEGER;
             case Types.SMALLINT:
                 return DataTypes.SMALLINT;
-            case Types.TINYINT:
+            case Types.TINYINT: // should never happen !
                 return DataTypes.TINYINT;
             case Types.VARCHAR:
                 return DataTypes.VARCHAR;
@@ -140,7 +140,7 @@ public class PostgresStorageManager extends StorageManager {
     public StringBuilder getStatementCreateTable(String tableName, DataField[] structure) {
         StringBuilder result = new StringBuilder("CREATE TABLE ").append(tableName);
 
-        result.append(" (PK serial PRIMARY KEY NOT NULL , timed BIGINT NOT NULL, "); //TODO: add auto increment AUTO_INCREMENT
+        result.append(" (PK bigserial PRIMARY KEY NOT NULL , timed BIGINT NOT NULL, "); //TODO: add auto increment AUTO_INCREMENT
 
         for (DataField field : structure) {
             if (field.getName().equalsIgnoreCase("pk") || field.getName().equalsIgnoreCase("timed")) continue;

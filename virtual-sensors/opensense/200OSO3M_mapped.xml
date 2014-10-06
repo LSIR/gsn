@@ -1,4 +1,4 @@
-<virtual-sensor name="OSCO_mapped" priority="11">
+<virtual-sensor name="OSO3M_mapped" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.ModellingVirtualSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
@@ -8,16 +8,16 @@
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="CO" type="int" />
-           <field name="NO2" type="int" />
-           <field name="CO2" type="int" />
+           <field name="O3_res" type="smallint" />
+           <field name="temp" type="float" />
+           <field name="RH" type="smallint" />
            <field name="latitude" type="double" />
            <field name="longitude" type="double" />
            <field name="altitude" type="float" />
            <field name="HDOP" type="float" />
 		</output-structure>
 	</processing-class>
-	<description>Map GPS onto CO</description>
+	<description>Map GPS onto o3m</description>
 	<life-cycle pool-size="100" />
 	<addressing>
 		<predicate key="geographical">Lausanne, Switzerland</predicate>
@@ -37,8 +37,8 @@
 		<stream name="B">
 			<source alias="B"  sampling-rate="1" storage-size="1">
 				<address wrapper="zeromq" partial-order-key="station">
-					<predicate key="address">inproc://stream/osco</predicate>
-					<predicate key="vsensor">osco</predicate>
+					<predicate key="address">inproc://stream/oso3m</predicate>
+					<predicate key="vsensor">oso3m</predicate>
 				</address>
 				<query>select * from wrapper</query>
 			</source>

@@ -1,18 +1,18 @@
-<virtual-sensor name="OSCO" priority="11">
+<virtual-sensor name="OSANM" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.OpensenseSplitterVSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
 		<init-params>
-		    <param name="type">CO</param> 
+		    <param name="type">ANM</param> 
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />
-           <field name="CO" type="int" />
-           <field name="NO2" type="int" />
-           <field name="CO2" type="int" />
+           <field name="CO" type="smallint" />
+           <field name="NO2" type="smallint" />
+           <field name="CO2" type="smallint" />
 		</output-structure>
 	</processing-class>
-	<description>Parse CO packets</description>
+	<description>Parse ANM packets</description>
 	<life-cycle pool-size="100" />
 	<addressing>
 		<predicate key="geographical">Lausanne, Switzerland</predicate>

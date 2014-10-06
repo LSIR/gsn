@@ -388,7 +388,17 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 		}
 
 		public void readSignalQ(BinaryParser p) throws IOException {
-			payload = p.readBytes(3);
+			payload = p.readBytes(1);
+			int time = p.readNextShort(false);
+			int _hh = (int) (time / 100);
+			int _mn = (int) (time % 100);
+			if (_hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 ){
+				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+_hh+":"+_mn+":00)");
+			}
+			//ms = 0; ??
+			//ss = 0; ??
+			mn = _mn;
+			hh = _hh;
 		}
 
 		public void readAccel(BinaryParser p) throws IOException {

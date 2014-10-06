@@ -695,7 +695,7 @@ public class RequestHandler {
 
         try {
             connection = Main.getStorage(sensor).getConnection();
-            StringBuilder query = new StringBuilder("select MAX(timed) as tt, MAX(" + field + "), MIN(" + field + ") ");
+            StringBuilder query = new StringBuilder("select MAX(timed) as tt, MAX(" + field + ") as max_"+field+", MIN(" + field + ") as min_"+field+" ");
             query.append(" from ").append(sensor);
 
             resultSet = Main.getStorage(sensor).executeQueryWithResultSet(query, connection);
@@ -704,8 +704,8 @@ public class RequestHandler {
             while (resultSet.next()) {
                 Vector<Double> stream = new Vector<Double>();
                 timestamps.add(resultSet.getLong("tt"));
-                stream.add(getDouble(resultSet, "MAX(" + field + ")"));
-                stream.add(getDouble(resultSet, "MIN(" + field + ")"));
+                stream.add(getDouble(resultSet, "max_" + field));
+                stream.add(getDouble(resultSet, "min_" + field));
                 elements.add(stream);
             }
         } catch (SQLException e) {
