@@ -25,7 +25,11 @@
 
 package tinygsn.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityPublishData;
 import tinygsn.model.vsensor.VirtualSensor;
@@ -34,6 +38,7 @@ import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
 
 public class AndroidControllerPublishData extends AbstractController {
 
@@ -115,5 +120,31 @@ public class AndroidControllerPublishData extends AbstractController {
 	@Override
 	public StorageManager getStorageManager() {
 		return null;
+	}
+
+	public StreamElement[] loadRangeData(String vsName, String fromdate,
+			String fromtime, String todate, String totime) {
+		StreamElement[] ret = new StreamElement[0];
+		try{
+			long start = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(fromdate + " " + fromtime).getTime();
+			long end = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(todate + " " + totime).getTime();
+		
+			for (VirtualSensor vs : vsList) {
+				if (vs.getConfig().getName().endsWith(vsName)) {
+					String[] fieldList = vs.getConfig().getInputStreams()[0].getSources()[0]
+							.getWrapper().getFieldList();
+					Byte[] fieldType = vs.getConfig().getInputStreams()[0].getSources()[0]
+							.getWrapper().getFieldType();
+	
+					ArrayList<StreamElement> result = storage.executeQueryGetRangeData(
+							"vs_" + vsName, start,end ,fieldList, fieldType);
+	
+					if ((result != null) && (result.size() != 0))
+						ret = result.toArray(ret);
+					break;
+				}
+			}
+		}catch(ParseException p){}
+		return ret;
 	}
 }

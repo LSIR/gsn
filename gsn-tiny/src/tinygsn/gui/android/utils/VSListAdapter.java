@@ -30,6 +30,7 @@ import tinygsn.controller.AndroidControllerListVSNew;
 import tinygsn.gui.android.ActivityListVSNew;
 import tinygsn.gui.android.ActivityViewDataNew;
 import tinygsn.gui.android.R;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -57,15 +58,20 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	public static final String EXTRA_VS_NAME = "vs_name";
 	private int resource;
 	private LayoutInflater inflater;
-	private Context context;
+	private Context context = null;
 	static int TEXT_SIZE = 8;
 	AndroidControllerListVSNew controller;
 	ActivityListVSNew activityListVSNew;
+	
+
+	
+	//TODO check if it is working properly or not :) with the context that is set
 
 	public VSListAdapter(Context ctx, int resourceId, List<VSRow> objects,
 			AndroidControllerListVSNew controller, ActivityListVSNew activityListVSNew) {
 
 		super(ctx, resourceId, objects);
+		this.context = ctx;
 		resource = resourceId;
 		inflater = LayoutInflater.from(ctx);
 		context = ctx;
@@ -73,7 +79,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 		this.activityListVSNew = activityListVSNew;
 	}
 
-	@Override
+	@SuppressLint("NewApi") @Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		/* create a new view of my layout and inflate it in the row */
@@ -95,7 +101,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 		runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				controller.startStopVS(vs.getName(), runningSwitch.isChecked());
+				controller.startStopVS(vs.getName(), runningSwitch.isChecked(),context);
 
 				String state = "enabled";
 				if (runningSwitch.isChecked() == false)
@@ -135,7 +141,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
 						case DialogInterface.BUTTON_POSITIVE:
-							controller.startStopVS(vs.getName(), false);
+							//controller.startStopVS(vs.getName(), false,context);
 							controller.deleteVS(vs.getName());
 							Toast.makeText(context, vs.getName() + " is deleted!",
 									Toast.LENGTH_SHORT).show();

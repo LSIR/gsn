@@ -28,10 +28,12 @@ package tinygsn.controller;
 import java.util.ArrayList;
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityListVS;
+import tinygsn.gui.android.ActivityVSConfig;
 import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.storage.StorageManager;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -50,6 +52,7 @@ public class AndroidControllerListVS extends AbstractController {
 		this.view = androidViewer;
 		Log.v(TAG, "Construction.");
 	}
+
 
 	public void consume(StreamElement streamElement) {
 		// view.showDataDemo(streamElement);
@@ -105,7 +108,7 @@ public class AndroidControllerListVS extends AbstractController {
 		this.handlerVS = handlerVS;
 	}
 
-	public void startStopVS(String vsName, boolean running) {
+	public void startStopVS(String vsName, boolean running, Context context) {
 		for (VirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().equals(vsName)) {
 				if (running == true) {
@@ -117,7 +120,8 @@ public class AndroidControllerListVS extends AbstractController {
 					SqliteStorageManager storage = new SqliteStorageManager(view);
 					storage.update("vsList", vsName, "running", "0");
 					vs.stop();
-					vs = new VirtualSensor(vs.getConfig());
+					//TODO check if this needs change
+					vs = new VirtualSensor(vs.getConfig(), context);
 				}
 				break;
 			}

@@ -195,6 +195,7 @@ var GSN = {
             var gsn = $("gsn",data);
             $(document).attr("title",$(gsn).attr("name")+" :: GSN");
             $("#gsn-name").empty().append($(gsn).attr("name")+" :: GSN");
+            $("#gsn-name").empty().append($(gsn).attr("name"));
             $("#gsn-desc").empty().append($(gsn).attr("description"));
             $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
         }

@@ -1,5 +1,15 @@
 ## GSN Change log
 
+### r1.1.6
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.6)
+* Major update on tinyGSN, virtual sensors are running as background services and a scheduler takes care of turning them on and off.
+* Moved GSN sources to /src/main/java
+* Updated licence to GPLv3 or later for compatibility with the libraries
+* Added support for 32bit native floats as GSN types
+* Adding support for pushing multiple stream elements in a single PUT request
+* Updating plots on the webapp (using d3.js), new aggregators, sampling option and scatter plots
+
+
 ### r1.1.5
 [commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.5)
 * Added possibility to omit latest values in request '/gsn?REQUEST=0'

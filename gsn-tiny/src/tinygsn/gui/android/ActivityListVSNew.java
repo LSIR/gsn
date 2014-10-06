@@ -25,6 +25,7 @@
 
 package tinygsn.gui.android;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +36,7 @@ import tinygsn.gui.android.utils.VSListAdapter;
 import tinygsn.gui.android.utils.VSRow;
 import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -52,8 +54,12 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 @SuppressLint("NewApi")
-public class ActivityListVSNew extends SherlockActivity {
+public class ActivityListVSNew extends SherlockActivity implements Serializable  {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8598546037770495346L;
 	private static final String TAG = "ActivityListVSNew";
 	private ListView listViewVS;
 	private Context context;
@@ -71,6 +77,17 @@ public class ActivityListVSNew extends SherlockActivity {
 		setContentView(R.layout.vs_list);
 //		setTheme(R.style.Sherlock___Theme_DarkActionBar);
 		
+		String VSName  = null;
+		VSName = (String) getIntent().getSerializableExtra("VSName");
+		if(VSName != null)
+		{
+			SqliteStorageManager storage = new SqliteStorageManager(this);
+			VirtualSensor vs = storage.getVSByName(VSName);
+			AndroidControllerListVSNew controllerListVSNew  = new AndroidControllerListVSNew(this);
+			vs.getConfig().setController(controllerListVSNew);
+			vs.start();
+		}
+		
 		context = this;
 
 		AbstractWrapper.getWrapperList(this);
@@ -87,10 +104,10 @@ public class ActivityListVSNew extends SherlockActivity {
 			};
 		};
 
-		controller = new AndroidControllerListVSNew(this);
+		controller = new AndroidControllerListVSNew(this); //TODO why shoudl we have one controller ??
 		controller.setHandlerVS(handlerVS);
 		controller.loadListVS();
-		controller.startActiveVS();
+		//controller.startActiveVS();
 //		Toast.makeText(context, "Started all active VS!", Toast.LENGTH_SHORT).show();
 	}
 
@@ -188,7 +205,7 @@ public class ActivityListVSNew extends SherlockActivity {
 				handler.postDelayed(new Runnable() {
 					public void run() {
 						refresh.setActionView(null);
-						controller.tinygsnStop();
+						//controller.tinygsnStop();
 						setUpController();
 					}
 				}, 50);
