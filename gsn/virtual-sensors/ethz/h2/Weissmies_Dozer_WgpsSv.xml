@@ -1,0 +1,52 @@
+<virtual-sensor name="Weissmies_Dozer_WgpsSv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_GPS_TIME" type="INTEGER" />
+            <field name="PAYLOAD_GPS_WEEK" type="SMALLINT" />
+            <field name="PAYLOAD_NUM_SV" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I0" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I1" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I2" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I3" type="TINYINT" />
+            <field name="PAYLOAD_CARRIER_PHASE_I4" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I0" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I1" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I2" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I3" type="TINYINT" />
+            <field name="PAYLOAD_PSEUDO_RANGE_I4" type="TINYINT" />
+            <field name="PAYLOAD_DOPPLER_I0" type="TINYINT" />
+            <field name="PAYLOAD_DOPPLER_I1" type="TINYINT" />
+            <field name="PAYLOAD_DOPPLER_I2" type="TINYINT" />
+            <field name="PAYLOAD_SPACE_VEHICLE" type="TINYINT" />
+            <field name="PAYLOAD_MEASUREMENT_QUALITY" type="TINYINT" />
+            <field name="PAYLOAD_SIGNAL_STRENGTH" type="TINYINT" />
+            <field name="PAYLOAD_LOSS_OF_LOCK" type="TINYINT" />
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWgpsSvMsg) from Weissmies deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-wm-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWgpsSvMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

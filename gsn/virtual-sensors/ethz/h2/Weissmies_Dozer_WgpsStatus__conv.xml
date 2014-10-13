@@ -1,0 +1,69 @@
+<virtual-sensor name="Weissmies_Dozer_WgpsStatus__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                		if (SAM7_POWER == 0 || SAM7_VALID == 0)
+                			INCLINOMETER_X = INCLINOMETER_Y = SAM7_UNIXTIME = GPS_SV_QUEUE = null;
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            
+            <field name="SENSORTYPE" type="VARCHAR(100)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="GPS_VOLTAGE" type="VARCHAR(30)" unit="V"/>
+            <field name="GPS_CURRENT" type="VARCHAR(30)" unit="mA"/>
+            <field name="SAM7_CURRENT" type="VARCHAR(30)" unit="mA"/>
+            <field name="TN_PER_CURRENT" type="VARCHAR(30)" unit="mA"/>
+            <field name="SAM7_POWER" type="TINYINT" />
+            <field name="SAM7_VALID" type="TINYINT" />
+            <field name="INCLINOMETER_X" type="VARCHAR(30)" unit="°" />
+            <field name="INCLINOMETER_Y" type="VARCHAR(30)" unit="°" />
+            <field name="SAM7_UNIXTIME" type="BIGINT" unit="unixtime" />
+            <field name="GPS_SV_QUEUE" type="INTEGER" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWgpsStatusMsg) from Weissmies deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Weissmies_Dozer_WgpsStatus__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR,
+                HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                cast(round(PAYLOAD_GPS_VOLTAGE * (1.5/4096.0) * (57.0/24.0), 3) as CHAR(30)) as GPS_VOLTAGE,
+                cast(round(PAYLOAD_GPS_CURRENT * (1.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as GPS_CURRENT,
+                cast(round(PAYLOAD_SAM7_CURRENT * (1.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as SAM7_CURRENT,
+                cast(round(PAYLOAD_TN_PER_CURRENT * (1.5/4096.0) * (10.0/0.15), 3) as CHAR(30)) as TN_PER_CURRENT,
+                PAYLOAD_SAM7_POWER as SAM7_POWER,
+                PAYLOAD_SAM7_VALID as SAM7_VALID,
+                cast(round(ASIN(PAYLOAD_INCLINOMETER_X / 32000.0) * 180.0/PI(), 3) as CHAR(30)) as INCLINOMETER_X,
+                cast(round(ASIN(PAYLOAD_INCLINOMETER_Y / 32000.0) * 180.0/PI(), 3) as CHAR(30)) as INCLINOMETER_Y,
+                PAYLOAD_SAM7_UNIXTIME*1000 as SAM7_UNIXTIME, PAYLOAD_GPS_SV_QUEUE as GPS_SV_QUEUE from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

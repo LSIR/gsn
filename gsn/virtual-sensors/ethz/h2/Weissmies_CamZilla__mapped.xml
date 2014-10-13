@@ -1,0 +1,47 @@
+<virtual-sensor name="Weissmies_CamZilla__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+            <field name="COMMAND" type="VARCHAR(127)" />
+            <field name="INFO" type="VARCHAR(255)" />
+            <field name="X" type="VARCHAR(8)" unit="°" />
+            <field name="Y" type="VARCHAR(8)" unit="°" />
+            <field name="START_X" type="VARCHAR(8)" unit="°" />
+            <field name="START_Y" type="VARCHAR(8)" unit="°" />
+            <field name="PICTURES_X" type="SMALLINT" />
+            <field name="PICTURES_Y" type="SMALLINT" />
+            <field name="ROTATION_X" type="VARCHAR(8)" />
+            <field name="ROTATION_Y" type="VARCHAR(8)" />
+            <field name="DELAY" type="SMALLINT" unit="s" />
+            <field name="BATCH_DOWNLOAD" type="SMALLINT" />
+            <field name="GPHOTO2_CONFIG" type="BINARY" />
+            
+        </output-structure>
+    </processing-class>
+    <description>Show CamZilla information of the CoreStations from the Weissmies deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from Weissmies_CamZilla</predicate>
+                    <predicate key="remote-contact-point">http://pvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
