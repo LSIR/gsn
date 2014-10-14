@@ -141,7 +141,7 @@
       </source>
       <query> select * from source </query>
     </stream>
-    <stream name="data7">
+    <!-- stream name="data7">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
@@ -152,7 +152,7 @@
         <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
-    </stream>
+    </stream -->
     <stream name="data8">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
@@ -423,7 +423,7 @@
       </source>
       <query> select * from source </query>
      </stream>
-     <stream name="data14">
+     <!-- stream name="data14">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
@@ -470,8 +470,8 @@
         <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
-    </stream>
-    <!-- stream name="data18">
+    </stream >
+    < stream name="data18">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
@@ -483,7 +483,7 @@
       </source>
       <query> select * from source </query>
     </stream>
-    <stream name="data19">
+    < stream name="data19">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
@@ -567,7 +567,7 @@
       </source>
       <query> select * from source </query>
     </stream> 
-    <!-- stream name="data26">
+    <stream name="data26">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">
           <predicate key="query">
@@ -578,7 +578,7 @@
         <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
-    </stream -->
+    </stream>
     <stream name="data27">
       <source alias="source" storage-size="1" sampling-rate="1">
         <address wrapper="local">

@@ -15,7 +15,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="tcp">
-                    <predicate key="PORT">22503</predicate>
+                    <predicate key="PORT">22504</predicate>
                     <predicate key="buffer-size">1024</predicate>
                 </address>
                 <query> select * from wrapper </query>
