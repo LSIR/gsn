@@ -1,0 +1,124 @@
+<virtual-sensor name="Saastal_Dozer_WgpsSv__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="gps_time_conversion" />
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+				        def divider = 1000.0;
+				        if (DEVICE_ID >= 3100 && DEVICE_ID < 3200)
+					        divider = 1024.0;
+					
+                		if (PAYLOAD_CARRIER_PHASE_I0 != null &&
+                			PAYLOAD_CARRIER_PHASE_I1 != null &&
+                			PAYLOAD_CARRIER_PHASE_I2 != null &&
+                			PAYLOAD_CARRIER_PHASE_I3 != null &&
+                			PAYLOAD_CARRIER_PHASE_I4 != null)
+                		{
+                			def cp_int64 =
+                				((long)( PAYLOAD_CARRIER_PHASE_I0 & 0xff )) |
+	                			(((long)( PAYLOAD_CARRIER_PHASE_I1 & 0xff )) << 8) |
+    	            			(((long)( PAYLOAD_CARRIER_PHASE_I2 & 0xff )) << 16) |
+        	        			(((long)( PAYLOAD_CARRIER_PHASE_I3 & 0xff )) << 24) |
+            	    			(((long)( PAYLOAD_CARRIER_PHASE_I4 & 0xff )) << 32);
+                			if (((PAYLOAD_CARRIER_PHASE_I4>>7)&0x1) == 1)
+            	    			cp_int64 |= (long)0xFFFFFF << 40;
+            	    		CARRIER_PHASE = ((double)cp_int64)/divider;
+                		}
+                		else
+                			CARRIER_PHASE = null;
+                			
+                		if (PAYLOAD_PSEUDO_RANGE_I0 != null &&
+                			PAYLOAD_PSEUDO_RANGE_I1 != null &&
+                			PAYLOAD_PSEUDO_RANGE_I2 != null &&
+                			PAYLOAD_PSEUDO_RANGE_I3 != null &&
+                			PAYLOAD_PSEUDO_RANGE_I4 != null)
+                		{
+	                		def pr_int64 =
+    	            			((long)( PAYLOAD_PSEUDO_RANGE_I0 & 0xff )) |
+        	        			(((long)( PAYLOAD_PSEUDO_RANGE_I1 & 0xff )) << 8) |
+            	    			(((long)( PAYLOAD_PSEUDO_RANGE_I2 & 0xff )) << 16) |
+                				(((long)( PAYLOAD_PSEUDO_RANGE_I3 & 0xff )) << 24) |
+                				(((long)( PAYLOAD_PSEUDO_RANGE_I4 & 0xff )) << 32);
+                			if (((PAYLOAD_PSEUDO_RANGE_I4>>7)&0x1) == 1)
+    	            			pr_int64 |= (long)0xFFFFFF << 40;
+            	    		PSEUDO_RANGE = ((double)pr_int64)/divider;
+                		}
+                		else
+                			PSEUDO_RANGE = null;
+                				
+                		if (PAYLOAD_DOPPLER_I0 != null &&
+                			PAYLOAD_DOPPLER_I1 != null &&
+                			PAYLOAD_DOPPLER_I2 != null)
+                		{
+	                		def do_int32 =
+    	            			((int)( PAYLOAD_DOPPLER_I0 & 0xff )) |
+        	        			(((int)( PAYLOAD_DOPPLER_I1 & 0xff )) << 8) |
+            	    			(((int)( PAYLOAD_DOPPLER_I2 & 0xff )) << 16);
+                			if (((PAYLOAD_DOPPLER_I2>>7)&0x1) == 1)
+            	    			do_int32 |= (int)0xFF << 24;
+            	    		DOPPLER = ((double)do_int32)/divider;
+                		}
+                		else
+                			DOPPLER = null;
+                			
+                		SPACE_VEHICLE = PAYLOAD_SPACE_VEHICLE;
+                		MEASUREMENT_QUALITY = (short)(PAYLOAD_MEASUREMENT_QUALITY+4);
+                		SIGNAL_STRENGTH = PAYLOAD_SIGNAL_STRENGTH;
+                		LOSS_OF_LOCK = PAYLOAD_LOSS_OF_LOCK;
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" />
+            
+            <field name="SENSORTYPE" type="VARCHAR(100)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            
+            <field name="GPS_TIME" type="INTEGER" />
+            <field name="GPS_WEEK" type="SMALLINT" />
+            <field name="NUM_SV" type="TINYINT" />
+            <field name="CARRIER_PHASE" type="DOUBLE" />
+            <field name="PSEUDO_RANGE" type="DOUBLE" />
+            <field name="DOPPLER" type="DOUBLE" />
+            <field name="SPACE_VEHICLE" type="TINYINT" />
+            <field name="MEASUREMENT_QUALITY" type="SMALLINT" />
+            <field name="SIGNAL_STRENGTH" type="TINYINT" />
+            <field name="LOSS_OF_LOCK" type="TINYINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWgpsSvMsg) from Saastal deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Saastal_Dozer_WgpsSv__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, SENSORTYPE_SERIALID, HEADER_SEQNR,
+                		HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_GPS_TIME as GPS_TIME, PAYLOAD_GPS_WEEK as GPS_WEEK, PAYLOAD_NUM_SV as NUM_SV,
+                		PAYLOAD_CARRIER_PHASE_I0, PAYLOAD_CARRIER_PHASE_I1, PAYLOAD_CARRIER_PHASE_I2, PAYLOAD_CARRIER_PHASE_I3, PAYLOAD_CARRIER_PHASE_I4,
+                		PAYLOAD_PSEUDO_RANGE_I0, PAYLOAD_PSEUDO_RANGE_I1, PAYLOAD_PSEUDO_RANGE_I2, PAYLOAD_PSEUDO_RANGE_I3, PAYLOAD_PSEUDO_RANGE_I4,
+                		PAYLOAD_DOPPLER_I0, PAYLOAD_DOPPLER_I1, PAYLOAD_DOPPLER_I2, PAYLOAD_SPACE_VEHICLE, PAYLOAD_MEASUREMENT_QUALITY,
+                		PAYLOAD_SIGNAL_STRENGTH, PAYLOAD_LOSS_OF_LOCK from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
