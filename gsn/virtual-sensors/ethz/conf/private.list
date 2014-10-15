@@ -182,6 +182,7 @@ Saastal_Dozer_Rssi.xml
 Saastal_Dozer_StateCounter.xml
 Saastal_Dozer_WgpsStatus.xml
 Saastal_Dozer_WgpsSv.xml
+Saastal_GPS_RAW.xml
 Saastal_Schedule.xml
 Saastal_Statistics.xml
 Saastal_SyslogNg.xml
