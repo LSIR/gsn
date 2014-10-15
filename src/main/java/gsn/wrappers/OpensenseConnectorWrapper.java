@@ -40,6 +40,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	private boolean running = true;
 	private int port;
 	private DataField[] df;
+	private int token = 0;
 	
 	@Override
 	public DataField[] getOutputFormat() {
@@ -70,8 +71,16 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	@Override
 	public void dispose() {
 		try {
-			socket.close();
 			running = false;
+			Thread.sleep(1000);
+			socket.close();
+			boolean done = false;
+			while (! done){
+			synchronized (timerLock) {
+				  done = token <= 0;	
+				}
+			Thread.sleep(100);
+			}
 		}catch(Exception e){}
 	}
 
@@ -146,6 +155,9 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 
 						@Override
 						public void run() {
+							synchronized (timerLock) {
+							  token++;	
+							}
 							try{
 								input = new BufferedInputStream(server.getInputStream());
 								output = new BufferedOutputStream(server.getOutputStream());
@@ -164,8 +176,9 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									p.setTimeStamp(++timer); //timestamp of those SE are a bit artificial but should guarantee ordering
 									postStreamElement(p);
 								}
+								token--;
 								try {
-									Thread.sleep(5000); //guarantee that there is at least 2s between the generation of the groups of stream elements (< 2000 SE)
+									Thread.sleep(3000); //guarantee that there is at least 2s between the generation of the groups of stream elements (< 2000 SE)
 								} catch (InterruptedException e) {} 
 							}
 						}

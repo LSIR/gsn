@@ -2,10 +2,15 @@ package gsn.networking.zeromq;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
+
+import zmq.Pub;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
@@ -19,44 +24,39 @@ import gsn.http.rest.StreamElement4Rest;
 
 public class ZeroMQDelivery implements DeliverySystem{
 	
-	private Context context;
+	private ZContext context;
 	private Socket publisher;
 	private boolean closed = true;
 	private Kryo kryo = new Kryo();
-	private VSensorConfig config;
+	private String name; 
 	
-	public ZeroMQDelivery(VSensorConfig config){
-        this.config = config;
-        //System.out.println("connecting");
+	public ZeroMQDelivery(String name){
+        this.name = name;
 		context = Main.getZmqContext();
 		// Socket to talk to clients
-		publisher = context.socket(ZMQ.PUB);
+		publisher = context.createSocket(ZMQ.PUB);
 		publisher.setLinger(5000);
-		publisher.setSndHWM(0);
-		publisher.bind("inproc://stream/"+config.getName());
-		//System.out.println("Delivery bind on inproc://stream/"+config.getName());
-		Main.getZmqProxy().connectTo(config.getName());
+		publisher.setSndHWM(0); // no limit
+		publisher.bind("inproc://stream/"+name);
+		Main.getZmqProxy().connectTo(name);
 		closed = false;
-		
+
 	}
 
 	@Override
 	public void writeStructure(DataField[] fields) throws IOException {
-        Main.getZmqProxy().registerStructure(config.getName(),fields);
+        Main.getZmqProxy().registerStructure(name,fields);
 	}
 
 	@Override
 	public boolean writeStreamElement(StreamElement se) {
 		try {
 			ByteArrayOutputStream bais = new ByteArrayOutputStream();
-			//System.out.println("sending :" + se);
-            bais.write((config.getName() + ": ").getBytes());
-            //StreamElement4Rest.getXstream().toXML(se.toRest(),bais);
+            bais.write((name + ": ").getBytes());
             Output o = new Output(bais);
             kryo.writeObjectOrNull(o,se,StreamElement.class);
             o.close();
             byte[] b = bais.toByteArray();
-            //System.out.println(config.getName()+" sending on Delivery");
             return publisher.send(b);
 		} catch (IOException e) {
 			e.printStackTrace();
