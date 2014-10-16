@@ -1398,6 +1398,113 @@
 											} ],
 										},
 
+// Saastal GPS Locations
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "saastal_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 1, 2, 3 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "GPS Position East - Batch [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "e" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Batch [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "n" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Batch [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "h" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity East - Batch [cm/d]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "v_e" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity North - Batch [cm/d]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "v_n" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity Altitude - Batch [cm/d]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "v_h" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity 3D - Batch [cm/d]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "v_3d" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Position East - Realtime [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__realtime",
+												field : [ "e" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Realtime [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__realtime",
+												field : [ "n" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Realtime [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__realtime",
+												field : [ "h" ],
+												position : [ 1, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Logger Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "saastal_gps_logger__status",
+												field : [ "inclinometer_x" ],
+												position : [ 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Logger Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "saastal_gps_logger__status",
+												field : [ "inclinometer_y" ],
+												position : [ 2, 3 ]
+											} ],
+										},
+
 // ETZ
 										{
 											title : "GPS Number of Satellites",
