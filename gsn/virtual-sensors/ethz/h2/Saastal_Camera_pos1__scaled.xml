@@ -5,7 +5,6 @@
         <init-params>
             <param name="jpeg_scaled">JPEG_SCALED</param>
             <param name="nef_extraction_type">thumbnail</param>
-            <param name="rotation">270</param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
