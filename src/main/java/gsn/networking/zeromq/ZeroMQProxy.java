@@ -110,6 +110,7 @@ public class ZeroMQProxy extends Thread implements Runnable {
 			public void run() {
 				while (true) {
 					String request = clients.recvStr (0);
+					logger.debug("ZMQ request received: "+request);
 					byte[] b=new byte[0];
 					if (request.startsWith("?")){
 						try{
@@ -123,12 +124,14 @@ public class ZeroMQProxy extends Thread implements Runnable {
 								if (m_time > r_time){
 									int rand = (int) Math.round(Math.random()*100000);
 									ZeroMQDelivery d = new ZeroMQDelivery(rand+"@"+r[1]);
+									b = (rand+"@"+r[1]).getBytes();
+									clients.send(b, 0);
+									Thread.sleep(1000);
 									DefaultDistributionRequest distributionReq = DefaultDistributionRequest.create(d, Mappings.getVSensorConfig(r[1]), "select * from "+r[1], r_time);
 									distributers.put(rand + "@" + r[1], distributionReq);
 									logger.debug("ZMQ request received: "+distributionReq.toString());
 									DataDistributer.getInstance(d.getClass()).addListener(distributionReq);
 									logger.debug("Streaming request received and registered:"+distributionReq.toString());
-									b = (rand+"@"+r[1]).getBytes();
 								}
 							}
 						}catch(Exception e){}
@@ -138,8 +141,8 @@ public class ZeroMQProxy extends Thread implements Runnable {
 			            kryo.writeObjectOrNull(o,structures.get(request),DataField[].class);
 			            o.close();
 			            b = bais.toByteArray();
+			            clients.send(b, 0);
 					}
-					clients.send(b, 0);
 				}
 			}
 		});

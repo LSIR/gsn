@@ -34,14 +34,33 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	@Override
 	public DataField[] getOutputFormat() {
 		if (structure == null){
-			if (requester.send(vsensor)){
-			    byte[] rec = requester.recv();
-			    if (rec != null){
-			        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
-			        if (structure != null)
-			            requester.close();
-			        return structure;
-			    }
+			if(isLive){
+				if (requester.send(vsensor)){
+				    byte[] rec = requester.recv();
+				    if (rec != null){
+				        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
+				        if (structure != null)
+				            requester.close();
+				        return structure;
+				    }
+				}
+			}else{
+				if (requester.send(vsensor)){
+				    byte[] rec = requester.recv();
+				    if (rec != null){
+				        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
+				        requester.send("?"+vsensor + "?" + startTime);
+				        rec = requester.recv();
+				        if (structure != null)
+				            requester.close();
+					    if (rec != null){
+					        vsensor = new String(rec);
+					        return structure;
+					    }else{
+					    	return null;
+					    }
+				    }
+				}
 			}
 		}
 		//if user defined structure is used... maybe
