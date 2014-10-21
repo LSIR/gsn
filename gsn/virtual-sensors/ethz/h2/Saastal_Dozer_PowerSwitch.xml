@@ -29,7 +29,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
-                    <predicate key="remote-connection">permasense-saas-bs01.ethz.ch:9003</predicate>
+                    <predicate key="remote-connection">permasense-hs-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
                     <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerPowerSwitchMsg</predicate>
                 </address>
