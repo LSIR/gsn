@@ -551,8 +551,9 @@ public class RequestHandler {
     public RequestHandler (String format) {
         //loading RestApiStringConstants properties file
         try {
-            stringConstantsPropertiesFileInputStream = new FileInputStream(STRING_CONSTANTS_PROPERTIES_FILENAME);
-            stringConstantsProperties.load(stringConstantsPropertiesFileInputStream);
+            //stringConstantsPropertiesFileInputStream = new FileInputStream(STRING_CONSTANTS_PROPERTIES_FILENAME);
+            //stringConstantsProperties.load(stringConstantsPropertiesFileInputStream);
+        	stringConstantsProperties.load(this.getClass().getClassLoader().getResourceAsStream(STRING_CONSTANTS_PROPERTIES_FILENAME));
         }
         catch (IOException ex){
             ex.printStackTrace();
@@ -889,7 +890,7 @@ public class RequestHandler {
     
     
     //properties file
-    private static final String STRING_CONSTANTS_PROPERTIES_FILENAME = "conf/RestApiConstants.properties";
+    private static final String STRING_CONSTANTS_PROPERTIES_FILENAME = "RestApiConstants.properties";
     private static Properties stringConstantsProperties = new Properties();
     private FileInputStream stringConstantsPropertiesFileInputStream= null;
 
