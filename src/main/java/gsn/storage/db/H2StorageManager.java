@@ -6,7 +6,7 @@
 * 
 * GSN is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 2 of the License, or
+* the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 * 
 * GSN is distributed in the hope that it will be useful,
@@ -63,6 +63,9 @@ public class H2StorageManager extends StorageManager {
                         else
                             convertedType = gsnType.getType();
                         break;
+                    case DataTypes.FLOAT:
+                    	convertedType = "REAL"; // Warning! The type FLOAT in H2 is a synonym of DOUBLE !!
+                        break;
                     default:
                         convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
                         break;
@@ -88,6 +91,8 @@ public class H2StorageManager extends StorageManager {
                     case Types.DOUBLE:
                     case Types.DECIMAL:    // This is needed for doing aggregates in datadownload servlet.
                         return DataTypes.DOUBLE;
+                    case Types.REAL:       // Warning! The type FLOAT in H2 is a synonym of DOUBLE !!
+                    	return DataTypes.FLOAT;
                     case Types.BINARY:
                     case Types.BLOB:
                     case Types.VARBINARY:

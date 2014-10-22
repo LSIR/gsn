@@ -31,11 +31,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import tinygsn.beans.DataField;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.vsensor.NotificationVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -46,6 +48,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -117,7 +120,9 @@ public class ActivityVSConfig extends SherlockActivity {
 	public void loadVSType() {
 		spinnerVSType = (Spinner) findViewById(R.id.spinner_vsType);
 		List<String> list = new ArrayList<String>();
-
+		
+		
+		//TODO change here if we don't need any repititopnm in sensors
 		for (String s : AbstractVirtualSensor.VIRTUAL_SENSOR_LIST) {
 			list.add(s);
 		}
@@ -180,7 +185,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		});
 	}
 
-	public void loadWrapperList() {
+	@SuppressLint("NewApi") public void loadWrapperList() {
 		spinnerWrapper = (Spinner) findViewById(R.id.spinner_wType);
 		List<String> list = new ArrayList<String>();
 
@@ -463,7 +468,8 @@ public class ActivityVSConfig extends SherlockActivity {
 
 		String wrapperName = wrapperList.getProperty(spinnerWrapper
 				.getSelectedItem().toString());
-
+		
+		//mycode
 		try {
 			storage
 					.executeInsert(
@@ -485,6 +491,16 @@ public class ActivityVSConfig extends SherlockActivity {
 				w = (AbstractWrapper) Class.forName(wrapperName).newInstance();
 				DataField[] outputStructure = w.getOutputStructure();
 				storage.createTable("vs_" + vsName, outputStructure);
+				storage.executeInsertSamplingRate(wrapperName, 0);
+				Log.i("WrapperName", wrapperName);
+				Log.i("vsName", vsName);
+				StaticData.saveName(vsName, wrapperName);
+				
+				//TODO I though this might be a good place to call this function
+//				VirtualSensor VS = storage.getVSByName(vsName);
+//				AbstractController controller = new AndroidControllerListVSNew();
+//				VS.getConfig().setController(controller);
+//				VS.start();
 			}
 			catch (InstantiationException e) {
 				e.printStackTrace();
@@ -528,6 +544,12 @@ public class ActivityVSConfig extends SherlockActivity {
 			if (isEnableSave) {
 				saveVS(null);
 				isEnableSave = false;
+				 Intent i = new Intent(getApplicationContext(),ActivityListVSNew.class);
+				 String vsName = editText_vsName.getText().toString();
+				 i.putExtra("VSName", vsName);
+				 startActivity(i);
+				 
+				 setContentView(R.layout.vs_list);
 			}
 			else
 				Toast.makeText(this, "There is nothing changed to save!",

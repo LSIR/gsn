@@ -6,7 +6,7 @@
 * 
 * GSN is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 2 of the License, or
+* the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 * 
 * GSN is distributed in the hope that it will be useful,
@@ -203,6 +203,9 @@ public class DataEnumerator implements DataEnumeratorIF {
 						break;
 					case DataTypes.DOUBLE :
 						output[ innerIndex ] = resultSet.getDouble( actualColIndex );
+						break;
+					case DataTypes.FLOAT :
+						output[ innerIndex ] = resultSet.getFloat( actualColIndex );
 						break;
 					case DataTypes.BIGINT :
 						output[ innerIndex ] = resultSet.getLong( actualColIndex );

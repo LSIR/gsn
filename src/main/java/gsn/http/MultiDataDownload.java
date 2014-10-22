@@ -6,7 +6,7 @@
  *
  * GSN is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * GSN is distributed in the hope that it will be useful,
@@ -186,7 +186,7 @@ public class MultiDataDownload extends HttpServlet {
                 String from = req.getParameter("from");
                 String to = req.getParameter("to");
 
-                if (from != null && to != null){
+                if (from != null && to != null && from != "" && to != ""){
 
                     Date date_from = sdfWeb.parse(from);
                     Date date_to = sdfWeb.parse(to);

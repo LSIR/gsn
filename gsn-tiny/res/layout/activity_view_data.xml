@@ -91,8 +91,6 @@
         android:gravity="center" >
 
         <TableLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:android1="http://schemas.android.com/apk/res/android"
             android:id="@+id/table_view_mode"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -170,7 +168,7 @@
         -->
 
         <ScrollView
-            xmlns:android="http://schemas.android.com/apk/res/android"
+           
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" 
             android:layout_span="2">

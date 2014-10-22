@@ -2,11 +2,11 @@
 <installation version="1.0">
     <info>
         <appname>gsn</appname>
-        <appversion>Version 1.1.4</appversion>
+        <appversion>Version 1.1.6</appversion>
         <authors>
             <author name="GSN Development Team." email="gsn@groupes.epfl.ch"/>
         </authors>
-        <javaversion>1.6</javaversion>
+        <javaversion>1.7</javaversion>
         <url>https://github.com/LSIR/gsn/</url>
     </info>
 

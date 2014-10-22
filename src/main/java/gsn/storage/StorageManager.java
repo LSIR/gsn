@@ -6,7 +6,7 @@
 * 
 * GSN is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 2 of the License, or
+* the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 * 
 * GSN is distributed in the hope that it will be useful,
@@ -678,6 +678,12 @@ public abstract class StorageManager {
                             ps.setNull(counter, Types.DOUBLE);
                         else
                             ps.setDouble(counter, ((Number) value).doubleValue());
+                        break;
+                    case DataTypes.FLOAT:
+                        if (value == null)
+                            ps.setNull(counter, Types.FLOAT);
+                        else
+                            ps.setFloat(counter, ((Number) value).floatValue());
                         break;
                     case DataTypes.BIGINT:
                         if (value == null)

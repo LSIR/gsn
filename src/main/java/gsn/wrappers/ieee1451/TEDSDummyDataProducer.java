@@ -6,7 +6,7 @@
 * 
 * GSN is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 2 of the License, or
+* the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 * 
 * GSN is distributed in the hope that it will be useful,
@@ -160,6 +160,9 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
                case DataTypes.DOUBLE :
                   result[ i ] = Math.random( ) * 255;
                   break;
+               case DataTypes.FLOAT :
+                   result[ i ] = (float) (Math.random( ) * 255);
+                   break;
                case DataTypes.BINARY :
                   result[ i ] = ( byte ) Math.random( ) * 255;
                   break;

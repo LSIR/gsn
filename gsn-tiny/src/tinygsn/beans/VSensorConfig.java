@@ -25,21 +25,34 @@
 
 package tinygsn.beans;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.TimeZone;
 import tinygsn.controller.AbstractController;
+import tinygsn.controller.AndroidControllerListVSNew;
+import tinygsn.gui.android.ActivityListVSNew;
 import tinygsn.model.wrappers.AbstractWrapper;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
-public class VSensorConfig implements Serializable {
 
+public class VSensorConfig implements Parcelable  {
+
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	private int id;
 	private String name;
 	private AbstractController controller = null;
 	private static final String TAG = "VSensorConfig";
-	private InputStream inputStreams[];
+	private InputStream inputStreams[] = null;
 	private DataField[] outputStructure;
 	private String processingClassName;
 	private boolean running;
@@ -48,9 +61,11 @@ public class VSensorConfig implements Serializable {
 
 	private Double notify_value;
 	private boolean save_to_db;
-
+	
+	
+	public ActivityListVSNew view = null;
+	//public AndroidControllerListVSNew VSNewController;
 	// ========================================================
-	private static final long serialVersionUID = 1625382440863797197L;
 	public static final int DEFAULT_PRIORITY = 100;
 	public static final int NO_FIXED_RATE = 0;
 	public static final int DEFAULT_POOL_SIZE = 10;
@@ -78,14 +93,93 @@ public class VSensorConfig implements Serializable {
 	public VSensorConfig() {
 
 	}
+	public VSensorConfig(Parcel source)
+	{
+		int idid = Integer.parseInt(source.readString());
+		String processingClass = source.readString();
+		String vsName = source.readString();
+		String wrapperN= source.readString();
+		int samplingRate= Integer.parseInt(source.readString());
+		int windowSize= Integer.parseInt(source.readString());
+		int step= Integer.parseInt(source.readString());
+		int aggregator= Integer.parseInt(source.readString());
+		boolean runningState= Boolean.parseBoolean(source.readString());
+		String notify_field_par= source.readString();
+		String notify_condition_par = source.readString();
+		Double notify_value_par=Double.parseDouble(source.readString());
+		String notify_action_par = source.readString();
+		String notify_contact_par = source.readString();
+		boolean save_to_db_par = Boolean.parseBoolean(source.readString());
+		
+		setController(StaticData.findController(idid));
+		
+		
+		
+		this.id = idid;
+		this.name = vsName;
+		this.processingClassName = processingClass;
+		this.running = runningState;
 
-	public VSensorConfig(String processingClass, String vsName,
+		// notify_field, notify_condition, notify_value,
+		// notify_action, notify_contact, save_to_db
+		this.notify_field = notify_field_par;
+		this.notify_condition = notify_condition_par;
+		this.notify_value = notify_value_par;
+		this.notify_action = notify_action_par;
+		this.notify_contact = notify_contact_par;
+		this.save_to_db = save_to_db_par;
+
+		Queue queue = new Queue(windowSize, step);
+		StreamSource s = new StreamSource(queue);
+
+		AbstractWrapper w;
+
+		try {
+			w = (AbstractWrapper) Class.forName(wrapperN).newInstance();
+			w.setQueue(s.getQueue());
+			w.setConfig(this);
+			w.setSamplingRate(samplingRate);
+			
+			s.setWrapper(w);
+			s.setAggregator(aggregator);
+			s.setSamplingRate(samplingRate);
+			s.setWindowSize(windowSize);
+			s.setStep(step);
+			outputStructure = w.getOutputStructure();
+		}
+		catch (InstantiationException e1) {
+			e1.printStackTrace();
+			Log.e(TAG, "Error: " + e1.getMessage());
+		}
+		catch (IllegalAccessException e1) {
+			e1.printStackTrace();
+			Log.e(TAG, "Error: " + e1.getMessage());
+		}
+		catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+			Log.e(TAG, "Error: " + e1.getMessage());
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			Log.e(TAG, "Error: " + e.getMessage());
+		}
+
+		InputStream is = StaticData.is;
+		s.setInputStream(is);
+
+		this.inputStreams = new InputStream[1];
+		this.inputStreams[0] = is;
+		this.wrapperName = wrapperN;
+			
+	}
+
+	public VSensorConfig(int id, String processingClass, String vsName,
 			String wrapperName, int samplingRate, int windowSize, int step,
 			int aggregator, boolean running, String notify_field,
 			String notify_condition, Double notify_value, String notify_action,
 			String notify_contact, boolean save_to_db) {
-		Log.v(TAG, "VSensorConfig is initiating...");
 
+		this.id = id;
 		this.name = vsName;
 		this.processingClassName = processingClass;
 		this.running = running;
@@ -141,7 +235,6 @@ public class VSensorConfig implements Serializable {
 		this.inputStreams[0] = is;
 		this.wrapperName = wrapperName;
 
-		Log.v(TAG, "VSensorConfig initiated successfully!");
 	}
 
 	// public void createTableIfNotExist(){
@@ -152,8 +245,14 @@ public class VSensorConfig implements Serializable {
 	// int step, int aggregator, boolean running) {
 	// }
 
+	public String getWrapperName() {
+		return wrapperName;
+	}
+	public void setWrapperName(String wrapperName) {
+		this.wrapperName = wrapperName;
+	}
 	public VSensorConfig clone() {
-		VSensorConfig vsConfig = new VSensorConfig(processingClassName, name,
+		VSensorConfig vsConfig = new VSensorConfig(id, processingClassName, name,
 				wrapperName, getInputStreams()[0].getSources()[0].getSamplingRate(),
 				getInputStreams()[0].getSources()[0].getWindowSize(),
 				getInputStreams()[0].getSources()[0].getStep(),
@@ -161,8 +260,10 @@ public class VSensorConfig implements Serializable {
 				notify_field, notify_condition, notify_value, notify_action,
 				notify_contact, save_to_db);
 		vsConfig.setController(controller);
+		
+		StaticData.addConfig(id, vsConfig);
+		StaticData.saveNameID(id, name);
 
-		Log.v(TAG, "Cloned: " + vsConfig.toString());
 
 		return vsConfig;
 	}
@@ -611,6 +712,8 @@ public class VSensorConfig implements Serializable {
 
 	public void setController(AbstractController controller) {
 		this.controller = controller;
+		this.controller.setId(id);
+		
 	}
 
 	public String getNotify_field() {
@@ -661,4 +764,48 @@ public class VSensorConfig implements Serializable {
 		this.save_to_db = save_to_db;
 	}
 
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(Integer.toString(id));
+		dest.writeString(getProcessingClassName());
+		dest.writeString(getName());
+		dest.writeString(getWrapperName());
+		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getSamplingRate()));
+		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getWindowSize()));
+		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getStep()));
+		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getAggregator()));
+		dest.writeString(Boolean.toString(getRunning()));
+		dest.writeString(getNotify_field());
+		dest.writeString(getNotify_condition());
+		dest.writeString(Double.toString(getNotify_value()));
+		dest.writeString(getNotify_action());
+		dest.writeString(getNotify_contact());
+		dest.writeString(Boolean.toString(isSave_to_db()));
+		StaticData.addController((AndroidControllerListVSNew) getController());
+		StaticData.is = getInputStreams()[0];
+	}
+	public static final Parcelable.Creator<VSensorConfig> CREATOR  = new Creator<VSensorConfig>() {
+
+	    public VSensorConfig createFromParcel(Parcel source) {
+
+	    	VSensorConfig vs = new VSensorConfig(source);
+	    	StaticData.addConfig(vs.id, vs);
+	    	StaticData.saveNameID(vs.id, vs.getName());
+			return vs;
+	    }
+
+	    public VSensorConfig[] newArray(int size) {
+
+	        return new VSensorConfig[size];
+	    }
+
+	};
+
 }
+

@@ -24,18 +24,31 @@
 
 
 package tinygsn.model.vsensor;
+import java.io.Serializable;
 
 import tinygsn.beans.InputStream;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
-import tinygsn.model.wrappers.AbstractWrapper;
-import android.app.Activity;
-import android.util.Log;
-import android.widget.Toast;
+import tinygsn.services.AccelometerService;
+import tinygsn.services.ActivityRecognitionService;
+import tinygsn.services.GyroscopeService;
+import tinygsn.services.LightSensorService;
+import tinygsn.services.LocationService;
+import tinygsn.services.WifiService;
+import android.content.Intent;
+import android.content.Context;
 
-public class VirtualSensor {
+public class VirtualSensor implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5273593293715944940L;
+
+	public Context context;
+	
 	private AbstractVirtualSensor virtualSensor = null;
 
 	private VSensorConfig config = null;
@@ -43,16 +56,18 @@ public class VirtualSensor {
 	public VSensorConfig getConfig() {
 		return config;
 	}
-
+	
 	public void setConfig(VSensorConfig config) {
 		this.config = config;
+		
 	}
 
 	private static final String TAG = "VirtualSensor";
 
-	public VirtualSensor(VSensorConfig originalConfig) {
+	public VirtualSensor(VSensorConfig originalConfig, Context context) {
 		this.config = originalConfig;
-
+		this.context = context;
+		
 		for (InputStream is : config.getInputStreams()) {
 			is.setPool(this);
 		}
@@ -78,22 +93,45 @@ public class VirtualSensor {
 	}
 
 	public void start() {
-		Log.v(TAG, "Starts VS: " + config.toString());
-
+		
+		StackTraceElement test[] = Thread.currentThread().getStackTrace();
+//		for(int i = 0; i < test.length;  i++)
+//		{
+//			Log.e("stack trace", test[i].getMethodName());
+//			Log.e("stack trace class", test[i].getClassName());
+//		}
+		// Context sContext =  getApplicationContext();
+		Intent serviceIntent = null;
+		if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidGyroscopeWrapper"))
+			serviceIntent = new Intent(this.context, GyroscopeService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidAccelerometerWrapper"))
+			serviceIntent = new Intent(this.context, AccelometerService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidGPSWrapper"))
+			serviceIntent = new Intent(this.context, LocationService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidLightWrapper"))
+			serviceIntent = new Intent(this.context, LightSensorService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidActivityRecognitionWrapper"))
+			serviceIntent = new Intent(this.context, ActivityRecognitionService.class);
+		else if(config.getWrapperName().equals("tinygsn.model.wrappers.WifiWrapper"))
+			serviceIntent = new Intent(this.context, WifiService.class);
+		
+		
+		
 		config.setRunning(true);
 		
-		for (InputStream inputStream : config.getInputStreams()) {
-			for (StreamSource streamSource : inputStream.getSources()) {
-				AbstractWrapper w = streamSource.getWrapper();
-				Log.v(TAG, w.toString());
-				w.start();
-			}
-		}
-		Log.v(TAG, config.toString() + " started.");
+		
+		serviceIntent.putExtra("tinygsn.beans.config", config);
+		
+		StaticData.addRunningService(config.getName(), serviceIntent);
+		context.startService(serviceIntent);
 	}
 
 	public void stop() {
+		
+		config = StaticData.findConfig(config.getId());
 		config.setRunning(false);
+		
+	
 		
 		for (InputStream inputStream : config.getInputStreams()) {
 			for (StreamSource streamSource : inputStream.getSources()) {
@@ -101,116 +139,17 @@ public class VirtualSensor {
 			}
 		}
 		
-		config = config.clone();
-		Log.v(TAG, "VS: " + config.toString() + " stopped.");
+		Intent serviceIntent = StaticData.getRunningIntentByName(config.getName());
+		if(serviceIntent != null)
+		{
+			serviceIntent.removeExtra("tinygsn.beans.config");
+			serviceIntent.putExtra("tinygsn.beans.config", config);
+			context.startService(serviceIntent);
+		}
 	}
 
 	public void dataAvailable(StreamElement se) {
 		virtualSensor.dataAvailable(null, se);
-		Activity a = getConfig().getController().getActivity();
-//		showLog(a, "VirtualSensor: " + se.toString());
 	}
-
-//	void showLog(final Activity a, final String text) {
-//		a.runOnUiThread(new Runnable() {
-//			public void run() {
-//				Toast.makeText(a, text, Toast.LENGTH_SHORT).show();
-//			}
-//		});
-//	}
-	
-	//
-	// public synchronized AbstractVirtualSensor borrowVS() throws
-	// VirtualSensorInitializationFailedException {
-	// if (virtualSensor == null) {
-	// try {
-	// virtualSensor = (AbstractVirtualSensor)
-	// Class.forName(config.getProcessingClass()).newInstance();
-	// virtualSensor.setVirtualSensorConfiguration(config);
-	// } catch (Exception e) {
-	// throw new VirtualSensorInitializationFailedException(e.getMessage(), e);
-	// }
-	// if (virtualSensor.initialize() == false) {
-	// virtualSensor = null;
-	// throw new VirtualSensorInitializationFailedException();
-	// }
-	// if (logger.isDebugEnabled())
-	// logger.debug(new
-	// StringBuilder().append("Created a new instance for VS ").append(config.getName()));
-	// }
-	// return virtualSensor;
-	// }
-	//
-	// /**
-	// * The method ignores the call if the input is null
-	// *
-	// * @param o
-	// */
-	// public synchronized void returnVS(AbstractVirtualSensor o) {
-	// if (o == null) return;
-	// if (++noOfCallsToReturnVS % GARBAGE_COLLECTOR_INTERVAL == 0)
-	// DoUselessDataRemoval();
-	// }
-	//
-	// public synchronized void closePool() {
-	// if (virtualSensor != null) {
-	// virtualSensor.dispose();
-	// if (logger.isDebugEnabled())
-	// logger.debug(new
-	// StringBuilder().append("VS ").append(config.getName()).append(" is now released."));
-	// } else if (logger.isDebugEnabled())
-	// logger.debug(new
-	// StringBuilder().append("VS ").append(config.getName()).append(" was already released."));
-	// }
-
-	//
-	// /**
-	// * @return the config
-	// */
-	// public VSensorConfig getConfig() {
-	// return config;
-	// }
-	//
-	// /**
-	// * @return the lastModified
-	// */
-	// public long getLastModified() {
-	// return lastModified;
-	// }
-	//
-	// public void dispose() {
-	// }
-	//
-	// // apply the storage size parameter to the virtual sensor table
-	// public void DoUselessDataRemoval() {
-	// if (config.getParsedStorageSize() == VSensorConfig.STORAGE_SIZE_NOT_SET)
-	// return;
-	// StringBuilder query;
-	//
-	// if (config.isStorageCountBased()) {
-	// query =
-	// Main.getStorage(config.getName()).getStatementRemoveUselessDataCountBased(config.getName(),
-	// config.getParsedStorageSize());
-	// }
-	// else {
-	// query =
-	// Main.getStorage(config.getName()).getStatementRemoveUselessDataTimeBased(config.getName(),
-	// config.getParsedStorageSize());
-	// }
-	//
-	// int effected = 0;
-	// try {
-	// if (logger.isDebugEnabled())
-	// logger.debug(new
-	// StringBuilder().append("Enforcing the limit size on the VS table by : ").append(query).toString());
-	// effected = Main.getStorage(config.getName()).executeUpdate(query);
-	// } catch (SQLException e) {
-	// logger.error("Error in executing: " + query);
-	// logger.error(e.getMessage(), e);
-	// }
-	// if (logger.isDebugEnabled())
-	// logger.debug(new
-	// StringBuilder().append(effected).append(" old rows dropped from ").append(config.getName()).toString());
-	// }
 
 }
