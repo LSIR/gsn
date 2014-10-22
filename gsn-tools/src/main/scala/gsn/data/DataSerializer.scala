@@ -15,25 +15,42 @@ object DataSerializer {
     Json.obj("type"->"FeatureCollection",
         "features"->JsArray(sensors.map(s=>toJson(s))))
   }  
-  def toJson(sensor:Sensor)={
+  
+  def sensorDataToJson(sensorsWithVals:Seq[SensorData])={
+    Json.obj("type"->"FeatureCollection",
+        "features"->JsArray(sensorsWithVals.map(s=>toJson(s))))
     
-    val fields=sensor.fields.map{f=>
-      Json.obj("name"->f.name,"type"->f.datatype.name,"unit"->f.unit.code)
+  }
+  
+  def toJson(data:SensorData):JsValue={
+    val values=data.ts.map{t=>
+      t.series.unzip._2       
+    } 
+    val fields=data.ts.map(_.output.fieldName) 
+    toJson(data.s,values, fields)
+     
+  }
+  
+  private def coreToJson(any:Seq[Any]):JsArray=JsArray (any.map{
+    case d:Double=>JsNumber(d)
+    case i:Int=>JsNumber(i)
+    case l:Long=>JsNumber(l)
+    case s:String=>JsString(s)
+    case a:Any=>JsString(a.toString) 
+    case null=>JsNull
+  })
+  
+  def toJson(sensor:Sensor,values:Seq[Seq[Any]]=Seq(),valueNames:Seq[String]=Seq())={
+        
+    val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
+    .map{f=>
+      Json.obj("name"->f.fieldName,"type"->f.dataType.name,"unit"->f.unit.code)
     }
     
-    val values=sensor.values.map{record=>
-      val data:Seq[JsValue]=record.map{
-        case d:Double=>JsNumber(d)
-        case i:Int=>JsNumber(i)
-        case l:Long=>JsNumber(l)
-        case s:String=>JsString(s)
-        case a:Any=>JsString(a.toString) 
-        case null=>JsNull
-      }.toSeq
-      JsArray(data)
-    }
+    val jsValues=values.map{record=>coreToJson(record)}      
+    
     val propvals=Seq("vs_name"->JsString(sensor.name),
-                     "values"->JsArray(values),
+                     "values"->JsArray(jsValues),
                      "fields"->JsArray(fields))++
       sensor.properties.map(a=>a._1->JsString(a._2)).toSeq
       
@@ -55,9 +72,9 @@ object DataSerializer {
     sw.append("#vs_name,"+props.mkString(",")+",fields,units,types"+System.lineSeparator)
     sensors.foreach{s=>
       sw.append(s.name+","+props.map(p=>s.properties.getOrElse(p,"")).mkString(","))
-      sw.append(",\""+s.fields.map(f=>f.name).mkString(",")+"\"")
+      sw.append(",\""+s.fields.map(f=>f.fieldName).mkString(",")+"\"")
       sw.append(",\""+s.fields.map(f=>f.unit.code).mkString(",")+"\"")
-      sw.append(",\""+s.fields.map(f=>f.datatype.name).mkString(",")+"\"")
+      sw.append(",\""+s.fields.map(f=>f.dataType.name).mkString(",")+"\"")
       sw.append(System.lineSeparator)
     }
     sw
@@ -70,9 +87,9 @@ object DataSerializer {
     
     head("vs_name",sensor.name)
     sensor.properties.foreach(p=>head(p._1,p._2))
-    head("fields",sensor.fields.map{_.name}.mkString(","))
+    head("fields",sensor.fields.map{_.fieldName}.mkString(","))
     head("units",sensor.fields.map{_.unit.code}.mkString(","))
-    head("types",sensor.fields.map{_.datatype.name}.mkString(","))
+    head("types",sensor.fields.map{_.dataType.name}.mkString(","))
         
     val values=sensor.values.map{record=>
       sw.append(record.mkString(",")+System.lineSeparator)}

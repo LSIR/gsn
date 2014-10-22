@@ -10,9 +10,6 @@ import java.nio.file.Paths
 
 object NetCdf {
   val timeName="time"
-  def papa={
-    
-  }  
     
   def serialize(s:Sensor,timeFieldName:String="time")={
     val id=UUID.randomUUID
@@ -26,23 +23,25 @@ object NetCdf {
     val dataSize=s.values.size    
     val timeDim = w.addDimension(null, timeName, dataSize) 
     val dataFields=s.fields
-    if (dataFields.find(_.name==timeFieldName)==None) 
+    if (dataFields.find(_.fieldName==timeFieldName)==None) 
       throw new IllegalArgumentException("Invalid sensor structure: missing time field: "+timeFieldName)
     val fieldArrays=dataFields.map(f=>new ArrayDouble.D1(dataSize))
-    dataFields.foreach{f=>
+    s.implements.foreach{sensing=>      
+      sensing.outputs.foreach{f=>
       
-      if (f.name==timeFieldName){
-        val fieldVar=w.addVariable(null, timeName,DataType.INT,timeName)
-        fieldVar.addAttribute(new Attribute("units",f.unit.code))        
-      }
-      else {
-        val fieldVar=w.addVariable(null, f.name,DataType.DOUBLE,timeName)
-        if (f.unit.code!=null)
-          fieldVar.addAttribute(new Attribute("units",f.unit.code))
-        if (f.obsproperty!=null)
-          fieldVar.addAttribute(new Attribute("long_name",f.obsproperty))
-      }
-    }  
+        if (f.fieldName==timeFieldName){
+          val fieldVar=w.addVariable(null, timeName,DataType.INT,timeName)
+          fieldVar.addAttribute(new Attribute("units",f.unit.code))        
+        }
+        else {
+          val fieldVar=w.addVariable(null, f.fieldName,DataType.DOUBLE,timeName)
+          if (f.unit.code!=null)
+            fieldVar.addAttribute(new Attribute("units",f.unit.code))
+          if (sensing.obsProperty!=null)
+            fieldVar.addAttribute(new Attribute("long_name",sensing.obsProperty))
+        }
+      } 
+    } 
     w.create
 
     var i=0
@@ -57,10 +56,10 @@ object NetCdf {
     
     i=0
     dataFields.foreach{f=>
-      if (f.name==timeFieldName)
+      if (f.fieldName==timeFieldName)
         w.write(w.findVariable(timeName), fieldArrays(i))
       else
-        w.write(w.findVariable(f.name), fieldArrays(i))
+        w.write(w.findVariable(f.fieldName), fieldArrays(i))
       i+=1
     }
        
