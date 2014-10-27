@@ -890,8 +890,6 @@ public class RequestHandler {
     
     
     //properties file
-    private static final String STRING_CONSTANTS_PROPERTIES_FILENAME = "conf/RestApiConstants.properties";
-    private static final String STRING_CONSTANTS_PROPERTIES_FILENAME = "src/main/resources/RestApiConstants.properties";
     private static final String STRING_CONSTANTS_PROPERTIES_FILENAME = "RestApiConstants.properties";
     private static Properties stringConstantsProperties = new Properties();
     private FileInputStream stringConstantsPropertiesFileInputStream= null;
