@@ -66,7 +66,7 @@
         <stream name="data5">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.chamonet.com/image_uploader/webcam/large/chamonix-aiguille-du-midi.jpg</predicate>
+                    <predicate key="url">http://static1.chamonet.com/image_uploader/webcam/large/chamonix-aiguille-du-midi.jpg</predicate>
                     <predicate key="rate">300000</predicate>
                     <predicate key="subdirectory-name">webcam4</predicate>
                     <predicate key="device-id">6004</predicate>
