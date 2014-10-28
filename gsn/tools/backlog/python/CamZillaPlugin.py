@@ -351,6 +351,19 @@ class CamZillaPluginClass(AbstractPluginClass):
                 except Exception, e:
                     self.exception(str(e))
             
+        if self._dslrAvailable and not self._plugStop:
+            turnoff = False
+            if not self._isDSLRPowered():
+                turnoff = True
+                self._powerOnCam()
+            try:
+                self.info('synchronize time of camera')
+                self._execCommand([GPHOTO2, '--port="usb:"', '--quiet', '--set-config /main/settings/datetime=%s' % (time.time(),)])
+            except Exception, e:
+                self.error(e.__str__())
+            if turnoff:
+                self._powerOffCam()
+            
         if self._dslrAvailable and not self._plugStop and not self._powerSaveMode:
             self._powerOnCam()
             try:
@@ -818,7 +831,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         sets = []
 #        ret = '/main/settings/capturetarget=1'
         ret = ''
-        self._autofocus = None
+        self._autofocus = '--set-config /main/actions/autofocusdrive=0'
         for setting in settings:
 #            ret += ', ' + setting
             if ret != '':
