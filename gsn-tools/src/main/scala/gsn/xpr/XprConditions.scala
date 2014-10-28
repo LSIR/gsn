@@ -11,6 +11,14 @@ object XprConditions {
       case _ => false
     }
   }
+  def parseConditions(conditions:Array[String])=Try{
+    conditions.map{c=>
+      val parsed=XprParser.parseXpr(c)
+      if (parsed.isSuccess && !isCondition(parsed.get))
+        throw new IllegalArgumentException("Invalid condition "+parsed.get)
+      parsed.get
+    }
+  }
   def serializeConditions(conditions:Array[String])=Try{
     conditions.map{c=>
       val parsed=XprParser.parseXpr(c)

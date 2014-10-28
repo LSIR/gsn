@@ -1,0 +1,34 @@
+<?xml version='1.0'?>
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY jena    'http://jena.hpl.hp.com/'>
+    <!ENTITY rdf     'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+    <!ENTITY rdfs    'http://www.w3.org/2000/01/rdf-schema#'>
+    <!ENTITY owl     'http://www.w3.org/2002/07/owl#'>
+    <!ENTITY xsd     'http://www.w3.org/2001/XMLSchema#'>
+    <!ENTITY base    '&jena;2003/04/schemagen'>
+    <!ENTITY sgen    '&base;#'>
+]>
+
+<rdf:RDF
+  xmlns:rdf="&rdf;" xmlns:rdfs="&rdfs;" xmlns:owl="&owl;"
+  xmlns:sgen="&sgen;" xmlns="&sgen;" xml:base="&base;">
+
+<sgen:Config>
+    <sgen:rdfs rdf:datatype="&xsd;boolean">true</sgen:rdfs>
+    <sgen:namespace rdf:resource="http://www.w3.org/2003/01/geo/wgs84_pos#"></sgen:namespace>    
+        <sgen:classname rdf:datatype="&xsd;string">Wgs84</sgen:classname>    
+    <sgen:package rdf:datatype="&xsd;string">gsn.vocab</sgen:package>
+    
+    <sgen:output rdf:datatype="&xsd;string">src/main/java</sgen:output>
+    <sgen:noComments rdf:datatype="&xsd;boolean">true</sgen:noComments>
+    <sgen:noIndjividuals rdf:datatype="&xsd;boolean">false</sgen:noIndjividuals>
+    <sgen:footer rdf:datatype="&xsd;string">
+/*
+@footer@
+*/
+    </sgen:footer>
+
+</sgen:Config>
+
+</rdf:RDF>

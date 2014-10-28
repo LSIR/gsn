@@ -1,0 +1,51 @@
+<?xml version='1.0'?>
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY jena    'http://jena.hpl.hp.com/'>
+    <!ENTITY rdf     'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+    <!ENTITY rdfs    'http://www.w3.org/2000/01/rdf-schema#'>
+    <!ENTITY owl     'http://www.w3.org/2002/07/owl#'>
+    <!ENTITY xsd     'http://www.w3.org/2001/XMLSchema#'>
+    <!ENTITY base    '&jena;2003/04/schemagen'>
+    <!ENTITY sgen    '&base;#'>
+]>
+
+<rdf:RDF
+  xmlns:rdf   ="&rdf;"
+  xmlns:rdfs  ="&rdfs;"
+  xmlns:owl   ="&owl;"
+  xmlns:sgen  ="&sgen;"
+  xmlns       ="&sgen;"
+  xml:base    ="&base;"
+>
+
+<sgen:Config>
+    <!-- specifies that the  source document uses OWL -->
+    <sgen:owl rdf:datatype="&xsd;boolean">true</sgen:owl>
+
+    <!-- specifies that we want the generated vocab to use OntClass, OntProperty, etc, not Resource and Property -->
+    <!-- <sgen:ontology rdf:datatype="&xsd;boolean">true</sgen:ontology>-->
+
+    <!-- specifies that we want names mapped to uppercase (as standard Java constants) -->
+
+    <!-- append Vocab to class name, so input beer.owl becomes BeerVocab.java -->
+
+    <!-- the Java package that the vocabulary is in -->
+    <sgen:package rdf:datatype="&xsd;string">gsn.vocab</sgen:package>
+
+    <!-- the directory or file to write the results out to -->
+    <sgen:output rdf:datatype="&xsd;string">src/main/java</sgen:output>
+
+    <!-- the template for the file header -->
+    <sgen:noComments rdf:datatype="&xsd;boolean">true</sgen:noComments>
+
+<!-- the template for the file footer (note @footer@ is an Ant-ism, and will not be processed by SchemaGen) -->
+<sgen:footer rdf:datatype="&xsd;string">
+/*
+@footer@
+*/
+</sgen:footer>
+
+</sgen:Config>
+
+</rdf:RDF>
