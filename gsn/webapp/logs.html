@@ -520,7 +520,7 @@ function getMaxLogsRecursive(logContainer, lastGenerationTime) {
 	var deployment = deployments[logContainer.deplId];
 	if (logContainer.identifier === "dozerevents") {
 		var tmp = "";
-		if (lastGenerationTime != "")
+		if (lastGenerationTime)
 			tmp = "&critJoin=and&critfield=event_timestamp&neg=&critop=<&critval=" + lastGenerationTime;
 		$.ajax({
 			type: "GET",
@@ -529,7 +529,7 @@ function getMaxLogsRecursive(logContainer, lastGenerationTime) {
 			cache: false,
 			timeout: 30000,
 			success: function(data){
-				var lastGenTime = "";
+				var lastGenTime;
 				$("line", data).each(function(){
 					if ($("field:eq(0)", this).text() != "event_timestamp") {
 						lastGenTime = $("field:eq(0)", this).text();
@@ -537,14 +537,14 @@ function getMaxLogsRecursive(logContainer, lastGenerationTime) {
 					}
 				});
 				scrollPane.reinitialise();
-				if (lastGenTime != "" && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
+				if (lastGenTime && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
 					getMaxLogsRecursive(logContainer, lastGenTime);
 			}
 		});
 	}
 	else {
 		var tmp = "";
-		if (lastGenerationTime != "")
+		if (lastGenerationTime)
 			tmp = "&critJoin=and&critfield=generation_time&neg=&critop=<&critval=" + lastGenerationTime;
 		$.ajax({
 			type: "GET",
@@ -553,7 +553,7 @@ function getMaxLogsRecursive(logContainer, lastGenerationTime) {
 			cache: false,
 			timeout: 30000,
 			success: function(data){
-				var lastGenTime = "";
+				var lastGenTime;
 				$("line", data).each(function(){
 					if ($("field:eq(0)", this).text() != "generation_time") {
 						lastGenTime = $("field:eq(0)", this).text();
@@ -561,7 +561,7 @@ function getMaxLogsRecursive(logContainer, lastGenerationTime) {
 					}
 				});
 				scrollPane.reinitialise();
-				if (lastGenTime != "" && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
+				if (lastGenTime && $('.jspPane',"#logcontainer_" + logContainer.containerId).find("div").length < MAX_LOGS_TOTAL)
 					getMaxLogsRecursive(logContainer, lastGenTime);
 			}
 		});
