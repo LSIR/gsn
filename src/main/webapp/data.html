@@ -505,13 +505,15 @@ csv_to_json($(this), drawGrid, 'iso');
             <div id="main" class="full-page">
                 <noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
                 <!-- data part -->
-                <br/> <br/> <br/>
+                
                 <div id="datachooser">
                     <div id="data_1" class="clearfix">
                         <form action="multidata" method="post">
 
-                                    <div class="data-output-content">
-                                        <div class="aggregations">
+                                    
+									<div class="left-form-container">
+										<h3>Aggregation</h3>
+										<div class="aggregations">
                                             <div>
                                                 <select id="nb" name="nb" style="display: inline-block">
                                                     <option value="ALL">All Data</option>
@@ -539,53 +541,58 @@ csv_to_json($(this), drawGrid, 'iso');
                                                 </select>
                                             </p>
                                         </div>
-                                        </br> </br>
+                                        <h3>Outputs</h3>
                                         <div class="data-outputs-container">
                                             <a id="add-data-output" href="#">Add Output</a>
                                             <ul id="data-outputs"></ul>
                                         </div>
-                                        </br>
-                                        <div class="time-range">
+									</div>
+									
+									<div class="right-form-container">
+										<h3>Time range</h3>
+										<div class="time-range">
                                             <div>
-                                                </br>
                                                 <span>From</span>
-                                                <input id="datepicker_from" name="from" type="text" value=""   style="width: 150px"/>
-                                                &nbsp
+                                                <input id="datepicker_from" name="from" type="text" value=""   style="width: 150px;float: right;"/>
+                                                <br/>
+                                                <br/>
                                                 <span>To</span>
-                                                <input id="datepicker_to" name="to" type="text" value=""  style="width: 150px"/>
+                                                <input id="datepicker_to" name="to" type="text" value=""  style="width: 150px; float: right;"/>
                                             </div>
+                                            <br/>
                                             <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
                                             <span>Add virtual sensor only if it has data in the given time period</span>
-                                            </br> </br>
+                                         
                                         </div>
-                                    </div>
-                                    </br></br></br>
-
-                                    <div class="plot-content">
-                                        <span>Plot Type</span>
-                                        <select id="plot-type">
-                                            <option value="drawTimeseries" selected="selected">Timeseries</option>
-                                            <option value="drawScatterplot">Scatterplot</option>
-                                            <option value="drawHistogram">Histogram</option>
-                                        </select>
-                                        <input class="ui-default-state plot" name="commit" type="button" value="Plot" />
-                                        <div style="display: inline-block" class="sampling_percentage" ><span>Sampling rate</span>&nbsp<input id="sampling_percentage" style="width: 30px" type="text" name="sampling_percentage"/><span>%</span></div>
-                                        &nbsp&nbsp&nbsp
-                                        <input id="disablesampling" type="checkbox" name="disablesampling"/><span>Disable sampling</span>
-                                    </div>
-
-                                    </br></br>
-
-                                    <div class="results-content">
+                                        <h3>Plot contents</h3>
+                                        <div class="plot-content">
+	                                        <span>Plot Type</span>
+	                                        <select id="plot-type">
+	                                            <option value="drawTimeseries" selected="selected">Timeseries</option>
+	                                            <option value="drawScatterplot">Scatterplot</option>
+	                                            <option value="drawHistogram">Histogram</option>
+	                                        </select>
+	                                        <input class="ui-default-state plot" name="commit" type="button" value="Plot" />
+	                                        <div style="display: inline-block" class="sampling_percentage" ><span>Sampling rate</span>&nbsp<input id="sampling_percentage" style="width: 30px" type="text" name="sampling_percentage"/><span>%</span></div>
+	                                        &nbsp&nbsp&nbsp
+	                                        <input id="disablesampling" type="checkbox" name="disablesampling"/><span>Disable sampling</span>
+	                                    </div>
+	                                    <h3>Results</h3>
+	                                    <div class="results-content">
                                         <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
                                         <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
                                          <span>Time Format</span>
                                         <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
                                         <input id="download_format" type="hidden" name="download_format" value="csv"/>
                                         <input id="reportclass" type="hidden" name="reportclass" value="report-default"/>
-                                    </div>
-
+                                    	</div>
+									
+									</div>
+									
+									<div class="plot-result-container">
                                     <div id="plotContainer">
+                                    
+                                    </div>
                                     </div>
                         </form>
                     </div>
