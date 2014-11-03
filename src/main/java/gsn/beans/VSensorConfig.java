@@ -31,6 +31,8 @@ package gsn.beans;
 
 import gsn.Main;
 import gsn.utils.CaseInsensitiveComparator;
+import gsn.utils.Pair;
+import gsn.utils.Utils;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -337,42 +339,17 @@ public class VSensorConfig implements Serializable {
 	}
 
 	public boolean validate ( ) {
-		String storageHistorySize = this.getStorageHistorySize( );
-		storageHistorySize = storageHistorySize.replace( " " , "" ).trim( ).toLowerCase( );
 		for ( final InputStream inputStream : this.inputStreams )
 			this.inputStreamNameToInputStreamObjectMapping.put( inputStream.getInputStreamName( ) , inputStream );
-
-		if ( storageHistorySize.equalsIgnoreCase( "0" ) ) return true;
-		final int second = 1000;
-		final int minute = second * 60;
-		final int hour = minute * 60;
-
-		final int mIndex = storageHistorySize.indexOf( "m" );
-		final int hIndex = storageHistorySize.indexOf( "h" );
-		final int sIndex = storageHistorySize.indexOf( "s" );
-		if ( mIndex < 0 && hIndex < 0 && sIndex < 0 ) {
-			try {
-				this.parsedStorageSize = Integer.parseInt( storageHistorySize );
-				this.isStorageCountBased = true;
+		try {
+			Pair<Boolean,Long> p = Utils.parseWindowSize(this.getStorageHistorySize( ));
+			this.parsedStorageSize = p.getSecond();
+			this.isStorageCountBased = ! p.getFirst();
 			} catch ( final NumberFormatException e ) {
 				this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.name )
 						.append( " is not valid." ).toString( ) , e );
 				return false;
 			}
-		} else {
-			try {
-				final StringBuilder shs = new StringBuilder( storageHistorySize );
-				if ( mIndex >= 0 && mIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( mIndex ).toString( ) ) * minute;
-				else if ( hIndex >= 0 && hIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( hIndex ).toString( ) ) * hour;
-				else if ( sIndex >= 0 && sIndex == shs.length() - 1) this.parsedStorageSize = Integer.parseInt( shs.deleteCharAt( sIndex ).toString( ) ) * second;
-				else Integer.parseInt("");
-				this.isStorageCountBased = false;
-			} catch ( final NumberFormatException e ) {
-				this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.name )
-						.append( " is not valid." ).toString( ) , e );
-				return false;
-			}
-		}
 		return true;
 	}
 

@@ -45,5 +45,23 @@ public class Utils {
         }
         return properties;
     }
+    
+    public static Pair<Boolean,Long> parseWindowSize(String s) throws NumberFormatException{
+		s = s.replace( " " , "" ).trim( ).toLowerCase( );
+		int mIndex = s.indexOf( "m" );
+		int hIndex = s.indexOf( "h" );
+		int sIndex = s.indexOf( "s" );
+		if ( mIndex < 0 && hIndex < 0 && sIndex < 0 ) {
+			return new Pair<Boolean,Long>(false,Long.parseLong(s));
+		} else {
+			StringBuilder shs = new StringBuilder(s);
+			long value = 0;
+			if ( mIndex >= 0 && mIndex == shs.length() - 1) value = Long.parseLong( shs.deleteCharAt( mIndex ).toString( ) ) * 60000;
+			else if ( hIndex >= 0 && hIndex == shs.length() - 1) value = Long.parseLong( shs.deleteCharAt( hIndex ).toString( ) ) * 3600000;
+			else if ( sIndex >= 0 && sIndex == shs.length() - 1) value = Long.parseLong( shs.deleteCharAt( sIndex ).toString( ) ) * 1000;
+			else throw new NumberFormatException("unable to pasre window size :"+shs);
+			return new Pair<Boolean,Long>(true,value);
+		} 
+    }
 
 }
