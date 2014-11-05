@@ -7,8 +7,42 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                    if ( ! isdef('positionMap')) { positionMap = [:]; }
-                    if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+					try {
+						def LIMIT = 11.7;
+						def SIZE = 10;
+						def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+						if ( ! isdef('voltageMap')) { voltageMap = [:]; }
+						if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
+							if (!voltageMap.containsKey(POSITION))
+								voltageMap.put(POSITION, [0, []]);
+								
+							def ptr = voltageMap.get(POSITION)[0];
+							def voltageList = voltageMap.get(POSITION)[1];
+					
+							org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).info("Position: " + POSITION + " voltageList.size()=" + voltageList.size());
+							if (voltageList.size() == SIZE) {
+								def averageBefore = voltageList.sum() / SIZE;
+								voltageList[ptr] = SDIVOLTAGE.toDouble();
+								
+								if ((voltageList.sum() / SIZE) <= LIMIT && averageBefore > LIMIT) {
+									// Notify by email
+									def emailTitle = "[PermaSense-GSN-Public] - VOLTAGE WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " - Battery voltage reaches critical state";
+									def emailContent = "VOLTAGE WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + ":\n\n Battery voltage dropped below " + LIMIT + "V.";
+									
+									sendEmail(mailrecipients, emailTitle, emailContent);
+								}
+							}
+							else { voltageList[ptr] = SDIVOLTAGE.toDouble(); }
+							
+							ptr = (ptr+1)%SIZE;
+							voltageMap.put(POSITION, [ptr, voltageList]);
+						}
+				
+						if ( ! isdef('positionMap')) { positionMap = [:]; }
+						if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
                 ]]>
             </param>
             <param name="period">600000</param>
