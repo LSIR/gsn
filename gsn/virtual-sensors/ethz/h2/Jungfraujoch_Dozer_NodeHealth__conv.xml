@@ -19,7 +19,6 @@
 							def ptr = voltageMap.get(POSITION)[0];
 							def voltageList = voltageMap.get(POSITION)[1];
 					
-							org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).info("Position: " + POSITION + " voltageList.size()=" + voltageList.size());
 							if (voltageList.size() == SIZE) {
 								def averageBefore = voltageList.sum() / SIZE;
 								voltageList[ptr] = SDIVOLTAGE.toDouble();
