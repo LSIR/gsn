@@ -15,6 +15,65 @@
 							bbuffer.position(bbuffer.position()+6);
                 			GPS_UNIXTIME = (long)(gsn.utils.Helpers.convertGPSTimeToUnixTime((double)bbuffer.getInt()/1000.0, (short)bbuffer.getShort())*1000.0);
                 		}
+                		
+                		// send email if number of satellites is zero LIMIT time in a row
+                		def LIMIT = 10;
+                    	def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+                		if ( ! isdef('zeroCountMap')) { zeroCountMap = [:]; }
+                		if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
+                			if (zeroCountMap.containsKey(POSITION)) {
+                				def zeroCount = 0;
+                				if (GPS_SATS == 0) {
+                					zeroCount = zeroCountMap.get(POSITION)++;
+                					if (zeroCount == LIMIT) {
+										// Notify by email
+										def emailTitle = "[PermaSense-GSN-Test] - GPS ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", POSITION);
+										def emailContent = "BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "]" + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", POSITION) + " (device_id=" + DEVICE_ID + "):\n\nNumber of received satellites has been zero " + LIMIT + " time in a row.";
+								
+										sendEmail(mailrecipients, emailTitle, emailContent);
+                					}
+                				}
+                				zeroCountMap.put(POSITION, zeroCount);
+                			} else { zeroCountMap.put(POSITION, 0); }
+                		}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+					
+                    if ( ! isdef('positionMap')) { positionMap = [:]; }
+                    if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+                ]]>
+            </param>
+            <param name="period">600000</param>
+            <param name="scriplet-periodic">
+                <![CDATA[
+                	try {
+                		// default alarm time after which an email is sent if no messages have been received
+                    	def timeDifferenceOffsetDefault = 86400000;
+                		// a list of alarm time per position
+                    	def timeDifferenceOffsetPositionMap = [:];
+                    	// the mail recipients
+                    	def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+                    	
+                    	if ( isdef('positionMap')) {
+                    		def rmlist = [];
+                    		for (entry in positionMap) {
+                    	    	def timeDifference = System.currentTimeMillis() - entry.value;
+                    	    	def timeDifferenceOffset = timeDifferenceOffsetDefault;
+                    	    	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
+                    	    		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
+                    	    	}
+                    	    	if (timeDifference > timeDifferenceOffset) {
+                    	    		// Notify by email
+                    	    		def emailTitle = "[PermaSense-GSN-Test] - WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", entry.key) + " - No more " + vsname + " messages received";
+                    	    		def emailContent = "WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", entry.key) + ":\n\n No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes.";
+
+                       		 		sendEmail(mailrecipients, emailTitle, emailContent);
+                        			rmlist.add(entry.key)
+                        		}
+                      		}
+                        	positionMap.keySet().removeAll( rmlist as Set );
+                    	}
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}

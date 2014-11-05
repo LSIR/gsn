@@ -11,36 +11,39 @@
                     if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
                 ]]>
             </param>
-            <param name="period">300000</param>
+            <param name="period">600000</param>
             <param name="scriplet-periodic">
                 <![CDATA[
-                	// default alarm time after which an email is sent if no messages have been received
-                    def timeDifferenceOffsetDefault = 86400000;
-                	// a list of alarm time per position
-                    def timeDifferenceOffsetPositionMap = [:];
-                    // the mail recipients
-                    def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
-                    
-                    if ( isdef('positionMap')) {
-                    	def rmlist = [];
-                    	for (entry in positionMap) {
-                        	def timeDifference = System.currentTimeMillis() - entry.value;
-                        	def timeDifferenceOffset = timeDifferenceOffsetDefault;
-                        	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
-                        		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
-                        	}
-                        	if (timeDifference > timeDifferenceOffset) {
-                        		// Notify by email
-                        		def emailTitle = "[PermaSense-GSN-Test] - WARNING: No more " + vsname + " messages received from position " + entry.key;
-                        		def emailContent = "WARNING: No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes from device with position " + entry.key + ".";
+                	try {
+                		// default alarm time after which an email is sent if no messages have been received
+                    	def timeDifferenceOffsetDefault = 86400000;
+                		// a list of alarm time per position
+                    	def timeDifferenceOffsetPositionMap = [:];
+                    	// the mail recipients
+                    	def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+                    	
+                    	if ( isdef('positionMap')) {
+                    		def rmlist = [];
+                    		for (entry in positionMap) {
+                    	    	def timeDifference = System.currentTimeMillis() - entry.value;
+                    	    	def timeDifferenceOffset = timeDifferenceOffsetDefault;
+                    	    	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
+                    	    		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
+                    	    	}
+                    	    	if (timeDifference > timeDifferenceOffset) {
+                    	    		// Notify by email
+                    	    		def emailTitle = "[PermaSense-GSN-Test] - WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", entry.key) + " - No more " + vsname + " messages received";
+                    	    		def emailContent = "WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", entry.key) + ":\n\n No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes.";
 
-								org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
-                        		sendEmail(mailrecipients, emailTitle, emailContent);
-                        		rmlist.add(entry.key)
-                        	}
-                        }
-                        positionMap.keySet().removeAll( rmlist as Set );
-                    }
+                       		 		sendEmail(mailrecipients, emailTitle, emailContent);
+                        			rmlist.add(entry.key)
+                        		}
+                      		}
+                        	positionMap.keySet().removeAll( rmlist as Set );
+                    	}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
                 ]]>
             </param>
         </init-params>

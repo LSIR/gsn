@@ -7,17 +7,33 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                    	def spl = new String(LOG_MESSAGE, "UTF-8").split("\\s+", 6);
-                    	PRIORITY = spl[0].substring(1, spl[0].length()-1).toShort();
-                    	HOST = spl[4];
-                    	spl = spl[5].split(":", 2);
-                    	if (spl.size() == 2 && spl[0].find(" ") == null) {
-                    		PROGRAM = spl[0];
-                    		MESSAGE = spl[1].getBytes("UTF-8");
-                    	} else {
-                    		PROGRAM = null; 
-                    		MESSAGE = spl[0].getBytes("UTF-8");
-                    	}
+						// parse syslog message and generate additional fields
+						def msg = new String(LOG_MESSAGE, "UTF-8").split("\\s+", 6);
+						PRIORITY = msg[0].substring(1, msg[0].length()-1).toShort();
+						HOST = msg[4];
+						msg = msg[5].split(":", 2);
+						if (msg.size() == 2 && msg[0].find(" ") == null) {
+							PROGRAM = msg[0];
+							msg = msg[1];
+							MESSAGE = msg.getBytes("UTF-8");
+						} else {
+							PROGRAM = null;
+							msg = msg[0];
+							MESSAGE = msg.getBytes("UTF-8");
+						}
+						
+						// send email on backlog error
+						if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
+							def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+			    		
+							if ( PROGRAM.toLowerCase() == "backlog" && PRIORITY%8 <= 3 ) {
+								// Notify by email
+								def emailTitle = "[PermaSense-GSN-Public] - BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", POSITION);
+								def emailContent = "BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "]" + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", POSITION) + " (device_id=" + DEVICE_ID + "):\n\n" + msg;
+								
+								sendEmail(mailrecipients, emailTitle, emailContent);
+							}
+						}
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}

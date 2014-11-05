@@ -10,7 +10,7 @@
                     	def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
 
             			// Notify by email
-            			def emailTitle = "[PermaSense-GSN-Test] - Schedule generated";
+            			def emailTitle = "[PermaSense-GSN-Public] - Schedule generated";
             			def emailContent = "New schedule generated at " + (new Date(GENERATION_TIME)).getDateTimeString() + " for CoreStation with device id " + DEVICE_ID;
 
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
