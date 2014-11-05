@@ -31,13 +31,11 @@
                     
                     if (idToMessageMap.containsKey(EVENT_ID.toInteger())) {
                     	// Notify by email
-                    	def emailTitle = "[PermaSense-GSN-Public] - ERROR: Dozer Event (vs=" + vsname + ", pos=" + POSITION + ")";
-                    	
-                    	def emailContent = "ERROR [" + (new Date(GENERATION_TIME)).getDateTimeString() + "] Dozer Event on position " + POSITION + " (device_id=" + DEVICE_ID + ") at " + vsname + ":\n\n" + idToMessageMap.get(EVENT_ID.toInteger());
-                    	if (EVENT_VALUE != null)
+                    	def emailTitle = "[PermaSense-GSN-Public] - DOZER ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION;
+						def emailContent = "DOZER ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "]" + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " (device_id=" + DEVICE_ID + "):\n\n" + idToMessageMap.get(EVENT_ID.toInteger());
+						if (EVENT_VALUE != null)
                     		emailContent = emailContent.replaceAll('%s',Integer.toString(EVENT_VALUE));
                     	
-                    	org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).warn(emailContent);
                     	sendEmail(mailrecipients, emailTitle, emailContent);
                     }
                 ]]>

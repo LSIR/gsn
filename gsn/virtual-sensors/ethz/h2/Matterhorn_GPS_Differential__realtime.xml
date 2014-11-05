@@ -113,8 +113,8 @@
                     	    	}
                     	    	if (timeDifference > timeDifferenceOffset) {
                     	    		// Notify by email
-                    	    		def emailTitle = "[PermaSense-GSN-Public] - WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", entry.key) + " - No more " + vsname + " messages received";
-                    	    		def emailContent = "WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", entry.key) + ":\n\n No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes.";
+                    	    		def emailTitle = "[PermaSense-GSN-Public] - WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + entry.key + " - No more " + vsname + " messages received";
+                    	    		def emailContent = "WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + entry.key + ":\n\n No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes.";
 
                        		 		sendEmail(mailrecipients, emailTitle, emailContent);
                         			rmlist.add(entry.key)

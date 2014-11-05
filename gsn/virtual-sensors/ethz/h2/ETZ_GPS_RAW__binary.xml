@@ -24,11 +24,11 @@
                 			if (zeroCountMap.containsKey(POSITION)) {
                 				def zeroCount = 0;
                 				if (GPS_SATS == 0) {
-                					zeroCount = zeroCountMap.get(POSITION)++;
+                					zeroCount = zeroCountMap.get(POSITION) + 1;
                 					if (zeroCount == LIMIT) {
 										// Notify by email
-										def emailTitle = "[PermaSense-GSN-Test] - GPS ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", POSITION);
-										def emailContent = "BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "]" + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", POSITION) + " (device_id=" + DEVICE_ID + "):\n\nNumber of received satellites has been zero " + LIMIT + " time in a row.";
+										def emailTitle = "[PermaSense-GSN-Test] - GPS ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION;
+										def emailContent = "BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "]" + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " (device_id=" + DEVICE_ID + "):\n\nNumber of received satellites has been zero " + LIMIT + " time in a row.";
 								
 										sendEmail(mailrecipients, emailTitle, emailContent);
                 					}
@@ -65,8 +65,8 @@
                     	    	}
                     	    	if (timeDifference > timeDifferenceOffset) {
                     	    		// Notify by email
-                    	    		def emailTitle = "[PermaSense-GSN-Test] - WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", entry.key) + " - No more " + vsname + " messages received";
-                    	    		def emailContent = "WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", entry.key) + ":\n\n No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes.";
+                    	    		def emailTitle = "[PermaSense-GSN-Test] - WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + entry.key + " - No more " + vsname + " messages received";
+                    	    		def emailContent = "WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + entry.key + ":\n\n No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes.";
 
                        		 		sendEmail(mailrecipients, emailTitle, emailContent);
                         			rmlist.add(entry.key)

@@ -28,8 +28,8 @@
 			    		
 							if ( PROGRAM.toLowerCase() == "backlog" && PRIORITY%8 <= 3 ) {
 								// Notify by email
-								def emailTitle = "[PermaSense-GSN-Public] - BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", POSITION);
-								def emailContent = "BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "]" + vsname.split("_",2)[0].toUpperCase() + " POS" + String.format( "%02d", POSITION) + " (device_id=" + DEVICE_ID + "):\n\n" + msg;
+								def emailTitle = "[PermaSense-GSN-Public] - BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION;
+								def emailContent = "BACKLOG ERROR [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "]" + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " (device_id=" + DEVICE_ID + "):\n\n" + msg;
 								
 								sendEmail(mailrecipients, emailTitle, emailContent);
 							}
