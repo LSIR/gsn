@@ -29,13 +29,24 @@ public class FileGetterWrapper extends AbstractWrapper {
 	private boolean deviceIdFromFilename;
 	final static private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
 
+    private static final String PARAM_SUBDIRECTORY_NAME = "subdirectory-name";
+    private static final String PARAM_FILENAME_REGEX = "filename-regex";
+    private static final String PARAM_DEVICEID_FROM_FILENAME = "deviceid-from-filename";
+    
+    private static final String COMMAND_NAME = "files";
+    
+    private static final String DATAFIELD_GENERATION_TIME = "GENERATION_TIME";
+    private static final String DATAFIELD_DEVICE_ID = "DEVICE_ID";
+    private static final String DATAFIELD_RELATIVE_FILE = "RELATIVE_FILE";
+    private static final String DATAFIELD_SIZE_FILE = "SIZE_FILE";
+
 	@Override
 	public boolean initialize() {
 		String rootBinaryDir = null;
 		format.setTimeZone(Main.getContainerConfig().getTimeZone());
 		
 		try {
-			subdirectoryName = getActiveAddressBean().getPredicateValueWithException("subdirectory-name");
+			subdirectoryName = getActiveAddressBean().getPredicateValueWithException(PARAM_SUBDIRECTORY_NAME);
 		} catch (Exception e){
 			logger.error(e.getMessage());
 			return false;
@@ -73,43 +84,57 @@ public class FileGetterWrapper extends AbstractWrapper {
 	    		logger.info("created new storage directory >" + deploymentBinaryDir + "<");
 		}
 
-		int size = -1;
+		DataField[] commandEntries = null;
 		for (int i=0; i<getActiveAddressBean().getVirtualSensorConfig().getWebinput().length; i++) {
-			if (getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getName().equalsIgnoreCase("files")) {
-				size = getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getParameters().length;
+			if (getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getName().equalsIgnoreCase(COMMAND_NAME)) {
+				commandEntries = getActiveAddressBean().getVirtualSensorConfig().getWebinput()[i].getParameters();
 				break;
 			}
 		}
-		if (size == -1) {
-			logger.error("command name files has to be existing in the web-input section");
+		if (commandEntries == null) {
+			logger.error("command name " + COMMAND_NAME + " has to be existing in the web-input section");
 			return false;
 		}
-		outputStructure = new DataField[(size*2)+2];
-		outputStructure[0] = new DataField("DEVICE_ID", "INTEGER");
-		outputStructure[1] = new DataField("GENERATION_TIME", "BIGINT");
-		filenamePatternArray = new Pattern [size];
+		
+		int relFileCnt = 0, sizeFileCnt = 0;
+		for (DataField field: commandEntries) {
+			if (field.getName().startsWith(DATAFIELD_RELATIVE_FILE))
+				relFileCnt++;
+			else if (field.getName().startsWith(DATAFIELD_SIZE_FILE))
+				sizeFileCnt++;
+		}
+		
+		if (relFileCnt != sizeFileCnt) {
+			logger.error("the number of " + DATAFIELD_RELATIVE_FILE + " entries has to be equal to the number of " + DATAFIELD_SIZE_FILE + " entries.");
+			return false;
+		}
+		
+		outputStructure = new DataField[(relFileCnt*2)+2];
+		outputStructure[0] = new DataField(DATAFIELD_DEVICE_ID, "INTEGER");
+		outputStructure[1] = new DataField(DATAFIELD_GENERATION_TIME, "BIGINT");
+		filenamePatternArray = new Pattern [relFileCnt];
 		boolean hasRegex = false;
-		for (int i=0; i<size; i++) {
-			String regex = getActiveAddressBean().getPredicateValue("filename-regex" + (i+1));
+		for (int i=0; i<relFileCnt; i++) {
+			String regex = getActiveAddressBean().getPredicateValue(PARAM_FILENAME_REGEX + (i+1));
 			if (regex != null) {
 				hasRegex = true;
 				filenamePatternArray[i] = Pattern.compile(regex);
 				logger.info("RELATIVE_FILE" + (i+1) + " has to match regular expression: " + regex);
 				
-				deviceIdFromFilename = Boolean.parseBoolean(getActiveAddressBean().getPredicateValue("deviceid-from-filename"));
+				deviceIdFromFilename = Boolean.parseBoolean(getActiveAddressBean().getPredicateValue(PARAM_DEVICEID_FROM_FILENAME));
 				if (deviceIdFromFilename)
 					logger.info("device id will be extracted from RELATIVE_FILE" + (i+1) + " using the first group from regular expresion: " + regex);
 			}
 			else
 				filenamePatternArray[i] = null;
 			
-			outputStructure[(i*2)+2] = new DataField("RELATIVE_FILE" + (i+1), "VARCHAR(255)");
-			outputStructure[(i*2)+3] = new DataField("SIZE_FILE" + (i+1), "BIGINT");
+			outputStructure[(i*2)+2] = new DataField(DATAFIELD_RELATIVE_FILE + (i+1), "VARCHAR(255)");
+			outputStructure[(i*2)+3] = new DataField(DATAFIELD_SIZE_FILE + (i+1), "BIGINT");
 		}
 		
 		
-		if (!hasRegex && Boolean.parseBoolean(getActiveAddressBean().getPredicateValue("deviceid-from-filename"))) {
-			logger.error("deviceid-from-filename predicate key can only be used together with filename-regex");
+		if (!hasRegex && Boolean.parseBoolean(getActiveAddressBean().getPredicateValue(PARAM_DEVICEID_FROM_FILENAME))) {
+			logger.error(PARAM_DEVICEID_FROM_FILENAME + " parameter can only be used together with filename-regex");
 			return false;
 		}
 		
@@ -118,18 +143,26 @@ public class FileGetterWrapper extends AbstractWrapper {
 	
 	@Override
 	public InputInfo sendToWrapper ( String action , String [ ] paramNames , Serializable [ ] paramValues ) throws OperationNotSupportedException {
-		if( action.compareToIgnoreCase("files") == 0 ) {
+		if( action.compareToIgnoreCase(COMMAND_NAME) == 0 ) {
 			try {
 				long gentime = System.currentTimeMillis();
 				String deviceid = null;
-				Vector<LoggerFile> inputFileItems = new Vector<LoggerFile>();
+				Vector<BinaryFile> inputFileItems = new Vector<BinaryFile>();
 				
 				for( int i=0; i<paramNames.length; i++ ) {
 					String tmp = paramNames[i];
-					if( tmp.compareToIgnoreCase("device_id") == 0 )
+					if( tmp.compareToIgnoreCase(DATAFIELD_DEVICE_ID) == 0 )
 						deviceid = (String) paramValues[i];
+					if( tmp.compareToIgnoreCase(DATAFIELD_GENERATION_TIME) == 0 ) {
+						try {
+							gentime = Long.parseLong((String) paramValues[i]);
+						} catch(Exception e) {
+							logger.error("Could not interprete " + DATAFIELD_GENERATION_TIME + " argument (" + ((String) paramValues[i]) +") as integer");
+							return new InputInfo(getActiveAddressBean().toString(), "Could not interprete " + DATAFIELD_GENERATION_TIME + " argument (" + ((String) paramValues[i]) +") as integer", false);
+						}
+					}
 					else if( tmp.endsWith("_file") )
-						inputFileItems.add(new LoggerFile((FileItem) paramValues[i], tmp));
+						inputFileItems.add(new BinaryFile((FileItem) paramValues[i], tmp));
 					else
 						logger.warn("unknown upload field: " + tmp + " -> skip it");
 				}
@@ -157,20 +190,20 @@ public class FileGetterWrapper extends AbstractWrapper {
 				}
 				
 				if (deviceid.equals("")) {
-					logger.error("device_id argument has to be an integer between 0 and 65535");
-					return new InputInfo(getActiveAddressBean().toString(), "device_id argument has to be an integer between 0 and 65535", false);
+					logger.error(DATAFIELD_DEVICE_ID + " argument has to be an integer between 0 and 65535");
+					return new InputInfo(getActiveAddressBean().toString(), DATAFIELD_DEVICE_ID + " argument has to be an integer between 0 and 65535", false);
 				}
 				
 				Integer id;
 				try {
 					id = Integer.parseInt(deviceid);
 				} catch(Exception e) {
-					logger.error("Could not interprete device_id argument (" + deviceid +") as integer");
-					return new InputInfo(getActiveAddressBean().toString(), "Could not interprete device_id argument (" + deviceid +") as integer", false);
+					logger.error("Could not interprete " + DATAFIELD_DEVICE_ID + " argument (" + deviceid +") as integer");
+					return new InputInfo(getActiveAddressBean().toString(), "Could not interprete " + DATAFIELD_DEVICE_ID + " argument (" + deviceid +") as integer", false);
 				}
 				if (id < 0 || id > 65534) {
-					logger.error("device_id argument has to be an integer between 0 and 65535");
-					return new InputInfo(getActiveAddressBean().toString(), "device_id argument has to be an integer between 0 and 65535", false);
+					logger.error(DATAFIELD_DEVICE_ID + " argument has to be an integer between 0 and 65535");
+					return new InputInfo(getActiveAddressBean().toString(), DATAFIELD_DEVICE_ID + " argument has to be an integer between 0 and 65535", false);
 				}
 				
 				File storageDir = new File(new File(deploymentBinaryDir, id.toString()), subdirectoryName);
@@ -187,8 +220,8 @@ public class FileGetterWrapper extends AbstractWrapper {
 				output[0] = id;
 				output[1] = gentime;
 				int i = 2;
-				for (Iterator<LoggerFile> it = inputFileItems.iterator (); it.hasNext (); ) {
-					LoggerFile inputLoggerFile = it.next ();
+				for (Iterator<BinaryFile> it = inputFileItems.iterator (); it.hasNext (); ) {
+					BinaryFile inputLoggerFile = it.next ();
 					if (inputLoggerFile.getFileItem().getSize() <= 0) {
 						if (!inputLoggerFile.getFileItem().getName().isEmpty())
 							logger.warn("uploaded file " + inputLoggerFile.getFileItem().getName() + " is empty => skip it");
@@ -242,11 +275,11 @@ public class FileGetterWrapper extends AbstractWrapper {
 		return "FileGetterWrapper";
 	}
 
-	class LoggerFile {
+	class BinaryFile {
 		private FileItem file;
 		private String prefix;
 		
-		public LoggerFile(FileItem file, String prefix) {
+		public BinaryFile(FileItem file, String prefix) {
 			this.file = file;
 			this.prefix = prefix;
 		}
