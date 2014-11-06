@@ -24,7 +24,7 @@
                 <address wrapper="local">
                     <predicate key="query">select * from Saastal_Binary_Upload__mapped</predicate>
                 </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE from wrapper where POSITION = 1</query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, RELATIVE_FILE1 as RELATIVE_FILE  from wrapper where POSITION = 1</query>
             </source>
             <query> select * from source </query>
         </stream>
