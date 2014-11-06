@@ -88,8 +88,8 @@ public class JpegGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 			logger.error(e.getMessage(), e);
 		}
 		
-		if (mimeType != null && (mimeType.equalsIgnoreCase("image/jpeg") || mimeType.equalsIgnoreCase("image/pjpeg"))) {
-			logger.debug("getting jpeg: " + file.getAbsolutePath());
+		if (mimeType != null && (mimeType.equalsIgnoreCase("image/png") || mimeType.equalsIgnoreCase("image/jpeg") || mimeType.equalsIgnoreCase("image/pjpeg"))) {
+			logger.debug("getting image: " + file.getAbsolutePath());
 		    try {
 		    	is = new FileInputStream(file);
 		    } catch (IOException e) {
@@ -97,7 +97,7 @@ public class JpegGetterVirtualSensor extends BridgeVirtualSensorPermasense {
 		    }
 		}
 		else {
-			logger.debug("exctracting jpeg from: " + file.getAbsolutePath());
+			logger.debug("exctracting image from: " + file.getAbsolutePath());
 			Process p = null;
 			StringBuffer cmd = new StringBuffer(DCRAW + " -c");
 			if (nef_extraction_type.equalsIgnoreCase("thumbnail"))

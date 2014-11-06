@@ -31,6 +31,7 @@ Dirruhorn_BackLogStatus_Revision.xml
 Dirruhorn_BackLogStatus_Static.xml
 Dirruhorn_Binary.xml
 Dirruhorn_Binary_Http.xml
+Dirruhorn_Binary_Upload.xml
 Dirruhorn_CamZilla.xml
 Dirruhorn_CoreStationStatus_Hardware.xml
 Dirruhorn_CoreStationStatus_Software.xml
@@ -163,6 +164,7 @@ Saastal_BackLogStatus_Revision.xml
 Saastal_BackLogStatus_Static.xml
 Saastal_Binary.xml
 #Saastal_Binary_Http.xml
+Saastal_Binary_Upload.xml
 Saastal_CamZilla.xml
 Saastal_CoreStationStatus_Hardware.xml
 Saastal_CoreStationStatus_Software.xml

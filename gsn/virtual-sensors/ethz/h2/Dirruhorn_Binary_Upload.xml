@@ -1,0 +1,39 @@
+<virtual-sensor name="Dirruhorn_Binary_Upload" priority="10" >
+" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+       	<web-input password="test">
+         	<command name="files">
+				<field name="device_id" type="*text" >the device id of the uploaded file</field>
+				<field name="generation_time" type="*text" >the generation time of the uploaded file</field>
+				<field name="binary_file" type="*binary">file</field>
+        	</command>
+   		</web-input>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            
+            <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>
+            <field name="BINARY_DATA" type="binary" data-path-field="RELATIVE_FILE1" />
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Uploaded binary files from Dirruhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+      <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="file-getter">
+                    <predicate key="subdirectory-name">binary_upload</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

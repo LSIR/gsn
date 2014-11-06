@@ -39,6 +39,8 @@ public class FileGetterWrapper extends AbstractWrapper {
     private static final String DATAFIELD_DEVICE_ID = "DEVICE_ID";
     private static final String DATAFIELD_RELATIVE_FILE = "RELATIVE_FILE";
     private static final String DATAFIELD_SIZE_FILE = "SIZE_FILE";
+    
+    private static final String DATAFIELD_BINARY_SUFFIX = "_file";
 
 	@Override
 	public boolean initialize() {
@@ -96,34 +98,27 @@ public class FileGetterWrapper extends AbstractWrapper {
 			return false;
 		}
 		
-		int relFileCnt = 0, sizeFileCnt = 0;
+		int fileCnt = 0;
 		for (DataField field: commandEntries) {
-			if (field.getName().startsWith(DATAFIELD_RELATIVE_FILE))
-				relFileCnt++;
-			else if (field.getName().startsWith(DATAFIELD_SIZE_FILE))
-				sizeFileCnt++;
+			if (field.getName().endsWith(DATAFIELD_BINARY_SUFFIX))
+				fileCnt++;
 		}
 		
-		if (relFileCnt != sizeFileCnt) {
-			logger.error("the number of " + DATAFIELD_RELATIVE_FILE + " entries has to be equal to the number of " + DATAFIELD_SIZE_FILE + " entries.");
-			return false;
-		}
-		
-		outputStructure = new DataField[(relFileCnt*2)+2];
+		outputStructure = new DataField[(fileCnt*2)+2];
 		outputStructure[0] = new DataField(DATAFIELD_DEVICE_ID, "INTEGER");
 		outputStructure[1] = new DataField(DATAFIELD_GENERATION_TIME, "BIGINT");
-		filenamePatternArray = new Pattern [relFileCnt];
+		filenamePatternArray = new Pattern [fileCnt];
 		boolean hasRegex = false;
-		for (int i=0; i<relFileCnt; i++) {
+		for (int i=0; i<fileCnt; i++) {
 			String regex = getActiveAddressBean().getPredicateValue(PARAM_FILENAME_REGEX + (i+1));
 			if (regex != null) {
 				hasRegex = true;
 				filenamePatternArray[i] = Pattern.compile(regex);
-				logger.info("RELATIVE_FILE" + (i+1) + " has to match regular expression: " + regex);
+				logger.info(DATAFIELD_RELATIVE_FILE + (i+1) + " has to match regular expression: " + regex);
 				
 				deviceIdFromFilename = Boolean.parseBoolean(getActiveAddressBean().getPredicateValue(PARAM_DEVICEID_FROM_FILENAME));
 				if (deviceIdFromFilename)
-					logger.info("device id will be extracted from RELATIVE_FILE" + (i+1) + " using the first group from regular expresion: " + regex);
+					logger.info("device id will be extracted from " + DATAFIELD_RELATIVE_FILE + (i+1) + " using the first group from regular expresion: " + regex);
 			}
 			else
 				filenamePatternArray[i] = null;
@@ -153,7 +148,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 					String tmp = paramNames[i];
 					if( tmp.compareToIgnoreCase(DATAFIELD_DEVICE_ID) == 0 )
 						deviceid = (String) paramValues[i];
-					if( tmp.compareToIgnoreCase(DATAFIELD_GENERATION_TIME) == 0 ) {
+					else if( tmp.compareToIgnoreCase(DATAFIELD_GENERATION_TIME) == 0 ) {
 						try {
 							gentime = Long.parseLong((String) paramValues[i]);
 						} catch(Exception e) {
@@ -161,7 +156,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 							return new InputInfo(getActiveAddressBean().toString(), "Could not interprete " + DATAFIELD_GENERATION_TIME + " argument (" + ((String) paramValues[i]) +") as integer", false);
 						}
 					}
-					else if( tmp.endsWith("_file") )
+					else if( tmp.endsWith(DATAFIELD_BINARY_SUFFIX) )
 						inputFileItems.add(new BinaryFile((FileItem) paramValues[i], tmp));
 					else
 						logger.warn("unknown upload field: " + tmp + " -> skip it");

@@ -52,6 +52,7 @@ Dirruhorn_BackLogStatus_Revision__mapped.xml
 Dirruhorn_BackLogStatus_Static__mapped.xml
 Dirruhorn_Binary__mapped.xml
 Dirruhorn_Binary_Http__mapped.xml
+Dirruhorn_Binary_Upload__mapped.xml
 #Dirruhorn_Camera_CamZilla_Randa__scaled.xml
 Dirruhorn_Camera_Dirru_Geisstriftbach__scaled.xml
 Dirruhorn_Camera_Findelengletscher__scaled.xml
@@ -380,6 +381,8 @@ Saastal_BackLogStatus_Revision__mapped.xml
 Saastal_BackLogStatus_Static__mapped.xml
 Saastal_Binary__mapped.xml
 #Saastal_Binary_Http__mapped.xml
+Saastal_Binary_Upload__mapped.xml
+Saastal_Camera_pos1__processed.xml
 Saastal_Camera_pos1__scaled.xml
 Saastal_CamZilla__mapped.xml
 Saastal_CoreStationStatus_Hardware__conv.xml
