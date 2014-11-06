@@ -9,32 +9,34 @@
                 <![CDATA[
 					try {
 						def LIMIT = 11.7;
-						def SIZE = 10;
+						def SIZE = 60;
 						def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
 						if ( ! isdef('voltageMap')) { voltageMap = [:]; }
 						if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
 							if (!voltageMap.containsKey(POSITION))
-								voltageMap.put(POSITION, [0, []]);
+								voltageMap.put(POSITION, [0, 0, []]);
 								
-							def ptr = voltageMap.get(POSITION)[0];
-							def voltageList = voltageMap.get(POSITION)[1];
-					
-							if (voltageList.size() == SIZE) {
-								def averageBefore = voltageList.sum() / SIZE;
-								voltageList[ptr] = SDIVOLTAGE.toDouble();
+							if (voltageMap.get(POSITION)[0] <= GENERATION_TIME) {
+								def ptr = voltageMap.get(POSITION)[1];
+								def voltageList = voltageMap.get(POSITION)[2];
 								
-								if ((voltageList.sum() / SIZE) <= LIMIT && averageBefore > LIMIT) {
-									// Notify by email
-									def emailTitle = "[PermaSense-GSN-Public] - VOLTAGE WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " - Battery voltage reaches critical state";
-									def emailContent = "VOLTAGE WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + ":\n\n Battery voltage dropped below " + LIMIT + "V.";
+								if (voltageList.size() == SIZE ) {
+									def averageBefore = voltageList.sum() / SIZE;
+									voltageList[ptr] = SDIVOLTAGE.toDouble();
 									
-									sendEmail(mailrecipients, emailTitle, emailContent);
+									if ((voltageList.sum() / SIZE) <= LIMIT && averageBefore > LIMIT) {
+										// Notify by email
+										def emailTitle = "[PermaSense-GSN-Public] - VOLTAGE WARNING [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " - Battery voltage reaches critical state";
+										def emailContent = "VOLTAGE WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + ":\n\n Battery voltage dropped below " + LIMIT + "V.";
+										
+										sendEmail(mailrecipients, emailTitle, emailContent);
+									}
 								}
+								else { voltageList[ptr] = SDIVOLTAGE.toDouble(); }
+								
+								ptr = (ptr+1)%SIZE;
+								voltageMap.put(POSITION, [GENERATION_TIME, ptr, voltageList]);
 							}
-							else { voltageList[ptr] = SDIVOLTAGE.toDouble(); }
-							
-							ptr = (ptr+1)%SIZE;
-							voltageMap.put(POSITION, [ptr, voltageList]);
 						}
 				
 						if ( ! isdef('positionMap')) { positionMap = [:]; }
