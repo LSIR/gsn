@@ -75,6 +75,7 @@ class CamZillaPluginClass(AbstractPluginClass):
     _calibrated
     _delay
     _powerSaveMode
+    _keepMinMbFree
     _dslrAvailable
     _pictureFolder
     _webcamAvailable
@@ -125,6 +126,13 @@ class CamZillaPluginClass(AbstractPluginClass):
             raise TypeError('%s does not exist' % (GPHOTO2,))
         if not os.access(GPHOTO2, os.X_OK):
             raise TypeError('%s can not be executed' % (GPHOTO2,))
+        
+        value = self.getOptionValue('keep_min_mb_free')
+        if value != None:
+            self._keepMinMbFree = int(value)
+            self.info('at least %dMb will be kept free' % (self._keepMinMbFree,))
+        else:
+            raise TypeError('keep_min_mb_free has to be specified')
         
         value = self.getOptionValue('dslr_available')
         if value != None and int(value) == 1:
@@ -873,6 +881,8 @@ class CamZillaPluginClass(AbstractPluginClass):
             return
         
         self._execCommand(command)
+        if camera == WEBCAM:
+            self._checkFreeSpaceAndDeleteFilesIfNecessary(self._keepMinMbFree, self._webcamPictureFolder)
         
         
     def _setFocus(self, focus):
@@ -894,7 +904,7 @@ class CamZillaPluginClass(AbstractPluginClass):
             self.warning('there are still files in the temporary directory -> move them to %s' % (self._pictureFolder,))
             for file in sorted(os.listdir(TMPPICTUREFOLDER)):
                 shutil.move(os.path.join(TMPPICTUREFOLDER, file), self._pictureFolder)
-               
+        
         pic_count = 0
         for filename in filenames:
             if self._plugStop:
@@ -906,6 +916,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                 bugwait = os.path.getsize(file) / 500000
                 shutil.move(file, self._pictureFolder)
             self._delay.wait(bugwait)
+            self._checkFreeSpaceAndDeleteFilesIfNecessary(self._keepMinMbFree, self._pictureFolder)
             pic_count += 1
         if pic_count > 0:
             self.info('downloaded %d pictures from DSLR' % (pic_count,))
@@ -940,6 +951,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                     bugwait = os.path.getsize(file) / 500000
                     shutil.move(file, self._pictureFolder)
                 self._delay.wait(bugwait)
+                self._checkFreeSpaceAndDeleteFilesIfNecessary(self._keepMinMbFree, self._pictureFolder)
         if pic_count > 0:
             self.info('downloaded %d unknown pictures from DSLR' % (pic_count,))
 
@@ -1145,6 +1157,24 @@ class CamZillaPluginClass(AbstractPluginClass):
             raise e
         finally:
             self._writeLock.release()
+        
+        
+        
+    def _checkFreeSpaceAndDeleteFilesIfNecessary(self, minFreeMb, path):
+        while true:
+            statvfs = os.statvfs(path)
+            freeSpace = (statvfs.f_frsize * statvfs.f_bfree)/1048576
+            if (minFreeMb >= freeSpace):
+                matches = []
+                for root, dirs, files in os.walk(path):
+                    if root == path:
+                        for file in files:
+                            matches.append(os.path.join(root, file))
+                toRemove = min(matches, key=os.path.getmtime)
+                self.warning('only %dMb free on %s --> deleting %s' % (freeSpace, path, toRemove))
+                os.remove(toRemove)
+            else:
+                return
             
     
 
