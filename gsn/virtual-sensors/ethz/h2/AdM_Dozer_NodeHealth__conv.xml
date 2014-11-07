@@ -27,7 +27,7 @@
 									if ((voltageList.sum() / SIZE) <= LIMIT && averageBefore > LIMIT) {
 										// Notify by email
 										def emailTitle = "[PermaSense-GSN-Public] - VOLTAGE WARNING [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " - Battery voltage reaches critical state";
-										def emailContent = "VOLTAGE WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + ":\n\n Battery voltage dropped below " + LIMIT + "V.";
+										def emailContent = "VOLTAGE WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " (device_id=" + DEVICE_ID + "):\n\n Battery voltage dropped below " + LIMIT + "V.";
 										
 										sendEmail(mailrecipients, emailTitle, emailContent);
 									}
@@ -40,7 +40,7 @@
 						}
 				
 						if ( ! isdef('positionMap')) { positionMap = [:]; }
-						if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
+						if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, [System.currentTimeMillis(), DEVICE_ID]); }
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -60,15 +60,16 @@
                     	if ( isdef('positionMap')) {
                     		def rmlist = [];
                     		for (entry in positionMap) {
-                    	    	def timeDifference = System.currentTimeMillis() - entry.value;
+                    			def now = System.currentTimeMillis();
+                    	    	def timeDifference = now - entry.value[0];
                     	    	def timeDifferenceOffset = timeDifferenceOffsetDefault;
                     	    	if (timeDifferenceOffsetPositionMap.containsKey(entry.key)) {
                     	    		timeDifferenceOffset = timeDifferenceOffsetPositionMap.get(entry.key);
                     	    	}
                     	    	if (timeDifference > timeDifferenceOffset) {
                     	    		// Notify by email
-                    	    		def emailTitle = "[PermaSense-GSN-Public] - WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + entry.key + " - No more " + vsname + " messages received";
-                    	    		def emailContent = "WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + entry.key + ":\n\n No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes.";
+                    	    		def emailTitle = "[PermaSense-GSN-Public] - OFFLINE WARNING [" + (new Date(now)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS " + entry.key;
+                    	    		def emailContent = "OFFLINE WARNING [" + (new Date(now)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS " + entry.key + " (device_id=" + entry.value[1] + "):\n\n No " + vsname + " messages received in the last " + (timeDifference/60000.0) + " minutes.";
 
                        		 		sendEmail(mailrecipients, emailTitle, emailContent);
                         			rmlist.add(entry.key)

@@ -5,34 +5,32 @@
     		<init-params>
             <param name="persistant">true</param>
 	    	<param name="scriptlet">
-	    	<![CDATA[
-                // Convert the dBm to Watts.
-                def dbmToWatt(double powerDbm) {
-                    double powerW = Math.pow(10, (powerDbm/10.0))*0.001;
-                    return powerW;
-                }
+	    		<![CDATA[
+                	// Convert the dBm to Watts.
+                	def dbmToWatt(double powerDbm) {
+                    	double powerW = Math.pow(10, (powerDbm/10.0))*0.001;
+                    	return powerW;
+                	}
 
-                // And back to dBm.
-                def wattToDbm(double powerW) {
-                    double powerDbm = 10*Math.log10(powerW/0.001);
-                    return powerDbm;
-                }
+                	// And back to dBm.
+                	def wattToDbm(double powerW) {
+                    	double powerDbm = 10*Math.log10(powerW/0.001);
+                    	return powerDbm;
+                	}
 
-                // Returns the E filed strength.
-                // rssi in dBm, freq in Hz, gain linear.
-                def rssiToFieldStrength(double rssi, double freq, double gain) {
-                    double C = 299792458; // Speed of light
-                    double Z0 = 376.73; // Free space impedance
+                	// Returns the E filed strength.
+                	// rssi in dBm, freq in Hz, gain linear.
+                	def rssiToFieldStrength(double rssi, double freq, double gain) {
+                    	double C = 299792458; // Speed of light
+                    	double Z0 = 376.73; // Free space impedance
           
-                    double powerW = dbmToWatt(rssi);
-                    double wavelength = C/freq;
-                    double fieldStrength = Math.sqrt(powerW*Z0/(gain*Math.pow(wavelength,2)/(4*Math.PI)));
+                    	double powerW = dbmToWatt(rssi);
+                    	double wavelength = C/freq;
+                    	double fieldStrength = Math.sqrt(powerW*Z0/(gain*Math.pow(wavelength,2)/(4*Math.PI)));
 
-                    return fieldStrength;
-                }
+                    	return fieldStrength;
+                	}
 
-	    		if ( ! isdef('positionMap')) { positionMap = [:]; }
-                    if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) { positionMap.put(POSITION, System.currentTimeMillis()); }
                     try {
                         // Wifi Data
                         String[] tokens = WIFI_RAW_DATA.split(",");
