@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_RAW__conv" priority="10" >
+<virtual-sensor name="ETZ_GPS_RAW__single__conv" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.GPSRawDemuxBridgeVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -36,7 +36,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_RAW__binary</predicate>
+                    <predicate key="query">select * from ETZ_GPS_RAW__binary__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
