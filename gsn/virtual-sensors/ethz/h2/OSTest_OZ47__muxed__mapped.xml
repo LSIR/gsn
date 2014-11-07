@@ -45,6 +45,7 @@
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
                 ]]>
+	    	</param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
