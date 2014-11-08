@@ -30,6 +30,7 @@ package gsn.beans;
 
 import gsn.Main;
 import gsn.Mappings;
+import gsn.config.VsConf;
 import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushRemoteWrapper;
 import gsn.http.rest.RestRemoteWrapper;
@@ -106,7 +107,7 @@ public final class Modifications {
 	 */
 	private void loadVirtualSensors ( Collection < String > fileNames , ArrayList < VSensorConfig > list ) {
 		if ( fileNames == null || list == null ) throw new RuntimeException( "Null pointer Exception (" + ( fileNames == null ) + "),(" + ( list == null ) + ")" );
-		IBindingFactory bfact;
+		/*IBindingFactory bfact;
 		IUnmarshallingContext uctx;
 		try {
 			bfact = BindingDirectory.getFactory( VSensorConfig.class );
@@ -114,11 +115,13 @@ public final class Modifications {
 		} catch ( JiBXException e1 ) {
 			logger.fatal( e1.getMessage( ) , e1 );
 			return;
-		}
+		}*/
 		VSensorConfig configuration;
 		for ( String file : fileNames ) {
 			try {
-				configuration = ( VSensorConfig ) uctx.unmarshalDocument( new FileInputStream( file ) , null );
+				//configuration = ( VSensorConfig ) uctx.unmarshalDocument( new FileInputStream( file ) , null );
+				VsConf vsConf=VsConf.load(file);
+				configuration=BeansInitializer.vsensor(vsConf);
 				configuration.setFileName( file );
 				if ( !configuration.validate( ) ) {
 					logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( file ).append( " failed because of one or more problems in configuration file." )
@@ -128,13 +131,13 @@ public final class Modifications {
 				}
 
 				list.add( configuration );
-			} catch ( JiBXException e ) {
+			/*} catch ( JiBXException e ) {
 				logger.error( e.getMessage( ) , e );
 				logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( file ).append(
-				" failed because there is syntax error in the configuration file. Please check the configuration file and try again." ).toString( ) );
-			} catch ( FileNotFoundException e ) {
+				" failed because there is syntax error in the configuration file. Please check the configuration file and try again." ).toString( ) );*/
+			} catch ( Exception e ) {
 				logger.error( e.getMessage( ) , e );
-				logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( file ).append( " failed because the configuratio of I/O problems." ).toString( ) );
+				logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( file ).append( " failed." ).toString( ) );
 			}
 		}
 	}

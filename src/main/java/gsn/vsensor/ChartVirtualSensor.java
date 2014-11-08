@@ -87,14 +87,16 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
        */
       TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
       ChartInfo chartInfo = new ChartInfo( );
-      chartInfo.setInputStreamName( params.get( "input-stream" ) );
       
+      chartInfo.setInputStreamName( params.get( "input-stream" ) );
+      logger.debug("All keys "+params.keySet().iterator().next());
       chartInfo.setPlotTitle( params.get( "title" ) );
       chartInfo.setType( params.get( "type" ) );
       chartInfo.setHeight( ParamParser.getInteger( params.get( "height" ) , 480 ) );
       chartInfo.setWidth( ParamParser.getInteger( params.get( "width" ) , 640 ) );
       chartInfo.setVerticalAxisTitle( params.get( "vertical-axis" ) );
       chartInfo.setHistorySize( ParamParser.getInteger( params.get( "history-size" ) , 10 ) );
+      logger.debug("Initializing chart input stream name: "+chartInfo.getInputStreamName());
       input_stream_name_to_ChartInfo_map.put( chartInfo.getInputStreamName( ) , chartInfo );
       chartInfo.initialize( );
       return true;

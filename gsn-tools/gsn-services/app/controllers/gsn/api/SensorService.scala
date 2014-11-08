@@ -19,6 +19,8 @@ import collection.JavaConversions._
 import org.joda.time.format.DateTimeFormatterBuilder
 import gsn.xpr.XprConditions
 import scala.util.Success
+import scala.util.Try
+import scala.util.Failure
 
 object SensorService extends Controller{
   lazy val conf=ConfigFactory.load
@@ -29,22 +31,30 @@ object SensorService extends Controller{
     DateTimeFormat.forPattern(d).getParser
   }.toArray
   val dtf=new DateTimeFormatterBuilder().append(null,parsers).toFormatter
-  //val dtf=ISODateTimeFormat.dateTime
 
   def sensorsMeta:Future[Map[String,Sensor]]=
     Cache.getOrElse("sensors")(metadata.allSensors)
   
-  def sensors(latestVals:Option[Boolean]) = Action.async {
+  def sensors(latestVals:Option[Boolean],format:Option[String]) = Action.async {
     sensorsMeta.map{s=>
+      Try{
+      val f=
+        if (!format.isDefined) defaultFormat.code
+        else if (!isValidFormat(format.get))
+          throw new Exception("grapa")
+        else format.get
+        
       if (latestVals.isDefined && latestVals.get){
         val m= s.map(ss=>latestValues(ss._2))
-        Ok(DataSerializer.sensorDataToJson(m.toSeq))        
+        Ok(DataSerializer.toJson(m.toSeq))        
       }
       else {
         Ok(DataSerializer.toJsonString(s.values.toSeq))       
       }
-    }
+    }.recover{case t=>BadRequest(t.getMessage)    }.get
+      }
   }
+  
     
   def sensor(sensorid:String,
              size:Option[Int],
@@ -54,8 +64,9 @@ object SensorService extends Controller{
              toStr:Option[String]) = Action.async {request=>
     
     sensorsMeta.map{s=>
+      Try{
       if (!s.contains(sensorid))
-        BadRequest("Invalid virtual sensor identifier: "+sensorid)
+        throw new IllegalArgumentException("Unknown virtual sensor identifier: "+sensorid)
       else{
         val filters=new ArrayBuffer[String]
         val sensor=s(sensorid)
@@ -67,13 +78,13 @@ object SensorService extends Controller{
         if (toStr.isDefined)          
           filters+= "timed<"+dtf.parseDateTime(toStr.get).getMillis
         val conds=XprConditions.parseConditions(filterStr.toArray).recover{                 
-          case e=>throw new IllegalArgumentException("illegal conditions in filter: "+e.getClass()+e.getMessage())
+          case e=>throw new IllegalArgumentException("illegal conditions in filter: "+e.getMessage())
         }.get.map(_.toString)
          
-        //.flatMap{_.map(_.toString)}
           
-        Ok(DataSerializer.sensorDataToJson(Seq(query(sensor,fields,conds++filters,size))))
+        Ok(DataSerializer.toJson(Seq(query(sensor,fields,conds++filters,size))))
       }
+      }.recover{case t=>BadRequest(t.getMessage)}.get
     }
   }
   
@@ -139,9 +150,17 @@ object SensorService extends Controller{
 	finally con.close
   }
   
+  private def isValidFormat(format:String)=
+    validFormats.exists(_.code.equals(format))
+    
+  private val validFormats=Seq(Csv,Json)
+  private val defaultFormat=Json
 
 
-
-
+  case class OutputFormat(code:String) 
+    object Csv extends OutputFormat("csv")
+    object Json extends OutputFormat("json")
+    
+  
 
 }

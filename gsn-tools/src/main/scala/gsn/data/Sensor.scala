@@ -7,8 +7,8 @@ case class Sensor(name:String,
     implements:Seq[Sensing],
     //location:Location,
     platform: Platform,
-    properties:collection.Map[String,String],
-    values:Seq[Array[Any]]){
+    properties:collection.Map[String,String]){
+    //values:Seq[Array[Any]]){
   lazy val fields:Seq[Output]=implements.map(_.outputs).flatten
   lazy val location=platform.location 
 } 

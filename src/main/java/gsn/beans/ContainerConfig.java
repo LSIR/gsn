@@ -28,6 +28,7 @@
 
 package gsn.beans;
 
+import gsn.config.GsnConf;
 import gsn.utils.KeyValueImp;
 import gsn.utils.ValidityTools;
 
@@ -110,12 +111,12 @@ public class ContainerConfig {
 	protected String                      containerFileName;
 	protected int                         storagePoolSize                  = -1;
 
-	private int                           sslPort                          = -1;
-    private boolean                       acEnabled                        = false;
-	private String                        sslKeyStorePassword;
-	private String                        sslKeyPassword;
-    private StorageConfig                 storage ;
-    private SlidingConfig                 sliding;
+	protected int                         sslPort                          = -1;
+    protected boolean                     acEnabled                        = false;
+	protected String                      sslKeyStorePassword;
+	protected String                      sslKeyPassword;
+    protected StorageConfig                 storage;
+    protected SlidingConfig                 sliding;
 	private String                        directoryLoggingLevel            = DEFAULT_LOGGING_LEVEL;
 	private long                          maxDirectoryLogSizeInMB          = DEFAULT_GSN_LOG_SIZE;
 	private String                        gsnLoggingLevel                  = DEFAULT_LOGGING_LEVEL;
@@ -127,8 +128,34 @@ public class ContainerConfig {
 	private Properties                    gsnLog4JProperties;
 	private String                        databaseSystem;
 	private boolean                       isdatabaseSystemInitialzied      = false;
-	private String                        timeFormat                       = "";
+	protected String                      timeFormat                       = "";
 
+	public ContainerConfig(){
+		
+	}
+	
+	public ContainerConfig(String name,String author,String description,String email,
+			int port, String timeFormat, boolean zmqEnabled,int zmqProxyPort,int zmqMetaPort,
+			boolean acEnabled,int sslPort, String sslKSPass,String sslKPass, 
+			StorageConfig storage,SlidingConfig slide){
+		this.webName=name;
+		this.webAuthor=author;
+		this.webEmail=email;
+		this.webDescription=description;
+		this.containerPort=port;
+		this.timeFormat=timeFormat;
+		this.zmqEnabled=zmqEnabled;
+		this.zmqProxyPort=zmqProxyPort;
+		this.zmqMetaPort=zmqMetaPort;
+		this.acEnabled=acEnabled;
+		this.sslPort=sslPort;
+		this.sslKeyStorePassword=sslKSPass;
+		this.sslKeyPassword=sslKPass;
+		this.storage=storage;
+		this.sliding=slide;				
+				
+				
+	}
 
     public boolean isAcEnabled() {
         return acEnabled;
@@ -308,10 +335,12 @@ public class ContainerConfig {
 	}
 
 	public static ContainerConfig getConfigurationFromFile ( String containerConfigurationFileName , String gsnLog4jFile , String dirLog4jFile ) throws JiBXException , FileNotFoundException {
-		IBindingFactory bfact = BindingDirectory.getFactory( ContainerConfig.class );
+/*		IBindingFactory bfact = BindingDirectory.getFactory( ContainerConfig.class );
 		IUnmarshallingContext uctx = bfact.createUnmarshallingContext( );
 		ContainerConfig toReturn = ( ContainerConfig ) uctx.unmarshalDocument( new FileInputStream( containerConfigurationFileName ) , null );
-
+*/
+		GsnConf gsn=GsnConf.load(containerConfigurationFileName);
+		ContainerConfig toReturn = BeansInitializer.container(gsn);
 		Properties gsnLog4j = new Properties( );
 		try {
 			gsnLog4j.load( new FileInputStream( gsnLog4jFile ) );

@@ -127,7 +127,7 @@ public class RestServices {
 		String ext = null;
 		ResponseBuilder resp = null;
 		if (FORMAT_CSV.equals(format)) {
-			StringWriter sw = DataSerializer.toCsv(sensor);
+			StringWriter sw = DataSerializer.toCsv(sensor,null,null);
 			resp = Response.ok(toString(sw));
 			resp.type(MEDIA_TYPE_CSV);
 			ext = ".csv";

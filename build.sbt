@@ -1,23 +1,31 @@
 import com.typesafe.sbt.SbtNativePackager._
 import NativePackagerKeys._
 
-packageArchetype.java_application
-
 name := "gsn"
 
-organization := "ch.epfl.lsir"
+organization := "gsn"
 
 version := "1.1.5"
 
-scalaVersion := "2.10.4"
+packageArchetype.java_application
+
+packAutoSettings
+
+Revolver.settings
+
+scalaVersion := "2.11.2"
 
 crossPaths := false
 
 libraryDependencies ++= Seq(
+  "gsn" % "gsn-tools" % "0.0.4-SNAPSHOT" exclude("ch.qos.logback","logback-classic") ,
   "com.typesafe" % "config" % "1.2.1",
+  "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
   "com.h2database" % "h2" % "1.4.181",
   "mysql" % "mysql-connector-java" % "5.1.29",
+  "org.postgresql" % "postgresql" % "9.3-1102-jdbc41",
   "commons-dbcp" % "commons-dbcp" % "1.4",
+  "org.hibernate" % "hibernate-core" % "3.6.10.Final",
   "org.apache.axis2" % "axis2-adb" % "1.5.5",
   "org.apache.httpcomponents" % "httpclient" % "4.3.2",
   "org.apache.commons" % "commons-email" % "1.3.2",
@@ -25,9 +33,10 @@ libraryDependencies ++= Seq(
   "org.apache.hbase" % "hbase" % "0.94.6.1",
   "org.apache.hadoop" % "hadoop-common" % "0.23.10",
   "log4j" % "log4j" % "1.2.17",
+  "org.slf4j" % "slf4j-api" % "1.7.5",
+  "org.slf4j" % "slf4j-log4j12" % "1.7.5",
   "org.jibx" % "jibx-run" % "1.2.5",            
   "org.eclipse.jetty" % "jetty-webapp" % "7.0.2.v20100331",
-  "org.hibernate" % "hibernate-core" % "3.6.10.Final",
   "net.sf.opencsv" % "opencsv" % "2.3",
   "com.thoughtworks.xstream" % "xstream" % "1.4.5",
   "servlets.com" % "cos" % "05Nov2002",
@@ -38,34 +47,39 @@ libraryDependencies ++= Seq(
   "org.glassfish.jersey.containers" % "jersey-container-servlet-core" % "2.8",
   "org.glassfish.jersey.core" % "jersey-client" % "2.8",
   "com.ganyo" % "gcm-server" % "1.0.2",
-  "junit" % "junit" % "4.11",
-  "org.easymock" % "easymockclassextension" % "3.2",
-  "org.httpunit" % "httpunit" % "1.7.2" intransitive
+  "org.jfree" % "jfreechart" % "1.0.19", 
+  "org.jfree" % "jcommon" % "1.0.23",
+  "com.vividsolutions" % "jts" % "1.13",
+  "org.postgis" % "postgis-jdbc" % "1.3.3",
+  "nz.ac.waikato.cms.weka" % "weka-stable" % "3.6.6",
+  //"nz.ac.waikato.cms.weka" % "LibSVM" % "1.0.6",
+  "org.asteriskjava" % "asterisk-java" % "1.0.0.M3",
+  "jasperreports" % "jasperreports" % "3.5.3",
+  "org.codehaus.groovy" % "groovy-all" % "2.2.2",
+  "net.rforge" % "REngine" % "0.6-8.1",
+  "net.rforge" % "Rserve" % "0.6-8.1",
+  "org.nuiton.thirdparty" % "JRI" % "0.8-4",
+  "org.rxtx" % "rxtx" % "2.1.7",
+  "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
+  "org.zeromq" % "jeromq" % "0.3.0",
+  "junit" % "junit" % "4.11" %  "test",
+  "org.easymock" % "easymockclassextension" % "3.2" % "test",
+  "org.httpunit" % "httpunit" % "1.7.2" exclude("xerces","xercesImpl") exclude("xerces","xmlParserAPIs")
 )
 
 resolvers ++= Seq(
   DefaultMavenRepository,
-  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+  "LSIR" at "http://planetdata.epfl.ch:8081/artifactory/gsn-release",
+  "Local ivy Repository" at "file://"+Path.userHome.absolutePath+"/.ivy2/local" 
 )
 
 mainClass := Some("gsn.Main")
 
-unmanagedSourceDirectories in Compile <<= (javaSource in Compile)(Seq(_))
-
-unmanagedSourceDirectories in Test <<= (javaSource in Test)(Seq(_))
-
-//javaSource in Compile <<= baseDirectory(base => base / "src")
-
-javaSource in Test :=  baseDirectory.value / "test"
-
-//resourceDirectory in Compile := baseDirectory.value / "conf"
-
-//resourceDirectory in Test := baseDirectory.value / "logs"
-
 unmanagedJars in Compile <++= baseDirectory map { base =>
     val libs = base / "lib"
     val option = libs / "optional"
-    val dirs = (option / "tinyos") +++ (option / "charting") +++ (option / "compiling") +++ (option / "databases") +++ (option / "gis") +++ (option / "modeling") +++ (option / "numerical") +++ (option / "scriptlet") +++ (option / "semantic") +++ (option / "serial-port") +++ (option / "statistics") +++ (option / "twitter") +++ (option / "voip") +++ (libs / "jasper")  
+    val dirs = (option / "legacy") +++ (option / "tinyos") +++ (option / "numerical")   
     (dirs ** "*.jar").classpath
 }
 
@@ -83,12 +97,18 @@ scalacOptions += "-deprecation"
 
 EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
 
+EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
+
 parallelExecution in Test := false
 
-publishTo := Some("Artifactory Realm" at "http://aldebaran.dia.fi.upm.es/artifactory/sstreams-releases-local")
+publishTo := Some("Artifactory Realm" at "http://planetdata.epfl.ch:8081/artifactory/gsn-release")
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
 publishMavenStyle := true
 
 publishArtifact in (Compile) := false
+
+mainClass in Revolver.reStart := Some("gsn.Main")
+
+Revolver.reStartArgs := Seq("22232")

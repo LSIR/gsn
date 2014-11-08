@@ -36,12 +36,12 @@ public class DataStore {
 	public Sensor findSensor(String vsName,boolean latestValues){
 	    VSensorConfig sensorConfig = Mappings.getConfig(vsName);
 
-        ArrayList<Field> fields = new ArrayList<Field>();
+        ArrayList<Sensing> fields = new ArrayList<Sensing>();
         
-        fields.add(new Field("time",IntDT$.MODULE$,new DataUnit("s","s"),"time"));
+        fields.add(Sensing.apply("time",new gsn.data.Output("time",vsName,new DataUnit("s","s"),IntType$.MODULE$)));
         for (DataField out:sensorConfig.getOutputStructure()){              
-      	  fields.add(new Field(out.getName(),DoubleDT$.MODULE$,
-      			  new DataUnit(out.getUnit(),out.getUnit()),""));        	  
+      	  fields.add(Sensing.apply(out.getName(),new gsn.data.Output(out.getName(),vsName,
+      			  new DataUnit(out.getUnit(),out.getUnit()),DoubleType$.MODULE$)));        	  
         }
         
         ArrayList<Object[]> values = new ArrayList<Object[]>();
@@ -74,11 +74,13 @@ public class DataStore {
         Double lon=doubleOrNull(props.get("longitude"));
         Double alt=doubleOrNull(props.get("altitude"));
                   
-        Sensor s=new Sensor(sensorConfig.getName(),
+        Platform p=new Platform(sensorConfig.getName(),Location.apply(lat,lon,alt),null);
+
+        Sensor s=new Sensor(sensorConfig.getName(),        		
       		  JavaConversions.asScalaBuffer(fields),
-      		  Location.apply(lat,lon,alt),
-      		  JavaConversions.mapAsScalaMap(props),
-      		  JavaConversions.asScalaBuffer(values));         
+      		  p,
+      		  JavaConversions.mapAsScalaMap(props)
+      		  );         
         return s;
 	}
 	
@@ -162,10 +164,10 @@ public class DataStore {
 		ff.add("time");
 		ff.addAll(Arrays.asList(fields));
 		Seq<String> fNames=JavaConversions.asScalaBuffer(ff);
-		Sensor sensorWithValues=Sensor.createWithValues(s,fNames,
-				JavaConversions.asScalaBuffer(res));
-
-		return sensorWithValues;
+		/*SensorData sensorWithValues=new SensorData(
+				JavaConversions.asScalaBuffer(res),s);
+*/
+		return null;
 	}
 
 	 private Object getObject(ResultSet rs,String fieldName) throws SQLException{

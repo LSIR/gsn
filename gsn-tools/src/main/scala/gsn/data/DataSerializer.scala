@@ -8,30 +8,28 @@ import gsn.data.netcdf.NetCdf
 
 object DataSerializer {
   
-  def toJsonString(sensors:Seq[Sensor])=Json.stringify(sensorsToJson(sensors))
+  def toJsonString(sensors:Seq[Sensor])=Json.stringify(toJson(sensors))
   def toJsonString(sensor:Sensor)=Json.stringify(toJson(sensor))
 
-  def sensorsToJson(sensors:Seq[Sensor])={
+  def toJson(sensors:Seq[Sensor]):JsValue=
     Json.obj("type"->"FeatureCollection",
         "features"->JsArray(sensors.map(s=>toJson(s))))
-  }  
   
-  def sensorDataToJson(sensorsWithVals:Seq[SensorData])={
+  
+  def toJson(sensorsData:Seq[SensorData])(implicit d:DummyImplicit):JsValue=
     Json.obj("type"->"FeatureCollection",
-        "features"->JsArray(sensorsWithVals.map(s=>toJson(s))))
-    
-  }
+        "features"->JsArray(sensorsData.map(s=>toJson(s))))    
+  
   
   def toJson(data:SensorData):JsValue={
     val values=data.ts.map{t=>
       t.series.unzip._2       
     } 
     val fields=data.ts.map(_.output.fieldName) 
-    toJson(data.s,values, fields)
-     
+    toJson(data.s,values, fields)     
   }
   
-  private def coreToJson(any:Seq[Any]):JsArray=JsArray (any.map{
+  private def valueToJson(any:Seq[Any]):JsArray=JsArray (any.map{
     case d:Double=>JsNumber(d)
     case i:Int=>JsNumber(i)
     case l:Long=>JsNumber(l)
@@ -40,14 +38,14 @@ object DataSerializer {
     case null=>JsNull
   })
   
-  def toJson(sensor:Sensor,values:Seq[Seq[Any]]=Seq(),valueNames:Seq[String]=Seq())={
+  private def toJson(sensor:Sensor,values:Seq[Seq[Any]]=Seq(),valueNames:Seq[String]=Seq())={
         
     val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
     .map{f=>
       Json.obj("name"->f.fieldName,"type"->f.dataType.name,"unit"->f.unit.code)
     }
     
-    val jsValues=values.map{record=>coreToJson(record)}      
+    val jsValues=values.map{record=>valueToJson(record)}      
     
     val propvals=Seq("vs_name"->JsString(sensor.name),
                      "values"->JsArray(jsValues),
@@ -61,11 +59,9 @@ object DataSerializer {
                              "coordinates"->Json.arr(sensor.location.latitude,
                                                      sensor.location.longitude,
                                                      sensor.location.altitude))
-    )
-    
+    )    
     feature
   }
-
   
   def toCsv(sensors:Seq[Sensor],props:Seq[String])={
     val sw=new StringWriter
@@ -81,23 +77,28 @@ object DataSerializer {
   }
   
   
-  def toCsv(sensor:Sensor)={
+  def toCsv(sensor:Sensor,
+      values:Seq[Seq[Any]]=Seq(),
+      valueNames:Seq[String]=Seq()):StringWriter={
     val sw=new StringWriter
-    def head(key:String,value:Any)=sw.append("# "+key+":"+value+System.lineSeparator)
+    def head(key:String,value:Any)=
+      sw.append("# "+key+":"+value+System.lineSeparator)
     
     head("vs_name",sensor.name)
     sensor.properties.foreach(p=>head(p._1,p._2))
-    head("fields",sensor.fields.map{_.fieldName}.mkString(","))
-    head("units",sensor.fields.map{_.unit.code}.mkString(","))
-    head("types",sensor.fields.map{_.dataType.name}.mkString(","))
+    val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
+
+    head("fields",fields.map{_.fieldName}.mkString(","))
+    head("units",fields.map{_.unit.code}.mkString(","))
+    head("types",fields.map{_.dataType.name}.mkString(","))
         
-    val values=sensor.values.map{record=>
+    values.map{record=>
       sw.append(record.mkString(",")+System.lineSeparator)}
     sw  
     
   }
   
   def toNetCdf(sensor:Sensor)={
-    NetCdf.serialize(sensor)
+    NetCdf.serialize(sensor,null)
   }
 }

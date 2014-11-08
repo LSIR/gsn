@@ -33,9 +33,11 @@
 
 package gsn;
 
+import gsn.beans.BeansInitializer;
 import gsn.beans.ContainerConfig;
 import gsn.beans.StorageConfig;
 import gsn.beans.VSensorConfig;
+import gsn.config.GsnConf;
 import gsn.http.ac.ConnectToDB;
 import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
@@ -91,10 +93,10 @@ import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
+//import org.jibx.runtime.BindingDirectory;
+//import org.jibx.runtime.IBindingFactory;
+//import org.jibx.runtime.IUnmarshallingContext;
+//import org.jibx.runtime.JiBXException;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.eclipse.jetty.server.AbstractConnector;
@@ -298,13 +300,13 @@ public final class Main {
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			if ( logger.isInfoEnabled ( ) ) logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
 			if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
-		} catch ( JiBXException e ) {
+		/*} catch ( JiBXException e ) {
 			logger.error ( e.getMessage ( ) );
 			logger.error ( "Can't parse the GSN configuration file : " + Main.DEFAULT_GSN_CONF_FILE );
 			logger.error ( "Please check the syntax of the file to be sure it is compatible with the requirements." );
 			logger.error ( "You can find a sample configuration file from the GSN release." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
-			System.exit ( 1 );
+			System.exit ( 1 );*/
 		} catch ( FileNotFoundException e ) {
 			logger.error ("The the configuration file : " + Main.DEFAULT_GSN_CONF_FILE + " doesn't exist.");
 			logger.error ( e.getMessage ( ) );
@@ -323,14 +325,18 @@ public final class Main {
 	/**
 	 * This method is called by Rails's Application.rb file.
 	 */
-	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
+	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws //JiBXException, 
+	    FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
 		if (!new File(gsnXMLpath).isFile()) {
 			logger.fatal("Couldn't find the gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
 			System.exit(1);
-		}
-		IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
+		}		
+
+		/*IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
 		IUnmarshallingContext uctx = bfact.createUnmarshallingContext ( );
-		ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( gsnXMLpath ) ) , null );
+		ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( gsnXMLpath ) ) , null );*/
+		GsnConf gsnConf =GsnConf.load(gsnXMLpath);
+		ContainerConfig conf=BeansInitializer.container(gsnConf);
 		Class.forName(conf.getStorage().getJdbcDriver());
 		conf.setContainerConfigurationFileName (  gsnXMLpath );
 		return conf;
