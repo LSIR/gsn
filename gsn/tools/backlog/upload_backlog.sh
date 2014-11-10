@@ -4,18 +4,19 @@ BACKLOG_PYTHON_DIR=/usr/lib/python2.6/backlog
 RCS_KEYWORDS_SCRIPT=rcs-keywords
 
 PRODUCTIVE_HOSTS=(
+	permasense-adm-bs01
 	permasense-dh-bs01
-	permasense-dh-gps01
 	permasense-dh-gps03
 	permasense-gg-bs01
 	permasense-gg-cam01
 	permasense-gg-cam02
 	permasense-gg-gps01
+	permasense-hs-bs01
+	permasense-hs-cam01
 	permasense-jj-bs01
 	permasense-mh-bs01
 	permasense-mh-cam01
 	permasense-rd-bs01
-	permasense-adm-bs01
 )
 TEST_HOSTS=(
 	permasense-etz-bs01
