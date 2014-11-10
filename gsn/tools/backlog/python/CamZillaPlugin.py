@@ -1161,7 +1161,7 @@ class CamZillaPluginClass(AbstractPluginClass):
         
         
     def _checkFreeSpaceAndDeleteFilesIfNecessary(self, minFreeMb, path):
-        while true:
+        while True:
             statvfs = os.statvfs(path)
             freeSpace = (statvfs.f_frsize * statvfs.f_bfree)/1048576
             if (minFreeMb >= freeSpace):
