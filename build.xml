@@ -19,8 +19,9 @@
         </tstamp>
         <property environment="env"/>
         <property name="conf.dir" value="${basedir}/conf"/>
-        <property name="build.dir" value="build/classes"/>
-        <property name="src.dir" value="src"/>
+        <property name="resources.dir" value="src/main/resources"/>
+        <property name="build.dir" value="target/classes"/>    	
+        <property name="src.dir" value="src/main/java"/>
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
         <property name="reports" value="reports"/>
@@ -32,6 +33,7 @@
         <!--  <property name="jmf.dir"     value="JMF-2.1.1e" /> -->
         <path id="classpath">
             <pathelement location="${build.dir}/jcoverage-classes/"/>
+            <pathelement location="${conf.dir}/"/>
             <pathelement location="${build.dir}/"/>
             <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
             <fileset dir="${libdir}">
@@ -54,9 +56,10 @@
         <mkdir dir="${reports}/javadoc"/>
         <mkdir dir="${reports}/junit"/>
         <mkdir dir="${jars}"/>
-        <condition property="java6">
+    	<echo>${ant.java.version}</echo>
+        <!--<condition property="java6">
             <equals arg1="${ant.java.version}" arg2="1.6"/>
-        </condition>
+        </condition>-->
     </target>
 
     <target name="build" depends="setup" description="Compile the cource code.">
@@ -65,14 +68,18 @@
             <exclude name="**/TCPConnPool.java"/>
             <exclude name="**/NetworkUtility.java"/>
         </javac>
+    	<copy todir="${build.dir}">
+    	    <fileset dir="${resources.dir}" includes="**/*.conf,**/*.properties" />
+    	</copy>
     </target>
 
     <target name="bind" depends="build" description="Compile the JIBX mappings.">
+    	
         <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
               failonerror="true">
             <classpath refid="classpath"/>
-            <arg value="conf/containerJIBX.xml"/>
-            <arg value="conf/VirtualSensorDescription.xml"/>
+            <arg value="src/main/resources/containerJIBX.xml"/>
+            <arg value="src/main/resources/VirtualSensorDescription.xml"/>
         </java>
     </target>
 

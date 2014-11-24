@@ -1,19 +1,46 @@
+import com.typesafe.sbt.SbtNativePackager._
+import NativePackagerKeys._
+
 packageArchetype.java_application
 
 name := "gsn"
 
 organization := "ch.epfl.lsir"
 
-version := "1.1.3"
+version := "1.1.5"
 
-scalaVersion := "2.10.1"
+scalaVersion := "2.10.4"
 
 crossPaths := false
 
 libraryDependencies ++= Seq(
-  "log4j" % "log4j" % "1.2.17"
-//  "org.jibx" % "jibx-bind" % "1.2.2",
-//  "commons-collections" % "commons-collections" % "3.2.1",
+  "com.typesafe" % "config" % "1.2.1",
+  "com.h2database" % "h2" % "1.4.181",
+  "mysql" % "mysql-connector-java" % "5.1.29",
+  "commons-dbcp" % "commons-dbcp" % "1.4",
+  "org.apache.axis2" % "axis2-adb" % "1.5.5",
+  "org.apache.httpcomponents" % "httpclient" % "4.3.2",
+  "org.apache.commons" % "commons-email" % "1.3.2",
+  "commons-io" % "commons-io" % "2.4",
+  "org.apache.hbase" % "hbase" % "0.94.6.1",
+  "org.apache.hadoop" % "hadoop-common" % "0.23.10",
+  "log4j" % "log4j" % "1.2.17",
+  "org.jibx" % "jibx-run" % "1.2.5",            
+  "org.eclipse.jetty" % "jetty-webapp" % "7.0.2.v20100331",
+  "org.hibernate" % "hibernate-core" % "3.6.10.Final",
+  "net.sf.opencsv" % "opencsv" % "2.3",
+  "com.thoughtworks.xstream" % "xstream" % "1.4.5",
+  "servlets.com" % "cos" % "05Nov2002",
+  "javax.media" % "jmf" % "2.1.1e",
+  "org.antlr" % "stringtemplate" % "3.0",
+  "org.apache.mina" % "mina-core" % "1.1.7",
+  "rome" % "rome" % "1.0",
+  "org.glassfish.jersey.containers" % "jersey-container-servlet-core" % "2.8",
+  "org.glassfish.jersey.core" % "jersey-client" % "2.8",
+  "com.ganyo" % "gcm-server" % "1.0.2",
+  "junit" % "junit" % "4.11",
+  "org.easymock" % "easymockclassextension" % "3.2",
+  "org.httpunit" % "httpunit" % "1.7.2" intransitive
 )
 
 resolvers ++= Seq(
@@ -27,18 +54,18 @@ unmanagedSourceDirectories in Compile <<= (javaSource in Compile)(Seq(_))
 
 unmanagedSourceDirectories in Test <<= (javaSource in Test)(Seq(_))
 
-javaSource in Compile <<= baseDirectory(base => base / "src")
+//javaSource in Compile <<= baseDirectory(base => base / "src")
 
 javaSource in Test :=  baseDirectory.value / "test"
 
-resourceDirectory in Compile := baseDirectory.value / "conf"
+//resourceDirectory in Compile := baseDirectory.value / "conf"
 
-resourceDirectory in Test := baseDirectory.value / "logs"
+//resourceDirectory in Test := baseDirectory.value / "logs"
 
 unmanagedJars in Compile <++= baseDirectory map { base =>
     val libs = base / "lib"
     val option = libs / "optional"
-    val dirs = (libs / "core") +++ (libs / "core" / "jetty") +++ (option / "tinyos") +++ (option / "charting") +++ (option / "compiling") +++ (option / "databases") +++ (option / "gis") +++ (option / "modeling") +++ (option / "numerical") +++ (option / "scriptlet") +++ (option / "semantic") +++ (option / "serial-port") +++ (option / "statistics") +++ (option / "twitter") +++ (option / "voip") +++ (libs / "axis-2") +++ (libs / "hbase") +++ (libs / "hibernate") +++ (libs / "jasper") +++ (libs / "safe-storage") +++ (libs / "rss") +++ (libs / "junit-jars") +++ (libs / "slf") 
+    val dirs = (option / "tinyos") +++ (option / "charting") +++ (option / "compiling") +++ (option / "databases") +++ (option / "gis") +++ (option / "modeling") +++ (option / "numerical") +++ (option / "scriptlet") +++ (option / "semantic") +++ (option / "serial-port") +++ (option / "statistics") +++ (option / "twitter") +++ (option / "voip") +++ (libs / "jasper")  
     (dirs ** "*.jar").classpath
 }
 

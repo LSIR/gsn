@@ -1,7 +1,36 @@
 ## GSN Change log
 
+### r1.1.6
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.6)
+* Major update on tinyGSN, virtual sensors are running as background services and a scheduler takes care of turning them on and off.
+* Moved GSN sources to /src/main/java
+* Updated licence to GPLv3 or later for compatibility with the libraries
+* Added support for 32bit native floats as GSN types
+* Adding support for pushing multiple stream elements in a single PUT request
+* Updating plots on the webapp (using d3.js), new aggregators, sampling option and scatter plots
+
+
+### r1.1.5
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.5)
+* Added possibility to omit latest values in request '/gsn?REQUEST=0'
+* Added latest values in /sensors response (/service?latest_values=true)
+* Added GeoJSON format for RestApi
+* Updated commons codec, upgraded web xml 2.5
+* Added the tinyGSN Android app, and google cloud messaging support
+* Updated ContainerInfoHandler to support non-unique time-stamps
+
+
+### r1.1.4
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.4)
+* Updated the logo and color scheme accordingly
+* Added zeromq wrapper and distribution system
+* Fixed GriddData out of memory
+* Adding support for request 113 in REST API and some refactoring
+* Filtering empty VS in multidata download
+
+
 ### r1.1.3
-[commits] (https://github.com/LSIR/gsn/commits/gsn-release-1.1.2)
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.3)
 * Added support for HBase storage
 * Updated REST API for accessing data
 * Added access control support for REST PAI

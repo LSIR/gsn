@@ -184,12 +184,12 @@
 					<reportElement
 						x="510"
 						y="4"
-						width="22"
+						width="44"
 						height="22"
 						key="image-1"/>
 					<box></box>
 					<graphicElement stretchType="NoStretch"/>
-					<imageExpression class="java.lang.String"><![CDATA["./icons/gsn-mark.png"]]></imageExpression>
+					<imageExpression class="java.lang.String"><![CDATA["./icons/GSN_green_low.png"]]></imageExpression>
 				</image>
 				<line direction="TopDown">
 					<reportElement

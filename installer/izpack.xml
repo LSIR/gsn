@@ -2,12 +2,12 @@
 <installation version="1.0">
     <info>
         <appname>gsn</appname>
-        <appversion>Version 1.0.0</appversion>
+        <appversion>Version 1.1.6</appversion>
         <authors>
-            <author name="GSN Development Team." email="ali.salehi@epfl.ch / salehiam@gmail.com"/>
+            <author name="GSN Development Team." email="gsn@groupes.epfl.ch"/>
         </authors>
-        <javaversion>1.6</javaversion>
-        <url>http://sourceforge.net/apps/trac/gsn/</url>
+        <javaversion>1.7</javaversion>
+        <url>https://github.com/LSIR/gsn/</url>
     </info>
 
     <guiprefs width="800" height="610" resizable="no">
@@ -30,7 +30,7 @@
         <res id="LicencePanel.licence" src="installer/license.txt"/>
         <!--  <res id="Installer.image" src="dist/lib/logo.png" /> -->
         <!--    <res id="shortcutSpec.xml" src="install/win_shortcut_specification.xml" /> -->
-        <res id="Heading.image" src="installer/logo-small.png"/>
+        <res id="Heading.image" src="icons/GSN_green_low.png"/>
 
     </resources>
 
