@@ -75,7 +75,8 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.eclipse.jetty.http.security.Constraint;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -385,13 +386,15 @@ public final class Main {
         SslSocketConnector sslSocketConnector = null;
         if (sslPort > 0) {
             System.out.println("SSL is Starting on port "+sslPort+"...");
-			sslSocketConnector = new SslSocketConnector();
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.addExcludeProtocols("SSLv3");
+            sslContextFactory.setKeyStorePath("conf/servertestkeystore");
+            sslContextFactory.setKeyStorePassword(getContainerConfig().getSSLKeyStorePassword());
+            sslContextFactory.setKeyManagerPassword(getContainerConfig().getSSLKeyPassword());
+            sslContextFactory.setTrustStore("conf/servertestkeystore");
+            sslContextFactory.setTrustStorePassword(getContainerConfig().getSSLKeyStorePassword());
+			sslSocketConnector = new SslSocketConnector(sslContextFactory);
             sslSocketConnector.setPort(getContainerConfig().getSSLPort());
-            sslSocketConnector.setKeystore("conf/servertestkeystore");
-            sslSocketConnector.setPassword(getContainerConfig().getSSLKeyPassword());
-            sslSocketConnector.setKeyPassword(getContainerConfig().getSSLKeyStorePassword());
-            sslSocketConnector.setTruststore("conf/servertestkeystore");
-            sslSocketConnector.setTrustPassword(getContainerConfig().getSSLKeyStorePassword());
         }
         else if (getContainerConfig().isAcEnabled())
             logger.error("SSL MUST be configured in the gsn.xml file when Access Control is enabled !");
