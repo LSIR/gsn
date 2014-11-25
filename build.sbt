@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "org.apache.hadoop" % "hadoop-common" % "0.23.10",
   "log4j" % "log4j" % "1.2.17",
   "org.jibx" % "jibx-run" % "1.2.5",            
-  "org.eclipse.jetty" % "jetty-webapp" % "7.0.2.v20100331",
+  "org.eclipse.jetty" % "jetty-webapp" % "7.6.16.v20140903",
   "org.hibernate" % "hibernate-core" % "3.6.10.Final",
   "net.sf.opencsv" % "opencsv" % "2.3",
   "com.thoughtworks.xstream" % "xstream" % "1.4.5",

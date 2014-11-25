@@ -7,10 +7,11 @@ import gsn.data.netcdf.NetCdf
 class NetcdfTest extends FunSpec with Matchers {
     
   describe("netcdf write"){
-    
-    val fields=Seq(Field("timed",LongDT,DataUnit("s","s"),"timbo"),
-        Field("temp",DoubleDT,DataUnit("C","C"),"air-temperature"),
-        Field("humid",DoubleDT,DataUnit("Perc","Perc"),"relative-humidity"))
+
+    val fields=Seq(
+        Sensing("timbo",Output("time","s1",DataUnit("s","s"),LongType)),
+        Sensing("air-temperature",Output("temp","s1",DataUnit("C","C"),DoubleType)),
+        Sensing("relative-humidity",Output("humid","s1",DataUnit("Perc","Perc"),DoubleType)))
         
         
     val values:Seq[Array[Any]]=Seq(
