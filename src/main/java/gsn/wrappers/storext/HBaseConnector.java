@@ -35,7 +35,6 @@ package gsn.wrappers.storext;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.client.ScannerCallable;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.filter.*;
 
@@ -84,6 +83,7 @@ public class HBaseConnector {
             admin.createTable(tableDesc);
             System.out.println("create table " + tableName + " ok.");
         }
+        admin.close();
     }
 
     /**

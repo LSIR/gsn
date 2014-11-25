@@ -1,3 +1,4 @@
 GET  /assets/*file        	controllers.Assets.at(path="/public", file)
-GET /api/sensors 			controllers.gsn.api.SensorService.sensors(latestValues:Option[Boolean],format:Option[String])
-GET /api/sensors/:sensorid  controllers.gsn.api.SensorService.sensor(sensorid:String,size:Option[Int],fields:Option[String],filter:Option[String],from:Option[String],to:Option[String])
+GET /api/sensors 			controllers.gsn.api.SensorService.sensors
+GET /api/sensors/:sensorid  controllers.gsn.api.SensorService.sensor(sensorid:String)
+#GET   /*path               controllers.gsn.api.GsnProxy.v1(path: String)

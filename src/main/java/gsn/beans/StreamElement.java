@@ -60,6 +60,8 @@ public final class StreamElement implements Serializable {
 
 	private static final String NULL_ENCODING = "NULL"; // null encoding for transmission over xml-rpc
 
+	private boolean timestampProvided = false;
+	
 	public StreamElement (StreamElement other) {
 		this.fieldNames=new String[other.fieldNames.length];
 		this.fieldValues=new Serializable[other.fieldValues.length];
@@ -101,6 +103,7 @@ public final class StreamElement implements Serializable {
 			throw new IllegalArgumentException( "The length of dataFileNames and dataFileTypes provided in the constructor of StreamElement doesn't match." );
 		if ( dataFieldNames.length != data.length ) throw new IllegalArgumentException( "The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match." );
 		this.timeStamp = timeStamp;
+		this.timestampProvided=true;
 		this.fieldTypes = dataFieldTypes;
 		this.fieldNames = dataFieldNames;
 		this.fieldValues = data;
@@ -121,8 +124,10 @@ public final class StreamElement implements Serializable {
 		for (String key:output.keySet()) {
 			Serializable value = output.get(key);
 
-			if(key.equalsIgnoreCase("timed"))
+			if(key.equalsIgnoreCase("timed")){
 				timestamp = (Long) value;
+				timestampProvided=true;				
+			}
 			else { 
 				fieldNames[idx] = key;
 				fieldValues[idx] = value;
@@ -251,13 +256,14 @@ public final class StreamElement implements Serializable {
 	}
 
 	/**
-	 * Returns true if the timestamp is valid. A timestamp is valid if it is
-	 * above zero.
+	 * Returns true if the timestamp is set. A timestamp is valid if it is
+	 * provided
 	 * 
-	 * @return Whether the timestamp is valid or not.
+	 * @return Whether the timestamp is set or not. If timestamp > 0 it is assumed to be set
 	 */
 	public boolean isTimestampSet ( ) {
-		return this.timeStamp > 0;
+		return this.timeStamp > 0 ||
+		timestampProvided;
 	}
 
 	/**

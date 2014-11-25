@@ -6,6 +6,10 @@
 <!-- <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>-->
     <display-name>GSN Server</display-name>
+    
+      <listener>
+      <listener-class>play.core.server.servlet25.Play2Servlet</listener-class>
+  </listener> 
 <!-- 
      *******************************************************************************     
       WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] ; there is
@@ -19,7 +23,11 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
  -->
-
+ <servlet>
+        <servlet-name>PlayServlet</servlet-name>
+        <display-name>Play Servlet</display-name>
+        <servlet-class>play.core.server.servlet25.Play2Servlet</servlet-class>
+    </servlet>
 <!-- *******************************************************************************     
       GSN's Main Servlets, Must be enabled for any kind of HTTP based access
      ******************************************************************************* -->
@@ -442,7 +450,10 @@
 
 
      
-
+ <servlet-mapping>
+        <servlet-name>PlayServlet</servlet-name>
+        <url-pattern>/ws/*</url-pattern>
+    </servlet-mapping>
 
 	<!-- GSN END -->
 	
@@ -488,6 +499,39 @@
         <filter-name>MSRIPSourceFilter</filter-name>
         <url-pattern>/services/Service/*</url-pattern>
     </filter-mapping>
+    
+    
+  <filter>
+    <filter-name>TequilaFilter</filter-name>
+    <filter-class>ch.epfl.tequila.client.system.TequilaFilter</filter-class>
+    <init-param>
+       <param-name>host</param-name>
+       <param-value>tequila.epfl.ch</param-value>
+    </init-param>
+    <init-param>
+       <param-name>service</param-name>
+       <param-value>GSN Server</param-value>
+    </init-param>
+    <init-param>
+      <param-name>request</param-name>
+      <param-value>uniqueid firstname lastname name org email</param-value>
+    </init-param>
+      <init-param>
+      <param-name>wish</param-name>
+      <param-value>org email</param-value>
+    </init-param>
+        <init-param>
+    <param-name>allows</param-name>
+    <param-value>categorie=shibboleth</param-value>
+    </init-param>
+    
+  </filter>
+
+  <filter-mapping>
+    <filter-name>TequilaFilter</filter-name>
+    <url-pattern>/gsn/NewLoginHandlerServlet</url-pattern>
+  </filter-mapping>
+    
     <!-- The following remove all constraints as no auth-constraint is specified. -->
     <security-constraint >
         <web-resource-collection>

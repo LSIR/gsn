@@ -304,10 +304,15 @@ public abstract class AbstractWrapper extends Thread {
                 conn = Main.getWindowStorage().getConnection();
                 StringBuilder query = new StringBuilder();
 				query.append("select max(timed) from ").append(aliasCodeS);
-
+				ResultSet rs2 = Main.getWindowStorage().executeQueryWithResultSet(new StringBuilder("select count(*) from "+aliasCodeS),
+						conn);
+				int n=rs2.next()?rs2.getInt(1):0;
+					
 				ResultSet rs = Main.getWindowStorage().executeQueryWithResultSet(query,
 						conn);
-				if (rs.next()) {
+				
+				if (rs.next() && n>0) {
+
 					lastInOrderTimestamp = rs.getLong(1);
 				} else {
 					lastInOrderTimestamp = Long.MIN_VALUE; // Table is empty

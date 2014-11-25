@@ -29,7 +29,7 @@
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
         <!--property name="dependencies" value="target/dependency"/>-->
-        <property name="reports" value="reports"/>
+        <property name="reports" value="target/reports"/>
         <property name="maxMemoryUsage" value="128m"/>
         <property name="jar.file" value="gsn-core.jar"/>
         <!--  Enable the following line when you want to use Java Media Framework.
@@ -94,7 +94,7 @@
 
 	
     <target name="cleandb" depends="build">
-        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}">
+        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring="">
             <classpath refid="classpath"/>
        </java>
     </target>
@@ -113,7 +113,7 @@
     </target>
 
     <target name="gsn" depends="cleandb" description="Run GSN server in non graphical mode.">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="true" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
             <jvmarg value="-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
