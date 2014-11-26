@@ -389,10 +389,10 @@ public final class Main {
             System.out.println("SSL is Starting on port "+sslPort+"...");
             SslContextFactory sslContextFactory = new SslContextFactory();
             sslContextFactory.addExcludeProtocols("SSLv3");
-            sslContextFactory.setKeyStorePath("conf/servertestkeystore");
+            sslContextFactory.setKeyStorePath(getContainerConfig().getSSLKeystore());
             sslContextFactory.setKeyStorePassword(getContainerConfig().getSSLKeyStorePassword());
             sslContextFactory.setKeyManagerPassword(getContainerConfig().getSSLKeyPassword());
-            sslContextFactory.setTrustStore("conf/servertestkeystore");
+            sslContextFactory.setTrustStore(getContainerConfig().getSSLKeystore());
             sslContextFactory.setTrustStorePassword(getContainerConfig().getSSLKeyStorePassword());
 			sslSocketConnector = new SslSocketConnector(sslContextFactory);
             sslSocketConnector.setPort(getContainerConfig().getSSLPort());
