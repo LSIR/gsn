@@ -322,20 +322,11 @@ public class VSensorConfig implements Serializable {
 	public String getStorageHistorySize ( ) {
         if (storageHistorySize == null) {
 		    if ( storage == null || storage.getStorageSize() == null || storage.getStorageSize().trim( ).equals( "" ) )
-                storageHistorySize = "0";
+                storageHistorySize = ""+STORAGE_SIZE_NOT_SET;
             else
                 storageHistorySize = storage.getStorageSize();
         }
 		return storageHistorySize;
-	}
-
-	/**
-	 * Checks whether the virtual sensor needs storage or not (checks the
-	 * variable <code>storageHistorySize</code>
-	 */
-	public boolean needsStorage ( ) {
-		if ( this.getStorageHistorySize( ).equals( "0" ) ) return false;
-		return true;
 	}
 
 	public boolean validate ( ) {
