@@ -493,6 +493,36 @@ csv_to_json($(this), drawGrid, 'iso');
 });
 
             });
+function showAdvancedOptions()
+{
+	AODiv = document.getElementById("advanced-options");
+	AO = document.getElementById("AO");
+	if ($(AODiv).css("display") == "none") {
+		AODiv.style = "display: 100%;";
+		AO[0].innerHTML = "Advanced Options \25bc";
+		
+	} else {
+		AODiv.style = "display: none;";
+		AO[0].innerHTML = "Advanced Options \26bc";
+	}
+}
+function showRepeatOptions()
+{
+	repeatCheckbox = document.getElementById("ifrepeat")
+	repeatNumber = document.getElementById("repeat-number");
+	repeatType = document.getElementById("repeat-type");
+	if (repeatCheckbox.checked) {
+		repeatNumber.style = "display: 100%;";
+		repeatType.style = "display: 100%;";
+		
+	} else {
+		repeatNumber.style = "display: none;";
+		repeatType.style = "display: none;";
+	}
+}
+$(function(){
+	$( "#speed" ).selectmenu();
+})
         </script>
     </head>
     <body>
@@ -512,7 +542,66 @@ csv_to_json($(this), drawGrid, 'iso');
 
                                     
 									<div class="left-form-container">
-										<h3>Aggregation</h3>
+										<h3>Time range</h3>
+										<div class="time-range">
+                                            <div>
+                                                <span>From</span>
+                                                <input id="datepicker_from" name="from" type="text" value=""   style="width: 150px;float: right;"/>
+                                                <br/>
+                                                <br/>
+                                                <span>To</span>
+                                                <input id="datepicker_to" name="to" type="text" value=""  style="width: 150px; float: right;"/>
+                                            </div>
+                                            <br/>
+                                            <input id="ifrepeat" type="checkbox" name="ifrepeat" value="false" onclick="showRepeatOptions()"/>
+                                            <span>Repeat</span>
+									        
+                                            <input type="number" name="repeat-nmb" id="repeat-number" min="1" max="100" value="1" style="display: none;"/>
+                                            <select name="repeat-type" id="repeat-type" style="display: none;">
+											<option>Year</option>
+											<option>Month</option>
+											<option selected="selected">Day</option>
+											</select>
+                                            <br/>
+                                            <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
+                                            <span>Add virtual sensor only if it has data in the given time period</span>
+                                         
+                                        </div>
+                                        <h3>Outputs</h3>
+                                        <div class="data-outputs-container">
+                                            <a id="add-data-output" href="#">Add Output</a>
+                                            <ul id="data-outputs"></ul>
+                                        </div>
+									</div>
+									
+									<div class="right-form-container">
+										
+                                        <h3>Plot contents</h3>
+                                        <div class="plot-content">
+	                                        <span>Plot Type</span>
+	                                        <select id="plot-type">
+	                                            <option value="drawTimeseries" selected="selected">Timeseries</option>
+	                                            <option value="drawScatterplot">Scatterplot</option>
+	                                            <option value="drawHistogram">Histogram</option>
+	                                        </select>
+	                                        <input class="ui-default-state plot" name="commit" type="button" value="Plot" />
+	                                        <div style="display: inline-block" class="sampling_percentage" ><span>Sampling rate</span>&nbsp<input id="sampling_percentage" style="width: 30px" type="text" name="sampling_percentage"/><span>%</span></div>
+	                                        &nbsp&nbsp&nbsp
+	                                        <input id="disablesampling" type="checkbox" name="disablesampling"/><span>Disable sampling</span>
+	                                    </div>
+	                                    <h3>Results</h3>
+	                                    <div class="results-content">
+                                        <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
+                                        <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
+                                         <span>Time Format</span>
+                                        <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
+                                        <input id="download_format" type="hidden" name="download_format" value="csv"/>
+                                        <input id="reportclass" type="hidden" name="reportclass" value="report-default"/>
+                                    	</div>
+                                    	
+                                    	<h3 onclick="showAdvancedOptions()" id="AO">Advanced Options</h3>
+                                    	<div id="advanced-options" style="display: none;"><!-- Hidden advanced options -->
+                                    	<h3>Aggregation</h3>
 										<div class="aggregations">
                                             <div>
                                                 <select id="nb" name="nb" style="display: inline-block">
@@ -541,50 +630,6 @@ csv_to_json($(this), drawGrid, 'iso');
                                                 </select>
                                             </p>
                                         </div>
-                                        <h3>Outputs</h3>
-                                        <div class="data-outputs-container">
-                                            <a id="add-data-output" href="#">Add Output</a>
-                                            <ul id="data-outputs"></ul>
-                                        </div>
-									</div>
-									
-									<div class="right-form-container">
-										<h3>Time range</h3>
-										<div class="time-range">
-                                            <div>
-                                                <span>From</span>
-                                                <input id="datepicker_from" name="from" type="text" value=""   style="width: 150px;float: right;"/>
-                                                <br/>
-                                                <br/>
-                                                <span>To</span>
-                                                <input id="datepicker_to" name="to" type="text" value=""  style="width: 150px; float: right;"/>
-                                            </div>
-                                            <br/>
-                                            <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
-                                            <span>Add virtual sensor only if it has data in the given time period</span>
-                                         
-                                        </div>
-                                        <h3>Plot contents</h3>
-                                        <div class="plot-content">
-	                                        <span>Plot Type</span>
-	                                        <select id="plot-type">
-	                                            <option value="drawTimeseries" selected="selected">Timeseries</option>
-	                                            <option value="drawScatterplot">Scatterplot</option>
-	                                            <option value="drawHistogram">Histogram</option>
-	                                        </select>
-	                                        <input class="ui-default-state plot" name="commit" type="button" value="Plot" />
-	                                        <div style="display: inline-block" class="sampling_percentage" ><span>Sampling rate</span>&nbsp<input id="sampling_percentage" style="width: 30px" type="text" name="sampling_percentage"/><span>%</span></div>
-	                                        &nbsp&nbsp&nbsp
-	                                        <input id="disablesampling" type="checkbox" name="disablesampling"/><span>Disable sampling</span>
-	                                    </div>
-	                                    <h3>Results</h3>
-	                                    <div class="results-content">
-                                        <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
-                                        <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
-                                         <span>Time Format</span>
-                                        <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
-                                        <input id="download_format" type="hidden" name="download_format" value="csv"/>
-                                        <input id="reportclass" type="hidden" name="reportclass" value="report-default"/>
                                     	</div>
 									
 									</div>
