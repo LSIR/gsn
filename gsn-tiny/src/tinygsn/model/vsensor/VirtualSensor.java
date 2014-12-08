@@ -33,6 +33,7 @@ import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.services.AccelometerService;
 import tinygsn.services.ActivityRecognitionService;
+import tinygsn.services.GPSService;
 import tinygsn.services.GyroscopeService;
 import tinygsn.services.LightSensorService;
 import tinygsn.services.LocationService;
@@ -107,7 +108,7 @@ public class VirtualSensor implements Serializable {
 		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidAccelerometerWrapper"))
 			serviceIntent = new Intent(this.context, AccelometerService.class);
 		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidGPSWrapper"))
-			serviceIntent = new Intent(this.context, LocationService.class);
+			serviceIntent = new Intent(this.context, GPSService.class);
 		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidLightWrapper"))
 			serviceIntent = new Intent(this.context, LightSensorService.class);
 		else if(config.getWrapperName().equals("tinygsn.model.wrappers.AndroidActivityRecognitionWrapper"))
@@ -118,7 +119,6 @@ public class VirtualSensor implements Serializable {
 		
 		
 		config.setRunning(true);
-		
 		
 		serviceIntent.putExtra("tinygsn.beans.config", config);
 		

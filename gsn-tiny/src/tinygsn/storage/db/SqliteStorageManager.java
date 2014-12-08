@@ -44,6 +44,7 @@ import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.storage.StorageManager;
 import tinygsn.utils.Const;
 import android.R.integer;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -229,40 +230,21 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		
 		Serializable[] fieldValues;
 		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
-		String query = "Select max(_id) as maxid from " + tableName;
-		Cursor cursor = database.rawQuery(query, new String[] {});
-		long max = 0;
-		if (cursor.moveToNext()) {
-			max = cursor.getLong(cursor.getColumnIndex("maxid"));
-		}
+		String query = "Select * from " + tableName + " order by _id desc limit ?";
+		Cursor cursor = database.rawQuery(query, new String[] { num + "" });
 
-		query = "Select * from " + tableName + " where _id > ?";
-
-		cursor = database.rawQuery(query, new String[] { max - num + "" });
-
-		
-		//TODO fek konam ke enja be dard nemikhore az vid estefade kardan bazam check kon
 		while (cursor.moveToNext()) {
-			// double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-			// double longitude =
-			// cursor.getDouble(cursor.getColumnIndex("longitude"));
 			fieldValues = new Serializable[FIELD_NAMES.length];
-
 			for (int i = 0; i < FIELD_NAMES.length; i++) {
-			//	Log.i("FILED_NAME[i]" , FIELD_NAMES[i]);
 				fieldValues[i] = cursor.getDouble(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase()));
-						//.getDouble(cursor.getColumnIndex(FIELD_NAMES[i]));
 			}
 			long time = cursor.getLong(cursor.getColumnIndex("timed"));
 
 			StreamElement se = new StreamElement(FIELD_NAMES, FIELD_TYPES,
 					fieldValues, time);
-			// Log.v(TAG, se.toString());
-
 			result.add(se);
 		}
-		// close();
-
+		cursor.close();
 		return result;
 	}
 
@@ -475,6 +457,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			vsList.add(new VirtualSensor(vs, context));
 			StaticData.addConfig(id, vs);
 			StaticData.saveNameID(id, vsname);
+			StaticData.saveName(vsname, wrappername);
 		}
 
 		return vsList;
@@ -511,16 +494,18 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return false;
 	}
 	
-	public Map<String, Integer> getFrequencies()
+	@SuppressLint("UseSparseArrays")
+	public Map<Long, Integer> getFrequencies()
 	{
-		Map<String, Integer> freqs = new HashMap<String, Integer>();
+		Map<Long, Integer> freqs = new HashMap<Long, Integer>();
 		String query = "Select * from WifiFrequency;";
 		Cursor cursor = database.rawQuery(query, new String[]{});
 		while (cursor.moveToNext())
 		{
 			int frequency = cursor.getInt(cursor.getColumnIndex("frequency"));
 			String mac = cursor.getString(cursor.getColumnIndex("mac"));
-			freqs.put(mac, frequency);
+			mac = mac.replaceAll(":", "");
+			freqs.put(Long.parseLong(mac, 16), frequency);
 		}
 		return freqs;
 	}

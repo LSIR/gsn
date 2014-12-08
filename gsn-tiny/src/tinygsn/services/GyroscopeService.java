@@ -3,10 +3,12 @@ package tinygsn.services;
 import java.io.Serializable;
 
 import tinygsn.beans.InputStream;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AndroidControllerListVSNew;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.wrappers.AndroidGyroscopeWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
@@ -48,7 +50,8 @@ public class GyroscopeService  extends IntentService implements SensorEventListe
 			Bundle b = intent.getExtras();
 			config = (VSensorConfig) b.get("tinygsn.beans.config");
 			storage = new SqliteStorageManager(config.getController().getActivity());
-			samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGPSWrapper");
+			VirtualSensor vs = new VirtualSensor(config, config.getController().getActivity());
+			samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGyroscopeWrapper");
 			
 			for (InputStream inputStream : config.getInputStreams()) {
 				for (StreamSource streamSource : inputStream.getSources()) {
@@ -63,6 +66,7 @@ public class GyroscopeService  extends IntentService implements SensorEventListe
 					while(w.isActive())
 					{
 						try {
+							samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGyroscopeWrapper");
 							Thread.sleep(w.getSamplingRate()/(1+ samplingRate));
 							((AndroidGyroscopeWrapper) w).getLastKnownData();
 						}

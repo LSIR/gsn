@@ -6,13 +6,16 @@ import java.io.Serializable;
 import com.google.android.gms.location.LocationRequest;
 
 import tinygsn.beans.InputStream;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AndroidControllerListVSNew;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.wrappers.AndroidAccelerometerWrapper;
 import tinygsn.model.wrappers.AndroidGPSWrapper;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -45,7 +48,7 @@ public class GPSService extends IntentService implements LocationListener {
 
 	private VSensorConfig config = null;
 
-	private static final String TAG = "AccelometerService";
+	private static final String TAG = "GPSService";
 	public AndroidControllerListVSNew VSNewController;
 	public AbstractWrapper w;
 	
@@ -185,7 +188,7 @@ public class GPSService extends IntentService implements LocationListener {
 		StreamElement streamElement = new StreamElement(w.getFieldList(),
 				w.getFieldType(), new Serializable[] {location.getLatitude(),location.getLongitude()});
 
-		((AndroidAccelerometerWrapper) w).setTheLastStreamElement(streamElement);
+		((AndroidGPSWrapper) w).setTheLastStreamElement(streamElement);
 	}
 	
 	@Override
@@ -211,53 +214,45 @@ public class GPSService extends IntentService implements LocationListener {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Bundle b = intent.getExtras();
-		config = (VSensorConfig) b.get("config");
-		
-		
-		Log.i("Service", config.getInputStreams().toString());
-		
+		SqliteStorageManager storage = null;
+		config = (VSensorConfig) b.get("tinygsn.beans.config");
+		storage = new SqliteStorageManager(config.getController().getActivity());
+		VirtualSensor vs = new VirtualSensor(config, config.getController().getActivity());
 		for (InputStream inputStream : config.getInputStreams()) {
 			for (StreamSource streamSource : inputStream.getSources()) {
 				w = streamSource.getWrapper();
-				Log.v(TAG, w.toString());
-
-
-//				
-	
-	//			Activity activity = config.getController().getActivity();
-	//			mSensorManager = (SensorManager) activity
-	//					.getSystemService(Context.SENSOR_SERVICE);
-	//			mSensor = mSensorManager.getDefaultSensor(Sensor.Typ);
-	//			mSensorManager.registerListener(this, mSensor,
-	//					SensorManager.SENSOR_DELAY_NORMAL);
-	
-				GPSService gps = new GPSService(config.getController().getActivity());
-				 gps.locationManager = (LocationManager) gps.mContext
-		                    .getSystemService(LOCATION_SERVICE);
-				 gps.locationManager.requestLocationUpdates(
-			             LocationManager.GPS_PROVIDER,
-			              MIN_TIME_BW_UPDATES,
-			              MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-				
-				while(true)
-				{
-					
-		            gps.getLocation();
-		            
-					Log.i("accelometer ", "accelometer");
-					try {
-						Thread.sleep(w.getSamplingRate());
-						((AndroidGPSWrapper) w).getLastKnownLocation();
-						Log.i("accelometer ", "accelometer");
-					}
-					catch (InterruptedException e) {
-						Log.e(e.getMessage(), e.toString());
-					}
-				}
 			}
 		}
 		
-	}
-	  
+		mContext = config.getController().getActivity();
+	    locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+			              MIN_TIME_BW_UPDATES,
+			              MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+		
+				
+		while(true)
+		{
+			int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGPSWrapper");
+			if (samplingRate > 0){
+				getLocation();
+			}else{
+				stopUsingGPS();
+			}
+			try {
+				Thread.sleep(w.getSamplingRate()*10);
+				if (samplingRate > 0){
+					Location l = getLocation();
+					if (l != null){
+						onLocationChanged(l);
+					}
+					((AndroidGPSWrapper) w).getLastKnownLocation();
+				}
+			}
+			catch (InterruptedException e) {
+				Log.e(e.getMessage(), e.toString());
+			}
+		}
+	}	  
 }
 

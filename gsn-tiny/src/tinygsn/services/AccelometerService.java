@@ -9,6 +9,7 @@ import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AndroidControllerListVSNew;
 import tinygsn.gui.android.ActivityListVSNew;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.wrappers.AndroidAccelerometerWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
@@ -67,6 +68,9 @@ public class AccelometerService extends IntentService implements SensorEventList
 	protected void onHandleIntent(Intent intent) {
 		Bundle b = intent.getExtras();
 		config = (VSensorConfig) b.get("tinygsn.beans.config");
+		storage = new SqliteStorageManager(config.getController().getActivity());
+		
+		VirtualSensor vs = new VirtualSensor(config, config.getController().getActivity());
 		
 		if(config.getRunning() == false)
 			return;
@@ -87,8 +91,10 @@ public class AccelometerService extends IntentService implements SensorEventList
 					storage = new SqliteStorageManager(config.getController().getActivity());
 					int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidAccelerometerWrapper");
 					try {
-						Thread.sleep(w.getSamplingRate()/(1+samplingRate));
-						((AndroidAccelerometerWrapper) w).getLastKnownData();
+						Thread.sleep(w.getSamplingRate()*(1+samplingRate));
+						if (samplingRate > 0){
+							((AndroidAccelerometerWrapper) w).getLastKnownData();
+						}
 					}
 					catch (InterruptedException e) {
 						Log.e(e.getMessage(), e.toString());
