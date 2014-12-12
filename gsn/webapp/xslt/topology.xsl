@@ -129,16 +129,16 @@ xmlns:atom="http://www.w3.org/2005/Atom">
        <tr><td><b>Device Id</b></td><td><xsl:value-of select="@node_id"/></td></tr>
        <tr><td><b>Device Type</b></td><td>
        <xsl:choose>
-        <xsl:when test="@nodetype = 0">SensorNode (SIB)</xsl:when>
+        <xsl:when test="@nodetype = 1">SIB TinyNode</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
-            <xsl:when test="@nodetype = 1">Corestation (Access node)</xsl:when>
+            <xsl:when test="@nodetype = 4">BaseStation</xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="@nodetype = 2">Powerswitch</xsl:when>
+                <xsl:when test="@nodetype = 3">Powerswitch TN</xsl:when>
                 <xsl:otherwise>
                   <xsl:choose>
-                    <xsl:when test="@nodetype = 3">Corestation (Dutycycled)</xsl:when>
+                    <xsl:when test="@nodetype = 5">GPS Corestation</xsl:when>
                     <xsl:otherwise>
                       unknown
                     </xsl:otherwise>
@@ -156,7 +156,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
        <tr><td><b>VSys</b></td><td><xsl:value-of select="@vsys"/>V</td></tr>
        <tr><td><b>VSdi</b></td><td><xsl:value-of select="@vsdi"/>V</td></tr>
        <xsl:choose>
-        <xsl:when test="@nodetype = 0">
+        <xsl:when test="@nodetype = 1">
           <tr><td><b>Current</b></td><td><xsl:value-of select="@current"/>mA</td></tr>
         </xsl:when>
        </xsl:choose>
@@ -166,7 +166,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
        <tr><td><b>uptime</b></td><td><xsl:value-of select="@uptime"/>s</td></tr>
        <tr><td><b>Battery level</b></td><td><xsl:value-of select="@batterylevel"/>%</td></tr>
        <xsl:choose>
-        <xsl:when test="@nodetype = 3">
+        <xsl:when test="@nodetype = 5">
           <tr><td><b>Corestation state</b></td><td>
           <xsl:choose>
             <xsl:when test="@corestation_running = true">running</xsl:when>
@@ -176,7 +176,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
         </xsl:when>
        </xsl:choose>
        <xsl:choose>
-        <xsl:when test="@nodetype = 2">
+        <xsl:when test="@nodetype = 3">
           <tr><td><b>Port states</b></td><td>
           <xsl:choose>
             <xsl:when test="@p1 = true">on</xsl:when>
