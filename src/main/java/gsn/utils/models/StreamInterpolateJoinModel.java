@@ -83,9 +83,10 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		double q = (double)params.getTimeStamp();
 		int size = arrays.get("timed").size();
 		double[] x = new double[size];
-		int i = 0;
+		int i = size -1;
 		for(Double d :arrays.get("timed")){
 			x[i] = d.doubleValue();
+			i--;
 		}
 		
 		Serializable[] r = new Serializable[params.getData().length+interpolation_types.size()];
@@ -106,9 +107,10 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 
 		for (String k : interpolation_types.keySet()){
 			double[] y = new double[size];
-			int j = 0;
+			int j = size - 1 ;
 			for(Double d :arrays.get(k)){
 				y[j] = d.doubleValue();
+				j--;
 			}
 			try {
 				gsl.gsl_interp_type typ = (gsl_interp_type) gsl.class.getMethod(interpolation_types.get(k)).invoke(null);
