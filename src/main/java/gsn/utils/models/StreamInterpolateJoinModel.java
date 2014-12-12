@@ -90,7 +90,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		}
 		
 		Serializable[] r = new Serializable[params.getData().length+interpolation_types.size()];
-		for(;i<params.getData().length;i++){
+		for(i=0;i<params.getData().length;i++){ //assumes that the first defined fields are the ones from B
 			r[i] = params.getData()[i];
 		}		
 		for(int j=0;j<interpolation_types.size();j++){
