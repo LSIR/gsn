@@ -17,10 +17,10 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TM_M2" type="VARCHAR(30)" />
-            <field name="TM_M3" type="VARCHAR(30)" />
-            <field name="TM_M4" type="VARCHAR(30)" />
-            <field name="TM_REF6" type="VARCHAR(30)" />
+            <field name="TM_M2" type="VARCHAR(30)" unit="MΩ" />
+            <field name="TM_M3" type="VARCHAR(30)" unit="MΩ" />
+            <field name="TM_M4" type="VARCHAR(30)" unit="MΩ" />
+            <field name="TM_REF6" type="VARCHAR(30)" unit="MΩ" />
         </output-structure>
     </processing-class>
     <description>Moisturechain/TM data (part 2) from Matterhorn deployment</description>

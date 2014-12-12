@@ -15,11 +15,12 @@
             <field name="PAYLOAD_SAMPLE_VALID" type="SMALLINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
             <field name="DCX_BATTERY" type="SMALLINT" />
-            <field name="DCX_P1" type="VARCHAR(30)" />
-            <field name="DCX_P2" type="VARCHAR(30)" />
-            <field name="DCX_P12" type="VARCHAR(30)" />
-            <field name="DCX_TOB1" type="VARCHAR(30)" />
-            <field name="DCX_TOB2" type="VARCHAR(30)" />
+            <field name="DCX_P1" type="VARCHAR(30)" unit="mBar" />
+            <field name="DCX_P2" type="VARCHAR(30)" unit="mBar" />
+            <field name="DCX_P12" type="VARCHAR(30)" unit="mBar" />
+            <field name="DCX_TOB1" type="VARCHAR(30)" unit="°C" />
+            <field name="DCX_TOB2" type="VARCHAR(30)" unit="°C" />
+
         </output-structure>
     </processing-class>
     <description>Waterpressure/PS data from Matterhorn deployment</description>

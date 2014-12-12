@@ -17,16 +17,16 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TM_REF1" type="VARCHAR(30)" />
-            <field name="TM_REF2" type="VARCHAR(30)" />
-            <field name="TM_T1" type="VARCHAR(30)" />
-            <field name="TM_T2" type="VARCHAR(30)" />
-            <field name="TM_T3" type="VARCHAR(30)" />
-            <field name="TM_T4" type="VARCHAR(30)" />
-            <field name="TM_REF3" type="VARCHAR(30)" />
-            <field name="TM_REF4" type="VARCHAR(30)" />
-            <field name="TM_REF5" type="VARCHAR(30)" />
-            <field name="TM_M1" type="VARCHAR(30)" />
+            <field name="TM_REF1" type="VARCHAR(30)" unit="MΩ" />
+            <field name="TM_REF2" type="VARCHAR(30)" unit="MΩ" />
+            <field name="TM_T1" type="VARCHAR(30)" unit="°C" />
+            <field name="TM_T2" type="VARCHAR(30)" unit="°C" />
+            <field name="TM_T3" type="VARCHAR(30)" unit="°C" />
+            <field name="TM_T4" type="VARCHAR(30)" unit="°C" />
+            <field name="TM_REF3" type="VARCHAR(30)" unit="MΩ" />
+            <field name="TM_REF4" type="VARCHAR(30)" unit="MΩ" />
+            <field name="TM_REF5" type="VARCHAR(30)" unit="MΩ" />
+            <field name="TM_M1" type="VARCHAR(30)" unit="MΩ" />
         </output-structure>
     </processing-class>
     <description>Moisturechain/TM data (part 1) from Matterhorn deployment</description>
