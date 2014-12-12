@@ -181,19 +181,6 @@
 
 // Dirruhorn
 										{
-											title : "GPS Number of Satellites",
-											signals : [ {
-												vsensor : "dirruhorn_gps_raw__binary__mapped",
-												field : [ "gps_sats" ],
-												position : [ 0, 4, 5, 7, 12,
-														14, 15, 16, 17, 18, 19,
-														21, 23, 25, 27, 29, 31,
-														33, 35, 39, 40, 41, 43,
-														44, 55, 56, 57, 62, 63,
-														64, 66, 67 ]
-											} ]
-										},
-										{
 											title : "GPS Number of Satellites gps_unixtime",
 											signals : [ {
 												vsensor : "dirruhorn_gps_raw__binary__mapped",
@@ -203,7 +190,7 @@
 														21, 23, 25, 27, 29, 31,
 														33, 35, 39, 40, 41, 43,
 														44, 55, 56, 57, 62, 63,
-														64, 66, 67 ],
+														64, 66, 67, 82, 83, 84 ],
 												timeline : "gps_unixtime"
 											} ]
 										},
@@ -212,7 +199,7 @@
 											signals : [ {
 												vsensor : "dirruhorn_gps_raw__tobinary__mapped",
 												field : [ "gps_missing_sv" ],
-												position : [ 40, 43, 44, 55, 62, 63 ]
+												position : [ 15, 17, 40, 43, 44, 55, 62, 63, 82, 83, 84 ]
 											} ]
 										},
 										{
@@ -222,7 +209,7 @@
 												field : [
 														"current_data_buffer_size",
 														"old_data_buffer_size" ],
-												position : [ 40, 43, 44, 55, 62, 63 ]
+												position : [ 15, 17, 40, 43, 44, 55, 62, 63, 82, 83, 84 ]
 											} ]
 										},
 										{
@@ -231,7 +218,7 @@
 												vsensor : "dirruhorn_gps_differential__realtime",
 												field : [ "e" ],
 												position : [ 4, 5, 7, 12, 39,
-														40, 43, 41, 44, 55, 62, 63, 66, 67 ]
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -240,7 +227,7 @@
 												vsensor : "dirruhorn_gps_differential__realtime",
 												field : [ "n" ],
 												position : [ 4, 5, 7, 12, 39,
-														40, 43, 41, 44, 55, 62, 63, 66, 67 ]
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -249,7 +236,7 @@
 												vsensor : "dirruhorn_gps_differential__realtime",
 												field : [ "h" ],
 												position : [ 4, 5, 7, 12, 39,
-														40, 43, 41, 44, 55, 62, 63, 66, 67 ]
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -262,7 +249,7 @@
 														18, 19, 21, 23, 25, 27,
 														29, 31, 33, 35, 39, 40,
 														41, 43, 44, 55, 56, 57,
-														62, 63, 64, 66, 67, 70 ]
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -275,7 +262,7 @@
 														18, 19, 21, 23, 25, 27,
 														29, 31, 33, 35, 39, 40,
 														41, 43, 44, 55, 56, 57,
-														62, 63, 64, 66, 67, 70 ]
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -288,7 +275,7 @@
 														18, 19, 21, 23, 25, 27,
 														29, 31, 33, 35, 39, 40,
 														41, 43, 44, 55, 56, 57,
-														62, 63, 64, 66, 67, 70 ]
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -301,7 +288,7 @@
 														18, 19, 21, 23, 25, 27,
 														29, 31, 33, 35, 39, 40,
 														41, 43, 44, 55, 56, 57,
-														62, 63, 64, 66, 67, 70 ]
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -314,7 +301,7 @@
 														18, 19, 21, 23, 25, 27,
 														29, 31, 33, 35, 39, 40,
 														41, 43, 44, 55, 56, 57,
-														62, 63, 64, 66, 67, 70 ]
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -327,7 +314,7 @@
 														18, 19, 21, 23, 25, 27,
 														29, 31, 33, 35, 39, 40,
 														41, 43, 44, 55, 56, 57,
-														62, 63, 64, 66, 67, 70 ]
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -340,7 +327,7 @@
 														18, 19, 21, 23, 25, 27,
 														29, 31, 33, 35, 39, 40,
 														41, 43, 44, 55, 56, 57,
-														62, 63, 64, 66, 67, 70 ]
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -378,7 +365,7 @@
 											signals : [ {
 												vsensor : "dirruhorn_dozer_wgpsstatus__conv",
 												field : [ "inclinometer_x" ],
-												position : [ 43, 44, 55, 62, 63 ]
+												position : [ 15, 17, 43, 44, 55, 62, 63, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -386,7 +373,7 @@
 											signals : [ {
 												vsensor : "dirruhorn_dozer_wgpsstatus__conv",
 												field : [ "inclinometer_y" ],
-												position : [ 43, 44, 55, 62, 63 ]
+												position : [ 15, 17, 43, 44, 55, 62, 63, 82, 83, 84 ]
 											} ],
 										},
 
@@ -400,7 +387,7 @@
 											} ]
 										},
 										{
-											title : "Temperature Position 1 [°C]",
+											title : "Ground Surface Temperatures Position 1 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__nctt",
 												field : [ "nctt_t1", "nctt_t2" ],
@@ -408,7 +395,7 @@
 											} ]
 										},
 										{
-											title : "Thermistorchain Position 1 [°C]",
+											title : "Crack Thermistorchain Position 1 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_thermistorchain1",
 												field : [ "tc_t1", "tc_t2",
@@ -425,7 +412,7 @@
 											} ]
 										},
 										{
-											title : "Temperature Position 2 [°C]",
+											title : "Ground Surface Temperature Position 2 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__nctt",
 												field : [ "nctt_t2" ],
@@ -433,7 +420,7 @@
 											} ]
 										},
 										{
-											title : "Thermistorchain Position 2 [°C]",
+											title : "Crack Thermistorchain Position 2 [°C]",
 											signals : [
 													{
 														vsensor : "matterhorn_thermistorchain1",
@@ -461,7 +448,7 @@
 											} ]
 										},
 										{
-											title : "Temperature Position 3 [°C]",
+											title : "Ground Surface Temperatures Position 3 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__nctt",
 												field : [ "nctt_t1", "nctt_t2" ],
@@ -469,7 +456,7 @@
 											} ]
 										},
 										{
-											title : "Thermistorchain Position 3 [°C]",
+											title : "Crack Thermistorchain Position 3 [°C]",
 											signals : [
 													{
 														vsensor : "matterhorn_thermistorchain1",
@@ -496,7 +483,7 @@
 											} ]
 										},
 										{
-											title : "Thermistorchain Position 4 [°C]",
+											title : "Crack Thermistorchain Position 4 [°C]",
 											signals : [
 													{
 														vsensor : "matterhorn_thermistorchain1",
@@ -513,46 +500,76 @@
 														select : "sensornode[position=4]"
 													} ]
 										},
+                                                                                {
+                                                                                        title : "Crack Thermistorchain Position 5 [°C]",
+                                                                                        signals : [
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                field : [ "tm_t1",
+                                                                                                                                "tm_t2",
+                                                                                                                                "tm_t3",
+                                                                                                                                "tm_t4" ],
+                                                                                                                select : "sensornode[position=5]"
+                                                                                                        } ]
+                                                                                },
 										{
-											title : "Moisturechain Position 5",
+											title : "Resistivity Position 5 [MΩ]",
 											signals : [
-													{
-														vsensor : "matterhorn_moisturechain1",
-														field : [ "tm_t1",
-																"tm_t2",
-																"tm_t3",
-																"tm_t4",
-																"tm_m1" ],
-														select : "sensornode[position=5]"
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain2",
+                                                                                                                field : [ "tm_m2",
+                                                                                                                                "tm_m3",
+                                                                                                                                "tm_m4" ],
+                                                                                                                select : "sensornode[position=5]"
 													},
-													{
-														vsensor : "matterhorn_moisturechain2",
-														field : [ "tm_m2",
-																"tm_m3",
-																"tm_m4" ],
-														select : "sensornode[position=5]"
-													} ]
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                field : [ "tm_m1" ],
+                                                                                                                select : "sensornode[position=5]"
+                                                                                                        } ]
 										},
+                                                                                {
+                                                                                        title : "Pressure Sensor Position 5 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_waterpressure",
+                                                                                                field : [ "dcx_p1", "dcx_p2" ],
+                                                                                                select : "sensornode[position=5]"
+                                                                                        } ]
+                                                                                },
+                                                                                {
+                                                                                        title : "Pressure Sensor Difference Value Position 5 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_waterpressure",
+                                                                                                field : [ "dcx_p12" ],
+                                                                                                select : "sensornode[position=5]"
+                                                                                        } ]
+                                                                                },
 										{
-											title : "Pressure Sensor Position 5",
+											title : "Ambient Temperature on Pressure Sensor Position 5 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_waterpressure",
-												field : [ "dcx_p1", "dcx_p2",
-														"dcx_p12", "dcx_tob1",
-														"dcx_tob2" ],
+												field : [ "dcx_tob1", "dcx_tob2" ],
 												select : "sensornode[position=5]"
 											} ]
 										},
 										{
-											title : "Earth Pressure Cell Position 5",
+											title : "Earth Pressure Cell Position 5 [mBar]",
 											signals : [ {
 												vsensor : "matterhorn_earthpressure__nepn",
-												field : [ "nepn_p1", "nepn_t1" ],
+												field : [ "nepn_p1" ],
 												select : "sensornode[position=5]"
 											} ]
 										},
+                                                                                {
+                                                                                        title : "Ambient Temperature on Earth Pressure Cell Position 5 [°C]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_earthpressure__nepn",
+                                                                                                field : [ "nepn_t1" ],
+                                                                                                select : "sensornode[position=5]"
+                                                                                        } ]
+                                                                                },
 										{
-											title : "Crackmeter 1 - Position 6 [mm]",
+											title : "Crackmeter 1 Position 6 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__tctc",
 												field : [ "tctc_dx1" ],
@@ -560,7 +577,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 2 - Position 6 [mm]",
+											title : "Crackmeter 2 Position 6 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__tctc",
 												field : [ "tctc_dx2" ],
@@ -568,53 +585,84 @@
 											} ]
 										},
 										{
-											title : "Temperature Position 6 [°C]",
+											title : "Ground Surface Temperatures Position 6 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__tctc",
 												field : [ "tctc_t1", "tctc_t2" ],
 												select : "sensornode[position=6]"
 											} ]
 										},
+                                                                                {
+                                                                                        title : "Crack Thermistorchain Position 7 [°C]",
+                                                                                        signals : [
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                field : [ "tm_t1",
+                                                                                                                                "tm_t2",
+                                                                                                                                "tm_t3",
+                                                                                                                                "tm_t4" ],
+                                                                                                                select : "sensornode[position=7]"
+                                                                                                        } ]
+                                                                                },
 										{
-											title : "Moisturechain Position 7",
-											signals : [
-													{
-														vsensor : "matterhorn_moisturechain1",
-														field : [ "tm_t1",
-																"tm_t2",
-																"tm_t3",
-																"tm_t4",
-																"tm_m1" ],
-														select : "sensornode[position=7]"
-													},
-													{
-														vsensor : "matterhorn_moisturechain2",
-														field : [ "tm_m2",
-																"tm_m3",
-																"tm_m4" ],
-														select : "sensornode[position=7]"
-													} ]
+											title : "Resistivity Position 7 [MΩ]",
+                                                                                        signals : [
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                field : [ "tm_m1" ],
+                                                                                                                select : "sensornode[position=7]"
+                                                                                                        },
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain2",
+                                                                                                                field : [ "tm_m2",
+                                                                                                                                "tm_m3",
+                                                                                                                                "tm_m4" ],
+                                                                                                                select : "sensornode[position=7]"
+                                                                                                        } ]
 										},
+                                                                                {
+                                                                                        title : "Pressure Sensor Position 7 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_waterpressure",
+                                                                                                field : [ "dcx_p1", "dcx_p2" ],
+                                                                                                select : "sensornode[position=7]"
+                                                                                        } ]
+                                                                                },
+                                                                                {
+
+                                                                                        title : "Pressure Sensor Difference Value Position 7 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_waterpressure",
+                                                                                                field : [ "dcx_p12" ],
+                                                                                                select : "sensornode[position=7]"
+                                                                                        } ]
+                                                                                },
 										{
-											title : "Pressure Sensor Position 7",
+											title : "Ambient Temperature on Pressure Sensor Position 7 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_waterpressure",
-												field : [ "dcx_p1", "dcx_p2",
-														"dcx_p12", "dcx_tob1",
-														"dcx_tob2" ],
+												field : [ "dcx_tob1", "dcx_tob2" ],
 												select : "sensornode[position=7]"
 											} ]
 										},
+                                                                                {
+                                                                                        title : "Earth Pressure Cell Position 7 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_earthpressure__nepn",
+                                                                                                field : [ "nepn_p1" ],
+                                                                                                select : "sensornode[position=7]"
+                                                                                        } ]
+                                                                                },
+                                                                                {
+                                                                                        title : "Ambient Temperature on Earth Pressure Cell Position 7 [°C]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_earthpressure__nepn",
+                                                                                                field : [ "nepn_t1" ],
+                                                                                                select : "sensornode[position=7]"
+                                                                                        } ]
+                                                                                },
 										{
-											title : "Earth Pressure Cell Position 7",
-											signals : [ {
-												vsensor : "matterhorn_earthpressure__nepn",
-												field : [ "nepn_p1", "nepn_t1" ],
-												select : "sensornode[position=7]"
-											} ]
-										},
-										{
-											title : "Crackmeter 1 - Position 8 [mm]",
+											title : "Crackmeter 1 Position 8 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__nctc",
 												field : [ "nctc_dx1" ],
@@ -622,7 +670,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 2 - Position 8 [mm]",
+											title : "Crackmeter 2 Position 8 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__nctc",
 												field : [ "nctc_dx2" ],
@@ -630,7 +678,7 @@
 											} ]
 										},
 										{
-											title : "Temperature Position 8 [°C]",
+											title : "Ground Surface Temperature Position 8 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__nctc",
 												field : [ "nctc_t1" ],
@@ -645,7 +693,7 @@
 										   }]
 										 },*/
 										{
-											title : "Crackmeter 1 - Position 9 [mm]",
+											title : "Crackmeter 1 Position 9 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccct",
 												field : [ "ccct_dx0" ],
@@ -653,7 +701,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 2 - Position 9 [mm]",
+											title : "Crackmeter 2 Position 9 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccct",
 												field : [ "ccct_dx1" ],
@@ -661,7 +709,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 3 - Position 9 [mm]",
+											title : "Crackmeter 3 Position 9 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccct",
 												field : [ "ccct_dx2" ],
@@ -669,7 +717,7 @@
 											} ]
 										},
 										{
-											title : "Temperature Position 9 [°C]",
+											title : "Ground Surface Temperature Position 9 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccct",
 												field : [ "ccct_t3" ],
@@ -686,7 +734,7 @@
 											} ]
 										},
 										{
-											title : "Temperature Position 10 [°C]",
+											title : "Ground Surface Temperature Position 10 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_temperature__ntnn",
 												field : [ "ntnn_t1" ],
@@ -703,7 +751,7 @@
 											} ]
 										},
 										{
-											title : "Thermistor Position 11 [°C]",
+											title : "Ground Surface Temperature Position 11 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_temperature__ntnn",
 												field : [ "ntnn_t1" ],
@@ -720,7 +768,7 @@
 											} ]
 										},
 										{
-											title : "Thermistor Position 12 [°C]",
+											title : "Ground Surface Temperature Position 12 [°C]",
 											signals : [ {
 												vsensor : "matterhorn_temperature__ntnn",
 												field : [ "ntnn_t1" ],
@@ -728,7 +776,7 @@
 											} ]
 										},
 										{
-											title : "Self Potential Position 13",
+											title : "Self Potential Position 13 [mV]",
 											signals : [ {
 												vsensor : "matterhorn_selfpotential",
 												field : [ "sp_dv1_1",
@@ -738,7 +786,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 1 - Position 20 [mm]",
+											title : "Crackmeter 1 Position 20 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccnn",
 												field : [ "ccnn_dx0" ],
@@ -746,7 +794,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 2 - Position 20 [mm]",
+											title : "Crackmeter 2 Position 20 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccnn",
 												field : [ "ccnn_dx1" ],
@@ -754,7 +802,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 1 - Position 21 [mm]",
+											title : "Crackmeter 1 Position 21 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccnn",
 												field : [ "ccnn_dx0" ],
@@ -762,7 +810,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 2 - Position 21 [mm]",
+											title : "Crackmeter 2 Position 21 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccnn",
 												field : [ "ccnn_dx1" ],
@@ -770,7 +818,7 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 1 - Position 22 [mm]",
+											title : "Crackmeter 1 Position 22 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccnn",
 												field : [ "ccnn_dx0" ],
@@ -778,19 +826,11 @@
 											} ]
 										},
 										{
-											title : "Crackmeter 2 - Position 22 [mm]",
+											title : "Crackmeter 2 Position 22 [mm]",
 											signals : [ {
 												vsensor : "matterhorn_crackmeter__ccnn",
 												field : [ "ccnn_dx1" ],
 												select : "sensornode[position=22]"
-											} ]
-										},
-										{
-											title : "GPS Number of Satellites",
-											signals : [ {
-												vsensor : "matterhorn_gps_raw__binary__mapped",
-												field : [ "gps_sats" ],
-												position : [ 33, 34, 35 ]
 											} ]
 										},
 										{
@@ -865,38 +905,6 @@
 											signals : [ {
 												vsensor : "matterhorn_gps_differential__batch__daily",
 												field : [ "h" ],
-												position : [ 33, 34, 35 ]
-											} ],
-										},
-										{
-											title : "GPS Velocity East - Batch [cm/d]",
-											signals : [ {
-												vsensor : "matterhorn_gps_differential__batch__daily",
-												field : [ "v_e" ],
-												position : [ 33, 34, 35 ]
-											} ],
-										},
-										{
-											title : "GPS Velocity North - Batch [cm/d]",
-											signals : [ {
-												vsensor : "matterhorn_gps_differential__batch__daily",
-												field : [ "v_n" ],
-												position : [ 33, 34, 35 ]
-											} ],
-										},
-										{
-											title : "GPS Velocity Altitude - Batch [cm/d]",
-											signals : [ {
-												vsensor : "matterhorn_gps_differential__batch__daily",
-												field : [ "v_h" ],
-												position : [ 33, 34, 35 ]
-											} ],
-										},
-										{
-											title : "GPS Velocity 3D - Batch [cm/d]",
-											signals : [ {
-												vsensor : "matterhorn_gps_differential__batch__daily",
-												field : [ "v_3d" ],
 												position : [ 33, 34, 35 ]
 											} ],
 										},
@@ -1297,15 +1305,6 @@
 										},
 
 // Permos GPS Locations
-										{
-											title : "GPS Number of Satellites",
-											signals : [ {
-												vsensor : "permos_gps_raw__binary__mapped",
-												field : [ "gps_sats" ],
-												position : [ 1, 2, 3, 4, 5, 6,
-														7 ]
-											} ]
-										},
 										{
 											title : "GPS Number of Satellites gps_unixtime",
 											signals : [ {
