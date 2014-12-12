@@ -33,6 +33,8 @@ import java.util.LinkedList;
 import org.bytedeco.javacpp.gsl;
 import org.bytedeco.javacpp.gsl.gsl_interp_type;
 
+import ucar.nc2.stream.NcStreamProto.DataType;
+
 import gsn.beans.StreamElement;
 
 public class StreamInterpolateJoinModel extends AbstractModel {
@@ -88,7 +90,12 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 			r[i] = params.getData()[i];
 		}		
 		for(int j=0;j<interpolation_types.size();j++){
-			r[i+j] = 0;
+			byte t = getOutputFields()[i].getDataTypeID();
+			if (t == DataType.DOUBLE_VALUE || t == DataType.FLOAT_VALUE){
+				r[i+j] = 0.0;
+			}else{
+				r[i+j] = 0;
+			}
 		}
 		StreamElement se = new StreamElement(getOutputFields(),r,params.getTimeStamp());
 
