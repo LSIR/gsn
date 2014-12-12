@@ -27,6 +27,7 @@
 package gsn.utils.models;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,6 +46,8 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	HashMap<String,String> interpolation_types = new HashMap<String,String>();
 	
 	LinkedList<StreamElement> toProcess = new LinkedList<StreamElement>();
+	
+	int min_size = 2;
 	
 	public StreamInterpolateJoinModel(){
 		arrays.put("timed", new LinkedList<Double>());
@@ -127,6 +130,15 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		if(k.startsWith("f_")){
 			arrays.put(k.substring(2), new LinkedList<Double>());
 			interpolation_types.put(k.substring(2), string);
+			try {
+				gsl.gsl_interp_type typ = (gsl_interp_type) gsl.class.getMethod(string).invoke(null);
+				int m = typ.min_size();
+				if (m>min_size) min_size = m;
+				if (m>historySize) historySize = m;
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+			
 		}
 		if(k.equalsIgnoreCase("historysize")){
 			historySize = Integer.parseInt(string);
@@ -137,7 +149,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	private StreamElement[] checkInterpolate(StreamElement element){
 		if (arrays.get("timed").size() == 0) return null;
 		if (element!=null)
-			if (element.getTimeStamp() <= arrays.get("timed").getFirst()){
+			if (element.getTimeStamp() <= arrays.get("timed").getFirst() && arrays.get("timed").size()>= min_size){
 				return query(element);
 			}else{
 		        toProcess.add(element);
@@ -148,7 +160,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		while (i>0){
 			StreamElement se = toProcess.removeFirst();
 			i--;
-			if (se.getTimeStamp() <= arrays.get("timed").getFirst()){
+			if (se.getTimeStamp() <= arrays.get("timed").getFirst() && arrays.get("timed").size()>= min_size){
 				StreamElement ses = query(se)[0];
 				if (ses != null) r.add(ses);
 			}else{
