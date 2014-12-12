@@ -28,24 +28,41 @@ package gsn.utils.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.LinkedList;
+import org.bytedeco.javacpp.gsl;
+import org.bytedeco.javacpp.gsl.gsl_interp_type;
 
 import gsn.beans.StreamElement;
 
 public class StreamInterpolateJoinModel extends AbstractModel {
 	
 	int historySize = 10;
-	LinkedList<StreamElement> buffer = new LinkedList<StreamElement>();
+	
+	HashMap<String,LinkedList<Double>> arrays = new HashMap<String, LinkedList<Double>>(); //FIFO queues
+	HashMap<String,String> interpolation_types = new HashMap<String,String>();
+	
 	LinkedList<StreamElement> toProcess = new LinkedList<StreamElement>();
-
+	
+	public StreamInterpolateJoinModel(){
+		arrays.put("timed", new LinkedList<Double>());
+	}
+	
 
 	@Override
 	public synchronized StreamElement[] pushData(StreamElement streamElement, String origin) {
 		if(origin.equalsIgnoreCase("A")){
-			buffer.addFirst(streamElement);
-			if (buffer.size() > historySize){
-				buffer.removeLast();
+			for (int i = 0;i<streamElement.getFieldTypes().length;i++){
+				if (arrays.containsKey(streamElement.getFieldNames()[i])){
+					arrays.get(streamElement.getFieldNames()[i]).addFirst(((Double)streamElement.getData()[i]));
+				}
+			}
+			arrays.get("timed").addFirst((double)streamElement.getTimeStamp());
+			
+			if (arrays.get("timed").size() > historySize){
+				for (String k : arrays.keySet()){
+					arrays.get(k).removeLast();
+				}
 			}
 			return checkInterpolate(null);
 		}else if(origin.equalsIgnoreCase("B")){
@@ -53,26 +70,55 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		}
 		return null;
 	}
+	
 
 	@Override
 	public StreamElement[] query(StreamElement params) {
-		Iterator<StreamElement> it = buffer.descendingIterator();
-		if (params.getTimeStamp() <= buffer.getLast().getTimeStamp())
-			return new StreamElement[]{merge(params,buffer.getLast(),buffer.getLast())};
-		if (params.getTimeStamp() >= buffer.getFirst().getTimeStamp())
-			return new StreamElement[]{merge(params,buffer.getFirst(),buffer.getFirst())};
-		StreamElement after = it.next();
-		StreamElement before = after;
-		while(it.hasNext()){
-			before = it.next();
-			if (params.getTimeStamp() >= before.getTimeStamp()) break;
-			after = before;
+		
+		double q = (double)params.getTimeStamp();
+		int size = arrays.get("timed").size();
+		double[] x = new double[size];
+		int i = 0;
+		for(Double d :arrays.get("timed")){
+			x[i] = d.doubleValue();
 		}
-		return new StreamElement[]{merge(params,before,after)};
+		
+		Serializable[] r = new Serializable[params.getData().length+interpolation_types.size()];
+		for(;i<params.getData().length;i++){
+			r[i] = params.getData()[i];
+		}		
+		for(int j=0;j<interpolation_types.size();j++){
+			r[i+j] = 0;
+		}
+		StreamElement se = new StreamElement(getOutputFields(),r,params.getTimeStamp());
+
+		for (String k : interpolation_types.keySet()){
+			double[] y = new double[size];
+			int j = 0;
+			for(Double d :arrays.get(k)){
+				y[j] = d.doubleValue();
+			}
+			try {
+				gsl.gsl_interp_type typ = (gsl_interp_type) gsl.class.getMethod(interpolation_types.get(k)).invoke(null);
+				gsl.gsl_interp workspace = gsl.gsl_interp_alloc(typ,size);
+			    gsl.gsl_interp_init(workspace, x, y, size);
+			    double val = gsl.gsl_interp_eval(workspace, x, y, q, null);
+			    se.setData(k, val);
+			    gsl.gsl_interp_free(workspace); 
+		    
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return new StreamElement[]{se};
 	}
 
 	@Override
 	public void setParam(String k, String string) {
+		if(k.startsWith("f_")){
+			arrays.put(k.substring(2), new LinkedList<Double>());
+			interpolation_types.put(k.substring(2), string);
+		}
 		if(k.equalsIgnoreCase("historysize")){
 			historySize = Integer.parseInt(string);
 		}
@@ -80,9 +126,9 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	
 	
 	private StreamElement[] checkInterpolate(StreamElement element){
-		if (buffer.size() == 0) return null;
+		if (arrays.get("timed").size() == 0) return null;
 		if (element!=null)
-			if (element.getTimeStamp() <= buffer.getFirst().getTimeStamp()){
+			if (element.getTimeStamp() <= arrays.get("timed").getFirst()){
 				return query(element);
 			}else{
 		        toProcess.add(element);
@@ -93,7 +139,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		while (i>0){
 			StreamElement se = toProcess.removeFirst();
 			i--;
-			if (se.getTimeStamp() <= buffer.getFirst().getTimeStamp()){
+			if (se.getTimeStamp() <= arrays.get("timed").getFirst()){
 				StreamElement ses = query(se)[0];
 				if (ses != null) r.add(ses);
 			}else{
@@ -103,22 +149,4 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		return r.toArray(new StreamElement[r.size()]);
 	}
 	
-	private StreamElement merge(StreamElement data, StreamElement before, StreamElement after){
-		Serializable[] r = new Serializable[data.getData().length+after.getData().length];
-		double ratio = 1;
-		if (after.getTimeStamp() != before.getTimeStamp())
-		    ratio = (data.getTimeStamp() - before.getTimeStamp()) * 1.0 / (after.getTimeStamp() - before.getTimeStamp());
-		int i=0;
-		for(;i<data.getData().length;i++){
-			r[i] = data.getData()[i];
-		}
-		for(int j=0;j<after.getData().length;j++){
-			if (after.getFieldTypes()[j] == 5){
-				r[i+j] = ((Double)after.getData()[j]) * ratio + ((Double)before.getData()[j]) * (1-ratio);
-			}else{
-				r[i+j] = before.getData()[j];
-			}
-		}
-		return new StreamElement(getOutputFields(),r,data.getTimeStamp());
-	}
 }
