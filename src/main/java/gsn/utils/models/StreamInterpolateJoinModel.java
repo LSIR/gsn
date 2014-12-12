@@ -91,8 +91,10 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		}		
 		for(int j=0;j<interpolation_types.size();j++){
 			byte t = getOutputFields()[i].getDataTypeID();
-			if (t == DataType.DOUBLE_VALUE || t == DataType.FLOAT_VALUE){
+			if (t == DataType.DOUBLE_VALUE){
 				r[i+j] = 0.0;
+			}else if (t == DataType.FLOAT_VALUE){
+				r[i+j] = 0.0f;
 			}else{
 				r[i+j] = 0;
 			}
