@@ -170,14 +170,28 @@ $(document).ready(function() {
         signals: [{
           vsensor:"dirruhorn_dozer_nodehealth__conv",
           field:["sdivoltage"],
-          select:"sensornode[position=0],sensornode[position=5],sensornode[position=7],sensornode[position=10],sensornode[position=11],sensornode[position=12]"
+          select:"sensornode[position=0],sensornode[position=5],sensornode[position=10],sensornode[position=11]"
+        }]
+      },
+      { title:"Dirruhorn WGPS PV Voltages",
+        signals: [{
+          vsensor:"dirruhorn_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=15],sensornode[position=17],sensornode[position=55],sensornode[position=62],sensornode[position=63],sensornode[position=82],sensornode[position=83],sensornode[position=84]"
         }]
       },
       { title:"Grabengufer PV Voltages",
         signals: [{
           vsensor:"dirruhorn_dozer_nodehealth__conv",
           field:["sdivoltage"],
-          select:"sensornode[position=39],sensornode[position=40],sensornode[position=41],sensornode[position=58],sensornode[position=66],sensornode[position=67]"
+          select:"sensornode[position=39],sensornode[position=41],sensornode[position=58],sensornode[position=66],sensornode[position=67]"
+        }]
+      },
+      { title:"Grabengufer WGPS PV Voltages",
+        signals: [{
+          vsensor:"dirruhorn_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=43],sensornode[position=44]"
         }]
       },
       { title:"Randa PV Voltages",
@@ -233,7 +247,14 @@ $(document).ready(function() {
         signals: [{
           vsensor:"matterhorn_dozer_nodehealth__conv",
           field:["sdivoltage"],
-          select:"sensornode[position=0],sensornode[position=14],sensornode[position=19],sensornode[position=23],sensornode[position=26]"
+          select:"sensornode[position=0],sensornode[position=14],sensornode[position=19],sensornode[position=23],sensornode[position=26],sensornode[position=28],sensornode[position=31]"
+        }]
+      },
+      { title:"Matterhorn WGPS Voltages",
+        signals: [{
+          vsensor:"matterhorn_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position=33],sensornode[position=34]"
         }]
       },
       { title:"Jungfraujoch PV Voltages",
@@ -303,6 +324,13 @@ $(document).ready(function() {
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
           field:["current"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"Dozer Sequence number (node health)",
+        signals: [{
+          vsensor:".*_dozer_nodehealth__conv",
+          field:["header_seqnr"],
           select:"sensornode[position]"
         }]
       },
@@ -499,21 +527,42 @@ $(document).ready(function() {
           signals: [{
           vsensor:".*[^_]_binary__mapped",
           field:["file_queue_length","file_queue_size"],
-          select:"sensornode[nodetype=6]"
+          select:"sensornode[nodetype=6][position]"
         }]
       },
       { title:"CamZilla Binary Files",
         signals: [{
           vsensor:".*[^_]_binary__mapped",
           field:["file_size","transmitted"],
-          select:"sensornode[nodetype=6]"
+          select:"sensornode[nodetype=6][position]"
         }]
       },
       { title:"CamZilla Binary Transmission Time",
         signals: [{
           vsensor:".*[^_]_binary__mapped",
           field:["transmission_time_eff","transmission_time_tot"],
-          select:"sensornode[nodetype=6]"
+          select:"sensornode[nodetype=6][position]"
+        }]
+      },
+      { title:"Webcam Binary Queue",
+          signals: [{
+          vsensor:".*[^_]_binary__mapped",
+          field:["file_queue_length","file_queue_size"],
+          select:"sensornode[nodetype=3][position]"
+        }]
+      },
+      { title:"Webcam Binary Files",
+        signals: [{
+          vsensor:".*[^_]_binary__mapped",
+          field:["file_size","transmitted"],
+          select:"sensornode[nodetype=3][position]"
+        }]
+      },
+      { title:"Webcam Binary Transmission Time",
+        signals: [{
+          vsensor:".*[^_]_binary__mapped",
+          field:["transmission_time_eff","transmission_time_tot"],
+          select:"sensornode[nodetype=3][position]"
         }]
       },
     ]);
