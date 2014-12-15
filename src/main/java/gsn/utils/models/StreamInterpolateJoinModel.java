@@ -115,10 +115,12 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 			try {
 				gsl.gsl_interp_type typ = (gsl_interp_type) gsl.class.getMethod(interpolation_types.get(k)).invoke(null);
 				gsl.gsl_interp workspace = gsl.gsl_interp_alloc(typ,size);
+				gsl.gsl_interp_accel acc = gsl.gsl_interp_accel_alloc();
 			    gsl.gsl_interp_init(workspace, x, y, size);
-			    double val = gsl.gsl_interp_eval(workspace, x, y, q, null);
+			    double val = gsl.gsl_interp_eval(workspace, x, y, q, acc);
 			    se.setData(k, val);
 			    gsl.gsl_interp_free(workspace); 
+			    gsl.gsl_interp_accel_free(acc);
 		    
 			} catch (Exception e) {
 				e.printStackTrace();
