@@ -36,7 +36,7 @@
 				</address>
 				<query>select * from wrapper</query>
 			</source>
-			<query>select latitude,longitude,altitude,HDOP from A</query>
+			<query>select timed,latitude,longitude,altitude,HDOP from A</query>
 		</stream>
 		<stream name="B">
 			<source alias="B"  sampling-rate="1" storage-size="1">
