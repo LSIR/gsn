@@ -27,15 +27,12 @@
 package gsn.utils.models;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import org.bytedeco.javacpp.gsl;
 import org.bytedeco.javacpp.gsl.gsl_interp_type;
-
-import ucar.nc2.stream.NcStreamProto.DataType;
-
+import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
 public class StreamInterpolateJoinModel extends AbstractModel {
@@ -58,8 +55,8 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	public synchronized StreamElement[] pushData(StreamElement streamElement, String origin) {
 		if(origin.equalsIgnoreCase("A")){
 			for (int i = 0;i<streamElement.getFieldTypes().length;i++){
-				if (arrays.containsKey(streamElement.getFieldNames()[i])){
-					arrays.get(streamElement.getFieldNames()[i]).addFirst(((Double)streamElement.getData()[i]));
+				if (arrays.containsKey(streamElement.getFieldNames()[i].toLowerCase())){
+					arrays.get(streamElement.getFieldNames()[i].toLowerCase()).addFirst(((Number)streamElement.getData()[i]).doubleValue());
 				}
 			}
 			arrays.get("timed").addFirst((double)streamElement.getTimeStamp());
@@ -80,7 +77,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	@Override
 	public StreamElement[] query(StreamElement params) {
 		
-		double q = (double)params.getTimeStamp();
+		double q = new Long(params.getTimeStamp()).doubleValue();
 		int size = arrays.get("timed").size();
 		double[] x = new double[size];
 		int i = size -1;
@@ -94,10 +91,10 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 			r[i] = params.getData()[i];
 		}		
 		for(int j=0;j<interpolation_types.size();j++){
-			byte t = getOutputFields()[i].getDataTypeID();
-			if (t == DataType.DOUBLE_VALUE){
+			byte t = getOutputFields()[i+j].getDataTypeID();
+			if (t == DataTypes.DOUBLE){
 				r[i+j] = 0.0;
-			}else if (t == DataType.FLOAT_VALUE){
+			}else if (t == DataTypes.FLOAT){
 				r[i+j] = 0.0f;
 			}else{
 				r[i+j] = 0;
@@ -116,9 +113,12 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 				gsl.gsl_interp_type typ = (gsl_interp_type) gsl.class.getMethod(interpolation_types.get(k)).invoke(null);
 				gsl.gsl_interp workspace = gsl.gsl_interp_alloc(typ,size);
 				gsl.gsl_interp_accel acc = gsl.gsl_interp_accel_alloc();
-			    gsl.gsl_interp_init(workspace, x, y, size);
+			    gsl.gsl_interp_init(workspace, x, y, size); 
 			    double val = gsl.gsl_interp_eval(workspace, x, y, q, acc);
-			    se.setData(k, val);
+			    if (se.getType(k) == DataTypes.FLOAT)
+			        se.setData(k, (float)val);
+			    else
+			    	se.setData(k, val);
 			    gsl.gsl_interp_free(workspace); 
 			    gsl.gsl_interp_accel_free(acc);
 		    
@@ -132,8 +132,8 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	@Override
 	public void setParam(String k, String string) {
 		if(k.startsWith("f_")){
-			arrays.put(k.substring(2), new LinkedList<Double>());
-			interpolation_types.put(k.substring(2), string);
+			arrays.put(k.substring(2).toLowerCase(), new LinkedList<Double>());
+			interpolation_types.put(k.substring(2).toLowerCase(), string);
 			try {
 				gsl.gsl_interp_type typ = (gsl_interp_type) gsl.class.getMethod(string).invoke(null);
 				int m = typ.min_size();
