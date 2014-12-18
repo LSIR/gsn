@@ -4,7 +4,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
-
+		
+		<script type="text/javascript" src="js/date-en-GB.js"></script>
         <script type="text/javascript" src="js/jquery-1.11/jquery-1.11.1.min.js"></script>
         <script type="text/javascript" src="js/jquery-1.11/jquery-ui.min.js"></script>
         <script type="text/javascript" src="js/jquery-1.11/jquery.datetimepicker.js"></script>
@@ -568,6 +569,35 @@ function showRepeatOptions()
 		repeatType.style = "display: none;";
 	}
 }
+function updateDateList()
+{
+	var from = Date.parse(document.getElementById('datepicker_from').value);
+	var to = Date.parse(document.getElementById('datepicker_to').value);
+	var datelist = [[from,to]];
+	
+	if(document.getElementById('ifrepeat').checked){
+		var e = document.getElementById('repeat-type');
+		var repeatType = e.options[e.selectedIndex].value
+		for(i = 1; i <= document.getElementById('repeat-number').value; i++){
+			if (repeatType == "Years"){
+				var new_from = from.addYear(i);
+				var new_to = to.addYear(i);
+				datelist += [new_from,new_to];
+			}
+			else if (repeatType == "Months"){
+				var new_from = from.addMonth(i);
+				var new_to = to.addMonth(i);
+				datelist += [new_from,new_to];
+			}
+			else if (repeatType == "Days"){
+				var new_from = from.addDay(i);
+				var new_to = to.addDay(i);
+				datelist += [new_from,new_to];
+			}
+		}
+	}
+	console.log(datelist.join("\n"));
+}
 $(function(){
 	$( "#speed" ).selectmenu();
 })
@@ -614,7 +644,7 @@ $(function(){
                                             <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
                                             <span>Add virtual sensor only if it has data in the given time period</span>
                                             <br/>
-                                            <!-- Result: <div id="datelist"></div> -->
+                                             <div onclick="updateDateList()">Result: </div><div id="datelist"></div> 
                                          
                                         </div>
                                         <h3>Outputs</h3>
