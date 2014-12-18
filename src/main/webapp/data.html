@@ -57,14 +57,14 @@
                         }
                     }
                     $.post('multidata', params, function(response, text_status, request){
-                        var lines = response.split("\n");
+                    	var lines = response.split("\n");
                         var headers = [];
                         var timestamp_idx = -1;
                         var vs_name='';
                         var keys =[];
                         var nb_elements = 0;
                         var datasets = [];
-                        for (var line_no=0;line_no<lines.length;line_no++){
+                        for (var line_no = 0; line_no < lines.length; line_no++){
                             var line = $.trim(lines[line_no]);
                             if (line.length == 0)
                                 continue;
@@ -174,7 +174,9 @@
                     virtual_sensors.sort();
                     return to_return;
                 }
-
+                function getURLParameter(name) {
+                	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+                }
                 function option_list_key(name,items,all, id){
                     to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all){
@@ -184,14 +186,20 @@
 
                     var sk = getSortedKeys(items);
                     var l = sk.length;
+                    var vsfromURL = getURLParameter("vsname");
                     for (var i = 0 ; i < l ; i++) {
                         if ("time" == sk[i]) continue;
-                        to_return+='<option value="' + sk[i]+'" >'+sk[i]+'</option>';
+                        
+                        to_return+='<option value="' + sk[i] +'"';
+                        if (vsfromURL == sk[i]){
+                        	to_return += ' selected';
+                        }
+                        to_return+=' >'+sk[i]+'</option>';
                     }
                     to_return+='</select>'
                     return to_return;
                 }
-
+                
                 function option_list_value(name,items,all, units, id){
                     to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all!=null){
@@ -199,6 +207,7 @@
                     }
                     var sv = getSortedValues(items);
                     var l = sv.length;
+                    
                     for (var i = 0 ; i < l ; i++) {
                         if ("time" == items[sv[i]]) continue;
                         if (units[items[sv[i]]]==null || units[items[sv[i]]]=="")
@@ -224,11 +233,48 @@
                     data_outputs_content += '<a class="remove-criterion" href="#"> Remove</a></li>';
                     $('#data-outputs').append(data_outputs_content);
 
-
                     $('#'+vss_id).chosen({
                         search_contains: true,
                         width: "200px"
                     });
+                    if(getURLParameter("vsname") != null){
+                    	var vs = $('#'+vss_id).val();
+                        if (vs != 'All') {
+                            $('#'+fields_div_id).html("&nbsp " + option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs], fields_id));
+                            $('#'+fields_id).chosen({
+                                search_contains: true,
+                                width: "150px"
+                            });
+                            $('#'+fields_id).on('change', function(evt, params){
+                                if ($('#'+vss_id).val() != 'All' && $('#'+vss_id).val() != 'All') {
+                                	$('#'+vss_id).parent().parent().children('.condition-slider').show();
+                                    var conditions_content = '&nbsp<input type="text" class="min" style="font-weight:bold; width:30px; display: inline-block;"/>';
+                                    conditions_content += '&nbsp &nbsp';
+                                    conditions_content += '<div class="slider-range" style="width: 200px; display: inline-block"></div>';
+                                    conditions_content += '&nbsp &nbsp';
+                                    conditions_content += '<input type="text" class="max" style="font-weight:bold; width:30px;"/>';
+                                    conditions_content += '<input type="text" class="c_vs" style="display: none;"/>';
+                                    conditions_content += '<input type="text" class="c_field" style="display: none;"/>';
+                                    conditions_content += '<input type="text" class="join" value="and" style="display: none;"/>';
+                                    $('#'+vss_id).parent().parent().children('.condition-slider').html(conditions_content);
+                                    parse_minmax_vals_for_slider($('#'+vss_id).val(), $('#'+vss_id).val(),
+                                    		$('#'+vss_id).parent().parent().children('.condition-slider').children(".slider-range"),
+                                    		$('#'+vss_id).parent().parent().children('.condition-slider').children(".min"),
+                                    		$('#'+vss_id).parent().parent().children('.condition-slider').children(".max")
+                                    );
+
+                                    $('#'+vss_id).parent().parent().children('.condition-slider').children(".min").val("-inf");
+                                    $('#'+vss_id).parent().parent().children('.condition-slider').children(".max").val("+inf");
+                                } else {
+                                	$('#'+vss_id).parent().parent().children('.condition-slider').hide();
+                                }
+                            });
+                        }
+                        else {
+                            $('#'+fields_div_id).html("");
+                        }
+                        $(this).parent().children('.condition-slider').hide();	
+                    }
                     $('#'+vss_id).on('change', function(evt, params){
                         var vs = $(this).val();
                         if (vs != 'All') {
@@ -276,10 +322,12 @@
                 }
 
                 function prepare_form_for_submission(tag){
-                    var counter = 0;
+                	var counter = 0;
                     tag.parents('form').find('.data-outputs-container li').each(function(){
                         $(this).find('.vss').each(function(){
                             $(this).chosen().attr("name", 'vs['+counter+']');
+                            
+                            
                             var vssId = $(this).attr('id');
                             vssId = parseInt(vssId.split("_")[1]);
                             if (typeof $("#toDelete") != "undefined") $("#toDelete").remove();
@@ -293,7 +341,7 @@
                                 $("#fields_" + vssId).chosen().val('All');
                             }
                             if ($("#fields_div_id_"+vssId).next().html() != ""){
-
+                            	
                                 var skip = 0;
                                 $("#fields_div_id_"+vssId).next().find('.min').each(function(){
                                     if ($(this).val() == "-inf") {
@@ -436,61 +484,61 @@
                 });
 
 
- $(".grid").click(function(){
-function drawGrid(l_datasets){
-$("#sensorSelect").empty();
-$("#sensorSelect").append('<option value="">Select a Virtual Sensor</option>');
-var displayed = [];
-for (var sensor in l_datasets) {
-sensor = sensor.split(' ')[0];
-if ($.inArray(sensor, displayed) < 0) {
-displayed.push(sensor);
-option = $("<option value=\"" + sensor + "\">" + sensor + "</option>");
-$("#sensorSelect").append(option);
-}
-}
-datasets = l_datasets;
-$("#sensorSelect").change(function(){
-var choice = $("#sensorSelect").val();
-$('#gridContainer').empty();
-if (choice == '') return;
-// columns
-var fields = [];
-// column headers
-var headers = [];
-for (var sensor_field in datasets) {
-if (sensor_field.substring(0, choice.length) == choice) {
-fields.push(datasets[sensor_field]);
-headers.push(sensor_field.substring(choice.length + 2, sensor_field.length - 1));
-}
-}
-var data_length = fields[0]['data'].length;
-var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>time</th>';
-for (var i = 0; i < headers.length; i++) {
-grid += '<th>' + headers[i] + '</th>';
-}
-grid += '</tr></thead><tbody>';
-for (var i = 0; i < data_length; i++) {
-// bug with the csv_to_json function: the last row is empty
-if (fields[0]['data'][i][0]) {
-grid += '<tr><td>' + fields[0]['data'][i][0] + '</td>';
-for (var j = 0; j < fields.length; j++) {
-grid += '<td>' + fields[j]['data'][i][1] + '</td>'
-}
-grid += '</tr>';
-}
-}
-grid += '</tbody></table>';
-$('#gridContainer').html(grid);
-$('#grid').tablesorter({
-widthFixed: true,
-widgets: ['zebra']
-});
-});
-}
-datasets = {};
-csv_to_json($(this), drawGrid, 'iso');
-});
+				 $(".grid").click(function(){
+					 function drawGrid(l_datasets){
+						 $("#sensorSelect").empty();
+						 $("#sensorSelect").append('<option value="">Select a Virtual Sensor</option>');
+						 var displayed = [];
+						 for (var sensor in l_datasets) {
+							 sensor = sensor.split(' ')[0];
+							 if ($.inArray(sensor, displayed) < 0) {
+								 displayed.push(sensor);
+								 option = $("<option value=\"" + sensor + "\">" + sensor + "</option>");
+								 $("#sensorSelect").append(option);
+							}
+						}
+						 datasets = l_datasets;
+						 $("#sensorSelect").change(function(){
+							 var choice = $("#sensorSelect").val();
+							 $('#gridContainer').empty();
+							 if (choice == '') return;
+							 // columns
+							 var fields = [];
+							 // column headers
+							 var headers = [];
+							 for (var sensor_field in datasets) {
+								 if (sensor_field.substring(0, choice.length) == choice) {
+									fields.push(datasets[sensor_field]);
+									headers.push(sensor_field.substring(choice.length + 2, sensor_field.length - 1));
+								}
+							}
+							var data_length = fields[0]['data'].length;
+							var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>time</th>';
+							for (var i = 0; i < headers.length; i++) {
+								grid += '<th>' + headers[i] + '</th>';
+							}
+							grid += '</tr></thead><tbody>';
+							for (var i = 0; i < data_length; i++) {
+								// bug with the csv_to_json function: the last row is empty
+								if (fields[0]['data'][i][0]) {
+									grid += '<tr><td>' + fields[0]['data'][i][0] + '</td>';
+									for (var j = 0; j < fields.length; j++) {
+										grid += '<td>' + fields[j]['data'][i][1] + '</td>'
+									}
+									grid += '</tr>';
+								}
+							}
+							grid += '</tbody></table>';
+							$('#gridContainer').html(grid);
+							$('#grid').tablesorter({
+								widthFixed: true,
+								widgets: ['zebra']
+							});
+						});
+					}
+					datasets = {};
+					csv_to_json($(this), drawGrid, 'iso');
+				});
 
             });
 function showAdvancedOptions()
@@ -565,6 +613,8 @@ $(function(){
                                             <br/>
                                             <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
                                             <span>Add virtual sensor only if it has data in the given time period</span>
+                                            <br/>
+                                            <!-- Result: <div id="datelist"></div> -->
                                          
                                         </div>
                                         <h3>Outputs</h3>
