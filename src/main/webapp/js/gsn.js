@@ -680,7 +680,7 @@ var GSN = {
                 "class":"tabupload"
             },"Upload")),
             $.LI({},$.A({
-                "href":"./data.html",
+                "href":"./data.html?vsname="+vsName,
                 "class":"tabdata"
             },"Download"))
             ),
