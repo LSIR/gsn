@@ -76,9 +76,9 @@ public class ContainerConfig {
 	public static final long              DEFAULT_GSN_LOG_SIZE             = 10 * 1024 * 1024;
     private static final String           DEFAULT_SSL_KEYSTORE_PWD         = "changeit";
     private static final String           DEFAULT_SSL_KEY_PWD              = "changeit";
-
+    private static final String           DEFAULT_SSL_KEYSTORE             = "conf/servertestkeystore";
 	public static final String            FIELD_NAME_gsnPortNo             = "containerPort";
-	public static final String            FIELD_NAME_zmqEnabled             = "zmqEnabled";
+	public static final String            FIELD_NAME_zmqEnabled            = "zmqEnabled";
 	public static final String            FIELD_NAME_zmqProxyPort          = "zmqProxyPort";
 	public static final String            FIELD_NAME_zmqMetaPort           = "zmqMetaPort";
 	public static final String            FIELD_NAME_webName               = "webName";
@@ -114,6 +114,7 @@ public class ContainerConfig {
     private boolean                       acEnabled                        = false;
 	private String                        sslKeyStorePassword;
 	private String                        sslKeyPassword;
+	private String 	                      sslKeyStore                      = DEFAULT_SSL_KEYSTORE;
     private StorageConfig                 storage ;
     private SlidingConfig                 sliding;
 	private String                        directoryLoggingLevel            = DEFAULT_LOGGING_LEVEL;
@@ -419,6 +420,9 @@ public class ContainerConfig {
 	}
 	public String getSSLKeyPassword(){
 		return sslKeyPassword == null ? DEFAULT_SSL_KEY_PWD : sslKeyPassword;
+	}
+	public String getSSLKeystore(){
+		return sslKeyStore;
 	}
 	
 	/**

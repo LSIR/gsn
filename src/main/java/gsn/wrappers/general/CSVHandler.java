@@ -125,7 +125,7 @@ public class CSVHandler {
 
     public static boolean validateFormats(String[] formats) {
         for (int i = 0; i < formats.length; i++) {
-            if (formats[i].equalsIgnoreCase("numeric") || formats[i].equalsIgnoreCase("string"))
+            if (formats[i].equalsIgnoreCase("numeric") || formats[i].equalsIgnoreCase("string") || formats[i].equalsIgnoreCase("bigint"))
                 continue;
             else if (isTimeStampFormat(formats[i])) {
                 try {
@@ -242,12 +242,19 @@ public class CSVHandler {
                 try {
                     streamElement.put(fields[i], Double.parseDouble(values[i]));
                 } catch (java.lang.NumberFormatException e) {
-                    logger.error("Parsing to Numeric fails: Value to parse=" + values[i]);
+                    logger.error("Parsing to Numeric failed: Value to parse=" + values[i]);
                     throw e;
                 }
-            } else if (formats[i].equalsIgnoreCase("string"))
+            } else if (formats[i].equalsIgnoreCase("string")) {
                 streamElement.put(fields[i], values[i]);
-            else if (isTimeStampFormat(formats[i])) {
+            } else if (formats[i].equalsIgnoreCase("bigint")) {
+            	try {
+                    streamElement.put(fields[i], Long.parseLong(values[i]));
+                } catch (java.lang.NumberFormatException e) {
+                    logger.error("Parsing to BigInt failed: Value to parse=" + values[i]);
+                    throw e;
+                }
+            } else if (isTimeStampFormat(formats[i])) {
                 String value = "";
                 String format = "";
                 if (streamElement.get(fields[i]) != null) {
@@ -332,6 +339,8 @@ public class CSVHandler {
                 fields.put(field, "bigint");
             } else if (type.equalsIgnoreCase("numeric"))
                 fields.put(field, "numeric");
+            else if (type.equalsIgnoreCase("bigint"))
+                fields.put(field, "bigint");
             else
                 fields.put(field, "string");
         }
