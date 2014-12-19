@@ -573,30 +573,32 @@ function updateDateList()
 {
 	var from = Date.parse(document.getElementById('datepicker_from').value);
 	var to = Date.parse(document.getElementById('datepicker_to').value);
-	var datelist = [[from,to]];
+	var datelist = "[["+from+","+to+"],\n";
 	
 	if(document.getElementById('ifrepeat').checked){
 		var e = document.getElementById('repeat-type');
 		var repeatType = e.options[e.selectedIndex].value
+		console.log(repeatType);
 		for(i = 1; i <= document.getElementById('repeat-number').value; i++){
-			if (repeatType == "Years"){
-				var new_from = from.addYear(i);
-				var new_to = to.addYear(i);
-				datelist += [new_from,new_to];
+			if (repeatType == ("Years")){
+				var new_from = (i).years().after(from);
+				var new_to = (i).years().after(to);
+				datelist += "["+new_from+","+new_to+"],\n";
 			}
-			else if (repeatType == "Months"){
-				var new_from = from.addMonth(i);
-				var new_to = to.addMonth(i);
-				datelist += [new_from,new_to];
+			else if (repeatType == ("Months")){
+				var new_from = (i).months().after(from);
+				var new_to = (i).months().after(to);
+				datelist += "["+new_from+","+new_to+"],\n";
 			}
-			else if (repeatType == "Days"){
-				var new_from = from.addDay(i);
-				var new_to = to.addDay(i);
-				datelist += [new_from,new_to];
+			else if (repeatType == ("Days")){
+				var new_from = (i).days().after(from);
+				var new_to = (i).days().after(to);
+				datelist += "["+new_from+","+new_to+"],\n";
 			}
 		}
 	}
-	console.log(datelist.join("\n"));
+	datelist+="]"
+	document.getElementById('datelist').innerHTML = datelist;
 }
 $(function(){
 	$( "#speed" ).selectmenu();
@@ -636,15 +638,15 @@ $(function(){
 									        
                                             <input type="number" name="repeat-nmb" id="repeat-number" min="1" max="100" value="1" style="display: none;"/>
                                             <select name="repeat-type" id="repeat-type" style="display: none;">
-											<option>Year</option>
-											<option>Month</option>
-											<option selected="selected">Day</option>
+											<option>Years</option>
+											<option>Months</option>
+											<option selected="selected">Days</option>
 											</select>
                                             <br/>
                                             <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
                                             <span>Add virtual sensor only if it has data in the given time period</span>
                                             <br/>
-                                             <div onclick="updateDateList()">Result: </div><div id="datelist"></div> 
+                                             <div onclick="updateDateList()">Click here for Result: </div><div id="datelist"></div> 
                                          
                                         </div>
                                         <h3>Outputs</h3>
