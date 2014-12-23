@@ -274,7 +274,8 @@
                         else {
                             $('#'+fields_div_id).html("");
                         }
-                        $(this).parent().children('.condition-slider').hide();	
+                        $(this).parent().children('.condition-slider').hide();
+                        
                     }
                     $('#'+vss_id).on('change', function(evt, params){
                         var vs = $(this).val();
@@ -313,6 +314,7 @@
                             $('#'+fields_div_id).html("");
                         }
                         $(this).parent().children('.condition-slider').hide();
+                       
                     });
 
                     $('.remove-criterion').click (function() {
@@ -441,10 +443,10 @@
                     return true;
                 });
 
-
+                
 
                 $(".plot").click(function(){
-                    datasets={};
+                	datasets={};
                     var choice = $("#plot-type").val();
                     $('#plotContainer').html('</br><div id="progressbar" style="width: 200px; margin-left: auto; margin-right: auto"></div>');
                     if (choice == '') return;
@@ -540,8 +542,15 @@
 					datasets = {};
 					csv_to_json($(this), drawGrid, 'iso');
 				});
-
+				 
+				 $(window).bind("load", setTimeout(function pre_load() {
+					 	if(getURLParameter("vsname") != null){
+							console.log("ONLOAD");
+							$(".plot").click();	
+					 	}
+					}),0);
             });
+
 function showAdvancedOptions()
 {
 	AODiv = document.getElementById("advanced-options");
@@ -600,12 +609,13 @@ function updateDateList()
 	datelist+="]"
 	document.getElementById('datelist').innerHTML = datelist;
 }
+
 $(function(){
 	$( "#speed" ).selectmenu();
 })
         </script>
     </head>
-    <body>
+    <body> 
         <div id="container">
             <div id="header">
                 <h1><a href="." id="gsn-name">GSN</a></h1>
