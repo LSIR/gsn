@@ -543,12 +543,12 @@
 					csv_to_json($(this), drawGrid, 'iso');
 				});
 				 
-				 $(window).bind("load", setTimeout(function pre_load() {
+				 $(window).bind("load", function pre_load() {
 					 	if(getURLParameter("vsname") != null){
 							console.log("ONLOAD");
 							$(".plot").click();	
 					 	}
-					}),0);
+					});
             });
 
 function showAdvancedOptions()
