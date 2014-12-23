@@ -58,6 +58,7 @@
                         }
                     }
                     $.post('multidata', params, function(response, text_status, request){
+                    	console.log(params);
                     	var lines = response.split("\n");
                         var headers = [];
                         var timestamp_idx = -1;
@@ -379,6 +380,7 @@
                         });
 
                     });
+                    console.log(tag.parents('form').find('.data-outputs-container li'));
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
@@ -409,6 +411,8 @@
                         });
                     });
                     add_data_output ();
+                    pre_load();
+                    
                 });
 
                 $('#add-data-output').click(function () {
@@ -543,12 +547,12 @@
 					csv_to_json($(this), drawGrid, 'iso');
 				});
 				 
-				 $(window).bind('load',  function() {
+				 function pre_load() {
 					 	if(getURLParameter("vsname") != null){
 							console.log("ONLOAD");
 							$(".plot").click();	
 					 	}
-					});
+				}
             });
 
 function showAdvancedOptions()
