@@ -77,11 +77,9 @@ public class ActivityHome extends SherlockActivity {
 			}
 		}
 		
-		
-		
-		
 		Intent serviceIntent = null;
 		serviceIntent = new Intent(this, schedular.class);
+		
 		this.startService(serviceIntent);
 	}
 

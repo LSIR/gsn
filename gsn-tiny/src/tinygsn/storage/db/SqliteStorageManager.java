@@ -138,11 +138,12 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 	}
 	
-	public void executeInsertSamples(int sample)
+	public void executeInsertSamples(int sample,int reason)
 	{
 		ContentValues newCon = new ContentValues();
 		newCon.put("time", System.currentTimeMillis());
 		newCon.put("sample", sample);
+		newCon.put("reason", reason);
 		
 		database.insert("Samples", null, newCon);
 	}
@@ -188,6 +189,16 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		database.insert((String) tableName, null, newCon);
 		// close();
 	}
+	
+	public int[] getLatestState(){
+		String query = "Select * from Samples order by time desc limit 1;";
+		Cursor cursor = database.rawQuery(query, new String[] {});
+		if (cursor.moveToNext()){
+			return new int[]{cursor.getInt(cursor.getColumnIndex("sample")),cursor.getInt(cursor.getColumnIndex("reason"))};
+		}else{
+			return new int[]{0,0};
+		}
+	}
 
 	public ArrayList<StreamElement> executeQuery() { //TODO this is only for GPS
 
@@ -218,6 +229,11 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return result;
 	}
 
+	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName,
+			String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num) {
+		return executeQueryGetLatestValues(tableName,FIELD_NAMES,FIELD_TYPES,num,0);
+	}
+	
 	/**
 	 * Get num latest values
 	 * 
@@ -226,11 +242,11 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	 * @return
 	 */
 	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName,
-			String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num) {
+			String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num, long minTimestamp) {
 		
 		Serializable[] fieldValues;
 		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
-		String query = "Select * from " + tableName + " order by _id desc limit ?";
+		String query = "Select * from " + tableName + " where timed > "+minTimestamp+" order by _id desc limit ?";
 		Cursor cursor = database.rawQuery(query, new String[] { num + "" });
 
 		while (cursor.moveToNext()) {

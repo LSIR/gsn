@@ -88,7 +88,7 @@ public class TestVS  extends IntentService implements SensorEventListener{
 		StreamElement streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
 				new Serializable[] { x, y, z });
 
-		((AndroidGyroscopeWrapper) w).theLastStreamElement = streamElement;
+		((AndroidGyroscopeWrapper) w).setTheLastStreamElement(streamElement);
 	}
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {

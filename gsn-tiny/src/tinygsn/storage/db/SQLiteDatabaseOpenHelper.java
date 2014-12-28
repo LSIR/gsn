@@ -73,6 +73,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		db.execSQL(createQuery);
 		createQuery = "CREATE TABLE Samples (_id integer primary key, time bigint, "
 				+ "sample integer"
+				+ "reason integer"
 				+ ");";
 		db.execSQL(createQuery);
 	

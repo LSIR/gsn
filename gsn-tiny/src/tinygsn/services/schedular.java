@@ -19,27 +19,41 @@ import tinygsn.model.wrappers.AndroidGyroscopeWrapper;
 import tinygsn.model.wrappers.WifiWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
+import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 public class schedular extends IntentService {
+	
+	public static final int STATE_LOST = 0;
+	public static final int STATE_GPS = 1;
+	public static final int STATE_STATIONARY = 2;
+	public static final int REASON_ACC = 0;
+	public static final int REASON_WIFI = 1;
+	public static final int REASON_GPS = 2;
 	
 	Intent intentGPS = null;
 	Intent intentActivity = null;
 	Intent intentWifi = null;
 	Intent intentAcc = null;
 	Intent intentGyro = null;
+	
+	WakeLock wakeLock = null;
 
 	public schedular(String name) {
 		super(name);
+		setIntentRedelivery(true);
 	}
 	public schedular()
 	{
-		this("schedular");
-		
+		this("schedular");	
 	}
 
 	//constants:
@@ -47,16 +61,15 @@ public class schedular extends IntentService {
 	private int numLatest = 10;
 	double accelometerThereshold = 10;
 	int wifiCountThreshold = 15;
-	
 	int SchedulerSleepingTime = 1000*60;
-	int SamplingRateAccelometerMoving = 1;
-	int SamplingRateAccelometerStationary = 4;
-    int SamplingRateAccelometerLost = 1;
+	
+	int SamplingRateAccelometerMoving = 3;
+	int SamplingRateAccelometerStationary = 1;
+    int SamplingRateAccelometerLost = 2;
     
-
-	int SamplingRateGyroscopeMoving = 1;
-	int SamplingRateGyroscopeStationary = 2;
-    int SamplingRateGyroscopeLost = 1;
+	int SamplingRateGyroscopeMoving = 3;
+	int SamplingRateGyroscopeStationary = 1;
+    int SamplingRateGyroscopeLost = 2;
 
 	int SamplingRateGPSMoving = 1;
 	int SamplingRateGPSStationary = 0;
@@ -69,61 +82,49 @@ public class schedular extends IntentService {
 	int SamplingRateActivityMoving = 0;
 	int SamplingRateActivityStationary = 0;
     int SamplingRateActivityLost = 0;
-	
-    
     //end of constants
     
-	private VSensorConfig config = null;
-	int machineState = 0; //0 = lost, 1= moving 2= stationary
-	int priMachineState = 1;
+	int machineState = STATE_LOST;
+	int priMachineState = STATE_GPS;
+	int reason = REASON_ACC;
+	
 	SqliteStorageManager storage = null;
-	
-	
+		
 	AndroidAccelerometerWrapper accelometerWrapper = new AndroidAccelerometerWrapper();
 	final String accelometerType = "tinygsn.model.wrappers.AndroidAccelerometerWrapper";
 	String accelometerVsName = null;
-	
-	
+		
 	AndroidGPSWrapper gpsWrapper = new AndroidGPSWrapper();
 	final String gpsType = "tinygsn.model.wrappers.AndroidGPSWrapper";
 	String gpsVsName = null;
-	
 	
 	AndroidGyroscopeWrapper gyroscopeWrapper = new AndroidGyroscopeWrapper();
 	final String gyroscopeType = "tinygsn.model.wrappers.AndroidGyroscopeWrapper";
 	String gyroscopeVsName = null;
 	
-	
 	AndroidActivityRecognitionWrapper activityWrapper = new AndroidActivityRecognitionWrapper();
 	final String activityType = "tinygsn.model.wrappers.AndroidActivityRecognitionWrapper";
 	String activityVsName = null;
-	
 	
 	WifiWrapper wifiWrapper = new WifiWrapper();
 	final String wifiType = "tinygsn.model.wrappers.WifiWrapper";
 	String wifiVsName = null;
 
 	
-	public void scheduleServices(ArrayList<Integer>rates)
-	{
-		
-	}
 	public ArrayList<Integer> CalcRates()
 	{
 
+		int[] s = storage.getLatestState();
+		machineState = s[0];
+		reason = s[1];
+		
 		//calculation of parameters
-		storage.executeInsertSamples(machineState);
+		
 		
 		Log.d("tinygsn-scheduler", "State is: "+ machineState);
 				
 		long curTime = System.currentTimeMillis();
-		double avgXChangedAccelometer = 0;
-		double avgYChangedAccelometer = 0;
-		double avgZChangedAccelometer = 0;
-		
-		double avgXChangedGyroscope = 0;
-		double avgYChangedGyroscope = 0;
-		double avgZChangedGyroscope = 0;
+		double avgChangedAccelometer = 0;
 		
 		boolean gpsConstant = true;
 		boolean isInKnownWifiAccess = true;
@@ -131,21 +132,6 @@ public class schedular extends IntentService {
 		ArrayList<StreamElement> accelometerResult = null;
 		ArrayList<StreamElement> gpsResult = null;
 		ArrayList<StreamElement> wifiResult = null;
-		ArrayList<StreamElement> gyroscopeResult = null;
-		
-		
-		/*
-		if(accelometerVsName == null && StaticData.findNameVs(accelometerType) != null)
-			isAccelometerRecent = true;
-		if(gyroscopeVsName == null && StaticData.findNameVs(gyroscopeType) != null)
-			isGyroscopeRecent = true;
-		if(gpsVsName == null && StaticData.findNameVs(gpsType) != null)
-			isgpsRecent = true;
-		if(wifiVsName == null && StaticData.findNameVs(wifiType) != null)
-			iswifiRecent = true;
-		if(activityVsName == null && StaticData.findNameVs(activityType) != null)
-			isActivityRecent = true;
-		*/
 		
 		accelometerVsName = StaticData.findNameVs(accelometerType);
 		gyroscopeVsName = StaticData.findNameVs(gyroscopeType);
@@ -217,13 +203,13 @@ public class schedular extends IntentService {
 		
 		if(wifiVsName != null)
 		{
-			wifiResult = storage.executeQueryGetLatestValues("vs_"+ wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest);
-			isInKnownWifiAccess = ContainsFamiliarWifis(wifiResult, curTime);
+			wifiResult = storage.executeQueryGetLatestValues("vs_"+ wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest, curTime-timeThereshold);
+			isInKnownWifiAccess = ContainsFamiliarWifis(wifiResult);
 			Log.d("tinygsn-scheduler","is in knownwifi accesspoint: "+ isInKnownWifiAccess);
 		}
 		if(gpsVsName != null)
 		{
-			gpsResult = storage.executeQueryGetLatestValues("vs_"+gpsVsName, gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), numLatest);
+			gpsResult = storage.executeQueryGetLatestValues("vs_"+gpsVsName, gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), numLatest, curTime-timeThereshold);
 			if(gpsResult != null && gpsResult.size() != 0)
 			{
 				long longitude = Math.round(((Double)(gpsResult.get(0).getData("longitude")) * 1000));
@@ -240,40 +226,21 @@ public class schedular extends IntentService {
 			
 			Log.d("tinygsn-scheduler","is GPS constant: "+ gpsConstant);
 		}
-		if(gyroscopeVsName != null)
-		{
-			gyroscopeResult = storage.executeQueryGetLatestValues("vs_"+gyroscopeVsName, gyroscopeWrapper.getFieldList(), gyroscopeWrapper.getFieldType(), numLatest);
-			if(gyroscopeResult.size() != 0)
-			{
-				for(int i = 0; i < gyroscopeResult.size(); i++)
-				{
-					avgXChangedGyroscope += Math.abs((Double)(gyroscopeResult.get(i).getData("x")));
-					avgYChangedGyroscope += Math.abs((Double)(gyroscopeResult.get(i).getData("y")));
-					avgZChangedGyroscope += Math.abs((Double)(gyroscopeResult.get(i).getData("z")));
-				}
-				avgXChangedGyroscope = avgXChangedGyroscope/gyroscopeResult.size();
-				avgYChangedGyroscope = avgYChangedGyroscope/gyroscopeResult.size();
-				avgZChangedGyroscope = avgZChangedGyroscope/gyroscopeResult.size();
-			}
-			
-			Log.d("tinygsn-scheduler","average Gyro change: "+ avgXChangedGyroscope + "," + avgYChangedGyroscope + "," + avgZChangedGyroscope);
-		}
 		if(accelometerVsName != null)
 		{
-			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelometerVsName, accelometerWrapper.getFieldList(), accelometerWrapper.getFieldType(), numLatest);
+			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelometerVsName, accelometerWrapper.getFieldList(), accelometerWrapper.getFieldType(), numLatest, curTime-timeThereshold);
 			if(accelometerResult.size() != 0)
 			{
 				for(int i = 0; i < accelometerResult.size(); i++)
 				{
-					avgXChangedAccelometer += Math.abs((Double)(accelometerResult.get(i).getData("x")));
-					avgYChangedAccelometer += Math.abs((Double)(accelometerResult.get(i).getData("y")));
-					avgZChangedAccelometer += Math.abs((Double)(accelometerResult.get(i).getData("z")));
+					double changedAccelometer = Math.pow((Double)(accelometerResult.get(i).getData("x")),2);
+					changedAccelometer += Math.pow((Double)(accelometerResult.get(i).getData("y")),2);
+					changedAccelometer += Math.pow((Double)(accelometerResult.get(i).getData("z")),2);
+					avgChangedAccelometer += Math.sqrt(changedAccelometer);
 				}
-				avgXChangedAccelometer = avgXChangedAccelometer/accelometerResult.size();
-				avgYChangedAccelometer = avgYChangedAccelometer/accelometerResult.size();
-				avgZChangedAccelometer = avgZChangedAccelometer/accelometerResult.size();
+				avgChangedAccelometer = avgChangedAccelometer/accelometerResult.size();
 			}
-			Log.d("tinygsn-scheduler","average Acc change: "+ avgXChangedAccelometer + "," + avgYChangedAccelometer + "," + avgZChangedAccelometer);
+			Log.d("tinygsn-scheduler","average Acc change: "+ avgChangedAccelometer);
 		}	
 		
 		//end of parameter calculation 
@@ -301,7 +268,7 @@ public class schedular extends IntentService {
 		switch(machineState)
 		{
 			
-			case 0://LOST
+			case STATE_LOST:
 
 				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeLost);
 				storage.updateSamplingRate(accelometerType,SamplingRateAccelometerLost);
@@ -309,26 +276,28 @@ public class schedular extends IntentService {
 				storage.updateSamplingRate(wifiType, SamplingRateWifiLost);
 				storage.updateSamplingRate(activityType, SamplingRateActivityLost);
 				
-				priMachineState = 0;
+				priMachineState = STATE_LOST;
 
 				//changing stage
-				if((gpsResult != null  && gpsResult.size() != 0) && (curTime - gpsResult.get(0).getTimeStamp() < timeThereshold)) //gps fixed
+				if(gpsResult != null  && gpsResult.size() != 0) //gps fixed
 				{
-					machineState = 1;
+					machineState = STATE_GPS;
 					Log.d("tinygsn-scheduler", "new state GPS");
 				}
-				else if(((wifiResult != null && wifiResult.size() != 0) 
-						&&(curTime - wifiResult.get(0).getTimeStamp() <timeThereshold ) && isInKnownWifiAccess) 
-						|| ((accelometerResult != null && accelometerResult.size() != 0)
-								&&((curTime - accelometerResult.get(0).getTimeStamp() < timeThereshold) &&
-										((avgXChangedAccelometer < accelometerThereshold) && (avgYChangedAccelometer < accelometerThereshold) && (avgZChangedAccelometer < accelometerThereshold)))))
+				else if(wifiResult != null && wifiResult.size() != 0 && isInKnownWifiAccess) 
 				{
-					//accelometer low || known WIFI --> going to stationary state
-					machineState = 2;
-					Log.d("tinygsn-scheduler", "new state STATIONARY");
+					machineState = STATE_STATIONARY;
+					reason = REASON_WIFI;
+					Log.d("tinygsn-scheduler", "new state STATIONARY (wifi)");
+				}
+				else if (accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer < accelometerThereshold)
+				{
+					machineState = STATE_STATIONARY;
+					reason = REASON_ACC;
+					Log.d("tinygsn-scheduler", "new state STATIONARY (acc)");
 				}
 				break;
-			case 1: //GPS MOVING
+			case STATE_GPS: 
 
 				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeMoving);
 				storage.updateSamplingRate(accelometerType, SamplingRateAccelometerMoving);
@@ -336,21 +305,27 @@ public class schedular extends IntentService {
 				storage.updateSamplingRate(wifiType, SamplingRateWifiMoving);
 				storage.updateSamplingRate(activityType, SamplingRateActivityMoving);		
 				
-				priMachineState = 1;
+				priMachineState = STATE_GPS;
 				
-				if((gpsResult != null && gpsResult.size() != 0) && (curTime - gpsResult.get(0).getTimeStamp() > timeThereshold)) //gps lost
+				if(gpsResult == null || gpsResult.size() == 0) //gps lost
 				{
-					machineState = 0;
+					machineState = STATE_LOST;
 					Log.d("tinygsn-scheduler", "new state LOST");
 				}
-				else if((gpsResult != null && gpsResult.size() != 0 && (curTime - gpsResult.get(0).getTimeStamp() < timeThereshold) && gpsConstant ) || (accelometerResult != null && accelometerResult.size() != 0 && (curTime - accelometerResult.get(0).getTimeStamp() < timeThereshold ) && ((avgXChangedAccelometer < accelometerThereshold) && (avgYChangedAccelometer < accelometerThereshold) && (avgZChangedAccelometer < accelometerThereshold)) ) )
+				else if(gpsResult != null && gpsResult.size() != 0 && gpsConstant) 
 				{
-					//Accelometer low || gps constant --> stationary
-					machineState = 2;
-					Log.d("tinygsn-scheduler", "new state STATIONARY");
+					machineState = STATE_STATIONARY;
+					reason = REASON_GPS;
+					Log.d("tinygsn-scheduler", "new state STATIONARY (gps)");
+				}
+				else if(accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer < accelometerThereshold) 
+				{
+					machineState = STATE_STATIONARY;
+					reason = REASON_ACC;
+					Log.d("tinygsn-scheduler", "new state STATIONARY (acc)");
 				}
 				break;
-			case 2:  //STATIONARY
+			case STATE_STATIONARY:
 
 				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeStationary);
 				storage.updateSamplingRate(accelometerType,SamplingRateAccelometerStationary);
@@ -358,74 +333,72 @@ public class schedular extends IntentService {
 				storage.updateSamplingRate(wifiType, SamplingRateWifiStationary);
 				storage.updateSamplingRate(activityType, SamplingRateActivityStationary);
 	
-				priMachineState = 2;
+				priMachineState = STATE_STATIONARY;
 
-				if((wifiResult != null && wifiResult.size() != 0) 
-						&& (((curTime - wifiResult.get(0).getTimeStamp() < timeThereshold)
-								&& !isInKnownWifiAccess)
-								//|| (curTime - wifiResult.get(0).getTimeStamp() > timeThereshold)
-								)
-								|| (accelometerResult != null && accelometerResult.size() != 0)
-								&&(curTime - accelometerResult.get(0).getTimeStamp() < timeThereshold) &&
-								((avgXChangedAccelometer > accelometerThereshold) || (avgYChangedAccelometer > accelometerThereshold) || (avgZChangedAccelometer > accelometerThereshold)))
+				if (reason == REASON_WIFI && (wifiResult == null || wifiResult.size() == 0 || !isInKnownWifiAccess))
 				{
-					machineState = 0;
+					machineState = STATE_LOST;
 					Log.d("tinygsn-scheduler", "new state LOST");
 				}
-
+				else if (reason == REASON_ACC || reason == REASON_GPS)
+				{
+					if(wifiResult != null && wifiResult.size() != 0 && isInKnownWifiAccess) 
+					{
+						reason = REASON_WIFI;
+						Log.d("tinygsn-scheduler", "new state STATIONARY (wifi)");
+					}
+					else if(accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer > accelometerThereshold)
+					{
+						machineState = STATE_LOST;
+						Log.d("tinygsn-scheduler", "new state LOST");
+					}
+				}
 		}
+		storage.executeInsertSamples(machineState,reason);
 		return null;
 		
 	}
 	
-	private boolean ContainsFamiliarWifis(ArrayList<StreamElement> wifiResult,
-			long curTime) {
+	private boolean ContainsFamiliarWifis(ArrayList<StreamElement> wifiResult) {
 		
 		Map<Long, Integer> freqs = storage.getFrequencies();
-		
-		/*for(Long l : freqs.keySet()){
-			Log.d("tinygsn-scheduler", "freq key:"+ l);
-		}*/
-
 		for(int i = 0; i < wifiResult.size(); i++)
 		{
-			
-				Long k = ((Double)(wifiResult.get(i).getData("mac1"))).longValue() * 16777216 + ((Double)(wifiResult.get(i).getData("mac2"))).longValue();
-				//Log.d("tinygsn-scheduler", "the key:"+ k);
-				if ((curTime - wifiResult.get(i).getTimeStamp()) < timeThereshold){
-				if( freqs.containsKey(k) && freqs.get(k) > wifiCountThreshold)
-				{
-					return true;
-				}
+			Long k = ((Double)(wifiResult.get(i).getData("mac1"))).longValue() * 16777216 + ((Double)(wifiResult.get(i).getData("mac2"))).longValue();
+			if( freqs.containsKey(k) && freqs.get(k) > wifiCountThreshold)
+			{
+				return true;
 			}
 		}
 		return false;
 	}
 	
-
-	@Override
-	public IBinder onBind(Intent intent) {
-
-		return null;
-	}
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		if (wakeLock != null){
+			wakeLock.release();
+		}
 	}
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		
-		while(true)
+		storage = new SqliteStorageManager(this);
+		
+		//PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+		//wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "schedular-lock");
+		//wakeLock.acquire();
+		//while(true)
 		{
-			storage = new SqliteStorageManager(new ActivityListVSNew());
 			CalcRates();
-			try {
+			/*try {
 				Thread.sleep(SchedulerSleepingTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}	 
-		
+		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+SchedulerSleepingTime,PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 	
 	

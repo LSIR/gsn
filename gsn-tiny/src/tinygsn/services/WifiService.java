@@ -19,7 +19,9 @@ import tinygsn.model.wrappers.WifiWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +29,9 @@ import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 
 public class WifiService extends IntentService {
@@ -37,6 +42,8 @@ public class WifiService extends IntentService {
 	WifiScanReceiver wifiReciever;
 	SqliteStorageManager storage = null;
 	long ctr = 0;
+	boolean scanning = false;
+	
 	
 	public WifiService(String name)
 	{
@@ -46,6 +53,15 @@ public class WifiService extends IntentService {
 	public WifiService()
 	{
 		super("wifiService");
+	}
+	
+	@Override
+	public void onCreate(){
+		mainWifiObj = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		wifiReciever = new WifiScanReceiver();
+		registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+		Log.d("wifi-scanning", "registered");
+		super.onCreate();
 	}
 	
 	@Override
@@ -60,69 +76,70 @@ public class WifiService extends IntentService {
 				w = streamSource.getWrapper();
 			}
 		}
-		Timer timer = new Timer(); 
-		registerReciever();
-		mainWifiObj = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		timer.scheduleAtFixedRate( new TimerTask() {
-
-			public void run() {
-				
+		//while (w.isActive()) 
+		{
+			//try {
 				int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.WifiWrapper");
-				if (samplingRate > 0 && ctr % samplingRate == 0 ){
-					if (mainWifiObj.isWifiEnabled() == false)
+			
+			    if (samplingRate > 0 && ctr % samplingRate == 0 ){
+			    	if (mainWifiObj.isWifiEnabled() == false)
 					{  
 						// If wifi disabled then enable it
 						mainWifiObj.setWifiEnabled(true);
 					}
-					registerReceiver(new WifiScanReceiver(), new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 					mainWifiObj.startScan();
+					scanning = true;
+					Log.d("wifi-scanning", "calling scan" + wifiReciever);
+					while (scanning){
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {}
+					}
 				}
-				else
-				{
-					//mainWifiObj.setWifiEnabled(false);
-				}
-				ctr++;
-			}
-		}, 0, 1000*60);
-	}
-
-	public void registerReciever()
-	{
-		wifiReciever = new WifiScanReceiver();     
-	    registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+			    if (samplingRate == 0){
+			    	ctr++;
+			    }else{
+			    	ctr = ctr+1 % samplingRate;
+			    }
+				//Thread.sleep(60*1000);
+			//}
+			//catch (InterruptedException e) {
+			//	Log.e(e.getMessage(), e.toString());
+			//}
+		}
+		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+60000,PendingIntent.getService(config.getController().getActivity(), 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 		
 	
 	@Override
 	public void onDestroy() {
+		try{
 		unregisterReceiver(wifiReciever);
+		Log.d("wifi-scanning", "de-registered");
+		}catch( Exception e)
+		{}
 		super.onDestroy();
 	}
 
 
 	class WifiScanReceiver extends BroadcastReceiver {
-		   String wifis[];
    
 	   @SuppressLint("UseValueOf")
 	   public void onReceive(Context c, Intent intent) {
 		    
 	   	  List<ScanResult> wifiScanList = mainWifiObj.getScanResults();
-	      wifis = new String[wifiScanList.size()];
+	   	  Log.d("wifi-scanning", "received " + wifiScanList.size());
 	      StreamElement streamElement = null;
 	      for(int i = 0; i < wifiScanList.size(); i++){
-	         wifis[i] = ((wifiScanList.get(i)).toString());
 	         	streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
 	 				new Serializable[] { converTingBSSID(wifiScanList.get(i).BSSID.substring(0, 8)), converTingBSSID(wifiScanList.get(i).BSSID.substring(8)), wifiScanList.get(i).level });
-	         ((WifiWrapper) w).getQueuedStreamElements().add(streamElement);
+	         ((WifiWrapper) w).postStreamElement(streamElement);
 	         storage.updateWifiFrequency(wifiScanList.get(i).BSSID);
 	      }
-	      for(int i = 0; i < ((WifiWrapper) w).getQueuedStreamElements().size(); i++)
-	      {
-	    	  ((WifiWrapper) w).setTheLastStreamElement(((WifiWrapper) w).getQueuedStreamElements().get(i));
-	  		((WifiWrapper) w).getLastKnownData();
-	      }
-	      ((WifiWrapper) w).getQueuedStreamElements().clear();
-	      
+	      unregisterReceiver(wifiReciever);
+	      registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+	      scanning = false;
 	   }
 	}
 
@@ -130,7 +147,6 @@ public class WifiService extends IntentService {
 	private double converTingBSSID(String bssid)
 	{
 		bssid = bssid.replaceAll(":", "");
-	//	Log.i("bssid",bssid);
 		return Integer.parseInt(bssid, 16);
 	}
 	

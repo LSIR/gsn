@@ -58,7 +58,7 @@ public class AndroidGyroscopeWrapper extends AbstractWrapper implements
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 
-	public StreamElement theLastStreamElement = null;
+	private StreamElement theLastStreamElement = null;
 
 	public AndroidGyroscopeWrapper() {
 		super();
@@ -141,6 +141,10 @@ public class AndroidGyroscopeWrapper extends AbstractWrapper implements
 		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
 				new Serializable[] { x, y, z });
 
+		theLastStreamElement = streamElement;
+	}
+
+	public void setTheLastStreamElement(StreamElement streamElement) {
 		theLastStreamElement = streamElement;
 	}
 

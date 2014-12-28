@@ -24,8 +24,6 @@
 
 
 package tinygsn.model.wrappers;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
@@ -43,21 +41,16 @@ import android.util.Log;
 public class AndroidAccelerometerWrapper extends AbstractWrapper implements SensorEventListener  {
 
 	private static final String[] FIELD_NAMES = new String[] { "x", "y", "z" };
-
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE,
 			DataTypes.DOUBLE, DataTypes.DOUBLE };
-
 	private static final String[] FIELD_DESCRIPTION = new String[] { "x", "y",
 			"z" };
-
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double",
 			"double", "double" };
 
 	private static final String TAG = "AndroidAccelerometerWrapper";
-
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
-
 	private StreamElement theLastStreamElement = null;
 
 	public AndroidAccelerometerWrapper() {
@@ -77,7 +70,6 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements Sens
 		Activity activity = getConfig().getController().getActivity();
 		
 		SqliteStorageManager storage = new SqliteStorageManager(getConfig().getController().getActivity());
-		
 		mSensorManager = (SensorManager) activity
 				.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -91,7 +83,6 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements Sens
 				getLastKnownData();
 			}
 			catch (InterruptedException e) {
-			
 				Log.e(e.getMessage(), e.toString());
 			}
 		}

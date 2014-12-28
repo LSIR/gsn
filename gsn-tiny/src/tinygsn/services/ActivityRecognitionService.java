@@ -202,7 +202,8 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)  {
     
-
+    	/*
+    	if (intent == null){return START_REDELIVER_INTENT;}
 		Bundle b = intent.getExtras();
 		config = (VSensorConfig) b.get("tinygsn.beans.config");
 		storage = new SqliteStorageManager(config.getController().getActivity());
@@ -250,8 +251,8 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
 
     		((AndroidActivityRecognitionWrapper) w).setTheLastStreamElement(streamElement);
 			((AndroidActivityRecognitionWrapper) w).getLastKnownData();
-        }
-		return resp;
+        }*/
+		return START_NOT_STICKY; //START_REDELIVER_INTENT;
         
     }    
     private String getType(int type){
