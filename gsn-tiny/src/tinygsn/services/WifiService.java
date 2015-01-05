@@ -95,6 +95,11 @@ public class WifiService extends IntentService {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {}
 					}
+					if (mainWifiObj.isWifiEnabled() == true)
+					{  
+						// If wifi disabled then enable it
+						mainWifiObj.setWifiEnabled(false);
+					}
 				}
 			    if (samplingRate == 0){
 			    	ctr++;
