@@ -29,6 +29,7 @@ package gsn.utils.models;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import org.bytedeco.javacpp.gsl;
 import org.bytedeco.javacpp.gsl.gsl_interp_type;
@@ -37,14 +38,18 @@ import gsn.beans.StreamElement;
 
 public class StreamInterpolateJoinModel extends AbstractModel {
 	
-	int historySize = 10;
+	int historySize = 10000; //max size of segment + shift between the two streams
+	int interpolateGap = 3000; //what gap to use for segmenting
 	
 	HashMap<String,LinkedList<Double>> arrays = new HashMap<String, LinkedList<Double>>(); //FIFO queues
+	HashMap<String,double[]> segments = new HashMap<String, double[]>(); //interpolation segments
 	HashMap<String,String> interpolation_types = new HashMap<String,String>();
+	
 	
 	LinkedList<StreamElement> toProcess = new LinkedList<StreamElement>();
 	
 	int min_size = 2;
+	boolean has_segment = false;
 	
 	public StreamInterpolateJoinModel(){
 		arrays.put("timed", new LinkedList<Double>());
@@ -54,42 +59,91 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	@Override
 	public synchronized StreamElement[] pushData(StreamElement streamElement, String origin) {
 		if(origin.equalsIgnoreCase("A")){
+			//put into the buffers for interpolation
 			for (int i = 0;i<streamElement.getFieldTypes().length;i++){
 				if (arrays.containsKey(streamElement.getFieldNames()[i].toLowerCase())){
 					arrays.get(streamElement.getFieldNames()[i].toLowerCase()).addFirst(((Number)streamElement.getData()[i]).doubleValue());
 				}
 			}
 			arrays.get("timed").addFirst((double)streamElement.getTimeStamp());
-			
+			//keep size below the max
 			if (arrays.get("timed").size() > historySize){
 				for (String k : arrays.keySet()){
 					arrays.get(k).removeLast();
 				}
 			}
+			//clean according to the last item in todo list
+			boolean modified = false;
+			if (toProcess.size()>0){
+				modified = removeOldSegments(new Long(toProcess.getFirst().getTimeStamp()).doubleValue());
+			}
+			if (modified || !has_segment){// if modified or no existing segment, trying to find a new one
+				has_segment = buildSegments();
+			}
+			//try to interpolate what is in the todo list
 			return checkInterpolate(null);
 		}else if(origin.equalsIgnoreCase("B")){
+			//truncate the queues by removing too old segments
+			if (removeOldSegments(new Long(streamElement.getTimeStamp()).doubleValue())){
+				has_segment = buildSegments(); //find the next segment if possible
+			}
+			//try to interpolate for this element or add it to the todo list
 			return checkInterpolate(streamElement);
 		}
 		return null;
 	}
 	
 
+	private boolean removeOldSegments(double timed) {
+		
+		Iterator<Double> it = arrays.get("timed").descendingIterator();
+		Double last = 0.0;
+		Double cur = 0.0;
+		int cut = 0; //how many to remove
+		int ctr = 0;
+		
+		while (it.hasNext()){
+			last = cur;
+			cur = it.next();
+			if(cur >= timed) break; //only check before this timepoint
+			if (last - cur > interpolateGap){ //segments are defined by gaps in time
+				cut = ctr;
+			}
+			ctr++;
+		}
+		if (cut>0){
+			for (String k : arrays.keySet()){
+				LinkedList<Double> l = arrays.get(k);
+				for (int i=0;i<cut;i++){
+					l.removeLast();
+				}
+			}
+			return true;
+		}else{
+			return false;
+		}
+		
+	}
+
+
 	@Override
 	public StreamElement[] query(StreamElement params) {
 		
 		double q = new Long(params.getTimeStamp()).doubleValue();
-		int size = arrays.get("timed").size();
-		double[] x = new double[size];
-		int i = size -1;
-		for(Double d :arrays.get("timed")){
-			x[i] = d.doubleValue();
-			i--;
-		}
+		double[] x = segments.get("timed");
+		
+		//too small segment, don't interpolate
+		if (x.length < min_size) return new StreamElement[]{null};
+		
+		//don't extrapolate for values between segments
+		if(x[0] > q) return new StreamElement[]{null};
 		
 		Serializable[] r = new Serializable[params.getData().length+interpolation_types.size()];
-		for(i=0;i<params.getData().length;i++){ //assumes that the first defined fields are the ones from B
+		int i = 0;
+		for(;i<params.getData().length;i++){ //assumes that the first defined fields are the ones from B
 			r[i] = params.getData()[i];
-		}		
+		}	
+		//fill with default values
 		for(int j=0;j<interpolation_types.size();j++){
 			byte t = getOutputFields()[i+j].getDataTypeID();
 			if (t == DataTypes.DOUBLE){
@@ -103,17 +157,12 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		StreamElement se = new StreamElement(getOutputFields(),r,params.getTimeStamp());
 
 		for (String k : interpolation_types.keySet()){
-			double[] y = new double[size];
-			int j = size - 1 ;
-			for(Double d :arrays.get(k)){
-				y[j] = d.doubleValue();
-				j--;
-			}
+			double[] y = segments.get(k);
 			try {
 				gsl.gsl_interp_type typ = (gsl_interp_type) gsl.class.getMethod(interpolation_types.get(k)).invoke(null);
-				gsl.gsl_interp workspace = gsl.gsl_interp_alloc(typ,size);
+				gsl.gsl_interp workspace = gsl.gsl_interp_alloc(typ,x.length);
 				gsl.gsl_interp_accel acc = gsl.gsl_interp_accel_alloc();
-			    gsl.gsl_interp_init(workspace, x, y, size); 
+			    gsl.gsl_interp_init(workspace, x, y, x.length); 
 			    double val = gsl.gsl_interp_eval(workspace, x, y, q, acc);
 			    if (se.getType(k) == DataTypes.FLOAT)
 			        se.setData(k, (float)val);
@@ -131,6 +180,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 
 	@Override
 	public void setParam(String k, String string) {
+		//set the interpolation types
 		if(k.startsWith("f_")){
 			arrays.put(k.substring(2).toLowerCase(), new LinkedList<Double>());
 			interpolation_types.put(k.substring(2).toLowerCase(), string);
@@ -147,13 +197,20 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		if(k.equalsIgnoreCase("historysize")){
 			historySize = Integer.parseInt(string);
 		}
+		if(k.equalsIgnoreCase("interpolategap")){
+			interpolateGap = Integer.parseInt(string);
+		}
 	}
 	
 	
 	private StreamElement[] checkInterpolate(StreamElement element){
+		//interpolation buffers are empty, pass
 		if (arrays.get("timed").size() == 0) return null;
+		
 		if (element!=null)
-			if (element.getTimeStamp() <= arrays.get("timed").getFirst() && arrays.get("timed").size()>= min_size){
+			//the interpolation request is computable now
+			//if a segment exists here, the element must be inside its time range
+			if (has_segment){
 				return query(element);
 			}else{
 		        toProcess.add(element);
@@ -164,7 +221,9 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		while (i>0){
 			StreamElement se = toProcess.removeFirst();
 			i--;
-			if (se.getTimeStamp() <= arrays.get("timed").getFirst() && arrays.get("timed").size()>= min_size){
+			//only the latest element is guaranteed to be in the current segment
+			//but none can be in another complete segment
+			if (has_segment && se.getTimeStamp() <= segments.get("timed")[segments.get("timed").length-1]){
 				StreamElement ses = query(se)[0];
 				if (ses != null) r.add(ses);
 			}else{
@@ -172,6 +231,39 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 			}
 		}
 		return r.toArray(new StreamElement[r.size()]);
+	}
+	
+	private boolean buildSegments(){
+		
+		Iterator<Double> it = arrays.get("timed").descendingIterator();
+		Double last = 0.0;
+		Double cur = 0.0;
+		int cut = 0; //how many to take
+		int ctr = 0;
+		
+		while (it.hasNext()){
+			last = cur;
+			cur = it.next();
+			if (last - cur > interpolateGap && ctr > 0){ //segments are defined by gaps in time
+				cut = ctr;
+				break; //find the first segment
+			}
+			ctr++;
+		}
+		if (cut>0){ //segment found
+			for (String k : arrays.keySet()){
+				double[] x = new double[cut];
+				int i = cut -1;
+				for(Double d :arrays.get(k)){
+					x[i] = d.doubleValue();
+					i--;
+				}
+				segments.put(k, x);
+			}
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 }
