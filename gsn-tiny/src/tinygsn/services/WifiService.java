@@ -82,30 +82,30 @@ public class WifiService extends IntentService {
 				int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.WifiWrapper");
 			
 			    if (samplingRate > 0 && ctr % samplingRate == 0 ){
-			    	if (mainWifiObj.isWifiEnabled() == false)
-					{  
-						// If wifi disabled then enable it
-						mainWifiObj.setWifiEnabled(true);
-					}
+
+					mainWifiObj.setWifiEnabled(true);
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {}
 					mainWifiObj.startScan();
 					scanning = true;
 					Log.d("wifi-scanning", "calling scan" + wifiReciever);
+					long t = System.currentTimeMillis();
 					while (scanning){
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {}
+						if (System.currentTimeMillis() - t > 120000){
+					    	  StreamElement streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
+						 				new Serializable[] { 1.0, mainWifiObj.isWifiEnabled()?1.0:0.0 , 0.0 });
+						         ((WifiWrapper) w).postStreamElement(streamElement);
+						         break;
+						}
 					}
-					if (mainWifiObj.isWifiEnabled() == true)
-					{  
-						// If wifi disabled then enable it
-						mainWifiObj.setWifiEnabled(false);
-					}
+					mainWifiObj.setWifiEnabled(false);
+
 				}
-			    if (samplingRate == 0){
-			    	ctr++;
-			    }else{
-			    	ctr = ctr+1 % samplingRate;
-			    }
+			    ctr++;
 				//Thread.sleep(60*1000);
 			//}
 			//catch (InterruptedException e) {
@@ -136,14 +136,22 @@ public class WifiService extends IntentService {
 	   	  List<ScanResult> wifiScanList = mainWifiObj.getScanResults();
 	   	  Log.d("wifi-scanning", "received " + wifiScanList.size());
 	      StreamElement streamElement = null;
+	      
+	      if (wifiScanList.size() == 0){
+	    	  
+	    	  streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
+		 				new Serializable[] { 0.0, mainWifiObj.isWifiEnabled()?1.0:0.0 , 0.0 });
+		         ((WifiWrapper) w).postStreamElement(streamElement);
+	      }
+	      
 	      for(int i = 0; i < wifiScanList.size(); i++){
 	         	streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
 	 				new Serializable[] { converTingBSSID(wifiScanList.get(i).BSSID.substring(0, 8)), converTingBSSID(wifiScanList.get(i).BSSID.substring(8)), wifiScanList.get(i).level });
 	         ((WifiWrapper) w).postStreamElement(streamElement);
 	         storage.updateWifiFrequency(wifiScanList.get(i).BSSID);
 	      }
-	      unregisterReceiver(wifiReciever);
-	      registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+	     // unregisterReceiver(wifiReciever);
+	     // registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 	      scanning = false;
 	   }
 	}

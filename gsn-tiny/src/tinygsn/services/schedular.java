@@ -57,11 +57,10 @@ public class schedular extends IntentService {
 	}
 
 	//constants:
-	final int timeThereshold = 1000*60*2;
 	private int numLatest = 10;
 	double accelometerThereshold = 10;
 	int wifiCountThreshold = 15;
-	int SchedulerSleepingTime = 1000*60;
+	int SchedulerSleepingTime = 1000*30;
 	
 	int SamplingRateAccelometerMoving = 3;
 	int SamplingRateAccelometerStationary = 1;
@@ -203,22 +202,26 @@ public class schedular extends IntentService {
 		
 		if(wifiVsName != null)
 		{
-			wifiResult = storage.executeQueryGetLatestValues("vs_"+ wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest, curTime-timeThereshold);
+			wifiResult = storage.executeQueryGetLatestValues("vs_"+ wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest, curTime-120000);
 			isInKnownWifiAccess = ContainsFamiliarWifis(wifiResult);
 			Log.d("tinygsn-scheduler","is in knownwifi accesspoint: "+ isInKnownWifiAccess);
 		}
 		if(gpsVsName != null)
 		{
-			gpsResult = storage.executeQueryGetLatestValues("vs_"+gpsVsName, gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), numLatest, curTime-timeThereshold);
+			gpsResult = storage.executeQueryGetLatestValues("vs_"+gpsVsName, gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), 180, curTime-180000);
 			if(gpsResult != null && gpsResult.size() != 0)
 			{
-				long longitude = Math.round(((Double)(gpsResult.get(0).getData("longitude")) * 1000));
-				long latitude = Math.round(((Double)(gpsResult.get(0).getData("latitude")) * 1000));
-				for(int i = 0; i < gpsResult.size(); i++)
-				{
-					if(Math.round(((Double)(gpsResult.get(i).getData("longitude")) * 1000)) != longitude || 
-							Math.round(((Double)(gpsResult.get(i).getData("latitude")) * 1000)) != latitude)
-						gpsConstant = false;
+				if (gpsResult.get(gpsResult.size()-1).getTimeStamp() - gpsResult.get(0).getTimeStamp() > 120000){
+					long longitude = Math.round(((Double)(gpsResult.get(0).getData("longitude")) * 1000));
+					long latitude = Math.round(((Double)(gpsResult.get(0).getData("latitude")) * 1000));
+					for(int i = 0; i < gpsResult.size(); i++)
+					{
+						if(Math.round(((Double)(gpsResult.get(i).getData("longitude")) * 1000)) != longitude || 
+								Math.round(((Double)(gpsResult.get(i).getData("latitude")) * 1000)) != latitude)
+							gpsConstant = false;
+					}
+				}else{
+					gpsConstant = false;
 				}
 			}
 			else
@@ -228,7 +231,7 @@ public class schedular extends IntentService {
 		}
 		if(accelometerVsName != null)
 		{
-			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelometerVsName, accelometerWrapper.getFieldList(), accelometerWrapper.getFieldType(), numLatest, curTime-timeThereshold);
+			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelometerVsName, accelometerWrapper.getFieldList(), accelometerWrapper.getFieldType(), 32, curTime-30000);
 			if(accelometerResult.size() != 0)
 			{
 				for(int i = 0; i < accelometerResult.size(); i++)

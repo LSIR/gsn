@@ -52,14 +52,18 @@ public class GPSService extends IntentService implements LocationListener {
             //	if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER )) {
             	//	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0, this);
             	//}
+            if (!isGPSEnabled){
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                  isGPSEnabled = true;   
+            }
            // }
                  Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                 if (location != null){
                  StreamElement streamElement = new StreamElement(w.getFieldList(),
          				w.getFieldType(), new Serializable[] {location.getLatitude(),location.getLongitude()});
                  streamElement.setTimeStamp(location.getTime());
          		((AndroidGPSWrapper) w).postStreamElement(streamElement);
+                 }
         } catch (Exception e) {
             e.printStackTrace();
         }
