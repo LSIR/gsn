@@ -4,10 +4,11 @@
 		<unique-timestamps>false</unique-timestamps>
 		<web-input password="test">
 			<command name="send">
-			    <field name="id" type="text">0</field>
-				<field name="command" type="text">exit</field>
+			    <field name="id" type="text">Node ID, as advertised in the command request function</field>
+				<field name="command" type="text">close --station_id--, telnet_set --station_id--, rstsys, reboot, setPeriod --station_id--,--T1--,--T2--, server --name-- --port--</field>
 			</command>
 			<command name="clear">
+			    <field name="clear" type="checkbox">Confirmation</field>
 			</command>
 		</web-input>
 		<output-structure>

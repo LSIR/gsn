@@ -191,7 +191,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								ctr ++;
 								if (retry > 0 && System.currentTimeMillis() - lastRetry > 1000) 
 								{
-									output.write(("close "+sd.id).getBytes());
+									output.write(("close "+sd.id+"\r\n").getBytes());
 									output.flush();
 									retry--;
 									lastRetry = System.currentTimeMillis();
@@ -282,8 +282,11 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 										messages.remove(id);
 									    break;
 									case 82:
+										logger.warn("received R from "+sd.id);
 										if (messages.containsKey(sd.id)){
+											logger.warn("writing "+messages.get(sd.id)+" from "+sd.id);
 											output.write(messages.get(sd.id));
+											output.write("\r\n".getBytes());
 											output.flush();
 										}
 										retry = 3;
