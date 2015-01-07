@@ -9,9 +9,10 @@ function include(filename)
     head.appendChild(script)
 }
 
-include("http://d3js.org/d3.v3.min.js");
+include("js/d3plots/d3.v3.min.js");
 
 function drawTimeseries(dataset, nb){
+	console.log(nb);
 	drawChartTimeseries(parseDataTimeseries(dataset));
 }
 
@@ -22,6 +23,7 @@ var allData;
 
 function parseDataTimeseries(dataset){
 	var keys = d3.keys(dataset);
+	console.log("Keys: "+keys);
     var data = [];
     var minDate = null;
     var maxDate = null;
@@ -30,6 +32,7 @@ function parseDataTimeseries(dataset){
         data[i] = [];
         data[i]['name'] = keys[i];
         data[i]['values'] = [];
+        console.log(keys[i]+" "+dataset[keys[i]].data.length);
         var cnt = 0;
         for (var j = 0; j < dataset[keys[i]].data.length; j++) {
             if (isNaN(dataset[keys[i]].data[j][1])) continue;
@@ -78,14 +81,13 @@ function drawChartTimeseries(data){
 		.interpolate("basis")
 		.x(function(d) { return x(d.date); })
 		.y(function(d) { return y(d.sensor_value); });
+	
 		
 	var svg = d3.select("#plotContainer").append("svg")
 		.attr("width", width + margin.left + margin.right)
 		.attr("height", height + margin.top + margin.bottom)
 		.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-	
 	
 	x.domain([
 		d3.min(data, function(c) { return d3.min(c.values, function(v) { return v.date; }); }),
