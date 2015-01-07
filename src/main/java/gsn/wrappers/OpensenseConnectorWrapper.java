@@ -3,6 +3,7 @@ package gsn.wrappers;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -26,7 +27,7 @@ import gsn.utils.Helpers;
 public class OpensenseConnectorWrapper extends AbstractWrapper {
 	
 	
-	public static final Integer[] MOBILE_STATIONS = {43,47,48};
+	public static final Integer[] MOBILE_STATIONS = {43,47,48,192};
 	public static final Integer[] STATIC_STATIONS = {101,102};
 	
 	private static final Object timerLock = new Object();
@@ -161,8 +162,10 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 							try{
 								input = new BufferedInputStream(server.getInputStream());
 								output = new BufferedOutputStream(server.getOutputStream());
-								parser = new BinaryParser(input);
+								FileOutputStream fos = new FileOutputStream("logs/"+System.currentTimeMillis()+".dat");
+								parser = new BinaryParser(input,fos);
 								while(connected && ! server.isClosed()) parse();
+								fos.close();
 								server.close();
 							}catch (IOException ioe){
 								logger.error("Error while connecting to remote station: " + server.getInetAddress(), ioe);
@@ -188,10 +191,8 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								ctr ++;
 								if (retry > 0 && System.currentTimeMillis() - lastRetry > 1000) 
 								{
-									if (messages.containsKey(sd.id)){
-										output.write(messages.get(sd.id));
-									}
 									output.write(("close "+sd.id).getBytes());
+									output.flush();
 									retry--;
 									lastRetry = System.currentTimeMillis();
 								}
@@ -276,11 +277,15 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									next = parser.readNextChar(true);
 									switch(next){
 									case 65:
+										logger.warn("received ACK from "+sd.id);
 										retry = 0;
 										messages.remove(id);
 									    break;
 									case 82:
-										output.write(("telnet_set "+id+"\r\n").getBytes());
+										if (messages.containsKey(sd.id)){
+											output.write(messages.get(sd.id));
+											output.flush();
+										}
 										retry = 3;
 										lastRetry = 0; // send immediately after
 										break;

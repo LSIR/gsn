@@ -2,6 +2,14 @@
 	<processing-class>
 		<class-name>gsn.vsensor.OpensenseBridgeVirtualSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
+		<web-input password="test">
+			<command name="send">
+			    <field name="id" type="text">0</field>
+				<field name="command" type="text">exit</field>
+			</command>
+			<command name="clear">
+			</command>
+		</web-input>
 		<output-structure>
                         <field name="timestamp" type="bigint" />
                         <field name="station" type="smallint" />

@@ -3,6 +3,7 @@ package gsn.utils;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -10,9 +11,15 @@ public class BinaryParser {
 	
 	private InputStream in;
 	private int s1,s2 = 0;
+	private OutputStream out;
 	
 	public BinaryParser(InputStream i){
 		in = i;
+	}
+	
+	public BinaryParser(InputStream i, OutputStream o){
+		in = i;
+		out = o;
 	}
 	
 	public byte[] readBytes(int len) throws IOException{
@@ -76,6 +83,13 @@ public class BinaryParser {
 	}
 	
 	public void addSum(byte[] b){
+		if(out != null){ // for debugging
+			try {
+				out.write(b);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		for(int i=0;i<b.length;i++){
 			s1 = (s1 +(b[i] & 0xFF)) % 255;
 			s2 = (s2 + s1) % 255;
@@ -86,6 +100,13 @@ public class BinaryParser {
 		byte[] buf = new byte[2];
 		int r = in.read(buf);
 		if (r == -1) throw new EOFException("EOF reached on stream, cannot read further.");
+		if(out != null){ // for debugging
+			try {
+				out.write(buf);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		if (s1 != (buf[0] & 0xFF) || s2 != (buf[1] & 0xFF)){
 			return false;
 		}
