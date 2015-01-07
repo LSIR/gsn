@@ -562,11 +562,11 @@ function showAdvancedOptions()
 	AO = document.getElementById("AO");
 	if ($(AODiv).css("display") == "none") {
 		AODiv.style = "display: 100%;";
-		AO[0].innerHTML = "Advanced Options \25bc";
+		AO.innerHTML = "Advanced Options &#9650;";
 		
 	} else {
 		AODiv.style = "display: none;";
-		AO[0].innerHTML = "Advanced Options \26bc";
+		AO.innerHTML = "Advanced Options &#9660;";
 	}
 }
 function showRepeatOptions()
@@ -696,7 +696,7 @@ $(function(){
                                         <input id="reportclass" type="hidden" name="reportclass" value="report-default"/>
                                     	</div>
                                     	
-                                    	<h3 onclick="showAdvancedOptions()" id="AO">Advanced Options</h3>
+                                    	<h3 onclick="showAdvancedOptions()" id="AO">Advanced Options &#9660;</h3>
                                     	<div id="advanced-options" style="display: none;"><!-- Hidden advanced options -->
                                     	<h3>Aggregation</h3>
 										<div class="aggregations">
