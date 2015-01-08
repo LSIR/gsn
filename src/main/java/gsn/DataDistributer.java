@@ -169,6 +169,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
         logger.debug("Updating the candidate list [" + listener.toString() + " (removed)].");
         if (candidatesForNextRound.contains(listener)) {
             candidateListeners.put(listener, makeDataEnum(listener));
+            locker.add(listener);
             candidatesForNextRound.remove(listener);
         } else {
             locker.remove(listener);
