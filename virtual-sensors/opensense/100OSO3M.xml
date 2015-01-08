@@ -1,4 +1,4 @@
-<virtual-sensor name="OSO3M" priority="11">
+<virtual-sensor name="p_oso3m" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.OpensenseSplitterVSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>

@@ -1,4 +1,4 @@
-<virtual-sensor name="OSGPS" priority="11">
+<virtual-sensor name="p_osgps" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.OpensenseSplitterVSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>

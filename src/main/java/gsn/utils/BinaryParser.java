@@ -35,7 +35,7 @@ public class BinaryParser {
 		int r = in.read(buf);
 		if (r == -1) throw new EOFException("EOF reached on stream, cannot read further.");
 		addSum(buf);
-		if (signed || buf[0] < 0) return (int)buf[0];
+		if (signed || buf[0] > 0) return (int)buf[0];
 		else return buf[0] & 0xFF;
 	}
 	
@@ -45,7 +45,7 @@ public class BinaryParser {
 		if (r == -1) throw new EOFException("EOF reached on stream, cannot read further.");
 		addSum(buf);
 		short s = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).getShort();
-		if (signed || s < 0) return (int)s;
+		if (signed || s > 0) return (int)s;
 		else return s & 0xFFFF;
 	}
 	
@@ -55,7 +55,7 @@ public class BinaryParser {
 		if (r == -1) throw new EOFException("EOF reached on stream, cannot read further.");
 		addSum(buf);
 		int i = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN).getInt();
-		if (signed || i < 0) return (long)i;
+		if (signed || i > 0) return (long)i;
 		else return i & 0xFFFFFFFF;
 	}
 	

@@ -1,4 +1,4 @@
-<virtual-sensor name="OSANM_mapped" priority="11">
+<virtual-sensor name="geo_osanm" priority="11">
 	<processing-class>
 		<class-name>gsn.vsensor.ModellingVirtualSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
@@ -27,18 +27,18 @@
 		<stream name="A">
 			<source alias="A"  sampling-rate="1" storage-size="1">
 				<address wrapper="zeromq" partial-order-key="station">
-					<predicate key="address">inproc://stream/osgps</predicate>
-					<predicate key="vsensor">osgps</predicate>
+					<predicate key="address">inproc://stream/p_osgps</predicate>
+					<predicate key="vsensor">p_osgps</predicate>
 				</address>
-				<query>select timed,latitude,longitude,altitude,HDOP from wrapper</query>
+				<query>select timed,station,latitude,longitude,altitude,HDOP from wrapper</query>
 			</source>
 			<query>select * from A</query>
 		</stream>
 		<stream name="B">
 			<source alias="B"  sampling-rate="1" storage-size="1">
 				<address wrapper="zeromq" partial-order-key="station">
-					<predicate key="address">inproc://stream/osanm</predicate>
-					<predicate key="vsensor">osanm</predicate>
+					<predicate key="address">inproc://stream/p_osanm</predicate>
+					<predicate key="vsensor">p_osanm</predicate>
 				</address>
 				<query>select * from wrapper</query>
 			</source>

@@ -208,6 +208,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 										throw new IOException("received packet from "+id+", while listening to "+sd.id);
 									}
 									sd.type = next;
+									sd.resetTime();
 									switch(next){
 									case 0:
 										sd.readGPS(parser);
@@ -354,6 +355,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	}
 	
 	private abstract class StationData{
+		int t_ms, t_ss, t_mn, t_hh, t_dd, t_mm,t_yy;
 		int ms,ss,mn,hh,dd,mm,yy,id,type;
 		byte[] payload;
 		
@@ -380,7 +382,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (_ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+hh+":"+mn+":"+_ss+")");
 			}
-			ss = _ss;
+			t_ss = _ss;
 			payload = p.readBytes(8);			
 		}
 
@@ -418,8 +420,8 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			}
 			//ms = 0; ??
 			//ss = 0; ??
-			mn = _mn;
-			hh = _hh;
+			t_mn = _mn;
+			t_hh = _hh;
 		}
 
 		public void readAccel(BinaryParser p) throws IOException {
@@ -469,10 +471,10 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (_hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+_hh+":"+_mn+":"+_ss+")");
 			}
-			ms = 0;
-			ss = _ss;
-			mn = _mn;
-			hh = _hh;
+			t_ms = 0;
+			t_ss = _ss;
+			t_mn = _mn;
+			t_hh = _hh;
 			payload = p.readBytes(21);
 		}
 
@@ -488,14 +490,14 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (_mm <= 0 || _yy < 12 || _dd <= 0 || _mm > 12 || _dd > 31 || _hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+_yy+"-"+_mm+"-"+_dd+" "+_hh+":"+_mn+":"+_ss+")");
 			}
-			ms = 0;
-			ss = _ss;
-			mn = _mn;
-			hh = _hh;
-			dd = _dd;
-			mm = _mm;
-			yy = _yy;
-			payload = new byte[0];
+			t_ms = 0;
+			t_ss = _ss;
+			t_mn = _mn;
+			t_hh = _hh;
+			t_dd = _dd;
+			t_mm = _mm;
+			t_yy = _yy;
+			payload = ("20"+_yy+"-"+_mm+"-"+_dd+" "+_hh+":"+_mn+":"+_ss).getBytes();
 
 		}
 		
@@ -508,11 +510,11 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (_hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+_hh+":"+_mn+":"+_ss+")");
 			}
-			ms = 0;
-			ss = _ss;
-			mn = _mn;
-			hh = _hh;
-			ms = _ms;
+			t_ms = 0;
+			t_ss = _ss;
+			t_mn = _mn;
+			t_hh = _hh;
+			t_ms = _ms;
 		}
 		
 		protected void readTimeMsFromShort(BinaryParser p) throws IOException{
@@ -522,8 +524,8 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if ( _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+hh+":"+mn+":"+_ss+")");
 			}
-			ss = _ss;
-			ms = _ms;
+			t_ss = _ss;
+			t_ms = _ms;
 		}
 		
 		protected void readTimeSsFromShort(BinaryParser p) throws IOException{
@@ -533,14 +535,31 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if ( _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+hh+":"+_mn+":"+_ss+")");
 			}
-			ms = 0;
-			ss = _ss;
-			mn = _mn;
+			t_ms = 0;
+			t_ss = _ss;
+			t_mn = _mn;
+		}
+		
+		public void resetTime(){
+			t_yy = yy;
+			t_mm = mm;
+			t_dd = dd;
+			t_hh = hh;
+			t_mn = mn;
+			t_ss = ss;
+			t_ms = ms;
 		}
 		
 		public StreamElement getStreamElement(){
 			Calendar c = Calendar.getInstance();
 			c.clear();
+			yy = t_yy;
+			mm = t_mm;
+			dd = t_dd;
+			hh = t_hh;
+			mn = t_mn;
+			ss = t_ss;
+			ms = t_ms;
 			c.set(yy + 2000, mm - 1, dd, hh, mn, ss);
 			long time = c.getTimeInMillis() + ms;
 			
@@ -574,10 +593,10 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (_hh < 0 || _hh > 24 || _mn < 0 || _mn > 59 || _ss < 0 || _ss > 59){
 				throw new IOException("invalid datetime received for station "+ id +". (20"+yy+"-"+mm+"-"+dd+" "+_hh+":"+_mn+":"+_ss+")");
 			}
-			ms = 0;
-			ss = _ss;
-			mn = _mn;
-			hh = _hh;
+			t_ms = 0;
+			t_ss = _ss;
+			t_mn = _mn;
+			t_hh = _hh;
 			payload = p.readBytes(13);
 		}
 		

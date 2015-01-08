@@ -1,4 +1,4 @@
-<virtual-sensor name="OSC" priority="20">
+<virtual-sensor name="osc" priority="20">
 	<processing-class>
 		<class-name>gsn.vsensor.OpensenseBridgeVirtualSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
@@ -8,7 +8,7 @@
 				<field name="command" type="text">close --station_id--, telnet_set --station_id--, rstsys, reboot, setPeriod --station_id--,--T1--,--T2--, server --name-- --port--</field>
 			</command>
 			<command name="clear">
-			    <field name="clear" type="checkbox">Confirmation</field>
+			    <field name="clear" type="checkbox:ok">Confirmation</field>
 			</command>
 		</web-input>
 		<output-structure>
