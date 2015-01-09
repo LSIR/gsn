@@ -269,6 +269,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 				for(Double d :arrays.get(type).get(k)){
 					x[i] = d.doubleValue();
 					i--;
+					if (i<0)break;
 				}
 				segments.get(type).put(k, x);
 			}
