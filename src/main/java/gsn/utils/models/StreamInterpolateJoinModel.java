@@ -117,7 +117,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 			last = cur;
 			cur = it.next();
 			if(cur >= timed) break; //only check before this timepoint
-			if (last - cur > interpolateGap){ //segments are defined by gaps in time
+			if (cur - last > interpolateGap){ //segments are defined by gaps in time
 				cut = ctr;
 			}
 			ctr++;
@@ -256,7 +256,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		while (it.hasNext()){
 			last = cur;
 			cur = it.next();
-			if (last - cur > interpolateGap && ctr > 0){ //segments are defined by gaps in time
+			if (cur - last > interpolateGap && ctr > 0){ //segments are defined by gaps in time
 				cut = ctr;
 				break; //find the first segment
 			}
