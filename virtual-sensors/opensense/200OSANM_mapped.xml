@@ -5,6 +5,10 @@
     	<init-params>
             <param name="model">gsn.utils.models.StreamInterpolateJoinModel</param>
             <param name="model.0.historysize">30</param>
+            <param name="model.0.f_latitude">gsl_interp_cspline</param>
+            <param name="model.0.f_longitude">gsl_interp_cspline</param>
+            <param name="model.0.f_hdop">gsl_interp_linear</param>
+            <param name="model.0.f_altitude">gsl_interp_linear</param>
 		</init-params>
 		<output-structure>
            <field name="station" type="smallint" />

@@ -57,7 +57,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 
 	@Override
 	public synchronized StreamElement[] pushData(StreamElement streamElement, String origin) {
-		Short type = (Short)streamElement.getData("station");
+		Short type = (short)(((Short)streamElement.getData("station"))%100);
 		if (!arrays.containsKey(type)){
 			toProcess.put(type, new LinkedList<StreamElement>());
 			arrays.put(type, new HashMap<String, LinkedList<Double>>());
@@ -140,7 +140,7 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	@Override
 	public StreamElement[] query(StreamElement params) {
 		
-		Short type = (Short)params.getData("station");
+		Short type = (short)(((Short)params.getData("station"))%100);
 		
 		double q = new Long(params.getTimeStamp()).doubleValue();
 		double[] x = segments.get(type).get("timed");

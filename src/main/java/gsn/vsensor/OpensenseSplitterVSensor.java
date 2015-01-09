@@ -124,6 +124,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 		try{
 			short s_type = (Short) streamElement.getData("type");
 			short id = (Short) streamElement.getData("station");
+			if (s_type > 20) id += 200; //secondary sensors get another station id
 			Long time = (Long) streamElement.getData("timestamp"); 
 			temp.setData(0,id);
 			temp.setTimeStamp(time);
