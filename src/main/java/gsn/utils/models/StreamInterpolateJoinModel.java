@@ -230,7 +230,9 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 			//the interpolation request is computable now
 			//if a segment exists here, the element must be inside its time range
 			if (has_segment.get(type)){
-				return query(element);
+				StreamElement[] ses = query(element);
+				if (ses[0] != null) return ses;
+				else return null;
 			}else{
 		        toProcess.get(type).add(element);
 		        return null;
