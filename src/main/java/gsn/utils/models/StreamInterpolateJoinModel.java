@@ -152,6 +152,11 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		
 		//don't extrapolate for values between segments
 		if(x[0] > q) return new StreamElement[]{null};
+		if(x[x.length-1] < q){
+			System.out.println("++++extrapolating: "+q+" ("+x[0]+"-"+x[x.length-1]+")");
+			return new StreamElement[]{null};
+		}
+		
 		
 		Serializable[] r = new Serializable[params.getData().length+interpolation_types.size()];
 		int i = 0;
