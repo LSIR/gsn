@@ -70,6 +70,8 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		}
 		if(origin.equalsIgnoreCase("A")){
 			HashMap<String,LinkedList<Double>> a = arrays.get(type);
+			
+			if (a.get("timed").getFirst()==(double)streamElement.getTimeStamp()) return null; //Strictly increasing time
 			//put into the buffers for interpolation
 			for (int i = 0;i<streamElement.getFieldTypes().length;i++){
 				if (a.containsKey(streamElement.getFieldNames()[i].toLowerCase())){
