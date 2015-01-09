@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.TimeZone;
 
 import javax.naming.OperationNotSupportedException;
 import javax.net.ServerSocketFactory;
@@ -285,7 +286,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									case 82:
 										logger.warn("received R from "+sd.id);
 										if (messages.containsKey(sd.id)){
-											logger.warn("writing "+messages.get(sd.id)+" from "+sd.id);
+											logger.warn("writing '"+new String(messages.get(sd.id))+"' to "+sd.id);
 											output.write(messages.get(sd.id));
 											output.write("\r\n".getBytes());
 											output.flush();
@@ -561,6 +562,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			ss = t_ss;
 			ms = t_ms;
 			c.set(yy + 2000, mm - 1, dd, hh, mn, ss);
+			c.setTimeZone(TimeZone.getTimeZone("UTC"));
 			long time = c.getTimeInMillis() + ms;
 			
 			Serializable[] data = new Serializable[]{time, new Short((short) id), new Short((short) type), payload};
