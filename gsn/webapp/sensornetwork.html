@@ -341,13 +341,6 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-      { title:"Dozer RSSI",
-        signals: [{
-          vsensor:".*_dozer_rssi__conv",
-          field:["rssi"],
-          select:"sensornode[position]"
-        }]
-      },
       { title:"Dozer Uptime",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
@@ -404,13 +397,6 @@ $(document).ready(function() {
           select:"sensornode[position][iscorestation='true']"
         }]
       },
-      { title:"BackLog Database",
-          signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
-          field:["db_entries","db_size"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
       { title:"BackLog Database Store Time",
         signals: [{
           vsensor:".*_backlogstatus_dynamic__mapped",
@@ -418,34 +404,6 @@ $(document).ready(function() {
           select:"sensornode[position][iscorestation='true']"
         }]
       },
-      { title:"BackLog Database Remove Time",
-        signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
-          field:["db_remove_time_min","db_remove_time_mean","db_remove_time_max"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"BackLog Message Counters",
-        signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
-          field:["gsn_plugin_msg_in_counter","gsn_plugin_msg_out_counter","tos_msg_recv_counter","tos_msg_send_counter"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"BackLog-GSN Connection Losses",
-        signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
-          field:["gsn_connection_losses"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"BackLog Python VM",
-          signals: [{
-              vsensor:".*_backlogstatus_dynamic__mapped",
-              field:["vm_size","vm_data","threads"],
-              select:"sensornode[position][iscorestation='true']"
-          }]
-        },
       { title:"CoreStation Uptime",
         signals: [{
           vsensor:".*_corestationstatus_software__mapped",
@@ -460,66 +418,10 @@ $(document).ready(function() {
           select:"sensornode[position][iscorestation='true']"
         }]
       },
-      { title:"CoreStation Stat",
-        signals: [{
-          vsensor:".*_corestationstatus_software__mapped",
-          field:["stat_procs_in_user_mode","stat_procs_in_kernel_mode","stat_procs_io_wait","stat_context_switches","stat_procs_threads_created"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation Sockstat",
-        signals: [{
-          vsensor:".*_corestationstatus_software__mapped",
-          field:["sockstat_used_sockets","sockstat_tcp_in_use","sockstat_udp_in_use"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation Root File System",
-        signals: [{
-          vsensor:".*_corestationstatus_software__mapped",
-          field:["statvfs_root_size","statvfs_root_free"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation Volatile File System",
-        signals: [{
-          vsensor:".*_corestationstatus_software__mapped",
-          field:["statvfs_vol_size","statvfs_vol_free"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
       { title:"CoreStation Card File System",
         signals: [{
           vsensor:".*_corestationstatus_software__mapped",
           field:["statvfs_card_size","statvfs_card_free"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation Memory",
-        signals: [{
-          vsensor:".*_corestationstatus_software__mapped",
-          field:["meminfo_total","meminfo_free","meminfo_cached"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation V12DC Input",
-        signals: [{
-          vsensor:".*_corestationstatus_hardware__mapped",
-          field:["v12dc_in"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation I_V12DC Input",
-        signals: [{
-          vsensor:".*_corestationstatus_hardware__mapped",
-          field:["i_v12dc_in"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation I_V12DC_EXT Output",
-        signals: [{
-          vsensor:".*_corestationstatus_hardware__mapped",
-          field:["i_v12dc_ext"],
           select:"sensornode[position][iscorestation='true']"
         }]
       },
@@ -530,39 +432,11 @@ $(document).ready(function() {
           select:"sensornode[nodetype=6][position]"
         }]
       },
-      { title:"CamZilla Binary Files",
-        signals: [{
-          vsensor:".*[^_]_binary__mapped",
-          field:["file_size","transmitted"],
-          select:"sensornode[nodetype=6][position]"
-        }]
-      },
       { title:"CamZilla Binary Transmission Time",
         signals: [{
           vsensor:".*[^_]_binary__mapped",
           field:["transmission_time_eff","transmission_time_tot"],
           select:"sensornode[nodetype=6][position]"
-        }]
-      },
-      { title:"Webcam Binary Queue",
-          signals: [{
-          vsensor:".*[^_]_binary__mapped",
-          field:["file_queue_length","file_queue_size"],
-          select:"sensornode[nodetype=3][position]"
-        }]
-      },
-      { title:"Webcam Binary Files",
-        signals: [{
-          vsensor:".*[^_]_binary__mapped",
-          field:["file_size","transmitted"],
-          select:"sensornode[nodetype=3][position]"
-        }]
-      },
-      { title:"Webcam Binary Transmission Time",
-        signals: [{
-          vsensor:".*[^_]_binary__mapped",
-          field:["transmission_time_eff","transmission_time_tot"],
-          select:"sensornode[nodetype=3][position]"
         }]
       },
     ]);
