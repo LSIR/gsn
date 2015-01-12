@@ -72,40 +72,19 @@ $(document).ready(function() {
         // plot configuration
         GsnPlots.setConfig([
           { title:"Temperature",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_temperature"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
-                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["air_temperature"], select:"sensornode[position=25]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["air_temperature"], select:"sensornode[position=42]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["air_temperature"], select:"sensornode[position=68]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_temperature"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },{ title:"Wind Speed",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
-                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position=25]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position=42]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position=68]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },{ title:"Wind Direction",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
-                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position=25]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position=42]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position=68]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },{ title:"Humidity",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
-                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position=25]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position=42]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position=68]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },{ title:"Air Pressure",
-            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
-                       { vsensor:"matterhorn_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position=25]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position=42]"},
-                       { vsensor:"dirruhorn_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position=68]"}]
+            signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },{ title:"Rain",
-            signals: [ { vsensor:".*_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
-                       { vsensor:"matterhorn_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position=25]"},
-                       { vsensor:"dirruhorn_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position=42]"},
-                       { vsensor:"dirruhorn_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position=68]"}]
+            signals: [ { vsensor:".*_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },{ title:"Hail",
-            signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}, 
-                       { vsensor:"matterhorn_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position=25]"},
-                       { vsensor:"dirruhorn_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position=42]"},
-                       { vsensor:"dirruhorn_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position=68]"}]
+            signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },
         ]);
 
@@ -408,10 +387,6 @@ function showPlots(id) {
                         <b>Current Jetstream</b><br/>
                         <img src="http://www.wetterzentrale.de/pics/Rtavn0015.gif"/>
                 </p>
-		<p style="text-align:center;margin-top:30px;">
-			<b>Precipitation Forecast +36 hrs</b><br/>
-                        <img src="http://www.sma.ch/web/en/research/consortia/cosmo.Par.0003.Image.jpg"/><br/>
-		</p>
 	</div>
 	<div class="separator">
 		<div id="footer">
