@@ -181,6 +181,11 @@
         </dependency>
         <dependency>
             <groupId>org.jibx</groupId>
+            <artifactId>jibx-bind</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jibx</groupId>
             <artifactId>jibx-run</artifactId>
             <version>1.2.5</version>
         </dependency>
