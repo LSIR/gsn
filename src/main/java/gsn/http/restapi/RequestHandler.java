@@ -705,8 +705,8 @@ public class RequestHandler {
             while (resultSet.next()) {
                 Vector<Double> stream = new Vector<Double>();
                 timestamps.add(resultSet.getLong("tt"));
-                stream.add(getDouble(resultSet, "max_" + field));
-                stream.add(getDouble(resultSet, "min_" + field));
+                stream.add(getDouble(resultSet, "max_" + field ));
+                stream.add(getDouble(resultSet, "min_" + field ));
                 elements.add(stream);
             }
         } catch (SQLException e) {
