@@ -6,10 +6,10 @@
 <!-- <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>-->
     <display-name>GSN Server</display-name>
-    
+    <!--  
       <listener>
       <listener-class>play.core.server.servlet25.Play2Servlet</listener-class>
-  </listener> 
+  </listener>--> 
 <!-- 
      *******************************************************************************     
       WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] ; there is
@@ -23,11 +23,12 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
  -->
+ <!-- 
  <servlet>
         <servlet-name>PlayServlet</servlet-name>
         <display-name>Play Servlet</display-name>
         <servlet-class>play.core.server.servlet25.Play2Servlet</servlet-class>
-    </servlet>
+    </servlet>-->
 <!-- *******************************************************************************     
       GSN's Main Servlets, Must be enabled for any kind of HTTP based access
      ******************************************************************************* -->
@@ -449,11 +450,11 @@
      </servlet-mapping>
 
 
-     
+     <!-- 
  <servlet-mapping>
         <servlet-name>PlayServlet</servlet-name>
         <url-pattern>/ws/*</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
 
 	<!-- GSN END -->
 	
