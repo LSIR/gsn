@@ -180,7 +180,7 @@
                 function getURLParameter(name) {
                 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
                 }
-                function option_list_key(name,items,all, id){
+                function option_list_key(name,items,all, id,vsSelected=null){
                     to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all){
                         to_return+='<option value="All" >' + all + '</optirmattemperaturehandleron>';
@@ -194,7 +194,7 @@
                         if ("time" == sk[i]) continue;
                         
                         to_return+='<option value="' + sk[i] +'"';
-                        if (vsfromURL == sk[i]){
+                        if (vsSelected != null && vsSelected == sk[i]){
                         	to_return += ' selected';
                         }
                         to_return+=' >'+sk[i]+'</option>';
@@ -223,14 +223,14 @@
                 }
 
 
-                function add_data_output () {
+                function add_data_output (vsname=null) {
 
                     var vss_id = "vss_" + vss_max_id;
                     var fields_id = "fields_" + fields_max_id;
                     var fields_div_id  = "fields_div_id_" + fields_max_id;
                     vss_max_id++; fields_max_id++;
                     var data_outputs_content = '<li>';
-                    data_outputs_content += option_list_key('vss', virtual_sensor_to_fields, "All Virtual Sensors", vss_id);
+                    data_outputs_content += option_list_key('vss', virtual_sensor_to_fields, "All Virtual Sensors", vss_id, vsname);
                     data_outputs_content += '<div name="fields" class="fields" style="display: inline-block;" id="' + fields_div_id+ '"></div>';
                     data_outputs_content += '<div class="condition-slider" style="display: inline-block;"></div>';
                     data_outputs_content += '<a class="remove-criterion" href="#"> Remove</a></li>';
@@ -240,7 +240,7 @@
                         search_contains: true,
                         width: "200px"
                     });
-                    if(getURLParameter("vsname") != null){
+                    if(vsname != null){
                     	var vs = $('#'+vss_id).val();
                         if (vs != 'All') {
                             $('#'+fields_div_id).html("&nbsp " + option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs], fields_id));
@@ -411,7 +411,17 @@
                             }
                         });
                     });
-                    add_data_output ();
+                    //First time called the output
+                    //Adding the URL parameters
+                    var i = 1;
+                    while(getURLParameter("vsname"+i) != null){
+                    	add_data_output(getURLParameter("vsname"+i));
+                    	i=i+1;
+                    }
+                    if(getURLParameter("vsname"+1) == null){
+                    	add_data_output ();
+                    	
+                    }
                     pre_load();
                     
                 });
