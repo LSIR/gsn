@@ -4,8 +4,8 @@
     android:versionName="1.0.1" android:installLocation="auto">
 
     <uses-sdk
-        android:minSdkVersion="15"
-        android:targetSdkVersion="15" />
+        android:minSdkVersion="16"
+        android:targetSdkVersion="16" />
 	
     <uses-permission android:name="android.permission.ACCESS_GPS" />
 	<uses-permission android:name="android.permission.ACCESS_ASSISTED_GPS" />
@@ -20,6 +20,20 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="tinygsn.gui.android.permission.C2D_MESSAGE" />
+    <permission
+        android:name="tinygsn.gui.android.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    
+
+    
+    
+    <!-- App receives GCM messages. -->
+
     
     <application
         android:name="TinyGSN"
@@ -121,30 +135,7 @@
                 <category android:name="tinygsn.gui.android" />
             </intent-filter>
         </receiver>
-
-        
+       
     </application>
-
-    <!-- GPS -->
-	
-    <!-- GCM -->
-    <permission
-        android:name="tinygsn.gui.android.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="tinygsn.gui.android.permission.C2D_MESSAGE" />
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    
-    
-    <!-- App receives GCM messages. -->
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <!-- GCM connects to Google Services. -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- GCM requires a Google account. -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <!-- Keeps the processor from sleeping when a message is received. -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
 </manifest>
