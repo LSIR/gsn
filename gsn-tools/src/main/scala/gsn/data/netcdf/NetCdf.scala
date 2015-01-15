@@ -11,16 +11,20 @@ import java.nio.file.Paths
 object NetCdf {
   val timeName="time"
     
-  def serialize(s:Sensor,timeFieldName:String="time")={
+  def serialize(s:Sensor,
+      values:Seq[Seq[Any]],
+      timeFieldName:String="time")={
     val id=UUID.randomUUID
+    val dataSize=values.size
+   
     implicit val w = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, id+".nc", null)
     addAttributes(Map(
         "title"->s.properties.getOrElse("description",""),
         "institution"-> "",
         "source"-> "","history"->"",
         "references"-> "","comment"-> ""))
-        
-    val dataSize=s.values.size    
+
+
     val timeDim = w.addDimension(null, timeName, dataSize) 
     val dataFields=s.fields
     if (dataFields.find(_.fieldName==timeFieldName)==None) 
@@ -45,7 +49,7 @@ object NetCdf {
     w.create
 
     var i=0
-    s.values.foreach{v=>
+    values.foreach{v=>
       var j=0
       v.foreach{value=>
         fieldArrays(j).setObject(i, value)

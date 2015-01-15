@@ -15,8 +15,7 @@
 		</output-structure>
 
 	</processing-class>
-	<description>Not Specified, please edit the file
-		$INSTALL_PATH/virtual-sensors/memoryPlotVS.xml</description>
+	<description>Not Specified, please edit the file memoryPlotVS.xml</description>
 	<life-cycle pool-size="2" />
 	<addressing>
 		<predicate key="geographical">Not Specified, please edit the file

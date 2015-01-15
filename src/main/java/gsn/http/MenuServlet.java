@@ -46,7 +46,8 @@ public class MenuServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private Config conf=ConfigFactory.load();
-	private boolean newDataPanel=conf.getBoolean("menu.data.newVersion");
+	private boolean newDataPanel=conf.getBoolean("gsn.ui.menu.data.newVersion");
+	private boolean fedLogin=conf.getBoolean("gsn.ac.federated");
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         PrintWriter out = res.getWriter();
@@ -74,12 +75,13 @@ public class MenuServlet extends HttpServlet {
         String name;
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user");
-        if (user == null)
-            name = "<li><a href=/gsn/MyLoginHandlerServlet> login</a></li>" + "<li><a href=/gsn/MyUserCandidateRegistrationServlet>register</a></li>";
-        else {
-            name = "<li><a href=/gsn/MyLogoutHandlerServlet> logout </a></li>" + "<li><div id=logintextprime >logged in as: " + user.getUserName() + "&nbsp" + "</div></li>";
-        }
-        return name;
+        if (user!=null)
+          name = "<li><a href=/gsn/MyLogoutHandlerServlet> logout </a></li>" + "<li><div id=logintextprime >logged in as: " + user.getUserName() + "&nbsp" + "</div></li>";
+        else if(fedLogin)
+          name = "<li><a href=/gsn/MyLoginHandlerServlet?federated=true> login</a></li>" + "<li><a href=/gsn/MyUserCandidateRegistrationServlet>register</a></li>";
+        else
+          name = "<li><a href=/gsn/MyLoginHandlerServlet> login</a></li>" + "<li><a href=/gsn/MyUserCandidateRegistrationServlet>register</a></li>";
+        return name ;
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

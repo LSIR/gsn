@@ -151,7 +151,7 @@ public class RestServlet extends HttpServlet {
                 str_date = request.getParameter(PARAMETER_DATE);
 
                 restResponse = requestHandler.getGridData(user, sensor, str_date);
-                break;
+                break;                
             default:
                 restResponse = requestHandler.errorResponse(RequestHandler.ErrorType.UNKNOWN_REQUEST, null, null);
                 break;
@@ -159,6 +159,7 @@ public class RestServlet extends HttpServlet {
 
         response.setStatus(restResponse.getHttpStatus());
         response.setContentType(restResponse.getType());
+        response.setCharacterEncoding("utf-8");
     	for (String key: restResponse.getHeaders().keySet()){
     		response.setHeader(key, restResponse.getHeaderValue(key));
     	}

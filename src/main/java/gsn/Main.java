@@ -33,9 +33,13 @@
 
 package gsn;
 
+import gsn.beans.BeansInitializer;
 import gsn.beans.ContainerConfig;
 import gsn.beans.StorageConfig;
 import gsn.beans.VSensorConfig;
+import gsn.config.GsnConf;
+import gsn.config.VsConf;
+import gsn.data.DataStore;
 import gsn.http.ac.ConnectToDB;
 import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
@@ -43,6 +47,7 @@ import gsn.http.rest.WPPushDelivery;
 import gsn.http.rest.RestDelivery;
 import gsn.networking.zeromq.ZeroMQDelivery;
 import gsn.networking.zeromq.ZeroMQProxy;
+import gsn.security.SecurityData;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.storage.StorageManagerFactory;
@@ -59,7 +64,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.SplashScreen;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -70,6 +74,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -82,20 +87,17 @@ import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
+//import org.jibx.runtime.BindingDirectory;
+//import org.jibx.runtime.IBindingFactory;
+//import org.jibx.runtime.IUnmarshallingContext;
+//import org.jibx.runtime.JiBXException;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.eclipse.jetty.server.AbstractConnector;
@@ -132,7 +134,8 @@ public final class Main {
     private static HashMap<VSensorConfig, StorageManager> storagesConfigs         = new HashMap<VSensorConfig, StorageManager>();
     private GSNController                                 controlSocket;
     private ContainerConfig                               containerConfig;
-    
+    private static GsnConf gsnConf;
+    private static Map <String,VsConf> vsConf =new HashMap<String,VsConf>();
     
 
     private Main() throws Exception {
@@ -159,10 +162,14 @@ public final class Main {
         int maxSlidingDBConnections = System.getProperty("maxSlidingDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxSlidingDBConnections"));
         int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
 
+    	
+    	DataStore ds = new DataStore(gsnConf,vsConf);
+    	
         // Init the AC db connection.
-        if(Main.getContainerConfig().isAcEnabled()==true)
-        {
-            ConnectToDB.init ( containerConfig.getStorage().getJdbcDriver() , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) );
+        if(Main.getContainerConfig().isAcEnabled()) {
+        	SecurityData sec=new SecurityData(ds);
+            ConnectToDB.init ( containerConfig.getStorage().getJdbcDriver() , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) );            
+        	//sec.upgradeUsersTable();;
         }
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getStorage().getJdbcDriver ( ) , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) , maxDBConnections);
@@ -189,6 +196,13 @@ public final class Main {
 		}
 		
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+		File vsDir=new File(DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
+		for (File f:vsDir.listFiles()){
+			if (f.getName().endsWith(".xml")){
+				VsConf vs= VsConf.load(f.getPath());
+				vsConf.put(vs.name(), vs);
+			}
+		}
 		controlSocket.setLoader(vsloader);
 
 		String msrIntegration = "gsn.msr.sensormap.SensorMapIntegration";
@@ -299,13 +313,13 @@ public final class Main {
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			if ( logger.isInfoEnabled ( ) ) logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
 			if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
-		} catch ( JiBXException e ) {
+		/*} catch ( JiBXException e ) {
 			logger.error ( e.getMessage ( ) );
 			logger.error ( "Can't parse the GSN configuration file : " + Main.DEFAULT_GSN_CONF_FILE );
 			logger.error ( "Please check the syntax of the file to be sure it is compatible with the requirements." );
 			logger.error ( "You can find a sample configuration file from the GSN release." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
-			System.exit ( 1 );
+			System.exit ( 1 );*/
 		} catch ( FileNotFoundException e ) {
 			logger.error ("The the configuration file : " + Main.DEFAULT_GSN_CONF_FILE + " doesn't exist.");
 			logger.error ( e.getMessage ( ) );
@@ -324,14 +338,19 @@ public final class Main {
 	/**
 	 * This method is called by Rails's Application.rb file.
 	 */
-	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws JiBXException, FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
+	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws //JiBXException, 
+	    FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
 		if (!new File(gsnXMLpath).isFile()) {
 			logger.fatal("Couldn't find the gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
 			System.exit(1);
-		}
-		IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
+		}		
+
+		/*IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
 		IUnmarshallingContext uctx = bfact.createUnmarshallingContext ( );
-		ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( gsnXMLpath ) ) , null );
+		ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( gsnXMLpath ) ) , null );*/
+		GsnConf gsn =GsnConf.load(gsnXMLpath);
+		gsnConf=gsn;
+		ContainerConfig conf=BeansInitializer.container(gsn);
 		Class.forName(conf.getStorage().getJdbcDriver());
 		conf.setContainerConfigurationFileName (  gsnXMLpath );
 		return conf;
@@ -380,7 +399,7 @@ public final class Main {
 		
         Server server = new Server();
 		HandlerCollection handlers = new HandlerCollection();
-        ContextHandlerCollection contexts = new ContextHandlerCollection();
+        //ContextHandlerCollection contexts = new ContextHandlerCollection();
         server.setThreadPool(new QueuedThreadPool(maxThreads));
 
         SslSocketConnector sslSocketConnector = null;
@@ -410,10 +429,23 @@ public final class Main {
 		else
 			server.setConnectors ( new Connector [ ] { connector,sslSocketConnector } );
 
-		WebAppContext webAppContext = new WebAppContext(contexts, DEFAULT_WEB_APP_PATH ,"/");
-
-		handlers.setHandlers(new Handler[]{contexts,new DefaultHandler()});
+		WebAppContext webAppContext = new WebAppContext();//contexts, DEFAULT_WEB_APP_PATH ,"/gsn");
+		webAppContext.setContextPath("/");
+		//webAppContext.
+		webAppContext.setResourceBase(DEFAULT_WEB_APP_PATH);
+		
+		//WebAppContext webAppPlay = new WebAppContext();
+		//webAppPlay.setContextPath("/new");
+		//webAppPlay.setWar("gsn-tools/gsn-services/target/gsn-services-0.0.2.war");
+		//ResourceCollection res=new ResourceCollection(new String[]{DEFAULT_WEB_APP_PATH,"gsn-tools/gsn-services/target/gsn-services-0.0.2.war"});
+		
+		//handlers.setHandlers(new Handler[]{contexts,new DefaultHandler()});
+		//webAppContext.setBaseResource(res);
+		handlers.addHandler(webAppContext);
+		//handlers.addHandler(webAppPlay);
+		//server.setHandler(webAppPlay);
 		server.setHandler(handlers);
+		//server.setHandler(webAppContext);
 
 		Properties usernames = new Properties();
 		usernames.load(new FileReader("conf/realm.properties"));
@@ -512,6 +544,12 @@ public final class Main {
     
     public static ZeroMQProxy getZmqProxy(){
     	return zmqproxy;
+    }
+    public GsnConf getGsnConf(){
+    	return gsnConf;
+    }
+    public Map<String,VsConf> getVsConf(){
+    	return vsConf;
     }
 }
 

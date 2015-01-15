@@ -126,9 +126,8 @@ public final class StreamElement implements Serializable {
 
 			if(key.equalsIgnoreCase("timed")){
 				timestamp = (Long) value;
-				timestampProvided=true;
+				timestampProvided=true;				
 			}
-				
 			else { 
 				fieldNames[idx] = key;
 				fieldValues[idx] = value;
@@ -258,12 +257,13 @@ public final class StreamElement implements Serializable {
 
 	/**
 	 * Returns true if the timestamp is set. A timestamp is valid if it is
-	 * set.
+	 * provided
 	 * 
-	 * @return Whether the timestamp is set or not. If it is >0 it is assumed to be set
+	 * @return Whether the timestamp is set or not. If timestamp > 0 it is assumed to be set
 	 */
 	public boolean isTimestampSet ( ) {
-		return this.timeStamp > 0 || timestampProvided;
+		return this.timeStamp > 0 ||
+		timestampProvided;
 	}
 
 	/**
