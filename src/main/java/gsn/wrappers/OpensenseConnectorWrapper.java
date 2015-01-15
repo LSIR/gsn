@@ -359,9 +359,14 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 		int t_ms, t_ss, t_mn, t_hh, t_dd, t_mm,t_yy;
 		int ms,ss,mn,hh,dd,mm,yy,id,type;
 		byte[] payload;
+		boolean time_set = false;
 		
 		public StationData(int id){
 			this.id = id;
+			Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+			yy = c.get(Calendar.YEAR);
+			mm = c.get(Calendar.MONTH+1);
+			dd = c.get(Calendar.DAY_OF_MONTH);
 		}
 
 		public void readSecOzone(BinaryParser p) throws IOException {
@@ -551,19 +556,29 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			t_ms = ms;
 		}
 		
-		public StreamElement getStreamElement(){
+		public StreamElement getStreamElement() throws IOException {
 			Calendar c = Calendar.getInstance();
 			c.clear();
-			yy = t_yy;
-			mm = t_mm;
-			dd = t_dd;
-			hh = t_hh;
-			mn = t_mn;
-			ss = t_ss;
-			ms = t_ms;
-			c.set(yy + 2000, mm - 1, dd, hh, mn, ss);
+			if (type == 1 || type == 8){
+				time_set = true;
+				yy = t_yy;
+				mm = t_mm;
+				dd = t_dd;
+				hh = t_hh;
+				mn = t_mn;
+				ss = t_ss;
+				ms = t_ms;
+			}
+			if (!time_set) {
+				throw new IOException("Time is not set yet, waiting for a OSDMY or OSODO packet.");
+			}
+			c.set(t_yy + 2000, t_mm - 1, t_dd, t_hh, t_mn, t_ss);
 			c.setTimeZone(TimeZone.getTimeZone("UTC"));
-			long time = c.getTimeInMillis() + ms;
+			long time = c.getTimeInMillis() + t_ms;
+			
+			if (time > System.currentTimeMillis() + 600000) {
+				throw new IOException("Packet time ("+c.toString()+") is in the future, dropping packet.");
+			}
 			
 			Serializable[] data = new Serializable[]{time, new Short((short) id), new Short((short) type), payload};
 			
