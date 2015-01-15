@@ -209,19 +209,22 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 				 }
 	        } else if (data_type.equalsIgnoreCase("GPS")){
 	        	if(s_type == 0){ //LLSSLCSLs
-	        		temp.setData(1,(p.readNextLong(false)- 460000000)/6000000.0 + 46);
-	        		temp.setData(2,(p.readNextLong(false)- 60000000)/6000000.0 + 6);
-	        		temp.setData(3,(float)(p.readNextShort(false) / 10.0));
 	        		if (((byte[])(streamElement.getData("payload"))).length > 6){
-		        		temp.setData(4,(float)(p.readNextShort(false)/ 100.0));			
+	        			temp.setData(1,(p.readNextLong(false)- 460000000)/6000000.0 + 46);
+	        			temp.setData(2,(p.readNextLong(false)- 60000000)/6000000.0 + 6);
+	        			temp.setData(3,(float)(p.readNextShort(false) / 10.0));
+		        		temp.setData(4,(float)(p.readNextLong(false)/ 1000.0));			
 		        		temp.setData(5,p.readNextChar(false));
-		        		temp.setData(6,(float)(p.readNextShort(false)/100));
+		        		temp.setData(6,(float)(p.readNextShort(false)/100.0));
 		        		temp.setData(7,(float)(p.readNextLong(false)/100.0));
 	        		}
 	        		else{
+	        			temp.setData(1,(p.readNextLong(false)- 46000000)/600000.0 + 46);
+	        			temp.setData(2,(p.readNextLong(false)- 6000000)/600000.0 + 6);
+	        			temp.setData(3,(float)(p.readNextShort(false) / 10.0));
 		        		temp.setData(4,null);			
 		        		temp.setData(5,p.readNextChar(false));
-		        		temp.setData(6,(float)(p.readNextShort(false)/100));
+		        		temp.setData(6,(float)(p.readNextShort(false)/10.0));
 		        		temp.setData(7,null);
 	        		}
 	        		dataProduced(new StreamElement(temp));
