@@ -4,7 +4,7 @@
 		<unique-timestamps>false</unique-timestamps>
     	<init-params>
             <param name="model">gsn.utils.models.StreamInterpolateJoinModel</param>
-            <param name="model.0.historysize">30</param>
+            <param name="model.0.historysize">1000</param>
             <param name="model.0.f_latitude">gsl_interp_cspline</param>
             <param name="model.0.f_longitude">gsl_interp_cspline</param>
             <param name="model.0.f_hdop">gsl_interp_linear</param>
