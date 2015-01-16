@@ -277,7 +277,7 @@ public class DownloadData extends AbstractDataRequest {
             respond.println();
         }
         if (wantTimed) {
-            respond.print(qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
+            respond.print(qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp())));
         }
         for (int i = 0; i < se.getData().length; i++) {
             respond.print(cvsDelimiter);
@@ -299,17 +299,11 @@ public class DownloadData extends AbstractDataRequest {
         }
         respond.println("\t\t<tuple>");
         if (wantTimed)
-            respond.println("\t\t\t<field>" + (qbuilder.getSdf() == null ? timestampInUTC(se.getTimeStamp()) : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
+            respond.println("\t\t\t<field>" + (qbuilder.getSdf() == null ? se.getTimeStamp() : qbuilder.getSdf().format(new Date(se.getTimeStamp()))) + "</field>");
         for (int i = 0; i < se.getData().length; i++) {
             respond.println("\t\t\t<field>" + se.getData()[i] + "</field>");
         }
         respond.println("\t\t</tuple>");
-    }
-
-    private long timestampInUTC(long timestamp) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timestamp);
-        return cal.getTimeInMillis() + cal.getTimeZone().getOffset(cal.getTimeInMillis());
     }
 
     public AllowedOutputType getOt() {

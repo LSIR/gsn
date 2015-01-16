@@ -55,10 +55,10 @@ public class ZeroMQWrapper extends AbstractWrapper {
 
 		AddressBean addressBean = getActiveAddressBean();
 
-		String address = addressBean.getPredicateValue ( "address" );
+		String address = addressBean.getPredicateValue ( "address" ).toLowerCase();
 		int dport = addressBean.getPredicateValueAsInt("data_port",Main.getContainerConfig().getZMQProxyPort());
 		int mport = addressBean.getPredicateValueAsInt("meta_port", Main.getContainerConfig().getZMQMetaPort());
-		vsensor = addressBean.getPredicateValue ( "vsensor" );
+		vsensor = addressBean.getPredicateValue ( "vsensor" ).toLowerCase();
 		if ( address == null || address.trim().length() == 0 ) 
 			throw new RuntimeException( "The >address< parameter is missing from the ZeroMQWrapper wrapper." );
 		

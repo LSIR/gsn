@@ -28,7 +28,9 @@ package gsn.vsensor;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.utils.Pair;
 import gsn.utils.ParamParser;
+import gsn.utils.Utils;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -86,17 +88,24 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
        * This can now plot only for one input stream value.
        */
       TreeMap <  String , String > params = getVirtualSensorConfiguration( ).getMainClassInitialParams( );
+      String size = params.get("history-size");
       ChartInfo chartInfo = new ChartInfo( );
-      
+      if (size == null){
+          chartInfo.setHistorySize( 10 );
+          chartInfo.setHistoryIsTime( false );
+      }else{
+    	  Pair<Boolean,Long> p = Utils.parseWindowSize(size); 
+          chartInfo.setHistorySize( p.getSecond().intValue() );
+          chartInfo.setHistoryIsTime( p.getFirst() );
+      }
       chartInfo.setInputStreamName( params.get( "input-stream" ) );
+      
       logger.debug("All keys "+params.keySet().iterator().next());
       chartInfo.setPlotTitle( params.get( "title" ) );
       chartInfo.setType( params.get( "type" ) );
       chartInfo.setHeight( ParamParser.getInteger( params.get( "height" ) , 480 ) );
       chartInfo.setWidth( ParamParser.getInteger( params.get( "width" ) , 640 ) );
       chartInfo.setVerticalAxisTitle( params.get( "vertical-axis" ) );
-      chartInfo.setHistorySize( ParamParser.getInteger( params.get( "history-size" ) , 10 ) );
-      logger.debug("Initializing chart input stream name: "+chartInfo.getInputStreamName());
       input_stream_name_to_ChartInfo_map.put( chartInfo.getInputStreamName( ) , chartInfo );
       chartInfo.initialize( );
       return true;
@@ -222,6 +231,8 @@ class ChartInfo {
    
    private boolean                         ready           = false;
    
+   private boolean 						   isTimeBased     = false;
+   
    private String                          verticalAxisTitle;
    
    public ChartInfo ( ) {
@@ -233,7 +244,12 @@ class ChartInfo {
       rowData = "";
    }
    
-   public void setWidth ( int width ) {
+   public void setHistoryIsTime(boolean b) {
+	if (!ready ) this.isTimeBased = b;
+	
+}
+
+public void setWidth ( int width ) {
       if ( !ready ) this.width = width;
    }
    
@@ -281,7 +297,11 @@ class ChartInfo {
          TimeSeries timeSeries = dataForTheChart.get( streamElement.getFieldNames( )[ i ] );
          if ( timeSeries == null ) {
             dataForTheChart.put( streamElement.getFieldNames( )[ i ] , timeSeries = new TimeSeries( streamElement.getFieldNames( )[ i ] , org.jfree.data.time.FixedMillisecond.class ) );
-            timeSeries.setMaximumItemCount( historySize );
+            if(isTimeBased){
+            	timeSeries.setMaximumItemAge(historySize);
+            }else{
+                timeSeries.setMaximumItemCount(historySize);
+            }
             dataCollectionForTheChart.addSeries( timeSeries );
          }
          try {
@@ -341,7 +361,7 @@ class ChartInfo {
          buffer.append( "Width : " ).append( width ).append( "\n" );
          buffer.append( "Height : " ).append( height ).append( "\n" );
          if ( type != null ) buffer.append( "Type : " ).append( type ).append( "\n" );
-         buffer.append( "History-size : " ).append( historySize ).append( "\n" );
+         buffer.append( "History-size : " ).append(historySize).append( "\n" );
       } catch ( Exception e ) {
          buffer.insert( 0 , "ERROR : Till now the ChartVirtualSensor instance could understand the followings : \n" );
       }
