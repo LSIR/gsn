@@ -37,10 +37,12 @@ package gsn.http.ac;
 
 
 import java.text.SimpleDateFormat;
+
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
+
 import java.io.LineNumberInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -1162,7 +1164,24 @@ public class ConnectToDB
         }
         return user;
     }
-
+    
+    User findUser(String userName) throws SQLException {
+    	User user=null;
+    	rs = this.selectAllColumnsUnderOneCondition("ACUSER",new Column("USERNAME",userName));
+        while(rs.next())
+        {
+        	user=new User(userName);
+            user.setFirstName(rs.getString("FIRSTNAME"));
+            user.setLastName(rs.getString("LASTNAME"));
+            user.setEmail(rs.getString("EMAIL")); 
+            Vector<String> dataSourceList = new Vector<String>();
+    		Vector<String> groupList = new Vector<String>();
+    		user.setDataSourceList(dataSourceList);
+    		user.setGroupList(groupList);    		
+        }
+        return user;
+    }
+    
     /* given datasourcename, returns an object user that owns this source */
     User getUserFromDataSource(String datasourcename)throws SQLException
     {

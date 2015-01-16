@@ -12,4 +12,5 @@ output/
 project/boot/
 virtual-sensors/*.xml
 *.db
-
+data/
+csv-check-points/

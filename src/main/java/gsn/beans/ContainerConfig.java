@@ -115,6 +115,7 @@ public class ContainerConfig {
     private boolean                       acEnabled                        = false;
 	private String                        sslKeyStorePassword;
 	private String                        sslKeyPassword;
+	private String						  sslKeyStore                      = DEFAULT_SSL_KEYSTORE;
     private StorageConfig                 storage ;
     private SlidingConfig                 sliding;
 	private String                        directoryLoggingLevel            = DEFAULT_LOGGING_LEVEL;

@@ -7,6 +7,9 @@ case class VsConf(name:String,accessProtected:Boolean,priority:Int,timeZone:Stri
     storageSize:Option[String],processing:ProcessingConf,streams:Seq[StreamConf]) {
   
 }
+
+//case class VsConfs(confs:Seq[VsConf])
+
 object VsConf extends Conf{
   lazy val vs=defaults.getConfig("vs")
   val defaultPoolSize=vs.getInt("poolSize")
@@ -22,12 +25,13 @@ object VsConf extends Conf{
 		  (xml \ "description").text,
 		  (xml \ "life-cycle").headOption.map(lc=>attInt(lc,"pool-size",defaultPoolSize)),
 		  (xml \ "addressing" \ "predicate").map(p=>(p \@ "key",p.text)).toMap,
-		  (xml \ "storage").headOption.flatMap(s=>s.attribute("url").headOption.map(u=>StorageConf.create(s))),
+		  (xml \ "storage").headOption.flatMap{s=>
+		    s.attribute("url").headOption.map(u=>StorageConf.create(s))},		  
 		  (xml \ "storage").headOption.map(s=>s \@ "history-size"),
 		  ProcessingConf.create((xml \ "processing-class").head) ,
 		  (xml \ "streams" \ "stream").map(s=>StreamConf.create(s))		  
   )
-  def load(path:String)=create(XML.load(path))
+  def load(path:String):VsConf=create(XML.load(path))
 }
 
 case class ProcessingConf(className:String,uniqueTimestamp:Boolean,initParams:Map[String,String],
@@ -35,7 +39,8 @@ case class ProcessingConf(className:String,uniqueTimestamp:Boolean,initParams:Ma
 object ProcessingConf extends Conf{
   def create(xml:Node)=ProcessingConf(
       (xml \ "class-name").text,
-      (xml \ "unique-timestamps").headOption.map(a=>a.text.toBoolean).getOrElse(VsConf.defaultUniqueTimestamps),
+      (xml \ "unique-timestamps").headOption.map(a=>a.text.toBoolean).
+        getOrElse(VsConf.defaultUniqueTimestamps),
       (xml \ "init-params" \ "param").map(p=>(p \@ "name",p.text)).toMap,
       (xml \ "output-specification").headOption.map(o=>attInt(o,"rate",VsConf.defaultOutputRate )),
       (xml \ "output-structure" \ "field").map(f=>FieldConf.create(f)),
@@ -43,11 +48,13 @@ object ProcessingConf extends Conf{
   )
 }
 
-
 case class FieldConf(name:String,dataType:String,description:String,unit:Option[String])
 object FieldConf {
   def create(xml:Node)=FieldConf(
-      xml \@ "name",xml \@ "type",xml.text,xml.attribute("unit").map(_.toString))        
+      xml \@ "name",
+      xml \@ "type",
+      xml.text,
+      xml.attribute("unit").map(_.toString))        
 }
    
 case class WebInputConf(password:String,commands:Seq[WebInputCommand])
@@ -62,8 +69,10 @@ case class WebInputCommand(name:String,params:Seq[FieldConf])
 
 case class StreamConf(name:String,rate:Int,count:Int,query:String,sources:Seq[SourceConf])
 object StreamConf extends Conf{
-  def create(xml:Node)=StreamConf(xml \@ "name",
-      attInt(xml,"rate",0),attInt(xml,"count",0),
+  def create(xml:Node)=StreamConf(
+      xml \@ "name",
+      attInt(xml,"rate",0),
+      attInt(xml,"count",0),
       (xml \ "query").text,
       (xml \ "source").map(s=>SourceConf.create(s)))
 }
@@ -88,4 +97,5 @@ object WrapperConf{
       (xml \ "predicate").map(p=>(p \@ "key",p.text)).toMap,
       (xml \ "field").map(f=>FieldConf.create(f)))
 }    
+
       

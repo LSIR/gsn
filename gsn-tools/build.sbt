@@ -21,10 +21,13 @@ lazy val root = project.
 libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",  
-  "ch.qos.logback" % "logback-classic" % "1.0.13" ,
   "com.typesafe.play" %% "play-json" % "2.3.4",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.4",
   "edu.ucar" % "netcdf" % "4.3.22",
-  "org.apache.jena" % "jena-core" % "2.11.0" exclude("log4j","log4j") exclude("org.slf4j","slf4j-log4j12"),  
+  "org.apache.jena" % "jena-core" % "2.11.0" exclude("log4j","log4j") exclude("org.slf4j","slf4j-log4j12"),
+  "com.typesafe.slick" %% "slick" % "2.1.0",
+  "com.mchange" % "c3p0" % "0.9.5-pre10",
+  "ch.qos.logback" % "logback-classic" % "1.1.1" % "test",
   "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
 )
 

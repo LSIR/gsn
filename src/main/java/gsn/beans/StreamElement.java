@@ -61,6 +61,7 @@ public final class StreamElement implements Serializable {
 	private static final String NULL_ENCODING = "NULL"; // null encoding for transmission over xml-rpc
 
 	private boolean timestampProvided = false;
+	
 
 	public StreamElement (StreamElement other) {
 		this.fieldNames=new String[other.fieldNames.length];

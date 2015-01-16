@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>gsn</groupId>
     <artifactId>gsn</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <description>gsn</description>
     <version>1.1.5</version>
     <name>gsn</name>
@@ -62,11 +62,22 @@
             <artifactId>gsn-tools</artifactId>
             <version>0.0.4-SNAPSHOT</version>
 			<exclusions>
-        <exclusion>  <!-- declare the exclusion here -->
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-      </exclusions> 
+        		<exclusion>  
+          			<groupId>org.slf4j</groupId>
+          			<artifactId>slf4j-nop</artifactId>
+        		</exclusion>
+      		</exclusions>      		
+        </dependency>
+        <dependency>
+            <groupId>gsn</groupId>
+            <artifactId>gsn-services</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+			<exclusions>
+        		<exclusion>  
+          			<groupId>org.slf4j</groupId>
+          			<artifactId>slf4j-nop</artifactId>
+        		</exclusion>
+      		</exclusions>      		
         </dependency>
         <dependency>
             <groupId>com.typesafe</groupId>
@@ -102,6 +113,12 @@
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb</artifactId>
             <version>1.5.5</version>
+            <exclusions>
+        <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </exclusion>
+    </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -120,13 +137,32 @@
         </dependency>
         <dependency>
             <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase</artifactId>
-            <version>0.94.6.1</version>
+            <artifactId>hbase-common</artifactId>
+            <version>0.99.0</version>            
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>0.99.0</version>            
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>0.23.10</version>
+            <artifactId>hadoop-core</artifactId>
+            <version>1.2.1</version>
+                  <exclusions>
+            <exclusion>
+              <groupId>com.sun.jersey</groupId>
+              <artifactId>jersey-core</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>com.sun.jersey</groupId>
+              <artifactId>jersey-server</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>com.sun.jersey</groupId>
+              <artifactId>jersey-json</artifactId>
+            </exclusion>
+            </exclusions>
         </dependency>
           <dependency>
             <groupId>org.slf4j</groupId>
@@ -299,10 +335,15 @@
             <groupId>org.httpunit</groupId>
             <artifactId>httpunit</artifactId>
             <version>1.7.2</version>
+            <scope>test</scope>
             	<exclusions>
         <exclusion>  <!-- declare the exclusion here -->
           <groupId>xerces</groupId>
           <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>  <!-- declare the exclusion here -->
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
         </exclusion>
         <exclusion>  <!-- declare the exclusion here -->
           <groupId>xerces</groupId>
@@ -344,13 +385,22 @@
 			<version>0.0.1</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/optional/numerical/flanagan.jar</systemPath>
-		</dependency> 		<dependency>
+		</dependency> 		
+		<dependency>
 			<groupId>numericalMethods</groupId>
 			<artifactId>numericalMethods</artifactId>
 			<version>0.0.1</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/optional/numerical/numericalMethods.jar</systemPath>
-		</dependency> 	</dependencies>
+		</dependency>
+		<dependency>
+			<groupId>tequila-client</groupId>
+			<artifactId>tequila-client</artifactId>
+			<version>0.0.2</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/optional/legacy/tequila-client.jar</systemPath>
+		</dependency> 
+	</dependencies>	    
     <repositories>
         <repository>
             <id>TypesafeRepository</id>
@@ -367,11 +417,7 @@
             <enabled>true</enabled>
           </snapshots>
         </repository>
-        <repository>
-            <id>localIvy</id>
-            <name>ivy</name>
-            <url>http://repo.typesafe.com/typesafe/releases/</url>
-            <layout>default</layout>
-        </repository>
+        
     </repositories>
+    
 </project>

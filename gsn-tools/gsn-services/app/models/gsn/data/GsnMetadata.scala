@@ -7,6 +7,8 @@ import play.api.libs.json.Json._
 import play.api.libs.concurrent._
 import concurrent.Future
 import gsn.data._
+import gsn.config.VsConf
+import java.io.File
 
 class GsnMetadata(gsnServer:String) {
 
@@ -17,6 +19,8 @@ class GsnMetadata(gsnServer:String) {
     println("all over again")
     getGsnSensors
   }
+
+
   
   def getGsnSensors={
     val holder: WSRequestHolder = WS.url(gsnServer+"/rest/sensors")

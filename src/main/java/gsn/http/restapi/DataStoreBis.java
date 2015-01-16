@@ -28,17 +28,17 @@ import scala.collection.Seq;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-public class DataStore {
-	private static transient Logger logger = LoggerFactory.getLogger(DataStore.class);
+public class DataStoreBis {
+	private static transient Logger logger = LoggerFactory.getLogger(DataStoreBis.class);
 	private Config config=ConfigFactory.load();
-	DateFormat dateFormat = new SimpleDateFormat(config.getString("dateFormat"));
+	DateFormat dateFormat = new SimpleDateFormat(config.getString("gsn.dateFormat"));
 
 	public Sensor findSensor(String vsName,boolean latestValues){
 	    VSensorConfig sensorConfig = Mappings.getConfig(vsName);
 
         ArrayList<Sensing> fields = new ArrayList<Sensing>();
         
-        fields.add(Sensing.apply("time",new gsn.data.Output("time",vsName,new DataUnit("s","s"),IntType$.MODULE$)));
+        fields.add(Sensing.apply("time",new Output("time",vsName,new DataUnit("s","s"),IntType$.MODULE$)));
         for (DataField out:sensorConfig.getOutputStructure()){              
       	  fields.add(Sensing.apply(out.getName(),new gsn.data.Output(out.getName(),vsName,
       			  new DataUnit(out.getUnit(),out.getUnit()),DoubleType$.MODULE$)));        	  
@@ -47,7 +47,7 @@ public class DataStore {
         ArrayList<Object[]> values = new ArrayList<Object[]>();
 
         if (latestValues){          
-      	  java.util.Map<String, Object> se = DataStore.latestValues(sensorConfig.getName());
+      	  java.util.Map<String, Object> se = DataStoreBis.latestValues(sensorConfig.getName());
             if (se != null){               
             	  Object[] vals=new Object[fields.size()];                	
              	  int i=1;

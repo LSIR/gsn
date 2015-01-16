@@ -192,6 +192,7 @@ public class CSVHandler {
             if (isEmpty(se))
                 continue;
             if (se.containsKey(TIMESTAMP)) {
+            	//System.out.println("times "+se.get(TIMESTAMP)+"--"+previousCheckPoint);
                 if (((Long) se.get(TIMESTAMP)) <= previousCheckPoint)
                     continue;
             } else {// assuming useCounterForCheckPoint = true
@@ -268,6 +269,7 @@ public class CSVHandler {
 
                 value += values[i];
                 format += getTimeStampFormat(formats[i]);
+
                 streamElement.put(fields[i], value);
                 timeStampFormats.put(fields[i], format);
             }

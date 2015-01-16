@@ -1,166 +1,136 @@
 package controllers.gsn.api
 
-import play.api.mvc._
-import play.api.db._
-import play.api.cache._
-import play.api.Play.current
-import play.api.libs.concurrent.Execution
-import com.typesafe.config.ConfigFactory
-import models.gsn.data.GsnMetadata
-import gsn.data._
-import scala.concurrent._
+import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.mutable.ArrayBuffer
-import java.util.Date
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormatter
-import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.format.DateTimeFormat
-import collection.JavaConversions._
-import org.joda.time.format.DateTimeFormatterBuilder
-import gsn.xpr.XprConditions
-import scala.util.Success
+import scala.concurrent.Future
+import scala.concurrent.Promise
+import scala.concurrent.duration.DurationInt
 import scala.util.Try
-import scala.util.Failure
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatterBuilder
+import com.typesafe.config.ConfigFactory
+import akka.actor._
+import controllers.gsn.Global
+import gsn.data._
+import gsn.xpr.XprConditions
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.mvc._
+import play.Logger
 
-object SensorService extends Controller{
+object SensorService extends Controller{   
   lazy val conf=ConfigFactory.load
-  lazy val gsnServer=conf.getString("gsn.server.url")
-  lazy val metadata=new GsnMetadata(gsnServer)
-  implicit val context = Execution.Implicits.defaultContext
-  val parsers=conf.getStringList("gsn.api.dateTimeFormats").map{d=>
-    DateTimeFormat.forPattern(d).getParser
-  }.toArray
-  val dtf=new DateTimeFormatterBuilder().append(null,parsers).toFormatter
+  val defaultMetaProps=conf.getStringList("gsn.api.defaultMetadataProps")
+  val dateFormatter={
+    val parsers=conf.getStringList("gsn.api.dateTimeFormats").map{d=>
+      DateTimeFormat.forPattern(d).getParser
+    }.toArray
+    new DateTimeFormatterBuilder().append(null,parsers).toFormatter
+  }
 
-  def sensorsMeta:Future[Map[String,Sensor]]=
-    Cache.getOrElse("sensors")(metadata.allSensors)
-  
-  def sensors(latestVals:Option[Boolean],format:Option[String]) = Action.async {
-    sensorsMeta.map{s=>
-      Try{
-      val f=
-        if (!format.isDefined) defaultFormat.code
-        else if (!isValidFormat(format.get))
-          throw new Exception("grapa")
-        else format.get
+  val validFormats=Seq(Csv,Json)
+  val defaultFormat=Json
+ 
+  def queryparam(name:String)(implicit req:Request[AnyContent])={
+    req.queryString.get(name).map(_.head)
+  }
+  def param[T](name:String,fun: String=>T,default:T)(implicit req:Request[AnyContent])=
+    queryparam(name).map(fun(_)).getOrElse(default)
+      
+  def sensors = Action.async {implicit request=>
+    Try{    
+      val format=param("format",OutputFormat,defaultFormat)    
+      val latestVals=param("latestValues",_.toBoolean,false)
+      val timeFormat=queryparam("timeFormat")
+      val p=Promise[Seq[SensorData]]
+      
+      val st=Akka.system.actorSelection("/user/gsnSensorStore")
+      val q=Akka.system.actorOf(Props(new QueryActor(p)))
+      q ! GetAllSensors(latestVals,timeFormat)
+      
+      p.future.map{data =>
+        val out=format match{          
+          case Json=>JsonSerializer.ser(data,Seq(),latestVals)
+          case Csv=>CsvSerializer.ser(data, defaultMetaProps, latestVals)
+        }
+        Ok(out)
+      } 
+    }.recover{
+      case t=>
+        t.printStackTrace  
+        Future(BadRequest(t.getMessage))    
+    }.get    
+  }
         
-      if (latestVals.isDefined && latestVals.get){
-        val m= s.map(ss=>latestValues(ss._2))
-        Ok(DataSerializer.toJson(m.toSeq))        
-      }
-      else {
-        Ok(DataSerializer.toJsonString(s.values.toSeq))       
-      }
-    }.recover{case t=>BadRequest(t.getMessage)    }.get
-      }
+  private def authorizeUserPass(vsname:String)(implicit request:Request[AnyContent])={
+    val optUser=queryparam("username")
+	val optPass=queryparam("password")
+	if (optUser.isDefined && optPass.isDefined){
+	  if (!Global.acDs .authorizeVs(vsname, optUser.get, optPass.get))
+	    throw new IllegalArgumentException(s"Not authorized user ${optUser.get} for resource $vsname")
+	}    
   }
   
-    
-  def sensor(sensorid:String,
-             size:Option[Int],
-             fieldStr:Option[String],
-             filterStr:Option[String],
-             fromStr:Option[String],
-             toStr:Option[String]) = Action.async {request=>
-    
-    sensorsMeta.map{s=>
-      Try{
-      if (!s.contains(sensorid))
-        throw new IllegalArgumentException("Unknown virtual sensor identifier: "+sensorid)
-      else{
-        val filters=new ArrayBuffer[String]
-        val sensor=s(sensorid)
-        val fields:Array[String]=
-          if (!fieldStr.isDefined) Array() 
-          else fieldStr.get.split(",")
-        if (fromStr.isDefined)          
-          filters+= "timed>"+dtf.parseDateTime(fromStr.get).getMillis
-        if (toStr.isDefined)          
-          filters+= "timed<"+dtf.parseDateTime(toStr.get).getMillis
-        val conds=XprConditions.parseConditions(filterStr.toArray).recover{                 
-          case e=>throw new IllegalArgumentException("illegal conditions in filter: "+e.getMessage())
-        }.get.map(_.toString)
-         
-          
-        Ok(DataSerializer.toJson(Seq(query(sensor,fields,conds++filters,size))))
-      }
-      }.recover{case t=>BadRequest(t.getMessage)}.get
+  private def authorizeVs(vsname:String)(implicit request:Request[AnyContent])={     
+    if (Global.gsnConf.accessControl.enabled && Global.acDs.hasAccessControl(vsname)){
+	  val optApikey=queryparam("apikey")
+	  // Deprecated user and pass on query params 
+	  //authorizeUserPass(vsname) 
+	   
+	  if (optApikey.isDefined){
+	    if (!Global.acDs.authorizeVs(vsname, optApikey.get))
+	      throw new IllegalArgumentException(s"Apikey ${optApikey.get} not authorized for resource $vsname")      
+	  }
+	  else
+	    throw new IllegalArgumentException("Not provided required apikey or user credentials")
     }
   }
   
-  private def latestValues(sensor:Sensor) ={
-    val vsName=sensor.name 
-	val query = s"""select * from $vsName where  
-	  timed = (select max(timed) from $vsName )"""
-    val con=DB.getConnection()
-	try {
-      val stmt=con.createStatement
-      val rs=stmt.executeQuery(query.toString)
-      val fields=sensor.fields
-      val data=fields.map{f=>new ArrayBuffer[(Any,Any)]}
-      while (rs.next){
-        for (i <- fields.indices) yield { 
-          data(i) += ((rs.getLong("timed"),rs.getDouble(fields(i).fieldName )))
-        }           
+  def sensor(sensorid:String) = Action.async {implicit request=>
+    Try{
+      val vsname=sensorid.toLowerCase
+      authorizeVs(sensorid)
+    	
+      val size:Option[Int]=queryparam("size").map(_.toInt)
+      val fieldStr:Option[String]=queryparam("fields")
+      val filterStr:Option[String]=queryparam("filter")
+      val fromStr:Option[String]=queryparam("from")
+      val toStr:Option[String]=queryparam("to")
+      val timeFormat:Option[String]=queryparam("timeFormat")
+
+      val format=param("format",OutputFormat,defaultFormat)           
+      val filters=new ArrayBuffer[String]
+      val fields:Array[String]=
+        if (!fieldStr.isDefined) Array() 
+        else fieldStr.get.split(",")
+      if (fromStr.isDefined)          
+        filters+= "timed>"+dateFormatter.parseDateTime(fromStr.get).getMillis
+      if (toStr.isDefined)          
+        filters+= "timed<"+dateFormatter.parseDateTime(toStr.get).getMillis
+      val conds=XprConditions.parseConditions(filterStr.toArray).recover{                 
+        case e=>throw new IllegalArgumentException("illegal conditions in filter: "+e.getMessage())
+      }.get.map(_.toString)
+ 
+      val p=Promise[Seq[SensorData]]               
+      val q=Akka.system.actorOf(Props(new QueryActor(p)))
+      
+      q ! GetSensorData(sensorid,fields,conds++filters,size,timeFormat)
+      val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 5.second)
+      val copo =Future.firstCompletedOf(Seq(p.future,to)).map{          
+        data=> 
+          format match{
+            case Json=>Ok(JsonSerializer.ser(data.head,Seq(),false))
+            case Csv=>Ok(CsvSerializer.ser(data.head,Seq(),false))
+          }
+      }.recoverWith{case e=>
+        Logger.error(e.getMessage)
+        Future(BadRequest(e.getMessage))
       }
-      val ts=fields.indices.map{i=>
-        TimeSeries(fields(i),data(i).toSeq)
-      }
-      SensorData(ts,sensor)      
-    }
-	finally con.close			
+      copo
+    }.recover{
+      case t=>
+        Future(BadRequest(t.getMessage))
+    }.get
   }
-
-  
-  private def query(sensor:Sensor, fields:Seq[String],
-			conditions:Seq[String], size:Option[Int]):SensorData= {
-    val ordered=
-      if (!fields.isEmpty)
-        sensor.fields.filter(f=>fields.contains(f.fieldName)).map(_.fieldName )
-      else sensor.fields.map(_.fieldName )
-
-    val con=DB.getConnection()
-    val data=ordered.map{f=>new ArrayBuffer[(Any,Any)]}
-
- 	val query = new StringBuilder("select ")
-    query.append((Seq("timed")++ordered).mkString(","))
-	query.append(" from ").append(sensor.name )
-	if (conditions != null && conditions.length>0) 
-	  query.append(" where "+conditions.mkString(" and "))
-    if (size.isDefined) 
-	  query.append(" order by timed desc").append(" limit 0," + size.get);	
-
-	try {
-      val stmt=con.createStatement
-      val rs=stmt.executeQuery(query.toString)
-	  println(query)
-      while (rs.next) {
-        for (i <- ordered.indices) yield {
-          data(i) += ((rs.getLong("timed"),rs.getDouble(ordered(i) )))
-        }           
-      }
-            
-      val selectedOutput=sensor.fields.filter(f=>ordered.contains(f.fieldName) ) 
-      val ts=selectedOutput.indices.map{i=>
-        TimeSeries(selectedOutput(i),data(i).toSeq)
-      }
-      SensorData(ts,sensor)
-            
-	} 
-	finally con.close
-  }
-  
-  private def isValidFormat(format:String)=
-    validFormats.exists(_.code.equals(format))
-    
-  private val validFormats=Seq(Csv,Json)
-  private val defaultFormat=Json
-
-
-  case class OutputFormat(code:String) 
-    object Csv extends OutputFormat("csv")
-    object Json extends OutputFormat("json")
-    
-  
-
 }
