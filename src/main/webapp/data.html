@@ -203,7 +203,7 @@
                     return to_return;
                 }
                 
-                function option_list_value(name,items,all, units, id){
+                function option_list_value(name,items,all, units, id, selected_field){
                     to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all!=null){
                         to_return+='<option value="All" >' + all + '</option>';
@@ -213,17 +213,30 @@
                     
                     for (var i = 0 ; i < l ; i++) {
                         if ("time" == items[sv[i]]) continue;
-                        if (units[items[sv[i]]]==null || units[items[sv[i]]]=="")
-                            to_return+='<option value="' + items[sv[i]]+'" >'+items[sv[i]]+'</option>';
+                        if (units[items[sv[i]]]==null || units[items[sv[i]]]==""){
+                        	to_return+='<option value="' + items[sv[i]]+'"';
+                            if(selected_field == items[sv[i]]){
+                            	to_return += ' selected';
+                            }
+                            to_return+=' >'+items[sv[i]]+'</option>';
+                        }
+                            
                         else
-                            to_return+='<option value="' + items[sv[i]]+'" >'+items[sv[i]] + " [" + units[items[sv[i]]] + "]" +'</option>';
+                        	{
+                        	to_return+='<option value="' + items[sv[i]]+'"';
+                            if(selected_field == items[sv[i]]){
+                            	to_return += ' selected';
+                            }
+                            to_return += ' >'+items[sv[i]] + " [" + units[items[sv[i]]] + "]" +'</option>';
+                        	}
+                            
                     }
                     to_return+='</select>'
                     return to_return;
                 }
 
 
-                function add_data_output (vsname=null) {
+                function add_data_output (vsname=null, fnames=[]) {
 
                     var vss_id = "vss_" + vss_max_id;
                     var fields_id = "fields_" + fields_max_id;
@@ -243,35 +256,73 @@
                     if(vsname != null){
                     	var vs = $('#'+vss_id).val();
                         if (vs != 'All') {
-                            $('#'+fields_div_id).html("&nbsp " + option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs], fields_id));
-                            $('#'+fields_id).chosen({
-                                search_contains: true,
-                                width: "150px"
-                            });
-                            $('#'+fields_id).on('change', function(evt, params){
-                                if ($('#'+vss_id).val() != 'All' && $('#'+vss_id).val() != 'All') {
-                                	$('#'+vss_id).parent().parent().children('.condition-slider').show();
-                                    var conditions_content = '&nbsp<input type="text" class="min" style="font-weight:bold; width:30px; display: inline-block;"/>';
-                                    conditions_content += '&nbsp &nbsp';
-                                    conditions_content += '<div class="slider-range" style="width: 200px; display: inline-block"></div>';
-                                    conditions_content += '&nbsp &nbsp';
-                                    conditions_content += '<input type="text" class="max" style="font-weight:bold; width:30px;"/>';
-                                    conditions_content += '<input type="text" class="c_vs" style="display: none;"/>';
-                                    conditions_content += '<input type="text" class="c_field" style="display: none;"/>';
-                                    conditions_content += '<input type="text" class="join" value="and" style="display: none;"/>';
-                                    $('#'+vss_id).parent().parent().children('.condition-slider').html(conditions_content);
-                                    parse_minmax_vals_for_slider($('#'+vss_id).val(), $('#'+vss_id).val(),
-                                    		$('#'+vss_id).parent().parent().children('.condition-slider').children(".slider-range"),
-                                    		$('#'+vss_id).parent().parent().children('.condition-slider').children(".min"),
-                                    		$('#'+vss_id).parent().parent().children('.condition-slider').children(".max")
-                                    );
+                        	if(fnames.length > 0){
+                        		var i = 0;
+                        		while(i!=fnames.length){
+                        			$('#'+fields_div_id).html("&nbsp " + option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs], fields_id, fnames[i]));
+                                    $('#'+fields_id).chosen({
+                                        search_contains: true,
+                                        width: "150px"
+                                    });
+                                    $('#'+fields_id).on('change', function(evt, params){
+                                        if ($('#'+vss_id).val() != 'All' && $('#'+vss_id).val() != 'All') {
+                                        	$('#'+vss_id).parent().parent().children('.condition-slider').show();
+                                            var conditions_content = '&nbsp<input type="text" class="min" style="font-weight:bold; width:30px; display: inline-block;"/>';
+                                            conditions_content += '&nbsp &nbsp';
+                                            conditions_content += '<div class="slider-range" style="width: 200px; display: inline-block"></div>';
+                                            conditions_content += '&nbsp &nbsp';
+                                            conditions_content += '<input type="text" class="max" style="font-weight:bold; width:30px;"/>';
+                                            conditions_content += '<input type="text" class="c_vs" style="display: none;"/>';
+                                            conditions_content += '<input type="text" class="c_field" style="display: none;"/>';
+                                            conditions_content += '<input type="text" class="join" value="and" style="display: none;"/>';
+                                            $('#'+vss_id).parent().parent().children('.condition-slider').html(conditions_content);
+                                            parse_minmax_vals_for_slider($('#'+vss_id).val(), $('#'+vss_id).val(),
+                                            		$('#'+vss_id).parent().parent().children('.condition-slider').children(".slider-range"),
+                                            		$('#'+vss_id).parent().parent().children('.condition-slider').children(".min"),
+                                            		$('#'+vss_id).parent().parent().children('.condition-slider').children(".max")
+                                            );
 
-                                    $('#'+vss_id).parent().parent().children('.condition-slider').children(".min").val("-inf");
-                                    $('#'+vss_id).parent().parent().children('.condition-slider').children(".max").val("+inf");
-                                } else {
-                                	$('#'+vss_id).parent().parent().children('.condition-slider').hide();
-                                }
-                            });
+                                            $('#'+vss_id).parent().parent().children('.condition-slider').children(".min").val("-inf");
+                                            $('#'+vss_id).parent().parent().children('.condition-slider').children(".max").val("+inf");
+                                        } else {
+                                        	$('#'+vss_id).parent().parent().children('.condition-slider').hide();
+                                        }
+                                    });
+                                    i+=1;
+                        		}
+                        		
+                        	} else {
+                        		$('#'+fields_div_id).html("&nbsp " + option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs], fields_id));
+                                $('#'+fields_id).chosen({
+                                    search_contains: true,
+                                    width: "150px"
+                                });
+                                $('#'+fields_id).on('change', function(evt, params){
+                                    if ($('#'+vss_id).val() != 'All' && $('#'+vss_id).val() != 'All') {
+                                    	$('#'+vss_id).parent().parent().children('.condition-slider').show();
+                                        var conditions_content = '&nbsp<input type="text" class="min" style="font-weight:bold; width:30px; display: inline-block;"/>';
+                                        conditions_content += '&nbsp &nbsp';
+                                        conditions_content += '<div class="slider-range" style="width: 200px; display: inline-block"></div>';
+                                        conditions_content += '&nbsp &nbsp';
+                                        conditions_content += '<input type="text" class="max" style="font-weight:bold; width:30px;"/>';
+                                        conditions_content += '<input type="text" class="c_vs" style="display: none;"/>';
+                                        conditions_content += '<input type="text" class="c_field" style="display: none;"/>';
+                                        conditions_content += '<input type="text" class="join" value="and" style="display: none;"/>';
+                                        $('#'+vss_id).parent().parent().children('.condition-slider').html(conditions_content);
+                                        parse_minmax_vals_for_slider($('#'+vss_id).val(), $('#'+vss_id).val(),
+                                        		$('#'+vss_id).parent().parent().children('.condition-slider').children(".slider-range"),
+                                        		$('#'+vss_id).parent().parent().children('.condition-slider').children(".min"),
+                                        		$('#'+vss_id).parent().parent().children('.condition-slider').children(".max")
+                                        );
+
+                                        $('#'+vss_id).parent().parent().children('.condition-slider').children(".min").val("-inf");
+                                        $('#'+vss_id).parent().parent().children('.condition-slider').children(".max").val("+inf");
+                                    } else {
+                                    	$('#'+vss_id).parent().parent().children('.condition-slider').hide();
+                                    }
+                                });
+                        	}
+                            
                         }
                         else {
                             $('#'+fields_div_id).html("");
@@ -415,7 +466,14 @@
                     //Adding the URL parameters
                     var i = 1;
                     while(getURLParameter("vsname"+i) != null){
-                    	add_data_output(getURLParameter("vsname"+i));
+                    	
+                    	var j = 1;
+                    	var fields = Array();
+                    	while(getURLParameter("field"+j+"vs"+i) != null){
+                    		fields.push(getURLParameter("field"+j+"vs"+i));
+                    		j=j+1;
+                    	}
+                    	add_data_output(getURLParameter("vsname"+i), fields);
                     	i=i+1;
                     }
                     if(getURLParameter("vsname"+1) == null){
@@ -559,7 +617,7 @@
 				});
 				 
 				 function pre_load() {
-					 	if(getURLParameter("vsname") != null){
+					 	if(getURLParameter("vsname1") != null){
 							console.log("ONLOAD");
 							$(".plot").click();	
 					 	}
