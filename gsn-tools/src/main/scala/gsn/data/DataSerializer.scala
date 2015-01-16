@@ -5,6 +5,8 @@ import play.api.libs.json.JsArray
 import java.io.StringWriter
 import scala.collection.mutable.ArrayBuffer
 import gsn.data.netcdf.NetCdf
+import java.nio.charset.Charset
+import play.api.libs.json.JsNumber
 
 trait DataSerializer{
   def ser(s:Sensor,props:Seq[String]):Object=
@@ -22,21 +24,31 @@ object JsonSerializer extends DataSerializer{
     Json.stringify(toJson(data))
   
   private def toJson(data:SensorData):JsValue={
-    val values=data.ts.map{t=>
-      t.series.unzip._2       
+    /*val values=data.ts.map{t=>
+      t.series      
     } 
-    val fields=data.ts.map(_.output.fieldName) 
-    toJson(data.sensor,values, fields)     
+    val fields=data.ts.map(_.output.fieldName)*/ 
+    toJson(data.sensor,data.ts)//values, fields)     
   }
   
-  private def toJson(sensor:Sensor,values:Seq[Seq[Any]]=Seq(),valueNames:Seq[String]=Seq())={
+  private def toJson(sensor:Sensor,ts:Seq[TimeSeries])={//values:Seq[Seq[Any]]=Seq(),valueNames:Seq[String]=Seq())={
         
-    val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
-    .map{f=>
+    
+    //val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
+    val values=ts.map(_.series)
+    val fields=ts.map(_.output).map{f=>
       Json.obj("name"->f.fieldName,"type"->f.dataType.name,"unit"->f.unit.code)
     }
     
-    val jsValues=values.map{record=>valueToJson(record)}      
+    val jsValues= if (values.isEmpty) Seq()
+    else {
+      for (i <- values.head.indices) yield { 
+        JsArray(  
+            fields.indices.map {j=>valueToJson(values(j).apply(i))}
+        )
+      }
+      //values.map{record=>valueToJson(record)}      
+    }
     
     val propvals=Seq("vs_name"->JsString(sensor.name),
                      "values"->JsArray(jsValues),
@@ -59,14 +71,16 @@ object JsonSerializer extends DataSerializer{
         "features"->JsArray(sensorsData.map(s=>toJson(s))))    
   
 
-  private def valueToJson(any:Seq[Any]):JsArray=JsArray (any.map{
+  private def valueToJson(any:Any):JsValue=any match{
+    
+   
     case d:Double=>JsNumber(d)
     case i:Int=>JsNumber(i)
     case l:Long=>JsNumber(l)
     case s:String=>JsString(s)
     case a:Any=>JsString(a.toString) 
     case null=>JsNull
-  })
+  }
 
 }
 
@@ -88,21 +102,27 @@ object CsvSerializer extends DataSerializer{
     }
     sw
   }
-  private def toString(s:Sensor,props:Seq[String])={
-    val prop=props.map(p=>"\""+s.properties.getOrElse(p,"")+"\"").mkString(",")
-    s"${s.name},$prop"+
-    ",\""+s.fields.map(f=>f.fieldName).mkString("|")+"\""+
-    ",\""+s.fields.map(f=>f.unit.code).mkString("|")+"\""+
-    ",\""+s.fields.map(f=>f.dataType.name).mkString("|")+"\""    
+  private def toString(s:SensorData,props:Seq[String])={
+    val output=s.ts.map(t=>t.output)
+    val prop=props.map(p=>"\""+encodeBreaks(s.sensor.properties.getOrElse(p,""))+"\"").mkString(",")
+    s"${s.sensor.name},$prop"+
+    ",\""+output.map(f=>f.fieldName).mkString("|")+"\""+
+    ",\""+output.map(f=>f.unit.code).mkString("|")+"\""+
+    ",\""+output.map(f=>f.dataType.name).mkString("|")+"\""    
   }
   
   def sensorDataToCsv(data:SensorData,props:Seq[String],withLatest:Boolean=false)={
     //val valueNames="latestValues("+data.latest.map(_._1.fieldName).mkString("|")+")"
     //"#vs_name,"+props.mkString(",")+",fields,units,types,"+valueNames+System.lineSeparator
     if (withLatest)
-      toString(data.sensor,props)+","+data.latest.map(_._2 ._2 ).mkString("|")
-    else toString(data.sensor,props)
+      toString(data,props)+","+data.latest.map(_._2).mkString("|")
+    else toString(data,props)
   }
+
+  private def encodeBreaks(s:String)=s.replaceAll("(\r\n)|\r|\n", "\\\\n")
+
+  
+  
   
   def toCsv(data:SensorData,
       valueNames:Seq[String]=Seq()):StringWriter={
@@ -111,17 +131,19 @@ object CsvSerializer extends DataSerializer{
       sw.append("# "+key+":"+value+System.lineSeparator)
     
     head("vs_name",data.sensor.name)
-    data.sensor.properties.foreach(p=>head(p._1,p._2))
-    val fields=data.sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
-
+    data.sensor.properties.foreach(p=>head(p._1,encodeBreaks(p._2)))
+    //val fields=data.sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
+    val fields=data.ts.map(_.output)
+    
     head("fields",fields.map{_.fieldName}.mkString(","))
     head("units",fields.map{_.unit.code}.mkString(","))
     head("types",fields.map{_.dataType.name}.mkString(","))
     println("drimp "+data.ts.head.series.size+" "+fields.size)
     val si=data.ts.head.series.size-1
-    (0 to si).foreach{i=>      
+    (0 to si).foreach{i=>
+      //sw.append(data.time(i)+",")
       val pp=(0 to fields.size-1).map{j=>
-        data.ts(j).series (i)._2        
+        data.ts(j).series (i)        
       }.mkString(",")
       sw.append(pp+System.lineSeparator)
       //sw.append(pp)

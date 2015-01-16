@@ -57,6 +57,7 @@ public class MyLogoutHandlerServlet extends HttpServlet
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Pragma", "no-cache");
         res.setHeader("Expires", "0");
+        res.sendRedirect( "/");
         //res.sendRedirect( "https://tequila.epfl.ch/cgi-bin/tequila/logout");
     }
     public void doPost(HttpServletRequest req, HttpServletResponse res)
