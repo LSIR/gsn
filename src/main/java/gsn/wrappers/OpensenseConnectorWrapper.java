@@ -28,7 +28,7 @@ import gsn.utils.Helpers;
 public class OpensenseConnectorWrapper extends AbstractWrapper {
 	
 	
-	public static final Integer[] MOBILE_STATIONS = {43,47,48,192};
+	public static final Integer[] MOBILE_STATIONS = {41,43,45,47,48,49,50,51,54,55,192};
 	public static final Integer[] STATIC_STATIONS = {101,102};
 	
 	private static final Object timerLock = new Object();
