@@ -12,6 +12,7 @@ public class BinaryParser {
 	private InputStream in;
 	private int s1,s2 = 0;
 	private OutputStream out;
+	private long position = 0;
 	
 	public BinaryParser(InputStream i){
 		in = i;
@@ -20,6 +21,10 @@ public class BinaryParser {
 	public BinaryParser(InputStream i, OutputStream o){
 		in = i;
 		out = o;
+	}
+	
+	public long getPosition(){
+		return position;
 	}
 	
 	public byte[] readBytes(int len) throws IOException{
@@ -73,7 +78,7 @@ public class BinaryParser {
 		int r = in.read(b);
 		if (r == -1) throw new EOFException("EOF reached on stream, cannot read further.");
 		addSum(b);
-		return new String(b);
+		return new String(b,"ISO-8859-1");
 	}
 
 	public void resetChecksum() {
@@ -90,6 +95,7 @@ public class BinaryParser {
 				e.printStackTrace();
 			}
 		}
+		position += b.length;
 		for(int i=0;i<b.length;i++){
 			s1 = (s1 +(b[i] & 0xFF)) % 255;
 			s2 = (s2 + s1) % 255;
@@ -107,6 +113,7 @@ public class BinaryParser {
 				e.printStackTrace();
 			}
 		}
+		position += 2;
 		if (s1 != (buf[0] & 0xFF) || s2 != (buf[1] & 0xFF)){
 			return false;
 		}

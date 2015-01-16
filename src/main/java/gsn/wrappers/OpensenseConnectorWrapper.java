@@ -426,8 +426,8 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			}
 			//ms = 0; ??
 			//ss = 0; ??
-			t_mn = _mn;
-			t_hh = _hh;
+			//t_mn = _mn;
+			//t_hh = _hh;
 		}
 
 		public void readAccel(BinaryParser p) throws IOException {
