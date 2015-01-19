@@ -316,6 +316,10 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
 								connected = false;
 								resync = false;
+							}catch(SocketTimeoutException e){
+								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								connected = false;
+								resync = false;
 							}catch(IOException e){
 								err ++;
 								if (! resync){
