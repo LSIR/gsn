@@ -132,6 +132,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 		   while (running){
 			   try {
 			       final Socket server = socket.accept();
+			       server.setSoTimeout(15000);
 			       logger.warn("accepted from "+server.getInetAddress());
                    Thread t = new Thread(new Runnable(){ 
                 	   
