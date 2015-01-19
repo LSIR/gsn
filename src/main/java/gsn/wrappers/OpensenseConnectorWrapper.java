@@ -171,6 +171,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 							}catch (IOException ioe){
 								logger.error("Error while connecting to remote station: " + server.getInetAddress(), ioe);
 							}
+							logger.warn("closed (received "+ctr+" packets, dropped "+err+" bytes, published "+pub+" packets)");
 							//publish data even if connection got interrupted as it may be erased on the logger side
 							
 							synchronized (timerLock) {
@@ -302,7 +303,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								case 43:
 									byte[] buf = parser.readBytes(2);
 									if (new String(buf).equals("++")){
-										logger.warn("closed (received "+ctr+" packets, dropped "+err+" bytes, published "+pub+" packets)");
+										logger.warn("Good Bye received");
 										connected = false;
 										resync = false;
 									}
