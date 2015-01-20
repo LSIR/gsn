@@ -85,8 +85,7 @@
     <target name="bind" depends="build" description="Compile the JIBX mappings.">
     	
         <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
-              failonerror="true">
-            <classpath refid="classpath"/>
+              failonerror="true" classpathref="classpath">
             <arg value="src/main/resources/containerJIBX.xml"/>
             <arg value="src/main/resources/VirtualSensorDescription.xml"/>
         </java>
@@ -94,9 +93,7 @@
 
 	
     <target name="cleandb" depends="build">
-        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring="">
-            <classpath refid="classpath"/>
-       </java>
+        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring=""  classpathref="classpath" />
     </target>
 
 
@@ -113,8 +110,7 @@
     </target>
 
     <target name="gsn" depends="cleandb" description="Run GSN server in non graphical mode.">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="true" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="true" fork="true" dir="${basedir}" classpathref="classpath">
             <jvmarg value="-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-DmaxServlets=${max-servlets}"/>

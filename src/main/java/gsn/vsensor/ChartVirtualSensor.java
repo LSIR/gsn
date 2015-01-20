@@ -21,6 +21,7 @@
 *
 * @author Ali Salehi
 * @author Mehdi Riahi
+* @author Julien Eberle
 *
 */
 
@@ -99,7 +100,6 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
           chartInfo.setHistoryIsTime( p.getFirst() );
       }
       chartInfo.setInputStreamName( params.get( "input-stream" ) );
-      
       logger.debug("All keys "+params.keySet().iterator().next());
       chartInfo.setPlotTitle( params.get( "title" ) );
       chartInfo.setType( params.get( "type" ) );

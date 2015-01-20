@@ -37,7 +37,7 @@ libraryDependencies ++= Seq(
   "log4j" % "log4j" % "1.2.17",
   "org.slf4j" % "slf4j-api" % "1.7.5",
   "org.slf4j" % "slf4j-log4j12" % "1.7.5",
-  "org.jibx" % "jibx-run" % "1.2.5",
+  "org.jibx" % "jibx-run" % "1.2.5",            
   "org.eclipse.jetty" % "jetty-webapp" % "7.6.16.v20140903",
   "org.hibernate" % "hibernate-core" % "3.6.10.Final",
   "net.sf.opencsv" % "opencsv" % "2.3",
