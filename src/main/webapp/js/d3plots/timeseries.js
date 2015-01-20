@@ -68,7 +68,7 @@ function drawChartTimeseries(data){
 	var xAxis = d3.svg.axis()
 		.scale(x)
 		.orient("bottom")
-		.tickFormat(d3.time.format.utc("%d/%m/%Y %H:%M:%S"));
+		.tickFormat(d3.time.format("%d/%m/%Y %H:%M:%S"));
 
 	var yAxis = d3.svg.axis()
 		.scale(y)
@@ -180,11 +180,11 @@ function drawChartTimeseries(data){
             var x1 = selectedTimeRangeHistory[currentTimeRangeShown].min;
             var x2 = selectedTimeRangeHistory[currentTimeRangeShown].max;
             selectedTimeRangeHistory[currentTimeRangeShown + 1] = null;
-            var x1Month = x1.getUTCMonth() + 1;
-            var x2Month = x2.getUTCMonth() + 1;
+            var x1Month = x1.getMonth() + 1;
+            var x2Month = x2.getMonth() + 1;
 
-            $("#datepicker_from").val(x1.getUTCDate() + "/" + x1Month +  "/" + x1.getUTCFullYear() + " " + x1.getUTCHours() + ":" + x1.getUTCMinutes() + ":" + x1.getUTCSeconds());
-            $("#datepicker_to").val(x2.getUTCDate() + "/" + x2Month +  "/" + x2.getUTCFullYear() + " " + x2.getUTCHours() + ":" + x2.getUTCMinutes() + ":" + x2.getUTCSeconds());
+            $("#datepicker_from").val(x1.getDate() + "/" + x1Month +  "/" + x1.getFullYear() + " " + x1.getHours() + ":" + x1.getMinutes() + ":" + x1.getSeconds());
+            $("#datepicker_to").val(x2.getDate() + "/" + x2Month +  "/" + x2.getFullYear() + " " + x2.getHours() + ":" + x2.getMinutes() + ":" + x2.getSeconds());
 
             var newData = [];
             for (var i=0;i<allData.length;i++){
@@ -206,11 +206,11 @@ function drawChartTimeseries(data){
 		var x2=e[1][0];
 
         //update datetime fields
-        var x1Month = x1.getUTCMonth() + 1;
-        var x2Month = x2.getUTCMonth() + 1;
+        var x1Month = x1.getMonth() + 1;
+        var x2Month = x2.getMonth() + 1;
 
-        $("#datepicker_from").val(x1.getUTCDate() + "/" + x1Month +  "/" + x1.getUTCFullYear() + " " + x1.getUTCHours() + ":" + x1.getUTCMinutes() + ":" + x1.getUTCSeconds());
-        $("#datepicker_to").val(x2.getUTCDate() + "/" + x2Month +  "/" + x2.getUTCFullYear() + " " + x2.getUTCHours() + ":" + x2.getUTCMinutes() + ":" + x2.getUTCSeconds());
+        $("#datepicker_from").val(x1.getDate() + "/" + x1Month +  "/" + x1.getFullYear() + " " + x1.getHours() + ":" + x1.getMinutes() + ":" + x1.getSeconds());
+        $("#datepicker_to").val(x2.getDate() + "/" + x2Month +  "/" + x2.getFullYear() + " " + x2.getHours() + ":" + x2.getMinutes() + ":" + x2.getSeconds());
 
 
         if (typeof $("#plotBack") != 'undefined')  $("#plotBack").remove();

@@ -35,16 +35,18 @@ import java.util.*;
 public class User
 {
 
-    private String userName;
+    public static final String GSN_INTERNAL_ORIGIN = "GSN";
+	private String userName;
     private String password;
     private String firstName;
     private String lastName;
     private String email;
     private Vector groupList;
-	private Vector dataSourceList;
+	private Vector dataSourceList;	
     private DataSource dataSource;
     private String isCandidate="no";// if isCandidte = yes, it means that user has alredy signed-up and is waiting for Admin  confirmation to become a real user */
     private String isWaiting="no";// if isWaiting = yes, it means that user has modified(added, changed, deleted) his access right for a virtual sensor or a group and waits for Owner/Admin decision
+    private String origin=GSN_INTERNAL_ORIGIN;
      private static transient Logger logger                             = Logger.getLogger( User.class );
 
 
@@ -141,7 +143,13 @@ public class User
         this.dataSource=dataSource;
     }
 
+    void setOrigin(String o){
+    	this.origin=o;
+    }
 
+    String getOrigin(){
+    	return this.origin;
+    }
 
    /****************************************** Get Methods*******************************************/
    /*************************************************************************************************/

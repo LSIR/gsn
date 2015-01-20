@@ -311,13 +311,18 @@ public abstract class AbstractWrapper extends Thread {
                 conn = Main.getWindowStorage().getConnection();
                 StringBuilder query = new StringBuilder();
 				query.append("select max(timed) from ").append(aliasCodeS);
+				StringBuilder query2 = new StringBuilder();
+				query2.append("select count(*) from ").append(aliasCodeS);
 				if (getPartialOrdersKey() != null){
 					query.append(" where "+getPartialOrdersKey()+"="+key); // code injection !!!
+					query2.append(" where "+getPartialOrdersKey()+"="+key); 
 				}
-				ResultSet rs = Main.getWindowStorage().executeQueryWithResultSet(query,
-						conn);
-				if (rs.next()) {
-					lastInOrderTimestamp.put(key, rs.getLong(1));
+				ResultSet rs = Main.getWindowStorage().executeQueryWithResultSet(query,conn);
+				ResultSet rs2 = Main.getWindowStorage().executeQueryWithResultSet(query2,conn);
+				int n=rs2.next()?rs2.getInt(1):0;
+
+				if (rs.next() && n>0) {
+					lastInOrderTimestamp = rs.getLong(1);
 				} else {
 					lastInOrderTimestamp.put(key,Long.MIN_VALUE); // Table is empty
 				}

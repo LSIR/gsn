@@ -14,16 +14,16 @@ class NetcdfTest extends FunSpec with Matchers {
         Sensing("relative-humidity",Output("humid","s1",DataUnit("Perc","Perc"),DoubleType)))
         
         
-    val values:Seq[Array[Any]]=Seq(
+    val values:Seq[Seq[Any]]=Seq(
         Array(11,36.5,98.2),
         Array(12,31.5,92.2),
         Array(13,30.5,94.2),
         Array(14,29.5,97.2),
         Array(15,32.5,95.2))    
-    val s=new Sensor("pipo",fields,null,Map("description"->"chochos"),values)
+    val s=new Sensor("pipo",fields,null,Map("description"->"chochos"))
     
     it("should serialize it"){
-          NetCdf.serialize(s)
+          NetCdf.serialize(s,values)
       //nc.testCreate
 
     }

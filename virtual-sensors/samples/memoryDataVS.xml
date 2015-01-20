@@ -2,22 +2,20 @@
 	<processing-class>
 		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
 		<output-structure>
-			<field name="HEAP" type="double" />
-			<field name="NON_HEAP" type="double" />
-			<field name="PENDING_FINALIZATION_COUNT" type="double" />
+			<field name="HEAP" type="double" unit="tri"/>
+			<field name="NON_HEAP" type="double" unit="b"/>
+			<field name="PENDING_FINALIZATION_COUNT" type="double" unit="nn"/>
 		</output-structure>
 
 	</processing-class>
-	<description>Not Specified, please edit the file
-		$INSTALL_PATH/virtual-sensors/memoryDataVS.xml</description>
+	<description>Not Specified, please edit the file</description>
 	<life-cycle pool-size="10" />
 	<addressing>
-		<predicate key="geographical">Not Specified, please edit the file
-			$INSTALL_PATH/virtual-sensors/memoryDataVS.xml</predicate>
+		<predicate key="geographical">Geographical data</predicate>
 		<predicate key="LATITUDE">37.5419</predicate>
-		<predicate key="LONGITUDE">-122.1419</predicate>
+		<predicate key="LONGITUDE">-122.1419</predicate>		
 	</addressing>
-	<storage history-size="1" />
+	<storage history-size="10000" />
 	<streams>
 		<stream name="input1">
 			<source alias="source1" sampling-rate="1" storage-size="1">

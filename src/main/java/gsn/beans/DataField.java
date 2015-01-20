@@ -46,9 +46,9 @@ public final class DataField implements Serializable {
 
    private String            unit = "";
    
-   private boolean index=false;   
+   private boolean           index = false;   
 
-   private DataField ( ) {}
+   public DataField ( ) {}
    
 
    public DataField ( final String fieldName , final String type , final String description ) throws GSNRuntimeException {
@@ -132,9 +132,16 @@ public final class DataField implements Serializable {
    
     public String getUnit() {
         return unit;
-}
-
-
+    }
+    public void setName(String name) {
+        this.name=name;
+    }    
+    public void setDescription(String desc) {
+        this.description=desc;
+    }
+    public void setType(String dtype) {
+        this.type = dtype;
+    }
     public void setUnit(String unit) {
         this.unit = unit;
     }

@@ -54,7 +54,7 @@
 	<storage history-size="10" />
 	<streams>
 		<stream name="input1">
-			<source alias="AbcMsg1" sampling-rate="1000" storage-size="1">
+			<source alias="AbcMsg1" sampling-rate="1" storage-size="1">
 				<address wrapper="tinyos-mig">
 					<predicate key="source">serial@/dev/tty.PL2303-0000101D:mica2</predicate>
 					<predicate key="packet-name">AbcMsg1</predicate>

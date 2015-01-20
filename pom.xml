@@ -60,9 +60,7 @@
         <dependency>
             <groupId>gsn</groupId>
             <artifactId>gsn-tools</artifactId>
-            <version>0.0.1</version>
-            <scope>system</scope>
-			<systemPath>${basedir}/lib/gsn-tools-0.0.1.jar</systemPath>
+            <version>0.0.4-SNAPSHOT</version>
 			<exclusions>
         		<exclusion>  
           			<groupId>org.slf4j</groupId>
@@ -183,6 +181,11 @@
         </dependency>
         <dependency>
             <groupId>org.jibx</groupId>
+            <artifactId>jibx-bind</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jibx</groupId>
             <artifactId>jibx-run</artifactId>
             <version>1.2.5</version>
         </dependency>
@@ -191,6 +194,11 @@
             <artifactId>jetty-webapp</artifactId>
             <version>7.6.16.v20140903</version>
         </dependency>
+        <dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>7.6.16.v20140903</version>
+		</dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -410,11 +418,6 @@
 			<version>j6</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/optional/semantic/lsmapi_j6.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-util</artifactId>
-			<version>7.6.16.v20140903</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bytedeco.javacpp-presets</groupId>
