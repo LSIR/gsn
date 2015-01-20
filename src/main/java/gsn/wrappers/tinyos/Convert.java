@@ -55,7 +55,7 @@ public class Convert {
    // The main method call all the converting method --> can show you how
    // it
    // fonctions
-   // You may want to use the readabkeValue() method to repr�sente your
+   // You may want to use the readabkeValue() method to represent your
    // values
    /** *********************************************************************************** */
    public static void main ( String args[] ) {

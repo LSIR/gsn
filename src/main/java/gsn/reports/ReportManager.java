@@ -112,7 +112,7 @@ public class ReportManager {
 		
 		// Streams
 		Collection<Stream> fields_v1 = new ArrayList<Stream> ();
-		fields_v1.add(new Stream("Temperature [°C]", lastUpdate.toString(), dat1));
+		fields_v1.add(new Stream("Temperature [C]", lastUpdate.toString(), dat1));
 		fields_v1.add(new Stream("Humidity [%]", lastUpdate.toString(), dat2));
 		fields_v1.add(new Stream("Temp", lastUpdate.toString(), dat3));
 		fields_v1.add(new Stream("Solar", lastUpdate.toString(), dat1));
