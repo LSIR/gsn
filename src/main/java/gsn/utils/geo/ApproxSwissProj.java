@@ -173,7 +173,7 @@ public class ApproxSwissProj {
 		return d;
 	}
 
-	// Convert WGS lat/long (� dec) and height to CH h
+	// Convert WGS lat/long (deg dec) and height to CH h
 	private static double WGStoCHh(double lat, double lng, double h) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);
@@ -193,7 +193,7 @@ public class ApproxSwissProj {
 		return h;
 	}
 
-	// Convert WGS lat/long (� dec) to CH x
+	// Convert WGS lat/long (deg dec) to CH x
 	private static double WGStoCHx(double lat, double lng) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);
@@ -216,7 +216,7 @@ public class ApproxSwissProj {
 		return x;
 	}
 
-	// Convert WGS lat/long (� dec) to CH y
+	// Convert WGS lat/long (deg dec) to CH y
 	private static double WGStoCHy(double lat, double lng) {
 		// Converts degrees dec to sex
 		lat = DecToSexAngle(lat);

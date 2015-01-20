@@ -41,7 +41,7 @@ import java.io.OutputStreamWriter;
  * <p>
  * Date: 04.04.03
  * <p>
- * Copyright (c) 2003 Andreas Klimke, Universit�t Stuttgart
+ * Copyright (c) 2003 Andreas Klimke, Universitaet Stuttgart
  * <p>
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
