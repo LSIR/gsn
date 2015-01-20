@@ -412,13 +412,13 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/optional/legacy/tequila-client.jar</systemPath>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>lsmapi</groupId>
 			<artifactId>lsmapi</artifactId>
 			<version>j6</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/optional/semantic/lsmapi_j6.jar</systemPath>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.bytedeco.javacpp-presets</groupId>
 			<artifactId>gsl</artifactId>

@@ -100,8 +100,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 //import org.jibx.runtime.IUnmarshallingContext;
 //import org.jibx.runtime.JiBXException;
 
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
+import org.zeromq.ZContext;
 import org.eclipse.jetty.server.AbstractConnector;
 
 

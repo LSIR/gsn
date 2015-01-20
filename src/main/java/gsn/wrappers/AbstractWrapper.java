@@ -322,7 +322,7 @@ public abstract class AbstractWrapper extends Thread {
 				int n=rs2.next()?rs2.getInt(1):0;
 
 				if (rs.next() && n>0) {
-					lastInOrderTimestamp = rs.getLong(1);
+					lastInOrderTimestamp.put(key,rs.getLong(1));
 				} else {
 					lastInOrderTimestamp.put(key,Long.MIN_VALUE); // Table is empty
 				}
