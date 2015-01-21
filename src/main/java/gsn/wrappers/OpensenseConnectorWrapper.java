@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -132,7 +133,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 		   while (running){
 			   try {
 			       final Socket server = socket.accept();
-			       server.setSoTimeout(15000);
+			       server.setSoTimeout(60000);
 			       logger.warn("accepted from "+server.getInetAddress());
                    Thread t = new Thread(new Runnable(){ 
                 	   
@@ -320,7 +321,12 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
 								connected = false;
 								resync = false;
-							}catch(IOException e){
+							}catch(SocketException e){
+								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								connected = false;
+								resync = false;
+							}
+							catch(IOException e){
 								err ++;
 								if (! resync){
 								    logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
