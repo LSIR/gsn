@@ -1,4 +1,4 @@
-<project name="gsn" default="build" basedir=".">
+<project name="gsn" default="build" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
     <property name="safe-storage-port" value="25700"/>
     <property name="safe-storage-controller-port" value="25712"/>
@@ -14,18 +14,24 @@
     <import file="${basedir}/installer/build.xml"/>
 
     <!-- Internal -->
-
+	 <path id="maven-ant-tasks.classpath" path="lib/build/maven-ant-tasks-2.1.3.jar" />
+	  <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+	           uri="antlib:org.apache.maven.artifact.ant"
+	           classpathref="maven-ant-tasks.classpath" />
+	
     <target name="init" description="Initializes properties and initialization tasks.">
         <tstamp>
             <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
         </tstamp>
         <property environment="env"/>
         <property name="conf.dir" value="${basedir}/conf"/>
-        <property name="build.dir" value="build/classes"/>
-        <property name="src.dir" value="src"/>
+        <property name="resources.dir" value="src/main/resources"/>
+        <property name="build.dir" value="target/classes"/>    	
+        <property name="src.dir" value="src/main/java"/>
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
-        <property name="reports" value="reports"/>
+        <!--property name="dependencies" value="target/dependency"/>-->
+        <property name="reports" value="target/reports"/>
         <property name="maxMemoryUsage" value="128m"/>
         <property name="jar.file" value="gsn-core.jar"/>
         <!--  Enable the following line when you want to use Java Media Framework.
@@ -34,12 +40,17 @@
         <!--  <property name="jmf.dir"     value="JMF-2.1.1e" /> -->
         <path id="classpath">
             <pathelement location="${build.dir}/jcoverage-classes/"/>
+            <pathelement location="${conf.dir}/"/>
             <pathelement location="${build.dir}/"/>
             <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
             <fileset dir="${libdir}">
                 <include name="**/*.jar"/>
             </fileset>
-            <!--  Enable the following line if you want to use Java Media Frame Work.
+        	  <fileset refid="gsndeps" />
+            <!--<fileset dir="${dependencies}">
+                  <include name="**/*.jar"/>
+              </fileset>-->         
+        	<!--  Enable the following line if you want to use Java Media Frame Work.
                   Note that you should first set the jmf.dir path above -->
             <!--  <fileset dir="${jmf.dir}">
             <include name="**/*.jar" />
@@ -55,7 +66,7 @@
         <mkdir dir="${reports}/todos"/>
         <mkdir dir="${reports}/javadoc"/>
         <mkdir dir="${reports}/junit"/>
-        <mkdir dir="${jars}"/>
+        <!--<mkdir dir="${jars}"/>-->
     	<echo>${ant.java.version}</echo>
         <!--<condition property="java6">
             <equals arg1="${ant.java.version}" arg2="1.6"/>
@@ -68,20 +79,23 @@
             <exclude name="**/TCPConnPool.java"/>
             <exclude name="**/NetworkUtility.java"/>
         </javac>
+    	<copy todir="${build.dir}">
+    	    <fileset dir="${resources.dir}" includes="**/*.conf,**/*.properties" />
+    	</copy>
     </target>
 
     <target name="bind" depends="build" description="Compile the JIBX mappings.">
     	
         <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
-              failonerror="true">
-            <classpath refid="classpath"/>
-            <arg value="conf/containerJIBX.xml"/>
-            <arg value="conf/VirtualSensorDescription.xml"/>
+              failonerror="true" classpathref="classpath">
+            <arg value="src/main/resources/containerJIBX.xml"/>
+            <arg value="src/main/resources/VirtualSensorDescription.xml"/>
         </java>
     </target>
 
-    <target name="cleandb" depends="bind">
-        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" classpathref="classpath"/>
+	
+    <target name="cleandb" depends="build">
+        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring=""  classpathref="classpath" />
     </target>
 
 
@@ -97,9 +111,8 @@
         </java>
     </target>
 
-    <target name="gsn" depends="bind,cleandb" description="Run GSN server in non graphical mode.">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
+    <target name="gsn" depends="cleandb" description="Run GSN server in non graphical mode.">
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="true" fork="true" dir="${basedir}" classpathref="classpath">
             <jvmarg value="-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-DmaxServlets=${max-servlets}"/>
@@ -246,7 +259,7 @@
      </target>
     
 
-    <target name="compile-reports" depends="init" description="Compile the Jasper Reports Layout files (.jrxml).">
+    <!--<target name="compile-reports" depends="init" description="Compile the Jasper Reports Layout files (.jrxml).">
         <taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask">
             <classpath refid="classpath"/>
         </taskdef>
@@ -258,7 +271,7 @@
             </src>
             <classpath refid="classpath"/>
         </jrc>
-    </target>
+    </target>-->
 
     <target name="clean" depends="init" description="Erase built files and target.">
         <delete includeEmptyDirs="yes" failonerror="no">
@@ -458,4 +471,10 @@
 
     <target name="installer" depends="build-gsn" description="Build a GSN Server installer based on izpack."/>
 
+	 <artifact:remoteRepository id="lsir.release" url="http://planetdata.epfl.ch:8081/artifactory/gsn-release/">
+	      <releases enabled="true"/>
+	      <snapshots enabled="true"/>
+	    </artifact:remoteRepository>
+	<artifact:pom id="gsnpom" file="pom.xml"></artifact:pom>
+	<artifact:dependencies filesetId="gsndeps" pomRefId="gsnpom" />
 </project>

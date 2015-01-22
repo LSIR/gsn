@@ -1,0 +1,4 @@
+GET  /assets/*file        	controllers.Assets.at(path="/public", file)
+GET /api/sensors 			controllers.gsn.api.SensorService.sensors
+GET /api/sensors/:sensorid  controllers.gsn.api.SensorService.sensor(sensorid:String)
+#GET   /*path               controllers.gsn.api.GsnProxy.v1(path: String)

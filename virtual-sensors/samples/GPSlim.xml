@@ -13,17 +13,17 @@
 		<predicate key="none">not yet</predicate>
 	</addressing>
 	<storage history-size="5m"></storage>
-	<input-streams>
-		<input-stream name="input1">
-			<stream-source alias="source1" sampling-rate="1"
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1"
 				storage-size="1">
 				<address wrapper="serial">
 					<predicate key="serialport">COM12</predicate>
 					<predicate key="representation">binary</predicate>
 				</address>
 				<query>select * from wrapper</query>
-			</stream-source>
+			</source>
 			<query>select * from source1</query>
-		</input-stream>
-	</input-streams>
+		</stream>
+	</streams>
 </virtual-sensor> 

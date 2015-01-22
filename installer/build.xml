@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project>
     <!-- UPDATE-ME: The name of your installer comes below in the gsn.name property -->
-    <property name="gsn.name" value="gsn-1.1.5"/>
+    <property name="gsn.name" value="gsn-1.1.6"/>
 
     <target name="build-gsn" depends="clean-installer">
 
@@ -9,7 +9,8 @@
         <property name="dist" location="${basedir}/dist"/>
         <property name="conf.dir" value="${basedir}/conf"/>
         <property name="build.dir" value="temp/build"/>
-        <property name="src.dir" value="src"/>
+        <property name="src.dir" value="src/main/java"/>
+        <property name="resources.dir" value="${basedir}/src/main/resources" />
         <property name="jars" value="jars"/>
         <property name="libdir" value="lib"/>
         <property name="temp" value="temp"/>
@@ -21,12 +22,16 @@
                 <include name="**/*.jar"/>
                 <!--  <exclude name="**/axis-2/**"/>  -->
             </fileset>
+      	  <fileset refid="gsndeps" />
+
+        	
         </path>
 
         <mkdir dir="${dist}/lib"/>
         <mkdir dir="${dist}/conf"/>
         <mkdir dir="${dist}/logs"/>
         <mkdir dir="${dist}/virtual-sensors"/>
+        <mkdir dir="${dist}/src/main/resources"/>
         <mkdir dir="${build.dir}"/>
 
         <javac debug="true" srcdir="${src.dir}" optimize="off" destdir="${build.dir}" failonerror="true" classpathref="classpath">
@@ -44,11 +49,11 @@
             <exclude name="**/DemoVSensor.java"/>
         </javac>
 
-        <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}" failonerror="true">
+        <!--<java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}" failonerror="true">
             <classpath refid="classpath"/>
-            <arg value="${conf.dir}/containerJIBX.xml"/>
-            <arg value="${conf.dir}/VirtualSensorDescription.xml"/>
-        </java>
+            <arg value="${resources.dir}/containerJIBX.xml"/>
+            <arg value="${resources.dir}/VirtualSensorDescription.xml"/>
+        </java>-->
 
         <jar destfile="${dist}/lib/${gsn.name}.jar" basedir="${build.dir}">
             <manifest>
@@ -77,7 +82,7 @@
         <copy file="${basedir}/conf/keystore" todir="${dist}/conf/"/>
         <copy file="${basedir}/conf/servertestcer.cer" todir="${dist}/conf/"/>
         <copy file="${basedir}/conf/servertestkeystore" todir="${dist}/conf/"/>
-        <copy file="${basedir}/conf/RestApiConstants.properties" todir="${dist}/conf/"/>
+        <copy file="${resources.dir}/RestApiConstants.properties" todir="${dist}/src/main/resources/"/>
         <copy file="${basedir}/installer/log4j.properties" todir="${dist}/conf/"/>
         <copy file="${basedir}/installer/gsn.xml" todir="${dist}/conf/"/>
         <copy file="${basedir}/icons/GSN_green_medium.png" todir="${dist}/lib/"/>
@@ -89,6 +94,7 @@
         <copy file="${basedir}/installer/license.txt" todir="${dist}/"/>
 
         <copy todir="dist/lib" flatten="yes" includeEmptyDirs="false">
+        	  <fileset refid="gsndeps" />
             <fileset dir="${basedir}/lib/">
                 <include name="**/**"/>
                 <exclude name="**/axis-2/**"/>
@@ -96,11 +102,12 @@
                 <exclude name="**/junit-jars/**"/>
                 <exclude name="**/compiling/**"/>
                 <exclude name="**/hibernate/**"/>
+                <exclude name="**/build/**"/>
                 <exclude name="**/.svn/**"/>
             </fileset>
         </copy>
-        <copy todir="dist/webapp">
-            <fileset dir="${basedir}/webapp/">
+        <copy todir="dist/src/main/webapp">
+            <fileset dir="${basedir}/src/main/webapp/">
                 <exclude name="**/.svn/**"/>
                 <exclude name="**/axis2.xml"/>
                 <exclude name="**/*.aar"/>
