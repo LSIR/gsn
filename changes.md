@@ -1,5 +1,17 @@
 ## GSN Change log
 
+### r1.1.7
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.7)
+* Improved tinyGSN background application using AlarmManagers for saving the battery.
+* Timestamp are not anymore shifted in /multidata response
+* Adding possibility for Chart virtual sensor to specify windows length by time
+* Adding maven support, automatic dependency management (only legacy libraries kept in /lib)
+* Adding type bigint, mapping to long, to CSV parser in the Wrapper (as currently numeric maps to double). This can be used to directly input timestamps (in milliseconds)
+* Allow for negative timestamps, they can be set before 1970.
+* Updating jetty to support disabling of SSLv3 (not supported anymore by firefox 34)
+* Keystore file location can be set in config file
+
+
 ### r1.1.6
 [commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.6)
 * Major update on tinyGSN, virtual sensors are running as background services and a scheduler takes care of turning them on and off.

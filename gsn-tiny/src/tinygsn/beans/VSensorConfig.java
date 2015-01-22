@@ -164,7 +164,7 @@ public class VSensorConfig implements Parcelable  {
 			Log.e(TAG, "Error: " + e.getMessage());
 		}
 
-		InputStream is = StaticData.is;
+		InputStream is = new InputStream(s);
 		s.setInputStream(is);
 
 		this.inputStreams = new InputStream[1];

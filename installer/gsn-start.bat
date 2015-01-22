@@ -10,11 +10,8 @@ SET max-sliding-db-connections=8
 SET remote-keep-alive-period=15000
 SET aes-enc-salt="this is a simple clear salt"
 SET max-memory=128M
-SET CLASSPATH=%JAVA_HOME%\lib\rt.jar
 
-FOR /R ./lib %%c in (*.jar) DO SET CLASSPATH=!CLASSPATH!;%%c
-
-"%JAVA_HOME%\bin\java" -classpath "%CLASSPATH%"^
+"%JAVA_HOME%\bin\java" -classpath "%JAVA_HOME%\lib\rt.jar;./lib/*"^
   -Xmx%max-memory%^
   -splash:lib/GSN_green_medium.png^
   -Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl^
