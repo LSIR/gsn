@@ -33,6 +33,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	public static final Integer[] STATIC_STATIONS = {101,102};
 	
 	private static final Object timerLock = new Object();
+	private static final Object tokenLock = new Object();
 	private static Long timer = System.currentTimeMillis();
 
 	private final transient Logger logger = Logger.getLogger( OpensenseConnectorWrapper.class );
@@ -79,7 +80,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			socket.close();
 			boolean done = false;
 			while (! done){
-			synchronized (timerLock) {
+			synchronized (tokenLock) {
 				  done = token <= 0;	
 				}
 			Thread.sleep(100);
@@ -159,7 +160,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 
 						@Override
 						public void run() {
-							synchronized (timerLock) {
+							synchronized (tokenLock) {
 							  token++;	
 							}
 							try{
@@ -183,10 +184,12 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									p.setTimeStamp(++timer); //timestamp of those SE are a bit artificial but should guarantee ordering
 									postStreamElement(p);
 								}
-								token--;
 								try {
 									Thread.sleep(3000); //guarantee that there is at least 2s between the generation of the groups of stream elements (< 2000 SE)
 								} catch (InterruptedException e) {} 
+							}
+							synchronized (tokenLock) {
+								token--;
 							}
 						}
 				
