@@ -58,7 +58,7 @@ public class schedular extends IntentService {
 
 	//constants:
 	private int numLatest = 10;
-	double accelometerThereshold = 10;
+	double accelometerThereshold = 1.5;
 	int wifiCountThreshold = 15;
 	int SchedulerSleepingTime = 1000*30;
 	
@@ -232,13 +232,13 @@ public class schedular extends IntentService {
 		if(accelometerVsName != null)
 		{
 			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelometerVsName, accelometerWrapper.getFieldList(), accelometerWrapper.getFieldType(), 32, curTime-30000);
-			if(accelometerResult.size() != 0)
+			if(accelometerResult.size() > 1)
 			{
-				for(int i = 0; i < accelometerResult.size(); i++)
+				for(int i = 1; i < accelometerResult.size(); i++)
 				{
-					double changedAccelometer = Math.pow((Double)(accelometerResult.get(i).getData("x")),2);
-					changedAccelometer += Math.pow((Double)(accelometerResult.get(i).getData("y")),2);
-					changedAccelometer += Math.pow((Double)(accelometerResult.get(i).getData("z")),2);
+					double changedAccelometer = Math.pow((Double)(accelometerResult.get(i).getData("x"))-(Double)(accelometerResult.get(i-1).getData("x")),2);
+					changedAccelometer += Math.pow((Double)(accelometerResult.get(i).getData("y"))-(Double)(accelometerResult.get(i-1).getData("y")),2);
+					changedAccelometer += Math.pow((Double)(accelometerResult.get(i).getData("z"))-(Double)(accelometerResult.get(i-1).getData("z")),2);
 					avgChangedAccelometer += Math.sqrt(changedAccelometer);
 				}
 				avgChangedAccelometer = avgChangedAccelometer/accelometerResult.size();

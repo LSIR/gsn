@@ -40,6 +40,8 @@ public class GPSService extends IntentService implements LocationListener {
 	
     private Context mContext = null;
     
+    private int timeToShutdown = -1;
+    
     boolean isGPSEnabled = false;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; 
     private static final long MIN_TIME_BW_UPDATES =  15000;
@@ -114,13 +116,17 @@ public class GPSService extends IntentService implements LocationListener {
 		{
 			int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGPSWrapper");
 			if (samplingRate > 0){
+				timeToShutdown = 8;
 				startGPS();
 				try {
 					Thread.sleep(15*1000);
 				}catch (InterruptedException e) {}
 			}else{
-				stopGPS();
-				break;
+				timeToShutdown--;
+				if (timeToShutdown < 0){
+					stopGPS();
+					break;
+				}
 			}
 		}
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
