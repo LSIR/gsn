@@ -16,9 +16,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.naming.OperationNotSupportedException;
 import javax.net.ServerSocketFactory;
+
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
@@ -32,7 +34,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	public static final Integer[] MOBILE_STATIONS = {41,43,45,47,48,49,50,51,54,55,192};
 	public static final Integer[] STATIC_STATIONS = {101,102};
 	
-	private static final Object timerLock = new Object();
+	private final ReentrantLock timerLock = new ReentrantLock(true);
 	private static final Object tokenLock = new Object();
 	private static Long timer = System.currentTimeMillis();
 
@@ -177,7 +179,8 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 							logger.warn("closed (received "+ctr+" packets, dropped "+err+" bytes, published "+pub+" packets)");
 							//publish data even if connection got interrupted as it may be erased on the logger side
 							
-							synchronized (timerLock) {
+							timerLock.lock();
+							try{
 								timer = Math.max(timer,System.currentTimeMillis());
 								while (!buffer.isEmpty()){
 									StreamElement p = buffer.poll();
@@ -187,7 +190,9 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								try {
 									Thread.sleep(3000); //guarantee that there is at least 2s between the generation of the groups of stream elements (< 2000 SE)
 								} catch (InterruptedException e) {} 
-							}
+							}finally {
+							       timerLock.unlock();
+						    }
 							synchronized (tokenLock) {
 								token--;
 							}
