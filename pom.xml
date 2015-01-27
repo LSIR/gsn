@@ -61,8 +61,6 @@
             <groupId>gsn</groupId>
             <artifactId>gsn-tools</artifactId>
             <version>0.0.4-SNAPSHOT</version>
-            <scope>system</scope>
-			<systemPath>${basedir}/lib/gsn-tools-custom.jar</systemPath>
 			<exclusions>
         		<exclusion>  
           			<groupId>org.slf4j</groupId>
@@ -428,6 +426,18 @@
 		</dependency>
     </dependencies>	    
     <repositories>
+        <repository>
+            <id>lib</id>
+            <name>lib</name>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
         <repository>
             <id>TypesafeRepository</id>
             <name>Typesafe Repository</name>
