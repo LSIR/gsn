@@ -61,6 +61,8 @@
             <groupId>gsn</groupId>
             <artifactId>gsn-tools</artifactId>
             <version>0.0.4-SNAPSHOT</version>
+            <scope>system</scope>
+			<systemPath>${basedir}/lib/gsn-tools-custom.jar</systemPath>
 			<exclusions>
         		<exclusion>  
           			<groupId>org.slf4j</groupId>
