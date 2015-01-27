@@ -164,7 +164,7 @@ public final class Main {
         int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
 
     	
-    	DataStore ds = new DataStore(gsnConf,vsConf);
+    	DataStore ds = new DataStore(gsnConf);
     	
         // Init the AC db connection.
         if(Main.getContainerConfig().isAcEnabled()) {

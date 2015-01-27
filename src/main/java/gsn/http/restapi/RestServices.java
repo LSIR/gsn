@@ -96,17 +96,17 @@ public class RestServices {
 	Buffer<String> defaultFields = asScalaBuffer(config.getStringList("gsn.metadata.defaultFields"));
 	
 	
-	DataStore ds = new DataStore(gsn.Main.getInstance().getGsnConf(),
-			gsn.Main.getInstance().getVsConf());
+	DataStore ds = new DataStore(gsn.Main.getInstance().getGsnConf());
 	
 	@GET
 	@Path("/sensors")
 	public Response sensors() {
 		validateFormat();
-		if (latestValues)
-		return response(ds.allSensorsLatest(),true).build();
-		else
-		return response(ds.allSensors(),false).build();
+		return null;
+		//if (latestValues)
+		//return response(ds.allSensorsLatest(),true).build();
+		//else
+		//return response(ds.allSensors(),false).build();
 	}
 
 	private String toString(StringWriter sw) {
@@ -270,10 +270,10 @@ public class RestServices {
 		scala.Option<Integer>optSize=scala.Option.apply(null);
 		if (size>0)
 			optSize=scala.Option.apply((Integer)size);
-		SensorData s=ds.sensorData(vsname, fieldNames, conditionList, optSize).get();
-		System.out.println(s);
-		
-		return response(s,true).build();
+		//SensorData s=ds.sensorData(vsname, fieldNames, conditionList, optSize).get();
+		//System.out.println(s);
+		return null;
+		//return response(s,true).build();
 	}
 
 	@GET
