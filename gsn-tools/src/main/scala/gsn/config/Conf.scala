@@ -22,7 +22,7 @@ trait Conf{
 
   lazy val ac=defaults.getConfig("ac")
   lazy val defaultAc=AcConf(ac.getBoolean("enabled"),ac.getInt("sslPort"),
-      ac.getString("sslKeyStorePass"),ac.getString("sslKeyPass"))
+      ac.getString("sslKeyStorePass"),ac.getString("sslKeyPass"),ac.getString("sslKeyStore"))
 
   lazy val storage=defaults.getConfig("storage")
   lazy val defaultStorage=StorageConf(storage.getString("driver"),storage.getString("url"),
