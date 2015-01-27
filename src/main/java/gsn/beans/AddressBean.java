@@ -73,6 +73,11 @@ public final class AddressBean implements Serializable{
 	public String getPartialOrderKey(){
 		return this.partialOrderKey;
 	}
+	
+	public void setPartialOrderKey(String key) {
+		this.partialOrderKey = key;
+		
+	}
 
 	public  KeyValue[] getPredicates ( ) {
 		return this.predicates;
