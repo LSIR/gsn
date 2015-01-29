@@ -554,6 +554,15 @@ var GSN = {
         $(".refreshing").show();
 		
 		
+        $.ajax({
+            type: "GET",
+            url: "/gsn?REQUEST=0&omit_latest_values=true",
+            success: function(data){
+                var start = new Date();
+                //initalisation of gsn info, vsmenu
+                if (!GSN.loaded) GSN.init(data);
+            }
+        });
   		
         $.ajax({
             type: "GET",
@@ -561,7 +570,7 @@ var GSN = {
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
-                if (!GSN.loaded) GSN.init(data);
+                //if (!GSN.loaded) GSN.init(data);
 			
                 //create vsbox on the first load
                 if (firstload && GSN.context == "home") {

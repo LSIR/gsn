@@ -3,7 +3,7 @@
 		This is template virtual sensor which can be used to quickly write a
 		new virtual sensor descriptor (VSD) file. Note that, this file is not
 		functional by itself, the parts which must be completed are market
-		with --- [3 dash] strings.
+		with [3 dash] strings.
 	-->
 
 <virtual-sensor name="---" priority="10">

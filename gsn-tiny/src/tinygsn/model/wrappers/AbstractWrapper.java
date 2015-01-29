@@ -135,7 +135,7 @@ public abstract class AbstractWrapper extends Thread {
 	 *         effected any input stream.
 	 */
 
-	protected Boolean postStreamElement(StreamElement streamElement) {
+	public Boolean postStreamElement(StreamElement streamElement) {
 		queue.add(streamElement);
 		return true;
 	}

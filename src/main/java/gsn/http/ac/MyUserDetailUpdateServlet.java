@@ -154,7 +154,8 @@ public class MyUserDetailUpdateServlet extends HttpServlet
 
             out.println("<BR>");
             out.println("<BR>");
-            this.printFormButtons(out);
+            if (user.getOrigin().equals(User.GSN_INTERNAL_ORIGIN))
+              this.printFormButtons(out);
             out.println("</FORM>");
 
         }

@@ -2,9 +2,11 @@ package tinygsn.services;
 
 
 import tinygsn.beans.InputStream;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AndroidControllerListVSNew;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Service;
@@ -48,11 +50,9 @@ import android.util.Log;
 		
 		 
 		 Bundle b = intent.getExtras();
-		 
-		 config = (VSensorConfig) b.get("tinygsn.beans.config");
-		 
-			
+			config = (VSensorConfig) b.get("tinygsn.beans.config");
 			storage = new SqliteStorageManager(config.getController().getActivity());
+			VirtualSensor vs = new VirtualSensor(config, config.getController().getActivity());
 			int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGPSWrapper");
 			
 	     locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -138,7 +138,8 @@ import android.util.Log;
 	 public void onDestroy() {       
 	    // handler.removeCallbacks(sendUpdatesToUI);     
 	     super.onDestroy();
-	     locationManager.removeUpdates(listener);        
+	     if (locationManager != null)
+	    	 locationManager.removeUpdates(listener);        
 	 }   
 
 	 public static Thread performOnBackgroundThread(final Runnable runnable) {

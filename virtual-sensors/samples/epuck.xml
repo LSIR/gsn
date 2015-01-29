@@ -2,6 +2,9 @@
 	<processing-class>
 		<class-name>gsn.vsensor.EPuckVS</class-name>
 		<init-params />
+		<output-structure>
+		<field name="RAW_PACKET" type="binary" />
+	</output-structure>
 	</processing-class>
 	<description>Not Specified, please edit the file
 		$INSTALL_PATH/virtual-sensors/serialRaw.xml.</description>
@@ -10,9 +13,7 @@
 		<predicate key="geographical">Not Specified, please edit the file
 			$INSTALL_PATH/virtual-sensors/localTimeVS.xml.</predicate>
 	</addressing>
-	<output-structure>
-		<field name="RAW_PACKET" type="binary" />
-	</output-structure>
+	
 	<storage history-size="1m" />
 	<streams>
 		<stream name="input1">

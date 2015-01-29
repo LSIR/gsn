@@ -31,7 +31,6 @@ package gsn.beans;
 import gsn.Main;
 import gsn.VirtualSensor;
 import gsn.VirtualSensorInitializationFailedException;
-import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.vsensor.AbstractVirtualSensor;
 

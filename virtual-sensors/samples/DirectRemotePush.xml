@@ -17,7 +17,7 @@ echo "<field name='value' type='numeric'>$SENSOR_VALUE</field>" >> xml.xml
 echo "<field name='latitude' type='numeric'>45.3</field>" >> xml.xml
 echo "<field name='longitude' type='numeric'>8.4</field>" >> xml.xml
 echo "</stream-element>" >> xml.xml
-curl -s -X PUT -d notification-id=2.3456789 --data-urlencode data@xml.xml http://server/gsn/streaming/
+curl -s -X PUT -d notification-id=2.3456789 -data-urlencode data@xml.xml http://server/gsn/streaming/
 
      -->
 	<processing-class>

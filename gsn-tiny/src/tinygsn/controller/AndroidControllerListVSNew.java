@@ -44,7 +44,7 @@ public class AndroidControllerListVSNew extends AbstractController {
 	 * 
 	 */
 
-	private ActivityListVSNew view = null;
+	private Activity view = null;
 
 	private Handler handlerVS = null;
 	private SqliteStorageManager storage = null;
@@ -53,7 +53,7 @@ public class AndroidControllerListVSNew extends AbstractController {
 
 	private static final String TAG = "AndroidControllerListVSNew";
 
-	public AndroidControllerListVSNew(ActivityListVSNew androidViewer) {
+	public AndroidControllerListVSNew(Activity androidViewer) {
 		this.view = androidViewer;
 		storage = new SqliteStorageManager(view);
 		
@@ -130,6 +130,15 @@ public class AndroidControllerListVSNew extends AbstractController {
 	}
 	
 	public void startActiveVS() {
+		SqliteStorageManager storage = new SqliteStorageManager(view);
+		if(vsList != null)
+			vsList = storage.completeListVS(vsList);
+		else
+			vsList = storage.getListofVS();
+		for (VirtualSensor vs : vsList) {
+			vs.getConfig().setController(this);
+
+		}
 		for (VirtualSensor vs : vsList) {
 			if (vs.getConfig().getRunning() == true) {
 				vs.start();

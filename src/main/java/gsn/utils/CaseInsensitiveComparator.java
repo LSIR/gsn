@@ -35,7 +35,7 @@ import java.util.Comparator;
  * and value pairs hence you don't need to call trim when putting or getting a
  * value to/from the hashmap.
  */
-public class CaseInsensitiveComparator implements Comparator,Serializable {
+public class CaseInsensitiveComparator implements Comparator<Object>,Serializable {
    
 private static final long serialVersionUID = 2540687777213332025L;
 

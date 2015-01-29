@@ -5,49 +5,50 @@ import play.api.libs.json.JsArray
 import java.io.StringWriter
 import scala.collection.mutable.ArrayBuffer
 import gsn.data.netcdf.NetCdf
+import java.nio.charset.Charset
+import play.api.libs.json.JsNumber
 
-object DataSerializer {
-  
-  def toJsonString(sensors:Seq[Sensor])=Json.stringify(sensorsToJson(sensors))
-  def toJsonString(sensor:Sensor)=Json.stringify(toJson(sensor))
+trait DataSerializer{
+  def ser(s:Sensor,props:Seq[String]):Object=
+    ser(SensorData(Seq(),s),props,false)
+  def ser(data:SensorData,props:Seq[String],latest:Boolean):Object
+  def ser(data:Seq[SensorData],props:Seq[String]=Seq(),latest:Boolean=false):Object
+  //def ser(data:Seq[Sensor],props:Seq[String]=Seq(),latest:Boolean=false):Object
+}
 
-  def sensorsToJson(sensors:Seq[Sensor])={
-    Json.obj("type"->"FeatureCollection",
-        "features"->JsArray(sensors.map(s=>toJson(s))))
-  }  
+object JsonSerializer extends DataSerializer{
   
-  def sensorDataToJson(sensorsWithVals:Seq[SensorData])={
-    Json.obj("type"->"FeatureCollection",
-        "features"->JsArray(sensorsWithVals.map(s=>toJson(s))))
-    
-  }
+  override def ser(data:Seq[SensorData],props:Seq[String],withVals:Boolean)=
+    Json.stringify(toJson(data))
+  override def ser(data:SensorData,props:Seq[String],withVals:Boolean)=
+    Json.stringify(toJson(data))
   
-  def toJson(data:SensorData):JsValue={
-    val values=data.ts.map{t=>
-      t.series.unzip._2       
+  private def toJson(data:SensorData):JsValue={
+    /*val values=data.ts.map{t=>
+      t.series      
     } 
-    val fields=data.ts.map(_.output.fieldName) 
-    toJson(data.s,values, fields)
-     
+    val fields=data.ts.map(_.output.fieldName)*/ 
+    toJson(data.sensor,data.ts)//values, fields)     
   }
   
-  private def coreToJson(any:Seq[Any]):JsArray=JsArray (any.map{
-    case d:Double=>JsNumber(d)
-    case i:Int=>JsNumber(i)
-    case l:Long=>JsNumber(l)
-    case s:String=>JsString(s)
-    case a:Any=>JsString(a.toString) 
-    case null=>JsNull
-  })
-  
-  def toJson(sensor:Sensor,values:Seq[Seq[Any]]=Seq(),valueNames:Seq[String]=Seq())={
+  private def toJson(sensor:Sensor,ts:Seq[TimeSeries])={//values:Seq[Seq[Any]]=Seq(),valueNames:Seq[String]=Seq())={
         
-    val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
-    .map{f=>
+    
+    //val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
+    val values=ts.map(_.series)
+    val fields=ts.map(_.output).map{f=>
       Json.obj("name"->f.fieldName,"type"->f.dataType.name,"unit"->f.unit.code)
     }
     
-    val jsValues=values.map{record=>coreToJson(record)}      
+    val jsValues= if (values.isEmpty) Seq()
+    else {
+      for (i <- values.head.indices) yield { 
+        JsArray(  
+            fields.indices.map {j=>valueToJson(values(j).apply(i))}
+        )
+      }
+      //values.map{record=>valueToJson(record)}      
+    }
     
     val propvals=Seq("vs_name"->JsString(sensor.name),
                      "values"->JsArray(jsValues),
@@ -61,43 +62,104 @@ object DataSerializer {
                              "coordinates"->Json.arr(sensor.location.latitude,
                                                      sensor.location.longitude,
                                                      sensor.location.altitude))
-    )
-    
+    )    
     feature
   }
-
   
-  def toCsv(sensors:Seq[Sensor],props:Seq[String])={
+  def toJson(sensorsData:Seq[SensorData])(implicit d:DummyImplicit):JsValue=
+    Json.obj("type"->"FeatureCollection",
+        "features"->JsArray(sensorsData.map(s=>toJson(s))))    
+  
+
+  private def valueToJson(any:Any):JsValue=any match{
+    
+   
+    case d:Double=>JsNumber(d)
+    case i:Int=>JsNumber(i)
+    case l:Long=>JsNumber(l)
+    case s:String=>JsString(s)
+    case a:Any=>JsString(a.toString) 
+    case null=>JsNull
+  }
+
+}
+
+object CsvSerializer extends DataSerializer{
+  
+  override def ser(data:Seq[SensorData],props:Seq[String],latest:Boolean)=
+    toCsv(data,props,latest).toString
+
+  override def ser(data:SensorData,props:Seq[String],latest:Boolean)=
+    toCsv(data,props).toString
+
+  def toCsv(data:Seq[SensorData],props:Seq[String],latest:Boolean)={
     val sw=new StringWriter
-    sw.append("#vs_name,"+props.mkString(",")+",fields,units,types"+System.lineSeparator)
-    sensors.foreach{s=>
-      sw.append(s.name+","+props.map(p=>s.properties.getOrElse(p,"")).mkString(","))
-      sw.append(",\""+s.fields.map(f=>f.fieldName).mkString(",")+"\"")
-      sw.append(",\""+s.fields.map(f=>f.unit.code).mkString(",")+"\"")
-      sw.append(",\""+s.fields.map(f=>f.dataType.name).mkString(",")+"\"")
-      sw.append(System.lineSeparator)
+    //val hasVals= !data.ts.isEmpty
+    val valsHead=if (latest) ",values" else ""
+    sw.append("#vs_name,"+props.mkString(",")+",fields,units,types"+valsHead+System.lineSeparator)
+    data.foreach{s=>
+      sw.append(sensorDataToCsv(s,props,latest)+System.lineSeparator())
     }
     sw
   }
+  private def toString(s:SensorData,props:Seq[String])={
+    val output=s.ts.map(t=>t.output)
+    val prop=props.map(p=>"\""+encodeBreaks(s.sensor.properties.getOrElse(p,""))+"\"").mkString(",")
+    s"${s.sensor.name},$prop"+
+    ",\""+output.map(f=>f.fieldName).mkString("|")+"\""+
+    ",\""+output.map(f=>f.unit.code).mkString("|")+"\""+
+    ",\""+output.map(f=>f.dataType.name).mkString("|")+"\""    
+  }
+  
+  def sensorDataToCsv(data:SensorData,props:Seq[String],withLatest:Boolean=false)={
+    //val valueNames="latestValues("+data.latest.map(_._1.fieldName).mkString("|")+")"
+    //"#vs_name,"+props.mkString(",")+",fields,units,types,"+valueNames+System.lineSeparator
+    if (withLatest)
+      toString(data,props)+","+data.latest.map(_._2).mkString("|")
+    else toString(data,props)
+  }
+
+  private def encodeBreaks(s:String)=s.replaceAll("(\r\n)|\r|\n", "\\\\n")
+
   
   
-  def toCsv(sensor:Sensor)={
+  
+  def toCsv(data:SensorData,
+      valueNames:Seq[String]=Seq()):StringWriter={
     val sw=new StringWriter
-    def head(key:String,value:Any)=sw.append("# "+key+":"+value+System.lineSeparator)
+    def head(key:String,value:Any)=
+      sw.append("# "+key+":"+value+System.lineSeparator)
     
-    head("vs_name",sensor.name)
-    sensor.properties.foreach(p=>head(p._1,p._2))
-    head("fields",sensor.fields.map{_.fieldName}.mkString(","))
-    head("units",sensor.fields.map{_.unit.code}.mkString(","))
-    head("types",sensor.fields.map{_.dataType.name}.mkString(","))
-        
-    val values=sensor.values.map{record=>
-      sw.append(record.mkString(",")+System.lineSeparator)}
+    head("vs_name",data.sensor.name)
+    data.sensor.properties.foreach(p=>head(p._1,encodeBreaks(p._2)))
+    //val fields=data.sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
+    val fields=data.ts.map(_.output)
+    
+    head("fields",fields.map{_.fieldName}.mkString(","))
+    head("units",fields.map{_.unit.code}.mkString(","))
+    head("types",fields.map{_.dataType.name}.mkString(","))
+    println("drimp "+data.ts.head.series.size+" "+fields.size)
+    val si=data.ts.head.series.size-1
+    (0 to si).foreach{i=>
+      //sw.append(data.time(i)+",")
+      val pp=(0 to fields.size-1).map{j=>
+        data.ts(j).series (i)        
+      }.mkString(",")
+      sw.append(pp+System.lineSeparator)
+      //sw.append(pp)
+    }
+    
     sw  
     
   }
-  
-  def toNetCdf(sensor:Sensor)={
-    NetCdf.serialize(sensor)
+}
+
+object NetCdfSerializer extends DataSerializer{ 
+
+  def ser(data:Seq[SensorData],props:Seq[String],withVals:Boolean=true)={
+    NetCdf.serialize(null,null)
   }
+  
+  override def ser(data:SensorData,props:Seq[String],latest:Boolean)= ???
+  
 }

@@ -77,7 +77,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		SENSORS_IDS.put("acc", 100001.0);
+		SENSORS_IDS.put("accelometer", 100001.0);
 		SENSORS_IDS.put("gps", 100002.0);
 		SENSORS_IDS.put("activity", 100003.0);
 		SENSORS_IDS.put("gyroscope", 100004.0);
@@ -97,10 +97,10 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 		
 		Date date = new Date();
 		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MINUTE, -15);
 		totimeEditText.setText(new SimpleDateFormat("HH:mm").format(date));
 		todateEditText.setText(new SimpleDateFormat("dd.MM.yyyy").format(date));
-		fromtimeEditText.setText(new SimpleDateFormat("HH:mm").format(date));
-		cal.add(Calendar.DATE, -1);
+		fromtimeEditText.setText(new SimpleDateFormat("HH:mm").format(cal.getTime()));
 		fromdateEditText.setText(new SimpleDateFormat("dd.MM.yyyy").format(cal.getTime()));
 		serverEditText.setText(DEFAULT_SERVER);
 		context = this;
@@ -267,11 +267,11 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenu.ContextMenuInfo menuInfo) {
-		menu.add("http://10.0.2.2:22001");
+		//menu.add("http://10.0.2.2:22001");
 		//menu.add("http://gsn.ijs.si");
 		//menu.add("http://montblanc.slf.ch:22001");
 		//menu.add("http://data.permasense.ch");
-		//menu.add("http://lsir-cloud.epfl.ch/gsn");
+		menu.add("http://lsir-cloud.epfl.ch/gsn");
 	}
 
 	@Override

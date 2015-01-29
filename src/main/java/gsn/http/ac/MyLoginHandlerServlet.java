@@ -27,16 +27,19 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import gsn.beans.ContainerConfig;
-import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import ch.epfl.tequila.client.model.TequilaPrincipal;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.Principal;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,11 +50,18 @@ import java.io.PrintWriter;
  */
 public class MyLoginHandlerServlet extends HttpServlet
 {
-        private static transient Logger logger                             = Logger.getLogger( MyLoginHandlerServlet.class );
-      /****************************************** Servlet Methods*******************************************/
+	private static final long serialVersionUID = 1L;
+	// private static transient Logger logger                             = Logger.getLogger( MyLoginHandlerServlet.class );
+    /****************************************** Servlet Methods*******************************************/
     /******************************************************************************************************/
-    public void doGet(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
-	{
+    public void doGet(HttpServletRequest req, HttpServletResponse res)
+    		throws ServletException, IOException{
+    	if (userLogged(req)){
+    		//System.out.println("proto "+req.getProtocol());
+    		//req.getProtocol()
+            res.sendRedirect("http://"+req.getServerName()+":"+ Main.getContainerConfig().getContainerPort()+"/");
+            return;
+    	}
 
         res.setContentType("text/html");
 		PrintWriter out = res.getWriter();
@@ -68,8 +78,50 @@ public class MyLoginHandlerServlet extends HttpServlet
 
     }
      /****************************************** HTML Printing Methods*******************************************/
-    /***********************************************************************************************************/
+    /**
+     * @throws ServletException *********************************************************************************************************/
 
+    boolean userLogged(HttpServletRequest req) throws ServletException {
+    	//boolean logged=false;
+    	if (req.getUserPrincipal()!=null){
+    		try{
+    			//ConnectToDB ctdb = new ConnectToDB();
+    			TequilaPrincipal prin=(TequilaPrincipal)req.getUserPrincipal();
+    			//User u=ctdb.findUser(prin.getName());
+    			User u =null;//new User(prin.getName());
+    			if (u==null){
+		    		u = new User(prin.getName());		    		
+		    		/*for (Object k:prin.getAttributes().keySet()){
+		    			System.out.println(k+" "+prin.getAttribute(k.toString()));
+		    			
+		    		}
+		    		System.out.println(prin.getOrg()+","+prin.getUser());*/
+		    		u.setIsCandidate("no");
+		    		u.setIsWaiting("no");
+		    		u.setOrigin(prin.getOrg());
+		    		u.setEmail(prin.getAttribute("email"));
+		    		String nameRaw=prin.getAttribute("name");
+		    		String fnameRaw=prin.getAttribute("firstname");
+		    		String lastName=nameRaw!=null?nameRaw.split(",")[0]:"";
+		    		u.setLastName(lastName);
+		    		String firstName=fnameRaw!=null?fnameRaw.split(",")[0]:"";
+		    		u.setFirstName(firstName);
+		    		
+		    		Vector<String> dataSourceList = new Vector<String>();
+		    		Vector<String> groupList = new Vector<String>();
+		    		u.setDataSourceList(dataSourceList);
+		    		u.setGroupList(groupList);    		
+		    	}
+    			req.getSession().setAttribute("user", u);
+    			return true;
+    		}
+    		catch (Exception ex){
+    			throw new ServletException(ex);
+    		}
+    	}
+    	return false;
+    }
+    
     private void printHeader(PrintWriter out) throws ServletException
 	{
         out.println("<HTML>");
@@ -79,9 +131,7 @@ public class MyLoginHandlerServlet extends HttpServlet
         out.println(" <link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" href=\"/style/acstyle.css\"/>");
         out.println("</HEAD>");
 		out.println("<BODY class=loginhandlerbody>");
-      }
-
-
+    }
 
     private void printForm(PrintWriter out)
     {
@@ -153,6 +203,8 @@ public class MyLoginHandlerServlet extends HttpServlet
     /********************************************************************************************************************/
     private void handleForm(HttpServletRequest req,HttpServletResponse res) throws IOException
     {
+    	
+    	
         HttpSession session = req.getSession();
 		PrintWriter out = (PrintWriter) session.getAttribute("out");
 		ParameterSet pm = new ParameterSet(req);
@@ -211,12 +263,14 @@ public class MyLoginHandlerServlet extends HttpServlet
 		}
 
 	}
+    
+    
 
     User allowUserToLogin(PrintWriter out,ParameterSet pm,HttpServletRequest req)
     {
         User user= null;
         ConnectToDB ctdb = null;
-
+       
         try
         {
             if(pm.hasEmptyParameter())
@@ -278,7 +332,7 @@ public class MyLoginHandlerServlet extends HttpServlet
 
     private void managaeUserAlert(HttpServletRequest req, PrintWriter out, String alertMessage)
     {
-        String finalAlertMessage=null;
+        //String finalAlertMessage=null;
         if(req.getHeader("client")==null)
         {
             this.createAlertBox(out, alertMessage);

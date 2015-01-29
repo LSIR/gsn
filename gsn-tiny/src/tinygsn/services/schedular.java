@@ -9,7 +9,9 @@ import java.util.Map.Entry;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.VSensorConfig;
+import tinygsn.controller.AndroidControllerListVSNew;
 import tinygsn.gui.android.ActivityListVSNew;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AndroidAccelerometerWrapper;
 import tinygsn.model.wrappers.AndroidActivityRecognitionWrapper;
 import tinygsn.model.wrappers.AndroidGPSWrapper;
@@ -17,490 +19,389 @@ import tinygsn.model.wrappers.AndroidGyroscopeWrapper;
 import tinygsn.model.wrappers.WifiWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
+import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 public class schedular extends IntentService {
+	
+	public static final int STATE_LOST = 0;
+	public static final int STATE_GPS = 1;
+	public static final int STATE_STATIONARY = 2;
+	public static final int REASON_ACC = 0;
+	public static final int REASON_WIFI = 1;
+	public static final int REASON_GPS = 2;
+	
+	Intent intentGPS = null;
+	Intent intentActivity = null;
+	Intent intentWifi = null;
+	Intent intentAcc = null;
+	Intent intentGyro = null;
+	
+	WakeLock wakeLock = null;
 
 	public schedular(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
+		setIntentRedelivery(true);
 	}
 	public schedular()
 	{
-		super("scheduler");
+		this("schedular");	
 	}
 
 	//constants:
-	final int timeThereshold = 1000*60*2;
 	private int numLatest = 10;
-	double accelometerThereshold = 10;
-	int SchedulerSleepingTime = 1000*60;
-	int SamplingRateAccelometerMoving = 1;
-	int SamplingRateAccelometerStationary = 2;
-    int SamplingRateAccelometerLost = 0;
+	double accelometerThereshold = 1.5;
+	int wifiCountThreshold = 15;
+	int SchedulerSleepingTime = 1000*30;
+	
+	int SamplingRateAccelometerMoving = 3;
+	int SamplingRateAccelometerStationary = 1;
+    int SamplingRateAccelometerLost = 2;
     
-
-	int SamplingRateGyroscopeMoving = 1;
-	int SamplingRateGyroscopeStationary = 2;
-    int SamplingRateGyroscopeLost = 0;
+	int SamplingRateGyroscopeMoving = 3;
+	int SamplingRateGyroscopeStationary = 1;
+    int SamplingRateGyroscopeLost = 2;
 
 	int SamplingRateGPSMoving = 1;
-	int SamplingRateGPSStationary = 2;
-    int SamplingRateGPSLost = 0;
+	int SamplingRateGPSStationary = 0;
+    int SamplingRateGPSLost = 2;
 
-	int SamplingRateWifiMoving = 1;
+	int SamplingRateWifiMoving = 0;
 	int SamplingRateWifiStationary = 2;
-    int SamplingRateWifiLost = 0;
+    int SamplingRateWifiLost = 1;
 
-	int SamplingRateActivityMoving = 1;
-	int SamplingRateActivityStationary = 2;
+	int SamplingRateActivityMoving = 0;
+	int SamplingRateActivityStationary = 0;
     int SamplingRateActivityLost = 0;
-	
-    
     //end of constants
     
-	private VSensorConfig config = null;
-	Context context = new ActivityListVSNew(); //TODO set this parameter
-	int machineState = 1; //0 = lost, 1= moving 2= stationary
-	int priMachineState = -1;
-	SqliteStorageManager storage = new SqliteStorageManager(this.context);
+	int machineState = STATE_LOST;
+	int priMachineState = STATE_GPS;
+	int reason = REASON_ACC;
 	
-	
+	SqliteStorageManager storage = null;
+		
 	AndroidAccelerometerWrapper accelometerWrapper = new AndroidAccelerometerWrapper();
 	final String accelometerType = "tinygsn.model.wrappers.AndroidAccelerometerWrapper";
 	String accelometerVsName = null;
-	
-	
+		
 	AndroidGPSWrapper gpsWrapper = new AndroidGPSWrapper();
 	final String gpsType = "tinygsn.model.wrappers.AndroidGPSWrapper";
 	String gpsVsName = null;
-	
 	
 	AndroidGyroscopeWrapper gyroscopeWrapper = new AndroidGyroscopeWrapper();
 	final String gyroscopeType = "tinygsn.model.wrappers.AndroidGyroscopeWrapper";
 	String gyroscopeVsName = null;
 	
-	
 	AndroidActivityRecognitionWrapper activityWrapper = new AndroidActivityRecognitionWrapper();
 	final String activityType = "tinygsn.model.wrappers.AndroidActivityRecognitionWrapper";
 	String activityVsName = null;
-	
 	
 	WifiWrapper wifiWrapper = new WifiWrapper();
 	final String wifiType = "tinygsn.model.wrappers.WifiWrapper";
 	String wifiVsName = null;
 
 	
-	public void scheduleServices(ArrayList<Integer>rates)
-	{
-		
-	}
 	public ArrayList<Integer> CalcRates()
 	{
 
+		int[] s = storage.getLatestState();
+		machineState = s[0];
+		reason = s[1];
+		
 		//calculation of parameters
-		storage.executeInsertSamples(machineState);
-		boolean iswifiRecent = false;
-		boolean isActivityRecent = false;
-		boolean isGyroscopeRecent = false;
-		boolean isgpsRecent = false;
-		boolean isAccelometerRecent = false;
 		
+		
+		Log.d("tinygsn-scheduler", "State is: "+ machineState);
+				
 		long curTime = System.currentTimeMillis();
-		double avgXChangedAccelometer = 0;
-		double avgYChangedAccelometer = 0;
-		double avgZChangedAccelometer = 0;
-		
-		double avgXChangedGyroscope = 0;
-		double avgYChangedGyroscope = 0;
-		double avgZChangedGyroscope = 0;
+		double avgChangedAccelometer = 0;
 		
 		boolean gpsConstant = true;
 		boolean isInKnownWifiAccess = true;
 		
-		
 		ArrayList<StreamElement> accelometerResult = null;
 		ArrayList<StreamElement> gpsResult = null;
 		ArrayList<StreamElement> wifiResult = null;
-		ArrayList<StreamElement> gyroscopeResult = null;
-		
-		
-		Intent intentGPS = null;
-		Intent intentActivity = null;
-		Intent intentWifi = null;
-		
-		if(accelometerVsName == null && StaticData.findNameVs(accelometerType) != null)
-			isAccelometerRecent = true;
-		if(gyroscopeVsName == null && StaticData.findNameVs(gyroscopeType) != null)
-			isGyroscopeRecent = true;
-		if(gpsVsName == null && StaticData.findNameVs(gpsType) != null)
-			isgpsRecent = true;
-		if(wifiVsName == null && StaticData.findNameVs(wifiType) != null)
-			iswifiRecent = true;
-		if(activityVsName == null && StaticData.findNameVs(activityType) != null)
-			isActivityRecent = true;
 		
 		accelometerVsName = StaticData.findNameVs(accelometerType);
 		gyroscopeVsName = StaticData.findNameVs(gyroscopeType);
 		wifiVsName = StaticData.findNameVs(wifiType);
 		gpsVsName = StaticData.findNameVs(gpsType);
 		activityVsName = StaticData.findNameVs(activityType);
+			
+		/*
+		if (intentWifi == null){
+		intentWifi = StaticData.getRunningIntentByName(wifiVsName);
+		if(intentWifi != null)
+		{
+			config = StaticData.findConfig(StaticData.retrieveIDByName(wifiVsName));
+			config.setRunning(true);
+			intentWifi.putExtra("tinygsn.beans.config", config);
+			startService(intentWifi);
+			config = null;
+		}
+		}
+		
+		if (intentActivity == null){
+		intentActivity = StaticData.getRunningIntentByName(activityVsName);
+		if(intentActivity != null)
+		{
+			config = StaticData.findConfig(StaticData.retrieveIDByName(activityVsName));
+			config.setRunning(true);
+			intentActivity.putExtra("tinygsn.beans.config", config);
+			startService(intentActivity);
+			config = null;
+		}
+		}
+		
+		if (intentGPS == null){
+		intentGPS = StaticData.getRunningIntentByName(gpsVsName);
+		if(intentGPS != null)
+		{
+			config = StaticData.findConfig(StaticData.retrieveIDByName(gpsVsName));
+			config.setRunning(true);
+			intentGPS.putExtra("tinygsn.beans.config", config);
+			startService(intentGPS);
+		}
+		}
+		
+		if (intentAcc == null){
+		intentAcc = StaticData.getRunningIntentByName(accelometerVsName);
+		if(intentAcc != null)
+		{
+			config = StaticData.findConfig(StaticData.retrieveIDByName(accelometerVsName));
+			config.setRunning(true);
+			intentAcc.putExtra("tinygsn.beans.config", config);
+			startService(intentAcc);
+			config = null;
+		}
+		}
+		
+		if (intentGyro == null){
+		intentGyro = StaticData.getRunningIntentByName(gyroscopeVsName);
+		if(intentGyro != null)
+		{
+			config = StaticData.findConfig(StaticData.retrieveIDByName(gyroscopeVsName));
+			config.setRunning(true);
+			intentGyro.putExtra("tinygsn.beans.config", config);
+			startService(intentGyro);
+			config = null;
+		}
+		}
+		*/
 		
 		
 		if(wifiVsName != null)
 		{
-			wifiResult = storage.executeQueryGetLatestValues("vs_"+ wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest);
-			isInKnownWifiAccess = ContainsFamiliarWifis(wifiResult, curTime);
+			wifiResult = storage.executeQueryGetLatestValues("vs_"+ wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest, curTime-120000);
+			isInKnownWifiAccess = ContainsFamiliarWifis(wifiResult);
+			Log.d("tinygsn-scheduler","is in knownwifi accesspoint: "+ isInKnownWifiAccess);
 		}
-		if(StaticData.findNameVs(gpsType) != null)
+		if(gpsVsName != null)
 		{
-			gpsResult = storage.executeQueryGetLatestValues("vs_"+StaticData.findNameVs(gpsType), gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), numLatest);
+			gpsResult = storage.executeQueryGetLatestValues("vs_"+gpsVsName, gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), 180, curTime-180000);
 			if(gpsResult != null && gpsResult.size() != 0)
 			{
-				double longitude = Double.parseDouble(gpsResult.get(0).getData("longitude").toString());
-				double latitude = Double.parseDouble(gpsResult.get(0).getData("latitude").toString());
-				for(int i = 0; i < gpsResult.size(); i++)
-				{
-					if(Double.parseDouble(gpsResult.get(i).getData("longitude").toString()) != longitude || Double.parseDouble(gpsResult.get(0).getData("latitude").toString()) != latitude)
-						gpsConstant = false;
+				if (gpsResult.get(gpsResult.size()-1).getTimeStamp() - gpsResult.get(0).getTimeStamp() > 120000){
+					long longitude = Math.round(((Double)(gpsResult.get(0).getData("longitude")) * 1000));
+					long latitude = Math.round(((Double)(gpsResult.get(0).getData("latitude")) * 1000));
+					for(int i = 0; i < gpsResult.size(); i++)
+					{
+						if(Math.round(((Double)(gpsResult.get(i).getData("longitude")) * 1000)) != longitude || 
+								Math.round(((Double)(gpsResult.get(i).getData("latitude")) * 1000)) != latitude)
+							gpsConstant = false;
+					}
+				}else{
+					gpsConstant = false;
 				}
 			}
 			else
 				gpsConstant = false;
-		}
-		if(StaticData.findNameVs(gyroscopeType) != null)
-		{
-			gyroscopeResult = storage.executeQueryGetLatestValues("vs_"+StaticData.findNameVs(gyroscopeType), gyroscopeWrapper.getFieldList(), gyroscopeWrapper.getFieldType(), numLatest);
-			if(gyroscopeResult.size() != 0)
-			{
-				for(int i = 0; i < gyroscopeResult.size(); i++)
-				{
-					avgXChangedGyroscope += Math.abs(Double.parseDouble(gyroscopeResult.get(i).getData("x").toString()));
-					avgYChangedGyroscope += Math.abs(Double.parseDouble(gyroscopeResult.get(i).getData("y").toString()));
-					avgZChangedGyroscope += Math.abs(Double.parseDouble(gyroscopeResult.get(i).getData("z").toString()));
-				}
-				avgXChangedGyroscope = avgXChangedGyroscope/gyroscopeResult.size();
-				avgYChangedGyroscope = avgYChangedGyroscope/gyroscopeResult.size();
-				avgZChangedGyroscope = avgZChangedGyroscope/gyroscopeResult.size();
-			}
+			
+			Log.d("tinygsn-scheduler","is GPS constant: "+ gpsConstant);
 		}
 		if(accelometerVsName != null)
 		{
-			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelometerVsName, accelometerWrapper.getFieldList(), accelometerWrapper.getFieldType(), numLatest);
-			if(accelometerResult.size() != 0)
+			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelometerVsName, accelometerWrapper.getFieldList(), accelometerWrapper.getFieldType(), 32, curTime-30000);
+			if(accelometerResult.size() > 1)
 			{
-				for(int i = 0; i < accelometerResult.size(); i++)
+				for(int i = 1; i < accelometerResult.size(); i++)
 				{
-					avgXChangedAccelometer += Math.abs(Double.parseDouble(accelometerResult.get(i).getData("x").toString()));
-					avgYChangedAccelometer += Math.abs(Double.parseDouble(accelometerResult.get(i).getData("y").toString()));
-					avgZChangedAccelometer += Math.abs(Double.parseDouble(accelometerResult.get(i).getData("z").toString()));
+					double changedAccelometer = Math.pow((Double)(accelometerResult.get(i).getData("x"))-(Double)(accelometerResult.get(i-1).getData("x")),2);
+					changedAccelometer += Math.pow((Double)(accelometerResult.get(i).getData("y"))-(Double)(accelometerResult.get(i-1).getData("y")),2);
+					changedAccelometer += Math.pow((Double)(accelometerResult.get(i).getData("z"))-(Double)(accelometerResult.get(i-1).getData("z")),2);
+					avgChangedAccelometer += Math.sqrt(changedAccelometer);
 				}
-				avgXChangedAccelometer = avgXChangedAccelometer/accelometerResult.size();
-				avgYChangedAccelometer = avgYChangedAccelometer/accelometerResult.size();
-				avgZChangedAccelometer = avgZChangedAccelometer/accelometerResult.size();
+				avgChangedAccelometer = avgChangedAccelometer/accelometerResult.size();
 			}
+			Log.d("tinygsn-scheduler","average Acc change: "+ avgChangedAccelometer);
 		}	
 		
 		//end of parameter calculation 
 		//checking for next state
+		
+		if (gpsResult != null  && gpsResult.size() != 0){
+			Log.d("tinygsn-scheduler", "Last GPS fix is : " + (curTime - gpsResult.get(0).getTimeStamp())/1000 + "s old.");
+		}else{
+			Log.d("tinygsn-scheduler", "no GPS results");
+		}
+		
+		if (wifiResult != null && wifiResult.size() != 0){
+			Log.d("tinygsn-scheduler", "Last wifi scan is : " + (curTime - wifiResult.get(0).getTimeStamp())/1000 + "s old.");
+		}else{
+			Log.d("tinygsn-scheduler", "no wifi results");
+		}
+		
+		if (accelometerResult != null && accelometerResult.size() != 0){
+			Log.d("tinygsn-scheduler", "Last acc scan is : " + (curTime - accelometerResult.get(0).getTimeStamp())/1000 + "s old.");
+		}else{
+			Log.d("tinygsn-scheduler", "no acc results");
+		}
+		
+		
 		switch(machineState)
 		{
 			
-			case 0:
-				if(priMachineState != 0 || isAccelometerRecent || isActivityRecent || isGyroscopeRecent || isgpsRecent || iswifiRecent)
-				{
-					
-					if(gyroscopeVsName != null || isGyroscopeRecent)
-						storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeLost);
-					if(accelometerVsName != null || isAccelometerRecent)
-						storage.updateSamplingRate(accelometerType,SamplingRateAccelometerLost);
-					if(gpsVsName != null || isgpsRecent)
-						storage.updateSamplingRate(gpsType, SamplingRateGPSLost);
-					if(wifiVsName != null || iswifiRecent)
-						storage.updateSamplingRate(wifiType, SamplingRateWifiLost);
-					if(activityVsName != null || isAccelometerRecent)
-						storage.updateSamplingRate(activityType, SamplingRateActivityLost);
-					
-					if(priMachineState == 1) // in this case we have to turn on the wifi
-					{
-						String wifiVSName = StaticData.findNameVs(wifiType);
-						intentWifi = StaticData.getRunningIntentByName(wifiVSName);
-						if(intentWifi != null)
-						{
-							config = StaticData.findConfig(StaticData.retrieveIDByName(wifiVSName));
-							intentWifi.putExtra("tinygsn.beans.config", config);
-							startService(intentWifi);
-							config = null;
-						}
-						
-					}
-					else if(priMachineState == 2) // in this case we have to turn off the activity
-					{
-						String activityVSName = StaticData.findNameVs(activityType);
-						intentActivity = StaticData.getRunningIntentByName(activityVSName);
-						if(intentActivity != null)
-						{
-							config = StaticData.findConfig(StaticData.retrieveIDByName(activityVSName));
-							intentActivity.putExtra("tinygsn.beans.config", config);
-							startService(intentActivity);
-							config = null;
-						}
-					}
-		
-					String gpsVSName = StaticData.findNameVs(gpsType);
-					intentGPS = StaticData.getRunningIntentByName(gpsVSName);
-					if(intentGPS != null)
-					{
-						config = StaticData.findConfig(StaticData.retrieveIDByName(gpsVSName));
-						intentGPS.putExtra("tinygsn.beans.config", config);
-						startService(intentGPS);
-					}
-					priMachineState = 0;
-					
-				}
-				//changing stage
-				if((gpsResult != null  && gpsResult.size() != 0) && (curTime - gpsResult.get(0).getTimeStamp() < timeThereshold)) //gps fixed
-				{
-					priMachineState = 0;
-					machineState = 1;
-				}
-				else if(((wifiResult != null && wifiResult.size() != 0) 
-						&&(curTime - wifiResult.get(0).getTimeStamp() <timeThereshold ) && isInKnownWifiAccess) 
-						|| ((accelometerResult != null && accelometerResult.size() != 0)
-								&&((curTime - accelometerResult.get(0).getTimeStamp() < timeThereshold) &&
-										((avgXChangedAccelometer < accelometerThereshold) && (avgYChangedAccelometer < accelometerThereshold) && (avgZChangedAccelometer < accelometerThereshold)))))
-				{
-					//accelometer low || known WIFI --> going to stationary state
-					priMachineState = 0;
-					machineState = 2;
-				}
-				break;
-			case 1:
-				if(priMachineState != 1 || isAccelometerRecent || isActivityRecent || isGyroscopeRecent || isgpsRecent || iswifiRecent)
-				{
-					if(gyroscopeVsName != null || isGyroscopeRecent)
-						storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeMoving);
-					if((accelometerVsName != null) || isAccelometerRecent)
-						storage.updateSamplingRate(accelometerType, SamplingRateAccelometerMoving);
-					if(gpsVsName != null || isgpsRecent)
-						storage.updateSamplingRate(gpsType, SamplingRateGPSMoving);
-					if(wifiVsName != null || iswifiRecent)
-						storage.updateSamplingRate(wifiType, SamplingRateWifiMoving);
-					if(activityVsName != null || isAccelometerRecent)
-						storage.updateSamplingRate(activityType, SamplingRateActivityMoving);		
-					
-					if(priMachineState == 0) // in this case we have to turn off the wifi
-					{
-						String wifiVSName = StaticData.findNameVs(wifiType);
-						intentWifi = StaticData.getRunningIntentByName(wifiVSName);
-						if(intentWifi != null)
-						{
-							config = StaticData.findConfig(StaticData.retrieveIDByName(wifiVSName));
-							intentWifi.putExtra("tinygsn.beans.config", config);
-							
-							//stopService(new Intent(this, WifiService.class));
-							startService(intentWifi);
-							config = null;
-						}
-					}
-					
-					
-					String gpsVSName = StaticData.findNameVs(gpsType);
-					intentGPS = StaticData.getRunningIntentByName(gpsVSName);
+			case STATE_LOST:
 
-					if(intentGPS != null)
-					{ 
-						config = StaticData.findConfig(StaticData.retrieveIDByName(gpsVSName));
-						intentGPS.putExtra("tinygsn.beans.config", config);
-						startService(intentGPS);
-					}
-					priMachineState = 1;
-				}
+				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeLost);
+				storage.updateSamplingRate(accelometerType,SamplingRateAccelometerLost);
+				storage.updateSamplingRate(gpsType, SamplingRateGPSLost);
+				storage.updateSamplingRate(wifiType, SamplingRateWifiLost);
+				storage.updateSamplingRate(activityType, SamplingRateActivityLost);
 				
-				if((gpsResult != null && gpsResult.size() != 0) && (curTime - gpsResult.get(0).getTimeStamp() > timeThereshold)) //gps lost
+				priMachineState = STATE_LOST;
+
+				//changing stage
+				if(gpsResult != null  && gpsResult.size() != 0) //gps fixed
 				{
-					priMachineState = 1;
-					machineState = 0;
+					machineState = STATE_GPS;
+					Log.d("tinygsn-scheduler", "new state GPS");
 				}
-				else if((gpsResult != null && gpsResult.size() != 0 && (curTime - gpsResult.get(0).getTimeStamp() < timeThereshold) && gpsConstant ) || (accelometerResult != null && accelometerResult.size() != 0 && (curTime - accelometerResult.get(0).getTimeStamp() < timeThereshold ) && ((avgXChangedAccelometer < accelometerThereshold) && (avgYChangedAccelometer < accelometerThereshold) && (avgZChangedAccelometer < accelometerThereshold)) ) )
+				else if(wifiResult != null && wifiResult.size() != 0 && isInKnownWifiAccess) 
 				{
-					//Accelometer low || gps constant --> stationary
-					priMachineState = 1;
-					machineState = 2;
+					machineState = STATE_STATIONARY;
+					reason = REASON_WIFI;
+					Log.d("tinygsn-scheduler", "new state STATIONARY (wifi)");
+				}
+				else if (accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer < accelometerThereshold)
+				{
+					machineState = STATE_STATIONARY;
+					reason = REASON_ACC;
+					Log.d("tinygsn-scheduler", "new state STATIONARY (acc)");
 				}
 				break;
-			case 2:
-				if(priMachineState != 2 || isAccelometerRecent || isActivityRecent || isGyroscopeRecent || isgpsRecent || iswifiRecent)
+			case STATE_GPS: 
+
+				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeMoving);
+				storage.updateSamplingRate(accelometerType, SamplingRateAccelometerMoving);
+				storage.updateSamplingRate(gpsType, SamplingRateGPSMoving);
+				storage.updateSamplingRate(wifiType, SamplingRateWifiMoving);
+				storage.updateSamplingRate(activityType, SamplingRateActivityMoving);		
+				
+				priMachineState = STATE_GPS;
+				
+				if(gpsResult == null || gpsResult.size() == 0) //gps lost
 				{
-					if(gyroscopeVsName != null || isGyroscopeRecent)
-						storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeStationary);
-					if(accelometerVsName != null || isAccelometerRecent)
-						storage.updateSamplingRate(accelometerType,SamplingRateAccelometerStationary);
-					if(gpsVsName != null || isgpsRecent)
-						storage.updateSamplingRate(gpsType, SamplingRateGPSStationary);
-					if(wifiVsName != null || iswifiRecent)
-						storage.updateSamplingRate(wifiType, SamplingRateWifiStationary);
-					if(activityVsName != null || isAccelometerRecent)
-						storage.updateSamplingRate(activityType, SamplingRateActivityStationary);
-					
-					
-					if(priMachineState == 1) // in this case we have to turn on the wifi and activity
-					{
-						String wifiVSName = StaticData.findNameVs(wifiType);
-						intentWifi = StaticData.getRunningIntentByName(wifiVSName);
-						if(intentWifi != null)
-						{
-							config = StaticData.findConfig(StaticData.retrieveIDByName(wifiVSName));
-							
-							intentWifi.putExtra("tinygsn.beans.config", config);
-							startService(intentWifi);
-							config = null;
-						}
-						
-						String activityVSName = StaticData.findNameVs(activityType);
-						intentActivity = StaticData.getRunningIntentByName(activityVSName);
-						if(intentActivity != null)
-						{
-							config = StaticData.findConfig(StaticData.retrieveIDByName(activityVSName));
-							intentActivity.putExtra("tinygsn.beans.config", config);
-							startService(intentActivity);
-							config = null;
-						}
-					}
-					else if (priMachineState == 0) //in this case we only need to turn on the activity sensor
-					{
-					
-						String activityVSName = StaticData.findNameVs(activityType);
-						intentActivity = StaticData.getRunningIntentByName(activityVSName);
-						if(intentActivity != null)
-						{
-							config = StaticData.findConfig(StaticData.retrieveIDByName(activityVSName));
-							intentActivity.putExtra("tinygsn.beans.config", config);
-							startService(intentActivity);
-							config = null;
-						}
-					
-					}
-			
-					//starting GPS 
-					String gpsVSName = StaticData.findNameVs(gpsType);
-					intentGPS = StaticData.getRunningIntentByName(gpsVSName);
-					if(intentGPS != null)
-					{
+					machineState = STATE_LOST;
+					Log.d("tinygsn-scheduler", "new state LOST");
+				}
+				else if(gpsResult != null && gpsResult.size() != 0 && gpsConstant) 
+				{
+					machineState = STATE_STATIONARY;
+					reason = REASON_GPS;
+					Log.d("tinygsn-scheduler", "new state STATIONARY (gps)");
+				}
+				else if(accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer < accelometerThereshold) 
+				{
+					machineState = STATE_STATIONARY;
+					reason = REASON_ACC;
+					Log.d("tinygsn-scheduler", "new state STATIONARY (acc)");
+				}
+				break;
+			case STATE_STATIONARY:
 
-						config = StaticData.findConfig(StaticData.retrieveIDByName(gpsVSName));
-						intentGPS.putExtra("tinygsn.beans.config", config);
-						startService(intentGPS);	
+				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeStationary);
+				storage.updateSamplingRate(accelometerType,SamplingRateAccelometerStationary);
+				storage.updateSamplingRate(gpsType, SamplingRateGPSStationary);
+				storage.updateSamplingRate(wifiType, SamplingRateWifiStationary);
+				storage.updateSamplingRate(activityType, SamplingRateActivityStationary);
+	
+				priMachineState = STATE_STATIONARY;
 
-						bindService(intentGPS, null, 0);
-					}
-					
-					priMachineState = 2;
-
-					if((wifiResult != null && wifiResult.size() != 0) 
-							&& (((curTime - wifiResult.get(0).getTimeStamp() < timeThereshold)
-									&& !isInKnownWifiAccess) || 
-									(curTime - wifiResult.get(0).getTimeStamp() > timeThereshold))
-									|| (accelometerResult != null && accelometerResult.size() != 0)
-									&&(curTime - accelometerResult.get(0).getTimeStamp() < timeThereshold) &&
-									((avgXChangedAccelometer > accelometerThereshold) || (avgYChangedAccelometer > accelometerThereshold) || (avgZChangedAccelometer > accelometerThereshold)))
+				if (reason == REASON_WIFI && (wifiResult == null || wifiResult.size() == 0 || !isInKnownWifiAccess))
+				{
+					machineState = STATE_LOST;
+					Log.d("tinygsn-scheduler", "new state LOST");
+				}
+				else if (reason == REASON_ACC || reason == REASON_GPS)
+				{
+					if(wifiResult != null && wifiResult.size() != 0 && isInKnownWifiAccess) 
 					{
-						priMachineState = 2;
-						machineState = 0;
+						reason = REASON_WIFI;
+						Log.d("tinygsn-scheduler", "new state STATIONARY (wifi)");
+					}
+					else if(accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer > accelometerThereshold)
+					{
+						machineState = STATE_LOST;
+						Log.d("tinygsn-scheduler", "new state LOST");
 					}
 				}
 		}
-//		priMachineState = -1;
-//		machineState = (machineState+1)%3;
+		storage.executeInsertSamples(machineState,reason);
 		return null;
 		
 	}
 	
-	private boolean ContainsFamiliarWifis(ArrayList<StreamElement> wifiResult,
-			long curTime) {
+	private boolean ContainsFamiliarWifis(ArrayList<StreamElement> wifiResult) {
 		
-		Map<String, Integer> freqs = storage.getFrequencies();
-		int numOfFamiliarplaces = freqs.size()/10;
-		if(numOfFamiliarplaces == 0 && freqs.size() > 0)
-			numOfFamiliarplaces = 1;
-		ArrayList<Integer> frequency = new ArrayList<Integer>();
-		ArrayList<String> macAdr = new ArrayList<String>();
-		for(Entry<String, Integer> item: freqs.entrySet())
-		{
-			macAdr.add(item.getKey());
-			frequency.add(item.getValue());
-		}
-		for(int i = 0; i < macAdr.size(); i++)
-		{
-			for (int j = i; j < macAdr.size()-1; j++)
-			{
-				if(frequency.get(j) > frequency.get(j+1))
-				{
-					int temp = frequency.get(j);
-					frequency.set(j, frequency.get(j+1));
-					frequency.set(j+1, temp);
-					
-					String tempAdr = macAdr.get(j);
-					macAdr.set(j, macAdr.get(j+1));
-					macAdr.set(j+1, tempAdr);
-				}
-			}
-		}
+		Map<Long, Integer> freqs = storage.getFrequencies();
 		for(int i = 0; i < wifiResult.size(); i++)
 		{
-			for(int j = 0; j < numOfFamiliarplaces; j++)
+			Long k = ((Double)(wifiResult.get(i).getData("mac1"))).longValue() * 16777216 + ((Double)(wifiResult.get(i).getData("mac2"))).longValue();
+			if( freqs.containsKey(k) && freqs.get(k) > wifiCountThreshold)
 			{
-				if( converTingBSSID(macAdr.get(j).substring(0, 8)) == Double.parseDouble(wifiResult.get(i).getData("mac1").toString()) && converTingBSSID(macAdr.get(j).substring(8)) == Double.parseDouble(wifiResult.get(i).getData("mac2").toString()) )
-				{
-					return true;
-				}
-			}
-		}
-		int j = numOfFamiliarplaces;
-		if(numOfFamiliarplaces != 0)
-		while(j < frequency.size() && frequency.get(j) == frequency.get(j-1))
-		{
-			for(int i = 0; i < wifiResult.size(); i++)
-			{
-				if( converTingBSSID(macAdr.get(j).substring(0, 8)) == Double.parseDouble(wifiResult.get(i).getData("mac1").toString()) && converTingBSSID(macAdr.get(j).substring(8)) == Double.parseDouble(wifiResult.get(i).getData("mac2").toString()) )
-				{
-					return true;
-				}
+				return true;
 			}
 		}
 		return false;
 	}
 	
-	private double converTingBSSID(String bssid)
-	{
-		bssid = bssid.replaceAll(":", "");
-		return Integer.parseInt(bssid, 16);
-	}
-	@Override
-	public IBinder onBind(Intent intent) {
-
-		return null;
-	}
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		if (wakeLock != null){
+			wakeLock.release();
+		}
 	}
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		while(true)
+		
+		storage = new SqliteStorageManager(this);
+		
+		//PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+		//wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "schedular-lock");
+		//wakeLock.acquire();
+		//while(true)
 		{
-			storage = new SqliteStorageManager(new ActivityListVSNew());
 			CalcRates();
-			try {
+			/*try {
 				Thread.sleep(SchedulerSleepingTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}	 
-		
+		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+SchedulerSleepingTime,PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 	
 	
