@@ -28,8 +28,12 @@ class QueryActor(p:Promise[Seq[SensorData]]) extends Actor {
       }
     case g:GetSensorData => 
       gsnSensor ! GetSensorConf(g.sensorid )
+      
       sensor.future.map{s=>
-        p.success(Seq(query(s,g.fields ,g.conditions ,g.size,g.timeFormat )))
+        if (g.size.isDefined && g.size.get== 0)
+          p.success(Seq(asSensorData(s.sensor )))
+        else
+          p.success(Seq(query(s,g.fields ,g.conditions ,g.size,g.timeFormat )))
         context.stop(self)
       }
     case all:AllSensorConf =>
@@ -76,6 +80,8 @@ class QueryActor(p:Promise[Seq[SensorData]]) extends Actor {
 			conditions:Seq[String], size:Option[Int],timeFormat:Option[String]):SensorData= {
     val sensor=sensorConf.sensor
     implicit val tf=timeFormat
+    
+    
     val ordered=(
       if (!fields.isEmpty)
         sensor.fields.filter(f=>fields.contains(f.fieldName))
