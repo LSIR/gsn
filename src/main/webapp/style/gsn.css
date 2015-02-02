@@ -72,7 +72,7 @@ body, html
 
 body 
 {
-	min-width:750px;	
+	min-width: 750px;*/	
 	width: 100%; 
 	height: 100%; 
 	margin: 0; 
@@ -83,7 +83,7 @@ body
 {
 	margin:10px auto;
 	padding:1px;
-	width:750px;
+	width: 750px;
 	background:#FFFFFF;
 }
 #header, #headerfm 
@@ -824,7 +824,7 @@ input.date-picker
 
 /* gsn data part */
 div.full-page {
-    width: 730px !important;
+    width: 95% !important; /* 730px */
 }
 
 .ui-accordion h3 {
@@ -979,4 +979,42 @@ div.full-page {
     width: 1.3em;
     height: 1.4em;
     background: #e6e6e6 url(/img/datepicker/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+}
+
+/* data page div format */
+
+.aggregations {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+.data-outputs-container {
+	margin-bottom: 20px;
+}
+.time-range {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+.plot-content {
+	margin-bottom: 20px;
+}
+.left-form-container {
+	float: left;
+	width: 49%;
+}
+.right-form-container{
+	float: right;
+	width: 49%;
+}
+.results-content {
+	margin-bottom: 20px;
+}
+.plotContainer {
+	margin-bottom: 20px;
+	
+}
+.plot-result-container {
+	width: 100%;	
+}
+h3 {
+	background-color: rgb(220,255,220);
 }
