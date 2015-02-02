@@ -163,9 +163,11 @@ import android.os.Bundle;
 import java.text.SimpleDateFormat;
 
 import tinygsn.beans.InputStream;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.wrappers.AndroidActivityRecognitionWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
@@ -196,22 +198,21 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
         super("ActivityRecognitionIntentService");
     }
 
-    /**
-     * Called when a new activity detection update is available.
-     */
-    
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)  {
     
-    	VSensorConfig tempConfig = null;
+    	/*
+    	if (intent == null){return START_REDELIVER_INTENT;}
 		Bundle b = intent.getExtras();
-    	tempConfig = (VSensorConfig) b.get("tinygsn.beans.config");
+		config = (VSensorConfig) b.get("tinygsn.beans.config");
+		storage = new SqliteStorageManager(config.getController().getActivity());
+		VirtualSensor vs = new VirtualSensor(config, config.getController().getActivity());
     	
-    	storage = new SqliteStorageManager(config.getController().getActivity());
-		samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGPSWrapper");
+    	
+		samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidActivityRecognitionWrapper");
 		
-		if(tempConfig != null)
-			config = tempConfig;
+
 		 for (InputStream inputStream : config.getInputStreams()) {
  			for (StreamSource streamSource : inputStream.getSources()) {
  				w = streamSource.getWrapper();
@@ -250,8 +251,8 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
 
     		((AndroidActivityRecognitionWrapper) w).setTheLastStreamElement(streamElement);
 			((AndroidActivityRecognitionWrapper) w).getLastKnownData();
-        }
-		return resp;
+        }*/
+		return START_NOT_STICKY; //START_REDELIVER_INTENT;
         
     }    
     private String getType(int type){
@@ -281,10 +282,10 @@ public class ActivityRecognitionService extends IntentService implements GoogleP
 	public void onConnected(Bundle arg0) {
 		Intent intent = new Intent(this, ActivityRecognitionService.class);
 		pIntent = PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
-		if(samplingRate == 2)	
+		/*if(samplingRate > 0)	
 			arclient.requestActivityUpdates(100, pIntent); 
 		else 
-			arclient.removeActivityUpdates(pIntent);
+			arclient.removeActivityUpdates(pIntent);*/
 	}
 
 	@Override

@@ -203,8 +203,8 @@ public class MultiDataDownload extends HttpServlet {
                             resultMax = Main.getStorage(sensorConfig.getName()).executeQueryWithResultSet(queryMax, conn);
                             resultMin = Main.getStorage(sensorConfig.getName()).executeQueryWithResultSet(queryMin, conn);
 
-                            resultMax.first();
-                            resultMin.first();
+                            resultMax.next();
+                            resultMin.next();
 
                             Date maxDate = new Date(resultMax.getLong(1));
                             Date minDate = new Date(resultMin.getLong(1));

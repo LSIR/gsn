@@ -9,11 +9,14 @@ import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AndroidControllerListVSNew;
 import tinygsn.gui.android.ActivityListVSNew;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.wrappers.AndroidAccelerometerWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -27,7 +30,6 @@ import android.util.Log;
 public class AccelometerService extends IntentService implements SensorEventListener {
 
 	private VSensorConfig config = null;
-	private static final String TAG = "AccelometerService";
 	public AndroidControllerListVSNew VSNewController;
 	public AbstractWrapper w;
 	private SensorManager mSensorManager;
@@ -39,37 +41,31 @@ public class AccelometerService extends IntentService implements SensorEventList
 	}
 	public AccelometerService(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
 	}
 
-	
 	
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-	//	Log.i("onSensorChanged", "OnSensorChanged");
 		double x = event.values[0];
 		double y = event.values[1];
 		double z = event.values[2];
+				
 		StreamElement streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
 				new Serializable[] { x, y, z });
 
-		((AndroidAccelerometerWrapper) w).setTheLastStreamElement(streamElement);
+		((AndroidAccelerometerWrapper) w).postStreamElement(streamElement);
 		
 	}
 
 	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Bundle b = intent.getExtras();
 		config = (VSensorConfig) b.get("tinygsn.beans.config");
-		
-		if(config.getRunning() == false)
-			return;
+		storage = new SqliteStorageManager(config.getController().getActivity());
+		VirtualSensor vs = new VirtualSensor(config, config.getController().getActivity());
 		
 		for (InputStream inputStream : config.getInputStreams()) {
 			for (StreamSource streamSource : inputStream.getSources()) {
@@ -78,22 +74,25 @@ public class AccelometerService extends IntentService implements SensorEventList
 				mSensorManager = (SensorManager) activity
 						.getSystemService(Context.SENSOR_SERVICE);
 				mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-				mSensorManager.registerListener(this, mSensor,
-						SensorManager.SENSOR_DELAY_NORMAL);
 				
-				
-				while (w.isActive()) 
+				//while (w.isActive()) 
 				{
-					storage = new SqliteStorageManager(config.getController().getActivity());
-					int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidAccelerometerWrapper");
 					try {
-						Thread.sleep(w.getSamplingRate()/(1+samplingRate));
-						((AndroidAccelerometerWrapper) w).getLastKnownData();
+					    int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidAccelerometerWrapper");
+					
+					    if (samplingRate > 0){
+							mSensorManager.registerListener(this, mSensor,60000); //around 16Hz 
+							Thread.sleep(samplingRate*1000);
+							mSensorManager.unregisterListener(this);
+						}
+						//Thread.sleep(15*1000);
 					}
 					catch (InterruptedException e) {
 						Log.e(e.getMessage(), e.toString());
 					}
 				}
+				AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+				am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+15000,PendingIntent.getService(activity, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 			}
 		}
 		

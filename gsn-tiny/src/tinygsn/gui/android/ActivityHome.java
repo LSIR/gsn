@@ -26,6 +26,11 @@
 package tinygsn.gui.android;
 
 
+import java.util.ArrayList;
+
+import tinygsn.beans.StaticData;
+import tinygsn.controller.AndroidControllerListVSNew;
+import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.services.schedular;
 import tinygsn.storage.db.SqliteStorageManager;
 
@@ -59,8 +64,22 @@ public class ActivityHome extends SherlockActivity {
 		badge.show();
 		
 		//my code		
+
+		ArrayList<VirtualSensor> vsList = storage.getListofVS();
+		
+		for (VirtualSensor vs : vsList) {
+			vs.getConfig().setController(new AndroidControllerListVSNew(this));
+
+		}
+		for (VirtualSensor vs : vsList) {
+			if (vs.getConfig().getRunning() == true) {
+				vs.start();
+			}
+		}
+		
 		Intent serviceIntent = null;
 		serviceIntent = new Intent(this, schedular.class);
+		
 		this.startService(serviceIntent);
 	}
 

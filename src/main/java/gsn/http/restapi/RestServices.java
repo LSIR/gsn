@@ -1,17 +1,19 @@
 package gsn.http.restapi;
 
-import gsn.data.Sensor;
-import gsn.Main;
-import gsn.Mappings;
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
+import gsn.data.CsvSerializer;
+import gsn.data.JsonSerializer;
+import gsn.data.SensorData;
+import gsn.Main;
+import gsn.Mappings;
 import gsn.http.ac.User;
 import gsn.http.ac.UserUtils;
 import gsn.utils.geo.GridTools;
 import gsn.xpr.XprConditions;
-import gsn.data.DataSerializer;
-import scala.collection.JavaConversions;
+import static scala.collection.JavaConversions.*;
 import scala.collection.Seq;
+import scala.collection.mutable.Buffer;
 import scala.util.Try;
 
 import java.io.IOException;
@@ -19,18 +21,9 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -41,6 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+
+import gsn.data.DataStore;
+
+
 
 @Path("/")
 public class RestServices {
@@ -91,25 +88,25 @@ public class RestServices {
 	@QueryParam(PARAM_ATTACH)
 	boolean attach;
 
-	private String[] validFormats = new String[] { FORMAT_GEOJSON, FORMAT_JSON,
+	private String[] validFormats = new String[] { 
+			FORMAT_GEOJSON, FORMAT_JSON,
 			FORMAT_CSV, FORMAT_NETCDF };
 	private Config config = ConfigFactory.load();
-	DateFormat dateFormat = new SimpleDateFormat(config.getString("dateFormat"));
-	List<String> defaultFields = config.getStringList("metadata.fields");
-	DataStore ds = new DataStore();
-
+	DateFormat dateFormat = new SimpleDateFormat(config.getString("gsn.dateFormat"));
+	Buffer<String> defaultFields = asScalaBuffer(config.getStringList("gsn.metadata.defaultFields"));
+	
+	
+	DataStore ds = new DataStore(gsn.Main.getInstance().getGsnConf());
+	
 	@GET
 	@Path("/sensors")
 	public Response sensors() {
 		validateFormat();
-		Iterator<VSensorConfig> vsIterator = Mappings.getAllVSensorConfigs();
-		List<Sensor> sensors = new ArrayList<Sensor>();
-		while (vsIterator.hasNext()) {
-			VSensorConfig sensorConfig = vsIterator.next();
-			Sensor s = ds.findSensor(sensorConfig.getName(), latestValues);
-			sensors.add(s);
-		}
-		return response(JavaConversions.asScalaBuffer(sensors)).build();
+		return null;
+		//if (latestValues)
+		//return response(ds.allSensorsLatest(),true).build();
+		//else
+		//return response(ds.allSensors(),false).build();
 	}
 
 	private String toString(StringWriter sw) {
@@ -122,47 +119,16 @@ public class RestServices {
 		return res;
 	}
 
-	private ResponseBuilder dataResponse(Sensor sensor) {
+	private ResponseBuilder response(Object body) {
 		String datetime = dateFormat.format(Calendar.getInstance().getTime());
 		String ext = null;
 		ResponseBuilder resp = null;
 		if (FORMAT_CSV.equals(format)) {
-			StringWriter sw = DataSerializer.toCsv(sensor);
-			resp = Response.ok(toString(sw));
-			resp.type(MEDIA_TYPE_CSV);
+			resp = Response.ok(body);
+			resp.type("text/plain");//MEDIA_TYPE_CSV);
 			ext = ".csv";
 		} else if (FORMAT_JSON.equals(format) || FORMAT_GEOJSON.equals(format)) {
-			resp = Response.ok(DataSerializer.toJsonString(sensor));
-			resp.type(MediaType.APPLICATION_JSON);
-			ext = ".json";
-		} else if (format.equals(FORMAT_NETCDF)) {
-			resp = Response.ok(DataSerializer.toNetCdf(sensor));
-			resp.type(MEDIA_TYPE_NETCDF);
-			ext = ".nc";
-		}
-		if (attach) {
-			String resultname = String.format("multiple_sensors_%s", datetime);
-			resp.header(RESPONSE_HEADER_CONTENT_DISPOSITION_NAME, String
-					.format(RESPONSE_HEADER_CONTENT_DISPOSITION_VALUE,
-							resultname + ext));
-		}
-
-		
-		return resp;
-	}
-
-	private ResponseBuilder response(Seq<Sensor> sensors) {
-		String datetime = dateFormat.format(Calendar.getInstance().getTime());
-		String ext = null;
-		ResponseBuilder resp = null;
-		if (FORMAT_CSV.equals(format)) {
-			StringWriter sw = DataSerializer.toCsv(sensors,
-					JavaConversions.asScalaBuffer(defaultFields));
-			resp = Response.ok(toString(sw));
-			resp.type(MEDIA_TYPE_CSV);
-			ext = ".csv";
-		} else if (FORMAT_JSON.equals(format) || FORMAT_GEOJSON.equals(format)) {
-			resp = Response.ok(DataSerializer.toJsonString(sensors));
+			resp = Response.ok(body);
 			resp.type(MediaType.APPLICATION_JSON);
 			ext = ".json";
 		} else if (format.equals(FORMAT_NETCDF)) {
@@ -176,6 +142,30 @@ public class RestServices {
 		}
 
 		return resp;
+	}
+
+	private ResponseBuilder response(SensorData sensor,boolean latest) {
+		Object body=null;
+		if (FORMAT_CSV.equals(format)) {
+			body =CsvSerializer.ser(sensor,defaultFields,latest);
+		} else if (FORMAT_JSON.equals(format) || FORMAT_GEOJSON.equals(format)) {
+			body = JsonSerializer.ser(sensor,defaultFields,latest);
+		} else if (format.equals(FORMAT_NETCDF)) {
+			throw exception("NetCDF is not a valid format for retrieving multiple sensors");
+		}		
+		return response(body);
+	}
+	
+	private ResponseBuilder response(Seq<SensorData> sensors,boolean latest) {
+		Object body=null;
+		if (FORMAT_CSV.equals(format)) {
+			body =CsvSerializer.ser(sensors,defaultFields,latest);
+		} else if (FORMAT_JSON.equals(format) || FORMAT_GEOJSON.equals(format)) {
+			body = (JsonSerializer.ser(sensors,defaultFields,latest));
+		} else if (format.equals(FORMAT_NETCDF)) {
+			throw exception("NetCDF is not a valid format for retrieving multiple sensors");
+		}		
+		return response(body);
 	}
 
 	private void validateFormat() {
@@ -209,6 +199,7 @@ public class RestServices {
 	}
 
 	private void authorize(String sensorid) {
+		if (!Main.getContainerConfig().isAcEnabled()) return;
 		if (!UserUtils.userHasAccessToVirtualSensor(username, pass, sensorid))
 			throw exception("User " + username
 					+ " not authorized for virtual sensor " + sensorid);
@@ -222,18 +213,19 @@ public class RestServices {
 			@DefaultValue("-1") @QueryParam(PARAM_SIZE) int size,
 			@QueryParam(PARAM_FIELDS) String fields,
 			@QueryParam(PARAM_FILTER) String filter) {
+		logger.debug("REST service requesting vs: "+vsname);
 		authenticate();
 		authorize(vsname);
 		validateFormat();
 
-		DataStore ds = new DataStore();
+		//DataStoreBis ds = new DataStoreBis();
 		VSensorConfig sensorConfig = Mappings.getConfig(vsname);
-
+		logger.debug("Retrieving metadata for vs: "+sensorConfig.getName());
+		
 		ArrayList<String> allfields = new ArrayList<String>();
 		for (DataField df : sensorConfig.getOutputStructure()) {
 			allfields.add(df.getName().toLowerCase());
 		}
-
 		
         ArrayList<String> filters=new ArrayList<String>();
         if (filter!=null)
@@ -275,11 +267,13 @@ public class RestServices {
 				conditionList = conditions.get();
 			}
 		}
-
-		Sensor s = ds.query(vsname, fieldNames, conditionList, fromTime,
-				toTime, size);
-
-		return dataResponse(s).build();
+		scala.Option<Integer>optSize=scala.Option.apply(null);
+		if (size>0)
+			optSize=scala.Option.apply((Integer)size);
+		//SensorData s=ds.sensorData(vsname, fieldNames, conditionList, optSize).get();
+		//System.out.println(s);
+		return null;
+		//return response(s,true).build();
 	}
 
 	@GET

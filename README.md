@@ -18,6 +18,7 @@ GSN requires the following software for building:
 
 * Jakarta apache ant version 1.7.x or higher.
 * Java JDK 1.6.x .
+* [Apache Maven](http://maven.apache.org/download.cgi)
 
 To build GSN follow these steps:
 * Add ANT_HOME/bin folder to your PATH
@@ -29,6 +30,17 @@ To run GSN from the source code, you can run the following ant task:
 
 To stop GSN:
 	``ant stop``
+
+Starting from version 1.1.7 GSN is using apache maven for managing the dependencies and libraries.
+If you use a IDE such as eclipse or NetBeans you may need to install additional plugins and change the settings of the project:
+
+* For eclipse: 
+  * You can install [M2Eclipse](http://eclipse.org/m2e/) 
+  * Right-click on your GSN project -> configure -> Convert to Maven project... 
+  * Right-click on your GSN project -> Build Path -> Configure build path...
+  * On the libraries tab, remove all references to the libraries that are marked in red.
+  * Press alt+F5 and update the maven libraries (it may take a while the first time) 
+  * If it still complains about missing libraries, check if they are in the lib folder and if needed add them to the build path
 
 ## Download Installer
 

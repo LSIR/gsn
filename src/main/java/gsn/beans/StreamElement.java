@@ -62,6 +62,7 @@ public final class StreamElement implements Serializable {
 
 	private boolean timestampProvided = false;
 
+
 	public StreamElement (StreamElement other) {
 		this.fieldNames=new String[other.fieldNames.length];
 		this.fieldValues=new Serializable[other.fieldValues.length];
@@ -127,9 +128,7 @@ public final class StreamElement implements Serializable {
 			if(key.equalsIgnoreCase("timed")){
 				timestamp = (Long) value;
 				timestampProvided=true;
-			}
-				
-			else { 
+			}else{ 
 				fieldNames[idx] = key;
 				fieldValues[idx] = value;
 				for (int i=0;i<fields.length;i++) {

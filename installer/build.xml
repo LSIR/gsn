@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project>
     <!-- UPDATE-ME: The name of your installer comes below in the gsn.name property -->
-    <property name="gsn.name" value="gsn-1.1.6"/>
+    <property name="gsn.name" value="gsn-1.1.7"/>
 
     <target name="build-gsn" depends="clean-installer">
 
@@ -22,6 +22,9 @@
                 <include name="**/*.jar"/>
                 <!--  <exclude name="**/axis-2/**"/>  -->
             </fileset>
+      	  <fileset refid="gsndeps" />
+
+        	
         </path>
 
         <mkdir dir="${dist}/lib"/>
@@ -46,11 +49,11 @@
             <exclude name="**/DemoVSensor.java"/>
         </javac>
 
-        <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}" failonerror="true">
+        <!--<java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}" failonerror="true">
             <classpath refid="classpath"/>
             <arg value="${resources.dir}/containerJIBX.xml"/>
             <arg value="${resources.dir}/VirtualSensorDescription.xml"/>
-        </java>
+        </java>-->
 
         <jar destfile="${dist}/lib/${gsn.name}.jar" basedir="${build.dir}">
             <manifest>
@@ -91,6 +94,7 @@
         <copy file="${basedir}/installer/license.txt" todir="${dist}/"/>
 
         <copy todir="dist/lib" flatten="yes" includeEmptyDirs="false">
+        	  <fileset refid="gsndeps" />
             <fileset dir="${basedir}/lib/">
                 <include name="**/**"/>
                 <exclude name="**/axis-2/**"/>
@@ -98,6 +102,7 @@
                 <exclude name="**/junit-jars/**"/>
                 <exclude name="**/compiling/**"/>
                 <exclude name="**/hibernate/**"/>
+                <exclude name="**/build/**"/>
                 <exclude name="**/.svn/**"/>
             </fileset>
         </copy>

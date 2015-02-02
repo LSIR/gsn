@@ -44,23 +44,24 @@ import java.io.IOException;
 public class MyLogoutHandlerServlet extends HttpServlet
 {
     
-     /****************************************** Servlet Methods*******************************************/
+	private static final long serialVersionUID = 1L;
+	/****************************************** Servlet Methods*******************************************/
     /******************************************************************************************************/
 
-    public void doGet(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
-    {
+    public void doGet(HttpServletRequest req, HttpServletResponse res)
+    		throws ServletException, IOException {
         HttpSession session = req.getSession(false);
-        if(session != null)
-        {
+        if(session != null) {
             session.invalidate();
         }
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Pragma", "no-cache");
         res.setHeader("Expires", "0");
         res.sendRedirect( "/");
+        //res.sendRedirect( "https://tequila.epfl.ch/cgi-bin/tequila/logout");
     }
-    public void doPost(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
-    {
+    public void doPost(HttpServletRequest req, HttpServletResponse res)
+    		throws ServletException, IOException{
         this.doGet(req,res);
     }
 

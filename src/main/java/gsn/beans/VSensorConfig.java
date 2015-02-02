@@ -348,6 +348,9 @@ public class VSensorConfig implements Serializable {
         return storage;
     }
 
+    public void setStorage(StorageConfig sc){
+    	this.storage=sc;
+    }
     public boolean isStorageCountBased ( ) {
 		return this.isStorageCountBased;
 	}
@@ -367,6 +370,9 @@ public class VSensorConfig implements Serializable {
 		return webParameterPassword;
 	}
 
+	public void setWebParameterPassword ( String p) {
+		webParameterPassword=p;
+	}
 
 	public String toString ( ) {
 		final StringBuilder builder = new StringBuilder( "Input Stream [" );
@@ -494,6 +500,10 @@ public class VSensorConfig implements Serializable {
 		return isTimestampUnique ;
 	}
 
+	public void setIsTimeStampUnique(boolean unique){
+		this.isTimestampUnique=unique;
+	}
+	
 	public boolean isAccess_protected() {
 		try {
 		return Boolean.parseBoolean(access_protected.trim());

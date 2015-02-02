@@ -45,7 +45,6 @@ public class BridgeVirtualSensor extends AbstractVirtualSensor {
         String allow_nulls_str = params.get("allow-nulls");
         if (allow_nulls_str != null)
             allow_nulls = allow_nulls_str.equalsIgnoreCase("true");
-
         return true;
     }
 

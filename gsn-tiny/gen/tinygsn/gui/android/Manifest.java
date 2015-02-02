@@ -9,9 +9,6 @@ package tinygsn.gui.android;
 
 public final class Manifest {
     public static final class permission {
-        /**  GPS 
- GCM 
-         */
         public static final String C2D_MESSAGE="tinygsn.gui.android.permission.C2D_MESSAGE";
     }
 }
