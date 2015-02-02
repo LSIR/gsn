@@ -66,7 +66,6 @@
                         var keys =[];
                         var nb_elements = 0;
                         var datasets = [];
-                        console.log("Lines "+lines.length);
                         for (var line_no = 0; line_no < lines.length; line_no++){
                             var line = $.trim(lines[line_no]);
                             if (line.length == 0)
@@ -75,12 +74,10 @@
                             if(line[0]=='#'){ //comment lines
                                 if (line.indexOf("# vsname:") >= 0){
                                     vs_name = line.substring(9,line.length);
-                                    console.log("vsname "+vs_name);
                                     keys=[];
                                     headers=[];
                                 } else if (line.indexOf("# time") >= 0) { //field name
                                     headers = line.split(',');
-                                	console.log(headers);
                                     for (var i=0;i<headers.length;i++){
                                         headers[i] = headers[i].replace("#","");
                                         headers[i] = headers[i].replace(" ","");
@@ -121,7 +118,6 @@
                                 $("#sampling_percentage").val("");
                             }
                         }
-                        console.log(datasets);
                         callback(datasets,nb_elements);
                     });
                 }
@@ -183,8 +179,9 @@
                 function getURLParameter(name) {
                 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
                 }
-                function option_list_key(name,items,all, id,vsSelected=null){
-                    to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
+                function option_list_key(name,items,all, id,vsSelected){
+                	if(typeof(vsSelected)==='undefined') vsSelected=null;
+                	to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">';
                     if (all){
                         to_return+='<option value="All" >' + all + '</optirmattemperaturehandleron>';
                     }
@@ -239,8 +236,9 @@
                 }
 
 
-                function add_data_output (vsname=null, fnames=null) {
-
+                function add_data_output (vsname, fnames) {
+                	if(typeof(vsname)==='undefined') vsname=null;
+                	if(typeof(fnames)==='undefined') fnames=null;
                     var vss_id = "vss_" + vss_max_id;
                     var fields_id = "fields_" + fields_max_id;
                     var fields_div_id  = "fields_div_id_" + fields_max_id;
@@ -256,8 +254,6 @@
                         search_contains: true,
                         width: "200px"
                     });
-                    console.log(fields_div_id+" "+fields_id);
-                    console.log("Params: "+vsname+" "+fnames);
                     if(vsname != null){
                     	var vs = $('#'+vss_id).val();
                         if (vs != 'All') {
@@ -393,15 +389,13 @@
                                 $(this).append('<input id="toDelete" name="field[0]" value="All"/>');
                                 return;
                             }
-							console.log("Field "+vssId);
                             $("#fields_" + vssId).chosen().attr("name", 'field['+counter+']');
-                            console.log("Attr "+$("#fields_" + vssId).chosen().attr("name"));
                             if (typeof $("#fields_" + vssId).chosen().val() == "undefined"){
                                 $("#fields_" + vssId).chosen().val('All');
                             }
-                            console.log("Next "+$("#fields_div_id_"+vssId).html());
                             if ($("#fields_div_id_"+vssId).next().html() != ""){
                             	//No idea what comes next
+                            	//This is never call on my knowledge
                                 var skip = 0;
                                 $("#fields_div_id_"+vssId).next().find('.min').each(function(){
                                     if ($(this).val() == "-inf") {
@@ -436,7 +430,6 @@
                         });
 
                     });
-                    console.log(tag.parents('form').find('.data-outputs-container li'));
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
@@ -468,13 +461,16 @@
                     });
                     //First time called the output
                     //Adding the URL parameters
+                    //Convention: vsname1, vsname2
+                    //Convention: field1vs1, field2vs1, field1vs2
                     var i = 1;
                     while(getURLParameter("vsname"+i) != null){
                     	
                     	var j = 1;
 
                     	while(getURLParameter("field"+j+"vs"+i) != null){
-                    		
+                    		//Add a nex sensor for each new fields
+                    		//TODO A better dynamic GUI way of add field directly to sensor
                     		add_data_output(getURLParameter("vsname"+i), getURLParameter("field"+j+"vs"+i));
                     		j=j+1;
                     	}
@@ -624,8 +620,9 @@
 				});
 				 
 				 function pre_load() {
+					 //ONLOAD plotting
 					 	if(getURLParameter("vsname1") != null){
-							console.log("ONLOAD");
+							
 							$(".plot").click();	
 					 	}
 				}
@@ -660,6 +657,8 @@ function showRepeatOptions()
 }
 function updateDateList()
 {
+	//Date can be used for better time range
+	//TODO add a way to pass it to the back-end
 	var from = Date.parse(document.getElementById('datepicker_from').value);
 	var to = Date.parse(document.getElementById('datepicker_to').value);
 	var datelist = "[["+from+","+to+"],\n";
@@ -667,7 +666,7 @@ function updateDateList()
 	if(document.getElementById('ifrepeat').checked){
 		var e = document.getElementById('repeat-type');
 		var repeatType = e.options[e.selectedIndex].value
-		console.log(repeatType);
+	
 		for(i = 1; i <= document.getElementById('repeat-number').value; i++){
 			if (repeatType == ("Years")){
 				var new_from = (i).years().after(from);
