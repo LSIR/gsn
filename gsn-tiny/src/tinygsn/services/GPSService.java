@@ -116,7 +116,7 @@ public class GPSService extends IntentService implements LocationListener {
 		{
 			int samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidGPSWrapper");
 			if (samplingRate > 0){
-				timeToShutdown = 8;
+				timeToShutdown = 20;
 				startGPS();
 				try {
 					Thread.sleep(15*1000);
@@ -126,6 +126,11 @@ public class GPSService extends IntentService implements LocationListener {
 				if (timeToShutdown < 0){
 					stopGPS();
 					break;
+				}else{
+					startGPS();
+					try {
+						Thread.sleep(15*1000);
+					}catch (InterruptedException e) {}
 				}
 			}
 		}
