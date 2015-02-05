@@ -301,7 +301,7 @@ public class InputStream implements Serializable{
 				while ( resultOfTheQuery.hasMoreElements( ) ) {
 					elementCounterForDebugging++;
 					StreamElement element= resultOfTheQuery.nextElement( );
-					sensor.dataAvailable( this.getInputStreamName( ) , element );
+					sensor.dataAvailable_wrapper( this.getInputStreamName( ) , element );
 				}
 			} catch ( final UnsupportedOperationException e ) {
 				logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );

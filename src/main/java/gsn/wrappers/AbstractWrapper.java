@@ -29,6 +29,7 @@
 package gsn.wrappers;
 
 import gsn.Main;
+import gsn.Monitorable;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -38,7 +39,6 @@ import gsn.beans.windowing.RemoteTimeBasedSlidingHandler;
 import gsn.beans.windowing.SlidingHandler;
 import gsn.beans.windowing.TupleBasedSlidingHandler;
 import gsn.beans.windowing.WindowType;
-import gsn.storage.StorageManager;
 import gsn.utils.GSNRuntimeException;
 
 import java.io.Serializable;
@@ -48,13 +48,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
 
 import org.apache.log4j.Logger;
 
-public abstract class AbstractWrapper extends Thread {
+public abstract class AbstractWrapper extends Thread implements Monitorable {
 
 	private final static transient Logger logger = Logger
 			.getLogger(AbstractWrapper.class);
@@ -77,6 +78,8 @@ public abstract class AbstractWrapper extends Thread {
 	private Long lastInOrderTimestamp;
 
 	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
+	
+	private Long oooCount = 0L;
 
 	/**
 	 * Returns the view name created for this listener. Note that, GSN creates
@@ -282,6 +285,7 @@ public abstract class AbstractWrapper extends Thread {
 		Connection conn = null;
 		try {
             if (isOutOfOrder(se)) {
+            	oooCount = oooCount == Long.MAX_VALUE ? 0 : oooCount + 1;
 				logger.debug("Out of order data item detected, it is not propagated into the system : [" + se.toString() + "]");
 				return false;
 			}
@@ -400,6 +404,7 @@ public abstract class AbstractWrapper extends Thread {
 
 	public void releaseResources() throws SQLException {
 		isActive = false;
+		Main.getInstance().getToMonitor().remove(this);
 		dispose();
 		if (logger.isInfoEnabled())
 			logger.info("dispose called");
@@ -411,6 +416,12 @@ public abstract class AbstractWrapper extends Thread {
 	}
 
 	public static final String TIME_FIELD = "timed";
+	
+	
+	public final boolean initialize_wrapper(){
+		Main.getInstance().getToMonitor().add(this);
+		return initialize();
+	}
 
 	/**
 	 * The addressing is provided in the ("ADDRESS",Collection<KeyValue>). If
@@ -424,7 +435,7 @@ public abstract class AbstractWrapper extends Thread {
 	 */
 
 	public abstract boolean initialize();
-
+	
 	public abstract void dispose();
 
 	public abstract String getWrapperName();
@@ -464,4 +475,12 @@ public abstract class AbstractWrapper extends Thread {
 		throw new RuntimeException(
 				"Manual data insertion is not supported by this wrapper");
 	}
+	
+	public Hashtable<String, Object> getStatistics(){
+		Hashtable<String, Object> stat = new Hashtable<String, Object>();
+		stat.put(activeAddressBean.getVirtualSensorName()+"_"+ activeAddressBean.getInputStreamName() +"_outOfOrder_count", oooCount);
+		return stat;
+	}
+	
+	
 }

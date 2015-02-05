@@ -73,6 +73,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -136,6 +137,7 @@ public final class Main {
     private ContainerConfig                               containerConfig;
     private static GsnConf gsnConf;
     private static Map <String,VsConf> vsConf =new HashMap<String,VsConf>();
+    private static ArrayList<Monitorable> toMonitor = new ArrayList<Monitorable>();
     
 
     private Main() throws Exception {
@@ -550,6 +552,9 @@ public final class Main {
     }
     public Map<String,VsConf> getVsConf(){
     	return vsConf;
+    }
+    public ArrayList<Monitorable> getToMonitor(){
+    	return toMonitor;
     }
 }
 
