@@ -138,15 +138,17 @@ object CsvSerializer extends DataSerializer{
     head("fields",fields.map{_.fieldName}.mkString(","))
     head("units",fields.map{_.unit.code}.mkString(","))
     head("types",fields.map{_.dataType.name}.mkString(","))
-    println("drimp "+data.ts.head.series.size+" "+fields.size)
-    val si=data.ts.head.series.size-1
-    (0 to si).foreach{i=>
-      //sw.append(data.time(i)+",")
-      val pp=(0 to fields.size-1).map{j=>
-        data.ts(j).series (i)        
-      }.mkString(",")
-      sw.append(pp+System.lineSeparator)
-      //sw.append(pp)
+    if (!data.ts.isEmpty){
+	    println("drimp "+data.ts.head.series.size+" "+fields.size)
+	    val si=data.ts.head.series.size-1
+	    (0 to si).foreach{i=>
+	      //sw.append(data.time(i)+",")
+	      val pp=(0 to fields.size-1).map{j=>
+	        data.ts(j).series (i)        
+	      }.mkString(",")
+	      sw.append(pp+System.lineSeparator)
+	      //sw.append(pp)  
+	    }
     }
     
     sw  

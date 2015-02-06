@@ -62,7 +62,8 @@ object SensorService extends Controller{
         Future(BadRequest(t.getMessage))    
     }.get    
   }
-        
+  
+  @deprecated("user-password authentication phased out","")
   private def authorizeUserPass(vsname:String)(implicit request:Request[AnyContent])={
     val optUser=queryparam("username")
 	val optPass=queryparam("password")
@@ -83,7 +84,7 @@ object SensorService extends Controller{
 	      throw new IllegalArgumentException(s"Apikey ${optApikey.get} not authorized for resource $vsname")      
 	  }
 	  else
-	    throw new IllegalArgumentException("Not provided required apikey or user credentials")
+	    throw new IllegalArgumentException("Required apikey or user credentials were not provided")
     }
   }
   
@@ -124,7 +125,8 @@ object SensorService extends Controller{
             case Csv=>Ok(CsvSerializer.ser(data.head,Seq(),false))
           }
       }.recoverWith{case e=>
-        Logger.error(e.getMessage)
+        
+        Logger.error(e.getMessage+e.getStackTrace().mkString("\n"))
         Future(BadRequest(e.getMessage))
       }
       copo
@@ -132,5 +134,11 @@ object SensorService extends Controller{
       case t=>
         Future(BadRequest(t.getMessage))
     }.get
+  }
+  
+  def download= Action.async {implicit request=>
+    //request.body.
+    Future(Ok(""))
+    
   }
 }
