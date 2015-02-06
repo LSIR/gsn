@@ -45,6 +45,8 @@ import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.WPPushDelivery;
 import gsn.http.rest.RestDelivery;
+import gsn.monitoring.MemoryMonitor;
+import gsn.monitoring.Monitorable;
 import gsn.networking.zeromq.ZeroMQDelivery;
 import gsn.networking.zeromq.ZeroMQProxy;
 import gsn.security.SecurityData;
@@ -182,6 +184,8 @@ public final class Main {
         validationStorage = StorageManagerFactory.getInstance("org.h2.Driver", "sa", "", "jdbc:h2:mem:validator", Main.DEFAULT_MAX_DB_CONNECTIONS);
 
         if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
+        
+        toMonitor.add(new MemoryMonitor());
 
 		try {
 			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxSlidingDBConnections: " + maxSlidingDBConnections + ", maxServlets:"+maxServlets+")"+" ...");

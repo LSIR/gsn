@@ -23,10 +23,10 @@
 *
 */
 
-package gsn.http;
+package gsn.monitoring;
 
 import gsn.Main;
-import gsn.Monitorable;
+import gsn.http.HttpRequestUtils;
 
 import org.apache.log4j.Logger;
 

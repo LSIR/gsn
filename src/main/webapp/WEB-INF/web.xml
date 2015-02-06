@@ -261,7 +261,7 @@
 	<servlet>
 		<servlet-name>MonitoringServlet</servlet-name>
 		<display-name>MonitoringServlet</display-name>
-		<servlet-class>gsn.http.MonitoringServlet</servlet-class>
+		<servlet-class>gsn.monitoring.MonitoringServlet</servlet-class>
 	</servlet>
 
 	<servlet>

@@ -23,13 +23,13 @@
 * @author Ali Salehi
 * @author Mehdi Riahi
 * @author Timotee Maret
+* @author Julien Eberle
 *
 */
 
 package gsn.wrappers;
 
 import gsn.Main;
-import gsn.Monitorable;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -39,6 +39,7 @@ import gsn.beans.windowing.RemoteTimeBasedSlidingHandler;
 import gsn.beans.windowing.SlidingHandler;
 import gsn.beans.windowing.TupleBasedSlidingHandler;
 import gsn.beans.windowing.WindowType;
+import gsn.monitoring.Monitorable;
 import gsn.utils.GSNRuntimeException;
 
 import java.io.Serializable;
@@ -478,7 +479,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put(activeAddressBean.getVirtualSensorName()+"_"+ activeAddressBean.getInputStreamName() +"_outOfOrder_count", oooCount);
+		stat.put(activeAddressBean.getVirtualSensorName()+":"+ activeAddressBean.getInputStreamName() +":outOfOrder:count", oooCount);
 		return stat;
 	}
 	

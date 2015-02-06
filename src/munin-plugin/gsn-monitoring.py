@@ -1,6 +1,7 @@
  #!/usr/bin/python
 
 import urllib, sys
+from collections import defaultdict
 
 
 def main():
@@ -9,23 +10,59 @@ def main():
     if len(sys.argv) < 2:
         data(r)
 
+
     if sys.argv[1] == "config":
-        print "graph_title GSN status"
+        vs = defaultdict(list)
+        print "multigraph gsn_core"
+        print "graph_title GSN Server status"
         for k in r[0][:-1].split(","):
-            print "%s.label %s"%(k,k)
-            if k.endswith("count"):
-                print "%s.min 0"%(k)
-                print "%s.type DERIVE"%(k)
+            kk = k.split(":")
+            if kk[0] == "":
+                print "%s.label %s"%(kk[2],kk[2])
+                if kk[3] == "count":
+                    print "%s.min 0"%(kk[2])
+                    print "%s.type DERIVE"%(kk[2])
+             else:
+                vs[kk[0]].append(kk[1:])
+        for k,v in vs.iteritems():
+            print "multigraph gsn_vsensors_"+k
+            print "graph_title GSN Virtual Sensor '"+k+"' status"
+            for vv in v:
+                if vv[0] == "":
+                    print "%s.label %s"%(vv[1],vv[1])
+                    if vv[2] == "count":
+                        print "%s.min 0"%(vv[1])
+                        print "%s.type DERIVE"%(vv[1])
+                else:
+                    print "%s_%s.label (%s) %s"%(vv[0],vv[1],vv[0],vv[1])
+                    if vv[2] == "count":
+                        print "%s_%s.min 0"%(vv[0],vv[1])
+                        print "%s_%s.type DERIVE"%(vv[0],vv[1])
+
     elif sys.argv[1] == "help":
         usage()
     else:
         data(r)
 
 def data(r):
-     keys = r[0][:-1].split(",")
-     vals = r[1][:-1].split(",")
-     for i in range(len(keys)):
-         print "%s.value %s"%(keys[i],vals[i])
+    keys = r[0][:-1].split(",")
+    vals = r[1][:-1].split(",")
+    vs = defaultdict(list)
+    print "multigraph gsn_core"
+    for i in range(len(keys)):
+        kk = keys[i].split(":")
+        if kk[0] == "":
+            print "%s.value %s"%(kk[2],vals[i])
+        else:
+            vs[kk[0]].append((kk[1],kk[2],vals[i]))
+    for k,v in vs.iteritems():
+        print "multigraph gsn_vsensors_"+k
+        for vv in v:
+            if vv[0] == "":
+                print "%s.value %s"%(vv[1],vv[2])
+            else:
+                print "%s_%s.value %s"%(vv[0],vv[1],vv[2])
+
 
 
 def usage():

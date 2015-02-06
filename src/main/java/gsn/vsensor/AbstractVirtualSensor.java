@@ -29,11 +29,11 @@ package gsn.vsensor;
 
 import gsn.ContainerImpl;
 import gsn.Main;
-import gsn.Monitorable;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.monitoring.Monitorable;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -201,8 +201,8 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 	 */
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put(virtualSensorConfiguration.getName() +"_output_count", outputCount);
-		stat.put(virtualSensorConfiguration.getName() +"_input_count", inputCount);
+		stat.put(virtualSensorConfiguration.getName() +"::output:count", outputCount);
+		stat.put(virtualSensorConfiguration.getName() +"::input:count", inputCount);
 		return stat;
 	}
 	

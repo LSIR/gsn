@@ -1,4 +1,4 @@
-package gsn;
+package gsn.monitoring;
 
 import java.util.Hashtable;
 
