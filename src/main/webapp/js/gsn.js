@@ -556,7 +556,7 @@ var GSN = {
 		
         $.ajax({
             type: "GET",
-            url: "/gsn?REQUEST=0&omit_latest_values=true",
+            url: "gsn?REQUEST=0&omit_latest_values=true",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
@@ -566,7 +566,7 @@ var GSN = {
   		
         $.ajax({
             type: "GET",
-            url: "/gsn?REQUEST=0&omit_latest_values=false",
+            url: "gsn?REQUEST=0&omit_latest_values=false",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
@@ -621,7 +621,7 @@ var GSN = {
         GSN.vsbox.bringToFront(vsName);
         $.ajax({
             type: "GET",
-            url: "/gsn?name="+vsName,
+            url: "gsn?name="+vsName,
             success: function(data){
                 $("virtual-sensor[@name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
@@ -722,7 +722,7 @@ var GSN = {
             })
             ));
 			
-            $(this.container).find("."+vsdiv+" dl.upload").html('<form target="webupload" enctype="multipart/form-data" method="post" action="/upload"><input value="'+vsName+'" name="vsname" type="hidden"><select name="cmd" class="cmd"></select><dl class="input"></dl><input value="upload" type="submit"><p>* compulsary fields.</p></form>');
+            $(this.container).find("."+vsdiv+" dl.upload").html('<form target="webupload" enctype="multipart/form-data" method="post" action="upload"><input value="'+vsName+'" name="vsname" type="hidden"><select name="cmd" class="cmd"></select><dl class="input"></dl><input value="upload" type="submit"><p>* compulsary fields.</p></form>');
             $(this.container).find("."+vsdiv+" select.cmd").bind("change", function(event) {
                 GSN.vsbox.toggleWebInput(event)
             });
@@ -1231,7 +1231,7 @@ var GSN = {
                 $.ajax({
                     async: false,
                     type: "GET",
-                    url: "/gsn?REQUEST=113&name="+GSN.selectedSensors[i],
+                    url: "gsn?REQUEST=113&name="+GSN.selectedSensors[i],
                     success: function(msg) {
                         $("virtual-sensor field", msg).each(function() {
                             if ($(this).attr("type").substr(0,3) != "bin") {
@@ -1675,7 +1675,7 @@ var GSN = {
    			document.forms["formular"].submit();
    		} */ 
             else if ($("#CSV").attr("checked")) {
-                $("form").attr("action", "/multidata");
+                $("form").attr("action", "multidata");
                 $("form").attr("target", "_blank");
    			
                 $("#step2Container .data :disabled").removeAttr("disabled");
@@ -1750,7 +1750,7 @@ var GSN = {
                     async: false,
                     type: "GET",
 //TODO                    url: "/data?"+request+"&vsName="+vsName+"&rand="+Math.random(),
-                    url: "/multidata?vsname=ss_mem_vs:heap_memory_usage",
+                    url: "multidata?vsname=ss_mem_vs:heap_memory_usage",
                     success: function(answer) {
 
 
