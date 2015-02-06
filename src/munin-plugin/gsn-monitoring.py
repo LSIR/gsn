@@ -1,4 +1,4 @@
- #!/usr/bin/python
+#!/usr/bin/python
 
 import urllib, sys
 from collections import defaultdict
@@ -15,6 +15,7 @@ def main():
         vs = defaultdict(list)
         print "multigraph gsn_core"
         print "graph_title GSN Server status"
+        print "graph_period minute"
         for k in r[0][:-1].split(","):
             kk = k.split(":")
             if kk[0] == "":
@@ -22,11 +23,12 @@ def main():
                 if kk[3] == "count":
                     print "%s.min 0"%(kk[2])
                     print "%s.type DERIVE"%(kk[2])
-             else:
+            else:
                 vs[kk[0]].append(kk[1:])
         for k,v in vs.iteritems():
             print "multigraph gsn_vsensors_"+k
             print "graph_title GSN Virtual Sensor '"+k+"' status"
+            print "graph_period minute"
             for vv in v:
                 if vv[0] == "":
                     print "%s.label %s"%(vv[1],vv[1])
@@ -62,6 +64,7 @@ def data(r):
                 print "%s.value %s"%(vv[1],vv[2])
             else:
                 print "%s_%s.value %s"%(vv[0],vv[1],vv[2])
+    sys.exit(0)
 
 
 
