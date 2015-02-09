@@ -108,16 +108,22 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			if (action.equals("send")){
 				int id=0;
 				String command="";
+				boolean force = false;
 			    for (int i = 0;i<paramNames.length;i++){
 			    	if (paramNames[i].equals("id")){
 			    		id = Integer.parseInt((String) paramValues[i]);
 			    	}else if(paramNames[i].equals("command")){
 			    		command = (String) paramValues[i];
+			    	}else if(paramNames[i].equals("force")){
+			    		force = ((String) paramValues[i]).equalsIgnoreCase("ok");
 			    	}
 			    }
 			    if (id == 0 || command.equals("")){
 			    	return false;
 			    }else{
+			    	if (force){
+			    		id += 9000;
+			    	}
 			        messages.put(id,command.getBytes());
 			    }
 			}else if (action.equals("clear")){
@@ -201,6 +207,13 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 						public void parse(){
 							try{
 								ctr ++;
+								if (messages.containsKey(sd.id+9000)){ //forced messages
+									logger.warn("writing (forced) '"+new String(messages.get(sd.id))+"' to "+sd.id);
+									output.write(messages.get(sd.id+9000));
+									output.write("\r\n".getBytes());
+									output.flush();
+									messages.remove(sd.id+9000);
+								}
 								if (retry > 0 && System.currentTimeMillis() - lastRetry > 1000) 
 								{
 									output.write(("close "+sd.id+"\r\n").getBytes());

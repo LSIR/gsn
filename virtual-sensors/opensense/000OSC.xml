@@ -2,14 +2,15 @@
 	<processing-class>
 		<class-name>gsn.vsensor.OpensenseBridgeVirtualSensor</class-name>
 		<unique-timestamps>false</unique-timestamps>
-		<web-input password="test">
+		<web-input>
 			<command name="send">
-			    <field name="id" type="text">Node ID, as advertised in the command request function</field>
-				<field name="command" type="text">close --station_id--, telnet_set --station_id--, rstsys, reboot, setPeriod --station_id--,--T1--,--T2--, server --name-- --port--</field>
-			</command>
-			<command name="clear">
-			    <field name="clear" type="checkbox:ok">Confirmation</field>
-			</command>
+                <field name="id" type="text">Node ID, as advertised in the command request function</field>
+                <field name="command" type="text">close --station_id--, telnet_set --station_id--, rstsys, reboot, setPeriod --station_id--,--T1--,-       -T2--, server --name-- --port--</field>
+                <field name="force" type="checkbox:ok">Force sending of the command. Will send it without waiting for the request packet.</field>
+            </command>
+            <command name="clear">
+                <field name="clear" type="checkbox:ok">Confirmation</field>
+            </command>
 		</web-input>
 		<output-structure>
                         <field name="timestamp" type="bigint" />
