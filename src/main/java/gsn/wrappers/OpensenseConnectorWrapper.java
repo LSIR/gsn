@@ -207,7 +207,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 						public void parse(){
 							try{
 								ctr ++;
-								if (messages.containsKey(sd.id+9000)){ //forced messages
+								if (sd != null && messages.containsKey(sd.id+9000)){ //forced messages
 									logger.warn("writing (forced) '"+new String(messages.get(sd.id))+"' to "+sd.id);
 									output.write(messages.get(sd.id+9000));
 									output.write("\r\n".getBytes());
