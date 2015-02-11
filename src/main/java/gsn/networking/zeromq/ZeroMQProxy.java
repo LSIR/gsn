@@ -71,7 +71,7 @@ public class ZeroMQProxy extends Thread implements Runnable {
 		        	   break;
 		        	   }
 		        	   String topic = ((String)event.getValue()).substring(1);
-		        	   logger.warn("removing unused publisher " + topic);
+		        	   logger.warn("["+event.getAddress()+"] removing unused publisher " + topic);
 		        	   DataDistributer.getInstance(ZeroMQDelivery.class).removeListener(distributers.get(topic));
 		        	   distributers.remove(topic);
 	        	   }
