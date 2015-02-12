@@ -184,6 +184,8 @@ class ScheduleHandlerClass(Thread, Statistics):
         
         if self._duty_cycle_mode:
             self._pingThread = TOSPingThread(self, PING_INTERVAL_SEC, WATCHDOG_TIMEOUT_SEC)
+            self._backlogMain.instantiateTOSPeer()
+            self._pingThread.start()
         
         if os.path.isfile('%s.parsed' % (self._getOptionValue('schedule_file', self._config),)):
             try:
@@ -263,7 +265,6 @@ class ScheduleHandlerClass(Thread, Statistics):
             self._logger.info('started')
             
             if self._duty_cycle_mode:
-                self._pingThread.start()
                 self.tosMsgSend(TOSTypes.CONTROL_CMD_WAKEUP_QUERY)
                 if self._scheduleHandlerStop:
                     self._logger.info('died')

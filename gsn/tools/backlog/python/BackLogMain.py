@@ -182,11 +182,11 @@ class BackLogMainClass(Thread, Statistics):
         self._logger.info('loaded PowerControl class')
         self.gsnpeer = GSNPeerClass(self, self.device_id, self.confighandler.getParsedConfig()['gsn_port'])
         self._logger.info('loaded GSNPeerClass')
-        self.backlog = BackLogDBClass(self, self.confighandler.getParsedConfig()['backlog_db'], self.confighandler.getParsedConfig()['backlog_db_resend_hr'])
-        self._logger.info('loaded BackLogDBClass')
-            
         self.schedulehandler = ScheduleHandlerClass(self, self.duty_cycle_mode, self.confighandler.getParsedConfig()['config_schedule'])
         self._msgtypetoplugin.update({self.schedulehandler.getMsgType(): [self.schedulehandler]})
+        self._logger.info('loaded ScheduleHandlerClass')
+        self.backlog = BackLogDBClass(self, self.confighandler.getParsedConfig()['backlog_db'], self.confighandler.getParsedConfig()['backlog_db_resend_hr'])
+        self._logger.info('loaded BackLogDBClass')
         
         self.powerMonitor = None
         try:
@@ -363,7 +363,7 @@ class BackLogMainClass(Thread, Statistics):
                 self._logger.info('tos_version: %s' % (self._tos_version,))
                 try:
                     self._tospeer = TOSPeerClass(self, self._tos_address, self._tos_version)
-                    if self.isAlive():
+                    if self.isAlive() or self.duty_cycle_mode:
                         self._tospeer.start()
                     self._logger.info('TOSPeerClass instantiated')
                 except Exception, e:
