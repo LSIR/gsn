@@ -539,8 +539,6 @@ class ScheduleHandlerClass(Thread, Statistics):
         elif response['command'] == TOSTypes.CONTROL_CMD_RESET_WATCHDOG:
             if self._logger.isEnabledFor(logging.DEBUG):
                 self._logger.debug('CONTROL_CMD_RESET_WATCHDOG response received with argument: %s' % (response['argument'],))
-        else:
-            return False
         
              
         if packet['type'] == TOSTypes.AM_CONTROLCOMMAND:
@@ -554,7 +552,6 @@ class ScheduleHandlerClass(Thread, Statistics):
                     self._logger.debug('TOS packet acknowledge already received')
                 else:
                     self.error('received TOS message type (%s) does not match the sent command type (%s)' % (response['command'], self._tosSentCmd))
-                    return False
                 
         return True
         
