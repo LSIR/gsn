@@ -28,7 +28,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "2.1.0",
   "com.mchange" % "c3p0" % "0.9.5-pre10",
   "ch.qos.logback" % "logback-classic" % "1.1.1" % "test",
-  "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
+  "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test"
 )
 
 resolvers ++= Seq(

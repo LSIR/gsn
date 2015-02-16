@@ -31,7 +31,7 @@ object JsonSerializer extends DataSerializer{
     toJson(data.sensor,data.ts)//values, fields)     
   }
   
-  private def toJson(sensor:Sensor,ts:Seq[TimeSeries])={//values:Seq[Seq[Any]]=Seq(),valueNames:Seq[String]=Seq())={
+  private def toJson(sensor:Sensor,ts:Seq[TimeSeries])={
         
     
     //val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
@@ -71,9 +71,7 @@ object JsonSerializer extends DataSerializer{
         "features"->JsArray(sensorsData.map(s=>toJson(s))))    
   
 
-  private def valueToJson(any:Any):JsValue=any match{
-    
-   
+  private def valueToJson(any:Any):JsValue=any match{       
     case d:Double=>JsNumber(d)
     case i:Int=>JsNumber(i)
     case l:Long=>JsNumber(l)

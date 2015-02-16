@@ -18,6 +18,7 @@ import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 import play.Logger
+import scala.util.Success
 
 object SensorService extends Controller{   
   lazy val conf=ConfigFactory.load
@@ -44,7 +45,7 @@ object SensorService extends Controller{
       val latestVals=param("latestValues",_.toBoolean,false)
       val timeFormat=queryparam("timeFormat")
       val p=Promise[Seq[SensorData]]
-      
+           
       val st=Akka.system.actorSelection("/user/gsnSensorStore")
       val q=Akka.system.actorOf(Props(new QueryActor(p)))
       q ! GetAllSensors(latestVals,timeFormat)
@@ -88,10 +89,11 @@ object SensorService extends Controller{
     }
   }
   
-  def sensor(sensorid:String) = Action.async {implicit request=>
+  def sensorData(sensorid:String) = Action.async {implicit request=>
     Try{
       val vsname=sensorid.toLowerCase
-      authorizeVs(sensorid)
+      //to enable
+      //authorizeVs(sensorid)
     	
       val size:Option[Int]=queryparam("size").map(_.toInt)
       val fieldStr:Option[String]=queryparam("fields")
@@ -117,7 +119,15 @@ object SensorService extends Controller{
       val q=Akka.system.actorOf(Props(new QueryActor(p)))
       
       q ! GetSensorData(sensorid,fields,conds++filters,size,timeFormat)
-      val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 5.second)
+      //val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 15.second)
+      p.future.map{data=>
+        
+          format match{
+            case Json=>Ok(JsonSerializer.ser(data.head,Seq(),false))
+            case Csv=>Ok(CsvSerializer.ser(data.head,Seq(),false))
+          }
+          
+      }/*
       val copo =Future.firstCompletedOf(Seq(p.future,to)).map{          
         data=> 
           format match{
@@ -129,13 +139,35 @@ object SensorService extends Controller{
         Logger.error(e.getMessage+e.getStackTrace().mkString("\n"))
         Future(BadRequest(e.getMessage))
       }
-      copo
+      copo*/
     }.recover{
       case t=>
         Future(BadRequest(t.getMessage))
     }.get
   }
-  
+
+  def sensorMetadata(sensorid:String) = Action.async {implicit request=>
+    Try{
+      //to enable
+      //authorizeVs(sensorid)    	
+      val timeFormat:Option[String]=queryparam("timeFormat")
+      val format=param("format",OutputFormat,defaultFormat)            
+      val p=Promise[Seq[SensorData]]               
+      val q=Akka.system.actorOf(Props(new QueryActor(p)))      
+      q ! GetSensor(sensorid,true,timeFormat)
+      //val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 15.second)
+      p.future.map{data=>        
+          format match{
+            case Json=>Ok(JsonSerializer.ser(data.head,Seq(),false))
+            case Csv=>Ok(CsvSerializer.ser(data.head,Seq(),false))
+          }          
+      }
+    }.recover{
+      case t=>
+        Future(BadRequest(t.getMessage))
+    }.get
+  }
+
   def download= Action.async {implicit request=>
     //request.body.
     Future(Ok(""))

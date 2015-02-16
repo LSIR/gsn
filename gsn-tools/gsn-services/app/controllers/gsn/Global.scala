@@ -20,7 +20,8 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
     Logger.info("Application has started")
     val sec=new SecurityData(ds)
-    sec.upgradeUsersTable    
+    //to enable 
+    //sec.upgradeUsersTable    
     Akka.system(app).actorOf(Props(new SensorStore(ds)),"gsnSensorStore")
   }
 
