@@ -135,7 +135,13 @@ object SensorDatabase {
 	  log debug s"Computed rate for $vsName"
 	}
 	SensorStats(rate,min,max,latestValues(sensor,timeFormat))
-    }.getOrElse(throw new Exception("Error in computing the stats of "+sensor.name ))
+    } match{
+      case Failure(f)=> 
+        log error s"Error ${f.getMessage}"
+        f.printStackTrace(); 
+        throw new Exception(s"Error in computing the stats of $vsName" )
+      case Success(d) => d
+    }
   }
   
   private def vsDB(ds:Option[DataSource])={
