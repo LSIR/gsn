@@ -34,10 +34,12 @@ object SensorDatabase {
         fields.indices.map{i=>
         TimeSeries(fields(i),data(i).toSeq)
       }
-      log.debug(s"computed latest values for ${sensor.name}" )
+      log debug s"computed latest values for $vsName" 
       ts      
     }) match{
-      case Failure(f)=> f.printStackTrace(); Seq()
+      case Failure(f)=> 
+        log error s"Error ${f.getMessage}"
+        f.printStackTrace(); Seq()
       case Success(d) => d
     }
   }
@@ -115,7 +117,8 @@ object SensorDatabase {
       while (rs.next){
         min=Some(rs.getLong(2))
         max=Some(rs.getLong(1))
-      }          
+      }
+      log debug s"Computed max_/min for $vsName"
     }
 	vsDB(ds).withSession {implicit session=>
 	  val times=new ArrayBuffer[Long]()
@@ -129,7 +132,7 @@ object SensorDatabase {
         t1=t2
       }          
 	  rate=Some(times.sum/times.size)
-	  
+	  log debug s"Computed rate for $vsName"
 	}
 	SensorStats(rate,min,max,latestValues(sensor,timeFormat))
     }.getOrElse(throw new Exception("Error in computing the stats of "+sensor.name ))
