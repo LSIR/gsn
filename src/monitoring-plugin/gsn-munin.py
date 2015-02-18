@@ -36,7 +36,7 @@ def main():
 def data(r):
     groups = defaultdict(list)
     for k in r:
-        p = k[:-1].partition(" ") #ignore the newline
+        p = k.partition(" ")
         kk = p[0].split(".")
         groups[(kk[0],kk[1])].append((kk,p[2]))
 
