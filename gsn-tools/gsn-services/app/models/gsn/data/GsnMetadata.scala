@@ -48,7 +48,7 @@ class GsnMetadata(gsnServer:String) {
     val location=Location(coord(0).asOpt[Double],
         coord(1).asOpt[Double],
         coord(2).asOpt[Double])
-    lazy val platform=new Platform(vsName,location,Seq(s))
+    lazy val platform=new Platform(vsName,location)
     lazy val s:Sensor= Sensor(vsName,fields,platform,Map())
     s
   }
