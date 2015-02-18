@@ -26,7 +26,6 @@
 package gsn.monitoring;
 
 import gsn.Main;
-import gsn.http.HttpRequestUtils;
 
 import org.apache.log4j.Logger;
 
@@ -41,15 +40,15 @@ import java.util.Map;
 
 
 
-
 public class MonitoringServlet extends HttpServlet {
 
     private static transient Logger logger = Logger.getLogger(MonitoringServlet.class);
     
     /**
      * Return statistics about the GSN server
-     * if the "header" parameter is "true", returns the column names (comma separated).
-     * Otherwise returns only the values (comma separated)
+     * 
+     * the protocol is similar to the carbon protocol used by Graphite, except the timestamp
+     * http://matt.aimonetti.net/posts/2013/06/26/practical-guide-to-graphite-monitoring/
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -57,22 +56,16 @@ public class MonitoringServlet extends HttpServlet {
         response.setDateHeader("Expires", 0);
         response.setHeader("Pragma", "no-cache");
 
-        String header = HttpRequestUtils.getStringParameter("header", "false", request);
-
         StringBuilder values = new StringBuilder();
-        StringBuilder head = new StringBuilder();
         
         for (Monitorable m : Main.getInstance().getToMonitor()){
         	Hashtable<String,Object> h = m.getStatistics();
         	for (Map.Entry<String,Object> e : h.entrySet()){
-        		head.append(e.getKey()).append(",");
-        		values.append(e.getValue()).append(",");
+        		values.append(e.getKey()).append(" ");
+        		values.append(e.getValue()).append("\n");
         	}
         }
         
-		if (header.equalsIgnoreCase("true")){
-			values = head.append("\n").append(values);
-		}
 	    response.getWriter().write(values.toString());
     }
 

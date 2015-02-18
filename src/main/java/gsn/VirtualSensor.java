@@ -80,7 +80,7 @@ public class VirtualSensor {
 
     public synchronized void closePool() {
         if (virtualSensor != null) {
-            virtualSensor.dispose_wrapper();
+            virtualSensor.dispose_decorated();
             if (logger.isDebugEnabled())
                 logger.debug("VS " + config.getName() + " is now released.");
         } else if (logger.isDebugEnabled())

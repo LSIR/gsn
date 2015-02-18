@@ -163,7 +163,7 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 	}
 
 	
-	public final void dispose_wrapper(){
+	public final void dispose_decorated(){
 		Main.getInstance().getToMonitor().remove(this);
 		dispose();
 	}
@@ -201,12 +201,12 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 	 */
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put(virtualSensorConfiguration.getName() +"::output:count", outputCount);
-		stat.put(virtualSensorConfiguration.getName() +"::input:count", inputCount);
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll(".", "_") +".output.produced.count", outputCount);
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll(".", "_") +".input.produced.count", inputCount);
 		return stat;
 	}
 	
-	public final void dataAvailable_wrapper ( String inputStreamName , StreamElement streamElement ){
+	public final void dataAvailable_decorated ( String inputStreamName , StreamElement streamElement ){
 		dataAvailable ( inputStreamName , streamElement );
 		inputCount = inputCount == Long.MAX_VALUE ? 0 : inputCount + 1;
 	}

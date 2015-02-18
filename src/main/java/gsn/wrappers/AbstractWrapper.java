@@ -81,6 +81,8 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
 	
 	private Long oooCount = 0L;
+	
+	private Long elementCount = 0L;
 
 	/**
 	 * Returns the view name created for this listener. Note that, GSN creates
@@ -293,6 +295,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 			conn = Main.getWindowStorage().getConnection();
 			Main.getWindowStorage().executeInsert(aliasCodeS, getOutputFormat(), se, conn);
             lastInOrderTimestamp = se.getTimeStamp();
+            elementCount = elementCount == Long.MAX_VALUE ? 0 : elementCount + 1;
             return true;
 		} finally {
 			Main.getWindowStorage().close(conn);
@@ -479,7 +482,8 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put(activeAddressBean.getVirtualSensorName()+":"+ activeAddressBean.getInputStreamName() +":outOfOrder:count", oooCount);
+		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll(".", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll(".", "_") +".outOfOrder.count", oooCount);
+		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll(".", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll(".", "_") +".produced.count", elementCount);
 		return stat;
 	}
 	
