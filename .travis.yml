@@ -1,0 +1,9 @@
+language: java
+script: "ant build"
+jdk:
+  - openjdk7
+branches:
+  only:
+    - master
+    - opensense
+
