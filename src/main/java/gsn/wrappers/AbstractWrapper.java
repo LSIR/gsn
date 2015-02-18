@@ -482,8 +482,8 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll(".", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll(".", "_") +".outOfOrder.count", oooCount);
-		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll(".", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll(".", "_") +".produced.count", elementCount);
+		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll("\\.", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll("\\.", "_") +".outOfOrder.count", oooCount);
+		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll("\\.", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll("\\.", "_") +".produced.count", elementCount);
 		return stat;
 	}
 	

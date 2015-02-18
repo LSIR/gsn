@@ -17,7 +17,7 @@ def main():
             kk = k.partition(" ")[0].split(".")
             groups[(kk[0],kk[1])].append(kk)
 
-        for k,v in groups:
+        for k,v in groups.iteritems():
             print "multigraph gsn_%s_%s"%(k[0],k[1])
             print "graph_title GSN Server %s %s"%(k[0],k[1])
             print "graph_period minute"
@@ -40,7 +40,7 @@ def data(r):
         kk = p[0].split(".")
         groups[(kk[0],kk[1])].append((kk,p[2]))
 
-    for k,v in groups:
+    for k,v in groups.iteritems():
         print "multigraph gsn_%s_%s"%(k[0],k[1])
         for vv in v:
             print "%s.value %s"%("_".join(vv[0][2:-1]),vv[1])

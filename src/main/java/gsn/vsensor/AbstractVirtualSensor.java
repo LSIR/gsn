@@ -201,8 +201,8 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 	 */
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll(".", "_") +".output.produced.count", outputCount);
-		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll(".", "_") +".input.produced.count", inputCount);
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.produced.count", outputCount);
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".input.produced.count", inputCount);
 		return stat;
 	}
 	
