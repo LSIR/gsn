@@ -54,7 +54,7 @@ class QueryActor(p:Promise[Seq[SensorData]]) extends Actor {
   }
   
   private def latestToData(si:SensorInfo)={
-    SensorData(si.stats.get.latestValues,si.sensor ) 
+    SensorData(si.stats.get.latestValues,si.sensor,si.stats.getOrElse(EmptyStats) ) 
   }
   
   

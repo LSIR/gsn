@@ -9,15 +9,14 @@ import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
 
-
 object SensorDatabase { 
-  val log=LoggerFactory.getLogger(SensorDatabase.getClass())
+  val log=LoggerFactory.getLogger(SensorDatabase.getClass)
   def latestValues(sensor:Sensor, timeFormat:Option[String]=None)
     (implicit ds:Option[DataSource]) ={
     val vsName=sensor.name 
 	val query = s"""select * from $vsName where  
 	  timed = (select max(timed) from $vsName )"""
-	Try(vsDB(ds).withSession {implicit session=>	  
+	Try(vsDB(ds).withSession {implicit session=>
       val stmt=session.conn.createStatement
       val rs= stmt.executeQuery(query.toString)
       val fields=sensor.fields
@@ -29,6 +28,10 @@ object SensorDatabase {
           data(i) += (rs.getObject(fields(i).fieldName ))
         }           
       }
+      rs.close
+      stmt.close
+      session.conn.close
+      session.close
       val ts=
         Seq(TimeSeries(timeOutput(sensor.name),time))++
         fields.indices.map{i=>
@@ -131,7 +134,8 @@ object SensorDatabase {
           times+= t2-t1
         t1=t2
       }          
-	  rate=Some(times.sum/times.size)
+	  if (times.size>0)
+	    rate=Some(times.sum/times.size)
 	  log debug s"Computed rate for $vsName"
 	}
 	SensorStats(rate,min,max,latestValues(sensor,timeFormat))
@@ -139,7 +143,9 @@ object SensorDatabase {
       case Failure(f)=> 
         log error s"Error ${f.getMessage}"
         f.printStackTrace(); 
-        throw new Exception(s"Error in computing the stats of $vsName" )
+      	SensorStats(rate,min,max,Seq())
+
+        //throw new Exception(s"Error in computing the stats of $vsName" )
       case Success(d) => d
     }
   }

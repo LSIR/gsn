@@ -50,6 +50,8 @@ case class SensorStats(rate:Option[Double],
   }
 }
 
+object EmptyStats extends SensorStats(None,None,None,Seq())
+
 case class Platform(val name:String,val location:Location)
 
 case class Output(fieldName:String,stream:String,unit:DataUnit,dataType:DataType){

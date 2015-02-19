@@ -31,36 +31,39 @@ class SensorStore(ds:DataStore) extends Actor{
   def receive ={    
     //vs config messages
     case ModifiedVsConf(vs)=>
+      val vsname=vs.name.toLowerCase
       if (vs.storage.isDefined) {
         val d=ds.datasource(vs.storage.get.url, vs.storage.get)
-        vsDatasources.put(vs.name, d)        
+        vsDatasources.put(vsname, d)        
       }
       val hasAc=sec.hasAccessControl(vs.name)
-      implicit val source=vsDatasources.get(vs.name)          
+      implicit val source=vsDatasources.get(vsname)          
       val s=Sensor.fromConf(vs,hasAc,None)
       val sStats= stats(s)
       
-      sensorStats put(vs.name,sStats)
-      sensors.put(vs.name,s)
+      sensorStats put(vsname,sStats)
+      sensors.put(vsname,s)
       
     case DeletedVsConf(vs)=>
-      if (sensors.contains(vs.name)){
-        sensors remove vs.name
-        vsDatasources remove vs.name
-        sensorStats remove vs.name
+      val vsname=vs.name.toLowerCase
+      if (sensors.contains(vsname)){
+        sensors remove vsname
+        vsDatasources remove vsname
+        sensorStats remove vsname
       }
   
     //sensor request messages
     case GetAllSensorsInfo =>
       sender ! AllSensorInfo(sensors.values.map{
-        s=>SensorInfo(s,vsDatasources.get(s.name ),sensorStats.get(s.name))
+        s=>SensorInfo(s,vsDatasources.get(s.name.toLowerCase),sensorStats.get(s.name.toLowerCase))
       }.toSeq)
     case GetSensorInfo(sensorid) =>
-      if (!sensors.contains(sensorid ))
+      val vsname=sensorid.toLowerCase
+      if (!sensors.contains(vsname ))
         sender ! Failure(new IllegalArgumentException(s"Sensor id $sensorid is not valid."))
       else 
-        sender ! SensorInfo(sensors(sensorid),
-            vsDatasources.get(sensorid),sensorStats.get(sensorid))
+        sender ! SensorInfo(sensors(vsname),
+            vsDatasources.get(vsname),sensorStats.get(vsname))
      
     //stats
     case RefreshStats=>

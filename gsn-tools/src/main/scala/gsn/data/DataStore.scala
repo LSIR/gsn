@@ -35,9 +35,9 @@ class DataStore(gsn:GsnConf) {
 	    cpds setJdbcUrl store.url  
 	    cpds setUser store.user 
 	    cpds setPassword store.pass 
-	    cpds setMinPoolSize 5 
+	    cpds setMinPoolSize 10 
 	    cpds setAcquireIncrement 5  
-	    cpds setMaxPoolSize 20
+	    cpds setMaxPoolSize 80
 	    cpds
     }
   }

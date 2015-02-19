@@ -28,12 +28,11 @@ object JsonSerializer extends DataSerializer{
       t.series      
     } 
     val fields=data.ts.map(_.output.fieldName)*/ 
-    toJson(data.sensor,data.ts)//values, fields)     
+    toJson(data.sensor,data.ts,data.stats)//values, fields)     
   }
   
-  private def toJson(sensor:Sensor,ts:Seq[TimeSeries])={
-        
-    
+  private def toJson(sensor:Sensor,ts:Seq[TimeSeries],stats:SensorStats)={
+            
     //val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
     val values=ts.map(_.series)
     val fields=ts.map(_.output).map{f=>
@@ -49,10 +48,13 @@ object JsonSerializer extends DataSerializer{
       }
       //values.map{record=>valueToJson(record)}      
     }
+    val st=Json.obj("start-datetime"->valueToJson(stats.start.getOrElse(null)),
+                    "end-datetime"->valueToJson(stats.end.getOrElse(null)))
     
     val propvals=Seq("vs_name"->JsString(sensor.name),
                      "values"->JsArray(jsValues),
-                     "fields"->JsArray(fields))++
+                     "fields"->JsArray(fields),
+                     "stats"->st)++
       sensor.properties.map(a=>a._1->JsString(a._2)).toSeq
       
     val feature=Json.obj(
