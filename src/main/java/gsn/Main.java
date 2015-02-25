@@ -45,6 +45,8 @@ import gsn.http.rest.LocalDeliveryWrapper;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.WPPushDelivery;
 import gsn.http.rest.RestDelivery;
+import gsn.monitoring.MemoryMonitor;
+import gsn.monitoring.Monitorable;
 import gsn.networking.zeromq.ZeroMQDelivery;
 import gsn.networking.zeromq.ZeroMQProxy;
 import gsn.security.SecurityData;
@@ -73,6 +75,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -136,6 +139,7 @@ public final class Main {
     private ContainerConfig                               containerConfig;
     private static GsnConf gsnConf;
     private static Map <String,VsConf> vsConf =new HashMap<String,VsConf>();
+    private static ArrayList<Monitorable> toMonitor = new ArrayList<Monitorable>();
     
 
     private Main() throws Exception {
@@ -180,6 +184,8 @@ public final class Main {
         validationStorage = StorageManagerFactory.getInstance("org.h2.Driver", "sa", "", "jdbc:h2:mem:validator", Main.DEFAULT_MAX_DB_CONNECTIONS);
 
         if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
+        
+        toMonitor.add(new MemoryMonitor());
 
 		try {
 			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxSlidingDBConnections: " + maxSlidingDBConnections + ", maxServlets:"+maxServlets+")"+" ...");
@@ -550,6 +556,9 @@ public final class Main {
     }
     public Map<String,VsConf> getVsConf(){
     	return vsConf;
+    }
+    public ArrayList<Monitorable> getToMonitor(){
+    	return toMonitor;
     }
 }
 
