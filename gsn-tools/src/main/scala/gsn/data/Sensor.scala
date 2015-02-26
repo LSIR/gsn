@@ -1,38 +1,56 @@
 package gsn.data
 
 import gsn.config.VsConf
+import org.joda.time.DateTime
 
 case class Sensor(name:String,
     implements:Seq[Sensing],
     platform: Platform,
-    properties:collection.Map[String,String]){
+    properties:collection.Map[String,String]
+    //stats:Option[SensorStats] 
+    ){
   lazy val fields:Seq[Output]=implements.map(_.outputs).flatten
   lazy val location=platform.location    
 } 
 
 object Sensor{
-  def fromConf(vsConf:VsConf):Sensor=fromConf(vsConf,false)
-  def fromConf(vsConf:VsConf,accessProtected:Boolean)={
+  def fromConf(vsConf:VsConf):Sensor=fromConf(vsConf,false,None)
+  def fromConf(vsConf:VsConf,accessProtected:Boolean,stats:Option[SensorStats])={
     val output=
-      vsConf.processing.output.map{out=>
+      vsConf.processing.output map{out=>
         Sensing(out.name,Output(out.name.toLowerCase,vsConf.name,
             DataUnit(out.unit.getOrElse(null)),DataType(out.dataType) ))
       }
     val props=vsConf.address.map{kv=>
-      (kv._1.toLowerCase.trim,kv._2.trim )
-    } ++ 
-    Map("description"->vsConf.description,
-        "accessProtected"->accessProtected.toString  )
-    def coord(p:Map[String,String],n:String)=p.get(n).map(_.toDouble)
+        (kv._1.toLowerCase.trim,kv._2.trim )
+      } ++ 
+      Map("description"->vsConf.description,
+          "accessProtected"->accessProtected.toString  )
+    def coord(p:Map[String,String],n:String)=
+      try p.get(n).map(_.toDouble)
+      catch {case e:Exception=> None}
     val location=Location(coord(props,"latitude"),
         coord(props,"longitude"),
         coord(props,"altitude"))
-    val platform=new Platform(vsConf.name,location,null)
+    val platform=new Platform(vsConf.name,location)
     Sensor(vsConf.name,output,platform,props)
   }
+  //def fromSensor(s:Sensor,stats:Option[SensorStats])=
+    //Sensor(s.name,s.implements,s.platform,s.properties,stats)
 }   
 
-class Platform(val name:String,val location:Location,sensors: =>Seq[Sensor])
+case class SensorStats(rate:Option[Double],
+    start:Option[Long],end:Option[Long], latestValues:Seq[TimeSeries]){
+  private val minTime=30*24*3600*1000
+  val isArchive:Boolean={
+    end.map{endtime=>
+      val duration= (new DateTime).minus(endtime)
+      duration.getMillis > minTime
+    }.getOrElse(false)
+  }
+}
+
+case class Platform(val name:String,val location:Location)
 
 case class Output(fieldName:String,stream:String,unit:DataUnit,dataType:DataType){
   //lazy val obsProperty=sensing.obsProperty 
@@ -61,7 +79,6 @@ object Location{
     new Location(lt,lg,al)
   }
 }
-
 
 case class DataUnit(name:String,code:String)
 

@@ -62,13 +62,13 @@ public class schedular extends IntentService {
 	int wifiCountThreshold = 15;
 	int SchedulerSleepingTime = 1000*30;
 	
-	int SamplingRateAccelometerMoving = 3;
-	int SamplingRateAccelometerStationary = 1;
-    int SamplingRateAccelometerLost = 2;
+	int SamplingRateAccelometerMoving = 4;
+	int SamplingRateAccelometerStationary = 4;
+    int SamplingRateAccelometerLost = 4;
     
-	int SamplingRateGyroscopeMoving = 3;
-	int SamplingRateGyroscopeStationary = 1;
-    int SamplingRateGyroscopeLost = 2;
+	int SamplingRateGyroscopeMoving = 4;
+	int SamplingRateGyroscopeStationary = 4;
+    int SamplingRateGyroscopeLost = 4;
 
 	int SamplingRateGPSMoving = 1;
 	int SamplingRateGPSStationary = 0;

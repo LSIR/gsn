@@ -1,4 +1,5 @@
 import com.github.play2war.plugin._
+import com.typesafe.sbt.packager.Keys._
 
 name := "gsn-services"
 
@@ -13,6 +14,8 @@ Play2WarKeys.servletVersion := "2.5"
 scalaVersion := "2.11.2"
 
 crossPaths := false
+
+scriptClasspath := Seq("*")
 
 libraryDependencies ++= Seq(
   jdbc,

@@ -12,6 +12,7 @@
 
 
     <import file="${basedir}/installer/build.xml"/>
+    <import file="${basedir}/packager/build.xml"/>
 
     <!-- Internal -->
 	 <path id="maven-ant-tasks.classpath" path="lib/build/maven-ant-tasks-2.1.3.jar" />
@@ -112,7 +113,7 @@
     </target>
 
     <target name="gsn" depends="cleandb" description="Run GSN server in non graphical mode.">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="true" fork="true" dir="${basedir}" classpathref="classpath">
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}" classpathref="classpath">
             <jvmarg value="-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-DmaxServlets=${max-servlets}"/>
@@ -470,6 +471,8 @@
     </target>
 
     <target name="installer" depends="build-gsn" description="Build a GSN Server installer based on izpack."/>
+
+    <target name="packager" depends="pack-gsn" description="Build GSN Server Debian and RPM packages."/>
 
 	 <artifact:remoteRepository id="lsir.release" url="http://planetdata.epfl.ch:8081/artifactory/gsn-release/">
 	      <releases enabled="true"/>

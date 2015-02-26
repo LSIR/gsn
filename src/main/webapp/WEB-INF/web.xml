@@ -6,10 +6,10 @@
 		2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd"> <web-app> -->
 	<display-name>GSN Server</display-name>
 
-	<listener>
+	<!-- <listener>
 		<listener-class>play.core.server.servlet25.Play2Servlet
 		</listener-class>
-	</listener>
+	</listener>-->
 	<!-- ******************************************************************************* 
 		WEB SERVICES CALL [ USED FOR INTERACTIONS WITH MICROSOFT SENSOR MAP ] ; there 
 		is another part down in this file which has to be uncommented to have the 
@@ -257,6 +257,12 @@
 		<display-name>RestServlet</display-name>
 		<servlet-class>gsn.http.restapi.RestServlet</servlet-class>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>MonitoringServlet</servlet-name>
+		<display-name>MonitoringServlet</display-name>
+		<servlet-class>gsn.monitoring.MonitoringServlet</servlet-class>
+	</servlet>
 
 	<servlet>
 		<servlet-name>SensorServlet</servlet-name>
@@ -310,6 +316,10 @@
 	<servlet-mapping>
 		<servlet-name>GridDataServlet</servlet-name>
 		<url-pattern>/griddata</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>MonitoringServlet</servlet-name>
+		<url-pattern>/stat</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>RestServlet</servlet-name>

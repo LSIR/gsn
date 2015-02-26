@@ -92,7 +92,7 @@ public class AccelometerService extends IntentService implements SensorEventList
 					}
 				}
 				AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-				am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+15000,PendingIntent.getService(activity, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
+				am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+10000,PendingIntent.getService(activity, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 			}
 		}
 		
