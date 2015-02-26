@@ -17,7 +17,7 @@ class SensorStore(ds:DataStore) extends Actor{
   val vsDatasources=new collection.mutable.HashMap[String,DataSource]
   val sensorStats=new collection.mutable.HashMap[String,SensorStats]
   implicit val exe=context.dispatcher
-  val refresh = context.system.scheduler.schedule(0 millis, 1 minutes, self, RefreshStats)
+  val refresh = context.system.scheduler.schedule(0 millis, 10 minutes, self, RefreshStats)
   object RefreshStats
 
   import SensorDatabase._

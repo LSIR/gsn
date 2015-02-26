@@ -17,10 +17,10 @@ object SensorDatabase {
 	val query = s"""select * from $vsName where  
 	  timed = (select max(timed) from $vsName )"""
 	Try(vsDB(ds).withSession {implicit session=>
-      val stmt=session.conn.createStatement
-      val rs= stmt.executeQuery(query.toString)
+      val stmt=session.conn.createStatement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+      val rs= stmt executeQuery query.toString
       val fields=sensor.fields
-      val data=fields.map{f=>new ArrayBuffer[Any]}
+      val data=fields map{f=>new ArrayBuffer[Any]}
       val time=new ArrayBuffer[Any]
       while (rs.next){
         time+=formatTime(rs.getLong("timed"))(timeFormat)
