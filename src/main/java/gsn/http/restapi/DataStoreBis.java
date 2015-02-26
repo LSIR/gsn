@@ -74,7 +74,7 @@ public class DataStoreBis {
         Double lon=doubleOrNull(props.get("longitude"));
         Double alt=doubleOrNull(props.get("altitude"));
                   
-        Platform p=new Platform(sensorConfig.getName(),Location.apply(lat,lon,alt),null);
+        Platform p=new Platform(sensorConfig.getName(),Location.apply(lat,lon,alt));
 
         Sensor s=new Sensor(sensorConfig.getName(),        		
       		  JavaConversions.asScalaBuffer(fields),

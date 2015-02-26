@@ -434,7 +434,7 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
             <url>file://${project.basedir}/lib</url>
         </repository>
