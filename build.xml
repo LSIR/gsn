@@ -12,6 +12,7 @@
 
 
     <import file="${basedir}/installer/build.xml"/>
+    <import file="${basedir}/packager/build.xml"/>
 
     <!-- Internal -->
 	 <path id="maven-ant-tasks.classpath" path="lib/build/maven-ant-tasks-2.1.3.jar" />
