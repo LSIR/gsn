@@ -72,6 +72,8 @@ public class ContainerConfig {
 
     private StorageConfig storage ;
 
+    private StorageConfig acStorage = null;
+
     private SlidingConfig sliding;
 
 	private String timeFormat = DEFAULT_TIME_FORMAT;
@@ -84,6 +86,10 @@ public class ContainerConfig {
 
     public StorageConfig getStorage() {
         return storage;
+    }
+
+    public StorageConfig getAcStorage() {
+        return acStorage;
     }
 
     public SlidingConfig getSliding() {

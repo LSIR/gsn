@@ -108,7 +108,10 @@ public final class Main implements UncaughtExceptionHandler {
         // Init the AC db connection.
         if(Main.getContainerConfig().isAcEnabled()==true)
         {
-            ConnectToDB.init ( containerConfig.getStorage().getJdbcDriver() , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) );
+        	if (containerConfig.getAcStorage() == null)
+        		ConnectToDB.init ( containerConfig.getStorage().getJdbcDriver() , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) );
+        	else
+        		ConnectToDB.init ( containerConfig.getAcStorage().getJdbcDriver() , containerConfig.getAcStorage().getJdbcUsername ( ) , containerConfig.getAcStorage().getJdbcPassword ( ) , containerConfig.getAcStorage().getJdbcURL ( ) );
         }
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getStorage().getJdbcDriver ( ) , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) , maxDBConnections);
