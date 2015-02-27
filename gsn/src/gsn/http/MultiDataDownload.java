@@ -71,7 +71,7 @@ public class MultiDataDownload extends HttpServlet {
 			if ("csv".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
                 //
-                if (Main.getContainerConfig().isAcEnabled()) {
+                if (Main.getContainerConfig().getAcConfig().isEnabled()) {
                     ArrayList<String> noAccess = checkAccessControl(user, dd.getQueryBuilder());
                     if (noAccess != null && noAccess.size() > 0) {
                         res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsNames:" + noAccess + " and user: " + (user == null ? "not logged in" : user.getUserName()));
@@ -92,7 +92,7 @@ public class MultiDataDownload extends HttpServlet {
 			else if ("xml".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
                 //
-                if (Main.getContainerConfig().isAcEnabled()) {
+                if (Main.getContainerConfig().getAcConfig().isEnabled()) {
                     ArrayList<String> noAccess = checkAccessControl(user, dd.getQueryBuilder());
                     if (noAccess != null && noAccess.size() > 0) {
                         res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsNames:" + noAccess + " and user: " + (user == null ? "not logged in" : user.getUserName()));
@@ -110,7 +110,7 @@ public class MultiDataDownload extends HttpServlet {
 			else if ("pdf".equals(downloadFormat)) {
 				DownloadReport rpd = new DownloadReport (parameterMap) ;
                 //
-                if (Main.getContainerConfig().isAcEnabled()) {
+                if (Main.getContainerConfig().getAcConfig().isEnabled()) {
                     ArrayList<String> noAccess = checkAccessControl(user, rpd.getQueryBuilder());
                     if (noAccess != null && noAccess.size() > 0) {
                         res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsNames:" + noAccess + " and user: " + (user == null ? "not logged in" : user.getUserName()));
@@ -127,7 +127,7 @@ public class MultiDataDownload extends HttpServlet {
 			else if ("binary".equals(downloadFormat)) {
 				gsn.http.datarequest.DownloadData dd = new gsn.http.datarequest.DownloadData(parameterMap);
                 //
-                if (Main.getContainerConfig().isAcEnabled()) {
+                if (Main.getContainerConfig().getAcConfig().isEnabled()) {
                     ArrayList<String> noAccess = checkAccessControl(user, dd.getQueryBuilder());
                     if (noAccess != null && noAccess.size() > 0) {
                         res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsNames:" + noAccess + " and user: " + (user == null ? "not logged in" : user.getUserName()));
@@ -159,7 +159,7 @@ public class MultiDataDownload extends HttpServlet {
 	}
 
     public ArrayList<String> checkAccessControl (User user, QueriesBuilder qbuilder) {
-        if(Main.getContainerConfig().isAcEnabled()){
+        if(Main.getContainerConfig().getAcConfig().isEnabled()){
             ArrayList<String> noAccess = new ArrayList<String>();
             for (String vsname : qbuilder.getSqlQueries().keySet()) {
                 if (DataSource.isVSManaged(vsname)) {

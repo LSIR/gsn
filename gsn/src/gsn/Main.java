@@ -106,12 +106,12 @@ public final class Main implements UncaughtExceptionHandler {
         int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
 
         // Init the AC db connection.
-        if(Main.getContainerConfig().isAcEnabled()==true)
+        if(Main.getContainerConfig().getAcConfig().isEnabled()==true)
         {
-        	if (containerConfig.getAcStorage() == null)
+        	if (containerConfig.getAcConfig().getStorage() == null)
         		ConnectToDB.init ( containerConfig.getStorage().getJdbcDriver() , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) );
         	else
-        		ConnectToDB.init ( containerConfig.getAcStorage().getJdbcDriver() , containerConfig.getAcStorage().getJdbcUsername ( ) , containerConfig.getAcStorage().getJdbcPassword ( ) , containerConfig.getAcStorage().getJdbcURL ( ) );
+        		ConnectToDB.init ( containerConfig.getAcConfig().getStorage().getJdbcDriver() , containerConfig.getAcConfig().getStorage().getJdbcUsername ( ) , containerConfig.getAcConfig().getStorage().getJdbcPassword ( ) , containerConfig.getAcConfig().getStorage().getJdbcURL ( ) );
         }
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getStorage().getJdbcDriver ( ) , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) , maxDBConnections);
@@ -375,7 +375,7 @@ public final class Main implements UncaughtExceptionHandler {
             sslSocketConnector.setTruststore("conf/servertestkeystore");
             sslSocketConnector.setTrustPassword(getContainerConfig().getSSLKeyStorePassword());
         }
-        else if (getContainerConfig().isAcEnabled())
+        else if (getContainerConfig().getAcConfig().isEnabled())
             logger.error("SSL MUST be configured in the gsn.xml file when Access Control is enabled !");
         
         AbstractConnector connector=new SelectChannelConnector (); // before was connector//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector

@@ -9,8 +9,10 @@
 		<value name="ssl-port" field="sslPort" usage="optional"/>
         <value name="ssl-key-store-password" field="sslKeyStorePassword" usage="optional"/>
         <value name="ssl-key-password" field="sslKeyPassword" usage="optional"/>
-        <value name="access-control" field="acEnabled" usage="optional"/>
-        <value name="ac-storage" field="acStorage" usage="optional"/>
+        <structure name="access-control" field="accessControl" usage="optional">
+        	<value name="enabled" field="enabled"/>
+            <structure field="storage" usage="optional"/>
+        </structure>
         <structure field="storage"/>
         <structure name="sliding" field="sliding" usage="optional">
             <structure field="storage"/>

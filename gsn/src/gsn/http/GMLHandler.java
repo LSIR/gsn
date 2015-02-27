@@ -46,7 +46,7 @@ public class GMLHandler implements RequestHandler {
         boolean authenticateUserFromURL = false;
         User user = null;
 
-        if (Main.getContainerConfig().isAcEnabled()) {
+        if (Main.getContainerConfig().getAcConfig().isEnabled()) {
 
             if ((reqUsername != null) && (reqPassword != null)) {
                 authenticateUserFromURL = true;
@@ -70,7 +70,7 @@ public class GMLHandler implements RequestHandler {
             if (reqName != null && !sensorsSet.contains(sensorConfig.getName())) continue;
             if (reqGroup != null && !(sensorConfig.getName().startsWith(reqGroup + "_"))) continue;
 
-            if (Main.getContainerConfig().isAcEnabled()) {
+            if (Main.getContainerConfig().getAcConfig().isEnabled()) {
                 if (user == null) {
                     if (authenticateUserFromURL)
                         continue; // means that username and password provided are rejected dince they don't map to a correct User object

@@ -70,7 +70,7 @@ public class ContainerInfoHandler implements RequestHandler {
     
     while ( vsIterator.hasNext( ) ) {
       VSensorConfig sensorConfig = vsIterator.next( );
-      if(Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(sensorConfig.getName()))
+      if(Main.getContainerConfig().getAcConfig().isEnabled() && DataSource.isVSManaged(sensorConfig.getName()))
       {
           if ( user == null || (reqName != null && !sensorConfig.getName().equals(reqName) ) || ( user.hasReadAccessRight(sensorConfig.getName())== false && user.isAdmin()==false) ) continue;
       }

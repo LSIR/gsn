@@ -48,7 +48,7 @@ public class MyControllerFilter implements Filter {
 
             HttpSession session = req.getSession();
             User user = (User) session.getAttribute("user");
-            if (!Main.getContainerConfig().isAcEnabled()) // do as filter does not exist
+            if (!Main.getContainerConfig().getAcConfig().isEnabled()) // do as filter does not exist
             {
                 chain.doFilter(request, response);
             } else {

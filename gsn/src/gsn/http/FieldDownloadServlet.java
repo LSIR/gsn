@@ -45,7 +45,7 @@ public class FieldDownloadServlet extends HttpServlet {
         res.setDateHeader("Expires", 0);
         res.setHeader("Pragma","no-cache");
 
-        if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)) {
+        if ( Main.getContainerConfig().getAcConfig().isEnabled() && DataSource.isVSManaged(vsName)) {
             if(user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName))) {
                 res.sendError(WebConstants.ACCESS_DENIED, "Access Control failed for vsName:" + vsName + " and user: " + (user == null ? "not logged in" : user.getUserName()));
                 return;

@@ -55,7 +55,7 @@ public class OutputStructureHandler implements RequestHandler {
             return false;
         }
 
-        if (Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)) {
+        if (Main.getContainerConfig().getAcConfig().isEnabled() && DataSource.isVSManaged(vsName)) {
             if (user == null || (!user.hasReadAccessRight(vsName) && !user.isAdmin()))  // ACCESS_DENIED
             {
                 response.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified virtual sensor .");

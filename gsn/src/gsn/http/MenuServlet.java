@@ -28,11 +28,11 @@ public class MenuServlet extends HttpServlet {
         //out.println("<li" + ("map".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"map.html#map\">map</a></li>");
         //out.println("<li" + ("fullmap".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"fullmap.html#fullmap\">fullmap</a></li>");
         //out.println("<li" + ("position".equals(selected) ? " class=\"selected\"" : "") + "><a href=\"position.html#position\">position</a></li>");
-        if (Main.getContainerConfig().isAcEnabled()) {
+        if (Main.getContainerConfig().getAcConfig().isEnabled()) {
             out.println("<li><a href=\"/gsn/MyAccessRightsManagementServlet\">access rights</a></li>");
         }
         out.println("</ul>");
-        if (Main.getContainerConfig().isAcEnabled()) {
+        if (Main.getContainerConfig().getAcConfig().isEnabled()) {
             out.println("<ul id=\"logintext\">" + displayLogin(req) + "</ul>");
         } else {
             out.println("<ul id=\"linkWebsite\"><li><a href=\"http://www.permasense.ch/\">Permasense Home</a></li></ul>");

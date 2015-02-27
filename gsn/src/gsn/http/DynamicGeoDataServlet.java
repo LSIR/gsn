@@ -62,7 +62,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
 
         List<String> allowedSensors = new Vector<String>();
 
-        if (Main.getContainerConfig().isAcEnabled()) {
+        if (Main.getContainerConfig().getAcConfig().isEnabled()) {
         	allowedSensors = UserUtils.getAllowedVirtualSensorsForUser(username, password, getAllSensors());
         	
         	if (allowedSensors.isEmpty()) {

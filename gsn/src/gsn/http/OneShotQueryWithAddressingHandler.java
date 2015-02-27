@@ -104,7 +104,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler {
             response.sendError(WebConstants.ERROR_INVALID_VSNAME, "The specified virtual sensor doesn't exist.");
             return false;
         }
-        if (Main.getContainerConfig().isAcEnabled() == true && DataSource.isVSManaged(vsName)) {
+        if (Main.getContainerConfig().getAcConfig().isEnabled() == true && DataSource.isVSManaged(vsName)) {
             if (user == null || (!user.hasReadAccessRight(vsName) && !user.isAdmin()))  // ACCESS_DENIED
             {
                 response.sendError(WebConstants.ACCESS_DENIED, "Access denied to the specified virtual sensor .");

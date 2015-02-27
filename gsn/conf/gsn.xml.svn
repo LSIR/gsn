@@ -13,9 +13,13 @@
 -->
 
 <!-- Access Control -->
-<!-- <access-control>true</access-control>-->
-<!-- Access Control Storage, Optional (defaults to the main storage database)-->
-<!-- <ac-storage user="USER" password="PASSWORD" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://taugwalder.ee.ethz.ch/DATABASE?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true" /> -->
+<!-- The Access Control storage location is optional, If not specified, the Access Control is using the Main Storage Database specified below  -->
+<!--
+   <access-control>
+      <enabled>true</enabled>
+      <storage user="USER" password="PASSWORD" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://taugwalder.ee.ethz.ch/DATABASE?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true" />
+   </access-control>
+-->
 
 <!-- Main Storage Database Options -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" /> -->

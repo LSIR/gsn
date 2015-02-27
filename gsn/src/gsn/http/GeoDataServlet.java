@@ -30,7 +30,7 @@ public class GeoDataServlet extends HttpServlet {
 
         try {
 
-            if (Main.getContainerConfig().isAcEnabled()) {
+            if (Main.getContainerConfig().getAcConfig().isEnabled()) {
                 HttpSession session = request.getSession();
                 user = (User) session.getAttribute("user");
                 response.setHeader("Cache-Control", "no-store");
@@ -71,7 +71,7 @@ public class GeoDataServlet extends HttpServlet {
         StringBuilder matchingSensors = new StringBuilder();
 
         for (String vsName : sensors) {
-            if (!Main.getContainerConfig().isAcEnabled() || !DataSource.isVSManaged(vsName) || (user != null && (user.hasReadAccessRight(vsName) || user.isAdmin()))) {
+            if (!Main.getContainerConfig().getAcConfig().isEnabled() || !DataSource.isVSManaged(vsName) || (user != null && (user.hasReadAccessRight(vsName) || user.isAdmin()))) {
                 matchingSensors.append(vsName);
                 matchingSensors.append(GetSensorDataWithGeo.SEPARATOR);
             }

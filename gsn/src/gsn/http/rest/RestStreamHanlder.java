@@ -73,7 +73,7 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
                 String vsName = parser.getVSensorConfig().getName();
                 
                 //
-                if ( Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName) ){
+                if ( Main.getContainerConfig().getAcConfig().isEnabled() && DataSource.isVSManaged(vsName) ){
                 	String[] cred = parseAuthorizationHeader(request);
                     if (cred == null) {
                         try {
@@ -174,7 +174,7 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
             String vsName = parser.getVSensorConfig().getName();
 
             //
-            if (Main.getContainerConfig().isAcEnabled() && DataSource.isVSManaged(vsName)) {
+            if (Main.getContainerConfig().getAcConfig().isEnabled() && DataSource.isVSManaged(vsName)) {
                 String[] cred = parseAuthorizationHeader(request);
                 if (cred == null) {
                     try {

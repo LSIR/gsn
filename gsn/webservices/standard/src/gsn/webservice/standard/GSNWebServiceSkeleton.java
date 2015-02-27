@@ -53,7 +53,7 @@ public class GSNWebServiceSkeleton {
         //
         HashMap<String, ArrayList<String>> vsAndFields = buildSelection(getVirtualSensorsDetails.getFieldSelector());
         for (Map.Entry<String, ArrayList<String>> selection : vsAndFields.entrySet()) {
-            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(selection.getKey()) || user.isAdmin()))) {
+            if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null && (user.hasReadAccessRight(selection.getKey()) || user.isAdmin()))) {
             VSensorConfig config = Mappings.getConfig(selection.getKey());
             if (config != null) {
                 GSNWebService_VirtualSensorDetails details = new GSNWebService_VirtualSensorDetails();
@@ -148,7 +148,7 @@ public class GSNWebServiceSkeleton {
     }
 
     private User getUserForAC(GSNWebService_ACDetails acDetails) {
-        if (Main.getContainerConfig().isAcEnabled()) {
+        if (Main.getContainerConfig().getAcConfig().isEnabled()) {
             if (acDetails != null) {
                 return GeneralServicesAPI.getInstance().doLogin(acDetails.getUsername(), acDetails.getPassword());
             }
@@ -171,7 +171,7 @@ public class GSNWebServiceSkeleton {
         VSensorConfig config;
         while (iter.hasNext()) {
             config = iter.next();
-            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(config.getName()) || user.isAdmin()))) {
+            if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null && (user.hasReadAccessRight(config.getName()) || user.isAdmin()))) {
                 for (gsn.beans.InputStream is : config.getInputStreams()) {
                     for (gsn.beans.StreamSource source : is.getSources()) {
                         GSNWebService_WrapperURL wrapperURL = new GSNWebService_WrapperURL();
@@ -261,7 +261,7 @@ public class GSNWebServiceSkeleton {
         User user = getUserForAC(createVirtualSensor.getAcDetails());
         //
         CreateVirtualSensorResponse response = new CreateVirtualSensorResponse();
-        if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && user.isAdmin())) {
+        if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null && user.isAdmin())) {
         try {
             gsn.VSensorLoader.getInstance(gsn.Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY).loadVirtualSensor(
                     createVirtualSensor.getDescriptionFileContent(),
@@ -290,7 +290,7 @@ public class GSNWebServiceSkeleton {
         //
         QuerySession session = getSession(getNextData.getSid());
         if (session != null) {
-            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(session.vsname) || user.isAdmin()))) {
+            if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null && (user.hasReadAccessRight(session.vsname) || user.isAdmin()))) {
             GSNWebService_QueryResult result = getResult(session);
             //
             response.addQueryResult(result);
@@ -386,7 +386,7 @@ public class GSNWebServiceSkeleton {
 
         ArrayList<String> vsnames = new ArrayList<String>();
         for (Map.Entry<String, ArrayList<String>> entry : vsAndFields.entrySet()) {
-            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(entry.getKey()) || user.isAdmin()))) {
+            if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null && (user.hasReadAccessRight(entry.getKey()) || user.isAdmin()))) {
             StringBuilder sb = new StringBuilder();
             sb.append(entry.getKey());
             for (String elt : entry.getValue()) {
@@ -623,7 +623,7 @@ public class GSNWebServiceSkeleton {
         GSNWebService_ContainerDetails cd = new GSNWebService_ContainerDetails();
         //
         ContainerConfig cc = Main.getContainerConfig();
-        if ( ! Main.getContainerConfig().isAcEnabled() || (user != null)) {
+        if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null)) {
         if (cc.getWebAuthor() != null)
             cd.setAuthor(cc.getWebAuthor());
         if (cc.getWebDescription() != null)
@@ -657,7 +657,7 @@ public class GSNWebServiceSkeleton {
         VSensorConfig config;
         while (iter.hasNext()) {
             config = iter.next();
-            if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && (user.hasReadAccessRight(config.getName()) || user.isAdmin()))) {
+            if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null && (user.hasReadAccessRight(config.getName()) || user.isAdmin()))) {
                 vsnames.add(config.getName());
             }
         }
@@ -678,7 +678,7 @@ public class GSNWebServiceSkeleton {
         User user = getUserForAC(deleteVirtualSensor.getAcDetails());
         //
         DeleteVirtualSensorResponse response = new DeleteVirtualSensorResponse();
-        if ( ! Main.getContainerConfig().isAcEnabled() || (user != null && user.isAdmin())) {
+        if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null && user.isAdmin())) {
         if (unloadVirtualSensor(deleteVirtualSensor.getVsname())) {
             logger.warn("Failed to delete the following Virtual Sensor: " + deleteVirtualSensor.getVsname());
         } else {

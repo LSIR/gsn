@@ -64,15 +64,13 @@ public class ContainerConfig {
 
 	private int                           sslPort                           = -1;
 
-    private boolean                       acEnabled                     = false;
-
 	private String sslKeyStorePassword;
 
 	private String sslKeyPassword;
 
     private StorageConfig storage ;
 
-    private StorageConfig acStorage = null;
+    private AccessControlConfig accessControl;
 
     private SlidingConfig sliding;
 
@@ -80,16 +78,14 @@ public class ContainerConfig {
 
 	private String timeZone = DEFAULT_TIME_ZONE;
 
-    public boolean isAcEnabled() {
-        return acEnabled;
-    }
-
     public StorageConfig getStorage() {
         return storage;
     }
 
-    public StorageConfig getAcStorage() {
-        return acStorage;
+    public AccessControlConfig getAcConfig() {
+    	if (accessControl == null)
+    		accessControl = new AccessControlConfig();
+        return accessControl;
     }
 
     public SlidingConfig getSliding() {
