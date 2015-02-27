@@ -14,6 +14,7 @@ import java.net.SocketTimeoutException;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.PriorityQueue;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,6 +39,11 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	private static final Object tokenLock = new Object();
 	private static Long timer = System.currentTimeMillis();
 
+	private Long timeWaiting = 0L;
+	private Long timeReceiving = 0L;
+	private Long timeProcessing = 0L;
+	private Long connectionCount = 0L;
+	
 	private final transient Logger logger = Logger.getLogger( OpensenseConnectorWrapper.class );
 	
 	private HashMap<Integer,byte[]> messages = new HashMap<Integer,byte[]>();
@@ -47,6 +53,16 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	private int port;
 	private DataField[] df;
 	private int token = 0;
+	
+	@Override
+	public Hashtable<String,Object> getStatistics() {
+		Hashtable<String, Object> stat = super.getStatistics();
+		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".waitingTime.count", timeWaiting);
+		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".receivingTime.count", timeReceiving);
+		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".processingTime.count", timeProcessing);
+		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".connection.count", connectionCount);
+		return stat;
+	}
 	
 	@Override
 	public DataField[] getOutputFormat() {
@@ -143,8 +159,11 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			   try {
 			       final Socket server = socket.accept();
 			       server.setSoTimeout(60000);
-			       logger.warn("accepted from "+server.getInetAddress());
+			       connectionCount = connectionCount == Long.MAX_VALUE ? 0 : connectionCount + 1;
+			       logger.debug("accepted from "+server.getInetAddress());
                    Thread t = new Thread(new Runnable(){ 
+                	   
+                	   Long startTime = System.currentTimeMillis();
                 	   
 					   BufferedInputStream input;
 					   BufferedOutputStream output;
@@ -179,14 +198,18 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								while(connected && ! server.isClosed()) parse();
 								fos.close();
 								server.close();
+								timeReceiving += (startTime-System.currentTimeMillis())/1000;
+								startTime = System.currentTimeMillis();
 							}catch (IOException ioe){
 								logger.error("Error while connecting to remote station: " + server.getInetAddress(), ioe);
 							}
-							logger.warn("closed (received "+ctr+" packets, dropped "+err+" bytes, published "+pub+" packets)");
+							logger.info("node "+sd.id+", ip "+server.getInetAddress()+", parse loop "+ctr+", dropped bytes "+err+", published packets "+pub);
 							//publish data even if connection got interrupted as it may be erased on the logger side
 							
 							timerLock.lock();
 							try{
+								timeWaiting += (startTime-System.currentTimeMillis())/1000;
+								startTime = System.currentTimeMillis();
 								timer = Math.max(timer,System.currentTimeMillis());
 								while (!buffer.isEmpty()){
 									StreamElement p = buffer.poll();
@@ -202,13 +225,14 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 							synchronized (tokenLock) {
 								token--;
 							}
+							timeProcessing += (startTime-System.currentTimeMillis())/1000;
 						}
 				
 						public void parse(){
 							try{
 								ctr ++;
 								if (sd != null && messages.containsKey(sd.id+9000)){ //forced messages
-									logger.warn("writing (forced) '"+new String(messages.get(sd.id+9000))+"' to "+sd.id);
+									logger.info("writing (forced) '"+new String(messages.get(sd.id+9000))+"' to "+sd.id);
 									output.write(messages.get(sd.id+9000));
 									output.write("\r\n".getBytes());
 									output.flush();
@@ -227,7 +251,6 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								case 36:
 									int next = parser.readNextChar(false);
 									int id = parser.readNextShort(false);
-									logger.debug("received packet number :"+next);
 									if (sd == null) sd = create(id);
 									else if (sd.id != id){
 										throw new IOException("received packet from "+id+", while listening to "+sd.id);
@@ -296,21 +319,20 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									break;
 								case 35:
 									byte[] b = parser.readBytes(3);
-									logger.debug("char:" + b[0] + ", "+ b[1] + ", "+ b[2]);
 									id = Integer.parseInt(new String(b));
 									if (sd == null) sd = create(id);
 									else if (sd.id != id) logger.warn("received packet from "+id+", while listening to "+sd.id);
 									next = parser.readNextChar(true);
 									switch(next){
 									case 65:
-										logger.warn("received ACK from "+sd.id);
+										logger.debug("received ACK from "+sd.id);
 										retry = 0;
 										messages.remove(id);
 									    break;
 									case 82:
-										logger.warn("received R from "+sd.id);
+										logger.debug("received R from "+sd.id);
 										if (messages.containsKey(sd.id)){
-											logger.warn("writing '"+new String(messages.get(sd.id))+"' to "+sd.id);
+											logger.info("writing '"+new String(messages.get(sd.id))+"' to "+sd.id);
 											output.write(messages.get(sd.id));
 											output.write("\r\n".getBytes());
 											output.flush();
@@ -326,7 +348,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								case 43:
 									byte[] buf = parser.readBytes(2);
 									if (new String(buf).equals("++")){
-										logger.warn("Good Bye received");
+										logger.debug("Good Bye received");
 										connected = false;
 										resync = false;
 									}
@@ -335,28 +357,28 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									throw new IOException("unknown packet type:"+type);
 								}
 							}catch(EOFException e){
-								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								logger.debug("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
 								connected = false;
 								resync = false;
 							}catch(SocketTimeoutException e){
-								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								logger.debug("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
 								connected = false;
 								resync = false;
 							}catch(SocketException e){
-								logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								logger.debug("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
 								connected = false;
 								resync = false;
 							}
 							catch(IOException e){
 								err ++;
 								if (! resync){
-								    logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								    logger.debug("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
 								}
 								resync = true;
 							}catch(NumberFormatException e){
 								err ++;
 								if (! resync){
-								    logger.warn("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								    logger.debug("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
 								}
 								resync = true;
 							}
@@ -383,7 +405,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 		if (Helpers.contains(STATIC_STATIONS, id))
 			return new StaticStationData(id);
 		else{
-			logger.warn("Unknown station ID ("+id+"), assuming mobile.");
+			logger.info("Unknown station ID ("+id+"), assuming mobile.");
 			return new MobileStationData(id);
 		}
 	}

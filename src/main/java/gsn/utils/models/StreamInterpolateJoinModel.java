@@ -29,14 +29,19 @@ package gsn.utils.models;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import org.bytedeco.javacpp.gsl;
 import org.bytedeco.javacpp.gsl.gsl_interp_type;
+
+import gsn.Main;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.monitoring.Monitorable;
 
-public class StreamInterpolateJoinModel extends AbstractModel {
+public class StreamInterpolateJoinModel extends AbstractModel implements Monitorable{
 	
 	int historySize = 10000; //max size of segment + shift between the two streams
 	int interpolateGap = 3000; //what gap to use for segmenting
@@ -52,6 +57,12 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 	HashMap<Short,Boolean> has_segment = new HashMap<Short,Boolean>();
 	
 	public StreamInterpolateJoinModel(){	
+	}
+	
+	@Override
+	public boolean initialize(){
+		Main.getInstance().getToMonitor().add(this);
+		return true;
 	}
 	
 
@@ -283,6 +294,20 @@ public class StreamInterpolateJoinModel extends AbstractModel {
 		}else{
 			return false;
 		}
+	}
+
+
+	@Override
+	public Hashtable<String, Object> getStatistics() {
+		Hashtable<String, Object> stat = new Hashtable<String, Object>();
+		for (Short k :segments.keySet()){
+		    stat.put("vs."+vs.getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".Valuebuffer."+k+".size.value", arrays.get(k).get("timed").size());
+		    stat.put("vs."+vs.getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".segment."+k+".size.value", segments.get(k).get("timed").length);
+		}
+		for (Short k :toProcess.keySet()){
+		    stat.put("vs."+vs.getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".Mappedbuffer."+k+".size.value", toProcess.get(k).size());
+		}
+		return stat;
 	}
 	
 }

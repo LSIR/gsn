@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -20,6 +21,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	private final transient Logger logger = Logger.getLogger( OpensenseSplitterVSensor.class );
 	
 	private final static String PARAM_DATA_TYPE = "type";
+	
 	private static final HashMap<String,DataField[]> dataFields = new HashMap<String,DataField[]>();    
 	static{
 		dataFields.put("FPM",new DataField[]{
@@ -87,6 +89,8 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	private HashMap<Short,StreamElement> last_values;
 	private HashMap<Short,ArrayList<Double>> last_acc;
 	private HashMap<Short,Long> last_acc_time;
+	
+	private Long parsingErrorCount = 0L;
 
 	@Override
 	public boolean initialize() {
@@ -116,6 +120,13 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	@Override
 	public void dispose() {
 	
+	}
+	
+	@Override
+	public Hashtable<String,Object> getStatistics() {
+		Hashtable<String, Object> stat = super.getStatistics();
+		stat.put("vs."+getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".error.parsing.count", parsingErrorCount);
+		return stat;
 	}
 	
 	
@@ -254,6 +265,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	        }
 
 		}catch(Exception e){
+			parsingErrorCount = parsingErrorCount == Long.MAX_VALUE ? 0 : parsingErrorCount + 1;
 			logger.warn("error processing packet",e);
 		}
 	}
