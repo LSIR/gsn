@@ -216,7 +216,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 				try {
 					StringBuilder query = new StringBuilder();
 					query.append("select * from ").append(getActiveAddressBean().getVirtualSensorName());
-					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection());
+					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).executeQueryWithResultSet(query, Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).getConnection());
 				} catch (SQLException e) {
 					logger.debug(e.getMessage());
 				}

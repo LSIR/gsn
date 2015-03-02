@@ -607,7 +607,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append(" where timed = (select max(timed) from " ).append(virtual_sensor_name).append(") order by PK desc limit 1");
 		ArrayList<StreamElement> latestvalues=new ArrayList<StreamElement>() ;
 		try {
-	      DataEnumerator result = Main.getStorage(virtual_sensor_name).executeQuery( query , false );
+	      DataEnumerator result = Main.getStorage(getVirtualSensorConfiguration()).executeQuery( query , false );
 	      while ( result.hasMoreElements( ) ) 
 	    	  latestvalues.add(result.nextElement());
 	    } catch (SQLException e) {

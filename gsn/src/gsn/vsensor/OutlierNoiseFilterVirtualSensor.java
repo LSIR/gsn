@@ -214,7 +214,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 				else if( sWrapperName.contains("local") ) {
 					try {
 						logger.info("Init buffer of outlier/noise filter with " + iBufferSize + "entries");
-						conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
+						conn = Main.getStorage(getVirtualSensorConfiguration()).getConnection();
 						StringBuilder query = new StringBuilder();
 						// query is done according parameters in configuration file (xml)
 						// query only takes:
@@ -235,7 +235,7 @@ public class OutlierNoiseFilterVirtualSensor extends BridgeVirtualSensorPermasen
 						//logger.debug("query: " + query); // output query
 						
 						// execute query
-						rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
+						rs = Main.getStorage(getVirtualSensorConfiguration()).executeQueryWithResultSet(query, conn);
 						
 						// read query result as long as buffer is not full and results are available
 						while(rs.next() & mRawValueBuffer.size() < iBufferSize){

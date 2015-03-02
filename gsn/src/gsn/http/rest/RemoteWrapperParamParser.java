@@ -73,15 +73,15 @@ public class RemoteWrapperParamParser {
 			Connection conn = null;
 			ResultSet rs = null;
 			try {
-				conn = Main.getStorage(addressBean.getVirtualSensorName()).getConnection();
+				conn = Main.getStorage(addressBean.getVirtualSensorConfig()).getConnection();
 
 				// check if table already exists
 				rs = conn.getMetaData().getTables(null, null, addressBean.getVirtualSensorName(), new String[] {"TABLE"});
 				if (rs.next()) {
 					StringBuilder query = new StringBuilder();
 					query.append("select max(timed) from ").append(addressBean.getVirtualSensorName());
-					Main.getStorage(addressBean.getVirtualSensorName()).close(rs);
-					rs = Main.getStorage(addressBean.getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+					Main.getStorage(addressBean.getVirtualSensorConfig()).close(rs);
+					rs = Main.getStorage(addressBean.getVirtualSensorConfig()).executeQueryWithResultSet(query, conn);
 					if (rs.next()) {
 						startTime = rs.getLong(1);
 						continuous = true;
@@ -93,8 +93,8 @@ public class RemoteWrapperParamParser {
 				logger.error(e.getMessage(), e);
 				throw new RuntimeException(e);
 			} finally {
-				Main.getStorage(addressBean.getVirtualSensorName()).close(rs);
-				Main.getStorage(addressBean.getVirtualSensorName()).close(conn);
+				Main.getStorage(addressBean.getVirtualSensorConfig()).close(rs);
+				Main.getStorage(addressBean.getVirtualSensorConfig()).close(conn);
 			}
 		} else if (strStartTime != null && strStartTime.startsWith("-")) {
 			try {

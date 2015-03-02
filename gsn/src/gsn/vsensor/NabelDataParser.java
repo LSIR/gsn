@@ -74,10 +74,10 @@ public class NabelDataParser extends BridgeVirtualSensorPermasense {
 		Connection conn = null;
 		ResultSet rs = null;
 		try {
-			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
+			conn = Main.getStorage(getVirtualSensorConfiguration()).getConnection();
 			StringBuilder query = new StringBuilder();
 			query.append("select generation_time from ").append(getVirtualSensorConfiguration().getName()).append(" order by generation_time desc limit 1");
-			rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
+			rs = Main.getStorage(getVirtualSensorConfiguration()).executeQueryWithResultSet(query, conn);
 			
 			if (rs.next()) {
 				// get nabel_timestamp

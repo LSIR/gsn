@@ -196,7 +196,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 		// based on DB
 		try {
 			logger.info("Get control algorithm enable state and set schedule generation reset time from DB ");
-			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
+			conn = Main.getStorage(getVirtualSensorConfiguration()).getConnection();
 			StringBuilder query = new StringBuilder();
 	
 			query.append("select * from ");
@@ -210,7 +210,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 			logger.debug("query: " + query.toString());
 
 			// execute query
-			rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
+			rs = Main.getStorage(getVirtualSensorConfiguration()).executeQueryWithResultSet(query, conn);
 			
 			if( rs.next() ){
 				if( rs.getByte("control_algorithm_enable_state") == 0 ){
@@ -262,7 +262,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 					else if( sWrapperName.contains("local") ) {
 						try {
 							logger.info("Init buffer of control algorithm with maximal " + iBufferSize + " entries");
-							conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
+							conn = Main.getStorage(getVirtualSensorConfiguration()).getConnection();
 							StringBuilder query = new StringBuilder();
 							// query is done according parameters in configuration file (xml)
 							// query only takes:
@@ -283,7 +283,7 @@ public class Sampler6712ControlAlgorithmVS extends BridgeVirtualSensorPermasense
 							//logger.info("query: " + query); // output query
 							
 							// execute query
-							rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
+							rs = Main.getStorage(getVirtualSensorConfiguration()).executeQueryWithResultSet(query, conn);
 							
 							// read query result as long as buffer is not full and results are available
 							// most current sensor values are read first

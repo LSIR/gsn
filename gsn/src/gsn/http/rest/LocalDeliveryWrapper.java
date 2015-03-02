@@ -70,15 +70,15 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 		if (startTime.equals("continue")) {
 			continuous = true;
 			try {
-				conn = Main.getStorage(params.getVirtualSensorName()).getConnection();
+				conn = Main.getStorage(params.getVirtualSensorConfig()).getConnection();
 				
 				rs = conn.getMetaData().getTables(null, null, params.getVirtualSensorName(), new String[] {"TABLE"});
 				if (rs.next()) {
 					StringBuilder dbquery = new StringBuilder();
 					dbquery.append("select max(timed) from ").append(params.getVirtualSensorName());
-					Main.getStorage(params.getVirtualSensorName()).close(rs);
+					Main.getStorage(params.getVirtualSensorConfig()).close(rs);
 
-					rs = Main.getStorage(params.getVirtualSensorName()).executeQueryWithResultSet(dbquery, conn);
+					rs = Main.getStorage(params.getVirtualSensorConfig()).executeQueryWithResultSet(dbquery, conn);
 					if (rs.next()) {
 						lastVisited = rs.getLong(1);
 					}
@@ -86,8 +86,8 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				Main.getStorage(params.getVirtualSensorName()).close(rs);
-				Main.getStorage(params.getVirtualSensorName()).close(conn);
+				Main.getStorage(params.getVirtualSensorConfig()).close(rs);
+				Main.getStorage(params.getVirtualSensorConfig()).close(conn);
 			}
 		} else if (startTime.startsWith("-")) {
 			try {

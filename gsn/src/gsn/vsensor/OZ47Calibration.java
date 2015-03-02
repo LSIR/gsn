@@ -117,7 +117,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 		Connection conn = null;
 		ResultSet rs = null;
 		try {
-			conn = Main.getStorage(getVirtualSensorConfiguration().getName()).getConnection();
+			conn = Main.getStorage(getVirtualSensorConfiguration()).getConnection();
 			
 			for (int d = 0; d < deviceList.size(); d++) {
 			  ArrayList<Double>[] bins = binMap.get(deviceList.get(d));
@@ -130,7 +130,7 @@ public class OZ47Calibration extends BridgeVirtualSensorPermasense {
 			  
   			StringBuilder query = new StringBuilder();
   			query.append("select * from ").append(getVirtualSensorConfiguration().getName()).append(" where device_id = " + deviceList.get(d) + " order by generation_time desc limit 1");
-  			rs = Main.getStorage(getVirtualSensorConfiguration().getName()).executeQueryWithResultSet(query, conn);
+  			rs = Main.getStorage(getVirtualSensorConfiguration()).executeQueryWithResultSet(query, conn);
   			
   			if (rs.next()) {
   				// get bin data

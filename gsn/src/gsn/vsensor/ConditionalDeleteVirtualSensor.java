@@ -68,7 +68,7 @@ public class ConditionalDeleteVirtualSensor extends BridgeVirtualSensorPermasens
 			index++;
 		}
 		try {
-			preparedDeleteStatement = Main.getStorage(vsensor.getName()).getConnection().prepareStatement(conditional);
+			preparedDeleteStatement = Main.getStorage(vsensor).getConnection().prepareStatement(conditional);
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 		}
