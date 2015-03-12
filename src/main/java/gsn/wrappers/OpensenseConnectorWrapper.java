@@ -198,17 +198,22 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								while(connected && ! server.isClosed()) parse();
 								fos.close();
 								server.close();
-								timeReceiving += (startTime-System.currentTimeMillis())/1000;
+								timeReceiving += (System.currentTimeMillis()-startTime)/1000;
 								startTime = System.currentTimeMillis();
 							}catch (IOException ioe){
 								logger.error("Error while connecting to remote station: " + server.getInetAddress(), ioe);
 							}
-							logger.info("node "+sd.id+", ip "+server.getInetAddress()+", parse loop "+ctr+", dropped bytes "+err+", published packets "+pub);
+							if (sd == null){
+								logger.info("node unknown, ip "+server.getInetAddress()+", parse loop "+ctr+", dropped bytes "+err+", published packets "+pub);
+							}else{
+								logger.info("node "+sd.id+", ip "+server.getInetAddress()+", parse loop "+ctr+", dropped bytes "+err+", published packets "+pub);
+							}
+							
 							//publish data even if connection got interrupted as it may be erased on the logger side
 							
 							timerLock.lock();
 							try{
-								timeWaiting += (startTime-System.currentTimeMillis())/1000;
+								timeWaiting += (System.currentTimeMillis()-startTime)/1000;
 								startTime = System.currentTimeMillis();
 								timer = Math.max(timer,System.currentTimeMillis());
 								while (!buffer.isEmpty()){
@@ -225,7 +230,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 							synchronized (tokenLock) {
 								token--;
 							}
-							timeProcessing += (startTime-System.currentTimeMillis())/1000;
+							timeProcessing += (System.currentTimeMillis()-startTime)/1000;
 						}
 				
 						public void parse(){
