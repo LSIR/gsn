@@ -52,9 +52,7 @@ public class MultiFormatWrapper extends AbstractWrapper {
   private AddressBean params;
   private long rate = 1000;
 
-  public boolean initialize() {
-    setName("MultiFormatWrapper" + counter++);
-    
+  public boolean initialize() {    
     params = getActiveAddressBean();
     
     if ( params.getPredicateValue( "rate" ) != null ) {

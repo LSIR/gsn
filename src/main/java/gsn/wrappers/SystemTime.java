@@ -80,7 +80,6 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
   private Object objectLock = new Object();
   
   public boolean initialize (  ) {
-    setName( "LocalTimeWrapper-Thread" + ( ++threadCounter ) );
     AddressBean addressBean =getActiveAddressBean ( );
     //  TODO: negative values?
     timer = new Timer(  addressBean.getPredicateValueAsInt( CLOCK_PERIOD_KEY ,DEFAULT_CLOCK_PERIODS) , this );

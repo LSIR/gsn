@@ -81,7 +81,6 @@ public class HBaseWrapper extends AbstractWrapper {
             logger.error("Error in initializing HBaseWrapper because of incompatible jdk version: " + javaVersion + " (should be 1.6.x)");
             return false;
         }
-        setName("HBaseWrapper-Thread" + (++threadCounter));
         // load the xml predicates
         AddressBean addressBean = getActiveAddressBean();
         // get each interesting value

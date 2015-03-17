@@ -91,7 +91,6 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
   private Object packetObject;
   
   public boolean initialize ( ) {
-    setName( "MigMessageWrapper-Thread" + ( ++threadCounter ) );
     AddressBean addressBean = getActiveAddressBean( );
     if ( addressBean.getPredicateValue(INITPARAM_SOURCE) != null ) {
       source = addressBean.getPredicateValue(INITPARAM_SOURCE);

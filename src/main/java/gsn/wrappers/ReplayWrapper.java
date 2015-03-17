@@ -73,7 +73,6 @@ public class ReplayWrapper  extends AbstractWrapper{
   }
   
   public boolean initialize() {
-    setName(getWrapperName() + ( ++threadCounter ) );
     AddressBean addressBean =getActiveAddressBean ( );
     dbname = addressBean.getPredicateValue("dbname");
     speed = addressBean.getPredicateValueAsInt("speed",1);
