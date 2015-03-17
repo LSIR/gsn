@@ -106,8 +106,6 @@ public class ZeroMQWrapper extends AbstractWrapper {
 			remoteContactPoint_META = "tcp://127.0.0.1:" + Main.getContainerConfig().getZMQMetaPort();
 		}
 		
-		setName("ZMQ-Wrapper::"+addressBean.getVirtualSensorName());
-		
 		ZContext ctx = Main.getZmqContext();
 		requester = ctx.createSocket(ZMQ.REQ);
 		requester.setReceiveTimeOut(1000);
