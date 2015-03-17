@@ -150,7 +150,6 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       lazyActiveMicas.addChangeListener( this );
       // Serial Forwarder Related
       if ( logger.isDebugEnabled( ) ) logger.debug( "The MoteIdentifier connects to the Serial Forwarder interface at *" + host + ":" + port + "*" );
-      setName( "MoteIdentifier-Thread" + ( ++threadCounter ) );
       logger.info("Initializing the serial forwarder connection to:  "+host+":"+port);
       mote = new MoteIF( host , port );
       mote.registerListener( new TedsMessage( ) , this );

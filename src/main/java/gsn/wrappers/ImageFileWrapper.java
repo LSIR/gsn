@@ -72,7 +72,6 @@ public class ImageFileWrapper extends AbstractWrapper {
     }
 
     public boolean initialize() {
-        setName(getWrapperName() + "-" + (++threadCounter));
         AddressBean addressBean = getActiveAddressBean();
 
         fileExtension = addressBean.getPredicateValue(PARAM_EXTENSION);

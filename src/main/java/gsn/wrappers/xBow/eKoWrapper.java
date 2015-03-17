@@ -161,8 +161,6 @@ public class eKoWrapper extends AbstractWrapper {
 
 		AddressBean addressBean = getActiveAddressBean( );
 
-		setName( "XmlWrapper" + ( threadCounter++ ) );
-
 		host = addressBean.getPredicateValue ( "host" );
 
 		if ( host == null || host.trim ( ).length ( ) == 0 ) {

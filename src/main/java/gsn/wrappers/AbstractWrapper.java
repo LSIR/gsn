@@ -424,6 +424,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	
 	public final boolean initialize_wrapper(){
 		Main.getInstance().getToMonitor().add(this);
+		setName(getWrapperName()+"::"+activeAddressBean.getVirtualSensorName());
 		return initialize();
 	}
 

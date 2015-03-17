@@ -411,7 +411,6 @@ public class SensorScope2ServerWrapper extends AbstractWrapper {
     private long packetsCount = 0;
 
     public boolean initialize() {
-        setName("SensorScope2Server-Thread" + (++threadCounter));
         AddressBean addressBean = getActiveAddressBean();
 
         // server port

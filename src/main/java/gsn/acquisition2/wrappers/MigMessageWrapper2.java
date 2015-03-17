@@ -117,7 +117,6 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 			return false;
 		}
 		logger.warn("tinyos wrapper initialize completed ...");
-		setName( "TinyOSWrapper-Thread:" + ( ++threadCounter ) );
 		return true;
 	}
 

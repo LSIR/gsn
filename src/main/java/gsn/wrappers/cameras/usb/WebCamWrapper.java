@@ -128,7 +128,6 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
    private boolean isLiveViewEnabled = false;
    
    public boolean initialize ( ) {
-      setName( "WebCamWrapper-Thread:" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
       String liveView = addressBean.getPredicateValue( "live-view" );
       String deviceName=addressBean.getPredicateValue("device");

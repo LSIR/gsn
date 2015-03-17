@@ -408,7 +408,6 @@ public class SensorScope2ExtendedWrapper extends AbstractWrapper {
     PacketSource reader;
 
     public boolean initialize() {
-        setName("SensorScope2-Thread" + (++threadCounter));
         AddressBean addressBean = getActiveAddressBean();
 
         // source
