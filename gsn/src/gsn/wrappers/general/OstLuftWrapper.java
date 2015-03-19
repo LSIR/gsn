@@ -97,10 +97,10 @@ public class OstLuftWrapper extends AbstractWrapper {
       Connection conn = null;
       ResultSet rs = null;
       try {
-        conn = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig().getName()).getConnection();
+        conn = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).getConnection();
         StringBuilder query = new StringBuilder();
         query.append("select generation_time from ").append(getActiveAddressBean().getVirtualSensorConfig().getName()).append(" order by generation_time desc limit 1");
-        rs = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig().getName()).executeQueryWithResultSet(query, conn);
+        rs = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).executeQueryWithResultSet(query, conn);
         
         if (rs.next()) {
           // get latest timestamp

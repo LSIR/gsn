@@ -122,15 +122,6 @@ public final class Main implements UncaughtExceptionHandler {
         validationStorage = StorageManagerFactory.getInstance("org.h2.Driver", "sa", "", "jdbc:h2:mem:validator", Main.DEFAULT_MAX_DB_CONNECTIONS);
 
         if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
-
-		try {
-			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxSlidingDBConnections: " + maxSlidingDBConnections + ", maxServlets:"+maxServlets+")"+" ...");
-            Server jettyServer = getJettyServer(getContainerConfig().getContainerPort(), getContainerConfig().getSSLPort(), maxServlets);
-			jettyServer.start ( );
-			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
-		} catch ( Exception e ) {
-			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
-		}
 		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		controlSocket.setLoader(vsloader);
 
@@ -151,6 +142,14 @@ public final class Main implements UncaughtExceptionHandler {
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
 		vsloader.startLoading();
 
+		try {
+			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxSlidingDBConnections: " + maxSlidingDBConnections + ", maxServlets:"+maxServlets+")"+" ...");
+            Server jettyServer = getJettyServer(getContainerConfig().getContainerPort(), getContainerConfig().getSSLPort(), maxServlets);
+			jettyServer.start ( );
+			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
+		} catch ( Exception e ) {
+			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
+		}
 
 	}
 
@@ -223,7 +222,7 @@ public final class Main implements UncaughtExceptionHandler {
 
     private static final int DEFAULT_JETTY_SERVLETS = 100;
 
-    public static final int DEFAULT_MAX_DB_CONNECTIONS = 8;
+    public static final int DEFAULT_MAX_DB_CONNECTIONS = 64;
 
 	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 

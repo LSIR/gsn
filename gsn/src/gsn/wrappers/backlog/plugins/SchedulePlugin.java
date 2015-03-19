@@ -72,10 +72,10 @@ public class SchedulePlugin extends AbstractPlugin {
 			try {
 				Serializable [] reply;
 				// get the newest schedule from the SQL database
-				conn = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).getConnection();
+				conn = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).getConnection();
 				StringBuilder query = new StringBuilder();
 				query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" and transmission_time is null order by timed desc limit 1");
-				rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+				rs = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).executeQueryWithResultSet(query, conn);
 				
 				byte[] schedule = null;
 				long timestamp_gsn = 0;
@@ -84,21 +84,21 @@ public class SchedulePlugin extends AbstractPlugin {
 					schedule = rs.getBytes("schedule");
 					timestamp_gsn = rs.getLong("generation_time");
 					query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" and generation_time = ").append(rs.getLong("generation_time")).append(" and transmission_time is not null order by timed desc limit 1");
-					ResultSet result = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+					ResultSet result = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).executeQueryWithResultSet(query, conn);
 					if (result.next())
 						schedule = null;
 				}
+				Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).close(rs);
 				
 				if (schedule == null) {
 					query = new StringBuilder();
 					query.append("select * from ").append(activeBackLogWrapper.getActiveAddressBean().getVirtualSensorName()).append(" where device_id = ").append(deviceId).append(" order by timed desc limit 1");
-					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorName()).executeQueryWithResultSet(query, conn);
+					rs = Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).executeQueryWithResultSet(query, conn);
 					
 					if (rs.next()) {
 						// get the creation time of the newest schedule
 						timestamp_gsn = rs.getLong("generation_time");
 						schedule = rs.getBytes("schedule");
-						Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
 	
 						if (timestamp_gsn <= timestamp) {
 							// if the schedule on the deployment has the same or a newer
@@ -136,8 +136,8 @@ public class SchedulePlugin extends AbstractPlugin {
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			} finally {
-				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(rs);
-				Main.getStorage(getActiveAddressBean().getVirtualSensorName()).close(conn);
+				Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).close(rs);
+				Main.getStorage(getActiveAddressBean().getVirtualSensorConfig()).close(conn);
 			}
 			return true;
 		} else if (((Byte)data[0]) == TYPE_SCHEDULE) {

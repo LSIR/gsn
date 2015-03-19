@@ -112,17 +112,19 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			if(vsName==null) //while the other instance is not loaded.
 				return false;
 			
+			vSensorConfig = Mappings.getVSensorConfig(vsName);
+			
 			if (startTime.equals("continue")){
 				try {
-					conn = Main.getStorage(vsName).getConnection();
+					conn = Main.getStorage(vSensorConfig).getConnection();
 					
 					rs = conn.getMetaData().getTables(null, null, vsName, new String[] {"TABLE"});
 					if (rs.next()) {
 						StringBuilder dbquery = new StringBuilder();
 						dbquery.append("select max(timed) from ").append(vsName);
-						Main.getStorage(vsName).close(rs);
+						Main.getStorage(vSensorConfig).close(rs);
 
-						rs = Main.getStorage(vsName).executeQueryWithResultSet(dbquery, conn);
+						rs = Main.getStorage(vSensorConfig).executeQueryWithResultSet(dbquery, conn);
 						if (rs.next()) {
 							long t = rs.getLong(1);
 							if (lastVisited > t) {
@@ -134,8 +136,8 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 				} catch (SQLException e) {
 					logger.error(e.getMessage(), e);
 				} finally {
-					Main.getStorage(vsName).close(rs);
-					Main.getStorage(vsName).close(conn);
+					Main.getStorage(vSensorConfig).close(rs);
+					Main.getStorage(vSensorConfig).close(conn);
 				}
 			}
 			if (logger.isDebugEnabled())
@@ -146,7 +148,6 @@ public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySys
 			if (logger.isDebugEnabled())
 				logger.debug("Local wrapper request received for: "+vsName);
 			
-			vSensorConfig = Mappings.getConfig(vsName);
 			distributionRequest = DefaultDistributionRequest.create(this, vSensorConfig, query, lastVisited, continuous);
 			// This call MUST be executed before adding this listener to the data-distributer because distributer checks the isClose method before flushing.
 		}catch (Exception e) {

@@ -100,17 +100,17 @@ public class VirtualSensor {
         StringBuilder query;
 
         if (config.isStorageCountBased()) {
-            query = Main.getStorage(config.getName()).getStatementRemoveUselessDataCountBased(config.getName(), config.getParsedStorageSize());
+            query = Main.getStorage(config).getStatementRemoveUselessDataCountBased(config.getName(), config.getParsedStorageSize());
         }
         else {
-            query = Main.getStorage(config.getName()).getStatementRemoveUselessDataTimeBased(config.getName(), config.getParsedStorageSize());
+            query = Main.getStorage(config).getStatementRemoveUselessDataTimeBased(config, config.getParsedStorageSize());
         }
 
         int effected = 0;
         try {
             if (logger.isDebugEnabled())
                 logger.debug(new StringBuilder().append("Enforcing the limit size on the VS table by : ").append(query).toString());
-            effected = Main.getStorage(config.getName()).executeUpdate(query);
+            effected = Main.getStorage(config).executeUpdate(query);
         } catch (SQLException e) {
             logger.error("Error in executing: " + query);
             logger.error(e.getMessage(), e);

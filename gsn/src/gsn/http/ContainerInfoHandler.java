@@ -92,7 +92,7 @@ public class ContainerInfoHandler implements RequestHandler {
           ses.add(null);
       }
       else {
-          ses = getMostRecentValueFor(sensorConfig.getName());  
+          ses = getMostRecentValueFor(sensorConfig);  
       }
       int counter = 1;
       if (ses!=null ) {
@@ -177,14 +177,14 @@ public class ContainerInfoHandler implements RequestHandler {
   /**
    * returns null if there is an error.
    * 
-   * @param virtual_sensor_name
+   * @param sensorConfig
    * @return
    */
-  public static ArrayList<StreamElement> getMostRecentValueFor(String virtual_sensor_name) {
-    StringBuilder query=  new StringBuilder("select * from " ).append(virtual_sensor_name).append( " where timed = (select max(timed) from " ).append(virtual_sensor_name).append(") order by PK desc limit 1");
+  public static ArrayList<StreamElement> getMostRecentValueFor(VSensorConfig sensorConfig) {
+    StringBuilder query=  new StringBuilder("select * from " ).append(sensorConfig.getName()).append( " where timed = (select max(timed) from " ).append(sensorConfig.getName()).append(") order by PK desc limit 1");
     ArrayList<StreamElement> toReturn=new ArrayList<StreamElement>() ;
     try {
-      DataEnumerator result = Main.getStorage(virtual_sensor_name).executeQuery( query , true );
+      DataEnumerator result = Main.getStorage(sensorConfig).executeQuery( query , true );
       while ( result.hasMoreElements( ) ) 
         toReturn.add(result.nextElement());
     } catch (SQLException e) {

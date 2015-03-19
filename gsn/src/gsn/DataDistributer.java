@@ -138,7 +138,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     									logger.error(e.getMessage(), e);
     									throw new RuntimeException(e);
     								}
-    								dataEnum = new DataEnumerator(Main.getStorage(listener.request.getVSensorConfig().getName()), prepareStatement, false, true);
+    								dataEnum = new DataEnumerator(Main.getStorage(listener.request.getVSensorConfig()), prepareStatement, false, true);
     								synchronized (MyListeners) {
     									listener.setResources(dataEnum, prepareStatement);
     									if (!listener.removed) {

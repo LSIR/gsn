@@ -70,10 +70,10 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
             continuation.suspend();
             try {
                 URLParser parser = new URLParser(request);
-                String vsName = parser.getVSensorConfig().getName();
+                VSensorConfig vsConfig = parser.getVSensorConfig();
                 
                 //
-                if ( Main.getContainerConfig().getAcConfig().isEnabled() && DataSource.isVSManaged(vsName) ){
+                if ( Main.getContainerConfig().getAcConfig().isEnabled() && DataSource.isVSManaged(vsConfig.getName()) ){
                 	String[] cred = parseAuthorizationHeader(request);
                     if (cred == null) {
                         try {
@@ -87,7 +87,7 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
                     }
                 	
                     User user = GeneralServicesAPI.getInstance().doLogin(cred[0], cred[1]);
-                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsName)))) {
+                    if ((user == null || (! user.isAdmin() && ! user.hasReadAccessRight(vsConfig.getName())))) {
                         response.setHeader("WWW-Authenticate", "Basic realm=\"GSN Access Control\"");// set the supported challenge
                         response.sendError(HttpStatus.SC_UNAUTHORIZED, "Unauthorized access.");
                         return;
@@ -103,15 +103,15 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
     				Connection conn = null;
     				ResultSet rs = null;
     				try {
-    					conn = Main.getStorage(vsName).getConnection();
+    					conn = Main.getStorage(vsConfig).getConnection();
     	
     					// check if table already exists
-    					rs = conn.getMetaData().getTables(null, null, vsName, new String[] {"TABLE"});
+    					rs = conn.getMetaData().getTables(null, null, vsConfig.getName(), new String[] {"TABLE"});
     					if (rs.next()) {
     						StringBuilder query = new StringBuilder();
-    						query.append("select max(timed) from ").append(vsName);
-    						Main.getStorage(vsName).close(rs);
-    						rs = Main.getStorage(vsName).executeQueryWithResultSet(query, conn);
+    						query.append("select max(timed) from ").append(vsConfig.getName());
+    						Main.getStorage(vsConfig).close(rs);
+    						rs = Main.getStorage(vsConfig).executeQueryWithResultSet(query, conn);
     						if (rs.next()) {
     							long t = rs.getLong(1);
     							if (startTime > t) {
@@ -121,12 +121,12 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
     						}
     					}
     					else
-    						logger.info("Table '" + vsName + "' doesn't exist => can not check for newest local timed");
+    						logger.info("Table '" + vsConfig.getName() + "' doesn't exist => can not check for newest local timed");
     				} catch (SQLException e) {
     					logger.error(e.getMessage(), e);
     				} finally {
-    					Main.getStorage(vsName).close(rs);
-    					Main.getStorage(vsName).close(conn);
+    					Main.getStorage(vsConfig).close(rs);
+    					Main.getStorage(vsConfig).close(conn);
     				}
                 }
                 
@@ -305,7 +305,7 @@ public class RestStreamHanlder extends HttpServlet implements ContinuationListen
 			tableName=tableName.trim();
 			query = SQLUtils.newRewrite(query, tableName, tableName.toLowerCase()).toString();
 			tableName=tableName.toLowerCase();
-			config = Mappings.getConfig(tableName);
+			config = Mappings.getVSensorConfig(tableName);
 		}
 		private void checkToken(String s) throws Exception {
 			if (s.startsWith("t"))

@@ -2,6 +2,7 @@ package gsn.vsensor;
 
 import gsn.Main;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.storage.DataEnumerator;
 
 import java.awt.event.ActionEvent;
@@ -57,17 +58,17 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 
 		/*******************************************/
 		// select latest update time of VS output table
-		String output_table_name = getVirtualSensorConfiguration().getName();
-		logger.warn("OUTPUT TABLE NAME: "+ output_table_name);
+		VSensorConfig vsConfig = getVirtualSensorConfiguration();
+		logger.warn("OUTPUT TABLE NAME: "+ vsConfig.getName());
 
-		StringBuilder query = new StringBuilder("select max(timed) from "+output_table_name);
-		logger.warn("select max(timed) from "+output_table_name);
+		StringBuilder query = new StringBuilder("select max(timed) from "+vsConfig.getName());
+		logger.warn("select max(timed) from "+vsConfig.getName());
 
 		Connection connection = null;
 		ResultSet rs = null;
 		try {
-			connection = Main.getStorage(output_table_name).getConnection();
-			rs = Main.getStorage(output_table_name).executeQueryWithResultSet(query, connection);
+			connection = Main.getStorage(vsConfig).getConnection();
+			rs = Main.getStorage(vsConfig).executeQueryWithResultSet(query, connection);
 			if (rs.next()) {
 				Long i = rs.getLong(1); // get result from first column (1)
 				logger.warn("LAST UPDATE: "+ Long.toString(i));
@@ -76,8 +77,8 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
 		} finally {
-			Main.getStorage(output_table_name).close(rs);
-			Main.getStorage(output_table_name).close(connection);
+			Main.getStorage(vsConfig).close(rs);
+			Main.getStorage(vsConfig).close(connection);
 		}
 
 

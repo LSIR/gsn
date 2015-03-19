@@ -4,6 +4,7 @@ import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.http.datarequest.AbstractQuery;
 import gsn.storage.hibernate.DBConnectionInfo;
 import gsn.utils.GSNRuntimeException;
@@ -11,7 +12,6 @@ import gsn.utils.ValidityTools;
 
 import java.io.Serializable;
 import java.sql.*;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.apache.commons.dbcp.*;
@@ -114,22 +114,22 @@ public abstract class StorageManager {
 
     public abstract StringBuilder getStatementRemoveUselessDataCountBased(String virtualSensorName, long storageSize) ;
 
-    public StringBuilder getStatementRemoveUselessDataTimeBased(String virtualSensorName, long storageSize) {
+    public StringBuilder getStatementRemoveUselessDataTimeBased(VSensorConfig config, long storageSize) {
         StringBuilder query = null;
         long timedToRemove = -1;
         Connection conn = null;
         ResultSet rs = null;
         try {
-            rs = Main.getStorage(virtualSensorName).executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(virtualSensorName), conn = Main.getStorage(virtualSensorName).getConnection());
+            rs = Main.getStorage(config).executeQueryWithResultSet(new StringBuilder("SELECT MAX(timed) FROM ").append(config.getName()), conn = Main.getStorage(config).getConnection());
             if (rs.next())
                 timedToRemove = rs.getLong(1);
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } finally {
-        	Main.getStorage(virtualSensorName).close(rs);
-            Main.getStorage(virtualSensorName).close(conn);
+        	Main.getStorage(config).close(rs);
+            Main.getStorage(config).close(conn);
         }
-        query = new StringBuilder().append("delete from ").append(virtualSensorName).append(" where ").append(virtualSensorName).append(".timed < ").append(timedToRemove);
+        query = new StringBuilder().append("delete from ").append(config.getName()).append(" where ").append(config.getName()).append(".timed < ").append(timedToRemove);
         query.append(" - ").append(storageSize);
         return query;
     }

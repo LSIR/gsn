@@ -29,6 +29,7 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.InputInfo;
 import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
 import gsn.storage.StorageManager;
 import gsn.vsensor.permasense.Converter;
 
@@ -233,7 +234,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 								if (rs.wasNull())
 									end = null;
 								mapping.executePositionInsert(
-										getActiveAddressBean().getVirtualSensorName(),
+										getActiveAddressBean().getVirtualSensorConfig(),
 										rs.getInt(outputStructure[0].getName()),
 										rs.getShort(outputStructure[1].getName()),
 										rs.getLong(outputStructure[2].getName()),
@@ -250,7 +251,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 							while (rs.next()) {
 								isEmpty = false;
 								mapping.executeGeoInsert(
-										getActiveAddressBean().getVirtualSensorName(),
+										getActiveAddressBean().getVirtualSensorConfig(),
 										rs.getInt(outputStructure[0].getName()),
 										rs.getDouble(outputStructure[1].getName()),
 										rs.getDouble(outputStructure[2].getName()),
@@ -272,7 +273,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 								if (rs.wasNull())
 									sensortyp_args = null;
 								mapping.executeSensorInsert(
-										getActiveAddressBean().getVirtualSensorName(),
+										getActiveAddressBean().getVirtualSensorConfig(),
 										rs.getInt(outputStructure[0].getName()),
 										rs.getLong(outputStructure[1].getName()),
 										end,
@@ -557,7 +558,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 					return new InputInfo(getActiveAddressBean().toString(), "comment has to be set", false);
 				
 				try {
-					streamElements = deployments.get(deployment).executePositionInsert(getActiveAddressBean().getVirtualSensorName(), deviceId, deviceType, begin, end, position, comment, true);
+					streamElements = deployments.get(deployment).executePositionInsert(getActiveAddressBean().getVirtualSensorConfig(), deviceId, deviceType, begin, end, position, comment, true);
 				} catch (Exception e) {
 					return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 				}
@@ -608,7 +609,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 					return new InputInfo(getActiveAddressBean().toString(), "comment has to be set", false);
 				
 				try {
-					streamElements = deployments.get(deployment).executeGeoInsert(getActiveAddressBean().getVirtualSensorName(), position, longitude, latitude, altitude, comment, true);
+					streamElements = deployments.get(deployment).executeGeoInsert(getActiveAddressBean().getVirtualSensorConfig(), position, longitude, latitude, altitude, comment, true);
 				} catch (Exception e) {
 					return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 				}
@@ -660,7 +661,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 					return new InputInfo(getActiveAddressBean().toString(), "comment has to be set", false);
 				
 				try {
-					streamElements = deployments.get(deployment).executeSensorInsert(getActiveAddressBean().getVirtualSensorName(), position, begin, end, sensortype, sensortypeArgs, comment, true);
+					streamElements = deployments.get(deployment).executeSensorInsert(getActiveAddressBean().getVirtualSensorConfig(), position, begin, end, sensortype, sensortypeArgs, comment, true);
 				} catch (Exception e) {
 					return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 				}
@@ -762,13 +763,13 @@ public class DataMappingWrapper extends AbstractWrapper {
 				return true;
 		}
 		
-		public ArrayList<Serializable[]> executePositionInsert(String vs, int deviceId, short deviceType, Long begin, Long end, int pos, String comment, boolean check) throws Exception {
+		public ArrayList<Serializable[]> executePositionInsert(VSensorConfig vSensorConfig, int deviceId, short deviceType, Long begin, Long end, int pos, String comment, boolean check) throws Exception {
 			if (position_insert != null) {
 				synchronized (position_insert){
 					ArrayList<Serializable[]> ret = new ArrayList<Serializable[]>(2);
-					Statement h2Stat = h2DBconn.createStatement();
-					StorageManager gsnsm = Main.getStorage(vs);
 					if (check) {
+						Statement h2Stat = h2DBconn.createStatement();
+						StorageManager gsnsm = Main.getStorage(vSensorConfig);
 						ResultSet rs;
 						if (deviceId < 0)
 							throw new Exception("device_id must be a positive integer");
@@ -820,7 +821,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 								if (h2deviceType != deviceType)
 									throw new Exception("new mapping has not the same device type as the existing one to be ended");
 								
-								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs +
+								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vSensorConfig.getName() +
 									" WHERE position = " + pos + " AND end IS null AND begin < " + end), gsnsm.getConnection());
 
 								if (comment.isEmpty()) {
@@ -873,7 +874,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 								long h2pk = rs.getLong(1);
 								String h2comment = rs.getString(6);
 								
-								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs + 
+								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vSensorConfig.getName() + 
 										" WHERE position = " + pos + " AND end IS null AND begin = " + begin), gsnsm.getConnection());
 
 								if (comment.isEmpty()) {
@@ -908,7 +909,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 							h2Stat.executeUpdate("UPDATE " + deployment + "_position SET end = " + 
 									(begin-1) + " WHERE pk = " + h2pk);
 							
-							gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs + 
+							gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vSensorConfig.getName() + 
 									" WHERE position = " + pos + " AND end IS null AND begin < " + begin), gsnsm.getConnection());
 
 							ret.add(new Serializable[] {h2deviceid, h2devicetype, h2begin, begin-1, pos, h2comment});
@@ -1000,13 +1001,13 @@ public class DataMappingWrapper extends AbstractWrapper {
 				return true;
 		}
 		
-		public ArrayList<Serializable[]> executeGeoInsert(String vs, Integer pos, Double longitude, Double latitude, Double altitude, String comment, boolean check) throws Exception {
+		public ArrayList<Serializable[]> executeGeoInsert(VSensorConfig vSensorConfig, Integer pos, Double longitude, Double latitude, Double altitude, String comment, boolean check) throws Exception {
 			if (geo_insert != null) {
 				synchronized (geo_insert) {
 					ArrayList<Serializable[]> ret = new ArrayList<Serializable[]>(1);
-					Statement h2Stat = h2DBconn.createStatement();
-					StorageManager gsnsm = Main.getStorage(vs);
 					if (check) {
+						Statement h2Stat = h2DBconn.createStatement();
+						StorageManager gsnsm = Main.getStorage(vSensorConfig);
 						if (pos == null || longitude == null || latitude == null || altitude == null)
 							throw new Exception("position, longitude, latitude and altitude have to be specified");
 						else if (pos < 0)
@@ -1014,7 +1015,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 						else {
 							int h2del = h2Stat.executeUpdate("DELETE FROM " + deployment + "_geo WHERE position = " + pos);
 							
-							int gsndel = gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs +
+							int gsndel = gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vSensorConfig.getName() +
 								" WHERE position = " + pos), gsnsm.getConnection());
 							
 							if (h2del != gsndel)
@@ -1073,14 +1074,14 @@ public class DataMappingWrapper extends AbstractWrapper {
 				return true;
 		}
 		
-		public ArrayList<Serializable[]> executeSensorInsert(String vs, Integer pos, Long begin, Long end, String type, Long typeArgs, String comment, boolean check) throws Exception {
+		public ArrayList<Serializable[]> executeSensorInsert(VSensorConfig vSensorConfig, Integer pos, Long begin, Long end, String type, Long typeArgs, String comment, boolean check) throws Exception {
 			if (sensor_insert != null) {
 				synchronized (sensor_insert) {
 					ArrayList<Serializable[]> ret = new ArrayList<Serializable[]>(2);
-					Statement h2Stat = h2DBconn.createStatement();
-					StorageManager gsnsm = Main.getStorage(vs);
-					String rootType = type.split("_")[0];
 					if (check) {
+						Statement h2Stat = h2DBconn.createStatement();
+						StorageManager gsnsm = Main.getStorage(vSensorConfig);
+						String rootType = type.split("_")[0];
 						ResultSet rs;
 						if (pos < 0)
 							throw new Exception("position must be a positive integer");
@@ -1117,7 +1118,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 								long h2begin = rs.getLong(3);
 								String h2comment = rs.getString(7);
 								
-								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs +
+								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vSensorConfig.getName() +
 									" WHERE position = " + pos + " AND sensortype LIKE '" +
 									type + "' AND end IS null AND begin < " + end), gsnsm.getConnection());
 
@@ -1165,7 +1166,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 								long h2pk = rs.getLong(1);
 								String h2comment = rs.getString(7);
 								
-								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs + 
+								gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vSensorConfig.getName() + 
 										" WHERE position = " + pos + " AND sensortype LIKE '" +
 										type + "' AND end IS null AND begin = " + begin), gsnsm.getConnection());
 
@@ -1203,7 +1204,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 							h2Stat.executeUpdate("UPDATE " + deployment + "_sensor SET end = " + 
 									(begin-1) + " WHERE pk = " + h2pk);
 							
-							gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vs + 
+							gsnsm.executeUpdate(new StringBuilder("DELETE FROM " + vSensorConfig.getName() + 
 									" WHERE position = " + pos + " AND sensortype LIKE '" +
 									rootType + "%' AND end IS null AND begin < " + begin), gsnsm.getConnection());
 

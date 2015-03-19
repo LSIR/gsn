@@ -54,7 +54,7 @@ public class GSNWebServiceSkeleton {
         HashMap<String, ArrayList<String>> vsAndFields = buildSelection(getVirtualSensorsDetails.getFieldSelector());
         for (Map.Entry<String, ArrayList<String>> selection : vsAndFields.entrySet()) {
             if ( ! Main.getContainerConfig().getAcConfig().isEnabled() || (user != null && (user.hasReadAccessRight(selection.getKey()) || user.isAdmin()))) {
-            VSensorConfig config = Mappings.getConfig(selection.getKey());
+            VSensorConfig config = Mappings.getVSensorConfig(selection.getKey());
             if (config != null) {
                 GSNWebService_VirtualSensorDetails details = new GSNWebService_VirtualSensorDetails();
                 details.setVsname(selection.getKey());
