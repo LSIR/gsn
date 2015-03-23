@@ -11,7 +11,7 @@ import java.io.FileNotFoundException;
 /**
  * Created by kryvych on 17/03/15.
  */
-public class TaxonomyTermUpdater {
+public class TaxonomyTermReload {
 
     public static void main(String[] args) {
 

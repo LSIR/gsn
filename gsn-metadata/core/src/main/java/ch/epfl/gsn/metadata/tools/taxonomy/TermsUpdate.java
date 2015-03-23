@@ -31,6 +31,7 @@ public class TermsUpdate {
         int count = 0;
         Iterable<VirtualSensorMetadata> sensors = virtualSensorMetadataRepository.findAll();
         for (VirtualSensorMetadata sensor : sensors) {
+            sensor.clearPropertyNames();
             for (ObservedProperty observedProperty : sensor.getObservedProperties()) {
                 String term = taxonomyResolver.getTermForColumnName(observedProperty.getColumnName());
                 if (StringUtils.isEmpty(term)) {

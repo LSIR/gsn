@@ -72,6 +72,10 @@ public abstract class GSNMetadata implements Serializable{
         propertyNames.add(propertyName);
     }
 
+    public void clearPropertyNames() {
+        propertyNames.clear();
+    }
+
     public String getDescription() {
         return description;
     }
