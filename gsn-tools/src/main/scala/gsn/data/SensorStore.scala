@@ -14,7 +14,8 @@ class SensorStore(ds:DataStore) extends Actor{
   val confWatch=context.actorOf(Props[ConfWatcher])
   
   val sensors=new collection.mutable.HashMap[String,Sensor]
-  val vsDatasources=new collection.mutable.HashMap[String,DataSource]
+  //val vsDatasources=new collection.mutable.HashMap[String,DataSource]
+  val vsDatasources=new collection.mutable.HashMap[String,String]
   val sensorStats=new collection.mutable.HashMap[String,SensorStats]
   implicit val exe=context.dispatcher
   val refresh = context.system.scheduler.schedule(0 millis, 10 minutes, self, RefreshStats)
@@ -34,7 +35,7 @@ class SensorStore(ds:DataStore) extends Actor{
       val vsname=vs.name.toLowerCase
       if (vs.storage.isDefined) {
         val d=ds.datasource(vs.storage.get.url, vs.storage.get)
-        vsDatasources.put(vsname, d)        
+        vsDatasources.put(vsname, d.getDataSourceName)        
       }
       val hasAc=sec.hasAccessControl(vs.name)
       implicit val source=vsDatasources.get(vsname)          
@@ -54,8 +55,9 @@ class SensorStore(ds:DataStore) extends Actor{
   
     //sensor request messages
     case GetAllSensorsInfo =>
-      sender ! AllSensorInfo(sensors.values.map{
-        s=>SensorInfo(s,vsDatasources.get(s.name.toLowerCase),sensorStats.get(s.name.toLowerCase))
+      sender ! AllSensorInfo(sensors.values.map{s=>
+        val vsname=s.name.toLowerCase
+        SensorInfo(s,vsDatasources.get(vsname),sensorStats.get(vsname))
       }.toSeq)
     case GetSensorInfo(sensorid) =>
       val vsname=sensorid.toLowerCase
@@ -86,7 +88,7 @@ class SensorStore(ds:DataStore) extends Actor{
 
 case class GetSensorInfo(sensorid:String)
 case class GetAllSensorsInfo()
-case class SensorInfo(sensor:Sensor,ds:Option[DataSource]=None,stats:Option[SensorStats]=None)			
+case class SensorInfo(sensor:Sensor,ds:Option[String]=None,stats:Option[SensorStats]=None)			
 case class AllSensorInfo(sensors:Seq[SensorInfo])
 
 case class GetAllSensors(latestValues:Boolean=false,timeFormat:Option[String]=None)

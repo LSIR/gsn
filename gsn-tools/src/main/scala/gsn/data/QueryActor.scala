@@ -17,18 +17,18 @@ class QueryActor(p:Promise[Seq[SensorData]]) extends Actor {
       gsnSensor ! GetAllSensorsInfo  
       sensors.future.map{ s=>
         if (latest)
-          p.success(s.map(sc=>latestToData(sc)))
+          p.success(s.map(sc=>sensorInfoToData(sc)))
         else
-          p.success(s.map(sc=>asSensorData(sc.sensor) ))
+          p.success(s.map(sc=>sensorInfoToData(sc,false) ))
         context stop self
       }
     case GetSensor(vsName,latest,timeformat) =>
       gsnSensor ! GetSensorInfo(vsName)
       sensor.future map{s=>
         if (latest)
-          p success Seq(latestToData(s)) 
+          p success Seq(sensorInfoToData(s)) 
         else
-          p success Seq(asSensorData(s.sensor))
+          p success Seq(sensorInfoToData(s,false))
         context stop self
       }
     case g:GetSensorData =>
@@ -53,8 +53,11 @@ class QueryActor(p:Promise[Seq[SensorData]]) extends Actor {
       p.failure(f.cause)
   }
   
-  private def latestToData(si:SensorInfo)={
-    SensorData(si.stats.get.latestValues,si.sensor,si.stats.getOrElse(EmptyStats) ) 
+  private def sensorInfoToData(si:SensorInfo,latest:Boolean=true)={
+    val latestValues=
+      if (latest) si.stats.get.latestValues
+      else Seq()
+    SensorData(latestValues,si.sensor,si.stats.getOrElse(EmptyStats) ) 
   }
   
   

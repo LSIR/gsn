@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 object SensorDatabase { 
   val log=LoggerFactory.getLogger(SensorDatabase.getClass)
   def latestValues(sensor:Sensor, timeFormat:Option[String]=None)
-    (implicit ds:Option[DataSource]) ={
+    (implicit ds:Option[String]) ={
     val vsName=sensor.name 
 	val query = s"""select * from $vsName where  
 	  timed = (select max(timed) from $vsName )"""
@@ -106,13 +106,15 @@ object SensorDatabase {
   }
 
   def stats(sensor:Sensor,timeFormat:Option[String]=None)
-    (implicit ds:Option[DataSource]) ={
+    (implicit ds:Option[String]) ={
     //val sensor=sensorConf.sensor 
     val vsName=sensor.name 
 	val queryMinMax = s"select max(timed), min(timed) from $vsName "
 	val queryRate = s"select timed from $vsName limit 100 "
     var min,max :Option[Long]=None
     var rate:Option[Double]=None
+    //if (true)  SensorStats(rate,min,max,Seq())
+//else {
 	Try{
 	vsDB(ds ).withSession {implicit session=>	  
       val stmt=session.conn.createStatement      
@@ -148,6 +150,7 @@ object SensorDatabase {
         //throw new Exception(s"Error in computing the stats of $vsName" )
       case Success(d) => d
     }
+//}
   }
   
   private def vsDB(ds:Option[DataSource])={
@@ -156,8 +159,14 @@ object SensorDatabase {
 	else 
 	  Database.forDataSource(C3P0Registry.pooledDataSourceByName("gsn"))
   }
-  
-  
+      
+  private def vsDB(dsName:Option[String])={
+	if (dsName.isDefined)
+	  Database.forDataSource(C3P0Registry.pooledDataSourceByName(dsName.get))	  
+	else 
+	  Database.forDataSource(C3P0Registry.pooledDataSourceByName("gsn"))
+  }
+
   private def formatTime(t:Long)(implicit timeFormat:Option[String])=timeFormat match{
     case Some("unixTime") | None => t
     case _ => getTimeFormat(timeFormat).print(t)

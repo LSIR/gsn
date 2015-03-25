@@ -26,18 +26,18 @@ class DataStore(gsn:GsnConf) {
   def withTransaction[T](s: Session => T)=db.withTransaction[T](s)  
 
   def datasource(name:String,store:StorageConf)={
-    println("the storage: "+store)
     val ds=C3P0Registry.pooledDataSourceByName(store.url)
     if (ds!=null) ds
     else {
+    	log debug("Create a new datasource: "+store)
 	    val cpds = new ComboPooledDataSource(name)
 	    cpds setDriverClass store.driver 
 	    cpds setJdbcUrl store.url  
 	    cpds setUser store.user 
 	    cpds setPassword store.pass 
-	    cpds setMinPoolSize 10 
-	    cpds setAcquireIncrement 5  
-	    cpds setMaxPoolSize 80
+	    cpds setMinPoolSize 1 
+	    cpds setAcquireIncrement 1 
+	    cpds setMaxPoolSize 5
 	    cpds
     }
   }

@@ -150,11 +150,12 @@ object SensorService extends Controller{
     Try{
       //to enable
       //authorizeVs(sensorid)    	
+      val latestVals=param("latestValues",_.toBoolean,false)
       val timeFormat:Option[String]=queryparam("timeFormat")
       val format=param("format",OutputFormat,defaultFormat)            
       val p=Promise[Seq[SensorData]]               
       val q=Akka.system.actorOf(Props(new QueryActor(p)))      
-      q ! GetSensor(sensorid,true,timeFormat)
+      q ! GetSensor(sensorid,latestVals,timeFormat)
       //val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 15.second)
       p.future.map{data=>        
           format match{
