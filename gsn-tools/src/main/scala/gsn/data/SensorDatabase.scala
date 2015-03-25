@@ -13,7 +13,7 @@ object SensorDatabase {
   val log=LoggerFactory.getLogger(SensorDatabase.getClass)
   def latestValues(sensor:Sensor, timeFormat:Option[String]=None)
     (implicit ds:Option[String]) ={
-    val vsName=sensor.name 
+    val vsName=sensor.name.toLowerCase 
 	val query = s"""select * from $vsName where  
 	  timed = (select max(timed) from $vsName )"""
 	Try(vsDB(ds).withSession {implicit session=>
@@ -108,7 +108,7 @@ object SensorDatabase {
   def stats(sensor:Sensor,timeFormat:Option[String]=None)
     (implicit ds:Option[String]) ={
     //val sensor=sensorConf.sensor 
-    val vsName=sensor.name 
+    val vsName=sensor.name.toLowerCase 
 	val queryMinMax = s"select max(timed), min(timed) from $vsName "
 	val queryRate = s"select timed from $vsName limit 100 "
     var min,max :Option[Long]=None
