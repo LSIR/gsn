@@ -7,6 +7,7 @@
     <groupId>ch.epfl.gsn</groupId>
     <artifactId>core</artifactId>
     <version>0.1.0</version>
+    <packaging>jar</packaging>
 
     <parent>
         <groupId>ch.epfl.gsn</groupId>

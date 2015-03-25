@@ -41,6 +41,7 @@ public class GSNMetadataBuilder {
             virtualSensorMetadata.addObservedProperty(new ObservedProperty(null, field.getUnit(), field.getName(), field.getType()));
         }
 
+        virtualSensorMetadata.setDescription(vsJson.getProperties().getDescription());
         return virtualSensorMetadata;
 
 
@@ -69,7 +70,7 @@ public class GSNMetadataBuilder {
 
         List<Field> fields = vsJson.getProperties().getFields();
         int i = 0;
-        List<List<Double>> values = vsJson.getProperties().getValues();
+        List<List<String>> values = vsJson.getProperties().getValues();
 
         //ToDo: Implement building grid!!!
         for (Field field : fields) {

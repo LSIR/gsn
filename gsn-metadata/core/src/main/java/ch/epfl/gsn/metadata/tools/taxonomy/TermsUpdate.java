@@ -1,5 +1,6 @@
 package ch.epfl.gsn.metadata.tools.taxonomy;
 
+import ch.epfl.gsn.metadata.core.model.GeoData;
 import ch.epfl.gsn.metadata.core.model.ObservedProperty;
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.core.repositories.VirtualSensorMetadataRepository;
@@ -42,6 +43,7 @@ public class TermsUpdate {
                     sensor.addPropertyName(term);
                 }
             }
+            sensor.setGeoData(null);
             virtualSensorMetadataRepository.save(sensor);
             count ++;
         }

@@ -15,7 +15,7 @@ public class Properties {
     @Expose
     private String vsName;
     @Expose
-    private List<List<Double>> values = new ArrayList<List<Double>>();
+    private List<List<String>> values = new ArrayList<List<String>>();
     @Expose
     private List<Field> fields = new ArrayList<Field>();
     @Expose
@@ -67,7 +67,7 @@ public class Properties {
      * @return
      *     The values
      */
-    public List<List<Double>> getValues() {
+    public List<List<String>> getValues() {
         return values;
     }
 
@@ -76,7 +76,7 @@ public class Properties {
      * @param values
      *     The values
      */
-    public void setValues(List<List<Double>> values) {
+    public void setValues(List<List<String>> values) {
         this.values = values;
     }
 

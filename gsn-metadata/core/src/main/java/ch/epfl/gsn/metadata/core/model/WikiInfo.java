@@ -1,5 +1,7 @@
 package ch.epfl.gsn.metadata.core.model;
 
+import org.springframework.data.mongodb.core.index.TextIndexed;
+
 /**
  * Created by kryvych on 10/03/15.
  */
