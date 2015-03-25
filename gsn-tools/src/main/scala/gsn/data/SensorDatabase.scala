@@ -15,14 +15,12 @@ object SensorDatabase {
     (implicit ds:Option[String]) ={
     val vsName=sensor.name.toLowerCase 
 	val query = s"""select * from $vsName where  
-	  timed = (select max(timed) from $vsName )"""
-	 
+	  timed = (select max(timed) from $vsName limit 1) limit 1"""	  	  
 	  
-	
 	Try{
 	    //vsDB(ds).withSession {implicit session=>
 	  val dss=vsDs(ds)
-	  val conn=dss.getConnection
+	  val conn=dss.getConnection()
       val stmt=conn.createStatement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
       val rs= stmt executeQuery query.toString
       val fields=sensor.fields
@@ -37,6 +35,7 @@ object SensorDatabase {
       rs.close
       stmt.close
       conn.close
+      dss.close
       val ts=
         Seq(TimeSeries(timeOutput(sensor.name),time))++
         fields.indices.map{i=>

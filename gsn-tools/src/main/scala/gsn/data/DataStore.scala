@@ -26,6 +26,7 @@ class DataStore(gsn:GsnConf) {
   def withTransaction[T](s: Session => T)=db.withTransaction[T](s)  
 
   def datasource(name:String,store:StorageConf)={
+    
     val ds=C3P0Registry.pooledDataSourceByName(store.url)
     if (ds!=null) ds
     else {
