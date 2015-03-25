@@ -8,6 +8,8 @@ import scala.collection.mutable.ArrayBuffer
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
+import com.mchange.v2.c3p0.DataSources
+import java.sql.DriverManager
 
 object SensorDatabase { 
   val log=LoggerFactory.getLogger(SensorDatabase.getClass)
@@ -19,9 +21,9 @@ object SensorDatabase {
 	  
 	Try{
 	    //vsDB(ds).withSession {implicit session=>
-	  val dss=vsDs(ds)
-	  val conn=dss.getConnection()
-      val stmt=conn.createStatement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+	 
+	  val conn=vsDs(ds)
+      val stmt=conn.createStatement
       val rs= stmt executeQuery query.toString
       val fields=sensor.fields
       val data=fields map{f=>new ArrayBuffer[Any]}
@@ -35,7 +37,6 @@ object SensorDatabase {
       rs.close
       stmt.close
       conn.close
-      dss.close
       val ts=
         Seq(TimeSeries(timeOutput(sensor.name),time))++
         fields.indices.map{i=>
@@ -165,10 +166,12 @@ object SensorDatabase {
   }
 
   private def vsDs(dsName:Option[String])={
-	if (dsName.isDefined)
-	  C3P0Registry.pooledDataSourceByName(dsName.get)
+	val sc=if (dsName.isDefined)
+      dsReg.dsss (dsName.get)
 	else 
-	  C3P0Registry.pooledDataSourceByName("gsn")
+	  dsReg.dsss("gsn")
+	 DriverManager.getConnection(sc.url , sc.user , sc.pass )
+
   }
 
   

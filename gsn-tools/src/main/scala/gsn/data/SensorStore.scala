@@ -8,6 +8,11 @@ import javax.sql.DataSource
 import concurrent.duration._
 import akka.event.Logging
 
+object dsReg{
+  val dsss=new collection.mutable.HashMap[String,StorageConf]
+  
+}
+
 class SensorStore(ds:DataStore) extends Actor{
   val log = Logging(context.system, this)
   private val sec=new SecurityData(ds)
@@ -29,13 +34,15 @@ class SensorStore(ds:DataStore) extends Actor{
     refresh cancel
   }    
   
+  
   def receive ={    
     //vs config messages
     case ModifiedVsConf(vs)=>
       val vsname=vs.name.toLowerCase
       if (vs.storage.isDefined) {
-        val d=ds.datasource(vs.storage.get.url, vs.storage.get)
-        vsDatasources.put(vsname, d.getDataSourceName)        
+        dsReg.dsss.put(vsname, vs.storage.get)
+        //val d=ds.datasource(vs.storage.get.url, vs.storage.get)
+        //vsDatasources.put(vsname, d.getDataSourceName)        
       }
       val hasAc=sec.hasAccessControl(vs.name)
       implicit val source=vsDatasources.get(vsname)          

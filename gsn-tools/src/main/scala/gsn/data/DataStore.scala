@@ -21,10 +21,10 @@ class DataStore(gsn:GsnConf) {
   
   val db =
     Database.forDataSource(datasource("gsn",gsn.storageConf))
- 
+ dsReg.dsss .put("gsn",gsn.storageConf )
   def withSession[T](s: Session => T)=db.withSession[T](s)
   def withTransaction[T](s: Session => T)=db.withTransaction[T](s)  
-
+  
   def datasource(name:String,store:StorageConf)={
     
     val ds=C3P0Registry.pooledDataSourceByName(store.url)
