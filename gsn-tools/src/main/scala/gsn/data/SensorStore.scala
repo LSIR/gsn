@@ -17,6 +17,7 @@ class SensorStore(ds:DataStore) extends Actor{
   val log = Logging(context.system, this)
   private val sec=new SecurityData(ds)
   val confWatch=context.actorOf(Props[ConfWatcher])
+    
   
   val sensors=new collection.mutable.HashMap[String,Sensor]
   //val vsDatasources=new collection.mutable.HashMap[String,DataSource]
@@ -27,7 +28,7 @@ class SensorStore(ds:DataStore) extends Actor{
   object RefreshStats
 
   import SensorDatabase._
-  override def preStart()={  
+  override def preStart()={
   }    
   
   override def postStop()={

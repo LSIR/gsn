@@ -121,30 +121,34 @@ object SensorDatabase {
     //if (true)  SensorStats(rate,min,max,Seq())
 //else {
 	Try{
-	vsDB(ds ).withSession {implicit session=>	  
-      val stmt=session.conn.createStatement      
+	val conn=vsDs(ds )
+	//.withSession {implicit session=>	  
+      val stmt=conn.createStatement      
       val rs= stmt.executeQuery(queryMinMax.toString)
       while (rs.next){
         min=Some(rs.getLong(2))
         max=Some(rs.getLong(1))
       }
       log debug s"Computed max_/min for $vsName"
-    }
-	vsDB(ds).withSession {implicit session=>
+      conn.close
+    //}
+	//vsDB(ds).withSession {implicit session=>
+    val conn2=vsDs(ds)
 	  val times=new ArrayBuffer[Long]()
-	  val stmt=session.conn.createStatement
-      val rs= stmt.executeQuery(queryRate.toString)
+	  val stmt2=conn2.createStatement
+      val rs2= stmt2.executeQuery(queryRate.toString)
       var t1,t2=0L
-      while (rs.next){
-        t2=rs.getLong(1)
-        if (!rs.isFirst)
+      while (rs2.next){
+        t2=rs2.getLong(1)
+        if (!rs2.isFirst)
           times+= t2-t1
         t1=t2
       }          
 	  if (times.size>0)
 	    rate=Some(times.sum/times.size)
 	  log debug s"Computed rate for $vsName"
-	}
+	  conn2.close
+	//}
 	SensorStats(rate,min,max,latestValues(sensor,timeFormat))
     } match{
       case Failure(f)=> 
@@ -157,13 +161,13 @@ object SensorDatabase {
     }
 //}
   }
-  
+  /*
   private def vsDB(ds:Option[DataSource])={
 	if (ds.isDefined)
 	  Database.forDataSource(ds.get)	  
 	else 
 	  Database.forDataSource(C3P0Registry.pooledDataSourceByName("gsn"))
-  }
+  }*/
 
   private def vsDs(dsName:Option[String])={
 	val sc=if (dsName.isDefined)
