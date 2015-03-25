@@ -26,7 +26,7 @@ class SensorStore(ds:DataStore) extends Actor{
   implicit val exe=context.dispatcher
   val refresh = context.system.scheduler.schedule(0 millis, 10 minutes, self, RefreshStats)
   object RefreshStats
-
+ dsReg.dsss .put("gsn",ds.gsn.storageConf )
   import SensorDatabase._
   override def preStart()={
   }    

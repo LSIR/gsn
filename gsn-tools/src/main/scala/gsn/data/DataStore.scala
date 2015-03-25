@@ -15,13 +15,13 @@ import com.mchange.v2.c3p0.C3P0Registry
 import scala.util.Try
 import javax.sql.DataSource
 
-class DataStore(gsn:GsnConf) {
+class DataStore(val gsn:GsnConf) {
   
   private val log =LoggerFactory.getLogger(classOf[DataStore])
   
   val db =
     Database.forDataSource(datasource("gsn",gsn.storageConf))
- dsReg.dsss .put("gsn",gsn.storageConf )
+
   def withSession[T](s: Session => T)=db.withSession[T](s)
   def withTransaction[T](s: Session => T)=db.withTransaction[T](s)  
   
