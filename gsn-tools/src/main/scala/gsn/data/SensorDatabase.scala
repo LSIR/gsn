@@ -16,8 +16,14 @@ object SensorDatabase {
     val vsName=sensor.name.toLowerCase 
 	val query = s"""select * from $vsName where  
 	  timed = (select max(timed) from $vsName )"""
-	Try(vsDB(ds).withSession {implicit session=>
-      val stmt=session.conn.createStatement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+	 
+	  
+	
+	Try{
+	    //vsDB(ds).withSession {implicit session=>
+	  val dss=vsDs(ds)
+	  val conn=dss.getConnection
+      val stmt=conn.createStatement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
       val rs= stmt executeQuery query.toString
       val fields=sensor.fields
       val data=fields map{f=>new ArrayBuffer[Any]}
@@ -30,8 +36,7 @@ object SensorDatabase {
       }
       rs.close
       stmt.close
-      session.conn.close
-      session.close
+      conn.close
       val ts=
         Seq(TimeSeries(timeOutput(sensor.name),time))++
         fields.indices.map{i=>
@@ -39,7 +44,7 @@ object SensorDatabase {
       }
       log debug s"computed latest values for $vsName" 
       ts      
-    }) match{
+    } match{
       case Failure(f)=> 
         log error s"Error ${f.getMessage}"
         f.printStackTrace(); Seq()
@@ -159,7 +164,15 @@ object SensorDatabase {
 	else 
 	  Database.forDataSource(C3P0Registry.pooledDataSourceByName("gsn"))
   }
-      
+
+  private def vsDs(dsName:Option[String])={
+	if (dsName.isDefined)
+	  C3P0Registry.pooledDataSourceByName(dsName.get)
+	else 
+	  C3P0Registry.pooledDataSourceByName("gsn")
+  }
+
+  
   private def vsDB(dsName:Option[String])={
 	if (dsName.isDefined)
 	  Database.forDataSource(C3P0Registry.pooledDataSourceByName(dsName.get))	  
