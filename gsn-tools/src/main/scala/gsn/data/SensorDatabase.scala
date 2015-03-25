@@ -22,7 +22,7 @@ object SensorDatabase {
 	Try{
 	    //vsDB(ds).withSession {implicit session=>
 	 
-	  val conn=vsDs(ds)
+	  val conn=vsDs(vsName)
       val stmt=conn.createStatement
       val rs= stmt executeQuery query.toString
       val fields=sensor.fields
@@ -121,7 +121,7 @@ object SensorDatabase {
     //if (true)  SensorStats(rate,min,max,Seq())
 //else {
 	Try{
-	val conn=vsDs(ds )
+	val conn=vsDs(vsName )
 	//.withSession {implicit session=>	  
       val stmt=conn.createStatement      
       val rs= stmt.executeQuery(queryMinMax.toString)
@@ -133,7 +133,7 @@ object SensorDatabase {
       conn.close
     //}
 	//vsDB(ds).withSession {implicit session=>
-    val conn2=vsDs(ds)
+    val conn2=vsDs(vsName)
 	  val times=new ArrayBuffer[Long]()
 	  val stmt2=conn2.createStatement
       val rs2= stmt2.executeQuery(queryRate.toString)
@@ -169,9 +169,9 @@ object SensorDatabase {
 	  Database.forDataSource(C3P0Registry.pooledDataSourceByName("gsn"))
   }*/
 
-  private def vsDs(dsName:Option[String])={
-	val sc=if (dsName.isDefined)
-      dsReg.dsss (dsName.get)
+  private def vsDs(dsName:String)={
+	val sc=if (dsReg.dsss.contains(dsName))
+      dsReg.dsss(dsName)
 	else 
 	  dsReg.dsss("gsn")
 	 DriverManager.getConnection(sc.url , sc.user , sc.pass )
