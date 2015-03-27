@@ -177,6 +177,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 					   int err = 0;
 					   int pub = 0;
 					   int last = 0;
+					   String bye = "";
 					   PriorityQueue<StreamElement> buffer = new PriorityQueue<StreamElement>(3000,new Comparator<StreamElement>() {
 							@Override
 							public int compare(StreamElement o1, StreamElement o2) {
@@ -204,9 +205,9 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								logger.error("Error while connecting to remote station: " + server.getInetAddress(), ioe);
 							}
 							if (sd == null){
-								logger.info("node unknown, ip "+server.getInetAddress()+", parse loop "+ctr+", dropped bytes "+err+", published packets "+pub);
+								logger.info("node unknown, ip "+server.getInetAddress()+", parse loop "+ctr+", dropped bytes "+err+", published packets "+pub+", bye:"+bye);
 							}else{
-								logger.info("node "+sd.id+", ip "+server.getInetAddress()+", parse loop "+ctr+", dropped bytes "+err+", published packets "+pub);
+								logger.info("node "+sd.id+", ip "+server.getInetAddress()+", parse loop "+ctr+", dropped bytes "+err+", published packets "+pub+", bye:"+bye);
 							}
 							
 							//publish data even if connection got interrupted as it may be erased on the logger side
@@ -331,11 +332,13 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									switch(next){
 									case 65:
 										logger.debug("received ACK from "+sd.id);
+										bye += "-ACK";
 										retry = 0;
 										messages.remove(id);
 									    break;
 									case 82:
 										logger.debug("received R from "+sd.id);
+										bye += "-R";
 										if (messages.containsKey(sd.id)){
 											logger.info("writing '"+new String(messages.get(sd.id))+"' to "+sd.id);
 											output.write(messages.get(sd.id));
@@ -354,6 +357,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 									byte[] buf = parser.readBytes(2);
 									if (new String(buf).equals("++")){
 										logger.debug("Good Bye received");
+										bye += "++";
 										connected = false;
 										resync = false;
 									}
@@ -363,14 +367,17 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 								}
 							}catch(EOFException e){
 								logger.debug("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								bye += "-EOF";
 								connected = false;
 								resync = false;
 							}catch(SocketTimeoutException e){
 								logger.debug("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								bye += "-timeout";
 								connected = false;
 								resync = false;
 							}catch(SocketException e){
 								logger.debug("packet reading error [last:"+last+", ctr:"+ctr+"] " + e.getMessage());
+								bye += "-socket";
 								connected = false;
 								resync = false;
 							}
