@@ -315,40 +315,37 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     private DataEnumerator makeDataEnum(DistributionRequest listener) {
 
         PreparedStatement prepareStatement = preparedStatements.get(listener);
-        try {	
-            if (prepareStatement.isClosed()){
-            	logger.error("Connection to Database was unexpectedly closed, trying to reconnect...");
-        		preparedStatements.remove(listener);
-                boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
-                String query = SQLValidator.addPkField(listener.getQuery());
-                if (needsAnd)
-                    query += " AND ";
-                else
-                    query += " WHERE ";
-                query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
-                PreparedStatement prepareStatementnew = null;
-                try {
-                    prepareStatementnew = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
-                    prepareStatementnew.setMaxRows(1000); // Limit the number of rows loaded in memory.
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                preparedStatements.put(listener, prepareStatement);
-        	}
-            //prepareStatement.setLong(1, listener.getStartTime());
+        DataEnumerator dataEnum = null;
+        try{
             prepareStatement.setLong(1, listener.getLastVisitedPk());
-        } catch (SQLException e) {
-        	logger.error(e.getMessage(), e);
-            try {
-				prepareStatement.close();
-			} catch (SQLException e1) {
-
-				logger.error(e.getMessage(), e);
-			}
-            return new DataEnumerator();
+            dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
+        }catch(Exception e){
+            try {	
+	        	logger.error("Connection to Database was unexpectedly closed, trying to reconnect...");
+	    		preparedStatements.remove(listener);
+	            boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
+	            String query = SQLValidator.addPkField(listener.getQuery());
+	            if (needsAnd)
+	                query += " AND ";
+	            else
+	                query += " WHERE ";
+	            query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
+	            PreparedStatement prepareStatementnew = null;
+	            prepareStatementnew = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
+	            prepareStatementnew.setMaxRows(1000); // Limit the number of rows loaded in memory.
+	            preparedStatements.put(listener, prepareStatement);
+	            prepareStatement.setLong(1, listener.getLastVisitedPk());
+	            dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
+            } catch (Exception e0) {
+        	    logger.error(e0.getMessage(), e0);
+                try {
+				    prepareStatement.close();
+			    } catch (SQLException e1) {
+				    logger.error(e1.getMessage(), e1);
+			    }
+                return new DataEnumerator();
+            }
         }
-
-        DataEnumerator dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
         return dataEnum;
     }
 
