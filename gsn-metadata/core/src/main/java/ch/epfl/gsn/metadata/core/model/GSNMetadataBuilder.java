@@ -36,6 +36,7 @@ public class GSNMetadataBuilder {
         VirtualSensorMetadata virtualSensorMetadata = new VirtualSensorMetadata(vsJson.getProperties().getVsName(),
                 server, fromDate, toDate, location, isPublic);
 
+        virtualSensorMetadata.setMetadataLink(vsJson.getProperties().getMetadata());
         List<Field> fields = vsJson.getProperties().getFields();
         for (Field field : fields) {
             virtualSensorMetadata.addObservedProperty(new ObservedProperty(null, field.getUnit(), field.getName(), field.getType()));

@@ -29,6 +29,10 @@ public abstract class GSNMetadata implements Serializable{
 
     protected String description;
 
+    protected Sensor sensor;
+
+    protected String metadataLink;
+
     public GSNMetadata(String name, String server, Date fromDate, Date toDate, Point location, boolean isPublic) {
         this.toDate = toDate;
         this.server = server;
@@ -82,6 +86,22 @@ public abstract class GSNMetadata implements Serializable{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Sensor getSensor() {
+        return sensor;
+    }
+
+    public void setSensor(Sensor sensor) {
+        this.sensor = sensor;
+    }
+
+    public String getMetadataLink() {
+        return metadataLink;
+    }
+
+    public void setMetadataLink(String metadataLink) {
+        this.metadataLink = metadataLink;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package ch.epfl.gsn.metadata.tools.mediawiki;
 
-import ch.epfl.gsn.metadata.core.model.GeoData;
 import ch.epfl.gsn.metadata.core.model.RelativePosition;
+import ch.epfl.gsn.metadata.core.model.Sensor;
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.core.model.WikiInfo;
 import ch.epfl.gsn.metadata.core.repositories.VirtualSensorMetadataRepository;
@@ -39,7 +39,9 @@ public class MediaWikiReannotation {
                 MeasurementRecord.RelativePosition relativePosition = measurementRecord.getRelativePosition();
                 WikiInfo wikiInfo = new WikiInfo(measurementRecord.getMeasurementLocationName(), measurementRecord.getMeasurementLocation().getDeploymentName(),
                         measurementRecord.getMeasurementLocation().getTitle(), new RelativePosition(relativePosition.getX(), relativePosition.getY(), relativePosition.getZ()));
-
+                wikiInfo.setOrganisation(measurementRecord.getOrganisation());
+                wikiInfo.setEmail(measurementRecord.getEmail());
+                sensor.setSensor(new Sensor(measurementRecord.getSerialNumber()));
                 sensor.setWikiInfo(wikiInfo);
                 sensor.setSamplingFrequency(measurementRecord.getSamplingFrequency());
                 virtualSensorMetadataRepository.save(sensor);

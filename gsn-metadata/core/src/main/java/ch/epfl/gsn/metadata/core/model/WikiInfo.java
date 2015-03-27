@@ -1,7 +1,5 @@
 package ch.epfl.gsn.metadata.core.model;
 
-import org.springframework.data.mongodb.core.index.TextIndexed;
-
 /**
  * Created by kryvych on 10/03/15.
  */
@@ -15,6 +13,9 @@ public class WikiInfo {
 
     private RelativePosition relativePosition;
 
+    private String organisation;
+
+    private String email;
 
     public WikiInfo(String measurementLocationName, String deploymentName, String wikiLink, RelativePosition relativePosition) {
         this.measurementLocationName = measurementLocationName;
@@ -37,5 +38,21 @@ public class WikiInfo {
 
     public RelativePosition getRelativePosition() {
         return relativePosition;
+    }
+
+    public String getOrganisation() {
+        return organisation;
+    }
+
+    public void setOrganisation(String organisation) {
+        this.organisation = organisation;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
