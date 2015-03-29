@@ -18,7 +18,7 @@ object SensorDatabase {
     val vsName=sensor.name.toLowerCase 
     val fields=sensor.fields
     val fieldNames=fields.map (f=>f.fieldName ) 
-              .filterNot (_.equals("grid")).mkString(",")
+              .filterNot (_.equals("grid"))++Seq("timed").mkString(",")
 	val query = s"""select $fieldNames from $vsName where  
 	  timed = (select max(timed) from $vsName limit 1) limit 1"""	  	  	  	  
 	Try{
