@@ -16,7 +16,10 @@ object SensorDatabase {
   def latestValues(sensor:Sensor, timeFormat:Option[String]=None)
     (implicit ds:Option[String]) ={
     val vsName=sensor.name.toLowerCase 
-	val query = s"""select * from $vsName where  
+    val fields=sensor.fields
+    val fieldNames=fields.map (f=>f.fieldName ) 
+              .filterNot (_.equals("grid")).mkString(",")
+	val query = s"""select $fieldNames from $vsName where  
 	  timed = (select max(timed) from $vsName limit 1) limit 1"""	  	  
 	  
 	Try{
@@ -25,13 +28,15 @@ object SensorDatabase {
 	  val conn=vsDs(vsName)
       val stmt=conn.createStatement
       val rs= stmt executeQuery query.toString
-      val fields=sensor.fields
       val data=fields map{f=>new ArrayBuffer[Any]}
       val time=new ArrayBuffer[Any]
       while (rs.next){
         time+=formatTime(rs.getLong("timed"))(timeFormat)
         for (i <- fields.indices) yield { 
-          data(i) += (rs.getObject(fields(i).fieldName ))
+          if (fields(i).fieldName == "grid")
+            data(i) += ("griddy")
+          else 
+            data(i) += (rs.getObject(fields(i).fieldName ))
         }           
       }
       rs.close
