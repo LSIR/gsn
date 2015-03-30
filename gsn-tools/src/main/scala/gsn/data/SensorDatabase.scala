@@ -18,11 +18,11 @@ object SensorDatabase {
     val vsName=sensor.name.toLowerCase 
     val fields=sensor.fields
     val fieldNames=fields.map (f=>f.fieldName ) 
-              .filterNot (_.equals("grid"))++Seq("timed").mkString(",")
-	val query = s"""select $fieldNames from $vsName where  
+              .filterNot (_.equals("grid")) ++ Seq("timed") 
+	val query = s"""select ${fieldNames.mkString(",")} from $vsName where  
 	  timed = (select max(timed) from $vsName limit 1) limit 1"""	  	  	  	  
 	Try{
-	    vsDB(ds).withSession {implicit session=>
+	  vsDB(ds).withSession {implicit session=>
 	 
 	  //val conn=vsDs(vsName)
       //val stmt=conn.createStatement
