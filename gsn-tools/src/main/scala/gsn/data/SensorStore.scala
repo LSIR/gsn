@@ -48,8 +48,8 @@ class SensorStore(ds:DataStore) extends Actor{
       val vsname=vs.name.toLowerCase
       if (vs.storage.isDefined) {
         dsReg.dsss.put(vsname, vs.storage.get)
-        //val d=ds.datasource(vs.storage.get.url, vs.storage.get)
-        //vsDatasources.put(vsname, d.getDataSourceName)        
+        val d=ds.datasource(vs.storage.get.url, vs.storage.get)
+        vsDatasources.put(vsname, d.getDataSourceName)        
       }
       val hasAc=sec.hasAccessControl(vs.name)
       implicit val source=vsDatasources.get(vsname)    
