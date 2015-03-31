@@ -1,5 +1,6 @@
 package ch.epfl.gsn.metadata.tools.taxonomy;
 
+import ch.epfl.gsn.metadata.mongodb.MongoApplicationConfig;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
@@ -14,21 +15,21 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "ch.epfl.gsn.metadata.tools.taxonomy")
-public class MongoTaxonomyConfig extends AbstractMongoConfiguration {
-    @Override
-    protected String getDatabaseName() {
-        return "taxonomy";
-    }
-
-    @Override
-    public Mongo mongo() throws Exception {
-        Mongo mongo =  new MongoClient();
-        mongo.setWriteConcern(WriteConcern.SAFE);
-        return mongo;
-    }
-
-    public @Bean
-    MongoTemplate mongoTemplate() throws Exception {
-        return new MongoTemplate(mongo(), "taxonomy");
-    }
+public class MongoTaxonomyConfig extends MongoApplicationConfig {
+//    @Override
+//    protected String getDatabaseName() {
+//        return "metadata";
+//    }
+//
+//    @Override
+//    public Mongo mongo() throws Exception {
+//        Mongo mongo =  new MongoClient();
+//        mongo.setWriteConcern(WriteConcern.SAFE);
+//        return mongo;
+//    }
+//
+//    public @Bean
+//    MongoTemplate mongoTemplate() throws Exception {
+//        return new MongoTemplate(mongo(), "metadata");
+//    }
 }

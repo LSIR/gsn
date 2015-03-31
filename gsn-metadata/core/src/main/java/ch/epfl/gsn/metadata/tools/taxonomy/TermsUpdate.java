@@ -34,28 +34,6 @@ public class TermsUpdate {
         this.taxonomyResolver = taxonomyResolver;
     }
 
-//    public int updateTaxonomyTerms() {
-//        int count = 0;
-//        Iterable<VirtualSensorMetadata> sensors = virtualSensorMetadataRepository.findAll();
-//        for (VirtualSensorMetadata sensor : sensors) {
-//            sensor.clearPropertyNames();
-//            for (ObservedProperty observedProperty : sensor.getObservedProperties()) {
-//                String term = taxonomyResolver.getTermForColumnName(observedProperty.getColumnName());
-//                if (StringUtils.isEmpty(term) || term.equalsIgnoreCase("na")) {
-//                    logger.info("Missing term for " + sensor.getName() + " : " + observedProperty.getColumnName());
-//                    System.out.println(sensor.getName() + " : " + observedProperty.getColumnName());
-//                } else {
-//                    observedProperty.setName(term);
-//                    sensor.addPropertyName(term);
-//                }
-//            }
-//            sensor.setGeoData(null);
-//            virtualSensorMetadataRepository.save(sensor);
-//            count ++;
-//        }
-//
-//        return count;
-//    }
 
     public int updateTaxonomyTerms() {
         int count = 0;
@@ -79,7 +57,6 @@ public class TermsUpdate {
                     sensor.addPropertyName(term);
                 }
             }
-            sensor.setGeoData(null);
             virtualSensorMetadataRepository.save(sensor);
             count ++;
         }

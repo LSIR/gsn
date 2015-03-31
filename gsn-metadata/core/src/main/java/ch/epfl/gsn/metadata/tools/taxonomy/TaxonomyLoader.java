@@ -46,7 +46,7 @@ public class TaxonomyLoader {
 
         CsvReader csvReader = new CsvReader(reader);
         while (csvReader.readRecord()) {
-            TaxonomyProperty property = new TaxonomyProperty(csvReader.get(0).trim(),
+            TaxonomyProperty property = new TaxonomyProperty(csvReader.get(0).trim().toLowerCase(),
                     csvReader.get(2).trim().toLowerCase(), csvReader.get(3).trim().toLowerCase());
             result.add(property);
 

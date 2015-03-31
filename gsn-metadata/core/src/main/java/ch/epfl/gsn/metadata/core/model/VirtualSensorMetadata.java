@@ -52,13 +52,6 @@ public class VirtualSensorMetadata extends GSNMetadata {
         this.geoData = geoData;
     }
 
-    public void setObservedProperties(Set<ObservedProperty> observedProperties) {
-        this.observedProperties = observedProperties;
-    }
-
-    public void setPropertyNames(Set<String> propertyNames) {
-        this.propertyNames = propertyNames;
-    }
 
     public void setWikiInfo(WikiInfo wikiInfo) {
         this.wikiInfo = wikiInfo;

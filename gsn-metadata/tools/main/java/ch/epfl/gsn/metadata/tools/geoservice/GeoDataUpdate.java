@@ -27,6 +27,7 @@ public class GeoDataUpdate {
         Iterable<VirtualSensorMetadata> sensors = repository.findAll();
         for (VirtualSensorMetadata sensor : sensors) {
             if (sensor.getLocation() == null) {
+                System.out.println("No coordinates for sensor: " + sensor.getName());
                 continue;
             }
             GeoData geoData = locationEnrichmentService.fetchGeoData(sensor.getLocation().getX(), sensor.getLocation().getY());
@@ -35,7 +36,7 @@ public class GeoDataUpdate {
                 repository.save(sensor);
                 count++;
             } else {
-                System.out.println("sensor.getName() = " + sensor.getName());
+                System.out.println("No extra geo data: " + sensor.getName());
             }
             if ((count % 100) == 0 ) {
                 System.out.println("count = " + count);

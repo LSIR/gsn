@@ -32,7 +32,7 @@ public class TaxonomyResolver {
     }
 
     public String getTermForColumnName(String columnName) {
-        TaxonomyProperty taxonomyProperty = taxonomyRepository.findByColumnName(columnName);
+        TaxonomyProperty taxonomyProperty = taxonomyRepository.findByColumnName(columnName.toLowerCase());
         return taxonomyProperty != null? taxonomyProperty.getTaxonomyName():null;
 
     }

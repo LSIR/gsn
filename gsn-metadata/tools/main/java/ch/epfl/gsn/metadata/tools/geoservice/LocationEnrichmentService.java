@@ -27,10 +27,10 @@ import java.text.MessageFormat;
 @Scope("prototype")
 public class LocationEnrichmentService {
 
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     // http://osgl.ethz.ch/webservices/gsndem/get2?lon=8.50693&lat=47.40803
     public static final String COORDINATES_URL = "http://osgl.ethz.ch/webservices/gsndem/get2?lon={0}&lat={1}";
-
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private RestTemplate restTemplate;
 
@@ -41,7 +41,7 @@ public class LocationEnrichmentService {
 
 
     public GeoData fetchGeoData(double lon, double lat) {
-        String url = MessageFormat.format(COORDINATES_URL, lat, lon);
+        String url = MessageFormat.format(COORDINATES_URL, lon, lat);
 
         try {
             String result = restTemplate.getForObject(url, String.class);

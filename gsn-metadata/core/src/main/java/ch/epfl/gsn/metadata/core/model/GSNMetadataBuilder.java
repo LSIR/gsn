@@ -23,8 +23,8 @@ public class GSNMetadataBuilder {
         Long endDatetime = vsJson.getProperties().getStats().getEndDatetime();
         Date toDate = (endDatetime != null) ? new Date(endDatetime) : null;
 
-        Double x = vsJson.getGeometry().getCoordinates().get(0);
-        Double y = vsJson.getGeometry().getCoordinates().get(1);
+        Double x = vsJson.getGeometry().getCoordinates().get(1);
+        Double y = vsJson.getGeometry().getCoordinates().get(0);
 
         Point location = null;
         if (x != null && y != null) {
