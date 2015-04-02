@@ -109,6 +109,11 @@ public class GeoJsonConverter {
 
     protected void writeShort(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
 
+        writer.name("sensorName").value(record.getName());
+
+        writer.name("fromDate").value(DATE_FORMAT.format(record.getFromDate() == null ? new Date() : record.getFromDate()));
+        writer.name("toDate").value(DATE_FORMAT.format(record.getToDate() == null ? new Date() : record.getToDate()));
+
         writeObservedProperties(writer, record);
 
         writeGeoData(writer, record);
@@ -118,10 +123,6 @@ public class GeoJsonConverter {
             writer.name("deployment").value(wikiInfo.getDeploymentName());
             writer.name("organisation").value(wikiInfo.getOrganisation());
         }
-        writer.name("sensorName").value(record.getName());
-
-        writer.name("fromDate").value(DATE_FORMAT.format(record.getFromDate() == null ? new Date() : record.getFromDate()));
-        writer.name("toDate").value(DATE_FORMAT.format(record.getToDate() == null ? new Date() : record.getToDate()));
         writer.name("serverLink").value(record.getServer());
         writer.name("sensorLink")
                 .value(configuration.getProperty("metadata.server") + "metadata/virtualSensors/" + record.getName());

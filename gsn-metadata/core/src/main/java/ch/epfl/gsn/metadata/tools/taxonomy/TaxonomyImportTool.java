@@ -28,6 +28,7 @@ public class TaxonomyImportTool {
 
         long count = service.loadTaxonomy(args[0]);
         logger.info("loaded column mappings : " + count);
+        System.out.println("count = " + count);
     }
 
 }

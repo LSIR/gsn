@@ -8,7 +8,7 @@
     <artifactId>web</artifactId>
     <version>0.1.0</version>
 
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <parent>
         <groupId>ch.epfl.gsn</groupId>
@@ -17,7 +17,7 @@
     </parent>
 
     <properties>
-        <start-class>ch.epfl.osper.Application</start-class>
+        <start-class>ch.epfl.gsn.metadata.web.Application</start-class>
         <geotools.version>12-RC1</geotools.version>
     </properties>
 
@@ -34,10 +34,37 @@
             <version>2.3.1</version>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-web</artifactId>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>javax.servlet</groupId>-->
+            <!--<artifactId>javax.servlet-api</artifactId>-->
+            <!--<version>3.0.1</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -56,7 +83,7 @@
             <artifactId>spring-data-commons</artifactId>
             <version>1.9.1.RELEASE</version>
         </dependency>
-        
+
     </dependencies>
 
     <build>

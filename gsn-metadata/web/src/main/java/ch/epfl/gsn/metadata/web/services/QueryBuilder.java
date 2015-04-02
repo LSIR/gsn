@@ -1,12 +1,8 @@
 package ch.epfl.gsn.metadata.web.services;
 
 import com.google.common.collect.Lists;
-import org.springframework.data.geo.Distance;
-import org.springframework.data.geo.Metrics;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.NearQuery;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.TextCriteria;
 
 import javax.inject.Named;
 import java.util.ArrayList;
@@ -24,6 +20,7 @@ public class QueryBuilder {
     
     public Query build(SensorQuery sensorQuery) {
         List<Criteria> criteriaList = new ArrayList<Criteria>();
+
         if (sensorQuery.hasValidBoundingBox()) {
             Criteria criteria = where("location").within(sensorQuery.getBoundingBox());
             criteriaList.add(criteria);
@@ -57,6 +54,8 @@ public class QueryBuilder {
 
         criteriaList.addAll(buildGeoCriterias(sensorQuery));
 
+        criteriaList.add(buildOnlyWithMappedParametersCriteria());
+
         Criteria criteria = new Criteria();
         if (!criteriaList.isEmpty()) {
             criteria.andOperator(criteriaList.toArray(new Criteria[criteriaList.size()]));
@@ -82,5 +81,10 @@ public class QueryBuilder {
         result.add(where("geoData.elevation").gte(query.getAltitudeMin()));
         result.add(where("geoData.elevation").lte(query.getAltitudeMax()));
         return result;
+    }
+
+    protected Criteria buildOnlyWithMappedParametersCriteria() {
+        Criteria criteria = where("propertyNames").not().size(0);
+        return criteria;
     }
 }
