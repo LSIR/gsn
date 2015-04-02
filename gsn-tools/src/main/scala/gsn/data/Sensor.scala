@@ -6,9 +6,7 @@ import org.joda.time.DateTime
 case class Sensor(name:String,
     implements:Seq[Sensing],
     platform: Platform,
-    properties:collection.Map[String,String]
-    //stats:Option[SensorStats] 
-    ){
+    properties:collection.Map[String,String]){
   lazy val fields:Seq[Output]=implements.map(_.outputs).flatten
   lazy val location=platform.location    
 } 
@@ -55,7 +53,6 @@ object EmptyStats extends SensorStats(None,None,None,Seq())
 case class Platform(val name:String,val location:Location)
 
 case class Output(fieldName:String,stream:String,unit:DataUnit,dataType:DataType){
-  //lazy val obsProperty=sensing.obsProperty 
 }
 
 class Sensing(val obsProperty:String,outputSeq: => Seq[Output]){

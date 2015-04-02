@@ -19,6 +19,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 import play.Logger
 import scala.util.Success
+import gsn.data.format.XmlSerializer
+import play.api.http.ContentTypes
 
 object SensorService extends Controller{   
   lazy val conf=ConfigFactory.load
@@ -54,8 +56,9 @@ object SensorService extends Controller{
         val out=format match{          
           case Json=>JsonSerializer.ser(data,Seq(),latestVals)
           case Csv=>CsvSerializer.ser(data, defaultMetaProps, latestVals)
+          case Xml=>XmlSerializer.ser(data, defaultMetaProps, latestVals)
         }
-        Ok(out)
+        result(out,format)
       } 
     }.recover{
       case t=>
@@ -174,4 +177,15 @@ object SensorService extends Controller{
     Future(Ok(""))
     
   }
+  
+  def result(s:String,out:OutputFormat)={
+    val contentType = out match {
+      case Xml=>ContentTypes.XML
+      case Json=>ContentTypes.JSON
+      case _ =>ContentTypes.TEXT
+    }
+    Ok(s).as(contentType)
+  }
+  
+  
 }

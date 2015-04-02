@@ -16,27 +16,32 @@ object SensorDatabase {
   def latestValues(sensor:Sensor, timeFormat:Option[String]=None)
     (implicit ds:Option[String]) ={
     val vsName=sensor.name.toLowerCase 
-	val query = s"""select * from $vsName where  
-	  timed = (select max(timed) from $vsName limit 1) limit 1"""	  	  
-	  
+    val fields=sensor.fields
+    val fieldNames=fields.map (f=>f.fieldName ) 
+              .filterNot (_.equals("grid")) ++ Seq("timed") 
+	val query = s"""select ${fieldNames.mkString(",")} from $vsName where  
+	  timed = (select max(timed) from $vsName limit 1) limit 1"""	  	  	  	  
 	Try{
-	    //vsDB(ds).withSession {implicit session=>
+	  vsDB(ds).withSession {implicit session=>
 	 
-	  val conn=vsDs(vsName)
-      val stmt=conn.createStatement
-      val rs= stmt executeQuery query.toString
-      val fields=sensor.fields
+	  //val conn=vsDs(vsName)
+      //val stmt=conn.createStatement
+	  val stmt= session.conn.createStatement
+      val rs= stmt.executeQuery(query)
       val data=fields map{f=>new ArrayBuffer[Any]}
       val time=new ArrayBuffer[Any]
       while (rs.next){
         time+=formatTime(rs.getLong("timed"))(timeFormat)
         for (i <- fields.indices) yield { 
-          data(i) += (rs.getObject(fields(i).fieldName ))
+          if (fields(i).dataType == BinaryType)
+            data(i) += ("binary")
+          else 
+            data(i) += (rs.getObject(fields(i).fieldName ))
         }           
       }
       rs.close
       stmt.close
-      conn.close
+      //conn.close
       val ts=
         Seq(TimeSeries(timeOutput(sensor.name),time))++
         fields.indices.map{i=>
@@ -44,7 +49,7 @@ object SensorDatabase {
       }
       log debug s"computed latest values for $vsName" 
       ts      
-    } match{
+    }} match{
       case Failure(f)=> 
         log error s"Error ${f.getMessage}"
         f.printStackTrace(); Seq()
@@ -121,19 +126,20 @@ object SensorDatabase {
     //if (true)  SensorStats(rate,min,max,Seq())
 //else {
 	Try{
-	val conn=vsDs(vsName )
-	//.withSession {implicit session=>	  
-      val stmt=conn.createStatement      
+	//val conn=vsDs(vsName )
+	vsDB(ds).withSession {implicit session=>	  
+      val stmt=session.conn.createStatement      
       val rs= stmt.executeQuery(queryMinMax.toString)
       while (rs.next){
         min=Some(rs.getLong(2))
         max=Some(rs.getLong(1))
       }
       log debug s"Computed max_/min for $vsName"
-      conn.close
-    //}
-	//vsDB(ds).withSession {implicit session=>
-    val conn2=vsDs(vsName)
+      stmt.close
+      //conn.close
+    }
+	vsDB(ds).withSession {implicit session=>
+    val conn2=session.conn//vsDs(vsName)
 	  val times=new ArrayBuffer[Long]()
 	  val stmt2=conn2.createStatement
       val rs2= stmt2.executeQuery(queryRate.toString)
@@ -147,8 +153,9 @@ object SensorDatabase {
 	  if (times.size>0)
 	    rate=Some(times.sum/times.size)
 	  log debug s"Computed rate for $vsName"
+	  stmt2.close
 	  conn2.close
-	//}
+	}
 	SensorStats(rate,min,max,latestValues(sensor,timeFormat))
     } match{
       case Failure(f)=> 

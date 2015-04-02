@@ -31,11 +31,11 @@ object JsonSerializer extends DataSerializer{
     toJson(data.sensor,data.ts,data.stats)//values, fields)     
   }
   
-  private def toJson(sensor:Sensor,ts:Seq[TimeSeries],stats:SensorStats)={
-            
+  private def toJson(sensor:Sensor,ts:Seq[TimeSeries],stats:SensorStats)={            
     //val fields=sensor.fields.filter(f=>valueNames.isEmpty || valueNames.contains(f.fieldName ))
     val values=ts.map(_.series)
-    val fields=ts.map(_.output).map{f=>
+    val outputs= if (ts.isEmpty) sensor.fields else ts.map(_.output) 
+    val fields=outputs.map{f=>
       Json.obj("name"->f.fieldName,"type"->f.dataType.name,"unit"->f.unit.code)
     }
     
