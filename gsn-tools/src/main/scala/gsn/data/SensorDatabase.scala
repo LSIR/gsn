@@ -33,8 +33,8 @@ object SensorDatabase {
       while (rs.next){
         time+=formatTime(rs.getLong("timed"))(timeFormat)
         for (i <- fields.indices) yield { 
-          if (fields(i).fieldName == "grid")
-            data(i) += ("griddy")
+          if (fields(i).dataType == BinaryType)
+            data(i) += ("binary")
           else 
             data(i) += (rs.getObject(fields(i).fieldName ))
         }           

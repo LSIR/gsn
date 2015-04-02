@@ -52,7 +52,8 @@ class SensorStore(ds:DataStore) extends Actor{
         vsDatasources.put(vsname, d.getDataSourceName)        
       }
       val hasAc=sec.hasAccessControl(vs.name)
-      implicit val source=vsDatasources.get(vsname)    
+      implicit val source=vsDatasources.get(vsname)
+      
       val s=Sensor.fromConf(vs,hasAc,None)
       val sStats= stats(s)
       //storeMongo(s)
