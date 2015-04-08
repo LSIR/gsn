@@ -1,0 +1,60 @@
+<virtual-sensor name="Matterhorn_Dozer_AEDAQHealthData__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+		<init-params>
+            <param name="persistant">true</param>
+	    	<param name="scriptlet">
+				<![CDATA[
+		    		if (PAYLOAD_VCCCH1 != null) { VCCCH1 = 2 * PAYLOAD_VCCCH1 };
+		    		if (PAYLOAD_VCCCH2 != null) { VCCCH2 = 2 * PAYLOAD_VCCCH2 };
+		    		if (PAYLOAD_VCCADC != null) { VCCADC = PAYLOAD_VCCADC };
+		    		if (PAYLOAD_REFADC != null) { REFADC = 2 * PAYLOAD_REFADC };
+		    		if (PAYLOAD_VCCOPA != null) { VCCOPA = 2 * PAYLOAD_VCCOPA };
+	  	    		if (PAYLOAD_VCC55V != null) { VCC55V = Math.round(1.83 * PAYLOAD_VCC55V) as int };
+	 	    		I12V = PAYLOAD_I12V;
+		    		I55VANALOG = PAYLOAD_I55VANALOG;
+		    		I55VDIGITAL = PAYLOAD_I55VDIGITAL;
+		    		SDEVENTSFREE = PAYLOAD_SDEVENTSFREE;
+		    		DAQPOWERSTATE = PAYLOAD_DAQPOWERSTATE;
+				]]>
+	    	</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="VCCCH1" type="INTEGER" unit="mV"/>            
+            <field name="VCCCH2" type="INTEGER" unit="mV"/>
+            <field name="VCCADC" type="INTEGER" unit="mV"/>
+            <field name="REFADC" type="INTEGER" unit="mV"/>
+            <field name="VCCOPA" type="INTEGER" unit="mV"/>
+            <field name="VCC55V" type="INTEGER" unit="mV"/>
+            <field name="I12V" type="INTEGER" />
+            <field name="I55VANALOG" type="INTEGER" />
+            <field name="I55VDIGITAL" type="INTEGER" />
+            <field name="SDEVENTSFREE" type="BIGINT" />
+            <field name="DAQPOWERSTATE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerAEDAQHealthDataMsg) from Matterhorn deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    	<stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Dozer_AEDAQHealthData__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>    
+    </streams>
+</virtual-sensor>

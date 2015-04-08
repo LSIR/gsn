@@ -135,6 +135,9 @@ Matterhorn_CoreStationStatus_Static.xml
 Matterhorn_Dozer_AdcComDiff.xml
 Matterhorn_Dozer_AdcMux1.xml
 Matterhorn_Dozer_AdcMux2.xml
+Matterhorn_Dozer_AEDAQHealthData.xml
+Matterhorn_Dozer_AEData.xml
+Matterhorn_Dozer_AEStatistics.xml
 Matterhorn_Dozer_BaseDebug.xml
 Matterhorn_Dozer_BaseStatus.xml
 Matterhorn_Dozer_Command.xml
