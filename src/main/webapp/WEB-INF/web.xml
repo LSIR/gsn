@@ -259,6 +259,12 @@
 	</servlet>
 
 	<servlet>
+		<servlet-name>GsnProxy</servlet-name>
+		<display-name>GsnProxy</display-name>
+		<servlet-class>gsn.http.restapi.GsnProxy</servlet-class>
+	</servlet>
+
+	<servlet>
 		<servlet-name>SensorServlet</servlet-name>
 		<display-name>SensorServlet</display-name>
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer
@@ -310,6 +316,11 @@
 	<servlet-mapping>
 		<servlet-name>GridDataServlet</servlet-name>
 		<url-pattern>/griddata</url-pattern>
+	</servlet-mapping>
+	
+    <servlet-mapping>
+		<servlet-name>GsnProxy</servlet-name>
+		<url-pattern>/ws/api/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>RestServlet</servlet-name>
