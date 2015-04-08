@@ -21,7 +21,7 @@ object XmlSerializer extends DataSerializer{
     val s= data.sensor 
     val desc=s.properties.getOrElse("description","")
     val acces=s.properties.getOrElse("accessProtected","false").toBoolean
-    val protect=if (acces) "(protected)" else "" 
+    val protect=if (acces) "(protected)" else " " 
     val vs= 
       <virtual-sensor name={s.name} 
         protected={protect} 
