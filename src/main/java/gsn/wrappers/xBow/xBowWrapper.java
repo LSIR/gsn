@@ -137,7 +137,6 @@ public class xBowWrapper extends AbstractWrapper {
 		 */
 		
 		AddressBean addressBean = getActiveAddressBean( );
-		setName( "xbowWrapper" + ( threadCounter++ ) );
 		host = addressBean.getPredicateValue ( "host" );
 	
 		if ( host == null || host.trim ( ).length ( ) == 0 ) {

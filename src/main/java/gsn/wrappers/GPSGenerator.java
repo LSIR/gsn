@@ -70,7 +70,6 @@ public class GPSGenerator extends AbstractWrapper {
    }
    
    public boolean initialize (  ) {
-      setName( "GPSGenerator-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
       if ( addressBean.getPredicateValue( "rate" ) != null ) {
          samplingRate = ParamParser.getInteger( addressBean.getPredicateValue( "rate" ) , DEFAULT_SAMPLING_RATE );

@@ -112,7 +112,6 @@ public class SwissPegelWrapper extends AbstractWrapper {
 	private List<String> not_a_number_constants = new ArrayList<String>() ;
 
 	public boolean initialize() {
-		setName( "SwissPegelWrapper-Thread:" + ( ++threadCounter ) );
 		dateTimeFormat = new SimpleDateFormat( DateFormat );
 		svnDateTimeFormat = new SimpleDateFormat( SvnDateFormat );
 		sampling = getActiveAddressBean( ).getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);

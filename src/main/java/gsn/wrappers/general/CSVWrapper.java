@@ -68,7 +68,6 @@ public class CSVWrapper extends AbstractWrapper {
     long processedLineCounter = 0; // counts lines processed when checkpoint use counter to track changes (instead of timestamp, by default)
 
     public boolean initialize() {
-        setName("CSVWrapper-Thread" + (++threadCounter));
         AddressBean addressBean = getActiveAddressBean();
         dataFile = addressBean.getPredicateValueWithException("file");
         String csvFields = addressBean.getPredicateValueWithException("fields");

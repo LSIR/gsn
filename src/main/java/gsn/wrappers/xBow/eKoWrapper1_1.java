@@ -153,7 +153,6 @@ public class eKoWrapper1_1 extends AbstractWrapper {
 		 * check the host and port parameters.
 		 */
 		AddressBean addressBean = getActiveAddressBean( );
-		setName( "eKoWrapper1_1" + ( threadCounter++ ) );
 
 		host = addressBean.getPredicateValue ( "host" );
 		if ( host == null || host.trim ( ).length ( ) == 0 ) {

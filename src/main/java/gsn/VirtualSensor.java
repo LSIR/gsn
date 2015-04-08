@@ -57,7 +57,7 @@ public class VirtualSensor {
             } catch (Exception e) {
                 throw new VirtualSensorInitializationFailedException(e.getMessage(), e);
             }
-            if (virtualSensor.initialize() == false) {
+            if (virtualSensor.initialize_wrapper() == false) {
                 virtualSensor = null;
                 throw new VirtualSensorInitializationFailedException();
             }
@@ -80,7 +80,7 @@ public class VirtualSensor {
 
     public synchronized void closePool() {
         if (virtualSensor != null) {
-            virtualSensor.dispose();
+            virtualSensor.dispose_decorated();
             if (logger.isDebugEnabled())
                 logger.debug("VS " + config.getName() + " is now released.");
         } else if (logger.isDebugEnabled())

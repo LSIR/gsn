@@ -74,7 +74,6 @@ public class TEDSDummyDataProducer extends AbstractWrapper {
    
    public boolean initialize ( ) {
       ArrayList < DataField > dataField = new ArrayList < DataField >( );
-      setName( "TEDSDummyRandomDataProducer-Thread" + ( ++threadCounter ) );
       AddressBean addressBean = getActiveAddressBean( );
       /**
        * Reading from the XML Configurations provided.

@@ -556,7 +556,8 @@ var GSN = {
 		
         $.ajax({
             type: "GET",
-            url: "gsn?REQUEST=0&omit_latest_values=true",
+            url: "ws/api/sensors?format=xml&latestValues=true",
+            //url: "gsn?REQUEST=0&omit_latest_values=true",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
@@ -566,7 +567,8 @@ var GSN = {
   		
         $.ajax({
             type: "GET",
-            url: "gsn?REQUEST=0&omit_latest_values=false",
+            url: "ws/api/sensors?format=xml&latestValues=true",
+            //url: "gsn?REQUEST=0&omit_latest_values=true",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
