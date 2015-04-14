@@ -30,16 +30,5 @@ public class SensorPageController {
         return "sensor";
     }
 
-    @RequestMapping("/foo")
-    public String foo(Map<String, Object> model) {
-        throw new RuntimeException("Foo");
-    }
-
-    @RequestMapping(value = "/hii", method = RequestMethod.GET, produces = "application/json")
-    public
-    @ResponseBody
-    String test(Map<String, Object> model) {
-        return "HIIIII";
-    }
 
 }

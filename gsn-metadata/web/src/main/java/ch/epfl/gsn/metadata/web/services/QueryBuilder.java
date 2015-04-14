@@ -47,8 +47,15 @@ public class QueryBuilder {
 
         Set<String> observedProperties = sensorQuery.getObservedProperties();
         if (!observedProperties.isEmpty()) {
-            Criteria criteria = where("propertyNames").in(observedProperties);
-            criteriaList.add(criteria);
+            if (!sensorQuery.isConjunction()) { //OR
+                Criteria criteria = where("propertyNames").in(observedProperties);
+                criteriaList.add(criteria);
+            } else { //AND
+                for (String observedProperty : observedProperties) {
+                    Criteria criteria = where("propertyNames").is(observedProperty);
+                    criteriaList.add(criteria);
+                }
+            }
 
         }
 
@@ -80,6 +87,8 @@ public class QueryBuilder {
         result.add(where("geoData.slope").lte(query.getSlopeMax()));
         result.add(where("geoData.elevation").gte(query.getAltitudeMin()));
         result.add(where("geoData.elevation").lte(query.getAltitudeMax()));
+        result.add(where("geoData.aspect").gte(query.getAspectMin()));
+        result.add(where("geoData.aspect").lte(query.getAspectMax()));
         return result;
     }
 
