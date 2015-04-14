@@ -104,7 +104,7 @@ EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
 
 parallelExecution in Test := false
 
-publishTo := Some("Artifactory Realm" at "http://planetdata.epfl.ch:8081/artifactory/gsn-release")
+publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release")
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 
