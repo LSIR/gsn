@@ -343,11 +343,6 @@
 	</servlet-mapping>
 
 	<servlet-mapping>
-		<servlet-name>MenuServlet</servlet-name>
-		<url-pattern>/menu.jsp</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
 		<servlet-name>MyCreateGroupServlet</servlet-name>
 		<url-pattern>/gsn/MyCreateGroupServlet</url-pattern>
 	</servlet-mapping>
