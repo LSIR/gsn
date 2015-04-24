@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -95,6 +96,10 @@ public class GeoJsonConverter {
         } else {
             writeShort(writer, record);
         }
+
+        String dataLink = MessageFormat.format(configuration.getProperty("gsn.server.vs"), record.getName().toLowerCase());
+        writer.name("dataLink").value(dataLink);
+
         WikiInfo wikiInfo = record.getWikiInfo();
 
         if (wikiInfo != null) {
@@ -124,7 +129,7 @@ public class GeoJsonConverter {
             writer.name("organisation").value(wikiInfo.getOrganisation());
         }
         writer.name("serverLink").value(record.getServer());
-        writer.name("sensorLink")
+        writer.name("metadataLink")
                 .value(configuration.getProperty("metadata.server") + "metadata/virtualSensors/" + record.getName());
 
 
@@ -163,8 +168,6 @@ public class GeoJsonConverter {
         writeGeoData(writer, record);
 
         writer.name("deployed").value(buildDeploymentDatesString(record.getFromDate(), record.getToDate()));
-
-        writer.name("dataLink").value(configuration.getProperty("gsn.server"));
 
     }
 

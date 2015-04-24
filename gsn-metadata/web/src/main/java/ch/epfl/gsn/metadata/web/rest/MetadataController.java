@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
 /**
@@ -45,8 +46,12 @@ public class MetadataController {
     @RequestMapping(value = "/virtualSensors", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    String getVirtualSensors(SensorQuery sensorQuery) {
+    String getVirtualSensors(SensorQuery sensorQuery, HttpServletResponse response) {
         System.out.println("sensorQuery = " + sensorQuery);
+
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "GET");
+        response.addHeader("Access-Control-Allow-Headers", "Content-Type");
 
         Query query = queryBuilder.build(sensorQuery);
 
@@ -82,10 +87,14 @@ public class MetadataController {
     @RequestMapping(value = "/virtualSensors/{dbTableName}", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    String getMeasurementRecordsForDbTableName(@PathVariable String dbTableName) {
+    String getMeasurementRecordsForDbTableName(@PathVariable String dbTableName, HttpServletResponse response) {
         System.out.println("dbTableName = " + dbTableName);
 
         VirtualSensorMetadata virtualSensorMetadata = sensorAccessService.getVirtualSensorMetadata(dbTableName);
+
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "GET");
+        response.addHeader("Access-Control-Allow-Headers", "Content-Type");
 
         return geoJsonConverter.convertMeasurementRecords(Lists.newArrayList(virtualSensorMetadata), true);
     }
