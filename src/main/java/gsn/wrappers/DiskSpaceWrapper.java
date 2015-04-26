@@ -58,7 +58,6 @@ public class DiskSpaceWrapper extends AbstractWrapper{
             logger.error("Error in initializing DiskSpaceWrapper because of incompatible jdk version: " + javaVersion + " (should be 1.6.x)");
             return false;
         }
-        setName("DiskSpaceWrapper-Thread" + (++threadCounter));
         return true;
     }
     

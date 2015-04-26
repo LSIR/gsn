@@ -66,7 +66,6 @@ public class WanWrapper extends AbstractWrapper {
   private List<String> not_a_number_constants = new ArrayList<String>() ;
   
   public boolean initialize() {
-    setName( "WanWrapper-Thread:" + ( ++threadCounter ) );
     dateTimeFormat = new SimpleDateFormat( DateFormat );
     sampling = getActiveAddressBean( ).getPredicateValueAsInt(SAMPLING, SAMPLING_DEFAULT);
     filename = getActiveAddressBean().getPredicateValue(FILE);

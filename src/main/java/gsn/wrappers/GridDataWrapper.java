@@ -77,7 +77,6 @@ public class GridDataWrapper extends AbstractWrapper {
     private long rate;
 
     public boolean initialize() {
-        setName(getWrapperName() + "-" + (++threadCounter));
 
         AddressBean addressBean = getActiveAddressBean();
 

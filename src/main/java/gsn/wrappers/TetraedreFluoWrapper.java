@@ -90,7 +90,6 @@ public class TetraedreFluoWrapper extends AbstractWrapper {
     }
 
     public boolean initialize() {
-        setName(getWrapperName() + "-" + (++threadCounter));
         AddressBean addressBean = getActiveAddressBean();
 
         table_name = addressBean.getPredicateValue("table-name");

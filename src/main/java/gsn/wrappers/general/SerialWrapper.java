@@ -123,7 +123,6 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
 	 * ODD parity scheme. - PARITY_SPACE: SPACE parity scheme.
 	 */
 	public boolean initialize ( ) {
-		setName( "SerialWrapper-Thread" + ( ++threadCounter ) );
 		addressBean = getActiveAddressBean( );
 		serialPort = addressBean.getPredicateValue( "serialport" );
 		if ( serialPort == null || serialPort.trim( ).length( ) == 0 ) {

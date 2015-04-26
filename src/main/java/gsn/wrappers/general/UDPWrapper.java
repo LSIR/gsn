@@ -75,7 +75,6 @@ public class UDPWrapper extends AbstractWrapper {
          logger.warn( e.getMessage( ) , e );
          return false;
       }
-      setName( "UDPWrapper-Thread" + ( ++threadCounter ) );
       return true;
    }
    

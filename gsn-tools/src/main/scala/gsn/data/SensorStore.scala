@@ -41,11 +41,13 @@ class SensorStore(ds:DataStore) extends Actor{
     refresh cancel
   }    
   
+  private def canonicalName(name:String)=
+    name.toLowerCase.replaceAll(" ", "")
   
   def receive ={    
     //vs config messages
     case ModifiedVsConf(vs)=>
-      val vsname=vs.name.toLowerCase
+      val vsname=canonicalName(vs.name)
       if (vs.storage.isDefined) {
         dsReg.dsss.put(vsname, vs.storage.get)
         val d=ds.datasource(vs.storage.get.url, vs.storage.get)
@@ -61,7 +63,7 @@ class SensorStore(ds:DataStore) extends Actor{
       sensors put(vsname,s)
       
     case DeletedVsConf(vs)=>
-      val vsname=vs.name.toLowerCase
+      val vsname=canonicalName(vs.name)
       if (sensors.contains(vsname)){
         sensors remove vsname
         vsDatasources remove vsname

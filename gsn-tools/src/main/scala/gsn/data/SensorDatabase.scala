@@ -10,6 +10,7 @@ import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
 import com.mchange.v2.c3p0.DataSources
 import java.sql.DriverManager
+import gsn.data.format.TimeFormats._
 
 object SensorDatabase { 
   val log=LoggerFactory.getLogger(SensorDatabase.getClass)
@@ -191,25 +192,6 @@ object SensorDatabase {
 	  Database.forDataSource(C3P0Registry.pooledDataSourceByName(dsName.get))	  
 	else 
 	  Database.forDataSource(C3P0Registry.pooledDataSourceByName("gsn"))
-  }
-
-  private def formatTime(t:Long)(implicit timeFormat:Option[String])=timeFormat match{
-    case Some("unixTime") | None => t
-    case _ => getTimeFormat(timeFormat).print(t)
-  }
-            
-  private def getTimeFormat(tf:Option[String])={// e.g. yyyyMMdd    
-    tf match {
-      case Some("iso8601") => ISODateTimeFormat.dateTimeNoMillis()
-      case Some("iso8601ms") => ISODateTimeFormat.dateTime()
-      
-      case Some(f) => 
-        Try(DateTimeFormat.forPattern(f))              
-        .recover{case e =>
-          println("error here "+e)
-          throw new IllegalArgumentException(s"Invalid time format: $f ${e.getMessage}")}.get 
-      case None => ISODateTimeFormat.dateHourMinuteSecond()
-    }
   }
 
 }

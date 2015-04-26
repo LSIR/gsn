@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project>
+    <!-- UPDATE-ME: The name of your installer comes below in the gsn.name property -->
+    <property name="gsn.name" value="gsn-1.1.7"/>
+
+    <target name="pack-gsn" depends="clean-packager">
+
+        <property environment="env"/>
+        <property name="pack" location="${basedir}/pack"/>
+        <property name="conf.dir" value="${basedir}/conf"/>
+        <property name="build.dir" value="temp/build"/>
+        <property name="src.dir" value="src/main/java"/>
+        <property name="resources.dir" value="${basedir}/src/main/resources" />
+        <property name="jars" value="jars"/>
+        <property name="libdir" value="lib"/>
+        <property name="temp" value="temp"/>
+        <property name="maxMemoryUsage" value="128m"/>
+
+        <path id="classpath">
+            <pathelement location="${build.dir}/"/>
+            <fileset dir="${libdir}">
+                <include name="**/*.jar"/>
+            </fileset>   
+            <fileset refid="gsndeps" />     	
+        </path>
+
+        <mkdir dir="${pack}/opt/gsn/1.1.7/lib"/>
+        <mkdir dir="${pack}/opt/gsn/1.1.7/conf"/>
+        <mkdir dir="${pack}/opt/gsn/1.1.7/logs"/>
+        <mkdir dir="${pack}/opt/gsn/1.1.7/virtual-sensors"/>
+        <mkdir dir="${pack}/opt/gsn/1.1.7/src/main/resources"/>
+        <mkdir dir="${build.dir}"/>
+
+
+        <javac debug="true" srcdir="${src.dir}" optimize="off" destdir="${build.dir}" failonerror="true" classpathref="classpath">
+            <exclude name="**/msr/**"/>
+            <exclude name="**/microsoft/**"/>
+            <exclude name="**/tempuri/**"/>
+            <exclude name="**/epfl/**"/>
+            <exclude name="**/ethz/**"/>
+            <exclude name="**/slf/**"/>
+            <exclude name="**/acquisition2/**"/>
+            <exclude name="**/ieee1451/**"/>
+            <exclude name="**/svn/**"/>
+            <exclude name="**/hibernate/**"/>
+            <exclude name="**/WebCamWrapper.java"/>
+            <exclude name="**/DemoVSensor.java"/>
+        </javac>
+
+        <jar destfile="${pack}/opt/gsn/1.1.7/lib/${gsn.name}.jar" basedir="${build.dir}">
+            <manifest>
+                <attribute name="Built-By" value="GSN Development Team."/>
+                <attribute name="Main-Class" value="gsn.Main"/>
+                <attribute name="SplashScreen-Image" value="GSN_green_medium.png"/>
+            </manifest>
+        </jar>
+
+        <copy file="${basedir}/virtual-sensors/samples/memoryDataVS.xml" todir="${pack}/opt/gsn/1.1.7/virtual-sensors/"/>
+        <copy file="${basedir}/virtual-sensors/samples/memoryPlotVS.xml" todir="${pack}/opt/gsn/1.1.7/virtual-sensors/"/>
+        <copy todir="${pack}/opt/gsn/1.1.7/virtual-sensors/samples/">
+            <fileset dir="${basedir}/virtual-sensors/samples/">
+                <include name="**/**"/>
+                <exclude name="**/memoryDataVS.xml"/>
+                <exclude name="**/memoryPlotVS.xml"/>
+            </fileset>
+        </copy>
+
+        <copy file="${basedir}/conf/wrappers.properties" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${basedir}/conf/realm.properties" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${basedir}/conf/clienttestkeystore" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${basedir}/conf/emails.properties" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${basedir}/conf/keystore" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${basedir}/conf/servertestcer.cer" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${basedir}/conf/servertestkeystore" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${resources.dir}/RestApiConstants.properties" todir="${pack}/opt/gsn/1.1.7/src/main/resources/"/>
+        <copy file="${basedir}/packager/log4j.properties" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${basedir}/packager/gsn.xml" todir="${pack}/opt/gsn/1.1.7/conf/"/>
+        <copy file="${basedir}/icons/GSN_green_medium.png" todir="${pack}/opt/gsn/1.1.7/lib/"/>
+        <copy file="${basedir}/packager/pom.xml" todir="${pack}/opt/gsn/1.1.7/"/>
+        <copy file="${basedir}/packager/license.txt" todir="${pack}/opt/gsn/1.1.7/"/>
+
+        <copy todir="${pack}/opt/gsn/1.1.7/lib" flatten="yes" includeEmptyDirs="false">
+            <fileset dir="${basedir}/lib/">
+                <include name="**/**"/>
+                <exclude name="**/axis-2/**"/>
+                <exclude name="**/safe-storage/**"/>
+                <exclude name="**/junit-jars/**"/>
+                <exclude name="**/compiling/**"/>
+                <exclude name="**/hibernate/**"/>
+                <exclude name="**/build/**"/>
+                <exclude name="**/.svn/**"/>
+            </fileset>
+        </copy>
+        <copy todir="${pack}/opt/gsn/1.1.7/src/main/webapp">
+            <fileset dir="${basedir}/src/main/webapp/">
+                <exclude name="**/.svn/**"/>
+                <exclude name="**/axis2.xml"/>
+                <exclude name="**/*.aar"/>
+            </fileset>
+        </copy>
+        <tar destfile="${basedir}/${gsn.name}-pack.tar.gz" compression="gzip">
+          <fileset dir="${pack}/">
+            <include name="**/**"/>
+          </fileset>
+        </tar>
+    </target>
+
+    <target name="clean-packager">
+        <delete includeEmptyDirs="yes" failonerror="no">
+            <fileset dir="temp"/>
+            <fileset dir="${pack}"/>
+        </delete>
+        <delete file="${basedir}/${gsn.name}-pack.tar.gz"/>
+    </target>
+</project>

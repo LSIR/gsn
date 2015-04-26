@@ -28,24 +28,35 @@
 package gsn.vsensor;
 
 import gsn.ContainerImpl;
+import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
+import gsn.monitoring.Monitorable;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 
-public abstract class AbstractVirtualSensor {
+public abstract class AbstractVirtualSensor implements Monitorable{
 
-	private static final transient Logger logger           = Logger.getLogger( AbstractVirtualSensor.class );
+	private static final transient Logger logger = Logger.getLogger( AbstractVirtualSensor.class );
 
-	private VSensorConfig                 virtualSensorConfiguration;
+	private VSensorConfig  virtualSensorConfiguration;
 
-	private long                          lastVisitiedTime = 0;
+	private Long		outputCount = 0L;
+	private Long 	    inputCount = 0L;
+	
+	private long        lastOutputedTime = 0;
+	
 
+	public final boolean initialize_wrapper(){
+		Main.getInstance().getToMonitor().add(this);
+		return initialize();
+	}
 	/**
 	 * Called once while initializing an instance of the virtual sensor
 	 * 
@@ -87,14 +98,14 @@ public abstract class AbstractVirtualSensor {
 
 		final int outputStreamRate = getVirtualSensorConfiguration( ).getOutputStreamRate( );
 		final long currentTime = System.currentTimeMillis( );
-		if ( ( currentTime - lastVisitiedTime ) < outputStreamRate ) {
+		if ( ( currentTime - lastOutputedTime ) < outputStreamRate ) {
 			if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
 			return;
 		}
-		lastVisitiedTime = currentTime;
-
+		lastOutputedTime = currentTime;
 		try {
 			ContainerImpl.getInstance().publishData( this ,streamElement);
+			outputCount = outputCount == Long.MAX_VALUE ? 0 : outputCount + 1;
 		} catch (SQLException e) {
 			if (e.getMessage().toLowerCase().contains("duplicate entry"))
 				logger.info(e.getMessage(),e);
@@ -151,12 +162,17 @@ public abstract class AbstractVirtualSensor {
 		return true;
 	}
 
+	
+	public final void dispose_decorated(){
+		Main.getInstance().getToMonitor().remove(this);
+		dispose();
+	}
 	/**
 	 * Called when the container want to stop the pool and remove it's resources.
 	 * The container will call this method once on each install of the virtual
-	 * sensor in the pool. The progrmmer should release all the resouce used by
-	 * this virtual sensor instance in this method specially those resouces
-	 * aquired during the <code>initialize</code> call. <p/> Called once while
+	 * sensor in the pool. The programmer should release all the resources used by
+	 * this virtual sensor instance in this method specially those resources
+	 * acquired during the <code>initialize</code> call. <p/> Called once while
 	 * finalizing an instance of the virtual sensor
 	 */
 	public abstract void dispose ( );
@@ -179,13 +195,28 @@ public abstract class AbstractVirtualSensor {
 	public void setVirtualSensorConfiguration ( VSensorConfig virtualSensorConfiguration ) {
 		this.virtualSensorConfiguration = virtualSensorConfiguration;
 	}
+	
+	/**
+	 * 
+	 */
+	public Hashtable<String, Object> getStatistics(){
+		Hashtable<String, Object> stat = new Hashtable<String, Object>();
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.produced.count", outputCount);
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".input.produced.count", inputCount);
+		return stat;
+	}
+	
+	public final void dataAvailable_decorated ( String inputStreamName , StreamElement streamElement ){
+		dataAvailable ( inputStreamName , streamElement );
+		inputCount = inputCount == Long.MAX_VALUE ? 0 : inputCount + 1;
+	}
 
 	/**
 	 * This method is going to be called by the container when one of the input
 	 * streams has a data to be delivered to this virtual sensor. After receiving
-	 * the data, the virutal sensor can do the processing on it and this
+	 * the data, the virtual sensor can do the processing on it and this
 	 * processing could possibly result in producing a new stream element in this
-	 * virtual sensor in which case the virutal sensor will notify the container
+	 * virtual sensor in which case the virtual sensor will notify the container
 	 * by simply adding itself to the list of the virtual sensors which have
 	 * produced data. (calling <code>container.publishData(this)</code>. For
 	 * more information please check the <code>AbstractVirtalSensor</code>

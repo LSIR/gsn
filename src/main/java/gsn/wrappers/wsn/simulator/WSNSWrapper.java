@@ -76,7 +76,7 @@ public class WSNSWrapper extends AbstractWrapper implements DataListener {
    private int                      step_counter               = STEP_COUNTER_DEFAULT_VALUE;
    
    public boolean initialize (  ) {
-      setName( "WirelessSensorNetworkSimulatorWrapper-Thread" + ( ++threadCounter ) );
+
       AddressBean addressBean = getActiveAddressBean( );
       /**
        * Reading the initialization paramteters from the XML Configurations

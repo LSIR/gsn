@@ -279,6 +279,7 @@ public class ScriptletProcessor extends AbstractVirtualSensor {
                 o = binding.getVariable(df.getName().toUpperCase());
             }
             catch (MissingPropertyException e) {
+            	logger.warn(e);
                 // ...   
             }
             data[i] = (Serializable) o;

@@ -413,7 +413,7 @@ public class VSensorLoader extends Thread {
 			}
 			AbstractWrapper wrapper = ( AbstractWrapper ) Main.getWrapperClass ( addressBean.getWrapper ( ) ).newInstance ( );
 			wrapper.setActiveAddressBean ( addressBean );
-			boolean initializationResult = wrapper.initialize (  );
+			boolean initializationResult = wrapper.initialize_wrapper (  );
 			if ( initializationResult == false )
 				return null;
 			try {

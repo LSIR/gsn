@@ -39,8 +39,11 @@ public class GsnProxy extends HttpServlet {
             int statusCode;
             int oneByte;
             String methodName;
-            
-            String urlString = "http://localhost:9000"; //request.getRequestURL().toString();
+            log.info(request.getLocalName());
+            log.info(request.getPathInfo());
+            log.info(request.getServletPath());
+            log.info(request.getLocalAddr());
+            String urlString = "http://localhost:9000"+request.getServletPath()+request.getPathInfo(); //request.getRequestURL().toString();
             String queryString = request.getQueryString();
             
             urlString += queryString==null?"":"?"+queryString;

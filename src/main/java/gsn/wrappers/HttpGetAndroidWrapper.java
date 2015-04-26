@@ -123,7 +123,6 @@ public class HttpGetAndroidWrapper extends AbstractWrapper {
       if ( inputRate == null || inputRate.trim( ).length( ) == 0 ) rate = DEFAULT_RATE;
       else
          rate = Integer.parseInt( inputRate );
-      setName( "HttpAndroidReceiver-Thread" + ( ++threadCounter ) );
       if ( logger.isDebugEnabled( ) ) logger.debug( "AndroidWrapper is now running @" + rate + " Rate." );
       return true;
    }

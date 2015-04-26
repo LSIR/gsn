@@ -143,7 +143,6 @@ public class CameraIdentifier extends AbstractWrapper {
       tedsToVirtualSensor = new TedsToVirtualSensor( templateDirPath , templateFile );
       // ------INITIALIZING THE TEMPLATE DIRECTORY ---------DONE
       
-      setName( "CameraIdentifier-Thread" + ( ++threadCounter ) );
       try {
          Thread.sleep( 4000 );
       } catch ( InterruptedException e ) {

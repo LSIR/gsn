@@ -81,7 +81,7 @@ case class SourceConf(alias:String,query:String,storageSize:Option[String],slide
     disconnectBufferSize:Option[Int],samplingRate:Option[Double],wrappers:Seq[WrapperConf])
 object SourceConf{
   def create(xml:Node)=SourceConf(
-      xml \@ "alias", xml \@ "query",
+      xml \@ "alias",(xml \ "query").text,
       xml.attribute("storage-size").map(_.toString),
       xml.attribute("slide").map(_.toString),
       xml.attribute("disconnected-buffer-size").map(_.toString.toInt),

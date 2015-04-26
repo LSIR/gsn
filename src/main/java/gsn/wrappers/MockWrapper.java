@@ -35,7 +35,6 @@ public class MockWrapper extends AbstractWrapper {
 	private DataField[] outputFormat =new DataField[] {new DataField("data","int")};
 
 	public boolean initialize() {
-		setName("TestWrapperMockObject-Thread" + (++threadCounter));
 		return true;
 	}
 

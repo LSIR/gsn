@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<title>GSN</title>
-	
+		
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
@@ -15,32 +15,34 @@
 	<script type="text/javascript" src="js/functions.js"></script>
 	
 	<script type="text/javascript" src="js/gsn.js"></script>
-<script type="text/javascript">
-<!--//<![CDATA[
-$(document).ready(function() {
-	//bind every buttons to javascript functionality (only once)
-	$("#refreshall_timeout").bind("change",GSN.updateallchange);
-	$("#refreshall").bind("click",GSN.updateall);
-	$("#closeall").bind("click",GSN.closeall);
-	//$("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
+	<script type="text/javascript">
+	<!--//<![CDATA[-->
+		$(document).ready(function() {
+			//bind every buttons to javascript functionality (only once)
+			$("#refreshall_timeout").bind("change",GSN.updateallchange);
+			$("#refreshall").bind("click",GSN.refreshVSs);
+			$("#closeall").bind("click",GSN.closeall);
+			//$("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
 	
-	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+			$("#navigation ul a.local").bind("click",function() { 
+				return GSN.nav($(this).text()); 
+			});
 		
-	//load the requested page
-	$.historyInit(GSN.load);
+			//load the requested page
+			$.historyInit(GSN.load);
 	
-	$("#refreshall_autozoomandcenter").bind("click",function() { 
-		if ($("#refreshall_autozoomandcenter").attr("checked")) {
-			GSN.map.userchange();
-			GSN.map.autozoomandcenter();
-		}
-	});
-    $.get('menu.jsp', {selected: "index"}, function(data) {
-        $('#navigation').html(data);
-    });
-});	
-//]]>-->
-</script>
+			$("#refreshall_autozoomandcenter").bind("click",function() { 
+				if ($("#refreshall_autozoomandcenter").attr("checked")) {
+					GSN.map.userchange();
+					GSN.map.autozoomandcenter();
+				}
+			});
+    		$.get('menu.jsp', {selected: "index"}, function(data) {
+        		$('#navigation').html(data);
+    		});
+		});	
+<!--//]]>-->
+	</script>
 </head>
 <body>
 
