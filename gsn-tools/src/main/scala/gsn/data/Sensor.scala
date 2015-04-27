@@ -62,8 +62,7 @@ object EmptyStats extends SensorStats(None,None,None,Seq())
 
 case class Platform(val name:String,val location:Location)
 
-case class Output(fieldName:String,stream:String,unit:DataUnit,dataType:DataType,
-    mapping:Option[List[(String,String)]])
+case class Output(fieldName:String,stream:String,unit:DataUnit,dataType:DataType, mapping:Option[List[(String,String)]])
 
 class Sensing(val obsProperty:String,outputSeq: => Seq[Output]){
   lazy val outputs:Seq[Output]=outputSeq

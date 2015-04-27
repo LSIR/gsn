@@ -31,9 +31,10 @@ object XmlSerializer extends DataSerializer{
     val protect=if (acces) "(protected)" else " "
     def xmlFields= 
       s.fields.map{f=>
-         <field name={f.fieldName }
+         var tmp = <field name={f.fieldName }
             type={f.dataType.name} unit={f.unit.code} >
          </field>
+         addMappings(tmp, f.mapping)
       }
     def xmlFieldValues=
       data.stats.latestValues.map{ts=>

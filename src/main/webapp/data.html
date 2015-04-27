@@ -151,8 +151,6 @@
                     });
                 }
 
-
-
                 function getSortedKeys(obj){
                     var keys = [];
                     for(var key in obj){
@@ -179,25 +177,22 @@
                 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
                 }
 
-                function option_list_key(name,items,all, id,vsname){
-                	//if(typeof(vsname)==='undefined') vsname=null;
+                function option_list_key(name,items,all, id){
                     to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all){
                         to_return+='<option value="All" >' + all + '</option>';
                     }
 
+                    var selectedVs = getURLParam("vsName");
                     var sk = getSortedKeys(items);
                     var l = sk.length;
-                    //var vsfromURL = getURLParameter("vsname");
                     for (var i = 0 ; i < l ; i++) {
-                        //if ("time" == sk[i]) continue;
-                        //console.info(sk[i]);
-                        to_return+='<option value="' + sk[i] +'"';
-                        if (vsname != null && vsname == sk[i]){
-                          to_return += ' selected';
-                        }
-                        to_return+=' >'+sk[i]+'</option>';
-                        //to_return+='<option value="' + sk[i]+'" >'+sk[i]+'</option>';
+                        if ("time" == sk[i]) continue;
+                        if (selectedVs == sk[i].toLowerCase() && id == "vss_0") {
+                        	to_return+='<option selected value="' + sk[i]+'" >'+sk[i]+'</option>';
+                        } else {
+                       		to_return+='<option value="' + sk[i]+'" >'+sk[i]+'</option>';
+                    	}
                     }
                     to_return+='</select>'
                     return to_return;
@@ -353,7 +348,7 @@
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
-                $.get("gsn?REQUEST=0&omit_latest_values=true", function(xml){
+                $.get("ext/ws/api/sensors?format=xml", function(xml){
                     lovs = xml
                     virtual_sensors.push("All");
                     var vsname = getURLParameter("vsname");
@@ -525,6 +520,24 @@ csv_to_json($(this), drawGrid, 'iso');
 });
 
             });
+            
+function getURLParam(strParamName){
+    var strReturn = "";
+    var strHref = window.location.href;
+    if ( strHref.indexOf("?") > -1 ){
+        var strQueryString = strHref.substr(strHref.indexOf("?")).toLowerCase();
+        var aQueryString = strQueryString.split("&");
+        for ( var iParam = 0; iParam < aQueryString.length; iParam++ ){
+            if (
+                aQueryString[iParam].indexOf(strParamName.toLowerCase() + "=") > -1 ){
+                var aParam = aQueryString[iParam].split("=");
+                strReturn = aParam[1];
+                break;
+            }
+        }
+    }
+    return unescape(strReturn);
+}
         </script>
     </head>
     <body>

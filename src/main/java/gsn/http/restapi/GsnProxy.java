@@ -32,6 +32,7 @@ public class GsnProxy extends HttpServlet {
     }
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    	FileOutputStream os = new FileOutputStream("/home/michael/dev/semester_project/gsn_perso_log.txt");
     	
     	log.info("	");
         HttpURLConnection con;
@@ -45,6 +46,8 @@ public class GsnProxy extends HttpServlet {
             
             urlString += queryString==null?"":"?"+queryString;
             URL url = new URL(urlString);
+            
+            IOUtils.write("urlString = " + urlString + "\n", os);
             
             log.info("Fetching >"+url.toString());
             
@@ -73,6 +76,7 @@ public class GsnProxy extends HttpServlet {
             }
             
             IOUtils.copy(con.getInputStream(), response.getOutputStream());
+            IOUtils.copy(con.getInputStream(), os);
 
             con.disconnect();
             
