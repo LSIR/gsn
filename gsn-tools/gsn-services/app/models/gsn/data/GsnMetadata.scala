@@ -42,7 +42,7 @@ class GsnMetadata(gsnServer:String) {
       if (fn=="time") fn="timed"
       Sensing(null,Output(fn,vsName,
           DataUnit(unit),
-          DataType((f\"type").as[String])))
+          DataType((f\"type").as[String]),None))
     }
     val coord= (jsFeature \ "geometry" \ "coordinates")
     val location=Location(coord(0).asOpt[Double],

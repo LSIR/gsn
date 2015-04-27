@@ -368,9 +368,14 @@
                         virtual_sensor_to_fields[vsname] = virtual_sensor_to_fields[vsname] || []
                         $(this).find('field').each(function(){
                             if ($(this).attr('category') != 'predicate') {
-                                var field_name = $(this).attr('name');
+                                var obsProperty = $(this).attr('obsProperty')
+                            	var field_name = $(this).attr('name');
                                 var field_unit = $(this).attr('unit');
-                                virtual_sensor_to_fields[vsname].push(field_name);
+                                if (obsProperty != null) {
+                                	virtual_sensor_to_fields[vsname].push(field_name + " (" + obsProperty + ")");
+                                } else {
+                                	virtual_sensor_to_fields[vsname].push(field_name);
+                                }
                                 field_to_virtual_sensor[field_name] = field_to_virtual_sensor[field_name] || []
                                 field_to_virtual_sensor[field_name].push(vsname)
 

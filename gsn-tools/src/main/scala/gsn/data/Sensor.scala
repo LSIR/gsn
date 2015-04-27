@@ -12,13 +12,23 @@ case class Sensor(name:String,
 } 
 
 object Sensor{
-  def fromConf(vsConf:VsConf):Sensor=fromConf(vsConf,false,None)
-  def fromConf(vsConf:VsConf,accessProtected:Boolean,stats:Option[SensorStats])={
-    val output=
-      vsConf.processing.output map{out=>
-        Sensing(out.name,Output(out.name.toLowerCase,vsConf.name,
-            DataUnit(out.unit.getOrElse(null)),DataType(out.dataType) ))
+  def fromConf(vsConf:VsConf):Sensor=fromConf(vsConf,false,None,None)
+  def fromConf(vsConf:VsConf,accessProtected:Boolean,stats:Option[SensorStats], mappings:Option[Map[String,List[(String,String)]]])={
+    val output= {
+      
+      mappings match {
+          case Some(m) => {
+            vsConf.processing.output map{out=>
+               Sensing(out.name,Output(out.name.toLowerCase,vsConf.name,
+              DataUnit(out.unit.getOrElse(null)),DataType(out.dataType), m.get(out.name.toLowerCase())))}
+          }
+          case None => {
+            vsConf.processing.output map{out=>
+           Sensing(out.name,Output(out.name.toLowerCase,vsConf.name,
+              DataUnit(out.unit.getOrElse(null)),DataType(out.dataType), None))}
+          }
       }
+    }
     val props=vsConf.address.map{kv=>
         (kv._1.toLowerCase.trim,kv._2.trim )
       } ++ 
@@ -52,8 +62,8 @@ object EmptyStats extends SensorStats(None,None,None,Seq())
 
 case class Platform(val name:String,val location:Location)
 
-case class Output(fieldName:String,stream:String,unit:DataUnit,dataType:DataType){
-}
+case class Output(fieldName:String,stream:String,unit:DataUnit,dataType:DataType,
+    mapping:Option[List[(String,String)]])
 
 class Sensing(val obsProperty:String,outputSeq: => Seq[Output]){
   lazy val outputs:Seq[Output]=outputSeq

@@ -12,6 +12,7 @@ import reactivemongo.bson.BSONDocument
 import scala.util.{Failure=>ScalaFailure}
 import scala.util.Success
 import reactivemongo.bson.BSON
+import gsn.data.discovery.PropertiesManager
 
 object dsReg{
   val dsss=new collection.mutable.HashMap[String,StorageConf]
@@ -25,6 +26,13 @@ class SensorStore(ds:DataStore) extends Actor{
     
   val driver = new MongoDriver(context.system)
   val connection = driver.connection(List("localhost"))
+  
+  val propertiesEndpoint = GsnConf.defaultFuseki.getString("propertiesEndpoint")
+  val mappingsEndpoint = GsnConf.defaultFuseki.getString("mappingsEndpoint")
+  val virtualSensorsEndpoint = GsnConf.defaultFuseki.getString("virtualSensorsEndpoint")
+  val baseRdfUri = GsnConf.defaultFuseki.getString("baseRdfUri")
+  val propertiesManager:PropertiesManager = new PropertiesManager(propertiesEndpoint,
+      mappingsEndpoint,virtualSensorsEndpoint, baseRdfUri)
   
   val sensors=new collection.mutable.HashMap[String,Sensor]
   val vsDatasources=new collection.mutable.HashMap[String,String]
@@ -56,7 +64,9 @@ class SensorStore(ds:DataStore) extends Actor{
       val hasAc=sec.hasAccessControl(vs.name)
       implicit val source=vsDatasources.get(vsname)
       
-      val s=Sensor.fromConf(vs,hasAc,None)
+      val mappings = propertiesManager.getMappingsForSensor(vsname)
+      
+      val s=Sensor.fromConf(vs,hasAc,None,Option(mappings))
       val sStats= stats(s)
       //storeMongo(s)
       sensorStats put(vsname,sStats)

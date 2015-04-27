@@ -113,7 +113,7 @@ object SensorDatabase {
   }   
   
   private def timeOutput(sensorname:String)={
-    Output("timestamp",sensorname,DataUnit("ms"),TimeType)
+    Output("timestamp",sensorname,DataUnit("ms"),TimeType,None)
   }
 
   def stats(sensor:Sensor,timeFormat:Option[String]=None)

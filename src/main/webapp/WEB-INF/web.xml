@@ -326,7 +326,7 @@
 	
     <servlet-mapping>
 		<servlet-name>GsnProxy</servlet-name>
-		<url-pattern>/ws/api/*</url-pattern>
+		<url-pattern>/ext/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MonitoringServlet</servlet-name>

@@ -556,8 +556,7 @@ var GSN = {
   		
         $.ajax({
             type: "GET",            
-            //url: "ws/api/sensors?format=xml&latestValues=true",
-            url: "gsn?REQUEST=0&omit_latest_values=true",
+            url: "ext/ws/api/sensors?format=xml&latestValues=true",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
@@ -779,7 +778,7 @@ var GSN = {
             var input = $("dl.input",vsdl.get(4));
             dl = dynamic;
 			
-            var name,cat,type,value,unit;
+            var name,cat,type,value,unit,obsProperty;
             var last_cmd,cmd;
             var hiddenclass ="";
             //update the vsbox the first time, when it's empty
@@ -792,6 +791,7 @@ var GSN = {
                     type = $(this).attr("type");
                     value = $(this).text();
                     unit = $(this).attr("unit");
+                    obsProperty = $(this).attr("obsProperty");
                     if (unit==null)
                         unit="";
                     else
@@ -826,7 +826,7 @@ var GSN = {
                         var s = type ;
                         if ($(this).attr("description")!=null)
                             s += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';
-                        $(struct).append('<dt>'+name+'</dt><dd class="'+name+'">'+s+'</dd>');
+                        $(struct).append('<dt>'+name+ ((obsProperty!=null)?' ('+obsProperty + ')':'') + '</dt><dd class="'+name+'">'+s+'</dd>');
                         if (!gotDynamic) {
                             $("a.tabdynamic", vsd).show();
                             $("a.tabstructure", vsd).show();
@@ -899,7 +899,7 @@ var GSN = {
 
                         name = comp+name;
                     }
-                    $(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
+                    $(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+ ((obsProperty!=null)?' ('+obsProperty + ')':'') + '</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
                 });
 			  
                 if ($(vs).attr("description")!="") {
@@ -957,6 +957,7 @@ var GSN = {
                     type = $(field).attr("type");
                     value = $(field).text();
                     unit = $(field).attr("unit");
+                    obsProperty = $(field).attr("obsProperty")
                     if (unit==null || value=="null")
                         unit="";
                     else
@@ -1077,11 +1078,13 @@ var GSN = {
 		* Add marker
 		*/
         ,
-        addMarker: function(vsName,lat,lon){
+        addMarker: function(vs,lat,lon){
+        	var vsName = $(vs).attr("name");
             var marker = new Marker(new LatLonPoint(lat,lon));
             marker.setAttribute("vsname",vsName);
   		
-  		
+            var fieldsAsString = vsFieldsToString(vs);
+            
             if(mapProvider=="microsoft"){
                 marker.setIcon("./img/green_marker.png");
                 marker.setInfoBubble("Show/Hide Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
@@ -1089,11 +1092,11 @@ var GSN = {
             }
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
+                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a>\n"+fieldsAsString);
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
+            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a>\n"+fieldsAsString);
                 GSN.map.markers.push(marker);
             }
 			
@@ -1112,7 +1115,8 @@ var GSN = {
 		* Update marker
 		*/
         ,
-        updateMarker: function(vsName,lat,lon){
+        updateMarker: function(vs,lat,lon){
+        	var vsName = $(vs).attr("name");
             for (x=0; x<GSN.map.markers.length; x++) {
                 var m = GSN.map.markers[x];
                 if (m.getAttribute("vsname") == vsName) {
@@ -1121,7 +1125,7 @@ var GSN = {
                     GSN.map.markers.splice(x,1);
                 }
             }
-            GSN.map.addMarker(vsName,lat,lon);
+            GSN.map.addMarker(vs,lat,lon);
         }
 		
 		
@@ -2241,4 +2245,13 @@ var GSN = {
 		
     }
 };
+
+function vsFieldsToString(vs){
+	var result = "";
+	$("field",vs).each(function(){
+		var obsProperty = $(this).attr("obsProperty");
+		result += $(this).attr("name") + ((obsProperty!=null)?' ('+obsProperty + ')':'') + '\n';
+	});
+	return result;
+}
 

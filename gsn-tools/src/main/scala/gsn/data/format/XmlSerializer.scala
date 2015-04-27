@@ -3,6 +3,10 @@ package gsn.data.format
 import gsn.data._
 import gsn.data.format.TimeFormats._
 import scala.xml.XML
+import scala.xml.Text
+import scala.xml.Null
+import scala.xml.Elem
+import scala.xml.Attribute
 import org.joda.time.format.ISODateTimeFormat
 
 object XmlSerializer extends DataSerializer{
@@ -59,5 +63,13 @@ object XmlSerializer extends DataSerializer{
         }
       </virtual-sensor>;
     vs
-  }  
+  }
+  private def addMappings(e:Elem,mappings:Option[List[(String, String)]]):Elem = {
+    var acc = e
+    mappings match {
+      case Some(m) => m.foreach(x => acc = acc % Attribute(None, x._1, Text(x._2), Null))
+      case None =>
+    }
+    acc
+  }
 }

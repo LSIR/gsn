@@ -5,15 +5,15 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.List;
+import java.util.Map.Entry;
 
 public class GsnProxy extends HttpServlet {
     
@@ -22,6 +22,7 @@ public class GsnProxy extends HttpServlet {
     private Logger log;
     
     public void init(ServletConfig servletConfig) throws ServletException {
+//    	super.init(servletConfig);
         //servletContext = servletConfig.getServletContext();
         log = LoggerFactory.getLogger(GsnProxy.class.getName());
     }
@@ -30,20 +31,16 @@ public class GsnProxy extends HttpServlet {
     	return;
     }
     
-    public void doGet(HttpServletRequest request, HttpServletResponse response){
-        BufferedInputStream webToProxyBuf = null;
-        BufferedOutputStream proxyToClientBuf = null;
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    	
+    	log.info("	");
         HttpURLConnection con;
         
         try{
             int statusCode;
-            int oneByte;
             String methodName;
-            log.info(request.getLocalName());
-            log.info(request.getPathInfo());
-            log.info(request.getServletPath());
-            log.info(request.getLocalAddr());
-            String urlString = "http://localhost:9000"+request.getServletPath()+request.getPathInfo(); //request.getRequestURL().toString();
+            
+            String urlString = "http://localhost:9000" + request.getPathInfo().toString(); //request.getRequestURL().toString();
             String queryString = request.getQueryString();
             
             urlString += queryString==null?"":"?"+queryString;
@@ -64,28 +61,19 @@ public class GsnProxy extends HttpServlet {
                 String headerName = e.nextElement().toString();
                 con.setRequestProperty(headerName,    request.getHeader(headerName));
             }
-
+            
             con.connect();
                    
             statusCode = con.getResponseCode();
             response.setStatus(statusCode);
             
-            for( Iterator i = con.getHeaderFields().entrySet().iterator() ; i.hasNext() ;){
-                Map.Entry mapEntry = (Map.Entry)i.next();
-                if(mapEntry.getKey()!=null)
-                    response.setHeader(mapEntry.getKey().toString(), ((List)mapEntry.getValue()).get(0).toString());
+            for (Entry<String, List<String>> e : con.getHeaderFields().entrySet()){
+            	if (e.getKey() != null)
+            		response.setHeader(e.getKey().toString(), e.getValue().get(0).toString());
             }
             
-            webToProxyBuf = new BufferedInputStream(con.getInputStream());
-            proxyToClientBuf = new BufferedOutputStream(response.getOutputStream());
+            IOUtils.copy(con.getInputStream(), response.getOutputStream());
 
-            while ((oneByte = webToProxyBuf.read()) != -1) 
-                proxyToClientBuf.write(oneByte);
-
-            proxyToClientBuf.flush();
-            proxyToClientBuf.close();
-
-            webToProxyBuf.close();
             con.disconnect();
             
         }catch(Exception e){
