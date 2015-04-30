@@ -76,7 +76,6 @@ public class GsnProxy extends HttpServlet {
             }
             
             IOUtils.copy(con.getInputStream(), response.getOutputStream());
-            IOUtils.copy(con.getInputStream(), os);
 
             con.disconnect();
             

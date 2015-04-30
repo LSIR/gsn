@@ -31,31 +31,32 @@ object XmlSerializer extends DataSerializer{
     val protect=if (acces) "(protected)" else " "
     def xmlFields= 
       s.fields.map{f=>
-         var tmp = <field name={f.fieldName }
+         var tmp = <field name={f.fieldName}
             type={f.dataType.name} unit={f.unit.code} >
          </field>
          addMappings(tmp, f.mapping)
       }
     def xmlFieldValues=
       data.stats.latestValues.map{ts=>
-         <field name={fieldName(ts.output.fieldName) }
+         var tmp = <field name={fieldName(ts.output.fieldName) }
             type={ts.output.dataType.name} unit={ts.output.unit.code}>{
               if (ts.output.fieldName=="timestamp") 
                 dateFormat.print(ts.series.head.toString.toLong)
               else
                 ts.series.headOption.getOrElse(null)
             }</field>
+        addMappings(tmp, ts.output.mapping)
       }
     def fieldName(name:String)=
       if (name=="timestamp") "time" else name
     
     val vs= 
-      <virtual-sensor name={s.name} 
+      <virtual-sensor name={s.name.toLowerCase()} 
         protected={protect} 
         description={desc}>
         {         
           val predicates=s.properties.map{case (k,v)=>
-            <field name={k} catergory="predicate" >{v}</field>
+            <field name={k} category="predicate" >{v}</field>
           }
           if (withVals)
             xmlFieldValues++predicates

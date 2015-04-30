@@ -321,18 +321,18 @@ var GSN = {
                     if(GSN.context == "data")   {
                         $("#vsmenu").append($.DIV({
                         "class":vsName[i][1]
-                    },$.SPAN({
-                        "class":"sensorName",
-                        "id":"menu-"+vsName[i][0]
-                    },vsName[i][0])));
+	                    },$.SPAN({
+	                        "class":"sensorName",
+	                        "id":"menu-"+vsName[i][0]
+	                    },vsName[i][0])));
                     } else $("#vsmenu").append($.DIV({
                         "class":vsName[i][1]
-                    },$.A({
-                        "class":"sensorName",
-                        "href":"javascript:GSN.menu('"+vsName[i][0]+"');",
-                        "id":"menu-"+vsName[i][0]+""
-                    },vsName[i][0]+GSN.protect[i][1])));
-                    GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);                    // added May 2013
+	                    },$.A({
+	                        "class":"sensorName",
+	                        "href":"javascript:GSN.menu('"+vsName[i][0]+"');",
+	                        "id":"menu-"+vsName[i][0]+""
+	                    },vsName[i][0]+GSN.protect[i][1])));
+                    	GSN.numSensorAssociatedWithCategory.setItem(vsName[i][1],GSN.numSensorAssociatedWithCategory.getItem(vsName[i][1])+1);                    // added May 2013
                 }
             }
         }
@@ -557,6 +557,7 @@ var GSN = {
         $.ajax({
             type: "GET",            
             url: "ext/ws/api/sensors?format=xml&latestValues=true",
+            //url: "gsn?REQUEST=0&omit_latest_values=true",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
@@ -604,7 +605,7 @@ var GSN = {
 
     ,
     refreshVSs: function(){
-
+    
     	sss= $(this.container).find("span[class='vsname']");
 	    for(i=0;i<sss.length;i++){
 		  vsname=$(sss[i]).text();
@@ -633,6 +634,7 @@ var GSN = {
         $.ajax({
             type: "GET",
             url: "gsn?name="+vsName,
+            //url: "ext/ws/api/sensors?format=xml",
             success: function(data){
                 $("virtual-sensor[@name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
@@ -758,11 +760,11 @@ var GSN = {
         ,
         update: function (vs){
             //when map is enable, update marker
-            if (GSN.map.loaded){
+        	if (GSN.map.loaded){
                 var lat = $("field[@name=latitude]",vs).text();
                 var lon = $("field[@name=longitude]",vs).text();
                 if (lat != "" && lon != ""){
-                    GSN.map.updateMarker($(vs).attr("name"),lat,lon);
+                    GSN.map.updateMarker(vs,lat,lon);
                 }
             }
 			
@@ -957,7 +959,7 @@ var GSN = {
                     type = $(field).attr("type");
                     value = $(field).text();
                     unit = $(field).attr("unit");
-                    obsProperty = $(field).attr("obsProperty")
+                    obsProperty = $(field).attr("obsProperty");
                     if (unit==null || value=="null")
                         unit="";
                     else
@@ -1079,7 +1081,8 @@ var GSN = {
 		*/
         ,
         addMarker: function(vs,lat,lon){
-        	var vsName = $(vs).attr("name");
+        	
+	        var vsName = $(vs).attr("name");
             var marker = new Marker(new LatLonPoint(lat,lon));
             marker.setAttribute("vsname",vsName);
   		
@@ -1092,11 +1095,13 @@ var GSN = {
             }
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
+                //marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
                 marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a>\n"+fieldsAsString);
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
             	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a>\n"+fieldsAsString);
+            	//marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
                 GSN.map.markers.push(marker);
             }
 			
@@ -1105,8 +1110,8 @@ var GSN = {
             $("#menu-"+vsName).addClass("gpsenabled");
 			
             if(GSN.context=="fullmap"){
-                var vs = $(".vsbox-"+vsName+" > h3 > span.vsname")
-                $(vs).wrap("<a href=\"javascript:GSN.menu('"+$(vs).text()+"');\"></a>");
+                var vs2 = $(".vsbox-"+vsName+" > h3 > span.vsname")
+                $(vs2).wrap("<a href=\"javascript:GSN.menu('"+$(vs2).text()+"');\"></a>");
             }
         }
 		
@@ -2249,9 +2254,10 @@ var GSN = {
 function vsFieldsToString(vs){
 	var result = "";
 	$("field",vs).each(function(){
-		var obsProperty = $(this).attr("obsProperty");
-		result += $(this).attr("name") + ((obsProperty!=null)?' ('+obsProperty + ')':'') + '\n';
+		if ($(this).attr("category") != "predicate") {
+			var obsProperty = $(this).attr("obsProperty");
+			result += $(this).attr("name") + ((obsProperty!=null)?' ('+obsProperty + ')':'') + '\n';
+		}
 	});
 	return result;
 }
-

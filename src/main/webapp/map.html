@@ -5,33 +5,37 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
         <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+        
         <script type="text/javascript" src="js/jquery-latest.pack.js"></script>
         <script type="text/javascript" src="js/jquery-dom.js"></script>
         <script type="text/javascript" src="js/jquery.history.js"></script>
         <script type="text/javascript" src="js/jquery-tooltip.js"></script>
-
+        
+        <script type="text/javascript" src="js/jquery-1.11/jquery-1.11.1.min.js"></script> 
+        <script type="text/javascript" src="js/combobox/chosen.jquery.min.js"></script>
+        <link rel="stylesheet" href="js/combobox/chosen.min.css" type="text/css" media="screen,projection" />
+ 	 	
         <!-- Include Map engine-->
         <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
         <!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
         <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>
         <script type="text/javascript" src="js/mapstraction.js"></script>
-
-		<link rel="stylesheet" href="js/jquery-ui-1.11.4/jquery-ui.css">
-        <script type="text/javascript" src="js/jquery-ui-1.11.4/external/jquery/jquery.js"></script>    
-		<script type="text/javascript" src="js/jquery-ui-1.11.4/jquery-ui.js"></script>
-
+        
         <script type="text/javascript" src="js/constants.js"></script>
         <script type="text/javascript" src="js/functions.js"></script>
         <script type="text/javascript" src="js/gsn.js"></script>
-
+        
         <script type="text/javascript">
-            <!--//<![CDATA[
+        
+        	var J = jQuery.noConflict(); // Avoid conflict between vsmenu and the remaining JS of this page
+        
+            <!--//<![CDATA[ -->
             var mapProvider = null;
 
-            $(document).ready(function() {
+            J(document).ready(function() {
 
-                $.get('menu.jsp', {selected: "map"}, function(data) {
-                    $('#navigation').html(data);
+                J.get('menu.jsp', {selected: "map"}, function(data) {
+                    J('#navigation').html(data);
                 });
 
                 mapProvider = GSN.util.getURLParam("mapProvider");
@@ -44,14 +48,14 @@
                 }
 
                 if(mapProvider=="google"){
-                    $("#GM").attr("checked","checked");
+                    J("#GM").attr("checked","checked");
                 }
                 if(mapProvider=="yahoo"){
-                    $("#YM").attr("checked","checked");
+                    J("#YM").attr("checked","checked");
                 }
                 if(mapProvider=="microsoft"){
-                    $("#VE").attr("checked","checked");
-                    $("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
+                    J("#VE").attr("checked","checked");
+                    J("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
                 }
 
 
@@ -60,42 +64,64 @@
 
 
                 //bind every buttons to javascript functionality (only once)
-                $("#refreshall_timeout").bind("change",GSN.updateallchange);
-                $("#refreshall").bind("click",GSN.updateall);
-                $("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
-                $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+                J("#refreshall_timeout").bind("change",GSN.updateallchange);
+                J("#refreshall").bind("click",GSN.updateall);
+                J("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
+                J("#navigation ul a.local").bind("click",function() { return GSN.nav(J(this).text()); });
 
 
                 GSN.load();
             });
-            //]]>-->
-            $(function() {
-            	var observedProperties = [];
-            	$.ajax({
+            <!--//]]>-->
+            
+            J(function() {
+            	J.ajax({
 		    	    type: "GET",
 		    	    url: "ext/ws/api/sensors?format=xml",
 		    	   	async: false,
 		    	    success: function(data){
-		    	    	$("virtual-sensor",data).each(function(){
-		    	    		$("field",this).each(function(){
-		    	    			if ($(this).attr("obsProperty") !== undefined) {
-		    	    				observedProperties.push($(this).attr("obsProperty"));
+		    	    	J("virtual-sensor",data).each(function(){
+		    	    		J("field",this).each(function(){
+		    	    			if (J(this).attr("obsProperty") !== undefined) {
+		    	    				J('#observedProperties').append(J('<option>', {
+		    	    				    value: J(this).attr("obsProperty"),
+		    	    				    text: J(this).attr("obsProperty")
+		    	    				}));
 		    	    			}
 		    	    		});
 		    	        });
 		    	    }
 		    	});
+            	
+            	
+            	
+            	J("#observedProperties").chosen({
+                    search_contains: true,
+                    width: "200px"
+                });
             });
             
-            $("#observedProperties").autocomplete({
- 				source: observedProperties	
- 			});
-            
-            //$('#observedProperties').on('input', function() { 
-            //    $(this).val()
-                //TODO: something
-            //});
-            
+            /function displaySensors() {
+            	
+            	for (x=0; x<GSN.map.markers.length; x++) {
+                    var m = GSN.map.markers[x];
+                    //alert(m);
+                    //if(GSN.areVisible) m.hide();
+                    //else m.show();
+                }
+                //GSN.areVisible = !GSN.areVisible;
+            	
+				J.ajax({
+					async: false,
+					type: "GET",
+					url: "ext/ws/api/sensors?format=xml",
+					success: function(data){
+					    $("virtual-sensor",data).each(function(){
+					          	 
+					    });
+					}
+				});
+            }
             
         </script>
 
@@ -166,9 +192,11 @@
                     <li><a href="#">not loaded</a></li>
                 </ul>
                 <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
-                <div class="observedproperties-autocomplete">
-					<label for="observedProperties">Observed properties: </label>
-					<input id="observedProperties">
+		    	<div class="observedproperties-autocomplete">
+					<label for="observedProperties">Observed properties: </label><br>
+					<select name="observedProperties" id="observedProperties">
+                   	</select>'
+					<!-- <input id="observedProperties" onkeyup="displaySensors()" onchange="displaySensors()"> -->
                 </div>
             </div>
             <div id="footer">

@@ -30,10 +30,11 @@
             /* XML object loaded from the REQUEST_LIST_OF_VIRTUAL_SENSORS GSN request */
             var lovs = null;
             /* Mapping from virtual sensor name to list of fields name */
-            var virtual_sensor_to_fields = []
+            var virtual_sensor_to_fields = [];
             var virtual_sensors = [];
-            var field_to_virtual_sensor = []
-            var field_to_unit = []
+            var field_to_virtual_sensor = [];
+            var field_to_unit = [];
+            var field_to_obsProperty = [];
             var vss_max_id = 0;
             var fields_max_id = 0;
 
@@ -198,7 +199,7 @@
                     return to_return;
                 }
 
-                function option_list_value(name,items,all, units, id, selected_field){
+                function option_list_value(name,items,all, units, obsProperties, id, selected_field){
                     to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all!=null){
                         to_return+='<option value="All" >' + all + '</option>';
@@ -212,7 +213,12 @@
                         	sel="  selected";
                         }
                         to_return+= '<option value="' + items[sv[i]]+sel+'" >'+items[sv[i]];
-                                                
+
+                        if (obsProperties[items[sv[i]]] != null && obsProperties[items[sv[i]]] !="") {
+                        	to_return += " (" + obsProperties[items[sv[i]]] + ") ";
+                        }
+                        
+                        
                         if (units[items[sv[i]]]==null || units[items[sv[i]]]=="")
                         	to_return+='</option>';
                         else
@@ -248,7 +254,7 @@
                         var vs = $(this).val();
                     	console.info("onchange "+vs);
                         if (vs != 'All') {
-                            $('#'+fields_div_id).html("&nbsp " + option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs], fields_id));
+                            $('#'+fields_div_id).html("&nbsp " + option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs],field_to_obsProperty[vs], fields_id));
                             $('#'+fields_id).chosen({
                                 search_contains: true,
                                 width: "150px"
@@ -363,17 +369,23 @@
                         virtual_sensor_to_fields[vsname] = virtual_sensor_to_fields[vsname] || []
                         $(this).find('field').each(function(){
                             if ($(this).attr('category') != 'predicate') {
-                                var obsProperty = $(this).attr('obsProperty')
+                                var field_obsProperty = $(this).attr('obsProperty')
                             	var field_name = $(this).attr('name');
                                 var field_unit = $(this).attr('unit');
-                                if (obsProperty != null) {
-                                	virtual_sensor_to_fields[vsname].push(field_name + " (" + obsProperty + ")");
-                                } else {
-                                	virtual_sensor_to_fields[vsname].push(field_name);
-                                }
+                               	
+                                virtual_sensor_to_fields[vsname].push(field_name);
+                                
                                 field_to_virtual_sensor[field_name] = field_to_virtual_sensor[field_name] || []
                                 field_to_virtual_sensor[field_name].push(vsname)
 
+                                if (!field_to_obsProperty[vsname]) {
+                                	field_to_obsProperty[vsname] = [];
+                                }
+                                if (!field_to_obsProperty[vsname][field_name]) {
+                                	field_to_obsProperty[vsname][field_name] = [];
+                                }
+                                field_to_obsProperty[vsname][field_name].push(field_obsProperty)
+                                
                                 if (!field_to_unit[vsname]){
                                     field_to_unit[vsname] = [];
                                 }
