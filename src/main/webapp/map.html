@@ -16,7 +16,7 @@
         <link rel="stylesheet" href="js/combobox/chosen.min.css" type="text/css" media="screen,projection" />
  	 	
         <!-- Include Map engine-->
-        <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
+        <script src="	http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
         <!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
         <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>
         <script type="text/javascript" src="js/mapstraction.js"></script>
@@ -58,10 +58,7 @@
                     J("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
                 }
 
-
                 map = new Mapstraction('vsmap',mapProvider);
-
-
 
                 //bind every buttons to javascript functionality (only once)
                 J("#refreshall_timeout").bind("change",GSN.updateallchange);
@@ -69,65 +66,68 @@
                 J("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
                 J("#navigation ul a.local").bind("click",function() { return GSN.nav(J(this).text()); });
 
-
                 GSN.load();
-            });
-            <!--//]]>-->
-            
-            J(function() {
-            	J.ajax({
-		    	    type: "GET",
-		    	    url: "ext/ws/api/sensors?format=xml",
-		    	   	async: false,
-		    	    success: function(data){
-		    	    	J("virtual-sensor",data).each(function(){
-		    	    		J("field",this).each(function(){
-		    	    			if (J(this).attr("obsProperty") !== undefined) {
-		    	    				J('#observedProperties').append(J('<option>', {
-		    	    				    value: J(this).attr("obsProperty"),
-		    	    				    text: J(this).attr("obsProperty")
-		    	    				}));
-		    	    			}
-		    	    		});
-		    	        });
-		    	    }
-		    	});
-            	
-            	
-            	
-            	J("#observedProperties").chosen({
-                    search_contains: true,
-                    width: "200px"
+                
+                GSN.map.toggleAllMarkers();
+                
+                GSN.map.addAllMarkersToMap();
+                
+                var obsPropVsMap = new Map();
+                
+                J(function() {
+                	J.ajax({
+    		    	    type: "GET",
+    		    	    url: "ext/ws/api/sensors?format=xml",
+    		    	   	async: false,
+    		    	    success: function(data){
+    		    	    	J("virtual-sensor",data).each(function(){
+    		    	    		var vsName = J(this).attr("name");
+    		    	    		J("field",this).each(function(){
+    		    	    			var obsProp = J(this).attr("obsProperty");
+    		    	    			if (obsProp !== undefined) {
+    		    	    				J('#observedProperties').append(J('<option>', {
+    		    	    				    value: obsProp,
+    		    	    				    text: obsProp
+    		    	    				}));
+    		    	    				var vsArray = obsPropVsMap.get(obsProp);
+    		    	    				if (vsArray == undefined) {
+    		    	    					obsPropVsMap.set(obsProp, new Array(vsName));
+    		    	    				} else {
+    		    	    					obsPropVsMap.get(obsProp).push(vsName)
+    		    	    				}
+    		    	    			}
+    		    	    		});
+    		    	        });
+    		    	    }
+    		    	});
+                	
+                	J("#observedProperties").chosen({
+                        search_contains: true,
+                        width: "200px"
+                    });
+
+                	J("#observedProperties").on('change', function() {
+                		var selectedObsProp = J("#observedProperties").val();
+                    	if (GSN.areVisible) {
+                    		if (selectedObsProp == "any") {
+                    			GSN.areVisible = false;
+                    			GSN.map.toggleAllMarkers();
+                    		} else {
+    	    	            	for (x=0; x<GSN.map.markers.length; x++) {
+    	    	                    var m = GSN.map.markers[x];
+    	    	                    if (J.inArray(m.getAttribute("vsname"),obsPropVsMap.get(selectedObsProp)) != -1) {
+    	    	                    	m.show();
+    	    	                	} else {
+    	    	                		m.hide();
+    	    	                	}
+    	    	            	}
+                    		}
+                    	}
+                    });
                 });
             });
-            
-            /function displaySensors() {
-            	
-            	for (x=0; x<GSN.map.markers.length; x++) {
-                    var m = GSN.map.markers[x];
-                    //alert(m);
-                    //if(GSN.areVisible) m.hide();
-                    //else m.show();
-                }
-                //GSN.areVisible = !GSN.areVisible;
-            	
-				J.ajax({
-					async: false,
-					type: "GET",
-					url: "ext/ws/api/sensors?format=xml",
-					success: function(data){
-					    $("virtual-sensor",data).each(function(){
-					          	 
-					    });
-					}
-				});
-            }
-            
+            <!--//]]>-->
         </script>
-
-
-
-
 
     </head>
     <body onunload="">
@@ -188,16 +188,16 @@
                 <h3>Author</h3>
                 <p id="gsn-author">none</p>
                 <h3>Virtual sensors</h3>
+                <div class="observedproperties-autocomplete">
+					<label for="observedProperties">Observed properties: </label><br>
+					<select name="observedProperties" id="observedProperties">
+						<option value="any">Any</option> 
+                   	</select>'
+                </div>
                 <ul id="vsmenu">
                     <li><a href="#">not loaded</a></li>
                 </ul>
                 <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
-		    	<div class="observedproperties-autocomplete">
-					<label for="observedProperties">Observed properties: </label><br>
-					<select name="observedProperties" id="observedProperties">
-                   	</select>'
-					<!-- <input id="observedProperties" onkeyup="displaySensors()" onchange="displaySensors()"> -->
-                </div>
             </div>
             <div id="footer">
                 <p>Powered by <a href="https://github.com/LSIR/gsn">GSN</a>,  Distributed Information Systems Lab, EPFL 2014</p>

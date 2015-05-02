@@ -132,7 +132,7 @@ var GSN = {
 	
 	
     /**
-	* Click on the virtual sensor on the left bar
+	* Click on the virtual sensor on the right bar
 	*/
     ,
     menu: function (vsName) {
@@ -639,6 +639,7 @@ var GSN = {
                 $("virtual-sensor[@name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
                 });
+                GSN.areVisible = true;
             }
         });    	
     }
@@ -1164,6 +1165,13 @@ var GSN = {
                 else m.show();
             }
             GSN.areVisible = !GSN.areVisible;
+        }
+        ,
+        addAllMarkers: true
+        ,
+        addAllMarkersToMap: function() {
+        	addAllMarkers = true;
+        	GSN.refreshVSs();
         }
 		
 		
@@ -2254,7 +2262,7 @@ var GSN = {
 function vsFieldsToString(vs){
 	var result = "";
 	$("field",vs).each(function(){
-		if ($(this).attr("category") != "predicate") {
+		if ($(this).attr("category") != "predicate" && $(this).attr("name") != "time") {
 			var obsProperty = $(this).attr("obsProperty");
 			result += $(this).attr("name") + ((obsProperty!=null)?' ('+obsProperty + ')':'') + '\n';
 		}
