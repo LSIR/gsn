@@ -13,7 +13,7 @@ public interface SlidingHandler {
 
 	public boolean isInterestedIn(StreamSource streamSource);
 
-	public long getOldestTimestamp();
+	public String getCuttingCondition();
 	
 	public void dispose();
 
