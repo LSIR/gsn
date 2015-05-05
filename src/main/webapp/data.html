@@ -41,6 +41,38 @@
             var plotIsShown = false;
 
             $(function(){
+            	
+            	//Allows parsing array as URL parameter
+				// Code found on https://gist.github.com/kares/956897
+				(function($) {
+				    var re = /([^&=]+)=?([^&]*)/g;
+				    var decode = function(str) {
+				        return decodeURIComponent(str.replace(/\+/g, ' '));
+				    };
+				    $.parseParams = function(query) {
+				        var params = {}, e;
+				        if (query) {
+				            if (query.substr(0, 1) == '?') {
+				                query = query.substr(1);
+				            }
+			
+				            while (e = re.exec(query)) {
+				                var k = decode(e[1]);
+				                var v = decode(e[2]);
+				                if (params[k] !== undefined) {
+				                    if (!$.isArray(params[k])) {
+				                        params[k] = [params[k]];
+				                    }
+				                    params[k].push(v);
+				                } else {
+				                    params[k] = v;
+				                }
+				            }
+				        }
+				        return params;
+				    };
+				})(jQuery);
+            	
                 function csv_to_json(tag,callback,format, plot){
                     callback = callback || function(){};
                     var old_value = $('#time_format').val();
@@ -178,18 +210,17 @@
                 	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
                 }
 
-                function option_list_key(name,items,all, id){
-                    to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
+                function option_list_key(name,items,all, id, vsName){
+                	to_return = '<select name="' + name + '" class="' + name+ '" id="' + id+ '">'
                     if (all){
                         to_return+='<option value="All" >' + all + '</option>';
                     }
 
-                    var selectedVs = getURLParam("vsName");
                     var sk = getSortedKeys(items);
                     var l = sk.length;
                     for (var i = 0 ; i < l ; i++) {
                         if ("time" == sk[i]) continue;
-                        if (selectedVs == sk[i].toLowerCase() && id == "vss_0") {
+                        if (vsName == sk[i].toLowerCase()) {
                         	to_return+='<option selected value="' + sk[i]+'" >'+sk[i]+'</option>';
                         } else {
                        		to_return+='<option value="' + sk[i]+'" >'+sk[i]+'</option>';
@@ -293,7 +324,7 @@
 
                     $('.remove-criterion').click (function() {
                         if ($(this).parent().parent().children().size() > 1) {
-                            $(this).parent().remove();
+                        	$(this).parent().remove();
                         }
                     });
                 }
@@ -396,7 +427,18 @@
                             }
                         });
                     });
-                    add_data_output (vsname,vsfields);
+                    
+                    var params = $.parseParams(location.search);
+    				
+                    if (params.basket != undefined) {
+                    	for (i = 0; i < params.basket.length; i++) {
+                    		add_data_output(params.basket[i],vsfields);
+                    	}
+                    } else if (params.vsname != undefined) {
+                    	add_data_output(params.vsname,vsfields);
+                    } else {
+                    	add_data_output(vsname,vsfields);
+                    }
                 });
 
                 $('#add-data-output').click(function () {
@@ -431,15 +473,11 @@
                     return true;
                 });
 
-
-
                 $(".plot").click(function(){
                     datasets={};
                     var choice = $("#plot-type").val();
                     $('#plotContainer').html('</br><div id="progressbar" style="width: 200px; margin-left: auto; margin-right: auto"></div>');
                     if (choice == '') return;
-
-
 
                     $('#progressbar').progressbar({
                         value: false
@@ -454,8 +492,6 @@
                     if (choice == 'drawHistogram') csv_to_json($(this),drawHistogram, 'unix', true);
                     else if (choice == 'drawScatterplot') csv_to_json($(this),drawScatterplot, 'unix', true);
                     else if (choice == 'drawTimeseries') csv_to_json($(this),drawTimeseries, 'unix', true);
-
-
                 });
 
                 $(".sampling_percentage").hide();
@@ -474,82 +510,63 @@
                     $('#navigation').html(data);
                 });
 
-
- $(".grid").click(function(){
-function drawGrid(l_datasets){
-$("#sensorSelect").empty();
-$("#sensorSelect").append('<option value="">Select a Virtual Sensor</option>');
-var displayed = [];
-for (var sensor in l_datasets) {
-sensor = sensor.split(' ')[0];
-if ($.inArray(sensor, displayed) < 0) {
-displayed.push(sensor);
-option = $("<option value=\"" + sensor + "\">" + sensor + "</option>");
-$("#sensorSelect").append(option);
-}
-}
-datasets = l_datasets;
-$("#sensorSelect").change(function(){
-var choice = $("#sensorSelect").val();
-$('#gridContainer').empty();
-if (choice == '') return;
-// columns
-var fields = [];
-// column headers
-var headers = [];
-for (var sensor_field in datasets) {
-if (sensor_field.substring(0, choice.length) == choice) {
-fields.push(datasets[sensor_field]);
-headers.push(sensor_field.substring(choice.length + 2, sensor_field.length - 1));
-}
-}
-var data_length = fields[0]['data'].length;
-var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>time</th>';
-for (var i = 0; i < headers.length; i++) {
-grid += '<th>' + headers[i] + '</th>';
-}
-grid += '</tr></thead><tbody>';
-for (var i = 0; i < data_length; i++) {
-// bug with the csv_to_json function: the last row is empty
-if (fields[0]['data'][i][0]) {
-grid += '<tr><td>' + fields[0]['data'][i][0] + '</td>';
-for (var j = 0; j < fields.length; j++) {
-grid += '<td>' + fields[j]['data'][i][1] + '</td>'
-}
-grid += '</tr>';
-}
-}
-grid += '</tbody></table>';
-$('#gridContainer').html(grid);
-$('#grid').tablesorter({
-widthFixed: true,
-widgets: ['zebra']
-});
-});
-}
-datasets = {};
-csv_to_json($(this), drawGrid, 'iso');
-});
-
-            });
+				$(".grid").click(function(){
+					function drawGrid(l_datasets){
+						$("#sensorSelect").empty();
+						$("#sensorSelect").append('<option value="">Select a Virtual Sensor</option>');
+						var displayed = [];
+						for (var sensor in l_datasets) {
+							sensor = sensor.split(' ')[0];
+							if ($.inArray(sensor, displayed) < 0) {
+								displayed.push(sensor);
+								option = $("<option value=\"" + sensor + "\">" + sensor + "</option>");
+								$("#sensorSelect").append(option);
+							}
+						}
+						datasets = l_datasets;
+						$("#sensorSelect").change(function(){
+							var choice = $("#sensorSelect").val();
+							$('#gridContainer').empty();
+							if (choice == '') return;
+							// columns
+							var fields = [];
+							// column headers
+							var headers = [];
+							for (var sensor_field in datasets) {
+								if (sensor_field.substring(0, choice.length) == choice) {
+									fields.push(datasets[sensor_field]);
+									headers.push(sensor_field.substring(choice.length + 2, sensor_field.length - 1));
+								}
+							}
+							var data_length = fields[0]['data'].length;
+							var grid = '<table id="grid" class="tablesorter" border="0" cellpadding="0" cellspacing="1"><thead><tr><th>time</th>';
+							for (var i = 0; i < headers.length; i++) {
+								grid += '<th>' + headers[i] + '</th>';
+							}
+							grid += '</tr></thead><tbody>';
+							for (var i = 0; i < data_length; i++) {
+								// bug with the csv_to_json function: the last row is empty
+								if (fields[0]['data'][i][0]) {
+									grid += '<tr><td>' + fields[0]['data'][i][0] + '</td>';
+									for (var j = 0; j < fields.length; j++) {
+										grid += '<td>' + fields[j]['data'][i][1] + '</td>'
+									}
+									grid += '</tr>';
+								}
+							}
+							grid += '</tbody></table>';
+							$('#gridContainer').html(grid);
+							$('#grid').tablesorter({
+								widthFixed: true,
+								widgets: ['zebra']
+							});
+						});
+					}
+					datasets = {};
+					csv_to_json($(this), drawGrid, 'iso');
+				});
+			});
             
-function getURLParam(strParamName){
-    var strReturn = "";
-    var strHref = window.location.href;
-    if ( strHref.indexOf("?") > -1 ){
-        var strQueryString = strHref.substr(strHref.indexOf("?")).toLowerCase();
-        var aQueryString = strQueryString.split("&");
-        for ( var iParam = 0; iParam < aQueryString.length; iParam++ ){
-            if (
-                aQueryString[iParam].indexOf(strParamName.toLowerCase() + "=") > -1 ){
-                var aParam = aQueryString[iParam].split("=");
-                strReturn = aParam[1];
-                break;
-            }
-        }
-    }
-    return unescape(strReturn);
-}
         </script>
     </head>
     <body>
@@ -613,7 +630,6 @@ function getURLParam(strParamName){
                                             </div>
                                             <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
                                             <span>Add virtual sensor only if it has data in the given time period</span>
-                                            </br> </br>
                                         </div>
                                     </div>
                                     </br></br></br>
@@ -636,7 +652,7 @@ function getURLParam(strParamName){
                                     <div class="results-content">
                                         <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
                                         <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
-                                         <span>Time Format</span>
+                                        <span>Time Format</span>
                                         <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
                                         <input id="download_format" type="hidden" name="download_format" value="csv"/>
                                         <input id="reportclass" type="hidden" name="reportclass" value="report-default"/>

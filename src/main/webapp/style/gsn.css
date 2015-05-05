@@ -49,9 +49,6 @@ input[type=button],input[type=submit]
 	background-color: #DCFFDC;
 }
 
-
-
-
 input[type=button]:active,input[type=button]:hover,input[type=submit]:active,input[type=submit]:hover
 {
 	color: #7c6;
@@ -979,4 +976,72 @@ div.full-page {
     width: 1.3em;
     height: 1.4em;
     background: #e6e6e6 url(../img/datepicker/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+}
+
+/* VS basket on map.html */
+#vsbasket{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	border: none;
+	
+	/*display: block;
+	margin: 1px;
+	padding: 5px 5px 5px 0.5em;
+	border-left: 10px solid #FFF5E0;
+	background-color: #FFF0D1;
+	color: #E6B800;
+	text-decoration: none;/*
+}
+
+.vsbasket_elem {
+	display: block;	
+	margin: 1px;
+	padding: 5px 5px 5px 29px;
+	border-left: 10px solid #FFF5E0;
+	background-color: #FFF0D1;
+	color: #7c6;
+	text-decoration: none;
+	
+	/*display: block;	
+	margin: 12px;*/
+}
+
+.rubric_vsbasket {
+	display: block;
+	margin: 1px;
+	padding: 5px 5px 5px 0.5em;
+	border-left: 10px solid #FFF5E0;
+	background-color: #FFF0D1;
+	color: #E6B800;
+	text-decoration: none;
+}
+
+.vsbasket_elem {
+	display: block;	
+	margin: 1px;
+	padding: 5px 5px 5px 29px;
+	border-left: 10px solid #FFF5E0;
+	background-color: #FFF0D1;
+	color: #E6B800;
+	text-decoration: none;
+}
+
+.vsbasket_button input[type=button] {
+	color: black;
+	text-align: center;
+	border: 0px;
+	cursor: pointer;
+	
+	margin:1px;
+	
+	border: 1px solid #E6B800;
+	border-left: 10px solid #FFF5E0;
+	background-color: #FFF0D1;
+}
+
+.vsbasket_button input[type=button]:active, .vsbasket_button input[type=button]:hover {
+	color: #E6B800;
+	background-color: white;
+	border-left: 10px solid #FFF5E0;
 }

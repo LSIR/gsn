@@ -764,13 +764,23 @@ var GSN = {
         	if (GSN.map.loaded){
                 var lat = $("field[@name=latitude]",vs).text();
                 var lon = $("field[@name=longitude]",vs).text();
-                if (lat != "" && lon != ""){
+                
+                var vsName = $(vs).attr("name");
+                var selectObsProp = $("#observedProperties").val();
+                var hasObsProp = false;
+                if (selectObsProp == "any") {
+                	hasObsProp = true;
+                } else if (undefined != obsPropVsMap.get(selectObsProp)) {
+                	hasObsProp = $.inArray(vsName,obsPropVsMap.get(selectObsProp)) != -1;
+                }
+                
+                if (lat != "" && lon != "" && hasObsProp){
                     GSN.map.updateMarker(vs,lat,lon);
                 }
             }
 			
             //update the vsbox
-            var vsd = $(".vsbox-"+$(vs).attr("name"), $(this.container))[0];
+            var vsd = $(".vsbox-"+vsName, $(this.container))[0];
             if (typeof vsd == "undefined") return;
             //if (vsd.css("display")=="none") return;
 			
@@ -1096,13 +1106,11 @@ var GSN = {
             }
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
-                //marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a>\n"+fieldsAsString);
+                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInBasket(this);\" /><br>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
             	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a>\n"+fieldsAsString);
-            	//marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
                 GSN.map.markers.push(marker);
             }
 			

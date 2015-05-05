@@ -15,11 +15,37 @@
         <script type="text/javascript" src="js/combobox/chosen.jquery.min.js"></script>
         <link rel="stylesheet" href="js/combobox/chosen.min.css" type="text/css" media="screen,projection" />
  	 	
+ 	 	<link rel="stylesheet" href="style/map.css" type="text/css" media="screen,projection" />
+ 	 	
         <!-- Include Map engine-->
         <script src="	http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
         <!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
         <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>
         <script type="text/javascript" src="js/mapstraction.js"></script>
+        
+        <script type="text/javascript">
+        	
+        	var basket = new Array();
+        
+        	// Is called in gsn.js
+	        function putInBasket(cb) {
+        		var vsName = cb.value;
+	    		if(cb.checked) {
+	    			basket.push(vsName);
+	    			$("#vsbasket").append("<div class=\"vsbasket_elem\" id=\"basket_" + vsName + "\"><input type=\"checkbox\" id=\"basket_cb_" + vsName + "\" value=\"" + vsName + "\" onclick=\"putInBasket(this);\" checked />" + vsName + "</div>");
+	    			$("#basket_cb_" + vsName).attr("checked", true);
+	    			$("#map_cb_" + vsName).attr("checked", true);
+	    		} else {
+	    			basket.splice($.inArray(vsName,basket),1);
+	    			$("#basket_" + vsName).remove();
+	    			$("#basket_cb_" + vsName).attr("checked", false);
+	    			$("#map_cb_" + vsName).attr("checked", false);
+	    			
+	    		}
+	    	}
+        	
+	        var obsPropVsMap = new Map();
+        </script>
         
         <script type="text/javascript" src="js/constants.js"></script>
         <script type="text/javascript" src="js/functions.js"></script>
@@ -33,7 +59,7 @@
             var J = jQuery.noConflict();
             
             var mapProvider = null;
-            
+
             J(document).ready(function() {
 
                 J.get('menu.jsp', {selected: "map"}, function(data) {
@@ -74,7 +100,6 @@
                 
                 GSN.map.addAllMarkersToMap();
                 
-                var obsPropVsMap = new Map();
                 var obsPropArray = new Array();
                 
                	J.ajax({
@@ -130,6 +155,30 @@
                    		}
                    	}
               	});
+               	
+               	J("#load_basket_in_data").on('click', function() {
+               		var url = "data.html?";
+               		if (basket.length == 0) {
+               			return;
+               		}
+               		
+                	url += $.param({basket: basket}) + "#data";
+               		window.location.href = url;
+               	});
+               	
+               	function putInBasket(cb) {
+               		if(cb.checked) {
+               			alert("Checked !");
+               		} else {
+               			alert("Not checked !");
+               		}
+               	}
+               	
+           	    $("#load_basket_in_data")
+         	      	.button()
+            	    .click(function(event) {
+            	    	event.preventDefault();
+					});
             });
             
             <!--//]]>-->
@@ -204,6 +253,10 @@
                     <li><a href="#">not loaded</a></li>
                 </ul>
                 <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
+                <ul id="vsbasket">
+                	<div class="rubric_vsbasket">Basket</div>
+                </ul>
+                <p class="vsbasket_button"><input id="load_basket_in_data" type="button" value="Load basket in data" /></p>
             </div>
             <div id="footer">
                 <p>Powered by <a href="https://github.com/LSIR/gsn">GSN</a>,  Distributed Information Systems Lab, EPFL 2014</p>
