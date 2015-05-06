@@ -9,7 +9,8 @@ function include(filename)
     head.appendChild(script)
 }
 
-include("http://d3js.org/d3.v3.min.js");
+//include("http://d3js.org/d3.v3.min.js");
+include("js/d3plots/d3.v3.min.js");
 
 function drawTimeseries(dataset, nb){
 	drawChartTimeseries(parseDataTimeseries(dataset));
@@ -55,9 +56,9 @@ function drawChartTimeseries(data){
 	
 	var color = d3.scale.category20();
 	
-	var margin = {top: 40, right: 60, bottom: 500, left: 80},
+	var margin = {top: 20, right: 10, bottom: 150, left: 90},
 		width = 700 - margin.left - margin.right,
-		height = 800 - margin.top - margin.bottom;
+		height = 700 - margin.top - margin.bottom;
 	
 	var x = d3.time.scale()
 		.range([0, width])
@@ -81,6 +82,7 @@ function drawChartTimeseries(data){
 		
 	var svg = d3.select("#plotContainer").append("svg")
 		.attr("width", width + margin.left + margin.right)
+		//.attr("width", "100%")
 		.attr("height", height + margin.top + margin.bottom)
 		.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -145,15 +147,15 @@ function drawChartTimeseries(data){
 		.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
 	legend.append("rect")
-		.attr("x", 0)
-		.attr("y", 400)
-		.attr("width", 18)
-		.attr("height", 18)
+		.attr("x", 300)
+		.attr("y", 5)
+		.attr("width", 15)
+		.attr("height", 8)
 		.style("fill", color);
 
 	legend.append("text")
-		.attr("x", 20)
-		.attr("y", 414)
+		.attr("x", 320)
+		.attr("y", 10)
 		.style("text-anchor", "start")
 		.text(function(d) { return d; });
 	

@@ -45,10 +45,9 @@ var GSN = {
             pageName[0] = "home";
         }
 		
-        var params=location.hash.substr(1).split(",");
-		
-        params[0] = pageName[0];
-		
+        var params=location.hash.substr(1).split(",");		
+        console.log(params)
+        params[0] = pageName[0];		
         GSN.context = params[0];
 
         //highlight the right tab in the navigation bar
@@ -59,10 +58,10 @@ var GSN = {
                 $(this).removeClass("selected");
         });
 				
-        $("#main > div").hide();
+        //$("#main > div").hide();
         if (GSN.context!="map") {
             $("#toggleallmarkers").hide();
-            $("#vsmenu .toggle").hide();
+            //$("#vsmenu .toggle").hide();
         }
         //for each page context
         if (GSN.context=="home")	{
@@ -85,7 +84,7 @@ var GSN = {
             $("#main #mapdiv").show();
             $("#toggleallmarkers").show();
             $("#vsmenu .toggle").show();
-            if(!GSN.map.loaded) {
+            if(!GSN.loaded) {
                 GSN.updateall();
                 GSN.map.init();
             }
@@ -100,6 +99,7 @@ var GSN = {
                     if (val[0]=="z") zoom = parseInt(val[1]);
                 }
                 if (lat!=null) {
+                	console.log("centering"+lat);
                     map.setCenterAndZoom(new LatLonPoint(lat,lng),zoom);
                 }
             }
@@ -700,7 +700,7 @@ var GSN = {
                 "class":"tabupload"
             },"Upload")),
             $.LI({},$.A({
-                "href":"./data.html",
+                "href":"./data.html?vsname="+vsName,
                 "class":"tabdata"
             },"Download"))
             ),

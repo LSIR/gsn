@@ -72,6 +72,8 @@ body, html
 
 body 
 {
+		font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	
 	min-width:750px;	
 	width: 100%; 
 	height: 100%; 
@@ -83,7 +85,7 @@ body
 {
 	margin:10px auto;
 	padding:1px;
-	width:750px;
+	width:100%;
 	background:#FFFFFF;
 }
 #header, #headerfm 
@@ -149,7 +151,7 @@ body
     list-style-type:none;
 	border-right:1px solid #ffffff;
 	color: #000000;
-	font-weight:bold;
+	/*font-weight:bold;*/
 
 }
 #logintextprime 
@@ -252,10 +254,6 @@ body
 	background:#7c6;
 }
 
-#datachooser table 
-{
-	width:100%;
-}
 
 .step
 {
@@ -276,8 +274,8 @@ body
 #main 
 {
 	float:left;
-	width:490px;
-	padding:0 10px;
+	width:100%;
+	padding:10px 10px;
 }
 
 #main h2, #main h3, #main p 
@@ -287,8 +285,8 @@ body
     	
 #sidebar 
 {
-	float:left;
-	width:220px;
+	float:right;
+	width:20%;/*280px;*/
 	margin:0;
 	padding:0;
 	text-align:left;
@@ -381,7 +379,7 @@ body
 
 #dropAreaMask
 {
-	background-color: none;
+/*	background-color: none;*/
 	height: 300px;
 	width:80%;
 	margin-left: 10%;
@@ -785,7 +783,7 @@ input.date-picker
 .chart
 {
 	text-align:center;
-	border: 2px solid #404040;//#FFC29F;
+	border: 2px solid #404040;/*//#FFC29F;*/
 	background-color: #303030;
 	padding: 10px;
 }
@@ -823,9 +821,9 @@ input.date-picker
 }	
 
 /* gsn data part */
-div.full-page {
+/*div.full-page {
     width: 730px !important;
-}
+}*/
 
 .ui-accordion h3 {
     margin: 0;
@@ -913,6 +911,39 @@ div.full-page {
     padding: 4px;
 }
 
+.condition-slider {
+	margin:2px;
+}
+
+.slider-range {
+	display:inline-block;
+	width:130px;
+	margin-left:8px;
+	margin-right:8px;
+}
+
+.slider-min input{
+	width:45px;	
+}
+
+.slider-max {
+	width:45px;	
+}
+.ui-slider-horizontal {
+	height:9px;
+}
+
+.ui-slider-handle {
+	height:3px; 
+	width:3px; 
+	margin-left:0em; 
+}
+
+
+.fields{
+	display:inline-block;
+}
+
 #gridContainer table th {
     background-color: #9d8;
 }
@@ -979,4 +1010,57 @@ div.full-page {
     width: 1.3em;
     height: 1.4em;
     background: #e6e6e6 url(../img/datepicker/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+}
+
+.chosen-container{
+	margin: 0px 3px;
+}
+
+div.form-inline input button {
+	margin: 0px 6px;
+}
+
+.form-inline{
+	margin: 0px 0px 4px;
+}
+
+.panel-default{
+	margin: 2px;
+}
+
+
+#panel-data-filter
+{
+	width:40%;
+	float:left;
+	
+}
+
+#panel-plot
+{
+	width:59%;
+	float:right;
+	
+}
+
+#plotContainer{
+	overflow:auto;
+}
+
+#panel-grid
+{
+	width:59%;
+	float:right;
+	
+}
+
+.form-group-sm .form-control {
+	height:23px ;
+	padding: 2px;
+}
+
+.form-group-xs input{
+	height:23px;
+	font-size:11px;
+	padding: 0px;
 }

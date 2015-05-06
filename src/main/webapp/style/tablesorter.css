@@ -13,6 +13,15 @@ table.tablesorter thead tr th, table.tablesorter tfoot tr th {
 	font-size: 8pt;
 	padding: 4px;
 }
+
+.tablesorter-header {
+	background-image: url(../img/tablesorter/bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+
+
 table.tablesorter thead tr .header {
 	background-image: url(../img/tablesorter/bg.gif);
 	background-repeat: no-repeat;
