@@ -21,9 +21,10 @@
         <script type="text/javascript" src="js/d3plots/scatterplot.js"></script>
         <script type="text/javascript" src="js/d3plots/timeseries.js"></script>
         <link rel="stylesheet" href="js/d3plots/d3plots.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
 
         <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
-        <link rel="stylesheet" href="style/tablesorter.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="style/gsn_theme.css" type="text/css" media="screen,projection" />
         
         <script type="text/javascript" src="js/jquery.flot.pack.js"></script>
         <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
@@ -84,7 +85,6 @@
             	$('#panel-grid').hide();
                 var startDateParam = getURLParameter("start");
                 var endDateParam = getURLParameter("end");
-                console.log("papa"+startDateParam);
             	$('#datepicker_from').val(startDateParam);
             	$('#datepicker_to').val(endDateParam);
             	
@@ -98,7 +98,6 @@
                     prepare_form_for_submission(tag);
                     var params = tag.parents('form').serializeArray();
 
-                    console.log(params);
                     if (plot == true && $("#disablesampling").prop("checked") == false) {
                         params.push({"name": "sample", "value": "true"});
                         if (plotIsShown == false){
@@ -349,7 +348,6 @@
                     $('#'+vss_id).on('change', function(evt, params){
                     	
                         var vs = $(this).val();
-                    	console.info("onchange "+vs);
                         if (vs != 'All') {
                             $('#'+fields_div_id).html(option_list_value('fields',virtual_sensor_to_fields[vs],"All Fields", field_to_unit[vs], fields_id,fname));
                             $('#'+fields_id).chosen({
@@ -362,7 +360,6 @@
                            	$('#'+fields_id).on('change', function(evt, params){
                                 if ($(this).val() != 'All' && $('#'+vss_id).val() != 'All') {                                	
                                 	newSlider=min_max_slider($('#'+vss_id).val(), $(this).val());
-                                	console.log($(this).attr('id'));
                                 	$(this).parent().children('.condition-slider').remove();
                                    	$(this).parent().children('.btn-filter').show();                                    $(this).parent().append(newSlider);
                                     newSlider.hide();
@@ -371,6 +368,8 @@
                                 	$(this).parent().children('.btn-filter').hide();
                                 }
                             });
+                            $('#'+fields_id).trigger('change');
+
                         }
                         else {
                             $('#'+fields_div_id).html("");
@@ -450,7 +449,6 @@
                     var vsfields="";
                     if (vsfieldstr!=null ) 
                     	vsfields=vsfieldstr.split(",");
-					console.info(vsfields.length);
                     $('virtual-sensor',xml).each(function(){
                         var vsname = $(this).attr('name');
                         virtual_sensors.push(vsname);
@@ -478,7 +476,6 @@
                     	add_data_output(vsname);
                     }
                     for (var i = 0 ; i < l ; i++) {               
-                    	console.log(vsfields[i]);
                         add_data_output (vsname,vsfields[i]);
                     }
                 });

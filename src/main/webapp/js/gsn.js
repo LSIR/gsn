@@ -46,7 +46,6 @@ var GSN = {
         }
 		
         var params=location.hash.substr(1).split(",");		
-        console.log(params)
         params[0] = pageName[0];		
         GSN.context = params[0];
 
@@ -99,7 +98,6 @@ var GSN = {
                     if (val[0]=="z") zoom = parseInt(val[1]);
                 }
                 if (lat!=null) {
-                	console.log("centering"+lat);
                     map.setCenterAndZoom(new LatLonPoint(lat,lng),zoom);
                 }
             }
