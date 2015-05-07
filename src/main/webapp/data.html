@@ -429,11 +429,14 @@
                     });
                     
                     var params = $.parseParams(location.search);
-    				
                     if (params.basket != undefined) {
-                    	for (i = 0; i < params.basket.length; i++) {
-                    		add_data_output(params.basket[i],vsfields);
-                    	}
+						if (typeof params.basket === 'string') {
+							add_data_output(params.basket,vsfields);
+						} else {
+	                    	for (i = 0; i < params.basket.length; i++) {
+	                    		add_data_output(params.basket[i],vsfields);
+	                    	}
+						}
                     } else if (params.vsname != undefined) {
                     	add_data_output(params.vsname,vsfields);
                     } else {

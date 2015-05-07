@@ -634,7 +634,7 @@ var GSN = {
         $.ajax({
             type: "GET",
             url: "gsn?name="+vsName,
-            //url: "ext/ws/api/sensors?format=xml",
+            //url: "ext/ws/api/sensors?format=xml&latestValues=true",
             success: function(data){
                 $("virtual-sensor[@name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
@@ -1106,11 +1106,11 @@ var GSN = {
             }
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInBasket(this);\" /><br>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
+                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInBasket(this);\" /><br>Selected Sensor: <a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
-            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: <a href=\"data.html?vsName="+vsName+"\">"+vsName+"</a>\n"+fieldsAsString);
+            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: <a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a>\n"+fieldsAsString);
                 GSN.map.markers.push(marker);
             }
 			
