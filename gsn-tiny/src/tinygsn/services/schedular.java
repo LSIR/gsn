@@ -58,7 +58,7 @@ public class schedular extends IntentService {
 
 	//constants:
 	private int numLatest = 10;
-	double accelometerThereshold = 1.5;
+	double accelometerThereshold = 1.3;
 	int wifiCountThreshold = 15;
 	int SchedulerSleepingTime = 1000*30;
 	
