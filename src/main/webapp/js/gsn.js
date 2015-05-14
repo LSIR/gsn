@@ -337,7 +337,7 @@ var GSN = {
 		
 		
         // Hide all the sensors in the side bar
-        $(".sensorName").hide();
+        //$(".sensorName").hide();
 		
         // Drag and Drop Functionnality
         if(GSN.context == "data"){
@@ -782,6 +782,8 @@ var GSN = {
 
                 if (lat != "" && lon != "" && hasObsProp) {
                     GSN.map.updateMarker(vs,lat,lon);
+                } else {
+                	$("#menu-"+vsName).parent().hide();
                 }
             }
         	
@@ -1125,11 +1127,11 @@ var GSN = {
             }
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br>Selected Sensor: <a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
+                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
-            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br>Selected Sensor: <a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
+            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
                 GSN.map.markers.push(marker);
             }
 			
@@ -2273,8 +2275,6 @@ var GSN = {
             }
             return unescape(strReturn);
         }
-		
-		
     }
 };
 

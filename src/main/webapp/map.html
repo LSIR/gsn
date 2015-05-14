@@ -107,30 +107,49 @@
                		var selectedObsProp = J("#observedProperties").chosen().val();
                    	if (GSN.map.areVisible && selectedObsProp != null) {
                    		if (J.inArray("any",selectedObsProp) != -1) {
-                   			GSN.map.areVisible = false;
-                   			GSN.map.toggleAllMarkers();
+                   			for (x = 0; x < GSN.map.markers.length; x++) {
+                   				var m = GSN.map.markers[x];
+   	    	                    var vsName = m.getAttribute("vsname");
+   	    	                    m.show();
+   	    	                 	showSensorToVsMenu(vsName);
+                   			}
                    		} else {
                    			// Show or hide markers based on the observed properties filter
    	    	            	for (x = 0; x < GSN.map.markers.length; x++) {
    	    	                    var m = GSN.map.markers[x];
+   	    	                    var vsName = m.getAttribute("vsname");
 	   	    	                for (i = 0; i < selectedObsProp.length; i++) {
 	   		                		if (undefined != obsPropVsMap.get(selectedObsProp[i])) {
-	   		                			if (J.inArray(m.getAttribute("vsname"),obsPropVsMap.get(selectedObsProp[i])) != -1) {
+	   		                			if (J.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1) {
 	   		                				m.show();
+	   		                				showSensorToVsMenu(vsName);
 	   		                				break; // One observed property is enough to display the sensor (logical OR)
 	   		                			} else {
 	   		                				m.hide();
+	   		                				hideSensorFromVsMenu(vsName);
 	   		                			}
 	   		                		} else {
 	   		                			m.hide();
+	   		                			hideSensorFromVsMenu(vsName);
 	   		                		}
 	   		                	}
    	    	            	}
                    		}
                    	} else if (selectedObsProp == null) {
                    		for (x = 0; x < GSN.map.markers.length; x++) {
-	    	            	GSN.map.markers[x].hide();
+                   			var m = GSN.map.markers[x];
+    	                    var vsName = m.getAttribute("vsname");
+    	                    m.hide();
+    	                    hideSensorFromVsMenu(vsName);
 	    	           	}
+                   	}
+                   	
+                   	function showSensorToVsMenu(vsName) {
+                   		J("#menu-"+vsName).parent().show();
+                   	}
+                   	
+                   	function hideSensorFromVsMenu(vsName) {
+                   		J("#menu-"+vsName).parent().hide();
                    	}
                	});
               	
