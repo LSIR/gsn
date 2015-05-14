@@ -9,16 +9,20 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
-import gsn.config.GsnConf;
 
 public class GsnProxy extends HttpServlet {
     
 	private static final long serialVersionUID = 1L;
+	
+	private Config conf = ConfigFactory.load();
 	
 	//private ServletContext servletContext;
     private Logger log;
@@ -42,9 +46,7 @@ public class GsnProxy extends HttpServlet {
             int statusCode;
             String methodName;
             
-            //GsnConf.defaults().
-            
-            String urlString = "http://localhost:9000" + request.getPathInfo().toString(); //request.getRequestURL().toString();
+            String urlString = conf.getString("gsn-service.url") + request.getPathInfo().toString(); //request.getRequestURL().toString();
             String queryString = request.getQueryString();
             
             urlString += queryString==null?"":"?"+queryString;
