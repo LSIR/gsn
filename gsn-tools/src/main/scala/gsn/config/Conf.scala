@@ -34,4 +34,5 @@ trait Conf{
       defaultZmq,defaultAc,defaultStorage,None)
 
   lazy val defaultFuseki=defaults.getConfig("fuseki")
+  lazy val defaultGsnServiceProxyUrl=defaults.getConfig("gsnServiceProxyUrl")
 }

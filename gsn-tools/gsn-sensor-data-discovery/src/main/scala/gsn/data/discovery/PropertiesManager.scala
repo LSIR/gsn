@@ -1,6 +1,7 @@
 package gsn.data.discovery
 
 import com.hp.hpl.jena.query.QueryExecutionFactory
+
 import com.hp.hpl.jena.rdf.model.Statement
 import com.hp.hpl.jena.update.UpdateExecutionFactory
 import com.hp.hpl.jena.update.UpdateFactory
@@ -12,6 +13,8 @@ import java.net.URL
 import java.net.HttpURLConnection
 import java.io.IOException
 import com.sun.org.apache.xerces.internal.impl.PropertyManager
+import org.apache.commons.validator.routines.UrlValidator
+
 
 /**
  * Allows to add and get data from Fuseki
@@ -134,14 +137,38 @@ class PropertiesManager(sparqlServiceProperties:String,
   }
 
   /**
-   * Checks whether the observed property exists in Fuseki
+   * Checks whether the observed property exists in Fuseki, based on its URI
    */
-  def observedPropertyExists(propertyUri:String):Boolean = {
-    val query = prefixRdf + "ASK { <" + propertyUri + "> rdf:type ?o }"
+  def observedPropertyExistsByUri(propertyUri:String):Boolean = {
+    if(checkUri(propertyUri)) {
+      val query = prefixRdf + "ASK { <" + propertyUri + "> rdf:type ?o }"
+      askQuery(query)
+    } else {
+      false
+    }
+  }
+  
+  /**
+   * Checks whether the observed property exists in Fuseki, based on its label
+   * Note: the label isn't a unique identifier of a property, therefore the method that takes the URI as parameter
+   * should be preferred when possible.
+   */
+  def observedPropertyExistsByLabel(label:String):Boolean = {
+    val query = prefixRdfs + "ASK { ?p rdfs:label \"" + label + "\" }"
+    askQuery(query)
+  }
+  
+  private def askQuery(query:String):Boolean = {
     val queryExec = QueryExecutionFactory.sparqlService(sparqlServiceProperties + "/query", query)
     val result = queryExec.execAsk()
     queryExec.close()
     result
+  }
+  
+  private def checkUri(uri:String):Boolean = {
+    val schemes = Array("http")
+    val urlValidator = new UrlValidator(schemes)
+    urlValidator.isValid(uri)
   }
 
   /**

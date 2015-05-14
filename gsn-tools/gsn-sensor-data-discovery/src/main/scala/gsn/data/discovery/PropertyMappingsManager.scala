@@ -25,9 +25,11 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
   
   /**
    * Create new mappings in Fuseki
-   * The CSV file has 2 columns:
+   * The CSV file has 2 or 3 columns:
    * - the first one contains the properties, like air_tmp
-   * . the second on contains the observed properties URIs, like http://purl.oclc.org/NET/ssnx/cf/cf-property#air_temperature
+   * - the second on contains the observed properties URIs or the label, like http://purl.oclc.org/NET/ssnx/cf/cf-property#air_temperature 
+   * or air temperature respectively
+   * - the third column contains the units URIs
    */
   def importMappingsFromCsv(file:File) {
     
@@ -35,13 +37,18 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
     
     mappings.foreach { m => 
       val propertyToMap:String = m(0).toLowerCase();
-      val obsPropertyURI:String = m(1);
+      val obsProperty:String = m(1);
       
       // Create the mapping only for existing observed properties
-      if (propertiesManager.observedPropertyExists(obsPropertyURI)) {
-        propertiesManager.addNewMapping(propertyToMap, obsPropertyURI)
+      if (propertiesManager.observedPropertyExistsByUri(obsProperty)) {
+        // In this case, obsProperty is already a URI
+        propertiesManager.addNewMapping(propertyToMap, obsProperty)
+      } else if (propertiesManager.observedPropertyExistsByLabel(obsProperty)) {
+        // Find the URI of the first property found with the given label
+        val propertyUri = propertiesManager.findObservedPropertyByLabelExactMatch(obsProperty)
+        propertiesManager.addNewMapping(propertyToMap, propertyUri)
       } else {
-        println("WARNING:(mapping) Property: " + obsPropertyURI + " doesn't exist in the model: ignored");
+        println("WARNING:(mapping) Property: " + obsProperty + " doesn't exist in the model: ignored");
       }
     }
   }

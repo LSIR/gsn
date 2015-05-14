@@ -14,10 +14,12 @@ import java.net.HttpURLConnection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
+import gsn.config.GsnConf;
 
 public class GsnProxy extends HttpServlet {
     
 	private static final long serialVersionUID = 1L;
+	
 	//private ServletContext servletContext;
     private Logger log;
     
@@ -32,7 +34,6 @@ public class GsnProxy extends HttpServlet {
     }
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
-    	FileOutputStream os = new FileOutputStream("/home/michael/dev/semester_project/gsn_perso_log.txt");
     	
     	log.info("	");
         HttpURLConnection con;
@@ -41,13 +42,13 @@ public class GsnProxy extends HttpServlet {
             int statusCode;
             String methodName;
             
+            //GsnConf.defaults().
+            
             String urlString = "http://localhost:9000" + request.getPathInfo().toString(); //request.getRequestURL().toString();
             String queryString = request.getQueryString();
             
             urlString += queryString==null?"":"?"+queryString;
             URL url = new URL(urlString);
-            
-            IOUtils.write("urlString = " + urlString + "\n", os);
             
             log.info("Fetching >"+url.toString());
             

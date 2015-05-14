@@ -19,13 +19,13 @@ object VsGenerator {
     val r = Random
     
     for (i <- 1 to count) {
-      val fileName = folderPath + "MultiFormatTemperatureHandler" + i
+      val fileName = folderPath + "VirtualSensor_" + i
       generateXMLDefFile(fileName + ".xml", i,r.nextInt(10))        
     }
   }
   
   private def generateXMLDefFile(fileName:String, parameter:Integer, sensorType:Int) {
-    val vsName = "MultiFormatTemperatureHandler" + parameter
+    val vsName = "vs" + parameter
       val vs = 
         <virtual-sensor name={vsName} priority="10">
           <processing-class>
@@ -35,28 +35,28 @@ object VsGenerator {
 					{
            sensorType match {
               case 0 => 
-                <field name="air_tmp" type="double"/>
-                <field name="soil_tmp" type="double"/>
-                <field name="snow_tmp" type="double"/>
+                <field name="air_tmp" unit="kelvin" type="double"/>
+                <field name="soil_tmp" unit="kelvin" type="double"/>
+                <field name="snow_tmp" unit="kelvin" type="double"/>
               case 1 =>
-                <field name="air_tmp" type="double"/>
-                <field name="wind_speed" type="double"/>
+                <field name="air_tmp" unit="kelvin" type="double"/>
+                <field name="wind_speed" unit="kmph" type="double"/>
               case 2 =>
-                <field name="soil_tmp" type="double"/>
-                <field name="snow_tmp" type="double"/>
+                <field name="soil_tmp" unit="kelvin" type="double"/>
+                <field name="snow_tmp" unit="kelvin" type="double"/>
               case 3 =>
-                <field name="rock_tmp" type="double"/>
-                <field name="air_tmp" type="double"/>
+                <field name="rock_tmp" unit="kelvin" type="double"/>
+                <field name="air_tmp" unit="kelvin" type="double"/>
               case 4 =>
-                <field name="sea_water_volume" type="double"/>
-                <field name="sea_ice_volume" type="double"/>
+                <field name="sea_water_volume" unit="m3" type="double"/>
+                <field name="sea_ice_volume" unit="m3" type="double"/>
               case 5 =>
-                <field name="flow_height" type="double"/>
-                <field name="snow_thermal_energy_cont" type="double"/>
-                <field name="sea_floor" type="double"/>
+                <field name="flow_height" unit="m" type="double"/>
+                <field name="snow_thermal_energy_cont" unit="J" type="double"/>
+                <field name="sea_floor" unit="m" type="double"/>
               case 6 =>
-                <field name="angle_rotation_east_to_x" type="double"/>
-                <field name="angle_rotation_east_to_y" type="double"/>
+                <field name="angle_rotation_east_to_x" unit="rad" type="double"/>
+                <field name="angle_rotation_east_to_y" unit="rad" type="double"/>
                 <field name="angstrom_exp_ambient_aerosol_air" type="double"/>
               case 7 =>
                 <field name="area_frac" type="double"/>

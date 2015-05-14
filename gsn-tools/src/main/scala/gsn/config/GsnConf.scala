@@ -15,7 +15,7 @@ object GsnConf extends Conf {
     take(xml \ "author").getOrElse(defaultGsn.author ),
     take(xml \ "description").getOrElse(defaultGsn.description ),
     take(xml \ "email").getOrElse(defaultGsn.email ),
-    takeInt(xml \ "port").getOrElse(defaultGsn.port ),    
+    takeInt(xml \ "port").getOrElse(defaultGsn.port ),  
     take(xml \ "time-format").getOrElse(defaultGsn.timeFormat ),
     ZmqConf.create(xml),AcConf.create(xml),
     StorageConf.create((xml \ "storage").head),
