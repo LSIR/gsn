@@ -1127,11 +1127,11 @@ var GSN = {
             }
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
+                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
-            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Add to basket <input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
+            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
                 GSN.map.markers.push(marker);
             }
 			
@@ -1144,7 +1144,6 @@ var GSN = {
                 $(vs2).wrap("<a href=\"javascript:GSN.menu('"+$(vs2).text()+"');\"></a>");
             }
         }
-		
 		
         /**
 		* Update marker
@@ -2283,7 +2282,7 @@ function vsFieldsToString(vs){
 	$("field",vs).each(function(){
 		if ($(this).attr("category") != "predicate" && $(this).attr("name") != "time") {
 			var obsProperty = $(this).attr("obsProperty");
-			result += $(this).attr("name") + ((obsProperty!=null)?' ('+obsProperty + ')':'') + '\n';
+			result += '<p ' + ((obsProperty!=null)?'title="'+obsProperty + '"':'') + '>' + $(this).attr("name") + '</p>';
 		}
 	});
 	return result;
