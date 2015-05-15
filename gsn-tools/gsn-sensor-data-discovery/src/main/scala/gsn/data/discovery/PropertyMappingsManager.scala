@@ -18,10 +18,12 @@ import java.io.FileInputStream
 import gsn.data.discovery.util.ReadResource
 import play.api.libs.json.Json
 import com.typesafe.config._
+import scala.xml.Node
 
 class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:String) extends ReadResource {
   
   val ssnUri = "http://purl.oclc.org/NET/ssnx/ssn#"
+  val wgs84Uri = "http://www.w3.org/2003/01/geo/wgs84_pos#"
   
   /**
    * Create new mappings in Fuseki
@@ -45,7 +47,7 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
         propertiesManager.addNewMapping(propertyToMap, obsProperty)
       } else if (propertiesManager.observedPropertyExistsByLabel(obsProperty)) {
         // Find the URI of the first property found with the given label
-        val propertyUri = propertiesManager.findObservedPropertyByLabelExactMatch(obsProperty)
+        val propertyUri = propertiesManager.findObservedPropertyByLabelExactMatch(obsProperty.replaceAll("_", "\\s"))
         propertiesManager.addNewMapping(propertyToMap, propertyUri)
       } else {
         println("WARNING:(mapping) Property: " + obsProperty + " doesn't exist in the model: ignored");
@@ -90,6 +92,13 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
     }
   }
   
+  private def extractAttributeValue(n:Node):String = {
+    n.attribute("key") match {
+      case s if s.size >= 1 => s.head.text
+      case _ => null
+    }
+  }
+  
   /**
    * Add the virtual sensor found in the provided XML file to the model
    */
@@ -99,6 +108,18 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
       val mainNode = xml.XML.loadFile(file)
       val virtualSensorName = (mainNode \ "@name").text.toLowerCase()
       val fields = (mainNode \ "processing-class" \ "output-structure" \ "field").map {_ \ "@name"}
+      val longitude = {
+        val elem = (mainNode \ "addressing" \ "predicate").filter { x => extractAttributeValue(x).equalsIgnoreCase("longitude")}
+        if (elem.size >= 1) elem.head.text else ""
+      }
+      val latitude = {
+        val elem = (mainNode \ "addressing" \ "predicate").filter { x => extractAttributeValue(x).equalsIgnoreCase("latitude")}
+        if (elem.size >= 1) elem.head.text else ""
+      }
+      val altitude = {
+        val elem = (mainNode \ "addressing" \ "predicate").filter { x => extractAttributeValue(x).equalsIgnoreCase("altitude")}
+        if (elem.size >= 1) elem.head.text else ""
+      }
       
       val newSensor = vsModel.createResource(baseUri + virtualSensorName)
       
@@ -108,6 +129,20 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
       val namedIndividualType = vsModel.createResource(OWL.getURI() + "NamedIndividual")
       newSensor.addProperty(RDF.`type`, namedIndividualType)
       
+      if (!longitude.equals("")) {
+        val longitudeProperty = vsModel.createProperty(wgs84Uri, "long")
+        //newSensor.addProperty(longitudeProperty, longitude)
+        newSensor.addLiteral(longitudeProperty, longitude)
+      }
+      if (!latitude.equals("")) {
+        val latitudeProperty = vsModel.createProperty(wgs84Uri, "lat")
+        newSensor.addProperty(latitudeProperty, latitude)
+      }
+      if (!altitude.equals("")) {
+        val altitudeProperty = vsModel.createProperty(wgs84Uri, "alt")
+        newSensor.addProperty(altitudeProperty, altitude)
+      }
+        
       val ssnObserves = vsModel.createProperty(ssnUri, "observes")
       val ssnHasOutput = vsModel.createProperty(ssnUri, "hasOutput")
       
@@ -116,14 +151,13 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
           val obsPropertyUri = propertiesManager.getMappingForProperty(value.text)
           newSensor.addProperty(ssnHasOutput, vsModel.createResource(obsPropertyUri))
         } else {
-          val log = "WARNING: There is no mapping for property " + value.text
-          println(log)
+          println("WARNING: There is no mapping for property " + value.text)
         }
       }
-      // Write new statements to database...
+      // Write all statements from the temporary model to fuseki
       vsModel.listStatements().toList().foreach { s => 
-      propertiesManager.addNewVirtualSensorStatement(s)
-    }
+        propertiesManager.addNewVirtualSensorStatement(s)
+      }
   }
 }
 

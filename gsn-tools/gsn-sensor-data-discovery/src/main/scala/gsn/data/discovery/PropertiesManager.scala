@@ -212,7 +212,7 @@ class PropertiesManager(sparqlServiceProperties:String,
     }
     qexec.close();
 
-    return resultUri;
+    resultUri;
   }
   
   /**
@@ -239,11 +239,15 @@ class PropertiesManager(sparqlServiceProperties:String,
    * Insert new virtual sensor statement into Fuseki virtual sensors dataset
    */
   def addNewVirtualSensorStatement(s:Statement) = {
-    val insert = "INSERT DATA {\n " +
-      "<" + s.getSubject().getURI() + "> <" + s.getPredicate().getURI() + "> <" + s.getObject().toString() + "> " +
-      "\n }"
+      var insert = "INSERT DATA {\n "
+      if (s.getObject().isLiteral()) {
+        insert += "<" + s.getSubject().getURI() + "> <" + s.getPredicate().getURI() + "> \"" + s.getLiteral().getString() + "\" "
+      } else {
+        insert += "<" + s.getSubject().getURI() + "> <" + s.getPredicate().getURI() + "> <" + s.getObject().toString() + "> "
+      }
+      insert += "\n }"
 
-      val request = UpdateFactory.create()
+    val request = UpdateFactory.create()
     request.add(insert)
 
     val updateProc = UpdateExecutionFactory.createRemote(request, sparqlServiceSensors + "/update")
