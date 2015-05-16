@@ -73,7 +73,7 @@ libraryDependencies ++= Seq(
 resolvers ++= Seq(
   DefaultMavenRepository,
   "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "LSIR" at "http://planetdata.epfl.ch:8081/artifactory/gsn-release",
+  "LSIR" at "http://osper.epfl.ch:8081/artifactory/gsn-release",
   "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local" 
 )
 

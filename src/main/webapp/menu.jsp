@@ -33,7 +33,7 @@
 <% 
 	if (gsn.Main.getContainerConfig().isAcEnabled()) { 
 %>
-       <li><a href="/gsn/MyAccessRightsManagementServlet">access rights management</a></li>
+       <li><a href="/gsn/MyAccessRightsManagementServlet">access rights</a></li>
 <%  } %>
    
 	</ul>

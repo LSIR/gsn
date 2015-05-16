@@ -8,13 +8,13 @@ table.tablesorter {
 	border-spacing: 1px;
 }
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-	background-color: #e6EEe6;
+	background-color: #e6EEEE;
 	border: 1px solid #FFF;
 	font-size: 8pt;
 	padding: 4px;
 }
 table.tablesorter thead tr .header {
-	background-image: url(../img/tablesorter/bg.gif);
+	background-image: url(/img/tablesorter/bg.gif);
 	background-repeat: no-repeat;
 	background-position: center right;
 	cursor: pointer;
@@ -26,14 +26,14 @@ table.tablesorter tbody td {
 	vertical-align: top;
 }
 table.tablesorter tbody tr.odd td {
-	background-color:#F0F0F0;
+	background-color:#F0F0F6;
 }
 table.tablesorter thead tr .headerSortUp {
-	background-image: url(../img/tablesorter/asc.gif);
+	background-image: url(/img/tablesorter/asc.gif);
 }
 table.tablesorter thead tr .headerSortDown {
-	background-image: url(../img/tablesorter/desc.gif);
+	background-image: url(/img/tablesorter/desc.gif);
 }
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-    background-color: #8dbd8d;
+    background-color: #8dbdd8;
 }
