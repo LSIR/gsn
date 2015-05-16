@@ -26,14 +26,13 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
   val wgs84Uri = "http://www.w3.org/2003/01/geo/wgs84_pos#"
   
   /**
-   * Create new mappings in Fuseki
-   * The CSV file has 2 or 3 columns:
+   * Create new property mappings in Fuseki
+   * The CSV file has 2 columns:
    * - the first one contains the properties, like air_tmp
    * - the second on contains the observed properties URIs or the label, like http://purl.oclc.org/NET/ssnx/cf/cf-property#air_temperature 
    * or air temperature respectively
-   * - the third column contains the units URIs
    */
-  def importMappingsFromCsv(file:File) {
+  def importPropertyMappingsFromCsv(file:File) {
     
     val mappings = Source.fromFile(file).getLines().map { line => line.split(",") }.filter { a => a.length >= 2 }
     
@@ -58,6 +57,7 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
   /**
    * Add the virtual sensor found in the provided JSON file to the model
    */
+  //TODO altitude/longitude/latitude (same as for XML)
   def addVirtualSensorFromJSON(file:File) {
     
       val vsModel = ModelFactory.createDefaultModel()

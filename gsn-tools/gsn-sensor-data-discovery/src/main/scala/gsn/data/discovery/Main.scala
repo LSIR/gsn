@@ -23,8 +23,8 @@ object Main extends App {
   val propertyMappingsMgr = new PropertyMappingsManager(propertiesMgr, conf.getString("baseUri"))
     
   mode match {
-    case "--add-new-mappings" =>
-      propertyMappingsMgr.importMappingsFromCsv(mappingsFilePath)
+    case "--add-new-property-mappings" =>
+      propertyMappingsMgr.importPropertyMappingsFromCsv(mappingsFilePath)
     case "--add-new-virtual-sensors" => 
       val jsonFiles = virtualSensorsFolder.listFiles().filter(_.getName.endsWith(".json"))
       for (file <- jsonFiles) {
@@ -41,7 +41,7 @@ object Main extends App {
   private def help() {
     println("Various arguments needs to be provided.")
     println("Operation modes:")
-    println("--add-new-mappings csvFilePath: add new mappings to mappings model on Fuseki")
+    println("--add-new-property-mappings csvFilePath: add new property mappings to mappings model on Fuseki")
     println("--add-new-virtual-sensors virtualSensorsFolderPath: add new virtual sensors to Fuseki")
   }
 }

@@ -6,27 +6,34 @@
         <title>GSN</title>
         <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
         
-        <script type="text/javascript" src="js/jquery-latest.pack.js"></script>
-        <script type="text/javascript" src="js/jquery-dom.js"></script>
+ 	 	<script type="text/javascript" src="js/jquery-1.11/jquery-1.11.1.min.js"></script>
+ 	 	<script type="text/javascript" src="js/chosen-1.4.2/chosen.jquery.min.js"></script>
+ 	 	<link rel="stylesheet" href="js/chosen-1.4.2/chosen.min.css" type="text/css" media="screen,projection" />
+ 	 	<script type="text/javascript" src="js/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+ 	 	<link rel="stylesheet" href="js/jquery-ui-1.11.4/jquery-ui.min.css" type="text/css" media="screen,projection" />
+ 	 	<script type="text/javascript" src="js/jquery-dom.js"></script>
         <script type="text/javascript" src="js/jquery.history.js"></script>
         <script type="text/javascript" src="js/jquery-tooltip.js"></script>
-        
-        <script type="text/javascript" src="js/jquery-1.11/jquery-1.11.1.min.js"></script> 
-        <script type="text/javascript" src="js/combobox/chosen.jquery.min.js"></script>
-        <link rel="stylesheet" href="js/combobox/chosen.min.css" type="text/css" media="screen,projection" />
  	 	
  	 	<link rel="stylesheet" href="style/map.css" type="text/css" media="screen,projection" />
  	 	
         <!-- Include Map engine-->
-        <script src="	http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
+        <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
         <!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
         <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>
         <script type="text/javascript" src="js/mapstraction.js"></script>
         
-        <script type="text/javascript">
-        	
-        	var vsBasket = new Array();
+       
+        <script type="text/javascript" src="js/constants.js"></script>
+        <script type="text/javascript" src="js/functions.js"></script>
+        <script type="text/javascript" src="js/gsn.js"></script>
         
+        <script type="text/javascript">
+        
+            <!--//<![CDATA[ -->
+
+            var vsBasket = new Array();
+            
         	// Function called in gsn.js
 	        function putInVsBasket(cb) {
         		var vsName = cb.value;
@@ -44,25 +51,12 @@
 	    	}
         	
 	        var obsPropVsMap = new Map();
-        </script>
-        
-        <script type="text/javascript" src="js/constants.js"></script>
-        <script type="text/javascript" src="js/functions.js"></script>
-        <script type="text/javascript" src="js/gsn.js"></script>
-        
-        <script type="text/javascript">
-        
-            <!--//<![CDATA[ -->
-
-         	// Avoid conflict between Chosen and jQuery
-            var J = jQuery.noConflict();
-            
             var mapProvider = null;
 
-            J(document).ready(function() {
-
-                J.get('menu.jsp', {selected: "map"}, function(data) {
-                    J('#navigation').html(data);
+            $(document).ready(function() {
+            	
+                $.get('menu.jsp', {selected: "map"}, function(data) {
+                    $('#navigation').html(data);
                 });
 
                 mapProvider = GSN.util.getURLParam("mapProvider");
@@ -75,38 +69,38 @@
                 }
 
                 if(mapProvider=="google"){
-                    J("#GM").attr("checked","checked");
+                    $("#GM").attr("checked","checked");
                 }
                 if(mapProvider=="yahoo"){
-                    J("#YM").attr("checked","checked");
+                    $("#YM").attr("checked","checked");
                 }
                 if(mapProvider=="microsoft"){
-                    J("#VE").attr("checked","checked");
-                    J("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
+                    $("#VE").attr("checked","checked");
+                    $("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
                 }
 
                 map = new Mapstraction('vsmap',mapProvider);
 
                 //bind every buttons to javascript functionality (only once)
-                J("#refreshall_timeout").bind("change",GSN.updateallchange);
-                J("#refreshall").bind("click",GSN.updateall);
-                J("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
-                J("#navigation ul a.local").bind("click",function() { return GSN.nav(J(this).text()); });
+                $("#refreshall_timeout").bind("change",GSN.updateallchange);
+                $("#refreshall").bind("click",GSN.updateall);
+                $("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
+                $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
                 GSN.load();
                 
-               	J("#observedProperties").chosen({
+               	$("#observedProperties").chosen({
                        search_contains: true,
                        width: "200px",
                        no_results_text: "No property found, try \"any\"",
                        placeholder_text_multiple: "Select some properties"
                 });
                	
-               	J("#observedProperties").chosen().change(function(e, params) {
+               	$("#observedProperties").chosen().change(function(e, params) {
                		
-               		var selectedObsProp = J("#observedProperties").chosen().val();
+               		var selectedObsProp = $("#observedProperties").chosen().val();
                    	if (GSN.map.areVisible && selectedObsProp != null) {
-                   		if (J.inArray("any",selectedObsProp) != -1) {
+                   		if ($.inArray("any",selectedObsProp) != -1) {
                    			for (x = 0; x < GSN.map.markers.length; x++) {
                    				var m = GSN.map.markers[x];
    	    	                    var vsName = m.getAttribute("vsname");
@@ -120,7 +114,7 @@
    	    	                    var vsName = m.getAttribute("vsname");
 	   	    	                for (i = 0; i < selectedObsProp.length; i++) {
 	   		                		if (undefined != obsPropVsMap.get(selectedObsProp[i])) {
-	   		                			if (J.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1) {
+	   		                			if ($.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1) {
 	   		                				m.show();
 	   		                				showSensorToVsMenu(vsName);
 	   		                				break; // One observed property is enough to display the sensor (logical OR)
@@ -145,26 +139,26 @@
                    	}
                    	
                    	function showSensorToVsMenu(vsName) {
-                   		J("#menu-"+vsName).parent().show();
+                   		$("#menu-"+vsName).parent().show();
                    	}
                    	
                    	function hideSensorFromVsMenu(vsName) {
-                   		J("#menu-"+vsName).parent().hide();
+                   		$("#menu-"+vsName).parent().hide();
                    	}
                	});
               	
               	var obsPropArray = new Array();
                 
-               	J.ajax({
+               	$.ajax({
    		    	    type: "GET",
    		    	    url: "ext/ws/api/sensors?format=xml",
    		    	    success: function(data){
-   		    	    	J("virtual-sensor",data).each(function(){
-   		    	    		var vsName = J(this).attr("name");
-   		    	    		J("field",this).each(function(){
-   		    	    			var obsProp = J(this).attr("obsProperty");
+   		    	    	$("virtual-sensor",data).each(function(){
+   		    	    		var vsName = $(this).attr("name");
+   		    	    		$("field",this).each(function(){
+   		    	    			var obsProp = $(this).attr("obsProperty");
    		    	    			if (undefined != obsProp) {
-   		    	    				if (J.inArray(obsProp,obsPropArray) == -1) {
+   		    	    				if ($.inArray(obsProp,obsPropArray) == -1) {
    		    	    					obsPropArray.push(obsProp);
    		    	    				}
    		    	    				var vsArray = obsPropVsMap.get(obsProp);
@@ -178,18 +172,18 @@
    		    	        });
    		    	    	obsPropArray.sort();
    		    	    	for (i = 0; i < obsPropArray.length; ++i) {
-	   		    	    	J('#observedProperties').append(J('<option>', {
+	   		    	    	$('#observedProperties').append($('<option>', {
 	   	    				    value: obsPropArray[i],
 	   	    				    text: obsPropArray[i]
 	   	    				}));
    		    	    	}
-   		    	    	J("#observedProperties").trigger("chosen:updated");
+   		    	    	$("#observedProperties").trigger("chosen:updated");
    		    	    }
    		    	});
                	
-               	J("#send_basket_to_data").on('click', function() {
+               	$("#send_basket_to_data").on('click', function() {
                		var url = "data.html?";
-               		var propVsBasket = J('#observedProperties').chosen().val();
+               		var propVsBasket = $('#observedProperties').chosen().val();
                		
                		if (vsBasket.length == 0) {
                			return;

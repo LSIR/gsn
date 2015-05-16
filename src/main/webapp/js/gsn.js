@@ -211,7 +211,7 @@ var GSN = {
             //logIvo(GSN.vsName[arraySize]+" -- "+GSN.protect[arraySize]);
             arraySize++;
 
-        //if ($("field[@name=latitude]",$(this)).text()!="")
+        //if ($("field[name=latitude]",$(this)).text()!="")
         //	$("#menu-"+vsname).addClass("gpsenabled");
         });
 		
@@ -619,7 +619,7 @@ var GSN = {
             type: "GET",
             url: "gsn?name="+vsName,
             success: function(data){
-                $("virtual-sensor[@name="+vsName+"]",data).each(function(){
+                $("virtual-sensor[name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
                 });
             }
@@ -633,7 +633,7 @@ var GSN = {
             //url: "gsn?name="+vsName,
             url: "ext/ws/api/sensors?format=xml&latestValues=true",
             success: function(data){
-            	 $("virtual-sensor[@name="+vsName+"]",data).each(function(){
+            	 $("virtual-sensor[name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
                     
                 });
@@ -761,29 +761,34 @@ var GSN = {
 
             //when map is enabled, update marker
         	if (GSN.map.loaded){
-                var lat = $("field[@name=latitude]",vs).text();
-                var lon = $("field[@name=longitude]",vs).text();
+                var lat = $("field[name=latitude]",vs).text();
+                var lon = $("field[name=longitude]",vs).text();
                 
-                // Here, J is used instead of $ because of a conflict between chosen and jquery (see map.html)
-                var selectedObsProp = J("#observedProperties").chosen().val();
-                var hasObsProp = false;
-            	if ($.inArray("any",selectedObsProp) != -1) {
-            		hasObsProp = true;
-            	} else {
-                	for (i=0;i<selectedObsProp.length;i++) {
-                		if (undefined != obsPropVsMap.get(selectedObsProp[i])) {
-                			if ($.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1) {
-                				hasObsProp = true;
-                				break;
-                			}
-                		}
-                	}
-            	}
-
-                if (lat != "" && lon != "" && hasObsProp) {
-                    GSN.map.updateMarker(vs,lat,lon);
+                if (GSN.context == "map") {
+	                var selectedObsProp = $("#observedProperties").chosen().val();
+	                var hasObsProp = false;
+	            	if ($.inArray("any",selectedObsProp) != -1) {
+	            		hasObsProp = true;
+	            	} else {
+	                	for (i=0;i<selectedObsProp.length;i++) {
+	                		if (undefined != obsPropVsMap.get(selectedObsProp[i])) {
+	                			if ($.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1) {
+	                				hasObsProp = true;
+	                				break;
+	                			}
+	                		}
+	                	}
+	            	}
+	
+	                if (lat != "" && lon != "" && hasObsProp) {
+	                    GSN.map.updateMarker(vs,lat,lon);
+	                } else {
+	                	$("#menu-"+vsName).parent().hide();
+	                }
                 } else {
-                	$("#menu-"+vsName).parent().hide();
+                	if (lat != "" && lon != "") {
+                        GSN.map.updateMarker(vs,lat,lon);
+                    }
                 }
             }
         	
@@ -981,7 +986,7 @@ var GSN = {
                 var dd,field,unit;
                 for (var i = 0; i<dds.size();i++){
                     dd = dds.get(i);
-                    field = $("field[@name="+$(dd).attr("class")+"]",vs);
+                    field = $("field[name="+$(dd).attr("class")+"]",vs);
                     type = $(field).attr("type");
                     value = $(field).text();
                     unit = $(field).attr("unit");
@@ -1022,7 +1027,7 @@ var GSN = {
                         }
                     }
                 }
-                value = $("field[@name=timed]",vs).text();
+                value = $("field[name=timed]",vs).text();
                 //if (value != "") value = GSN.util.printDate(value);
                 $("span.timed", vsd).empty().append(value);
                 return false;
@@ -1105,7 +1110,18 @@ var GSN = {
         }
 		
 		
-
+    	,
+    	vsFieldsToString: function(vs) {
+    		var result = "<ul>";
+    		$("field",vs).each(function(){
+    			if ($(this).attr("category") != "predicate" && $(this).attr("name") != "time") {
+    				var obsProperty = $(this).attr("obsProperty");
+    				result += '<li ' + ((obsProperty!=null)?'title="'+obsProperty + '"':'') + '>' + $(this).attr("name") + '</li>';
+    			}
+    		});
+    		result += '</ul>'
+    		return result;
+    	}
 		
 		
         /**
@@ -1118,8 +1134,6 @@ var GSN = {
             var marker = new Marker(new LatLonPoint(lat,lon));
             marker.setAttribute("vsname",vsName);
   		
-            var fieldsAsString = vsFieldsToString(vs);
-            
             if(mapProvider=="microsoft"){
                 marker.setIcon("./img/green_marker.png");
                 marker.setInfoBubble("Show/Hide Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
@@ -1127,11 +1141,15 @@ var GSN = {
             }
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
+                if (GSN.context == 'fullmap') {
+                	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");GSN.vsbox.bringToFront(\""+vsName+"\");</script><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+fieldsAsString);
+                } else if (GSN.context == 'map'){
+                	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
+                }
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
-            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+ fieldsAsString);
+            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
                 GSN.map.markers.push(marker);
             }
 			
@@ -2274,16 +2292,42 @@ var GSN = {
             }
             return unescape(strReturn);
         }
+        ,
+        getURLParamImproved: function(url) {
+        	//Allows parsing array as URL parameter
+    		// Code found on https://gist.github.com/kares/956897
+		    var re = /([^&=]+)=?([^&]*)/g;
+		    var decode = function(str) {
+		    	var tmp = decodeURIComponent(str.replace(/\+/g, ' '));
+		    
+		    	// remove trailing [] of the multipled-value parameters
+		    	tmp = tmp.replace(/\[\]/,'');
+		        return tmp;
+		    };
+		    function parseParam(query) {
+		        var params = {}, e;
+		        if (query) {
+		            if (query.substr(0, 1) == '?') {
+		                query = query.substr(1);
+		            }
+	
+		            while (e = re.exec(query)) {
+		                var k = decode(e[1]);
+		                var v = decode(e[2]);
+		                if (params[k] !== undefined) {
+		                    if (!$.isArray(params[k])) {
+		                        params[k] = [params[k]];
+		                    }
+		                    params[k].push(v);
+		                } else {
+		                    params[k] = v;
+		                }
+		            }
+		        }
+		        return params;
+		    };
+		    
+		    return parseParam(url);
+        }
     }
 };
-
-function vsFieldsToString(vs){
-	var result = "";
-	$("field",vs).each(function(){
-		if ($(this).attr("category") != "predicate" && $(this).attr("name") != "time") {
-			var obsProperty = $(this).attr("obsProperty");
-			result += '<p ' + ((obsProperty!=null)?'title="'+obsProperty + '"':'') + '>' + $(this).attr("name") + '</p>';
-		}
-	});
-	return result;
-}

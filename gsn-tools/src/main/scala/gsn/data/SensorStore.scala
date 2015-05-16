@@ -65,8 +65,9 @@ class SensorStore(ds:DataStore) extends Actor{
       implicit val source=vsDatasources.get(vsname)
 
       val mappings = propertiesManager.getMappingsForSensor(vsname)
+      val updatedMappings = updateMappingWithUnitStd(vs, mappings)
       
-      val s=Sensor.fromConf(vs,hasAc,None,Option(mappings))
+      val s=Sensor.fromConf(vs,hasAc,None,Option(updatedMappings))
       val sStats= stats(s)
       //storeMongo(s)
       sensorStats put(vsname,sStats)
@@ -121,7 +122,32 @@ class SensorStore(ds:DataStore) extends Actor{
       }
     }
   }
+  
+  /**
+   * Fetch standardized units and update the mappings
+   */
+  private def updateMappingWithUnitStd(vs:VsConf, mappings:Map[String, List[(String,String)]]):Map[String, List[(String,String)]] = {
+    val updatedMappings = scala.collection.mutable.Map(mappings.toSeq: _*)
+    vs.processing.output map{out=> 
+      val unitStd = propertiesManager.getUnitLabelBySymbol(out.unit.getOrElse(null))
+      if (!unitStd.equals("")) {
+        val tupleToInsert = ("unitStd",unitStd)
+        if (updatedMappings.contains(out.name)) {
+          val list = mappings.get(out.name)
+          val updatedList:List[(String,String)] = list match {
+            case Some(l) => l++List(tupleToInsert)
+            case None => List(tupleToInsert)
+          }
+          updatedMappings.put(out.name, updatedList)
+        } else {
+          updatedMappings.put(out.name, List(tupleToInsert))
+        }
+      }
+    }
+    updatedMappings.toMap
+  }
 }
+
 
 case class GetSensorInfo(sensorid:String)
 case class GetAllSensorsInfo()

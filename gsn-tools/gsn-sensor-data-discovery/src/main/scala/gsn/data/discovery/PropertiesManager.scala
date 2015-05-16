@@ -119,6 +119,26 @@ class PropertiesManager(sparqlServiceProperties:String,
     (property, details.toList)
   }
   
+  def getUnitLabelBySymbol(symbol:String):String = {
+    val queryUnitStd = "SELECT ?label " +
+                        "WHERE { " + 
+                          "?s <http://purl.oclc.org/NET/ssnx/qu/qu#symbol> ?o . " +
+                          "?s <http://www.w3.org/2000/01/rdf-schema#label> ?label . " +
+                          "?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?dim . " +
+                          "?dim <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://purl.oclc.org/NET/ssnx/qu/qu#Unit> " +
+                          "FILTER (?o = \"" + symbol + "\")" +
+                        "}";
+    val queryExecUnit = QueryExecutionFactory.sparqlService(sparqlServiceProperties + "/query", queryUnitStd)
+    val resultsUnit = queryExecUnit.execSelect()
+    var unitStd = ""
+    // Takes the first result if any
+    if (resultsUnit.hasNext()) {
+      unitStd = resultsUnit.nextSolution().getLiteral("label").getString
+    }
+    queryExecUnit.close()
+    unitStd
+  }
+  
   /**
    * Returns the mappings for the specified virtual sensor
    */
@@ -135,7 +155,7 @@ class PropertiesManager(sparqlServiceProperties:String,
      queryExec.close()
      mappings.toMap
   }
-
+  
   /**
    * Checks whether the observed property exists in Fuseki, based on its URI
    */

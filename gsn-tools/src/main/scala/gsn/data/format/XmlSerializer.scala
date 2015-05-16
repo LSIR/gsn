@@ -1,6 +1,7 @@
 package gsn.data.format
 
 import gsn.data._
+
 import gsn.data.format.TimeFormats._
 import scala.xml.XML
 import scala.xml.Text
@@ -8,6 +9,7 @@ import scala.xml.Null
 import scala.xml.Elem
 import scala.xml.Attribute
 import org.joda.time.format.ISODateTimeFormat
+import gsn.data.discovery.PropertiesManager
 
 object XmlSerializer extends DataSerializer{
   val dateFormat=ISODateTimeFormat.dateTimeNoMillis
@@ -34,7 +36,7 @@ object XmlSerializer extends DataSerializer{
          var tmp = <field name={f.fieldName}
             type={f.dataType.name} unit={f.unit.code} >
          </field>
-         addMappings(tmp, f.mapping)
+         addAttributes(tmp, f.mapping)
       }
     def xmlFieldValues=
       data.stats.latestValues.map{ts=>
@@ -45,7 +47,7 @@ object XmlSerializer extends DataSerializer{
               else
                 ts.series.headOption.getOrElse(null)
             }</field>
-        addMappings(tmp, ts.output.mapping)
+        addAttributes(tmp, ts.output.mapping)
       }
     def fieldName(name:String)=
       if (name=="timestamp") "time" else name
@@ -66,9 +68,9 @@ object XmlSerializer extends DataSerializer{
       </virtual-sensor>;
     vs
   }
-  private def addMappings(e:Elem,mappings:Option[List[(String, String)]]):Elem = {
+  private def addAttributes(e:Elem, attributes:Option[List[(String, String)]]):Elem = {
     var acc = e
-    mappings match {
+    attributes match {
       case Some(m) => m.foreach(x => acc = acc % Attribute(None, x._1, Text(x._2), Null))
       case None =>
     }

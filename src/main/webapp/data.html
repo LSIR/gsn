@@ -5,13 +5,13 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
 
-        <script type="text/javascript" src="js/jquery-1.11/jquery-1.11.1.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.11/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="js/jquery-1.11/jquery.datetimepicker.js"></script>
-        <script type="text/javascript" src="js/combobox/chosen.jquery.min.js"></script>
-        <link rel="stylesheet" href="js/jquery-1.11/jquery-ui.min.css" type="text/css" media="screen,projection" />
-        <link rel="stylesheet" href="js/jquery-1.11/jquery-ui.structure.min.css" type="text/css" media="screen,projection" />
-        <link rel="stylesheet" href="js/combobox/chosen.min.css" type="text/css" media="screen,projection" />
+		<script type="text/javascript" src="js/jquery-1.11/jquery-1.11.1.min.js"></script>
+		<link rel="stylesheet" href="js/jquery-1.11/jquery-ui.structure.min.css" type="text/css" media="screen,projection" />
+ 	 	<script type="text/javascript" src="js/chosen-1.4.2/chosen.jquery.min.js"></script>
+ 	 	<link rel="stylesheet" href="js/chosen-1.4.2/chosen.min.css" type="text/css" media="screen,projection" />
+ 	 	<script type="text/javascript" src="js/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+ 	 	<link rel="stylesheet" href="js/jquery-ui-1.11.4/jquery-ui.min.css" type="text/css" media="screen,projection" />
+ 	 	<script type="text/javascript" src="js/jquery-1.11/jquery.datetimepicker.js"></script>
         <link rel="stylesheet" href="js/jquery-1.11/jquery.datetimepicker.css" type="text/css" media="screen,projection" />
 
         <script type="text/javascript" src="js/d3plots/histogram.js"></script>
@@ -24,6 +24,9 @@
 
         <script type="text/javascript" src="js/jquery.flot.pack.js"></script>
 
+		<script type="text/javascript" src="js/constants.js"></script>
+        <script type="text/javascript" src="js/functions.js"></script>
+        <script type="text/javascript" src="js/gsn.js"></script>
 
         <script type="text/javascript">
 
@@ -43,37 +46,6 @@
             var plotIsShown = false;
 
             $(function(){
-            	
-            	//Allows parsing array as URL parameter
-				// Code found on https://gist.github.com/kares/956897
-				(function($) {
-				    var re = /([^&=]+)=?([^&]*)/g;
-				    var decode = function(str) {
-				        return decodeURIComponent(str.replace(/\+/g, ' '));
-				    };
-				    $.parseParams = function(query) {
-				        var params = {}, e;
-				        if (query) {
-				            if (query.substr(0, 1) == '?') {
-				                query = query.substr(1);
-				            }
-			
-				            while (e = re.exec(query)) {
-				                var k = decode(e[1]);
-				                var v = decode(e[2]);
-				                if (params[k] !== undefined) {
-				                    if (!$.isArray(params[k])) {
-				                        params[k] = [params[k]];
-				                    }
-				                    params[k].push(v);
-				                } else {
-				                    params[k] = v;
-				                }
-				            }
-				        }
-				        return params;
-				    };
-				})(jQuery);
             	
                 function csv_to_json(tag,callback,format, plot){
                     callback = callback || function(){};
@@ -442,7 +414,7 @@
                         });
                     });
                     
-                    var params = $.parseParams(location.search);
+                    var params = GSN.util.getURLParamImproved(location.search);
                     var vsName = params.vsname;
                     var vsBasket = params.vsbasket;
                     var propBasket = params.propbasket;
@@ -620,83 +592,82 @@
                 <div id="datachooser">
                     <div id="data_1" class="clearfix">
                         <form action="multidata" method="post">
-
-                                    <div class="data-output-content">
-                                        <div class="aggregations">
-                                            <div>
-                                                <select id="nb" name="nb" style="display: inline-block">
-                                                    <option value="ALL">All Data</option>
-                                                    <option value="SPECIFIED" selected="selected">Only</option>
-                                                </select>
-                                                <div id="nb_value_div" style="display: inline-block">
-                                                    <input id="nb_value" name="nb_value" size="3" type="text" value="100"/><span> Values</span>
-                                                </div>
-                                            </div>
-                                            <p>
-                                                <span>Aggregation</span>
-                                                <select id="agg_function" name="agg_function">
-                                                    <option value="-1">No Aggregation</option>
-                                                    <option value="avg">AVG</option>
-                                                    <option value="max">MAX</option>
-                                                    <option value="min">MIN</option>
-                                                    <option value="sum">SUM</option>
-                                                </select>
-                                                <input disabled="disabled" id="agg_period" name="agg_period" size="5" type="text" value="2" />
-                                                <select disabled="disabled" id="agg_unit" name="agg_unit">
-                                                    <option value="3600000">Hours</option>
-                                                    <option value="60000">Minutes</option>
-                                                    <option value="1000">Seconds</option>
-                                                    <option value="1">Milli Seconds</option>
-                                                </select>
-                                            </p>
-                                        </div>
-                                        </br> </br>
-                                        <div class="data-outputs-container">
-                                            <a id="add-data-output" href="#">Add Output</a>
-                                            <ul id="data-outputs"></ul>
-                                        </div>
-                                        </br>
-                                        <div class="time-range">
-                                            <div>
-                                                </br>
-                                                <span>From</span>
-                                                <input id="datepicker_from" name="from" type="text" value=""   style="width: 150px"/>
-                                                &nbsp
-                                                <span>To</span>
-                                                <input id="datepicker_to" name="to" type="text" value=""  style="width: 150px"/>
-                                            </div>
-                                            <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
-                                            <span>Add virtual sensor only if it has data in the given time period</span>
-                                        </div>
-                                    </div>
-                                    </br></br></br>
-
-                                    <div class="plot-content">
-                                        <span>Plot Type</span>
-                                        <select id="plot-type">
-                                            <option value="drawTimeseries" selected="selected">Timeseries</option>
-                                            <option value="drawScatterplot">Scatterplot</option>
-                                            <option value="drawHistogram">Histogram</option>
-                                        </select>
-                                        <input class="ui-default-state plot" name="commit" type="button" value="Plot" />
-                                        <div style="display: inline-block" class="sampling_percentage" ><span>Sampling rate</span>&nbsp<input id="sampling_percentage" style="width: 30px" type="text" name="sampling_percentage"/><span>%</span></div>
-                                        &nbsp&nbsp&nbsp
-                                        <input id="disablesampling" type="checkbox" name="disablesampling"/><span>Disable sampling</span>
-                                    </div>
-
-                                    </br></br>
-
-                                    <div class="results-content">
-                                        <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
-                                        <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
-                                        <span>Time Format</span>
-                                        <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
-                                        <input id="download_format" type="hidden" name="download_format" value="csv"/>
-                                        <input id="reportclass" type="hidden" name="reportclass" value="report-default"/>
-                                    </div>
-
-                                    <div id="plotContainer">
-                                    </div>
+	                        <div class="data-output-content">
+	                            <div class="aggregations">
+	                                <div>
+	                                    <select id="nb" name="nb" style="display: inline-block">
+	                                        <option value="ALL">All Data</option>
+	                                        <option value="SPECIFIED" selected="selected">Only</option>
+	                                    </select>
+	                                    <div id="nb_value_div" style="display: inline-block">
+	                                        <input id="nb_value" name="nb_value" size="3" type="text" value="100"/><span> Values</span>
+	                                    </div>
+	                                </div>
+	                                <p>
+	                                    <span>Aggregation</span>
+	                                    <select id="agg_function" name="agg_function">
+	                                        <option value="-1">No Aggregation</option>
+	                                        <option value="avg">AVG</option>
+	                                        <option value="max">MAX</option>
+	                                        <option value="min">MIN</option>
+	                                        <option value="sum">SUM</option>
+	                                    </select>
+	                                    <input disabled="disabled" id="agg_period" name="agg_period" size="5" type="text" value="2" />
+	                                    <select disabled="disabled" id="agg_unit" name="agg_unit">
+	                                        <option value="3600000">Hours</option>
+	                                        <option value="60000">Minutes</option>
+	                                        <option value="1000">Seconds</option>
+	                                        <option value="1">Milli Seconds</option>
+	                                    </select>
+	                                </p>
+	                            </div>
+	                            </br> </br>
+	                            <div class="data-outputs-container">
+	                                <a id="add-data-output" href="#">Add Output</a>
+	                                <ul id="data-outputs"></ul>
+	                            </div>
+	                            </br>
+	                            <div class="time-range">
+	                                <div>
+	                                    </br>
+	                                    <span>From</span>
+	                                    <input id="datepicker_from" name="from" type="text" value=""   style="width: 150px"/>
+	                                    &nbsp
+	                                    <span>To</span>
+	                                    <input id="datepicker_to" name="to" type="text" value=""  style="width: 150px"/>
+	                                </div>
+	                                <input id="ifexists" type="checkbox" name="ifexists" value="false" checked/>
+	                                <span>Add virtual sensor only if it has data in the given time period</span>
+	                            </div>
+	                        </div>
+	                        </br></br></br>
+	
+	                        <div class="plot-content">
+	                            <span>Plot Type</span>
+	                            <select id="plot-type">
+	                                <option value="drawTimeseries" selected="selected">Timeseries</option>
+	                                <option value="drawScatterplot">Scatterplot</option>
+	                                <option value="drawHistogram">Histogram</option>
+	                            </select>
+	                            <input class="ui-default-state plot" name="commit" type="button" value="Plot" />
+	                            <div style="display: inline-block" class="sampling_percentage" ><span>Sampling rate</span>&nbsp<input id="sampling_percentage" style="width: 30px" type="text" name="sampling_percentage"/><span>%</span></div>
+	                            &nbsp&nbsp&nbsp
+	                            <input id="disablesampling" type="checkbox" name="disablesampling"/><span>Disable sampling</span>
+	                        </div>
+	
+	                        </br></br>
+	
+	                        <div class="results-content">
+	                            <input class="ui-default-state download_btn_csv" name="commit" type="submit" value="Download CSV" />
+	                            <input class="ui-default-state download_btn_xml" name="commit" type="submit" value="Download XML" />
+	                            <span>Time Format</span>
+	                            <select id="time_format" name="time_format"><option value="iso">ISO 8601</option><option value="unix">UNIX</option></select>
+	                            <input id="download_format" type="hidden" name="download_format" value="csv"/>
+	                            <input id="reportclass" type="hidden" name="reportclass" value="report-default"/>
+	                        </div>
+	
+	                        <div id="plotContainer">
+	                        </div>
                         </form>
                     </div>
                 </div>

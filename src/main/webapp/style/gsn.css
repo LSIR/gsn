@@ -984,14 +984,6 @@ div.full-page {
 	margin: 0;
 	padding: 0;
 	border: none;
-	
-	/*display: block;
-	margin: 1px;
-	padding: 5px 5px 5px 0.5em;
-	border-left: 10px solid #FFF5E0;
-	background-color: #FFF0D1;
-	color: #E6B800;
-	text-decoration: none;/*
 }
 
 .vsbasket_elem {
@@ -1002,9 +994,6 @@ div.full-page {
 	background-color: #FFF0D1;
 	color: #7c6;
 	text-decoration: none;
-	
-	/*display: block;	
-	margin: 12px;*/
 }
 
 .rubric_vsbasket {
