@@ -1142,14 +1142,14 @@ var GSN = {
             if(mapProvider=="google"){
                 marker.setIcon("./img/green_marker.png");
                 if (GSN.context == 'fullmap') {
-                	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");GSN.vsbox.bringToFront(\""+vsName+"\");</script><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+fieldsAsString);
+                	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");GSN.vsbox.bringToFront(\""+vsName+"\");</script><a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
                 } else if (GSN.context == 'map'){
-                	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
+                	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
                 }
                 GSN.map.markers.push(marker);
             }
             if(mapProvider=="yahoo"){
-            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
+            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
                 GSN.map.markers.push(marker);
             }
 			
