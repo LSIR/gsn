@@ -28,7 +28,7 @@ object Main extends App {
     case "--add-new-virtual-sensors" => 
       val jsonFiles = virtualSensorsFolder.listFiles().filter(_.getName.endsWith(".json"))
       for (file <- jsonFiles) {
-        propertyMappingsMgr.addVirtualSensorFromXML(file)
+        propertyMappingsMgr.addVirtualSensorFromJSON(file)
       }
       
       val xmlFiles = virtualSensorsFolder.listFiles().filter(_.getName.endsWith(".xml"))

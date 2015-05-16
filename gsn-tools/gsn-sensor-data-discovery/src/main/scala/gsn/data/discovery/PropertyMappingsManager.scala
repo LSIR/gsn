@@ -57,46 +57,16 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
   /**
    * Add the virtual sensor found in the provided JSON file to the model
    */
-  //TODO altitude/longitude/latitude (same as for XML)
   def addVirtualSensorFromJSON(file:File) {
     
-      val vsModel = ModelFactory.createDefaultModel()
-      
       val json = Json.parse(Source.fromFile(file).mkString)
-      val virtualSensorName = PropertyMappingsManager.removeQuotes((json \ "properties" \ "vs_name").as[String].toLowerCase())
-      val fields =   json \ "properties" \ "fields" \\ "name"
-
-      val newSensor = vsModel.createResource(baseUri + virtualSensorName)
+      val vsName = PropertyMappingsManager.removeQuotes((json \ "properties" \ "vs_name").as[String].toLowerCase())
+      val fields = json \ "properties" \ "fields" \\ "name"
+      val longitude = PropertyMappingsManager.removeQuotes((json \ "properties" \ "longitude").as[String])
+      val latitude = PropertyMappingsManager.removeQuotes((json \ "properties" \ "latitude").as[String])
+      val altitude = PropertyMappingsManager.removeQuotes((json \ "properties" \ "altitude").as[String])
       
-      val ssnSensorType = vsModel.createResource(ssnUri + "Sensor")
-      newSensor.addProperty(RDF.`type`, ssnSensorType)
-      
-      val namedIndividualType = vsModel.createResource(OWL.getURI() + "NamedIndividual")
-      newSensor.addProperty(RDF.`type`, namedIndividualType)
-      
-      val ssnObserves = vsModel.createProperty(ssnUri, "observes")
-      val ssnHasOutput = vsModel.createProperty(ssnUri, "hasOutput")
-      
-      for (value <- fields) {
-        if (propertiesManager.mappingExists(value.as[String])) {
-          val obsPropertyUri = propertiesManager.getMappingForProperty(value.as[String])
-          newSensor.addProperty(ssnHasOutput, vsModel.createResource(obsPropertyUri))
-        } else {
-          println("WARNING: There is no mapping for property " + value.as[String] + ": ignored")
-        }
-      }
-    
-      // Write new statements to database...
-      vsModel.listStatements().toList().foreach { s => 
-      propertiesManager.addNewVirtualSensorStatement(s)
-    }
-  }
-  
-  private def extractAttributeValue(n:Node):String = {
-    n.attribute("key") match {
-      case s if s.size >= 1 => s.head.text
-      case _ => null
-    }
+      addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.as[String] } toList)
   }
   
   /**
@@ -104,9 +74,8 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
    */
   def addVirtualSensorFromXML(file:File) {
     
-      val vsModel = ModelFactory.createDefaultModel()
       val mainNode = xml.XML.loadFile(file)
-      val virtualSensorName = (mainNode \ "@name").text.toLowerCase()
+      val vsName = (mainNode \ "@name").text.toLowerCase()
       val fields = (mainNode \ "processing-class" \ "output-structure" \ "field").map {_ \ "@name"}
       val longitude = {
         val elem = (mainNode \ "addressing" \ "predicate").filter { x => extractAttributeValue(x).equalsIgnoreCase("longitude")}
@@ -121,7 +90,20 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
         if (elem.size >= 1) elem.head.text else ""
       }
       
-      val newSensor = vsModel.createResource(baseUri + virtualSensorName)
+      addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.text } toList)
+  }
+  
+  private def extractAttributeValue(n:Node):String = {
+    n.attribute("key") match {
+      case s if s.size >= 1 => s.head.text
+      case _ => null
+    }
+  }
+  
+  private def addVirtualSensor(vsName:String, longitude:String, latitude:String, altitude:String, fields:List[String]) {
+    
+      val vsModel = ModelFactory.createDefaultModel()
+      val newSensor = vsModel.createResource(baseUri + vsName)
       
       val ssnSensorType = vsModel.createResource(ssnUri + "Sensor")
       newSensor.addProperty(RDF.`type`, ssnSensorType)
@@ -131,7 +113,6 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
       
       if (!longitude.equals("")) {
         val longitudeProperty = vsModel.createProperty(wgs84Uri, "long")
-        //newSensor.addProperty(longitudeProperty, longitude)
         newSensor.addLiteral(longitudeProperty, longitude)
       }
       if (!latitude.equals("")) {
@@ -147,11 +128,11 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
       val ssnHasOutput = vsModel.createProperty(ssnUri, "hasOutput")
       
       for (value <- fields) {
-        if (propertiesManager.mappingExists(value.text)) {
-          val obsPropertyUri = propertiesManager.getMappingForProperty(value.text)
+        if (propertiesManager.mappingExists(value)) {
+          val obsPropertyUri = propertiesManager.getMappingForProperty(value)
           newSensor.addProperty(ssnHasOutput, vsModel.createResource(obsPropertyUri))
         } else {
-          println("WARNING: There is no mapping for property " + value.text)
+          println("WARNING: There is no mapping for property " + value)
         }
       }
       // Write all statements from the temporary model to fuseki
@@ -167,6 +148,6 @@ object PropertyMappingsManager {
    * which return quotes with text
    */
   def removeQuotes(str:String):String = {
-    str.substring(1, str.length()-1)
+    if (str != null) str.replaceAll("\"","") else ""
   }
 }
