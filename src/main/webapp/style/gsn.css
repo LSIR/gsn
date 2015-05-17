@@ -1133,3 +1133,9 @@ div.form-inline input button {
 	background-color: white;
 	border-left: 10px solid #FFF5E0;
 }
+
+/* Map */
+.mapInfoWindow {
+    padding-left: 20px;
+}
+

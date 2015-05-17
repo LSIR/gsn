@@ -19,10 +19,12 @@
 	<script type="text/javascript" src="js/gsn.js"></script>	
 	
 	<!-- Include Map engine-->
-	<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
+	<!-- <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>-->
 	<!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
 	<script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>
-	<script type="text/javascript" src="js/mapstraction.js"></script>
+	<!-- <script type="text/javascript" src="js/mapstraction.js"></script>-->
+	
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
 	
 	<script type="text/javascript" src="js/constants.js"></script>
 	
@@ -45,7 +47,7 @@
 			$(window).resize( function() { $("#vs").height($(window).height() - $("#vs").offset().top - 10) } );
 			$("#vsmap").css("width",$(window).width()-500+"px");
 			
-			mapProvider = GSN.util.getURLParam("mapProvider");
+			/*mapProvider = GSN.util.getURLParam("mapProvider");
 			if(mapProvider.indexOf("#")!=-1){ //remove hash if any
 				mapProvider = mapProvider.substring(0,mapProvider.indexOf("#"));
 			}
@@ -65,7 +67,7 @@
 				$("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
 			}
 			
-			map = new Mapstraction('vsmap',mapProvider);
+			map = new Mapstraction('vsmap',mapProvider);*/
 			
 			GSN.load();
 		});	
@@ -81,8 +83,9 @@
 	
 	<div id="main2" style="padding:0 2px;">
 		<div id='selectMapProvider'>
-				<input type="radio" id="VE" class="mapProvider" name="mapProvider" onclick="location.href='fullmap.html?mapProvider=microsoft';" value="VE">Virtual Earth
+				<!-- <input type="radio" id="VE" class="mapProvider" name="mapProvider" onclick="location.href='fullmap.html?mapProvider=microsoft';" value="VE">Virtual Earth
 				<input type="radio" id="GM" class="mapProvider" name="mapProvider" onclick="location.href='fullmap.html?mapProvider=google';" value="GM">Google Maps
+				-->
 				<!-- <input type="radio" id="YM" class="mapProvider" name="mapProvider" onclick="location.href='fullmap.html?mapProvider=yahoo';" value="YM">Yahoo Maps -->
 		</div>
 		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>

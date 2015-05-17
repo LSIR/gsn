@@ -98,10 +98,10 @@ var GSN = {
                     if (val[0]=="z") zoom = parseInt(val[1]);
                 }
                 if (lat!=null) {
-                    map.setCenterAndZoom(new LatLonPoint(lat,lng),zoom);
+                	map.setCenter(new google.maps.LatLng(lat, lng));
+                	map.setZoom(zoom);
                 }
             }
-            GSN.map.showAllMarkers();
         } else if (GSN.context=="fullmap")	{
             GSN.vsbox.container = "#vs";
             if(!GSN.map.loaded) {
@@ -198,8 +198,6 @@ var GSN = {
         //build the rightside vs menu
         $("#vsmenu").empty();
 
-
-
         var arraySize = 0;
         $("virtual-sensor",data).each(function(){
         	var name = $(this).attr("name");
@@ -219,8 +217,8 @@ var GSN = {
 		
         //Test example
         //GSN.vsName.push("genepi_meteo_10_replay", "genepi_meteo_11_replay","genepi_meteo_12_replay","genepi_meteo_13_replay","genepi_meteo_15_replay","genepi_meteo_16_replay","genepi_meteo_18_replay","genepi_meteo_2_replay","genepi_meteo_3_replay","genepi_meteo_4_replay","genepi_meteo_6_replay","genepi_meteo_7_replay");
-      GSN.vsName = GSN.util.regroupByUnderscore(GSN.vsName);
-      GSN.protect.sort();
+        GSN.vsName = GSN.util.regroupByUnderscore(GSN.vsName);
+        GSN.protect.sort();
         /*for(var i=0;i<GSN.vsName.length;++i){
             logIvo(GSN.vsName[i]+"--"+GSN.protect[i][0]+"--"+GSN.protect[i][1]);
         }*/
@@ -650,7 +648,6 @@ var GSN = {
         //box showing all vs info
         container: "#vs"
 		
-		
         /**
 		* Create an empty vsbox
 		*/
@@ -750,7 +747,6 @@ var GSN = {
             $(this.container).prepend($("."+vsdiv, $(this.container)));
             $("."+vsdiv, $(this.container)).fadeIn("slow");
         }
-		
 		
         /**
 		* Update and show all the data of the vsbox
@@ -1034,7 +1030,6 @@ var GSN = {
             }
         }
 		
-		
         /**
 		* Remove the vsbox from the container
 		*/
@@ -1043,7 +1038,6 @@ var GSN = {
             var vsdiv = "vsbox-"+vsName;
             $("."+vsdiv, $(this.container)).remove();
         }
-		
 		
         /**
 		* Vsbox tabs control
@@ -1066,7 +1060,6 @@ var GSN = {
         }
     },
 	
-	
     /**
 	* All the map thing
 	*/
@@ -1078,7 +1071,8 @@ var GSN = {
         highlighted : null
         ,
         highlightedmarker : null
-		
+        ,
+        infowindow: null
 		
         /**
 		* Initialize the map
@@ -1086,33 +1080,27 @@ var GSN = {
         ,
         init : function(){
             this.loaded=true;
-            map.setCenterAndZoom(new LatLonPoint(0,0),1);
-			
-            // Setting the map type
-            var map_type;
-            if(DEFAULT_MAP_TYPE=="road"){
-                map_type = Mapstraction.ROAD;
-            } else if(DEFAULT_MAP_TYPE=="satellite") {
-                map_type = Mapstraction.SATELLITE;
-            } else if(DEFAULT_MAP_TYPE=="hybrid") {
-                map_type = Mapstraction.HYBRID;
-            } else {
-                alert("Error: "+DEFAULT_MAP_TYPE+" is an unknown map type");
-                return;
-            }
 			  
-            map.setMapType(map_type);
-		    
-            //set the different control on the map
-            map.addMapTypeControls();
-            map.addLargeControls();
-			
+            function initialize() {
+            	var mapOptions = {
+            		zoom: 1,
+            		center: new google.maps.LatLng(0, 0)
+            	};
+            	map = new google.maps.Map(document.getElementById('vsmap'),mapOptions);
+            	
+            	google.maps.event.addListener(map, 'bounds_changed', function() {
+               		if (GSN.context == "map") {
+               			updateMapMarkersDisplay();
+               		}
+               	});
+			}
+            
+          	google.maps.event.addDomListener(window, 'load', initialize);
         }
-		
 		
     	,
     	vsFieldsToString: function(vs) {
-    		var result = "<ul>";
+    		var result = "<ul class=\"mapInfoWindow\">";
     		$("field",vs).each(function(){
     			if ($(this).attr("category") != "predicate" && $(this).attr("name") != "time") {
     				var obsProperty = $(this).attr("obsProperty");
@@ -1123,7 +1111,6 @@ var GSN = {
     		return result;
     	}
 		
-		
         /**
 		* Add marker
 		*/
@@ -1131,29 +1118,32 @@ var GSN = {
         addMarker: function(vs,lat,lon){
         	
 	        var vsName = $(vs).attr("name");
-            var marker = new Marker(new LatLonPoint(lat,lon));
-            marker.setAttribute("vsname",vsName);
-  		
-            if(mapProvider=="microsoft"){
-                marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("Show/Hide Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
-                GSN.map.markers.push(marker);
+	        var marker = new google.maps.Marker({
+	    		position: new google.maps.LatLng(lat, lon),
+	    		map: map,
+	    		icon: './img/green_marker.png',
+	    		draggable: false,
+	    		vsname: vsName
+	    	});
+	        
+	        if (GSN.context == 'fullmap') {
+	        	marker.content = "<script>GSN.menu(\""+vsName+"\");GSN.vsbox.bringToFront(\""+vsName+"\");</script><a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs);
+            } else if (GSN.context == 'map'){
+            	marker.content = "<script>GSN.menu(\""+vsName+"\");</script><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add <a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a> to basket</label><br>"+GSN.map.vsFieldsToString(vs);
             }
-            if(mapProvider=="google"){
-                marker.setIcon("./img/green_marker.png");
-                if (GSN.context == 'fullmap') {
-                	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");GSN.vsbox.bringToFront(\""+vsName+"\");</script><a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
-                } else if (GSN.context == 'map'){
-                	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
-                }
-                GSN.map.markers.push(marker);
-            }
-            if(mapProvider=="yahoo"){
-            	marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add to basket </label><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><br><a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs));
-                GSN.map.markers.push(marker);
-            }
-			
-            map.addMarker(marker);
+	        
+	        google.maps.event.addListener(marker, 'click', function() {
+	        	if (GSN.map.infowindow != null) {
+	        		GSN.map.infowindow.close();
+	        	}
+	        	GSN.map.infowindow = new google.maps.InfoWindow({
+		            content: marker.content
+		        });
+	        	GSN.map.infowindow.open(map,marker);
+		    });
+	        
+            GSN.map.markers.push(marker);
+            
             //add gpsenable class
             $("#menu-"+vsName).addClass("gpsenabled");
 			
@@ -1171,15 +1161,14 @@ var GSN = {
         	var vsName = $(vs).attr("name");
             for (x=0; x<GSN.map.markers.length; x++) {
                 var m = GSN.map.markers[x];
-                if (m.getAttribute("vsname") == vsName) {
-                    m.hide();
-                    map.removeMarker(m);
+                if (m.vsname == vsName) {
+                    m.setVisible(false);
+                    m.setMap(null);
                     GSN.map.markers.splice(x,1);
                 }
             }
             GSN.map.addMarker(vs,lat,lon);
         }
-		
 		
         /**
 		* Highlight a marker
@@ -1192,23 +1181,22 @@ var GSN = {
             if (vsName!=null) {
                 for (x in GSN.map.markers) {
                     var m = GSN.map.markers[x];
-                    if (m.getAttribute("vsname") == vsName) {
+                    if (m.vsname == vsName) {
                         GSN.map.highlighted = x;
-                        map.setCenter(new LatLonPoint(m.location.lat,m.location.lon))
+                        map.setCenter(m.getPosition())
                         return;
                     }
                 }
             }
         }
-		
         ,
         areVisible: true
         ,
         toggleAllMarkers: function(){
             for (x=0; x<GSN.map.markers.length; x++) {
                 var m = GSN.map.markers[x];
-                if(GSN.map.areVisible) m.hide();
-                else m.show();
+                if(GSN.map.areVisible) m.setVisible(false);
+                else m.setVisible(true);
             }
             GSN.map.areVisible = !GSN.map.areVisible;
         }		
@@ -1218,7 +1206,8 @@ var GSN = {
 		*/
         ,
         showAllMarkers: function(){
-            map.autoCenterAndZoom();
+			map.setCenter(new google.maps.LatLng(0, 0));
+			map.setZoom(1);
         }
     }
 	

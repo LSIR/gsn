@@ -17,12 +17,7 @@
  	 	
  	 	<link rel="stylesheet" href="style/map.css" type="text/css" media="screen,projection" />
  	 	
-        <!-- Include Map engine-->
-        <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
-        <!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
-        <!--<script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>-->
-        <script type="text/javascript" src="js/mapstraction.js"></script>
-        
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
        
         <script type="text/javascript" src="js/constants.js"></script>
         <script type="text/javascript" src="js/functions.js"></script>
@@ -50,45 +45,76 @@
 	    		}
 	    	}
         	
+        	function updateMapMarkersDisplay() {
+        		var mapBounds = map.getBounds();
+       			var selectedObsProp = $("#observedProperties").chosen().val();
+               	if (GSN.map.areVisible && selectedObsProp != null) {
+               		if ($.inArray("any",selectedObsProp) != -1) {
+               			for (x = 0; x < GSN.map.markers.length; x++) {
+               				var m = GSN.map.markers[x];
+    	                    var vsName = m.vsname;
+    	                    if (mapBounds.contains(m.getPosition())) {
+    	                    	m.setVisible(true);
+        	                 	showSensorToVsMenu(vsName);
+    	                    } else {
+    	                    	m.setVisible(false)
+		                		hideSensorFromVsMenu(vsName);
+    	                    }
+               			}
+               		} else {
+               			// Show or hide markers based on the observed properties filter and the bounds of the map
+    	            	for (x = 0; x < GSN.map.markers.length; x++) {
+    	                    var m = GSN.map.markers[x];
+    	                    var vsName = m.vsname;
+   	    	                for (i = 0; i < selectedObsProp.length; i++) {
+   		                		if (undefined != obsPropVsMap.get(selectedObsProp[i])) {
+   		                			if ($.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1 && mapBounds.contains(m.getPosition())) {
+   		                				m.setVisible(true)
+   		                				showSensorToVsMenu(vsName);
+   		                				break; // One observed property is enough to display the sensor (logical OR)
+   		                			} else {
+   		                				m.setVisible(false)
+   		                				hideSensorFromVsMenu(vsName);
+   		                			}
+   		                		} else {
+   		                			m.setVisible(false)
+   		                			hideSensorFromVsMenu(vsName);
+   		                		}
+   		                	}
+    	            	}
+               		}
+               	} else if (selectedObsProp == null) {
+               		for (x = 0; x < GSN.map.markers.length; x++) {
+               			var m = GSN.map.markers[x];
+	                    var vsName = m.vsname;
+	                    m.setVisible(false)
+	                    hideSensorFromVsMenu(vsName);
+    	           	}
+               	}
+               	
+               	function showSensorToVsMenu(vsName) {
+               		$("#menu-"+vsName).parent().show();
+               	}
+               	
+               	function hideSensorFromVsMenu(vsName) {
+               		$("#menu-"+vsName).parent().hide();
+               	}
+        	}
+        	
 	        var obsPropVsMap = new Map();
-            var mapProvider = null;
-
+            
             $(document).ready(function() {
             	
                 $.get('menu.jsp', {selected: "map"}, function(data) {
                     $('#navigation').html(data);
                 });
 
-                mapProvider = GSN.util.getURLParam("mapProvider");
-                if(mapProvider.indexOf("#")!=-1){ //remove hash if any
-                    mapProvider = mapProvider.substring(0,mapProvider.indexOf("#"));
-                }
-
-                if(mapProvider==""){
-                    mapProvider = DEFAULT_MAP_PROVIDER;
-                }
-
-                if(mapProvider=="google"){
-                    $("#GM").attr("checked","checked");
-                }
-                if(mapProvider=="yahoo"){
-                    $("#YM").attr("checked","checked");
-                }
-                if(mapProvider=="microsoft"){
-                    $("#VE").attr("checked","checked");
-                    $("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
-                }
-
-                map = new Mapstraction('vsmap',mapProvider);
-
                 //bind every buttons to javascript functionality (only once)
                 $("#refreshall_timeout").bind("change",GSN.updateallchange);
                 $("#refreshall").bind("click",GSN.refreshVSs);
-                $("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
+                <!--$("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);-->
                 $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
-                GSN.load();
-                
                	$("#observedProperties").chosen({
                        search_contains: true,
                        width: "200px",
@@ -97,54 +123,7 @@
                 });
                	
                	$("#observedProperties").chosen().change(function(e, params) {
-               		
-               		var selectedObsProp = $("#observedProperties").chosen().val();
-                   	if (GSN.map.areVisible && selectedObsProp != null) {
-                   		if ($.inArray("any",selectedObsProp) != -1) {
-                   			for (x = 0; x < GSN.map.markers.length; x++) {
-                   				var m = GSN.map.markers[x];
-   	    	                    var vsName = m.getAttribute("vsname");
-   	    	                    m.show();
-   	    	                 	showSensorToVsMenu(vsName);
-                   			}
-                   		} else {
-                   			// Show or hide markers based on the observed properties filter
-   	    	            	for (x = 0; x < GSN.map.markers.length; x++) {
-   	    	                    var m = GSN.map.markers[x];
-   	    	                    var vsName = m.getAttribute("vsname");
-	   	    	                for (i = 0; i < selectedObsProp.length; i++) {
-	   		                		if (undefined != obsPropVsMap.get(selectedObsProp[i])) {
-	   		                			if ($.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1) {
-	   		                				m.show();
-	   		                				showSensorToVsMenu(vsName);
-	   		                				break; // One observed property is enough to display the sensor (logical OR)
-	   		                			} else {
-	   		                				m.hide();
-	   		                				hideSensorFromVsMenu(vsName);
-	   		                			}
-	   		                		} else {
-	   		                			m.hide();
-	   		                			hideSensorFromVsMenu(vsName);
-	   		                		}
-	   		                	}
-   	    	            	}
-                   		}
-                   	} else if (selectedObsProp == null) {
-                   		for (x = 0; x < GSN.map.markers.length; x++) {
-                   			var m = GSN.map.markers[x];
-    	                    var vsName = m.getAttribute("vsname");
-    	                    m.hide();
-    	                    hideSensorFromVsMenu(vsName);
-	    	           	}
-                   	}
-                   	
-                   	function showSensorToVsMenu(vsName) {
-                   		$("#menu-"+vsName).parent().show();
-                   	}
-                   	
-                   	function hideSensorFromVsMenu(vsName) {
-                   		$("#menu-"+vsName).parent().hide();
-                   	}
+               		updateMapMarkersDisplay();
                	});
               	
               	var obsPropArray = new Array();
@@ -196,7 +175,7 @@
                		window.location.href = url;
                	});
                	
-               	$.historyInit(GSN.load);
+               	GSN.load();
             });
             
             <!--//]]>-->
@@ -247,8 +226,9 @@
                     <!-- <h2>Global Sensor Network Map</h2> -->
                     <p><a style="text-decoration:underline" href="javascript:GSN.map.showAllMarkers();">Auto-zoom and focus the map</a></p>
                     <div id='selectMapProvider'>
-                        <input type="radio" id="VE" class="mapProvider" name="mapProvider" onclick="location.href='map.html?mapProvider=microsoft';" value="VE">Virtual Earth
+                       <!-- <input type="radio" id="VE" class="mapProvider" name="mapProvider" onclick="location.href='map.html?mapProvider=microsoft';" value="VE">Virtual Earth
                         <input type="radio" id="GM" class="mapProvider" name="mapProvider" onclick="location.href='map.html?mapProvider=google';" value="GM">Google Maps
+                        -->
                         <!--<input type="radio" id="YM" class="mapProvider" name="mapProvider" onclick="location.href='map.html?mapProvider=yahoo';" value="YM">Yahoo Maps -->
                     </div>
                     <div id="vsmap" style="width: 100%; height: 500px; position:relative;"></div>
