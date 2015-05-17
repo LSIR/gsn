@@ -46,7 +46,7 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
         propertiesManager.addNewMapping(propertyToMap, obsProperty)
       } else if (propertiesManager.observedPropertyExistsByLabel(obsProperty)) {
         // Find the URI of the first property found with the given label
-        val propertyUri = propertiesManager.findObservedPropertyByLabelExactMatch(obsProperty.replaceAll("_", "\\s"))
+        val propertyUri = propertiesManager.findObservedPropertyByLabelExactMatch(obsProperty.replaceAll("_", "\\s").toLowerCase())
         propertiesManager.addNewMapping(propertyToMap, propertyUri)
       } else {
         println("WARNING:(mapping) Property: " + obsProperty + " doesn't exist in the model: ignored");
