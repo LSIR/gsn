@@ -8,6 +8,7 @@ import com.hp.hpl.jena.update.UpdateFactory
 import com.hp.hpl.jena.vocabulary.RDF
 import com.hp.hpl.jena.vocabulary.RDFS
 import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
 import java.net.ConnectException
 import java.net.URL
 import java.net.HttpURLConnection
@@ -15,11 +16,12 @@ import java.io.IOException
 import com.sun.org.apache.xerces.internal.impl.PropertyManager
 import org.apache.commons.validator.routines.UrlValidator
 
+import gsn.data.discovery.util.DataFormatter
 
 /**
  * Allows to add and get data from Fuseki
  */
-class PropertiesManager(sparqlServiceProperties:String, 
+class DataManager(sparqlServiceProperties:String, 
     sparqlServiceMapping:String, 
     sparqlServiceSensors:String, 
     baseUri:String) {
@@ -62,7 +64,7 @@ class PropertiesManager(sparqlServiceProperties:String,
    * Add new mapping to Fuseki. Maps "property" to the observed property designated by its URI
    */
   def addNewMapping(property:String, observedPropertyUri:String) {
-    val name = "output_" + property.replaceAll("\\s", "_") + "_" + observedPropertyUri.split("#")(1)
+    val name = "output_" + property.replaceAll("\\s", "_") + "_" + DataFormatter.extractFragmentId(observedPropertyUri)
     
     val insert = "INSERT DATA {\n" + 
       "<" + baseUri + name + "> " +
@@ -143,17 +145,17 @@ class PropertiesManager(sparqlServiceProperties:String,
    * Returns the mappings for the specified virtual sensor
    */
   def getMappingsForSensor(sensorName:String):Map[String,List[(String,String)]] = {
-     val query = "SELECT ?output\n WHERE {\n <" + baseUri + sensorName + "> " + ssnHasOutput + " ?output \n}"
-     val mappings = scala.collection.mutable.Map[String, List[(String,String)]]()
-     val queryExec = QueryExecutionFactory.sparqlService(sparqlServiceSensors + "/query", query)
-     val results =  queryExec.execSelect()
+    val query = "SELECT ?output\n WHERE {\n <" + baseUri + sensorName + "> " + ssnHasOutput + " ?output \n}"
+    val mappings = scala.collection.mutable.Map[String, List[(String,String)]]()
+    val queryExec = QueryExecutionFactory.sparqlService(sparqlServiceSensors + "/query", query)
+    val results =  queryExec.execSelect()
      
-     for(r <- results; if r.get("output") != null && r.get("output").isURIResource()) {
-       val (property,details) = getOutputDetails(r.get("output").toString())
-       mappings.put(property, details)
-     }
-     queryExec.close()
-     mappings.toMap
+    for(r <- results; if r.get("output") != null && r.get("output").isURIResource()) {
+      val (property,details) = getOutputDetails(r.get("output").toString())
+      mappings.put(property, details)
+    }
+    queryExec.close()
+    mappings.toMap
   }
   
   /**
@@ -273,7 +275,44 @@ class PropertiesManager(sparqlServiceProperties:String,
     val updateProc = UpdateExecutionFactory.createRemote(request, sparqlServiceSensors + "/update")
     updateProc.execute()
   }
+  
+  /**
+   * Fetch all virtual sensor that observe the given property
+   * return a list of tuples of the form (vs name, longitude, latitude, altitude)
+   */
+  def getVirtualSensorsForObservedProperty(obsPropUri:String):List[(String,Double,Double,Option[Double])] = {
+    checkUri(obsPropUri)
+    val query = "SELECT ?sensor ?long ?lat ?alt \n" +
+                "WHERE { \n" +
+                    "?output <http://purl.oclc.org/NET/ssnx/ssn#forProperty> <"+obsPropUri+"> . \n" +
+                    "SERVICE <"+sparqlServiceSensors+"> { \n" +
+                        "?sensor <http://purl.oclc.org/NET/ssnx/ssn#hasOutput> ?output . \n" +
+                        "?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long . \n" +
+                        "?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat . \n" +
+                        "OPTIONAL { ?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#alt> ?alt . } \n" +
+                    "}" +
+                "}"
+                    
+    val qexec = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", query);
+    val results = qexec.execSelect();
+
+    var resultsSeq = new ListBuffer[(String,Double,Double,Option[Double])]()
+    
+    while (results.hasNext()) {
+      val s = results.nextSolution();
+      val vsName = DataFormatter.extractFragmentId(s.get("sensor").toString())
+      val long = DataFormatter.removeQuotes(s.get("long").toString()).toDouble
+      val lat = DataFormatter.removeQuotes(s.get("lat").toString()).toDouble
+      val alt:Option[Double] = if (s.get("alt") != null) Option(DataFormatter.removeQuotes(s.get("alt").toString()).toDouble) else None
+      val tuple = (vsName, long, lat, alt)
+      resultsSeq += tuple
+    }
+    qexec.close();
+
+    resultsSeq.toList
+  }
 }
 
-object PropertiesManager {
+object DataManager {
+  
 }

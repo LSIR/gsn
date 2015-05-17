@@ -1,13 +1,10 @@
 import com.typesafe.config._
 
 import gsn.data.discovery.VsGenerator
-import gsn.data.discovery.PropertiesManager
+import gsn.data.discovery.DataManager
 import java.io.File
 
 object Main extends App {
-  
-  //VsGenerator.generate("/home/michael/dev/semester_project/virtual_sensors/", 1000)
-  
   require(args.length >= 2, help())
   
   val mode = args(0)
@@ -15,12 +12,12 @@ object Main extends App {
   val mappingsFilePath = new File(args(1))
   
   val conf = ConfigFactory.load("application.conf")
-  val propertiesMgr = new PropertiesManager(
+  val dataMgr = new DataManager(
       conf.getString("fusekiEndpoints.properties"),
       conf.getString("fusekiEndpoints.mappings"),
       conf.getString("fusekiEndpoints.virtualSensors"),
       conf.getString("baseUri"))
-  val propertyMappingsMgr = new PropertyMappingsManager(propertiesMgr, conf.getString("baseUri"))
+  val propertyMappingsMgr = new PropertyMappingsManager(dataMgr, conf.getString("baseUri"))
     
   mode match {
     case "--add-new-property-mappings" =>

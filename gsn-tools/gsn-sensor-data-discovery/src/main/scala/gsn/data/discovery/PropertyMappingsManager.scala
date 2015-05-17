@@ -13,14 +13,15 @@ import com.hp.hpl.jena.vocabulary.RDF
 import scala.io.Source
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import gsn.data.discovery.PropertiesManager
+import gsn.data.discovery.DataManager
+import gsn.data.discovery.util.DataFormatter
 import java.io.FileInputStream
 import gsn.data.discovery.util.ReadResource
 import play.api.libs.json.Json
 import com.typesafe.config._
 import scala.xml.Node
 
-class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:String) extends ReadResource {
+class PropertyMappingsManager(dataManager:DataManager, baseUri:String) extends ReadResource {
   
   val ssnUri = "http://purl.oclc.org/NET/ssnx/ssn#"
   val wgs84Uri = "http://www.w3.org/2003/01/geo/wgs84_pos#"
@@ -41,13 +42,13 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
       val obsProperty:String = m(1);
       
       // Create the mapping only for existing observed properties
-      if (propertiesManager.observedPropertyExistsByUri(obsProperty)) {
+      if (dataManager.observedPropertyExistsByUri(obsProperty)) {
         // In this case, obsProperty is already a URI
-        propertiesManager.addNewMapping(propertyToMap, obsProperty)
-      } else if (propertiesManager.observedPropertyExistsByLabel(obsProperty)) {
+        dataManager.addNewMapping(propertyToMap, obsProperty)
+      } else if (dataManager.observedPropertyExistsByLabel(obsProperty)) {
         // Find the URI of the first property found with the given label
-        val propertyUri = propertiesManager.findObservedPropertyByLabelExactMatch(obsProperty.replaceAll("_", "\\s").toLowerCase())
-        propertiesManager.addNewMapping(propertyToMap, propertyUri)
+        val propertyUri = dataManager.findObservedPropertyByLabelExactMatch(obsProperty.replaceAll("_", "\\s").toLowerCase())
+        dataManager.addNewMapping(propertyToMap, propertyUri)
       } else {
         println("WARNING:(mapping) Property: " + obsProperty + " doesn't exist in the model: ignored");
       }
@@ -60,11 +61,11 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
   def addVirtualSensorFromJSON(file:File) {
     
       val json = Json.parse(Source.fromFile(file).mkString)
-      val vsName = PropertyMappingsManager.removeQuotes((json \ "properties" \ "vs_name").as[String].toLowerCase())
+      val vsName = DataFormatter.removeQuotes((json \ "properties" \ "vs_name").as[String].toLowerCase())
       val fields = json \ "properties" \ "fields" \\ "name"
-      val longitude = PropertyMappingsManager.removeQuotes((json \ "properties" \ "longitude").as[String])
-      val latitude = PropertyMappingsManager.removeQuotes((json \ "properties" \ "latitude").as[String])
-      val altitude = PropertyMappingsManager.removeQuotes((json \ "properties" \ "altitude").as[String])
+      val longitude = DataFormatter.removeQuotes((json \ "properties" \ "longitude").as[String])
+      val latitude = DataFormatter.removeQuotes((json \ "properties" \ "latitude").as[String])
+      val altitude = DataFormatter.removeQuotes((json \ "properties" \ "altitude").as[String])
       
       addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.as[String] } toList)
   }
@@ -124,12 +125,11 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
         newSensor.addProperty(altitudeProperty, altitude)
       }
         
-      val ssnObserves = vsModel.createProperty(ssnUri, "observes")
       val ssnHasOutput = vsModel.createProperty(ssnUri, "hasOutput")
       
       for (value <- fields) {
-        if (propertiesManager.mappingExists(value)) {
-          val obsPropertyUri = propertiesManager.getMappingForProperty(value)
+        if (dataManager.mappingExists(value)) {
+          val obsPropertyUri = dataManager.getMappingForProperty(value)
           newSensor.addProperty(ssnHasOutput, vsModel.createResource(obsPropertyUri))
         } else {
           println("WARNING: There is no mapping for property " + value)
@@ -137,17 +137,11 @@ class PropertyMappingsManager(propertiesManager:PropertiesManager, baseUri:Strin
       }
       // Write all statements from the temporary model to fuseki
       vsModel.listStatements().toList().foreach { s => 
-        propertiesManager.addNewVirtualSensorStatement(s)
+        dataManager.addNewVirtualSensorStatement(s)
       }
   }
 }
 
 object PropertyMappingsManager {
-  /**
-   * Remove the first and last character of the provided String: it is needed for the parsing of JSON files
-   * which return quotes with text
-   */
-  def removeQuotes(str:String):String = {
-    if (str != null) str.replaceAll("\"","") else ""
-  }
+  
 }
