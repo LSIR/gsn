@@ -9,7 +9,6 @@ import scala.xml.Null
 import scala.xml.Elem
 import scala.xml.Attribute
 import org.joda.time.format.ISODateTimeFormat
-import gsn.data.discovery.PropertiesManager
 
 object XmlSerializer extends DataSerializer{
   val dateFormat=ISODateTimeFormat.dateTimeNoMillis
