@@ -1,10 +1,12 @@
 import com.typesafe.config._
 
-import gsn.data.discovery.VsGenerator
 import gsn.data.discovery.DataManager
 import java.io.File
 
 object Main extends App {
+  
+  //VsGenerator.generate("/home/michael/dev/semester_project/virtual_sensors/", 1000)
+  
   require(args.length >= 2, help())
   
   val mode = args(0)

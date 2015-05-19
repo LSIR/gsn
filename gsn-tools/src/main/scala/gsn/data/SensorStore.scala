@@ -129,18 +129,19 @@ class SensorStore(ds:DataStore) extends Actor{
   private def updateMappingWithUnitStd(vs:VsConf, mappings:Map[String, List[(String,String)]]):Map[String, List[(String,String)]] = {
     val updatedMappings = scala.collection.mutable.Map(mappings.toSeq: _*)
     vs.processing.output map{out=> 
-      val unitStd = dataManager.getUnitLabelBySymbol(out.unit.getOrElse(null))
-      if (!unitStd.equals("")) {
-        val tupleToInsert = ("unitStd",unitStd)
+      val (unitStdUri,unitStd) = dataManager.getUnitBySymbol(out.unit.getOrElse(null))
+      if (!unitStdUri.equals("") && !unitStd.equals("")) {
+        val unitStdUriTuple = ("unitStdUri", unitStdUri)
+        val unitStdTuple = ("unitStd",unitStd)
         if (updatedMappings.contains(out.name)) {
           val list = mappings.get(out.name)
           val updatedList:List[(String,String)] = list match {
-            case Some(l) => l++List(tupleToInsert)
-            case None => List(tupleToInsert)
+            case Some(l) => l++List(unitStdUriTuple, unitStdTuple)
+            case None => List(unitStdUriTuple, unitStdTuple)
           }
           updatedMappings.put(out.name, updatedList)
         } else {
-          updatedMappings.put(out.name, List(tupleToInsert))
+          updatedMappings.put(out.name, List(unitStdUriTuple, unitStdTuple))
         }
       }
     }

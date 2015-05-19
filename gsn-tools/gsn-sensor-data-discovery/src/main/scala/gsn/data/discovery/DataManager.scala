@@ -113,32 +113,37 @@ class DataManager(sparqlServiceProperties:String,
     // Takes the first result if any
     if (resultsObsProperty.hasNext()) {
       val sol = resultsObsProperty.nextSolution()
-      val obsProperty = getObservedPropertyLabel(sol.get("obsProperty").toString())
-      details ++= List(("obsProperty", obsProperty))
+      val obsPropertyUri = sol.get("obsProperty").toString()
+      val obsPropertyLabel = getObservedPropertyLabel(sol.get("obsProperty").toString())
+      details ++= List(("obsProperty", obsPropertyLabel))
+      details ++= List(("obsPropertyUri", obsPropertyUri))
     }
     queryExecProperty.close()
     
     (property, details.toList)
   }
   
-  def getUnitLabelBySymbol(symbol:String):String = {
-    val queryUnitStd = "SELECT ?label " +
+  def getUnitBySymbol(symbol:String):(String,String) = {
+    val queryUnitStd = "SELECT ?unit ?label " +
                         "WHERE { " + 
-                          "?s <http://purl.oclc.org/NET/ssnx/qu/qu#symbol> ?o . " +
-                          "?s <http://www.w3.org/2000/01/rdf-schema#label> ?label . " +
-                          "?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?dim . " +
+                          "?unit <http://purl.oclc.org/NET/ssnx/qu/qu#symbol> ?symbol . " +
+                          "?unit <http://www.w3.org/2000/01/rdf-schema#label> ?label . " +
+                          "?unit <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?dim . " +
                           "?dim <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://purl.oclc.org/NET/ssnx/qu/qu#Unit> " +
-                          "FILTER (?o = \"" + symbol + "\")" +
+                          "FILTER (?symbol = \"" + symbol + "\")" +
                         "}";
     val queryExecUnit = QueryExecutionFactory.sparqlService(sparqlServiceProperties + "/query", queryUnitStd)
     val resultsUnit = queryExecUnit.execSelect()
+    var unitStdUri = ""
     var unitStd = ""
     // Takes the first result if any
     if (resultsUnit.hasNext()) {
-      unitStd = resultsUnit.nextSolution().getLiteral("label").getString
+      val s = resultsUnit.nextSolution()
+      unitStdUri = s.get("unit").toString()
+      unitStd = s.getLiteral("label").getString()
     }
     queryExecUnit.close()
-    unitStd
+    (unitStdUri,unitStd)
   }
   
   /**
