@@ -7,7 +7,6 @@ import scala.xml.Null
 import scala.xml.Elem
 import scala.xml.Attribute
 import scala.util.Random
-import sun.org.mozilla.javascript.internal.xmlimpl.XML
 
 class VsGenerator {
 }
