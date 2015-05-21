@@ -285,11 +285,12 @@ class DataManager(sparqlServiceProperties:String,
    * Fetch all virtual sensor that observe the given property
    * return a list of tuples of the form (vs name, longitude, latitude, altitude)
    */
-  def getVirtualSensorsForObservedProperty(obsPropUri:String):List[(String,Double,Double,Option[Double])] = {
+  def getVirtualSensorsForObservedProperty(obsPropUri:String):List[(String, String, Double, Double, Option[Double])] = {
     checkUri(obsPropUri)
-    val query = "SELECT ?sensor ?long ?lat ?alt \n" +
+    val query = "SELECT ?sensor ?column_name ?long ?lat ?alt \n" +
                 "WHERE { \n" +
                     "?output <http://purl.oclc.org/NET/ssnx/ssn#forProperty> <"+obsPropUri+"> . \n" +
+                    "?output <http://ssx.ch#dbField> ?column_name \n" +
                     "SERVICE <"+sparqlServiceSensors+"> { \n" +
                         "?sensor <http://purl.oclc.org/NET/ssnx/ssn#hasOutput> ?output . \n" +
                         "?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long . \n" +
@@ -301,15 +302,16 @@ class DataManager(sparqlServiceProperties:String,
     val qexec = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", query);
     val results = qexec.execSelect();
 
-    var resultsSeq = new ListBuffer[(String,Double,Double,Option[Double])]()
+    var resultsSeq = new ListBuffer[(String, String, Double, Double, Option[Double])]()
     
     while (results.hasNext()) {
       val s = results.nextSolution();
       val vsName = DataFormatter.extractFragmentId(s.get("sensor").toString())
+      val columnName = DataFormatter.removeQuotes(s.get("column_name").toString())
       val long = DataFormatter.removeQuotes(s.get("long").toString()).toDouble
       val lat = DataFormatter.removeQuotes(s.get("lat").toString()).toDouble
       val alt:Option[Double] = if (s.get("alt") != null) Option(DataFormatter.removeQuotes(s.get("alt").toString()).toDouble) else None
-      val tuple = (vsName, long, lat, alt)
+      val tuple = (vsName, columnName, long, lat, alt)
       resultsSeq += tuple
     }
     qexec.close();
