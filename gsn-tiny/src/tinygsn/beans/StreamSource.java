@@ -38,8 +38,6 @@ public class StreamSource implements Serializable, QueueListener {
 	public static String[] AGGREGATOR = { "Average", "Max", "Min" };
 
 	private int samplingRate;
-	private int windowSize;
-	private int step;
 	private int aggregator;
 
 	private Queue queue = null;
@@ -49,8 +47,6 @@ public class StreamSource implements Serializable, QueueListener {
 	// ================================================
 	private static final long serialVersionUID = 5222853537667420098L;
 	public static final String DEFAULT_QUERY = "select * from wrapper";
-	// private static final transient Logger logger = Logger.getLogger(
-	// StreamSource.class );
 	private String alias;
 	private String rawHistorySize = null;
 	private String rawSlideValue = null;
@@ -75,7 +71,6 @@ public class StreamSource implements Serializable, QueueListener {
 	public void notifyMe(ArrayList<StreamElement> data) {
 		// Use Aggregator to process data s
 		StreamElement se = data.get(0);
-	//	Log.i("StreamElement se = data.get(0);" , se.getData()[0].toString());
 
 		if (inputStream == null) {
 			Log.e(TAG, "inputStream is null");
@@ -113,11 +108,11 @@ public class StreamSource implements Serializable, QueueListener {
 					se = data.get(i);
 				}
 			}
-		}
-		;
-
-		//Log.v(TAG, se.toString());
-	//	Log.i(TAG+"my Log", inputStream.getVirtualSensor().toString());
+		case 3:
+			// No aggragation
+			inputStream.getVirtualSensor().dataAvailable(data);
+			return;
+		}	
 		inputStream.getVirtualSensor().dataAvailable(se);
 		
 	}
@@ -186,20 +181,6 @@ public class StreamSource implements Serializable, QueueListener {
 
 	public int getSamplingRate() {
 		return samplingRate;
-	}
-
-	/**
-	 * @return Returns the storageSize.
-	 */
-	public String getStorageSize() {
-		return this.rawHistorySize;
-	}
-
-	/**
-	 * @return the slide value
-	 */
-	public String getSlideValue() {
-		return "";
 	}
 
 	/**
@@ -279,22 +260,6 @@ public class StreamSource implements Serializable, QueueListener {
 
 	public void setQueue(Queue queue) {
 		this.queue = queue;
-	}
-
-	public int getWindowSize() {
-		return windowSize;
-	}
-
-	public void setWindowSize(int windowSize) {
-		this.windowSize = windowSize;
-	}
-
-	public int getStep() {
-		return step;
-	}
-
-	public void setStep(int step) {
-		this.step = step;
 	}
 
 	public int getAggregator() {

@@ -34,21 +34,20 @@ import android.util.Log;
 public class Queue{
 
 	private int step = 1;
-	private int timeInterval = 1000; //intended to use in case the step is time
 	private int windowSize = 1;
+	private boolean timeBased = false;
 	private Date lastTimeAdded;
 	private ArrayList<StreamElement> values = new ArrayList<StreamElement>();
 	
 	List<QueueListener> listeners = new ArrayList<QueueListener>() ; 
 	// add elements of a concrete QueueListener, which implements QueueListener 
 	
-	public Queue(){
-		
-	}
+	public Queue(){}
 	
-	public Queue(int windowSize, int step){
-		this.setStep(step);
-		this.setWindowSize(windowSize);		
+	public Queue(int windowSize, int step, boolean timeBased){
+		setStep(step);
+		setWindowSize(windowSize);		
+		setTimeBased(timeBased);
 	}
 	
 	/**
@@ -56,32 +55,41 @@ public class Queue{
 	 * We keep the Queue's size is double of window size
 	 */
 	public boolean isFull(){
-		return values.size() >= windowSize;
+		if (isTimeBased()){
+			return values.get(values.size()-1).getTimeStamp() - values.get(0).getTimeStamp() >= windowSize;
+		}
+		else{
+			return values.size() >= windowSize;
+		}
 	}
 
 	public boolean isEmpty(){
 		return values.size() == 0;
 	}
 	
-	public synchronized Queue add(StreamElement element){
+	public synchronized void add(StreamElement element){
 		values.add(element);
 		lastTimeAdded = new Date();
 		
 		if (this.isFull()){
 			for (QueueListener l: listeners){
 				l.notifyMe(values);
-				moveToNextStep();
 			}
+			moveToNextStep();
 		}
-		
-		return this;
 	}
 	
-	public synchronized Queue moveToNextStep(){
-		for (int i = 0; i < step; i++){
-			values.remove(0);
+	public synchronized void moveToNextStep(){
+		if (isTimeBased()){
+			long ref = values.get(0).getTimeStamp() + step;
+			while (!isEmpty() && values.get(0).getTimeStamp() < ref){
+				values.remove(0);
+			}
+		}else{
+			for (int i = 0; i < step; i++){
+				values.remove(0);
+			}
 		}
-		return this;
 	}
 	
 	/**
@@ -89,11 +97,19 @@ public class Queue{
 	 * @return
 	 */
 	public ArrayList<StreamElement> getWindowValues(){
-		int w = windowSize;
-		if (w < values.size()) w = values.size();
 		ArrayList<StreamElement> window = new ArrayList<StreamElement>();
-		for (int i = 0; i < w; i++){
-			window.add(values.get(i));
+		if (isTimeBased()){
+			int i = 0;
+			long ref = values.get(0).getTimeStamp() + windowSize;
+			while (i < values.size() && values.get(i).getTimeStamp() < ref){
+				window.add(values.get(i));
+			}
+		}else{
+			int w = windowSize;
+			if (w < values.size()) w = values.size();
+			for (int i = 0; i < w; i++){
+				window.add(values.get(i));
+			}
 		}
 		return window;
 	}
@@ -138,12 +154,11 @@ public class Queue{
 		return lastTimeAdded;
 	}
 
-	public int getInterval() {
-		return timeInterval;
+	public boolean isTimeBased() {
+		return timeBased;
 	}
 
-	public void setInterval(int interval) {
-		this.timeInterval = interval;
+	public void setTimeBased(boolean timeBased) {
+		this.timeBased = timeBased;
 	}
-
 }

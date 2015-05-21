@@ -351,9 +351,10 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
 			int running = cursor.getInt(cursor.getColumnIndex("running"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
-			double vstype = cursor.getDouble(cursor.getColumnIndex("vstype"));
+			int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
 			double sswindow = cursor.getDouble(cursor.getColumnIndex("sswindowsize"));
 			double ssstep = cursor.getDouble(cursor.getColumnIndex("ssstep"));
+			boolean sstimebased = cursor.getShort(cursor.getColumnIndex("sstimebased"))==1;
 			double sssamplingrate = cursor.getDouble(cursor
 					.getColumnIndex("sssamplingrate"));
 			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
@@ -377,14 +378,10 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	
 			// Log.v(TAG, "save_to_db is " + save_to_db);
 	
-			String processingClass;
-			if (vstype == 1)
-				processingClass = AbstractVirtualSensor.PROCESSING_CLASS_BRIDGE;
-			else
-				processingClass = AbstractVirtualSensor.PROCESSING_CLASS_NOTIFICATION;
+			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
 	
 			VSensorConfig vs = new VSensorConfig(id ,processingClass, vsname,
-					wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep,
+					wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep, sstimebased,
 					aggregator, running == 1, notify_field, notify_condition,
 					notify_value, notify_action, notify_contact, save_to_db);
 			
@@ -433,9 +430,10 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
 			int running = cursor.getInt(cursor.getColumnIndex("running"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
-			double vstype = cursor.getDouble(cursor.getColumnIndex("vstype"));
+			int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
 			double sswindow = cursor.getDouble(cursor.getColumnIndex("sswindowsize"));
 			double ssstep = cursor.getDouble(cursor.getColumnIndex("ssstep"));
+			boolean sstimebased = cursor.getShort(cursor.getColumnIndex("sstimebased"))==1;
 			double sssamplingrate = cursor.getDouble(cursor
 					.getColumnIndex("sssamplingrate"));
 			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
@@ -459,14 +457,10 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 			// Log.v(TAG, "save_to_db is " + save_to_db);
 
-			String processingClass;
-			if (vstype == 1)
-				processingClass = AbstractVirtualSensor.PROCESSING_CLASS_BRIDGE;
-			else
-				processingClass = AbstractVirtualSensor.PROCESSING_CLASS_NOTIFICATION;
+			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
 
 			VSensorConfig vs = new VSensorConfig(id ,processingClass, vsname,
-					wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep,
+					wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep, sstimebased,
 					aggregator, running == 1, notify_field, notify_condition,
 					notify_value, notify_action, notify_contact, save_to_db);
 
@@ -724,9 +718,10 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
 			int running = cursor.getInt(cursor.getColumnIndex("running"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
-			double vstype = cursor.getDouble(cursor.getColumnIndex("vstype"));
+			int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
 			double sswindow = cursor.getDouble(cursor.getColumnIndex("sswindowsize"));
 			double ssstep = cursor.getDouble(cursor.getColumnIndex("ssstep"));
+			boolean sstimebased = cursor.getShort(cursor.getColumnIndex("sstimebased"))==1;
 			double sssamplingrate = cursor.getDouble(cursor
 					.getColumnIndex("sssamplingrate"));
 			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
@@ -750,11 +745,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 			// Log.v(TAG, "save_to_db is " + save_to_db);
 
-			String processingClass;
-			if (vstype == 1)
-				processingClass = AbstractVirtualSensor.PROCESSING_CLASS_BRIDGE;
-			else
-				processingClass = AbstractVirtualSensor.PROCESSING_CLASS_NOTIFICATION;
+			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
 			boolean needsToBeCreated = true;
 			for(int i = 0; i< InpVsList.size(); i++)
 				if(InpVsList.get(i).getConfig().getName().equals(vsname))
@@ -765,7 +756,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			if(needsToBeCreated)
 			{
 				VSensorConfig vs = new VSensorConfig(id,processingClass, vsname,
-						wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep,
+						wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep, sstimebased,
 						aggregator, running == 1, notify_field, notify_condition,
 						notify_value, notify_action, notify_contact, save_to_db);
 				

@@ -71,11 +71,8 @@ public class VSensorConfig implements Parcelable  {
 	public static final int DEFAULT_POOL_SIZE = 10;
 	private int priority = DEFAULT_PRIORITY;
 	private String description;
-	@Deprecated
-	private int lifeCyclePoolSize = DEFAULT_POOL_SIZE;
 	private int outputStreamRate;
 	// private KeyValue[] addressing;
-	private String webParameterPassword = null;
 	private String storageHistorySize = null;
 	private final HashMap<String, InputStream> inputStreamNameToInputStreamObjectMapping = new HashMap<String, InputStream>();
 	// private ArrayList<KeyValue> mainClassInitialParams = new
@@ -86,8 +83,6 @@ public class VSensorConfig implements Parcelable  {
 	private String timeZone;
 	private SimpleDateFormat sdf = null;
 	private String directoryQuery;
-	// private WebInput[] webinput;
-	private String sensorMap = "false";
 	private String access_protected = "false";
 
 	public VSensorConfig() {
@@ -98,15 +93,16 @@ public class VSensorConfig implements Parcelable  {
 		int idid = Integer.parseInt(source.readString());
 		String processingClass = source.readString();
 		String vsName = source.readString();
-		String wrapperN= source.readString();
-		int samplingRate= Integer.parseInt(source.readString());
-		int windowSize= Integer.parseInt(source.readString());
-		int step= Integer.parseInt(source.readString());
-		int aggregator= Integer.parseInt(source.readString());
-		boolean runningState= Boolean.parseBoolean(source.readString());
-		String notify_field_par= source.readString();
+		String wrapperN = source.readString();
+		int samplingRate = Integer.parseInt(source.readString());
+		int windowSize = Integer.parseInt(source.readString());
+		int step = Integer.parseInt(source.readString());
+		boolean timeBased = Boolean.parseBoolean(source.readString());
+		int aggregator = Integer.parseInt(source.readString());
+		boolean runningState = Boolean.parseBoolean(source.readString());
+		String notify_field_par = source.readString();
 		String notify_condition_par = source.readString();
-		Double notify_value_par=Double.parseDouble(source.readString());
+		Double notify_value_par = Double.parseDouble(source.readString());
 		String notify_action_par = source.readString();
 		String notify_contact_par = source.readString();
 		boolean save_to_db_par = Boolean.parseBoolean(source.readString());
@@ -129,7 +125,7 @@ public class VSensorConfig implements Parcelable  {
 		this.notify_contact = notify_contact_par;
 		this.save_to_db = save_to_db_par;
 
-		Queue queue = new Queue(windowSize, step);
+		Queue queue = new Queue(windowSize, step, timeBased);
 		StreamSource s = new StreamSource(queue);
 
 		AbstractWrapper w;
@@ -143,8 +139,6 @@ public class VSensorConfig implements Parcelable  {
 			s.setWrapper(w);
 			s.setAggregator(aggregator);
 			s.setSamplingRate(samplingRate);
-			s.setWindowSize(windowSize);
-			s.setStep(step);
 			outputStructure = w.getOutputStructure();
 		}
 		catch (InstantiationException e1) {
@@ -174,7 +168,7 @@ public class VSensorConfig implements Parcelable  {
 	}
 
 	public VSensorConfig(int id, String processingClass, String vsName,
-			String wrapperName, int samplingRate, int windowSize, int step,
+			String wrapperName, int samplingRate, int windowSize, int step, boolean timeBased,
 			int aggregator, boolean running, String notify_field,
 			String notify_condition, Double notify_value, String notify_action,
 			String notify_contact, boolean save_to_db) {
@@ -193,7 +187,7 @@ public class VSensorConfig implements Parcelable  {
 		this.notify_contact = notify_contact;
 		this.save_to_db = save_to_db;
 
-		Queue queue = new Queue(windowSize, step);
+		Queue queue = new Queue(windowSize, step, timeBased);
 		StreamSource s = new StreamSource(queue);
 
 		AbstractWrapper w;
@@ -207,8 +201,6 @@ public class VSensorConfig implements Parcelable  {
 			s.setWrapper(w);
 			s.setAggregator(aggregator);
 			s.setSamplingRate(samplingRate);
-			s.setWindowSize(windowSize);
-			s.setStep(step);
 			outputStructure = w.getOutputStructure();
 		}
 		catch (InstantiationException e1) {
@@ -254,8 +246,9 @@ public class VSensorConfig implements Parcelable  {
 	public VSensorConfig clone() {
 		VSensorConfig vsConfig = new VSensorConfig(id, processingClassName, name,
 				wrapperName, getInputStreams()[0].getSources()[0].getSamplingRate(),
-				getInputStreams()[0].getSources()[0].getWindowSize(),
-				getInputStreams()[0].getSources()[0].getStep(),
+				getInputStreams()[0].getSources()[0].getQueue().getWindowSize(),
+				getInputStreams()[0].getSources()[0].getQueue().getStep(),
+				getInputStreams()[0].getSources()[0].getQueue().isTimeBased(),
 				getInputStreams()[0].getSources()[0].getAggregator(), running,
 				notify_field, notify_condition, notify_value, notify_action,
 				notify_contact, save_to_db);
@@ -308,14 +301,6 @@ public class VSensorConfig implements Parcelable  {
 
 	public InputStream getInputStream(final String inputStreamName) {
 		return this.inputStreamNameToInputStreamObjectMapping.get(inputStreamName);
-	}
-
-	/**
-	 * @Deprecated
-	 * @return Returns the lifeCyclePoolSize.
-	 */
-	public int getLifeCyclePoolSize() {
-		return this.lifeCyclePoolSize;
 	}
 
 	/**
@@ -379,15 +364,6 @@ public class VSensorConfig implements Parcelable  {
 	 */
 	public void setLastModified(final Long lastModified) {
 		this.lastModified = lastModified;
-	}
-
-	/**
-	 * @Deprecated
-	 * @param lifeCyclePoolSize
-	 *          The lifeCyclePoolSize to set.
-	 */
-	public void setLifeCyclePoolSize(final int lifeCyclePoolSize) {
-		this.lifeCyclePoolSize = lifeCyclePoolSize;
 	}
 
 	/**
@@ -579,21 +555,14 @@ public class VSensorConfig implements Parcelable  {
 		return directoryQuery;
 	}
 
-	/**
-	 * @return the securityCode
-	 */
-	public String getWebParameterPassword() {
-		return webParameterPassword;
-	}
-
 	public String toString() {
 		return "VSensorConfig{" + "name='" + this.name + '\'' + ", mainClass='"
 				+ this.processingClassName + '\'' + ", wrapperName='"
 				+ this.wrapperName + '\'' + ", SamplingRate="
 				+ this.getInputStreams()[0].getSources()[0].getSamplingRate()
 				+ ", WindowSize="
-				+ this.getInputStreams()[0].getSources()[0].getWindowSize() + ", Step="
-				+ this.getInputStreams()[0].getSources()[0].getStep() + ", Running="
+				+ this.getInputStreams()[0].getSources()[0].getQueue().getWindowSize() + ", Step="
+				+ this.getInputStreams()[0].getSources()[0].getQueue().getStep() + ", Running="
 				+ this.getRunning();
 	}
 
@@ -629,29 +598,13 @@ public class VSensorConfig implements Parcelable  {
 		return sdf;
 	}
 
-	/**
-	 * @return the webinput
-	 */
-	// public WebInput[] getWebinput() {
-	// return webinput;
-	// }
-	//
-	// public void setWebInput(WebInput[] webInput) {
-	// this.webinput = webInput;
-	// }
-
+	
 	public void setInputStreams(InputStream... inputStreams) {
 		this.inputStreams = inputStreams;
 	}
 
 	public void setStorageHistorySize(String storageHistorySize) {
 		this.storageHistorySize = storageHistorySize;
-	}
-
-	public boolean getPublishToSensorMap() {
-		if (sensorMap == null)
-			return false;
-		return Boolean.parseBoolean(sensorMap.toString());
 	}
 
 	/**
@@ -766,7 +719,6 @@ public class VSensorConfig implements Parcelable  {
 
 	@Override
 	public int describeContents() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -777,8 +729,9 @@ public class VSensorConfig implements Parcelable  {
 		dest.writeString(getName());
 		dest.writeString(getWrapperName());
 		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getSamplingRate()));
-		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getWindowSize()));
-		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getStep()));
+		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getQueue().getWindowSize()));
+		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getQueue().getStep()));
+		dest.writeString(Boolean.toString(getInputStreams()[0].getSources()[0].getQueue().isTimeBased()));
 		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getAggregator()));
 		dest.writeString(Boolean.toString(getRunning()));
 		dest.writeString(getNotify_field());

@@ -27,6 +27,8 @@ package tinygsn.model.vsensor;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.VSensorConfig;
@@ -39,11 +41,9 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -94046553047097162L;
-	public static String[] VIRTUAL_SENSOR_LIST = { "bridge", "notification" };
+	public static final String[] VIRTUAL_SENSOR_LIST = { "bridge", "notification", "activity" };
+	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor","tinygsn.model.vsensor.NotificationVirtualSensor","tinygsn.model.vsensor.ActivityVirtualSensor"};
 	private static final String TAG = "AbstractVirtualSensor";
-
-	public static final String PROCESSING_CLASS_BRIDGE = "tinygsn.model.vsensor.BridgeVirtualSensor";
-	public static final String PROCESSING_CLASS_NOTIFICATION = "tinygsn.model.vsensor.NotificationVirtualSensor";
 
 	private VSensorConfig config;
 
@@ -128,6 +128,10 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		// }
 		return true;
 	}
+	
+	public DataField[] getOutputStructure(DataField[] in){
+		return in;
+	}
 
 	/**
 	 * Called when the container want to stop the pool and remove it's resources.
@@ -184,5 +188,10 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 */
 	public abstract void dataAvailable(String inputStreamName,
 			StreamElement streamElement);
+	
+	public void dataAvailable(String inputStreamName,
+			ArrayList<StreamElement> data){
+		if (!data.isEmpty()) dataAvailable(inputStreamName,data.get(data.size()-1));
+	}
 
 }

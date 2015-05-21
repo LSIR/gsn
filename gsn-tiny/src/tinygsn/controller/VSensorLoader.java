@@ -102,7 +102,7 @@ public class VSensorLoader extends Thread {
 				vs.start();
 		}
 	}
-	
+/*	
 	private void runDemo() {
 		// config = new VSensorConfig(VSensorConfig.PROCESSING_CLASS_BRIDGE, "gps",
 		// "tinygsn.wrappers.AndroidFakeGPSWrapper", 200, 1, 1, controller);
@@ -137,7 +137,7 @@ public class VSensorLoader extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
+*/	
 	public void unloadVirtualSensor(VirtualSensor vs) {
 		if (vs != null)
 			vs.stop();

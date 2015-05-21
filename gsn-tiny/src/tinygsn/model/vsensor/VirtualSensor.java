@@ -25,6 +25,7 @@
 
 package tinygsn.model.vsensor;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import tinygsn.beans.InputStream;
 import tinygsn.beans.StaticData;
@@ -149,6 +150,10 @@ public class VirtualSensor implements Serializable {
 	}
 
 	public void dataAvailable(StreamElement se) {
+		virtualSensor.dataAvailable(null, se);
+	}
+	
+	public void dataAvailable(ArrayList<StreamElement> se) {
 		virtualSensor.dataAvailable(null, se);
 	}
 

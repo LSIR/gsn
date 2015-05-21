@@ -181,6 +181,29 @@
                 android1:text="@string/defaultstep" >
             </EditText>
         </TableRow>
+        
+        <TableRow
+            android:id="@+id/tableRow_ssTimeBased"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <TextView
+                android1:id="@+id/textView_ssTimeBased"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:text="@string/timebased"
+                android1:textAppearance="?android:attr/textAppearanceSmall"
+                android1:textColor="@color/black" />
+
+            <CheckBox
+                android:id="@+id/checkBox_ssTimeBased"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="8"
+                android:textColor="@color/black" />
+
+        </TableRow>
 
         <TableRow
             android:id="@+id/tableRow_ssAggregate"

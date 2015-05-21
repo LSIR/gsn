@@ -24,6 +24,7 @@
     <string name="vsType">VS Type</string>
     <string name="wsize">Window Size</string>
     <string name="step">Step</string>
+    <string name="timebased">Is time based?</string>
     <string name="samplingRate">Sampling Rate</string>
     <string name="ss">Stream Source</string>
     <string name="aggregator">Aggregator</string>

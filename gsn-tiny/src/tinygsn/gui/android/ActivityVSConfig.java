@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
@@ -61,6 +62,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -74,7 +76,7 @@ public class ActivityVSConfig extends SherlockActivity {
 	private EditText editText_vsName, editText_ssWindowSize, editText_ssStep,
 			editText_ssSamplingRate, editText_value, editText_contact;
 	private TableLayout table_notify_config = null;
-	private CheckBox saveToDB;
+	private CheckBox saveToDB, checkBox_ssTimeBased;
 
 	private SqliteStorageManager storage = null;
 	private Properties wrapperList;
@@ -105,6 +107,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		editText_vsName = (EditText) findViewById(R.id.editText_vsName);
 		editText_ssWindowSize = (EditText) findViewById(R.id.editText_ssWindowSize);
 		editText_ssStep = (EditText) findViewById(R.id.editText_ssStep);
+		checkBox_ssTimeBased = (CheckBox) findViewById(R.id.checkBox_ssTimeBased);
 		editText_ssSamplingRate = (EditText) findViewById(R.id.editText_ssSamplingRate);
 		table_notify_config = (TableLayout) findViewById(R.id.table_notify_config);
 
@@ -122,7 +125,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		List<String> list = new ArrayList<String>();
 		
 		
-		//TODO change here if we don't need any repititopnm in sensors
+		//TODO change here if we don't need any repetition in sensors
 		for (String s : AbstractVirtualSensor.VIRTUAL_SENSOR_LIST) {
 			list.add(s);
 		}
@@ -452,10 +455,8 @@ public class ActivityVSConfig extends SherlockActivity {
 
 		String notify_field = "", notify_condition = "", notify_value = "", notify_action = "", notify_contact = "", save_to_db = "";
 
-		String vsType = "1";
-		if (spinnerVSType.getSelectedItemPosition() == 1) {
-			vsType = "2";
-
+		int vsType = spinnerVSType.getSelectedItemPosition();
+		if (vsType == 1) {
 			notify_field = field.getSelectedItem().toString();
 			notify_condition = condition.getSelectedItem().toString();
 			notify_value = editText_value.getText().toString();
@@ -475,13 +476,13 @@ public class ActivityVSConfig extends SherlockActivity {
 					.executeInsert(
 							"vsList",
 							new ArrayList<String>(Arrays.asList("running", "vsname",
-									"vstype", "sswindowsize", "ssstep", "sssamplingrate",
+									"vstype", "sswindowsize", "ssstep","sstimebased", "sssamplingrate",
 									"ssaggregator", "wrappername", "notify_field",
 									"notify_condition", "notify_value", "notify_action",
 									"notify_contact", "save_to_db")),
-							new ArrayList<String>(Arrays.asList("1", vsName, vsType,
+							new ArrayList<String>(Arrays.asList("1", vsName, ""+vsType,
 									editText_ssWindowSize.getText().toString(), editText_ssStep
-											.getText().toString(), editText_ssSamplingRate.getText()
+											.getText().toString(),checkBox_ssTimeBased.isChecked()+"", editText_ssSamplingRate.getText()
 											.toString(), spinnerAggregate.getSelectedItemPosition()
 											+ "", wrapperName, notify_field, notify_condition,
 									notify_value, notify_action, notify_contact, save_to_db)));
@@ -490,6 +491,8 @@ public class ActivityVSConfig extends SherlockActivity {
 			try {
 				w = (AbstractWrapper) Class.forName(wrapperName).newInstance();
 				DataField[] outputStructure = w.getOutputStructure();
+				AbstractVirtualSensor vs = (AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vsType]).newInstance();
+				outputStructure = vs.getOutputStructure(outputStructure);
 				storage.createTable("vs_" + vsName, outputStructure);
 				storage.executeInsertSamplingRate(wrapperName, 0);
 				Log.i("WrapperName", wrapperName);
@@ -501,14 +504,13 @@ public class ActivityVSConfig extends SherlockActivity {
 //				AbstractController controller = new AndroidControllerListVSNew();
 //				VS.getConfig().setController(controller);
 //				VS.start();
-			}
-			catch (InstantiationException e) {
+			} catch (InstantiationException e) {
 				e.printStackTrace();
-			}
-			catch (IllegalAccessException e) {
+			} catch (IllegalAccessException e) {
 				e.printStackTrace();
-			}
-			catch (ClassNotFoundException e) {
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}
 			Toast.makeText(this, "Save new virtual sensor successfully!",
@@ -567,5 +569,6 @@ public class ActivityVSConfig extends SherlockActivity {
 		Button saveButton = (Button) findViewById(R.id.btnSaveVS);
 		saveButton.setEnabled(isEnabled);
 	}
+
 
 }
