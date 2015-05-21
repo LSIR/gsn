@@ -1,6 +1,6 @@
 import com.typesafe.config._
 
-import gsn.data.discovery.DataManager
+import gsn.data.discovery._
 import java.io.File
 
 object Main extends App {
