@@ -20,6 +20,8 @@ import gsn.data.discovery.util.ReadResource
 import play.api.libs.json.Json
 import com.typesafe.config._
 import scala.xml.Node
+import scala.xml.NodeSeq
+import play.api.libs.json.JsValue
 
 class PropertyMappingsManager(dataManager:DataManager, baseUri:String) extends ReadResource {
   
@@ -63,12 +65,17 @@ class PropertyMappingsManager(dataManager:DataManager, baseUri:String) extends R
       val json = Json.parse(Source.fromFile(file).mkString)
       val vsName = DataFormatter.removeQuotes((json \ "properties" \ "vs_name").as[String].toLowerCase())
       val fields = json \ "properties" \ "fields" \\ "name"
-      val longitude = DataFormatter.removeQuotes((json \ "properties" \ "longitude").as[String])
-      val latitude = DataFormatter.removeQuotes((json \ "properties" \ "latitude").as[String])
-      val altitude = DataFormatter.removeQuotes((json \ "properties" \ "altitude").as[String])
+      val longitude = extractOptionalStringFromJsValue((json \ "properties" \ "longitude"))
+      val latitude = extractOptionalStringFromJsValue((json \ "properties" \ "latitude"))
+      val altitude = extractOptionalStringFromJsValue((json \ "properties" \ "altitude"))
       
       addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.as[String] } toList)
   }
+  
+  private def extractOptionalStringFromJsValue(jsVal:JsValue):Option[String] = {
+    if (jsVal != null) Option(DataFormatter.removeQuotes(jsVal.as[String])) else None
+  }
+  
   
   /**
    * Add the virtual sensor found in the provided XML file to the model
@@ -78,20 +85,16 @@ class PropertyMappingsManager(dataManager:DataManager, baseUri:String) extends R
       val mainNode = xml.XML.loadFile(file)
       val vsName = (mainNode \ "@name").text.toLowerCase()
       val fields = (mainNode \ "processing-class" \ "output-structure" \ "field").map {_ \ "@name"}
-      val longitude = {
-        val elem = (mainNode \ "addressing" \ "predicate").filter { x => extractAttributeValue(x).equalsIgnoreCase("longitude")}
-        if (elem.size >= 1) elem.head.text else ""
-      }
-      val latitude = {
-        val elem = (mainNode \ "addressing" \ "predicate").filter { x => extractAttributeValue(x).equalsIgnoreCase("latitude")}
-        if (elem.size >= 1) elem.head.text else ""
-      }
-      val altitude = {
-        val elem = (mainNode \ "addressing" \ "predicate").filter { x => extractAttributeValue(x).equalsIgnoreCase("altitude")}
-        if (elem.size >= 1) elem.head.text else ""
-      }
+      val longitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "longitude")
+      val latitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "latitude")
+      val altitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "altitude")
       
       addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.text } toList)
+  }
+  
+  private def extractOptionalStringFromNodeSeq(nodeSeq:NodeSeq, property:String):Option[String] = {
+    val seq = nodeSeq.filter { x => extractAttributeValue(x).equalsIgnoreCase(property) }
+    if (seq.size >= 1) Option(seq.head.text) else None
   }
   
   private def extractAttributeValue(n:Node):String = {
@@ -101,7 +104,11 @@ class PropertyMappingsManager(dataManager:DataManager, baseUri:String) extends R
     }
   }
   
-  private def addVirtualSensor(vsName:String, longitude:String, latitude:String, altitude:String, fields:List[String]) {
+  private def addVirtualSensor(vsName:String, 
+      longitude:Option[String], 
+      latitude:Option[String], 
+      altitude:Option[String], 
+      fields:List[String]) {
     
       val vsModel = ModelFactory.createDefaultModel()
       val newSensor = vsModel.createResource(baseUri + vsName)
@@ -112,17 +119,17 @@ class PropertyMappingsManager(dataManager:DataManager, baseUri:String) extends R
       val namedIndividualType = vsModel.createResource(OWL.getURI() + "NamedIndividual")
       newSensor.addProperty(RDF.`type`, namedIndividualType)
       
-      if (!longitude.equals("")) {
+      if (longitude.isDefined) {
         val longitudeProperty = vsModel.createProperty(wgs84Uri, "long")
-        newSensor.addLiteral(longitudeProperty, longitude)
+        newSensor.addLiteral(longitudeProperty, longitude.get)
       }
-      if (!latitude.equals("")) {
+      if (latitude.isDefined) {
         val latitudeProperty = vsModel.createProperty(wgs84Uri, "lat")
-        newSensor.addProperty(latitudeProperty, latitude)
+        newSensor.addProperty(latitudeProperty, latitude.get)
       }
-      if (!altitude.equals("")) {
+      if (altitude.isDefined) {
         val altitudeProperty = vsModel.createProperty(wgs84Uri, "alt")
-        newSensor.addProperty(altitudeProperty, altitude)
+        newSensor.addProperty(altitudeProperty, altitude.get)
       }
         
       val ssnHasOutput = vsModel.createProperty(ssnUri, "hasOutput")

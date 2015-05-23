@@ -7,6 +7,7 @@ import com.hp.hpl.jena.update.UpdateExecutionFactory
 import com.hp.hpl.jena.update.UpdateFactory
 import com.hp.hpl.jena.vocabulary.RDF
 import com.hp.hpl.jena.vocabulary.RDFS
+import com.hp.hpl.jena.query.QuerySolution
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 import java.net.ConnectException
@@ -283,9 +284,9 @@ class DataManager(sparqlServiceProperties:String,
   
   /**
    * Fetch all virtual sensor that observe the given property
-   * return a list of tuples of the form (vs name, longitude, latitude, altitude)
+   * return a list of tuples of the form (vs name, column name, longitude, latitude, altitude)
    */
-  def getVirtualSensorsForObservedProperty(obsPropUri:String):List[(String, String, Double, Double, Option[Double])] = {
+  def getVirtualSensorsForObservedProperty(obsPropUri:String):List[(String, String, Option[String], Option[String], Option[String])] = {
     checkUri(obsPropUri)
     val query = "SELECT ?sensor ?column_name ?long ?lat ?alt \n" +
                 "WHERE { \n" +
@@ -293,8 +294,8 @@ class DataManager(sparqlServiceProperties:String,
                     "?output <http://ssx.ch#dbField> ?column_name \n" +
                     "SERVICE <"+sparqlServiceSensors+"> { \n" +
                         "?sensor <http://purl.oclc.org/NET/ssnx/ssn#hasOutput> ?output . \n" +
-                        "?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long . \n" +
-                        "?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat . \n" +
+                        "OPTIONAL { ?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long . } \n" +
+                        "OPTIONAL { ?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat . } \n" +
                         "OPTIONAL { ?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#alt> ?alt . } \n" +
                     "}" +
                 "}"
@@ -302,21 +303,26 @@ class DataManager(sparqlServiceProperties:String,
     val qexec = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", query);
     val results = qexec.execSelect();
 
-    var resultsSeq = new ListBuffer[(String, String, Double, Double, Option[Double])]()
+    var resultsSeq = new ListBuffer[(String, String, Option[String], Option[String], Option[String])]()
     
     while (results.hasNext()) {
       val s = results.nextSolution();
       val vsName = DataFormatter.extractFragmentId(s.get("sensor").toString())
       val columnName = DataFormatter.removeQuotes(s.get("column_name").toString())
-      val long = DataFormatter.removeQuotes(s.get("long").toString()).toDouble
-      val lat = DataFormatter.removeQuotes(s.get("lat").toString()).toDouble
-      val alt:Option[Double] = if (s.get("alt") != null) Option(DataFormatter.removeQuotes(s.get("alt").toString()).toDouble) else None
+      val long = getOptionalStringFromResult(s, "long")
+      val lat = getOptionalStringFromResult(s, "lat")
+      val alt = getOptionalStringFromResult(s, "alt")
       val tuple = (vsName, columnName, long, lat, alt)
       resultsSeq += tuple
     }
     qexec.close();
 
     resultsSeq.toList
+  }
+  
+  private def getOptionalStringFromResult(result:QuerySolution, property:String):Option[String] = {
+    val node = result.get(property)
+    if (node != null) Option(DataFormatter.removeQuotes(node.toString())) else None
   }
 }
 
