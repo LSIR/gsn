@@ -47,10 +47,10 @@ object DiscoveryAgent extends App {
   requestExecutor.tell(SendDiscoveryRequest(requestToSend, intancesToQuery), ActorRef.noSender)
 }
 
+case object AnswerDiscoveryRequest
 case class CreateNewVirtualSensor(data:List[DiscoveryAnswer])
 case class SendDiscoveryRequest(request:DiscoveryRequest, targets:List[(String, String)])
 case class DiscoveryRequest(obsPropertyUri: String, x1:Double, y1:Double, x2:Double, y2:Double)
-case object AnswerDiscoveryRequest
 case class ReceiveAnswer(answer:DiscoveryAnswer)
 case class DiscoveryAnswer(gsnInstanceId:String, results:List[VsResult])
 case class VsResult(
@@ -66,7 +66,7 @@ class RequestExecutor extends Actor {
 
   import context.dispatcher
   
-  private def futureToFutureTry[T](f: Future[T]): Future[Try[T]] = { f map {Success(_)} recover({case e => Failure(e)}) } 
+  private def futureToFutureTry[T](f: Future[T]): Future[Try[T]] = { f map {Success(_)} recover {case e => Failure(e)} } 
   
   def receive = {
             
@@ -76,15 +76,11 @@ class RequestExecutor extends Actor {
      .ask(request)(20000)
      .mapTo[DiscoveryAnswer])
      
-     val listOfFutureTries = listOfFutures.map(futureToFutureTry(_))
+     val listOfFuturesTry = listOfFutures.map(futureToFutureTry(_))
+     val futureListOfTry = Future.sequence(listOfFuturesTry)
+     val futureListOfSuccesses = futureListOfTry.map(_.collect{ case Success(x) => x})
      
-     val futureListOfSuccesses = listOfFutureTries.map(_.collect{case Success(x) => x})
-     
-//     val futureListOfFailures = listOfFutureTries.map(_.collect{ case Failure(x) => x})
-     
-     val futureList = Future.sequence(futureListOfSuccesses)
-     
-     futureList onComplete { 
+     futureListOfSuccesses onComplete { 
         case Success(result) => 
           val vsCreator = context.actorOf(Props[VirtualSensorCreator])
           vsCreator ! CreateNewVirtualSensor(result)
