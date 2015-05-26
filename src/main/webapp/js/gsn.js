@@ -822,10 +822,6 @@ var GSN = {
                     else
                         unit=" "+unit;
                     
-                    if (undefined != unitStd) {
-                    	unit += " (" + unitStd + ")";
-                    }
-				
                     if (name=="timed") {
                         //if (value != "") value = GSN.util.printDate(value);
                         $(vsd).find("span.timed").empty().append(value);
@@ -855,7 +851,7 @@ var GSN = {
                         var s = type ;
                         if ($(this).attr("description")!=null)
                             s += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';
-                        $(struct).append('<dt>'+name+((obsProperty!=null)?' ('+obsProperty+')':'')+'</dt><dd class="'+name+'">'+s+'</dd>');
+                        $(struct).append('<dt '+((obsProperty!=null)? 'title="'+obsProperty+'"' :'')+'>'+name+'</dt><dd class="'+name+'">'+s+'</dd>');
                         if (!gotDynamic) {
                             $("a.tabdynamic", vsd).show();
                             $("a.tabstructure", vsd).show();
@@ -890,7 +886,7 @@ var GSN = {
                         } else if (unit==" ms"){
                             //value = GSN.vsbox.formatTimeInterval(value / 1000); // Missing function
                         } else {
-                            value = value + unit;
+                            value = value + ((unitStd!=null)? '<span title="'+unitStd+'">'+unit+'</span>' : '<span>'+unit+'</span>');
                         }
                     } else if (cat == "input") {
                         if (last_cmd != cmd) {
@@ -928,7 +924,7 @@ var GSN = {
 
                         name = comp+name;
                     }
-                    $(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+((obsProperty!=null)?' ('+obsProperty+')':'')+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
+                    $(dl).append('<dt '+((obsProperty!=null)?'title="'+obsProperty + '"':'')+' class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
                 });
 			  
                 if ($(vs).attr("description")!="") {
@@ -993,10 +989,6 @@ var GSN = {
                     else
                         unit=" "+unit;
                     
-                    if (undefined != unitStd) {
-                    	unit += " (" + unitStd + ")";
-                    }
-                    
                     if (value!="") {
                         if (type.indexOf("svg") != -1){
                             $("embed",dd).attr("src",value);
@@ -1019,7 +1011,7 @@ var GSN = {
                         } else if (unit==" ms"){
                             //$(dd).empty().append(GSN.vsbox.formatTimeInterval(value / 1000)); // Missing function
                         } else {
-                            $(dd).empty().append(value + unit);
+                            $(dd).empty().append(value + ((unitStd!=null)? '<span title="'+unitStd+'">'+unit+'</span>' : '<span>'+unit+'</span>'));
                         }
                     }
                 }
@@ -1206,8 +1198,8 @@ var GSN = {
 		*/
         ,
         showAllMarkers: function(){
-			map.setCenter(new google.maps.LatLng(0, 0));
-			map.setZoom(1);
+			//map.setCenter(new google.maps.LatLng(0, 0));
+			//map.setZoom(1);
         }
     }
 	
