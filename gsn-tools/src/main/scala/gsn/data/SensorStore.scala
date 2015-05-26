@@ -12,7 +12,7 @@ import reactivemongo.bson.BSONDocument
 import scala.util.{Failure=>ScalaFailure}
 import scala.util.Success
 import reactivemongo.bson.BSON
-import gsn.data.discovery.DataManager
+import gsn.data.discovery.MetadataManager
 
 object dsReg{
   val dsss=new collection.mutable.HashMap[String,StorageConf]
@@ -31,7 +31,7 @@ class SensorStore(ds:DataStore) extends Actor{
   val mappingsEndpoint = GsnConf.defaultFuseki.getString("mappingsEndpoint")
   val virtualSensorsEndpoint = GsnConf.defaultFuseki.getString("virtualSensorsEndpoint")
   val baseRdfUri = GsnConf.defaultFuseki.getString("baseRdfUri")
-  val dataManager:DataManager = new DataManager(propertiesEndpoint,
+  val metadataManager = new MetadataManager(propertiesEndpoint,
       mappingsEndpoint,virtualSensorsEndpoint, baseRdfUri)
   
   val sensors=new collection.mutable.HashMap[String,Sensor]
@@ -64,7 +64,7 @@ class SensorStore(ds:DataStore) extends Actor{
       val hasAc=sec.hasAccessControl(vs.name)
       implicit val source=vsDatasources.get(vsname)
 
-      val mappings = dataManager.getMappingsForSensor(vsname)
+      val mappings = metadataManager.getMappingsForSensor(vsname)
       val updatedMappings = updateMappingWithUnitStd(vs, mappings)
       
       val s=Sensor.fromConf(vs,hasAc,None,Option(updatedMappings))
@@ -129,7 +129,7 @@ class SensorStore(ds:DataStore) extends Actor{
   private def updateMappingWithUnitStd(vs:VsConf, mappings:Map[String, List[(String,String)]]):Map[String, List[(String,String)]] = {
     val updatedMappings = scala.collection.mutable.Map(mappings.toSeq: _*)
     vs.processing.output map{out=> 
-      val (unitStdUri,unitStd) = dataManager.getUnitBySymbol(out.unit.getOrElse(null))
+      val (unitStdUri,unitStd) = metadataManager.getUnitBySymbol(out.unit.getOrElse(null))
       if (!unitStdUri.equals("") && !unitStd.equals("")) {
         val unitStdUriTuple = ("unitStdUri", unitStdUri)
         val unitStdTuple = ("unitStd",unitStd)
