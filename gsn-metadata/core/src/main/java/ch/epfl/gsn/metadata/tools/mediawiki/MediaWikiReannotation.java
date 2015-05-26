@@ -6,6 +6,7 @@ import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.core.model.WikiInfo;
 import ch.epfl.gsn.metadata.core.repositories.VirtualSensorMetadataRepository;
 import ch.epfl.gsn.metadata.tools.mediawiki.model.MeasurementRecord;
+import org.springframework.data.geo.Point;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +36,13 @@ public class MediaWikiReannotation {
                 System.out.println(sensor.getName());
             }
             for (MeasurementRecord measurementRecord : measurementRecords) {
+
+                Point locationPoint = measurementRecord.getLocationPoint();
+                if (locationPoint.getX() != sensor.getLocation().getY() || locationPoint.getY() != sensor.getLocation().getX()) {
+                    System.out.println("sensor = " + sensor.getName());
+                    System.out.println("locationPoint = " + locationPoint);
+                    System.out.println("sensorlocation = " + sensor.getLocation());
+                }
 
                 MeasurementRecord.RelativePosition relativePosition = measurementRecord.getRelativePosition();
                 WikiInfo wikiInfo = new WikiInfo(measurementRecord.getMeasurementLocationName(), measurementRecord.getMeasurementLocation().getDeploymentName(),

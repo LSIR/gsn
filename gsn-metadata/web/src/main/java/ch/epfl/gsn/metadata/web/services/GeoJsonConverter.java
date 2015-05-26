@@ -107,9 +107,15 @@ public class GeoJsonConverter {
         } else {
             writer.name("wikiLink").value(record.getMetadataLink());
         }
+
+        writeExtra(writer, record);
+
         writer.endObject();
 
         writer.endObject();
+    }
+
+    protected void writeExtra(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
     }
 
     protected void writeShort(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
@@ -154,6 +160,10 @@ public class GeoJsonConverter {
             writer.name("serialNumber").value(record.getSensor().getSerialNumber());
         }
 
+        if (StringUtils.isNotEmpty(record.getDescription())) {
+            writer.name("description").value(record.getDescription());
+        }
+
         WikiInfo wikiInfo = record.getWikiInfo();
         if (wikiInfo != null) {
             writer.name("deployment").value(wikiInfo.getDeploymentName());
@@ -173,14 +183,7 @@ public class GeoJsonConverter {
 
     private void writeObservedProperties(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
 
-        Multimap<String, String> termToColumn = HashMultimap.create();
-
-        for (ObservedProperty property : record.getObservedProperties()) {
-            String term = property.getName();
-            if (StringUtils.isNotEmpty(term) && !term.equals("NA")) {
-                termToColumn.put(term, property.getColumnName());
-            }
-        }
+        Multimap<String, String> termToColumn = getTermToColumnMultimap(record);
 
         writer.name("observed_properties");
         writer.beginArray();
@@ -197,6 +200,18 @@ public class GeoJsonConverter {
             }
             writer.endArray();
         }
+    }
+
+    protected Multimap<String, String> getTermToColumnMultimap(VirtualSensorMetadata record) {
+        Multimap<String, String> termToColumn = HashMultimap.create();
+
+        for (ObservedProperty property : record.getObservedProperties()) {
+            String term = property.getName();
+            if (StringUtils.isNotEmpty(term) && !term.equals("NA")) {
+                termToColumn.put(term, property.getColumnName());
+            }
+        }
+        return termToColumn;
     }
 
     protected void writePoint(JsonWriter writer, Point point) throws IOException {

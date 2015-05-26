@@ -33,7 +33,7 @@ public class GSNMetadataBuilder {
         boolean isPublic = !Boolean.parseBoolean(vsJson.getProperties().getAccessProtected());
 
 
-        VirtualSensorMetadata virtualSensorMetadata = new VirtualSensorMetadata(vsJson.getProperties().getVsName(),
+        VirtualSensorMetadata virtualSensorMetadata = new VirtualSensorMetadata(vsJson.getProperties().getVsName().toLowerCase(),
                 server, fromDate, toDate, location, isPublic);
 
         virtualSensorMetadata.setMetadataLink(vsJson.getProperties().getMetadata());
