@@ -37,7 +37,7 @@
       </init-param>
       <load-on-startup>0</load-on-startup>
     </servlet> 
-    -->
+     -->
 	<servlet>
 		<servlet-name>ControllerServlet</servlet-name>
 		<display-name>GSN XML Output</display-name>
