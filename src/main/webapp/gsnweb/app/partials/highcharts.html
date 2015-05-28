@@ -8,7 +8,7 @@
                 <label>Sensor</label>
                 <ui-select ng-model="selectedSensor" theme="select2" ng-disabled="disabled"
                            on-select="updateSensor($item, $model)"
-                           style="min-width: 300px;">
+                           style="min-width: 400px;">
                     <ui-select-match placeholder="Select Sensor...">{{$select.selected}}
                     </ui-select-match>
                     <ui-select-choices
@@ -33,40 +33,82 @@
                 </ui-select>
             </div>
 
-            <div class="bs-docs-section" ng-controller="DatepickerCtrl">
+            <!--<div layout="row" layout-align="start center">-->
+            <!--<div flex><label>Valid from :</label>{{from | date:'yyyy-MM-dd'}}</div>-->
+            <!--<div flex><label>to :</label>{{until | date:'yyyy-MM-dd'}}</div>-->
+
+            <!--</div>-->
+
+            <md-whiteframe style="margin-top: 10px;"
+                           class="md-whiteframe-z2" layout="column" layout-align="start">
 
 
-                <div class="bs-example" style="padding-bottom: 24px;" append-source>
-                    <form name="datepickerForm" class="form-inline" role="form">
-                        <!-- Date range example -->
-                        <div>
-                            <!--<label class="control-label"><i class="fa fa-calendar"></i> <i-->
-                            <!--class="fa fa-arrows-h"></i>-->
-                            <!--<i class="fa fa-calendar"></i> Date range-->
-                            <!--</label><br>-->
-
-                            <div>
-                                <label>From</label>
-                                <input type="text" class="form-control" ng-model="dates.fromDate"
-                                       data-max-date="{{maxDateFrom()}}" data-min-date="{{minDateFrom()}}"
-                                       placeholder="From" bs-datepicker>
-                            </div>
-                            <div>
-                                <label>To</label>
-                                <input type="text" class="form-control" ng-model="dates.untilDate"
-                                       data-min-date="{{minDateTo()}}"
-                                       data-max-date="{{maxDateTo()}}"
-                                       placeholder="Until" bs-datepicker>
-                            </div>
-
-                        </div>
-
-                    </form>
+                <div>
+                    <span class=".md-caption"><i>Sensor has data between {{from | date:'yyyy-MM-dd'}} and {{until |
+                        date:'yyyy-MM-dd'}}</i></span>
                 </div>
 
-            </div>
+                <div class="bs-docs-section" ng-controller="DatepickerCtrl">
 
-            <div>
+
+                    <div class="bs-example" style="padding-bottom: 24px;" append-source>
+                        <form name="datepickerForm" class="form-inline" role="form">
+                            <!-- Date range example -->
+                            <div layout="row" layout-align="start center" layout-margin>
+
+                                <div>
+                                    <label>From</label>
+                                    <input type="text" class="form-control" ng-model="dates.fromDate"
+                                           data-max-date="{{maxDateFrom()}}" data-min-date="{{minDateFrom()}}"
+                                           placeholder="From" bs-datepicker>
+                                </div>
+                                <div style="margin-left: 10px;">
+                                    <label>To</label>
+                                    <input type="text" class="form-control" ng-model="dates.untilDate"
+                                           data-min-date="{{minDateTo()}}"
+                                           placeholder="Until" bs-datepicker>
+                                </div>
+
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </md-whiteframe>
+
+
+            <md-whiteframe style="margin-top: 10px;"
+                           class="md-whiteframe-z2" layout="column" layout-align="start">
+                <div>
+                    <label>Aggregation</label>
+                    <ui-select ng-model="aggFunc.selected" theme="select2" ng-disabled="disabled"
+                               style="min-width: 50px;">
+                        <ui-select-match placeholder="Select Aggregation...">{{$select.selected.name}}
+                        </ui-select-match>
+                        <ui-select-choices
+                                repeat="func in aggregationFunctions">
+                            <span ng-bind-html="func.name | highlight: $select.search.name"></span>
+                        </ui-select-choices>
+                    </ui-select>
+
+                    <input ng-show="aggFunc.selected.value!= '-1'" name="input" ng-model="aggregationPeriod"
+                           required>
+
+                    <ui-select ng-model="aggUnit.selected" theme="select2" ng-disabled="disabled"
+                               style="min-width: 50px;" ng-show="aggFunc.selected.value!= '-1'">
+                        <ui-select-match placeholder="Select Aggregation...">{{$select.selected.name}}
+                        </ui-select-match>
+                        <ui-select-choices
+                                repeat="unit in aggregationUnits | filter: $select.search">
+                            <span ng-bind-html="unit.name | highlight: $select.search.name"></span>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+
+            </md-whiteframe>
+
+            <div style="margin-top: 10px;">
                 <md-content>
                     <section layout="row" layout-sm="column" layout-align="left center">
                         <!--<button type="submit" ng-click="submitSelected();">Update Plot</button>-->

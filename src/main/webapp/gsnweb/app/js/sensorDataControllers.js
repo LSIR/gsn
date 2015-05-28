@@ -35,8 +35,8 @@ sensorData.filter('propsFilter', function () {
 
 
 sensorData.controller('ParameterSelectCtrl',
-    ['$scope', 'MetadataLoader', '$location', 'sharedService', 'FilterParameters', 'AllSensors',
-        function ($scope, MetadataLoader, $location, sharedService, FilterParameters, AllSensors) {
+    ['$scope', 'MetadataLoader', '$location', 'sharedService', 'FilterParameters', 'AllSensors', 'SensorMetadata',
+        function ($scope, MetadataLoader, $location, sharedService, FilterParameters, AllSensors, SensorMetadata) {
 
 
             $scope.nameGroupFn = function (item) {
@@ -47,17 +47,22 @@ sensorData.controller('ParameterSelectCtrl',
                 return item.columnName + "(" + item.unit + ")";
             };
 
+            function updateSensorInfo(d) {
+                $scope.metadata = new SensorMetadata(d);
+                $scope.fields = $scope.metadata.getProperties();
+                $scope.from = $scope.metadata.getFromDate();
+                $scope.until = $scope.metadata.getToDate();
+                $scope.multipleDemo = {};
+                $scope.multipleDemo.selectedFields = [];
+            }
 
-            $scope.updateSensor = function (item, model) {
+            $scope.updateSensor = function (item) {
                 FilterParameters.vs = item;
 
                 MetadataLoader.loadData(item, true).then(function (d) {
-                    $scope.metadata = d;
+                    //$scope.metadata = d;
 
-                    $scope.fields = $scope.metadata.features[0].properties['allProperties'];
-
-                    $scope.multipleDemo = {};
-                    $scope.multipleDemo.selectedFields = [];
+                    updateSensorInfo(d);
 
 
                 }).finally(function () {
@@ -65,6 +70,27 @@ sensorData.controller('ParameterSelectCtrl',
                 });
             };
 
+            $scope.aggregationFunctions = [
+                {value: '-1', name: ' No Aggregation'},
+                {value: 'avg', name: 'AVG'},
+                {value: 'max', name: 'MAX'},
+                {value: 'min', name: 'MIN'},
+                {value: 'sum', name: 'SUM'}
+            ];
+
+            $scope.aggFunc = {};
+            $scope.aggFunc.selected = $scope.aggregationFunctions[0];
+
+            $scope.aggregationPeriod = 1;
+
+            $scope.aggregationUnits = [
+                {value: '3600000', name: 'Hours'},
+                {value: '60000', name: 'Minutes'},
+                {value: '1000', name: 'Seconds'}
+            ];
+
+            $scope.aggUnit = {};
+            $scope.aggUnit.selected = $scope.aggregationUnits[0];
 
             $scope.selectedSensor = FilterParameters.vs;
 
@@ -76,15 +102,11 @@ sensorData.controller('ParameterSelectCtrl',
 
 
                 MetadataLoader.loadData(FilterParameters.vs).then(function (d) {
-                    $scope.metadata = d;
+                    //$scope.metadata = d;
 
-                    //$scope.sensorName = $scope.metadata.features[0].properties.sensorName;
+                    //$scope.fields = $scope.metadata.features[0].properties['allProperties'];
 
-                    $scope.fields = $scope.metadata.features[0].properties['allProperties'];
-
-                    $scope.multipleDemo = {};
-                    $scope.multipleDemo.selectedFields = [];
-
+                    updateSensorInfo(d);
                     for (var i = 0; i < $scope.fields.length; i++) {
                         if (FilterParameters.getFields().indexOf($scope.fields[i].columnName) > -1) {
                             $scope.multipleDemo.selectedFields.push($scope.fields[i]);
@@ -123,51 +145,148 @@ sensorData.controller('ParameterSelectCtrl',
         }]);
 
 
-sensorData.controller('DatepickerCtrl', ['$scope', 'FilterParameters', function ($scope, FilterParameters) {
+//sensorData.controller('AggregationCtrl',
+//    ['$scope', 'FilterParameters',
+//        function ($scope, FilterParameters) {
+//
+//
+//            $scope.aggregationFunctions = [
+//                {value: "-1", name: " No Aggregation"},
+//                {value: "avg", name: "AVG"},
+//                {value: "max", name: "MAX"},
+//                {value: "min", name: "MIN"},
+//                {value: "sum", name: "SUM"}
+//            ];
+//
+//            $scope.selectedAggFunc = {};
+//
+//            $scope.aggregationPeriod = 1;
+//
+//            $scope.aggregationUnits = [
+//                {value: "3600000", name: "Hours"},
+//                {value: "60000", name: "Minutes"},
+//                {value: "1000", name: "Seconds"}
+//            ];
+//
+//            $scope.selectedAggUnit = {};
+//
+//            $scope.updateSensor = function (item) {
+//                FilterParameters.vs = item;
+//
+//                MetadataLoader.loadData(item, true).then(function (d) {
+//                    //$scope.metadata = d;
+//
+//                    updateSensorInfo(d);
+//
+//
+//                }).finally(function () {
+//                    $scope.loading = false;
+//                });
+//            };
+//
+//
+//            $scope.selectedSensor = FilterParameters.vs;
+//
+//            $scope.loading = true;
+//
+//            AllSensors.loadData().then(function (d) {
+//
+//                $scope.sensorNames = d;
+//
+//
+//                MetadataLoader.loadData(FilterParameters.vs).then(function (d) {
+//                    //$scope.metadata = d;
+//
+//                    //$scope.fields = $scope.metadata.features[0].properties['allProperties'];
+//
+//                    updateSensorInfo(d);
+//                    for (var i = 0; i < $scope.fields.length; i++) {
+//                        if (FilterParameters.getFields().indexOf($scope.fields[i].columnName) > -1) {
+//                            $scope.multipleDemo.selectedFields.push($scope.fields[i]);
+//
+//                        }
+//                    }
+//
+//                }).finally(function () {
+//                    $scope.loading = false;
+//                });
+//
+//            });
+//
+//            $scope.submitSelected = function () {
+//
+//                var selectedColumns = [];
+//
+//                for (var i = 0; i < $scope.multipleDemo.selectedFields.length; i++) {
+//                    selectedColumns.push($scope.multipleDemo.selectedFields[i].columnName)
+//
+//                }
+//
+//                FilterParameters.setFields(selectedColumns);
+//                FilterParameters.updateURL($location);
+//
+//
+//                sharedService.prepForBroadcast();
+//
+//                //$window.location.reload();
+//            };
+//
+//            $scope.handleClick = function (msg) {
+//                sharedService.prepForBroadcast(msg);
+//            };
+//
+//        }]);
 
-    $scope.dates = FilterParameters;
+
+sensorData.controller('DatepickerCtrl', ['$scope', 'FilterParameters', 'SensorMetadata',
+    function ($scope, FilterParameters, SensorMetadata) {
+
+        $scope.dates = FilterParameters;
 
 
-    //$scope.selectedDate = new Date();
-    //$scope.selectedDateAsNumber = Date.UTC(1986, 1, 22);
+        //$scope.selectedDate = new Date();
+        //$scope.selectedDateAsNumber = Date.UTC(1986, 1, 22);
 
-    $scope.getType = function (key) {
-        return Object.prototype.toString.call($scope[key]);
-    };
+        $scope.getType = function (key) {
+            return Object.prototype.toString.call($scope[key]);
+        };
 
-    $scope.clearDates = function () {
-        $scope.selectedDate = null;
-    };
+        $scope.clearDates = function () {
+            $scope.selectedDate = null;
+        };
 
-    $scope.maxDateFrom = function () {
-        var endDate = new Date('2015-01-01');
-        if (endDate > $scope.untilDate) {
+        $scope.maxDateFrom = function () {
+            ////var endDate = new Date('2015-01-01');
+            //var endDate = new Date();
+            //if (endDate > $scope.untilDate) {
             return $scope.untilDate;
-        } else {
-            return endDate;
+            //} else {
+            //    return endDate;
+            //}
         }
-    }
 
-    $scope.minDateFrom = function () {
-        var startDate = new Date('2001-01-01');
-        return startDate;
-    }
-
-    $scope.maxDateTo = function () {
-        var endDate = new Date('2015-01-01');
-        return endDate;
-    }
-
-    $scope.minDateTo = function () {
-        var startDate = new Date('2001-01-01');
-        if (startDate < $scope.fromDate) {
-            return $scope.fromDate;
-        } else {
+        $scope.minDateFrom = function () {
+            var startDate = new Date('1903-01-01');
             return startDate;
         }
-    }
 
-}]);
+        //$scope.maxDateTo = function () {
+        //    //var endDate = new Date('2015-01-01');
+        //    var endDate = new Date();
+        //
+        //    return endDate;
+        //}
+
+        $scope.minDateTo = function () {
+            var startDate = new Date('1903-01-01');
+            if (startDate < $scope.fromDate) {
+                return $scope.fromDate;
+            } else {
+                return startDate;
+            }
+        }
+
+    }]);
 
 
 sensorData.factory('FilterParameters', ['$routeParams', '$filter', function ($routeParams, $filter) {
