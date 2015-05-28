@@ -83,23 +83,23 @@ public class SensorPageController {
 
         setResponseHeader(response);
 
-        return geoJsonConverter.convertMeasurementRecords(Lists.newArrayList(virtualSensorMetadata), true);
+        return geoJsonConverter.convertMeasurementRecords(Lists.newArrayList(virtualSensorMetadata), false);
     }
 
-    @RequestMapping(value = "/allSensorsTable", method = RequestMethod.GET, produces = "application/json")
-    public
-    @ResponseBody
-    String getTableModelForAllSensors(SensorQuery sensorQuery, HttpServletResponse response) {
-        System.out.println("sensorQuery = " + sensorQuery);
-
-
-        Query query = queryBuilder.build(sensorQuery);
-        Iterable<VirtualSensorMetadata> virtualSensorMetadata = sensorAccessService.findForQuery(query);
-
-        setResponseHeader(response);
-
-        return geoJsonConverter.writeTableModel(Lists.newArrayList(virtualSensorMetadata));
-    }
+//    @RequestMapping(value = "/allSensorsTable", method = RequestMethod.GET, produces = "application/json")
+//    public
+//    @ResponseBody
+//    String getTableModelForAllSensors(SensorQuery sensorQuery, HttpServletResponse response) {
+//        System.out.println("sensorQuery = " + sensorQuery);
+//
+//
+//        Query query = queryBuilder.build(sensorQuery);
+//        Iterable<VirtualSensorMetadata> virtualSensorMetadata = sensorAccessService.findForQuery(query);
+//
+//        setResponseHeader(response);
+//
+//        return geoJsonConverter.writeTableModel(Lists.newArrayList(virtualSensorMetadata));
+//    }
 
     private void setResponseHeader(HttpServletResponse response) {
         response.addHeader("Access-Control-Allow-Origin", "*");

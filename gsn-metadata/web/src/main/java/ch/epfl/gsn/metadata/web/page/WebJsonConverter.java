@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -31,28 +32,6 @@ public class WebJsonConverter extends GeoJsonConverter {
 
     @Override
     protected void writeExtra(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
-        writer.name("treeModel").beginArray().beginObject();
-        writer.name("label").value(record.getName())
-                .name("children").beginArray();
-
-        Multimap<String, String> termToColumn = getTermToColumnMultimap(record);
-
-        for (String term : termToColumn.keySet()) {
-            writer.beginObject();
-            writer.name("label").value(term);
-            writer.name("children");
-            writer.beginArray();
-            for (String column : termToColumn.get(term)) {
-                writer.beginObject();
-                writer.name("label").value(column);
-                writer.endObject();
-            }
-            writer.endArray();
-            writer.endObject();
-        }
-        writer.endArray();
-        writer.endObject();
-        writer.endArray();
 
         writer.name("allProperties").beginArray();
         for (ObservedProperty observedProperty : record.getObservedProperties()) {
@@ -65,48 +44,51 @@ public class WebJsonConverter extends GeoJsonConverter {
             }
         }
         writer.endArray();
+
+        writer.name("fromDate").value(DATE_FORMAT.format(record.getFromDate() == null ? new Date() : record.getFromDate()));
+        writer.name("untilDate").value(DATE_FORMAT.format(record.getToDate() == null ? new Date() : record.getToDate()));
     }
 
-    public String writeTableModel(Collection<VirtualSensorMetadata> records){
-
-        try (StringWriter stringWriter = new StringWriter()) {
-            JsonWriter writer = new JsonWriter(stringWriter);
-            writer.beginObject();
-
-            writer.name("treeModel").beginArray();
-
-            for (VirtualSensorMetadata record : records) {
-                writer.beginObject();
-                writer.name("label").value(record.getName())
-                        .name("children").beginArray();
-
-                Multimap<String, String> termToColumn = getTermToColumnMultimap(record);
-
-                for (String term : termToColumn.keySet()) {
-                    writer.beginObject();
-                    writer.name("label").value(term);
-                    writer.name("children");
-                    writer.beginArray();
-                    for (String column : termToColumn.get(term)) {
-                        writer.beginObject();
-                        writer.name("label").value(column);
-                        writer.endObject();
-                    }
-                    writer.endArray();
-                    writer.endObject();
-                }
-                writer.endArray();
-                writer.endObject();
-            }
-
-            writer.endArray();
-            writer.endObject();
-            return stringWriter.toString();
-        } catch (IOException e) {
-            logger.error("Cannot write JSON! ", e);
-            return "";
-        }
-
-
-    }
+//    public String writeTableModel(Collection<VirtualSensorMetadata> records){
+//
+//        try (StringWriter stringWriter = new StringWriter()) {
+//            JsonWriter writer = new JsonWriter(stringWriter);
+//            writer.beginObject();
+//
+//            writer.name("treeModel").beginArray();
+//
+//            for (VirtualSensorMetadata record : records) {
+//                writer.beginObject();
+//                writer.name("label").value(record.getName())
+//                        .name("children").beginArray();
+//
+//                Multimap<String, String> termToColumn = getTermToColumnMultimap(record);
+//
+//                for (String term : termToColumn.keySet()) {
+//                    writer.beginObject();
+//                    writer.name("label").value(term);
+//                    writer.name("children");
+//                    writer.beginArray();
+//                    for (String column : termToColumn.get(term)) {
+//                        writer.beginObject();
+//                        writer.name("label").value(column);
+//                        writer.endObject();
+//                    }
+//                    writer.endArray();
+//                    writer.endObject();
+//                }
+//                writer.endArray();
+//                writer.endObject();
+//            }
+//
+//            writer.endArray();
+//            writer.endObject();
+//            return stringWriter.toString();
+//        } catch (IOException e) {
+//            logger.error("Cannot write JSON! ", e);
+//            return "";
+//        }
+//
+//
+//    }
 }
