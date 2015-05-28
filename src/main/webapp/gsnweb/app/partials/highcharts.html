@@ -1,0 +1,135 @@
+<div layout="row" layout-sm="column" layout-margin>
+    <!--<div class="container">-->
+
+
+    <div flex="70">
+        <div ng-controller="ParameterSelectCtrl">
+            <div>
+                <label>Sensor</label>
+                <ui-select ng-model="selectedSensor" theme="select2" ng-disabled="disabled"
+                           on-select="updateSensor($item, $model)"
+                           style="min-width: 300px;">
+                    <ui-select-match placeholder="Select Sensor...">{{$select.selected}}
+                    </ui-select-match>
+                    <ui-select-choices
+                            repeat="sensor in sensorNames | filter:$select.search">
+                        <span ng-bind-html="sensor | highlight: $select.search"></span>
+                        <!--<img ng-src="{{getIconUlr(sensor)}}" style="width: 16px; height:16px">-->
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+
+            <div>
+                <label>Property</label>
+                <ui-select multiple ng-model="multipleDemo.selectedFields" theme="select2" ng-disabled="disabled"
+                           style="width: 400px;">
+                    <ui-select-match placeholder="Select property...">{{$item.columnName}}({{$item.unit}})
+                    </ui-select-match>
+                    <ui-select-choices group-by="nameGroupFn"
+                                       repeat="property in fields | propsFilter: {name: $select.search, columnName: $select.search}">
+                        <div ng-bind-html="propWithUnit(property) | highlight: $select.search"></div>
+
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+
+            <div class="bs-docs-section" ng-controller="DatepickerCtrl">
+
+
+                <div class="bs-example" style="padding-bottom: 24px;" append-source>
+                    <form name="datepickerForm" class="form-inline" role="form">
+                        <!-- Date range example -->
+                        <div>
+                            <!--<label class="control-label"><i class="fa fa-calendar"></i> <i-->
+                            <!--class="fa fa-arrows-h"></i>-->
+                            <!--<i class="fa fa-calendar"></i> Date range-->
+                            <!--</label><br>-->
+
+                            <div>
+                                <label>From</label>
+                                <input type="text" class="form-control" ng-model="dates.fromDate"
+                                       data-max-date="{{maxDateFrom()}}" data-min-date="{{minDateFrom()}}"
+                                       placeholder="From" bs-datepicker>
+                            </div>
+                            <div>
+                                <label>To</label>
+                                <input type="text" class="form-control" ng-model="dates.untilDate"
+                                       data-min-date="{{minDateTo()}}"
+                                       data-max-date="{{maxDateTo()}}"
+                                       placeholder="Until" bs-datepicker>
+                            </div>
+
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+
+            <div>
+                <md-content>
+                    <section layout="row" layout-sm="column" layout-align="left center">
+                        <!--<button type="submit" ng-click="submitSelected();">Update Plot</button>-->
+                        <md-button class="md-raised" ng-click="submitSelected();">Update Plot</md-button>
+                        <md-button class="md-raised"
+                                   onclick="window.location.href='http://montblanc.slf.ch:22001/multidata?nb=ALL&from=07/05/2012%2000:00:00&to=13/04/2015%2000:00:00&vs[0]=imis_fka_2&field[0]=ta&vs[1]=imis_fka_2&field[1]=ts0&time_format=unix&download_format=csv'">
+                            Download
+                        </md-button>
+                        <!--<md-button ng-disabled="true" class="md-raised md-primary">Disabled</md-button>-->
+                        <!--<md-button class="md-raised md-warn">Warn</md-button>-->
+                        <div class="label">Raised</div>
+                    </section>
+                </md-content>
+            </div>
+        </div>
+
+
+        <!--<div>-->
+        <!--Sensor name:-->
+        <!--Description:-->
+        <!--Parameters: air temperature, humidity-->
+        <!--dates:-->
+        <!--</div>-->
+
+    </div>
+</div>
+<div>
+    <div ng-controller="hcCtrl">
+
+
+        <!--<div ng-if="dataLoading" layout="column" layout-margin style="padding:50px;">-->
+        <!--Loading of the plot data might take a few minutes.-->
+        <!--<md-progress-linear md-mode="indeterminate"></md-progress-linear>-->
+        <!-- -->
+        <!--</div>-->
+
+        <div ng-if="dataLoading" layout="row" layout-sm="column" layout-align="space-around">
+            <md-progress-circular class="md-hue-2" md-mode="indeterminate"></md-progress-circular>
+        </div>
+
+        <div ng-if="!dataLoading">
+            <div ng-if="!noData">
+                <highchart id="chart1" config="chartConfig" class="container"></highchart>
+
+            </div>
+
+            <div>
+
+            </div>
+            <div ng-if="missingData.length>0">
+                <md-whiteframe class="md-whiteframe-z2" layout layout-align="center center">
+                    <span>No data available for property <strong>{{missingData.toString()}}</strong> during selected period of time.</span>
+                </md-whiteframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<button-->
+<!--class="btn btn-block"-->
+<!--onclick="window.location.href='http://montblanc.slf.ch:22001/multidata?nb=ALL&from=07/05/2012%2000:00:00&to=13/04/2015%2000:00:00&vs[0]=imis_fka_2&field[0]=ta&vs[1]=imis_fka_2&field[1]=ts0&time_format=unix&download_format=csv'">-->
+<!--download-->
+<!--</button>-->
+
+
+</div>
