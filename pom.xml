@@ -109,6 +109,12 @@
             <artifactId>commons-dbcp</artifactId>
             <version>1.4</version>
         </dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.genesis.config</groupId>
+			<artifactId>config</artifactId>
+			<version>1.1</version>
+			<type>pom</type>
+		</dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb</artifactId>
@@ -120,6 +126,7 @@
         </exclusion>
     </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -427,7 +434,11 @@
             <enabled>true</enabled>
           </snapshots>
         </repository>
-        
+        <repository>
+            <id>Mvn</id>
+            <name>Mvn central repo</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>       
     </repositories>
     
 </project>

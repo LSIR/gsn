@@ -12,6 +12,7 @@ import reactivemongo.bson.BSONDocument
 import scala.util.{Failure=>ScalaFailure}
 import scala.util.Success
 import reactivemongo.bson.BSON
+import reactivemongo.api.MongoConnection
 
 object dsReg{
   val dsss=new collection.mutable.HashMap[String,StorageConf]
@@ -24,7 +25,7 @@ class SensorStore(ds:DataStore) extends Actor{
   val confWatch=context.actorOf(Props[ConfWatcher])
     
   val driver = new MongoDriver(context.system)
-  val connection = driver.connection(List("localhost"))
+  val connection:MongoConnection = null//driver.connection(List("localhost"))
   
   val sensors=new collection.mutable.HashMap[String,Sensor]
   val vsDatasources=new collection.mutable.HashMap[String,String]

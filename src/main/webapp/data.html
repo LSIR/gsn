@@ -29,6 +29,7 @@
         <script type="text/javascript" src="js/jquery.flot.pack.js"></script>
         <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
         <script type="text/javascript" src="js/jquery.tablesorter.pager.min.js"></script>
+        <script type="text/javascript" src="js/moment.js"></script>
 
 
         <script type="text/javascript">
@@ -85,8 +86,14 @@
             	$('#panel-grid').hide();
                 var startDateParam = getURLParameter("start");
                 var endDateParam = getURLParameter("end");
-            	$('#datepicker_from').val(startDateParam);
-            	$('#datepicker_to').val(endDateParam);
+                var parsedStart=moment(startDateParam);
+                var parsedEnd=moment(endDateParam);
+                if (parsedStart.isValid()){
+            	  $('#datepicker_from').val(parsedStart.format("DD/MM/YYYY HH:mm:ss"));
+                }
+                if (parsedEnd.isValid()){
+            	  $('#datepicker_to').val(parsedEnd.format("DD/MM/YYYY HH:mm:ss"));
+                }
             	
                 function csv_to_json(tag,callback,format, plot){
                     callback = callback || function(){};

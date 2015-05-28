@@ -11,7 +11,7 @@ a:hover {
 input[type=button],input[type=submit] {
 	border: 1px solid #011A59;
 	border-left: 10px solid #011A59;
-	background-color: #ffffff;
+	background-color: #c5e2fe;
 }
 input[type=button]:active,input[type=button]:hover,input[type=submit]:active,input[type=submit]:hover {
 	color: #ABBBDF;
@@ -21,7 +21,7 @@ body, html {
 }
 #header, #headerfm {
 	background:url("CCES.jpg") no-repeat;
-	background-color:#c5e2fe;
+	background-color:#ffffff;
 }
 
 #header h1 {
