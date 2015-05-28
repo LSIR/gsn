@@ -1,7 +1,6 @@
 package ch.epfl.gsn.metadata.web.page;
 
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
-import ch.epfl.gsn.metadata.web.services.GeoJsonConverter;
 import ch.epfl.gsn.metadata.web.services.QueryBuilder;
 import ch.epfl.gsn.metadata.web.services.SensorQuery;
 import ch.epfl.gsn.metadata.web.services.VirtualSensorAccessService;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +20,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 /**
 * Created by kryvych on 01/04/15.
