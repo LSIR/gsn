@@ -28,7 +28,7 @@ public class MediaWikiReannotation {
     }
 
     public int updateWikiAnnotations() {
-        int count =0;
+        int count = 0;
         Iterable<VirtualSensorMetadata> sensors = virtualSensorMetadataRepository.findAll();
         for (VirtualSensorMetadata sensor : sensors) {
             List<MeasurementRecord> measurementRecords = measurementRecordRepository.findByDbTableName(sensor.getName().toLowerCase());
@@ -37,11 +37,14 @@ public class MediaWikiReannotation {
             }
             for (MeasurementRecord measurementRecord : measurementRecords) {
 
+
                 Point locationPoint = measurementRecord.getLocationPoint();
-                if (locationPoint.getX() != sensor.getLocation().getY() || locationPoint.getY() != sensor.getLocation().getX()) {
-                    System.out.println("sensor = " + sensor.getName());
-                    System.out.println("locationPoint = " + locationPoint);
-                    System.out.println("sensorlocation = " + sensor.getLocation());
+                if (locationPoint != null && sensor.getLocation() != null) {
+                    if (locationPoint.getX() != sensor.getLocation().getY() || locationPoint.getY() != sensor.getLocation().getX()) {
+                        System.out.println("sensor = " + sensor.getName());
+                        System.out.println("locationPoint = " + locationPoint);
+                        System.out.println("sensorlocation = " + sensor.getLocation());
+                    }
                 }
 
                 MeasurementRecord.RelativePosition relativePosition = measurementRecord.getRelativePosition();
@@ -53,7 +56,7 @@ public class MediaWikiReannotation {
                 sensor.setWikiInfo(wikiInfo);
                 sensor.setSamplingFrequency(measurementRecord.getSamplingFrequency());
                 virtualSensorMetadataRepository.save(sensor);
-                count ++;
+                count++;
                 break;
             }
         }
