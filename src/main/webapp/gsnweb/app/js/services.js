@@ -137,8 +137,8 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
     function ($routeParams, $filter, FilterParameters) {
 
         var self = this;
-        //self.metatdataUrl = 'http://eflumpc18.epfl.ch/gsn/';
-        self.metatdataUrl = 'http://localhost:8090/';
+        self.metatdataUrl = 'http://eflumpc18.epfl.ch/gsn/';
+        //self.metatdataUrl = 'http://localhost:8090/';
 
         return {
 
