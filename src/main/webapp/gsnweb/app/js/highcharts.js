@@ -9,7 +9,6 @@ angular.module('hcControllers', [])
                   ChartConfigService, FilterParameters) {
 
 
-            $scope.dataLoading = true;
 
             AxisInfo.getAxesInfo().then(function (d) {
 
@@ -18,7 +17,6 @@ angular.module('hcControllers', [])
 
 
             $scope.$on('handleBroadcast', function () {
-                $scope.dataLoading = true;
 
                 AxisInfo.resetPromise();
 
@@ -31,6 +29,7 @@ angular.module('hcControllers', [])
             });
 
             function updatePlotModel(d) {
+                $scope.dataLoading = true;
                 $scope.axisInfo = d;
                 dataProcessingService.async().then(function (d) {
                     $scope.dataMap = d.dataMap;
@@ -42,6 +41,7 @@ angular.module('hcControllers', [])
                         $scope.noData =  true;
                         $scope.missingData = Object.keys(d.dataMap);
                     }
+                    $scope.pointCount = d.pointCount;
                 })
                     .finally(function () {
                         $scope.dataLoading = false;

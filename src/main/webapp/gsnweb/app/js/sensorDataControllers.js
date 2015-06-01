@@ -35,8 +35,8 @@ sensorData.filter('propsFilter', function () {
 
 
 sensorData.controller('ParameterSelectCtrl',
-    ['$scope', 'MetadataLoader', '$location', 'sharedService', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation',
-        function ($scope, MetadataLoader, $location, sharedService, FilterParameters, AllSensors, SensorMetadata, Aggregation) {
+    ['$scope', '$window', 'MetadataLoader', '$location', 'sharedService', 'UrlBuilder', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation',
+        function ($scope, $window, MetadataLoader, $location, sharedService, UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation) {
 
 
             $scope.nameGroupFn = function (item) {
@@ -112,8 +112,7 @@ sensorData.controller('ParameterSelectCtrl',
 
             });
 
-            $scope.submitSelected = function () {
-
+            function updateFilterParameters() {
                 var selectedColumns = [];
 
                 for (var i = 0; i < $scope.multipleDemo.selectedFields.length; i++) {
@@ -123,7 +122,7 @@ sensorData.controller('ParameterSelectCtrl',
 
                 FilterParameters.aggFunc = $scope.aggFunc.selected.value;
 
-                if ( $scope.aggFunc.selected.value != -1) {
+                if ($scope.aggFunc.selected.value != -1) {
                     FilterParameters.aggPeriod = $scope.aggregationPeriod;
                     FilterParameters.aggUnit = $scope.aggUnit.selected.name;
                 } else {
@@ -133,8 +132,11 @@ sensorData.controller('ParameterSelectCtrl',
 
                 FilterParameters.setFields(selectedColumns);
                 FilterParameters.updateURL($location);
+            }
 
+            $scope.submitSelected = function () {
 
+                updateFilterParameters();
                 sharedService.prepForBroadcast();
 
                 //$window.location.reload();
@@ -143,6 +145,12 @@ sensorData.controller('ParameterSelectCtrl',
             $scope.handleClick = function (msg) {
                 sharedService.prepForBroadcast(msg);
             };
+
+            $scope.download = function () {
+                updateFilterParameters();
+                $window.location.href = UrlBuilder.getDwonloadUrl();
+            };
+
 
         }]);
 

@@ -8,11 +8,13 @@ gsnDataServices.factory('GsnResult', function () {
         dataMap: {},
         missingData: {},
         hasValues: false,
+        pointCount: 0,
 
         reset: function () {
             this.dataMap = {};
-            this.missingData = {}
+            this.missingData = {};
             this.hasValues = false;
+            pointCount: 0;
         }
     };
 });
@@ -32,6 +34,9 @@ gsnDataServices.factory('dataProcessingService', ['UrlBuilder', '$http', 'Filter
             //split content based on new line
             var allTextLines = allText.split(/\r\n|\n/);
 
+            GsnResult.pointCount = allTextLines.length;
+
+            console.log("Loaded " + GsnResult.pointCount + " time points");
             for (var i = 0; i < allTextLines.length; i++) {
                 if (allTextLines[i].indexOf("#") === 0) {
                     continue;
@@ -90,8 +95,7 @@ gsnDataServices.factory('dataProcessingService', ['UrlBuilder', '$http', 'Filter
 
                 // Return the promise to the controller
                 return promise;
-            }
-            ,
+            },
 
             resetPromise: function () {
                 promise = null;
@@ -100,6 +104,62 @@ gsnDataServices.factory('dataProcessingService', ['UrlBuilder', '$http', 'Filter
         return dataProcessingService;
     }]);
 
+//gsnDataServices.factory('ProcessGsnData', ['GsnResult', 'FilterParameters',
+//    function (GsnResult, FilterParameters) {
+//
+//        ProcessGsnData = function (allText) {
+//            GsnResult.reset();
+//
+//            var headers = FilterParameters.getFields();
+//            for (var j = 0; j < headers.length; j++) {
+//                GsnResult.dataMap[headers[j]] = [];
+//            }
+//
+//            //split content based on new line
+//            var allTextLines = allText.split(/\r\n|\n/);
+//
+//            GsnResult.pointCount = allTextLines.length;
+//
+//            console.log("Loaded " + GsnResult.pointCount + " time points");
+//            for (var i = 0; i < allTextLines.length; i++) {
+//                if (allTextLines[i].indexOf("#") === 0) {
+//                    continue;
+//                }
+//
+//                // split content based on comma
+//                var data = allTextLines[i].split(',');
+//                if (data.length >= headers.length + 1) {
+//                    for (var j = 0; j < headers.length; j++) {
+//                        var tarr = [];
+//
+//                        var time = parseFloat(data[0]);
+//                        if (!isNaN(time)) {
+//                            tarr.push(time);
+//
+//                            var value = parseFloat(data[j + 1]);
+//                            if (!isNaN(value)) {
+//                                tarr.push(value);
+//                                delete GsnResult.missingData[headers[j]]
+//
+//                            }
+//                            else {
+//                                tarr.push(null);
+//                                GsnResult.missingData[headers[j]] = true;
+//                            }
+//                            GsnResult.dataMap[headers[j]].push(tarr);
+//                            GsnResult.hasValues = true;
+//                        }
+//
+//
+//                    }
+//                }
+//            }
+//            return GsnResult;
+//        };
+//
+//        return ProcessGsnData;
+//
+//    }]);
 
 gsnDataServices.factory('AxisInfo', ['UrlBuilder', '$http',
     function (UrlBuilder, $http) {
@@ -142,10 +202,8 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
 
         return {
 
-            getGsnUrl: function () {
-                //var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline" +
-                //var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline&agg_function=avg&agg_unit=3600000&agg_period=4" +
-                var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline" +
+            buildGsnLink: function () {
+                var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv" +
                     "&from=" + this.formatDateGSN(FilterParameters.getFromDate())
                     + "&to=" + this.formatDateGSN(FilterParameters.getUntilDate());
                 for (var i = 0; i < FilterParameters.getFields().length; i++) {
@@ -158,9 +216,19 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
                     "&agg_unit=" + FilterParameters.getAggUnitObj().value +
                     "&agg_period=" + FilterParameters.aggPeriod;
                 }
-
-                //url = 'http://localhost:8000/app/sensors/imis_fka_2_30min_test.txt';
                 return url;
+            },
+
+            getGsnUrl: function () {
+                //var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline" +
+                //var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline&agg_function=avg&agg_unit=3600000&agg_period=4" +
+                var url = this.buildGsnLink();
+                //url = 'http://localhost:8000/app/sensors/imis_fka_2_30min_test.txt';
+                return url + '&download_mode=inline';
+            },
+
+            getDwonloadUrl: function () {
+                return this.buildGsnLink();
             },
 
             formatDateGSN: function (date) {
