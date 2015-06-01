@@ -144,13 +144,19 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
 
             getGsnUrl: function () {
                 //var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline" +
-                var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline&agg_function=avg&agg_unit=3600000&agg_period=4" +
+                //var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline&agg_function=avg&agg_unit=3600000&agg_period=4" +
+                var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline" +
                     "&from=" + this.formatDateGSN(FilterParameters.getFromDate())
                     + "&to=" + this.formatDateGSN(FilterParameters.getUntilDate());
                 for (var i = 0; i < FilterParameters.getFields().length; i++) {
                     url += "&vs[" + i + "]=" + FilterParameters.vs
                     + "&field[" + i + "]=" + FilterParameters.getFields()[i];
 
+                }
+                if (FilterParameters.hasAggregation()) {
+                    url += "&agg_function=" + FilterParameters.getAggFuncObj().value +
+                    "&agg_unit=" + FilterParameters.getAggUnitObj().value +
+                    "&agg_period=" + FilterParameters.aggPeriod;
                 }
 
                 //url = 'http://localhost:8000/app/sensors/imis_fka_2_30min_test.txt';
@@ -164,10 +170,10 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
 
             getMetaDataUrl: function (sensorName) {
                 //return "http://eflumpc18.epfl.ch/gsn/web/virtualSensors/" + this.vs;
-                return  self.metatdataUrl + "web/virtualSensors/" + sensorName;
+                return self.metatdataUrl + "web/virtualSensors/" + sensorName;
             },
 
-            sensorListUrl: function() {
+            sensorListUrl: function () {
                 return self.metatdataUrl + 'web/virtualSensorNames';
             },
 
