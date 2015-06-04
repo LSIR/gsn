@@ -101,7 +101,7 @@
         <repository>
             <id>lsirremote</id>
             <name>lsir remote</name>
-            <url>http://planetdata.epfl.ch:8081/artifactory/remote-repos/</url>
+            <url>http://osper.epfl.ch:8081/artifactory/remote-repos/</url>
             <layout>default</layout>
         </repository>
     </repositories>
