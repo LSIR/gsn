@@ -20,7 +20,7 @@
    <ssl-key-store-password>/home/ivo/.keystore</ssl-key-store-password>
    <ssl-key-password>password</ssl-key-password>
 -->
-<access-control>true</access-control>
+<access-control>false</access-control>
 <!-- Main Storage Database, Mandatory -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />   -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:./GsnMemDb" />-->

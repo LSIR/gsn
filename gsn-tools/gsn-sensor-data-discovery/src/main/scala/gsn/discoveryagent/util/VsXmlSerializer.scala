@@ -1,33 +1,25 @@
-package gsn.data.discovery.util
+package gsn.discoveryagent.util
 
-import gsn.data._
-
-import scala.xml.XML
-import scala.xml.Text
-import scala.xml.Null
-import scala.xml.Elem
-import scala.xml.Attribute
-import org.joda.time.format.ISODateTimeFormat
 import gsn.discoveryagent.VsResult
+import scala.xml.Elem
 
-object XmlSerializer {
+object VsXmlSerializer {
   
-  def serializeToFile(data:List[VsResult]) = {
-    val vsName = "../virtual-sensors/vs_n.xml" //TODO: Find a way to generate a unique name
-    scala.xml.XML.save(vsName, ser(data))
+  def serializeToFile(vsName:String, columnName:String, data:List[VsResult], destFile:String) = {
+    scala.xml.XML.save(destFile, ser(vsName, columnName, data))
   }
   
-  private def ser(data:List[VsResult]):Elem = {
+  private def ser(vsName:String, columnName:String, data:List[VsResult]):Elem = {
     
     val (latitude, longitude, altitude) = computeMeanLocation(data)
     
     val xml =
-      <virtual-sensor name="vs_n" priority="10">
+      <virtual-sensor name={vsName} priority="10">
           <processing-class>
           <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
           <init-params/>
           <output-structure>
-          	<field name="column_name" unit="unit" type="type"/> <!-- name, unit and type TO REPLACE -->
+          	<field name={columnName} unit="unit" type="type"/> <!-- unit and type TO REPLACE -->
           </output-structure>
           </processing-class>
           <description>
@@ -45,15 +37,15 @@ object XmlSerializer {
 			{
 				val streams = data.map{d => 
           <stream name={d.gsnInstance+"_"+d.vsName+"_"+d.columnName}>
-						<source name={d.gsnInstance+"_"+d.vsName+"_"+d.columnName} storage-size="1" sampling-rate="1">
+						<source alias={d.gsnInstance+"_"+d.vsName+"_"+d.columnName} storage-size="1" sampling-rate="1">
         			<address wrapper="remote-rest">
           			<predicate key="HOST">{d.host}</predicate>
           			<predicate key="PORT">{d.port}</predicate>
           			<predicate key="QUERY">select * from {d.vsName}</predicate><!-- ?????????????????? -->
         			</address>
-        			<query>SELECT column_name, timed FROM wrapper</query> <!-- ?????????????????? -->
+        			<query>SELECT {d.columnName}, timed FROM wrapper</query> <!-- ?????????????????? -->
       			</source>
-      			<query>select * from {d.vsName}</query><!-- ?????????????????? -->
+      			<query>select * from {d.gsnInstance+"_"+d.vsName+"_"+d.columnName}</query><!-- ?????????????????? -->
           </stream>
         }
         streams

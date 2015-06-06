@@ -65,7 +65,7 @@ class MetadataManager(sparqlServiceProperties:String,
   /**
    * Create new property mappings in Fuseki
    * The CSV file has 2 columns:
-   * - the first one contains the properties, like air_tmp
+   * - the first one contains the column names, like air_tmp
    * - the second on contains the observed properties URIs or the label, like http://purl.oclc.org/NET/ssnx/cf/cf-property#air_temperature 
    * or air temperature respectively
    */
@@ -74,19 +74,19 @@ class MetadataManager(sparqlServiceProperties:String,
     val mappings = Source.fromFile(file).getLines().map { line => line.split(",") }.filter { a => a.length >= 2 }
     
     mappings.foreach { m => 
-      val propertyToMap:String = m(0).toLowerCase();
+      val columnNamesToMap:String = m(0).toLowerCase();
       val obsProperty:String = m(1);
       
       // Create the mapping only for existing observed properties
       if (observedPropertyExistsByUri(obsProperty)) {
         // In this case, obsProperty is already a URI
-        addNewMapping(propertyToMap, obsProperty)
+        addNewMapping(columnNamesToMap, obsProperty)
       } else if (observedPropertyExistsByLabel(obsProperty)) {
         // Find the URI of the first property found with the given label
-        val propertyUri = findObservedPropertyByLabelExactMatch(obsProperty.replaceAll("_", "\\s").toLowerCase())
-        addNewMapping(propertyToMap, propertyUri)
+        val obsPropertyUri = findObservedPropertyByLabelExactMatch(obsProperty.replaceAll("_", "\\s").toLowerCase())
+        addNewMapping(columnNamesToMap, obsPropertyUri)
       } else {
-        println("WARNING:(mapping) Property: " + obsProperty + " doesn't exist in the model: ignored");
+        println("WARNING:(mapping) Observed property: " + obsProperty + " doesn't exist in the model: ignored");
       }
     }
   }
@@ -109,7 +109,6 @@ class MetadataManager(sparqlServiceProperties:String,
   private def extractOptionalStringFromJsValue(jsVal:JsValue):Option[String] = {
     if (jsVal != null) Option(DataFormatter.removeQuotes(jsVal.as[String])) else None
   }
-  
   
   /**
    * Add the virtual sensor found in the provided XML file to the model
@@ -139,10 +138,10 @@ class MetadataManager(sparqlServiceProperties:String,
   }
   
   private def addVirtualSensor(vsName:String, 
-      longitude:Option[String], 
-      latitude:Option[String], 
-      altitude:Option[String], 
-      fields:List[String]) {
+                              longitude:Option[String], 
+                              latitude:Option[String], 
+                              altitude:Option[String], 
+                              fields:List[String]) {
     
       val vsModel = ModelFactory.createDefaultModel()
       val newSensor = vsModel.createResource(baseUri + vsName)
@@ -170,27 +169,27 @@ class MetadataManager(sparqlServiceProperties:String,
       
       for (value <- fields) {
         if (mappingExists(value)) {
-          val obsPropertyUri = getMappingForProperty(value)
+          val obsPropertyUri = getMappingForColumnName(value)
           newSensor.addProperty(ssnHasOutput, vsModel.createResource(obsPropertyUri))
         } else {
           println("WARNING: There is no mapping for property " + value)
         }
       }
-      // Write all statements from the temporary model to fuseki
+      // Write all statements from the temporary model to Fuseki
       vsModel.listStatements().toList().foreach { s => 
         addNewVirtualSensorStatement(s)
       }
   }
   
   /**
-   * Returns the observed property URI for the given property name
+   * Returns the observed property URI for the given column name
    */
-  def getMappingForProperty(propertyName:String):String = {
+  def getMappingForColumnName(columnName:String): String = {
     val query = prefixSsn + prefixSsx + 
       "SELECT ?s \n" + 
       "WHERE { \n" + 
       "?s ssx:dbField \"" + 
-      propertyName + "\"\n"  + 
+      columnName + "\"\n"  + 
       "}";
 
     var resultUri = "NOT_FOUND";
@@ -207,14 +206,14 @@ class MetadataManager(sparqlServiceProperties:String,
   }
   
   /**
-   * Add new mapping to Fuseki. Maps "property" to the observed property designated by its URI
+   * Add new mapping to Fuseki. Maps "columnName" to the observed property designated by its URI
    */
-  def addNewMapping(property:String, observedPropertyUri:String) {
-    val name = "output_" + property.replaceAll("\\s", "_") + "_" + DataFormatter.extractFragmentId(observedPropertyUri)
+  def addNewMapping(columnName:String, observedPropertyUri:String) {
+    val name = "output_" + columnName.replaceAll("\\s", "_") + "_" + DataFormatter.extractFragmentId(observedPropertyUri)
     
     val insert = "INSERT DATA {\n" + 
       "<" + baseUri + name + "> " +
-                                    "<" + ssxUri + "dbField> \"" + property + "\" ; \n" +
+                                    "<" + ssxUri + "dbField> \"" + columnName + "\" ; \n" +
                                     "<" + ssnUri + "forProperty> <" + observedPropertyUri + "> \n" +
       "}" 
                                     
@@ -226,10 +225,10 @@ class MetadataManager(sparqlServiceProperties:String,
   }
 
   /**
-   * Checks whether a mapping exists for the provided property
+   * Checks whether a mapping exists for the provided column name
    */
-  def mappingExists(property:String):Boolean = {
-    val query = "ASK { ?subject <" + ssxUri + "dbField> \"" + property + "\"}"
+  def mappingExists(columnName:String):Boolean = {
+    val query = "ASK { ?subject <" + ssxUri + "dbField> \"" + columnName + "\"}"
     val queryExec = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", query)
     val result = queryExec.execAsk()
     queryExec.close()
@@ -242,16 +241,16 @@ class MetadataManager(sparqlServiceProperties:String,
   def getOutputDetails(outputUri:String):(String, List[(String,String)]) = {
     val details = scala.collection.mutable.ListBuffer[(String,String)]()
     
-    var property:String = ""
-    val queryProperty = prefixSsx + "SELECT ?property \n WHERE { \n <" + outputUri + "> ssx:dbField ?property \n}"
-    val queryExecProperty = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", queryProperty)
-    val resultsProperty = queryExecProperty.execSelect();
+    var columnName:String = ""
+    val queryColumnName = prefixSsx + "SELECT ?columnName \n WHERE { \n <" + outputUri + "> ssx:dbField ?columnName \n}"
+    val queryExecColumnName = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", queryColumnName)
+    val resultsColumnName = queryExecColumnName.execSelect();
     // Takes the first result if any
-    if (resultsProperty.hasNext()) {
-      val sol = resultsProperty.nextSolution();
-      property = sol.get("property").toString()
+    if (resultsColumnName.hasNext()) {
+      val sol = resultsColumnName.nextSolution();
+      columnName = sol.get("columnName").toString()
     }
-    queryExecProperty.close()
+    queryExecColumnName.close()
     
     val queryObsProperty = prefixSsn + "SELECT ?obsProperty WHERE { \n <" + outputUri + "> ssn:forProperty  ?obsProperty \n}"
     val queryExecObsProperty = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", queryObsProperty)
@@ -264,9 +263,9 @@ class MetadataManager(sparqlServiceProperties:String,
       details ++= List(("obsProperty", obsPropertyLabel))
       details ++= List(("obsPropertyUri", obsPropertyUri))
     }
-    queryExecProperty.close()
+    queryExecColumnName.close()
     
-    (property, details.toList)
+    (columnName, details.toList)
   }
   
   def getUnitBySymbol(symbol:String):(String,String) = {
@@ -312,9 +311,9 @@ class MetadataManager(sparqlServiceProperties:String,
   /**
    * Checks whether the observed property exists in Fuseki, based on its URI
    */
-  def observedPropertyExistsByUri(propertyUri:String):Boolean = {
-    if(checkUri(propertyUri)) {
-      val query = prefixRdf + "ASK { <" + propertyUri + "> rdf:type ?o }"
+  def observedPropertyExistsByUri(obsPropertyUri:String):Boolean = {
+    if(checkUri(obsPropertyUri)) {
+      val query = prefixRdf + "ASK { <" + obsPropertyUri + "> rdf:type ?o }"
       askQuery(query)
     } else {
       false
@@ -347,11 +346,11 @@ class MetadataManager(sparqlServiceProperties:String,
   /**
    * Return the label of the observed property specified by the URI propertyUri
    */
-  def getObservedPropertyLabel(propertyUri:String):String = {
-     val query = prefixRdfs + "SELECT ?label \n WHERE { \n <" + propertyUri + "> rdfs:label ?label \n }"
+  def getObservedPropertyLabel(obsPropertyUri:String):String = {
+     val query = prefixRdfs + "SELECT ?label \n WHERE { \n <" + obsPropertyUri + "> rdfs:label ?label \n }"
 
      // Initialize with the name from the URI in case there is no label
-    var label:String = parsePropertyNameFromUri(propertyUri)
+    var label:String = parsePropertyNameFromUri(obsPropertyUri)
 
     val qexec = QueryExecutionFactory.sparqlService(sparqlServiceProperties + "/query", query)
     val results = qexec.execSelect()
@@ -428,15 +427,15 @@ class MetadataManager(sparqlServiceProperties:String,
   }
   
   /**
-   * Fetch all virtual sensor that observe the given property
+   * Fetch all virtual sensors that observe the given property
    * return a list of tuples of the form (vs name, column name, longitude, latitude, altitude)
    */
   def getVirtualSensorsForObservedProperty(obsPropUri:String):List[(String, String, Option[String], Option[String], Option[String])] = {
     checkUri(obsPropUri)
-    val query = "SELECT ?sensor ?column_name ?long ?lat ?alt \n" +
+    val query = "SELECT ?sensor ?columnName ?long ?lat ?alt \n" +
                 "WHERE { \n" +
                     "?output <http://purl.oclc.org/NET/ssnx/ssn#forProperty> <"+obsPropUri+"> . \n" +
-                    "?output <http://ssx.ch#dbField> ?column_name \n" +
+                    "?output <http://ssx.ch#dbField> ?columnName \n" +
                     "SERVICE <"+sparqlServiceSensors+"> { \n" +
                         "?sensor <http://purl.oclc.org/NET/ssnx/ssn#hasOutput> ?output . \n" +
                         "OPTIONAL { ?sensor <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long . } \n" +
@@ -453,7 +452,7 @@ class MetadataManager(sparqlServiceProperties:String,
     while (results.hasNext()) {
       val s = results.nextSolution();
       val vsName = DataFormatter.extractFragmentId(s.get("sensor").toString())
-      val columnName = DataFormatter.removeQuotes(s.get("column_name").toString())
+      val columnName = DataFormatter.removeQuotes(s.get("columnName").toString())
       val long = getOptionalStringFromResult(s, "long")
       val lat = getOptionalStringFromResult(s, "lat")
       val alt = getOptionalStringFromResult(s, "alt")

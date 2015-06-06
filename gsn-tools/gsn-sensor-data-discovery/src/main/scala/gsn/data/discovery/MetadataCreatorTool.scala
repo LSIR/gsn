@@ -3,7 +3,7 @@ import com.typesafe.config._
 import gsn.data.discovery.MetadataManager
 import java.io.File
 
-object Main extends App {
+object MetadataCreatorTool extends App {
   
   require(args.length >= 2, help())
   

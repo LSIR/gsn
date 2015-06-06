@@ -11,18 +11,19 @@ import scala.concurrent._
 
 import scala.concurrent.duration._
 
-import gsn.data.discovery.util.XmlSerializer
+import gsn.discoveryagent.util.VsXmlSerializer
 
 import scala.concurrent.{ ExecutionContext }
 import akka.actor.{ ActorRef, ActorSystem, Props, Actor }
 import scala.concurrent.duration._
 import gsn.data.discovery.MetadataManager
+import java.io.File
 
 object DiscoveryAgent extends App {
   
   val conf = ConfigFactory.load("application.conf")
   
-  val akkaConfig = ConfigFactory.load("remote-configuration.conf")
+  val akkaConfig = ConfigFactory.load("actor-configuration.conf")
     
   val metadataMagager = new MetadataManager(
       conf.getString("fusekiEndpoints.properties"),
@@ -35,7 +36,7 @@ object DiscoveryAgent extends App {
   val obsPropertyUri = "http://purl.oclc.org/NET/ssnx/cf/cf-property#air_temperature"
   val location = (88.0, -68.0, 105.0, 90.0)
   val requestToSend = DiscoveryRequest(obsPropertyUri, Option(location))
-  val intancesToQuery = List(("GSN_2","127.0.0.1:5151"), ("GSN_3","127.0.0.1:5152"))
+  val intancesToQuery = List(("GSN_2","osper.epfl.ch:5150")/*, ("GSN_3","127.0.0.1:5152")*/)
      
   val requestExecutor = system.actorOf(Props[RequestExecutor], "requestExecutor")
   requestExecutor.tell(SendDiscoveryRequest(requestToSend, intancesToQuery), ActorRef.noSender)
@@ -83,7 +84,7 @@ class RequestExecutor extends Actor {
      futureListOfSuccesses onComplete { 
         case Success(result) => 
           val vsCreator = context.actorOf(Props[VirtualSensorCreator])
-          vsCreator ! CreateNewVirtualSensor(result)
+          if (result.size > 0) vsCreator ! CreateNewVirtualSensor(result)
         case Failure(failure) => // possible scenario ?
      }
      
@@ -105,16 +106,25 @@ class VirtualSensorCreator extends Actor {
         println(r.vsName+" "+r.columnName+" "+r.host+" "+r.port)
       }
       
-      // Create VSD file
-      XmlSerializer.serializeToFile(data.flatMap { x => x.results })
+      val vsResults = data.flatMap { x => x.results }
       
-      // Create mapping for column name <-> observed property
-      data.foreach { d => 
-        DiscoveryAgent.metadataMagager.addNewMapping("column_name", d.obsPropertyUri)    
+      if (vsResults.size > 0) {
+        
+        val vsName = ""
+        val columnName = "aggregated_" + data.head.obsPropertyUri
+        
+        // Create VSD file
+        val vsdFile = "../virtual-sensors/" + vsName + ".xml" //TODO: Find a way to generate a unique name
+        VsXmlSerializer.serializeToFile(vsName, columnName, vsResults, vsdFile)
+        
+        // Create mapping for column name <-> observed property
+        data.foreach { d => 
+          DiscoveryAgent.metadataMagager.addNewMapping(columnName, d.obsPropertyUri)    
+        }
+        
+        // Add the virtual-sensor to the metadata store
+        DiscoveryAgent.metadataMagager.addVirtualSensorFromXML(new File(vsdFile))
       }
-      
-      // Add virtual-sensor to Fuseki store
-      //TODO:
   }
 }
 
@@ -123,9 +133,9 @@ class VirtualSensorCreator extends Actor {
  */
 class DiscoveryRequestReceiver extends Actor {
   
-  // Get config from GSN to access the port used and the hostname (if there is one ?)
+  //TODO Get config from GSN to access the port used and the hostname (if there is one ?)
   val gsnInstance = "GSN_1"
-  val host = "osper1.epfl.ch"
+  val host = "laptop.michael" 
   val port = 22001
 
   def receive = {
