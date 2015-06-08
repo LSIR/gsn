@@ -1131,7 +1131,13 @@ var GSN = {
 	        	GSN.map.infowindow = new google.maps.InfoWindow({
 		            content: marker.content
 		        });
+	        	
 	        	GSN.map.infowindow.open(map,marker);
+	        	
+	        	if($("#basket_cb_" + vsName).attr('checked') == "checked") {
+	        		console.info(vsName);
+	        		$("#map_cb_" + vsName).attr('checked', true);
+	        	}
 		    });
 	        
             GSN.map.markers.push(marker);
