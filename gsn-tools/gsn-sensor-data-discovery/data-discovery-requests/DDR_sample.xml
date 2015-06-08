@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataDiscovery>
+<dataDiscoveryRequest>
+	<requestId>1</requestId>
+	<observedProperty>http://purl.oclc.org/NET/ssnx/cf/cf-property#air_temperature</observedProperty>
+	<location>
+		<leftDownCorner>
+			<latitude>89.0</latitude>
+			<longitude>88.0</longitude>
+		</leftDownCorner>
+		<rightUpCorner>
+			<latitude>90.0</latitude>
+			<longitude>89.0</longitude>
+		</rightUpCorner>
+	</location>
+</dataDiscoveryRequest>
+<targets>
+	<target>
+		<identifier>GSN-2</identifier>
+		<host>localhost</host>
+		<port>5151</port>
+	</target>
+</targets>
+</dataDiscovery>

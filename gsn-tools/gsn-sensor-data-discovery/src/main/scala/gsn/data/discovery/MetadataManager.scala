@@ -44,7 +44,7 @@ import scala.xml.NodeSeq
 import play.api.libs.json.JsValue
 
 /**
- * Allows to add and get data from Fuseki
+ * API for metadata store Fuseki
  */
 class MetadataManager(sparqlServiceProperties:String, 
                       sparqlServiceMapping:String, 
@@ -63,11 +63,11 @@ class MetadataManager(sparqlServiceProperties:String,
   val prefixRdfs = "PREFIX rdfs: <" + RDFS.getURI() + ">\n"
   
   /**
-   * Create new property mappings in Fuseki
+   * Create new resource output for each mapping
    * The CSV file has 2 columns:
-   * - the first one contains the column names, like air_tmp
-   * - the second on contains the observed properties URIs or the label, like http://purl.oclc.org/NET/ssnx/cf/cf-property#air_temperature 
-   * or air temperature respectively
+   * - the first one contains the column names, like <i>air_tmp</i>
+   * - the second on contains the observed properties URIs or the label, like <i>http://purl.oclc.org/NET/ssnx/cf/cf-property#air_temperature</i> 
+   * or <i>air temperature</i> respectively
    */
   def importPropertyMappingsFromCsv(file:File) {
     
@@ -77,16 +77,16 @@ class MetadataManager(sparqlServiceProperties:String,
       val columnNamesToMap:String = m(0).toLowerCase();
       val obsProperty:String = m(1);
       
-      // Create the mapping only for existing observed properties
+      // Create the output only for existing observed properties
       if (observedPropertyExistsByUri(obsProperty)) {
         // In this case, obsProperty is already a URI
-        addNewMapping(columnNamesToMap, obsProperty)
+        addNewOutput(columnNamesToMap, obsProperty)
       } else if (observedPropertyExistsByLabel(obsProperty)) {
         // Find the URI of the first property found with the given label
         val obsPropertyUri = findObservedPropertyByLabelExactMatch(obsProperty.replaceAll("_", "\\s").toLowerCase())
-        addNewMapping(columnNamesToMap, obsPropertyUri)
+        addNewOutput(columnNamesToMap, obsPropertyUri)
       } else {
-        println("WARNING:(mapping) Observed property: " + obsProperty + " doesn't exist in the model: ignored");
+        println("WARNING: (Mapping ignored) Observed property: " + obsProperty + " doesn't exist in the model: no output created");
       }
     }
   }
@@ -96,18 +96,18 @@ class MetadataManager(sparqlServiceProperties:String,
    */
   def addVirtualSensorFromJSON(file:File) {
     
-      val json = Json.parse(Source.fromFile(file).mkString)
-      val vsName = DataFormatter.removeQuotes((json \ "properties" \ "vs_name").as[String].toLowerCase())
-      val fields = json \ "properties" \ "fields" \\ "name"
-      val longitude = extractOptionalStringFromJsValue((json \ "properties" \ "longitude"))
-      val latitude = extractOptionalStringFromJsValue((json \ "properties" \ "latitude"))
-      val altitude = extractOptionalStringFromJsValue((json \ "properties" \ "altitude"))
-      
-      addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.as[String] } toList)
-  }
-  
-  private def extractOptionalStringFromJsValue(jsVal:JsValue):Option[String] = {
-    if (jsVal != null) Option(DataFormatter.removeQuotes(jsVal.as[String])) else None
+    def extractOptionalStringFromJsValue(jsVal:JsValue):Option[String] = {
+      if (jsVal != null) Option(DataFormatter.removeQuotes(jsVal.as[String])) else None
+    }
+    
+    val json = Json.parse(Source.fromFile(file).mkString)
+    val vsName = DataFormatter.removeQuotes((json \ "properties" \ "vs_name").as[String].toLowerCase())
+    val fields = json \ "properties" \ "fields" \\ "name"
+    val longitude = extractOptionalStringFromJsValue((json \ "properties" \ "longitude"))
+    val latitude = extractOptionalStringFromJsValue((json \ "properties" \ "latitude"))
+    val altitude = extractOptionalStringFromJsValue((json \ "properties" \ "altitude"))
+    
+    addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.as[String] } toList)
   }
   
   /**
@@ -115,26 +115,26 @@ class MetadataManager(sparqlServiceProperties:String,
    */
   def addVirtualSensorFromXML(file:File) {
     
-      val mainNode = xml.XML.loadFile(file)
-      val vsName = (mainNode \ "@name").text.toLowerCase()
-      val fields = (mainNode \ "processing-class" \ "output-structure" \ "field").map {_ \ "@name"}
-      val longitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "longitude")
-      val latitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "latitude")
-      val altitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "altitude")
-      
-      addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.text } toList)
-  }
-  
-  private def extractOptionalStringFromNodeSeq(nodeSeq:NodeSeq, property:String):Option[String] = {
-    val seq = nodeSeq.filter { x => extractAttributeValue(x).equalsIgnoreCase(property) }
-    if (seq.size >= 1) Option(seq.head.text) else None
-  }
-  
-  private def extractAttributeValue(n:Node):String = {
-    n.attribute("key") match {
-      case s if s.size >= 1 => s.head.text
-      case _ => null
+    def extractOptionalStringFromNodeSeq(nodeSeq:NodeSeq, property:String):Option[String] = {
+      val seq = nodeSeq.filter { x => extractAttributeValue(x).equalsIgnoreCase(property) }
+      if (seq.size >= 1) Option(seq.head.text) else None
     }
+    
+    def extractAttributeValue(n:Node):String = {
+      n.attribute("key") match {
+        case s if s.size >= 1 => s.head.text
+        case _ => null
+      }
+    }
+    
+    val mainNode = xml.XML.loadFile(file)
+    val vsName = (mainNode \ "@name").text.toLowerCase()
+    val fields = (mainNode \ "processing-class" \ "output-structure" \ "field").map {_ \ "@name"}
+    val longitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "longitude")
+    val latitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "latitude")
+    val altitude = extractOptionalStringFromNodeSeq((mainNode \ "addressing" \ "predicate"), "altitude")
+    
+    addVirtualSensor(vsName, longitude, latitude, altitude, fields.map { x => x.text } toList)
   }
   
   private def addVirtualSensor(vsName:String, 
@@ -164,11 +164,12 @@ class MetadataManager(sparqlServiceProperties:String,
         val altitudeProperty = vsModel.createProperty(wgs84Uri, "alt")
         newSensor.addProperty(altitudeProperty, altitude.get)
       }
-        
+      
+      // Assign all outputs to the virtual sensor
       val ssnHasOutput = vsModel.createProperty(ssnUri, "hasOutput")
       
       for (value <- fields) {
-        if (mappingExists(value)) {
+        if (outputExists(value)) {
           val obsPropertyUri = getMappingForColumnName(value)
           newSensor.addProperty(ssnHasOutput, vsModel.createResource(obsPropertyUri))
         } else {
@@ -206,9 +207,12 @@ class MetadataManager(sparqlServiceProperties:String,
   }
   
   /**
-   * Add new mapping to Fuseki. Maps "columnName" to the observed property designated by its URI
+   * Create new virtual sensor output
+   * <li><i>columnName</i> is the name of the database field where the data of the output is stored
+   * it corresponds to the name of the <i>field</i> in the virtual sensor definition file</li>
+   * <li><i>observedPropertyURI</i> defines what produces the output</li>
    */
-  def addNewMapping(columnName:String, observedPropertyUri:String) {
+  def addNewOutput(columnName:String, observedPropertyUri:String) {
     val name = "output_" + columnName.replaceAll("\\s", "_") + "_" + DataFormatter.extractFragmentId(observedPropertyUri)
     
     val insert = "INSERT DATA {\n" + 
@@ -225,10 +229,10 @@ class MetadataManager(sparqlServiceProperties:String,
   }
 
   /**
-   * Checks whether a mapping exists for the provided column name
+   * Checks whether an output exists for the provided column name
    */
-  def mappingExists(columnName:String):Boolean = {
-    val query = "ASK { ?subject <" + ssxUri + "dbField> \"" + columnName + "\"}"
+  def outputExists(columnName:String): Boolean = {
+    val query = "ASK { ?output <" + ssxUri + "dbField> \"" + columnName + "\"}"
     val queryExec = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", query)
     val result = queryExec.execAsk()
     queryExec.close()
@@ -245,6 +249,7 @@ class MetadataManager(sparqlServiceProperties:String,
     val queryColumnName = prefixSsx + "SELECT ?columnName \n WHERE { \n <" + outputUri + "> ssx:dbField ?columnName \n}"
     val queryExecColumnName = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", queryColumnName)
     val resultsColumnName = queryExecColumnName.execSelect();
+    
     // Takes the first result if any
     if (resultsColumnName.hasNext()) {
       val sol = resultsColumnName.nextSolution();
@@ -255,6 +260,7 @@ class MetadataManager(sparqlServiceProperties:String,
     val queryObsProperty = prefixSsn + "SELECT ?obsProperty WHERE { \n <" + outputUri + "> ssn:forProperty  ?obsProperty \n}"
     val queryExecObsProperty = QueryExecutionFactory.sparqlService(sparqlServiceMapping + "/query", queryObsProperty)
     val resultsObsProperty = queryExecObsProperty.execSelect()
+    
     // Takes the first result if any
     if (resultsObsProperty.hasNext()) {
       val sol = resultsObsProperty.nextSolution()
@@ -268,6 +274,9 @@ class MetadataManager(sparqlServiceProperties:String,
     (columnName, details.toList)
   }
   
+  /**
+   * Returns the URI and label of the unit corresponding to the provided symbol 
+   */
   def getUnitBySymbol(symbol:String):(String,String) = {
     val queryUnitStd = "SELECT ?unit ?label " +
                         "WHERE { " + 
@@ -292,29 +301,29 @@ class MetadataManager(sparqlServiceProperties:String,
   }
   
   /**
-   * Returns the mappings for the specified virtual sensor
+   * Returns the outputs of the specified virtual sensor
    */
-  def getMappingsForSensor(sensorName:String):Map[String,List[(String,String)]] = {
+  def getOutputsForSensor(sensorName:String): Map[String,List[(String,String)]] = {
     val query = "SELECT ?output\n WHERE {\n <" + baseUri + sensorName + "> " + ssnHasOutput + " ?output \n}"
-    val mappings = scala.collection.mutable.Map[String, List[(String,String)]]()
+    val outputs = scala.collection.mutable.Map[String, List[(String,String)]]()
     val queryExec = QueryExecutionFactory.sparqlService(sparqlServiceSensors + "/query", query)
     val results =  queryExec.execSelect()
      
     for(r <- results; if r.get("output") != null && r.get("output").isURIResource()) {
       val (property,details) = getOutputDetails(r.get("output").toString())
-      mappings.put(property, details)
+      outputs.put(property, details)
     }
     queryExec.close()
-    mappings.toMap
+    outputs.toMap
   }
   
   /**
    * Checks whether the observed property exists in Fuseki, based on its URI
    */
   def observedPropertyExistsByUri(obsPropertyUri:String):Boolean = {
-    if(checkUri(obsPropertyUri)) {
+    if(MetadataManager.checkUri(obsPropertyUri)) {
       val query = prefixRdf + "ASK { <" + obsPropertyUri + "> rdf:type ?o }"
-      askQuery(query)
+      askQuery(query) 
     } else {
       false
     }
@@ -337,12 +346,6 @@ class MetadataManager(sparqlServiceProperties:String,
     result
   }
   
-  private def checkUri(uri:String):Boolean = {
-    val schemes = Array("http")
-    val urlValidator = new UrlValidator(schemes)
-    urlValidator.isValid(uri)
-  }
-
   /**
    * Return the label of the observed property specified by the URI propertyUri
    */
@@ -350,7 +353,7 @@ class MetadataManager(sparqlServiceProperties:String,
      val query = prefixRdfs + "SELECT ?label \n WHERE { \n <" + obsPropertyUri + "> rdfs:label ?label \n }"
 
      // Initialize with the name from the URI in case there is no label
-    var label:String = parsePropertyNameFromUri(obsPropertyUri)
+    var label:String = MetadataManager.parsePropertyNameFromUri(obsPropertyUri)
 
     val qexec = QueryExecutionFactory.sparqlService(sparqlServiceProperties + "/query", query)
     val results = qexec.execSelect()
@@ -385,15 +388,6 @@ class MetadataManager(sparqlServiceProperties:String,
     qexec.close();
 
     resultUri;
-  }
-  
-  /**
-   * Retrieve the last part of the URI to get the property name, e.g: http:://slf.ch#air_temperature
-   * will return air_temperature
-   */
-  private def parsePropertyNameFromUri(propertyUri:String):String = {
-    val result = propertyUri.split("#")
-    if (result.length >= 2) result(1) else propertyUri
   }
 
   /**
@@ -431,7 +425,8 @@ class MetadataManager(sparqlServiceProperties:String,
    * return a list of tuples of the form (vs name, column name, longitude, latitude, altitude)
    */
   def getVirtualSensorsForObservedProperty(obsPropUri:String):List[(String, String, Option[String], Option[String], Option[String])] = {
-    checkUri(obsPropUri)
+    MetadataManager.checkUri(obsPropUri)
+    
     val query = "SELECT ?sensor ?columnName ?long ?lat ?alt \n" +
                 "WHERE { \n" +
                     "?output <http://purl.oclc.org/NET/ssnx/ssn#forProperty> <"+obsPropUri+"> . \n" +
@@ -459,17 +454,30 @@ class MetadataManager(sparqlServiceProperties:String,
       val tuple = (vsName, columnName, long, lat, alt)
       resultsSeq += tuple
     }
+    
+    def getOptionalStringFromResult(result:QuerySolution, property:String):Option[String] = {
+      val node = result.get(property)
+      if (node != null) Option(DataFormatter.removeQuotes(node.toString())) else None
+    }
+    
     qexec.close();
 
     resultsSeq.toList
   }
-  
-  private def getOptionalStringFromResult(result:QuerySolution, property:String):Option[String] = {
-    val node = result.get(property)
-    if (node != null) Option(DataFormatter.removeQuotes(node.toString())) else None
-  }
 }
 
 object MetadataManager {
+  /**
+   * Retrieve the last part of the URI to get the property name, e.g: http:://slf.ch#air_temperature
+   * will return air_temperature
+   */
+  private def parsePropertyNameFromUri(propertyUri:String):String = {
+    DataFormatter.extractFragmentId(propertyUri)
+  }
   
+  private def checkUri(uri:String):Boolean = {
+    val schemes = Array("http")
+    val urlValidator = new UrlValidator(schemes)
+    urlValidator.isValid(uri)
+  }
 }

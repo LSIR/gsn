@@ -64,10 +64,10 @@ class SensorStore(ds:DataStore) extends Actor{
       val hasAc=sec.hasAccessControl(vs.name)
       implicit val source=vsDatasources.get(vsname)
 
-      val mappings = metadataManager.getMappingsForSensor(vsname)
-      val updatedMappings = updateMappingWithUnitStd(vs, mappings)
+      val outputs = metadataManager.getOutputsForSensor(vsname)
+      val outputsWithUnits = addUnitsToOutputs(vs, outputs)
       
-      val s=Sensor.fromConf(vs,hasAc,None,Option(updatedMappings))
+      val s=Sensor.fromConf(vs,hasAc,None,Option(outputsWithUnits))
       val sStats= stats(s)
       //storeMongo(s)
       sensorStats put(vsname,sStats)
@@ -124,28 +124,28 @@ class SensorStore(ds:DataStore) extends Actor{
   }
   
   /**
-   * Fetch standardized units and update the mappings
+   * Fetch standardized units and add them to the outputs
    */
-  private def updateMappingWithUnitStd(vs:VsConf, mappings:Map[String, List[(String,String)]]):Map[String, List[(String,String)]] = {
-    val updatedMappings = scala.collection.mutable.Map(mappings.toSeq: _*)
+  private def addUnitsToOutputs(vs:VsConf, outputs:Map[String, List[(String,String)]]):Map[String, List[(String,String)]] = {
+    val outputsWithUnits = scala.collection.mutable.Map(outputs.toSeq: _*)
     vs.processing.output map{out=> 
       val (unitStdUri,unitStd) = metadataManager.getUnitBySymbol(out.unit.getOrElse(null))
       if (!unitStdUri.equals("") && !unitStd.equals("")) {
         val unitStdUriTuple = ("unitStdUri", unitStdUri)
         val unitStdTuple = ("unitStd",unitStd)
-        if (updatedMappings.contains(out.name)) {
-          val list = mappings.get(out.name)
+        if (outputsWithUnits.contains(out.name)) {
+          val list = outputs.get(out.name)
           val updatedList:List[(String,String)] = list match {
             case Some(l) => l++List(unitStdUriTuple, unitStdTuple)
             case None => List(unitStdUriTuple, unitStdTuple)
           }
-          updatedMappings.put(out.name, updatedList)
+          outputsWithUnits.put(out.name, updatedList)
         } else {
-          updatedMappings.put(out.name, List(unitStdUriTuple, unitStdTuple))
+          outputsWithUnits.put(out.name, List(unitStdUriTuple, unitStdTuple))
         }
       }
     }
-    updatedMappings.toMap
+    outputsWithUnits.toMap
   }
 }
 

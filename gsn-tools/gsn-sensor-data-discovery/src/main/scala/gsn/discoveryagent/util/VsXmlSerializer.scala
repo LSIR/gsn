@@ -5,11 +5,11 @@ import scala.xml.Elem
 
 object VsXmlSerializer {
   
-  def serializeToFile(vsName:String, columnName:String, data:List[VsResult], destFile:String) = {
-    scala.xml.XML.save(destFile, ser(vsName, columnName, data))
+  def serializeToFile(vsName:String, fieldName:String, data:List[VsResult], destFile:String) = {
+    scala.xml.XML.save(destFile, ser(vsName, fieldName, data))
   }
   
-  private def ser(vsName:String, columnName:String, data:List[VsResult]):Elem = {
+  private def ser(vsName:String, fieldName:String, data:List[VsResult]):Elem = {
     
     val (latitude, longitude, altitude) = computeMeanLocation(data)
     
@@ -19,12 +19,9 @@ object VsXmlSerializer {
           <class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
           <init-params/>
           <output-structure>
-          	<field name={columnName} unit="unit" type="type"/> <!-- unit and type TO REPLACE -->
+          	<field name={fieldName} unit="unit" type="type"/> <!-- unit and type TO REPLACE -->
           </output-structure>
           </processing-class>
-          <description>
-          <!-- TODO -->
-          </description>
           <life-cycle pool-size="10"/>
           <addressing>
           <predicate key="geographical"><!-- What to put here ? --></predicate>
@@ -36,16 +33,16 @@ object VsXmlSerializer {
           <streams>
 			{
 				val streams = data.map{d => 
-          <stream name={d.gsnInstance+"_"+d.vsName+"_"+d.columnName}>
-						<source alias={d.gsnInstance+"_"+d.vsName+"_"+d.columnName} storage-size="1" sampling-rate="1">
+          <stream name={d.gsnId+"_"+d.vsName+"_"+d.fieldName}>
+						<source alias={d.gsnId+"_"+d.vsName+"_"+d.fieldName} storage-size="1" sampling-rate="1">
         			<address wrapper="remote-rest">
           			<predicate key="HOST">{d.host}</predicate>
           			<predicate key="PORT">{d.port}</predicate>
           			<predicate key="QUERY">select * from {d.vsName}</predicate><!-- ?????????????????? -->
         			</address>
-        			<query>SELECT {d.columnName}, timed FROM wrapper</query> <!-- ?????????????????? -->
+        			<query>SELECT {d.fieldName}, timed FROM wrapper</query> <!-- ?????????????????? -->
       			</source>
-      			<query>select * from {d.gsnInstance+"_"+d.vsName+"_"+d.columnName}</query><!-- ?????????????????? -->
+      			<query>select * from {d.gsnId+"_"+d.vsName+"_"+d.fieldName}</query><!-- ?????????????????? -->
           </stream>
         }
         streams
@@ -68,7 +65,10 @@ object VsXmlSerializer {
         mLong += d.longitude.get.toDouble ; countLong += 1
         mLat += d.latitude.get.toDouble ; countLat += 1
       }
-      if (d.altitude.isDefined) mAlt += d.altitude.get.toDouble ; countAlt += 1
+      if (d.altitude.isDefined) {
+       mAlt += d.altitude.get.toDouble
+       countAlt += 1 
+      }
     }
     mLong = mLong / countLong
     mLat = mLat / countLat

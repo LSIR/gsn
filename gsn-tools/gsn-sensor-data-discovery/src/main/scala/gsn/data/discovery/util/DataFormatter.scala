@@ -16,6 +16,6 @@ object DataFormatter {
    */
   def extractFragmentId(uri:String):String = {
     val s = uri.split("#")
-    if (s.size >= 1) s(1) else uri
+    if (s.size >= 2) s(1) else uri
   }
 }
