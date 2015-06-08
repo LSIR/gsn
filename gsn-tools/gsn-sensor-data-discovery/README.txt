@@ -108,12 +108,18 @@ It creates also the necessary metadata in Fuseki
 
 2.2.3 Configuration
 The configuration file is src/main/resources/application.conf (same as for MetadataCreatorTool)
+and the configuration for the actor system is in src/main/resources/actor-configuration.conf
 
-Relevant properties of this file for the Discovery Agent are:
+Relevant properties of application.conf for the Discovery Agent are:
 - gsnId: identifier of the GSN instance this DA operates for
 - host: fully qualified domain name of this GSN instance that the other instances will use in their remote wrappers
 - port: port of this GSN instance, also for remote wrappers
 - ddrFolder: path of the folder containing the data discovery request XML files
+
+and for actor-configuration.conf:
+- hostname: IP address on which the server can be reached (Note: Can't use NAT)
+- port: port on which the actor system listens for incoming remote messages
+
 
 2.2.4 Improvements needed
 This is a prototype version and needs improvements to be fully functional: see following subsections
