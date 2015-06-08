@@ -1,0 +1,44 @@
+<virtual-sensor name="Matterhorn_GPS_RAW" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    SENSOR_TYPE = "gps-corestation";
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+            <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
+		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
+		    <field name="GPS_SATS" type="INTEGER"/>
+            <field name="GPS_RAW_DATA" type="binary"/>
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>show RAW GPS information from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-mh-bs02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.GPSPlugin</predicate>
+                    <predicate key="gps-data-type">raw</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

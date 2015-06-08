@@ -104,6 +104,17 @@
     <streams>
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query">select * from Matterhorn_GPS_RAW</predicate>
+                    <predicate key="remote-contact-point">http://pvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed as GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, 0 as GPS_UNIXTIME, 0 as GPS_MISSING_SV, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">select * from Matterhorn_GPS_RAW__tobinary__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
