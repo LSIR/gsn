@@ -13,6 +13,7 @@ import scala.util.{Failure=>ScalaFailure}
 import scala.util.Success
 import reactivemongo.bson.BSON
 import gsn.data.discovery.MetadataManager
+import reactivemongo.api.MongoConnection
 
 object dsReg{
   val dsss=new collection.mutable.HashMap[String,StorageConf]
@@ -25,7 +26,7 @@ class SensorStore(ds:DataStore) extends Actor{
   val confWatch=context.actorOf(Props[ConfWatcher])
     
   val driver = new MongoDriver(context.system)
-  val connection = driver.connection(List("localhost"))
+  val connection:MongoConnection = null//driver.connection(List("localhost"))
   
   val propertiesEndpoint = GsnConf.defaultFuseki.getString("propertiesEndpoint")
   val mappingsEndpoint = GsnConf.defaultFuseki.getString("mappingsEndpoint")

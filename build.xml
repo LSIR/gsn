@@ -472,10 +472,13 @@
 
     <target name="installer" depends="build-gsn" description="Build a GSN Server installer based on izpack."/>
 
+	 <!--<artifact:remoteRepository id="mvn" url="http://repo1.maven.org/maven2/"/>-->
+
 	 <artifact:remoteRepository id="lsir.release" url="http://osper.epfl.ch:8081/artifactory/gsn-release/">
 	      <releases enabled="true"/>
 	      <snapshots enabled="true"/>
 	    </artifact:remoteRepository>
+
 	<artifact:pom id="gsnpom" file="pom.xml"></artifact:pom>
 	<artifact:dependencies filesetId="gsndeps" pomRefId="gsnpom" />
 </project>
