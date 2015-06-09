@@ -35,7 +35,8 @@ object BsonConverter{
         doc.getAs[String]("name").get,
         doc.getAs[String]("stream").get,
         DataUnit(doc.getAs[String]("unit").get),
-        DataType(doc.getAs[String]("type").get)        
+        DataType(doc.getAs[String]("type").get),
+        None
     )
   }
   

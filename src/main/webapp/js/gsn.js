@@ -45,8 +45,8 @@ var GSN = {
             pageName[0] = "home";
         }
 		
-        var params=location.hash.substr(1).split(",");		
-        params[0] = pageName[0];		
+        var params=location.hash.substr(1).split(",");
+        params[0] = pageName[0];
         GSN.context = params[0];
 
         //highlight the right tab in the navigation bar
@@ -98,10 +98,10 @@ var GSN = {
                     if (val[0]=="z") zoom = parseInt(val[1]);
                 }
                 if (lat!=null) {
-                    map.setCenterAndZoom(new LatLonPoint(lat,lng),zoom);
+                	map.setCenter(new google.maps.LatLng(lat, lng));
+                	map.setZoom(zoom);
                 }
             }
-            GSN.map.showAllMarkers();
         } else if (GSN.context=="fullmap")	{
             GSN.vsbox.container = "#vs";
             if(!GSN.map.loaded) {
@@ -130,7 +130,7 @@ var GSN = {
 	
 	
     /**
-	* Click on the virtual sensor on the left bar
+	* Click on the virtual sensor on the right bar
 	*/
     ,
     menu: function (vsName) {
@@ -146,7 +146,6 @@ var GSN = {
                 $("#vs4map").empty();
                 GSN.addandupdate(vsName);
                 GSN.map.zoomOnMarker(vsName);
-				
             } else
                 GSN.vsbox.remove(vsName);
         } else if (GSN.context=="data"){
@@ -199,11 +198,9 @@ var GSN = {
         //build the rightside vs menu
         $("#vsmenu").empty();
 
-
-
         var arraySize = 0;
         $("virtual-sensor",data).each(function(){
-            name = $(this).attr("name");
+        	var name = $(this).attr("name");
                   // logIvo($(this).attr("protected"));   // just for logging
             GSN.vsName[arraySize] = name;
             GSN.protect[arraySize] = new Array(2);          // added May 2013
@@ -212,7 +209,7 @@ var GSN = {
             //logIvo(GSN.vsName[arraySize]+" -- "+GSN.protect[arraySize]);
             arraySize++;
 
-        //if ($("field[@name=latitude]",$(this)).text()!="")
+        //if ($("field[name=latitude]",$(this)).text()!="")
         //	$("#menu-"+vsname).addClass("gpsenabled");
         });
 		
@@ -220,8 +217,8 @@ var GSN = {
 		
         //Test example
         //GSN.vsName.push("genepi_meteo_10_replay", "genepi_meteo_11_replay","genepi_meteo_12_replay","genepi_meteo_13_replay","genepi_meteo_15_replay","genepi_meteo_16_replay","genepi_meteo_18_replay","genepi_meteo_2_replay","genepi_meteo_3_replay","genepi_meteo_4_replay","genepi_meteo_6_replay","genepi_meteo_7_replay");
-      GSN.vsName = GSN.util.regroupByUnderscore(GSN.vsName);
-      GSN.protect.sort();
+        GSN.vsName = GSN.util.regroupByUnderscore(GSN.vsName);
+        GSN.protect.sort();
         /*for(var i=0;i<GSN.vsName.length;++i){
             logIvo(GSN.vsName[i]+"--"+GSN.protect[i][0]+"--"+GSN.protect[i][1]);
         }*/
@@ -338,7 +335,7 @@ var GSN = {
 		
 		
         // Hide all the sensors in the side bar
-        $(".sensorName").hide();
+        //$(".sensorName").hide();
 		
         // Drag and Drop Functionnality
         if(GSN.context == "data"){
@@ -533,9 +530,10 @@ var GSN = {
     updatenb: 0
     ,
     updateallchange: function(){
-        if($("#refreshall_timeout").attr("value") != 0)
+        if($("#refreshall_timeout").attr("value") != 0) {
             //GSN.updateall();
         	GSN.refreshVSs();
+        }
     }
 	
 	
@@ -554,8 +552,8 @@ var GSN = {
   		
         $.ajax({
             type: "GET",            
-            //url: "ws/api/sensors?format=xml&latestValues=true",
-            url: "gsn?REQUEST=0&omit_latest_values=true",
+            url: "ext/ws/api/sensors?format=xml&latestValues=true",
+            //url: "gsn?REQUEST=0&omit_latest_values=true",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
@@ -574,9 +572,9 @@ var GSN = {
                 }
 			
                 //update vsbox
-                //$("virtual-sensor",data).each(function(){
-                //    GSN.vsbox.update(this);
-                //});
+                $("virtual-sensor",data).each(function(){
+                    GSN.vsbox.update(this);
+                });
 			
 			
                 //next refresh
@@ -603,10 +601,9 @@ var GSN = {
 
     ,
     refreshVSs: function(){
-
-    	sss= $(this.container).find("span[class='vsname']");
+    	var sss = $(this.container).find("span[class='vsname']");
 	    for(i=0;i<sss.length;i++){
-		  vsname=$(sss[i]).text();
+		  var vsname=$(sss[i]).text();
 		  GSN.updateVs(vsname);
 	    }
     }
@@ -620,22 +617,25 @@ var GSN = {
             type: "GET",
             url: "gsn?name="+vsName,
             success: function(data){
-                $("virtual-sensor[@name="+vsName+"]",data).each(function(){
+                $("virtual-sensor[name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
                 });
             }
-        });*/    	
+        });*/ 	
         GSN.updateVs(vsName);
     }
 	,
-    updateVs: function(vsName){
+	updateVs: function(vsName){
         $.ajax({
             type: "GET",
-            url: "gsn?name="+vsName,
+            //url: "gsn?name="+vsName,
+            url: "ext/ws/api/sensors?format=xml&latestValues=true",
             success: function(data){
-                $("virtual-sensor[@name="+vsName+"]",data).each(function(){
+            	 $("virtual-sensor[name="+vsName+"]",data).each(function(){
                     GSN.vsbox.update(this);
+                    
                 });
+                GSN.map.areVisible = true;
             }
         });    	
     }
@@ -648,7 +648,6 @@ var GSN = {
         //box showing all vs info
         container: "#vs"
 		
-		
         /**
 		* Create an empty vsbox
 		*/
@@ -657,7 +656,6 @@ var GSN = {
             var vsdiv = "vsbox-"+vsName;
 			
             if($(this.container).find("."+vsdiv).size()!=0) return; //already exists
-			
 			
             $(this.container).append($.DIV({
                 "class":vsdiv+" vsbox"
@@ -750,39 +748,66 @@ var GSN = {
             $("."+vsdiv, $(this.container)).fadeIn("slow");
         }
 		
-		
         /**
 		* Update and show all the data of the vsbox
 		*/
         ,
         update: function (vs){
-            //when map is enable, update marker
-            if (GSN.map.loaded){
-                var lat = $("field[@name=latitude]",vs).text();
-                var lon = $("field[@name=longitude]",vs).text();
-                if (lat != "" && lon != ""){
-                    GSN.map.updateMarker($(vs).attr("name"),lat,lon);
+	        var vsName = $(vs).attr("name");
+
+            //when map is enabled, update marker
+        	if (GSN.map.loaded){
+                var lat = $("field[name=latitude]",vs).text();
+                var lon = $("field[name=longitude]",vs).text();
+                
+                if (GSN.context == "map") {
+	                var selectedObsProp = $("#observedProperties").chosen().val();
+	                var hasObsProp = false;
+	            	if ($.inArray("any",selectedObsProp) != -1) {
+	            		hasObsProp = true;
+	            	} else {
+	                	for (i=0;i<selectedObsProp.length;i++) {
+	                		if (undefined != obsPropVsMap.get(selectedObsProp[i])) {
+	                			if ($.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1) {
+	                				hasObsProp = true;
+	                				break;
+	                			}
+	                		}
+	                	}
+	            	}
+	
+	                if (lat != "" && lon != "" && hasObsProp) {
+	                    GSN.map.updateMarker(vs,lat,lon);
+	                } else {
+	                	$("#menu-"+vsName).parent().hide();
+	                }
+                } else {
+                	if (lat != "" && lon != "") {
+                        GSN.map.updateMarker(vs,lat,lon);
+                    }
                 }
             }
-			
+        	
             //update the vsbox
-            var vsd = $(".vsbox-"+$(vs).attr("name"), $(this.container))[0];
+            var vsd = $(".vsbox-"+vsName, $(this.container))[0];
             if (typeof vsd == "undefined") return;
             //if (vsd.css("display")=="none") return;
-			
+
             var vsdl = $("dl", vsd);
             var dynamic = vsdl.get(0);
             var static_ = vsdl.get(1);
             var struct = vsdl.get(2);
             var input = $("dl.input",vsdl.get(4));
             dl = dynamic;
-			
-            var name,cat,type,value,unit;
+            
+            var name,cat,type,value,unit,obsProperty,unitStd;
             var last_cmd,cmd;
             var hiddenclass ="";
+            
             //update the vsbox the first time, when it's empty
             if ($(dynamic).children().size()==0 && $(static_).children().size()==0){
                 var gotDynamic,gotStatic,gotInput = false;
+                
                 $("field",vs).each(function(){
                     name = $(this).attr("name");
                     cat = $(this).attr("category");
@@ -790,11 +815,13 @@ var GSN = {
                     type = $(this).attr("type");
                     value = $(this).text();
                     unit = $(this).attr("unit");
+                    obsProperty = $(this).attr("obsProperty");
+                    unitStd = $(this).attr("unitStd");
                     if (unit==null)
                         unit="";
                     else
                         unit=" "+unit;
-				
+                    
                     if (name=="timed") {
                         //if (value != "") value = GSN.util.printDate(value);
                         $(vsd).find("span.timed").empty().append(value);
@@ -824,7 +851,7 @@ var GSN = {
                         var s = type ;
                         if ($(this).attr("description")!=null)
                             s += ' <img src="style/help_icon.gif" alt="" title="'+$(this).attr("description")+'"/>';
-                        $(struct).append('<dt>'+name+'</dt><dd class="'+name+'">'+s+'</dd>');
+                        $(struct).append('<dt '+((obsProperty!=null)? 'title="'+obsProperty+'"' :'')+'>'+name+'</dt><dd class="'+name+'">'+s+'</dd>');
                         if (!gotDynamic) {
                             $("a.tabdynamic", vsd).show();
                             $("a.tabstructure", vsd).show();
@@ -855,11 +882,11 @@ var GSN = {
                         } else if (type.indexOf("binary") != -1){
                             value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
                         } else if (unit==" s"){
-                            value = GSN.vsbox.formatTimeInterval(value);
+                            //value = GSN.vsbox.formatTimeInterval(value); // Missing function
                         } else if (unit==" ms"){
-                            value = GSN.vsbox.formatTimeInterval(value / 1000);
+                            //value = GSN.vsbox.formatTimeInterval(value / 1000); // Missing function
                         } else {
-                            value = value + unit;
+                            value = value + ((unitStd!=null)? '<span title="'+unitStd+'">'+unit+'</span>' : '<span>'+unit+'</span>');
                         }
                     } else if (cat == "input") {
                         if (last_cmd != cmd) {
@@ -897,7 +924,7 @@ var GSN = {
 
                         name = comp+name;
                     }
-                    $(dl).append('<dt class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
+                    $(dl).append('<dt '+((obsProperty!=null)?'title="'+obsProperty + '"':'')+' class="'+cmd+hiddenclass+'">'+name+'</dt><dd class="'+name+((cmd!=null)?' '+cmd:'')+hiddenclass+'">'+value+'</dd>');
                 });
 			  
                 if ($(vs).attr("description")!="") {
@@ -951,14 +978,17 @@ var GSN = {
                 var dd,field,unit;
                 for (var i = 0; i<dds.size();i++){
                     dd = dds.get(i);
-                    field = $("field[@name="+$(dd).attr("class")+"]",vs);
+                    field = $("field[name="+$(dd).attr("class")+"]",vs);
                     type = $(field).attr("type");
                     value = $(field).text();
                     unit = $(field).attr("unit");
+                    obsProperty = $(field).attr("obsProperty");
+                    unitStd = $(field).attr("unitStd");
                     if (unit==null || value=="null")
                         unit="";
                     else
                         unit=" "+unit;
+                    
                     if (value!="") {
                         if (type.indexOf("svg") != -1){
                             $("embed",dd).attr("src",value);
@@ -977,21 +1007,20 @@ var GSN = {
                         } else if (type.indexOf("binary") != -1){
                             $("a",dd).attr("href",value);
                         } else if (unit==" s"){
-                            $(dd).empty().append(GSN.vsbox.formatTimeInterval(value));
+                            //$(dd).empty().append(GSN.vsbox.formatTimeInterval(value)); // Missing function
                         } else if (unit==" ms"){
-                            $(dd).empty().append(GSN.vsbox.formatTimeInterval(value / 1000));
+                            //$(dd).empty().append(GSN.vsbox.formatTimeInterval(value / 1000)); // Missing function
                         } else {
-                            $(dd).empty().append(value + unit);
+                            $(dd).empty().append(value + ((unitStd!=null)? '<span title="'+unitStd+'">'+unit+'</span>' : '<span>'+unit+'</span>'));
                         }
                     }
                 }
-                value = $("field[@name=timed]",vs).text();
+                value = $("field[name=timed]",vs).text();
                 //if (value != "") value = GSN.util.printDate(value);
                 $("span.timed", vsd).empty().append(value);
                 return false;
             }
         }
-		
 		
         /**
 		* Remove the vsbox from the container
@@ -1001,7 +1030,6 @@ var GSN = {
             var vsdiv = "vsbox-"+vsName;
             $("."+vsdiv, $(this.container)).remove();
         }
-		
 		
         /**
 		* Vsbox tabs control
@@ -1024,7 +1052,6 @@ var GSN = {
         }
     },
 	
-	
     /**
 	* All the map thing
 	*/
@@ -1036,7 +1063,8 @@ var GSN = {
         highlighted : null
         ,
         highlightedmarker : null
-		
+        ,
+        infowindow: null
 		
         /**
 		* Initialize the map
@@ -1044,84 +1072,101 @@ var GSN = {
         ,
         init : function(){
             this.loaded=true;
-            map.setCenterAndZoom(new LatLonPoint(0,0),1);
-			
-            // Setting the map type
-            var map_type;
-            if(DEFAULT_MAP_TYPE=="road"){
-                map_type = Mapstraction.ROAD;
-            } else if(DEFAULT_MAP_TYPE=="satellite") {
-                map_type = Mapstraction.SATELLITE;
-            } else if(DEFAULT_MAP_TYPE=="hybrid") {
-                map_type = Mapstraction.HYBRID;
-            } else {
-                alert("Error: "+DEFAULT_MAP_TYPE+" is an unknown map type");
-                return;
-            }
 			  
-            map.setMapType(map_type);
-		    
-            //set the different control on the map
-            map.addMapTypeControls();
-            map.addLargeControls();
-			
+            function initialize() {
+            	var mapOptions = {
+            		zoom: 1,
+            		center: new google.maps.LatLng(0, 0)
+            	};
+            	map = new google.maps.Map(document.getElementById('vsmap'),mapOptions);
+            	
+            	google.maps.event.addListener(map, 'bounds_changed', function() {
+               		if (GSN.context == "map") {
+               			updateMapMarkersDisplay();
+               		}
+               	});
+			}
+            
+          	google.maps.event.addDomListener(window, 'load', initialize);
         }
 		
-		
-
-		
+    	,
+    	vsFieldsToString: function(vs) {
+    		var result = "<ul class=\"mapInfoWindow\">";
+    		$("field",vs).each(function(){
+    			if ($(this).attr("category") != "predicate" && $(this).attr("name") != "time") {
+    				var obsProperty = $(this).attr("obsProperty");
+    				result += '<li ' + ((obsProperty!=null)?'title="'+obsProperty + '"':'') + '>' + $(this).attr("name") + '</li>';
+    			}
+    		});
+    		result += '</ul>'
+    		return result;
+    	}
 		
         /**
 		* Add marker
 		*/
         ,
-        addMarker: function(vsName,lat,lon){
-            var marker = new Marker(new LatLonPoint(lat,lon));
-            marker.setAttribute("vsname",vsName);
-  		
-  		
-            if(mapProvider=="microsoft"){
-                marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("Show/Hide Information: <a style='text-decoration:underline;color:blue;' href='javascript:GSN.menu(\""+vsName+"\");if (GSN.context==\"fullmap\")GSN.vsbox.bringToFront(\""+vsName+"\");'>"+vsName+"</a>");
-                GSN.map.markers.push(marker);
+        addMarker: function(vs,lat,lon){
+        	
+	        var vsName = $(vs).attr("name");
+	        var marker = new google.maps.Marker({
+	    		position: new google.maps.LatLng(lat, lon),
+	    		map: map,
+	    		icon: './img/green_marker.png',
+	    		draggable: false,
+	    		vsname: vsName
+	    	});
+	        
+	        if (GSN.context == 'fullmap') {
+	        	marker.content = "<script>GSN.menu(\""+vsName+"\");GSN.vsbox.bringToFront(\""+vsName+"\");</script><a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a><br>"+GSN.map.vsFieldsToString(vs);
+            } else if (GSN.context == 'map'){
+            	marker.content = "<script>GSN.menu(\""+vsName+"\");</script><input type=\"checkbox\" id=\"map_cb_" + vsName + "\"value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" /><label for=\"map_cb_" + vsName + "\"value=\"" + vsName + "\">Add <a href=\"data.html?vsname="+vsName+"#data\">"+vsName+"</a> to basket</label><br>"+GSN.map.vsFieldsToString(vs);
             }
-            if(mapProvider=="google"){
-                marker.setIcon("./img/green_marker.png");
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
-                GSN.map.markers.push(marker);
-            }
-            if(mapProvider=="yahoo"){
-                marker.setInfoBubble("<script>GSN.menu(\""+vsName+"\");if (GSN.context=='fullmap')GSN.vsbox.bringToFront(\""+vsName+"\");</script>Selected Sensor: "+vsName);
-                GSN.map.markers.push(marker);
-            }
-			
-            map.addMarker(marker);
+	        
+	        google.maps.event.addListener(marker, 'click', function() {
+	        	if (GSN.map.infowindow != null) {
+	        		GSN.map.infowindow.close();
+	        	}
+	        	GSN.map.infowindow = new google.maps.InfoWindow({
+		            content: marker.content
+		        });
+	        	
+	        	GSN.map.infowindow.open(map,marker);
+	        	
+	        	if($("#basket_cb_" + vsName).attr('checked') == "checked") {
+	        		console.info(vsName);
+	        		$("#map_cb_" + vsName).attr('checked', true);
+	        	}
+		    });
+	        
+            GSN.map.markers.push(marker);
+            
             //add gpsenable class
             $("#menu-"+vsName).addClass("gpsenabled");
 			
             if(GSN.context=="fullmap"){
-                var vs = $(".vsbox-"+vsName+" > h3 > span.vsname")
-                $(vs).wrap("<a href=\"javascript:GSN.menu('"+$(vs).text()+"');\"></a>");
+                var vs2 = $(".vsbox-"+vsName+" > h3 > span.vsname")
+                $(vs2).wrap("<a href=\"javascript:GSN.menu('"+$(vs2).text()+"');\"></a>");
             }
         }
-		
 		
         /**
 		* Update marker
 		*/
         ,
-        updateMarker: function(vsName,lat,lon){
+        updateMarker: function(vs,lat,lon){
+        	var vsName = $(vs).attr("name");
             for (x=0; x<GSN.map.markers.length; x++) {
                 var m = GSN.map.markers[x];
-                if (m.getAttribute("vsname") == vsName) {
-                    m.hide();
-                    map.removeMarker(m);
+                if (m.vsname == vsName) {
+                    m.setVisible(false);
+                    m.setMap(null);
                     GSN.map.markers.splice(x,1);
                 }
             }
-            GSN.map.addMarker(vsName,lat,lon);
+            GSN.map.addMarker(vs,lat,lon);
         }
-		
 		
         /**
 		* Highlight a marker
@@ -1134,34 +1179,33 @@ var GSN = {
             if (vsName!=null) {
                 for (x in GSN.map.markers) {
                     var m = GSN.map.markers[x];
-                    if (m.getAttribute("vsname") == vsName) {
+                    if (m.vsname == vsName) {
                         GSN.map.highlighted = x;
-                        map.setCenter(new LatLonPoint(m.location.lat,m.location.lon))
+                        map.setCenter(m.getPosition())
                         return;
                     }
                 }
             }
         }
-		
         ,
         areVisible: true
         ,
         toggleAllMarkers: function(){
             for (x=0; x<GSN.map.markers.length; x++) {
                 var m = GSN.map.markers[x];
-                if(GSN.areVisible) m.hide();
-                else m.show();
+                if(GSN.map.areVisible) m.setVisible(false);
+                else m.setVisible(true);
             }
-            GSN.areVisible = !GSN.areVisible;
-        }
-		
+            GSN.map.areVisible = !GSN.map.areVisible;
+        }		
 		
         /**
 		* Zoom out to see all marker
 		*/
         ,
         showAllMarkers: function(){
-            map.autoCenterAndZoom();
+			//map.setCenter(new google.maps.LatLng(0, 0));
+			//map.setZoom(1);
         }
     }
 	
@@ -2235,8 +2279,42 @@ var GSN = {
             }
             return unescape(strReturn);
         }
-		
-		
+        ,
+        getURLParamImproved: function(url) {
+        	//Allows parsing array as URL parameter
+    		// Code found on https://gist.github.com/kares/956897
+		    var re = /([^&=]+)=?([^&]*)/g;
+		    var decode = function(str) {
+		    	var tmp = decodeURIComponent(str.replace(/\+/g, ' '));
+		    
+		    	// remove trailing [] of the multipled-value parameters
+		    	tmp = tmp.replace(/\[\]/,'');
+		        return tmp;
+		    };
+		    function parseParam(query) {
+		        var params = {}, e;
+		        if (query) {
+		            if (query.substr(0, 1) == '?') {
+		                query = query.substr(1);
+		            }
+	
+		            while (e = re.exec(query)) {
+		                var k = decode(e[1]);
+		                var v = decode(e[2]);
+		                if (params[k] !== undefined) {
+		                    if (!$.isArray(params[k])) {
+		                        params[k] = [params[k]];
+		                    }
+		                    params[k].push(v);
+		                } else {
+		                    params[k] = v;
+		                }
+		            }
+		        }
+		        return params;
+		    };
+		    
+		    return parseParam(url);
+        }
     }
 };
-

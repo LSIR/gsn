@@ -5,68 +5,180 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
         <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
-        <link rel="stylesheet" href="style/gsn_theme.css" type="text/css" media="screen,projection" />
-        <script type="text/javascript" src="js/jquery-latest.pack.js"></script>
-        <script type="text/javascript" src="js/jquery-dom.js"></script>
+
+ 	 	<script type="text/javascript" src="js/jquery-1.11/jquery-1.11.1.min.js"></script>
+ 	 	<script type="text/javascript" src="js/chosen-1.4.2/chosen.jquery.min.js"></script>
+ 	 	<link rel="stylesheet" href="js/chosen-1.4.2/chosen.min.css" type="text/css" media="screen,projection" />
+ 	 	<script type="text/javascript" src="js/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+ 	 	<link rel="stylesheet" href="js/jquery-ui-1.11.4/jquery-ui.min.css" type="text/css" media="screen,projection" />
+ 	 	<script type="text/javascript" src="js/jquery-dom.js"></script>
         <script type="text/javascript" src="js/jquery.history.js"></script>
         <script type="text/javascript" src="js/jquery-tooltip.js"></script>
-
-        <!-- Include Map engine-->
-        <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
-        <!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
-        <!--<script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>-->
-        <script type="text/javascript" src="js/mapstraction.js"></script>
-
+ 	 	
+ 	 	<link rel="stylesheet" href="style/map.css" type="text/css" media="screen,projection" />
+ 	 	
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+       
         <script type="text/javascript" src="js/constants.js"></script>
         <script type="text/javascript" src="js/functions.js"></script>
         <script type="text/javascript" src="js/gsn.js"></script>
-
+        
         <script type="text/javascript">
-           // <!--//<![CDATA[
-            var mapProvider = null;
+        
+            <!--//<![CDATA[ -->
 
+            var vsBasket = new Array();
+            
+        	// Function called in gsn.js
+	        function putInVsBasket(cb) {
+        		var vsName = cb.value;
+	    		if(cb.checked) {
+	    			vsBasket.push(vsName);
+	    			$("#vsbasket").append("<div class=\"vsbasket_elem\" id=\"basket_" + vsName + "\"><input type=\"checkbox\" id=\"basket_cb_" + vsName + "\" value=\"" + vsName + "\" onclick=\"putInVsBasket(this);\" checked />" + vsName + "</div>");
+	    			$("#basket_cb_" + vsName).attr("checked", true);
+	    			$("#map_cb_" + vsName).attr("checked", true);
+	    		} else {
+	    			vsBasket.splice($.inArray(vsName,vsBasket),1);
+	    			$("#basket_" + vsName).remove();
+	    			$("#basket_cb_" + vsName).attr("checked", false);
+	    			$("#map_cb_" + vsName).attr("checked", false);
+	    		}
+	    	}
+        	
+        	function updateMapMarkersDisplay() {
+        		var mapBounds = map.getBounds();
+       			var selectedObsProp = $("#observedProperties").chosen().val();
+               	if (GSN.map.areVisible && selectedObsProp != null) {
+               		if ($.inArray("any",selectedObsProp) != -1) {
+               			for (x = 0; x < GSN.map.markers.length; x++) {
+               				var m = GSN.map.markers[x];
+    	                    var vsName = m.vsname;
+    	                    if (mapBounds.contains(m.getPosition())) {
+    	                    	m.setVisible(true);
+        	                 	showSensorToVsMenu(vsName);
+    	                    } else {
+    	                    	m.setVisible(false)
+		                		hideSensorFromVsMenu(vsName);
+    	                    }
+               			}
+               		} else {
+               			// Show or hide markers based on the observed properties filter and the bounds of the map
+    	            	for (x = 0; x < GSN.map.markers.length; x++) {
+    	                    var m = GSN.map.markers[x];
+    	                    var vsName = m.vsname;
+   	    	                for (i = 0; i < selectedObsProp.length; i++) {
+   		                		if (undefined != obsPropVsMap.get(selectedObsProp[i])) {
+   		                			if ($.inArray(vsName,obsPropVsMap.get(selectedObsProp[i])) != -1 && mapBounds.contains(m.getPosition())) {
+   		                				m.setVisible(true)
+   		                				showSensorToVsMenu(vsName);
+   		                				break; // One observed property is enough to display the sensor (logical OR)
+   		                			} else {
+   		                				m.setVisible(false)
+   		                				hideSensorFromVsMenu(vsName);
+   		                			}
+   		                		} else {
+   		                			m.setVisible(false)
+   		                			hideSensorFromVsMenu(vsName);
+   		                		}
+   		                	}
+    	            	}
+               		}
+               	} else if (selectedObsProp == null) {
+               		for (x = 0; x < GSN.map.markers.length; x++) {
+               			var m = GSN.map.markers[x];
+	                    var vsName = m.vsname;
+	                    m.setVisible(false)
+	                    hideSensorFromVsMenu(vsName);
+    	           	}
+               	}
+               	
+               	function showSensorToVsMenu(vsName) {
+               		$("#menu-"+vsName).parent().show();
+               	}
+               	
+               	function hideSensorFromVsMenu(vsName) {
+               		$("#menu-"+vsName).parent().hide();
+               	}
+        	}
+        	
+	        var obsPropVsMap = new Map();
+            
             $(document).ready(function() {
-
+            	
                 $.get('menu.jsp', {selected: "map"}, function(data) {
                     $('#navigation').html(data);
                 });
 
-                mapProvider = GSN.util.getURLParam("mapProvider");
-                if(mapProvider.indexOf("#")!=-1){ //remove hash if any
-                    mapProvider = mapProvider.substring(0,mapProvider.indexOf("#"));
-                }
-
-                if(mapProvider==""){
-                    mapProvider = DEFAULT_MAP_PROVIDER;
-                }
-
-                if(mapProvider=="google"){
-                    $("#GM").attr("checked","checked");
-                }
-                if(mapProvider=="yahoo"){
-                    $("#YM").attr("checked","checked");
-                }
-                if(mapProvider=="microsoft"){
-                    $("#VE").attr("checked","checked");
-                    $("#toggleallmarkers").remove(); // because marker.hide() not possible with VE
-                }
-
-
-                map = new Mapstraction('vsmap',mapProvider);
-
-
-
                 //bind every buttons to javascript functionality (only once)
                 $("#refreshall_timeout").bind("change",GSN.updateallchange);
                 $("#refreshall").bind("click",GSN.refreshVSs);
-                $("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
+                <!--$("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);-->
                 $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
-    			$.historyInit(GSN.load);
-
-                //GSN.load();
+               	$("#observedProperties").chosen({
+                       search_contains: true,
+                       width: "200px",
+                       no_results_text: "No property found, try \"any\"",
+                       placeholder_text_multiple: "Select some properties"
+                });
+               	
+               	$("#observedProperties").chosen().change(function(e, params) {
+               		updateMapMarkersDisplay();
+               	});
+              	
+              	var obsPropArray = new Array();
+                
+               	$.ajax({
+   		    	    type: "GET",
+   		    	    url: "ext/ws/api/sensors?format=xml",
+   		    	    success: function(data){
+   		    	    	$("virtual-sensor",data).each(function(){
+   		    	    		var vsName = $(this).attr("name");
+   		    	    		$("field",this).each(function(){
+   		    	    			var obsProp = $(this).attr("obsProperty");
+   		    	    			if (undefined != obsProp) {
+   		    	    				if ($.inArray(obsProp,obsPropArray) == -1) {
+   		    	    					obsPropArray.push(obsProp);
+   		    	    				}
+   		    	    				var vsArray = obsPropVsMap.get(obsProp);
+   		    	    				if (undefined != vsArray) {
+   		    	    					obsPropVsMap.get(obsProp).push(vsName)
+   		    	    				} else {
+   		    	    					obsPropVsMap.set(obsProp, new Array(vsName));   		    	    					
+   		    	    				}
+   		    	    			}
+   		    	    		});
+   		    	        });
+   		    	    	obsPropArray.sort();
+   		    	    	for (i = 0; i < obsPropArray.length; ++i) {
+	   		    	    	$('#observedProperties').append($('<option>', {
+	   	    				    value: obsPropArray[i],
+	   	    				    text: obsPropArray[i]
+	   	    				}));
+   		    	    	}
+   		    	    	$("#observedProperties").trigger("chosen:updated");
+   		    	    }
+   		    	});
+               	
+               	$("#send_basket_to_data").on('click', function() {
+               		var url = "data.html?";
+               		var propVsBasket = $('#observedProperties').chosen().val();
+               		
+               		if (vsBasket.length == 0) {
+               			return;
+               		} else if (vsBasket.length == 1) {
+                    	url += $.param({vsname: vsBasket, propbasket: propVsBasket}) + "#data";
+               		} else {
+                    	url += $.param({vsbasket: vsBasket, propbasket: propVsBasket}) + "#data";
+               		}
+               		
+               		window.location.href = url;
+               	});
+               	
+               	GSN.load();
             });
-            ////]]>-->
+            
+            <!--//]]>-->
         </script>
 
     </head>
@@ -114,8 +226,9 @@
                     <!-- <h2>Global Sensor Network Map</h2> -->
                     <p><a style="text-decoration:underline" href="javascript:GSN.map.showAllMarkers();">Auto-zoom and focus the map</a></p>
                     <div id='selectMapProvider'>
-                        <input type="radio" id="VE" class="mapProvider" name="mapProvider" onclick="location.href='map.html?mapProvider=microsoft';" value="VE">Virtual Earth
+                       <!-- <input type="radio" id="VE" class="mapProvider" name="mapProvider" onclick="location.href='map.html?mapProvider=microsoft';" value="VE">Virtual Earth
                         <input type="radio" id="GM" class="mapProvider" name="mapProvider" onclick="location.href='map.html?mapProvider=google';" value="GM">Google Maps
+                        -->
                         <!--<input type="radio" id="YM" class="mapProvider" name="mapProvider" onclick="location.href='map.html?mapProvider=yahoo';" value="YM">Yahoo Maps -->
                     </div>
                     <div id="vsmap" style="width: 100%; height: 500px; position:relative;"></div>
@@ -129,10 +242,20 @@
                 <h3>Author</h3>
                 <p id="gsn-author">none</p>
                 <h3>Virtual sensors</h3>
+                <div class="observedproperties-autocomplete">
+					<label for="observedProperties">Filter by choosing observed properties: </label><br>
+					<select name="observedProperties" id="observedProperties" multiple>
+						<option selected value="any">Any</option> 
+                   	</select>'
+                </div>
                 <ul id="vsmenu">
                     <li><a href="#">not loaded</a></li>
                 </ul>
-                <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
+                <!--<p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>-->
+                <ul id="vsbasket">
+                	<div class="rubric_vsbasket">Basket</div>
+                </ul>
+                <p class="vsbasket_button"><input id="send_basket_to_data" type="button" value="Load basket in data" /></p>
             </div>
             </div>
             <div id="footer">
