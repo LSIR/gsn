@@ -39,6 +39,10 @@ sensorData.controller('ParameterSelectCtrl',
         function ($scope, $window, MetadataLoader, $location, sharedService, UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation) {
 
 
+            $scope.submit = function() {
+                $scope.submitValue = $scope.test;
+            };
+
             $scope.nameGroupFn = function (item) {
                 return item.name;
             };
@@ -47,11 +51,13 @@ sensorData.controller('ParameterSelectCtrl',
                 return item.columnName + "(" + item.unit + ")";
             };
 
+
             function updateSensorInfo(d) {
                 $scope.metadata = new SensorMetadata(d);
                 $scope.fields = $scope.metadata.getProperties();
                 $scope.from = $scope.metadata.getFromDate();
                 $scope.until = $scope.metadata.getToDate();
+                $scope.limitRowNumber = !FilterParameters.hasDates();
                 $scope.multipleDemo = {};
                 $scope.multipleDemo.selectedFields = [];
 
@@ -59,17 +65,28 @@ sensorData.controller('ParameterSelectCtrl',
 
             $scope.updateSensor = function (item) {
                 FilterParameters.vs = item;
+                $scope.sensorSelected = true;
+
 
                 MetadataLoader.loadData(item, true).then(function (d) {
                     //$scope.metadata = d;
 
                     updateSensorInfo(d);
 
+                    $scope.plotAvailable = false;
+
 
                 }).finally(function () {
                     $scope.loading = false;
                 });
             };
+
+            $scope.updateParameter = function (item) {
+                $scope.plotAvailable = true;
+            };
+
+            $scope.rowNumber = FilterParameters.rowNumber;
+            $scope.limitByRows = FilterParameters.limitByRows;
 
 
             $scope.aggregationFunctions = Aggregation.aggFunctions();
@@ -85,12 +102,22 @@ sensorData.controller('ParameterSelectCtrl',
             $scope.aggUnit = {};
             $scope.aggUnit.selected = FilterParameters.getAggUnitObj();
 
+            $scope.multipleDemo = {};
+            $scope.multipleDemo.selectedFields = [];
 
             $scope.loading = true;
+
 
             AllSensors.loadData().then(function (d) {
 
                 $scope.sensorNames = d;
+
+                if (!FilterParameters.vs) {
+                    $scope.multipleDemo.selectedFields = [];
+                    $scope.plotAvailable = false;
+                    $scope.sensorSelected = false;
+                    return;
+                }
 
 
                 MetadataLoader.loadData(FilterParameters.vs).then(function (d) {
@@ -98,10 +125,14 @@ sensorData.controller('ParameterSelectCtrl',
 
                     //$scope.fields = $scope.metadata.features[0].properties['allProperties'];
 
+                    $scope.sensorSelected = true;
                     updateSensorInfo(d);
+
                     for (var i = 0; i < $scope.fields.length; i++) {
                         if (FilterParameters.getFields().indexOf($scope.fields[i].columnName) > -1) {
                             $scope.multipleDemo.selectedFields.push($scope.fields[i]);
+                            $scope.plotAvailable = true;
+
 
                         }
                     }
@@ -128,6 +159,12 @@ sensorData.controller('ParameterSelectCtrl',
                 } else {
                     FilterParameters.aggPeriod = 1;
                     FilterParameters.aggUnit = Aggregation.aggUnits()[0].name;
+                }
+
+                FilterParameters.limitByRows = $scope.limitByRows;
+
+                if($scope.limitByRows) {
+                    FilterParameters.rowNumber = $scope.rowNumber;
                 }
 
                 FilterParameters.setFields(selectedColumns);
@@ -215,9 +252,6 @@ sensorData.controller('DatepickerCtrl', ['$scope', 'FilterParameters', 'SensorMe
         $scope.dates = FilterParameters;
 
 
-        //$scope.selectedDate = new Date();
-        //$scope.selectedDateAsNumber = Date.UTC(1986, 1, 22);
-
         $scope.getType = function (key) {
             return Object.prototype.toString.call($scope[key]);
         };
@@ -280,6 +314,9 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                 this.aggUnit = $routeParams['aggUnit'];
                 this.aggPeriod = $routeParams['aggPeriod'];
 
+                this.rowNumber = 100;
+                this.limitByRows = !this.hasDates();
+
             }
 
         }
@@ -316,6 +353,10 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                 return this.untilDate;
             },
 
+            hasDates: function () {
+                return this.untilDate && this.fromDate;
+            },
+
             hasAggregation: function () {
                 return this.aggFunc != -1;
             },
@@ -330,10 +371,16 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
 
             },
 
+            hasRequiredParameters: function () {
+                return this.vs && this.fields;
+            },
+
             updateURL: function (location) {
                 location.search('parameters', this.fields.toString());
-                location.search('from', this.formatDateWeb(this.getFromDate()));
-                location.search('to', this.formatDateWeb(this.getUntilDate()));
+                if (this.hasDates()) {
+                    location.search('from', this.formatDateWeb(this.getFromDate()));
+                    location.search('to', this.formatDateWeb(this.getUntilDate()));
+                }
                 location.search('sensors', this.vs);
                 if (this.hasAggregation()) {
                     location.search('aggFunc', this.aggFunc);
