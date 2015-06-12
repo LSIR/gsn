@@ -71,19 +71,19 @@ $(document).ready(function() {
 
         // plot configuration
         GsnPlots.setConfig([
-          { title:"Temperature",
+          { title:"Temperature [°C]",
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_temperature"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
-          },{ title:"Wind Speed",
+          },{ title:"Wind Speed [km/h]",
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_speed_minimum","wind_speed_average","wind_speed_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
-          },{ title:"Wind Direction",
+          },{ title:"Wind Direction [°]",
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["wind_direction_minimum","wind_direction_average","wind_direction_maximum"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
-          },{ title:"Humidity",
+          },{ title:"Humidity [%RH]",
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
-          },{ title:"Air Pressure",
+          },{ title:"Air Pressure [hPa]",
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
-          },{ title:"Rain",
+          },{ title:"Rain [mm]",
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
-          },{ title:"Hail",
+          },{ title:"Hail [hits/cm²]",
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },
         ]);
