@@ -17,8 +17,9 @@ ETZ_Dozer_AdcMux1__mapped.xml
 ETZ_Dozer_AdcMux2__mapped.xml
 ETZ_Dozer_AEDAQHealthData__mapped.xml
 ETZ_Dozer_AEDAQHealthData__conv.xml
-ETZ_Dozer_AEData__mapped.xml
 ETZ_Dozer_AEData__conv.xml
+ETZ_Dozer_AEData__demux.xml
+ETZ_Dozer_AEData__mapped.xml
 ETZ_Dozer_AEStatistics__mapped.xml
 ETZ_Dozer_BaseDebug__mapped.xml
 ETZ_Dozer_BaseStatus__mapped.xml
