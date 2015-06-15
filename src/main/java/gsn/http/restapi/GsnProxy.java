@@ -8,6 +8,8 @@ import javax.servlet.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.typesafe.config.ConfigFactory;
+
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.util.Enumeration;
@@ -20,6 +22,7 @@ public class GsnProxy extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	//private ServletContext servletContext;
     private Logger log;
+    private String servicesUrl=ConfigFactory.load().getString("gsn.services.proxy");
     
     public void init(ServletConfig servletConfig) throws ServletException {
         //servletContext = servletConfig.getServletContext();
@@ -43,7 +46,7 @@ public class GsnProxy extends HttpServlet {
             log.info(request.getPathInfo());
             log.info(request.getServletPath());
             log.info(request.getLocalAddr());
-            String urlString = "http://localhost:9000"+request.getServletPath()+request.getPathInfo(); //request.getRequestURL().toString();
+            String urlString = servicesUrl+request.getServletPath()+request.getPathInfo(); //request.getRequestURL().toString();
             String queryString = request.getQueryString();
             
             urlString += queryString==null?"":"?"+queryString;

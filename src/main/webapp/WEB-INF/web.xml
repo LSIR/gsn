@@ -27,7 +27,7 @@
 		GSN's Main Servlets, Must be enabled for any kind of HTTP based access ******************************************************************************* -->
 
 	<!-- GSN START -->
-	<!-- Enable Only for development
+	<!-- Enable Only for development-->
 	<servlet>
       <servlet-name>default</servlet-name>
       <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
@@ -37,7 +37,7 @@
       </init-param>
       <load-on-startup>0</load-on-startup>
     </servlet> 
-     -->
+     <!-- -->
 	<servlet>
 		<servlet-name>ControllerServlet</servlet-name>
 		<display-name>GSN XML Output</display-name>

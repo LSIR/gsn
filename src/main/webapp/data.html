@@ -176,7 +176,7 @@
                 }
 
                 function parse_minmax_vals_for_slider(sensor, field, slider, min, max){
-
+                    
                     $.get('rest/sensors/'+sensor+'/'+field+'/minmax', {}, function(response, text_status, request){
                     //alert("features "+response['features'][0].properties['values'][0][3]);
                         var result = response['features'][0];
@@ -366,7 +366,7 @@
                             btnfil.hide();
                            	$('#'+fields_id).on('change', function(evt, params){
                                 if ($(this).val() != 'All' && $('#'+vss_id).val() != 'All') {                                	
-                                	newSlider=min_max_slider($('#'+vss_id).val(), $(this).val());
+                                	newSlider=min_max_slider($('#'+vss_id).val().toLowerCase(), $(this).val());
                                 	$(this).parent().children('.condition-slider').remove();
                                    	$(this).parent().children('.btn-filter').show();                                    $(this).parent().append(newSlider);
                                     newSlider.hide();
@@ -448,10 +448,13 @@
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
-                $.get("gsn?REQUEST=0&omit_latest_values=true", function(xml){
+                //$.get("gsn?REQUEST=0&omit_latest_values=true", function(xml){
+                $.get("ws/api/sensors?latestValues=true&format=xml", function(xml){                
                     lovs = xml
                     virtual_sensors.push("All");
                     var vsname = getURLParameter("vsname");
+                    //if (vsname!=null) vsname=vsname.toLowerCase();
+                    console.log(vsname);
                     var vsfieldstr = getURLParameter("fields")
                     var vsfields="";
                     if (vsfieldstr!=null ) 

@@ -631,6 +631,7 @@ var GSN = {
     updateVs: function(vsName){
         $.ajax({
             type: "GET",
+            //url: "ws/api/sensors/"+vsName+"?format=xml&latestValues=true",
             url: "gsn?name="+vsName,
             success: function(data){
                 $("virtual-sensor[@name="+vsName+"]",data).each(function(){
@@ -854,10 +855,10 @@ var GSN = {
                             });
                         } else if (type.indexOf("binary") != -1){
                             value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
-                        } else if (unit==" s"){
-                            value = GSN.vsbox.formatTimeInterval(value);
-                        } else if (unit==" ms"){
-                            value = GSN.vsbox.formatTimeInterval(value / 1000);
+                        //} else if (unit==" s"){
+                        //    value = GSN.vsbox.formatTimeInterval(value);
+                        //} else if (unit==" ms"){
+                        //    value = GSN.vsbox.formatTimeInterval(value / 1000);
                         } else {
                             value = value + unit;
                         }
