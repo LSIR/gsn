@@ -1,0 +1,1890 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<title>GSN</title>
+
+<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery-dom.js"></script>
+<script type="text/javascript" src="js/jquery.history.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script type="text/javascript" src="js/uptime.js"></script>
+
+<!-- Visualization -->
+<link rel="stylesheet" type="text/css" href="http://vizzly.ethz.ch/vizzly.min.css" />
+<link rel="stylesheet" type="text/css" href="style/jquery-ui.custom.min.css" />
+<!--[if IE]><script src="http://vizzly.ethz.ch/excanvas.js"></script><![endif]-->
+<script type='text/javascript' src='js/jquery-ui.min.js'></script>
+<script type='text/javascript' src='http://vizzly.ethz.ch/extlib/dygraph-combined.js'></script>
+<script type='text/javascript' src='http://vizzly.ethz.ch/vizzly.min.js'></script>
+<script type='text/javascript' src='js/gsnplots.js'></script>
+
+<script type="text/javascript">
+<!--//<![CDATA[
+	$(document)
+			.ready(
+					function() {
+						$.get('/menu.jsp', {
+							selected : "science"
+						}, function(data) {
+							$('#navigation').html(data);
+						}, 'html');
+						$("#navigation ul a.local").bind("click", function() {
+							return GSN.nav($(this).text());
+						});
+
+						// plot configuration
+
+						GsnPlots
+								.setConfig([
+
+// ADM
+										{
+											title : "Crackmeter Position 1 [mm]",
+											signals : [ {
+												vsensor : "adm_crackmeter__nctn",
+												field : [ "nctn_dx1" ],
+												select : "sensornode[position=1]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 1 [°C]",
+											signals : [ {
+												vsensor : "adm_crackmeter__nctn",
+												field : [ "nctn_t2" ],
+												select : "sensornode[position=1]"
+											} ]
+										},
+										{
+											title : "Crackmeter Position 2 [mm]",
+											signals : [ {
+												vsensor : "adm_crackmeter__ncnn",
+												field : [ "ncnn_dx1" ],
+												select : "sensornode[position=2]"
+											} ]
+										},
+										{
+											title : "Crackmeter Position 3 [mm]",
+											signals : [ {
+												vsensor : "adm_crackmeter__ncnn",
+												field : [ "ncnn_dx1" ],
+												select : "sensornode[position=3]"
+											} ]
+										},
+										{
+											title : "Crackmeter Position 4 [mm]",
+											signals : [ {
+												vsensor : "adm_crackmeter__nctn",
+												field : [ "nctn_dx1" ],
+												select : "sensornode[position=4]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 4 [°C]",
+											signals : [ {
+												vsensor : "adm_crackmeter__nctn",
+												field : [ "nctn_t2" ],
+												select : "sensornode[position=4]"
+											} ]
+										},
+										{
+											title : "Crackmeter Position 5 [mm]",
+											signals : [ {
+												vsensor : "adm_crackmeter__ncnn",
+												field : [ "ncnn_dx1" ],
+												select : "sensornode[position=5]"
+											} ]
+										},
+										{
+											title : "Crackmeter Position 6 [mm]",
+											signals : [ {
+												vsensor : "adm_crackmeter__nctn",
+												field : [ "nctn_dx1" ],
+												select : "sensornode[position=6]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 6 [°C]",
+											signals : [ {
+												vsensor : "adm_crackmeter__nctn",
+												field : [ "nctn_t2" ],
+												select : "sensornode[position=6]"
+											} ]
+										},
+										{
+											title : "Borehole Thermistors Position 7 (South) [°C]",
+											signals : [ {
+												vsensor : "adm_cr1000",
+												field : [ "thermistor_1",
+														"thermistor_2",
+														"thermistor_3",
+														"thermistor_4",
+														"thermistor_5",
+														"thermistor_6",
+														"thermistor_7",
+														"thermistor_8",
+														"thermistor_9",
+														"thermistor_10",
+														"thermistor_11",
+														"thermistor_12",
+														"thermistor_13",
+														"thermistor_14",
+														"thermistor_15" ],
+												select : "sensornode[position=7]"
+											} ]
+										},
+										{
+											title : "Borehole Thermistors Position 8 (North) [°C]",
+											signals : [ {
+												vsensor : "adm_cr1000",
+												field : [ "thermistor_1",
+														"thermistor_2",
+														"thermistor_3",
+														"thermistor_4",
+														"thermistor_5",
+														"thermistor_6",
+														"thermistor_7",
+														"thermistor_8",
+														"thermistor_9",
+														"thermistor_10",
+														"thermistor_11",
+														"thermistor_12",
+														"thermistor_13",
+														"thermistor_14",
+														"thermistor_15" ],
+												select : "sensornode[position=8]"
+											} ]
+										},
+										{
+											title : "Borehole Thermistors Position 9 (East) [°C]",
+											signals : [ {
+												vsensor : "adm_cr1000",
+												field : [ "thermistor_1",
+														"thermistor_2",
+														"thermistor_3",
+														"thermistor_4",
+														"thermistor_5",
+														"thermistor_6",
+														"thermistor_8",
+														"thermistor_9",
+														"thermistor_10",
+														"thermistor_11",
+														"thermistor_12",
+														"thermistor_13",
+														"thermistor_14",
+														"thermistor_15" ],
+												select : "sensornode[position=9]"
+											} ]
+										},
+
+// Dirruhorn
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "dirruhorn_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 0, 4, 5, 7, 12,
+														14, 15, 16, 17, 18, 19,
+														21, 23, 25, 27, 29, 31,
+														33, 35, 39, 40, 41, 43,
+														44, 55, 56, 57, 62, 63,
+														64, 66, 67, 82, 83, 84 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "dirruhorn_gps_raw__tobinary__mapped",
+												field : [ "gps_missing_sv" ],
+												position : [ 15, 17, 40, 43, 44, 55, 62, 63, 82, 83, 84 ]
+											} ]
+										},
+										{
+											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "dirruhorn_gps_raw__tobinary__mapped",
+												field : [
+														"current_data_buffer_size",
+														"old_data_buffer_size" ],
+												position : [ 15, 17, 40, 43, 44, 55, 62, 63, 82, 83, 84 ]
+											} ]
+										},
+										{
+											title : "GPS Position East - Realtime [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__realtime",
+												field : [ "e" ],
+												position : [ 4, 5, 7, 12, 39,
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Realtime [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__realtime",
+												field : [ "n" ],
+												position : [ 4, 5, 7, 12, 39,
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Realtime [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__realtime",
+												field : [ "h" ],
+												position : [ 4, 5, 7, 12, 39,
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Position East - Batch [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__batch__daily",
+												field : [ "e" ],
+												position : [ 0, 2, 4, 5, 6, 7,
+														9, 12, 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 39, 40,
+														41, 43, 44, 55, 56, 57,
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Batch [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__batch__daily",
+												field : [ "n" ],
+												position : [ 0, 2, 4, 5, 6, 7,
+														9, 12, 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 39, 40,
+														41, 43, 44, 55, 56, 57,
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Batch [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__batch__daily",
+												field : [ "h" ],
+												position : [ 0, 2, 4, 5, 6, 7,
+														9, 12, 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 39, 40,
+														41, 43, 44, 55, 56, 57,
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity East - Batch [cm/d]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__batch__daily",
+												field : [ "v_e" ],
+												position : [ 0, 2, 4, 5, 6, 7,
+														9, 12, 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 39, 40,
+														41, 43, 44, 55, 56, 57,
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity North - Batch [cm/d]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__batch__daily",
+												field : [ "v_n" ],
+												position : [ 0, 2, 4, 5, 6, 7,
+														9, 12, 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 39, 40,
+														41, 43, 44, 55, 56, 57,
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity Altitude - Batch [cm/d]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__batch__daily",
+												field : [ "v_h" ],
+												position : [ 0, 2, 4, 5, 6, 7,
+														9, 12, 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 39, 40,
+														41, 43, 44, 55, 56, 57,
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity 3D - Batch [cm/d]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__batch__daily",
+												field : [ "v_3d" ],
+												position : [ 0, 2, 4, 5, 6, 7,
+														9, 12, 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 39, 40,
+														41, 43, 44, 55, 56, 57,
+														62, 63, 64, 66, 67, 70, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "Grabengufer Crackmeter Pos65 [mm]",
+											signals : [ {
+												vsensor : "dirruhorn_crackmeter__cnnn",
+												field : [ "cnnn_dx0" ],
+												select : "sensornode[position=65]"
+											} ]
+										},
+										{
+											title : "GPS Logger Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_logger__status",
+												field : [ "inclinometer_x" ],
+												position : [ 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 43, 44,
+														55, 56, 57, 62, 63, 64 ]
+											} ],
+										},
+										{
+											title : "GPS Logger Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_logger__status",
+												field : [ "inclinometer_y" ],
+												position : [ 14, 15, 16, 17,
+														18, 19, 21, 23, 25, 27,
+														29, 31, 33, 35, 43, 44,
+														55, 56, 57, 62, 63, 64 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "dirruhorn_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_x" ],
+												position : [ 15, 17, 43, 44, 55, 62, 63, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "dirruhorn_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_y" ],
+												position : [ 15, 17, 43, 44, 55, 62, 63, 82, 83, 84 ]
+											} ],
+										},
+
+// Matterhorn
+										{
+											title : "Crackmeter Position 1 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctt",
+												field : [ "nctt_dx1" ],
+												select : "sensornode[position=1]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperatures Position 1 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctt",
+												field : [ "nctt_t1", "nctt_t2" ],
+												select : "sensornode[position=1]"
+											} ]
+										},
+										{
+											title : "Crack Thermistorchain Position 1 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_thermistorchain1",
+												field : [ "tc_t1", "tc_t2",
+														"tc_t3", "tc_t4" ],
+												select : "sensornode[position=1]"
+											} ]
+										},
+										{
+											title : "Crackmeter Position 2 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctt",
+												field : [ "nctt_dx1" ],
+												select : "sensornode[position=2]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 2 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctt",
+												field : [ "nctt_t2" ],
+												select : "sensornode[position=2]"
+											} ]
+										},
+										{
+											title : "Crack Thermistorchain Position 2 [°C]",
+											signals : [
+													{
+														vsensor : "matterhorn_thermistorchain1",
+														field : [ "tc_t1",
+																"tc_t2" ],
+														select : "sensornode[position=2]"
+													},
+													{
+														vsensor : "matterhorn_thermistorchain2",
+														field : [ "tc_t6" ],
+														select : "sensornode[position=2]"
+													} ]
+										},
+										{
+											title : "Crackmeter Position 3 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctt",
+												field : [ "nctt_dx1" ],
+												select : "sensornode[position=3]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperatures Position 3 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctt",
+												field : [ "nctt_t1", "nctt_t2" ],
+												select : "sensornode[position=3]"
+											} ]
+										},
+										{
+											title : "Crack Thermistorchain Position 3 [°C]",
+											signals : [
+													{
+														vsensor : "matterhorn_thermistorchain1",
+														field : [ "tc_t1",
+																"tc_t2",
+																"tc_t3",
+																"tc_t4",
+																"tc_t5" ],
+														select : "sensornode[position=3]"
+													},
+													{
+														vsensor : "matterhorn_thermistorchain2",
+														field : [ "tc_t6",
+																"tc_t7" ],
+														select : "sensornode[position=3]"
+													} ]
+										},
+										{
+											title : "Crackmeter Position 4 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctt",
+												field : [ "nctt_dx1" ],
+												select : "sensornode[position=4]"
+											} ]
+										},
+										{
+											title : "Crack Thermistorchain Position 4 [°C]",
+											signals : [
+													{
+														vsensor : "matterhorn_thermistorchain1",
+														field : [ "tc_t1",
+																"tc_t2",
+																"tc_t3",
+																"tc_t4",
+																"tc_t5" ],
+														select : "sensornode[position=4]"
+													},
+													{
+														vsensor : "matterhorn_thermistorchain2",
+														field : [ "tc_t6" ],
+														select : "sensornode[position=4]"
+													} ]
+										},
+                                                                                {
+                                                                                        title : "Crack Thermistorchain Position 5 [°C]",
+                                                                                        signals : [
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                field : [ "tm_t1",
+                                                                                                                                "tm_t2",
+                                                                                                                                "tm_t3",
+                                                                                                                                "tm_t4" ],
+                                                                                                                select : "sensornode[position=5]"
+                                                                                                        } ]
+                                                                                },
+										{
+											title : "Resistivity Position 5 [MΩ]",
+											signals : [
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain2",
+                                                                                                                field : [ "tm_m2",
+                                                                                                                                "tm_m3",
+                                                                                                                                "tm_m4" ],
+                                                                                                                select : "sensornode[position=5]"
+													},
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                field : [ "tm_m1" ],
+                                                                                                                select : "sensornode[position=5]"
+                                                                                                        } ]
+										},
+                                                                                {
+                                                                                        title : "Pressure Sensor Position 5 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_waterpressure",
+                                                                                                field : [ "dcx_p1", "dcx_p2" ],
+                                                                                                select : "sensornode[position=5]"
+                                                                                        } ]
+                                                                                },
+                                                                                {
+                                                                                        title : "Pressure Sensor Difference Value Position 5 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_waterpressure",
+                                                                                                field : [ "dcx_p12" ],
+                                                                                                select : "sensornode[position=5]"
+                                                                                        } ]
+                                                                                },
+										{
+											title : "Ambient Temperature on Pressure Sensor Position 5 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_waterpressure",
+												field : [ "dcx_tob1", "dcx_tob2" ],
+												select : "sensornode[position=5]"
+											} ]
+										},
+										{
+											title : "Earth Pressure Cell Position 5 [mBar]",
+											signals : [ {
+												vsensor : "matterhorn_earthpressure__nepn",
+												field : [ "nepn_p1" ],
+												select : "sensornode[position=5]"
+											} ]
+										},
+                                                                                {
+                                                                                        title : "Ambient Temperature on Earth Pressure Cell Position 5 [°C]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_earthpressure__nepn",
+                                                                                                field : [ "nepn_t1" ],
+                                                                                                select : "sensornode[position=5]"
+                                                                                        } ]
+                                                                                },
+										{
+											title : "Crackmeter 1 Position 6 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__tctc",
+												field : [ "tctc_dx1" ],
+												select : "sensornode[position=6]"
+											} ]
+										},
+										{
+											title : "Crackmeter 2 Position 6 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__tctc",
+												field : [ "tctc_dx2" ],
+												select : "sensornode[position=6]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperatures Position 6 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__tctc",
+												field : [ "tctc_t1", "tctc_t2" ],
+												select : "sensornode[position=6]"
+											} ]
+										},
+                                                                                {
+                                                                                        title : "Crack Thermistorchain Position 7 [°C]",
+                                                                                        signals : [
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                field : [ "tm_t1",
+                                                                                                                                "tm_t2",
+                                                                                                                                "tm_t3",
+                                                                                                                                "tm_t4" ],
+                                                                                                                select : "sensornode[position=7]"
+                                                                                                        } ]
+                                                                                },
+										{
+											title : "Resistivity Position 7 [MΩ]",
+                                                                                        signals : [
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                field : [ "tm_m1" ],
+                                                                                                                select : "sensornode[position=7]"
+                                                                                                        },
+                                                                                                        {
+                                                                                                                vsensor : "matterhorn_moisturechain2",
+                                                                                                                field : [ "tm_m2",
+                                                                                                                                "tm_m3",
+                                                                                                                                "tm_m4" ],
+                                                                                                                select : "sensornode[position=7]"
+                                                                                                        } ]
+										},
+                                                                                {
+                                                                                        title : "Pressure Sensor Position 7 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_waterpressure",
+                                                                                                field : [ "dcx_p1", "dcx_p2" ],
+                                                                                                select : "sensornode[position=7]"
+                                                                                        } ]
+                                                                                },
+                                                                                {
+
+                                                                                        title : "Pressure Sensor Difference Value Position 7 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_waterpressure",
+                                                                                                field : [ "dcx_p12" ],
+                                                                                                select : "sensornode[position=7]"
+                                                                                        } ]
+                                                                                },
+										{
+											title : "Ambient Temperature on Pressure Sensor Position 7 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_waterpressure",
+												field : [ "dcx_tob1", "dcx_tob2" ],
+												select : "sensornode[position=7]"
+											} ]
+										},
+                                                                                {
+                                                                                        title : "Earth Pressure Cell Position 7 [mBar]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_earthpressure__nepn",
+                                                                                                field : [ "nepn_p1" ],
+                                                                                                select : "sensornode[position=7]"
+                                                                                        } ]
+                                                                                },
+                                                                                {
+                                                                                        title : "Ambient Temperature on Earth Pressure Cell Position 7 [°C]",
+                                                                                        signals : [ {
+                                                                                                vsensor : "matterhorn_earthpressure__nepn",
+                                                                                                field : [ "nepn_t1" ],
+                                                                                                select : "sensornode[position=7]"
+                                                                                        } ]
+                                                                                },
+										{
+											title : "Crackmeter 1 Position 8 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctc",
+												field : [ "nctc_dx1" ],
+												select : "sensornode[position=8]"
+											} ]
+										},
+										{
+											title : "Crackmeter 2 Position 8 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctc",
+												field : [ "nctc_dx2" ],
+												select : "sensornode[position=8]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 8 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__nctc",
+												field : [ "nctc_t1" ],
+												select : "sensornode[position=8]"
+											} ]
+										},
+										/*{ title:"Sensorrod Temperatures Position 8 [°C]",
+										   signals: [{
+										     vsensor:"matterhorn_sensorrod1",
+										     field:["sr_t1","sr_t2","sr_t3","sr_t4"],
+										     select:"sensornode[position=8]"
+										   }]
+										 },*/
+										{
+											title : "Crackmeter 1 Position 9 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccct",
+												field : [ "ccct_dx0" ],
+												select : "sensornode[position=9]"
+											} ]
+										},
+										{
+											title : "Crackmeter 2 Position 9 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccct",
+												field : [ "ccct_dx1" ],
+												select : "sensornode[position=9]"
+											} ]
+										},
+										{
+											title : "Crackmeter 3 Position 9 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccct",
+												field : [ "ccct_dx2" ],
+												select : "sensornode[position=9]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 9 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccct",
+												field : [ "ccct_t3" ],
+												select : "sensornode[position=9]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 10 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=10]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 10 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_temperature__ntnn",
+												field : [ "ntnn_t1" ],
+												select : "sensornode[position=10]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 11 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=11]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 11 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_temperature__ntnn",
+												field : [ "ntnn_t1" ],
+												select : "sensornode[position=11]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 12 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=12]"
+											} ]
+										},
+										{
+											title : "Ground Surface Temperature Position 12 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_temperature__ntnn",
+												field : [ "ntnn_t1" ],
+												select : "sensornode[position=12]"
+											} ]
+										},
+										{
+											title : "Self Potential Position 13 [mV]",
+											signals : [ {
+												vsensor : "matterhorn_selfpotential",
+												field : [ "sp_dv1_1",
+														"sp_dv2_1", "sp_dv1_2",
+														"sp_dv2_2" ],
+												select : "sensornode[position=13]"
+											} ]
+										},
+										{
+											title : "Crackmeter 1 Position 20 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccnn",
+												field : [ "ccnn_dx0" ],
+												select : "sensornode[position=20]"
+											} ]
+										},
+										{
+											title : "Crackmeter 2 Position 20 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccnn",
+												field : [ "ccnn_dx1" ],
+												select : "sensornode[position=20]"
+											} ]
+										},
+										{
+											title : "Crackmeter 1 Position 21 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccnn",
+												field : [ "ccnn_dx0" ],
+												select : "sensornode[position=21]"
+											} ]
+										},
+										{
+											title : "Crackmeter 2 Position 21 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccnn",
+												field : [ "ccnn_dx1" ],
+												select : "sensornode[position=21]"
+											} ]
+										},
+										{
+											title : "Crackmeter 1 Position 22 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccnn",
+												field : [ "ccnn_dx0" ],
+												select : "sensornode[position=22]"
+											} ]
+										},
+										{
+											title : "Crackmeter 2 Position 22 [mm]",
+											signals : [ {
+												vsensor : "matterhorn_crackmeter__ccnn",
+												field : [ "ccnn_dx1" ],
+												select : "sensornode[position=22]"
+											} ]
+										},
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "matterhorn_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 33, 34, 35, 40 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "matterhorn_gps_raw__tobinary__mapped",
+												field : [ "gps_missing_sv" ],
+												position : [ 33, 34, 35, 40 ]
+											} ]
+										},
+										{
+											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "matterhorn_gps_raw__tobinary__mapped",
+												field : [
+														"current_data_buffer_size",
+														"old_data_buffer_size" ],
+														position : [ 33, 34, 35, 40 ]
+											} ]
+										},
+// 										{
+// 											title : "GPS Position East - Realtime [m]",
+// 											signals : [ {
+// 												vsensor : "matterhorn_gps_differential__realtime",
+// 												field : [ "e" ],
+// 												position : [ 33, 34, 35, 40 ]
+// 											} ],
+// 										},
+// 										{
+// 											title : "GPS Position North - Realtime [m]",
+// 											signals : [ {
+// 												vsensor : "matterhorn_gps_differential__realtime",
+// 												field : [ "n" ],
+// 												position : [ 33, 34, 35, 40 ]
+// 											} ],
+// 										},
+// 										{
+// 											title : "GPS Position Altitude - Realtime [m]",
+// 											signals : [ {
+// 												vsensor : "matterhorn_gps_differential__realtime",
+// 												field : [ "h" ],
+// 												position : [ 33, 34, 35, 40 ]
+// 											} ],
+// 										},
+										{
+											title : "GPS Position East - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "e" ],
+												position : [ 33, 34, 35, 40 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "n" ],
+												position : [ 33, 34, 35, 40 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "h" ],
+												position : [ 33, 34, 35, 40 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "matterhorn_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_x" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "matterhorn_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_y" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+
+// Jungfraujoch
+										{
+											title : "Sensorrod Temperatures Position 1 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=1]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 2 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=2]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 3 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=3]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 4 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=4]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 5 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=5]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 6 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=6]"
+											} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 7 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=7]"
+											} ]
+										},
+										{
+											title : "Temperatures Thermistorchain Position 8 [°C]",
+											signals : [
+													{
+														vsensor : "jungfraujoch_thermistorchain1",
+														field : [ "tc_t1",
+																"tc_t2",
+																"tc_t3",
+																"tc_t4",
+																"tc_t5" ],
+														select : "sensornode[position=8]"
+													},
+													{
+														vsensor : "jungfraujoch_thermistorchain2",
+														field : [ "tc_t6",
+																"tc_t7",
+																"tc_t8" ],
+														select : "sensornode[position=8]"
+													} ]
+										},
+										{
+											title : "Sensorrod Temperatures Position 9 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_sensorrod1",
+												field : [ "sr_t1", "sr_t2",
+														"sr_t3", "sr_t4" ],
+												select : "sensornode[position=9]"
+											} ]
+										},
+										{
+											title : "Temperatures Thermistorchain Position 10 [°C]",
+											signals : [
+													{
+														vsensor : "jungfraujoch_thermistorchain1",
+														field : [ "tc_t1",
+																"tc_t2",
+																"tc_t3",
+																"tc_t4",
+																"tc_t5" ],
+														select : "sensornode[position=10]"
+													},
+													{
+														vsensor : "jungfraujoch_thermistorchain2",
+														field : [ "tc_t6",
+																"tc_t7",
+																"tc_t8" ],
+														select : "sensornode[position=10]"
+													} ]
+										},
+										{
+											title : "Temperatures TH3",
+											signals : [ {
+												vsensor : "etz_dozer_th3temp__conv",
+												field : [ "temperature_5cm",
+														"temperature_10cm",
+														"temperature_20cm",
+														"temperature_30cm",
+														"temperature_50cm",
+														"temperature_100cm" ],
+												select : "sensornode[position]:has(configuration[th3=true])"
+											} ],
+										},
+										{
+											title : "Acoustic Emission Events Channel 1",
+											signals : [ {
+												vsensor : ".*_dozer_aedata__demux",
+												field : [ "length_ch1", "risetime_ch1",
+														"amplitude_db_ch1",
+														"count_ch1", "energy_ch1" ],
+												select : "sensornode[nodetype=9]"
+											} ],
+										},
+										{
+											title : "Acoustic Emission Events Channel 2",
+											signals : [ {
+												vsensor : ".*_dozer_aedata__demux",
+												field : [ "length_ch2", "risetime_ch2",
+														"amplitude_db_ch2",
+														"count_ch2", "energy_ch2" ],
+												select : "sensornode[nodetype=9]"
+											} ],
+										},
+										{
+											title : "Acoustic Emission Statistics",
+											signals : [ {
+												vsensor : ".*_dozer_aestatistics__mapped",
+												field : [
+														"payload_ch1_measured",
+														"payload_ch1_noisefloor",
+														"payload_ch2_measured",
+														"payload_ch2_noisefloor" ],
+												select : "sensornode[nodetype=9]"
+											} ],
+										},
+										{
+											title : "Moistures Enviroscan Position 19",
+											signals : [ {
+												vsensor : "jungfraujoch_dozer_enviroscanmoisture__conv",
+												field : [ "moisture1",
+														"moisture2",
+														"moisture3",
+														"moisture4",
+														"moisture5" ],
+												select : "sensornode[position=19]"
+											} ],
+										},
+										{
+											title : "Temperatures TH3 Position 22 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_dozer_th3temp__conv",
+												field : [ "temperature_5cm",
+														"temperature_10cm",
+														"temperature_20cm",
+														"temperature_30cm",
+														"temperature_50cm",
+														"temperature_100cm" ],
+												select : "sensornode[position=22]"
+											} ],
+										},
+										{
+											title : "Moistures Enviroscan Position 24",
+											signals : [ {
+												vsensor : "jungfraujoch_dozer_enviroscanmoisture__conv",
+												field : [ "moisture1",
+														"moisture2",
+														"moisture3" ],
+												select : "sensornode[position=24]"
+											} ],
+										},
+										{
+											title : "Temperatures TH3 Position 25 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_dozer_th3temp__conv",
+												field : [ "temperature_5cm",
+														"temperature_10cm",
+														"temperature_20cm",
+														"temperature_30cm",
+														"temperature_50cm",
+														"temperature_100cm" ],
+												select : "sensornode[position=25]"
+											} ],
+										},
+
+// Thur
+										{
+											title : "Decagon Conductivity Position 1 [µS/cm]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "conductivity0",
+														"conductivity1",
+														"conductivity2",
+														"conductivity3",
+														"conductivity4" ],
+												position : [ 1 ]
+											} ],
+										},
+										{
+											title : "Decagon Dielectric Position 1 [F/m]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "dielectric0",
+														"dielectric1",
+														"dielectric2",
+														"dielectric3",
+														"dielectric4" ],
+												position : [ 1 ]
+											} ],
+										},
+										{
+											title : "Decagon Temperature Position 1 [°C]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "temperature0",
+														"temperature1",
+														"temperature2",
+														"temperature3",
+														"temperature4" ],
+												position : [ 1 ]
+											} ],
+										},
+										{
+											title : "Decagon Conductivity Position 2 [µS/cm]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "conductivity0",
+														"conductivity1",
+														"conductivity2",
+														"conductivity3",
+														"conductivity4" ],
+												position : [ 2 ]
+											} ],
+										},
+										{
+											title : "Decagon Dielectric Position 2 [F/m]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "dielectric0",
+														"dielectric1",
+														"dielectric2",
+														"dielectric3",
+														"dielectric4" ],
+												position : [ 2 ]
+											} ],
+										},
+										{
+											title : "Decagon Temperature Position 2 [°C]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "temperature0",
+														"temperature1",
+														"temperature2",
+														"temperature3",
+														"temperature4" ],
+												position : [ 2 ]
+											} ],
+										},
+										{
+											title : "Decagon Conductivity Position 3 [µS/cm]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "conductivity0",
+														"conductivity1",
+														"conductivity2",
+														"conductivity3",
+														"conductivity4" ],
+												position : [ 3 ]
+											} ],
+										},
+										{
+											title : "Decagon Dielectric Position 3 [F/m]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "dielectric0",
+														"dielectric1",
+														"dielectric2",
+														"dielectric3",
+														"dielectric4" ],
+												position : [ 3 ]
+											} ],
+										},
+										{
+											title : "Decagon Temperature Position 3 [°C]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "temperature0",
+														"temperature1",
+														"temperature2",
+														"temperature3",
+														"temperature4" ],
+												position : [ 3 ]
+											} ],
+										},
+										{
+											title : "Decagon Conductivity Position 4 [µS/cm]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "conductivity0",
+														"conductivity1",
+														"conductivity2",
+														"conductivity3",
+														"conductivity4" ],
+												position : [ 4 ]
+											} ],
+										},
+										{
+											title : "Decagon Dielectric Position 4 [F/m]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "dielectric0",
+														"dielectric1",
+														"dielectric2",
+														"dielectric3",
+														"dielectric4" ],
+												position : [ 4 ]
+											} ],
+										},
+										{
+											title : "Decagon Temperature Position 4 [°C]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "temperature0",
+														"temperature1",
+														"temperature2",
+														"temperature3",
+														"temperature4" ],
+												position : [ 4 ]
+											} ],
+										},
+										{
+											title : "Decagon Conductivity Position 5 [µS/cm]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "conductivity0",
+														"conductivity1",
+														"conductivity2",
+														"conductivity3",
+														"conductivity4" ],
+												position : [ 5 ]
+											} ],
+										},
+										{
+											title : "Decagon Dielectric Position 5 [F/m]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "dielectric0",
+														"dielectric1",
+														"dielectric2",
+														"dielectric3",
+														"dielectric4" ],
+												position : [ 5 ]
+											} ],
+										},
+										{
+											title : "Decagon Temperature Position 5 [°C]",
+											signals : [ {
+												vsensor : "thur_dozer_decagonmux__conv",
+												field : [ "temperature0",
+														"temperature1",
+														"temperature2",
+														"temperature3",
+														"temperature4" ],
+												position : [ 5 ]
+											} ],
+										},
+
+// Permos GPS Locations
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "permos_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "GPS Position East - Batch [m]",
+											signals : [ {
+												vsensor : "permos_gps_differential__batch__daily",
+												field : [ "e" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Batch [m]",
+											signals : [ {
+												vsensor : "permos_gps_differential__batch__daily",
+												field : [ "n" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Batch [m]",
+											signals : [ {
+												vsensor : "permos_gps_differential__batch__daily",
+												field : [ "h" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity East - Batch [cm/d]",
+											signals : [ {
+												vsensor : "permos_gps_differential__batch__daily",
+												field : [ "v_e" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity North - Batch [cm/d]",
+											signals : [ {
+												vsensor : "permos_gps_differential__batch__daily",
+												field : [ "v_n" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity Altitude - Batch [cm/d]",
+											signals : [ {
+												vsensor : "permos_gps_differential__batch__daily",
+												field : [ "v_h" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity 3D - Batch [cm/d]",
+											signals : [ {
+												vsensor : "permos_gps_differential__batch__daily",
+												field : [ "v_3d" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+										{
+											title : "GPS Logger Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "permos_gps_logger__status",
+												field : [ "inclinometer_x" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+										{
+											title : "GPS Logger Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "permos_gps_logger__status",
+												field : [ "inclinometer_y" ],
+												position : [ 1, 2, 3, 4, 5, 6,
+														7 ]
+											} ],
+										},
+
+// Saastal GPS Locations
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "saastal_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 0, 2, 3 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "saastal_gps_raw__tobinary__mapped",
+												field : [ "gps_missing_sv" ],
+												position : [ 2, 3 ]
+											} ]
+										},
+										{
+											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "saastal_gps_raw__tobinary__mapped",
+												field : [
+														"current_data_buffer_size",
+														"old_data_buffer_size" ],
+														position : [ 2, 3 ]
+											} ]
+										},
+										{
+											title : "GPS Position East - Batch [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "e" ],
+												position : [ 0, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Batch [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "n" ],
+												position : [ 0, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Batch [m]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "h" ],
+												position : [ 0, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity East - Batch [cm/d]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "v_e" ],
+												position : [ 0, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity North - Batch [cm/d]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "v_n" ],
+												position : [ 0, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity Altitude - Batch [cm/d]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "v_h" ],
+												position : [ 0, 2, 3 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity 3D - Batch [cm/d]",
+											signals : [ {
+												vsensor : "saastal_gps_differential__batch__daily",
+												field : [ "v_3d" ],
+												position : [ 0, 2, 3 ]
+											} ],
+										},
+// 										{
+// 											title : "GPS Position East - Realtime [m]",
+// 											signals : [ {
+// 												vsensor : "saastal_gps_differential__realtime",
+// 												field : [ "e" ],
+// 												position : [ 0, 2, 3 ]
+// 											} ],
+// 										},
+// 										{
+// 											title : "GPS Position North - Realtime [m]",
+// 											signals : [ {
+// 												vsensor : "saastal_gps_differential__realtime",
+// 												field : [ "n" ],
+// 												position : [ 0, 2, 3 ]
+// 											} ],
+// 										},
+// 										{
+// 											title : "GPS Position Altitude - Realtime [m]",
+// 											signals : [ {
+// 												vsensor : "saastal_gps_differential__realtime",
+// 												field : [ "h" ],
+// 												position : [ 0, 2, 3 ]
+// 											} ],
+// 										},
+										{
+											title : "Wireless GPS Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "saastal_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_x" ],
+												position : [ 2, 3 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "saastal_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_y" ],
+												position : [ 2, 3 ]
+											} ],
+										},
+
+// ETZ
+										{
+											title : "GPS Number of Satellites",
+											signals : [ {
+												vsensor : "etz_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ]
+										},
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "etz_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "etz_gps_raw__tobinary__mapped",
+												field : [ "gps_missing_sv" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ]
+										},
+										{
+											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "etz_gps_raw__tobinary__mapped",
+												field : [
+														"current_data_buffer_size",
+														"old_data_buffer_size" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ]
+										},
+										{
+											title : "GPS Position East - Realtime [m]",
+											signals : [ {
+												vsensor : "etz_gps_differential__realtime",
+												field : [ "e" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Realtime [m]",
+											signals : [ {
+												vsensor : "etz_gps_differential__realtime",
+												field : [ "n" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Realtime [m]",
+											signals : [ {
+												vsensor : "etz_gps_differential__realtime",
+												field : [ "h" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Position East - Batch [m]",
+											signals : [ {
+												vsensor : "etz_gps_differential__batch__daily",
+												field : [ "e" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Batch [m]",
+											signals : [ {
+												vsensor : "etz_gps_differential__batch__daily",
+												field : [ "n" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Batch [m]",
+											signals : [ {
+												vsensor : "etz_gps_differential__batch__daily",
+												field : [ "h" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity East - Batch [cm/d]",
+											signals : [ {
+												vsensor : "etz_gps_differential__batch__daily",
+												field : [ "v_e" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity North - Batch [cm/d]",
+											signals : [ {
+												vsensor : "etz_gps_differential__batch__daily",
+												field : [ "v_n" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity Altitude - Batch [cm/d]",
+											signals : [ {
+												vsensor : "etz_gps_differential__batch__daily",
+												field : [ "v_h" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "GPS Velocity 3D - Batch [cm/d]",
+											signals : [ {
+												vsensor : "etz_gps_differential__batch__daily",
+												field : [ "v_3d" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "etz_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_x" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "etz_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_y" ],
+												position : [ 3000, 3001, 3002,
+														3003, 3004, 3005, 3006,
+														3007, 3008, 3009, 3010,
+														3011, 3012, 3013, 3014,
+														3015, 3016, 3017, 3018,
+														3019, 3020, 3021, 3022,
+														3023, 3024, 3025, 3026 ]
+											} ],
+										}
+								]);
+
+						$
+								.ajax({
+									type : "GET",
+									url : "/gsn?structure",
+									success : function(data) {
+										if ($(document).attr("title") == "GSN") {
+											var gsn = $("gsn", data);
+											$(document).attr("title",
+													$(gsn).attr("name"));
+											$("#gsn-name").empty().append(
+													$(gsn).attr("name"));
+											$("#gsn-desc").empty().append(
+													$(gsn).attr("description"));
+											$("#gsn-author").empty().append(
+													$(gsn).attr("author")
+															+ " ("
+															+ $(gsn).attr(
+																	"email")
+															+ ")");
+											var gsnname = $(gsn)
+													.attr("name")
+													.replace(
+															/.*::\s*GSN\s*-\s*/,
+															"").replace(/\s/g,
+															"").toLowerCase();
+											$('head', document)
+													.append(
+															'<link rel="shortcut icon" href="/img/favicon/permasense-'+gsnname+'.ico"><link rel="icon" href="/img/favicon/permasense-'+gsnname+'.ico">');
+										}
+										$("#gsn-name").show();
+										uptime.setTime($(gsn).attr("uptime"));
+										GsnPlots.initPlots(data, function() {
+											addDeployments();
+										});
+									}
+								});
+					});
+
+	function addDeployments() {
+		// add deployment tabs and container
+		var visible = -1;
+		var d = GsnPlots.getDeployments(".*", "Statistics");
+		$(d).each(function() {
+			if ($.cookie("deployment") == this)
+				visible = this;
+		});
+		if (visible == -1) {
+			visible = d[0];
+		}
+		$(d).each(
+				function() {
+					$('#deployment_menu').append(
+							'<li><a href="javascript:showPlots(\'' + this
+									+ '\')" id="deployment_menu_item_' + this
+									+ '">' + this + '</a></li>');
+					$('#plotscontainer').append(
+							'<div id="plot_'+this+'"></div>');
+					$('#plot_' + this).hide();
+				});
+
+		showPlots(visible);
+	}
+
+	function showPlots(id) {
+		$(GsnPlots.getDeployments(".*", "Statistics")).each(function() {
+			$("#plot_" + this).empty().hide();
+			$("#deployment_menu_item_" + this).removeClass("selected");
+		});
+		$("#plot_" + id).show();
+		$("#deployment_menu_item_" + id).addClass("selected");
+		// add graphs
+		GsnPlots.addPlots($("#plot_" + id), id)
+		$.cookie("deployment", id);
+	}
+//]]>-->
+</script>
+</head>
+<body>
+
+		<div id="container">
+				<div id="header">
+						<h1>
+								<a href="." id="gsn-name" style="display: none">GSN</a>
+						</h1>
+						<div id="breadcrumbnav">
+								<a href="http://www.permasense.ch">PermaSense</a> > <a href="." id="gsn-name">GSN</a> > Science
+						</div>
+				</div>
+				<div id="navigation"></div>
+
+				<div id="separator">
+						<div id="starttext">
+								<p>A collection of scientific plots related to the PermaSense Deployments.</p>
+						</div>
+				</div>
+
+				<div id="maindiv">
+						<div id="deployment_navigation">
+								<ul id="deployment_menu">
+										<li />
+								</ul>
+						</div>
+
+						<div id="plotscontainer" style="margin-top: 5px"></div>
+
+				</div>
+				<div class="separator">
+						<div id="footer">
+								<table width="100%">
+										<tr>
+												<td style="width: 50%; color: #444444;"><b>A Project of <a href="http://www.ethz.ch" target="_blank">ETH Zurich</a>, <a
+																href="http://www.unibas.ch" target="_blank">Uni Basel</a> and <a href="http://www.uzh.ch" target="_blank">Uni Zurich</a></b></td>
+												<td style="text-align: right; width: 50%; font-size: 9px;">Powered by <a href="http://gsn.sourceforge.net/">GSN</a>, Distributed
+														Information Systems Lab, EPFL 2006
+												</td>
+										</tr>
+								</table>
+						</div>
+				</div>
+		</div>
+		<!-- script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-5632004-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script -->
+</body>
+</html>
