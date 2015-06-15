@@ -22,9 +22,9 @@ gsnWebApp.config(['$routeProvider',  '$datepickerProvider',
     function ($routeProvider,  $datepickerProvider) {
         $routeProvider.
             when('/plot', {
-                templateUrl: 'partials/highcharts.html',
-                controller: 'hcCtrl'
-                , reloadOnSearch: true
+                templateUrl: 'partials/highcharts.html'
+                //, controller: 'hcCtrl'
+                //, reloadOnSearch: true
             })
             //.
             //when('/test', {

@@ -25,8 +25,11 @@ var metaDataServices = angular.module('metaDataServices', [])
     }])
 
     .factory('SensorMetadata', function(){
-        var SensorMetadata = {
-            metadata: null,
+        function SensorMetadata(metadata) {
+            this.metadata = metadata;
+        }
+
+        SensorMetadata.prototype = {
 
             init: function(data) {
                 this.metadata = data;
@@ -37,15 +40,17 @@ var metaDataServices = angular.module('metaDataServices', [])
             },
 
             getSensorName: function() {
-                $scope.metadata.features[0].properties.sensorName;
+                return this.metadata.features[0].properties.sensorName;
             },
 
-            getFormDate: function() {
-
+            getFromDate: function() {
+                //return new Date('2001-01-01');
+                return this.metadata.features[0].properties['fromDate'];
             },
 
             getToDate: function() {
-
+                //return new Date('2016-01-01');
+                return this.metadata.features[0].properties['untilDate'];
             }
 
 
