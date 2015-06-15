@@ -1,0 +1,76 @@
+<virtual-sensor name="ETZ_Dozer_AEData__demux" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+          <param name="persistant">true</param>
+          <param name="scriptlet">
+          <![CDATA[
+            STARTSAMPLE_CH1 = LENGTH_CH1 = RISETIME_CH1 = AMPLITUDE_CH1 = AMPLITUDE_DB_CH1 = COUNT_CH1 = ENERGY_CH1 = null;
+            STARTSAMPLE_CH2 = LENGTH_CH2 = RISETIME_CH2 = AMPLITUDE_CH2 = AMPLITUDE_DB_CH2 = COUNT_CH2 = ENERGY_CH2 = null;
+            
+            if (CHANNEL == 1) {
+            	STARTSAMPLE_CH1 = STARTSAMPLE;
+            	LENGTH_CH1 = LENGTH;
+            	RISETIME_CH1 = RISETIME;
+            	AMPLITUDE_CH1 = AMPLITUDE;
+            	AMPLITUDE_DB_CH1 = AMPLITUDE_DB;
+            	COUNT_CH1 = COUNT;
+            	ENERGY_CH1 = ENERGY;
+            }
+            else if (CHANNEL == 2) {
+            	STARTSAMPLE_CH2 = STARTSAMPLE;
+            	LENGTH_CH2 = LENGTH;
+            	RISETIME_CH2 = RISETIME;
+            	AMPLITUDE_CH2 = AMPLITUDE;
+            	AMPLITUDE_DB_CH2 = AMPLITUDE_DB;
+            	COUNT_CH2 = COUNT;
+            	ENERGY_CH2 = ENERGY;
+            };
+          ]]>
+          </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="SERIAL" type="BIGINT" />
+            <field name="POSTTRIGGER" type="INTEGER" />
+            <field name="THRESHOLD" type="SMALLINT" unit="dB"/>
+            <field name="STARTSAMPLE_CH1" type="BIGINT" unit="µs"/>
+            <field name="LENGTH_CH1" type="INTEGER" unit="µs" />
+            <field name="RISETIME_CH1" type="INTEGER" unit="µs"/>
+            <field name="AMPLITUDE_CH1" type="DOUBLE" unit="V"/>
+            <field name="AMPLITUDE_DB_CH1" type="DOUBLE" unit="dB"/>
+            <field name="COUNT_CH1" type="INTEGER" />
+            <field name="ENERGY_CH1" type="DOUBLE" unit="V²"/>
+            <field name="STARTSAMPLE_CH2" type="BIGINT" unit="µs"/>
+            <field name="LENGTH_CH2" type="INTEGER" unit="µs" />
+            <field name="RISETIME_CH2" type="INTEGER" unit="µs"/>
+            <field name="AMPLITUDE_CH2" type="DOUBLE" unit="V"/>
+            <field name="AMPLITUDE_DB_CH2" type="DOUBLE" unit="dB"/>
+            <field name="COUNT_CH2" type="INTEGER" />
+            <field name="ENERGY_CH2" type="DOUBLE" unit="V²"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerAEDataMsg) from ETZ deployment demultiplexed</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+    	<stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_AEData__conv</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream> 
+    </streams>
+</virtual-sensor>
