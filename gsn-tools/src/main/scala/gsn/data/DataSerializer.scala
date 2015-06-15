@@ -57,13 +57,17 @@ object JsonSerializer extends DataSerializer{
                      "stats"->st)++
       sensor.properties.map(a=>a._1->JsString(a._2)).toSeq
       
+    val geo= 
+      if (sensor.location.latitude.isDefined && sensor.location .longitude.isDefined)
+        Json.obj("type"->"Point",
+                 "coordinates"->Json.arr(sensor.location.longitude,
+                                         sensor.location.latitude,
+                                         Some(sensor.location.altitude.getOrElse(0.0))))
+      else JsNull                                               
     val feature=Json.obj(
         "type"->"Feature",
         "properties"->JsObject(propvals),
-        "geometry"->Json.obj("type"->"Point",
-                             "coordinates"->Json.arr(sensor.location.latitude,
-                                                     sensor.location.longitude,
-                                                     sensor.location.altitude))
+        "geometry"->geo
     )    
     feature
   }

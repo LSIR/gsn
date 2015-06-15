@@ -123,14 +123,16 @@ object SensorService extends Controller{
       
       q ! GetSensorData(sensorid,fields,conds++filters,size,timeFormat)
       //val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 15.second)
-      p.future.map{data=>
-        
+      p.future.map{data=>        
           format match{
             case Json=>Ok(JsonSerializer.ser(data.head,Seq(),false))
             case Csv=>Ok(CsvSerializer.ser(data.head,Seq(),false))
           }
           
-      }/*
+      }.recover{
+        case t=> BadRequest(t.getMessage)
+      }
+      /*
       val copo =Future.firstCompletedOf(Seq(p.future,to)).map{          
         data=> 
           format match{
@@ -144,8 +146,7 @@ object SensorService extends Controller{
       }
       copo*/
     }.recover{
-      case t=>
-        Future(BadRequest(t.getMessage))
+      case t=>Future(BadRequest("Error: "+t.getMessage))
     }.get
   }
 
@@ -160,15 +161,18 @@ object SensorService extends Controller{
       val q=Akka.system.actorOf(Props(new QueryActor(p)))      
       q ! GetSensor(sensorid,latestVals,timeFormat)
       //val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 15.second)
+      
       p.future.map{data=>        
-          format match{
+        format match {
             case Json=>Ok(JsonSerializer.ser(data.head,Seq(),false))
             case Csv=>Ok(CsvSerializer.ser(data.head,Seq(),false))
-          }          
+            case Xml=>Ok(XmlSerializer.ser(data.head, Seq(), latestVals))
+        }          
+      }.recover{
+        case t=> BadRequest(t.getMessage)        
       }
     }.recover{
-      case t=>
-        Future(BadRequest(t.getMessage))
+      case t=> Future(BadRequest(t.getMessage))
     }.get
   }
 

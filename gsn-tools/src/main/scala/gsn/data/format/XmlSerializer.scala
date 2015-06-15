@@ -10,15 +10,21 @@ object XmlSerializer extends DataSerializer{
   
   override def ser(data:Seq[SensorData],props:Seq[String],withVals:Boolean)={
     val xml=
-      <gsn name="gsnlocal" author="gsn" email="emailo" description="desc">{
+      <gsn name="gsnlocal" author="gssn" email="emailos" description="desc">{
       data.map(d=>toXml(d,withVals))
       }        
       </gsn>;
     xml.toString
   }
     
-  override def ser(data:SensorData,props:Seq[String],withVals:Boolean)=
-    toXml(data,withVals).toString
+  override def ser(data:SensorData,props:Seq[String],withVals:Boolean)={
+    val xml=
+      <gsn name="gsnlocal" >{
+        toXml(data,withVals)
+      }        
+      </gsn>;
+    xml.toString
+  }
   
   private def toXml(data:SensorData, withVals:Boolean):xml.Elem={    
     val s= data.sensor 
@@ -50,7 +56,7 @@ object XmlSerializer extends DataSerializer{
         description={desc}>
         {         
           val predicates=s.properties.map{case (k,v)=>
-            <field name={k} catergory="predicate" >{v}</field>
+            <field name={k} category="predicate" >{v}</field>
           }
           if (withVals)
             xmlFieldValues++predicates

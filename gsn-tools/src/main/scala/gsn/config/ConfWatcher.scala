@@ -66,7 +66,11 @@ class ConfWatcher extends Actor {
         val vs=removeVsConfig(file)
         if (vs.isDefined)
           context.parent ! DeletedVsConf(vs.get)
-      case Modified(fileOrDir) =>
+      case Modified(file) =>
+        removeVsConfig(file)
+        val vs=addVsConfig(file)
+        if (vs.isDefined)
+          context .parent ! ModifiedVsConf(vs.get)        
       case GetSensorConf(sensorid) =>
         sender ! vsMap(sensorid)   
       //case GetSensorsConf =>
