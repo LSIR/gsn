@@ -130,49 +130,25 @@ xmlns:atom="http://www.w3.org/2005/Atom">
        <tr><td><b>Device Type</b></td><td>
        <xsl:choose>
         <xsl:when test="@nodetype = 1">SIB TinyNode</xsl:when>
-	<xsl:otherwise>
-		<xsl:choose>
-		<xsl:when test="@nodetype = 2">WGPS TinyNode</xsl:when>
-		<xsl:otherwise>
-			<xsl:choose>
-			<xsl:when test="@nodetype = 3">PowerSwitch TN</xsl:when>
-			<xsl:otherwise>
-				<xsl:choose>
-				<xsl:when test="@nodetype = 4">BaseStation</xsl:when>
-				<xsl:otherwise>
-					<xsl:choose>
-					<xsl:when test="@nodetype = 5">GPS Corestation</xsl:when>
-					<xsl:otherwise>
-						<xsl:choose>
-						<xsl:when test="@nodetype = 6">CamZilla CoreStation</xsl:when>
-						<xsl:otherwise>
-							<xsl:choose>
-							<xsl:when test="@nodetype = 7">GPS Logger</xsl:when>
-							<xsl:otherwise>
-								<xsl:choose>
-								<xsl:when test="@nodetype = 8">Webcam</xsl:when>
-								<xsl:otherwise>
-									<xsl:choose>
-									<xsl:when test="@nodetype = 9">AE TinyNode</xsl:when>
-									<xsl:otherwise>
-										unknown
-									</xsl:otherwise>
-									</xsl:choose>
-								</xsl:otherwise>
-								</xsl:choose>
-							</xsl:otherwise>
-							</xsl:choose>
-						</xsl:otherwise>
-						</xsl:choose>
-					</xsl:otherwise>
-					</xsl:choose>
-				</xsl:otherwise>
-				</xsl:choose>
-			</xsl:otherwise>
-			</xsl:choose>
-		</xsl:otherwise>
-		</xsl:choose>
-	</xsl:otherwise>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="@nodetype = 4">BaseStation</xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="@nodetype = 3">Powerswitch TN</xsl:when>
+                <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="@nodetype = 5">GPS Corestation</xsl:when>
+                    <xsl:otherwise>
+                      unknown
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+       </xsl:choose>
        </td></tr>
        <tr><td><b>Parent ID</b></td><td><xsl:value-of select="@parent_id"/></td></tr>
        <tr><td><b>Last packet generated at</b></td><td><xsl:value-of select="@generation_time"/></td></tr>
