@@ -1047,6 +1047,26 @@
 											} ],
 										},
 										{
+											title : "Acoustic Emission Events Channel 1",
+											signals : [ {
+												vsensor : ".*_dozer_aedata__demux",
+												field : [ "length_ch1", "risetime_ch1",
+														"amplitude_db_ch1",
+														"count_ch1", "energy_ch1" ],
+												select : "sensornode[nodetype=9]"
+											} ],
+										},
+										{
+											title : "Acoustic Emission Events Channel 2",
+											signals : [ {
+												vsensor : ".*_dozer_aedata__demux",
+												field : [ "length_ch2", "risetime_ch2",
+														"amplitude_db_ch2",
+														"count_ch2", "energy_ch2" ],
+												select : "sensornode[nodetype=9]"
+											} ],
+										},
+										{
 											title : "Acoustic Emission Events",
 											signals : [ {
 												vsensor : ".*_dozer_aedata__conv",
