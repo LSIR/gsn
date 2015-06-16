@@ -459,9 +459,12 @@
                     //if (vsname!=null) vsname=vsname.toLowerCase();
                     console.log(vsnames);
                     var vsfieldstr = getURLParameter("fields")
-                    var vsfields="";
+                    var vsfields=[];
                     if (vsfieldstr!=null ) 
-                    	vsfields=vsfieldstr.split(",");
+                    	repfields=vsfieldstr.split(",");
+                    $.each(repfields, function(i, el){
+                        if($.inArray(el, vsfields) === -1) vsfields.push(el);
+                    });
                     $('virtual-sensor',xml).each(function(){
                         var vs_name = $(this).attr('name');
                         virtual_sensors.push(vs_name);
@@ -491,7 +494,8 @@
                     	}
                     }
                     for (var i = 0 ; i < l ; i++) {               
-                    	for (j=0;j<vsnames.length;j++){                   
+                    	for (j=0;j<vsnames.length;j++){   
+                    	if ($.inArray(vsfields[i],virtual_sensor_to_fields[vsnames[j]])!=-1)
                         add_data_output (vsnames[j],vsfields[i]);}
                     }
                 });
