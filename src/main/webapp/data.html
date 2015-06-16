@@ -448,45 +448,51 @@
                 }
 
                 /** Load the REQUEST_LIST_OF_VIRTUAL_SENSORS xml and create the mapping */
-                //$.get("gsn?REQUEST=0&omit_latest_values=true", function(xml){
-                $.get("ws/api/sensors?latestValues=true&format=xml", function(xml){                
+                $.get("gsn?REQUEST=0&omit_latest_values=true", function(xml){
+                //$.get("ws/api/sensors?latestValues=true&format=xml", function(xml){                
                     lovs = xml
                     virtual_sensors.push("All");
                     var vsname = getURLParameter("vsname");
+                    var vsnames="";
+                    if (vsname!=null)
+                      vsnames=vsname.split(",");
                     //if (vsname!=null) vsname=vsname.toLowerCase();
-                    console.log(vsname);
+                    console.log(vsnames);
                     var vsfieldstr = getURLParameter("fields")
                     var vsfields="";
                     if (vsfieldstr!=null ) 
                     	vsfields=vsfieldstr.split(",");
                     $('virtual-sensor',xml).each(function(){
-                        var vsname = $(this).attr('name');
-                        virtual_sensors.push(vsname);
-                        virtual_sensor_to_fields[vsname] = virtual_sensor_to_fields[vsname] || []
+                        var vs_name = $(this).attr('name');
+                        virtual_sensors.push(vs_name);
+                        virtual_sensor_to_fields[vs_name] = virtual_sensor_to_fields[vs_name] || []
                         $(this).find('field').each(function(){
                             if ($(this).attr('category') != 'predicate') {
                                 var field_name = $(this).attr('name');
                                 var field_unit = $(this).attr('unit');
-                                virtual_sensor_to_fields[vsname].push(field_name);
+                                virtual_sensor_to_fields[vs_name].push(field_name);
                                 field_to_virtual_sensor[field_name] = field_to_virtual_sensor[field_name] || []
-                                field_to_virtual_sensor[field_name].push(vsname)
+                                field_to_virtual_sensor[field_name].push(vs_name)
 
-                                if (!field_to_unit[vsname]){
-                                    field_to_unit[vsname] = [];
+                                if (!field_to_unit[vs_name]){
+                                    field_to_unit[vs_name] = [];
                                 }
-                                if (!field_to_unit[vsname][field_name]){
-                                    field_to_unit[vsname][field_name] = [];
+                                if (!field_to_unit[vs_name][field_name]){
+                                    field_to_unit[vs_name][field_name] = [];
                                 }
-                                field_to_unit[vsname][field_name].push(field_unit)
+                                field_to_unit[vs_name][field_name].push(field_unit)
                             }
                         });
                     });
-                    l=vsfields.length;
+                    l=vsfields.length;                    
                     if (l==0){
-                    	add_data_output(vsname);
+                    	for (i=0;i<vsnames.length;i++){                   
+                    	  add_data_output(vsnames[i]);
+                    	}
                     }
                     for (var i = 0 ; i < l ; i++) {               
-                        add_data_output (vsname,vsfields[i]);
+                    	for (j=0;j<vsnames.length;j++){                   
+                        add_data_output (vsnames[j],vsfields[i]);}
                     }
                 });
 

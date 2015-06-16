@@ -18,7 +18,7 @@ object VsConf extends Conf{
   val defaultOutputRate=vs.getInt("outputRate")
   val defaultUniqueTimestamps=vs.getBoolean("uniqueTimestamps")
   def create(xml:Elem)=VsConf(
-		  xml \@ "name",
+		  (xml \@ "name").replaceAll(" ", ""),
 		  attBool(xml,"protected",defaultProtected),
 		  attInt(xml,"priority",defaultPriority),
 		  att(xml,"time-zone",null),
