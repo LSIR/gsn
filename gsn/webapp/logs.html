@@ -874,6 +874,9 @@ $(document).ready(function() {
 					$(this).find("ul.subnav").slideUp('slow');
 				});
 			    
+			    if (depl.dozerEventsExists)
+			    	addNewLogContainer(i, "dozerevents", "Dozer Event");
+			    
 				$.each(getAvailableCoreStations(depl), function(){
 					if (isPublicGSN)
 						addNewLogContainer(i, this, "CoreStation Pos " + this);
@@ -881,9 +884,6 @@ $(document).ready(function() {
 						addNewLogContainer(i, this, "CoreStation Id " + this);
 					depl.identifiers.push(this);
 				});
-			    
-			    if (depl.dozerEventsExists)
-			    	addNewLogContainer(i, "dozerevents", "Dozer Event");
 			});
 			
 			$.each(logContainers, function(){
