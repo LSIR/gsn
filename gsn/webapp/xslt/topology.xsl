@@ -143,10 +143,30 @@ xmlns:atom="http://www.w3.org/2005/Atom">
                       <xsl:choose>
                         <xsl:when test="@nodetype = 5">GPS Corestation</xsl:when>
                         <xsl:otherwise>
-                          unknown
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:otherwise>
+                          <xsl:choose>
+                            <xsl:when test="@nodetype = 6">CamZilla CoreStation</xsl:when>
+                            <xsl:otherwise>
+                              <xsl:choose>
+                                <xsl:when test="@nodetype = 7">GPS Logger</xsl:when>
+                                <xsl:otherwise>
+                                  <xsl:choose>
+                                    <xsl:when test="@nodetype = 8">Webcam</xsl:when>
+                                    <xsl:otherwise>
+                                      <xsl:choose>
+                                        <xsl:when test="@nodetype = 9">AE TinyNode</xsl:when>
+                                        <xsl:otherwise>                        
+          				                unknown
+			                       		</xsl:otherwise>
+			                      	  </xsl:choose>
+			                        </xsl:otherwise>
+			                      </xsl:choose>
+			                    </xsl:otherwise>
+			                  </xsl:choose>
+			                </xsl:otherwise>
+			              </xsl:choose>
+			            </xsl:otherwise>
+			          </xsl:choose>
+			        </xsl:otherwise>
                   </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
