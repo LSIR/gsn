@@ -132,10 +132,13 @@ xmlns:atom="http://www.w3.org/2005/Atom">
         <xsl:when test="@nodetype = 1">SIB TinyNode</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
-            <xsl:when test="@nodetype = 4">BaseStation</xsl:when>
+            <xsl:when test="@nodetype = 2">WGPS TinyNode</xsl:when>
+            <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="@nodetype = 3">Powerswitch TN</xsl:when>
             <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="@nodetype = 3">Powerswitch TN</xsl:when>
+                <xsl:when test="@nodetype = 4">BaseStation</xsl:when>
                 <xsl:otherwise>
                   <xsl:choose>
                     <xsl:when test="@nodetype = 5">GPS Corestation</xsl:when>
