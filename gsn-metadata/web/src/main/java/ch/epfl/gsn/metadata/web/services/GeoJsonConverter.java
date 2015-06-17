@@ -97,16 +97,9 @@ public class GeoJsonConverter {
             writeShort(writer, record);
         }
 
-        String dataLink = MessageFormat.format(configuration.getProperty("gsn.server.vs"), record.getName().toLowerCase());
-        writer.name("dataLink").value(dataLink);
 
         WikiInfo wikiInfo = record.getWikiInfo();
 
-        if (wikiInfo != null) {
-            writer.name("wikiLink").value(configuration.getProperty("wiki.server") + wikiInfo.getWikiLink());
-        } else {
-            writer.name("wikiLink").value(record.getMetadataLink());
-        }
 
         writeExtra(writer, record);
 
@@ -121,22 +114,33 @@ public class GeoJsonConverter {
     protected void writeShort(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
 
         writer.name("sensorName").value(record.getName());
+        WikiInfo wikiInfo = record.getWikiInfo();
+        if (wikiInfo != null) {
+            String organisation = wikiInfo.getOrganisation();
+            if (organisation != null) {
+                writer.name("organisation").value(organisation);
+            }
+            writer.name("deployment").value(wikiInfo.getDeploymentName());
+        }
 
         writer.name("fromDate").value(DATE_FORMAT.format(record.getFromDate() == null ? new Date() : record.getFromDate()));
         writer.name("toDate").value(DATE_FORMAT.format(record.getToDate() == null ? new Date() : record.getToDate()));
 
-        writeObservedProperties(writer, record);
-
-        writeGeoData(writer, record);
-        WikiInfo wikiInfo = record.getWikiInfo();
-
-        if (wikiInfo != null) {
-            writer.name("deployment").value(wikiInfo.getDeploymentName());
-            writer.name("organisation").value(wikiInfo.getOrganisation());
-        }
         writer.name("serverLink").value(record.getServer());
         writer.name("metadataLink")
                 .value(configuration.getProperty("metadata.server") + "metadata/virtualSensors/" + record.getName());
+        String dataLink = MessageFormat.format(configuration.getProperty("gsn.server.vs"), record.getName().toLowerCase());
+        writer.name("dataLink").value(dataLink);
+        if (wikiInfo != null) {
+            writer.name("wikiLink").value(configuration.getProperty("wiki.server") + wikiInfo.getWikiLink());
+        } else {
+            writer.name("wikiLink").value(record.getMetadataLink());
+        }
+
+        writeObservedProperties(writer, record);
+
+        writeGeoData(writer, record);
+
 
 
     }
@@ -178,6 +182,13 @@ public class GeoJsonConverter {
         writeGeoData(writer, record);
 
         writer.name("deployed").value(buildDeploymentDatesString(record.getFromDate(), record.getToDate()));
+        String dataLink = MessageFormat.format(configuration.getProperty("gsn.server.vs"), record.getName().toLowerCase());
+        writer.name("dataLink").value(dataLink);
+        if (wikiInfo != null) {
+            writer.name("wikiLink").value(configuration.getProperty("wiki.server") + wikiInfo.getWikiLink());
+        } else {
+            writer.name("wikiLink").value(record.getMetadataLink());
+        }
 
     }
 
