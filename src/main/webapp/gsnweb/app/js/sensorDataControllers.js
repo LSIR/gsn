@@ -35,13 +35,53 @@ sensorData.filter('propsFilter', function () {
 
 
 sensorData.controller('ParameterSelectCtrl',
-    ['$scope', '$window', 'MetadataLoader', '$location', 'sharedService', 'UrlBuilder', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation',
-        function ($scope, $window, MetadataLoader, $location, sharedService, UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation) {
+    ['$scope', '$window', 'MetadataLoader', '$location', 'sharedService', 'UrlBuilder', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation', 'SensorModel', '$q',
+        function ($scope, $window, MetadataLoader, $location, sharedService, UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation, SensorModel, $q) {
 
 
-            $scope.submit = function() {
-                $scope.submitValue = $scope.test;
+            $scope.rowNumber = FilterParameters.rowNumber;
+            $scope.limitByRows = FilterParameters.limitByRows;
+
+            $scope.limitRowNumber = !FilterParameters.hasDates();
+
+            $scope.aggregationFunctions = Aggregation.aggFunctions();
+            $scope.aggregationUnits = Aggregation.aggUnits();
+            $scope.aggFunc = {};
+            $scope.aggFunc.selected = FilterParameters.getAggFuncObj();
+            $scope.aggregationPeriod = FilterParameters.aggPeriod;
+            $scope.aggUnit = {};
+            $scope.aggUnit.selected = FilterParameters.getAggUnitObj();
+
+
+            $scope.sensorsWithParameters = [];
+
+            $scope.loading = true;
+
+
+            AllSensors.loadData().then(function (d) {
+                $scope.sensorNames = d;
+
+
+                if (FilterParameters.sensors.length < 1) {
+                    $scope.plotAvailable = false;
+                    $scope.sensorsWithParameters.push(new SensorModel());
+                    return;
+                }
+
+                FilterParameters.getSensorModels().then(function (sensorModels) {
+                    $scope.sensorsWithParameters = sensorModels;
+                    $scope.plotAvailable = true
+
+                }).finally(function () {
+                    $scope.loading = false;
+                });
+
+            });
+
+            $scope.updateParameter = function (item) {
+                $scope.plotAvailable = true;
             };
+
 
             $scope.nameGroupFn = function (item) {
                 return item.name;
@@ -52,26 +92,23 @@ sensorData.controller('ParameterSelectCtrl',
             };
 
 
-            function updateSensorInfo(d) {
-                $scope.metadata = new SensorMetadata(d);
-                $scope.fields = $scope.metadata.getProperties();
-                $scope.from = $scope.metadata.getFromDate();
-                $scope.until = $scope.metadata.getToDate();
-                $scope.limitRowNumber = !FilterParameters.hasDates();
-                $scope.multipleDemo = {};
-                $scope.multipleDemo.selectedFields = [];
+            function updateSensorInfo(d, index) {
+                var metadata = new SensorMetadata(d);
+
+                $scope.sensorsWithParameters[index].update(metadata);
+
 
             }
 
-            $scope.updateSensor = function (item) {
+            $scope.updateSensor = function (item, index) {
                 FilterParameters.vs = item;
-                $scope.sensorSelected = true;
+                $scope.sensorsWithParameters[index].selectedSensor = item;
 
 
                 MetadataLoader.loadData(item, true).then(function (d) {
                     //$scope.metadata = d;
 
-                    updateSensorInfo(d);
+                    updateSensorInfo(d, index);
 
                     $scope.plotAvailable = false;
 
@@ -81,75 +118,26 @@ sensorData.controller('ParameterSelectCtrl',
                 });
             };
 
-            $scope.updateParameter = function (item) {
-                $scope.plotAvailable = true;
+            $scope.addSensor = function () {
+                $scope.sensorsWithParameters.push(new SensorModel());
             };
 
-            $scope.rowNumber = FilterParameters.rowNumber;
-            $scope.limitByRows = FilterParameters.limitByRows;
-
-
-            $scope.aggregationFunctions = Aggregation.aggFunctions();
-
-
-            $scope.aggregationUnits = Aggregation.aggUnits();
-
-            $scope.selectedSensor = FilterParameters.vs;
-
-            $scope.aggFunc = {};
-            $scope.aggFunc.selected = FilterParameters.getAggFuncObj();
-            $scope.aggregationPeriod = FilterParameters.aggPeriod;
-            $scope.aggUnit = {};
-            $scope.aggUnit.selected = FilterParameters.getAggUnitObj();
-
-            $scope.multipleDemo = {};
-            $scope.multipleDemo.selectedFields = [];
-
-            $scope.loading = true;
-
-
-            AllSensors.loadData().then(function (d) {
-
-                $scope.sensorNames = d;
-
-                if (!FilterParameters.vs) {
-                    $scope.multipleDemo.selectedFields = [];
-                    $scope.plotAvailable = false;
-                    $scope.sensorSelected = false;
-                    return;
-                }
-
-
-                MetadataLoader.loadData(FilterParameters.vs).then(function (d) {
-                    //$scope.metadata = d;
-
-                    //$scope.fields = $scope.metadata.features[0].properties['allProperties'];
-
-                    $scope.sensorSelected = true;
-                    updateSensorInfo(d);
-
-                    for (var i = 0; i < $scope.fields.length; i++) {
-                        if (FilterParameters.getFields().indexOf($scope.fields[i].columnName) > -1) {
-                            $scope.multipleDemo.selectedFields.push($scope.fields[i]);
-                            $scope.plotAvailable = true;
-
-
-                        }
-                    }
-
-                }).finally(function () {
-                    $scope.loading = false;
-                });
-
-            });
+            $scope.removeSensor = function (index) {
+                $scope.sensorsWithParameters.splice(index, 1);
+            };
 
             function updateFilterParameters() {
+
+                FilterParameters.sensorModels = $scope.sensorsWithParameters;
+
                 var selectedColumns = [];
 
-                for (var i = 0; i < $scope.multipleDemo.selectedFields.length; i++) {
-                    selectedColumns.push($scope.multipleDemo.selectedFields[i].columnName)
+                for (var i = 0; i < $scope.sensorsWithParameters[0].parameters.selectedFields.length; i++) {
+                    selectedColumns.push($scope.sensorsWithParameters[0].parameters.selectedFields[i].columnName)
 
                 }
+                FilterParameters.setFields(selectedColumns);
+
 
                 FilterParameters.aggFunc = $scope.aggFunc.selected.value;
 
@@ -163,11 +151,10 @@ sensorData.controller('ParameterSelectCtrl',
 
                 FilterParameters.limitByRows = $scope.limitByRows;
 
-                if($scope.limitByRows) {
+                if ($scope.limitByRows) {
                     FilterParameters.rowNumber = $scope.rowNumber;
                 }
 
-                FilterParameters.setFields(selectedColumns);
                 FilterParameters.updateURL($location);
             }
 
@@ -190,6 +177,38 @@ sensorData.controller('ParameterSelectCtrl',
 
 
         }]);
+
+sensorData.factory('SensorModel', function () {
+    function SensorModel() {
+        this.selectedSensor;
+        this.parameters = {};
+        this.parameters.selectedFields = [];
+        this.from = '';
+        this.until = '';
+        this.fields = [];
+
+
+    }
+
+    SensorModel.prototype = {
+
+        update: function (metadata) {
+            this.fields = metadata.getProperties();
+
+            this.parameters = {};
+            this.parameters.selectedFields = [];
+
+            this.from = metadata.getFromDate();
+            this.until = metadata.getToDate();
+        },
+
+        isSensorSelected: function () {
+            return this.selectedSensor;
+        }
+    };
+
+    return SensorModel;
+});
 
 sensorData.factory('Aggregation', function () {
     var self = this;
@@ -241,7 +260,7 @@ sensorData.factory('Aggregation', function () {
             return self.aggUnits[0];
 
         }
-    }
+    };
 
     return Aggregation;
 });
@@ -294,12 +313,16 @@ sensorData.controller('DatepickerCtrl', ['$scope', 'FilterParameters', 'SensorMe
     }]);
 
 
-sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation',
-    function ($routeParams, $filter, Aggregation) {
+sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation', 'SensorModel', 'SensorMetadata', 'MetadataLoader', '$q',
+    function ($routeParams, $filter, Aggregation, SensorModel, SensorMetadata, MetadataLoader, $q) {
 
         function FilterParameters() {
 
             if (!jQuery.isEmptyObject($routeParams)) {
+
+                if ($routeParams['sensors'])
+                    this.sensors = $routeParams['sensors'].split(',');
+                else this.sensors = [];
 
                 this.vs = $routeParams['sensors'];
                 this.fromDate = Date.parse($routeParams['from']);
@@ -316,6 +339,8 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
 
                 this.rowNumber = 100;
                 this.limitByRows = !this.hasDates();
+
+                this.sensorModels = [];
 
             }
 
@@ -372,16 +397,99 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
             },
 
             hasRequiredParameters: function () {
-                return this.vs && this.fields;
+                return this.vs && this.fields.length > 0;
+            },
+
+            getSensorModels: function () {
+
+
+                if (!this.promise) {
+
+                    var promises = [];
+
+                    for (var s = 0; s < this.sensors.length; s++) {
+
+                        var index = s;
+
+                        var sensorModel = new SensorModel();
+                        sensorModel.selectedSensor = this.sensors[index];
+                        this.sensorModels.push(sensorModel);
+
+                        promises.push(MetadataLoader.loadData(this.sensors[index], true));
+
+                    }
+
+                    var self = this;
+
+                    this.promise = $q.all(promises).then(function (data) {
+
+                        for (var index = 0; index < data.length; index++) {
+                            var metadata = new SensorMetadata(data[index]);
+
+                            self.sensorModels[index].update(metadata);
+
+                            for (var i = 0; i < self.sensorModels[index].fields.length; i++) {
+                                if (self.getFields().indexOf(self.sensorModels[index].fields[i].columnName) > -1) {
+                                    self.sensorModels[index].parameters.selectedFields.push(self.sensorModels[index].fields[i]);
+
+                                }
+                            }
+
+                        }
+
+                        return self.sensorModels;
+
+                    });
+                }
+
+                return this.promise;
+            },
+
+            getAllSelectedParameters: function () {
+                var parameters = {};
+                this.sensorModels.forEach(function (sensor) {
+                    sensor.parameters.selectedFields.forEach(function (selectedParameter) {
+                        var parameter = {
+                            name: selectedParameter.name + '(' + sensor.selectedSensor + ')',
+                            unit: selectedParameter.unit
+                        }
+
+                        parameters[selectedParameter.columnName + '_' + sensor.selectedSensor] = parameter;
+                    })
+
+                });
+                return parameters;
+            },
+
+            getHeaders: function () {
+                var headers = [];
+                this.sensorModels.forEach(function (sensor) {
+                    sensor.parameters.selectedFields.forEach(function (selectedParameter) {
+                        headers.push(selectedParameter.columnName + '_' + sensor.selectedSensor);
+                    })
+
+                });
+
+                return headers;
             },
 
             updateURL: function (location) {
+                this.fields = [];
+                this.sensors = [];
+                for (var i = 0; i < this.sensorModels.length; i++) {
+                    for (var j = 0; j < this.sensorModels[i].parameters.selectedFields.length; j++) {
+                        this.fields.push(this.sensorModels[i].parameters.selectedFields[j].columnName);
+                    }
+                    this.sensors.push(this.sensorModels[i].selectedSensor);
+                }
+
                 location.search('parameters', this.fields.toString());
                 if (this.hasDates()) {
                     location.search('from', this.formatDateWeb(this.getFromDate()));
                     location.search('to', this.formatDateWeb(this.getUntilDate()));
                 }
-                location.search('sensors', this.vs);
+                //location.search('sensors', this.sensors.toString());
+                location.search('sensors', this.sensors.toString());
                 if (this.hasAggregation()) {
                     location.search('aggFunc', this.aggFunc);
                     location.search('aggUnit', this.aggUnit);
@@ -391,6 +499,14 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                     location.search('aggUnit', null);
                     location.search('aggPeriod', null);
                 }
+            },
+
+            setSensorFields: function (sensorFields) {
+                this.sensorFields = sensorFields;
+            },
+
+            getSensorFields: function () {
+                return this.sensorFields;
             }
         };
 

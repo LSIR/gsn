@@ -2,14 +2,18 @@
 
 var metaDataServices = angular.module('metaDataServices', [])
 
-    .factory('MetadataLoader', ['UrlBuilder', '$http', function (UrlBuilder, $http) {
+    .factory('MetadataLoader', [ '$http', '$q',  function ( $http, $q) {
 
         var promise;
+
+        var self = this;
+        self.metatdataUrl = 'http://eflumpc18.epfl.ch/gsn/';
 
         var MetadataLoader = {
             loadData: function (sensorName, reset) {
                 if (!promise || reset) {
-                    var url = UrlBuilder.getMetaDataUrl(sensorName);
+                    //var url = UrlBuilder.getMetaDataUrl(sensorName);
+                    var url = self.metatdataUrl + "web/virtualSensors/" + sensorName;;
                     console.log(url);
 
                     promise = $http.get(url).then(function (response) {
@@ -20,6 +24,8 @@ var metaDataServices = angular.module('metaDataServices', [])
                 }
                 return promise;
             }
+
+
         };
         return MetadataLoader;
     }])

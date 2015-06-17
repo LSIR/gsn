@@ -58,18 +58,12 @@ gsnDataServices.factory('dataProcessingService', ['UrlBuilder', '$http', 'Filter
 gsnDataServices.factory('ProcessGsnData', ['GsnResult', 'FilterParameters',
     function (GsnResult, FilterParameters) {
 
-
-
-
-
-
-
         var ProcessGsnData = {
             process: function (allText) {
 
                 GsnResult.reset();
 
-                var headers = FilterParameters.getFields();
+                var headers = FilterParameters.getHeaders();
                 for (var j = 0; j < headers.length; j++) {
                     GsnResult.dataMap[headers[j]] = [];
                 }
@@ -115,6 +109,75 @@ gsnDataServices.factory('ProcessGsnData', ['GsnResult', 'FilterParameters',
                 }
                 return GsnResult;
 
+            },
+
+            processMultiSensors: function (allText) {
+
+                GsnResult.reset();
+
+                //split content based on new line
+                var allTextLines = allText.split(/\r\n|\n/);
+
+                GsnResult.pointCount = allTextLines.length;
+
+                console.log("Loaded " + GsnResult.pointCount + " time points");
+                var gsnHeaders = [];
+
+                var sensorName ='';
+                var sensorsCount = 0;
+                var paramCount = 0;
+                for (var i = 0; i < allTextLines.length; i++) {
+
+                    if (allTextLines[i].indexOf("# vsname") == 0) {
+                        sensorName = allTextLines[i].split(":").pop();
+                        sensorsCount ++;
+                        paramCount = 0;
+                    } else if (allTextLines[i].indexOf("# time")== 0) {
+                        var parameters = allTextLines[i].split(',');
+                        for (var j = 1; j < parameters.length; j++) {
+                            if (parameters[j] != 'aggregation_interval') {
+                                var currentHeader = parameters[j] + '_' + sensorName;
+                                gsnHeaders.push(currentHeader);
+                                GsnResult.dataMap[currentHeader] = [];
+                                paramCount++;
+                            }
+                        }
+
+                    } else if (allTextLines[i].indexOf("#") === 0) {
+                        continue;
+                    }
+
+                    // split content based on comma
+                    var data = allTextLines[i].split(',');
+                    //if (data.length >= headers.length + 1) {
+                    for (var j = 0; j < paramCount; j++) {
+                        var tarr = [];
+
+                        var index = gsnHeaders.length - paramCount + j;
+                        var time = parseFloat(data[0]);
+                        if (!isNaN(time)) {
+                            tarr.push(time);
+
+                            var value = parseFloat(data[j + 1]);
+                            if (!isNaN(value)) {
+                                tarr.push(value);
+                                delete GsnResult.missingData[gsnHeaders[index]]
+
+                            }
+                            else {
+                                tarr.push(null);
+                                GsnResult.missingData[gsnHeaders[index]] = true;
+                            }
+                            GsnResult.dataMap[gsnHeaders[index]].push(tarr);
+                            GsnResult.hasValues = true;
+                        }
+
+
+                        //}
+                    }
+                }
+                return GsnResult;
+
             }
         }
 
@@ -122,14 +185,18 @@ gsnDataServices.factory('ProcessGsnData', ['GsnResult', 'FilterParameters',
 
     }]);
 
-gsnDataServices.factory('AxisInfo', ['UrlBuilder', '$http',
-    function (UrlBuilder, $http) {
+gsnDataServices.factory('AxisInfo', ['UrlBuilder', '$http', 'FilterParameters',
+    function (UrlBuilder, $http, FilterParameters) {
         var promise;
 
         var AxisInfo = {
             getAxesInfo: function () {
                 if (!promise) {
 
+                    for (var i = 0; i < FilterParameters.sensorModels; i++) {
+                        var obj = FilterParameters[i];
+
+                    }
                     var url = UrlBuilder.getTaxonomyUrl();
 
                     console.log(url);
@@ -166,9 +233,16 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
             buildGsnLink: function () {
                 var url = "http://montblanc.slf.ch:22001/multidata?time_format=unix&download_format=csv";
 
-                for (var i = 0; i < FilterParameters.getFields().length; i++) {
-                    url += "&vs[" + i + "]=" + FilterParameters.vs
-                    + "&field[" + i + "]=" + FilterParameters.getFields()[i];
+
+                var count = 0;
+                for (var i = 0; i < FilterParameters.sensorModels.length; i++) {
+                    var model = FilterParameters.sensorModels[i];
+                    for (var j = 0; j < model.parameters.selectedFields.length; j++) {
+                        url += "&vs[" + count + "]=" + model.selectedSensor
+                        + "&field[" + count + "]=" + model.parameters.selectedFields[j].columnName;
+                        count++;
+
+                    }
 
                 }
                 if (FilterParameters.hasAggregation()) {
@@ -214,15 +288,6 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
 
             sensorListUrl: function () {
                 return self.metatdataUrl + 'web/virtualSensorNames';
-            },
-
-            getTaxonomyUrl: function () {
-                var url = self.metatdataUrl + "taxonomy/columnData?sensorName=" + FilterParameters.vs +
-                    "&columnNames=";
-                for (var i = 0; i < FilterParameters.getFields().length; i++) {
-                    url += "&columnNames=" + FilterParameters.getFields()[i];
-                }
-                return url;
             }
         };
 

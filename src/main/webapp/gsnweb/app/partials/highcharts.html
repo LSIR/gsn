@@ -6,44 +6,66 @@
 
         <form name="myForm">
             <div ng-controller="ParameterSelectCtrl">
-                <div flex="70">
-                    <div layout="row">
-                        <div flex="45">
-                            <ui-select ng-model="selectedSensor" theme="select2" ng-disabled="disabled"
-                                       on-select="updateSensor($item, $model)"
-                                       style="min-width: 300px;">
-                                <ui-select-match placeholder="Select Sensor...">{{$select.selected}}
-                                </ui-select-match>
-                                <ui-select-choices
-                                        repeat="sensor in sensorNames | filter:$select.search">
-                                    <span ng-bind-html="sensor | highlight: $select.search"></span>
-                                    <!--<img ng-src="{{getIconUlr(sensor)}}" style="width: 16px; height:16px">-->
-                                </ui-select-choices>
-                            </ui-select>
-                        </div>
+                <div flex="100">
 
-                        <div flex="55" ng-disabled="!sensorSelected">
-                            <ui-select multiple ng-model="multipleDemo.selectedFields" theme="select2"
-                                       ng-disabled="disabled"
-                                       style="width: 400px;"
-                                       on-select="updateParameter()">
-                                <ui-select-match placeholder="Select property...">{{$item.columnName}}({{$item.unit}})
-                                </ui-select-match>
-                                <ui-select-choices group-by="nameGroupFn"
-                                                   repeat="property in fields | propsFilter: {name: $select.search, columnName: $select.search}">
-                                    <div ng-bind-html="propWithUnit(property) | highlight: $select.search"></div>
+                    <div>
+                        <md-button class="md-raised" ng-click="addSensor();">
+                            Add Sensor
+                        </md-button>
+                    </div>
+                    <div ng-repeat="sensor in sensorsWithParameters" layout="row" style="margin-bottom: 4px">
 
-                                </ui-select-choices>
-                            </ui-select>
+                            <div>
+                                <md-button class="md-icon-button md-primary" ng-click="removeSensor($index)" aria-label="Remove"
+                                           ng-show="sensorsWithParameters.length>1"
+                                        style="height:36px; width:36px;line-height:36px">
+                                    <md-icon style="height:20px;" md-svg-src="img/Less.svg"></md-icon>
+                                </md-button>
+
+                            </div>
+
+                            <div>
+                                <ui-select ng-model="sensor.selectedSensor" theme="select2" ng-disabled="disabled"
+                                           on-select="updateSensor($item, $index)"
+                                           style="min-width: 300px;">
+                                    <ui-select-match placeholder="Select Sensor...">{{$select.selected}}
+                                    </ui-select-match>
+                                    <ui-select-choices
+                                            repeat="sensor in sensorNames | filter:$select.search">
+                                        <span ng-bind-html="sensor | highlight: $select.search"></span>
+                                        <!--<img ng-src="{{getIconUlr(sensor)}}" style="width: 16px; height:16px">-->
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+
+                            <div  ng-disabled="!sensor.sensorSelected" style="margin-left: 5px; margin-right: 5px">
+                                <ui-select multiple ng-model="sensor.parameters.selectedFields" theme="select2"
+                                           ng-disabled="disabled"
+                                           style="width: 400px;"
+                                           on-select="updateParameter()">
+                                    <ui-select-match placeholder="Select property...">
+                                        {{$item.columnName}}({{$item.unit}})
+                                    </ui-select-match>
+                                    <ui-select-choices group-by="nameGroupFn"
+                                                       repeat="property in sensor.fields | propsFilter: {name: $select.search, columnName: $select.search}">
+                                        <div ng-bind-html="propWithUnit(property) | highlight: $select.search"></div>
+
+                                    </ui-select-choices>
+                                </ui-select>
+                            </div>
+                            <div ng-if="sensor.isSensorSelected()">
+                                <small><span class=".md-caption" style="color:GrayText"><i>({{sensor.from | date:'yyyy-MM-dd'}}
+                                    and {{sensor.until |
+                                    date:'yyyy-MM-dd'}})</i></span></small>
+
                         </div>
                     </div>
 
 
+                    <div ng-controller="DatepickerCtrl" ng-disabled="!sensorsWithParameters[0].sensorSelected">
 
-                    <div ng-controller="DatepickerCtrl" ng-disabled="!sensorSelected">
 
-
-                        <div  append-source>
+                        <div append-source>
                             <!--<form name="datepickerForm" class="form-inline" role="form">-->
                             <!-- Date range example -->
                             <div layout="row" layout-align="start center" layout-margin>
@@ -52,13 +74,13 @@
                                     <label>From</label>
                                     <input type="text" class="form-control" ng-model="dates.fromDate"
                                            data-max-date="{{maxDateFrom()}}" data-min-date="{{minDateFrom()}}"
-                                           placeholder="From" bs-datepicker >
+                                           placeholder="From" bs-datepicker>
                                 </div>
                                 <div>
                                     <label>To</label>
                                     <input type="text" class="form-control" ng-model="dates.untilDate"
                                            data-min-date="{{minDateTo()}}"
-                                           placeholder="Until" bs-datepicker >
+                                           placeholder="Until" bs-datepicker>
                                 </div>
 
 
@@ -82,9 +104,11 @@
                         <!--<md-checkbox ng-model="limitRowNumber">-->
                         <!--Show only-->
                         <!--</md-checkbox>-->
-                        <input style="margin: 4px;" type="checkbox" ng-model="limitByRows"/>
-                        Show only <input  ng-disabled="!limitByRows" style="margin-left: 4px; margin-right: 4px; max-width: 50px;"
-                                          name="rowNumber" ng-model="rowNumber"/> latest values
+                        <input style="margin: 4px;" type="checkbox" ng-model="limitByRows"
+                               ng-change="changeLimitByRows()"/>
+                        Show only <input ng-disabled="!limitByRows"
+                                         style="margin-left: 4px; margin-right: 4px; max-width: 50px;"
+                                         name="rowNumber" ng-model="rowNumber"/> latest values
 
                     </div>
 
@@ -184,9 +208,9 @@
                 </div>
             </div>
             <!--<div ng-if="!dataLoading">-->
-                <!--<md-whiteframe class="md-whiteframe-z2" layout layout-align="center center">-->
-                    <!--<span>Loaded <strong>{{pointCount}}</strong> time points.</span>-->
-                <!--</md-whiteframe>-->
+            <!--<md-whiteframe class="md-whiteframe-z2" layout layout-align="center center">-->
+            <!--<span>Loaded <strong>{{pointCount}}</strong> time points.</span>-->
+            <!--</md-whiteframe>-->
             <!--</div>-->
 
             <div ng-if="error" layout="row" layout-sm="column" layout-margin>
@@ -195,7 +219,9 @@
 
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <div class="panel-title">Retrieved too many data points ({{error}}) to build the plot! Please reduce number of points by: </div>
+                            <div class="panel-title">Retrieved too many data points ({{error}}) to build the plot!
+                                Please reduce number of points by:
+                            </div>
                         </div>
                         <div class="panel-body">
                             <ul class="list-group">
