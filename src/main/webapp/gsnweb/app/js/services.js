@@ -289,6 +289,16 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
             sensorListUrl: function () {
                 return self.metatdataUrl + 'web/virtualSensorNames';
             }
+            //,
+            //
+            //getTaxonomyUrl: function () {
+            //    var url = self.metatdataUrl + "taxonomy/columnData?sensorName=" + FilterParameters.sensors[0] +
+            //        "&columnNames=";
+            //    for (var i = 0; i < FilterParameters.getFields().length; i++) {
+            //        url += "&columnNames=" + FilterParameters.getFields()[i];
+            //    }
+            //    return url;
+            //}
         };
 
     }]);
