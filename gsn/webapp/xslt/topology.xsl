@@ -134,23 +134,25 @@ xmlns:atom="http://www.w3.org/2005/Atom">
           <xsl:choose>
             <xsl:when test="@nodetype = 2">WGPS TinyNode</xsl:when>
             <xsl:otherwise>
-          <xsl:choose>
-            <xsl:when test="@nodetype = 3">Powerswitch TN</xsl:when>
-            <xsl:otherwise>
               <xsl:choose>
-                <xsl:when test="@nodetype = 4">BaseStation</xsl:when>
+                <xsl:when test="@nodetype = 3">Powerswitch TN</xsl:when>
                 <xsl:otherwise>
                   <xsl:choose>
-                    <xsl:when test="@nodetype = 5">GPS Corestation</xsl:when>
+                    <xsl:when test="@nodetype = 4">BaseStation</xsl:when>
                     <xsl:otherwise>
-                      unknown
+                      <xsl:choose>
+                        <xsl:when test="@nodetype = 5">GPS Corestation</xsl:when>
+                        <xsl:otherwise>
+                          unknown
+                        </xsl:otherwise>
+                      </xsl:choose>
                     </xsl:otherwise>
                   </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:otherwise>
+         </xsl:otherwise>
        </xsl:choose>
        </td></tr>
        <tr><td><b>Parent ID</b></td><td><xsl:value-of select="@parent_id"/></td></tr>
