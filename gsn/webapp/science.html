@@ -181,65 +181,6 @@
 
 // Dirruhorn
 										{
-											title : "GPS Number of Satellites gps_unixtime",
-											signals : [ {
-												vsensor : "dirruhorn_gps_raw__binary__mapped",
-												field : [ "gps_sats" ],
-												position : [ 0, 4, 5, 7, 12,
-														14, 15, 16, 17, 18, 19,
-														21, 23, 25, 27, 29, 31,
-														33, 35, 39, 40, 41, 43,
-														44, 55, 56, 57, 62, 63,
-														64, 66, 67, 82, 83, 84 ],
-												timeline : "gps_unixtime"
-											} ]
-										},
-										{
-											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
-											signals : [ {
-												vsensor : "dirruhorn_gps_raw__tobinary__mapped",
-												field : [ "gps_missing_sv" ],
-												position : [ 15, 17, 40, 43, 44, 55, 62, 63, 82, 83, 84 ]
-											} ]
-										},
-										{
-											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
-											signals : [ {
-												vsensor : "dirruhorn_gps_raw__tobinary__mapped",
-												field : [
-														"current_data_buffer_size",
-														"old_data_buffer_size" ],
-												position : [ 15, 17, 40, 43, 44, 55, 62, 63, 82, 83, 84 ]
-											} ]
-										},
-										{
-											title : "GPS Position East - Realtime [m]",
-											signals : [ {
-												vsensor : "dirruhorn_gps_differential__realtime",
-												field : [ "e" ],
-												position : [ 4, 5, 7, 12, 39,
-														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
-											} ],
-										},
-										{
-											title : "GPS Position North - Realtime [m]",
-											signals : [ {
-												vsensor : "dirruhorn_gps_differential__realtime",
-												field : [ "n" ],
-												position : [ 4, 5, 7, 12, 39,
-														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
-											} ],
-										},
-										{
-											title : "GPS Position Altitude - Realtime [m]",
-											signals : [ {
-												vsensor : "dirruhorn_gps_differential__realtime",
-												field : [ "h" ],
-												position : [ 4, 5, 7, 12, 39,
-														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
-											} ],
-										},
-										{
 											title : "GPS Position East - Batch [m]",
 											signals : [ {
 												vsensor : "dirruhorn_gps_differential__batch__daily",
@@ -374,6 +315,65 @@
 												vsensor : "dirruhorn_dozer_wgpsstatus__conv",
 												field : [ "inclinometer_y" ],
 												position : [ 15, 17, 43, 44, 55, 62, 63, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "dirruhorn_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 0, 4, 5, 7, 12,
+														14, 15, 16, 17, 18, 19,
+														21, 23, 25, 27, 29, 31,
+														33, 35, 39, 40, 41, 43,
+														44, 55, 56, 57, 62, 63,
+														64, 66, 67, 82, 83, 84 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "dirruhorn_gps_raw__tobinary__mapped",
+												field : [ "gps_missing_sv" ],
+												position : [ 15, 17, 40, 43, 44, 55, 62, 63, 82, 83, 84 ]
+											} ]
+										},
+										{
+											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "dirruhorn_gps_raw__tobinary__mapped",
+												field : [
+														"current_data_buffer_size",
+														"old_data_buffer_size" ],
+												position : [ 15, 17, 40, 43, 44, 55, 62, 63, 82, 83, 84 ]
+											} ]
+										},
+										{
+											title : "GPS Position East - Realtime [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__realtime",
+												field : [ "e" ],
+												position : [ 4, 5, 7, 12, 39,
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Realtime [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__realtime",
+												field : [ "n" ],
+												position : [ 4, 5, 7, 12, 39,
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Realtime [m]",
+											signals : [ {
+												vsensor : "dirruhorn_gps_differential__realtime",
+												field : [ "h" ],
+												position : [ 4, 5, 7, 12, 39,
+														40, 43, 41, 44, 55, 62, 63, 66, 67, 82, 83, 84 ]
 											} ],
 										},
 
@@ -829,6 +829,46 @@
 											} ]
 										},
 										{
+											title : "GPS Position East - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "e" ],
+												position : [ 33, 34, 35, 40 ]
+											} ],
+										},
+										{
+											title : "GPS Position North - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "n" ],
+												position : [ 33, 34, 35, 40 ]
+											} ],
+										},
+										{
+											title : "GPS Position Altitude - Batch [m]",
+											signals : [ {
+												vsensor : "matterhorn_gps_differential__batch__daily",
+												field : [ "h" ],
+												position : [ 33, 34, 35, 40 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer X-axis [Degrees]",
+											signals : [ {
+												vsensor : "matterhorn_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_x" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
+											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
+											signals : [ {
+												vsensor : "matterhorn_dozer_wgpsstatus__conv",
+												field : [ "inclinometer_y" ],
+												position : [ 33, 34, 35 ]
+											} ],
+										},
+										{
 											title : "GPS Number of Satellites gps_unixtime",
 											signals : [ {
 												vsensor : "matterhorn_gps_raw__binary__mapped",
@@ -879,46 +919,6 @@
 // 												position : [ 33, 34, 35, 40 ]
 // 											} ],
 // 										},
-										{
-											title : "GPS Position East - Batch [m]",
-											signals : [ {
-												vsensor : "matterhorn_gps_differential__batch__daily",
-												field : [ "e" ],
-												position : [ 33, 34, 35, 40 ]
-											} ],
-										},
-										{
-											title : "GPS Position North - Batch [m]",
-											signals : [ {
-												vsensor : "matterhorn_gps_differential__batch__daily",
-												field : [ "n" ],
-												position : [ 33, 34, 35, 40 ]
-											} ],
-										},
-										{
-											title : "GPS Position Altitude - Batch [m]",
-											signals : [ {
-												vsensor : "matterhorn_gps_differential__batch__daily",
-												field : [ "h" ],
-												position : [ 33, 34, 35, 40 ]
-											} ],
-										},
-										{
-											title : "Wireless GPS Inclinometer X-axis [Degrees]",
-											signals : [ {
-												vsensor : "matterhorn_dozer_wgpsstatus__conv",
-												field : [ "inclinometer_x" ],
-												position : [ 33, 34, 35 ]
-											} ],
-										},
-										{
-											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
-											signals : [ {
-												vsensor : "matterhorn_dozer_wgpsstatus__conv",
-												field : [ "inclinometer_y" ],
-												position : [ 33, 34, 35 ]
-											} ],
-										},
 
 // Jungfraujoch
 										{
@@ -1404,33 +1404,6 @@
 
 // Saastal GPS Locations
 										{
-											title : "GPS Number of Satellites gps_unixtime",
-											signals : [ {
-												vsensor : "saastal_gps_raw__binary__mapped",
-												field : [ "gps_sats" ],
-												position : [ 0, 2, 3 ],
-												timeline : "gps_unixtime"
-											} ]
-										},
-										{
-											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
-											signals : [ {
-												vsensor : "saastal_gps_raw__tobinary__mapped",
-												field : [ "gps_missing_sv" ],
-												position : [ 2, 3 ]
-											} ]
-										},
-										{
-											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
-											signals : [ {
-												vsensor : "saastal_gps_raw__tobinary__mapped",
-												field : [
-														"current_data_buffer_size",
-														"old_data_buffer_size" ],
-														position : [ 2, 3 ]
-											} ]
-										},
-										{
 											title : "GPS Position East - Batch [m]",
 											signals : [ {
 												vsensor : "saastal_gps_differential__batch__daily",
@@ -1525,6 +1498,33 @@
 												field : [ "inclinometer_y" ],
 												position : [ 2, 3 ]
 											} ],
+										},
+										{
+											title : "GPS Number of Satellites gps_unixtime",
+											signals : [ {
+												vsensor : "saastal_gps_raw__binary__mapped",
+												field : [ "gps_sats" ],
+												position : [ 0, 2, 3 ],
+												timeline : "gps_unixtime"
+											} ]
+										},
+										{
+											title : "Missing GPS Satellites in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "saastal_gps_raw__tobinary__mapped",
+												field : [ "gps_missing_sv" ],
+												position : [ 2, 3 ]
+											} ]
+										},
+										{
+											title : "Reassembly Buffer Size in WGPSSV to Binary Conversion",
+											signals : [ {
+												vsensor : "saastal_gps_raw__tobinary__mapped",
+												field : [
+														"current_data_buffer_size",
+														"old_data_buffer_size" ],
+														position : [ 2, 3 ]
+											} ]
 										},
 
 // ETZ
