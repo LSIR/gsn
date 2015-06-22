@@ -3,10 +3,10 @@
 angular.module('hcControllers', [])
 
 
-    .controller('hcCtrl', ['$scope', 'AxisInfo', 'dataProcessingService',
-        'ChartConfigService', 'FilterParameters', 'ProcessGsnData', '$window',
-        function ($scope, AxisInfo, dataProcessingService,
-                  ChartConfigService, FilterParameters, ProcessGsnData, $window) {
+    .controller('hcCtrl', ['$scope', 'dataProcessingService',
+        'ChartConfigService', 'FilterParameters', 'ProcessGsnData',
+        function ($scope, dataProcessingService,
+                  ChartConfigService, FilterParameters, ProcessGsnData) {
 
             FilterParameters.getSensorModels().then(function () {
                 $scope.canPlot = FilterParameters.hasRequiredParameters();
@@ -15,10 +15,7 @@ angular.module('hcControllers', [])
 
 
                 if ($scope.canPlot) {
-                    //AxisInfo.getAxesInfo().then(function (d) {
-
-                        updatePlotModel();
-                    //});
+                    updatePlotModel();
                 }
 
             });
@@ -26,14 +23,9 @@ angular.module('hcControllers', [])
 
             $scope.$on('handleBroadcast', function () {
 
-                AxisInfo.resetPromise();
-
                 dataProcessingService.resetPromise();
 
-                //AxisInfo.getAxesInfo(true).then(function (axisInfo) {
-
-                    updatePlotModel();
-                //});
+                updatePlotModel();
             });
 
             function updatePlotModel() {
@@ -42,13 +34,12 @@ angular.module('hcControllers', [])
                 $scope.dataLoading = true;
 
                 $scope.axisInfo = FilterParameters.getAllSelectedParameters();
-                var dataLoadingPromise = dataProcessingService.async().then(function (d) {
+                var dataLoadingPromise = dataProcessingService.loadData().then(function (d) {
 
                     $scope.pointCount = d.split(/\r\n|\n/).length;
                     $scope.csvData = d;
-                    //$window.alert("Loaded data " + $scope.pointCount);
 
-                    if ($scope.pointCount * FilterParameters.getHeaders().length > 30000) {
+                    if ($scope.pointCount * FilterParameters.getHeaders().length/FilterParameters.sensorModels.length > 40000) {
                         throw $scope.pointCount;
                     }
                     $scope.dataLoading = false;
@@ -60,11 +51,11 @@ angular.module('hcControllers', [])
 
                 dataLoadingPromise.then(function () {
 
-
+                    var processed = {};
                     if (FilterParameters.sensorModels.length == 1) {
-                        var processed = ProcessGsnData.process($scope.csvData);
+                        processed = ProcessGsnData.process($scope.csvData);
                     } else {
-                        var processed = ProcessGsnData.processMultiSensors($scope.csvData);
+                        processed = ProcessGsnData.processMultiSensors($scope.csvData);
                     }
 
                     $scope.dataMap = processed.dataMap;

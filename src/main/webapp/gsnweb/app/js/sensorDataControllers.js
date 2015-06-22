@@ -69,7 +69,7 @@ sensorData.controller('ParameterSelectCtrl',
                 }
 
                 FilterParameters.getSensorModels().then(function (sensorModels) {
-                    $scope.sensorsWithParameters = sensorModels;
+                    $scope.sensorsWithParameters = FilterParameters.sensorModels;
                     $scope.plotAvailable = true
 
                 }).finally(function () {
@@ -156,6 +156,7 @@ sensorData.controller('ParameterSelectCtrl',
                 }
 
                 FilterParameters.updateURL($location);
+                //FilterParameters.resetPromise();
             }
 
             $scope.submitSelected = function () {
@@ -163,7 +164,6 @@ sensorData.controller('ParameterSelectCtrl',
                 updateFilterParameters();
                 sharedService.prepForBroadcast();
 
-                //$window.location.reload();
             };
 
             $scope.handleClick = function (msg) {
@@ -318,31 +318,37 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
 
         function FilterParameters() {
 
-            if (!jQuery.isEmptyObject($routeParams)) {
+            //if (!jQuery.isEmptyObject($routeParams)) {
 
-                if ($routeParams['sensors'])
-                    this.sensors = $routeParams['sensors'].split(',');
-                else this.sensors = [];
+            if ($routeParams['sensors'])
+                this.sensors = $routeParams['sensors'].split(',');
+            else this.sensors = [];
 
-                this.vs = $routeParams['sensors'];
-                this.fromDate = Date.parse($routeParams['from']);
-                this.untilDate = Date.parse($routeParams['to']);
+            this.vs = $routeParams['sensors'];
+            this.fromDate = Date.parse($routeParams['from']);
+            this.untilDate = Date.parse($routeParams['to']);
 
-                if ($routeParams['parameters'])
-                    this.fields = $routeParams['parameters'].split(',');
-                else this.fields = [];
+            if ($routeParams['parameters'])
+                this.fields = $routeParams['parameters'].split(',');
+            else this.fields = [];
 
 
-                this.aggFunc = $routeParams['aggFunc'];
-                this.aggUnit = $routeParams['aggUnit'];
-                this.aggPeriod = $routeParams['aggPeriod'];
+            this.aggFunc = $routeParams['aggFunc'];
+            this.aggUnit = $routeParams['aggUnit'];
+            this.aggPeriod = $routeParams['aggPeriod'];
 
+            if ($routeParams['rowNumber']) {
+                this.rowNumber = $routeParams['rowNumber'];
+                this.limitByRows = true;
+            } else {
                 this.rowNumber = 100;
                 this.limitByRows = !this.hasDates();
+            };
 
-                this.sensorModels = [];
+            this.sensorModels = [];
 
-            }
+            //this.resetPromise();
+        //}
 
         }
 
@@ -410,12 +416,16 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                     for (var s = 0; s < this.sensors.length; s++) {
 
                         var index = s;
+                        var sensor = this.sensors[index];
 
-                        var sensorModel = new SensorModel();
-                        sensorModel.selectedSensor = this.sensors[index];
-                        this.sensorModels.push(sensorModel);
+                        if (sensor && sensor.length > 0) {
 
-                        promises.push(MetadataLoader.loadData(this.sensors[index], true));
+                            var sensorModel = new SensorModel();
+                            sensorModel.selectedSensor = sensor;
+                            this.sensorModels.push(sensorModel);
+
+                            promises.push(MetadataLoader.loadData(sensor, true));
+                        }
 
                     }
 
@@ -443,6 +453,10 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                 }
 
                 return this.promise;
+            },
+
+            resetPromise: function () {
+                this.promise = null;
             },
 
             getAllSelectedParameters: function () {
@@ -477,10 +491,15 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                 this.fields = [];
                 this.sensors = [];
                 for (var i = 0; i < this.sensorModels.length; i++) {
-                    for (var j = 0; j < this.sensorModels[i].parameters.selectedFields.length; j++) {
-                        this.fields.push(this.sensorModels[i].parameters.selectedFields[j].columnName);
+                    var selectedSensor = this.sensorModels[i].selectedSensor;
+                    if (selectedSensor && selectedSensor.length > 0) {
+                        for (var j = 0; j < this.sensorModels[i].parameters.selectedFields.length; j++) {
+                            this.fields.push(this.sensorModels[i].parameters.selectedFields[j].columnName);
+                        }
+                        this.sensors.push(selectedSensor);
+                    } else {
+                        this.sensorModels.splice(i, 1);
                     }
-                    this.sensors.push(this.sensorModels[i].selectedSensor);
                 }
 
                 location.search('parameters', this.fields.toString());
@@ -488,7 +507,6 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                     location.search('from', this.formatDateWeb(this.getFromDate()));
                     location.search('to', this.formatDateWeb(this.getUntilDate()));
                 }
-                //location.search('sensors', this.sensors.toString());
                 location.search('sensors', this.sensors.toString());
                 if (this.hasAggregation()) {
                     location.search('aggFunc', this.aggFunc);
@@ -498,6 +516,12 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                     location.search('aggFunc', null);
                     location.search('aggUnit', null);
                     location.search('aggPeriod', null);
+                }
+
+                if (this.limitByRows) {
+                    location.search('rowNumber', this.rowNumber);
+                } else {
+                    location.search('rowNumber', null);
                 }
             },
 

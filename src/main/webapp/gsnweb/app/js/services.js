@@ -25,7 +25,7 @@ gsnDataServices.factory('dataProcessingService', ['UrlBuilder', '$http', 'Filter
         var promise;
 
         var dataProcessingService = {
-            async: function () {
+            loadData: function () {
                 if (!promise) {
                     //promise = $http.get('http://montblanc.slf.ch:22001/multidata?nb=ALL&from=01/01/2015%2000:00:00&to=13/04/2015%2000:00:00&vs[0]=imis_fka_2&field[0]=rh&time_format=unix&download_format=csv&download_mode=inline&vs[1]=imis_fka_2&field[1]=ta&vs[2]=imis_fka_2&field[2]=rswr').then(function (response) {
 
@@ -185,42 +185,6 @@ gsnDataServices.factory('ProcessGsnData', ['GsnResult', 'FilterParameters',
 
     }]);
 
-gsnDataServices.factory('AxisInfo', ['UrlBuilder', '$http', 'FilterParameters',
-    function (UrlBuilder, $http, FilterParameters) {
-        var promise;
-
-        var AxisInfo = {
-            getAxesInfo: function () {
-                if (!promise) {
-
-                    for (var i = 0; i < FilterParameters.sensorModels; i++) {
-                        var obj = FilterParameters[i];
-
-                    }
-                    var url = UrlBuilder.getTaxonomyUrl();
-
-                    console.log(url);
-
-                    promise = $http.get(url).then(function (response) {
-
-                        return response.data;
-
-                    });
-                }
-                // Return the promise to the controller
-                return promise;
-            },
-
-            resetPromise: function () {
-                promise = null;
-            }
-
-        };
-
-        return AxisInfo;
-    }]);
-
-
 gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParameters',
     function ($routeParams, $filter, FilterParameters) {
 
@@ -269,7 +233,9 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
                 //var url = "http://montblanc.slf.ch:22001/multidata?nb=ALL&time_format=unix&download_format=csv&download_mode=inline&agg_function=avg&agg_unit=3600000&agg_period=4" +
                 var url = this.buildGsnLink();
                 //url = 'http://localhost:8000/app/sensors/imis_fka_2_30min_test.txt';
+
                 return url + '&download_mode=inline';
+                //return 'http://localhost:8000/app/sensors/multiple_sensors_2015-06-16_22-29-23.csv';
             },
 
             getDwonloadUrl: function () {
@@ -281,24 +247,11 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
             },
 
 
-            getMetaDataUrl: function (sensorName) {
-                //return "http://eflumpc18.epfl.ch/gsn/web/virtualSensors/" + this.vs;
-                return self.metatdataUrl + "web/virtualSensors/" + sensorName;
-            },
 
             sensorListUrl: function () {
                 return self.metatdataUrl + 'web/virtualSensorNames';
             }
-            //,
-            //
-            //getTaxonomyUrl: function () {
-            //    var url = self.metatdataUrl + "taxonomy/columnData?sensorName=" + FilterParameters.sensors[0] +
-            //        "&columnNames=";
-            //    for (var i = 0; i < FilterParameters.getFields().length; i++) {
-            //        url += "&columnNames=" + FilterParameters.getFields()[i];
-            //    }
-            //    return url;
-            //}
+
         };
 
     }]);
