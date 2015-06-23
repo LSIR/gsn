@@ -4,8 +4,9 @@ import ch.epfl.gsn.metadata.core.model.GeoData;
 import ch.epfl.gsn.metadata.core.model.ObservedProperty;
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.core.model.WikiInfo;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.*;
 import com.google.gson.stream.JsonWriter;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -18,9 +19,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by kryvych on 26/03/15.
@@ -137,12 +136,32 @@ public class GeoJsonConverter {
             writer.name("wikiLink").value(record.getMetadataLink());
         }
 
+        writePlotLink(writer, record);
+
         writeObservedProperties(writer, record);
 
         writeGeoData(writer, record);
 
 
 
+    }
+
+    private void writePlotLink(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
+        StringBuilder link = new StringBuilder();
+        link.append(configuration.getProperty("gsn.plot"));
+        link.append("sensors=").append(record.getName()).append("&parameters=");
+        final List<ObservedProperty> observedProperties = record.getSortedProperties();
+        int count = 0;
+        List<String> columnNames = Lists.newArrayList();
+
+        for (ObservedProperty observedProperty : observedProperties) {
+            if (count++ < 5) {
+                columnNames.add(observedProperty.getColumnName());
+            }
+        }
+        Joiner.on(",").appendTo(link, columnNames);
+
+        writer.name("plotLink").value(link.toString());
     }
 
     private void writeGeoData(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
@@ -214,7 +233,7 @@ public class GeoJsonConverter {
     }
 
     protected Multimap<String, String> getTermToColumnMultimap(VirtualSensorMetadata record) {
-        Multimap<String, String> termToColumn = HashMultimap.create();
+        Multimap<String, String> termToColumn = TreeMultimap.create();
 
         for (ObservedProperty property : record.getObservedProperties()) {
             String term = property.getName();

@@ -3,6 +3,7 @@ package ch.epfl.gsn.metadata.web.page;
 import ch.epfl.gsn.metadata.core.model.ObservedProperty;
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.web.services.GeoJsonConverter;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.gson.stream.JsonWriter;
 import org.apache.commons.lang.StringUtils;
@@ -14,9 +15,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by kryvych on 08/05/15.
@@ -34,14 +33,13 @@ public class WebJsonConverter extends GeoJsonConverter {
     protected void writeExtra(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
 
         writer.name("allProperties").beginArray();
-        for (ObservedProperty observedProperty : record.getObservedProperties()) {
-            if (StringUtils.isNotEmpty(observedProperty.getName())) {
+        List<ObservedProperty> properties =record.getSortedProperties();
+        for (ObservedProperty observedProperty : properties) {
                 writer.beginObject();
                 writer.name("name").value(observedProperty.getName());
                 writer.name("columnName").value(observedProperty.getColumnName());
                 writer.name("unit").value(observedProperty.getUnit());
                 writer.endObject();
-            }
         }
         writer.endArray();
 
