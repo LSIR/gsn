@@ -1,0 +1,46 @@
+<virtual-sensor name="Matterhorn_Dozer_Th3Temp__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="TEMPERATURE_5CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_10CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_20CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_30CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_50CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_100CM" type="VARCHAR(30)" unit="°C"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerTh3TempMsg) from Matterhorn deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+      <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Dozer_Th3Temp__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T1&gt;-9989,cast(round(PAYLOAD_T1 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_5CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T2&gt;-9989,cast(round(PAYLOAD_T2 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_10CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T3&gt;-9989,cast(round(PAYLOAD_T3 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_20CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T4&gt;-9989,cast(round(PAYLOAD_T4 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_30CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T5&gt;-9989,cast(round(PAYLOAD_T5 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_50CM,
+                casewhen(PAYLOAD_SAMPLE_VALID=1 AND PAYLOAD_T6&gt;-9989,cast(round(PAYLOAD_T6 / 100.0, 2) as CHAR(30)),NULL) as TEMPERATURE_100CM
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+    </streams>
+</virtual-sensor>

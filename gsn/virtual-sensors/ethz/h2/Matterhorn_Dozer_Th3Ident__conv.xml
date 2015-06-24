@@ -1,0 +1,47 @@
+<virtual-sensor name="Matterhorn_Dozer_Th3Ident__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="FIRMWAREVERSION" type="VARCHAR(3)"/>
+            <field name="SERIAL" type="CHAR(8)"/>
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWxt520IdentMsg) from Matterhorn deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Dozer_Th3Ident__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, 
+                CASEWHEN(PAYLOAD_FIRMWAREVERSION0 &gt;=32 AND PAYLOAD_FIRMWAREVERSION0 &lt;= 126, char(PAYLOAD_FIRMWAREVERSION0), '') ||
+                CASEWHEN(PAYLOAD_FIRMWAREVERSION1 &gt;=32 AND PAYLOAD_FIRMWAREVERSION1 &lt;= 126, char(PAYLOAD_FIRMWAREVERSION1), '') ||
+                CASEWHEN(PAYLOAD_FIRMWAREVERSION2 &gt;=32 AND PAYLOAD_FIRMWAREVERSION2 &lt;= 126, char(PAYLOAD_FIRMWAREVERSION2), '')
+                 as FIRMWAREVERSION,
+                CASEWHEN(PAYLOAD_SERIAL0 &gt;=32 AND PAYLOAD_SERIAL0 &lt;= 126, char(PAYLOAD_SERIAL0), '') ||
+                CASEWHEN(PAYLOAD_SERIAL1 &gt;=32 AND PAYLOAD_SERIAL1 &lt;= 126, char(PAYLOAD_SERIAL1), '') ||
+                CASEWHEN(PAYLOAD_SERIAL2 &gt;=32 AND PAYLOAD_SERIAL2 &lt;= 126, char(PAYLOAD_SERIAL2), '') ||
+                CASEWHEN(PAYLOAD_SERIAL3 &gt;=32 AND PAYLOAD_SERIAL3 &lt;= 126, char(PAYLOAD_SERIAL3), '') ||
+                CASEWHEN(PAYLOAD_SERIAL4 &gt;=32 AND PAYLOAD_SERIAL4 &lt;= 126, char(PAYLOAD_SERIAL4), '') ||
+                CASEWHEN(PAYLOAD_SERIAL5 &gt;=32 AND PAYLOAD_SERIAL5 &lt;= 126, char(PAYLOAD_SERIAL5), '') ||
+                CASEWHEN(PAYLOAD_SERIAL6 &gt;=32 AND PAYLOAD_SERIAL6 &lt;= 126, char(PAYLOAD_SERIAL6), '') ||
+                CASEWHEN(PAYLOAD_SERIAL7 &gt;=32 AND PAYLOAD_SERIAL7 &lt;= 126, char(PAYLOAD_SERIAL7), '')
+                 as SERIAL
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

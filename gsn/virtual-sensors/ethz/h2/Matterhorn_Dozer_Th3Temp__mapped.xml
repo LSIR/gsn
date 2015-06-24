@@ -1,0 +1,46 @@
+<virtual-sensor name="Matterhorn_Dozer_Th3Temp__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+	 <init-params>
+            <param name="position_mapping" />
+            <param name="sensortype_mapping" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="SENSORTYPE" type="VARCHAR(100)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="PAYLOAD_T1" type="INTEGER" />
+            <field name="PAYLOAD_T2" type="INTEGER" />
+            <field name="PAYLOAD_T3" type="INTEGER" />
+            <field name="PAYLOAD_T4" type="INTEGER" />
+            <field name="PAYLOAD_T5" type="INTEGER" />
+            <field name="PAYLOAD_T6" type="INTEGER" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerTh3TempMsg) from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from Matterhorn_Dozer_Th3Temp</predicate>
+                    <predicate key="remote-contact-point">http://pvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

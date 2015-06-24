@@ -1,0 +1,54 @@
+<virtual-sensor name="Matterhorn_Dozer_Th3Ident" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_FIRMWAREVERSION0" type="TINYINT" />
+            <field name="PAYLOAD_FIRMWAREVERSION1" type="TINYINT" />
+            <field name="PAYLOAD_FIRMWAREVERSION2" type="TINYINT" />
+            <field name="PAYLOAD_SERIAL0" type="TINYINT" />
+            <field name="PAYLOAD_SERIAL1" type="TINYINT" />
+            <field name="PAYLOAD_SERIAL2" type="TINYINT" />
+            <field name="PAYLOAD_SERIAL3" type="TINYINT" />
+            <field name="PAYLOAD_SERIAL4" type="TINYINT" />
+            <field name="PAYLOAD_SERIAL5" type="TINYINT" />
+            <field name="PAYLOAD_SERIAL6" type="TINYINT" />
+            <field name="PAYLOAD_SERIAL7" type="TINYINT" />            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerTh3IdentMsg) from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-mh-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerTh3IdentMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-mh-bs02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerTh3IdentMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
