@@ -829,6 +829,32 @@
 											} ]
 										},
 										{
+											title : "Temperatures TH3 Position 27 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_dozer_th3temp__conv",
+												field : [ "temperature_5cm",
+														"temperature_10cm",
+														"temperature_20cm",
+														"temperature_30cm",
+														"temperature_50cm",
+														"temperature_100cm" ],
+												select : "sensornode[position=27]"
+											} ],
+										},
+										{
+											title : "Temperatures TH3 Position 30 [°C]",
+											signals : [ {
+												vsensor : "matterhorn_dozer_th3temp__conv",
+												field : [ "temperature_5cm",
+														"temperature_10cm",
+														"temperature_20cm",
+														"temperature_30cm",
+														"temperature_50cm",
+														"temperature_100cm" ],
+												select : "sensornode[position=30]"
+											} ],
+										},
+										{
 											title : "GPS Position East - Batch [m]",
 											signals : [ {
 												vsensor : "matterhorn_gps_differential__batch__daily",
