@@ -277,7 +277,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 		}
 	}
 	
-	private <T extends Comparable<T>> void validateRange(String field, T v, T low, T high) throws NumberFormatException{
+	private <T extends Comparable<T>> void validateRange(String field, T v, T high, T low) throws NumberFormatException{
 		if (v.compareTo(high) > 0 ||v.compareTo(low) < 0) {
 			throw new NumberFormatException("got value "+v+" for "+field+".");
 		}
