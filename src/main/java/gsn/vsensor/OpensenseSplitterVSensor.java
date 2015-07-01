@@ -238,6 +238,13 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 		        		temp.setData(6,(float)(p.readNextShort(false)/10.0));
 		        		temp.setData(7,null);
 	        		}
+                    validateRange("latitude",(Double)temp.getData("latitude"),46.6909,46.4660);
+                    validateRange("longitude",(Double)temp.getData("longitude"),6.8289,6.5031);
+                    validateRange("altitude",(Float)temp.getData("altitude"),1000f,300f);
+                    validateRange("speed",(Float)temp.getData("speed"),150f,0f);
+                    validateRange("satellites",(Integer)temp.getData("satellites"),20,0);
+                    validateRange("HDOP",(Float)temp.getData("HDOP"),100f,0f);
+                    validateRange("gyro",(Float)temp.getData("gyro"),45535f,20000f);
 	        		dataProduced(new StreamElement(temp));
 				 }
 	        } else if (data_type.equalsIgnoreCase("TL")){
@@ -268,6 +275,13 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 			parsingErrorCount = parsingErrorCount == Long.MAX_VALUE ? 0 : parsingErrorCount + 1;
 			logger.warn("error processing packet",e);
 		}
+	}
+	
+	private <T extends Comparable<T>> void validateRange(String field, T v, T low, T high) throws NumberFormatException{
+		if (v.compareTo(high) > 0 ||v.compareTo(low) < 0) {
+			throw new NumberFormatException("got value "+v+" for "+field+".");
+		}
+		
 	}
 }
 
