@@ -302,7 +302,11 @@ public class StreamInterpolateJoinModel extends AbstractModel implements Monitor
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
 		for (Short k :segments.keySet()){
 		    stat.put("vs."+vs.getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".Valuebuffer."+k+".size.value", arrays.get(k).get("timed").size());
-		    stat.put("vs."+vs.getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".segment."+k+".size.value", segments.get(k).get("timed").length);
+		    if (segments.get(k).containsKey("timed")){
+		        stat.put("vs."+vs.getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".segment."+k+".size.value", segments.get(k).get("timed").length);
+		    }else{
+		    	stat.put("vs."+vs.getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".segment."+k+".size.value", 0);
+		    }
 		}
 		for (Short k :toProcess.keySet()){
 		    stat.put("vs."+vs.getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".Mappedbuffer."+k+".size.value", toProcess.get(k).size());
