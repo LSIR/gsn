@@ -1,36 +1,41 @@
-<!--<div>-->
-
-    <!--<div ng-controller="AllSensorsCtrl as sensors">-->
-        <!--<h3>Sensor Info</h3>-->
-
-        <!--<div ng-if="loading">-->
-            <!--Loading sensor metadata.-->
-        <!--</div>-->
-
-        <!--<div ng-if="!loading">-->
-            <!--<input type="text" ng-model="myQuery">-->
-
-
-            <!--<div ivh-treeview="sensors.treeModel"-->
-                 <!--ivh-treeview-expand-to-depth="1"-->
-                 <!--ivh-treeview-filter="myQuery"-->
-                 <!--ivh-treeview-validate="true"-->
-                 <!--ivh-treeview-default-selected-state="false">-->
-            <!--</div>-->
-        <!--</div>-->
-
-
-
-        <!--&lt;!&ndash;<button type="submit" ng-click="submitSelected();">Update Plot</button>&ndash;&gt;-->
-    <!--</div>-->
-
-
-    <!--&lt;!&ndash;<div>&ndash;&gt;-->
-    <!--&lt;!&ndash;Sensor name:&ndash;&gt;-->
-    <!--&lt;!&ndash;Description:&ndash;&gt;-->
-    <!--&lt;!&ndash;Parameters: air temperature, humidity&ndash;&gt;-->
-    <!--&lt;!&ndash;dates:&ndash;&gt;-->
-    <!--&lt;!&ndash;</div>&ndash;&gt;-->
-
-
+<!--<div ng-controller="GoogleMapsController" layout="column">-->
+<!--<div flex="30">-->
+<!--Search-->
 <!--</div>-->
+
+<!--<div flex="70">-->
+<!--<leaflet center="center" geojson="geojson" layers="layers" height="480px"></leaflet>-->
+<!--</div>-->
+<!--</div>-->
+
+
+<div ng-controller="AppCtrl" layout="column" style="height:500px;">
+    <section layout="row" flex>
+        <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left"
+                    md-is-locked-open="$mdMedia('gt-md')">
+            <md-toolbar class="md-theme-indigo">
+                <h1 class="md-toolbar-tools">Filters</h1>
+            </md-toolbar>
+            <md-content layout-padding ng-controller="LeftCtrl">
+
+                <form ng-submit="submit()">
+
+                    <ul>
+                        <li><label>Name:</label><input type="text" ng-model="filter.sensorName" name="text" /></li>
+                        <li><label>Deployment:</label><input type="text" ng-model="filter.deployment" name="text" /></li>
+                        <li><label>Parameter:</label><input type="text" ng-model="filter.parameters" name="text" /></li>
+                        <input type="submit" id="submit" value="Filter" />
+                    </ul>
+                </form>
+            </md-content>
+        </md-sidenav>
+        <md-content flex layout-padding>
+            <div layout="column" layout-fill layout-align="top center">
+                <leaflet center="center" layers="layers" height="480px"></leaflet>
+
+            </div>
+        </md-content>
+
+    </section>
+</div>
+

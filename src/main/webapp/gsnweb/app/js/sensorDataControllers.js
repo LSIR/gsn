@@ -38,7 +38,6 @@ sensorData.controller('ParameterSelectCtrl',
     ['$scope', '$window', 'MetadataLoader', '$location', 'sharedService', 'UrlBuilder', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation', 'SensorModel', '$q',
         function ($scope, $window, MetadataLoader, $location, sharedService, UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation, SensorModel, $q) {
 
-
             $scope.rowNumber = FilterParameters.rowNumber;
             $scope.limitByRows = FilterParameters.limitByRows;
 
@@ -316,10 +315,7 @@ sensorData.controller('DatepickerCtrl', ['$scope', 'FilterParameters', 'SensorMe
 sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation', 'SensorModel', 'SensorMetadata', 'MetadataLoader', '$q',
     function ($routeParams, $filter, Aggregation, SensorModel, SensorMetadata, MetadataLoader, $q) {
 
-        function FilterParameters() {
-
-            //if (!jQuery.isEmptyObject($routeParams)) {
-
+        function init() {
             if ($routeParams['sensors'])
                 this.sensors = $routeParams['sensors'].split(',');
             else this.sensors = [];
@@ -343,10 +339,16 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
             } else {
                 this.rowNumber = 100;
                 this.limitByRows = !this.hasDates();
-            };
+            }
+            ;
 
             this.sensorModels = [];
+        }
 
+        function FilterParameters() {
+
+            //if (!jQuery.isEmptyObject($routeParams)) {
+            init.call(this);
             //this.resetPromise();
         //}
 
@@ -355,6 +357,9 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
 
         FilterParameters.prototype = {
 
+            reset: function() {
+                init.call(this);
+            },
 
             formatDateWeb: function (date) {
                 return $filter('date')(Date.parse(date), 'yyyy-MM-dd');
@@ -523,6 +528,14 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                 } else {
                     location.search('rowNumber', null);
                 }
+            },
+
+            updateURLFromMap: function (location) {
+
+                location.search('parameters', this.fields.toString());
+
+                location.search('sensors', this.sensors.toString());
+
             },
 
             setSensorFields: function (sensorFields) {

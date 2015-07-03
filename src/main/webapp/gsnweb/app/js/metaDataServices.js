@@ -8,12 +8,13 @@ var metaDataServices = angular.module('metaDataServices', [])
 
         var self = this;
         self.metatdataUrl = 'http://eflumpc18.epfl.ch/gsn/';
+        //self.metatdataUrl = 'http://localhost:8090/';
 
         var MetadataLoader = {
             loadData: function (sensorName, reset) {
                 if (!promise || reset) {
                     //var url = UrlBuilder.getMetaDataUrl(sensorName);
-                    var url = self.metatdataUrl + "web/virtualSensors/" + sensorName;;
+                    var url = self.metatdataUrl + "web/virtualSensors/" + sensorName;
                     console.log(url);
 
                     promise = $http.get(url).then(function (response) {
