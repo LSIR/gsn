@@ -129,7 +129,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                     query += " AND ";
                 else
                     query += " WHERE ";
-                query += " timed > " + listener.getStartTime() + " and pk > ? order by timed asc ";
+                query += " timed > ? and pk > ? order by pk asc "; //both have to be parameters to force the optimizer of Postgres < 9.2 to not scan on timed index
                 PreparedStatement prepareStatement = null;
                 try {
                     prepareStatement = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
@@ -304,8 +304,10 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
         PreparedStatement prepareStatement = preparedStatements.get(listener);
         try {
-            //prepareStatement.setLong(1, listener.getStartTime());
-            prepareStatement.setLong(1, listener.getLastVisitedPk());
+        	//last time can be also used, but must change > to >= in the query for non-unique timestamps
+        	//and it works only with totally ordered streams
+            prepareStatement.setLong(1, listener.getStartTime());
+            prepareStatement.setLong(2, listener.getLastVisitedPk());
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             return new DataEnumerator();
