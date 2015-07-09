@@ -127,7 +127,7 @@ Matterhorn_BackLogStatus_Dynamic.xml
 Matterhorn_BackLogStatus_Revision.xml
 Matterhorn_BackLogStatus_Static.xml
 Matterhorn_Binary.xml
-#Matterhorn_Binary_Http.xml
+Matterhorn_Binary_Http.xml
 Matterhorn_CamZilla.xml
 Matterhorn_CoreStationStatus_Hardware.xml
 Matterhorn_CoreStationStatus_Software.xml

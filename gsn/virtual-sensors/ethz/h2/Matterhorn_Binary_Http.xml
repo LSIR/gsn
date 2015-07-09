@@ -18,12 +18,12 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://radar-kmh-cam01.ethz.ch/cgi-bin/image.jpg</predicate>
-                    <predicate key="username">admin</predicate>
-                    <predicate key="password">meinsm</predicate>
+                    <predicate key="url">http://internetboxhoernlihuette.dyndns.org/cam/matterhorn.php</predicate>
+<!--                     <predicate key="username">admin</predicate> -->
+<!--                     <predicate key="password">meinsm</predicate> -->
                     <predicate key="rate">900000</predicate>
                     <predicate key="subdirectory-name">webcam1</predicate>
-                    <predicate key="device-id">6010</predicate>
+                    <predicate key="device-id">6016</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
