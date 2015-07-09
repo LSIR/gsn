@@ -21,7 +21,7 @@
                     <predicate key="url">http://internetboxhoernlihuette.dyndns.org/cam/matterhorn.php</predicate>
 <!--                     <predicate key="username">admin</predicate> -->
 <!--                     <predicate key="password">meinsm</predicate> -->
-                    <predicate key="rate">900000</predicate>
+                    <predicate key="rate">300000</predicate>
                     <predicate key="subdirectory-name">webcam1</predicate>
                     <predicate key="device-id">6016</predicate>
                 </address>
