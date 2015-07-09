@@ -1,0 +1,32 @@
+<virtual-sensor name="Matterhorn_Camera_pos41_MatterhornSummit__scaled" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.JpegGetterVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="jpeg_scaled">JPEG_SCALED</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="RELATIVE_FILE" type="VARCHAR(255)" />
+            <field name="DATA" type="binary" data-path-field="RELATIVE_FILE" />
+            <field name="JPEG_SCALED" type="binary:image/jpeg" />
+        </output-structure>
+    </processing-class>
+    <description>Webcam pictures (position 41) at Hoernlihuette looking at the Matterhorn summit as thumbnail</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" history-size="1"/>
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_Binary_Http__mapped</predicate>
+                </address>
+                <query> select * from wrapper where POSITION = 41</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
