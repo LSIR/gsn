@@ -29,10 +29,12 @@ import gsn.beans.InputStream;
 import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.vsensor.AbstractVirtualSensor;
+import gsn.wrappers.AbstractWrapper;
 import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class VirtualSensor {
 
@@ -88,9 +90,18 @@ public class VirtualSensor {
     }
 
     public void start() throws VirtualSensorInitializationFailedException {
+        
+        /*
+         *  Starting wrapper threads and storing their ids and names in AbstractVirtualSensor's 
+         *  HashMap threads for monitoring
+         */
+        
+        Map <Long, String> threads = virtualSensor.getThreads();
         for (InputStream inputStream : config.getInputStreams()) {
             for (StreamSource streamSource : inputStream.getSources()) {
-                streamSource.getWrapper().start();
+                AbstractWrapper wrapper = streamSource.getWrapper();
+                wrapper.start();
+                threads.put(wrapper.getId(),wrapper.getName());
             }
         }
         borrowVS();
