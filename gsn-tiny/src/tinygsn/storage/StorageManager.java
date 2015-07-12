@@ -34,14 +34,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamElement;
-import tinygsn.model.vsensor.VirtualSensor;
+import tinygsn.beans.StreamSource;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.utils.GSNRuntimeException;
 import android.annotation.SuppressLint;
-
-//import org.apache.commons.dbcp.BasicDataSource;
 
 public abstract class StorageManager {
 
@@ -56,31 +56,11 @@ public abstract class StorageManager {
 	public void init(String databaseDriver, String username, String password,
 			String databaseURL, int maxDBConnections) {
 		this.databaseDriver = databaseDriver;
-		// pool = DataSources.getDataSource(new
-		// DBConnectionInfo(databaseDriver,databaseURL,username,password));
-		// pool.setMaxActive(maxDBConnections);
-		// pool.setMaxIdle(maxDBConnections);
-		//
-		// pool.setRemoveAbandoned(true); // removing unused connections, used to
-		// clean after poorly written code
-		// pool.setRemoveAbandonedTimeout(300); // 5 minutes
-		// //
-
 		try {
 			initDatabaseAccess(con = getConnection());
-			// logger.info(new
-			// StringBuilder().append("StorageManager DB connection initialized successfuly. driver:").append(databaseDriver).append(" url:").append(databaseURL));
 		}
 		catch (Exception e) {
-			// logger.error(new
-			// StringBuilder().append("Connecting to the database with the following properties failed :").append("\n\t UserName :").append(username).append("\n\t Password : ").append(password).append("\n\t Driver class : ").append(databaseDriver).append("\n\t Database URL : ").append(databaseURL).toString());
-			// logger.error(new
-			// StringBuilder().append(e.getMessage()).append(", Please refer to the logs for more detailed information.").toString());
-			//
-			// logger.error("Make sure in the gsn.xml file, the <storage ...> element is correct.");
-			// e.printStackTrace();
-			// if (logger.isInfoEnabled())
-			// logger.info(e.getMessage(), e);
+
 		}
 		finally {
 			close(con);
@@ -308,32 +288,6 @@ public abstract class StorageManager {
 	}
 
 	/**
-	 * Returns true if the specified query has any result in it's result set. The
-	 * created result set will be closed automatically.
-	 * 
-	 * @param sqlQuery
-	 * @return
-	 */
-	public boolean isThereAnyResult(StringBuilder sqlQuery) {
-		boolean toreturn = false;
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			PreparedStatement prepareStatement = connection.prepareStatement(sqlQuery
-					.toString());
-			ResultSet resultSet = prepareStatement.executeQuery();
-			toreturn = resultSet.next();
-		}
-		catch (SQLException error) {
-			// logger.error(error.getMessage(), error);
-		}
-		finally {
-			close(connection);
-		}
-		return toreturn;
-	}
-
-	/**
 	 * Executes the query of the database. Returns the specified colIndex of the
 	 * first row. Useful for image recovery of the web interface.
 	 * 
@@ -359,7 +313,6 @@ public abstract class StorageManager {
 			}
 		}
 		catch (SQLException e) {
-			// logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -370,7 +323,6 @@ public abstract class StorageManager {
 			}
 		}
 		catch (SQLException e) {
-			// logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -381,7 +333,6 @@ public abstract class StorageManager {
 			}
 		}
 		catch (SQLException e) {
-			// logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -392,15 +343,7 @@ public abstract class StorageManager {
 			}
 		}
 		catch (SQLException e) {
-			// logger.debug(e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * @throws SQLException
-	 */
-	public void shutdown() throws SQLException {
-		// logger.warn("Closing the connection pool [done].");
 	}
 
 	/**
@@ -451,37 +394,11 @@ public abstract class StorageManager {
 		PreparedStatement prepareStatement = null;
 		try {
 			String stmt = getStatementDropTable(tableName, connection).toString();
-			// if (logger.isDebugEnabled())
-			// logger.debug("Dropping table structure: " + tableName + " With query: "
-			// + stmt);
 			prepareStatement = connection.prepareStatement(stmt);
 			prepareStatement.execute();
 		}
 		catch (SQLException e) {
-			// logger.info(e.getMessage(), e);
 		}
-	}
-
-	public void executeDropView(StringBuilder tableName) throws SQLException {
-		Connection conn = null;
-		try {
-			conn = getConnection();
-			executeDropView(tableName, conn);
-		}
-		finally {
-			close(conn);
-		}
-	}
-
-	public void executeDropView(StringBuilder tableName, Connection connection)
-			throws SQLException {
-		// if (logger.isDebugEnabled())
-		// logger.debug("Dropping table structure: " + tableName);
-		PreparedStatement prepareStatement = connection
-				.prepareStatement(getStatementDropView(tableName, connection)
-						.toString());
-		prepareStatement.execute();
-		close(prepareStatement);
 	}
 
 	public void executeCreateTable(CharSequence tableName, DataField[] structure,
@@ -511,18 +428,11 @@ public abstract class StorageManager {
 			boolean unique, Connection connection) throws SQLException {
 		StringBuilder sql = getStatementCreateTable(tableName, structure,
 				connection);
-		// if (logger.isDebugEnabled())
-		// logger.debug(new
-		// StringBuilder().append("The create table statement is : ").append(sql).toString());
-
 		PreparedStatement prepareStatement = connection.prepareStatement(sql
 				.toString());
 		prepareStatement.execute();
 		prepareStatement.close();
 		sql = getStatementCreateIndexOnTimed(tableName, unique);
-		// if (logger.isDebugEnabled())
-		// logger.debug(new StringBuilder().append(
-		// "The create index statement is : ").append(sql).toString());
 		prepareStatement = connection.prepareStatement(sql.toString());
 		prepareStatement.execute();
 
@@ -608,32 +518,9 @@ public abstract class StorageManager {
 	// return streamedExecuteQuery(query, binaryFieldsLinked, getConnection());
 	// }
 
-	public void executeCreateView(CharSequence viewName, CharSequence selectQuery)
-			throws SQLException {
-		Connection connection = null;
-		try {
-			connection = getConnection();
-			executeCreateView(viewName, selectQuery, connection);
-		}
-		finally {
-			close(connection);
-		}
-	}
-
-	public void executeCreateView(CharSequence viewName,
-			CharSequence selectQuery, Connection connection) throws SQLException {
-		StringBuilder statement = getStatementCreateView(viewName, selectQuery);
-		// if (logger.isDebugEnabled())
-		// logger.debug("Creating a view:" + statement);
-		final PreparedStatement prepareStatement = connection
-				.prepareStatement(statement.toString());
-		prepareStatement.execute();
-		close(prepareStatement);
-	}
-
 	/**
 	 * This method executes the provided statement over the connection. If there
-	 * is an error retruns -1 otherwise it returns the output of the executeUpdate
+	 * is an error returns -1 otherwise it returns the output of the executeUpdate
 	 * method on the PreparedStatement class which reflects the number of changed
 	 * rows in the underlying table.
 	 * 
@@ -649,7 +536,6 @@ public abstract class StorageManager {
 			stmt.execute(sql);
 		}
 		catch (SQLException error) {
-			// logger.error(error.getMessage() + " FOR: " + sql, error);
 		}
 		finally {
 			try {
@@ -664,21 +550,17 @@ public abstract class StorageManager {
 
 	public int executeUpdate(String updateStatement, Connection connection) {
 		int toReturn = -1;
-		// PreparedStatement prepareStatement = null;
 		try {
-			// prepareStatement = connection.prepareStatement(updateStatement);
-			// toReturn = prepareStatement.executeUpdate();
 			toReturn = connection.createStatement().executeUpdate(updateStatement);
 		}
 		catch (SQLException error) {
-			// logger.error(error.getMessage(), error);
 		}
 		return toReturn;
 	}
 
 	public int executeUpdate(StringBuilder updateStatement, Connection connection) {
-		int to_return = -1;
-		to_return = executeUpdate(updateStatement.toString(), connection);
+
+		int to_return = executeUpdate(updateStatement.toString(), connection);
 		return to_return;
 	}
 
@@ -692,18 +574,18 @@ public abstract class StorageManager {
 			close(connection);
 		}
 	}
-
-//	public void executeInsert(CharSequence tableName, List<String> list,
-//			List<String> list2) throws SQLException {
-//		Connection connection = null;
-//		try {
-//			connection = getConnection();
-//			executeInsert(tableName, list, list2, connection);
-//		}
-//		finally {
-//			close(connection);
-//		}
-//	}
+	
+	public void executeInsert(CharSequence tableName, DataField[] fields,
+			StreamElement se) throws SQLException {
+		Connection connection = null;
+		try {
+			connection = getConnection();
+			executeInsert(tableName,fields, se, connection);
+		}
+		finally {
+			close(connection);
+		}
+	}
 
 	public void executeInsert(CharSequence tableName, DataField[] fields,
 			StreamElement streamElement, Connection connection) throws SQLException {
@@ -864,11 +746,6 @@ public abstract class StorageManager {
 				.replace("#NAME", indexName).replace("#TABLE", tableName));
 	}
 
-	public StringBuilder getStatementDropView(CharSequence viewName,
-			Connection connection) throws SQLException {
-		return new StringBuilder(getStatementDropView().replace("#NAME", viewName));
-	}
-
 	public StringBuilder getStatementCreateIndexOnTimed(CharSequence tableName,
 			boolean unique) throws SQLException {
 		StringBuilder toReturn = new StringBuilder("CREATE ");
@@ -888,11 +765,6 @@ public abstract class StorageManager {
 	public abstract StringBuilder getStatementCreateTable(String tableName,
 			DataField[] structure);
 
-	public StringBuilder getStatementCreateView(CharSequence viewName,
-			CharSequence selectQuery) {
-		return new StringBuilder("create view ").append(viewName).append(" AS ( ")
-				.append(selectQuery).append(" ) ");
-	}
 
 	private String driver = null;
 
@@ -923,15 +795,6 @@ public abstract class StorageManager {
 	 * @throws SQLException
 	 */
 	public Connection getConnection() throws SQLException {
-		// if (logger.isDebugEnabled())
-		// logger.debug(new StringBuilder("Asking a con. to DB: ")
-		// .append(pool.getUrl())
-		// .append(" => busy: ")
-		// .append(pool.getNumActive())
-		// .append(", max-size: ")
-		// .append(pool.getMaxActive())
-		// .append(", idle: ")
-		// .append(pool.getNumIdle()));
 		return con;
 	}
 
@@ -964,10 +827,6 @@ public abstract class StorageManager {
 	}
 
 	public abstract String getStatementDifferenceTimeInMillis();
-
-	public ArrayList<String> getInternalTables() throws SQLException {
-		return new ArrayList<String>();
-	}
 
 	//
 
@@ -1013,21 +872,7 @@ public abstract class StorageManager {
 		return isSQLite;
 	}
 
-	public void createTable(String vsName, DataField[] outputStructure) {
-	}
-
-	public void createTable(String vsName, ArrayList<String> fields) {
-	};
-
-	public void executeInsert(String tableName, ArrayList<String> fields,
-			ArrayList<String> values) throws SQLException {
-	}
-
-	public void executeInsert(CharSequence tableName, DataField[] fields,
-			StreamElement se) throws SQLException {
-	}
-
-	public ArrayList<VirtualSensor> getListofVS() { //TODO why does it return null?
-		return null;
-	};
+	public abstract ArrayList<AbstractVirtualSensor> getListofVS();
+	
+	public abstract ArrayList<StreamSource> getSourcesOfVS(String name);
 }

@@ -25,13 +25,11 @@
 
 package tinygsn.beans;
 
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.TimeZone;
+
+import java.util.ArrayList;
+
 import tinygsn.controller.AbstractController;
-import tinygsn.controller.AndroidControllerListVSNew;
-import tinygsn.gui.android.ActivityListVSNew;
+import tinygsn.controller.AndroidControllerListVS;
 import tinygsn.model.wrappers.AbstractWrapper;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -52,53 +50,62 @@ public class VSensorConfig implements Parcelable  {
 	private String name;
 	private AbstractController controller = null;
 	private static final String TAG = "VSensorConfig";
-	private InputStream inputStreams[] = null;
+	private InputStream inputStream = null;
 	private DataField[] outputStructure;
 	private String processingClassName;
 	private boolean running;
-	private String wrapperName;
 	private String notify_field, notify_condition, notify_action, notify_contact;
-
 	private Double notify_value;
 	private boolean save_to_db;
 	
 	
-	public ActivityListVSNew view = null;
-	//public AndroidControllerListVSNew VSNewController;
-	// ========================================================
 	public static final int DEFAULT_PRIORITY = 100;
 	public static final int NO_FIXED_RATE = 0;
 	public static final int DEFAULT_POOL_SIZE = 10;
 	private int priority = DEFAULT_PRIORITY;
 	private String description;
 	private int outputStreamRate;
-	// private KeyValue[] addressing;
 	private String storageHistorySize = null;
-	private final HashMap<String, InputStream> inputStreamNameToInputStreamObjectMapping = new HashMap<String, InputStream>();
-	// private ArrayList<KeyValue> mainClassInitialParams = new
-	// ArrayList<KeyValue>();
 	private transient Long lastModified;
-	private String fileName;
 	private StorageConfig storage;
-	private String timeZone;
-	private SimpleDateFormat sdf = null;
-	private String directoryQuery;
-	private String access_protected = "false";
+	
+	
+	private ArrayList<StreamSource> streamSources = new ArrayList<StreamSource>();
 
-	public VSensorConfig() {
 
-	}
+	public VSensorConfig() {}
+	
 	public VSensorConfig(Parcel source)
 	{
+		inputStream = new InputStream();
 		int idid = Integer.parseInt(source.readString());
 		String processingClass = source.readString();
 		String vsName = source.readString();
-		String wrapperN = source.readString();
-		int samplingRate = Integer.parseInt(source.readString());
-		int windowSize = Integer.parseInt(source.readString());
-		int step = Integer.parseInt(source.readString());
-		boolean timeBased = Boolean.parseBoolean(source.readString());
-		int aggregator = Integer.parseInt(source.readString());
+		int nb = Integer.parseInt(source.readString());
+		for(int i=0;i<nb;i++){
+			String wrapperN = source.readString();
+			int samplingRate = Integer.parseInt(source.readString());
+			int windowSize = Integer.parseInt(source.readString());
+			int step = Integer.parseInt(source.readString());
+			boolean timeBased = Boolean.parseBoolean(source.readString());
+			int aggregator = Integer.parseInt(source.readString());
+			try {
+			    StreamSource ss = new StreamSource(windowSize, step, timeBased, aggregator);
+			    AbstractWrapper w = (AbstractWrapper) Class.forName(wrapperN).newInstance();
+				w.setSamplingRate(samplingRate);
+				w.registerListener(ss);
+				ss.setWrapper(w);
+				ss.setInputStream(inputStream);
+				streamSources.add(ss);
+				inputStream.addStreamSource(ss);
+				outputStructure = w.getOutputStructure();
+				outputStructure = StaticData.getProcessingClassByVSConfig(this).getOutputStructure(outputStructure);
+			}
+			catch (Exception e1) {
+				e1.printStackTrace();
+				Log.e(TAG, "Error: " + e1.getMessage());
+			}
+		}
 		boolean runningState = Boolean.parseBoolean(source.readString());
 		String notify_field_par = source.readString();
 		String notify_condition_par = source.readString();
@@ -107,69 +114,29 @@ public class VSensorConfig implements Parcelable  {
 		String notify_contact_par = source.readString();
 		boolean save_to_db_par = Boolean.parseBoolean(source.readString());
 		
-		setController(StaticData.findController(idid));
-		
-		
+		setController(StaticData.findController(idid));		
 		
 		this.id = idid;
 		this.name = vsName;
 		this.processingClassName = processingClass;
 		this.running = runningState;
 
-		// notify_field, notify_condition, notify_value,
-		// notify_action, notify_contact, save_to_db
 		this.notify_field = notify_field_par;
 		this.notify_condition = notify_condition_par;
 		this.notify_value = notify_value_par;
 		this.notify_action = notify_action_par;
 		this.notify_contact = notify_contact_par;
 		this.save_to_db = save_to_db_par;
-
-		Queue queue = new Queue(windowSize, step, timeBased);
-		StreamSource s = new StreamSource(queue);
-
-		AbstractWrapper w;
-
+		
 		try {
-			w = (AbstractWrapper) Class.forName(wrapperN).newInstance();
-			w.setQueue(s.getQueue());
-			w.setConfig(this);
-			w.setSamplingRate(samplingRate);
-			
-			s.setWrapper(w);
-			s.setAggregator(aggregator);
-			s.setSamplingRate(samplingRate);
-			outputStructure = w.getOutputStructure();
-		}
-		catch (InstantiationException e1) {
-			e1.printStackTrace();
-			Log.e(TAG, "Error: " + e1.getMessage());
-		}
-		catch (IllegalAccessException e1) {
-			e1.printStackTrace();
-			Log.e(TAG, "Error: " + e1.getMessage());
-		}
-		catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-			Log.e(TAG, "Error: " + e1.getMessage());
-		}
-		catch (SQLException e) {
+			inputStream.setVirtualSensor(StaticData.getProcessingClassByVSConfig(this));
+		} catch (Exception e) {
 			e.printStackTrace();
-			Log.e(TAG, "Error: " + e.getMessage());
 		}
-
-		InputStream is = new InputStream(s);
-		s.setInputStream(is);
-
-		this.inputStreams = new InputStream[1];
-		this.inputStreams[0] = is;
-		this.wrapperName = wrapperN;
-			
 	}
 
 	public VSensorConfig(int id, String processingClass, String vsName,
-			String wrapperName, int samplingRate, int windowSize, int step, boolean timeBased,
-			int aggregator, boolean running, String notify_field,
+			ArrayList<StreamSource> ss, boolean running, String notify_field,
 			String notify_condition, Double notify_value, String notify_action,
 			String notify_contact, boolean save_to_db) {
 
@@ -178,8 +145,6 @@ public class VSensorConfig implements Parcelable  {
 		this.processingClassName = processingClass;
 		this.running = running;
 
-		// notify_field, notify_condition, notify_value,
-		// notify_action, notify_contact, save_to_db
 		this.notify_field = notify_field;
 		this.notify_condition = notify_condition;
 		this.notify_value = notify_value;
@@ -187,78 +152,24 @@ public class VSensorConfig implements Parcelable  {
 		this.notify_contact = notify_contact;
 		this.save_to_db = save_to_db;
 
-		Queue queue = new Queue(windowSize, step, timeBased);
-		StreamSource s = new StreamSource(queue);
-
-		AbstractWrapper w;
-
+		inputStream = new InputStream();
+		for (StreamSource s:ss){
+			try {
+				s.setInputStream(inputStream);
+				streamSources.add(s);
+				inputStream.addStreamSource(s);
+				outputStructure = s.getWrapper().getOutputStructure();
+				outputStructure = StaticData.getProcessingClassByVSConfig(this).getOutputStructure(outputStructure);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		try {
-			w = (AbstractWrapper) Class.forName(wrapperName).newInstance();
-			w.setQueue(s.getQueue());
-			w.setConfig(this);
-			w.setSamplingRate(samplingRate);
-			
-			s.setWrapper(w);
-			s.setAggregator(aggregator);
-			s.setSamplingRate(samplingRate);
-			outputStructure = w.getOutputStructure();
-		}
-		catch (InstantiationException e1) {
-			e1.printStackTrace();
-			Log.e(TAG, "Error: " + e1.getMessage());
-		}
-		catch (IllegalAccessException e1) {
-			e1.printStackTrace();
-			Log.e(TAG, "Error: " + e1.getMessage());
-		}
-		catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-			Log.e(TAG, "Error: " + e1.getMessage());
-		}
-		catch (SQLException e) {
+			inputStream.setVirtualSensor(StaticData.getProcessingClassByVSConfig(this));
+		} catch (Exception e) {
 			e.printStackTrace();
-			Log.e(TAG, "Error: " + e.getMessage());
 		}
 
-		InputStream is = new InputStream(s);
-		s.setInputStream(is);
-
-		this.inputStreams = new InputStream[1];
-		this.inputStreams[0] = is;
-		this.wrapperName = wrapperName;
-
-	}
-
-	// public void createTableIfNotExist(){
-	// controller.getStorageManager().createTable(name, outputStructure);
-	// }
-	// /(String processingClass, String vsName,
-	// String wrapperName, int samplingRate, int windowSize,
-	// int step, int aggregator, boolean running) {
-	// }
-
-	public String getWrapperName() {
-		return wrapperName;
-	}
-	public void setWrapperName(String wrapperName) {
-		this.wrapperName = wrapperName;
-	}
-	public VSensorConfig clone() {
-		VSensorConfig vsConfig = new VSensorConfig(id, processingClassName, name,
-				wrapperName, getInputStreams()[0].getSources()[0].getSamplingRate(),
-				getInputStreams()[0].getSources()[0].getQueue().getWindowSize(),
-				getInputStreams()[0].getSources()[0].getQueue().getStep(),
-				getInputStreams()[0].getSources()[0].getQueue().isTimeBased(),
-				getInputStreams()[0].getSources()[0].getAggregator(), running,
-				notify_field, notify_condition, notify_value, notify_action,
-				notify_contact, save_to_db);
-		vsConfig.setController(controller);
-		
-		StaticData.addConfig(id, vsConfig);
-		StaticData.saveNameID(id, name);
-
-
-		return vsConfig;
 	}
 
 	public String getProcessingClassName() {
@@ -277,13 +188,6 @@ public class VSensorConfig implements Parcelable  {
 		this.running = running;
 	}
 
-	// /**
-	// * @return Returns the addressing.
-	// */
-	// public KeyValue[] getAddressing() {
-	// return this.addressing;
-	// }
-
 	/**
 	 * @return Returns the description.
 	 */
@@ -294,26 +198,11 @@ public class VSensorConfig implements Parcelable  {
 	/**
 	 * @return Returns the inputStreams.
 	 */
-	public InputStream[] getInputStreams() {
-		return inputStreams;
-		// return this.inputStreamNameToInputStreamObjectMapping.values();
+	public ArrayList<StreamSource> getStreamSource() {
+		return streamSources ;
 	}
-
-	public InputStream getInputStream(final String inputStreamName) {
-		return this.inputStreamNameToInputStreamObjectMapping.get(inputStreamName);
-	}
-
-	/**
-	 * The <code>nameInitialized</code> is used to cache the virtual sensor's name
-	 * for preformance.
-	 */
-	private boolean nameInitialized = false;
 
 	public String getName() {
-		// if (this.nameInitialized == false) {
-		// this.name = this.name.replace(" ", "").trim().toLowerCase();
-		// this.nameInitialized = true;
-		// }
 		return this.name;
 	}
 
@@ -341,14 +230,6 @@ public class VSensorConfig implements Parcelable  {
 	public Long getLastModified() {
 		return this.lastModified;
 	}
-
-	/**
-	 * @param addressing
-	 *          The addressing to set.
-	 */
-	// public void setAddressing(KeyValue[] addressing) {
-	// this.addressing = addressing;
-	// }
 
 	/**
 	 * @param description
@@ -398,58 +279,6 @@ public class VSensorConfig implements Parcelable  {
 		this.priority = priority;
 	}
 
-	// public String[] getAddressingKeys() {
-	// final String result[] = new String[this.getAddressing().length];
-	// int counter = 0;
-	// for (final KeyValue predicate : this.getAddressing())
-	// result[counter++] = (String) predicate.getKey();
-	// return result;
-	// }
-	//
-	// public String[] getAddressingValues() {
-	// final String result[] = new String[this.getAddressing().length];
-	// int counter = 0;
-	// for (final KeyValue predicate : this.getAddressing())
-	// result[counter++] = (String) predicate.getValue();
-	// return result;
-	// }
-
-	private boolean isGetMainClassInitParamsInitialized = false;
-
-	// private final TreeMap<String, String> mainClassInitParams = new
-	// TreeMap<String, String>(
-	// new CaseInsensitiveComparator());
-
-	/**
-	 * Note that the key and value both are trimmed before being inserted into the
-	 * data strcture.
-	 * 
-	 * @return
-	 */
-	// public TreeMap<String, String> getMainClassInitialParams() {
-	// if (!this.isGetMainClassInitParamsInitialized) {
-	// this.isGetMainClassInitParamsInitialized = true;
-	// for (final KeyValue param : this.mainClassInitialParams) {
-	// this.mainClassInitParams.put(param.getKey().toString().toLowerCase(),
-	// param.getValue().toString());
-	// }
-	// }
-	// return this.mainClassInitParams;
-	// }
-
-	// public void setMainClassInitialParams(
-	// final ArrayList<KeyValue> mainClassInitialParams) {
-	// this.mainClassInitialParams = mainClassInitialParams;
-	// }
-
-	public String getFileName() {
-		return this.fileName;
-	}
-
-	public void setFileName(final String fileName) {
-		this.fileName = fileName;
-	}
-
 	private boolean isStorageCountBased = true;
 
 	public static final int STORAGE_SIZE_NOT_SET = -1;
@@ -484,10 +313,6 @@ public class VSensorConfig implements Parcelable  {
 		String storageHistorySize = this.getStorageHistorySize();
 		storageHistorySize = storageHistorySize.replace(" ", "").trim()
 				.toLowerCase();
-		for (final InputStream inputStream : this.inputStreams)
-			this.inputStreamNameToInputStreamObjectMapping.put(
-					inputStream.getInputStreamName(), inputStream);
-
 		if (storageHistorySize.equalsIgnoreCase("0"))
 			return true;
 		final int second = 1000;
@@ -551,21 +376,6 @@ public class VSensorConfig implements Parcelable  {
 		return this.parsedStorageSize;
 	}
 
-	public String getDirectoryQuery() {
-		return directoryQuery;
-	}
-
-	public String toString() {
-		return "VSensorConfig{" + "name='" + this.name + '\'' + ", mainClass='"
-				+ this.processingClassName + '\'' + ", wrapperName='"
-				+ this.wrapperName + '\'' + ", SamplingRate="
-				+ this.getInputStreams()[0].getSources()[0].getSamplingRate()
-				+ ", WindowSize="
-				+ this.getInputStreams()[0].getSources()[0].getQueue().getWindowSize() + ", Step="
-				+ this.getInputStreams()[0].getSources()[0].getQueue().getStep() + ", Running="
-				+ this.getRunning();
-	}
-
 	public boolean equals(Object obj) {
 		if (obj instanceof VSensorConfig) {
 			VSensorConfig vSensorConfig = (VSensorConfig) obj;
@@ -583,80 +393,15 @@ public class VSensorConfig implements Parcelable  {
 		}
 	}
 
-	// time zone
-
-	public SimpleDateFormat getSDF() {
-		if (timeZone == null)
-			return null;
-		else {
-			if (sdf == null) {
-				// sdf = new
-				// SimpleDateFormat(Main.getContainerConfig().getTimeFormat());
-				sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
-			}
-		}
-		return sdf;
-	}
-
 	
-	public void setInputStreams(InputStream... inputStreams) {
-		this.inputStreams = inputStreams;
-	}
-
 	public void setStorageHistorySize(String storageHistorySize) {
 		this.storageHistorySize = storageHistorySize;
 	}
 
-	/**
-	 * Addressing Helper methods.
-	 */
-	private transient Double cached_altitude = null;
-	private transient Double cached_longitude = null;
-	private transient Double cached_latitude = null;
-	private boolean addressing_processed = false;
-
 	private boolean isTimestampUnique = false;
 
-	public void preprocess_addressing() {
-		// if (!addressing_processed) {
-		// for (KeyValue kv : getAddressing())
-		// if (kv.getKey().toString().equalsIgnoreCase("altitude"))
-		// cached_altitude = Double.parseDouble(kv.getValue().toString());
-		// else if (kv.getKey().toString().equalsIgnoreCase("longitude"))
-		// cached_longitude = Double.parseDouble(kv.getValue().toString());
-		// else if (kv.getKey().toString().equalsIgnoreCase("latitude"))
-		// cached_latitude = Double.parseDouble(kv.getValue().toString());
-		// addressing_processed = true;
-		// }
-	}
-
-	public Double getAltitude() {
-		preprocess_addressing();
-		return cached_altitude;
-	}
-
-	public Double getLatitude() {
-		preprocess_addressing();
-		return cached_latitude;
-	}
-
-	public Double getLongitude() {
-		preprocess_addressing();
-		return cached_longitude;
-	}
-
-	public boolean getIsTimeStampUnique() {
+		public boolean getIsTimeStampUnique() {
 		return isTimestampUnique;
-	}
-
-	public boolean isAccess_protected() {
-		try {
-			return Boolean.parseBoolean(access_protected.trim());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
 	}
 
 	public AbstractController getController() {
@@ -727,12 +472,15 @@ public class VSensorConfig implements Parcelable  {
 		dest.writeString(Integer.toString(id));
 		dest.writeString(getProcessingClassName());
 		dest.writeString(getName());
-		dest.writeString(getWrapperName());
-		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getSamplingRate()));
-		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getQueue().getWindowSize()));
-		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getQueue().getStep()));
-		dest.writeString(Boolean.toString(getInputStreams()[0].getSources()[0].getQueue().isTimeBased()));
-		dest.writeString(Integer.toString(getInputStreams()[0].getSources()[0].getAggregator()));
+		dest.writeString(Integer.toString(streamSources.size()));
+		for(StreamSource s:streamSources){
+			dest.writeString(s.getWrapper().getWrapperName());
+			dest.writeString(Integer.toString(s.getWrapper().getSamplingRate()));
+			dest.writeString(Integer.toString(s.getWindowSize()));
+			dest.writeString(Integer.toString(s.getStep()));
+			dest.writeString(Boolean.toString(s.isTimeBased()));
+			dest.writeString(Integer.toString(s.getAggregator()));
+		}
 		dest.writeString(Boolean.toString(getRunning()));
 		dest.writeString(getNotify_field());
 		dest.writeString(getNotify_condition());
@@ -740,8 +488,7 @@ public class VSensorConfig implements Parcelable  {
 		dest.writeString(getNotify_action());
 		dest.writeString(getNotify_contact());
 		dest.writeString(Boolean.toString(isSave_to_db()));
-		StaticData.addController((AndroidControllerListVSNew) getController());
-		StaticData.is = getInputStreams()[0];
+		StaticData.addController((AndroidControllerListVS) getController());
 	}
 	public static final Parcelable.Creator<VSensorConfig> CREATOR  = new Creator<VSensorConfig>() {
 
@@ -754,11 +501,16 @@ public class VSensorConfig implements Parcelable  {
 	    }
 
 	    public VSensorConfig[] newArray(int size) {
-
 	        return new VSensorConfig[size];
 	    }
 
 	};
+
+
+	public InputStream getInputStream() {
+		return inputStream;
+		
+	}
 
 }
 

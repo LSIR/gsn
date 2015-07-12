@@ -28,17 +28,16 @@ package tinygsn.controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
+import tinygsn.beans.DataField;
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityPublishData;
-import tinygsn.model.vsensor.VirtualSensor;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.storage.StorageManager;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Editable;
 
 public class AndroidControllerPublishData extends AbstractController {
 
@@ -46,9 +45,8 @@ public class AndroidControllerPublishData extends AbstractController {
 
 	private Handler handlerVS = null;
 
-	private ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
+	private ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
 
-	private static final String TAG = "AndroidControllerPublishData";
 	private SqliteStorageManager storage = null;
 	
 	public AndroidControllerPublishData(ActivityPublishData androidViewer) {
@@ -59,7 +57,7 @@ public class AndroidControllerPublishData extends AbstractController {
 	public void loadListVS() {
 		SqliteStorageManager storage = new SqliteStorageManager(view);
 		vsList = storage.getListofVS();
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			vs.getConfig().setController(this);
 		}
 
@@ -83,13 +81,16 @@ public class AndroidControllerPublishData extends AbstractController {
 	public StreamElement loadLatestData(int numLatest, String vsName) {
 		StreamElement latest = null;
 		
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().endsWith(vsName)) {
-				String[] fieldList = vs.getConfig().getInputStreams()[0].getSources()[0]
-						.getWrapper().getFieldList();
-				Byte[] fieldType = vs.getConfig().getInputStreams()[0].getSources()[0]
-						.getWrapper().getFieldType();
+				DataField[] df = vs.getConfig().getOutputStructure();
 
+				String[] fieldList = new String[df.length];
+				Byte[] fieldType = new Byte[df.length];
+				for(int i=0;i<df.length;i++){
+					fieldList[i] = df[i].getName();
+					fieldType[i] = df[i].getDataTypeID();
+				}
 				ArrayList<StreamElement> result = storage.executeQueryGetLatestValues(
 						"vs_" + vsName, fieldList, fieldType, numLatest);
 
@@ -105,10 +106,6 @@ public class AndroidControllerPublishData extends AbstractController {
 		return latest;
 	}
 	
-	@Override
-	public void startLoadVSList() {
-	}
-
 	public void consume(StreamElement streamElement) {
 	}
 
@@ -129,12 +126,16 @@ public class AndroidControllerPublishData extends AbstractController {
 			long start = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(fromdate + " " + fromtime).getTime();
 			long end = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(todate + " " + totime).getTime();
 		
-			for (VirtualSensor vs : vsList) {
+			for (AbstractVirtualSensor vs : vsList) {
 				if (vs.getConfig().getName().endsWith(vsName)) {
-					String[] fieldList = vs.getConfig().getInputStreams()[0].getSources()[0]
-							.getWrapper().getFieldList();
-					Byte[] fieldType = vs.getConfig().getInputStreams()[0].getSources()[0]
-							.getWrapper().getFieldType();
+					DataField[] df = vs.getConfig().getOutputStructure();
+
+					String[] fieldList = new String[df.length];
+					Byte[] fieldType = new Byte[df.length];
+					for(int i=0;i<df.length;i++){
+						fieldList[i] = df[i].getName();
+						fieldType[i] = df[i].getDataTypeID();
+					}
 	
 					ArrayList<StreamElement> result = storage.executeQueryGetRangeData(
 							"vs_" + vsName, start,end ,fieldList, fieldType);

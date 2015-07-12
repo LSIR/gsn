@@ -29,8 +29,8 @@ package tinygsn.gui.android;
 import java.util.ArrayList;
 
 import tinygsn.beans.StaticData;
-import tinygsn.controller.AndroidControllerListVSNew;
-import tinygsn.model.vsensor.VirtualSensor;
+import tinygsn.controller.AndroidControllerListVS;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.services.schedular;
 import tinygsn.storage.db.SqliteStorageManager;
 
@@ -56,31 +56,27 @@ public class ActivityHome extends SherlockActivity {
 		setContentView(R.layout.home);
 		getSupportActionBar().hide();
 		SqliteStorageManager storage = new SqliteStorageManager(this);
-//		ImageView subscribe = (ImageView) findViewById(R.id.imageViewSubscribe);
 		TextView subscribe = (TextView) findViewById(R.id.tvSubscribe);
 		BadgeView badge = new BadgeView(this, subscribe);
 		badge.setBadgePosition(BadgeView.POSITION_BOTTOM_RIGHT); 
 		badge.setText("2");
 		badge.show();
 		
-		//my code		
-
-		ArrayList<VirtualSensor> vsList = storage.getListofVS();
-		
-		for (VirtualSensor vs : vsList) {
-			vs.getConfig().setController(new AndroidControllerListVSNew(this));
-
+		//start all defined virtual sensors
+		ArrayList<AbstractVirtualSensor> vsList = storage.getListofVS();
+		for (AbstractVirtualSensor vs : vsList) {
+			vs.getConfig().setController(new AndroidControllerListVS(this));
 		}
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getRunning() == true) {
 				vs.start();
 			}
 		}
 		
-		Intent serviceIntent = null;
+		//start the scheduler
+		/*Intent serviceIntent = null;
 		serviceIntent = new Intent(this, schedular.class);
-		
-		this.startService(serviceIntent);
+		this.startService(serviceIntent);*/
 	}
 
 	@Override
@@ -99,7 +95,7 @@ public class ActivityHome extends SherlockActivity {
 	}
 	
 	public void open_listVSActivity(View view) {
-		Intent myIntent = new Intent(this, ActivityListVSNew.class);
+		Intent myIntent = new Intent(this, ActivityListVS.class);
 		this.startActivity(myIntent);
 	}
 

@@ -1,6 +1,6 @@
 /**
 * Global Sensor Networks (GSN) Source Code
-* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* Copyright (c) 2006-2015, Ecole Polytechnique Federale de Lausanne (EPFL)
 *
 * This file is part of GSN.
 *
@@ -20,6 +20,7 @@
 * File: gsn-tiny/src/tinygsn/model/wrappers/AndroidLightWrapper.java
 *
 * @author Do Ngoc Hoan
+* @author Julien Eberle
 */
 
 
@@ -27,10 +28,12 @@ package tinygsn.model.wrappers;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
-import tinygsn.beans.Queue;
 import tinygsn.beans.StreamElement;
+import tinygsn.services.WrapperService;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -39,74 +42,37 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-/**
- * 
- * @author Do Ngoc Hoan (hoan.do@epfl.ch)
- *
- */
+
 public class AndroidLightWrapper extends AbstractWrapper implements
 		SensorEventListener {
 
 	private static final String[] FIELD_NAMES = new String[] {"Illuminance"};
-
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE };
-
 	private static final String[] FIELD_DESCRIPTION = new String[] { "Illuminance" };
-
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double"};
 
-	private static final String TAG = "AndroidLightWrapper";
-
+	public static final Class<LightService> SERVICE = LightService.class;
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 
-	private StreamElement theLastStreamElement = null;
 
-	public AndroidLightWrapper() {
-		super();
-	}
-
-	public AndroidLightWrapper(Queue queue) {
-		super(queue);
-		initialize();
-	}
-
-	public boolean initialize() {
-		return true;
-	}
-
-	/**
-	 * This run
-	 */
-	public void run() {
+	public void runOnce() {
 		Activity activity = getConfig().getController().getActivity();
 		mSensorManager = (SensorManager) activity
 				.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-		mSensorManager.registerListener(this, mSensor,
-				SensorManager.SENSOR_DELAY_NORMAL);
-
-		while (isActive()) {
-			try {
-				Thread.sleep(samplingRate);
-				getLastKnownData();
-			}
-			catch (InterruptedException e) {
-				Log.e(e.getMessage(), e.toString());
+		SqliteStorageManager storage = new SqliteStorageManager(activity);
+		int samplingPeriod = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidLightWrapper");
+		try {
+			if (samplingPeriod > 0){
+				mSensorManager.registerListener(this, mSensor,SensorManager.SENSOR_DELAY_NORMAL); 
+				Thread.sleep(samplingPeriod*1000);
+				mSensorManager.unregisterListener(this);
 			}
 		}
-	}
-
-	public void getLastKnownData() {
-		if (theLastStreamElement == null) {
-			Log.e(TAG, "There is no signal!");
+		catch (InterruptedException e) {
+			Log.e(e.getMessage(), e.toString());
 		}
-		else {
-			postStreamElement(theLastStreamElement);
-		}
-	}
-
-	public void dispose() {
 	}
 
 	public String getWrapperName() {
@@ -134,16 +100,7 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 	}
 
 	@Override
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
-	}
-
-	public StreamElement getTheLastStreamElement() {
-		return theLastStreamElement;
-	}
-
-	public void setTheLastStreamElement(StreamElement theLastStreamElement) {
-		this.theLastStreamElement = theLastStreamElement;
-	}
+	public void onAccuracyChanged(Sensor arg0, int arg1) {}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
@@ -152,7 +109,15 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
 				new Serializable[] { distance });
 
-		theLastStreamElement = streamElement;
+		postStreamElement(streamElement);
+	}
+	
+	public static class LightService extends WrapperService{
+
+		public LightService() {
+			super("lightService");
+
+		}
 	}
 
 }

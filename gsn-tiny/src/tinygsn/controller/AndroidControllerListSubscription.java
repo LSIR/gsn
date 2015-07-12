@@ -82,10 +82,6 @@ public class AndroidControllerListSubscription extends AbstractController {
 	}
 
 	@Override
-	public void startLoadVSList() {
-	}
-
-	@Override
 	public Activity getActivity() {
 		return view;
 	}

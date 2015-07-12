@@ -17,72 +17,97 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn/beans/StreamSource.java
+* File: gsn-tiny/src/tinygsn/beans/Queue.java
 *
 * @author Do Ngoc Hoan
 */
 
-
 package tinygsn.beans;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import tinygsn.model.wrappers.AbstractWrapper;
-import tinygsn.utils.GSNRuntimeException;
-import android.util.Log;
 
-public class StreamSource implements Serializable, QueueListener {
-	private static final String TAG = "StreamSource";
-	public static String[] AGGREGATOR = { "Average", "Max", "Min" };
 
-	private int samplingRate;
-	private int aggregator;
+public class StreamSource implements Serializable{
+	
+	private static final long serialVersionUID = 7791682194678539871L;
 
-	private Queue queue = null;
+	public static final String[] AGGREGATOR = { "Average", "Max", "Min", "Window" };
+
+	//properties
+	private int id = 0;
+	private int step = 1;
+	private int windowSize = 1;
+	private boolean timeBased = false;
+	private int aggregator = 0;
+	
+	//references
 	private transient AbstractWrapper wrapper;
-	private InputStream inputStream;
-
-	// ================================================
-	private static final long serialVersionUID = 5222853537667420098L;
-	public static final String DEFAULT_QUERY = "select * from wrapper";
-	private String alias;
-	private String rawHistorySize = null;
-	private String rawSlideValue = null;
-	private int disconnectedBufferSize;
-	private String sqlQuery;
-	protected int uid;
-	protected StringBuilder uidS;
-	private static final String[] dateFormats = new String[] {
-			"yyyy/MM/dd 'at' HH:mm:ss z", "h:mm:ss a", "h:mm a" };
-	private transient Date startDate;
-	private transient Date endDate;
-	public static final AddressBean[] EMPTY_ADDRESS_BEAN = new AddressBean[] {};
-	private AddressBean addressing[] = EMPTY_ADDRESS_BEAN;
-	private AddressBean activeAddressBean; // To be used by the gui
-
-	public StreamSource(Queue queue) {
-		queue.registerListener(this);
-		this.queue = queue;
+	private transient InputStream inputStream;
+	
+	//internals
+	private Date lastTimeAdded;
+	private ArrayList<StreamElement> values = new ArrayList<StreamElement>();
+	
+	public StreamSource(){}
+	
+	public StreamSource(int windowSize, int step, boolean timeBased, int aggregator){
+		setStep(step);
+		setWindowSize(windowSize);		
+		setTimeBased(timeBased);
+		setAggregator(aggregator);
+	}
+	
+	/**
+	 * Assume step <= windowSize
+	 * We keep the Queue's size is double of window size
+	 */
+	public boolean isFull(){
+		if (isTimeBased()){
+			return values.get(values.size()-1).getTimeStamp() - values.get(0).getTimeStamp() >= windowSize;
+		}
+		else{
+			return values.size() >= windowSize;
+		}
 	}
 
-	@Override
-	public void notifyMe(ArrayList<StreamElement> data) {
+	public boolean isEmpty(){
+		return values.size() == 0;
+	}
+	
+	public synchronized void add(StreamElement element){
+		values.add(element);
+		lastTimeAdded = new Date();
+		if (this.isFull()){
+			notifyInputStream(values);
+			moveToNextStep();
+		}
+	}
+	
+	private synchronized void moveToNextStep(){
+		if (isTimeBased()){
+			long ref = values.get(0).getTimeStamp() + step;
+			while (!isEmpty() && values.get(0).getTimeStamp() < ref){
+				values.remove(0);
+			}
+		}else{
+			for (int i = 0; i < step; i++){
+				values.remove(0);
+			}
+		}
+	}
+	
+	public void notifyInputStream(ArrayList<StreamElement> data) {
 		// Use Aggregator to process data s
 		StreamElement se = data.get(0);
 
 		if (inputStream == null) {
-			Log.e(TAG, "inputStream is null");
 			return;
 		}
 		switch (aggregator) {
 		case 0:
-			// Average
-			
-			//TODO replace with constant. Add SQL filter 
-			
-			
 			// 1. Get sum
 			for (int i = 1; i < data.size(); i++) {
 				for (int j = 0; j < se.getFieldNames().length; j++) {
@@ -109,11 +134,11 @@ public class StreamSource implements Serializable, QueueListener {
 				}
 			}
 		case 3:
-			// No aggragation
-			inputStream.getVirtualSensor().dataAvailable(data);
+			// No aggregation
+			inputStream.getVirtualSensor().dataAvailable(getWrapper().getWrapperName(),data);
 			return;
 		}	
-		inputStream.getVirtualSensor().dataAvailable(se);
+		inputStream.getVirtualSensor().dataAvailable(getWrapper().getWrapperName(),se);
 		
 	}
 
@@ -122,146 +147,68 @@ public class StreamSource implements Serializable, QueueListener {
 		return d;
 	}
 	
-	public String getRawHistorySize() {
-		return rawHistorySize;
-	}
-
-	public StreamSource setRawHistorySize(String rawHistorySize) {
-		this.rawHistorySize = rawHistorySize;
-		return this;
-	}
-
-	public StreamSource setRawSlideValue(String rawSlideValue) {
-		this.rawSlideValue = rawSlideValue;
-		return this;
-	}
-
-	public StreamSource setAddressing(AddressBean[] addressing) {
-		this.addressing = addressing;
-		return this;
-	}
-
-	public StreamSource setAlias(String alias) {
-		this.alias = alias;
-		return this;
-	}
-
-	public StreamSource setSqlQuery(String sqlQuery) {
-		this.sqlQuery = sqlQuery;
-		return this;
-	}
-
-	public AddressBean[] getAddressing() {
-		if (addressing == null)
-			addressing = EMPTY_ADDRESS_BEAN;
-		return addressing;
-	}
-
 	/**
-	 * @return Returns the alias.
-	 */
-	public CharSequence getAlias2() {
-		return alias.toLowerCase();
-	}
-
-	public InputStream getInputStream() {
-		return inputStream;
-	}
-
-	/**
-	 * @return Returns the bufferSize.
-	 */
-	public int getDisconnectedBufferSize() {
-		return disconnectedBufferSize;
-	}
-
-	public void setDisconnectedBufferSize(int disconnectedBufferSize) {
-		this.disconnectedBufferSize = disconnectedBufferSize;
-	}
-
-	public int getSamplingRate() {
-		return samplingRate;
-	}
-
-	/**
-	 * @return Returns the sqlQuery.
-	 */
-	public String getSqlQuery() {
-		if (sqlQuery == null || sqlQuery.trim().length() == 0)
-			sqlQuery = DEFAULT_QUERY;
-		return sqlQuery;
-	}
-
-	public void setWrapper(AbstractWrapper wrapper) throws SQLException {
-		if (validate() == false)
-			throw new GSNRuntimeException(
-					"Can't set the wrapper when the stream source is invalid.");
-		this.wrapper = wrapper;
-		wrapper.addListener(this);
-	}
-
-	/**
-	 * @return Returns the activeSourceProducer.
-	 */
-	public AbstractWrapper getWrapper() {
-		if (wrapper == null)
-			throw new GSNRuntimeException(
-					"The wrapper for stream source is not set !.");
-		return wrapper;
-	}
-
-	/**
-	 * ; Note that the validate method doesn't case if the wrapper variable or
-	 * input stream variable are set or not.
-	 * 
+	 * Get the first windowSize elements
 	 * @return
 	 */
-	public boolean validate() {
-		return true;
+	public ArrayList<StreamElement> getWindowValues(){
+		ArrayList<StreamElement> window = new ArrayList<StreamElement>();
+		if (isTimeBased()){
+			int i = 0;
+			long ref = values.get(0).getTimeStamp() + windowSize;
+			while (i < values.size() && values.get(i).getTimeStamp() < ref){
+				window.add(values.get(i));
+			}
+		}else{
+			int w = windowSize;
+			if (w < values.size()) w = values.size();
+			for (int i = 0; i < w; i++){
+				window.add(values.get(i));
+			}
+		}
+		return window;
+	}
+	
+	public ArrayList<StreamElement> getAllValues(){
+		return values;
+	}
+	
+	public String toString(){
+		String s = "";
+		for (StreamElement i: getAllValues()){
+			s += i.toString() + " ";
+		}
+		return s;
+	}
+	
+	public int getStep() {
+		return step;
 	}
 
-	public StringBuilder toSql() {
-		return new StringBuilder();
-
+	public void setStep(int step) {
+		this.step = step;
 	}
 
-	public AddressBean getActiveAddressBean() {
-		return activeAddressBean;
+	public int getWindowSize() {
+		return windowSize;
 	}
 
-	public StreamSource setInputStream(InputStream is) throws GSNRuntimeException {
-		// if (alias == null)
-		// throw new NullPointerException("Alias can't be null!");
-		// if (this.inputStream != null && is != this.inputStream)
-		// throw new
-		// GSNRuntimeException("Can't reset the input stream variable !.");
-		// this.inputStream = is;
-		// if (validate() == false)
-		// throw new GSNRuntimeException(
-		// "You can't set the input stream on an invalid stream source. ");
-		inputStream = is;
-
-		return this;
+	public void setWindowSize(int windowSize) {
+		this.windowSize = windowSize;
 	}
 
-	public String toString() {
-		StringBuilder toReturn = new StringBuilder();
-		toReturn.append(" Stream Source object: ");
-		toReturn.append(" Alias: ").append(alias);
-		toReturn.append(" uidS: ").append(uidS);
-		toReturn.append(" Active source: ").append(activeAddressBean);
-
-		return toReturn.toString();
+	public Date getLastTimeAdded() {
+		return lastTimeAdded;
 	}
 
-	public Queue getQueue() {
-		return queue;
+	public boolean isTimeBased() {
+		return timeBased;
 	}
 
-	public void setQueue(Queue queue) {
-		this.queue = queue;
+	public void setTimeBased(boolean timeBased) {
+		this.timeBased = timeBased;
 	}
-
+	
 	public int getAggregator() {
 		return aggregator;
 	}
@@ -270,7 +217,27 @@ public class StreamSource implements Serializable, QueueListener {
 		this.aggregator = aggregator;
 	}
 
-	public void setSamplingRate(int samplingRate) {
-		this.samplingRate = samplingRate;
+	public AbstractWrapper getWrapper() {
+		return wrapper;
+	}
+
+	public void setWrapper(AbstractWrapper wrapper) {
+		this.wrapper = wrapper;
+	}
+
+	public InputStream getInputStream() {
+		return inputStream;
+	}
+
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

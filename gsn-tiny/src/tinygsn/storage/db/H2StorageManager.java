@@ -29,8 +29,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StreamSource;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.storage.StorageManager;
 
 //import gsn.beans.DataField;
@@ -205,11 +209,21 @@ public class H2StorageManager extends StorageManager {
      * HSQLDB properly with high probability, the DB goes into instable or in
      * worst case becomes corrupted.
      */
-    @Override
     public void shutdown() throws SQLException {
         getConnection().createStatement().execute("SHUTDOWN");
 //        logger.warn("Closing the database server (for HSqlDB) [done].");
 //        logger.warn("Closing the connection pool [done].");
-        super.shutdown();
     }
+
+	@Override
+	public ArrayList<AbstractVirtualSensor> getListofVS() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<StreamSource> getSourcesOfVS(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

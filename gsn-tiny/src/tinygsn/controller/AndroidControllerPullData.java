@@ -169,9 +169,6 @@ public class AndroidControllerPullData extends AbstractController {
 		this.handlerData = handlerData;
 	}
 
-	@Override
-	public void startLoadVSList() {
-	}
 
 	public void consume(StreamElement streamElement) {
 	}

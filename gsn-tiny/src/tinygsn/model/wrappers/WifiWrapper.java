@@ -25,84 +25,43 @@
 
 package tinygsn.model.wrappers;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.IntentService;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.util.Log;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
-import tinygsn.beans.Queue;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
-import android.app.Activity;
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.util.Log;
+import tinygsn.beans.VSensorConfig;
+import tinygsn.beans.WrapperConfig;
+import tinygsn.storage.db.SqliteStorageManager;
 
-public class WifiWrapper extends AbstractWrapper implements
-		SensorEventListener {
 
+public class WifiWrapper extends AbstractWrapper {
+	
 	private static final String[] FIELD_NAMES = new String[] { "mac1", "mac2", "level" };
-
-	public StreamElement getTheLastStreamElement() {
-		return theLastStreamElement;
-	}
-
-	public void setTheLastStreamElement(StreamElement theLastStreamElement) {
-		this.theLastStreamElement = theLastStreamElement;
-	}
-
-	
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE };
-
 	private static final String[] FIELD_DESCRIPTION = new String[] { "mac1", "mac2", "level" };
-
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double", "double", "double" };
-
-	private static final String TAG = "AndroidWifiWrapper";
-
-	public StreamElement theLastStreamElement = null;
-	public ArrayList<StreamElement> queuedStreamElements = new ArrayList<StreamElement>();
-
 	
-	public ArrayList<StreamElement> getQueuedStreamElements() {
-		return queuedStreamElements;
-	}
-
-	public void setQueuedStreamElements(
-			ArrayList<StreamElement> queuedStreamElements) {
-		this.queuedStreamElements = queuedStreamElements;
-	}
-
-	public WifiWrapper() {
-		super();
-	}
-
-	public WifiWrapper(Queue queue) {
-		super(queue);
-		initialize();
-	}
-
-	public boolean initialize() {
-		return true;
-	}
-
-	public void run() {
-		
-
-	}
-
-	public void getLastKnownData() {
-		if (theLastStreamElement == null) {
-			Log.e(TAG, "There is no signal!");
-		}
-		else {
-			postStreamElement(theLastStreamElement);
-		}
-	}
-
-	public void dispose() {
-	}
+	public static final Class<WifiService> SERVICE = WifiService.class;
+	
+	@Override
+	public void runOnce(){}
 
 	public String getWrapperName() {
 		return this.getClass().getSimpleName();
@@ -127,21 +86,121 @@ public class WifiWrapper extends AbstractWrapper implements
 	public Byte[] getFieldType() {
 		return FIELD_TYPES;
 	}
+	
+	public static class WifiService extends IntentService {
+		
+		private WrapperConfig config = null;
+		public AbstractWrapper w;
+		WifiManager mainWifiObj;
+		WifiScanReceiver wifiReciever;
+		SqliteStorageManager storage = null;
+		long ctr = 0;
+		boolean scanning = false;
+		
+		public WifiService()
+		{
+			super("wifiService");
+		}
+		
+		@Override
+		public void onCreate(){
+			mainWifiObj = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+			wifiReciever = new WifiScanReceiver();
+			registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+			Log.d("wifi-scanning", "registered");
+			super.onCreate();
+		}
+		
+		@Override
+		protected void onHandleIntent(Intent intent) {
 
-	@Override
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
-	}
+			Bundle b = intent.getExtras();
+			config = (WrapperConfig) b.get("tinygsn.beans.config");
+			if(!config.isRunning()) return;
+			storage = new SqliteStorageManager(config.getController().getActivity());
+			try {
+				w = StaticData.getWrapperByName("tinygsn.model.wrappers.WifiWrapper");
+			} catch (Exception e1) {}
+				
+			int samplingRate = w.getSamplingRate();
+		
+		    if (samplingRate > 0 && ctr % samplingRate == 0 ){
 
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		double x = event.values[0];
-		double y = event.values[1];
-		double z = event.values[2];
+				mainWifiObj.setWifiEnabled(true);
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {}
+				mainWifiObj.startScan();
+				scanning = true;
+				Log.d("wifi-scanning", "calling scan" + wifiReciever);
+				long t = System.currentTimeMillis();
+				while (scanning){
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {}
+					if (System.currentTimeMillis() - t > 120000){
+				    	  StreamElement streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
+					 				new Serializable[] { 1.0, mainWifiObj.isWifiEnabled()?1.0:0.0 , 0.0 });
+					         ((WifiWrapper) w).postStreamElement(streamElement);
+					         break;
+					}
+				}
+				mainWifiObj.setWifiEnabled(false);
 
-		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
-				new Serializable[] { x, y, z });
+			}
+		    ctr++;
+			
+			AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+			am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+60000,PendingIntent.getService(config.getController().getActivity(), 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
+		}
+			
+		
+		@Override
+		public void onDestroy() {
+			try{
+			unregisterReceiver(wifiReciever);
+			Log.d("wifi-scanning", "de-registered");
+			}catch( Exception e)
+			{}
+			super.onDestroy();
+		}
 
-		theLastStreamElement = streamElement;
+
+		class WifiScanReceiver extends BroadcastReceiver {
+	   
+		   @SuppressLint("UseValueOf")
+		   public void onReceive(Context c, Intent intent) {
+			    
+		   	  List<ScanResult> wifiScanList = mainWifiObj.getScanResults();
+		   	  Log.d("wifi-scanning", "received " + wifiScanList.size());
+		      StreamElement streamElement = null;
+		      
+		      if (wifiScanList.size() == 0){
+		    	  
+		    	  streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
+			 				new Serializable[] { 0.0, mainWifiObj.isWifiEnabled()?1.0:0.0 , 0.0 });
+			         ((WifiWrapper) w).postStreamElement(streamElement);
+		      }
+		      
+		      for(int i = 0; i < wifiScanList.size(); i++){
+		         	streamElement = new StreamElement(w.getFieldList(), w.getFieldType(),
+		 				new Serializable[] { converTingBSSID(wifiScanList.get(i).BSSID.substring(0, 8)), converTingBSSID(wifiScanList.get(i).BSSID.substring(8)), wifiScanList.get(i).level });
+		         ((WifiWrapper) w).postStreamElement(streamElement);
+		         storage.updateWifiFrequency(wifiScanList.get(i).BSSID);
+		      }
+		     // unregisterReceiver(wifiReciever);
+		     // registerReceiver(wifiReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+		      scanning = false;
+		   }
+		}
+
+
+		private double converTingBSSID(String bssid)
+		{
+			bssid = bssid.replaceAll(":", "");
+			return Integer.parseInt(bssid, 16);
+		}
+		
 	}
 
 }

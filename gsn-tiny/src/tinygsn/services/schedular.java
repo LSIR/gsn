@@ -1,17 +1,10 @@
 package tinygsn.services;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
-import tinygsn.beans.VSensorConfig;
-import tinygsn.controller.AndroidControllerListVSNew;
-import tinygsn.gui.android.ActivityListVSNew;
-import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.model.wrappers.AndroidAccelerometerWrapper;
 import tinygsn.model.wrappers.AndroidActivityRecognitionWrapper;
 import tinygsn.model.wrappers.AndroidGPSWrapper;
@@ -19,14 +12,10 @@ import tinygsn.model.wrappers.AndroidGyroscopeWrapper;
 import tinygsn.model.wrappers.WifiWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
-import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
@@ -138,68 +127,6 @@ public class schedular extends IntentService {
 		gpsVsName = StaticData.findNameVs(gpsType);
 		activityVsName = StaticData.findNameVs(activityType);
 			
-		/*
-		if (intentWifi == null){
-		intentWifi = StaticData.getRunningIntentByName(wifiVsName);
-		if(intentWifi != null)
-		{
-			config = StaticData.findConfig(StaticData.retrieveIDByName(wifiVsName));
-			config.setRunning(true);
-			intentWifi.putExtra("tinygsn.beans.config", config);
-			startService(intentWifi);
-			config = null;
-		}
-		}
-		
-		if (intentActivity == null){
-		intentActivity = StaticData.getRunningIntentByName(activityVsName);
-		if(intentActivity != null)
-		{
-			config = StaticData.findConfig(StaticData.retrieveIDByName(activityVsName));
-			config.setRunning(true);
-			intentActivity.putExtra("tinygsn.beans.config", config);
-			startService(intentActivity);
-			config = null;
-		}
-		}
-		
-		if (intentGPS == null){
-		intentGPS = StaticData.getRunningIntentByName(gpsVsName);
-		if(intentGPS != null)
-		{
-			config = StaticData.findConfig(StaticData.retrieveIDByName(gpsVsName));
-			config.setRunning(true);
-			intentGPS.putExtra("tinygsn.beans.config", config);
-			startService(intentGPS);
-		}
-		}
-		
-		if (intentAcc == null){
-		intentAcc = StaticData.getRunningIntentByName(accelometerVsName);
-		if(intentAcc != null)
-		{
-			config = StaticData.findConfig(StaticData.retrieveIDByName(accelometerVsName));
-			config.setRunning(true);
-			intentAcc.putExtra("tinygsn.beans.config", config);
-			startService(intentAcc);
-			config = null;
-		}
-		}
-		
-		if (intentGyro == null){
-		intentGyro = StaticData.getRunningIntentByName(gyroscopeVsName);
-		if(intentGyro != null)
-		{
-			config = StaticData.findConfig(StaticData.retrieveIDByName(gyroscopeVsName));
-			config.setRunning(true);
-			intentGyro.putExtra("tinygsn.beans.config", config);
-			startService(intentGyro);
-			config = null;
-		}
-		}
-		*/
-		
-		
 		if(wifiVsName != null)
 		{
 			wifiResult = storage.executeQueryGetLatestValues("vs_"+ wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest, curTime-120000);
@@ -387,19 +314,8 @@ public class schedular extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		
 		storage = new SqliteStorageManager(this);
-		
-		//PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-		//wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "schedular-lock");
-		//wakeLock.acquire();
-		//while(true)
-		{
-			CalcRates();
-			/*try {
-				Thread.sleep(SchedulerSleepingTime);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
-		}	 
+		CalcRates();
+ 
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+SchedulerSleepingTime,PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 	}

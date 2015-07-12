@@ -27,10 +27,12 @@ package tinygsn.model.wrappers;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
-import tinygsn.beans.Queue;
 import tinygsn.beans.StreamElement;
+import tinygsn.services.WrapperService;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -42,67 +44,33 @@ import android.util.Log;
 public class AndroidMagneticFieldWrapper extends AbstractWrapper implements
 		SensorEventListener {
 
-	private static final String[] FIELD_NAMES = new String[] { "x",
-			"y", "z" };
-
-	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE,
-			DataTypes.DOUBLE, DataTypes.DOUBLE };
-
-	private static final String[] FIELD_DESCRIPTION = new String[] { "x",
-			"y", "z" };
-
-	private static final String[] FIELD_TYPES_STRING = new String[] { "double",
-			"double", "double" };
-
-	private static final String TAG = "AndroidMagneticFieldWrapper";
+	private static final String[] FIELD_NAMES = new String[] { "x", "y", "z" };
+	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE };
+	private static final String[] FIELD_DESCRIPTION = new String[] { "x", "y", "z" };
+	private static final String[] FIELD_TYPES_STRING = new String[] { "double", "double", "double" };
+	
+	public static final Class<MagneticService> SERVICE = MagneticService.class;
 
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 
-	private StreamElement theLastStreamElement = null;
-
-	public AndroidMagneticFieldWrapper() {
-		super();
-	}
-
-	public AndroidMagneticFieldWrapper(Queue queue) {
-		super(queue);
-		initialize();
-	}
-
-	public boolean initialize() {
-		return true;
-	}
-
-	public void run() {
+	public void runOnce() {
 		Activity activity = getConfig().getController().getActivity();
 		mSensorManager = (SensorManager) activity
 				.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-		mSensorManager.registerListener(this, mSensor,
-				SensorManager.SENSOR_DELAY_NORMAL);
-
-		while (isActive()) {
-			try {
-				Thread.sleep(samplingRate);
-				getLastKnownData();
-			}
-			catch (InterruptedException e) {
-				Log.e(e.getMessage(), e.toString());
+		SqliteStorageManager storage = new SqliteStorageManager(activity);
+		int samplingPeriod = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidMagneticFieldWrapper");
+		try {
+			if (samplingPeriod > 0){
+				mSensorManager.registerListener(this, mSensor,SensorManager.SENSOR_DELAY_NORMAL);  
+				Thread.sleep(samplingPeriod*1000);
+				mSensorManager.unregisterListener(this);
 			}
 		}
-	}
-
-	private void getLastKnownData() {
-		if (theLastStreamElement == null) {
-			Log.e(TAG, "There is no signal!");
+		catch (InterruptedException e) {
+			Log.e(e.getMessage(), e.toString());
 		}
-		else {
-			postStreamElement(theLastStreamElement);
-		}
-	}
-
-	public void dispose() {
 	}
 
 	public String getWrapperName() {
@@ -130,19 +98,26 @@ public class AndroidMagneticFieldWrapper extends AbstractWrapper implements
 	}
 
 	@Override
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
-	}
+	public void onAccuracyChanged(Sensor arg0, int arg1) {}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		double x = event.values[0];
 		double y = event.values[1];
 		double z = event.values[2];
-		
+
 		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
 				new Serializable[] { x, y, z });
 
-		theLastStreamElement = streamElement;
+		postStreamElement(streamElement);
+	}
+	
+	public static class MagneticService extends WrapperService{
+
+		public MagneticService() {
+			super("magneticService");
+
+		}
 	}
 
 }

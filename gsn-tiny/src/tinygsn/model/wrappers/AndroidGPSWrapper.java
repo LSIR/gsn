@@ -27,158 +27,93 @@ package tinygsn.model.wrappers;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
-import tinygsn.beans.Queue;
 import tinygsn.beans.StreamElement;
+import tinygsn.services.WrapperService;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Looper;
-import android.util.Log;
 
 public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListener {
 
-	private static final String[] FIELD_NAMES = new String[] { "latitude",
-			"longitude" };
-
-	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE,
-			DataTypes.DOUBLE };
-
-	private static final String[] FIELD_DESCRIPTION = new String[] {
-			"Latitude Reading", "Longitude Reading" };
-
-	private static final String[] FIELD_TYPES_STRING = new String[] { "double",
-			"double" };
-
-	private static final String TAG = "AndroidGPSWrapper";
-
-	private static int threadCounter = 0;
-
-	private LocationManager myLocationManager;
-	private LocationListener myLocationListener;
-	private StreamElement theLastStreamElement = null;
+	private static final String[] FIELD_NAMES = new String[] { "latitude", "longitude" };
+	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE };
+	private static final String[] FIELD_DESCRIPTION = new String[] {"Latitude", "Longitude" };
+	private static final String[] FIELD_TYPES_STRING = new String[] { "double", "double" };
 	
-	public AndroidGPSWrapper() {
-		super();
-	}
-	
-	public AndroidGPSWrapper(Queue queue) {
-		super(queue);
-		initialize();
-	}
+	public static final Class<GPSService> SERVICE = GPSService.class;
 
-	public boolean initialize() {
-		return true;
-	}
-
-	public void run() {
+	private LocationManager locationManager;
+    private int timeToShutdown = -1;
+    
+    boolean isGPSEnabled = false;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; 
+    private static final long MIN_TIME_BW_UPDATES =  15000;
 	
+	public void runOnce() {
 		Activity activity = getConfig().getController().getActivity();
-		Looper.prepare();
-		
-		// Get Location service
-		myLocationManager = (LocationManager) activity
-				.getSystemService(Context.LOCATION_SERVICE);
-		// Register a LocationListener
-		myLocationListener = new MyLocationListener();
-		// Update GPS data every 0 ms and 0 meter
-		myLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				0, myLocationListener);
-
-		while (isActive()) {
-			try {
-				Thread.sleep(samplingRate);
-				getLastKnownLocation();
+		SqliteStorageManager storage = new SqliteStorageManager(activity);
+		int samplingPeriod = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidAccelerometerWrapper");
+		while(isActive())
+		{
+			if (samplingPeriod > 0){
+				timeToShutdown = 40;
+				startGPS();
+				try {
+					Thread.sleep(15*1000);
+				}catch (InterruptedException e) {}
+			}else{
+				timeToShutdown--;
+				if (timeToShutdown < 0){
+					stopGPS();
+					break;
+				}else{
+					startGPS();
+					try {
+						Thread.sleep(15*1000);
+					}catch (InterruptedException e) {}
+				}
 			}
-			catch (InterruptedException e) {
-				Log.e(e.getMessage(), e.toString());
-			}
-		}
-		
-		Looper.loop();
-	}
-
-//	protected void getLastKnownLocation() {
-//		try {
-//			// Get the current location
-//			Location location = myLocationManager
-//					.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//			if (location == null) {
-//				Log.e(TAG, "There is no signal!");
-//			}
-//			else {
-//				double latitude = location.getLatitude();
-//				double longitude = location.getLongitude();
-//
-//				StreamElement streamElement = new StreamElement(FIELD_NAMES,
-//						FIELD_TYPES, new Serializable[] { latitude, longitude });
-//				
-//				if (isTheSameWithTheLastStreamElement(streamElement)){
-//					return;
-//				}
-//				postStreamElement(streamElement);
-//			}
-//		}
-//		catch (Exception e) {
-//			Log.e(TAG, "There is an error! \n" + e.getMessage().toString());
-//		}
-//	}
-
-	public void getLastKnownLocation() {
-		if (theLastStreamElement == null){
-			Log.e(TAG, "There is no signal!");
-		}
-		else{
-			postStreamElement(theLastStreamElement);
 		}
 	}
+	
+	public void startGPS() {
+        try {
+        	Activity activity = getConfig().getController().getActivity();
+            locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
 
-	public void dispose() {
-		threadCounter--;
+            if (!isGPSEnabled){
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                 isGPSEnabled = true;   
+            }
+                 Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                 if (location != null){
+                 StreamElement streamElement = new StreamElement(FIELD_NAMES,
+         				FIELD_TYPES, new Serializable[] {location.getLatitude(),location.getLongitude()});
+                 streamElement.setTimeStamp(location.getTime());
+         		 postStreamElement(streamElement);
+                 }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+   
+    public void stopGPS(){
+        if(locationManager != null){
+            locationManager.removeUpdates(this);
+        } 
+        isGPSEnabled = false; 
+    }
+
+    public String getWrapperName() {
+		return this.getClass().getSimpleName();
 	}
-
-	public String getWrapperName() {
-		return "AndroidGPSWrapper";
-	}
-
-	private class MyLocationListener implements LocationListener {
-
-		public void onLocationChanged(Location location) {
-			double latitude = location.getLatitude();
-			double longitude = location.getLongitude();
-
-			StreamElement streamElement = new StreamElement(FIELD_NAMES,
-					FIELD_TYPES, new Serializable[] { latitude, longitude });
-			
-			theLastStreamElement = streamElement;
-		}
-
-		public void onProviderDisabled(String provider) {
-		}
-
-		public void onProviderEnabled(String provider) {
-		}
-
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-	}
-
-//	private boolean isTheSameWithTheLastStreamElement(StreamElement se){
-//		if (theLastStreamElement == null){
-//			theLastStreamElement = se;
-//			return false;
-//		}
-//		if (theLastStreamElement.isTheSame(se)){
-//			theLastStreamElement = se;
-//			return true;
-//		}
-//		theLastStreamElement = se;
-//		return false;
-//	}
 	
 	@Override
 	public DataField[] getOutputStructure() {
@@ -202,29 +137,27 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
+		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
+				new Serializable[] {location.getLatitude(),location.getLongitude()});
 		
+		postStreamElement(streamElement);
 	}
 
 	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onStatusChanged(String provider, int status, Bundle extras) {}
 
 	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onProviderEnabled(String provider) {}
 
 	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-		
-	}
-	public void setTheLastStreamElement(StreamElement theLastStreamElement) {
-		this.theLastStreamElement = theLastStreamElement;
-	}
+	public void onProviderDisabled(String provider) {}
+	
+	public static class GPSService extends WrapperService{
 
+		public GPSService() {
+			super("gpsService");
+
+		}
+	}
+	
 }

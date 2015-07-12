@@ -35,7 +35,7 @@ import java.util.Hashtable;
 import java.util.List;
 import tinygsn.beans.StreamElement;
 import tinygsn.controller.AndroidControllerPublishData;
-import tinygsn.model.vsensor.VirtualSensor;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -70,7 +70,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
     private EditText totimeEditText = null;
     private EditText todateEditText = null;
     private Handler handlerVS;
-	private ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
+	private ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
 
 
 	@Override
@@ -112,7 +112,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void handleMessage(Message msg) {
-				vsList = (ArrayList<VirtualSensor>) msg.obj;
+				vsList = (ArrayList<AbstractVirtualSensor>) msg.obj;
 				//renderVSList();
 			};
 		};

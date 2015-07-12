@@ -25,7 +25,6 @@
 
 package tinygsn.storage.db;
 
-import java.io.File;
 import java.io.Serializable;
 
 import android.content.Context;
@@ -52,8 +51,12 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		
 		String createQuery = "CREATE TABLE vsList (_id integer primary key autoincrement,"
 				+ "running, vsname, vstype, "
-				+ "sswindowsize, ssstep, sstimebased, sssamplingrate, ssaggregator, wrappername, "
 				+ "notify_field, notify_condition, notify_value, notify_action, notify_contact, save_to_db"
+				+ ");";
+		db.execSQL(createQuery);
+		
+		createQuery = "CREATE TABLE sourcesList (_id integer primary key autoincrement,"
+				+ "vsname, sswindowsize, ssstep, sstimebased, sssamplingrate, ssaggregator, wrappername, "
 				+ ");";
 		db.execSQL(createQuery);
 
@@ -72,7 +75,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 				+ ");";
 		db.execSQL(createQuery);
 		createQuery = "CREATE TABLE Samples (_id integer primary key, time bigint, "
-				+ "sample integer"
+				+ "sample integer,"
 				+ "reason integer"
 				+ ");";
 		db.execSQL(createQuery);
@@ -82,7 +85,9 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		db.execSQL("Drop table vsList");
+		db.execSQL("Drop table sourcesList");
 		db.execSQL("Drop table SUBSCRIPTION_ROW");
+		db.execSQL("Drop table SAMPLIG_RATE");
 		onCreate(db);
 	}
 

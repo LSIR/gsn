@@ -26,9 +26,9 @@
 package tinygsn.gui.android.utils;
 
 import java.util.List;
-import tinygsn.controller.AndroidControllerListVSNew;
-import tinygsn.gui.android.ActivityListVSNew;
-import tinygsn.gui.android.ActivityViewDataNew;
+import tinygsn.controller.AndroidControllerListVS;
+import tinygsn.gui.android.ActivityListVS;
+import tinygsn.gui.android.ActivityViewData;
 import tinygsn.gui.android.R;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -60,15 +60,15 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	private LayoutInflater inflater;
 	private Context context = null;
 	static int TEXT_SIZE = 8;
-	AndroidControllerListVSNew controller;
-	ActivityListVSNew activityListVSNew;
+	AndroidControllerListVS controller;
+	ActivityListVS activityListVSNew;
 	
 
 	
 	//TODO check if it is working properly or not :) with the context that is set
 
 	public VSListAdapter(Context ctx, int resourceId, List<VSRow> objects,
-			AndroidControllerListVSNew controller, ActivityListVSNew activityListVSNew) {
+			AndroidControllerListVS controller, ActivityListVS activityListVSNew) {
 
 		super(ctx, resourceId, objects);
 		this.context = ctx;
@@ -166,7 +166,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	}
 
 	protected void startActivityViewData(String vsName) {
-		Intent myIntent = new Intent(context, ActivityViewDataNew.class);
+		Intent myIntent = new Intent(context, ActivityViewData.class);
 		myIntent.putExtra(EXTRA_VS_NAME, vsName);
 		
 		context.startActivity(myIntent);

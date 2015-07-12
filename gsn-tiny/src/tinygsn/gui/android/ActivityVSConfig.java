@@ -49,7 +49,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -68,7 +67,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 public class ActivityVSConfig extends SherlockActivity {
-	private static final String TAG = "AndroidVSConfigSetting";
 	static int TEXT_SIZE = 10;
 	private Context context = this;
 	private Spinner spinnerVSType, spinnerAggregate, spinnerWrapper, field,
@@ -123,9 +121,7 @@ public class ActivityVSConfig extends SherlockActivity {
 	public void loadVSType() {
 		spinnerVSType = (Spinner) findViewById(R.id.spinner_vsType);
 		List<String> list = new ArrayList<String>();
-		
-		
-		//TODO change here if we don't need any repetition in sensors
+
 		for (String s : AbstractVirtualSensor.VIRTUAL_SENSOR_LIST) {
 			list.add(s);
 		}
@@ -139,10 +135,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		spinnerVSType.setOnItemSelectedListener(new OnItemSelectedListener() {
 			public void onItemSelected(AdapterView<?> parent, View view, int pos,
 					long id) {
-				Toast.makeText(
-						parent.getContext(),
-						"The virtual sensor \"" + parent.getItemAtPosition(pos).toString()
-								+ "\" is selected.", Toast.LENGTH_SHORT).show();
+				
 				if (pos == 1) {
 					addViewNotifyConfig();
 				}
@@ -165,30 +158,15 @@ public class ActivityVSConfig extends SherlockActivity {
 		for (String s : StreamSource.AGGREGATOR) {
 			list.add(s);
 		}
-
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
 				R.layout.spinner_item, list);
 		dataAdapter
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerAggregate.setAdapter(dataAdapter);
-
-		spinnerAggregate.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				Toast.makeText(
-						parent.getContext(),
-						"The aggregate funtion \""
-								+ parent.getItemAtPosition(pos).toString() + "\" is selected.",
-						Toast.LENGTH_SHORT).show();
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-			}
-		});
 	}
 
-	@SuppressLint("NewApi") public void loadWrapperList() {
+	@SuppressLint("NewApi") 
+	public void loadWrapperList() {
 		spinnerWrapper = (Spinner) findViewById(R.id.spinner_wType);
 		List<String> list = new ArrayList<String>();
 
@@ -205,10 +183,6 @@ public class ActivityVSConfig extends SherlockActivity {
 		spinnerWrapper.setOnItemSelectedListener(new OnItemSelectedListener() {
 			public void onItemSelected(AdapterView<?> parent, View view, int pos,
 					long id) {
-				Toast.makeText(
-						parent.getContext(),
-						"The wrapper \"" + parent.getItemAtPosition(pos).toString()
-								+ "\" is selected.", Toast.LENGTH_SHORT).show();
 				if (spinnerVSType.getSelectedItemPosition() == 1) {
 					addViewNotifyConfig();
 				}
@@ -361,7 +335,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		row.addView(txt);
 
 		editText_contact = new EditText(this);
-		editText_contact.setText("+41786302385");
+		editText_contact.setText("+41798765432");
 		editText_contact.setTextSize(TEXT_SIZE + 5);
 		// editText_contact.setInputType(InputType.TYPE_CLASS_NUMBER);
 		// editText_contact.requestFocus();
@@ -465,15 +439,13 @@ public class ActivityVSConfig extends SherlockActivity {
 			save_to_db = saveToDB.isChecked() + "";
 		}
 
-		// Log.v(TAG, "save_to_db is " + save_to_db);
 
 		String wrapperName = wrapperList.getProperty(spinnerWrapper
 				.getSelectedItem().toString());
 		
 		//mycode
 		try {
-			storage
-					.executeInsert(
+			storage.executeInsert(
 							"vsList",
 							new ArrayList<String>(Arrays.asList("running", "vsname",
 									"vstype", "sswindowsize", "ssstep","sstimebased", "sssamplingrate",
@@ -493,24 +465,10 @@ public class ActivityVSConfig extends SherlockActivity {
 				DataField[] outputStructure = w.getOutputStructure();
 				AbstractVirtualSensor vs = (AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vsType]).newInstance();
 				outputStructure = vs.getOutputStructure(outputStructure);
-				storage.createTable("vs_" + vsName, outputStructure);
+				storage.executeCreateTable("vs_" + vsName, outputStructure,true);
 				storage.executeInsertSamplingRate(wrapperName, 0);
-				Log.i("WrapperName", wrapperName);
-				Log.i("vsName", vsName);
 				StaticData.saveName(vsName, wrapperName);
-				
-				//TODO I though this might be a good place to call this function
-//				VirtualSensor VS = storage.getVSByName(vsName);
-//				AbstractController controller = new AndroidControllerListVSNew();
-//				VS.getConfig().setController(controller);
-//				VS.start();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			Toast.makeText(this, "Save new virtual sensor successfully!",
@@ -546,7 +504,7 @@ public class ActivityVSConfig extends SherlockActivity {
 			if (isEnableSave) {
 				saveVS(null);
 				isEnableSave = false;
-				 Intent i = new Intent(getApplicationContext(),ActivityListVSNew.class);
+				 Intent i = new Intent(getApplicationContext(),ActivityListVS.class);
 				 String vsName = editText_vsName.getText().toString();
 				 i.putExtra("VSName", vsName);
 				 startActivity(i);

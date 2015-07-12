@@ -21,14 +21,15 @@
 *
 * @author Do Ngoc Hoan
 */
-
-
 package tinygsn.model.wrappers;
+
+import java.io.Serializable;
 import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
-import tinygsn.beans.Queue;
 import tinygsn.beans.StreamElement;
+import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.content.Context;
@@ -41,63 +42,31 @@ import android.util.Log;
 public class AndroidAccelerometerWrapper extends AbstractWrapper implements SensorEventListener  {
 
 	private static final String[] FIELD_NAMES = new String[] { "x", "y", "z" };
-	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE,
-			DataTypes.DOUBLE, DataTypes.DOUBLE };
-	private static final String[] FIELD_DESCRIPTION = new String[] { "x", "y",
-			"z" };
-	private static final String[] FIELD_TYPES_STRING = new String[] { "double",
-			"double", "double" };
+	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE };
+	private static final String[] FIELD_DESCRIPTION = new String[] { "x", "y", "z" };
+	private static final String[] FIELD_TYPES_STRING = new String[] { "double", "double", "double" };
 
-	private static final String TAG = "AndroidAccelerometerWrapper";
+	public static final Class<AccelometerService> SERVICE = AccelometerService.class;
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
-	private StreamElement theLastStreamElement = null;
 
-	public AndroidAccelerometerWrapper() {
-		super();
-	}
-
-	public AndroidAccelerometerWrapper(Queue queue) {
-		super(queue);
-		initialize();
-	}
-
-	public boolean initialize() {
-		return true;
-	}
-
-	public void run() {
+	public void runOnce(){
 		Activity activity = getConfig().getController().getActivity();
-		
-		SqliteStorageManager storage = new SqliteStorageManager(getConfig().getController().getActivity());
 		mSensorManager = (SensorManager) activity
 				.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		mSensorManager.registerListener(this, mSensor,
-				SensorManager.SENSOR_DELAY_NORMAL);
-
-		while (isActive()) {
-			int samplingRate = storage.getSamplingRateByName("");
-			try {
-				Thread.sleep(samplingRate);
-				getLastKnownData();
-			}
-			catch (InterruptedException e) {
-				Log.e(e.getMessage(), e.toString());
+		SqliteStorageManager storage = new SqliteStorageManager(activity);
+		int samplingPeriod = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidAccelerometerWrapper");
+		try {
+			if (samplingPeriod > 0){
+				mSensorManager.registerListener(this, mSensor,60000); //around 16Hz 
+				Thread.sleep(samplingPeriod*1000);
+				mSensorManager.unregisterListener(this);
 			}
 		}
-	}
-
-	public void getLastKnownData() {
-		if (getTheLastStreamElement() == null) {
-			Log.e(TAG, "There is no signal!");
+		catch (InterruptedException e) {
+			Log.e(e.getMessage(), e.toString());
 		}
-		else {
-			postStreamElement(getTheLastStreamElement());
-		}
-	}
-
-	public void dispose() {
 	}
 
 	public String getWrapperName() {
@@ -125,24 +94,25 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements Sens
 	}
 
 	@Override
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
-	}
+	public void onAccuracyChanged(Sensor arg0, int arg1) {}
 
 	@Override
-	public void onSensorChanged(SensorEvent event) {
+	public void  onSensorChanged (SensorEvent event) {
+		double x = event.values[0];
+		double y = event.values[1];
+		double z = event.values[2];
+				
+		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
+				new Serializable[] { x, y, z });
+
+		postStreamElement(streamElement);
+	}
 	
-	}
-	public void  onSensorChanged (int sensor, float[] values)
-	{
-		//Log.i("heror", "heeeeeeeeeereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-	}
+	public static class AccelometerService extends WrapperService {
 
-	public StreamElement getTheLastStreamElement() {
-		return theLastStreamElement;
-	}
-
-	public void setTheLastStreamElement(StreamElement theLastStreamElement) {
-		this.theLastStreamElement = theLastStreamElement;
+		public AccelometerService() {
+			super("accelerometerService");
+		}
 	}
 
 }

@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn/controller/AndroidControllerListVS.java
+* File: gsn-tiny/src/tinygsn/controller/AndroidControllerListVSNew.java
 *
 * @author Do Ngoc Hoan
 */
@@ -25,11 +25,13 @@
 
 package tinygsn.controller;
 
+
 import java.util.ArrayList;
+
+import tinygsn.beans.DataField;
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityListVS;
-import tinygsn.gui.android.ActivityVSConfig;
-import tinygsn.model.vsensor.VirtualSensor;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.storage.StorageManager;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
@@ -40,19 +42,32 @@ import android.util.Log;
 
 public class AndroidControllerListVS extends AbstractController {
 
-	private ActivityListVS view = null;
+	/**
+	 * 
+	 */
+
+	private Activity view = null;
 
 	private Handler handlerVS = null;
+	private SqliteStorageManager storage = null;
+	
+	private ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
 
-	private ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
+	private static final String TAG = "AndroidControllerListVSNew";
 
-	private static final String TAG = "AndroidControllerListVS";
-
-	public AndroidControllerListVS(ActivityListVS androidViewer) {
+	public AndroidControllerListVS(Activity androidViewer) {
 		this.view = androidViewer;
+		storage = new SqliteStorageManager(view);
+		
 		Log.v(TAG, "Construction.");
 	}
 
+//	public AndroidControllerListVSNew() {
+//		ActivityListVS activity = new ActivityListVS();
+//		this.view = activity;
+//		Log.v(TAG, "Construction.");
+//		// TODO Auto-generated constructor stub
+//	}
 
 	public void consume(StreamElement streamElement) {
 		// view.showDataDemo(streamElement);
@@ -61,30 +76,69 @@ public class AndroidControllerListVS extends AbstractController {
 		// handlerData.sendMessage(msg);
 	}
 
-	public void loadListVSName() {
+	public void loadListVS() {
 		SqliteStorageManager storage = new SqliteStorageManager(view);
 		vsList = storage.getListofVS();
-		ArrayList<String> vsListName = new ArrayList<String>();
-		for (VirtualSensor vs : vsList) {
+//		ArrayList<String> vsListName = new ArrayList<String>();
+		for (AbstractVirtualSensor vs : vsList) {
 			vs.getConfig().setController(this);
-			vsListName.add(vs.getConfig().getName());
+//			vs.getConfig().VSNewController = this;
+//			vsListName.add(vs.getConfig().getName());
 		}
 
 		Message msg = new Message();
-		msg.obj = vsListName;
+		msg.obj = vsList;
 		handlerVS.sendMessage(msg);
 	}
 
 	public boolean getRunningState(String vsName) {
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().equals(vsName))
 				return vs.getConfig().getRunning();
 		}
 		return false;
 	}
 
+	public StreamElement loadLatestData(String vsName) {
+		return loadLatestData(1, vsName);
+	}
+	
+	public StreamElement loadLatestData(int numLatest, String vsName) {
+		StreamElement latest = null;
+		
+		for (AbstractVirtualSensor vs : vsList) {
+			if (vs.getConfig().getName().endsWith(vsName)) {
+				DataField[] df = vs.getConfig().getOutputStructure();
+
+				String[] fieldList = new String[df.length];
+				Byte[] fieldType = new Byte[df.length];
+				for(int i=0;i<df.length;i++){
+					fieldList[i] = df[i].getName();
+					fieldType[i] = df[i].getDataTypeID();
+				}
+
+				ArrayList<StreamElement> result = storage.executeQueryGetLatestValues(
+						"vs_" + vsName, fieldList, fieldType, numLatest);
+
+				if ((result != null) && (result.size() != 0))
+					latest = result.get(0);
+				else 
+					return null;
+				
+				break;
+			}
+		}
+		
+		return latest;
+	}
+	
 	public void startActiveVS() {
-		for (VirtualSensor vs : vsList) {
+		SqliteStorageManager storage = new SqliteStorageManager(view);
+		vsList = storage.getListofVS();
+		for (AbstractVirtualSensor vs : vsList) {
+			vs.getConfig().setController(this);
+		}
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getRunning() == true) {
 				vs.start();
 			}
@@ -92,7 +146,13 @@ public class AndroidControllerListVS extends AbstractController {
 	}
 
 	public void tinygsnStop() {
-
+		for (AbstractVirtualSensor vs : vsList) {
+			if (vs.getConfig().getRunning() == true) {
+				//vs.stop();
+				//TODO En jahaye baD call mishod felan cmt shode ta bad 
+				
+			}
+		}
 	}
 
 	public StorageManager getStorageManager() {
@@ -109,8 +169,11 @@ public class AndroidControllerListVS extends AbstractController {
 	}
 
 	public void startStopVS(String vsName, boolean running, Context context) {
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().equals(vsName)) {
+				AndroidControllerListVS controllerListVSNew  = new AndroidControllerListVS((ActivityListVS) this.getActivity());
+				vs.getConfig().setController(controllerListVSNew);
+				
 				if (running == true) {
 					vs.start();
 					SqliteStorageManager storage = new SqliteStorageManager(view);
@@ -120,21 +183,17 @@ public class AndroidControllerListVS extends AbstractController {
 					SqliteStorageManager storage = new SqliteStorageManager(view);
 					storage.update("vsList", vsName, "running", "0");
 					vs.stop();
-					//TODO check if this needs change
-					vs = new VirtualSensor(vs.getConfig(), context);
+					//TODO check if this needs change or check why do we need new VS after stopping one
+					//vs = new VirtualSensor(vs.getConfig(), context);
 				}
 				break;
 			}
 		}
 	}
 
-	@Override
-	public void startLoadVSList() {
-		
-	}
 
 	public void deleteVS(String vsName) {
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().equals(vsName)) {
 				vs.stop();
 				SqliteStorageManager storage = new SqliteStorageManager(view);

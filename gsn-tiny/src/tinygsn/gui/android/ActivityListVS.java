@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn/gui/android/ActivityListVS.java
+* File: gsn-tiny/src/tinygsn/gui/android/ActivityListVSNew.java
 *
 * @author Do Ngoc Hoan
 */
@@ -25,235 +25,190 @@
 
 package tinygsn.gui.android;
 
+import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import tinygsn.beans.StreamElement;
 import tinygsn.controller.AndroidControllerListVS;
-import tinygsn.model.vsensor.VirtualSensor;
+import tinygsn.gui.android.utils.VSListAdapter;
+import tinygsn.gui.android.utils.VSRow;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.Switch;
-import android.widget.TableLayout;
-import android.widget.TableRow;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-@SuppressLint("NewApi")
-public class ActivityListVS extends Activity{
-	Context context = this;
-	static int TEXT_SIZE = 10;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-	TableLayout table = null;
+@SuppressLint("NewApi")
+public class ActivityListVS extends SherlockActivity implements Serializable  {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8598546037770495346L;
+	private ListView listViewVS;
+	private Context context;
 	Handler handlerVS;
 	AndroidControllerListVS controller;
-	boolean firstRun = true;
+	List<VSRow> vsRowList;
+	ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
+	TextView numVS = null;
 
-	/** Called when the activity is first created. */
+	private final Handler handler = new Handler();
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// Activate StrictMode
-//		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//				.detectAll().penaltyLog().penaltyDeath().build());
-//		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll()
-//				.penaltyLog().penaltyDeath().build());
+		setContentView(R.layout.vs_list);
 		
-
+		String VSName  = null;
+		VSName = (String) getIntent().getSerializableExtra("VSName");
+		if(VSName != null)
+		{
+			SqliteStorageManager storage = new SqliteStorageManager(this);
+			AbstractVirtualSensor vs = storage.getVSByName(VSName);
+			AndroidControllerListVS controllerListVSNew  = new AndroidControllerListVS(this);
+			vs.getConfig().setController(controllerListVSNew);
+			vs.start();
+		}
 		
+		context = this;
+
 		AbstractWrapper.getWrapperList(this);
-		
-		renderLayout();
+		setUpController();
 	}
 
-	private void renderLayout() {
-		table = new TableLayout(this);
-		table.setStretchAllColumns(true);
-		table.setShrinkAllColumns(true);
-
-		TableRow rowTitle = new TableRow(this);
-		TableRow rowNewVS = new TableRow(this);
-		rowTitle.setGravity(Gravity.CENTER_HORIZONTAL);
-
-		// title column/row
-		TextView title = new TextView(this);
-		title.setText("List of Virtual Sensor");
-		title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-		title.setGravity(Gravity.CENTER);
-		title.setTypeface(Typeface.SERIF, Typeface.BOLD);
-
-		TableRow.LayoutParams params = new TableRow.LayoutParams();
-		params.span = 5;
-		rowTitle.addView(title, params);
-
-		Button addNewVS = new Button(this);
-		addNewVS.setTextSize(TEXT_SIZE + 4);
-		addNewVS.setText("Add New Vitual Sensor");
-		addNewVS.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startVSActivity();
-			}
-		});
-
-		rowNewVS.addView(addNewVS, params);
-
-		table.addView(rowNewVS);
-		table.addView(rowTitle);
-		setContentView(table);
-
-		// ~~~~~~~~~~~~~~~~Handle the result from Controller~~~~~~~~~~~~~~~~
+	// ~~~~~~~~~~~~~~~~Handle the result from Controller~~~~~~~~~~~~~~~~
+	public void setUpController() {
 		handlerVS = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
-				ArrayList<String> vsListName = (ArrayList<String>) msg.obj;
-				for (String s : vsListName) {
-					addRow(s, controller.getRunningState(s));
-				}
+				vsList = (ArrayList<AbstractVirtualSensor>) msg.obj;
+				renderLayout(vsList);
 			};
 		};
 
 		controller = new AndroidControllerListVS(this);
 		controller.setHandlerVS(handlerVS);
-		controller.loadListVSName();
-//		controller.startActiveVS();
+		controller.loadListVS();
+	}
+
+	private void renderLayout(ArrayList<AbstractVirtualSensor> vsList) {
+		vsRowList = new ArrayList<VSRow>();
+		for (AbstractVirtualSensor vs : vsList) {
+			DecimalFormat df = new DecimalFormat("#.##");
+
+			String latest = "";
+			StreamElement se = controller.loadLatestData(vs.getConfig().getName());
+			if (se != null)
+				for (String field : se.getFieldNames()) {
+					latest += field + ": " + df.format(se.getData(field)) + "\n";
+				}
+
+			vsRowList.add(new VSRow(vs.getConfig().getName(), vs.getConfig()
+					.getRunning(), latest));
+		}
+
+		listViewVS = (ListView) findViewById(R.id.vs_list);
+		VSListAdapter vSListAdapter = new VSListAdapter(context,
+				R.layout.vs_row_item, vsRowList, controller, this);
+		listViewVS.setAdapter(vSListAdapter);
+		vSListAdapter.notifyDataSetChanged();
+		
+		ActionBar actionBar = getSupportActionBar();
+		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
+		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+				| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		numVS = (TextView) actionBar.getCustomView().findViewById(R.id.num_vs);
+
+		if (numVS == null) {
+			Toast.makeText(context, "numVS is null", Toast.LENGTH_SHORT).show();
+		}
+		else {
+			numVS.setText(vsRowList.size() + "");
+		}
+
+		TextView lastUpdate = (TextView) actionBar.getCustomView().findViewById(
+				R.id.lastUpdate);
+		lastUpdate.setText("Last update:\n" + (new Date()).toString());
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		final MenuItem add = menu.add("Add");
+		add.setIcon(R.drawable.add).setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			// on selecting show add2 for 0.01s
+			public boolean onMenuItemClick(final MenuItem item) {
+				item.setIcon(R.drawable.add2);
+				handler.postDelayed(new Runnable() {
+					public void run() {
+						item.setIcon(R.drawable.add);
+					}
+				}, 10);
+
+				startVSActivity();
+
+				return false;
+			}
+		});
+
+		final MenuItem refresh = menu.add("Refresh");
+		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			// on selecting show progress spinner for 1s
+			public boolean onMenuItemClick(MenuItem item) {
+				item.setActionView(R.layout.indeterminate_progress_action);
+				handler.postDelayed(new Runnable() {
+					public void run() {
+						refresh.setActionView(null);
+						setUpController();
+					}
+				}, 50);
+				return false;
+			}
+		});
+
+    	return super.onCreateOptionsMenu(menu);
+	}
+
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		int itemId = item.getItemId();
+		switch (itemId) {
+		case android.R.id.home:
+			finish();
+			break;
+		}
+		return true;
 	}
 
 	private void startVSActivity() {
 		Intent myIntent = new Intent(this, ActivityVSConfig.class);
 		this.startActivity(myIntent);
 	}
-
-	private void addRow(final String vsName, boolean running) {
-		TableRow row = new TableRow(this);
-		TextView vsNametxt = new TextView(this);
-		vsNametxt.setText(vsName);
-
-		final Switch runningSwitch = new Switch(this);
-		runningSwitch.setTextOn("Running");
-		runningSwitch.setTextOff("Disabled");
-		runningSwitch.setChecked(running);
-		runningSwitch.setTextSize(TEXT_SIZE);
-		runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				controller.startStopVS(vsName, runningSwitch.isChecked(), ActivityListVS.this);
-				String state = "enabled";
-				if (runningSwitch.isChecked() == false)
-					state = "disabled";
-				Toast.makeText(context, vsName + " is " + state + " successfully!",
-						Toast.LENGTH_SHORT).show();
-			}
-		});
-
-		// Button start = new Button(this);
-		// start.setTextSize(TEXT_SIZE);
-		// start.setText("Start");
-		//
-		// Button stop = new Button(this);
-		// stop.setTextSize(TEXT_SIZE);
-		// stop.setText("Stop");
-
-		Button config = new Button(this);
-		config.setTextSize(TEXT_SIZE);
-		config.setText("Config");
-		config.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// Toast.makeText(context, "Config " + vsName,
-				// Toast.LENGTH_SHORT).show();
-
-			}
-		});
-
-		Button delete = new Button(this);
-		delete.setTextSize(TEXT_SIZE);
-		delete.setText("Delete");
-		delete.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which) {
-						case DialogInterface.BUTTON_POSITIVE:
-							controller.deleteVS(vsName);
-							Toast.makeText(context, vsName + " is deleted!",
-									Toast.LENGTH_SHORT).show();
-							renderLayout();
-							break;
-						case DialogInterface.BUTTON_NEGATIVE:
-							break;
-						}
-					}
-				};
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setMessage("Are you sure to delete \'" + vsName + "\'?")
-						.setPositiveButton("Yes", dialogClickListener)
-						.setNegativeButton("No", dialogClickListener).show();
-			}
-		});
-
-		row.addView(vsNametxt);
-		row.addView(runningSwitch);
-		row.addView(config);
-		row.addView(delete);
-
-		table.addView(row);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		if (firstRun == true) {
-			firstRun = false;
-		}
-		else {
-			renderLayout();
-			// Toast.makeText(context, "Resumed", Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(Menu.NONE, 0, 0, "View Data");
-		menu.add(Menu.NONE, 1, 1, "Publish Data");
-
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case 0:
-			Intent viewDataIntent = new Intent(this, ActivityViewData.class);
-			this.startActivity(viewDataIntent);
-			return true;
-
-		case 1:
-			Intent publishDataIntent = new Intent(this, ActivityPublishData.class);
-			this.startActivity(publishDataIntent);
-			return true;
-		}
-		return true;
-	}
-
 }

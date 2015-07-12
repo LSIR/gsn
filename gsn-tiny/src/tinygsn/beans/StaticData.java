@@ -5,14 +5,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 import android.content.Intent;
-
-import tinygsn.controller.AndroidControllerListVSNew;
+import tinygsn.controller.AndroidControllerListVS;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
+import tinygsn.model.wrappers.AbstractWrapper;
 
 public class StaticData {
 	public static final int USER_ID = 123;
 	private static int LastIdUsed = 1;
 	public static InputStream is;
-	private static Map<Integer, AndroidControllerListVSNew> controllerMap = new HashMap< Integer, AndroidControllerListVSNew>();
+	private static Map<Integer, AndroidControllerListVS> controllerMap = new HashMap< Integer, AndroidControllerListVS>();
 	private static Map<String, Intent> runningServices = new HashMap<String, Intent>();
 	private static Map<Integer, VSensorConfig> configMap = new HashMap<Integer, VSensorConfig>();
 	public static Map<String, String> vsNames = new HashMap<String, String>();
@@ -84,11 +85,11 @@ public class StaticData {
 		runningServices.put(name, intent);
 	}
 	
-	synchronized static public void addController(AndroidControllerListVSNew controller)
+	synchronized static public void addController(AndroidControllerListVS controller)
 	{
 		controllerMap.put(controller.getId(), controller);
 	}
-	synchronized static public AndroidControllerListVSNew findController(int id)
+	synchronized static public AndroidControllerListVS findController(int id)
 	{
 		return controllerMap.get(id);
 	}
@@ -97,4 +98,36 @@ public class StaticData {
 		return LastIdUsed++;
 	}
 	
+	private static Map<String, AbstractVirtualSensor> vsMap = new HashMap<String, AbstractVirtualSensor>();
+	public static AbstractVirtualSensor getProcessingClassByVSConfig(VSensorConfig config) throws Exception {
+		if(vsMap.containsKey(config.getName())){
+			return vsMap.get(config.getName());
+		}
+		AbstractVirtualSensor vs = (AbstractVirtualSensor) Class.forName(config.getProcessingClassName()).newInstance();
+		
+		vs.setVirtualSensorConfiguration(config);
+		vs.is = config.getInputStream();
+		vs.initialize();
+		vsMap.put(config.getName(), vs);
+		return vs;
+	}
+	
+	public static void deleteVS(String name){
+		vsMap.remove(name);
+	}
+	
+	private static Map<String, AbstractWrapper> wrapperMap = new HashMap<String, AbstractWrapper>();
+	public static AbstractWrapper getWrapperByName(String name) throws Exception {
+		if(wrapperMap.containsKey(name)){
+			return wrapperMap.get(name);
+		}
+		AbstractWrapper wrapper = (AbstractWrapper) Class.forName(name).newInstance();
+		wrapper.setConfig(new WrapperConfig(0,name));
+		wrapperMap.put(name, wrapper);
+		
+		return wrapper;
+	}
+	
+	public static Map<Integer, StreamSource> sourceMap = new HashMap<Integer, StreamSource>();
+		
 }

@@ -30,9 +30,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
+import tinygsn.beans.InputStream;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
+import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AbstractController;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 public abstract class AbstractVirtualSensor implements Serializable {
@@ -45,7 +50,10 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor","tinygsn.model.vsensor.NotificationVirtualSensor","tinygsn.model.vsensor.ActivityVirtualSensor"};
 	private static final String TAG = "AbstractVirtualSensor";
 
+	public Context context;
 	private VSensorConfig config;
+	public InputStream is;
+	
 
 	public abstract boolean initialize();
 
@@ -60,8 +68,6 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		try {
 			controller.getStorageManager().executeInsert("vs_" + config.getName(),
 					null, streamElement);
-			//Log.v(TAG,
-				//	"Inserted: " + streamElement.toString() + " to " + config.getName());
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -192,6 +198,29 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	public void dataAvailable(String inputStreamName,
 			ArrayList<StreamElement> data){
 		if (!data.isEmpty()) dataAvailable(inputStreamName,data.get(data.size()-1));
+	}
+	
+	synchronized public void start() {
+		config = StaticData.findConfig(config.getId());
+		if (!config.getRunning()){
+			config.setRunning(true);
+			for (StreamSource s: config.getInputStream().getSources()){
+				s.getWrapper().start(context);
+			}
+		}
+	}
+
+	synchronized public void stop() {
+		config = StaticData.findConfig(config.getId());
+		config.setRunning(false);
+		for (StreamSource streamSource : config.getInputStream().getSources()) {
+			streamSource.getWrapper().stop(context);
+		}
+		
+	}
+
+	public VSensorConfig getConfig() {
+		return config;
 	}
 
 }

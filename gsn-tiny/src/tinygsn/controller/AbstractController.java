@@ -37,12 +37,8 @@ public abstract class AbstractController  {
 	 */
 	private int id;
 
-public abstract void startLoadVSList();
-//
-//  public abstract void tinygsnStop();
-//
 	public abstract void consume(StreamElement streamElement);
-//
+
 	public abstract StorageManager getStorageManager();
 	
 	public abstract Activity getActivity();

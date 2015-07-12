@@ -38,14 +38,12 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
+import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
-import tinygsn.model.vsensor.VirtualSensor;
 import tinygsn.storage.StorageManager;
 import tinygsn.utils.Const;
-import android.R.integer;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -59,22 +57,14 @@ import android.os.Environment;
  */
 public class SqliteStorageManager extends StorageManager implements Serializable{
 
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 7774503312823392567L;
-	// private static final String DB_NAME = "tinygsn11.db";
 	private SQLiteDatabase database;
 	private static SQLiteDatabaseOpenHelper dbOpenHelper;
-
-	private static final String TAG = "SqliteStorageManager";
-	private Context context = null;
 	
-
 	public SqliteStorageManager(Context context) {
 		super();
 		this.isSQLite = true;
-		this.context = context;
 		dbOpenHelper = getInstance(context);
 		File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/Android/data/tinygsn" );
@@ -91,31 +81,19 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return dbOpenHelper;
 	}
 
-	// public void open() throws SQLException {
-	// // open database in reading/writing mode
-	// database = dbOpenHelper.getWritableDatabase();
-	// }
-	//
-	// public void close() {
-	// if (database != null)
-	// database.close();
-	// }
-
-	public void createTable(String vsName, DataField[] outputStructure) {
+    @Override
+	public void executeCreateTable(CharSequence tableName, DataField[] outputStructure, boolean uniq) {
 		
 		ArrayList<String> fields = new ArrayList<String>();
-		
-		//mycode
-		//fields.add("vid");
+
 		for (DataField f : outputStructure) {
 			fields.add(f.getName());
 		}
 		fields.add("timed");
-		createTable(vsName, fields);
+		createTable(tableName, fields);
 	}
 
-	public void createTable(String vsName, ArrayList<String> fields) {
-		// open();
+	public void createTable(CharSequence vsName, ArrayList<String> fields) {
 		String createQuery = "CREATE TABLE " + vsName
 				+ "(_id integer primary key autoincrement";
 
@@ -125,7 +103,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 		createQuery += ");";
 		database.execSQL(createQuery);
-		// close();
 	}
 
 	public void executeInsertWifiFrequency(String macAdr)
@@ -173,9 +150,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 		newCon.put("timed", se.getTimeStamp());
 
-		// open();
 		database.insert((String) tableName, null, newCon);
-		// close();
 	}
 
 	public void executeInsert(String tableName, ArrayList<String> fields,
@@ -184,10 +159,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		for (int i = 0; i < fields.size(); i++) {
 			newCon.put(fields.get(i), values.get(i));
 		}
-
-		// open();
 		database.insert((String) tableName, null, newCon);
-		// close();
 	}
 	
 	public int[] getLatestState(){
@@ -198,35 +170,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}else{
 			return new int[]{0,0};
 		}
-	}
-
-	public ArrayList<StreamElement> executeQuery() { //TODO this is only for GPS
-
-		String[] FIELD_NAMES = new String[] { "latitude", "longitude" };
-		Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE };
-
-		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
-
-		// try {
-		// open();
-		// }
-		// catch (SQLException e) {
-		// e.printStackTrace();
-		// }
-		Cursor cursor = database.query("gps", new String[] { "_id", "longitude",
-				"latitude" }, null, null, null, null, null);
-		while (cursor.moveToNext()) {
-			double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-			double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-
-			StreamElement se = new StreamElement(FIELD_NAMES, FIELD_TYPES,
-					new Serializable[] { latitude, longitude });
-
-			result.add(se);
-		}
-		// close();
-
-		return result;
 	}
 
 	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName,
@@ -264,41 +207,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return result;
 	}
 
-	public ArrayList<StreamElement> executeQueryGetValues(String tableName,
-			long start, long end) {//TODO only for gps??
-		String[] FIELD_NAMES = new String[] { "latitude", "longitude" };
-		Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE };
-
-		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
-
-		// try {
-		// open();
-		// }
-		// catch (SQLException e) {
-		// e.printStackTrace();
-		// }
-		String query;
-
-		query = "Select * from " + tableName + " where timed > ? and timed < ?";
-
-		Cursor cursor = database.rawQuery(query, new String[] { start + "",
-				end + "" });
-
-		while (cursor.moveToNext()) {
-			double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-			double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-			long time = cursor.getLong(cursor.getColumnIndex("timed"));
-
-			StreamElement se = new StreamElement(FIELD_NAMES, FIELD_TYPES,
-					new Serializable[] { latitude, longitude }, time);
-
-			result.add(se);
-		}
-		// close();
-
-		return result;
-	}
-
 	public ArrayList<StreamElement> executeQueryGetRangeData(String vsName,
 			long start, long end, String[] FIELD_NAMES, Byte[] FIELD_TYPES) {
 		Serializable[] fieldValues;
@@ -326,73 +234,15 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			long time = cursor.getLong(cursor.getColumnIndex("timed"));
 			fieldNames[fieldNames.length-1] = "userid";
 			fieldTypes[fieldTypes.length-1] = DataTypes.INTEGER;
-			fieldValues[fieldValues.length-1] = new Integer(123);
+			fieldValues[fieldValues.length-1] = Integer.valueOf(Const.USER_ID);
 			StreamElement se = new StreamElement(fieldNames, fieldTypes,
 					fieldValues, time);
-			// Log.v(TAG, se.toString());
 
 			result.add(se);
 		}
-		// close();
-
 		return result;
 	}
 	
-
-	
-	//TODO this is my code 
-	public VirtualSensor getVSByName(String vsName)
-	{
-		String query = "Select * from vsList where vsname = ?;";
-		// open();
-		Cursor cursor = database.rawQuery(query, new String[] { vsName });
-		
-		while (cursor.moveToNext()) {
-			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
-			int running = cursor.getInt(cursor.getColumnIndex("running"));
-			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
-			int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
-			double sswindow = cursor.getDouble(cursor.getColumnIndex("sswindowsize"));
-			double ssstep = cursor.getDouble(cursor.getColumnIndex("ssstep"));
-			boolean sstimebased = cursor.getShort(cursor.getColumnIndex("sstimebased"))==1;
-			double sssamplingrate = cursor.getDouble(cursor
-					.getColumnIndex("sssamplingrate"));
-			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
-			String wrappername = cursor.getString(cursor
-					.getColumnIndex("wrappername"));
-			// "notify_field",
-			// "notify_condition", "notify_value", "notify_action",
-			// "notify_contact", "save_to_db"
-			String notify_field = cursor.getString(cursor
-					.getColumnIndex("notify_field"));
-			String notify_condition = cursor.getString(cursor
-					.getColumnIndex("notify_condition"));
-			Double notify_value = cursor.getDouble(cursor
-					.getColumnIndex("notify_value"));
-			String notify_action = cursor.getString(cursor
-					.getColumnIndex("notify_action"));
-			String notify_contact = cursor.getString(cursor
-					.getColumnIndex("notify_contact"));
-			boolean save_to_db = cursor
-					.getString(cursor.getColumnIndex("save_to_db")).equals("true");
-	
-			// Log.v(TAG, "save_to_db is " + save_to_db);
-	
-			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
-	
-			VSensorConfig vs = new VSensorConfig(id ,processingClass, vsname,
-					wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep, sstimebased,
-					aggregator, running == 1, notify_field, notify_condition,
-					notify_value, notify_action, notify_contact, save_to_db);
-			
-			StaticData.addConfig(id, vs);
-			StaticData.saveNameID(id, vsname);
-			return new VirtualSensor(vs, context);
-			
-		}
-		return null;
-	}
-
 	public Map<String, Integer> getSamplingRates()
 	{
 		Map<String, Integer> samplingRates = new HashMap<String, Integer>();
@@ -406,6 +256,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}
 		return samplingRates;
 	}
+	
 	public int getSamplingRateByName(String vsname)
 	{
 		String query = "Select * from SAMPLIG_RATE WHERE vsname = ?;";
@@ -420,82 +271,14 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return -1;
 
 	}
-	
-	@Override
-	public ArrayList<VirtualSensor> getListofVS() {
-		ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
-		String query = "Select * from vsList;";
-		Cursor cursor = database.rawQuery(query, new String[] {});
-		while (cursor.moveToNext()) {
-			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
-			int running = cursor.getInt(cursor.getColumnIndex("running"));
-			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
-			int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
-			double sswindow = cursor.getDouble(cursor.getColumnIndex("sswindowsize"));
-			double ssstep = cursor.getDouble(cursor.getColumnIndex("ssstep"));
-			boolean sstimebased = cursor.getShort(cursor.getColumnIndex("sstimebased"))==1;
-			double sssamplingrate = cursor.getDouble(cursor
-					.getColumnIndex("sssamplingrate"));
-			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
-			String wrappername = cursor.getString(cursor
-					.getColumnIndex("wrappername"));
-			// "notify_field",
-			// "notify_condition", "notify_value", "notify_action",
-			// "notify_contact", "save_to_db"
-			String notify_field = cursor.getString(cursor
-					.getColumnIndex("notify_field"));
-			String notify_condition = cursor.getString(cursor
-					.getColumnIndex("notify_condition"));
-			Double notify_value = cursor.getDouble(cursor
-					.getColumnIndex("notify_value"));
-			String notify_action = cursor.getString(cursor
-					.getColumnIndex("notify_action"));
-			String notify_contact = cursor.getString(cursor
-					.getColumnIndex("notify_contact"));
-			boolean save_to_db = cursor
-					.getString(cursor.getColumnIndex("save_to_db")).equals("true");
-
-			// Log.v(TAG, "save_to_db is " + save_to_db);
-
-			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
-
-			VSensorConfig vs = new VSensorConfig(id ,processingClass, vsname,
-					wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep, sstimebased,
-					aggregator, running == 1, notify_field, notify_condition,
-					notify_value, notify_action, notify_contact, save_to_db);
-
-			vsList.add(new VirtualSensor(vs, context));
-			StaticData.addConfig(id, vs);
-			StaticData.saveNameID(id, vsname);
-			StaticData.saveName(vsname, wrappername);
-		}
-
-		return vsList;
-	};
-
-	public boolean vsExists(String vsName) {
-		String query = "Select vsname from vsList where vsname = ?;";
-		// open();
-		Cursor cursor = database.rawQuery(query, new String[] { vsName });
-		while (cursor.moveToNext()) {
-			
-			//TODO check why if is removed 
-			// if (cursor.getString(cursor.getColumnIndex("vsname")).equals(vsName))
-			return true;
-		}
-		// close();
-		return false;
-	}
-	
+		
 	public boolean updateWifiFrequency(String macAdr)
 	{
 		int frequency = getFrequencyByMac(macAdr);
 		if(frequency != -1)
 		{
 			String query = "UPDATE WifiFrequency SET frequency = ? WHERE mac = ?;";
-			//Log.i(TAG+"fieeeeeld",macAdr);
 			Cursor cursor = database.rawQuery(query, new String[] {(frequency+1)+"", macAdr});
-			//Log.v(TAG, cursor.toString());
 			if(cursor.moveToNext())
 				return true;
 		}
@@ -537,7 +320,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	public boolean updateSamplingRate(String feild, int i) //for updating sampling rates from the activity for the schedular
 	{
 		String query = "UPDATE SAMPLIG_RATE SET samplingrate = ? WHERE vsname = ?;";
-		//Log.i(TAG+"fieeeeeld",feild);
 		Cursor cursor = database.rawQuery(query, new String[] {i+"", feild});
 		if(cursor.moveToNext())
 			return true;
@@ -549,48 +331,32 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			String value) {
 		String query = "UPDATE " + tableName + " SET " + field + " = ? "
 				+ " WHERE vsname = ?;";
-		// open();
 		Cursor cursor = database.rawQuery(query, new String[] { value, vsName });
 		
 		if (cursor.moveToNext()) {
 			return true;
 		}
-		// close();
 		return false;
 	}
 
 	public void deleteVS(String vsName) {
 		String query = "DELETE from vsList where vsname = ?;";
-		// open();
 		Cursor cursor = database.rawQuery(query, new String[] { vsName });
 		if (cursor.moveToNext()) {
 			return;
 		}
-		// close();
 	}
 
 	public void deleteTable(String tableName) {
 		String query = "DROP TABLE " + tableName;
-		// open();
 		Cursor cursor = database.rawQuery(query, new String[] {});
 		if (cursor.moveToNext()) {
 			return;
 		}
-		// close();
 	}
-
-	// public ArrayList<String> getFieldList(String vsName) {
-	// ArrayList<String> fList = new ArrayList<String>();
-	// String query = "Select * from vsList;";
-	//
-	// return fList;
-	// }
 
 	@Override
 	public void initDatabaseAccess(Connection con) throws Exception {
-		// Statement stmt = con.createStatement();
-		// stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
-		// stmt.execute("CREATE ALIAS IF NOT EXISTS NOW_MILLIS FOR \"java.lang.System.currentTimeMillis\";");
 		super.initDatabaseAccess(con);
 	}
 
@@ -691,14 +457,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	}
 
 	@Override
-	public void shutdown() throws SQLException {
-		getConnection().createStatement().execute("SHUTDOWN");
-		// logger.warn("Closing the database server (for HSqlDB) [done].");
-		// logger.warn("Closing the connection pool [done].");
-		super.shutdown();
-	}
-
-	@Override
 	public StringBuilder getStatementUselessDataRemoval(String virtualSensorName,
 			long storageSize) {
 		return null;
@@ -710,8 +468,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return null;
 	}
 
-	public ArrayList<VirtualSensor> completeListVS(ArrayList<VirtualSensor> InpVsList) {
-		ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
+	@Override
+	public ArrayList<AbstractVirtualSensor> getListofVS() {
+		ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
 		String query = "Select * from vsList;";
 		Cursor cursor = database.rawQuery(query, new String[] {});
 		while (cursor.moveToNext()) {
@@ -719,17 +478,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			int running = cursor.getInt(cursor.getColumnIndex("running"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
-			double sswindow = cursor.getDouble(cursor.getColumnIndex("sswindowsize"));
-			double ssstep = cursor.getDouble(cursor.getColumnIndex("ssstep"));
-			boolean sstimebased = cursor.getShort(cursor.getColumnIndex("sstimebased"))==1;
-			double sssamplingrate = cursor.getDouble(cursor
-					.getColumnIndex("sssamplingrate"));
-			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
-			String wrappername = cursor.getString(cursor
-					.getColumnIndex("wrappername"));
-			// "notify_field",
-			// "notify_condition", "notify_value", "notify_action",
-			// "notify_contact", "save_to_db"
 			String notify_field = cursor.getString(cursor
 					.getColumnIndex("notify_field"));
 			String notify_condition = cursor.getString(cursor
@@ -742,31 +490,117 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 					.getColumnIndex("notify_contact"));
 			boolean save_to_db = cursor
 					.getString(cursor.getColumnIndex("save_to_db")).equals("true");
-
-			// Log.v(TAG, "save_to_db is " + save_to_db);
-
+	
 			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
-			boolean needsToBeCreated = true;
-			for(int i = 0; i< InpVsList.size(); i++)
-				if(InpVsList.get(i).getConfig().getName().equals(vsname))
-				{
-					needsToBeCreated = false;
-					break;
-				}
-			if(needsToBeCreated)
-			{
-				VSensorConfig vs = new VSensorConfig(id,processingClass, vsname,
-						wrappername, (int) sssamplingrate, (int) sswindow, (int) ssstep, sstimebased,
-						aggregator, running == 1, notify_field, notify_condition,
-						notify_value, notify_action, notify_contact, save_to_db);
-				
-				vsList.add(new VirtualSensor(vs, context));
-				StaticData.addConfig(id, vs);
+			
+			
+			VSensorConfig vsc = new VSensorConfig(id ,processingClass, vsname, getSourcesOfVS(vsname),
+					 running == 1, notify_field, notify_condition,
+					notify_value, notify_action, notify_contact, save_to_db);
+			
+			AbstractVirtualSensor vs = null;
+			try {
+				vs = StaticData.getProcessingClassByVSConfig(vsc);
+				vsList.add(vs);
+				StaticData.addConfig(id, vsc);
 				StaticData.saveNameID(id, vsname);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
-
 		return vsList;
+	};
+	
+		public AbstractVirtualSensor getVSByName(String vsName)
+		{
+			String query = "Select * from vsList where vsname = ?;";
+			Cursor cursor = database.rawQuery(query, new String[] { vsName });
+			
+			while (cursor.moveToNext()) {
+				int id  = cursor.getInt(cursor.getColumnIndex("_id"));
+				int running = cursor.getInt(cursor.getColumnIndex("running"));
+				String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
+				int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
+				String notify_field = cursor.getString(cursor
+						.getColumnIndex("notify_field"));
+				String notify_condition = cursor.getString(cursor
+						.getColumnIndex("notify_condition"));
+				Double notify_value = cursor.getDouble(cursor
+						.getColumnIndex("notify_value"));
+				String notify_action = cursor.getString(cursor
+						.getColumnIndex("notify_action"));
+				String notify_contact = cursor.getString(cursor
+						.getColumnIndex("notify_contact"));
+				boolean save_to_db = cursor
+						.getString(cursor.getColumnIndex("save_to_db")).equals("true");
+		
+				String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
+				
+				
+				VSensorConfig vsc = new VSensorConfig(id ,processingClass, vsname, getSourcesOfVS(vsName),
+						 running == 1, notify_field, notify_condition,
+						notify_value, notify_action, notify_contact, save_to_db);
+				
+				AbstractVirtualSensor vs = null;
+				try {
+					vs = StaticData.getProcessingClassByVSConfig(vsc);
+					StaticData.addConfig(id, vsc);
+					StaticData.saveNameID(id, vsname);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				return vs;
+				
+			}
+			return null;
+		}
+
+	public boolean vsExists(String vsName) {
+		String query = "Select vsname from vsList where vsname = ?;";
+		Cursor cursor = database.rawQuery(query, new String[] { vsName });
+		while (cursor.moveToNext()) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public ArrayList<StreamSource> getSourcesOfVS(String name) {
+		ArrayList<StreamSource> sources = new ArrayList<StreamSource>();
+		String query = "Select * from sourcesList where vsname = ?;";
+		// open();
+		Cursor cursor = database.rawQuery(query, new String[] { name });
+		
+		while (cursor.moveToNext()) {
+			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
+			int sswindow = cursor.getInt(cursor.getColumnIndex("sswindowsize"));
+			int ssstep = cursor.getInt(cursor.getColumnIndex("ssstep"));
+			boolean sstimebased = cursor.getShort(cursor.getColumnIndex("sstimebased"))==1;
+			int sssamplingrate = cursor.getInt(cursor.getColumnIndex("sssamplingrate"));
+			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
+			String wrappername = cursor.getString(cursor.getColumnIndex("wrappername"));
+	
+			StreamSource ss = null;
+			if(StaticData.sourceMap.containsKey(id)){
+				ss = StaticData.sourceMap.get(id);
+			}else{
+				ss = new StreamSource();
+				ss.setId(id);
+				StaticData.sourceMap.put(id, ss);
+			}
+			ss.setAggregator(aggregator);
+			ss.setStep(ssstep);
+			ss.setTimeBased(sstimebased);
+			ss.setWindowSize(sswindow);
+			try {
+				ss.setWrapper(StaticData.getWrapperByName(wrappername));
+			} catch (Exception e) {
+			}
+			ss.getWrapper().setSamplingRate(sssamplingrate);
+			sources.add(ss);
+		}
+		return sources;
 	}
 
 }

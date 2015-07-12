@@ -21,34 +21,25 @@
 *
 * @author Do Ngoc Hoan
 */
-
-
 package tinygsn.model.wrappers;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
-import tinygsn.beans.Queue;
 import tinygsn.beans.StreamElement;
 import tinygsn.model.wrappers.utils.MICSensor;
 import tinygsn.model.wrappers.utils.MICSensor.VirtualSensorDataListener;
+import tinygsn.services.WrapperService;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
-import android.os.Looper;
-import android.util.Log;
 
-public class USBplugO3Wrapper extends AbstractWrapper {
+
+public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDataListener{
 
 	private static final String[] FIELD_NAMES = new String[] { "resistanceo",
 			"resistancev", "humidity", "temperature", "ozonecalibrated",
 			"voccalibrated" };
-
-	// df[0] = new DataField("resistanceO", "int");
-	// df[1] = new DataField("resistanceV", "int");
-	// df[2] = new DataField("humidity", "double");
-	// df[3] = new DataField("temperature", "double");
-	// df[4] = new DataField("ozoneCalibrated", "double");
-	// df[5] = new DataField("vocCalibrated", "double");
 
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE,
 			DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE,
@@ -60,108 +51,36 @@ public class USBplugO3Wrapper extends AbstractWrapper {
 
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double",
 			"double", "double", "double", "double", "double" };
-
-	private static final String TAG = "USBplugO3Wrapper";
+	
+	public static final Class<USBplugService> SERVICE = USBplugService.class;
 
 	private MICSensor sensor;
 
-	private StreamElement theLastStreamElement = null;
-	private Activity activity;
-
-	public USBplugO3Wrapper() {
-		super();
-	}
-
-	public USBplugO3Wrapper(Queue queue) {
-		super(queue);
-	}
-
-	public boolean initialize() {
-		activity = getConfig().getController().getActivity();
-		sensor = new MICSensor(activity);
-		return true;
-	}
-
-	public void run() {
-		l(" is waiting for data");
-		l("initSensor");
-		
-		Looper.prepare();
-		initialize();
-
-		sensor.initSensor();
-
-		sensor.setListener(new VirtualSensorDataListener() {
-			@Override
-			public void consume(StreamElement se) {
-				
-//				StreamElement se = new StreamElement(df, new Serializable[] {
-//						resistanceO, resistanceV, humidity, temperature, ozoneCalculated,
-//						vocCalculated });
-
-//				 Serializable[] fv = se.getData();
-//				 StreamElement streamElement = new StreamElement(FIELD_NAMES,
-//							FIELD_TYPES, new Serializable[] { fv });
-				 
-				// Serializable[] fv2 = new Serializable[fv.length];
-				// for (int i = 0; i < fv.length; i++){
-				// fv2[i] = new Serializable(getDouble(fv[i]));
-				// }
-				
-				double resistanceO = getDouble(se.getData()[0]);
-				double resistanceV = getDouble(se.getData()[1]);
-				double humidity = getDouble(se.getData()[2]);
-				double temperature = getDouble(se.getData()[3]);
-				double ozoneCalculated = getDouble(se.getData()[4]);
-				double vocCalculated = getDouble(se.getData()[5]);
-				
-				StreamElement streamElement = new StreamElement(FIELD_NAMES,
-						FIELD_TYPES, new Serializable[] { resistanceO, resistanceV,
-								humidity, temperature, ozoneCalculated, vocCalculated });
-				
-				theLastStreamElement = streamElement;
-//				showLog(TAG + ": " + theLastStreamElement.toString());
-//				Log.v(TAG, streamElement.toString());
-			}
-		});
-
-		while (isActive()) {
+	public void runOnce() {
+		Activity activity = getConfig().getController().getActivity();
+		SqliteStorageManager storage = new SqliteStorageManager(activity);
+		int samplingPeriod = storage.getSamplingRateByName("tinygsn.model.wrappers.USBplugO3Wrapper");
+		if(samplingPeriod>0){
+			sensor = new MICSensor(activity);
+			sensor.initSensor();
+			sensor.setListener(this);
 			try {
 				Thread.sleep(samplingRate / 2);
 				sensor.getMeasurement();
 				Thread.sleep(samplingRate / 2);
-				getLastKnownValues();
 			}
-			catch (InterruptedException e) {
-				Log.e(e.getMessage(), e.toString());
-			}
+			catch (InterruptedException e) {}
 		}
-		// sensor.Pause();
-		Looper.loop();
 	}
 
-	private double getDouble(Serializable s) {
-		double d = ((Number) s).doubleValue();
-		return d;
-	}
 
-	private void getLastKnownValues() {
-//		StreamElement se = new StreamElement(FIELD_NAMES,
-//				FIELD_TYPES, new Serializable[] { 1d,
-//				1d, 1d, 1d, 1d, 1d });
-//		theLastStreamElement = se;
+	@Override
+	public void consume(StreamElement se) {
+	    postStreamElement(se);
+	}
 		
-		if (theLastStreamElement == null) {
-			Log.e(TAG, "There is no signal!");
-		}
-		else {
-			postStreamElement(theLastStreamElement);
-			l("Received: " + theLastStreamElement.toString());
-		}
-	}
-
 	public String getWrapperName() {
-		return "USBplugO3Wrapper";
+		return this.getClass().getSimpleName();
 	}
 
 	@Override
@@ -184,15 +103,13 @@ public class USBplugO3Wrapper extends AbstractWrapper {
 		return FIELD_TYPES;
 	}
 
-	void l(String text){
-		Log.v(TAG, text);
-	}
 	
-//	void showLog(final String text) {
-//		activity.runOnUiThread(new Runnable() {
-//			public void run() {
-//				Toast.makeText(activity, text, Toast.LENGTH_LONG).show();
-//			}
-//		});
-//	}
+	public static class USBplugService extends WrapperService{
+
+		public USBplugService() {
+			super("usbPlugService");
+
+		}
+	}
+
 }

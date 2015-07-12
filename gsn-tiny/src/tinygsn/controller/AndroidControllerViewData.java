@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn/controller/AndroidControllerViewData.java
+* File: gsn-tiny/src/tinygsn/controller/AndroidControllerViewDataNew.java
 *
 * @author Do Ngoc Hoan
 */
@@ -26,10 +26,11 @@
 package tinygsn.controller;
 
 import java.util.ArrayList;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityViewData;
-import tinygsn.model.vsensor.VirtualSensor;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.storage.StorageManager;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
@@ -44,7 +45,7 @@ public class AndroidControllerViewData extends AbstractController {
 	private Handler handlerVS = null;
 	private Handler handlerField = null;
 	private SqliteStorageManager storage = null;
-	private ArrayList<VirtualSensor> vsList = new ArrayList<VirtualSensor>();
+	private ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
 
 	// private VSensorLoader vSensorLoader = null;
 
@@ -53,23 +54,15 @@ public class AndroidControllerViewData extends AbstractController {
 	public AndroidControllerViewData(ActivityViewData originalView) {
 		this.view = originalView;
 		Log.v(TAG, "Start");
-
 		storage = new SqliteStorageManager(view);
-		// vSensorLoader = new VSensorLoader(this, storage);
-	}
-
-	public void startLoadVSList() {
-		// vSensorLoader.start();
-		// loadListVS();
 	}
 
 	public void loadListVS() {
 		vsList = storage.getListofVS();
 		ArrayList<String> vsListName = new ArrayList<String>();
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			vsListName.add(vs.getConfig().getName());
 		}
-
 		Message msg = new Message();
 		msg.obj = vsListName;
 		handlerVS.sendMessage(msg);
@@ -78,31 +71,30 @@ public class AndroidControllerViewData extends AbstractController {
 	public void loadListFields(String vsName) {
 		ArrayList<String> fieldList = new ArrayList<String>();
 		DataField[] fields = null;
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().endsWith(vsName)) {
-				fields = vs.getConfig().getInputStreams()[0].getSources()[0]
-						.getWrapper().getOutputStructure();
+				fields = vs.getConfig().getOutputStructure();
 				break;
 			}
 		}
 		for (DataField f : fields) {
 			fieldList.add(f.getName());
-			Log.v(TAG, f.getName());
 		}
-
 		Message msg = new Message();
 		msg.obj = fieldList;
 		handlerField.sendMessage(msg);
 	}
 
 	public void loadData(int numLatest, String vsName) {
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().endsWith(vsName)) {
-				String[] fieldList = vs.getConfig().getInputStreams()[0].getSources()[0]
-						.getWrapper().getFieldList();
-				Byte[] fieldType = vs.getConfig().getInputStreams()[0].getSources()[0]
-						.getWrapper().getFieldType();
-
+				DataField[] df = vs.getConfig().getOutputStructure();
+				String[] fieldList = new String[df.length];
+				Byte[] fieldType = new Byte[df.length];
+				for(int i=0;i<df.length;i++){
+					fieldList[i] = df[i].getName();
+					fieldType[i] = df[i].getDataTypeID();
+				}
 				ArrayList<StreamElement> result = storage.executeQueryGetLatestValues(
 						"vs_" + vsName, fieldList, fieldType, numLatest);
 
@@ -116,13 +108,15 @@ public class AndroidControllerViewData extends AbstractController {
 	}
 
 	public void loadRangeData(String vsName, long start, long end) {
-		for (VirtualSensor vs : vsList) {
+		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().endsWith(vsName)) {
-				String[] fieldList = vs.getConfig().getInputStreams()[0].getSources()[0]
-						.getWrapper().getFieldList();
-				Byte[] fieldType = vs.getConfig().getInputStreams()[0].getSources()[0]
-						.getWrapper().getFieldType();
-
+				DataField[] df = vs.getConfig().getOutputStructure();
+				String[] fieldList = new String[df.length];
+				Byte[] fieldType = new Byte[df.length];
+				for(int i=0;i<df.length;i++){
+					fieldList[i] = df[i].getName();
+					fieldType[i] = df[i].getDataTypeID();
+				}
 				ArrayList<StreamElement> result = storage.executeQueryGetRangeData(
 						"vs_" + vsName, start, end, fieldList, fieldType);
 
@@ -134,10 +128,6 @@ public class AndroidControllerViewData extends AbstractController {
 			}
 		}
 
-	}
-
-	public ArrayList<StreamElement> loadData2() {
-		return storage.executeQuery();
 	}
 
 	public StorageManager getStorageManager() {

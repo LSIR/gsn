@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn/gui/android/ActivityViewData.java
+* File: gsn-tiny/src/tinygsn/gui/android/ActivityViewDataNew.java
 *
 * @author Do Ngoc Hoan
 */
@@ -34,10 +34,12 @@ import tinygsn.beans.StreamElement;
 import tinygsn.controller.AndroidControllerViewData;
 import tinygsn.gui.android.chart.AbstractDemoChart;
 import tinygsn.gui.android.chart.SensorValuesChart;
+import tinygsn.gui.android.utils.VSListAdapter;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -45,7 +47,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -69,8 +70,12 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
 @SuppressLint({ "HandlerLeak", "SimpleDateFormat" })
+@SuppressWarnings("unchecked")
 public class ActivityViewData extends SherlockFragmentActivity {
 	static int TEXT_SIZE = 10;
 
@@ -88,6 +93,8 @@ public class ActivityViewData extends SherlockFragmentActivity {
 	private ArrayList<String> fieldList = null;
 	private int numLatest = 10;
 	private String vsName = null;
+	private String vsNameFromExtra = null;
+
 	protected int viewMode = 1;
 	protected String fieldName;
 
@@ -97,32 +104,168 @@ public class ActivityViewData extends SherlockFragmentActivity {
 	private Date startTime, endTime;
 	private static final String TAG = "ActivityViewData";
 
-	@SuppressLint("HandlerLeak")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_view_data);
-		
 		lblOutput = (TextView) findViewById(R.id.txbViewData);
 		lblOutput.setTextSize(TEXT_SIZE);
 
-		// numLatestTxt = (EditText) findViewById(R.id.numLatestTxt);
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			vsNameFromExtra = extras.getString(VSListAdapter.EXTRA_VS_NAME);
+		}
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		addHandlers();
 
-		// btnLoad = (Button) findViewById(R.id.btnLoad);
-		// btnLoad.setOnClickListener(new View.OnClickListener() {
-		// public void onClick(View v) {
-		// // latestLbl.setText(numLatest + " latest values");
-		// controller.loadData(numLatest);
-		// }
-		// });
-
-		// controller.startLoadVSList();
 		controller.loadListVS();
 
-		// addTableViewModeLatest();
 		loadViewMode();
+	}
+
+	private void addHandlers() {
+		controller = new AndroidControllerViewData(this);
+
+		handlerVS = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				vsNameList = (ArrayList<String>) msg.obj;
+				loadVSList();
+			}
+		};
+		controller.setHandlerVS(handlerVS);
+
+		handlerField = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				fieldList = (ArrayList<String>) msg.obj;
+				loadFieldList();
+			}
+		};
+		controller.setHandlerField(handlerField);
+
+		handlerData = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				streamElements = (ArrayList<StreamElement>) msg.obj;
+				if (streamElements.size() == 0)
+					outputData("No data!");
+				else {
+					outputData(getDataOutput());
+				}
+			}
+		};
+		controller.setHandlerData(handlerData);
+	}
+
+	public void loadVSList() {
+		spinnerVS = (Spinner) findViewById(R.id.spinner_vs);
+		List<String> list = new ArrayList<String>();
+		for (String s : vsNameList) {
+			list.add(s);
+		}
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+				R.layout.spinner_item, list);
+		dataAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerVS.setAdapter(dataAdapter);
+
+		int index = 0;
+		if (vsNameFromExtra != null) {
+			for (String s : vsNameList) {
+				if (s.equals(vsNameFromExtra)) {
+					spinnerVS.setSelection(index);
+				}
+				index++;
+			}
+		}
+
+		spinnerVS.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int pos,
+					long id) {
+				vsName = parent.getItemAtPosition(pos).toString();
+				Toast.makeText(parent.getContext(),
+						"The virtual sensor \"" + vsName + "\" is selected.",
+						Toast.LENGTH_SHORT).show();
+				controller.loadListFields(parent.getItemAtPosition(pos).toString());
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				Toast.makeText(context, "Please select a virtual sensor",
+						Toast.LENGTH_SHORT).show();
+			}
+		});
+
+	}
+
+	protected void loadFieldList() {
+		spinnerField = (Spinner) findViewById(R.id.spinner_field);
+		List<String> list = new ArrayList<String>();
+		for (String s : fieldList) {
+			list.add(s);
+		}
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+				R.layout.spinner_item, list);
+		dataAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerField.setAdapter(dataAdapter);
+
+		spinnerField.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int pos,
+					long id) {
+				fieldName = parent.getItemAtPosition(pos).toString();
+				Toast.makeText(parent.getContext(),
+						"The field \"" + fieldName + "\" is selected.", Toast.LENGTH_SHORT)
+						.show();
+				loadData();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				Toast.makeText(context, "Please select a field", Toast.LENGTH_SHORT)
+						.show();
+			}
+		});
+	}
+
+	protected void loadViewMode() {
+		spinnerViewMode = (Spinner) findViewById(R.id.spinner_view_mode);
+		List<String> list = new ArrayList<String>();
+		list.add("Latest values");
+		list.add("Customize time");
+
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+				R.layout.spinner_item, list);
+		dataAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerViewMode.setAdapter(dataAdapter);
+
+		spinnerViewMode.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int pos,
+					long id) {
+				// Toast.makeText(
+				// parent.getContext(),
+				// "The view mode \"" + parent.getItemAtPosition(pos).toString()
+				// + "\" is selected.", Toast.LENGTH_SHORT).show();
+				if (pos == 0) {
+					addTableViewModeLatest();
+					viewMode = 1;
+					loadData();
+				}
+				else {
+					addTableViewModeCustomize();
+					viewMode = 2;
+					loadData();
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+			}
+		});
 	}
 
 	private void addTableViewModeLatest() {
@@ -182,23 +325,29 @@ public class ActivityViewData extends SherlockFragmentActivity {
 
 		row = new TableRow(this);
 		Button detailBtn = new Button(this);
-		// plotDataBtn.setTextSize(TEXT_SIZE);
 		detailBtn.setText("Detail");
+
+		// detailBtn.setBackground(getResources().getDrawable(R.drawable.info));
+		// detailBtn.setWidth(200);
+		detailBtn.setTextSize(TEXT_SIZE + 2);
 		detailBtn.setTextColor(Color.parseColor("#000000"));
 		detailBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-//				Toast.makeText(context, "detailBtn is clicked",
-//						Toast.LENGTH_SHORT).show();
-				
 				showDialogDetail();
 			}
 		});
 
 		Button plotDataBtn = new Button(this);
-		// plotDataBtn.setTextSize(TEXT_SIZE);
 		plotDataBtn.setText("Plot data");
+		plotDataBtn.setTextSize(TEXT_SIZE + 2);
 		plotDataBtn.setTextColor(Color.parseColor("#000000"));
+		// plotDataBtn.setBackground(getResources().getDrawable(R.drawable.chart));
+
+		// LinearLayout.LayoutParams params = plotDataBtn.getLayoutParams();
+		// params.width = 50;
+		// plotDataBtn.setLayoutParams(params);
+
 		plotDataBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -206,13 +355,19 @@ public class ActivityViewData extends SherlockFragmentActivity {
 			}
 		});
 
-		TableRow.LayoutParams params = new TableRow.LayoutParams();
+		TableRow.LayoutParams rowParams = new TableRow.LayoutParams();
 		// params.addRule(TableRow.LayoutParams.FILL_PARENT);
-		params.span = 2;
+		rowParams.span = 2;
 
-		row.addView(detailBtn, params);
-		row.addView(plotDataBtn, params);
-		row.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT,
+		row.addView(detailBtn, rowParams);
+		row.addView(plotDataBtn, rowParams);
+
+		// detailBtn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
+		// LayoutParams.WRAP_CONTENT));
+		// plotDataBtn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
+		// LayoutParams.WRAP_CONTENT));
+
+		row.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
 		table_view_mode.addView(row);
 	}
@@ -227,7 +382,6 @@ public class ActivityViewData extends SherlockFragmentActivity {
 	private void loadLatestData() {
 		if (vsName == null)
 			return;
-		//TODO check for calling and caller of this method
 		controller.loadData(numLatest, vsName);
 	}
 
@@ -248,7 +402,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		txt.setTextColor(Color.parseColor("#000000"));
 		row.addView(txt);
 
-//		Date time = new Date();
+		// Date time = new Date();
 		startTime = new Date();
 		startTime.setMinutes(startTime.getMinutes() - 1);
 		endTime = new Date();
@@ -258,7 +412,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		txtStartTime = new TextView(this);
 		txtStartTime.setText(formatter.format(startTime) + "");
 		txtStartTime.setTextColor(Color.parseColor("#000000"));
-		txtStartTime.setBackgroundColor(Color.parseColor("#61a7db"));
+		txtStartTime.setBackgroundColor(Color.parseColor("#8dc63f"));
 		row.addView(txtStartTime);
 
 		txtStartTime.setOnClickListener(new OnClickListener() {
@@ -281,7 +435,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		txtStartDate = new TextView(this);
 		txtStartDate.setText(formatter.format(startTime) + "");
 		txtStartDate.setTextColor(Color.parseColor("#000000"));
-		txtStartDate.setBackgroundColor(Color.parseColor("#61a7db"));
+		txtStartDate.setBackgroundColor(Color.parseColor("#8dc63f"));
 		row.addView(txtStartDate);
 
 		txtStartDate.setOnClickListener(new OnClickListener() {
@@ -314,7 +468,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		txtEndTime = new TextView(this);
 		txtEndTime.setText(formatter.format(endTime) + "");
 		txtEndTime.setTextColor(Color.parseColor("#000000"));
-		txtEndTime.setBackgroundColor(Color.parseColor("#61a7db"));
+		txtEndTime.setBackgroundColor(Color.parseColor("#8dc63f"));
 		row.addView(txtEndTime);
 
 		txtEndTime.setOnClickListener(new OnClickListener() {
@@ -337,7 +491,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		txtEndDate = new TextView(this);
 		txtEndDate.setText(formatter.format(endTime) + "");
 		txtEndDate.setTextColor(Color.parseColor("#000000"));
-		txtEndDate.setBackgroundColor(Color.parseColor("#61a7db"));
+		txtEndDate.setBackgroundColor(Color.parseColor("#8dc63f"));
 		row.addView(txtEndDate);
 
 		txtEndDate.setOnClickListener(new OnClickListener() {
@@ -354,7 +508,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		// Row
 		row = new TableRow(this);
 		Button detailBtn = new Button(this);
-		detailBtn.setTextSize(TEXT_SIZE + 4);
+		detailBtn.setTextSize(TEXT_SIZE + 2);
 		detailBtn.setText("Detail");
 		detailBtn.setTextColor(Color.parseColor("#000000"));
 		detailBtn.setOnClickListener(new OnClickListener() {
@@ -365,7 +519,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		});
 
 		Button plotDataBtn = new Button(this);
-		plotDataBtn.setTextSize(TEXT_SIZE + 4);
+		plotDataBtn.setTextSize(TEXT_SIZE + 2);
 		plotDataBtn.setText("Plot data");
 		plotDataBtn.setTextColor(Color.parseColor("#000000"));
 		plotDataBtn.setOnClickListener(new OnClickListener() {
@@ -445,141 +599,6 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		loadCustomizedRange();
 	}
 
-	private void addHandlers() {
-		controller = new AndroidControllerViewData(this);
-
-		handlerVS = new Handler() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void handleMessage(Message msg) {
-				vsNameList = (ArrayList<String>) msg.obj;
-				loadVSList();
-			}
-		};
-		controller.setHandlerVS(handlerVS);
-
-		handlerField = new Handler() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void handleMessage(Message msg) {
-				fieldList = (ArrayList<String>) msg.obj;
-				loadFieldList();
-			}
-		};
-		controller.setHandlerField(handlerField);
-
-		handlerData = new Handler() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void handleMessage(Message msg) {
-				streamElements = (ArrayList<StreamElement>) msg.obj;
-				if (streamElements.size() == 0)
-					lblOutput.setText("No data!");
-				else {
-					outputData();
-				}
-			}
-		};
-		controller.setHandlerData(handlerData);
-	}
-
-	public void loadVSList() {
-		spinnerVS = (Spinner) findViewById(R.id.spinner_vs);
-		List<String> list = new ArrayList<String>();
-		for (String s : vsNameList) {
-			list.add(s);
-		}
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerVS.setAdapter(dataAdapter);
-
-		spinnerVS.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				vsName = parent.getItemAtPosition(pos).toString();
-				Toast.makeText(parent.getContext(),
-						"The virtual sensor \"" + vsName + "\" is selected.",
-						Toast.LENGTH_SHORT).show();
-				controller.loadListFields(parent.getItemAtPosition(pos).toString());
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				Toast.makeText(context, "Please select a virtual sensor",
-						Toast.LENGTH_SHORT).show();
-			}
-		});
-	}
-
-	protected void loadFieldList() {
-		spinnerField = (Spinner) findViewById(R.id.spinner_field);
-		List<String> list = new ArrayList<String>();
-		for (String s : fieldList) {
-			list.add(s);
-		}
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerField.setAdapter(dataAdapter);
-
-		spinnerField.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				fieldName = parent.getItemAtPosition(pos).toString();
-				Toast.makeText(parent.getContext(),
-						"The field \"" + fieldName + "\" is selected.", Toast.LENGTH_SHORT)
-						.show();
-				loadData();
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				Toast.makeText(context, "Please select a field", Toast.LENGTH_SHORT)
-						.show();
-			}
-		});
-	}
-
-	protected void loadViewMode() {
-		spinnerViewMode = (Spinner) findViewById(R.id.spinner_view_mode);
-		List<String> list = new ArrayList<String>();
-		list.add("Latest values");
-		list.add("Customize time");
-
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerViewMode.setAdapter(dataAdapter);
-
-		spinnerViewMode.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				// Toast.makeText(
-				// parent.getContext(),
-				// "The view mode \"" + parent.getItemAtPosition(pos).toString()
-				// + "\" is selected.", Toast.LENGTH_SHORT).show();
-				if (pos == 0) {
-					addTableViewModeLatest();
-					viewMode = 1;
-					loadData();
-				}
-				else {
-					addTableViewModeCustomize();
-					viewMode = 2;
-					loadData();
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-			}
-		});
-	}
-
 	public void viewChart() {
 		if (streamElements == null)
 			return;
@@ -617,16 +636,84 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		startActivity(intent);
 	}
 
-	private void outputData() {
-		String out = getDataOutput();
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		final MenuItem add = menu.add("Share");
+		add.setIcon(R.drawable.ic_action_share).setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			public boolean onMenuItemClick(final MenuItem item) {
+				shareOutputData();
+				return false;
+			}
+		});
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		int itemId = item.getItemId();
+		switch (itemId) {
+		case android.R.id.home:
+//			Intent myIntent = new Intent(this, ActivityListVSNew.class);
+//			this.startActivity(myIntent);
+			finish();
+			break;
+		}
+		return true;
+	}
+
+	protected void shareOutputData() {
+		String text = getShareData();
+		String subject = "Share " + spinnerVS.getSelectedItem().toString()
+				+ " data";
+
+		Intent i = new Intent(android.content.Intent.ACTION_SEND);
+		i.setType("text/plain");
+		i.putExtra(Intent.EXTRA_SUBJECT, subject);
+		i.putExtra(Intent.EXTRA_TEXT, text);
+
+		copyTextToClipboard(text);
+		Toast.makeText(context,
+				"Customed message to post on Facebook is copied to clipboard!",
+				Toast.LENGTH_SHORT).show();
+
+		startActivity(Intent.createChooser(i, "Share TinyGSN data"));
+	}
+
+	@SuppressWarnings("deprecation")
+	private void copyTextToClipboard(String text) {
+		int sdk = android.os.Build.VERSION.SDK_INT;
+		if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
+			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) this
+					.getSystemService(Context.CLIPBOARD_SERVICE);
+			clipboard.setText(text);
+		}
+		else {
+			android.content.ClipboardManager clipboard = (android.content.ClipboardManager) this
+					.getSystemService(Context.CLIPBOARD_SERVICE);
+			android.content.ClipData clip = ClipData
+					.newPlainText("simple text", text);
+			clipboard.setPrimaryClip(clip);
+		}
+	}
+
+	private void outputData(String out) {
 		lblOutput.setText(out);
-		
-//		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//		DialogFragment newFragment = DetailedDataFragment.newInstance(out);
-//		
-//		ft.add(R.id.embedded, newFragment);
-//		
-//		ft.commit();
+	}
+
+	private String getShareData() {
+		if (streamElements == null)
+			return "";
+
+		String out = "I'd like to share " + streamElements.size()
+				+ " stream data of virtual senor '"
+				+ spinnerVS.getSelectedItem().toString() + "'\n\n";
+		for (int i = 0; i < streamElements.size(); i++) {
+			out += streamElements.get(i).toString() + "\n";
+		}
+		return out;
 	}
 
 	private String getDataOutput() {
@@ -639,25 +726,25 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		}
 		return out;
 	}
-	
+
 	private void showDialogDetail() {
 		String out = getDataOutput();
-		
+
 		DialogFragment newFragment = DetailedDataFragment.newInstance(out);
 		newFragment.show(getSupportFragmentManager(), "dialog");
 	}
 
 	public static class DetailedDataFragment extends SherlockDialogFragment {
 		String text;
-		
-		public static DetailedDataFragment newInstance(String text){
+
+		public static DetailedDataFragment newInstance(String text) {
 			return new DetailedDataFragment(text);
 		}
-		
-		public DetailedDataFragment(String text){
+
+		public DetailedDataFragment(String text) {
 			this.text = text;
 		}
-		
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
