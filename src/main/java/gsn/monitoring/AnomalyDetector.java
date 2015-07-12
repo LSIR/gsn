@@ -43,6 +43,7 @@ public class AnomalyDetector implements Monitorable {
         add("positive_outlier");
         add("negative_outlier");
         add("iqr");
+        add("unique");
     }};
     
     // Constant flag for specifiying driection of outlier | Helps in code readability 
@@ -296,7 +297,7 @@ public class AnomalyDetector implements Monitorable {
                 
                 if (rs.next()) {
                     stat.put ("anomaly.vs." +sensor.getVirtualSensorConfiguration().getName().replaceAll("\\,","_")  
-                        +"."+anomaly.getFunction()+"."+ field.getName() +"." + anomaly.getValue().trim() +".iqr" , rs.getLong(1));
+                        +"."+anomaly.getFunction()+"."+ field.getName() +"." + anomaly.getValue().trim() , rs.getLong(1));
                 }
             } catch (NumberFormatException e) {
                 //TODO: For other datatpyes, there could be different exception for formatting
@@ -340,7 +341,91 @@ public class AnomalyDetector implements Monitorable {
         
         return toReturn.toString();
     }
-     
+
+    // Count unique values of a field over a specified timed-interval
+    private void countUnique (Hashtable <String, Object> stat) throws SQLException {
+
+        if (!functions.containsKey("unique"))
+            return;
+
+        ArrayList <Anomaly> anomalies = functions.get("unique");
+
+        // TODO: remove key iqr
+        if (anomalies == null || anomalies.size() == 0) {
+            functions.remove("unique");
+            return;
+        }
+
+        StorageManager storageMan = Main.getStorage(sensor.getVirtualSensorConfiguration().getName());
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        con = storageMan.getConnection();
+
+        Iterator <Anomaly> iterator = anomalies.iterator();
+        while (iterator.hasNext()) {
+            Anomaly anomaly = iterator.next();
+            DataField field = anomaly.getField();
+
+            String query = getUniqueQuery(sensor.getVirtualSensorConfiguration().getName().toLowerCase(), field);
+            try {
+                ps = con.prepareStatement(query);
+                long timestamp = 0;
+                switch (field.getDataTypeID()) {
+
+                    case DataTypes.DOUBLE:
+                        //TODO: Improve IQR SQL Query
+                        timestamp = this.getTimeStamp(anomaly.getTime());
+                        ps.setDouble(1, timestamp);
+                        break;
+
+                    default:
+                        logger.info ("ANOMALY-EXECUTION-ERROR [anomaly."+ anomaly.getFunction()+"."+
+                            field.getName()+"="+anomaly.getValue()+","+anomaly.getTimeStr()+"] "+ "Field: " +
+                            field.getName() + " datatype " + field.getDataTypeID() + " not stuppored");
+                        iterator.remove();
+                        continue;
+
+
+                }
+
+                rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    stat.put ("anomaly.vs." +sensor.getVirtualSensorConfiguration().getName().replaceAll("\\,","_")
+                        +"."+anomaly.getFunction()+"."+ field.getName() +"." + anomaly.getValue().trim(), rs.getLong(1));
+                }
+            } catch (NumberFormatException e) {
+                //TODO: For other datatpyes, there could be different exception for formatting
+                logger.info ("ANOMALY-EXECUTION-ERROR [anomaly."+ anomaly.getFunction()+"."+field.getName()+
+                        "="+anomaly.getValue()+","+anomaly.getTimeStr()+"] "+ "Value: " + anomaly.getValue() + " Invalid number format");
+                continue;
+            }
+
+            finally {
+                if (rs!=null)
+                    rs.close();
+                if (ps!=null)
+                    ps.close();
+            }
+        }
+
+        con.close();
+    }
+    
+    // Generates SQL query for the number of unique values of a field
+    private String getUniqueQuery ( String tableName, DataField field) {
+
+        StringBuilder toReturn = new StringBuilder ("SELECT COUNT (*) FROM (");
+        toReturn.append("SELECT DISTINCT " + field.getName() + " FROM ").append(tableName);
+        toReturn.append(" WHERE timed > ?) AS maxTabel");
+
+        return toReturn.toString();
+    }
+ 
+
+
     // Returns the time stamp by subtractive the windowSize from the current time
     private long getTimeStamp (long windowSize) {
         
@@ -383,7 +468,7 @@ public class AnomalyDetector implements Monitorable {
             countOutliers (stat, POSITIVE);
             countOutliers (stat, NEGATIVE);
             interQuartileRange(stat);
-
+            countUnique(stat);
         } catch (SQLException e) { e.printStackTrace(); } 
     
         return stat; 
