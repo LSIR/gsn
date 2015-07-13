@@ -8,6 +8,8 @@ angular.module('hcControllers', [])
         function ($scope, dataProcessingService,
                   ChartConfigService, FilterParameters, ProcessGsnData) {
 
+            dataProcessingService.resetPromise();
+
             FilterParameters.getSensorModels().then(function () {
                 $scope.canPlot = FilterParameters.hasRequiredParameters();
 
