@@ -8,7 +8,7 @@
             <param name="scriptlet">
                 <![CDATA[
 					try {
-						def LIMIT = 11.7;
+						def LIMIT = 11.5;
 						def SIZE = 60;
 						def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
 						if ( ! isdef('voltageMap')) { voltageMap = [:]; }
