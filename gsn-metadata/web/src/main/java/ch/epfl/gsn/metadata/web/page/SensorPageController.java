@@ -49,7 +49,7 @@ public class SensorPageController {
     @RequestMapping(value = "/virtualSensorNames", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public
     @ResponseBody
-    String getVirtualSensors(SensorQuery sensorQuery, HttpServletResponse response) {
+    String getVirtualSensorNames(SensorQuery sensorQuery, HttpServletResponse response) {
 
         setResponseHeader(response);
 
@@ -87,6 +87,23 @@ public class SensorPageController {
         return geoJsonConverter.convertMeasurementRecords(Lists.newArrayList(virtualSensorMetadata), false);
     }
 
+    @RequestMapping(value = "/virtualSensors", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getVirtualSensors(SensorQuery sensorQuery, HttpServletResponse response) {
+        System.out.println("sensorQuery = " + sensorQuery);
+
+        setResponseHeader(response);
+
+        Query query = queryBuilder.build(sensorQuery);
+
+        Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.findForQuery(query);
+
+        Set<VirtualSensorMetadata> sensorMetadataSet = Sets.newHashSet(virtualSensorMetadatas);
+        logger.info("query: " + sensorQuery + " results " + sensorMetadataSet.size());
+        return geoJsonConverter.convertMeasurementRecords(sensorMetadataSet, false);
+
+    }
 //    @RequestMapping(value = "/allSensorsTable", method = RequestMethod.GET, produces = "application/json")
 //    public
 //    @ResponseBody

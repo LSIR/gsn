@@ -3,6 +3,7 @@ package ch.epfl.gsn.metadata.web.page;
 import ch.epfl.gsn.metadata.core.model.ObservedProperty;
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.web.services.GeoJsonConverter;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.gson.stream.JsonWriter;
@@ -45,6 +46,10 @@ public class WebJsonConverter extends GeoJsonConverter {
 
         writer.name("fromDate").value(DATE_FORMAT.format(record.getFromDate() == null ? new Date() : record.getFromDate()));
         writer.name("untilDate").value(DATE_FORMAT.format(record.getToDate() == null ? new Date() : record.getToDate()));
+        Iterable<String> nameParts = Splitter.on('_').split(record.getName());
+        if (nameParts.iterator().hasNext()) {
+            writer.name("group").value(nameParts.iterator().next());
+        }
     }
 
 //    public String writeTableModel(Collection<VirtualSensorMetadata> records){
