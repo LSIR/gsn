@@ -1,21 +1,8 @@
 var gsnMap = angular.module("gsnMap", ["leaflet-directive"]);
 
 
-gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$compile', '$filter', 'sensors', 'FilterParameters', 'sharedService', '$location',
-    function ($scope, $http, leafletData, $compile, $filter, sensors, FilterParameters, sharedService, $location) {
-
-        $scope.person = {};
-        $scope.people = [
-            { name: 'Adam',      email: 'adam@email.com',      age: 10 },
-            { name: 'Amalie',    email: 'amalie@email.com',    age: 12 },
-            { name: 'Wladimir',  email: 'wladimir@email.com',  age: 30 },
-            { name: 'Samantha',  email: 'samantha@email.com',  age: 31 },
-            { name: 'Estefanía', email: 'estefanía@email.com', age: 16 },
-            { name: 'Natasha',   email: 'natasha@email.com',   age: 54 },
-            { name: 'Nicole',    email: 'nicole@email.com',    age: 43 },
-            { name: 'Adrian',    email: 'adrian@email.com',    age: 21 }
-        ];
-
+gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$compile', '$filter', 'sensors', 'FilterParameters', 'sharedService', '$location', '_',
+    function ($scope, $http, leafletData, $compile, $filter, sensors, FilterParameters, sharedService, $location, _) {
 
 
         $scope.geojson = {};
@@ -30,6 +17,26 @@ gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$c
             zoom: 8
         };
 
+        $scope.namesOfGroup = {};
+        $scope.parameters = [];
+
+        for (var i = 0; i < $scope.features.length; i++) {
+            var properties = $scope.features[i].properties;
+            if (!($scope.namesOfGroup[properties.group])) {
+                $scope.namesOfGroup[properties.group] = [];
+            }
+            $scope.namesOfGroup[properties.group].push(properties.sensorName);
+        }
+
+        $scope.groups = _.keys($scope.namesOfGroup).sort();
+        $scope.sensorNames = [].concat.apply([], _.values($scope.namesOfGroup).sort());
+
+
+        $scope.updateGroup = function (item) {
+            $scope.sensorNames = $scope.namesOfGroup[item];
+            $scope.filter.sensorName = {};
+            updateMarkers();
+        };
 
         angular.extend($scope, {
 
@@ -54,8 +61,11 @@ gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$c
             }
         });
 
+        $scope.group = {};
+
         $scope.filter = {
-            sensorName: '',
+            sensorName: {},
+            group: {},
             deployment: '',
             parameters: '',
             sensorNameFeature: {}
@@ -93,8 +103,11 @@ gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$c
 
         function filterSensor(feature) {
             var result = true;
-            if ($scope.filter.sensorName.length > 0) {
-                result = result && (feature.properties.sensorName === $scope.filter.sensorName);
+            if ($scope.filter.sensorName.selected) {
+                result = result && (feature.properties.sensorName === $scope.filter.sensorName.selected);
+            }
+            if ($scope.filter.group.selected) {
+                result = result && (feature.properties.group === $scope.filter.group.selected);
             }
             if ($scope.filter.deployment.length > 0) {
                 result = result && (feature.properties.deployment === $scope.filter.deployment);
@@ -242,7 +255,8 @@ gsnMap.factory('Sensors', ['$http', function($http) {
         getSensors: function() {
             var promise = $http({
                 method: 'GET',
-                url: 'http://eflumpc18.epfl.ch/gsn/metadata/virtualSensors'
+                //url: 'http://eflumpc18.epfl.ch/gsn/metadata/virtualSensors'
+                url: 'http://localhost:8090/web/virtualSensors'
             });
             promise.success(function(data, status, headers, conf) {
                 return data;
