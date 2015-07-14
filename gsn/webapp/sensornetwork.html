@@ -390,62 +390,62 @@ $(document).ready(function() {
           select:"sensornode[nodetype=3][position]"
         }]
       },
-      { title:"BackLog Uptime",
-        signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
-          field:["uptime"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"BackLog Error/Exception Counters",
-        signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
-          field:["error_counter","exception_counter"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"BackLog Database Store Time",
-        signals: [{
-          vsensor:".*_backlogstatus_dynamic__mapped",
-          field:["db_store_time_min","db_store_time_mean","db_store_time_max"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation Uptime",
-        signals: [{
-          vsensor:".*_corestationstatus_software__mapped",
-          field:["uptime"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation Load",
-        signals: [{
-          vsensor:".*_corestationstatus_software__mapped",
-          field:["loadavg_1_min","loadavg_5_min","loadavg_15_min"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CoreStation Card File System",
-        signals: [{
-          vsensor:".*_corestationstatus_software__mapped",
-          field:["statvfs_card_size","statvfs_card_free"],
-          select:"sensornode[position][iscorestation='true']"
-        }]
-      },
-      { title:"CamZilla Binary Queue",
-          signals: [{
-          vsensor:".*[^_]_binary__mapped",
-          field:["file_queue_length","file_queue_size"],
-          select:"sensornode[nodetype=6][position]"
-        }]
-      },
-      { title:"CamZilla Binary Transmission Time",
-        signals: [{
-          vsensor:".*[^_]_binary__mapped",
-          field:["transmission_time_eff","transmission_time_tot"],
-          select:"sensornode[nodetype=6][position]"
-        }]
-      },
+//       { title:"BackLog Uptime",
+//         signals: [{
+//           vsensor:".*_backlogstatus_dynamic__mapped",
+//           field:["uptime"],
+//           select:"sensornode[position][iscorestation='true']"
+//         }]
+//       },
+//       { title:"BackLog Error/Exception Counters",
+//         signals: [{
+//           vsensor:".*_backlogstatus_dynamic__mapped",
+//           field:["error_counter","exception_counter"],
+//           select:"sensornode[position][iscorestation='true']"
+//         }]
+//       },
+//       { title:"BackLog Database Store Time",
+//         signals: [{
+//           vsensor:".*_backlogstatus_dynamic__mapped",
+//           field:["db_store_time_min","db_store_time_mean","db_store_time_max"],
+//           select:"sensornode[position][iscorestation='true']"
+//         }]
+//       },
+//       { title:"CoreStation Uptime",
+//         signals: [{
+//           vsensor:".*_corestationstatus_software__mapped",
+//           field:["uptime"],
+//           select:"sensornode[position][iscorestation='true']"
+//         }]
+//       },
+//       { title:"CoreStation Load",
+//         signals: [{
+//           vsensor:".*_corestationstatus_software__mapped",
+//           field:["loadavg_1_min","loadavg_5_min","loadavg_15_min"],
+//           select:"sensornode[position][iscorestation='true']"
+//         }]
+//       },
+//       { title:"CoreStation Card File System",
+//         signals: [{
+//           vsensor:".*_corestationstatus_software__mapped",
+//           field:["statvfs_card_size","statvfs_card_free"],
+//           select:"sensornode[position][iscorestation='true']"
+//         }]
+//       },
+//       { title:"CamZilla Binary Queue",
+//           signals: [{
+//           vsensor:".*[^_]_binary__mapped",
+//           field:["file_queue_length","file_queue_size"],
+//           select:"sensornode[nodetype=6][position]"
+//         }]
+//       },
+//       { title:"CamZilla Binary Transmission Time",
+//         signals: [{
+//           vsensor:".*[^_]_binary__mapped",
+//           field:["transmission_time_eff","transmission_time_tot"],
+//           select:"sensornode[nodetype=6][position]"
+//         }]
+//       },
     ]);
     
     $.ajax({
