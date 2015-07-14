@@ -271,20 +271,20 @@ $(document).ready(function() {
           select:"sensornode[position=20],sensornode[position=21],sensornode[position=23]"
         }]
       },
-      { title:"Weather Station Voltages",
-        signals: [{
-          vsensor:"dirruhorn_vaisalawxt520sup",
-          field:["heating_voltage","supply_voltage","heating_temperature"],
-          select:"sensornode[position=13],sensornode[position=42],sensornode[position=68]"
-        }]
-      },
-      { title:"Weather Station Voltages",
-        signals: [{
-          vsensor:"matterhorn_vaisalawxt520sup",
-          field:["heating_voltage","supply_voltage","heating_temperature"],
-          select:"sensornode[position=25]"
-        }]
-      },
+//       { title:"Weather Station Voltages",
+//         signals: [{
+//           vsensor:"dirruhorn_vaisalawxt520sup",
+//           field:["heating_voltage","supply_voltage","heating_temperature"],
+//           select:"sensornode[position=13],sensornode[position=42],sensornode[position=68]"
+//         }]
+//       },
+//       { title:"Weather Station Voltages",
+//         signals: [{
+//           vsensor:"matterhorn_vaisalawxt520sup",
+//           field:["heating_voltage","supply_voltage","heating_temperature"],
+//           select:"sensornode[position=25]"
+//         }]
+//       },
       { title:"Dozer Temperature [°C]",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
@@ -348,13 +348,13 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-      { title:"Dozer Uptime",
-        signals: [{
-          vsensor:".*_dozer_nodehealth__conv",
-          field:["payload_uptime"],
-          select:"sensornode[position]"
-        }]
-      },
+//       { title:"Dozer Uptime",
+//         signals: [{
+//           vsensor:".*_dozer_nodehealth__conv",
+//           field:["payload_uptime"],
+//           select:"sensornode[position]"
+//         }]
+//       },
       { title:"Dozer Flashstatus",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
@@ -362,13 +362,13 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-      { title:"Dozer MCU Active",
-        signals: [{
-          vsensor:".*_dozer_statecounter__conv",
-          field:["mcuactive_dutycycle"],
-          select:"sensornode[position]"
-        }]
-      },
+//       { title:"Dozer MCU Active",
+//         signals: [{
+//           vsensor:".*_dozer_statecounter__conv",
+//           field:["mcuactive_dutycycle"],
+//           select:"sensornode[position]"
+//         }]
+//       },
       { title:"Dozer Radio TX",
         signals: [{
           vsensor:".*_dozer_statecounter__conv",
@@ -383,13 +383,13 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-      { title:"Powerswitch Portstate",
-        signals: [{
-          vsensor:".*_dozer_powerswitch__mapped",
-          field:["payload_port1on","payload_port2on"],
-          select:"sensornode[nodetype=3][position]"
-        }]
-      },
+//       { title:"Powerswitch Portstate",
+//         signals: [{
+//           vsensor:".*_dozer_powerswitch__mapped",
+//           field:["payload_port1on","payload_port2on"],
+//           select:"sensornode[nodetype=3][position]"
+//         }]
+//       },
 //       { title:"BackLog Uptime",
 //         signals: [{
 //           vsensor:".*_backlogstatus_dynamic__mapped",
