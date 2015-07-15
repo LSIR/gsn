@@ -17,24 +17,36 @@ gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$c
             zoom: 8
         };
 
-        $scope.namesOfGroup = {};
-        $scope.parameters = [];
+        var namesOfGroup = {};
+        var parametersOfGroup = {};
 
         for (var i = 0; i < $scope.features.length; i++) {
             var properties = $scope.features[i].properties;
-            if (!($scope.namesOfGroup[properties.group])) {
-                $scope.namesOfGroup[properties.group] = [];
+            if (!(namesOfGroup[properties.group])) {
+                namesOfGroup[properties.group] = [];
+                parametersOfGroup[properties.group] = [];
             }
-            $scope.namesOfGroup[properties.group].push(properties.sensorName);
+            namesOfGroup[properties.group].push(properties.sensorName);
+            parametersOfGroup[properties.group] = _.union(parametersOfGroup[properties.group], properties.observed_properties);
+
+            //parametersOfGroup[properties.group].push.apply(parametersOfGroup[properties.group], properties.observed_properties);
         }
 
-        $scope.groups = _.keys($scope.namesOfGroup).sort();
-        $scope.sensorNames = [].concat.apply([], _.values($scope.namesOfGroup).sort());
+        $scope.groups = ['All'].concat(_.keys(namesOfGroup).sort());
+        $scope.sensorNames = [].concat.apply([], _.values(namesOfGroup).sort());
+        $scope.parameters = _.uniq([].concat.apply([], _.values(parametersOfGroup)).sort(), true);
 
 
         $scope.updateGroup = function (item) {
-            $scope.sensorNames = $scope.namesOfGroup[item];
-            $scope.filter.sensorName = {};
+            if (item === 'All') {
+                $scope.sensorNames = [].concat.apply([], _.values(namesOfGroup).sort());
+                $scope.parameters = _.uniq([].concat.apply([], _.values(parametersOfGroup)).sort(), true);
+            } else {
+                $scope.sensorNames = [].concat(namesOfGroup[item].sort());
+                $scope.parameters = _.uniq([].concat(parametersOfGroup[item].sort()), true);
+
+            }
+            $scope.filter.sensors = [];
             updateMarkers();
         };
 
@@ -64,10 +76,11 @@ gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$c
         $scope.group = {};
 
         $scope.filter = {
+            sensors: [],
             sensorName: {},
             group: {},
             deployment: '',
-            parameters: '',
+            parameters: [],
             sensorNameFeature: {}
         };
 
@@ -103,65 +116,46 @@ gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$c
 
         function filterSensor(feature) {
             var result = true;
-            if ($scope.filter.sensorName.selected) {
-                result = result && (feature.properties.sensorName === $scope.filter.sensorName.selected);
+
+            if ($scope.filter.sensors.length > 0) {
+                var anySensor = false;
+                for (var i = 0; i < $scope.filter.sensors.length; i++) {
+                    anySensor = anySensor || (feature.properties.sensorName === $scope.filter.sensors[i]);
+                }
+                result = result && anySensor;
             }
-            if ($scope.filter.group.selected) {
+            if ($scope.filter.group.selected && $scope.filter.group.selected != 'All') {
                 result = result && (feature.properties.group === $scope.filter.group.selected);
             }
-            if ($scope.filter.deployment.length > 0) {
-                result = result && (feature.properties.deployment === $scope.filter.deployment);
-            }
+
             if ($scope.filter.parameters.length > 0) {
-                result = result && (feature.properties.observed_properties.indexOf($scope.filter.parameters) > -1);
-            }
-            if ($scope.filter.sensorNameFeature.properties) {
-                result = result && (feature.properties.sensorName === $scope.filter.sensorNameFeature.properties.sensorName);
+                //OR logic
+                //var anyParam= false;
+                //for (var j = 0; j < $scope.filter.parameters.length; j++) {
+                //    anyParam = anyParam || (feature.properties.observed_properties.indexOf($scope.filter.parameters[j]) > -1);
+                //}
+                //result = result && anyParam;
+
+                //AND logic
+                for (var j = 0; j < $scope.filter.parameters.length; j++) {
+                    result = result && (feature.properties.observed_properties.indexOf($scope.filter.parameters[j]) > -1);
+                }
             }
 
             return result;
         }
 
-        //angular.extend($scope, {
-        //    geojson: {
-        //        data: $scope.geojson.data,
-        //        style: function (feature) {
-        //            return {};
-        //        }
-        //    }
-        //});
-
-        //addGeoJsonLayerWithClustering($scope.geojson.data);
-
-        //function addGeoJsonLayerWithClustering(data) {
-
-        //}
-
-        //var markers = L.markerClusterGroup();
-        //
-        //for (var i = 0; i < sensors.length; i++) {
-        //    var a = sensors[i];
-        //    var title = a.properties.sensorName;
-        //    var marker = L.marker(new L.LatLng(a.geometry.coordinates[0], a.geometry.coordinates[1]), { title: title });
-        //    marker.bindPopup(title);
-        //    markers.addLayer(marker);
-        //}
-        //
-        //leafletData.getMap().then(function(map) {
-        //    map.addLayer(markers);
-        //    map.fitBounds(markers.getBounds());
-        //});
 
         function onEachFeature(feature, layer) {
             var sensorName = feature.properties.sensorName;
 
             //var html = '<div><b>{{sensorName}}</b><br><a href="#/plot?sensors={{sensorName}}&parameters={{parameters}}" my-refresh>Plot</a></div>';
-            var html = '<div><b>{{sensorName}}</b><br><md-button class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
+            var html = '<div><b>{{sensorName}}</b><p>Parameters</p><ul><li ng-repeat="param in parameters">{{param}}</li></ul><br><md-button class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
 
             var newScope = $scope.$new();
             newScope.sensorName = sensorName;
             newScope.feature = feature;
-            newScope.parameters = getParametersForLink(feature);
+            newScope.parameters = feature.properties.observed_properties;
 
             var linkFunction = $compile(html)(newScope);
 
@@ -181,10 +175,11 @@ gsnMap.controller("GoogleMapsController", ["$scope", '$http', 'leafletData', '$c
         };
 
         function getParametersForLink(feature) {
-            if ($scope.filter.parameters.length >0) {
-                return feature.properties[$scope.filter.parameters];
+            var colNames = [];
+            for (var i = 0; i < $scope.filter.parameters.length; i++) {
+                colNames = _.union(colNames, feature.properties[$scope.filter.parameters[i]])
             }
-            return [];
+            return colNames;
         }
         //$scope.centerJSON = function () {
         //    leafletData.getMap().then(function (map) {
@@ -233,22 +228,22 @@ gsnMap.controller('AppCtrl', function ($scope, $timeout, $mdSidenav, $mdUtil, $l
         return debounceFn;
     }
 });
-gsnMap.controller('LeftCtrl', function ($scope, $timeout, $mdSidenav, $log) {
-        $scope.close = function () {
-            $mdSidenav('left').close()
-                .then(function () {
-                    $log.debug("close LEFT is done");
-                });
-        };
-    });
-gsnMap.controller('RightCtrl', function ($scope, $timeout, $mdSidenav, $log) {
-        $scope.close = function () {
-            $mdSidenav('right').close()
-                .then(function () {
-                    $log.debug("close RIGHT is done");
-                });
-        };
-    });
+//gsnMap.controller('LeftCtrl', function ($scope, $timeout, $mdSidenav, $log) {
+        //$scope.close = function () {
+        //    $mdSidenav('left').close()
+        //        .then(function () {
+        //            $log.debug("close LEFT is done");
+        //        });
+        //};
+//    });
+//gsnMap.controller('RightCtrl', function ($scope, $timeout, $mdSidenav, $log) {
+//        $scope.close = function () {
+//            $mdSidenav('right').close()
+//                .then(function () {
+//                    $log.debug("close RIGHT is done");
+//                });
+//        };
+//    });
 
 gsnMap.factory('Sensors', ['$http', function($http) {
     var sdo = {
