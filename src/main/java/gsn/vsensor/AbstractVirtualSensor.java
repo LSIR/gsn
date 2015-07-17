@@ -216,6 +216,10 @@ public abstract class AbstractVirtualSensor implements Monitorable{
         return threads;
     }
 
+    public void setThreads (Map <Long, String> threads) {
+        this.threads = threads;
+    }
+
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = anomalyDetector.getStatistics(); 
 		stat.put(virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.counter.produced", outputCount);

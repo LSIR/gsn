@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.HashMap;
 
 public class VirtualSensor {
 
@@ -96,7 +97,7 @@ public class VirtualSensor {
          *  HashMap threads for monitoring
          */
         
-        Map <Long, String> threads = virtualSensor.getThreads();
+        Map <Long, String> threads = new HashMap <Long, String>();
         for (InputStream inputStream : config.getInputStreams()) {
             for (StreamSource streamSource : inputStream.getSources()) {
                 AbstractWrapper wrapper = streamSource.getWrapper();
@@ -105,6 +106,8 @@ public class VirtualSensor {
             }
         }
         borrowVS();
+
+        virtualSensor.setThreads(threads);
     }
 
     /**
