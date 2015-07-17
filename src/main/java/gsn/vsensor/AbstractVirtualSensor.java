@@ -218,8 +218,8 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = anomalyDetector.getStatistics(); 
-		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.produced.count", outputCount);
-		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".input.produced.count", inputCount);
+		stat.put(virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.counter.produced", outputCount);
+		stat.put(virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".input.counter.produced", inputCount);
 
         /*
         *    We know the IDs of threads associated with this VSensor
@@ -249,7 +249,7 @@ public abstract class AbstractVirtualSensor implements Monitorable{
             totalCpuTime += cpuTime;
         }
 
-        stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.","_")+".totalCpuTime", totalCpuTime);
+        stat.put(virtualSensorConfiguration.getName().replaceAll("\\.","_")+".time.counter.totalCpuTime", totalCpuTime);
 
 		return stat;
 	}

@@ -201,8 +201,7 @@ public class AnomalyDetector implements Monitorable {
                 rs = ps.executeQuery();
 
                 if (rs.next()) {    // Putting monitoring result for this anomaly in the HashMap stat
-                    stat.put ("anomaly.vs." + sensor.getVirtualSensorConfiguration().getName().replaceAll("\\,","_") + 
-                            "." + anomaly.getFunction()+"." + field.getName() + "." + anomaly.getValue().trim() + ".count" , rs.getLong(1)); 
+                    stat.put( this.getMetricName(anomaly), rs.getLong(1));
                 }
 
 
@@ -296,8 +295,7 @@ public class AnomalyDetector implements Monitorable {
                 rs = ps.executeQuery();
                 
                 if (rs.next()) {
-                    stat.put ("anomaly.vs." +sensor.getVirtualSensorConfiguration().getName().replaceAll("\\,","_")  
-                        +"."+anomaly.getFunction()+"."+ field.getName() +"." + anomaly.getValue().trim() , rs.getLong(1));
+                    stat.put(this.getMetricName(anomaly), rs.getLong(1));
                 }
             } catch (NumberFormatException e) {
                 //TODO: For other datatpyes, there could be different exception for formatting
@@ -393,8 +391,7 @@ public class AnomalyDetector implements Monitorable {
                 rs = ps.executeQuery();
 
                 if (rs.next()) {
-                    stat.put ("anomaly.vs." +sensor.getVirtualSensorConfiguration().getName().replaceAll("\\,","_")
-                        +"."+anomaly.getFunction()+"."+ field.getName() +"." + anomaly.getValue().trim(), rs.getLong(1));
+                    stat.put(this.getMetricName(anomaly), rs.getLong(1));
                 }
             } catch (NumberFormatException e) {
                 //TODO: For other datatpyes, there could be different exception for formatting
@@ -459,6 +456,21 @@ public class AnomalyDetector implements Monitorable {
         return sb.toString();
     
     }
+    
+    public String getMetricName (Anomaly anomaly) {
+        
+        StringBuilder sb = new StringBuilder (sensor.getVirtualSensorConfiguration().getName().replaceAll("\\,","_" ));
+        sb.append(".anomaly.gauge." + anomaly.getFunction() + "." + anomaly.getField().getName());
+        
+        if (anomaly.getFunction().equals ("positive_outlier") || anomaly.getFunction().equals ("negative_outlier"))
+            sb.append("." + anomaly.getValue().trim());
+       
+        return sb.toString();
+        
+    }
+
+
+    
 
     public Hashtable <String, Object> getStatistics () {
     
