@@ -28,14 +28,18 @@ import java.util.ArrayList;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamElement;
+import tinygsn.beans.WrapperConfig;
 import tinygsn.model.wrappers.utils.MICSensor;
 import tinygsn.model.wrappers.utils.MICSensor.VirtualSensorDataListener;
 import tinygsn.services.WrapperService;
-import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 
 
 public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDataListener{
+
+	public USBplugO3Wrapper(WrapperConfig wc) {
+		super(wc);
+	}
 
 	private static final String[] FIELD_NAMES = new String[] { "resistanceo",
 			"resistancev", "humidity", "temperature", "ozonecalibrated",
@@ -52,22 +56,21 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double",
 			"double", "double", "double", "double", "double" };
 	
-	public static final Class<USBplugService> SERVICE = USBplugService.class;
+	public final Class<? extends WrapperService> getSERVICE(){ return USBplugService.class;}
 
 	private MICSensor sensor;
 
 	public void runOnce() {
 		Activity activity = getConfig().getController().getActivity();
-		SqliteStorageManager storage = new SqliteStorageManager(activity);
-		int samplingPeriod = storage.getSamplingRateByName("tinygsn.model.wrappers.USBplugO3Wrapper");
-		if(samplingPeriod>0){
+		updateWrapperInfo();
+		if(dcDuration>0){
 			sensor = new MICSensor(activity);
 			sensor.initSensor();
 			sensor.setListener(this);
 			try {
-				Thread.sleep(samplingRate / 2);
+				Thread.sleep(dcDuration / 2);
 				sensor.getMeasurement();
-				Thread.sleep(samplingRate / 2);
+				Thread.sleep(dcDuration / 2);
 			}
 			catch (InterruptedException e) {}
 		}
@@ -77,10 +80,6 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 	@Override
 	public void consume(StreamElement se) {
 	    postStreamElement(se);
-	}
-		
-	public String getWrapperName() {
-		return this.getClass().getSimpleName();
 	}
 
 	@Override

@@ -5,13 +5,13 @@ import java.util.Map;
 
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
+import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.wrappers.AndroidAccelerometerWrapper;
 import tinygsn.model.wrappers.AndroidActivityRecognitionWrapper;
 import tinygsn.model.wrappers.AndroidGPSWrapper;
 import tinygsn.model.wrappers.AndroidGyroscopeWrapper;
 import tinygsn.model.wrappers.WifiWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -39,10 +39,16 @@ public class schedular extends IntentService {
 	public schedular(String name) {
 		super(name);
 		setIntentRedelivery(true);
-	}
-	public schedular()
-	{
-		this("schedular");	
+		try {
+			accelometerWrapper = StaticData.getWrapperByName(accelometerType);
+			gpsWrapper = StaticData.getWrapperByName(gpsType);
+			gyroscopeWrapper = StaticData.getWrapperByName(gyroscopeType);
+			wifiWrapper = StaticData.getWrapperByName(wifiType);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+				
 	}
 
 	//constants:
@@ -77,25 +83,25 @@ public class schedular extends IntentService {
 	int reason = REASON_ACC;
 	
 	SqliteStorageManager storage = null;
-		
-	AndroidAccelerometerWrapper accelometerWrapper = new AndroidAccelerometerWrapper();
+	
 	final String accelometerType = "tinygsn.model.wrappers.AndroidAccelerometerWrapper";
+	AbstractWrapper accelometerWrapper;
 	String accelometerVsName = null;
-		
-	AndroidGPSWrapper gpsWrapper = new AndroidGPSWrapper();
+
 	final String gpsType = "tinygsn.model.wrappers.AndroidGPSWrapper";
+	AbstractWrapper gpsWrapper;
 	String gpsVsName = null;
 	
-	AndroidGyroscopeWrapper gyroscopeWrapper = new AndroidGyroscopeWrapper();
 	final String gyroscopeType = "tinygsn.model.wrappers.AndroidGyroscopeWrapper";
+	AbstractWrapper gyroscopeWrapper;
 	String gyroscopeVsName = null;
 	
 	AndroidActivityRecognitionWrapper activityWrapper = new AndroidActivityRecognitionWrapper();
 	final String activityType = "tinygsn.model.wrappers.AndroidActivityRecognitionWrapper";
 	String activityVsName = null;
 	
-	WifiWrapper wifiWrapper = new WifiWrapper();
 	final String wifiType = "tinygsn.model.wrappers.WifiWrapper";
+	AbstractWrapper wifiWrapper;
 	String wifiVsName = null;
 
 	
@@ -200,11 +206,11 @@ public class schedular extends IntentService {
 			
 			case STATE_LOST:
 
-				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeLost);
-				storage.updateSamplingRate(accelometerType,SamplingRateAccelometerLost);
-				storage.updateSamplingRate(gpsType, SamplingRateGPSLost);
-				storage.updateSamplingRate(wifiType, SamplingRateWifiLost);
-				storage.updateSamplingRate(activityType, SamplingRateActivityLost);
+				storage.setWrapperInfo(gyroscopeType, 15, SamplingRateGyroscopeLost);
+				storage.setWrapperInfo(accelometerType, 15, SamplingRateAccelometerLost);
+				storage.setWrapperInfo(gpsType, 15, SamplingRateGPSLost);
+				storage.setWrapperInfo(wifiType, 60, SamplingRateWifiLost);
+				storage.setWrapperInfo(activityType, 60, SamplingRateActivityLost);
 				
 				priMachineState = STATE_LOST;
 
@@ -229,11 +235,11 @@ public class schedular extends IntentService {
 				break;
 			case STATE_GPS: 
 
-				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeMoving);
-				storage.updateSamplingRate(accelometerType, SamplingRateAccelometerMoving);
-				storage.updateSamplingRate(gpsType, SamplingRateGPSMoving);
-				storage.updateSamplingRate(wifiType, SamplingRateWifiMoving);
-				storage.updateSamplingRate(activityType, SamplingRateActivityMoving);		
+				storage.setWrapperInfo(gyroscopeType, 15, SamplingRateGyroscopeMoving);
+				storage.setWrapperInfo(accelometerType, 15, SamplingRateAccelometerMoving);
+				storage.setWrapperInfo(gpsType, 15, SamplingRateGPSMoving);
+				storage.setWrapperInfo(wifiType, 60, SamplingRateWifiMoving);
+				storage.setWrapperInfo(activityType, 60, SamplingRateActivityMoving);		
 				
 				priMachineState = STATE_GPS;
 				
@@ -257,11 +263,11 @@ public class schedular extends IntentService {
 				break;
 			case STATE_STATIONARY:
 
-				storage.updateSamplingRate(gyroscopeType, SamplingRateGyroscopeStationary);
-				storage.updateSamplingRate(accelometerType,SamplingRateAccelometerStationary);
-				storage.updateSamplingRate(gpsType, SamplingRateGPSStationary);
-				storage.updateSamplingRate(wifiType, SamplingRateWifiStationary);
-				storage.updateSamplingRate(activityType, SamplingRateActivityStationary);
+				storage.setWrapperInfo(gyroscopeType, 15, SamplingRateGyroscopeStationary);
+				storage.setWrapperInfo(accelometerType, 15, SamplingRateAccelometerStationary);
+				storage.setWrapperInfo(gpsType, 15, SamplingRateGPSStationary);
+				storage.setWrapperInfo(wifiType, 60, SamplingRateWifiStationary);
+				storage.setWrapperInfo(activityType, 60, SamplingRateActivityStationary);
 	
 				priMachineState = STATE_STATIONARY;
 

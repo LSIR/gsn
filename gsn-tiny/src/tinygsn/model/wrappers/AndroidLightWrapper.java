@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamElement;
+import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
-import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -46,12 +46,15 @@ import android.util.Log;
 public class AndroidLightWrapper extends AbstractWrapper implements
 		SensorEventListener {
 
+	public AndroidLightWrapper(WrapperConfig wc) {
+		super(wc);
+	}
 	private static final String[] FIELD_NAMES = new String[] {"Illuminance"};
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE };
 	private static final String[] FIELD_DESCRIPTION = new String[] { "Illuminance" };
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double"};
 
-	public static final Class<LightService> SERVICE = LightService.class;
+	public final Class<? extends WrapperService> getSERVICE(){ return LightService.class;}
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 
@@ -61,22 +64,17 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 		mSensorManager = (SensorManager) activity
 				.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-		SqliteStorageManager storage = new SqliteStorageManager(activity);
-		int samplingPeriod = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidLightWrapper");
+		updateWrapperInfo();
 		try {
-			if (samplingPeriod > 0){
+			if (dcDuration > 0){
 				mSensorManager.registerListener(this, mSensor,SensorManager.SENSOR_DELAY_NORMAL); 
-				Thread.sleep(samplingPeriod*1000);
+				Thread.sleep(dcDuration*1000);
 				mSensorManager.unregisterListener(this);
 			}
 		}
 		catch (InterruptedException e) {
 			Log.e(e.getMessage(), e.toString());
 		}
-	}
-
-	public String getWrapperName() {
-		return this.getClass().getSimpleName();
 	}
 
 	@Override

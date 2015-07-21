@@ -84,15 +84,13 @@ public class VSensorConfig implements Parcelable  {
 		int nb = Integer.parseInt(source.readString());
 		for(int i=0;i<nb;i++){
 			String wrapperN = source.readString();
-			int samplingRate = Integer.parseInt(source.readString());
 			int windowSize = Integer.parseInt(source.readString());
 			int step = Integer.parseInt(source.readString());
 			boolean timeBased = Boolean.parseBoolean(source.readString());
 			int aggregator = Integer.parseInt(source.readString());
 			try {
 			    StreamSource ss = new StreamSource(windowSize, step, timeBased, aggregator);
-			    AbstractWrapper w = (AbstractWrapper) Class.forName(wrapperN).newInstance();
-				w.setSamplingRate(samplingRate);
+			    AbstractWrapper w = StaticData.getWrapperByName(wrapperN);
 				w.registerListener(ss);
 				ss.setWrapper(w);
 				ss.setInputStream(inputStream);
@@ -475,7 +473,6 @@ public class VSensorConfig implements Parcelable  {
 		dest.writeString(Integer.toString(streamSources.size()));
 		for(StreamSource s:streamSources){
 			dest.writeString(s.getWrapper().getWrapperName());
-			dest.writeString(Integer.toString(s.getWrapper().getSamplingRate()));
 			dest.writeString(Integer.toString(s.getWindowSize()));
 			dest.writeString(Integer.toString(s.getStep()));
 			dest.writeString(Boolean.toString(s.isTimeBased()));

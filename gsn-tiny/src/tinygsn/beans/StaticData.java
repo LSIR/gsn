@@ -3,6 +3,7 @@ package tinygsn.beans;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.content.Intent;
 import tinygsn.controller.AndroidControllerListVS;
@@ -69,7 +70,7 @@ public class StaticData {
 	}
 	synchronized static public void IntentStopped(String name)
 	{
-		Iterator it = runningServices.entrySet().iterator();
+		Iterator<Entry<String,Intent>> it = runningServices.entrySet().iterator();
 		while(it.hasNext())
 		{
 			Map.Entry<String, Intent> item = (Map.Entry<String, Intent>) it.next();
@@ -98,6 +99,8 @@ public class StaticData {
 		return LastIdUsed++;
 	}
 	
+	public static AndroidControllerListVS globalController;
+	
 	private static Map<String, AbstractVirtualSensor> vsMap = new HashMap<String, AbstractVirtualSensor>();
 	public static AbstractVirtualSensor getProcessingClassByVSConfig(VSensorConfig config) throws Exception {
 		if(vsMap.containsKey(config.getName())){
@@ -121,8 +124,14 @@ public class StaticData {
 		if(wrapperMap.containsKey(name)){
 			return wrapperMap.get(name);
 		}
-		AbstractWrapper wrapper = (AbstractWrapper) Class.forName(name).newInstance();
-		wrapper.setConfig(new WrapperConfig(0,name));
+		String[] realNames = name.split("\\?");
+		WrapperConfig wc = null;
+		if(realNames.length==2){
+			wc = new WrapperConfig(0,name, globalController,realNames[1]);
+		}else{
+			wc = new WrapperConfig(0,name, globalController);
+		}
+		AbstractWrapper wrapper = (AbstractWrapper) Class.forName(realNames[0]).getDeclaredConstructor(new Class[] {WrapperConfig.class}).newInstance(wc);
 		wrapperMap.put(name, wrapper);
 		
 		return wrapper;

@@ -32,7 +32,7 @@
     
     <application
         android:name="TinyGSN"
-
+		android:allowBackup="false"
         android:icon="@drawable/gsn_mark"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -55,6 +55,7 @@
         <service android:name="tinygsn.model.wrappers.AndroidRotationVectorWrapper$RotationService" />
         <service android:name="tinygsn.model.wrappers.USBplugO3Wrapper$USBplugService" />
         <service android:name="tinygsn.model.wrappers.WifiWrapper$WifiService" />
+        <service android:name="tinygsn.model.wrappers.LocalWrapper$LocalService" />
         
         <activity
             android:name="tinygsn.gui.android.ActivityAndroidViewer"

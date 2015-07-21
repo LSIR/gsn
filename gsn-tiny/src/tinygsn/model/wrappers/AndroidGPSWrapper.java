@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamElement;
+import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
-import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
@@ -42,31 +42,33 @@ import android.os.Bundle;
 
 public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListener {
 
+	public AndroidGPSWrapper(WrapperConfig wc) {
+		super(wc);
+	}
+
 	private static final String[] FIELD_NAMES = new String[] { "latitude", "longitude" };
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE };
 	private static final String[] FIELD_DESCRIPTION = new String[] {"Latitude", "Longitude" };
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double", "double" };
 	
-	public static final Class<GPSService> SERVICE = GPSService.class;
+	public final Class<? extends WrapperService> getSERVICE(){ return GPSService.class;}
 
 	private LocationManager locationManager;
     private int timeToShutdown = -1;
     
     boolean isGPSEnabled = false;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; 
-    private static final long MIN_TIME_BW_UPDATES =  15000;
+    private static final long MIN_TIME_BW_UPDATES =  5000;
 	
 	public void runOnce() {
-		Activity activity = getConfig().getController().getActivity();
-		SqliteStorageManager storage = new SqliteStorageManager(activity);
-		int samplingPeriod = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidAccelerometerWrapper");
+		updateWrapperInfo();
 		while(isActive())
 		{
-			if (samplingPeriod > 0){
+			if (dcDuration > 0){
 				timeToShutdown = 40;
 				startGPS();
 				try {
-					Thread.sleep(15*1000);
+					Thread.sleep(dcInterval*1000);
 				}catch (InterruptedException e) {}
 			}else{
 				timeToShutdown--;
@@ -76,7 +78,7 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
 				}else{
 					startGPS();
 					try {
-						Thread.sleep(15*1000);
+						Thread.sleep(dcInterval*1000);
 					}catch (InterruptedException e) {}
 				}
 			}
@@ -111,10 +113,6 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
         isGPSEnabled = false; 
     }
 
-    public String getWrapperName() {
-		return this.getClass().getSimpleName();
-	}
-	
 	@Override
 	public DataField[] getOutputStructure() {
 		ArrayList<DataField> output = new ArrayList<DataField>();

@@ -64,9 +64,6 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	ActivityListVS activityListVSNew;
 	
 
-	
-	//TODO check if it is working properly or not :) with the context that is set
-
 	public VSListAdapter(Context ctx, int resourceId, List<VSRow> objects,
 			AndroidControllerListVS controller, ActivityListVS activityListVSNew) {
 
@@ -82,13 +79,10 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	@SuppressLint("NewApi") @Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		/* create a new view of my layout and inflate it in the row */
 		convertView = (LinearLayout) inflater.inflate(resource, null);
 
-		/* Extract the city's object to show */
 		final VSRow vs = getItem(position);
 
-		/* Take the TextView from layout and set the city's name */
 		TextView txtName = (TextView) convertView.findViewById(R.id.vs_name);
 		txtName.setText(vs.getName());
 
@@ -96,7 +90,6 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 				.findViewById(R.id.enableSwitch);
 		runningSwitch.setTextOn("Running");
 		runningSwitch.setTextOff("Disabled");
-		// runningSwitch.setTextSize(TEXT_SIZE); //doesn't work
 		runningSwitch.setChecked(vs.isRunning());
 		runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
@@ -141,7 +134,6 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
 						case DialogInterface.BUTTON_POSITIVE:
-							//controller.startStopVS(vs.getName(), false,context);
 							controller.deleteVS(vs.getName());
 							Toast.makeText(context, vs.getName() + " is deleted!",
 									Toast.LENGTH_SHORT).show();
@@ -155,7 +147,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 				};
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setMessage("Are you sure to delete \'" + vs.getName() + "\'?")
+				builder.setMessage("Are you sure you want to delete \'" + vs.getName() + "\'?")
 						.setPositiveButton("Yes", dialogClickListener)
 						.setNegativeButton("No", dialogClickListener).show();
 			}

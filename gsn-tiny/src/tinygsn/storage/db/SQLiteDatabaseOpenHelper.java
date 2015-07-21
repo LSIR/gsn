@@ -56,7 +56,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		db.execSQL(createQuery);
 		
 		createQuery = "CREATE TABLE sourcesList (_id integer primary key autoincrement,"
-				+ "vsname, sswindowsize, ssstep, sstimebased, sssamplingrate, ssaggregator, wrappername, "
+				+ "vsname, sswindowsize, ssstep, sstimebased, ssaggregator, wrappername "
 				+ ");";
 		db.execSQL(createQuery);
 
@@ -65,8 +65,8 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 				+ ");";
 		db.execSQL(createQuery);
 	
-		createQuery = "CREATE TABLE SAMPLIG_RATE (_id integer primary key, time bigint,"
-				+ "samplingrate integer, vsname text"
+		createQuery = "CREATE TABLE wrapperList (_id integer primary key, wrappername text,"
+				+ "dcinterval integer, dcduration integer"
 				+ ");";
 		db.execSQL(createQuery);
 		

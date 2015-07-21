@@ -29,22 +29,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.StreamElement;
-import tinygsn.beans.VSensorConfig;
 import tinygsn.beans.WrapperConfig;
-import tinygsn.model.wrappers.AndroidLightWrapper.LightService;
 import tinygsn.services.WrapperService;
+import tinygsn.storage.db.SqliteStorageManager;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
 public abstract class AbstractWrapper {
 
-	private WrapperConfig config = new WrapperConfig(0,getWrapperName());
+	private WrapperConfig config = null;
+	
+	public AbstractWrapper(WrapperConfig wc){
+		config = wc;
+	}
 	
 	public WrapperConfig getConfig() {
 		return config;
@@ -54,10 +57,13 @@ public abstract class AbstractWrapper {
 		this.config = config;
 	}
 
-	public Class<WrapperService> SERVICE = null;
+	public abstract Class<? extends WrapperService> getSERVICE();
 
-	protected static final int DEFAULT_SAMPLING_RATE = 5;
-	protected int samplingRate = DEFAULT_SAMPLING_RATE;
+	protected static final int DEFAULT_DUTY_CYCLE_DURATION = 2;
+	protected static final int DEFAULT_DUTY_CYCLE_INTERVAL = 15;
+	
+	protected int dcDuration = DEFAULT_DUTY_CYCLE_DURATION;
+	protected int dcInterval = DEFAULT_DUTY_CYCLE_INTERVAL;
 
 	protected final List<StreamSource> listeners = Collections
 			.synchronizedList(new ArrayList<StreamSource>());
@@ -69,8 +75,12 @@ public abstract class AbstractWrapper {
 	public AbstractWrapper() {
 	}
 
-	public int getSamplingRate() {
-		return samplingRate;
+	public int getDcDuration() {
+		return dcDuration;
+	}
+	
+	public int getDcInterval() {
+		return dcInterval;
 	}
 	
 	public void registerListener(StreamSource s){
@@ -79,10 +89,6 @@ public abstract class AbstractWrapper {
 	
 	public void unregisterListener(StreamSource s){
 		listeners.remove(s);
-	}
-
-	public void setSamplingRate(int samplingRate) {
-		this.samplingRate = samplingRate;
 	}
 
 	/**
@@ -109,7 +115,11 @@ public abstract class AbstractWrapper {
 	 */
 
 	public Boolean postStreamElement(StreamElement streamElement) {
-		for(StreamSource s:listeners) s.add(streamElement);
+		for(StreamSource s:listeners){
+			if (s.getInputStream().getVirtualSensor().getConfig().getRunning()){
+			    s.add(streamElement);
+			}
+		}
 		return true;
 	}
 
@@ -136,12 +146,24 @@ public abstract class AbstractWrapper {
 		return wrapperList;
 	}
 
-	public abstract String getWrapperName();
+	public String getWrapperName() {
+		return this.getClass().getName();
+	}
+	
+	public void updateWrapperInfo(){
+		Activity activity = getConfig().getController().getActivity();
+		SqliteStorageManager storage = new SqliteStorageManager(activity);
+		int[] info = storage.getWrapperInfo(getWrapperName());
+		if (info != null){
+			dcInterval = info[0];
+			dcDuration = info[1];
+		}
+	}
 	
 	synchronized public void start(Context context){
 		if (listenerCount < 1){
 			try {
-				Intent  serviceIntent = new Intent(context, SERVICE);
+				Intent  serviceIntent = new Intent(context, getSERVICE());
 				config.setRunning(true);
 				serviceIntent.putExtra("tinygsn.beans.config",config );
 				StaticData.addRunningService(getWrapperName(), serviceIntent);

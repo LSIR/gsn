@@ -84,7 +84,7 @@ public class ActivityListVS extends SherlockActivity implements Serializable  {
 			AbstractVirtualSensor vs = storage.getVSByName(VSName);
 			AndroidControllerListVS controllerListVSNew  = new AndroidControllerListVS(this);
 			vs.getConfig().setController(controllerListVSNew);
-			vs.start();
+			vs.start(this);
 		}
 		
 		context = this;

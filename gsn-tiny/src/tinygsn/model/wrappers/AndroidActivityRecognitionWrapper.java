@@ -18,6 +18,7 @@ import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.VSensorConfig;
+import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
 
 public class AndroidActivityRecognitionWrapper extends AbstractWrapper {
@@ -215,6 +216,12 @@ public class AndroidActivityRecognitionWrapper extends AbstractWrapper {
 			// TODO Auto-generated method stub
 			
 		}
+	}
+
+	@Override
+	public Class<? extends WrapperService> getSERVICE() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

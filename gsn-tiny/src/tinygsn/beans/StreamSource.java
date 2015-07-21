@@ -66,7 +66,7 @@ public class StreamSource implements Serializable{
 	 */
 	public boolean isFull(){
 		if (isTimeBased()){
-			return values.get(values.size()-1).getTimeStamp() - values.get(0).getTimeStamp() >= windowSize;
+			return values.get(values.size()-1).getTimeStamp() - values.get(0).getTimeStamp() >= windowSize * 1000;
 		}
 		else{
 			return values.size() >= windowSize;
@@ -88,7 +88,7 @@ public class StreamSource implements Serializable{
 	
 	private synchronized void moveToNextStep(){
 		if (isTimeBased()){
-			long ref = values.get(0).getTimeStamp() + step;
+			long ref = values.get(0).getTimeStamp() + step*1000;
 			while (!isEmpty() && values.get(0).getTimeStamp() < ref){
 				values.remove(0);
 			}
@@ -155,7 +155,7 @@ public class StreamSource implements Serializable{
 		ArrayList<StreamElement> window = new ArrayList<StreamElement>();
 		if (isTimeBased()){
 			int i = 0;
-			long ref = values.get(0).getTimeStamp() + windowSize;
+			long ref = values.get(0).getTimeStamp() + windowSize * 1000;
 			while (i < values.size() && values.get(i).getTimeStamp() < ref){
 				window.add(values.get(i));
 			}
@@ -167,6 +167,10 @@ public class StreamSource implements Serializable{
 			}
 		}
 		return window;
+	}
+	
+	public void dispose(){
+		wrapper.unregisterListener(this);
 	}
 	
 	public ArrayList<StreamElement> getAllValues(){
@@ -223,6 +227,7 @@ public class StreamSource implements Serializable{
 
 	public void setWrapper(AbstractWrapper wrapper) {
 		this.wrapper = wrapper;
+		wrapper.registerListener(this);
 	}
 
 	public InputStream getInputStream() {

@@ -37,8 +37,6 @@ import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.controller.AbstractController;
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 
 public abstract class AbstractVirtualSensor implements Serializable {
 
@@ -48,9 +46,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	private static final long serialVersionUID = -94046553047097162L;
 	public static final String[] VIRTUAL_SENSOR_LIST = { "bridge", "notification", "activity" };
 	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor","tinygsn.model.vsensor.NotificationVirtualSensor","tinygsn.model.vsensor.ActivityVirtualSensor"};
-	private static final String TAG = "AbstractVirtualSensor";
 
-	public Context context;
 	private VSensorConfig config;
 	public InputStream is;
 	
@@ -200,7 +196,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		if (!data.isEmpty()) dataAvailable(inputStreamName,data.get(data.size()-1));
 	}
 	
-	synchronized public void start() {
+	synchronized public void start(Context context) {
 		config = StaticData.findConfig(config.getId());
 		if (!config.getRunning()){
 			config.setRunning(true);
@@ -210,17 +206,27 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		}
 	}
 
-	synchronized public void stop() {
+	synchronized public void stop(Context context) {
 		config = StaticData.findConfig(config.getId());
-		config.setRunning(false);
-		for (StreamSource streamSource : config.getInputStream().getSources()) {
-			streamSource.getWrapper().stop(context);
+		if (config.getRunning()){
+			config.setRunning(false);
+			for (StreamSource streamSource : config.getInputStream().getSources()) {
+				streamSource.getWrapper().stop(context);
+			}
 		}
 		
 	}
 
 	public VSensorConfig getConfig() {
 		return config;
+	}
+	
+	public void delete(Context context){
+		stop(context);
+		for (StreamSource streamSource : config.getInputStream().getSources()) {
+			streamSource.dispose();
+		}
+		dispose();
 	}
 
 }

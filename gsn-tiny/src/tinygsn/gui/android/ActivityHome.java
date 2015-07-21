@@ -62,6 +62,8 @@ public class ActivityHome extends SherlockActivity {
 		badge.setText("2");
 		badge.show();
 		
+		StaticData.globalController = new AndroidControllerListVS(this);
+		
 		//start all defined virtual sensors
 		ArrayList<AbstractVirtualSensor> vsList = storage.getListofVS();
 		for (AbstractVirtualSensor vs : vsList) {
@@ -69,7 +71,7 @@ public class ActivityHome extends SherlockActivity {
 		}
 		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getRunning() == true) {
-				vs.start();
+				vs.start(this);
 			}
 		}
 		

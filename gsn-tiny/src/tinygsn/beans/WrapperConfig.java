@@ -16,8 +16,15 @@ public class WrapperConfig implements Parcelable {
 	private int id;
 	private AbstractController controller = null;
 	private boolean running = true;
+	private String param = "";
 	
 	
+	public String getParam() {
+		return param;
+	}
+	public void setParam(String param) {
+		this.param = param;
+	}
 	public boolean isRunning() {
 		return running;
 	}
@@ -39,21 +46,31 @@ public class WrapperConfig implements Parcelable {
 		this.wrapperName = wrapperName;
 	}
 
-	public WrapperConfig(int id, String name){
+	public WrapperConfig(int id, String name, AbstractController controller){
 		wrapperName = name;
+		this.controller = controller;
 	}
 	
 	public WrapperConfig(Parcel source){
 		id = source.readInt();
 		wrapperName = source.readString();
+		param = source.readString();
 		setController(StaticData.findController(id));
 	}
 
+	public WrapperConfig(int id, String name,
+			AndroidControllerListVS globalController, String parameter) {
+		wrapperName = name;
+		this.controller = globalController;
+		this.param = parameter;
+	}
+	
 	public AbstractController getController() {
 		return controller;
 	}
 	public void setController(AbstractController controller) {
 		this.controller = controller;
+		this.controller.setId(id);
 	}
 	@Override
 	public int describeContents() {
@@ -64,9 +81,25 @@ public class WrapperConfig implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
 		dest.writeString(wrapperName);
+		dest.writeString(param);
 		StaticData.addController((AndroidControllerListVS) getController());
 		
 	}
+	
+	public static final Parcelable.Creator<WrapperConfig> CREATOR  = new Creator<WrapperConfig>() {
+
+	    public WrapperConfig createFromParcel(Parcel source) {
+
+	    	WrapperConfig cf = new WrapperConfig(source);
+
+			return cf;
+	    }
+
+	    public WrapperConfig[] newArray(int size) {
+	        return new WrapperConfig[size];
+	    }
+
+	};
 	
 	
 

@@ -140,7 +140,7 @@ public class AndroidControllerListVS extends AbstractController {
 		}
 		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getRunning() == true) {
-				vs.start();
+				vs.start(view);
 			}
 		}
 	}
@@ -175,16 +175,14 @@ public class AndroidControllerListVS extends AbstractController {
 				vs.getConfig().setController(controllerListVSNew);
 				
 				if (running == true) {
-					vs.start();
+					vs.start(view);
 					SqliteStorageManager storage = new SqliteStorageManager(view);
 					storage.update("vsList", vsName, "running", "1");
 				}
 				else {
 					SqliteStorageManager storage = new SqliteStorageManager(view);
 					storage.update("vsList", vsName, "running", "0");
-					vs.stop();
-					//TODO check if this needs change or check why do we need new VS after stopping one
-					//vs = new VirtualSensor(vs.getConfig(), context);
+					vs.stop(view);
 				}
 				break;
 			}
@@ -195,9 +193,10 @@ public class AndroidControllerListVS extends AbstractController {
 	public void deleteVS(String vsName) {
 		for (AbstractVirtualSensor vs : vsList) {
 			if (vs.getConfig().getName().equals(vsName)) {
-				vs.stop();
+				vs.delete(view);
 				SqliteStorageManager storage = new SqliteStorageManager(view);
 				storage.deleteVS(vsName);
+				storage.deleteSS(vsName);
 				storage.deleteTable("vs_" + vsName);
 				break;
 			}

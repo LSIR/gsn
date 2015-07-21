@@ -28,6 +28,8 @@ package tinygsn.storage.db;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -125,15 +127,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		database.insert("Samples", null, newCon);
 	}
 	
-	public void executeInsertSamplingRate(String vsName, int samplingRate)
-	{
-		ContentValues newCon = new ContentValues();
-		newCon.put("time", System.currentTimeMillis());
-		newCon.put("samplingrate", samplingRate);
-		newCon.put("vsname", vsName);
-		
-		database.insert("SAMPLIG_RATE", null, newCon);
-	}
 	/**
 	 * As PreparedStatement on Android can't apply for Query (only for Insert,
 	 * Update) => Therefore, we have to override the function.
@@ -243,35 +236,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return result;
 	}
 	
-	public Map<String, Integer> getSamplingRates()
-	{
-		Map<String, Integer> samplingRates = new HashMap<String, Integer>();
-		String query = "Select * from SAMPLIG_RATE;";
-		Cursor cursor = database.rawQuery(query, new String[]{});
-		while (cursor.moveToNext())
-		{
-			int samplingRate = cursor.getInt(cursor.getColumnIndex("samplingrate"));
-			String vsName = cursor.getString(cursor.getColumnIndex("vsname"));
-			samplingRates.put(vsName, samplingRate);
-		}
-		return samplingRates;
-	}
-	
-	public int getSamplingRateByName(String vsname)
-	{
-		String query = "Select * from SAMPLIG_RATE WHERE vsname = ?;";
-		Cursor cursor = database.rawQuery(query, new String[]{vsname});
-		
-		while (cursor.moveToNext()) {
-			int samplingRate = cursor.getInt(cursor.getColumnIndex("samplingrate"));
-			String vsName = cursor.getString(cursor.getColumnIndex("vsname"));	
-			if(vsName.equals(vsname))
-				return samplingRate;			
-		}
-		return -1;
-
-	}
-		
 	public boolean updateWifiFrequency(String macAdr)
 	{
 		int frequency = getFrequencyByMac(macAdr);
@@ -317,16 +281,6 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return -1;
 	}
 
-	public boolean updateSamplingRate(String feild, int i) //for updating sampling rates from the activity for the schedular
-	{
-		String query = "UPDATE SAMPLIG_RATE SET samplingrate = ? WHERE vsname = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] {i+"", feild});
-		if(cursor.moveToNext())
-			return true;
-		return false;
-	}
-	
-	
 	public boolean update(String tableName, String vsName, String field,
 			String value) {
 		String query = "UPDATE " + tableName + " SET " + field + " = ? "
@@ -341,6 +295,14 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 	public void deleteVS(String vsName) {
 		String query = "DELETE from vsList where vsname = ?;";
+		Cursor cursor = database.rawQuery(query, new String[] { vsName });
+		if (cursor.moveToNext()) {
+			return;
+		}
+	}
+	
+	public void deleteSS(String vsName) {
+		String query = "DELETE from sourcesList where vsname = ?;";
 		Cursor cursor = database.rawQuery(query, new String[] { vsName });
 		if (cursor.moveToNext()) {
 			return;
@@ -388,26 +350,13 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	@Override
 	public byte convertLocalTypeToGSN(int jdbcType, int precision) {
 		switch (jdbcType) {
-		case Types.BIGINT:
-			return DataTypes.BIGINT;
-		case Types.INTEGER:
+		case Cursor.FIELD_TYPE_INTEGER:
 			return DataTypes.INTEGER;
-		case Types.SMALLINT:
-			return DataTypes.SMALLINT;
-		case Types.TINYINT:
-			return DataTypes.TINYINT;
-		case Types.VARCHAR:
+		case Cursor.FIELD_TYPE_STRING:
 			return DataTypes.VARCHAR;
-		case Types.CHAR:
-			return DataTypes.CHAR;
-		case Types.DOUBLE:
-		case Types.DECIMAL: // This is needed for doing aggregates in datadownload
-												// servlet.
+		case Cursor.FIELD_TYPE_FLOAT:
 			return DataTypes.DOUBLE;
-		case Types.BINARY:
-		case Types.BLOB:
-		case Types.VARBINARY:
-		case Types.LONGVARBINARY:
+		case Cursor.FIELD_TYPE_BLOB:
 			return DataTypes.BINARY;
 		default:
 			// logger.error("The type can't be converted to GSN form : " + jdbcType);
@@ -467,6 +416,18 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			String virtualSensorName, long storageSize) {
 		return null;
 	}
+	
+	public ArrayList<String> getListofVSName() {
+		ArrayList<String> vsList = new ArrayList<String>();
+		String query = "Select vsname from vsList;";
+		Cursor cursor = database.rawQuery(query, new String[] {});
+		while (cursor.moveToNext()) {
+			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
+			vsList.add(vsname);
+		}
+		return vsList;
+	}
+	
 
 	@Override
 	public ArrayList<AbstractVirtualSensor> getListofVS() {
@@ -576,8 +537,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
 			int sswindow = cursor.getInt(cursor.getColumnIndex("sswindowsize"));
 			int ssstep = cursor.getInt(cursor.getColumnIndex("ssstep"));
-			boolean sstimebased = cursor.getShort(cursor.getColumnIndex("sstimebased"))==1;
-			int sssamplingrate = cursor.getInt(cursor.getColumnIndex("sssamplingrate"));
+			boolean sstimebased = cursor.getString(cursor.getColumnIndex("sstimebased")).equals("true");
 			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
 			String wrappername = cursor.getString(cursor.getColumnIndex("wrappername"));
 	
@@ -596,11 +556,68 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			try {
 				ss.setWrapper(StaticData.getWrapperByName(wrappername));
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			ss.getWrapper().setSamplingRate(sssamplingrate);
 			sources.add(ss);
 		}
 		return sources;
+	}
+	
+	public boolean updateWrapperInfo(String name, int interval, int duration) 
+	{
+		String query = "UPDATE wrapperList SET dcinterval = ?, dcduration = ? WHERE wrappername = ?;";
+		Cursor cursor = database.rawQuery(query, new String[] {interval+"",duration+"", name});
+		if(cursor.moveToNext())
+			return true;
+		return false;
+	}
+	
+	public int[] getWrapperInfo(String name)
+	{
+		String query = "Select * from wrapperList WHERE wrappername = ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{name});
+		
+		while (cursor.moveToNext()) {
+			int duration = cursor.getInt(cursor.getColumnIndex("dcduration"));
+			int interval = cursor.getInt(cursor.getColumnIndex("dcinterval"));
+			return new int[]{interval, duration};			
+		}
+		return null;
+
+	}
+	
+	public void setWrapperInfo(String name, int interval, int duration)
+	{
+		if (getWrapperInfo(name) == null){
+			ContentValues newCon = new ContentValues();
+			newCon.put("wrappername", name);
+			newCon.put("dcinterval", interval);
+			newCon.put("dcduration", duration);
+			database.insert("wrapperList", null, newCon);
+		}else{
+			updateWrapperInfo(name,interval,duration);
+		}
+	}
+	
+	public DataField[] tableToStructure(CharSequence tableName) throws SQLException {
+		StringBuilder sb = new StringBuilder("select * from ").append(tableName)
+				.append(" where 1=0 ");
+		Cursor cursor = database.rawQuery(sb.toString(), new String[] {});
+		boolean c = cursor.moveToFirst();
+		ArrayList<DataField> toReturnArr = new ArrayList<DataField>();
+		for (int i = 0; i < cursor.getColumnCount(); i++) {
+			String colName = cursor.getColumnName(i);
+			if (colName.equalsIgnoreCase("_id") || colName.equalsIgnoreCase("timed"))
+				continue;
+			int colType = Cursor.FIELD_TYPE_FLOAT;
+			if (c){ //can only get type from data
+				colType = cursor.getType(i);
+			}
+			byte colTypeInGSN = convertLocalTypeToGSN(colType);
+			toReturnArr.add(new DataField(colName, colTypeInGSN));
+		}
+		return toReturnArr.toArray(new DataField[] {});
+
 	}
 
 }

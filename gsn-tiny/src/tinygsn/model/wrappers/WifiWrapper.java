@@ -32,7 +32,6 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
-import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -46,26 +45,26 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
-import tinygsn.beans.VSensorConfig;
 import tinygsn.beans.WrapperConfig;
+import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
 
 
 public class WifiWrapper extends AbstractWrapper {
 	
+	public WifiWrapper(WrapperConfig wc) {
+		super(wc);
+	}
+
 	private static final String[] FIELD_NAMES = new String[] { "mac1", "mac2", "level" };
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE };
 	private static final String[] FIELD_DESCRIPTION = new String[] { "mac1", "mac2", "level" };
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double", "double", "double" };
 	
-	public static final Class<WifiService> SERVICE = WifiService.class;
+	public final Class<? extends WrapperService> getSERVICE(){ return WifiService.class;}
 	
 	@Override
 	public void runOnce(){}
-
-	public String getWrapperName() {
-		return this.getClass().getSimpleName();
-	}
 
 	@Override
 	public DataField[] getOutputStructure() {
@@ -87,10 +86,8 @@ public class WifiWrapper extends AbstractWrapper {
 		return FIELD_TYPES;
 	}
 	
-	public static class WifiService extends IntentService {
+	public static class WifiService extends WrapperService {
 		
-		private WrapperConfig config = null;
-		public AbstractWrapper w;
 		WifiManager mainWifiObj;
 		WifiScanReceiver wifiReciever;
 		SqliteStorageManager storage = null;
@@ -121,10 +118,11 @@ public class WifiWrapper extends AbstractWrapper {
 			try {
 				w = StaticData.getWrapperByName("tinygsn.model.wrappers.WifiWrapper");
 			} catch (Exception e1) {}
+			
+			int duration = w.getDcDuration();
+			int interval = w.getDcInterval();
 				
-			int samplingRate = w.getSamplingRate();
-		
-		    if (samplingRate > 0 && ctr % samplingRate == 0 ){
+		    if (duration > 0 && ctr % duration == 0 ){
 
 				mainWifiObj.setWifiEnabled(true);
 				try {
@@ -151,7 +149,7 @@ public class WifiWrapper extends AbstractWrapper {
 		    ctr++;
 			
 			AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-			am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+60000,PendingIntent.getService(config.getController().getActivity(), 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
+			am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000*interval,PendingIntent.getService(config.getController().getActivity(), 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 		}
 			
 		

@@ -93,6 +93,8 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 	@Override
 	public void dataAvailable(String inputStreamName, ArrayList<StreamElement> streamElements) {
 		
+		if (streamElements.size() < 3) return; //too small to compute
+		
 		double[] x = new double[streamElements.size()];
 		double[] y = new double[x.length];
 		double[] z = new double[x.length];

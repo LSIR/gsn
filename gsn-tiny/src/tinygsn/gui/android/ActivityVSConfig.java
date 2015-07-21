@@ -38,7 +38,6 @@ import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.vsensor.NotificationVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -56,6 +55,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -69,15 +69,15 @@ import com.actionbarsherlock.view.MenuItem;
 public class ActivityVSConfig extends SherlockActivity {
 	static int TEXT_SIZE = 10;
 	private Context context = this;
-	private Spinner spinnerVSType, spinnerAggregate, spinnerWrapper, field,
-			condition, action;
-	private EditText editText_vsName, editText_ssWindowSize, editText_ssStep,
-			editText_ssSamplingRate, editText_value, editText_contact;
-	private TableLayout table_notify_config = null;
-	private CheckBox saveToDB, checkBox_ssTimeBased;
+	private Spinner spinnerVSType, field, condition, action;
+	private EditText editText_vsName, editText_value, editText_contact;
+	private TableLayout table_notify_config, table_layout;
+	private CheckBox saveToDB;
 
 	private SqliteStorageManager storage = null;
 	private Properties wrapperList;
+	
+	private ArrayList<StreamSourcePanel> pannels = new ArrayList<ActivityVSConfig.StreamSourcePanel>();
 
 	private boolean isEnableSave = true;
 
@@ -103,17 +103,20 @@ public class ActivityVSConfig extends SherlockActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		editText_vsName = (EditText) findViewById(R.id.editText_vsName);
-		editText_ssWindowSize = (EditText) findViewById(R.id.editText_ssWindowSize);
-		editText_ssStep = (EditText) findViewById(R.id.editText_ssStep);
-		checkBox_ssTimeBased = (CheckBox) findViewById(R.id.checkBox_ssTimeBased);
-		editText_ssSamplingRate = (EditText) findViewById(R.id.editText_ssSamplingRate);
 		table_notify_config = (TableLayout) findViewById(R.id.table_notify_config);
+		table_layout = (TableLayout) findViewById(R.id.tableLayout_vs);
+		Button button_add = (Button) findViewById(R.id.button_add);
+		button_add.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	table_layout.addView(addSource());
+            }
+        });
 
 		wrapperList = AbstractWrapper.getWrapperList(this);
 
 		loadVSType();
-		loadAggregatorType();
-		loadWrapperList();
+		
+		
 
 		storage = new SqliteStorageManager(this);
 	}
@@ -151,47 +154,118 @@ public class ActivityVSConfig extends SherlockActivity {
 		});
 	}
 
-	public void loadAggregatorType() {
-		spinnerAggregate = (Spinner) findViewById(R.id.spinner_ssAggregate);
+	private TableRow addSource(){
+		
+		final StreamSourcePanel panel = new StreamSourcePanel();
+		final TableRow row = new TableRow(this);
+		TableLayout layout = new TableLayout(this);
+		TableRow.LayoutParams p = new TableRow.LayoutParams();
+		p.span = 2;
+		p.width = TableRow.LayoutParams.MATCH_PARENT;
+		layout.setLayoutParams(p);
+		row.addView(layout);
+		TableRow inrow = new TableRow(this);
+		layout.addView(inrow);
+		LinearLayout separator = new LinearLayout(this);
+		separator.setBackgroundColor(Color.rgb(150, 150, 150));
+		p = new TableRow.LayoutParams();
+		p.span = 2;
+		separator.setLayoutParams(p);
+		inrow.addView(separator);
+		
+		Button b = new Button(this);
+		b.setText("-");
+		separator.addView(b);
+		b.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	pannels.remove(panel);
+            	table_layout.removeView(row);
+            }
+        });
+		
+		//window size
+		inrow = new TableRow(this);
+		TextView label = new TextView(this);
+		label.setText("Window size: ");
+		label.setTextColor(Color.rgb(0, 0, 0));
+		inrow.addView(label);
+		
+		panel.windowsize = new EditText(this);
+		panel.windowsize.setText("5");
+		panel.windowsize.setTextSize(TEXT_SIZE + 5);
+		panel.windowsize.setInputType(InputType.TYPE_CLASS_NUMBER);
+		panel.windowsize.setTextColor(Color.rgb(0, 0, 0));
+		inrow.addView(panel.windowsize);
+		layout.addView(inrow);
+		
+		//step size
+		inrow = new TableRow(this);
+		label = new TextView(this);
+		label.setText("Step size: ");
+		label.setTextColor(Color.rgb(0, 0, 0));
+		inrow.addView(label);
+		
+		panel.stepsize = new EditText(this);
+		panel.stepsize.setText("1");
+		panel.stepsize.setTextSize(TEXT_SIZE + 5);
+		panel.stepsize.setInputType(InputType.TYPE_CLASS_NUMBER);
+		panel.stepsize.setTextColor(Color.rgb(0, 0, 0));
+		inrow.addView(panel.stepsize);
+		layout.addView(inrow);
+
+		//time based
+		inrow = new TableRow(this);
+		label = new TextView(this);
+		label.setText("Time based? ");
+		label.setTextColor(Color.rgb(0, 0, 0));
+		inrow.addView(label);
+		
+		panel.timebased = new CheckBox(this);
+		panel.timebased.setTextColor(Color.rgb(0, 0, 0));
+		inrow.addView(panel.timebased);
+		layout.addView(inrow);
+		
+		//aggregator
+		inrow = new TableRow(this);
+		label = new TextView(this);
+		label.setText("Aggregation: ");
+		label.setTextColor(Color.rgb(0, 0, 0));
+		inrow.addView(label);
+		
+		panel.aggregator = new Spinner(this);
 		List<String> list = new ArrayList<String>();
-
-		for (String s : StreamSource.AGGREGATOR) {
-			list.add(s);
-		}
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerAggregate.setAdapter(dataAdapter);
-	}
-
-	@SuppressLint("NewApi") 
-	public void loadWrapperList() {
-		spinnerWrapper = (Spinner) findViewById(R.id.spinner_wType);
-		List<String> list = new ArrayList<String>();
-
-		for (String s : wrapperList.stringPropertyNames()) {
-			list.add(s);
-		}
-
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerWrapper.setAdapter(dataAdapter);
-
-		spinnerWrapper.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				if (spinnerVSType.getSelectedItemPosition() == 1) {
-					addViewNotifyConfig();
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-			}
-		});
+        for (String s : StreamSource.AGGREGATOR){
+				list.add(s);
+        }
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,R.layout.spinner_item, list);
+		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		panel.aggregator.setAdapter(dataAdapter);
+		inrow.addView(panel.aggregator);
+		layout.addView(inrow);
+		
+		//wrapper
+		inrow = new TableRow(this);
+		label = new TextView(this);
+		label.setText("Wrapper: ");
+		label.setTextColor(Color.rgb(0, 0, 0));
+		inrow.addView(label);
+		
+		panel.wrapper = new Spinner(this);
+		list = new ArrayList<String>();
+        for (String s : wrapperList.stringPropertyNames()){
+				list.add(s);
+        }
+        for (String s : storage.getListofVSName()){
+        	list.add("local: "+s);
+        }
+		dataAdapter = new ArrayAdapter<String>(this,R.layout.spinner_item, list);
+		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		panel.wrapper.setAdapter(dataAdapter);
+		inrow.addView(panel.wrapper);
+		layout.addView(inrow);
+		
+		pannels.add(panel);
+		return row;
 	}
 
 	public void addViewNotifyConfig() {
@@ -207,23 +281,15 @@ public class ActivityVSConfig extends SherlockActivity {
 
 		field = new Spinner(this);
 		List<String> list = new ArrayList<String>();
-		String wrapperName = wrapperList.getProperty(spinnerWrapper
-				.getSelectedItem().toString());
+		String wrapperName = wrapperList.getProperty("gps"); //TODO dynamic
 
 		try {
-			AbstractWrapper w = (AbstractWrapper) Class.forName(wrapperName)
-					.newInstance();
+			AbstractWrapper w = (AbstractWrapper) StaticData.getWrapperByName(wrapperName);
 			for (String s : w.getFieldList()) {
 				list.add(s);
 			}
 		}
-		catch (InstantiationException e1) {
-			e1.printStackTrace();
-		}
-		catch (IllegalAccessException e1) {
-			e1.printStackTrace();
-		}
-		catch (ClassNotFoundException e1) {
+		catch (Exception e1) {
 			e1.printStackTrace();
 		}
 
@@ -406,21 +472,6 @@ public class ActivityVSConfig extends SherlockActivity {
 			Toast.makeText(this, "Please input VS Name", Toast.LENGTH_SHORT).show();
 			return;
 		}
-		if (editText_ssWindowSize.getText().toString().equals("")) {
-			Toast.makeText(this, "Please input Window Size", Toast.LENGTH_SHORT)
-					.show();
-			return;
-		}
-		if (editText_ssStep.getText().toString().equals("")) {
-			Toast.makeText(this, "Please input Step", Toast.LENGTH_SHORT).show();
-			return;
-		}
-		if (editText_ssSamplingRate.getText().toString().equals("")) {
-			Toast.makeText(this, "Please input Sampling Rate", Toast.LENGTH_SHORT)
-					.show();
-			return;
-		}
-
 		if (storage.vsExists("vs_" + vsName) == true) {
 			Toast.makeText(this, "VS Name already exists, please choose a new one!",
 					Toast.LENGTH_SHORT).show();
@@ -439,34 +490,27 @@ public class ActivityVSConfig extends SherlockActivity {
 			save_to_db = saveToDB.isChecked() + "";
 		}
 
-
-		String wrapperName = wrapperList.getProperty(spinnerWrapper
-				.getSelectedItem().toString());
-		
-		//mycode
 		try {
 			storage.executeInsert(
 							"vsList",
 							new ArrayList<String>(Arrays.asList("running", "vsname",
-									"vstype", "sswindowsize", "ssstep","sstimebased", "sssamplingrate",
-									"ssaggregator", "wrappername", "notify_field",
-									"notify_condition", "notify_value", "notify_action",
+									"vstype", "notify_field", "notify_condition", "notify_value", "notify_action",
 									"notify_contact", "save_to_db")),
-							new ArrayList<String>(Arrays.asList("1", vsName, ""+vsType,
-									editText_ssWindowSize.getText().toString(), editText_ssStep
-											.getText().toString(),checkBox_ssTimeBased.isChecked()+"", editText_ssSamplingRate.getText()
-											.toString(), spinnerAggregate.getSelectedItemPosition()
-											+ "", wrapperName, notify_field, notify_condition,
+							new ArrayList<String>(Arrays.asList("1", vsName, ""+vsType, notify_field, notify_condition,
 									notify_value, notify_action, notify_contact, save_to_db)));
+			
+			String wrapperName=""; 
+			for(StreamSourcePanel p:pannels){
+				wrapperName = p.saveTo(vsName,storage); // TODO compute actual output structure !!!
+			}
 
 			AbstractWrapper w;
 			try {
-				w = (AbstractWrapper) Class.forName(wrapperName).newInstance();
+				w = StaticData.getWrapperByName(wrapperName);
 				DataField[] outputStructure = w.getOutputStructure();
 				AbstractVirtualSensor vs = (AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vsType]).newInstance();
 				outputStructure = vs.getOutputStructure(outputStructure);
 				storage.executeCreateTable("vs_" + vsName, outputStructure,true);
-				storage.executeInsertSamplingRate(wrapperName, 0);
 				StaticData.saveName(vsName, wrapperName);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -526,6 +570,49 @@ public class ActivityVSConfig extends SherlockActivity {
 	void enableSave(boolean isEnabled) {
 		Button saveButton = (Button) findViewById(R.id.btnSaveVS);
 		saveButton.setEnabled(isEnabled);
+	}
+	
+	private class StreamSourcePanel{
+		public EditText windowsize, stepsize;
+		public Spinner aggregator, wrapper;
+		public CheckBox timebased;
+		
+		public boolean validate(){
+		if (windowsize.getText().toString().equals("")) {
+			Toast.makeText(ActivityVSConfig.this, "Please input Window Size", Toast.LENGTH_SHORT)
+					.show();
+			return false;
+		}
+		if (stepsize.getText().toString().equals("")) {
+			Toast.makeText(ActivityVSConfig.this, "Please input Step", Toast.LENGTH_SHORT).show();
+			return false;
+		}
+		return true;
+		}
+		
+		public String saveTo(String vsname, SqliteStorageManager storage) throws SQLException {
+			String wrapperName = wrapper.getSelectedItem().toString();
+			if(wrapperName.startsWith("local: ")){
+				wrapperName = "tinygsn.model.wrappers.LocalWrapper?"+wrapperName.substring(7);
+			}else{
+				wrapperName  = wrapperList.getProperty(wrapperName);
+			}
+			if (validate()){
+			    storage.executeInsert(
+					"sourcesList",
+					new ArrayList<String>(Arrays.asList("vsname",
+							"sswindowsize", "ssstep", "sstimebased", "ssaggregator",
+							"wrappername")),
+					new ArrayList<String>(Arrays.asList(vsname, windowsize.getText().toString(), stepsize
+							.getText().toString(),timebased.isChecked()+"", aggregator.getSelectedItemPosition()
+							+ "", wrapperName)));
+			
+			}
+			return wrapperName;
+			
+		}
+
+		
 	}
 
 
