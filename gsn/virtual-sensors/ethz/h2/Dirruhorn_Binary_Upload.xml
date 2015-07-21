@@ -1,5 +1,4 @@
 <virtual-sensor name="Dirruhorn_Binary_Upload" priority="10" >
-" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
