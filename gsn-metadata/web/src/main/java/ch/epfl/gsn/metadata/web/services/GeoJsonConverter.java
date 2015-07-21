@@ -4,8 +4,9 @@ import ch.epfl.gsn.metadata.core.model.GeoData;
 import ch.epfl.gsn.metadata.core.model.ObservedProperty;
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.core.model.WikiInfo;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.*;
 import com.google.gson.stream.JsonWriter;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -18,9 +19,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by kryvych on 26/03/15.
@@ -97,16 +96,9 @@ public class GeoJsonConverter {
             writeShort(writer, record);
         }
 
-        String dataLink = MessageFormat.format(configuration.getProperty("gsn.server.vs"), record.getName().toLowerCase());
-        writer.name("dataLink").value(dataLink);
 
         WikiInfo wikiInfo = record.getWikiInfo();
 
-        if (wikiInfo != null) {
-            writer.name("wikiLink").value(configuration.getProperty("wiki.server") + wikiInfo.getWikiLink());
-        } else {
-            writer.name("wikiLink").value(record.getMetadataLink());
-        }
 
         writeExtra(writer, record);
 
@@ -121,24 +113,55 @@ public class GeoJsonConverter {
     protected void writeShort(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
 
         writer.name("sensorName").value(record.getName());
+        WikiInfo wikiInfo = record.getWikiInfo();
+        if (wikiInfo != null) {
+            String organisation = wikiInfo.getOrganisation();
+            if (organisation != null) {
+                writer.name("organisation").value(organisation);
+            }
+            writer.name("deployment").value(wikiInfo.getDeploymentName());
+        }
 
         writer.name("fromDate").value(DATE_FORMAT.format(record.getFromDate() == null ? new Date() : record.getFromDate()));
         writer.name("toDate").value(DATE_FORMAT.format(record.getToDate() == null ? new Date() : record.getToDate()));
 
-        writeObservedProperties(writer, record);
-
-        writeGeoData(writer, record);
-        WikiInfo wikiInfo = record.getWikiInfo();
-
-        if (wikiInfo != null) {
-            writer.name("deployment").value(wikiInfo.getDeploymentName());
-            writer.name("organisation").value(wikiInfo.getOrganisation());
-        }
         writer.name("serverLink").value(record.getServer());
         writer.name("metadataLink")
                 .value(configuration.getProperty("metadata.server") + "metadata/virtualSensors/" + record.getName());
+        String dataLink = MessageFormat.format(configuration.getProperty("gsn.server.vs"), record.getName().toLowerCase());
+        writer.name("dataLink").value(dataLink);
+        if (wikiInfo != null) {
+            writer.name("wikiLink").value(configuration.getProperty("wiki.server") + wikiInfo.getWikiLink());
+        } else {
+            writer.name("wikiLink").value(record.getMetadataLink());
+        }
+
+        writePlotLink(writer, record);
+
+        writeObservedProperties(writer, record);
+
+        writeGeoData(writer, record);
 
 
+
+    }
+
+    private void writePlotLink(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
+        StringBuilder link = new StringBuilder();
+        link.append(configuration.getProperty("gsn.plot"));
+        link.append("sensors=").append(record.getName()).append("&parameters=");
+        final List<ObservedProperty> observedProperties = record.getSortedProperties();
+        int count = 0;
+        List<String> columnNames = Lists.newArrayList();
+
+        for (ObservedProperty observedProperty : observedProperties) {
+            if (count++ < 5) {
+                columnNames.add(observedProperty.getColumnName());
+            }
+        }
+        Joiner.on(",").appendTo(link, columnNames);
+
+        writer.name("plotLink").value(link.toString());
     }
 
     private void writeGeoData(JsonWriter writer, VirtualSensorMetadata record) throws IOException {
@@ -178,6 +201,13 @@ public class GeoJsonConverter {
         writeGeoData(writer, record);
 
         writer.name("deployed").value(buildDeploymentDatesString(record.getFromDate(), record.getToDate()));
+        String dataLink = MessageFormat.format(configuration.getProperty("gsn.server.vs"), record.getName().toLowerCase());
+        writer.name("dataLink").value(dataLink);
+        if (wikiInfo != null) {
+            writer.name("wikiLink").value(configuration.getProperty("wiki.server") + wikiInfo.getWikiLink());
+        } else {
+            writer.name("wikiLink").value(record.getMetadataLink());
+        }
 
     }
 
@@ -203,7 +233,7 @@ public class GeoJsonConverter {
     }
 
     protected Multimap<String, String> getTermToColumnMultimap(VirtualSensorMetadata record) {
-        Multimap<String, String> termToColumn = HashMultimap.create();
+        Multimap<String, String> termToColumn = TreeMultimap.create();
 
         for (ObservedProperty property : record.getObservedProperties()) {
             String term = property.getName();
@@ -216,8 +246,8 @@ public class GeoJsonConverter {
 
     protected void writePoint(JsonWriter writer, Point point) throws IOException {
         writer.beginArray();
-        writer.value(point.getX());
         writer.value(point.getY());
+        writer.value(point.getX());
         writer.endArray();
     }
 

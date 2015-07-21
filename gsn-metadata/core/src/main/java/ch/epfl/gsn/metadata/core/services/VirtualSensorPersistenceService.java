@@ -48,7 +48,7 @@ public class VirtualSensorPersistenceService {
 
             for (VirtualSensor sensor : sensors) {
 
-                if (!builder.isGrid(sensor)) {
+                if (!builder.isGrid(sensor) && builder.hasCoordinates(sensor)) {
                     VirtualSensorMetadata metadata = builder.buildVirtualSensorMetadata(sensor, server);
                     virtualSensorMetadataRepository.save(metadata);
                     count++;
