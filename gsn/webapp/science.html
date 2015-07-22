@@ -1869,7 +1869,17 @@
 														3023, 3024, 3025, 3026 ]
 											} ],
 										},
-										{
+
+										{ title:"GPS Inclinometer X-axis [Degrees]",
+									        signals: [{
+  												vsensor : "etz_dozer_wgpsstatus__conv",
+// 									          vsensor:".*_dozer_nodehealth__conv",
+									          	field:["inclinometer_x"],
+									          select:"sensornode[position]"
+									        }]
+									      },
+
+									{
 											title : "Wireless GPS Inclinometer X-axis [Degrees]",
 											signals : [ {
 												vsensor : "etz_dozer_wgpsstatus__conv",
