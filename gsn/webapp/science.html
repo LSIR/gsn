@@ -319,11 +319,12 @@
 											} ]
 										},
 										{
-											title : "Wireless GPS Inclinometer X-axis [Degrees]",
+											title : "GPS Inclinometer X-axis [Degrees]",
 											signals : [ {
-												vsensor : "dirruhorn_dozer_wgpsstatus__conv",
+												vsensor : "dirruhorn_gps_inclinometer",
 												field : [ "inclinometer_x" ],
-												position : [ 15, 17, 43, 44, 55, 62, 63, 64, 82, 83, 84 ]
+												select:"sensornode[nodetype=2][position]"
+//												position : [ 15, 17, 43, 44, 55, 62, 63, 64, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -337,7 +338,7 @@
 										{
 											title : "GPS Logger Inclinometer X-axis [Degrees]",
 											signals : [ {
-												vsensor : "dirruhorn_gps_logger__status",
+												vsensor : "dirruhorn_gps_inclinometer",
 												field : [ "inclinometer_x" ],
 												position : [ 14, 15, 16, 17,
 														18, 19, 21, 23, 25, 27,
