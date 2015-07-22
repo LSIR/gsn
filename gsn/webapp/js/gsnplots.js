@@ -184,7 +184,7 @@ var GsnPlots = {
           $(this.signals).each(function() {
           // switch following cases:
           // 1) no selection criteria (missing select, position, deviceId)
-          // 2) selection by topology properites (select)
+          // 2) selection by topology properties (select)
           // 3) selection by position
           // 4) selection by deviceId            
             var thissignal=this;

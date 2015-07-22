@@ -1799,118 +1799,20 @@
 														3023, 3024, 3025, 3026 ]
 											} ],
 										},
-										{
-											title : "GPS Velocity East - Batch [cm/d]",
-											signals : [ {
-												vsensor : "etz_gps_differential__batch__daily",
-												field : [ "v_e" ],
-												position : [ 3000, 3001, 3002,
-														3003, 3004, 3005, 3006,
-														3007, 3008, 3009, 3010,
-														3011, 3012, 3013, 3014,
-														3015, 3016, 3017, 3018,
-														3019, 3020, 3021, 3022,
-														3023, 3024, 3025, 3026 ]
-											} ],
-										},
-										{
-											title : "GPS Velocity North - Batch [cm/d]",
-											signals : [ {
-												vsensor : "etz_gps_differential__batch__daily",
-												field : [ "v_n" ],
-												position : [ 3000, 3001, 3002,
-														3003, 3004, 3005, 3006,
-														3007, 3008, 3009, 3010,
-														3011, 3012, 3013, 3014,
-														3015, 3016, 3017, 3018,
-														3019, 3020, 3021, 3022,
-														3023, 3024, 3025, 3026 ]
-											} ],
-										},
-										{
-											title : "GPS Velocity Altitude - Batch [cm/d]",
-											signals : [ {
-												vsensor : "etz_gps_differential__batch__daily",
-												field : [ "v_h" ],
-												position : [ 3000, 3001, 3002,
-														3003, 3004, 3005, 3006,
-														3007, 3008, 3009, 3010,
-														3011, 3012, 3013, 3014,
-														3015, 3016, 3017, 3018,
-														3019, 3020, 3021, 3022,
-														3023, 3024, 3025, 3026 ]
-											} ],
-										},
-										{
-											title : "GPS Velocity Horizontal - Batch [cm/d]",
-											signals : [ {
-												vsensor : "etz_gps_differential__batch__daily",
-												field : [ "v_horiz" ],
-												position : [ 3000, 3001, 3002,
-														3003, 3004, 3005, 3006,
-														3007, 3008, 3009, 3010,
-														3011, 3012, 3013, 3014,
-														3015, 3016, 3017, 3018,
-														3019, 3020, 3021, 3022,
-														3023, 3024, 3025, 3026 ]
-											} ],
-										},
-										{
-											title : "GPS Velocity 3D - Batch [cm/d]",
-											signals : [ {
-												vsensor : "etz_gps_differential__batch__daily",
-												field : [ "v_3d" ],
-												position : [ 3000, 3001, 3002,
-														3003, 3004, 3005, 3006,
-														3007, 3008, 3009, 3010,
-														3011, 3012, 3013, 3014,
-														3015, 3016, 3017, 3018,
-														3019, 3020, 3021, 3022,
-														3023, 3024, 3025, 3026 ]
-											} ],
-										},
 										{ title:"GPS Inclinometer X-axis [Degrees]",
-									        signals: [{
-  												vsensor : "etz_gps_inclinometer",
-									          	field:["inclinometer_x"],
- 									            select:"sensornode[nodetype=2][position],sensornode[nodetype=7][position]"
-									        }]
+									      signals: [{
+									    	  vsensor : "etz_gps_inclinometer",
+									          field:["inclinometer_x"],
+ 									           select:"sensornode[position]"
+									           }]
 									      },
 											{ title:"GPS Inclinometer Y-axis [Degrees]",
 										        signals: [{
 	  												vsensor : "etz_gps_inclinometer",
 										          	field:["inclinometer_y"],
-	 									            select:"sensornode[nodetype=7][position]"
+	 									            select:"sensornode[position]"
 										        }]
-										      },
-									{
-											title : "Wireless GPS Inclinometer X-axis [Degrees]",
-											signals : [ {
-												vsensor : "etz_dozer_wgpsstatus__conv",
-												field : [ "inclinometer_x" ],
-												position : [ 3000, 3001, 3002,
-														3003, 3004, 3005, 3006,
-														3007, 3008, 3009, 3010,
-														3011, 3012, 3013, 3014,
-														3015, 3016, 3017, 3018,
-														3019, 3020, 3021, 3022,
-														3023, 3024, 3025, 3026 ]
-											} ],
-										},
-										{
-											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
-											signals : [ {
-												vsensor : "etz_dozer_wgpsstatus__conv",
-												field : [ "inclinometer_y" ],
-												position : [ 3000, 3001, 3002,
-														3003, 3004, 3005, 3006,
-														3007, 3008, 3009, 3010,
-														3011, 3012, 3013, 3014,
-														3015, 3016, 3017, 3018,
-														3019, 3020, 3021, 3022,
-														3023, 3024, 3025, 3026 ]
-											} ],
-										}
+										      }
 								]);
 
 						$

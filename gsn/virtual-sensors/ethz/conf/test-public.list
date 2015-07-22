@@ -68,6 +68,7 @@ ETZ_Dozer_EnviroScanMoisture__conv.xml
 ETZ_Dozer_EnviroScanParametersA__conv.xml
 ETZ_Dozer_EnviroScanParametersB__conv.xml
 ETZ_Dozer_EnviroScanParametersC__conv.xml
+ETZ_GPS_Inclinometer.xml
 ETZ_GPS_Differential__batch.xml
 ETZ_GPS_Differential__batch__daily.xml
 ETZ_GPS_Differential__realtime.xml
