@@ -32,31 +32,31 @@ $(document).ready(function() {
 
     // plot configuration
     GsnPlots.setConfig([
-      { title:"GSN cnt",
+      { title:"GSN Thread Counters",
         signals: [
         { vsensor:"statistics_gsn",
           field:["thread_blocked_cnt","thread_new_cnt","thread_runnable_cnt","thread_terminated_cnt","thread_timed_waiting_cnt","thread_waiting_cnt","thread_total_cnt","thread_deadlocked_cnt"],
           timeline:"timed"}]
       },
-      { title:"GSN uptime",
+      { title:"GSN Uptime",
         signals: [
         { vsensor:"statistics_gsn",
           field:["uptime"],
           timeline:"timed"}]
       },
-      { title:"GSN memory usage",
+      { title:"GSN Memory Usage",
         signals: [
         { vsensor:"statistics_gsn",
           field:["memory_heap_used","memory_nonheap_used"],
           timeline:"timed"}]
       },
-      { title:"MySQL select cnt",
+      { title:"MySQL Operation Counters",
         signals: [
         { vsensor:"statistics_mysql",
           field:["select_cnt","insert_cnt","delete_cnt","others_cnt","fetch_cnt"],
           timeline:"timed"}]
       },
-      { title:"MySQL max avg",
+      { title:"MySQL Operation Timing",
         signals: [
         { vsensor:"statistics_mysql",
           field:["select_max","select_avg","insert_max","insert_avg","delete_max","delete_avg","others_max","others_avg","fetch_max","fetch_avg"],
@@ -74,12 +74,18 @@ $(document).ready(function() {
           field:["cache_file_size"],
           timeline:"timed"}]
       },
-      { title:"Vizzly Signals/Cache",
+      { title:"Vizzly Signals/Cache Entries",
         signals: [
         { vsensor:"statistics_sensorviz__parsed",
-          field:["seen_signals","cache_entries","cache_requests","cache_hits","cache_misses"],
+          field:["seen_signals","cache_entries"],
           timeline:"timed"}]
-      }
+      },
+      { title:"Vizzly Cache Status",
+          signals: [
+          { vsensor:"statistics_sensorviz__parsed",
+            field:["cache_requests","cache_hits","cache_misses"],
+            timeline:"timed"}]
+        }
     ]);
     
     $.ajax({
