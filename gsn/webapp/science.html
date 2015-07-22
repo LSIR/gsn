@@ -1873,11 +1873,17 @@
 										{ title:"GPS Inclinometer X-axis [Degrees]",
 									        signals: [{
   												vsensor : "etz_dozer_wgpsstatus__conv",
-// 									          vsensor:".*_dozer_nodehealth__conv",
 									          	field:["inclinometer_x"],
-									          select:"sensornode[nodetype=2][position],sensornode[nodetype=7][position]"
+ 									            select:"sensornode[nodetype=7][position],sensornode[nodetype=2][position]"
 									        }]
 									      },
+											{ title:"GPS Inclinometer Y-axis [Degrees]",
+										        signals: [{
+	  												vsensor : "etz_dozer_wgpsstatus__conv",
+										          	field:["inclinometer_y"],
+	 									            select:"sensornode[nodetype=2][position]"
+										        }]
+										      },
 
 									{
 											title : "Wireless GPS Inclinometer X-axis [Degrees]",
