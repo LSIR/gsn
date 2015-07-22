@@ -624,6 +624,10 @@ function VizzlyDygraph() {
             bounds = this.calculateTextLinkBounds(90*24*3600*1000);
             this.appendZoomTextLink(this.zoomTextDiv, "3m", bounds[0], bounds[1], false);
         }
+        if(diff > 30*1.5) {
+            bounds = this.calculateTextLinkBounds(30*24*3600*1000);
+            this.appendZoomTextLink(this.zoomTextDiv, "1m", bounds[0], bounds[1], false);
+        }
         if(diff > 7*1.5) {
             bounds = this.calculateTextLinkBounds(7*24*3600*1000);
             this.appendZoomTextLink(this.zoomTextDiv, "1w", bounds[0], bounds[1], false);
