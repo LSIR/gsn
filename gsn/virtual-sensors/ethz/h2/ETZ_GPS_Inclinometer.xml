@@ -14,7 +14,7 @@
             <field name="INCLINOMETER_Y" type="VARCHAR(30)" unit="°" />
         </output-structure>
     </processing-class>
-    <description>Inclinometer data from GPS sensors</description>
+    <description>Inclinometer data from all GPS sensors</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -25,7 +25,7 @@
                     <predicate key="query">select * from ETZ_GPS_Logger__status</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE as SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper </query>
+                <query> select GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE as SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

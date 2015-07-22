@@ -1107,19 +1107,6 @@
 													} ]
 										},
 										{
-											title : "Temperatures TH3",
-											signals : [ {
-												vsensor : "etz_dozer_th3temp__conv",
-												field : [ "temperature_5cm",
-														"temperature_10cm",
-														"temperature_20cm",
-														"temperature_30cm",
-														"temperature_50cm",
-														"temperature_100cm" ],
-												select : "sensornode[position]:has(configuration[th3=true])"
-											} ],
-										},
-										{
 											title : "Acoustic Emission Events Channel 1",
 											signals : [ {
 												vsensor : ".*_dozer_aedata__demux",
@@ -1657,6 +1644,19 @@
 
 // ETZ
 										{
+											title : "Temperatures TH3",
+											signals : [ {
+												vsensor : "etz_dozer_th3temp__conv",
+												field : [ "temperature_5cm",
+														"temperature_10cm",
+														"temperature_20cm",
+														"temperature_30cm",
+														"temperature_50cm",
+														"temperature_100cm" ],
+												select : "sensornode[position]:has(configuration[th3=true])"
+											} ],
+										},
+										{
 											title : "GPS Number of Satellites",
 											signals : [ {
 												vsensor : "etz_gps_raw__binary__mapped",
@@ -1869,7 +1869,17 @@
 														3023, 3024, 3025, 3026 ]
 											} ],
 										},
-										{
+
+										{ title:"GPS Inclinometer X-axis [Degrees]",
+									        signals: [{
+  												vsensor : "etz_dozer_wgpsstatus__conv",
+// 									          vsensor:".*_dozer_nodehealth__conv",
+									          	field:["inclinometer_x"],
+									          select:"sensornode[nodetype=2][position],sensornode[nodetype=7][position]"
+									        }]
+									      },
+
+									{
 											title : "Wireless GPS Inclinometer X-axis [Degrees]",
 											signals : [ {
 												vsensor : "etz_dozer_wgpsstatus__conv",
