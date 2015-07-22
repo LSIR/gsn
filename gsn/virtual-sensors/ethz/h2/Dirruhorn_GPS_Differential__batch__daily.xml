@@ -38,7 +38,6 @@
 			<field name="SD_V_3D" type="DOUBLE" unit="cm/d" />
 			
 			<field name="RATIO_OF_FIXED_AMBIGUITIES" type="DOUBLE" unit="%" />
-			
         </output-structure>
     </processing-class>
     <description>Daily Differential GPS solutions from batch processing (only newest data points) from Dirruhorn deployment</description>

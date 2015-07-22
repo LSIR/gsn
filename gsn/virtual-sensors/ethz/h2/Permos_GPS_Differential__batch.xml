@@ -112,6 +112,7 @@
 			<field name="LABEL" type="VARCHAR(4)" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
 			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
 			<field name="VERSION" type="SMALLINT" />
 			<field name="REFERENCE_LABEL" type="VARCHAR(4)" />
@@ -139,26 +140,23 @@
 			<field name="V_E" type="DOUBLE" unit="cm/d" />
 			<field name="V_N" type="DOUBLE" unit="cm/d" />
 			<field name="V_H" type="DOUBLE" unit="cm/d" />
+			<field name="V_HORIZ" type="DOUBLE" unit="cm/d" />
+			<field name="V_3D" type="DOUBLE" unit="cm/d" />
+
 			<field name="SD_V_E" type="DOUBLE" unit="cm/d" />
 			<field name="SD_V_N" type="DOUBLE" unit="cm/d" />
 			<field name="SD_V_H" type="DOUBLE" unit="cm/d" />
-			
-			<field name="V_3D" type="DOUBLE" unit="cm/d" />
-			<field name="SD_V_3D" type="DOUBLE" unit="cm/d" />
-			
-			<field name="V_HORIZ" type="DOUBLE" unit="cm/d" />
 			<field name="SD_V_HORIZ" type="DOUBLE" unit="cm/d" />
+			<field name="SD_V_3D" type="DOUBLE" unit="cm/d" />
 			
 			<field name="RATIO_OF_FIXED_AMBIGUITIES" type="DOUBLE" unit="%" />
 			
 			<field name="COMMENTS" type="VARCHAR(512)" />
 			
-			<field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
             <field name="MIN_GENERATION_TIME" type="BIGINT" unit="unixtime"/>
             <field name="MAX_GENERATION_TIME" type="BIGINT" unit="unixtime"/>
             <field name="MIN_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="MAX_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            
         </output-structure>
     </processing-class>
     <description>Parsed differential GPS data from batch processing from Permos deployment</description>
