@@ -174,7 +174,8 @@ var GsnPlots = {
                 "height": 350,
                 "showForm": true
               },
-              "inittimerange": 2592000000,
+              "inittimerange": 864000000,
+//              "inittimerange": 2592000000,
               "appUrl": "http://vizzly.ethz.ch/vizzly?",
               "signals": [],
           };
