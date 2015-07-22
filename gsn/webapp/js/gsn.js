@@ -197,6 +197,7 @@ var GSN = {
 	    if (vsName[i].group != "others") {
 		// Append Group to menu if different from category others
 		if(vsName[i].group != previousGroup) {
+		    previousSubGroup = undefined;
 		    if(GSN.context == "data"){
 			$("#vsmenu").append($.A({
 			    "class":"rubric",
