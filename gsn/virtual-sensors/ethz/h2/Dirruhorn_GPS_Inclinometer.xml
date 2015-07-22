@@ -35,7 +35,7 @@
                     <predicate key="query">select * from Dirruhorn_Dozer_WgpsStatus__conv</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper </query>
+                <query> select timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper where INCLINOMETER_X is not null</query>
             </source>
             <query> select * from source </query>
         </stream>
