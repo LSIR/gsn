@@ -311,14 +311,6 @@
 											} ],
 										},
 										{
-											title : "Grabengufer Crackmeter Pos65 [mm]",
-											signals : [ {
-												vsensor : "dirruhorn_crackmeter__cnnn",
-												field : [ "cnnn_dx0" ],
-												select : "sensornode[position=65]"
-											} ]
-										},
-										{
 											title : "GPS Inclinometer X-axis [Degrees]",
 											signals : [ {
 												vsensor : "dirruhorn_gps_inclinometer",
@@ -328,11 +320,12 @@
 											} ],
 										},
 										{
-											title : "Wireless GPS Inclinometer Y-axis [Degrees]",
+											title : "GPS Inclinometer Y-axis [Degrees]",
 											signals : [ {
-												vsensor : "dirruhorn_dozer_wgpsstatus__conv",
+												vsensor : "dirruhorn_gps_inclinometer",
 												field : [ "inclinometer_y" ],
-												position : [ 15, 17, 43, 44, 55, 62, 63, 64, 82, 83, 84 ]
+												select:"sensornode[nodetype=7][position]"
+//												position : [ 15, 17, 43, 44, 55, 62, 63, 64, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -415,6 +408,14 @@
 												position : [ 4, 5, 7, 12, 39,
 														40, 43, 41, 44, 55, 62, 63, 64, 66, 67, 82, 83, 84 ]
 											} ],
+										},
+										{
+											title : "Grabengufer Crackmeter Position 65 [mm]",
+											signals : [ {
+												vsensor : "dirruhorn_crackmeter__cnnn",
+												field : [ "cnnn_dx0" ],
+												select : "sensornode[position=65]"
+											} ]
 										},
 
 // Matterhorn
