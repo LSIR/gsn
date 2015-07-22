@@ -138,13 +138,13 @@ $(document).ready(function() {
           select:"sensornode[nodetype=1][position]"
         }]
       },
-//       { title:"Dozer SDI Voltage",
-//         signals: [{
-//           vsensor:".*_dozer_nodehealth__conv",
-//           field:["sdivoltage"],
-//           select:"sensornode[position]"
-//         }]
-//       },
+      { title:"Dozer SDI Voltage",
+        signals: [{
+          vsensor:".*_dozer_nodehealth__conv",
+          field:["sdivoltage"],
+          select:"sensornode[position]"
+        }]
+      },
       { title:"Aiguille du Midi Internal PV Temperature [°C]",
         signals: [{
           vsensor:"adm_cr1000",
@@ -334,13 +334,13 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-//       { title:"Dozer Sequence number (node health)",
-//         signals: [{
-//           vsensor:".*_dozer_nodehealth__conv",
-//           field:["header_seqnr"],
-//           select:"sensornode[position]"
-//         }]
-//       },
+      { title:"Dozer Sequence number (node health)",
+        signals: [{
+          vsensor:".*_dozer_nodehealth__conv",
+          field:["header_seqnr"],
+          select:"sensornode[position]"
+        }]
+      },
       { title:"Dozer Queuesize",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
@@ -348,13 +348,13 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-//       { title:"Dozer Uptime",
-//         signals: [{
-//           vsensor:".*_dozer_nodehealth__conv",
-//           field:["payload_uptime"],
-//           select:"sensornode[position]"
-//         }]
-//       },
+      { title:"Dozer Uptime",
+        signals: [{
+          vsensor:".*_dozer_nodehealth__conv",
+          field:["payload_uptime"],
+          select:"sensornode[position]"
+        }]
+      },
       { title:"Dozer Flashstatus",
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
@@ -362,13 +362,13 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-//       { title:"Dozer MCU Active",
-//         signals: [{
-//           vsensor:".*_dozer_statecounter__conv",
-//           field:["mcuactive_dutycycle"],
-//           select:"sensornode[position]"
-//         }]
-//       },
+      { title:"Dozer MCU Active",
+        signals: [{
+          vsensor:".*_dozer_statecounter__conv",
+          field:["mcuactive_dutycycle"],
+          select:"sensornode[position]"
+        }]
+      },
       { title:"Dozer Radio TX",
         signals: [{
           vsensor:".*_dozer_statecounter__conv",
@@ -383,69 +383,69 @@ $(document).ready(function() {
           select:"sensornode[position]"
         }]
       },
-//       { title:"Powerswitch Portstate",
-//         signals: [{
-//           vsensor:".*_dozer_powerswitch__mapped",
-//           field:["payload_port1on","payload_port2on"],
-//           select:"sensornode[nodetype=3][position]"
-//         }]
-//       },
-//       { title:"BackLog Uptime",
-//         signals: [{
-//           vsensor:".*_backlogstatus_dynamic__mapped",
-//           field:["uptime"],
-//           select:"sensornode[position][iscorestation='true']"
-//         }]
-//       },
-//       { title:"BackLog Error/Exception Counters",
-//         signals: [{
-//           vsensor:".*_backlogstatus_dynamic__mapped",
-//           field:["error_counter","exception_counter"],
-//           select:"sensornode[position][iscorestation='true']"
-//         }]
-//       },
-//       { title:"BackLog Database Store Time",
-//         signals: [{
-//           vsensor:".*_backlogstatus_dynamic__mapped",
-//           field:["db_store_time_min","db_store_time_mean","db_store_time_max"],
-//           select:"sensornode[position][iscorestation='true']"
-//         }]
-//       },
-//       { title:"CoreStation Uptime",
-//         signals: [{
-//           vsensor:".*_corestationstatus_software__mapped",
-//           field:["uptime"],
-//           select:"sensornode[position][iscorestation='true']"
-//         }]
-//       },
-//       { title:"CoreStation Load",
-//         signals: [{
-//           vsensor:".*_corestationstatus_software__mapped",
-//           field:["loadavg_1_min","loadavg_5_min","loadavg_15_min"],
-//           select:"sensornode[position][iscorestation='true']"
-//         }]
-//       },
-//       { title:"CoreStation Card File System",
-//         signals: [{
-//           vsensor:".*_corestationstatus_software__mapped",
-//           field:["statvfs_card_size","statvfs_card_free"],
-//           select:"sensornode[position][iscorestation='true']"
-//         }]
-//       },
-//       { title:"CamZilla Binary Queue",
-//           signals: [{
-//           vsensor:".*[^_]_binary__mapped",
-//           field:["file_queue_length","file_queue_size"],
-//           select:"sensornode[nodetype=6][position]"
-//         }]
-//       },
-//       { title:"CamZilla Binary Transmission Time",
-//         signals: [{
-//           vsensor:".*[^_]_binary__mapped",
-//           field:["transmission_time_eff","transmission_time_tot"],
-//           select:"sensornode[nodetype=6][position]"
-//         }]
-//       },
+      { title:"Powerswitch Portstate",
+        signals: [{
+          vsensor:".*_dozer_powerswitch__mapped",
+          field:["payload_port1on","payload_port2on"],
+          select:"sensornode[nodetype=3][position]"
+        }]
+      },
+      { title:"BackLog Uptime",
+        signals: [{
+          vsensor:".*_backlogstatus_dynamic__mapped",
+          field:["uptime"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"BackLog Error/Exception Counters",
+        signals: [{
+          vsensor:".*_backlogstatus_dynamic__mapped",
+          field:["error_counter","exception_counter"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"BackLog Database Store Time",
+        signals: [{
+          vsensor:".*_backlogstatus_dynamic__mapped",
+          field:["db_store_time_min","db_store_time_mean","db_store_time_max"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"CoreStation Uptime",
+        signals: [{
+          vsensor:".*_corestationstatus_software__mapped",
+          field:["uptime"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"CoreStation Load",
+        signals: [{
+          vsensor:".*_corestationstatus_software__mapped",
+          field:["loadavg_1_min","loadavg_5_min","loadavg_15_min"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"CoreStation Card File System",
+        signals: [{
+          vsensor:".*_corestationstatus_software__mapped",
+          field:["statvfs_card_size","statvfs_card_free"],
+          select:"sensornode[position][iscorestation='true']"
+        }]
+      },
+      { title:"CamZilla Binary Queue",
+          signals: [{
+          vsensor:".*[^_]_binary__mapped",
+          field:["file_queue_length","file_queue_size"],
+          select:"sensornode[nodetype=6][position]"
+        }]
+      },
+      { title:"CamZilla Binary Transmission Time",
+        signals: [{
+          vsensor:".*[^_]_binary__mapped",
+          field:["transmission_time_eff","transmission_time_tot"],
+          select:"sensornode[nodetype=6][position]"
+        }]
+      },
     ]);
     
     $.ajax({
