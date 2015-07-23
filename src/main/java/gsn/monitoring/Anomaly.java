@@ -31,19 +31,27 @@ public class Anomaly {
     
     private String timeStr;         // Storing original timeStr to provide feedback in case of error
     
+    private boolean groupBy;
+    private DataField groupByField; 
+
+
     public Anomaly() {}
     
-    public Anomaly (String function, DataField field, String value) {
+    public Anomaly (String function, DataField field, String value, DataField groupByField) {
         this.function = function;
         this.field = field;
         this.value = value;
+        this.groupByField = groupByField;
+        if (groupByField != null)
+            this.groupBy = true;
+
         this.time = 0;              // Counter intuitively, Time = 0 means anomaly would be detected over the entire data history
     }
 
 
-    public Anomaly ( String function, DataField field, String value, String timeStr) {
+    public Anomaly ( String function, DataField field, String value, DataField groupByField ,String timeStr) {
         
-        this (function, field, value);
+        this (function, field, value, groupByField);
         this.timeStr = timeStr;
         
 
@@ -100,7 +108,9 @@ public class Anomaly {
     public String getFunction () { return function; }
     public long getTime () { return time;} 
     public String getTimeStr () { return timeStr;}   
-     
+    public boolean isGroupBy () { return groupBy; } 
+    public DataField getGroupByField () { return this.groupByField; } 
+
     public String toString () {
     
         StringBuilder sb = new StringBuilder();
@@ -109,7 +119,9 @@ public class Anomaly {
 
         if (this.timeStr != null)
             sb.append(","+ this.timeStr);
-    
+        
+        if (this.isGroupBy())
+           sb.append(",["+ this.groupByField.getName() + "]"); 
         return sb.toString();
     }
 }
