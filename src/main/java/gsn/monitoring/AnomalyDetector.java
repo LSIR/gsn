@@ -388,19 +388,19 @@ public class AnomalyDetector implements Monitorable {
         StringBuilder toReturn = new StringBuilder ("SELECT ");
         toReturn.append("(SELECT " + field.getName() + " FROM ( ");
         toReturn.append("SELECT ROW_NUMBER() OVER (ORDER BY " + field.getName() + " ASC) AS ROWNUMBER, " + field.getName());
-        toReturn.append(" FROM (SELECT * FROM " + tableName + " WHERE timed > ?) AS window_interval");
+        toReturn.append(" FROM " + tableName + " WHERE timed > ?");
         toReturn.append(" ) AS q3");
-        toReturn.append(" WHERE ROWNUMBER = (SELECT COUNT(*) FROM (SELECT * FROM " + tableName + 
-                " WHERE timed > ?) AS window_interval)*75/100)");
+        toReturn.append(" WHERE ROWNUMBER = (SELECT COUNT(*) FROM " + tableName + 
+                " WHERE timed > ?)*75/100)");
         
         toReturn.append(" - ");
         
         toReturn.append("(SELECT " + field.getName() + " FROM ( ");
         toReturn.append("SELECT ROW_NUMBER() OVER (ORDER BY " + field.getName() + " ASC) AS ROWNUMBER, " + field.getName());
-        toReturn.append(" FROM (SELECT * FROM " + tableName + " WHERE timed > ?) AS window_interval");
-        toReturn.append(" ) AS q3");
-        toReturn.append(" WHERE ROWNUMBER = (SELECT COUNT(*) FROM (SELECT * FROM " + tableName + 
-                " WHERE timed > ?) AS window_interval)*25/100) AS IQR");
+        toReturn.append(" FROM " + tableName + " WHERE timed > ?");
+        toReturn.append(" ) AS q1");
+        toReturn.append(" WHERE ROWNUMBER = (SELECT COUNT(*) FROM " + tableName + 
+                " WHERE timed > ?) *25/100) AS IQR");
         
         return toReturn.toString();
     }
