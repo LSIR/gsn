@@ -79,6 +79,9 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 				+ "reason integer"
 				+ ");";
 		db.execSQL(createQuery);
+		createQuery = "CREATE TABLE settings (key text primary key, value text);";
+		db.execSQL(createQuery);
+		
 	
 	}
 
@@ -86,8 +89,10 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		db.execSQL("Drop table vsList");
 		db.execSQL("Drop table sourcesList");
+		db.execSQL("Drop table wrapperList");
 		db.execSQL("Drop table SUBSCRIPTION_ROW");
-		db.execSQL("Drop table SAMPLIG_RATE");
+		db.execSQL("Drop table Samples");
+		db.execSQL("Drop table settings");
 		onCreate(db);
 	}
 

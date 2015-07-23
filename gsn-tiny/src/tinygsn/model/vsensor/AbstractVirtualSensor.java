@@ -28,6 +28,8 @@ package tinygsn.model.vsensor;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.InputStream;
@@ -50,8 +52,21 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	private VSensorConfig config;
 	public InputStream is;
 	
+	
+	public boolean initialize_wrapper(){
+		HashMap<String,String> param = config.getController().getStorageManager().getSetting("vsensor."+config.getName()+".");
+		for(Entry<String,String> e : param.entrySet()){
+			initParameter(e.getKey(), e.getValue());
+		}
+		return initialize();
+	}
+	
+	
+	public String[] getParameters(){return new String[]{};}
 
 	public abstract boolean initialize();
+	
+	protected void initParameter(String key, String value){}
 
 	// synchronized
 

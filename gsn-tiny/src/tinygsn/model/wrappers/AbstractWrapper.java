@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.StaticData;
@@ -56,7 +58,7 @@ public abstract class AbstractWrapper {
 	public void setConfig(WrapperConfig config) {
 		this.config = config;
 	}
-
+	
 	public abstract Class<? extends WrapperService> getSERVICE();
 
 	protected static final int DEFAULT_DUTY_CYCLE_DURATION = 2;
@@ -193,5 +195,20 @@ public abstract class AbstractWrapper {
 		}
 		listenerCount--;
 	}
+
+	public void initialize_wrapper() {
+		HashMap<String,String> param = config.getController().getStorageManager().getSetting("wrapper."+config.getWrapperName()+".");
+		for(Entry<String,String> e : param.entrySet()){
+			initParameter(e.getKey(), e.getValue());
+		}
+		initialize();
+	}
+	
+	private void initParameter(String key, String value){}
+	
+	public String[] getParameters(){return new String[]{};}
+
+	public void initialize(){};
+
 	
 }

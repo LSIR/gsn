@@ -111,6 +111,18 @@
             android:layout_height="2dip"
             android:background="#61a7db" />
 
+       <TableRow
+            android:id="@+id/table_vsensor_config"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+        </TableRow>
+        
+        <View
+            android:layout_height="2dip"
+            android:background="#61a7db" />
+
         <!-- Stream Source -->
 
         <TableRow

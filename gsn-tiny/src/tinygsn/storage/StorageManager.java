@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
@@ -875,4 +876,9 @@ public abstract class StorageManager {
 	public abstract ArrayList<AbstractVirtualSensor> getListofVS();
 	
 	public abstract ArrayList<StreamSource> getSourcesOfVS(String name);
+	
+	public abstract HashMap<String,String> getSetting(String keyPrefix);
+		
+	public abstract void setSetting(String key, String value);
+
 }

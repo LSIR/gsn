@@ -1,9 +1,5 @@
 package tinygsn.beans;
 
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
-
 import tinygsn.controller.AbstractController;
 import tinygsn.controller.AndroidControllerListVS;
 import android.os.Parcel;
@@ -12,7 +8,6 @@ import android.os.Parcelable;
 public class WrapperConfig implements Parcelable {
 	
 	private String wrapperName;
-	private List<Properties> predicates = new Vector<Properties>();
 	private int id;
 	private AbstractController controller = null;
 	private boolean running = true;

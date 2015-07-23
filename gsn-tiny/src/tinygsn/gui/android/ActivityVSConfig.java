@@ -72,8 +72,9 @@ public class ActivityVSConfig extends SherlockActivity {
 	private Spinner spinnerVSType, field, condition, action;
 	private EditText editText_vsName, editText_value, editText_contact;
 	private TableLayout table_notify_config, table_layout;
+	private TableRow table_vsensor_config;
 	private CheckBox saveToDB;
-
+    private SettingPanel vssetting;
 	private SqliteStorageManager storage = null;
 	private Properties wrapperList;
 	
@@ -104,6 +105,7 @@ public class ActivityVSConfig extends SherlockActivity {
 
 		editText_vsName = (EditText) findViewById(R.id.editText_vsName);
 		table_notify_config = (TableLayout) findViewById(R.id.table_notify_config);
+		table_vsensor_config = (TableRow) findViewById(R.id.table_vsensor_config);
 		table_layout = (TableLayout) findViewById(R.id.tableLayout_vs);
 		Button button_add = (Button) findViewById(R.id.button_add);
 		button_add.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +146,17 @@ public class ActivityVSConfig extends SherlockActivity {
 				}
 				else
 					table_notify_config.removeAllViews();
+				
+				table_vsensor_config.removeAllViews();
+				vssetting = null;
+				
+				try {
+					String[] params = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters();
+					vssetting = new SettingPanel(AbstractVirtualSensor.VIRTUAL_SENSOR_LIST[pos], params);
+					table_vsensor_config.addView(vssetting.getPanel());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 			@Override
@@ -499,10 +512,13 @@ public class ActivityVSConfig extends SherlockActivity {
 							new ArrayList<String>(Arrays.asList("1", vsName, ""+vsType, notify_field, notify_condition,
 									notify_value, notify_action, notify_contact, save_to_db)));
 			
+			vssetting.saveTo(vsName, storage);
+			
 			String wrapperName=""; 
 			for(StreamSourcePanel p:pannels){
 				wrapperName = p.saveTo(vsName,storage); // TODO compute actual output structure !!!
 			}
+			
 
 			AbstractWrapper w;
 			try {
@@ -611,7 +627,52 @@ public class ActivityVSConfig extends SherlockActivity {
 			return wrapperName;
 			
 		}
+	}
+	
+	private class SettingPanel{ //key-value parameters (for VS and wrappers)
+		
+		private String prefix;
+		private String[] params; 
+		private EditText[] values;
+		
+		SettingPanel(String prefix, String[] params){
+			this.prefix = prefix;
+			this.params = params;
+		}
+		
+		public TableLayout getPanel(){
+			
+			TableLayout layout = new TableLayout(ActivityVSConfig.this);
+			TableRow.LayoutParams p = new TableRow.LayoutParams();
+			p.span = 2;
+			p.width = TableRow.LayoutParams.MATCH_PARENT;
+			layout.setLayoutParams(p);
 
+			values = new EditText[params.length];
+
+			for(int i=0; i<params.length;i++){
+				TableRow inrow = new TableRow(ActivityVSConfig.this);
+				TextView label = new TextView(ActivityVSConfig.this);
+				label.setText(params[i]+": ");
+				label.setTextColor(Color.rgb(0, 0, 0));
+				inrow.addView(label);
+				
+				values[i] = new EditText(ActivityVSConfig.this);
+				values[i].setTextSize(TEXT_SIZE + 5);
+				values[i].setTextColor(Color.rgb(0, 0, 0));
+				inrow.addView(values[i]);
+				layout.addView(inrow);
+			}
+			return layout;
+		}
+		
+		public void saveTo(String module, SqliteStorageManager storage) {
+			for(int i=0; i<params.length;i++){
+				storage.setSetting(prefix+"."+module+"."+params[i], values[i].getText().toString());
+			}
+			
+		}
+		
 		
 	}
 

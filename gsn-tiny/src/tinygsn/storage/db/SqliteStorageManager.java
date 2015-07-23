@@ -619,5 +619,29 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return toReturnArr.toArray(new DataField[] {});
 
 	}
+	
+	public HashMap<String,String> getSetting(String keyPrefix){
+		String query = "Select * from settings WHERE key LIKE ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{keyPrefix+"%"});
+		HashMap<String,String> res = new HashMap<String, String>();
+		while (cursor.moveToNext()) {
+			String v = cursor.getString(cursor.getColumnIndex("value"));
+			String k = cursor.getString(cursor.getColumnIndex("key"));
+			res.put(k, v);
+		}
+		return res;
+	}
+	
+	public void setSetting(String key, String value){
+		ContentValues newCon = new ContentValues();
+		newCon.put("key", key);
+		newCon.put("value", value);
+		if (getSetting(key).size()==0){
+			database.update("settings",newCon,"key = ?",new String[]{key});
+		}
+		else{
+			database.insert("settings",null,newCon);
+		}
+	}
 
 }

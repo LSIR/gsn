@@ -73,15 +73,33 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 
 	
 	private Classifier cls_act;
+	private String fileName = "activity-julien-norm.model";
 	private DataField[] outputStructure = new DataField[]{new DataField("activity",DataTypes.DOUBLE)};
 
 
-	public ActivityVirtualSensor() {
+	@Override
+	public boolean initialize() {
 		try {
 			cls_act = (Classifier) SerializationHelper.read(Environment.getExternalStorageDirectory().getAbsolutePath()
-	                + "/Android/data/tinygsn/activity-julien-norm.model");
-		} catch (Exception e) {}
+	                + "/Android/data/tinygsn/"+fileName);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
+	
+	@Override
+	public String[] getParameters(){
+		return new String[]{"model_file"};
+		}
+	
+	@Override
+	protected void initParameter(String key, String value){
+		if (key.endsWith("model_file")){
+			fileName = value;
+		}
+	}
+
 
 	@Override
 	public void dispose() {
@@ -257,11 +275,6 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		return outputStructure;
 	}
 
-	@Override
-	public boolean initialize() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 	
 	
 

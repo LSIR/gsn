@@ -110,7 +110,7 @@ public class StaticData {
 		
 		vs.setVirtualSensorConfiguration(config);
 		vs.is = config.getInputStream();
-		vs.initialize();
+		vs.initialize_wrapper();
 		vsMap.put(config.getName(), vs);
 		return vs;
 	}
@@ -132,6 +132,7 @@ public class StaticData {
 			wc = new WrapperConfig(0,name, globalController);
 		}
 		AbstractWrapper wrapper = (AbstractWrapper) Class.forName(realNames[0]).getDeclaredConstructor(new Class[] {WrapperConfig.class}).newInstance(wc);
+		wrapper.initialize_wrapper();
 		wrapperMap.put(name, wrapper);
 		
 		return wrapper;

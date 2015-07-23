@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
@@ -225,5 +226,17 @@ public class H2StorageManager extends StorageManager {
 	public ArrayList<StreamSource> getSourcesOfVS(String name) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public HashMap<String, String> getSetting(String keyPrefix) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setSetting(String key, String value) {
+		// TODO Auto-generated method stub
+		
 	}
 }
