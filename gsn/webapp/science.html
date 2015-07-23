@@ -315,8 +315,11 @@
 											signals : [ {
 												vsensor : "dirruhorn_gps_inclinometer",
 												field : [ "inclinometer_x" ],
-												select:"sensornode[nodetype=2][position]"
+//												select:"sensornode[nodetype=2][position]"
 //												position : [ 15, 17, 43, 44, 55, 62, 63, 64, 82, 83, 84 ]
+												position : [ 14, 15, 16, 17, 18, 19, 21, 23, 25, 27,
+															 29, 31, 33, 35, 43, 44, 55, 56, 57, 62, 
+															 63, 64, 82, 83, 84 ]
 											} ],
 										},
 										{
@@ -1547,14 +1550,6 @@
 											} ],
 										},
 										{
-											title : "GPS Velocity Horizontal [cm/d]",
-											signals : [ {
-												vsensor : "saastal_gps_differential__batch__daily",
-												field : [ "v_horiz" ],
-												position : [ 0, 2, 3 ]
-											} ],
-										},
-										{
 											title : "GPS Velocity 3D [cm/d]",
 											signals : [ {
 												vsensor : "saastal_gps_differential__batch__daily",
@@ -1578,30 +1573,6 @@
 												position : [ 0, 2, 3 ]
 											} ],
 										},
-// 										{
-// 											title : "GPS Position East - Realtime [m]",
-// 											signals : [ {
-// 												vsensor : "saastal_gps_differential__realtime",
-// 												field : [ "e" ],
-// 												position : [ 0, 2, 3 ]
-// 											} ],
-// 										},
-// 										{
-// 											title : "GPS Position North - Realtime [m]",
-// 											signals : [ {
-// 												vsensor : "saastal_gps_differential__realtime",
-// 												field : [ "n" ],
-// 												position : [ 0, 2, 3 ]
-// 											} ],
-// 										},
-// 										{
-// 											title : "GPS Position Altitude - Realtime [m]",
-// 											signals : [ {
-// 												vsensor : "saastal_gps_differential__realtime",
-// 												field : [ "h" ],
-// 												position : [ 0, 2, 3 ]
-// 											} ],
-// 										},
 										{
 											title : "GPS Inclinometer X-axis [Degrees]",
 											signals : [ {
@@ -1645,6 +1616,30 @@
 														position : [ 2, 3 ]
 											} ]
 										},
+// 										{
+//											title : "GPS Position East - Realtime [m]",
+//											signals : [ {
+//												vsensor : "saastal_gps_differential__realtime",
+//												field : [ "e" ],
+//												position : [ 0, 2, 3 ]
+//											} ],
+//										},
+//										{
+//											title : "GPS Position North - Realtime [m]",
+//											signals : [ {
+//												vsensor : "saastal_gps_differential__realtime",
+//												field : [ "n" ],
+//												position : [ 0, 2, 3 ]
+//											} ],
+//										},
+//										{
+//											title : "GPS Position Altitude - Realtime [m]",
+//											signals : [ {
+//												vsensor : "saastal_gps_differential__realtime",
+//												field : [ "h" ],
+//												position : [ 0, 2, 3 ]
+//											} ],
+//										},
 
 // ETZ
 										{
