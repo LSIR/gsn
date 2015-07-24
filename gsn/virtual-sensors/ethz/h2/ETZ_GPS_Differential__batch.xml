@@ -216,7 +216,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_Differential__static_import</predicate>
+                    <predicate key="query">select * from ETZ_GPS_Differential__static_import </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper</query>
