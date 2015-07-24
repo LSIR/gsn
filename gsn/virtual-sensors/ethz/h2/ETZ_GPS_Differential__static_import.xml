@@ -1,0 +1,73 @@
+<virtual-sensor name="ETZ_GPS_Differential__static_import" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="LABEL" type="VARCHAR(4)" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
+            <field name="SENSOR_TYPE" type="VARCHAR(16)" />
+            <field name="VERSION" type="SMALLINT" />
+            <field name="REFERENCE_LABEL" type="VARCHAR(4)" />
+
+            <field name="X_ECEF" type="DOUBLE" unit="m" />
+            <field name="Y_ECEF" type="DOUBLE" unit="m" />
+            <field name="Z_ECEF" type="DOUBLE" unit="m" />
+            <field name="SD_X" type="DOUBLE" unit="m" />
+            <field name="SD_Y" type="DOUBLE" unit="m" />
+            <field name="SD_Z" type="DOUBLE" unit="m" />
+            <field name="SD_XY" type="DOUBLE" unit="m^2" />
+            <field name="SD_YZ" type="DOUBLE" unit="m^2" />
+            <field name="SD_ZX" type="DOUBLE" unit="m^2" />
+
+            <field name="E" type="DOUBLE" unit="m" />
+            <field name="N" type="DOUBLE" unit="m" />
+            <field name="H" type="DOUBLE" unit="m" />
+            <field name="SD_E" type="DOUBLE" unit="m" />
+            <field name="SD_N" type="DOUBLE" unit="m" />
+            <field name="SD_H" type="DOUBLE" unit="m" />
+            <field name="SD_EN" type="DOUBLE" unit="m^2" />
+            <field name="SD_EH" type="DOUBLE" unit="m^2" />
+            <field name="SD_NH" type="DOUBLE" unit="m^2" />
+
+            <field name="V_E" type="DOUBLE" unit="cm/d" />
+            <field name="V_N" type="DOUBLE" unit="cm/d" />
+            <field name="V_H" type="DOUBLE" unit="cm/d" />
+            <field name="V_HORIZ" type="DOUBLE" unit="cm/d" />
+            <field name="V_3D" type="DOUBLE" unit="cm/d" />
+
+            <field name="SD_V_E" type="DOUBLE" unit="cm/d" />
+            <field name="SD_V_N" type="DOUBLE" unit="cm/d" />
+            <field name="SD_V_H" type="DOUBLE" unit="cm/d" />
+            <field name="SD_V_HORIZ" type="DOUBLE" unit="cm/d" />
+            <field name="SD_V_3D" type="DOUBLE" unit="cm/d" />
+
+            <field name="RATIO_OF_FIXED_AMBIGUITIES" type="DOUBLE" unit="%" />
+
+            <field name="COMMENTS" type="VARCHAR(512)" />
+
+            <field name="MIN_GENERATION_TIME" type="BIGINT" unit="unixtime"/>
+            <field name="MAX_GENERATION_TIME" type="BIGINT" unit="unixtime"/>
+            <field name="MIN_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="MAX_GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
+        </output-structure>
+    </processing-class>
+    <description>Static differential GPS data import</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage user="permasense_test" password="CHANGEME" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://taugwalder.ee.ethz.ch/permasense_tpbl_backuped?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true"/>
+        <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_GPS_Differential__streaming where RAW_PACKET is null</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
