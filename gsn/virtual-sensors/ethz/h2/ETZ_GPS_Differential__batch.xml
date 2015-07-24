@@ -203,23 +203,13 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data0">
+        <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">select * from ETZ_GPS_Differential__streaming where RAW_PACKET like '0,%'</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-        <stream name="data1">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_Differential__static_import </predicate>
-                    <predicate key="start-time">continue</predicate>
-                </address>
-                <query> select * from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>
