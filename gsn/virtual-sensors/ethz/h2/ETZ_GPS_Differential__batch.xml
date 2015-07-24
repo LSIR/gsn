@@ -203,13 +203,23 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">select * from ETZ_GPS_Differential__streaming where RAW_PACKET like '0,%'</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_GPS_Differential__static_import</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, LABEL, DEVICE_ID, GENERATION_TIME, PROCESSING_TIME, SENSORTYPE, VERSION, REFERENCE_LABEL, X_ECEF, Y_ECEF, Z_ECEF, SD_X, SD_Y, SD_Z, SD_XY, SD_YZ, SD_ZX, E, N, H, SD_E, SD_N, SD_H, SD_EN, SD_EH, SD_NH, V_E, V_N, V_H, V_HORIZ, V_3D, SD_V_E, SD_V_N, SD_V_H, SD_V_HORIZ, SD_V_3D, RATIO_OF_FIXED_AMBIGUITIES, COMMENTS, MIN_GENERATION_TIME, MAX_GENERATION_TIME, MIN_GSN_TIMESTAMP, MAX_GSN_TIMESTAMP</query>
             </source>
             <query> select * from source </query>
         </stream>

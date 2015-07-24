@@ -56,12 +56,8 @@
     </processing-class>
     <description>Static differential GPS data import</description>
     <life-cycle pool-size="10" />
-    <addressing />
-    <!-- 
-    <storage user="permasense_test" password="CHANGEME" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://taugwalder.ee.ethz.ch/permasense_tpbl_backuped?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true"/> 
-    -->
     <storage />
-        <streams>
+    <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
