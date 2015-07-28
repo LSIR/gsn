@@ -171,6 +171,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		
 		final StreamSourcePanel panel = new StreamSourcePanel();
 		final TableRow row = new TableRow(this);
+		final TableLayout settingLayout = new TableLayout(this);
 		TableLayout layout = new TableLayout(this);
 		TableRow.LayoutParams p = new TableRow.LayoutParams();
 		p.span = 2;
@@ -275,6 +276,35 @@ public class ActivityVSConfig extends SherlockActivity {
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		panel.wrapper.setAdapter(dataAdapter);
 		inrow.addView(panel.wrapper);
+		layout.addView(inrow);
+		
+		panel.wrapper.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
+							
+				settingLayout.removeAllViews();
+				panel.settings = null;
+				
+				try {
+					String wrapperName = panel.wrapper.getSelectedItem().toString();
+					wrapperName  = wrapperList.getProperty(wrapperName);
+					String[] params = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
+					panel.settings = new SettingPanel(wrapperName, params);
+					settingLayout.addView(panel.settings.getPanel());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				Toast.makeText(context, "Please select a virtual sensor",
+						Toast.LENGTH_SHORT).show();
+			}
+		});
+		
+		//setting container
+		inrow = new TableRow(this);
+		inrow.addView(settingLayout);
 		layout.addView(inrow);
 		
 		pannels.add(panel);
@@ -592,6 +622,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		public EditText windowsize, stepsize;
 		public Spinner aggregator, wrapper;
 		public CheckBox timebased;
+		public SettingPanel settings;
 		
 		public boolean validate(){
 		if (windowsize.getText().toString().equals("")) {
@@ -622,6 +653,7 @@ public class ActivityVSConfig extends SherlockActivity {
 					new ArrayList<String>(Arrays.asList(vsname, windowsize.getText().toString(), stepsize
 							.getText().toString(),timebased.isChecked()+"", aggregator.getSelectedItemPosition()
 							+ "", wrapperName)));
+			    settings.saveTo(wrapperName, storage);
 			
 			}
 			return wrapperName;
@@ -668,7 +700,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		
 		public void saveTo(String module, SqliteStorageManager storage) {
 			for(int i=0; i<params.length;i++){
-				storage.setSetting(prefix+"."+module+"."+params[i], values[i].getText().toString());
+				storage.setSetting(prefix+":"+module+":"+params[i], values[i].getText().toString());
 			}
 			
 		}

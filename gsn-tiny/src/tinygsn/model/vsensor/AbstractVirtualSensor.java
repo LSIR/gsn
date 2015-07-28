@@ -54,7 +54,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	
 	
 	public boolean initialize_wrapper(){
-		HashMap<String,String> param = config.getController().getStorageManager().getSetting("vsensor."+config.getName()+".");
+		HashMap<String,String> param = StaticData.globalController.getStorageManager().getSetting("vsensor:"+config.getName()+":");
 		for(Entry<String,String> e : param.entrySet()){
 			initParameter(e.getKey(), e.getValue());
 		}

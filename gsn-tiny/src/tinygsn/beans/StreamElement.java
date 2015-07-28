@@ -25,9 +25,13 @@
 
 package tinygsn.beans;
 
+import tinygsn.utils.CaseInsensitiveComparator;
+
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.TreeMap;
+
 import android.util.Log;
 
 public final class StreamElement implements Serializable {
@@ -40,6 +44,8 @@ public final class StreamElement implements Serializable {
 
 	private Serializable[] fieldValues;
 
+	private transient TreeMap < String , Integer > indexedFieldNames = null;
+	
 	private transient Byte[] fieldTypes;
 
 	private transient long internalPrimayKey = -1;
@@ -275,6 +281,26 @@ public final class StreamElement implements Serializable {
 
 	public void setData(int index, Serializable data) {
 		this.fieldValues[index] = data;
+	}
+	
+	/**
+	 * Build the index for mapping field name to their positions in the array if it is not yet built
+	 * This assumes that StreamElements cannot change their structure
+	 */
+	private void generateIndex(){
+		if ( indexedFieldNames == null ) {
+			indexedFieldNames = new TreeMap < String , Integer >( new CaseInsensitiveComparator( ) );
+			for ( int i = 0 ; i < this.fieldNames.length ; i++ )
+				this.indexedFieldNames.put( fieldNames[ i ] , i );
+		}
+	}
+	
+	public void setData(String fieldName, Serializable data) throws IllegalArgumentException {
+		generateIndex();
+		Integer index = indexedFieldNames.get( fieldName );
+		if (index != null) {
+			setData(index,data);		
+		}
 	}
 
 	public long getTimeStamp() {
