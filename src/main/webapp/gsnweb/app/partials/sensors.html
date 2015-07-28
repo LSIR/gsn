@@ -1,15 +1,5 @@
-<!--<div ng-controller="GoogleMapsController" layout="column">-->
-<!--<div flex="30">-->
-<!--Search-->
-<!--</div>-->
 
-<!--<div flex="70">-->
-<!--<leaflet center="center" geojson="geojson" layers="layers" height="480px"></leaflet>-->
-<!--</div>-->
-<!--</div>-->
-
-
-<div ng-controller="AppCtrl" layout="column" style="height:500px;">
+<div  layout="column" style="height:500px;">
     <section layout="row" flex>
         <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left"
                     md-is-locked-open="$mdMedia('gt-md')">
@@ -18,7 +8,10 @@
             </md-toolbar>
             <md-content layout-padding style="height: 500px;">
 
-                <!--<form ng-submit="submit()">-->
+
+                <div>
+                    <input style="margin: 4px;" type="checkbox" ng-model="filter.onlyPublic" ng-change="changePrivacy()"/> Only public sensors
+                </div>
 
                 <div style="margin-bottom: 5px;">
                     <ui-select ng-model="filter.group.selected" theme="select2" ng-disabled="disabled"
@@ -52,6 +45,16 @@
                         </ui-select-choices>
                     </ui-select>
                 </div>
+
+                <!--<div>-->
+                    <!--<label>Dates</label>-->
+                    <!--<input type="text" class="form-control"  data-autoclose="1" ng-model="filter.fromDate"-->
+                           <!--placeholder="From" bs-datepicker>-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--<input type="text" class="form-control" data-autoclose="1" ng-model="filter.untilDate"-->
+                           <!--placeholder="Until" bs-datepicker>-->
+                <!--</div>-->
                 <!--<ul>-->
 
                 <!--<li><label>Name:</label><input type="text" ng-model="filter.sensorName" name="text"/></li>-->
