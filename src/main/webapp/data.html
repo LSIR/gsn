@@ -460,8 +460,9 @@
                     console.log(vsnames);
                     var vsfieldstr = getURLParameter("fields")
                     var vsfields=[];
+                    var repfields=[];
                     if (vsfieldstr!=null ) 
-                    	repfields=vsfieldstr.split(",");
+                    	repfields=vsfieldstr.split(",");                   
                     $.each(repfields, function(i, el){
                         if($.inArray(el, vsfields) === -1) vsfields.push(el);
                     });
