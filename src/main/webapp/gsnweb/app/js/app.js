@@ -16,7 +16,7 @@ var gsnWebApp = angular.module('gsnWebApp', [
     , 'ui.select'
     , 'ngMaterial'
     , 'gsnMap'
-
+,'rzModule'
 ]);
 
 gsnWebApp.config(['$routeProvider', '$datepickerProvider',
