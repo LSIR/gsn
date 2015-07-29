@@ -239,6 +239,8 @@ public abstract class AbstractVirtualSensor implements Monitorable{
         Iterator <Map.Entry<Long,String>> iter = threads.entrySet().iterator();
         long totalCpuTime = 0L;
 
+        //TODO: Not using thread names | Should be used for logging in debug mode
+
         while (iter.hasNext()) {
             Map.Entry<Long,String> entry = iter.next();
             Long id = entry.getKey();
@@ -253,7 +255,7 @@ public abstract class AbstractVirtualSensor implements Monitorable{
             totalCpuTime += cpuTime;
         }
 
-        stat.put(virtualSensorConfiguration.getName().replaceAll("\\.","_")+".time.counter.totalCpuTime", totalCpuTime);
+        stat.put(virtualSensorConfiguration.getName().replaceAll("\\.","_")+".time.cputime.totalCpuTime", totalCpuTime);
 
 		return stat;
 	}
