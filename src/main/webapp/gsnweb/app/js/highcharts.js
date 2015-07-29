@@ -3,46 +3,45 @@
 angular.module('hcControllers', [])
 
 
-    .controller('hcCtrl', ['$scope', 'AxisInfo', 'dataProcessingService',
-        'ChartConfigService', 'FilterParameters', 'ProcessGsnData', '$window',
-        function ($scope, AxisInfo, dataProcessingService,
-                  ChartConfigService, FilterParameters, ProcessGsnData, $window) {
+    .controller('hcCtrl', ['$scope', 'dataProcessingService',
+        'ChartConfigService', 'FilterParameters', 'ProcessGsnData',
+        function ($scope, dataProcessingService,
+                  ChartConfigService, FilterParameters, ProcessGsnData) {
+
+            dataProcessingService.resetPromise();
+
+            FilterParameters.getSensorModels().then(function () {
+                $scope.canPlot = FilterParameters.hasRequiredParameters();
+
+                console.log("SENSOR MODELS" + FilterParameters.sensorModels);
 
 
-            $scope.canPlot = FilterParameters.hasRequiredParameters();
+                if ($scope.canPlot) {
+                    updatePlotModel();
+                }
 
-            if ($scope.canPlot) {
-                AxisInfo.getAxesInfo().then(function (d) {
-
-                    updatePlotModel(d);
-                });
-            }
+            });
 
 
             $scope.$on('handleBroadcast', function () {
 
-                AxisInfo.resetPromise();
-
                 dataProcessingService.resetPromise();
 
-                AxisInfo.getAxesInfo(true).then(function (d) {
-
-                    updatePlotModel(d);
-                });
+                updatePlotModel();
             });
 
-            function updatePlotModel(d) {
+            function updatePlotModel() {
                 $scope.pointCount = 0;
                 $scope.dataProcessing = true;
                 $scope.dataLoading = true;
-                $scope.axisInfo = d;
-                var dataLoadingPromise = dataProcessingService.async().then(function (d) {
+
+                $scope.axisInfo = FilterParameters.getAllSelectedParameters();
+                var dataLoadingPromise = dataProcessingService.loadData().then(function (d) {
 
                     $scope.pointCount = d.split(/\r\n|\n/).length;
-                   $scope.csvData = d;
-                    //$window.alert("Loaded data " + $scope.pointCount);
+                    $scope.csvData = d;
 
-                    if ($scope.pointCount*FilterParameters.getFields().length > 20000) {
+                    if ($scope.pointCount * FilterParameters.getHeaders().length/FilterParameters.sensorModels.length > 40000) {
                         throw $scope.pointCount;
                     }
                     $scope.dataLoading = false;
@@ -52,22 +51,26 @@ angular.module('hcControllers', [])
                         $scope.dataLoading = false;
                     });
 
-                dataLoadingPromise.then (function () {
+                dataLoadingPromise.then(function () {
 
+                    var processed = {};
+                    if (FilterParameters.sensorModels.length == 1) {
+                        processed = ProcessGsnData.process($scope.csvData);
+                    } else {
+                        processed = ProcessGsnData.processMultiSensors($scope.csvData);
+                    }
 
-
-                    var processed = ProcessGsnData.process($scope.csvData);
                     $scope.dataMap = processed.dataMap;
-                    $scope.chartConfig = ChartConfigService.buildChartConfig(processed, $scope.axisInfo, FilterParameters.vs);
+                    $scope.chartConfig = ChartConfigService.buildChartConfig(processed, $scope.axisInfo, FilterParameters.sensors.toString());
                     $scope.missingData = Object.keys(processed.missingData);
-                    $scope.noData =  false;
-                    if ( $scope.missingData.length === FilterParameters.getFields().length
+                    $scope.noData = false;
+                    if ($scope.missingData.length === FilterParameters.getHeaders().length
                         || !processed.hasValues) {
-                        $scope.noData =  true;
+                        $scope.noData = true;
                         $scope.missingData = Object.keys(processed.dataMap);
                     }
                     $scope.pointCount = processed.pointCount;
-                }, function(error) {
+                }, function (error) {
                     $scope.error = error;
                     $scope.noData = true;
                 }).finally(function () {

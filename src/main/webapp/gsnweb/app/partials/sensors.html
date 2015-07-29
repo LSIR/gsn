@@ -1,36 +1,81 @@
-<!--<div>-->
 
-    <!--<div ng-controller="AllSensorsCtrl as sensors">-->
-        <!--<h3>Sensor Info</h3>-->
-
-        <!--<div ng-if="loading">-->
-            <!--Loading sensor metadata.-->
-        <!--</div>-->
-
-        <!--<div ng-if="!loading">-->
-            <!--<input type="text" ng-model="myQuery">-->
+<div  layout="column" style="height:500px;">
+    <section layout="row" flex>
+        <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left"
+                    md-is-locked-open="$mdMedia('gt-md')">
+            <md-toolbar class="md-theme-indigo">
+                <h1 class="md-toolbar-tools">Filters</h1>
+            </md-toolbar>
+            <md-content layout-padding style="height: 500px;">
 
 
-            <!--<div ivh-treeview="sensors.treeModel"-->
-                 <!--ivh-treeview-expand-to-depth="1"-->
-                 <!--ivh-treeview-filter="myQuery"-->
-                 <!--ivh-treeview-validate="true"-->
-                 <!--ivh-treeview-default-selected-state="false">-->
-            <!--</div>-->
-        <!--</div>-->
+                <div>
+                    <input style="margin: 4px;" type="checkbox" ng-model="filter.onlyPublic" ng-change="changePrivacy()"/> Only public sensors
+                </div>
 
+                <div style="margin-bottom: 5px;">
+                    <ui-select ng-model="filter.group.selected" theme="select2" ng-disabled="disabled"
+                               on-select="updateGroup($item)" style="min-width: 250px;">
+                        <ui-select-match placeholder="Select a group">{{$select.selected}}</ui-select-match>
+                        <ui-select-choices repeat="group in groups | filter: $select.search">
+                            <span ng-bind-html="group | highlight: $select.search"></span>
 
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+                <div style="margin-bottom: 5px;">
+                    <ui-select multiple ng-model="filter.sensors" theme="select2"
+                               ng-disabled="disabled"
+                               on-select="submit()"
+                               on-remove="submit()" style="width: 250px;">
+                        <ui-select-match placeholder="Select sensors...">{{$item}}</ui-select-match>
+                        <ui-select-choices repeat="sensorName in sensorNames | filter:$select.search">
+                            {{sensorName}}
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+                <div style="margin-bottom: 5px;">
+                    <ui-select multiple ng-model="filter.parameters" theme="select2"
+                               ng-disabled="disabled"
+                               on-select="submit()"
+                               on-remove="submit()" style="width: 250px;">
+                        <ui-select-match placeholder="Select parameters...">{{$item}}</ui-select-match>
+                        <ui-select-choices repeat="param in parameters | filter:$select.search">
+                            {{param}}
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
 
-        <!--&lt;!&ndash;<button type="submit" ng-click="submitSelected();">Update Plot</button>&ndash;&gt;-->
-    <!--</div>-->
+                <!--<div>-->
+                    <!--<label>Dates</label>-->
+                    <!--<input type="text" class="form-control"  data-autoclose="1" ng-model="filter.fromDate"-->
+                           <!--placeholder="From" bs-datepicker>-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--<input type="text" class="form-control" data-autoclose="1" ng-model="filter.untilDate"-->
+                           <!--placeholder="Until" bs-datepicker>-->
+                <!--</div>-->
+                <!--<ul>-->
 
+                <!--<li><label>Name:</label><input type="text" ng-model="filter.sensorName" name="text"/></li>-->
+                <!--<li><label>Deployment:</label><input type="text" ng-model="filter.deployment" name="text"/></li>-->
+                <!--<li><label>Parameter:</label><input type="text" ng-model="filter.parameters" name="text"/></li>-->
 
-    <!--&lt;!&ndash;<div>&ndash;&gt;-->
-    <!--&lt;!&ndash;Sensor name:&ndash;&gt;-->
-    <!--&lt;!&ndash;Description:&ndash;&gt;-->
-    <!--&lt;!&ndash;Parameters: air temperature, humidity&ndash;&gt;-->
-    <!--&lt;!&ndash;dates:&ndash;&gt;-->
-    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--<input type="submit" id="submit" value="Filter"/>-->
+                <!--</ul>-->
+                <!--</form>-->
 
+            </md-content>
+        </md-sidenav>
+        <md-content flex layout-padding>
+            <div layout="column" layout-fill layout-align="top center">
+                <leaflet center="center" layers="layers" height="480px"></leaflet>
 
-<!--</div>-->
+                <!--<leaflet  markers="markers" event-broadcast="events" center="center" layers="layers" height="480px"></leaflet>-->
+
+            </div>
+        </md-content>
+
+    </section>
+</div>
+
