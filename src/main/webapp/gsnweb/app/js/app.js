@@ -78,9 +78,9 @@ gsnWebApp.controller('TabsCtrl', function ($scope, $location) {
     };
 
     $scope.tabClass = function (tab) {
-        //if ($scope.selectedTab == tab)
-        //    return 'active';
-        //else
+        if ($scope.selectedTab == tab)
+            return 'active';
+        else
         return '';
 
     }

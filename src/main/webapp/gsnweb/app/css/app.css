@@ -1,5 +1,3 @@
-/* app css stylesheet */
-
 .select2 > .select2-choice.ui-select-match {
   /* Because of the inclusion of Bootstrap */
   height: 29px;
@@ -126,20 +124,25 @@ ul.specs dt {
   font-weight: bold;
 }
 
-h1 {
+#header h1 {
   border-bottom: 1px solid gray;
+  padding: 20px;
+  padding-top: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  padding-left: 20px;
+  text-align: right;
+  color: #3949AB;
 }
-
+#header small {
+  color: #3949AB;
+}
+.active {
+  background-color: #3F51B5 !important;
+  color: rgba(255, 255, 255, 0.87) !important;
+}
 .filter_panel {
-	width: 265px !important;
-    min-width: 265px !important;
-    max-width: 265px !important;
-}
-
-hr.style-six {
-  border: 0;
-  height: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  margin-bottom: 10px;
+  width: 265px !important;
+  min-width: 265px !important;
+  max-width: 265px !important;
 }

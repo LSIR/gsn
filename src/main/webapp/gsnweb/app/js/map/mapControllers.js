@@ -233,7 +233,8 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
 
             //var html = '<div><b>{{sensorName}}</b><br><a href="#/plot?sensors={{sensorName}}&parameters={{parameters}}" my-refresh>Plot</a></div>';
             //var html = '<div><b>{{sensorName}}</b></br><i>has data from {{fromDate}} to {{toDate}}</i><br><Label>Parameters</Label><ul><li ng-repeat="param in parameters">{{param}}</li></ul><br><md-button ng-disabled="protected" class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
-            var html = '<div><b>{{sensorName}}</b></br><i>has data from {{fromDate}} to {{toDate}}</i><br/><label style="margin-top: 8px;">Parameters: </label>{{parameterString}}<br/><ul><li><label>Elevation:</label>{{elevation}}</li><li><label>Slope angle:</label>{{angle}}</li><li><label>Aspect:</label>{{aspect}}</li></ul><md-button ng-disabled="protected" class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
+            var html = '<div><b>{{sensorName}}</b></br><i>has data from {{fromDate}} to {{toDate}}</i><br/><b>Parameters: </b>{{parameterString}}<br/><ul><li><b>Elevation:</b>{{elevation}}</li>' +
+                '<li><b>Slope angle:</b>{{angle}}</li><li><b>Aspect:</b>{{aspect}}</li></ul><md-button ng-disabled="protected" class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
 
             //var html = '<div><b>{{extra}}</b><p>Parameters</p><table><tr ng-repeat="param in parameters"><td>{{param.name}}</td></tr></table><ul><li ng-repeat="param in parameters">{{param}}</li></ul><br><md-button class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
 
