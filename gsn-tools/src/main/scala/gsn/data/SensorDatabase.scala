@@ -44,9 +44,9 @@ object SensorDatabase {
       stmt.close
       //conn.close
       val ts=
-        Seq(TimeSeries(timeOutput(sensor.name),time))++
+        Seq(Series(timeOutput(sensor.name),time))++
         fields.indices.map{i=>
-        TimeSeries(fields(i),data(i).toSeq)
+        Series(fields(i),data(i).toSeq)
       }
       log debug s"computed latest values for $vsName" 
       ts      
@@ -59,7 +59,7 @@ object SensorDatabase {
   }
     
   def asSensorData(s:Sensor)=
-    SensorData(s.fields.map(f=>TimeSeries(f,Seq())),s )
+    SensorData(s.fields.map(f=>Series(f,Seq())),s )
   
   def query(sensorConf:SensorInfo, fields:Seq[String],
 			conditions:Seq[String], size:Option[Int],timeFormat:Option[String]):SensorData= {
@@ -100,9 +100,9 @@ object SensorDatabase {
             	
       val selectedOutput=sensor.fields.filter(f=>ordered.contains(f.fieldName) ) 
       val ts=
-        Seq(TimeSeries(timeOutput(sensor.name),time)) ++
+        Seq(Series(timeOutput(sensor.name),time)) ++
         selectedOutput.indices.map{i=>
-          TimeSeries(selectedOutput(i),data(i).toSeq)
+          Series(selectedOutput(i),data(i).toSeq)
         }
       SensorData(ts,sensor)
             

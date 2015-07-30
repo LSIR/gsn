@@ -38,7 +38,7 @@ object Sensor{
 }   
 
 case class SensorStats(rate:Option[Double],
-    start:Option[Long],end:Option[Long], latestValues:Seq[TimeSeries]){
+    start:Option[Long],end:Option[Long], latestValues:Seq[Series]){
   private val minTime=30*24*3600*1000
   val isArchive:Boolean={
     end.map{endtime=>
