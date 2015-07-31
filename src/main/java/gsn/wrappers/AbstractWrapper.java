@@ -365,28 +365,19 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	 * 
 	 */
 	public StringBuilder getUselessWindow() {
-		long minTimed = -1;
+		StringBuilder condition = new StringBuilder("");
 		synchronized (slidingHandlers) {
 			for (SlidingHandler slidingHandler : slidingHandlers.values()) {
-				long timed = slidingHandler.getOldestTimestamp();
-				logger.debug("***** Oldest timestamp : " + timed);
-				if (timed == -1) {
-					minTimed = -1;
-					break;
-				} else {
-					minTimed = (minTimed != -1) ? Math.min(minTimed, timed)
-							: timed;
-				}
+				if (condition.length()>0){condition.append(" and ");}
+				condition.append(slidingHandler.getCuttingCondition());
 			}
 		}
-
-		logger.debug("Oldest timestamp : " + minTimed);
-
-		if (minTimed == -1)
+		logger.debug("Cutting condition : " + condition);
+		if (condition.length() == 0)
 			return null;
 		StringBuilder sb = new StringBuilder("delete from ").append(
 				getDBAliasInStr()).append(" where ");
-		sb.append(" timed < ").append(minTimed);
+		sb.append(condition);
 		return sb;
 	}
 
