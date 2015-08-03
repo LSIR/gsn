@@ -35,15 +35,28 @@ public class SensorQuery {
 
     private double altitudeMin = 0;
     private double slopeMin = 0;
+    private double aspectMin = 0;
 
     private double altitudeMax = 20000;
     private double slopeMax = 90;
+    private double aspectMax = 360;
 
     private Date fromDateParsed;
     private Date toDateParsed;
 
     private boolean onlyPublic = true;
     private boolean onlyWithData = true;
+
+    private boolean conjunction = false;
+
+
+    public boolean isConjunction() {
+        return conjunction;
+    }
+
+    public void setConjunction(boolean conjunction) {
+        this.conjunction = conjunction;
+    }
 
     public void setMinLon(double minLon) {
         this.minLon = minLon;
@@ -61,6 +74,22 @@ public class SensorQuery {
 
     public void setMaxLon(double maxLon) {
         this.maxLon = maxLon;
+    }
+
+    public double getAspectMin() {
+        return aspectMin;
+    }
+
+    public void setAspectMin(double aspectMin) {
+        this.aspectMin = aspectMin;
+    }
+
+    public double getAspectMax() {
+        return aspectMax;
+    }
+
+    public void setAspectMax(double aspectMax) {
+        this.aspectMax = aspectMax;
     }
 
     public Box getBoundingBox() {

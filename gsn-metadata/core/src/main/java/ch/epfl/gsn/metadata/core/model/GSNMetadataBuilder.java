@@ -23,8 +23,13 @@ public class GSNMetadataBuilder {
         Long endDatetime = vsJson.getProperties().getStats().getEndDatetime();
         Date toDate = (endDatetime != null) ? new Date(endDatetime) : null;
 
-        Double x = vsJson.getGeometry().getCoordinates().get(1);
-        Double y = vsJson.getGeometry().getCoordinates().get(0);
+        List<Double> coordinates = vsJson.getGeometry().getCoordinates();
+        Double x = null;
+        Double y = null;
+        if (coordinates != null) {
+            x = coordinates.get(0);
+            y = coordinates.get(1);
+        }
 
         Point location = null;
         if (x != null && y != null) {
@@ -33,7 +38,7 @@ public class GSNMetadataBuilder {
         boolean isPublic = !Boolean.parseBoolean(vsJson.getProperties().getAccessProtected());
 
 
-        VirtualSensorMetadata virtualSensorMetadata = new VirtualSensorMetadata(vsJson.getProperties().getVsName(),
+        VirtualSensorMetadata virtualSensorMetadata = new VirtualSensorMetadata(vsJson.getProperties().getVsName().toLowerCase(),
                 server, fromDate, toDate, location, isPublic);
 
         virtualSensorMetadata.setMetadataLink(vsJson.getProperties().getMetadata());
@@ -94,5 +99,13 @@ public class GSNMetadataBuilder {
         return false;
     }
 
-
+    public boolean hasCoordinates(VirtualSensor sensor) {
+        if (sensor.getGeometry() == null) {
+            return false;
+        }
+        if(sensor.getGeometry().getCoordinates() == null) {
+            return false;
+        }
+        return true;
+    }
 }

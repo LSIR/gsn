@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.index.TextIndexed;
 public class ObservedProperty {
 
     @TextIndexed
-    private String name;
+    private String name = "";
     private String unit;
     private String columnName;
     private String type;
@@ -59,4 +59,6 @@ public class ObservedProperty {
         result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
         return result;
     }
+
+
 }
