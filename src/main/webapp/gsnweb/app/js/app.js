@@ -16,7 +16,7 @@ var gsnWebApp = angular.module('gsnWebApp', [
     , 'ui.select'
     , 'ngMaterial'
     , 'gsnMap'
-
+,'rzModule'
 ]);
 
 gsnWebApp.config(['$routeProvider', '$datepickerProvider',
@@ -78,9 +78,9 @@ gsnWebApp.controller('TabsCtrl', function ($scope, $location) {
     };
 
     $scope.tabClass = function (tab) {
-        //if ($scope.selectedTab == tab)
-        //    return 'active';
-        //else
+        if ($scope.selectedTab == tab)
+            return 'active';
+        else
         return '';
 
     }

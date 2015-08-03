@@ -16,6 +16,10 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             zoom: 8
         };
 
+        //----------------------------
+        //Initialize filter parmeters
+        //----------------------------
+
         var namesOfGroup = {};
         var parametersOfGroup = {};
 
@@ -63,15 +67,19 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
         };
 
         $scope.changePrivacy = function () {
+            setFilterParameters();
+            updateMarkers();
+        };
+
+        function setFilterParameters() {
             if ($scope.filter.onlyPublic) {
                 updateFilterParameters(namesOfGroupPublic, parametersOfGroupPublic);
             } else {
                 updateFilterParameters(namesOfGroup, parametersOfGroup);
             }
 
-            updateMarkers();
-
         };
+
 
         angular.extend($scope, {
 
@@ -146,7 +154,7 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
 
         }
 
-        $scope.changePrivacy();
+        setFilterParameters();
 
 
         function filterSensor(feature) {
@@ -180,9 +188,53 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
                 result = result && feature.properties.isPublic;
             }
 
+            result = result && (feature.properties.elevation >= $scope.filter.altitude.min) &&
+            (feature.properties.elevation <= $scope.filter.altitude.max);
+
+            result = result && (feature.properties.aspect >= $scope.filter.aspect.min) &&
+            (feature.properties.aspect <= $scope.filter.aspect.max);
+
+            result = result && (feature.properties.slopeAngle >= $scope.filter.slopeAngle.min) &&
+            (feature.properties.slopeAngle <= $scope.filter.slopeAngle.max);
+
+            var from = new Date(feature.properties.fromDate);
+            from.setHours(0,0,0,0);
+            var to = new Date(feature.properties.toDate);
+            to.setHours(0,0,0,0);
+
+            if (notEmptyDate($scope.filter.fromDate)) {
+                result = result && ($scope.filter.fromDate.valueOf() >= from.valueOf())
+                && ($scope.filter.fromDate.valueOf() < to.valueOf());
+            }
+
+            if (notEmptyDate($scope.filter.untilDate)) {
+                result = result && ($scope.filter.untilDate.valueOf() > from.valueOf())
+                && ($scope.filter.untilDate.valueOf() <= to.valueOf());
+            }
             return result;
         }
 
+        $scope.$on("slideEnded", function () {
+            updateMarkers();
+        });
+
+        $scope.$watch('filter.fromDate' ,function(){
+            //if (!_.isEmpty($scope.filter.fromDate)) {
+                updateMarkers();
+            //}
+            console.log('From date' + $scope.filter.fromDate);
+        });
+
+        $scope.$watch('filter.untilDate' ,function(){
+            //if (!_.isEmpty($scope.filter.untilDate)) {
+                updateMarkers();
+            //}
+            console.log('Until date' + $scope.filter.untilDate);
+        });
+
+        function notEmptyDate(date) {
+            return (date && date.valueOf() > 0);
+        }
         //
         //function onEachFeature(feature, layer) {
         //    layer.on('click', function (e) {
@@ -215,7 +267,9 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             var sensorName = feature.properties.sensorName;
 
             //var html = '<div><b>{{sensorName}}</b><br><a href="#/plot?sensors={{sensorName}}&parameters={{parameters}}" my-refresh>Plot</a></div>';
-            var html = '<div><b>{{sensorName}}</b></br><i>has data from {{fromDate}} to {{toDate}}</i><p>Parameters</p><ul><li ng-repeat="param in parameters">{{param}}</li></ul><br><md-button ng-disabled="protected" class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
+            //var html = '<div><b>{{sensorName}}</b></br><i>has data from {{fromDate}} to {{toDate}}</i><br><Label>Parameters</Label><ul><li ng-repeat="param in parameters">{{param}}</li></ul><br><md-button ng-disabled="protected" class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
+            var html = '<div><b>{{sensorName}}</b></br><i>has data from {{fromDate}} to {{toDate}}</i><br/><b>Parameters: </b>{{parameterString}}<br/><ul><li><b>Elevation:</b>{{elevation}}</li>' +
+                '<li><b>Slope angle:</b>{{angle}}</li><li><b>Aspect:</b>{{aspect}}</li></ul><md-button ng-disabled="protected" class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
 
             //var html = '<div><b>{{extra}}</b><p>Parameters</p><table><tr ng-repeat="param in parameters"><td>{{param.name}}</td></tr></table><ul><li ng-repeat="param in parameters">{{param}}</li></ul><br><md-button class="md-raised" ng-click="plot(feature);">Plot</md-button></div>';
 
@@ -231,6 +285,10 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             //newScope.values = data.properties.values;
 
             newScope.parameters = feature.properties.observed_properties;
+            newScope.parameterString = feature.properties.observed_properties.join(', ');
+            newScope.elevation = feature.properties.elevation;
+            newScope.angle = feature.properties.slopeAngle;
+            newScope.aspect = feature.properties.aspect;
 
             var linkFunction = $compile(html)(newScope);
 
@@ -262,8 +320,7 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
 
     }
 
-])
-;
+]);
 
 
 gsnMap.directive('myRefresh', function ($location, $route) {
@@ -334,9 +391,28 @@ gsnMap.factory('MapFilterParameters', [function () {
         this.group = {};
         this.deployment = '';
         this.parameters = [];
-        this.onlyPublic = true;
-        this.fromDate = {};
-        this.untilDate = {};
+        this.onlyPublic = false;
+        this.fromDate;
+        this.untilDate;
+        this.altitude = {
+            min: 0,
+            max: 4700,
+            floor: 0,
+            ceil: 4700
+        };
+        this.slopeAngle = {
+            min: 0,
+            max: 90,
+            floor: 0,
+            ceil: 90
+        };
+
+        this.aspect = {
+            min: 0,
+            max: 360,
+            floor: 0,
+            ceil: 360
+        }
 
     }
 
