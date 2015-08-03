@@ -114,7 +114,7 @@
             <div style="margin-bottom: 5px;">
                 <label>Dates</label>
                 <input type="text" class="form-control" data-autoclose="1" ng-model="filter.fromDate"
-                       placeholder="From" bs-datepicker style="width: 250px;">
+                       placeholder="From" bs-datepicker style="width: 250px;" ng-change="submit()">
             </div>
             <div style="margin-bottom: 5px;">
                 <input type="text" class="form-control" data-autoclose="1" ng-model="filter.untilDate"

@@ -67,14 +67,19 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
         };
 
         $scope.changePrivacy = function () {
+            setFilterParameters();
+            updateMarkers();
+        };
+
+        function setFilterParameters() {
             if ($scope.filter.onlyPublic) {
                 updateFilterParameters(namesOfGroupPublic, parametersOfGroupPublic);
             } else {
                 updateFilterParameters(namesOfGroup, parametersOfGroup);
             }
 
-            updateMarkers();
         };
+
 
         angular.extend($scope, {
 
@@ -149,7 +154,7 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
 
         }
 
-        $scope.changePrivacy();
+        setFilterParameters();
 
 
         function filterSensor(feature) {
@@ -192,14 +197,44 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             result = result && (feature.properties.slopeAngle >= $scope.filter.slopeAngle.min) &&
             (feature.properties.slopeAngle <= $scope.filter.slopeAngle.max);
 
+            var from = new Date(feature.properties.fromDate);
+            from.setHours(0,0,0,0);
+            var to = new Date(feature.properties.toDate);
+            to.setHours(0,0,0,0);
 
+            if (notEmptyDate($scope.filter.fromDate)) {
+                result = result && ($scope.filter.fromDate.valueOf() >= from.valueOf())
+                && ($scope.filter.fromDate.valueOf() < to.valueOf());
+            }
+
+            if (notEmptyDate($scope.filter.untilDate)) {
+                result = result && ($scope.filter.untilDate.valueOf() > from.valueOf())
+                && ($scope.filter.untilDate.valueOf() <= to.valueOf());
+            }
             return result;
         }
 
-        $scope.$on("slideEnded", function() {
+        $scope.$on("slideEnded", function () {
             updateMarkers();
         });
 
+        $scope.$watch('filter.fromDate' ,function(){
+            //if (!_.isEmpty($scope.filter.fromDate)) {
+                updateMarkers();
+            //}
+            console.log('From date' + $scope.filter.fromDate);
+        });
+
+        $scope.$watch('filter.untilDate' ,function(){
+            //if (!_.isEmpty($scope.filter.untilDate)) {
+                updateMarkers();
+            //}
+            console.log('Until date' + $scope.filter.untilDate);
+        });
+
+        function notEmptyDate(date) {
+            return (date && date.valueOf() > 0);
+        }
         //
         //function onEachFeature(feature, layer) {
         //    layer.on('click', function (e) {
@@ -285,8 +320,7 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
 
     }
 
-])
-;
+]);
 
 
 gsnMap.directive('myRefresh', function ($location, $route) {
@@ -357,27 +391,27 @@ gsnMap.factory('MapFilterParameters', [function () {
         this.group = {};
         this.deployment = '';
         this.parameters = [];
-        this.onlyPublic = true;
-        this.fromDate = {};
-        this.untilDate = {};
+        this.onlyPublic = false;
+        this.fromDate;
+        this.untilDate;
         this.altitude = {
             min: 0,
             max: 4700,
-            floor:0,
-            ceil:4700
+            floor: 0,
+            ceil: 4700
         };
         this.slopeAngle = {
             min: 0,
             max: 90,
-            floor:0,
-            ceil:90
+            floor: 0,
+            ceil: 90
         };
 
         this.aspect = {
             min: 0,
             max: 360,
-            floor:0,
-            ceil:360
+            floor: 0,
+            ceil: 360
         }
 
     }
