@@ -29,24 +29,19 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
 import tinygsn.beans.StreamElement;
-import tinygsn.controller.AndroidControllerListVS;
+import tinygsn.controller.AndroidControllerVS;
 import tinygsn.gui.android.utils.VSListAdapter;
 import tinygsn.gui.android.utils.VSRow;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
-import tinygsn.storage.db.SqliteStorageManager;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -62,10 +57,8 @@ public class ActivityListVS extends SherlockActivity implements Serializable  {
 	 */
 	private static final long serialVersionUID = 8598546037770495346L;
 	private ListView listViewVS;
-	private Context context;
-	Handler handlerVS;
-	AndroidControllerListVS controller;
-	List<VSRow> vsRowList;
+	VSListAdapter vSListAdapter;
+	AndroidControllerVS controller = new AndroidControllerVS();
 	ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
 	TextView numVS = null;
 
@@ -75,60 +68,28 @@ public class ActivityListVS extends SherlockActivity implements Serializable  {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.vs_list);
-		
-		String VSName  = null;
-		VSName = (String) getIntent().getSerializableExtra("VSName");
-		if(VSName != null)
-		{
-			SqliteStorageManager storage = new SqliteStorageManager(this);
-			AbstractVirtualSensor vs = storage.getVSByName(VSName);
-			AndroidControllerListVS controllerListVSNew  = new AndroidControllerListVS(this);
-			vs.getConfig().setController(controllerListVSNew);
-			vs.start(this);
-		}
-		
-		context = this;
-
 		AbstractWrapper.getWrapperList(this);
-		setUpController();
+		listViewVS = (ListView) findViewById(R.id.vs_list);
+		vSListAdapter = new VSListAdapter(this, R.layout.vs_row_item, controller, this);
+		listViewVS.setAdapter(vSListAdapter);
+		initialize();
 	}
 
-	// ~~~~~~~~~~~~~~~~Handle the result from Controller~~~~~~~~~~~~~~~~
-	public void setUpController() {
-		handlerVS = new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-				vsList = (ArrayList<AbstractVirtualSensor>) msg.obj;
-				renderLayout(vsList);
-			};
-		};
 
-		controller = new AndroidControllerListVS(this);
-		controller.setHandlerVS(handlerVS);
-		controller.loadListVS();
+	public void initialize() {
+		new AsyncTask<AndroidControllerVS, Void, ArrayList<AbstractVirtualSensor>>(){
+			@Override
+			protected ArrayList<AbstractVirtualSensor> doInBackground(AndroidControllerVS... params) {
+				return params[0].loadListVS();
+			}
+			@Override
+			protected void onPostExecute(ArrayList<AbstractVirtualSensor> result) {
+				renderLayout(result);
+			}
+		}.execute(controller);
 	}
 
 	private void renderLayout(ArrayList<AbstractVirtualSensor> vsList) {
-		vsRowList = new ArrayList<VSRow>();
-		for (AbstractVirtualSensor vs : vsList) {
-			DecimalFormat df = new DecimalFormat("#.##");
-
-			String latest = "";
-			StreamElement se = controller.loadLatestData(vs.getConfig().getName());
-			if (se != null)
-				for (String field : se.getFieldNames()) {
-					latest += field + ": " + df.format(se.getData(field)) + "\n";
-				}
-
-			vsRowList.add(new VSRow(vs.getConfig().getName(), vs.getConfig()
-					.getRunning(), latest));
-		}
-
-		listViewVS = (ListView) findViewById(R.id.vs_list);
-		VSListAdapter vSListAdapter = new VSListAdapter(context,
-				R.layout.vs_row_item, vsRowList, controller, this);
-		listViewVS.setAdapter(vSListAdapter);
-		vSListAdapter.notifyDataSetChanged();
 		
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
@@ -138,14 +99,33 @@ public class ActivityListVS extends SherlockActivity implements Serializable  {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		numVS = (TextView) actionBar.getCustomView().findViewById(R.id.num_vs);
+		numVS.setText("0");
+		vSListAdapter.clear();
+		vSListAdapter.notifyDataSetChanged();
 
-		if (numVS == null) {
-			Toast.makeText(context, "numVS is null", Toast.LENGTH_SHORT).show();
-		}
-		else {
-			numVS.setText(vsRowList.size() + "");
-		}
+		for (AbstractVirtualSensor vs : vsList) {
+			
+			new AsyncTask<AbstractVirtualSensor, Void, VSRow>(){
+				@Override
+				protected VSRow doInBackground(AbstractVirtualSensor... params) {
+					StreamElement se = controller.loadLatestData(params[0].getConfig().getName());
+					DecimalFormat df = new DecimalFormat("#.##");
+					String latest = "";
+					if (se != null)
+						for (String field : se.getFieldNames()) {
+							latest += field + ": " + df.format(se.getData(field)) + "\n";
+						}
+					return new VSRow(params[0].getConfig().getName(), params[0].getConfig().getRunning(), latest);
+				}
+				@Override
+				protected void onPostExecute(VSRow result) {
+					vSListAdapter.add(result);
+					vSListAdapter.notifyDataSetChanged();
+					numVS.setText(vSListAdapter.getCount() + "");
+				}
+			}.execute(vs);
 
+		}
 		TextView lastUpdate = (TextView) actionBar.getCustomView().findViewById(
 				R.id.lastUpdate);
 		lastUpdate.setText("Last update:\n" + (new Date()).toString());
@@ -187,7 +167,7 @@ public class ActivityListVS extends SherlockActivity implements Serializable  {
 				handler.postDelayed(new Runnable() {
 					public void run() {
 						refresh.setActionView(null);
-						setUpController();
+						initialize();
 					}
 				}, 50);
 				return false;

@@ -28,10 +28,10 @@ import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -44,6 +44,8 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements Sens
 	public AndroidAccelerometerWrapper(WrapperConfig wc) {
 		super(wc);
 	}
+	public AndroidAccelerometerWrapper() {
+	}
 	private static final String[] FIELD_NAMES = new String[] { "x", "y", "z" };
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE };
 	private static final String[] FIELD_DESCRIPTION = new String[] { "x", "y", "z" };
@@ -54,9 +56,7 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements Sens
 	private Sensor mSensor;
 
 	public void runOnce(){
-		Activity activity = getConfig().getController().getActivity();
-		mSensorManager = (SensorManager) activity
-				.getSystemService(Context.SENSOR_SERVICE);
+		mSensorManager = (SensorManager) StaticData.globalContext.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		updateWrapperInfo();
 		try {

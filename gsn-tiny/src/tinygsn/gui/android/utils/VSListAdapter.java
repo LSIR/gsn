@@ -25,8 +25,7 @@
 
 package tinygsn.gui.android.utils;
 
-import java.util.List;
-import tinygsn.controller.AndroidControllerListVS;
+import tinygsn.controller.AndroidControllerVS;
 import tinygsn.gui.android.ActivityListVS;
 import tinygsn.gui.android.ActivityViewData;
 import tinygsn.gui.android.R;
@@ -60,14 +59,14 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	private LayoutInflater inflater;
 	private Context context = null;
 	static int TEXT_SIZE = 8;
-	AndroidControllerListVS controller;
+	AndroidControllerVS controller;
 	ActivityListVS activityListVSNew;
 	
 
-	public VSListAdapter(Context ctx, int resourceId, List<VSRow> objects,
-			AndroidControllerListVS controller, ActivityListVS activityListVSNew) {
+	public VSListAdapter(Context ctx, int resourceId, 
+			AndroidControllerVS controller, ActivityListVS activityListVSNew) {
 
-		super(ctx, resourceId, objects);
+		super(ctx, resourceId);
 		this.context = ctx;
 		resource = resourceId;
 		inflater = LayoutInflater.from(ctx);
@@ -94,7 +93,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 		runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				controller.startStopVS(vs.getName(), runningSwitch.isChecked(),context);
+				controller.startStopVS(vs.getName(), runningSwitch.isChecked());
 
 				String state = "enabled";
 				if (runningSwitch.isChecked() == false)
@@ -137,7 +136,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 							controller.deleteVS(vs.getName());
 							Toast.makeText(context, vs.getName() + " is deleted!",
 									Toast.LENGTH_SHORT).show();
-							activityListVSNew.setUpController();
+							activityListVSNew.initialize();
 
 							break;
 						case DialogInterface.BUTTON_NEGATIVE:

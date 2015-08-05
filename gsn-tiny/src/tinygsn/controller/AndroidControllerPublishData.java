@@ -28,6 +28,7 @@ package tinygsn.controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.StreamElement;
@@ -51,16 +52,12 @@ public class AndroidControllerPublishData extends AbstractController {
 	
 	public AndroidControllerPublishData(ActivityPublishData androidViewer) {
 		this.view = androidViewer;
-		storage = new SqliteStorageManager(view);
+		storage = new SqliteStorageManager();
 	}
 
 	public void loadListVS() {
-		SqliteStorageManager storage = new SqliteStorageManager(view);
-		vsList = storage.getListofVS();
-		for (AbstractVirtualSensor vs : vsList) {
-			vs.getConfig().setController(this);
-		}
 
+		vsList = storage.getListofVS();
 		Message msg = new Message();
 		msg.obj = vsList;
 		handlerVS.sendMessage(msg);
@@ -106,25 +103,13 @@ public class AndroidControllerPublishData extends AbstractController {
 		return latest;
 	}
 	
-	public void consume(StreamElement streamElement) {
-	}
-
-	@Override
-	public Activity getActivity() {
-		return view;
-	}
-
-	@Override
-	public StorageManager getStorageManager() {
-		return null;
-	}
-
+	
 	public StreamElement[] loadRangeData(String vsName, String fromdate,
 			String fromtime, String todate, String totime) {
 		StreamElement[] ret = new StreamElement[0];
 		try{
-			long start = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(fromdate + " " + fromtime).getTime();
-			long end = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(todate + " " + totime).getTime();
+			long start = new SimpleDateFormat("dd.MM.yyyy HH:mm",Locale.ENGLISH).parse(fromdate + " " + fromtime).getTime();
+			long end = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ENGLISH).parse(todate + " " + totime).getTime();
 		
 			for (AbstractVirtualSensor vs : vsList) {
 				if (vs.getConfig().getName().endsWith(vsName)) {

@@ -6,11 +6,7 @@ import java.util.Map;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.model.wrappers.AbstractWrapper;
-import tinygsn.model.wrappers.AndroidAccelerometerWrapper;
 import tinygsn.model.wrappers.AndroidActivityRecognitionWrapper;
-import tinygsn.model.wrappers.AndroidGPSWrapper;
-import tinygsn.model.wrappers.AndroidGyroscopeWrapper;
-import tinygsn.model.wrappers.WifiWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -319,7 +315,7 @@ public class schedular extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		
-		storage = new SqliteStorageManager(this);
+		storage = new SqliteStorageManager();
 		CalcRates();
  
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);

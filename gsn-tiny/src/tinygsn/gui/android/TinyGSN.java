@@ -29,9 +29,12 @@ import org.kroz.activerecord.ActiveRecordBase;
 import org.kroz.activerecord.ActiveRecordException;
 import org.kroz.activerecord.Database;
 import org.kroz.activerecord.DatabaseBuilder;
+
+import tinygsn.beans.StaticData;
 import tinygsn.gui.android.utils.SubscriptionRow;
 import tinygsn.utils.Const;
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 public class TinyGSN extends Application {
@@ -58,6 +61,8 @@ public class TinyGSN extends Application {
 //		catch (ActiveRecordException e) {
 //			e.printStackTrace();
 //		}
+		
+		StaticData.globalContext = getApplicationContext();
 
 		Log.v("TinyGSN", "TinyGSN is called!");
 

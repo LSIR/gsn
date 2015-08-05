@@ -37,8 +37,7 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
-import tinygsn.controller.AbstractController;
-import android.content.Context;
+import tinygsn.storage.db.SqliteStorageManager;
 
 public abstract class AbstractVirtualSensor implements Serializable {
 
@@ -49,12 +48,14 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	public static final String[] VIRTUAL_SENSOR_LIST = { "bridge", "notification", "activity" };
 	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor","tinygsn.model.vsensor.NotificationVirtualSensor","tinygsn.model.vsensor.ActivityVirtualSensor"};
 
+	private transient SqliteStorageManager storage = new SqliteStorageManager();
 	private VSensorConfig config;
 	public InputStream is;
 	
 	
+	
 	public boolean initialize_wrapper(){
-		HashMap<String,String> param = StaticData.globalController.getStorageManager().getSetting("vsensor:"+config.getName()+":");
+		HashMap<String,String> param = storage.getSetting("vsensor:"+config.getName()+":");
 		for(Entry<String,String> e : param.entrySet()){
 			initParameter(e.getKey(), e.getValue());
 		}
@@ -72,13 +73,8 @@ public abstract class AbstractVirtualSensor implements Serializable {
 
 	protected void dataProduced(StreamElement streamElement, boolean adjust) {
 
-		// Send data to controller -> update view
-		config.getController().consume(streamElement);
-		AbstractController controller = config.getController();
-
 		try {
-			controller.getStorageManager().executeInsert("vs_" + config.getName(),
-					null, streamElement);
+			storage.executeInsert("vs_" + config.getName(), null, streamElement);
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -161,11 +157,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 */
 	public abstract void dispose();
 
-	public boolean dataFromWeb(String action, String[] paramNames,
-			Serializable[] paramValues) {
-		return false;
-	}
-
+	
 	/**
 	 * @return the virtualSensorConfiguration
 	 */
@@ -188,9 +180,9 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	/**
 	 * This method is going to be called by the container when one of the input
 	 * streams has a data to be delivered to this virtual sensor. After receiving
-	 * the data, the virutal sensor can do the processing on it and this
+	 * the data, the virtual sensor can do the processing on it and this
 	 * processing could possibly result in producing a new stream element in this
-	 * virtual sensor in which case the virutal sensor will notify the container
+	 * virtual sensor in which case the virtual sensor will notify the container
 	 * by simply adding itself to the list of the virtual sensors which have
 	 * produced data. (calling <code>container.publishData(this)</code>. For more
 	 * information please check the <code>AbstractVirtalSensor</code>
@@ -211,22 +203,22 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		if (!data.isEmpty()) dataAvailable(inputStreamName,data.get(data.size()-1));
 	}
 	
-	synchronized public void start(Context context) {
+	synchronized public void start() {
 		config = StaticData.findConfig(config.getId());
 		if (!config.getRunning()){
 			config.setRunning(true);
 			for (StreamSource s: config.getInputStream().getSources()){
-				s.getWrapper().start(context);
+				s.getWrapper().start();
 			}
 		}
 	}
 
-	synchronized public void stop(Context context) {
+	synchronized public void stop() {
 		config = StaticData.findConfig(config.getId());
 		if (config.getRunning()){
 			config.setRunning(false);
 			for (StreamSource streamSource : config.getInputStream().getSources()) {
-				streamSource.getWrapper().stop(context);
+				streamSource.getWrapper().stop();
 			}
 		}
 		
@@ -236,8 +228,8 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		return config;
 	}
 	
-	public void delete(Context context){
-		stop(context);
+	public void delete(){
+		stop();
 		for (StreamSource streamSource : config.getInputStream().getSources()) {
 			streamSource.dispose();
 		}

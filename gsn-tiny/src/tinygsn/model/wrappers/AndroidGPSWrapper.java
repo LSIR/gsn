@@ -30,10 +30,10 @@ import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
-import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -44,6 +44,8 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
 
 	public AndroidGPSWrapper(WrapperConfig wc) {
 		super(wc);
+	}
+	public AndroidGPSWrapper() {
 	}
 
 	private static final String[] FIELD_NAMES = new String[] { "latitude", "longitude" };
@@ -87,8 +89,7 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
 	
 	public void startGPS() {
         try {
-        	Activity activity = getConfig().getController().getActivity();
-            locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+            locationManager = (LocationManager) StaticData.globalContext.getSystemService(Context.LOCATION_SERVICE);
 
             if (!isGPSEnabled){
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);

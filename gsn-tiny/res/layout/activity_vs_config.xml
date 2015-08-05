@@ -1,15 +1,16 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"    
     xmlns:android1="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-    <TableLayout
-        android:id="@+id/tableLayout_vs"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/background"
-        android:textColor="@color/black" >
+   <TableLayout
+       android:id="@+id/tableLayout_vs"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:background="@color/background"
+       android:textColor="@color/black"
+       android1:stretchColumns="1" >
 
         <!-- Virtual Sensor -->
 
@@ -17,26 +18,19 @@
             android:layout_height="2dip"
             android:background="#61a7db" />
 
-        <TableRow
-            android:id="@+id/tableRow_vs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dip" >
-
-            <TextView
+        <TextView
                 android1:id="@+id/textView_vs"
-                android1:layout_width="wrap_content"
+                android1:layout_width="match_parent"
                 android1:layout_height="wrap_content"
-                android:layout_span="2"
-                android:gravity="center"
+                android1:gravity="center"
                 android1:text="@string/vs"
                 android1:textAppearance="?android:attr/textAppearanceMedium"
                 android1:textColor="@color/black" />
-        </TableRow>
+
 
         <TableRow
             android:id="@+id/tableRow_vsName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dip" >
 
@@ -50,7 +44,7 @@
 
             <EditText
                 android:id="@+id/editText_vsName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="8"
                 android:inputType="text"
@@ -62,7 +56,7 @@
 
         <TableRow
             android:id="@+id/tableRow_vsType"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dip" >
 
@@ -77,7 +71,7 @@
             <Spinner
                 android1:id="@+id/spinner_vsType"
                 style="@layout/spinner_item"
-                android1:layout_width="wrap_content"
+                android1:layout_width="match_parent"
                 android1:layout_height="wrap_content"
                 android1:entries="@array/vs_type_value"
                 android1:prompt="@string/selectVS"
@@ -90,15 +84,14 @@
 
         <TableRow
             android:id="@+id/tableRow_"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dip" >
 
-            <TableLayout                
-                
+            <TableLayout
                 android:id="@+id/table_notify_config"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_span="2"
                 android:background="@color/background"
                 android:gravity="center"
@@ -113,7 +106,7 @@
 
        <TableRow
             android:id="@+id/table_vsensor_config"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dip" >
 
@@ -127,13 +120,13 @@
 
         <TableRow
             android:id="@+id/tableRow_ss"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dip" >
 
             <TextView
                 android1:id="@+id/textView_ss"
-                android1:layout_width="wrap_content"
+                android1:layout_width="match_parent"
                 android1:layout_height="wrap_content"
                 android:layout_span="2"
                 android:gravity="center"
@@ -144,16 +137,18 @@
         
         <TableRow
             android:id="@+id/tableRow_next"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dip" >
         
         <Button
-                    android1:id="@+id/button_add"
-                    style="?android:attr/buttonStyleSmall"
-                    android1:layout_width="wrap_content"
-                    android1:layout_height="wrap_content"
-                    android1:text="+" />
+            android1:id="@+id/button_add"
+            style="?android:attr/buttonStyleSmall"
+            android1:layout_width="wrap_content"
+            android1:layout_height="wrap_content"
+            android1:layout_gravity="center"
+            android1:text="+" />
+
         </TableRow>
 
     </TableLayout>

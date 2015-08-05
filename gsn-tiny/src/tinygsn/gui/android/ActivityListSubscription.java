@@ -178,7 +178,6 @@ public class ActivityListSubscription extends SherlockActivity {
 		switch (itemId) {
 		case android.R.id.home:
 			controller.markDataUnreadToRead();
-			controller.closeDB();
 			finish();
 			break;
 		}

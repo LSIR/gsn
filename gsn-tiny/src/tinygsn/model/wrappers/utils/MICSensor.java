@@ -27,9 +27,10 @@ package tinygsn.model.wrappers.utils;
 
 import java.io.Serializable;
 import java.util.Arrays;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.StreamElement;
-import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.widget.Toast;
 import ch.serverbox.android.ftdiusb.FTDI_USB_Handler;
@@ -77,7 +78,7 @@ public class MICSensor extends FTDI_USB_Handler {
 	private char[] receiveBuffer; // A buffer to store the received bytes
 	private int bufferIndex; // The buffer index for the receive buffer
 
-	public MICSensor(Activity a) {
+	public MICSensor(Context a) {
 		super(a);
 
 		try {

@@ -61,14 +61,10 @@ public class AndroidControllerListSubscription extends AbstractController {
 			ActivityListSubscription androidViewer) {
 		this.view = androidViewer;
 
-		initDb();
-		createSampleData();
+		
 	}
 
-	public void consume(StreamElement streamElement) {
-	}
-
-	public Handler getHandlerData() {
+    public Handler getHandlerData() {
 		return handlerData;
 	}
 
@@ -76,38 +72,8 @@ public class AndroidControllerListSubscription extends AbstractController {
 		this.handlerData = handlerData;
 	}
 
-	public StorageManager getStorageManager() {
-		SqliteStorageManager storage = new SqliteStorageManager(view);
-		return storage;
-	}
 
-	@Override
-	public Activity getActivity() {
-		return view;
-	}
 
-	private void initDb() {
-
-		try {
-			// --------- Prepare mDatabase connection ----------
-			DatabaseBuilder builder = new DatabaseBuilder(Const.DATABASE_NAME);
-			builder.addClass(SubscriptionRow.class);
-			Database.setBuilder(builder);
-
-			// Open database
-			_db = ActiveRecordBase.open(view, Const.DATABASE_NAME,
-					Const.DATABASE_VERSION);
-		}
-		catch (ActiveRecordException e) {
-			Logg.e(TAG, e, "(%t) %s.initDb(): Error=%s", TAG, e.getMessage());
-		}
-	}
-
-	public void closeDB() {
-		if (null != _db) {
-			_db.close();
-		}
-	}
 
 	public void createSampleData() {
 		for (int i = 0; i < 2; i++) {

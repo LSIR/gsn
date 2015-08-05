@@ -28,17 +28,17 @@ package tinygsn.gui.android;
 
 import java.util.ArrayList;
 
-import tinygsn.beans.StaticData;
-import tinygsn.controller.AndroidControllerListVS;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.services.schedular;
 import tinygsn.storage.db.SqliteStorageManager;
-
+import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
+
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -55,30 +55,33 @@ public class ActivityHome extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.home);
 		getSupportActionBar().hide();
-		SqliteStorageManager storage = new SqliteStorageManager(this);
 		TextView subscribe = (TextView) findViewById(R.id.tvSubscribe);
 		BadgeView badge = new BadgeView(this, subscribe);
 		badge.setBadgePosition(BadgeView.POSITION_BOTTOM_RIGHT); 
 		badge.setText("2");
 		badge.show();
-		
-		StaticData.globalController = new AndroidControllerListVS(this);
-		
-		//start all defined virtual sensors
-		ArrayList<AbstractVirtualSensor> vsList = storage.getListofVS();
-		for (AbstractVirtualSensor vs : vsList) {
-			vs.getConfig().setController(new AndroidControllerListVS(this));
-		}
-		for (AbstractVirtualSensor vs : vsList) {
-			if (vs.getConfig().getRunning() == true) {
-				vs.start(this);
+
+		new AsyncTask<Activity, Void, Void>(){
+			@Override
+			protected Void doInBackground(Activity... params) {
+				//start all defined virtual sensors
+				SqliteStorageManager storage = new SqliteStorageManager();
+				ArrayList<AbstractVirtualSensor> vsList = storage.getListofVS();
+				for (AbstractVirtualSensor vs : vsList) {
+					if (vs.getConfig().getRunning() == true) {
+						vs.start();
+					}
+				}
+				
+				//start the scheduler
+				/*Intent serviceIntent = null;
+				serviceIntent = new Intent(this, schedular.class);
+				this.startService(serviceIntent);*/
+				return null;
 			}
-		}
+		}.execute(this);
 		
-		//start the scheduler
-		/*Intent serviceIntent = null;
-		serviceIntent = new Intent(this, schedular.class);
-		this.startService(serviceIntent);*/
+		
 	}
 
 	@Override

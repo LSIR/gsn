@@ -42,6 +42,7 @@ package tinygsn.gui.android.chart;
 
 import java.util.Date;
 import java.util.List;
+
 import org.achartengine.chart.PointStyle;
 import org.achartengine.model.CategorySeries;
 import org.achartengine.model.MultipleCategorySeries;
@@ -52,13 +53,16 @@ import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 /**
- * An abstract class for the demo charts to extend. It contains some methods for
+ * An abstract class for the charts to extend. It contains some methods for
  * building datasets and renderers.
  */
-public abstract class AbstractDemoChart implements IDemoChart {
+public abstract class AbstractChart {
 
   /**
    * Builds an XY multiple dataset using the provided values.
@@ -272,5 +276,7 @@ public abstract class AbstractDemoChart implements IDemoChart {
     }
     return renderer;
   }
+  
+  public abstract Intent execute(Context context);
 
 }

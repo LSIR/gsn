@@ -26,9 +26,6 @@
 package tinygsn.controller;
 
 
-import tinygsn.beans.StreamElement;
-import tinygsn.storage.StorageManager;
-import android.app.Activity;
 
 public abstract class AbstractController  {
 
@@ -37,12 +34,6 @@ public abstract class AbstractController  {
 	 */
 	private int id;
 
-	public abstract void consume(StreamElement streamElement);
-
-	public abstract StorageManager getStorageManager();
-	
-	public abstract Activity getActivity();
-	
 	public int getId() {
 		return id;
 	}

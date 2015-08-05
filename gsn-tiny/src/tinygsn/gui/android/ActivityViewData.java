@@ -28,29 +28,25 @@ package tinygsn.gui.android;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
 import tinygsn.beans.StreamElement;
-import tinygsn.controller.AndroidControllerViewData;
-import tinygsn.gui.android.chart.AbstractDemoChart;
+import tinygsn.controller.AndroidControllerVS;
+import tinygsn.gui.android.chart.AbstractChart;
 import tinygsn.gui.android.chart.SensorValuesChart;
 import tinygsn.gui.android.utils.VSListAdapter;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
+import tinygsn.model.vsensor.AbstractVirtualSensor;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -67,205 +63,182 @@ import android.widget.TableLayout.LayoutParams;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-@SuppressLint({ "HandlerLeak", "SimpleDateFormat" })
-@SuppressWarnings("unchecked")
+import com.actionbarsherlock.view.MenuItem;
+
+
+
 public class ActivityViewData extends SherlockFragmentActivity {
 	static int TEXT_SIZE = 10;
 
-	private Context context = this;
-	// private Button btnLoad = null;
-	private AndroidControllerViewData controller;
-	private Handler handlerData, handlerVS, handlerField;
+
+	private AndroidControllerVS controller = new AndroidControllerVS();
+
 	private TextView lblOutput = null;
-	// private EditText numLatestTxt = null;
 	private Spinner spinnerVS, spinnerField, spinnerViewMode;
 	private TableLayout table_view_mode = null;
 
-	private ArrayList<StreamElement> streamElements = null;
-	private ArrayList<String> vsNameList = null;
-	private ArrayList<String> fieldList = null;
-	private int numLatest = 10;
+	private List<StreamElement> streamElements = null;
+
+	
 	private String vsName = null;
 	private String vsNameFromExtra = null;
-
-	protected int viewMode = 1;
 	protected String fieldName;
+
+	private int numLatest = 10;
+	protected int viewMode = 1;
+	
 
 	private TextView txtStartDate, txtStartTime, txtEndDate, txtEndTime;
 
-	private Calendar dateAndTime = Calendar.getInstance();
-	private Date startTime, endTime;
-	private static final String TAG = "ActivityViewData";
+	private Calendar startTime = Calendar.getInstance();
+	private Calendar endTime = Calendar.getInstance();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_view_data);
 		lblOutput = (TextView) findViewById(R.id.txbViewData);
+		spinnerField = (Spinner) findViewById(R.id.spinner_field);
+		spinnerVS = (Spinner) findViewById(R.id.spinner_vs);
+		spinnerViewMode = (Spinner) findViewById(R.id.spinner_view_mode);
 		lblOutput.setTextSize(TEXT_SIZE);
+		
+		endTime.add(Calendar.MINUTE, -1);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			vsNameFromExtra = extras.getString(VSListAdapter.EXTRA_VS_NAME);
 		}
-
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		addHandlers();
-
-		controller.loadListVS();
-
+		loadVSList();
 		loadViewMode();
-	}
-
-	private void addHandlers() {
-		controller = new AndroidControllerViewData(this);
-
-		handlerVS = new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-				vsNameList = (ArrayList<String>) msg.obj;
-				loadVSList();
-			}
-		};
-		controller.setHandlerVS(handlerVS);
-
-		handlerField = new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-				fieldList = (ArrayList<String>) msg.obj;
-				loadFieldList();
-			}
-		};
-		controller.setHandlerField(handlerField);
-
-		handlerData = new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-				streamElements = (ArrayList<StreamElement>) msg.obj;
-				if (streamElements.size() == 0)
-					outputData("No data!");
-				else {
-					outputData(getDataOutput());
-				}
-			}
-		};
-		controller.setHandlerData(handlerData);
+		setListeners();
 	}
 
 	public void loadVSList() {
-		spinnerVS = (Spinner) findViewById(R.id.spinner_vs);
-		List<String> list = new ArrayList<String>();
-		for (String s : vsNameList) {
-			list.add(s);
-		}
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerVS.setAdapter(dataAdapter);
-
-		int index = 0;
-		if (vsNameFromExtra != null) {
-			for (String s : vsNameList) {
-				if (s.equals(vsNameFromExtra)) {
-					spinnerVS.setSelection(index);
+		
+		new AsyncTask<AndroidControllerVS, Void, List<String>>(){
+			@Override
+			protected List<String> doInBackground(AndroidControllerVS... params) {
+				List<String> list = new ArrayList<String>();
+				for (AbstractVirtualSensor vs: params[0].loadListVS()){
+					list.add(vs.getConfig().getName());
 				}
-				index++;
+				return list;
 			}
-		}
-
-		spinnerVS.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				vsName = parent.getItemAtPosition(pos).toString();
-				Toast.makeText(parent.getContext(),
-						"The virtual sensor \"" + vsName + "\" is selected.",
-						Toast.LENGTH_SHORT).show();
-				controller.loadListFields(parent.getItemAtPosition(pos).toString());
-			}
-
+			
 			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				Toast.makeText(context, "Please select a virtual sensor",
-						Toast.LENGTH_SHORT).show();
-			}
-		});
+			protected void onPostExecute(List<String> result) {
+				ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(ActivityViewData.this,R.layout.spinner_item, result);
+				dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				spinnerVS.setAdapter(dataAdapter);
 
+				int index = 0;
+				if (vsNameFromExtra != null) {
+					for (String s : result) {
+						if (s.equals(vsNameFromExtra)) {
+							spinnerVS.setSelection(index);
+						}
+						index++;
+					}
+				}
+			}
+			
+		}.execute(controller);
 	}
-
-	protected void loadFieldList() {
-		spinnerField = (Spinner) findViewById(R.id.spinner_field);
-		List<String> list = new ArrayList<String>();
-		for (String s : fieldList) {
-			list.add(s);
-		}
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerField.setAdapter(dataAdapter);
-
-		spinnerField.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				fieldName = parent.getItemAtPosition(pos).toString();
-				Toast.makeText(parent.getContext(),
-						"The field \"" + fieldName + "\" is selected.", Toast.LENGTH_SHORT)
-						.show();
-				loadData();
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				Toast.makeText(context, "Please select a field", Toast.LENGTH_SHORT)
-						.show();
-			}
-		});
-	}
-
-	protected void loadViewMode() {
-		spinnerViewMode = (Spinner) findViewById(R.id.spinner_view_mode);
+	
+	private void loadViewMode() {
 		List<String> list = new ArrayList<String>();
 		list.add("Latest values");
 		list.add("Customize time");
 
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,R.layout.spinner_item, list);
+		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerViewMode.setAdapter(dataAdapter);
+	}
 
-		spinnerViewMode.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				// Toast.makeText(
-				// parent.getContext(),
-				// "The view mode \"" + parent.getItemAtPosition(pos).toString()
-				// + "\" is selected.", Toast.LENGTH_SHORT).show();
-				if (pos == 0) {
-					addTableViewModeLatest();
-					viewMode = 1;
-					loadData();
-				}
-				else {
-					addTableViewModeCustomize();
-					viewMode = 2;
-					loadData();
-				}
+	public void setListeners(){	
+		
+		spinnerVS.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+				vsName = parent.getItemAtPosition(pos).toString();
+				new AsyncTask<String, Void, List<String>>(){
+					@Override
+					protected List<String> doInBackground(String... params) {
+						List<String> list = controller.loadListFields(params[0]);
+						return list;
+					}
+					
+					@Override
+					protected void onPostExecute(List<String> result) {
+						
+						List<String> list = new ArrayList<String>();
+						for (String s : result) {
+							list.add(s);
+						}
+						ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(ActivityViewData.this,R.layout.spinner_item,list);
+						dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+						spinnerField.setAdapter(dataAdapter);
+					}
+					
+				}.execute(parent.getItemAtPosition(pos).toString());
 			}
 
 			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-			}
+			public void onNothingSelected(AdapterView<?> arg0) {}
 		});
+		spinnerField.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
+				if (vsName == null)	return;
+				fieldName = parent.getItemAtPosition(pos).toString();
+				updateData();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {}
+		});
+		spinnerViewMode.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
+				if (vsName == null)	return;
+				viewMode = pos + 1;
+				if (viewMode == 1) {
+					addTableViewModeLatest();
+				} else {
+					addTableViewModeCustomize();
+				}
+				updateData();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {}
+		});
+
+	}
+	
+	private void updateData(){
+		new AsyncTask<Void, Void, List<StreamElement>>(){
+			@Override
+			protected List<StreamElement> doInBackground(Void... params) {
+				List<StreamElement> list = new ArrayList<StreamElement>();
+				if (viewMode == 1) {
+					list.add(controller.loadLatestData(numLatest, vsName));
+				} else {
+					list.addAll(controller.loadRangeData(vsName, startTime.getTimeInMillis(), endTime.getTimeInMillis()));
+				}
+				return list;
+			}
+			
+			@Override
+			protected void onPostExecute(List<StreamElement> result) {
+				streamElements = result;
+				
+			}
+			
+		}.execute((Void)null);
 	}
 
 	private void addTableViewModeLatest() {
@@ -279,43 +252,35 @@ public class ActivityViewData extends SherlockFragmentActivity {
 
 		TextView txt = new TextView(this);
 		txt.setText("         View ");
-		txt.setTextColor(Color.parseColor("#000000"));
 		row.addView(txt);
 
 		final EditText editText_numLatest = new EditText(this);
 		editText_numLatest.setText("10");
 		editText_numLatest.setInputType(InputType.TYPE_CLASS_NUMBER);
 		editText_numLatest.requestFocus();
-		editText_numLatest.setTextColor(Color.parseColor("#000000"));
 		row.addView(editText_numLatest);
 
 		editText_numLatest.addTextChangedListener(new TextWatcher() {
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
+			public void beforeTextChanged(CharSequence s, int start, int count,int after) {}
 
 			@Override
 			public void afterTextChanged(Editable s) {
 				try {
 					numLatest = Integer.parseInt(editText_numLatest.getText().toString());
-					loadLatestData();
+					updateData();
 				}
 				catch (NumberFormatException e) {
-					AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-							context);
-					alertDialogBuilder.setTitle("Please input a number!");
+					e.printStackTrace();
 				}
 			}
 		});
 
 		txt = new TextView(this);
 		txt.setText(" latest values");
-		txt.setTextColor(Color.parseColor("#000000"));
 		row.addView(txt);
 
 		txt = new TextView(this);
@@ -326,11 +291,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		row = new TableRow(this);
 		Button detailBtn = new Button(this);
 		detailBtn.setText("Detail");
-
-		// detailBtn.setBackground(getResources().getDrawable(R.drawable.info));
-		// detailBtn.setWidth(200);
 		detailBtn.setTextSize(TEXT_SIZE + 2);
-		detailBtn.setTextColor(Color.parseColor("#000000"));
 		detailBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -341,13 +302,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		Button plotDataBtn = new Button(this);
 		plotDataBtn.setText("Plot data");
 		plotDataBtn.setTextSize(TEXT_SIZE + 2);
-		plotDataBtn.setTextColor(Color.parseColor("#000000"));
-		// plotDataBtn.setBackground(getResources().getDrawable(R.drawable.chart));
-
-		// LinearLayout.LayoutParams params = plotDataBtn.getLayoutParams();
-		// params.width = 50;
-		// plotDataBtn.setLayoutParams(params);
-
+		
 		plotDataBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -356,40 +311,16 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		});
 
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams();
-		// params.addRule(TableRow.LayoutParams.FILL_PARENT);
 		rowParams.span = 2;
-
 		row.addView(detailBtn, rowParams);
 		row.addView(plotDataBtn, rowParams);
-
-		// detailBtn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-		// LayoutParams.WRAP_CONTENT));
-		// plotDataBtn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-		// LayoutParams.WRAP_CONTENT));
 
 		row.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
 		table_view_mode.addView(row);
 	}
 
-	protected void loadData() {
-		if (viewMode == 1)
-			loadLatestData();
-		else
-			loadCustomizedRange();
-	}
-
-	private void loadLatestData() {
-		if (vsName == null)
-			return;
-		controller.loadData(numLatest, vsName);
-	}
-
-	private void loadCustomizedRange() {
-		Log.v(TAG, startTime.getTime() + " " + endTime.getTime());
-
-		controller.loadRangeData(vsName, startTime.getTime(), endTime.getTime());
-	}
+	
 
 	private void addTableViewModeCustomize() {
 		table_view_mode = (TableLayout) findViewById(R.id.table_view_mode);
@@ -399,28 +330,19 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		TableRow row = new TableRow(this);
 		TextView txt = new TextView(this);
 		txt.setText("From: ");
-		txt.setTextColor(Color.parseColor("#000000"));
 		row.addView(txt);
 
-		// Date time = new Date();
-		startTime = new Date();
-		startTime.setMinutes(startTime.getMinutes() - 1);
-		endTime = new Date();
-
 		// Start Time
-		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss",Locale.ENGLISH);
 		txtStartTime = new TextView(this);
-		txtStartTime.setText(formatter.format(startTime) + "");
-		txtStartTime.setTextColor(Color.parseColor("#000000"));
+		txtStartTime.setText(formatter.format(startTime.getTime()) + "");
 		txtStartTime.setBackgroundColor(Color.parseColor("#8dc63f"));
 		row.addView(txtStartTime);
 
 		txtStartTime.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new TimePickerDialog(context, startTimeSetListener, dateAndTime
-						.get(Calendar.HOUR_OF_DAY) - 1, dateAndTime.get(Calendar.MINUTE),
-						true).show();
+				new TimePickerDialog(ActivityViewData.this, startTimeSetListener, startTime.get(Calendar.HOUR_OF_DAY) - 1, startTime.get(Calendar.MINUTE),true).show();
 			}
 		});
 
@@ -430,20 +352,17 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		row.addView(txt);
 
 		// Start Date
-		formatter = new SimpleDateFormat("dd/MM/yyyy");
+		formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.ENGLISH);
 		// txtStartDate, txtStartTime
 		txtStartDate = new TextView(this);
-		txtStartDate.setText(formatter.format(startTime) + "");
-		txtStartDate.setTextColor(Color.parseColor("#000000"));
+		txtStartDate.setText(formatter.format(startTime.getTime()) + "");
 		txtStartDate.setBackgroundColor(Color.parseColor("#8dc63f"));
 		row.addView(txtStartDate);
 
 		txtStartDate.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new DatePickerDialog(context, startDateSetListener, dateAndTime
-						.get(Calendar.YEAR), dateAndTime.get(Calendar.MONTH), dateAndTime
-						.get(Calendar.DAY_OF_MONTH)).show();
+				new DatePickerDialog(ActivityViewData.this, startDateSetListener, startTime.get(Calendar.YEAR), startTime.get(Calendar.MONTH), startTime.get(Calendar.DAY_OF_MONTH)).show();
 			}
 		});
 
@@ -460,23 +379,19 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		row = new TableRow(this);
 		txt = new TextView(this);
 		txt.setText("To");
-		txt.setTextColor(Color.parseColor("#000000"));
 		row.addView(txt);
 
 		// End Time
-		formatter = new SimpleDateFormat("HH:mm:ss");
+		formatter = new SimpleDateFormat("HH:mm:ss",Locale.ENGLISH);
 		txtEndTime = new TextView(this);
-		txtEndTime.setText(formatter.format(endTime) + "");
-		txtEndTime.setTextColor(Color.parseColor("#000000"));
+		txtEndTime.setText(formatter.format(endTime.getTime()) + "");
 		txtEndTime.setBackgroundColor(Color.parseColor("#8dc63f"));
 		row.addView(txtEndTime);
 
 		txtEndTime.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new TimePickerDialog(context, endTimeSetListener, dateAndTime
-						.get(Calendar.HOUR_OF_DAY), dateAndTime.get(Calendar.MINUTE), true)
-						.show();
+				new TimePickerDialog(ActivityViewData.this, endTimeSetListener, endTime.get(Calendar.HOUR_OF_DAY), endTime.get(Calendar.MINUTE), true).show();
 			}
 		});
 
@@ -486,20 +401,17 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		row.addView(txt);
 
 		// End Date
-		formatter = new SimpleDateFormat("dd/MM/yyyy");
+		formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.ENGLISH);
 		// txtStartDate, txtStartTime
 		txtEndDate = new TextView(this);
-		txtEndDate.setText(formatter.format(endTime) + "");
-		txtEndDate.setTextColor(Color.parseColor("#000000"));
+		txtEndDate.setText(formatter.format(endTime.getTime()) + "");
 		txtEndDate.setBackgroundColor(Color.parseColor("#8dc63f"));
 		row.addView(txtEndDate);
 
 		txtEndDate.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new DatePickerDialog(context, endDateSetListener, dateAndTime
-						.get(Calendar.YEAR), dateAndTime.get(Calendar.MONTH), dateAndTime
-						.get(Calendar.DAY_OF_MONTH)).show();
+				new DatePickerDialog(ActivityViewData.this, endDateSetListener, endTime.get(Calendar.YEAR), endTime.get(Calendar.MONTH), endTime.get(Calendar.DAY_OF_MONTH)).show();
 			}
 		});
 
@@ -510,18 +422,16 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		Button detailBtn = new Button(this);
 		detailBtn.setTextSize(TEXT_SIZE + 2);
 		detailBtn.setText("Detail");
-		detailBtn.setTextColor(Color.parseColor("#000000"));
 		detailBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
+				showDialogDetail();
 			}
 		});
 
 		Button plotDataBtn = new Button(this);
 		plotDataBtn.setTextSize(TEXT_SIZE + 2);
 		plotDataBtn.setText("Plot data");
-		plotDataBtn.setTextColor(Color.parseColor("#000000"));
 		plotDataBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -535,26 +445,22 @@ public class ActivityViewData extends SherlockFragmentActivity {
 
 		row.addView(detailBtn, params);
 		row.addView(plotDataBtn, params);
-		row.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT,
-				LayoutParams.WRAP_CONTENT));
+		row.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
 		table_view_mode.addView(row);
-
 	}
+	
 
 	DatePickerDialog.OnDateSetListener startDateSetListener = new DatePickerDialog.OnDateSetListener() {
-		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {
-			startTime.setDate(dayOfMonth);
-			startTime.setYear(year - 1900);
-			startTime.setMonth(monthOfYear);
+		public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+			startTime.set(year, monthOfYear, dayOfMonth);
 			updateStartLabel();
 		}
 	};
 
 	TimePickerDialog.OnTimeSetListener startTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			startTime.setHours(hourOfDay);
-			startTime.setMinutes(minute);
+			startTime.set(Calendar.MINUTE, minute);
+			startTime.set(Calendar.HOUR_OF_DAY,hourOfDay);
 			updateStartLabel();
 		}
 	};
@@ -562,41 +468,33 @@ public class ActivityViewData extends SherlockFragmentActivity {
 	DatePickerDialog.OnDateSetListener endDateSetListener = new DatePickerDialog.OnDateSetListener() {
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
-			endTime.setDate(dayOfMonth);
-			endTime.setYear(year - 1900);
-			endTime.setMonth(monthOfYear);
+			endTime.set(year, monthOfYear, dayOfMonth);
 			updateEndLabel();
 		}
 	};
 
 	TimePickerDialog.OnTimeSetListener endTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			endTime.setHours(hourOfDay);
-			endTime.setMinutes(minute);
+			endTime.set(Calendar.HOUR_OF_DAY,hourOfDay);
+			endTime.set(Calendar.MINUTE, minute);
 			updateEndLabel();
 		}
 	};
 
 	protected void updateEndLabel() {
-		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-		txtEndTime.setText(formatter.format(endTime) + "");
-
-		formatter = new SimpleDateFormat("dd/MM/yyyy");
-		txtEndDate.setText(formatter.format(endTime) + "");
-		// txtEndDate.setText(endTime.getTime() + "");
-
-		loadCustomizedRange();
+		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss",Locale.ENGLISH);
+		txtEndTime.setText(formatter.format(endTime.getTime()) + "");
+		formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.ENGLISH);
+		txtEndDate.setText(formatter.format(endTime.getTime()) + "");
+		updateData();
 	}
 
 	protected void updateStartLabel() {
-		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-		txtStartTime.setText(formatter.format(startTime) + "");
-
-		formatter = new SimpleDateFormat("dd/MM/yyyy");
-		txtStartDate.setText(formatter.format(startTime) + "");
-		// txtStartDate.setText(startTime.getTime() + "");
-
-		loadCustomizedRange();
+		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss",Locale.ENGLISH);
+		txtStartTime.setText(formatter.format(startTime.getTime()) + "");
+		formatter = new SimpleDateFormat("dd/MM/yyyy",Locale.ENGLISH);
+		txtStartDate.setText(formatter.format(startTime.getTime()) + "");
+		updateData();
 	}
 
 	public void viewChart() {
@@ -605,38 +503,20 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		if (streamElements.size() == 0)
 			return;
 
-		ArrayList<Double> data = new ArrayList<Double>();
+		ArrayList<Long> x = new ArrayList<Long>();
+		ArrayList<Double> y = new ArrayList<Double>();
 		for (int i = 0; i < streamElements.size(); i++) {
-			data.add((Double) streamElements.get(i).getData(fieldName));
-			// Log.v(TAG, (Double) streamElements.get(i).getData(fieldName) + "");
+			y.add((Double) streamElements.get(i).getData(fieldName));
+			x.add(streamElements.get(i).getTimeStamp());
 		}
 
-		// Log.v(TAG, data.size() + "");
-
 		Intent intent = null;
-		AbstractDemoChart chart = new SensorValuesChart(vsName, fieldName, data);
+		AbstractChart chart = new SensorValuesChart(vsName, fieldName, x, y);
 		intent = chart.execute(this);
 		startActivity(intent);
 	}
 
-	// public void viewChart(View v) {
-	// if (streamElements == null)
-	// return;
-	// if (streamElements.size() == 0)
-	// return;
-	//
-	// Intent intent = null;
-	// AbstractDemoChart chart = new SensorValuesChart(streamElements);
-	// intent = chart.execute(this);
-	// startActivity(intent);
-	// }
-
-	public void customizeStartEnd(View v) {
-		Intent intent = new Intent(this, ActivityDateTimePicker.class);
-		startActivity(intent);
-	}
-
-	@Override
+	/*@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		final MenuItem add = menu.add("Share");
 		add.setIcon(R.drawable.ic_action_share).setShowAsAction(
@@ -648,22 +528,21 @@ public class ActivityViewData extends SherlockFragmentActivity {
 				return false;
 			}
 		});
-
 		return super.onCreateOptionsMenu(menu);
-	}
+	}*/
 
+	
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		int itemId = item.getItemId();
 		switch (itemId) {
 		case android.R.id.home:
-//			Intent myIntent = new Intent(this, ActivityListVSNew.class);
-//			this.startActivity(myIntent);
 			finish();
 			break;
 		}
 		return true;
 	}
 
+	/*
 	protected void shareOutputData() {
 		String text = getShareData();
 		String subject = "Share " + spinnerVS.getSelectedItem().toString()
@@ -675,7 +554,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		i.putExtra(Intent.EXTRA_TEXT, text);
 
 		copyTextToClipboard(text);
-		Toast.makeText(context,
+		Toast.makeText(this,
 				"Customed message to post on Facebook is copied to clipboard!",
 				Toast.LENGTH_SHORT).show();
 
@@ -699,6 +578,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		}
 	}
 
+	
 	private void outputData(String out) {
 		lblOutput.setText(out);
 	}
@@ -715,7 +595,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		}
 		return out;
 	}
-
+*/
 	private String getDataOutput() {
 		if (streamElements == null)
 			return "";

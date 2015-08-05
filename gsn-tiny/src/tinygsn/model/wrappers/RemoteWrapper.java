@@ -4,11 +4,18 @@ package tinygsn.model.wrappers;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import android.util.Log;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamElement;
@@ -21,14 +28,15 @@ public class RemoteWrapper extends AbstractWrapper {
 	public RemoteWrapper(WrapperConfig wc) {
 		super(wc);
 	}
+	public RemoteWrapper() {
+	}
 
 	@Override
 	public Class<? extends WrapperService> getSERVICE() {return RemoteService.class;}
 	
 	private DataField[] outputS = null;
 	private long lastRun = System.currentTimeMillis();
-	
-	private String[] lastHeader;
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",Locale.ENGLISH);
 	
     private HttpGet httpGet;
 	private DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -36,11 +44,13 @@ public class RemoteWrapper extends AbstractWrapper {
 	private String url = "";
 	private String vs_name = "";
 	
+	@Override
 	public String[] getParameters(){
 		return new String[]{"url","vs_name"};
 		}
 	
-	private void initParameter(String key, String value){
+	@Override
+	protected void initParameter(String key, String value){
 		if (key.endsWith("url")){
 			url = value;
 		}else if (key.endsWith("vs_name")){
@@ -53,7 +63,30 @@ public class RemoteWrapper extends AbstractWrapper {
 	@Override
 	public DataField[] getOutputStructure() {
 		if (outputS == null){
-			
+			try{
+				httpGet = new HttpGet("http://"+url+"/rest/sensors/"+vs_name+"?from=0000-00-00T00:00:00&to=0000-00-00T00:00:00&username=guest&password=guest");
+				HttpResponse response = httpclient.execute(httpGet);
+				int statusCode = response.getStatusLine().getStatusCode();
+				InputStreamReader is = new InputStreamReader(response.getEntity().getContent(),"UTF-8");																				
+				if (statusCode == 200) {
+					BufferedReader bufferedReader = new BufferedReader(is);
+			        String line = bufferedReader.readLine();
+			        if(line != null){
+			        	
+			        	JSONObject obj = new JSONObject(line);
+			        	JSONArray f = obj.getJSONArray("features").getJSONObject(0).getJSONObject("properties").getJSONArray("fields");
+			        	outputS = new DataField[f.length()-1];
+			        	for (int i = 1;i<f.length();i++){
+			        		JSONObject v = f.getJSONObject(i);
+			        		outputS[i-1] = new DataField(v.getString("name"), v.getString("type"));
+			        	}
+			        }
+				}
+				is.close();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		return outputS;
 	}
@@ -81,22 +114,26 @@ public class RemoteWrapper extends AbstractWrapper {
 	@Override
 	public void runOnce() {
 		try{
-			httpGet = new HttpGet("http://"+url+"/rest/sensors/"+vs_name+"?from=2013-05-30T08:30:04&to=2013-05-30T08:35:34&username=john2&password=john");
+			String f = sdf.format(new Date(lastRun+1000));
+			String t = sdf.format(new Date());
+			httpGet = new HttpGet("http://"+url+"/rest/sensors/"+vs_name+"?from="+f+"&to="+t+"&username=guest&password=guest");
+			Log.v("RemoteWrapper", "http://"+url+"/rest/sensors/"+vs_name+"?from="+f+"&to="+t+"&username=guest&password=guest");
 			HttpResponse response = httpclient.execute(httpGet);
 			int statusCode = response.getStatusLine().getStatusCode();
 			InputStreamReader is = new InputStreamReader(response.getEntity().getContent(),"UTF-8");																				
-			if (statusCode != 200) {
+			if (statusCode == 200) {
 				BufferedReader bufferedReader = new BufferedReader(is);
 		        String line = bufferedReader.readLine();
-		        while(line != null){
-		            
-		        	StreamElement s = convertToSE(line);
-		        	
-		        	if(s != null){
-		        	    postStreamElement(s);
-					    lastRun = s.getTimeStamp();
+		        if(line != null){
+		        	JSONObject obj = new JSONObject(line);
+		        	JSONArray val = obj.getJSONArray("features").getJSONObject(0).getJSONObject("properties").getJSONArray("values");
+		        	for (int i = val.length()-1;i>=0;i--){
+		        		StreamElement s = convertToSE(val.getJSONArray(i));
+		        		if(s != null){
+		        			postStreamElement(s);
+		        			lastRun = Math.max(lastRun,s.getTimeStamp());
+		        		}
 		        	}
-		            line = bufferedReader.readLine();
 		        }
 			}
 			is.close();
@@ -108,30 +145,26 @@ public class RemoteWrapper extends AbstractWrapper {
 	
 	
 	
-	private StreamElement convertToSE(String line) {
-		if (line.startsWith("#")){
-			lastHeader = line.split("[#,]");
-			return null;
-		}
-		if (lastHeader != null){
-			DataField[] struct = getOutputStructure();
-			String[] v = line.split(",");
-			StreamElement s = new StreamElement(getOutputStructure(), new Serializable[struct.length]);
-			for(int i=0;i<struct.length;i++){
-				switch(struct[i].getDataTypeID()){
-				case DataTypes.DOUBLE:
-					s.setData(lastHeader[i], Double.parseDouble(v[i]));
-					break;
-				case DataTypes.INTEGER:
-					s.setData(lastHeader[i], Integer.parseInt(v[i]));
-					break;
-				default:
-					s.setData(lastHeader[i], v[i]);	
-				}
+	private StreamElement convertToSE(JSONArray jsonArray) throws JSONException {
+		DataField[] struct = getOutputStructure();
+		StreamElement s = new StreamElement(getOutputStructure(), new Serializable[struct.length]);
+		for(int i=0;i<struct.length;i++){
+			switch(struct[i].getDataTypeID()){
+			case DataTypes.BIGINT:
+				s.setData(i, jsonArray.getLong(i+1));
+				break;
+			case DataTypes.DOUBLE:
+				s.setData(i, jsonArray.getDouble(i+1));
+				break;
+			case DataTypes.INTEGER:
+				s.setData(i, jsonArray.getInt(i+1));
+				break;
+			default:
+				s.setData(i, jsonArray.getString(i+1));	
 			}
-			return s;
 		}
-		return null;
+		s.setTimeStamp((Long)s.getData("timestamp"));
+		return s;
 	}
 
 

@@ -70,7 +70,7 @@ public class AndroidControllerSubscribe extends AbstractController {
 	
 	public AndroidControllerSubscribe(ActivitySubscribe androidViewer) {
 		this.view = androidViewer;
-		storage = new SqliteStorageManager(view);
+		storage = new SqliteStorageManager();
 	}
 
 	public void loadListVS(String server) {
@@ -171,18 +171,6 @@ public class AndroidControllerSubscribe extends AbstractController {
 		this.handlerData = handlerData;
 	}
 
-	public void consume(StreamElement streamElement) {
-	}
-
-	@Override
-	public Activity getActivity() {
-		return view;
-	}
-
-	@Override
-	public StorageManager getStorageManager() {
-		return null;
-	}
 
 	public void pullLatestData(String serverName, String vsName, String numLatest) {
 		new GetVSDataLatest()

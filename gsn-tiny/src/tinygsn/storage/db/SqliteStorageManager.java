@@ -64,20 +64,19 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	private SQLiteDatabase database;
 	private static SQLiteDatabaseOpenHelper dbOpenHelper;
 	
-	public SqliteStorageManager(Context context) {
+	public SqliteStorageManager() {
 		super();
 		this.isSQLite = true;
-		dbOpenHelper = getInstance(context);
+		dbOpenHelper = getInstance();
 		File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/Android/data/tinygsn" );
 		myFilesDir.mkdirs();
 		database = dbOpenHelper.getWritableDatabase();
 	}
 
-	public static synchronized SQLiteDatabaseOpenHelper getInstance(
-			Context context) {
+	public static synchronized SQLiteDatabaseOpenHelper getInstance() {
 		if (dbOpenHelper == null) {
-			dbOpenHelper = new SQLiteDatabaseOpenHelper(context, Const.DATABASE_NAME,
+			dbOpenHelper = new SQLiteDatabaseOpenHelper(StaticData.globalContext, Const.DATABASE_NAME,
 					null, Const.DATABASE_VERSION);
 		}
 		return dbOpenHelper;
@@ -636,7 +635,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		ContentValues newCon = new ContentValues();
 		newCon.put("key", key);
 		newCon.put("value", value);
-		if (getSetting(key).size()==0){
+		if (getSetting(key).size()!=0){
 			database.update("settings",newCon,"key = ?",new String[]{key});
 		}
 		else{

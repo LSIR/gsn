@@ -34,16 +34,18 @@ import java.util.Properties;
 import tinygsn.beans.DataField;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
+import tinygsn.controller.AndroidControllerVS;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.vsensor.NotificationVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -77,6 +79,7 @@ public class ActivityVSConfig extends SherlockActivity {
     private SettingPanel vssetting;
 	private SqliteStorageManager storage = null;
 	private Properties wrapperList;
+	AndroidControllerVS controller = new AndroidControllerVS();
 	
 	private ArrayList<StreamSourcePanel> pannels = new ArrayList<ActivityVSConfig.StreamSourcePanel>();
 
@@ -115,12 +118,8 @@ public class ActivityVSConfig extends SherlockActivity {
         });
 
 		wrapperList = AbstractWrapper.getWrapperList(this);
-
-		loadVSType();
-		
-		
-
-		storage = new SqliteStorageManager(this);
+		loadVSType();		
+		storage = new SqliteStorageManager();
 	}
 
 	public void loadVSType() {
@@ -131,32 +130,40 @@ public class ActivityVSConfig extends SherlockActivity {
 			list.add(s);
 		}
 
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-				R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, list);
+		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerVSType.setAdapter(dataAdapter);
 
 		spinnerVSType.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos,
-					long id) {
-				
-				if (pos == 1) {
-					addViewNotifyConfig();
-				}
-				else
-					table_notify_config.removeAllViews();
-				
+			public void onItemSelected(AdapterView<?> parent, View view, final int pos, long id) {
 				table_vsensor_config.removeAllViews();
-				vssetting = null;
 				
-				try {
-					String[] params = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters();
-					vssetting = new SettingPanel(AbstractVirtualSensor.VIRTUAL_SENSOR_LIST[pos], params);
-					table_vsensor_config.addView(vssetting.getPanel());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				if (pos == 1) addViewNotifyConfig();
+				else table_notify_config.removeAllViews();
+				
+				new AsyncTask<Activity, Void, SettingPanel>(){
+					@Override
+					protected SettingPanel doInBackground(Activity... params) {
+
+						vssetting = null;
+						try {
+							String[] param = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters();
+							vssetting = new SettingPanel("vsensor", param);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						return vssetting;
+					}
+					
+					@Override
+					protected void onPostExecute(SettingPanel result) {
+						if(result != null){
+							table_vsensor_config.addView(vssetting.getPanel());
+						}
+					}
+					
+				}.execute((Activity)null);
+				
 			}
 
 			@Override
@@ -176,7 +183,10 @@ public class ActivityVSConfig extends SherlockActivity {
 		TableRow.LayoutParams p = new TableRow.LayoutParams();
 		p.span = 2;
 		p.width = TableRow.LayoutParams.MATCH_PARENT;
+		layout.setColumnStretchable(1, true);
 		layout.setLayoutParams(p);
+		settingLayout.setLayoutParams(p);
+		settingLayout.setColumnStretchable(1, true);
 		row.addView(layout);
 		TableRow inrow = new TableRow(this);
 		layout.addView(inrow);
@@ -283,16 +293,27 @@ public class ActivityVSConfig extends SherlockActivity {
 							
 				settingLayout.removeAllViews();
 				panel.settings = null;
+				new AsyncTask<Activity, Void, SettingPanel>(){
+					@Override
+					protected SettingPanel doInBackground(Activity... params) {
+						try {
+							String wrapperName = panel.wrapper.getSelectedItem().toString();
+							wrapperName  = wrapperList.getProperty(wrapperName);
+							String[] param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
+							panel.settings = new SettingPanel("wrapper", param);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						return panel.settings;
+					}
+					@Override
+					protected void onPostExecute(SettingPanel result) {
+						if(result != null){
+							settingLayout.addView(panel.settings.getPanel());
+						}
+					}
+				}.execute((Activity)null);
 				
-				try {
-					String wrapperName = panel.wrapper.getSelectedItem().toString();
-					wrapperName  = wrapperList.getProperty(wrapperName);
-					String[] params = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
-					panel.settings = new SettingPanel(wrapperName, params);
-					settingLayout.addView(panel.settings.getPanel());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 			}
 
 			@Override
@@ -490,13 +511,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		saveToDB.setTextColor(Color.parseColor("#000000"));
 		row.addView(saveToDB);
 
-		// saveToDB.setOnClickListener(new OnClickListener() {
-		// @Override
-		// public void onClick(View v) {
-		//
-		// }
-		// });
-
+		
 		table_notify_config.addView(row);
 		// TableRow.LayoutParams params = new TableRow.LayoutParams();
 		// params.span = 2;
@@ -508,19 +523,8 @@ public class ActivityVSConfig extends SherlockActivity {
 		super.onPause();
 	}
 
-	public void saveVS(View view) {
+	public void saveVS() {
 		String vsName = editText_vsName.getText().toString();
-
-		if (vsName.equals("")) {
-			Toast.makeText(this, "Please input VS Name", Toast.LENGTH_SHORT).show();
-			return;
-		}
-		if (storage.vsExists("vs_" + vsName) == true) {
-			Toast.makeText(this, "VS Name already exists, please choose a new one!",
-					Toast.LENGTH_SHORT).show();
-			return;
-		}
-
 		String notify_field = "", notify_condition = "", notify_value = "", notify_action = "", notify_contact = "", save_to_db = "";
 
 		int vsType = spinnerVSType.getSelectedItemPosition();
@@ -549,7 +553,6 @@ public class ActivityVSConfig extends SherlockActivity {
 				wrapperName = p.saveTo(vsName,storage); // TODO compute actual output structure !!!
 			}
 			
-
 			AbstractWrapper w;
 			try {
 				w = StaticData.getWrapperByName(wrapperName);
@@ -561,9 +564,6 @@ public class ActivityVSConfig extends SherlockActivity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			Toast.makeText(this, "Save new virtual sensor successfully!",
-					Toast.LENGTH_SHORT).show();
-
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
@@ -584,22 +584,36 @@ public class ActivityVSConfig extends SherlockActivity {
 		int itemId = item.getItemId();
 		switch (itemId) {
 		case android.R.id.home:
-//			Toast.makeText(this, "Home pressed", Toast.LENGTH_SHORT).show();
-//			Intent myIntent = new Intent(this, ActivityListVSNew.class);
-//			this.startActivity(myIntent);
 			finish();
 			
 			break;
 		case 0:
 			if (isEnableSave) {
-				saveVS(null);
-				isEnableSave = false;
-				 Intent i = new Intent(getApplicationContext(),ActivityListVS.class);
-				 String vsName = editText_vsName.getText().toString();
-				 i.putExtra("VSName", vsName);
-				 startActivity(i);
-				 
-				 setContentView(R.layout.vs_list);
+				String vsName = editText_vsName.getText().toString();
+				if (vsName.equals("")) {
+					Toast.makeText(this, "Please input VS Name", Toast.LENGTH_SHORT).show();
+				}
+				else if (storage.vsExists("vs_" + vsName) == true) {
+					Toast.makeText(this, "VS Name already exists, please choose a new one!",
+							Toast.LENGTH_SHORT).show();
+				}
+				else {
+					new AsyncTask<Activity, Void, Void>(){
+						@Override
+						protected Void doInBackground(Activity... params) {
+							saveVS();
+							isEnableSave = false;
+							String vsName = editText_vsName.getText().toString();
+							controller.startStopVS(vsName, true);
+							return null;
+						}
+						@Override
+						protected void onPostExecute(Void result) {
+							finish();
+						}
+					}.execute(this);
+				}
+				
 			}
 			else
 				Toast.makeText(this, "There is nothing changed to save!",
@@ -675,6 +689,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		public TableLayout getPanel(){
 			
 			TableLayout layout = new TableLayout(ActivityVSConfig.this);
+			layout.setColumnStretchable(1, true);
 			TableRow.LayoutParams p = new TableRow.LayoutParams();
 			p.span = 2;
 			p.width = TableRow.LayoutParams.MATCH_PARENT;

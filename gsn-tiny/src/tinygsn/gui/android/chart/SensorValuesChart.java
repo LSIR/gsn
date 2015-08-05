@@ -22,7 +22,6 @@
 * @author Do Ngoc Hoan
 */
 
-
 package tinygsn.gui.android.chart;
 
 import java.util.ArrayList;
@@ -38,72 +37,40 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
 
-public class SensorValuesChart extends AbstractDemoChart {
-	ArrayList<Double> data = null;
+public class SensorValuesChart extends AbstractChart {
+	ArrayList<Double> y = null;
+	ArrayList<Long> x = null;
 	String vsName, title = "";
 
-	private static final long HOUR = 3600 * 1000;
 
-	private static final long DAY = HOUR * 24;
-
-	// private static final int HOURS = 24;
-
-	public SensorValuesChart(String vsName, String fieldName, ArrayList<Double> result) {
-		data = result;
+	public SensorValuesChart(String vsname, String fieldName, ArrayList<Long> times, ArrayList<Double> values) {
+		y = values;
+		x = times;
 		title = fieldName;
-		this.vsName = vsName;
+		vsName = vsname;
 	}
 
-	/**
-	 * Returns the chart name.
-	 * 
-	 * @return the chart name
-	 */
-	public String getName() {
-		return "Sensor chart";
-	}
-
-	/**
-	 * Returns the chart description.
-	 * 
-	 * @return the chart description
-	 */
-	public String getDesc() {
-		return "View stream elements as charts";
-	}
 
 	public Intent execute(Context context) {
 
 		String[] titles = new String[] { title };
-		long now = Math.round(new Date().getTime() / DAY) * DAY;
-		List<Date[]> x = new ArrayList<Date[]>();
+		List<Date[]> xd = new ArrayList<Date[]>();
+		List<double[]> yd = new ArrayList<double[]>();
 
-		int numOfValue = data.size();
+		int numOfValue = y.size();
 
-		for (int i = 0; i < titles.length; i++) {
-			Date[] dates = new Date[numOfValue];
-			for (int j = 0; j < numOfValue; j++) {
-
-				dates[j] = new Date(now - (numOfValue - j) * HOUR);
-			}
-			x.add(dates);
+		Date[] dates = new Date[numOfValue];
+		double[] values = new double[numOfValue];
+		
+		for (int j = 0; j < numOfValue; j++) {
+			dates[j] = new Date(x.get(j));
+			values[j] = y.get(j);
 		}
+		xd.add(dates);
+		yd.add(values);
 
-		List<double[]> values = new ArrayList<double[]>();
-
-		double[] d = new double[data.size()];
-		List<Double> yValues = new ArrayList<Double>();
-
-		for (int i = 0; i < data.size(); i++) {
-			d[i] = data.get(i);
-//			Log.v("value " + i + "=", d[i] + "");
-			yValues.add(d[i]);
-		}
-
-		double minY = Collections.min(yValues);
-		double maxY = Collections.max(yValues);
-
-		values.add(d);
+		double minY = Collections.min(y);
+		double maxY = Collections.max(y);
 
 		int[] colors = new int[] { Color.GREEN };
 		PointStyle[] styles = new PointStyle[] { PointStyle.CIRCLE };
@@ -113,8 +80,8 @@ public class SensorValuesChart extends AbstractDemoChart {
 			((XYSeriesRenderer) renderer.getSeriesRendererAt(i)).setFillPoints(true);
 		}
 
-		setChartSettings(renderer, vsName + " chart", "Time", title,
-				x.get(0)[0].getTime(), x.get(0)[numOfValue - 1].getTime(), minY * 2
+		setChartSettings(renderer, title + " from " + vsName, "Time", title,
+				x.get(0), x.get(numOfValue - 1), minY * 2
 						- maxY, maxY * 2 - minY, Color.LTGRAY, Color.LTGRAY);
 
 		renderer.setXLabels(10);
@@ -123,7 +90,7 @@ public class SensorValuesChart extends AbstractDemoChart {
 		renderer.setXLabelsAlign(Align.CENTER);
 		renderer.setYLabelsAlign(Align.RIGHT);
 		Intent intent = ChartFactory.getTimeChartIntent(context,
-				buildDateDataset(titles, x, values), renderer, "h:mm a");
+				buildDateDataset(titles, xd, yd), renderer, "h:mm a");
 
 		return intent;
 	}

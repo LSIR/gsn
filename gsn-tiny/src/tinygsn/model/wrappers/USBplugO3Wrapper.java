@@ -27,12 +27,12 @@ import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.model.wrappers.utils.MICSensor;
 import tinygsn.model.wrappers.utils.MICSensor.VirtualSensorDataListener;
 import tinygsn.services.WrapperService;
-import android.app.Activity;
 
 
 public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDataListener{
@@ -40,6 +40,9 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 	public USBplugO3Wrapper(WrapperConfig wc) {
 		super(wc);
 	}
+	public USBplugO3Wrapper() {
+	}
+
 
 	private static final String[] FIELD_NAMES = new String[] { "resistanceo",
 			"resistancev", "humidity", "temperature", "ozonecalibrated",
@@ -61,16 +64,15 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 	private MICSensor sensor;
 
 	public void runOnce() {
-		Activity activity = getConfig().getController().getActivity();
 		updateWrapperInfo();
 		if(dcDuration>0){
-			sensor = new MICSensor(activity);
+			sensor = new MICSensor(StaticData.globalContext);
 			sensor.initSensor();
 			sensor.setListener(this);
 			try {
-				Thread.sleep(dcDuration / 2);
+				Thread.sleep(12000);
 				sensor.getMeasurement();
-				Thread.sleep(dcDuration / 2);
+				Thread.sleep(12000);
 			}
 			catch (InterruptedException e) {}
 		}

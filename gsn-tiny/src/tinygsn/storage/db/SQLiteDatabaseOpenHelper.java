@@ -26,8 +26,10 @@
 package tinygsn.storage.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -83,6 +85,39 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		db.execSQL(createQuery);
 		
 	
+	}
+	
+	@Override
+	public void onOpen(SQLiteDatabase db) {
+		
+		//clean the database if any virtual sensor is not completely defined
+		String query = "Select * from vsList;";
+		Cursor cursor = db.rawQuery(query, new String[] {});
+		ArrayList<String> toRemove = new ArrayList<String>();
+		while (cursor.moveToNext()){
+			String name = cursor.getString(cursor.getColumnIndex("vsname"));
+			
+			//check if it has a data table
+			query = "SELECT * FROM sqlite_master WHERE type = 'table' AND name = ?;";
+			Cursor cursor0 = db.rawQuery(query, new String[] {"vs_"+name});
+			if (!cursor0.moveToNext()){
+				toRemove.add(name);
+			}
+			cursor0.close();
+			
+			//check if it has at least one stream source
+			query = "Select * from sourcesList where vsname = ?;";
+			cursor0 = db.rawQuery(query, new String[] {name});
+			if (!cursor0.moveToNext()){
+				toRemove.add(name);
+			}
+			cursor0.close();
+		}
+		cursor.close();
+		for (String s: toRemove){
+			db.delete("vsList", "vsname = ?", new String[] {s});
+			db.delete("sourcesList", "vsname = ?", new String[] {s});
+		}
 	}
 
 	@Override

@@ -26,6 +26,8 @@
 package tinygsn.model.vsensor;
 
 import java.util.Date;
+
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityViewData;
 import android.R;
@@ -120,11 +122,8 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	public void sendBasicNotification() {
-		Activity activity = getVirtualSensorConfiguration().getController()
-				.getActivity();
-
-		NotificationManager nm = (NotificationManager) activity
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+		
+		NotificationManager nm = (NotificationManager) StaticData.globalContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		int icon = R.drawable.alert_dark_frame;
 		CharSequence tickerText = "TinyGSN notification";
@@ -132,13 +131,12 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 		Notification notification = new Notification(icon, tickerText, when);
 
-		Context context = activity.getApplicationContext();
 		CharSequence contentTitle = "TinyGSN notification";
-		Intent notificationIntent = new Intent(activity, ActivityViewData.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(activity, 0,
+		Intent notificationIntent = new Intent(StaticData.globalContext, ActivityViewData.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(StaticData.globalContext, 0,
 				notificationIntent, 0);
 
-		notification.setLatestEventInfo(context, contentTitle, notify_contentText,
+		notification.setLatestEventInfo(StaticData.globalContext, contentTitle, notify_contentText,
 				contentIntent);
 		notification.flags = Notification.FLAG_AUTO_CANCEL;
 		

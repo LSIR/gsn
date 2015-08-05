@@ -30,10 +30,10 @@ import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -47,6 +47,8 @@ public class AndroidMagneticFieldWrapper extends AbstractWrapper implements
 	public AndroidMagneticFieldWrapper(WrapperConfig wc) {
 		super(wc);
 	}
+	public AndroidMagneticFieldWrapper() {
+	}
 
 	private static final String[] FIELD_NAMES = new String[] { "x", "y", "z" };
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE };
@@ -59,9 +61,7 @@ public class AndroidMagneticFieldWrapper extends AbstractWrapper implements
 	private Sensor mSensor;
 
 	public void runOnce() {
-		Activity activity = getConfig().getController().getActivity();
-		mSensorManager = (SensorManager) activity
-				.getSystemService(Context.SENSOR_SERVICE);
+		mSensorManager = (SensorManager) StaticData.globalContext.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 		updateWrapperInfo();
 		try {

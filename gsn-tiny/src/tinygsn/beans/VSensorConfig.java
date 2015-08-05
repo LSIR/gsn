@@ -27,9 +27,8 @@ package tinygsn.beans;
 
 
 import java.util.ArrayList;
+import java.util.Locale;
 
-import tinygsn.controller.AbstractController;
-import tinygsn.controller.AndroidControllerListVS;
 import tinygsn.model.wrappers.AbstractWrapper;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -48,7 +47,6 @@ public class VSensorConfig implements Parcelable  {
 
 	private int id;
 	private String name;
-	private AbstractController controller = null;
 	private static final String TAG = "VSensorConfig";
 	private InputStream inputStream = null;
 	private DataField[] outputStructure;
@@ -111,9 +109,7 @@ public class VSensorConfig implements Parcelable  {
 		String notify_action_par = source.readString();
 		String notify_contact_par = source.readString();
 		boolean save_to_db_par = Boolean.parseBoolean(source.readString());
-		
-		setController(StaticData.findController(idid));		
-		
+				
 		this.id = idid;
 		this.name = vsName;
 		this.processingClassName = processingClass;
@@ -309,8 +305,7 @@ public class VSensorConfig implements Parcelable  {
 
 	public boolean validate() {
 		String storageHistorySize = this.getStorageHistorySize();
-		storageHistorySize = storageHistorySize.replace(" ", "").trim()
-				.toLowerCase();
+		storageHistorySize = storageHistorySize.replace(" ", "").trim().toLowerCase(Locale.ENGLISH);
 		if (storageHistorySize.equalsIgnoreCase("0"))
 			return true;
 		final int second = 1000;
@@ -402,16 +397,6 @@ public class VSensorConfig implements Parcelable  {
 		return isTimestampUnique;
 	}
 
-	public AbstractController getController() {
-		return controller;
-	}
-
-	public void setController(AbstractController controller) {
-		this.controller = controller;
-		this.controller.setId(id);
-		
-	}
-
 	public String getNotify_field() {
 		return notify_field;
 	}
@@ -485,7 +470,6 @@ public class VSensorConfig implements Parcelable  {
 		dest.writeString(getNotify_action());
 		dest.writeString(getNotify_contact());
 		dest.writeString(Boolean.toString(isSave_to_db()));
-		StaticData.addController((AndroidControllerListVS) getController());
 	}
 	public static final Parcelable.Creator<VSensorConfig> CREATOR  = new Creator<VSensorConfig>() {
 

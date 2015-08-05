@@ -3,8 +3,6 @@ package tinygsn.services;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.model.wrappers.AbstractWrapper;
-
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -25,13 +23,12 @@ public abstract class WrapperService extends IntentService{
 		Bundle b = intent.getExtras();
 		config = (WrapperConfig) b.get("tinygsn.beans.config");
 		if (!config.isRunning()) return;
-		Activity activity = config.getController().getActivity();
 		try {
 			w = StaticData.getWrapperByName(config.getWrapperName());
 			w.runOnce();
 		} catch (Exception e1) {}
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000*w.getDcInterval(),PendingIntent.getService(activity, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000*w.getDcInterval(),PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 	
 }

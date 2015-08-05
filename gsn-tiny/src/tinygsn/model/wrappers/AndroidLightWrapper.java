@@ -31,10 +31,10 @@ import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -49,6 +49,8 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 	public AndroidLightWrapper(WrapperConfig wc) {
 		super(wc);
 	}
+	public AndroidLightWrapper() {
+	}
 	private static final String[] FIELD_NAMES = new String[] {"Illuminance"};
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE };
 	private static final String[] FIELD_DESCRIPTION = new String[] { "Illuminance" };
@@ -60,9 +62,7 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 
 
 	public void runOnce() {
-		Activity activity = getConfig().getController().getActivity();
-		mSensorManager = (SensorManager) activity
-				.getSystemService(Context.SENSOR_SERVICE);
+		mSensorManager = (SensorManager) StaticData.globalContext.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 		updateWrapperInfo();
 		try {

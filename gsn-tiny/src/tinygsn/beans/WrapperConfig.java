@@ -1,7 +1,5 @@
 package tinygsn.beans;
 
-import tinygsn.controller.AbstractController;
-import tinygsn.controller.AndroidControllerListVS;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -9,7 +7,6 @@ public class WrapperConfig implements Parcelable {
 	
 	private String wrapperName;
 	private int id;
-	private AbstractController controller = null;
 	private boolean running = true;
 	private String param = "";
 	
@@ -41,32 +38,21 @@ public class WrapperConfig implements Parcelable {
 		this.wrapperName = wrapperName;
 	}
 
-	public WrapperConfig(int id, String name, AbstractController controller){
+	public WrapperConfig(int id, String name){
 		wrapperName = name;
-		this.controller = controller;
 	}
 	
 	public WrapperConfig(Parcel source){
 		id = source.readInt();
 		wrapperName = source.readString();
 		param = source.readString();
-		setController(StaticData.findController(id));
 	}
 
-	public WrapperConfig(int id, String name,
-			AndroidControllerListVS globalController, String parameter) {
+	public WrapperConfig(int id, String name, String parameter) {
 		wrapperName = name;
-		this.controller = globalController;
 		this.param = parameter;
 	}
 	
-	public AbstractController getController() {
-		return controller;
-	}
-	public void setController(AbstractController controller) {
-		this.controller = controller;
-		this.controller.setId(id);
-	}
 	@Override
 	public int describeContents() {
 		return 0;
@@ -76,9 +62,7 @@ public class WrapperConfig implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
 		dest.writeString(wrapperName);
-		dest.writeString(param);
-		StaticData.addController((AndroidControllerListVS) getController());
-		
+		dest.writeString(param);		
 	}
 	
 	public static final Parcelable.Creator<WrapperConfig> CREATOR  = new Creator<WrapperConfig>() {

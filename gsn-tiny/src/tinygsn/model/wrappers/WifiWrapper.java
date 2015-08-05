@@ -55,6 +55,8 @@ public class WifiWrapper extends AbstractWrapper {
 	public WifiWrapper(WrapperConfig wc) {
 		super(wc);
 	}
+	public WifiWrapper() {
+	}
 
 	private static final String[] FIELD_NAMES = new String[] { "mac1", "mac2", "level" };
 	private static final Byte[] FIELD_TYPES = new Byte[] { DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE };
@@ -114,7 +116,7 @@ public class WifiWrapper extends AbstractWrapper {
 			Bundle b = intent.getExtras();
 			config = (WrapperConfig) b.get("tinygsn.beans.config");
 			if(!config.isRunning()) return;
-			storage = new SqliteStorageManager(config.getController().getActivity());
+			storage = new SqliteStorageManager();
 			try {
 				w = StaticData.getWrapperByName("tinygsn.model.wrappers.WifiWrapper");
 			} catch (Exception e1) {}
@@ -149,7 +151,7 @@ public class WifiWrapper extends AbstractWrapper {
 		    ctr++;
 			
 			AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-			am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000*interval,PendingIntent.getService(config.getController().getActivity(), 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
+			am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000*interval,PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
 		}
 			
 		

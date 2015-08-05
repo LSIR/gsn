@@ -26,7 +26,6 @@ package ch.serverbox.android.ftdiusb;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -39,7 +38,7 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
-import android.widget.Toast;
+
 
 //0403:6001 FTDI Serial
 //0x81 EP IN
@@ -57,11 +56,11 @@ public class FTDI_USB_Handler {
 	private UsbInterface usbIf = null;
 	private UsbEndpoint epIN = null;
 	private UsbEndpoint epOUT = null;
-	protected Activity activity = null;
+	protected Context activity = null;
 	private boolean mStopped = true;
 	protected Thread readThread = null;
 
-	public FTDI_USB_Handler(final Activity a) {
+	public FTDI_USB_Handler(final Context a) {
 		activity = a;
 
 		readThread = new Thread() {
@@ -226,11 +225,7 @@ public class FTDI_USB_Handler {
 			readThread.start();
 		}
 		catch (final Exception e) {
-			activity.runOnUiThread(new Runnable() {
-				public void run() {
-					Toast.makeText(activity, e.toString(), Toast.LENGTH_LONG).show();
-				}
-			});
+			 e.printStackTrace();
 		}
 
 		showLog("init_USB finish");
@@ -265,11 +260,6 @@ public class FTDI_USB_Handler {
 	}
 	
 	void showLog(final String text){
-		activity.runOnUiThread(new Runnable() {
-			public void run() {
-				Toast.makeText(activity, text, Toast.LENGTH_SHORT)
-						.show();
-			}
-		});
+		 Log.i("FTDI_USB", text);
 	}
 }

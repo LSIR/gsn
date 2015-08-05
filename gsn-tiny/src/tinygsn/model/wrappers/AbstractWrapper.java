@@ -39,7 +39,6 @@ import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -153,8 +152,7 @@ public abstract class AbstractWrapper {
 	}
 	
 	public void updateWrapperInfo(){
-		Activity activity = getConfig().getController().getActivity();
-		SqliteStorageManager storage = new SqliteStorageManager(activity);
+		SqliteStorageManager storage = new SqliteStorageManager();
 		int[] info = storage.getWrapperInfo(getWrapperName());
 		if (info != null){
 			dcInterval = info[0];
@@ -162,14 +160,14 @@ public abstract class AbstractWrapper {
 		}
 	}
 	
-	synchronized public void start(Context context){
+	synchronized public void start(){
 		if (listenerCount < 1){
 			try {
-				Intent  serviceIntent = new Intent(context, getSERVICE());
+				Intent  serviceIntent = new Intent(StaticData.globalContext, getSERVICE());
 				config.setRunning(true);
 				serviceIntent.putExtra("tinygsn.beans.config",config );
 				StaticData.addRunningService(getWrapperName(), serviceIntent);
-				context.startService(serviceIntent);
+				StaticData.globalContext.startService(serviceIntent);
 			} catch (Exception e) {
 				// release anything?
 			}
@@ -177,7 +175,7 @@ public abstract class AbstractWrapper {
 		listenerCount++;
 	}
 	
-	synchronized public void stop(Context context){
+	synchronized public void stop(){
 		if (listenerCount == 1){
 			try {
 				Intent serviceIntent = StaticData.getRunningIntentByName(getWrapperName());
@@ -186,7 +184,7 @@ public abstract class AbstractWrapper {
 					serviceIntent.removeExtra("tinygsn.beans.config");
 					config.setRunning(false);
 					serviceIntent.putExtra("tinygsn.beans.config", config);
-					context.startService(serviceIntent);
+					StaticData.globalContext.startService(serviceIntent);
 				}
 			} catch (Exception e) {
 				// release anything?
@@ -197,14 +195,15 @@ public abstract class AbstractWrapper {
 	}
 
 	public void initialize_wrapper() {
-		HashMap<String,String> param = config.getController().getStorageManager().getSetting("wrapper:"+config.getWrapperName()+":");
+		SqliteStorageManager storage = new SqliteStorageManager();
+		HashMap<String,String> param = storage.getSetting("wrapper:"+config.getWrapperName()+":");
 		for(Entry<String,String> e : param.entrySet()){
 			initParameter(e.getKey(), e.getValue());
 		}
 		initialize();
 	}
 	
-	private void initParameter(String key, String value){}
+	protected void initParameter(String key, String value){}
 	
 	public String[] getParameters(){return new String[]{};}
 

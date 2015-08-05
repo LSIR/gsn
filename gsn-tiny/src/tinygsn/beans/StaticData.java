@@ -5,8 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.content.Context;
 import android.content.Intent;
-import tinygsn.controller.AndroidControllerListVS;
+import tinygsn.controller.AndroidControllerVS;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 
@@ -14,7 +15,6 @@ public class StaticData {
 	public static final int USER_ID = 123;
 	private static int LastIdUsed = 1;
 	public static InputStream is;
-	private static Map<Integer, AndroidControllerListVS> controllerMap = new HashMap< Integer, AndroidControllerListVS>();
 	private static Map<String, Intent> runningServices = new HashMap<String, Intent>();
 	private static Map<Integer, VSensorConfig> configMap = new HashMap<Integer, VSensorConfig>();
 	public static Map<String, String> vsNames = new HashMap<String, String>();
@@ -86,22 +86,15 @@ public class StaticData {
 		runningServices.put(name, intent);
 	}
 	
-	synchronized static public void addController(AndroidControllerListVS controller)
-	{
-		controllerMap.put(controller.getId(), controller);
-	}
-	synchronized static public AndroidControllerListVS findController(int id)
-	{
-		return controllerMap.get(id);
-	}
 	synchronized static public int findNextID()
 	{
 		return LastIdUsed++;
 	}
 	
-	public static AndroidControllerListVS globalController;
+	public static Context globalContext;
 	
 	private static Map<String, AbstractVirtualSensor> vsMap = new HashMap<String, AbstractVirtualSensor>();
+	
 	public static AbstractVirtualSensor getProcessingClassByVSConfig(VSensorConfig config) throws Exception {
 		if(vsMap.containsKey(config.getName())){
 			return vsMap.get(config.getName());
@@ -119,6 +112,10 @@ public class StaticData {
 		vsMap.remove(name);
 	}
 	
+	public static AbstractVirtualSensor getProcessingClassByName(String name){
+		return vsMap.get(name);
+	}
+	
 	private static Map<String, AbstractWrapper> wrapperMap = new HashMap<String, AbstractWrapper>();
 	public static AbstractWrapper getWrapperByName(String name) throws Exception {
 		if(wrapperMap.containsKey(name)){
@@ -127,9 +124,9 @@ public class StaticData {
 		String[] realNames = name.split("\\?");
 		WrapperConfig wc = null;
 		if(realNames.length==2){
-			wc = new WrapperConfig(0,name, globalController,realNames[1]);
+			wc = new WrapperConfig(0,name,realNames[1]);
 		}else{
-			wc = new WrapperConfig(0,name, globalController);
+			wc = new WrapperConfig(0,name);
 		}
 		AbstractWrapper wrapper = (AbstractWrapper) Class.forName(realNames[0]).getDeclaredConstructor(new Class[] {WrapperConfig.class}).newInstance(wc);
 		wrapper.initialize_wrapper();
