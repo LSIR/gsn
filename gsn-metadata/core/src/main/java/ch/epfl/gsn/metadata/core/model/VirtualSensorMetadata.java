@@ -5,6 +5,8 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,9 +19,12 @@ import java.util.*;
 @Document(collection = "virtual_sensor_metadata")
 public class VirtualSensorMetadata extends GSNMetadata {
 
+    @Transient
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private GeoData geoData;
 
-    private Set<ObservedProperty> observedProperties  = Sets.newHashSet();
+    private Set<ObservedProperty> observedProperties = Sets.newHashSet();
 
     private WikiInfo wikiInfo;
 
@@ -60,7 +65,7 @@ public class VirtualSensorMetadata extends GSNMetadata {
                 if (o1.getName() != null && o2.getName() != null) {
                     return o1.getName().compareTo(o2.getName());
                 } else {
-                    return o1.getName() != null? 1:-1;
+                    return o1.getName() != null ? 1 : -1;
                 }
             }
         });
@@ -97,5 +102,31 @@ public class VirtualSensorMetadata extends GSNMetadata {
 
     public boolean addObservedProperty(ObservedProperty observedProperty) {
         return observedProperties.add(observedProperty);
+    }
+
+    public boolean replaceObservedProperties(Set<ObservedProperty> observedProperties) {
+        this.observedProperties.clear();
+        return this.observedProperties.addAll(observedProperties);
+    }
+
+    public void update(VirtualSensorMetadata newMetadata) {
+
+        this.description = newMetadata.getDescription();
+        this.fromDate = newMetadata.getFromDate();
+        this.isPublic = newMetadata.isPublic();
+        this.metadataLink = newMetadata.getMetadataLink();
+
+        if (this.location == null || (this.location != null && !this.location.equals(newMetadata.getLocation()))) {
+            this.location = newMetadata.getLocation();
+            this.setGeoData(null);
+            logger.info("NEW LOCATION for = " + newMetadata.getName());
+        }
+
+        if (this.getObservedProperties().size() != newMetadata.getObservedProperties().size()) {
+            this.replaceAllPropertyNames(newMetadata.getPropertyNames());
+            this.replaceObservedProperties(newMetadata.getObservedProperties());
+            logger.info("NEW properties= " + newMetadata.getName());
+
+        }
     }
 }

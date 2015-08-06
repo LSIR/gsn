@@ -246,8 +246,8 @@ public class GeoJsonConverter {
 
     protected void writePoint(JsonWriter writer, Point point) throws IOException {
         writer.beginArray();
-        writer.value(point.getY());
         writer.value(point.getX());
+        writer.value(point.getY());
         writer.endArray();
     }
 

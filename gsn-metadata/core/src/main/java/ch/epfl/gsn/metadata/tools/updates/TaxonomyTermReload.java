@@ -23,11 +23,6 @@ public class TaxonomyTermReload {
 
 
         long count = service.updateTaxonomyTerms();
-        System.out.println("count = " + count);
 
-        Multimap<String, String> missingParameters = service.getMissingParameters();
-        for (String parameter : missingParameters.keySet()) {
-            System.out.println(parameter  + " , (" + Joiner.on(" ").join(missingParameters.get(parameter)) + ")");
-        }
     }
 }

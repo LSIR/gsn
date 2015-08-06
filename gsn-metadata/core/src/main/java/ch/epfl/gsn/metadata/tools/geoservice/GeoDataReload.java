@@ -10,7 +10,7 @@ public class GeoDataReload {
 
     public static void main(String[] args) {
 
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(ToolsConfiguration.class, MongoApplicationConfig.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(MongoApplicationConfig.class);
         ctx.scan("ch.epfl.gsn.metadata");
         TopoDataUpdate service = ctx.getBean(TopoDataUpdate.class);
 

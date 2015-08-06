@@ -98,6 +98,7 @@ public class SensorPageController {
         Query query = queryBuilder.build(sensorQuery);
 
         Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.findForQuery(query);
+//        Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.allSensors();
 
         Set<VirtualSensorMetadata> sensorMetadataSet = Sets.newHashSet(virtualSensorMetadatas);
         logger.info("query: " + sensorQuery + " results " + sensorMetadataSet.size());
