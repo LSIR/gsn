@@ -22,6 +22,17 @@ import scala.util.Success
 import gsn.data.format.XmlSerializer
 import play.api.http.ContentTypes
 import gsn.data.format.CsvSerializer
+import play.api.http.Writeable
+import play.api.libs.json.JsValue
+import play.api.libs.iteratee.Enumerator
+import java.io.OutputStream
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.core.JsonFactory
+import java.io.ByteArrayOutputStream
+import java.io.ObjectOutputStream
+import java.io.ByteArrayInputStream
+import play.api.libs.json.JacksonJson
+import gsn.data.format.JsonSerializer
 
 object SensorService extends Controller{   
   lazy val conf=ConfigFactory.load
@@ -78,14 +89,17 @@ object SensorService extends Controller{
 	}    
   }
   
+  private def globalKeyOk(key:String)=
+    key.equals(Global.globalKey )
+  
   private def authorizeVs(vsname:String)(implicit request:Request[AnyContent])={     
     if (Global.gsnConf.accessControl.enabled && Global.acDs.hasAccessControl(vsname)){
 	  val optApikey=queryparam("apikey")
 	  // Deprecated user and pass on query params 
 	  //authorizeUserPass(vsname) 
 	   
-	  if (optApikey.isDefined){
-	    if (!Global.acDs.authorizeVs(vsname, optApikey.get))
+	  if (optApikey.isDefined){	    
+	    if (!globalKeyOk(optApikey.get) && !Global.acDs.authorizeVs(vsname, optApikey.get))	      
 	      throw new IllegalArgumentException(s"Apikey ${optApikey.get} not authorized for resource $vsname")      
 	  }
 	  else
@@ -97,7 +111,7 @@ object SensorService extends Controller{
     Try{
       val vsname=sensorid.toLowerCase
       //to enable
-      //authorizeVs(sensorid)
+      authorizeVs(sensorid)
     	
       val size:Option[Int]=queryparam("size").map(_.toInt)
       val fieldStr:Option[String]=queryparam("fields")
@@ -119,14 +133,23 @@ object SensorService extends Controller{
         case e=>throw new IllegalArgumentException("illegal conditions in filter: "+e.getMessage())
       }.get.map(_.toString)
  
+      
       val p=Promise[Seq[SensorData]]               
       val q=Akka.system.actorOf(Props(new QueryActor(p)))
-      
-      q ! GetSensorData(sensorid,fields,conds++filters,size,timeFormat)
+      Logger.debug("request the query actor")
+      q ! GetSensorData(vsname,fields,conds++filters,size,timeFormat)
       //val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 15.second)
       p.future.map{data=>        
-          format match{
-            case Json=>Ok(JsonSerializer.ser(data.head,Seq(),false))
+        Logger.debug("before formatting")
+                 
+        format match{
+            case controllers.gsn.api.Json=>
+              val pp=JsonSerializer.ser(data.head,Seq(),false)
+              Logger.debug("serialized json")
+              
+              Logger.debug("strings")
+              //val en=Enumerator.enumerate(top.get)
+              Ok(pp)
             case Csv=>Ok(CsvSerializer.ser(data.head,Seq(),false))
           }
           
@@ -273,13 +296,17 @@ object SensorService extends Controller{
     
   }
   
-  def result(s:String,out:OutputFormat)={
+  def result(s:Object,out:OutputFormat)={
     val contentType = out match {
       case Xml=>ContentTypes.XML
       case Json=>ContentTypes.JSON
       case _ =>ContentTypes.TEXT
     }
-    Ok(s).as(contentType)
+    s match {
+      case s:String=>Ok(s).as(contentType)
+      case j:JsValue=>
+        Ok(j).as(contentType)
+    }
   }
   
   

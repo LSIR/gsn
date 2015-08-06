@@ -78,7 +78,7 @@ object SensorDatabase {
     
  	val query = new StringBuilder("select ")
     query.append((Seq("timed")++ordered).mkString(","))
-	query.append(" from ").append(sensor.name )
+	query.append(" from ").append(sensor.name.toLowerCase )
 	if (conditions != null && conditions.length>0) 
 	  query.append(" where "+conditions.mkString(" and "))
     if (size.isDefined) 
