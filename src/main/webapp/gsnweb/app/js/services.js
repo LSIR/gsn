@@ -195,7 +195,7 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
         return {
 
             buildGsnLink: function () {
-                var url = "http://montblanc.slf.ch:22001/multidata?time_format=unix&download_format=csv";
+                var url = "http://montblanc.slf.ch:22001/multidata?download_format=csv";
 
 
                 var count = 0;
@@ -234,12 +234,12 @@ gsnDataServices.factory('UrlBuilder', ['$routeParams', '$filter', 'FilterParamet
                 var url = this.buildGsnLink();
                 //url = 'http://localhost:8000/app/sensors/imis_fka_2_30min_test.txt';
 
-                return url + '&download_mode=inline';
+                return url + '&download_mode=inline' + '&time_format=unix';
                 //return 'http://localhost:8000/app/sensors/multiple_sensors_2015-06-16_22-29-23.csv';
             },
 
             getDwonloadUrl: function () {
-                return this.buildGsnLink();
+                return this.buildGsnLink() + '&time_format=iso';
             },
 
             formatDateGSN: function (date) {

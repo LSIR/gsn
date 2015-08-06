@@ -340,7 +340,6 @@ gsnMap.factory('Sensors', ['$http', function ($http) {
             var promise = $http({
                 method: 'GET',
                 url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors?onlyPublic=false'
-                //url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors'
                 //url: 'http://localhost:8090/web/virtualSensors?onlyPublic=false'
             });
             promise.success(function (data, status, headers, conf) {
