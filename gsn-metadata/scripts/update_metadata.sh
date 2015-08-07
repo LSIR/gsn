@@ -8,6 +8,6 @@ server=${2:-$SERVER}
 
 echo "location = $location"
 
-cd ../
+cd core/
 mvn compile exec:java -Dexec.mainClass="ch.epfl.gsn.metadata.tools.gsn.GSNImportTool" -Dexec.args="$location $server"
 
