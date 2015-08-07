@@ -47,7 +47,6 @@ public class MetadataController {
     public
     @ResponseBody
     String getVirtualSensors(SensorQuery sensorQuery, HttpServletResponse response) {
-        System.out.println("sensorQuery = " + sensorQuery);
 
         addHeadersToResponce(response);
 
@@ -65,7 +64,6 @@ public class MetadataController {
     public
     @ResponseBody
     String getMeasurementRecordsForDbTableName(@PathVariable String dbTableName, HttpServletResponse response) {
-        System.out.println("dbTableName = " + dbTableName);
 
         VirtualSensorMetadata virtualSensorMetadata = sensorAccessService.getVirtualSensorMetadata(dbTableName.toLowerCase());
 

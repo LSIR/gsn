@@ -76,9 +76,6 @@ public class SensorPageController {
     public
     @ResponseBody
     String getSensorWithTableModel(@PathVariable String dbTableName, SensorQuery sensorQuery, HttpServletResponse response) {
-        System.out.println("dbTableName = " + dbTableName);
-        System.out.println("sensorQuery = " + sensorQuery);
-
 
         VirtualSensorMetadata virtualSensorMetadata = sensorAccessService.getVirtualSensorMetadata(dbTableName.toLowerCase());
 
@@ -91,7 +88,6 @@ public class SensorPageController {
     public
     @ResponseBody
     String getVirtualSensors(SensorQuery sensorQuery, HttpServletResponse response) {
-        System.out.println("sensorQuery = " + sensorQuery);
 
         setResponseHeader(response);
 

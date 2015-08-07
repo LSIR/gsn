@@ -7,6 +7,6 @@ fi
 
 location="$1"
 
-cd core/
+cd ../core/
 mvn compile exec:java -Dexec.mainClass="ch.epfl.gsn.metadata.tools.taxonomy.TaxonomyImportTool" -Dexec.args="$location"
 
