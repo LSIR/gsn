@@ -453,20 +453,21 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	
 			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
 			
-			
-			VSensorConfig vsc = new VSensorConfig(id ,processingClass, vsname, getSourcesOfVS(vsname),
-					 running == 1, notify_field, notify_condition,
-					notify_value, notify_action, notify_contact, save_to_db);
-			
-			AbstractVirtualSensor vs = null;
-			try {
-				vs = StaticData.getProcessingClassByVSConfig(vsc);
-				vsList.add(vs);
-				StaticData.addConfig(id, vsc);
-				StaticData.saveNameID(id, vsname);
-			} catch (Exception e) {
-				e.printStackTrace();
+			AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsname);
+			if (vs == null){
+				VSensorConfig vsc = new VSensorConfig(id ,processingClass, vsname, getSourcesOfVS(vsname),
+						 running == 1, notify_field, notify_condition,
+						notify_value, notify_action, notify_contact, save_to_db);
+	
+				try {
+					vs = StaticData.getProcessingClassByVSConfig(vsc);
+					StaticData.addConfig(id, vsc);
+					StaticData.saveNameID(id, vsname);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+			if (vs != null) vsList.add(vs);
 		}
 		return vsList;
 	};
@@ -496,18 +497,18 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		
 				String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
 				
-				
-				VSensorConfig vsc = new VSensorConfig(id ,processingClass, vsname, getSourcesOfVS(vsName),
+				AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsname);
+				if (vs == null){
+				    VSensorConfig vsc = new VSensorConfig(id ,processingClass, vsname, getSourcesOfVS(vsName),
 						 running == 1, notify_field, notify_condition,
 						notify_value, notify_action, notify_contact, save_to_db);
-				
-				AbstractVirtualSensor vs = null;
-				try {
-					vs = StaticData.getProcessingClassByVSConfig(vsc);
-					StaticData.addConfig(id, vsc);
-					StaticData.saveNameID(id, vsname);
-				} catch (Exception e) {
-					e.printStackTrace();
+				    try {
+					    vs = StaticData.getProcessingClassByVSConfig(vsc);
+					    StaticData.addConfig(id, vsc);
+					    StaticData.saveNameID(id, vsname);
+				    } catch (Exception e) {
+					    e.printStackTrace();
+				    }
 				}
 				
 				return vs;
@@ -523,6 +524,16 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			return true;
 		}
 		return false;
+	}
+	
+	public ArrayList<String> getVSfromSource(String name){
+		String query = "Select * from sourcesList where wrappername = ? order by vsname asc;";
+		Cursor cursor = database.rawQuery(query, new String[] { name });
+		ArrayList<String> r = new ArrayList<String>();
+		while (cursor.moveToNext()) {
+			r.add(cursor.getString(cursor.getColumnIndex("vsname")));
+		}
+		return r;
 	}
 
 	@Override

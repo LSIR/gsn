@@ -25,14 +25,14 @@
         <item name="actionBarTabStyle">@style/MyActionBarTabStyle</item>
         <item name="android:actionDropDownStyle">@style/MyDropDownNav</item>
         <item name="actionDropDownStyle">@style/MyDropDownNav</item>
-        <item name="android:listChoiceIndicatorMultiple">@drawable/ad_btn_check_holo_light</item>
-        <item name="android:listChoiceIndicatorSingle">@drawable/ad_btn_radio_holo_light</item>
+       <!--   <item name="android:listChoiceIndicatorMultiple">@drawable/ad_btn_check_holo_light</item>
+        <item name="android:listChoiceIndicatorSingle">@drawable/ad_btn_radio_holo_light</item>-->
         <!--<item name="android:actionOverflowButtonStyle">@style/MyOverflowButton</item>-->
     </style>
     
     <!-- style the overflow menu -->
     <style name="MyPopupMenu" parent="Widget.Sherlock.Light.PopupMenu">
-        <item name="android:popupBackground">@drawable/ad_menu_dropdown_panel_holo_light</item>
+        <item name="android:popupBackground">@drawable/abs__menu_dropdown_panel_holo_light</item>
     </style>
 
     <!-- style the items within the overflow menu -->
@@ -50,7 +50,7 @@
     <!-- style the list navigation -->
     <style name="MyDropDownNav" parent="Widget.Sherlock.Light.Spinner.DropDown.ActionBar">
         <item name="android:background">@drawable/ad_spinner_background_holo_light</item>
-        <item name="android:popupBackground">@drawable/ad_menu_dropdown_panel_holo_light</item>
+        <item name="android:popupBackground">@drawable/abs__menu_dropdown_panel_holo_light</item>
         <item name="android:dropDownSelector">@drawable/ad_selectable_background</item>
     </style>
 </resources>

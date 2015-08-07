@@ -35,7 +35,7 @@ import org.kroz.activerecord.DatabaseBuilder;
 import org.kroz.activerecord.utils.Logg;
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityListSubscription;
-import tinygsn.gui.android.utils.SubscriptionRow;
+import tinygsn.gui.android.utils.SensorRow;
 import tinygsn.storage.StorageManager;
 import tinygsn.storage.db.SqliteStorageManager;
 import tinygsn.utils.Const;
@@ -50,7 +50,7 @@ public class AndroidControllerListSubscription extends AbstractController {
 
 	private Handler handlerData = null;
 
-	private ArrayList<SubscriptionRow> subsDataList = new ArrayList<SubscriptionRow>();
+	private ArrayList<SensorRow> subsDataList = new ArrayList<SensorRow>();
 
 	private static final String TAG = "AndroidControllerListSubscription";
 
@@ -72,122 +72,4 @@ public class AndroidControllerListSubscription extends AbstractController {
 		this.handlerData = handlerData;
 	}
 
-
-
-
-	public void createSampleData() {
-		for (int i = 0; i < 2; i++) {
-			try {
-				SubscriptionRow r = _db.newEntity(SubscriptionRow.class);
-
-				r.setServer("http://10.0.2.2:22001");
-				r.setVsname("temperature");
-				r.setData("timed: 10/11/2013\n\ttemp: " + (new Random().nextInt(100)));
-				r.setRead("0");
-
-				r.save();
-				Log.v(TAG, "Create row ok");
-			}
-			catch (ActiveRecordException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveNewSubscriptionData(String server, String data) {
-
-		try {
-			SubscriptionRow r = _db.newEntity(SubscriptionRow.class);
-
-			r.setServer(server);
-			r.setVsname("multiFormatSample");
-			r.setData("timed: " + (new Date()).toString() + "\n\t " + (data));
-			r.setRead("0");
-
-			r.save();
-
-			Log.v(TAG, "Insert new subscription ok!");
-		}
-		catch (ActiveRecordException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public void loadListSubsData() {
-		try {
-			subsDataList = (ArrayList<SubscriptionRow>) _db.findByColumn(
-					SubscriptionRow.class, "read", "0");
-
-			for (SubscriptionRow r : subsDataList) {
-				numLoaded++;
-			}
-		}
-		catch (ActiveRecordException e) {
-			e.printStackTrace();
-		}
-
-		Message msg = new Message();
-		msg.obj = subsDataList;
-		handlerData.sendMessage(msg);
-	}
-
-	public void markDataUnreadToRead() {
-		try {
-			subsDataList = (ArrayList<SubscriptionRow>) _db.findByColumn(
-					SubscriptionRow.class, "read", "0");
-
-			for (SubscriptionRow r : subsDataList) {
-				r.setRead("1");
-				r.save();
-				numLoaded++;
-			}
-		}
-		catch (ActiveRecordException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void deleteAll() {
-		try {
-			subsDataList = (ArrayList<SubscriptionRow>) _db
-					.findAll(SubscriptionRow.class);
-
-			for (SubscriptionRow r : subsDataList) {
-				boolean delete = false;
-				
-				if (r.getVsname().equals("temperature"))
-					delete = true;
-				if (r.getData().contains("Trying"))
-					delete = true;
-				if (r.getData().contains("Demo"))
-					delete = true;
-				
-				if (delete == true)
-					r.delete();
-			}
-		}
-		catch (ActiveRecordException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void loadMore() {
-		try {
-			numLoaded += 3;
-
-			subsDataList = (ArrayList<SubscriptionRow>) _db
-					.rawQuery(
-							SubscriptionRow.class,
-							"SELECT * FROM Subscription_Row WHERE _id > (Select max(_id) as maxid from Subscription_Row) - "+numLoaded);
-
-		}
-		catch (ActiveRecordException e) {
-			e.printStackTrace();
-		}
-
-		Message msg = new Message();
-		msg.obj = subsDataList;
-		handlerData.sendMessage(msg);
-	}
 }

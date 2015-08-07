@@ -33,24 +33,27 @@
 
             <ImageButton
                 android:id="@+id/view"
-                android:layout_width="50dip"
-                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:layout_width="60dip"
+                android:layout_height="40dip"
                 android:background="@color/white"
-                android:src="@drawable/views_gear" />
+                android:src="@drawable/combo_chart" />
 
             <ImageButton
                 android:id="@+id/config"
-                android:layout_width="50dip"
-                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:layout_width="60dip"
+                android:layout_height="40dip"
                 android:background="@color/white"
-                android:src="@drawable/edit" />
+                android:src="@drawable/support" />
 
             <ImageButton
                 android:id="@+id/delete"
-                android:layout_width="50dip"
-                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:layout_width="60dip"
+                android:layout_height="40dip"
                 android:background="@color/white"
-                android:src="@drawable/delete" />
+                android:src="@drawable/full_trash" />
         </LinearLayout>
     </LinearLayout>
 

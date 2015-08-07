@@ -106,7 +106,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 *          default is false.
 	 * @return
 	 */
-	private static boolean compatibleStructure(StreamElement se,
+	/*private static boolean compatibleStructure(StreamElement se,
 			DataField[] outputStructure, boolean adjust) {
 		// if (!adjust && outputStructure.length != se.getFieldNames().length ) {
 		// logger.warn(
@@ -140,7 +140,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		// }
 		// }
 		return true;
-	}
+	}*/
 	
 	public DataField[] getOutputStructure(DataField[] in){
 		return in;
@@ -207,9 +207,6 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		config = StaticData.findConfig(config.getId());
 		if (!config.getRunning()){
 			config.setRunning(true);
-			for (StreamSource s: config.getInputStream().getSources()){
-				s.getWrapper().start();
-			}
 		}
 	}
 
@@ -217,9 +214,6 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		config = StaticData.findConfig(config.getId());
 		if (config.getRunning()){
 			config.setRunning(false);
-			for (StreamSource streamSource : config.getInputStream().getSources()) {
-				streamSource.getWrapper().stop();
-			}
 		}
 		
 	}

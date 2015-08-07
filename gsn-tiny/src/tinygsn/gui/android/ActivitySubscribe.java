@@ -58,7 +58,7 @@ public class ActivitySubscribe extends SherlockFragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.subscribe);
+		setContentView(R.layout.activity_sensors_config);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		registerForContextMenu(findViewById(R.id.select_server_btn));

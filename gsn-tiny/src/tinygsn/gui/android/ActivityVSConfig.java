@@ -553,6 +553,7 @@ public class ActivityVSConfig extends SherlockActivity {
 				wrapperName = p.saveTo(vsName,storage); // TODO compute actual output structure !!!
 			}
 			
+			//take the structure from the last wrapper !!
 			AbstractWrapper w;
 			try {
 				w = StaticData.getWrapperByName(wrapperName);
@@ -560,7 +561,6 @@ public class ActivityVSConfig extends SherlockActivity {
 				AbstractVirtualSensor vs = (AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vsType]).newInstance();
 				outputStructure = vs.getOutputStructure(outputStructure);
 				storage.executeCreateTable("vs_" + vsName, outputStructure,true);
-				StaticData.saveName(vsName, wrapperName);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

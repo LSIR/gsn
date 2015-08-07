@@ -29,7 +29,7 @@ package tinygsn.gui.android;
 import java.util.ArrayList;
 
 import tinygsn.model.vsensor.AbstractVirtualSensor;
-import tinygsn.services.schedular;
+import tinygsn.services.LocationScheduler;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
 import android.content.Intent;
@@ -109,12 +109,12 @@ public class ActivityHome extends SherlockActivity {
 		this.startActivity(myIntent);
 	}
 
-	public void open_PullActivity(View view) {
-		Intent myIntent = new Intent(this, ActivityPullData.class);
+	public void open_listWrapperActivity(View view) {
+		Intent myIntent = new Intent(this, ActivityListSensor.class);
 		this.startActivity(myIntent);
 	}
 
-	public void open_SubscribeActivity(View view) {
+	public void open_BrowseActivity(View view) {
 		Intent myIntent = new Intent(this, ActivityListSubscription.class);
 		this.startActivity(myIntent);
 	}

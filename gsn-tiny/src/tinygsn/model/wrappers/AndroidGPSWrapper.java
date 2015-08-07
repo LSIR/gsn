@@ -64,7 +64,7 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
 	
 	public void runOnce() {
 		updateWrapperInfo();
-		while(isActive())
+		while(getConfig().isRunning())
 		{
 			if (dcDuration > 0){
 				timeToShutdown = 40;

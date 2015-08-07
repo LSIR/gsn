@@ -73,7 +73,7 @@ public class ActivityPullData extends SherlockFragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.pull);
+		setContentView(R.layout.activity_servers);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		registerForContextMenu(findViewById(R.id.select_server_btn));
 		serverEditText = (EditText) findViewById(R.id.editText_server);

@@ -28,6 +28,8 @@ package tinygsn.gui.android;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,9 +65,9 @@ import android.widget.TableLayout.LayoutParams;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import com.actionbarsherlock.view.MenuItem;
 
 
@@ -106,7 +108,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		spinnerViewMode = (Spinner) findViewById(R.id.spinner_view_mode);
 		lblOutput.setTextSize(TEXT_SIZE);
 		
-		endTime.add(Calendar.MINUTE, -1);
+		startTime.add(Calendar.MINUTE, -1);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -117,6 +119,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		loadVSList();
 		loadViewMode();
 		setListeners();
+		addTableViewModeLatest();
 	}
 
 	public void loadVSList() {
@@ -225,7 +228,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 			protected List<StreamElement> doInBackground(Void... params) {
 				List<StreamElement> list = new ArrayList<StreamElement>();
 				if (viewMode == 1) {
-					list.add(controller.loadLatestData(numLatest, vsName));
+					list.addAll(controller.loadLatestData(numLatest, vsName));
 				} else {
 					list.addAll(controller.loadRangeData(vsName, startTime.getTimeInMillis(), endTime.getTimeInMillis()));
 				}
@@ -235,7 +238,11 @@ public class ActivityViewData extends SherlockFragmentActivity {
 			@Override
 			protected void onPostExecute(List<StreamElement> result) {
 				streamElements = result;
-				
+				StringBuilder sb = new StringBuilder();
+				for (StreamElement se : result){
+					sb.append(se.toString());
+				}
+				lblOutput.setText(sb);
 			}
 			
 		}.execute((Void)null);
@@ -502,6 +509,12 @@ public class ActivityViewData extends SherlockFragmentActivity {
 			return;
 		if (streamElements.size() == 0)
 			return;
+		
+		Collections.sort(streamElements, new Comparator<StreamElement>(){
+			@Override
+			public int compare(StreamElement lhs, StreamElement rhs) {
+				return (int) (lhs.getTimeStamp() - rhs.getTimeStamp());
+			}});
 
 		ArrayList<Long> x = new ArrayList<Long>();
 		ArrayList<Double> y = new ArrayList<Double>();

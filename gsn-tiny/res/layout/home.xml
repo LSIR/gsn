@@ -20,20 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_span="3"
             android:paddingTop="30dip"
-            android:src="@drawable/tinygsn10" />
+            android:src="@drawable/gsn_tiny" />
 
-        <!--
-             <TextView
-            android:id="@+id/tinygsn_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_span="3"
-            android:text="TinyGSN"
-            android:fontFamily="normal"    
-            android:textSize="30sp"
-            android:paddingTop="30dip" />
-        -->
         
     </TableRow>
 
@@ -62,7 +50,7 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_listVSActivity"
-            android:src="@drawable/g_plus_home" />
+            android:src="@drawable/services" />
 
         <ImageView
             android:id="@+id/imageView1_1"
@@ -74,8 +62,8 @@
             android:layout_width="60dip"
             android:layout_height="60dip"
             android:gravity="center"
-            android:onClick="open_publishActivity"
-            android:src="@drawable/publish" />
+            android:onClick="open_listWrapperActivity"
+            android:src="@drawable/electronics" />
     </TableRow>
 
     <!-- Text below images -->
@@ -96,7 +84,7 @@
             android:layout_alignTop="@+id/imageViewListVS"
             android:layout_margin="1dp"
             android:gravity="center"
-            android:text="List Virtual Sensor"
+            android:text="Processing Classes"
             android:textColor="#000000" />
 
         <ImageView
@@ -114,7 +102,7 @@
             android:layout_alignTop="@+id/imageViewPublish"
             android:layout_margin="1dp"
             android:gravity="center"
-            android:text="Publish data"
+            android:text="Sensor Wrappers"
             android:textColor="#000000" />
     </TableRow>
 
@@ -142,8 +130,8 @@
             android:layout_width="60dip"
             android:layout_height="60dip"
             android:gravity="center"
-            android:onClick="open_PullActivity"
-            android:src="@drawable/download2" />
+            android:onClick="open_PublishActivity"
+            android:src="@drawable/upload" />
 
         <ImageView
             android:id="@+id/imageView1_10"
@@ -155,8 +143,8 @@
             android:layout_width="60dip"
             android:layout_height="60dip"
             android:gravity="center"
-            android:onClick="open_SubscribeActivity"
-            android:src="@drawable/subscribe" />
+            android:onClick="open_BrowseActivity"
+            android:src="@drawable/globe" />
     </TableRow>
 
     <!-- Text below images -->
@@ -177,7 +165,7 @@
             android:layout_alignTop="@+id/imageViewPull"
             android:layout_margin="1dp"
             android:gravity="center"
-            android:text="Pull data"
+            android:text="Publish to GSN"
             android:textColor="#000000" />
 
         <ImageView
@@ -195,7 +183,7 @@
             android:layout_alignTop="@+id/imageViewSubscribe"
             android:layout_margin="1dp"
             android:gravity="center"
-            android:text="Subscribed data      "
+            android:text="GSN Servers"
             android:textColor="#000000" />
     </TableRow>
 
@@ -224,7 +212,7 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_helpActivity"
-            android:src="@drawable/help2b" />
+            android:src="@drawable/about" />
 
         <ImageView
             android:id="@+id/imageView5_1"
@@ -237,7 +225,7 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_aboutActivity"
-            android:src="@drawable/about2" />
+            android:src="@drawable/about" />
     </TableRow>
 
     <!-- Text below images -->

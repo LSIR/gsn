@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN. If not, see <http://www.gnu.org/licenses/>.
 *
-* File: gsn-tiny/src/tinygsn/gui/android/utils/VSRow.java
+* File: gsn-tiny/src/tinygsn/gui/android/utils/SubscriptionRow.java
 *
 * @author Do Ngoc Hoan
 */
@@ -27,26 +27,22 @@ package tinygsn.gui.android.utils;
 
 import java.io.Serializable;
 
-/**
- * A Virtual Sensor row in the List of VS activity  
- * @author Do Ngoc Hoan (hoan.do@epfl.ch)
- *
- */
-public class VSRow implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8585186135377493021L;
+
+
+public class SensorRow implements Serializable  {
+	
+	private static final long serialVersionUID = 7136228216822978309L;
 	private String name;
-	private boolean isRunning;
-	private String latestValue;
-	
-	
-	public VSRow(String name, boolean isRunning, String latestValues) {
-		super();
-		this.setName(name);
-		this.setRunning(isRunning);
-		this.setLatestValue(latestValues);
+	private boolean active;
+	private String info;
+	private boolean managed = false;
+
+	public boolean isManaged() {
+		return managed;
+	}
+
+	public void setManaged(boolean managed) {
+		this.managed = managed;
 	}
 
 	public String getName() {
@@ -57,20 +53,31 @@ public class VSRow implements Serializable {
 		this.name = name;
 	}
 
-	public boolean isRunning() {
-		return isRunning;
+	public boolean isActive() {
+		return active;
 	}
 
-	public void setRunning(boolean isRunning) {
-		this.isRunning = isRunning;
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
-	public String getLatestValue() {
-		return latestValue;
+	public String getInfo() {
+		return info;
 	}
 
-	public void setLatestValue(String latestValue) {
-		this.latestValue = latestValue;
+	public void setInfo(String info) {
+		this.info = info;
 	}
+
+	public SensorRow() {
+	}
+
+	public SensorRow(String name, boolean active, String info) {
+		this.name = name;
+		this.active = active;
+		this.info = info;
+	}
+
+	
 
 }

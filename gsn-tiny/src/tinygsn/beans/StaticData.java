@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import android.content.Context;
 import android.content.Intent;
-import tinygsn.controller.AndroidControllerVS;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 
@@ -17,7 +16,6 @@ public class StaticData {
 	public static InputStream is;
 	private static Map<String, Intent> runningServices = new HashMap<String, Intent>();
 	private static Map<Integer, VSensorConfig> configMap = new HashMap<Integer, VSensorConfig>();
-	public static Map<String, String> vsNames = new HashMap<String, String>();
 	public static Map<String, Integer> IDMap = new HashMap<String, Integer>();
 	
 	public static void saveNameID(int id, String name)
@@ -33,20 +31,6 @@ public class StaticData {
 		}
 		return -1;
 	
-	}
-	public static void saveName(String vsName, String vsType)
-	{
-		vsNames.put(vsType, vsName);
-	}
-	
-	public static String findNameVs(String type)
-	{
-		for(Map.Entry<String, String> item: vsNames.entrySet())
-		{
-			if(item.getKey().equals(type))
-				return item.getValue();
-		}
-		return null;
 	}
 	public static VSensorConfig findConfig(int id)
 	{

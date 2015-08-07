@@ -1,9 +1,9 @@
 <resources>
     
-    <string name="app_name">TinyGSN</string>
+    <string name="app_name">tinyGSN</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_tinygsn_main">TinyGSN</string>
+    <string name="title_activity_tinygsn_main">tinyGSN</string>
     <string name="time_text">time_text</string>
     <string name="set_date">Set Date</string>
     <string name="set_time">Set Time</string>
@@ -29,6 +29,7 @@
     <string name="ss">Stream Source</string>
     <string name="aggregator">Aggregator</string>
     <string name="wrapper">Wrapper</string>
+    <string name="scheduler">Scheduler</string>
     <string name="defaultsr">1000</string>
     <string name="defaultws">5</string>
     <string name="defaultstep">1</string>
@@ -61,11 +62,11 @@
     <string name="options_exit">Exit</string>
     <string name="test_vs_name">GPS virtual sensor</string>
     <string name="test_value">longtitute: 20.2</string>
-    <string name="view_data">TinyGSN - View data</string>
-    <string name="config">TinyGSN - Config VS</string>
+    <string name="view_data">tinyGSN - View data</string>
+    <string name="config">tinyGSN - Config VS</string>
     <string name="list_vs">List of VS</string>
-    <string name="publish_activity">TinyGSN - Publish data</string>
-    <string name="help">TinyGSN - Help</string>
-    <string name="about_us">TinyGSN - About Us</string>
+    <string name="publish_activity">tinyGSN - Publish data</string>
+    <string name="help">tinyGSN - Help</string>
+    <string name="about_us">tinyGSN - About Us</string>
     <string name="pull">"Pull data from GSN "</string>
 </resources>

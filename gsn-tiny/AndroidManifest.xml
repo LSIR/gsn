@@ -44,7 +44,7 @@
         
         
         <service android:name=".GCMIntentService" />
-        <service android:name="tinygsn.services.schedular" />
+        <service android:name="tinygsn.services.LocationScheduler$LocationSchedulerService" />
         <service android:name="tinygsn.model.wrappers.AndroidGyroscopeWrapper$GyroscopeService" />
         <service android:name="tinygsn.model.wrappers.AndroidLightWrapper$LightService" />
         <service android:name="tinygsn.model.wrappers.AndroidGPSWrapper$GPSService" />
@@ -82,6 +82,10 @@
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
         <!-- android:theme="@style/Theme.AndroidDevelopers" -->
+        <activity
+            android:name="tinygsn.gui.android.ActivityListSensor"
+            android:label="Sensor wrappers" >
+        </activity>
         <activity
             android:name="tinygsn.gui.android.ActivityListSubscription"
             android:label="Subscribed data" >

@@ -71,7 +71,8 @@ y_max- > -2.444118
 
 public class ActivityVirtualSensor extends AbstractVirtualSensor {
 
-	
+
+	private static final long serialVersionUID = 772132288546137586L;
 	private Classifier cls_act;
 	private String fileName = "activity-julien-norm.model";
 	private DataField[] outputStructure = new DataField[]{new DataField("activity",DataTypes.DOUBLE)};

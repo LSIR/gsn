@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import tinygsn.controller.AndroidControllerListSubscription;
 import tinygsn.gui.android.gcm.CommonUtilities;
-import tinygsn.gui.android.utils.SubscriptionListAdapter;
-import tinygsn.gui.android.utils.SubscriptionRow;
+import tinygsn.gui.android.utils.SensorListAdapter;
+import tinygsn.gui.android.utils.SensorRow;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -58,8 +58,8 @@ public class ActivityListSubscription extends SherlockActivity {
 	private Context context;
 	Handler handlerData;
 	AndroidControllerListSubscription controller;
-	List<SubscriptionRow> subscriptionRowList;
-	ArrayList<SubscriptionRow> dataList = new ArrayList<SubscriptionRow>();
+	List<SensorRow> subscriptionRowList;
+	ArrayList<SensorRow> dataList = new ArrayList<SensorRow>();
 	TextView numVS = null;
 
 	private final Handler handler = new Handler();
@@ -77,8 +77,8 @@ public class ActivityListSubscription extends SherlockActivity {
 			if (serverName == null)
 				Toast.makeText(context, data, Toast.LENGTH_SHORT).show();
 			else{
-				controller.saveNewSubscriptionData(serverName, data);
-				controller.loadListSubsData();
+			//	controller.saveNewSubscriptionData(serverName, data);
+			//	controller.loadListSubsData();
 			}
 		}
 	};
@@ -86,7 +86,7 @@ public class ActivityListSubscription extends SherlockActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.subscription_list);
+		setContentView(R.layout.activity_sensors_list);
 		context = this;
 
 		GCMRegistrar.checkDevice(this);
@@ -107,44 +107,44 @@ public class ActivityListSubscription extends SherlockActivity {
 		handlerData = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
-				dataList = (ArrayList<SubscriptionRow>) msg.obj;
-				TextView txt = (TextView) findViewById(R.id.txt);
-				txt.setText(dataList.size() + " data are loaded!");
+				dataList = (ArrayList<SensorRow>) msg.obj;
+				//TextView txt = (TextView) findViewById(R.id.txt);
+				//txt.setText(dataList.size() + " data are loaded!");
 				renderLayout(dataList);
 			};
 		};
 
 		controller = new AndroidControllerListSubscription(this);
 		controller.setHandlerData(handlerData);
-		controller.loadListSubsData();
+		//controller.loadListSubsData();
 	}
 
-	private void renderLayout(ArrayList<SubscriptionRow> subscriptionRowList) {
+	private void renderLayout(ArrayList<SensorRow> subscriptionRowList) {
 
-		listViewSubscription = (ListView) findViewById(R.id.subscription_list);
-		SubscriptionListAdapter dataListAdapter = new SubscriptionListAdapter(
-				context, R.layout.subscription_row_item, subscriptionRowList,
+/*		listViewSubscription = (ListView) findViewById(R.id.subscription_list);
+		SensorListAdapter dataListAdapter = new SubscriptionListAdapter(
+				context, R.layout.sensor_row_item, subscriptionRowList,
 				controller, this);
 		listViewSubscription.setAdapter(dataListAdapter);
 		dataListAdapter.notifyDataSetChanged();
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		final MenuItem add = menu.add("Add");
-		add.setIcon(R.drawable.add).setShowAsAction(
+		add.setIcon(R.drawable.plus_b).setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			public boolean onMenuItemClick(final MenuItem item) {
-				item.setIcon(R.drawable.add2);
+				item.setIcon(R.drawable.plus_b);
 				handler.postDelayed(new Runnable() {
 					public void run() {
-						item.setIcon(R.drawable.add);
+						item.setIcon(R.drawable.plus_b);
 					}
 				}, 10);
 
@@ -155,14 +155,14 @@ public class ActivityListSubscription extends SherlockActivity {
 		});
 
 		final MenuItem deleteAll = menu.add("Delete all");
-		deleteAll.setIcon(R.drawable.clear).setShowAsAction(
+		deleteAll.setIcon(R.drawable.full_trash).setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		deleteAll.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			public boolean onMenuItemClick(MenuItem item) {
-				controller.deleteAll();
-				controller.loadListSubsData();
+			//	controller.deleteAll();
+			//	controller.loadListSubsData();
 				Toast.makeText(context, "Delete all subscribed data!",
 						Toast.LENGTH_SHORT).show();
 
@@ -177,7 +177,7 @@ public class ActivityListSubscription extends SherlockActivity {
 		int itemId = item.getItemId();
 		switch (itemId) {
 		case android.R.id.home:
-			controller.markDataUnreadToRead();
+		//	controller.markDataUnreadToRead();
 			finish();
 			break;
 		}
@@ -197,6 +197,6 @@ public class ActivityListSubscription extends SherlockActivity {
 	}
 
 	public void load_more(View view) {
-		controller.loadMore();
+	//	controller.loadMore();
 	}
 }

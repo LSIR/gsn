@@ -7,7 +7,7 @@ public class WrapperConfig implements Parcelable {
 	
 	private String wrapperName;
 	private int id;
-	private boolean running = true;
+	private boolean running = false;
 	private String param = "";
 	
 	
@@ -46,6 +46,7 @@ public class WrapperConfig implements Parcelable {
 		id = source.readInt();
 		wrapperName = source.readString();
 		param = source.readString();
+		running = source.readString().equals("1");
 	}
 
 	public WrapperConfig(int id, String name, String parameter) {
@@ -62,7 +63,8 @@ public class WrapperConfig implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
 		dest.writeString(wrapperName);
-		dest.writeString(param);		
+		dest.writeString(param);
+		dest.writeString(running?"1":"0");
 	}
 	
 	public static final Parcelable.Creator<WrapperConfig> CREATOR  = new Creator<WrapperConfig>() {

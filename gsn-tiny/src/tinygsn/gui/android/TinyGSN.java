@@ -31,7 +31,7 @@ import org.kroz.activerecord.Database;
 import org.kroz.activerecord.DatabaseBuilder;
 
 import tinygsn.beans.StaticData;
-import tinygsn.gui.android.utils.SubscriptionRow;
+import tinygsn.gui.android.utils.SensorRow;
 import tinygsn.utils.Const;
 import android.app.Application;
 import android.content.Context;

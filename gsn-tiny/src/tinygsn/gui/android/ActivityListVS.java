@@ -72,8 +72,13 @@ public class ActivityListVS extends SherlockActivity implements Serializable  {
 		listViewVS = (ListView) findViewById(R.id.vs_list);
 		vSListAdapter = new VSListAdapter(this, R.layout.vs_row_item, controller, this);
 		listViewVS.setAdapter(vSListAdapter);
-		initialize();
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		initialize();
+	};
 
 
 	public void initialize() {
@@ -135,20 +140,11 @@ public class ActivityListVS extends SherlockActivity implements Serializable  {
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		final MenuItem add = menu.add("Add");
-		add.setIcon(R.drawable.add).setShowAsAction(
+		add.setIcon(R.drawable.plus_b).setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+				add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
-		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-			// on selecting show add2 for 0.01s
 			public boolean onMenuItemClick(final MenuItem item) {
-				item.setIcon(R.drawable.add2);
-				handler.postDelayed(new Runnable() {
-					public void run() {
-						item.setIcon(R.drawable.add);
-					}
-				}, 10);
-
 				startVSActivity();
 
 				return false;

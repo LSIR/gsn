@@ -35,9 +35,9 @@
         android:layout_width="33dip"
         android:layout_height="wrap_content"
         android:background="@color/background"
-        android:text="10"
+        android:text="0"
         android:gravity="center"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="15sp"
         android:typeface="serif"
         android:padding="5dip" />

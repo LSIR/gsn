@@ -53,11 +53,14 @@ public class AndroidControllerVS extends AbstractController {
 	}
 
 	public StreamElement loadLatestData(String vsName) {
-		return loadLatestData(1, vsName);
+		ArrayList<StreamElement> result = loadLatestData(1, vsName);
+		if ((result != null) && (result.size() != 0))
+			return result.get(0);
+		return null;
 	}
 	
-	public StreamElement loadLatestData(int numLatest, String vsName) {
-		StreamElement latest = null;
+	public ArrayList<StreamElement> loadLatestData(int numLatest, String vsName) {
+		ArrayList<StreamElement> latest = null;
 		AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsName);
 		if (vs != null){
 			DataField[] df = vs.getConfig().getOutputStructure();
@@ -67,9 +70,8 @@ public class AndroidControllerVS extends AbstractController {
 				fieldList[i] = df[i].getName();
 				fieldType[i] = df[i].getDataTypeID();
 			}
-			ArrayList<StreamElement> result = storage.executeQueryGetLatestValues("vs_" + vsName, fieldList, fieldType, numLatest);
-			if ((result != null) && (result.size() != 0))
-				latest = result.get(0);
+			latest = storage.executeQueryGetLatestValues("vs_" + vsName, fieldList, fieldType, numLatest);
+			
 		}
 		return latest;
 	}

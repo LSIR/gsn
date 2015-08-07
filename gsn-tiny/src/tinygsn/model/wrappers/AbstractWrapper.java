@@ -41,6 +41,7 @@ import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 public abstract class AbstractWrapper {
 
@@ -65,13 +66,12 @@ public abstract class AbstractWrapper {
 	
 	protected int dcDuration = DEFAULT_DUTY_CYCLE_DURATION;
 	protected int dcInterval = DEFAULT_DUTY_CYCLE_INTERVAL;
+	
+	
 
 	protected final List<StreamSource> listeners = Collections
 			.synchronizedList(new ArrayList<StreamSource>());
 	
-	private int listenerCount = 0;
-
-	private boolean isActive = true;
 
 	public AbstractWrapper() {
 	}
@@ -85,11 +85,17 @@ public abstract class AbstractWrapper {
 	}
 	
 	public void registerListener(StreamSource s){
-		listeners.add(s);
+		synchronized (listeners) {
+			Log.i(getWrapperName(), "registered");
+			listeners.add(s);
+		}
 	}
 	
 	public void unregisterListener(StreamSource s){
-		listeners.remove(s);
+		synchronized (listeners) {
+			Log.i(getWrapperName(), "unregistered");
+			listeners.remove(s);
+		}
 	}
 
 	/**
@@ -100,10 +106,6 @@ public abstract class AbstractWrapper {
 	 */
 	public abstract DataField[] getOutputStructure();
 
-
-	public boolean isActive() {
-		return isActive;
-	}
 
 	/**
 	 * This method gets the generated stream element and notifies the input
@@ -116,16 +118,18 @@ public abstract class AbstractWrapper {
 	 */
 
 	public Boolean postStreamElement(StreamElement streamElement) {
-		for(StreamSource s:listeners){
-			if (s.getInputStream().getVirtualSensor().getConfig().getRunning()){
-			    s.add(streamElement);
+		synchronized (listeners) {
+			for(StreamSource s:listeners){
+				if (s.getInputStream().getVirtualSensor().getConfig().getRunning()){
+				    s.add(streamElement);
+				}
 			}
 		}
 		return true;
 	}
 
 	public void releaseResources() {
-		isActive = false;
+		config.setRunning(false);
 	}
 
 	public abstract String[] getFieldList();
@@ -160,38 +164,40 @@ public abstract class AbstractWrapper {
 		}
 	}
 	
-	synchronized public void start(){
-		if (listenerCount < 1){
-			try {
-				Intent  serviceIntent = new Intent(StaticData.globalContext, getSERVICE());
+	synchronized public boolean start(){
+		try {
+			Intent serviceIntent = StaticData.getRunningIntentByName(getWrapperName());
+			if(serviceIntent == null)
+			{
+				serviceIntent = new Intent(StaticData.globalContext, getSERVICE());
 				config.setRunning(true);
 				serviceIntent.putExtra("tinygsn.beans.config",config );
 				StaticData.addRunningService(getWrapperName(), serviceIntent);
 				StaticData.globalContext.startService(serviceIntent);
-			} catch (Exception e) {
-				// release anything?
+				return true;
 			}
+		} catch (Exception e) {
+			// release anything?
 		}
-		listenerCount++;
+		return false;
 	}
 	
-	synchronized public void stop(){
-		if (listenerCount == 1){
-			try {
-				Intent serviceIntent = StaticData.getRunningIntentByName(getWrapperName());
-				if(serviceIntent != null)
-				{
-					serviceIntent.removeExtra("tinygsn.beans.config");
-					config.setRunning(false);
-					serviceIntent.putExtra("tinygsn.beans.config", config);
-					StaticData.globalContext.startService(serviceIntent);
-				}
-			} catch (Exception e) {
-				// release anything?
+	synchronized public boolean stop(){
+		try {
+			Intent serviceIntent = StaticData.getRunningIntentByName(getWrapperName());
+			if(serviceIntent != null)
+			{
+				serviceIntent.removeExtra("tinygsn.beans.config");
+				config.setRunning(false);
+				serviceIntent.putExtra("tinygsn.beans.config", config);
+				StaticData.globalContext.startService(serviceIntent);
+				StaticData.IntentStopped(getWrapperName());
+				return true;
 			}
-			
+		} catch (Exception e) {
+			// release anything?
 		}
-		listenerCount--;
+		return false;
 	}
 
 	public void initialize_wrapper() {
