@@ -26,7 +26,6 @@
 package tinygsn.gui.android;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import tinygsn.controller.AndroidControllerWrapper;
 import tinygsn.gui.android.utils.SensorListAdapter;
@@ -35,12 +34,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import com.actionbarsherlock.app.SherlockActivity;
-
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 
-public class ActivityListSensor extends SherlockActivity {
+
+public class ActivityListSensor extends SherlockFragmentActivity {
 
 
 	private ListView listViewSensors, listViewScheduler;

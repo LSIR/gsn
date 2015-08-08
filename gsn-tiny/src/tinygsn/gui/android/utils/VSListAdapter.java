@@ -41,7 +41,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -107,15 +107,15 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 		TextView txtWiki = (TextView) convertView.findViewById(R.id.latest_values);
 		txtWiki.setText(vs.getLatestValue());
 
-		ImageButton view = (ImageButton) convertView.findViewById(R.id.view);
+		ImageView view = (ImageView) convertView.findViewById(R.id.view);
 		view.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivityViewData(vs.getName());
 			}
 		});
-
-		ImageButton edit = (ImageButton) convertView.findViewById(R.id.config);
+/*
+		ImageView edit = (ImageView) convertView.findViewById(R.id.config);
 		edit.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -123,8 +123,8 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 						.show();
 			}
 		});
-
-		ImageButton delete = (ImageButton) convertView.findViewById(R.id.delete);
+*/
+		ImageView delete = (ImageView) convertView.findViewById(R.id.delete);
 		delete.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

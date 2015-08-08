@@ -61,8 +61,8 @@ public abstract class AbstractWrapper {
 	
 	public abstract Class<? extends WrapperService> getSERVICE();
 
-	protected static final int DEFAULT_DUTY_CYCLE_DURATION = 2;
-	protected static final int DEFAULT_DUTY_CYCLE_INTERVAL = 15;
+	public static final int DEFAULT_DUTY_CYCLE_DURATION = 2;
+	public static final int DEFAULT_DUTY_CYCLE_INTERVAL = 15;
 	
 	protected int dcDuration = DEFAULT_DUTY_CYCLE_DURATION;
 	protected int dcInterval = DEFAULT_DUTY_CYCLE_INTERVAL;
@@ -74,6 +74,7 @@ public abstract class AbstractWrapper {
 	
 
 	public AbstractWrapper() {
+		
 	}
 
 	public int getDcDuration() {

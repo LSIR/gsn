@@ -113,6 +113,7 @@ public class StaticData {
 			wc = new WrapperConfig(0,name);
 		}
 		AbstractWrapper wrapper = (AbstractWrapper) Class.forName(realNames[0]).getDeclaredConstructor(new Class[] {WrapperConfig.class}).newInstance(wc);
+		wrapper.updateWrapperInfo();
 		wrapper.initialize_wrapper();
 		wrapperMap.put(name, wrapper);
 		

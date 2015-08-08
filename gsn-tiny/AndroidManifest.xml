@@ -71,6 +71,11 @@
             android:label="@string/config"
             android:theme="@style/Theme.Styled" >
         </activity>
+         <activity
+            android:name="tinygsn.gui.android.ActivityWrapperEdit"
+            android:label="@string/edit"
+            android:theme="@style/Theme.Styled" >
+        </activity>
         <activity android:name="org.achartengine.GraphicalActivity" />
         <activity
             android:name="tinygsn.gui.android.ActivityDateTimePicker"

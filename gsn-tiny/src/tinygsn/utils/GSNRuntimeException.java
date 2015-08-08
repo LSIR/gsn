@@ -27,7 +27,9 @@ package tinygsn.utils;
 
 public class GSNRuntimeException extends RuntimeException {
 
-   public GSNRuntimeException ( String message ) {
+	private static final long serialVersionUID = -8493585363115457378L;
+
+public GSNRuntimeException ( String message ) {
       super( message );
    }
 

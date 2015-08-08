@@ -33,7 +33,7 @@
 
             <ImageButton
                 android:id="@+id/view_flows"
-                android:scaleType="fitCenter"
+                android:gravity="center"
                 android:layout_width="60dip"
                 android:layout_height="40dip"
                 android:background="@color/white"
@@ -42,7 +42,7 @@
             <ImageButton
                 android:id="@+id/edit_wrapper"
                 android:layout_width="60dip"
-                android:scaleType="fitCenter"
+                android:gravity="center"
                 android:layout_height="40dip"
                 android:background="@color/white"
                 android:src="@drawable/support" />

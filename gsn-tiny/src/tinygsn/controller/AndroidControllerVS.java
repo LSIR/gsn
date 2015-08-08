@@ -33,7 +33,6 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.storage.db.SqliteStorageManager;
-import android.os.Message;
 import android.util.Log;
 
 public class AndroidControllerVS extends AbstractController {

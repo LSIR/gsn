@@ -25,23 +25,27 @@
 
 package tinygsn.gui.android.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import tinygsn.beans.StaticData;
-import tinygsn.controller.AndroidControllerListSubscription;
-import tinygsn.controller.AndroidControllerVS;
 import tinygsn.controller.AndroidControllerWrapper;
 import tinygsn.gui.android.ActivityListSensor;
-import tinygsn.gui.android.ActivityListSubscription;
+import tinygsn.gui.android.ActivityViewData;
+import tinygsn.gui.android.ActivityWrapperEdit;
 import tinygsn.gui.android.R;
-import tinygsn.gui.android.R.color;
-import tinygsn.model.vsensor.AbstractVirtualSensor;
-import android.app.AlertDialog;
+import tinygsn.gui.android.ActivityViewData.DetailedDataFragment;
+import tinygsn.storage.db.SqliteStorageManager;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -58,7 +62,7 @@ import android.widget.Toast;
 
 public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 
-	public static final String EXTRA_VS_NAME = "vs_name";
+	public static final String EXTRA_SENSOR_NAME = "name";
 	private int resource;
 	private LayoutInflater inflater;
 	private Context context;
@@ -121,8 +125,7 @@ public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 		view.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(context, "View has not been implemented!",
-						Toast.LENGTH_SHORT).show();
+				showDialogDetail(vs.getName());
 			}
 		});
 
@@ -131,8 +134,9 @@ public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 		edit.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(context, "Configure has not been implemented!",
-						Toast.LENGTH_SHORT).show();
+				Intent myIntent = new Intent(context, ActivityWrapperEdit.class);
+				myIntent.putExtra(EXTRA_SENSOR_NAME, vs.getName());
+				context.startActivity(myIntent);
 			}
 		});
 		
@@ -147,5 +151,36 @@ public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 
 		
 		return convertView;
+	}
+	
+	private void showDialogDetail(String name) {
+		SqliteStorageManager storage = new SqliteStorageManager();
+		StringBuilder sb = new StringBuilder("This sensor is used by the following Virtual Sensors:\n"); 
+		for (String s :storage.getVSfromSource(name)){
+			sb.append(" - ").append(s).append("\n");
+		}
+		DialogFragment newFragment = DetailedDataFragment.newInstance(sb.toString());
+		newFragment.show(((SherlockFragmentActivity) context).getSupportFragmentManager(), "dialog");
+	}
+
+	public static class DetailedDataFragment extends SherlockDialogFragment {
+		String text;
+
+		public static DetailedDataFragment newInstance(String text) {
+			return new DetailedDataFragment(text);
+		}
+
+		public DetailedDataFragment(String text) {
+			this.text = text;
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View v = inflater.inflate(R.layout.text, container, false);
+			View tv = v.findViewById(R.id.text);
+			((TextView) tv).setText(text);
+			return v;
+		}
 	}
 }

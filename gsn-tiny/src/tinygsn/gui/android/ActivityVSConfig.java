@@ -35,6 +35,7 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
 import tinygsn.controller.AndroidControllerVS;
+import tinygsn.gui.android.utils.VSListAdapter;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.vsensor.NotificationVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
@@ -84,12 +85,18 @@ public class ActivityVSConfig extends SherlockActivity {
 	private ArrayList<StreamSourcePanel> pannels = new ArrayList<ActivityVSConfig.StreamSourcePanel>();
 
 	private boolean isEnableSave = true;
+	private String editingVS = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_vs_config);
 
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			editingVS = extras.getString("vsname");
+			loadEditingValues();
+		}
 		// This is a workaround for http://b.android.com/15340 from
 		// http://stackoverflow.com/a/5852198/132047
 		// if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -118,8 +125,26 @@ public class ActivityVSConfig extends SherlockActivity {
         });
 
 		wrapperList = AbstractWrapper.getWrapperList(this);
-		loadVSType();		
 		storage = new SqliteStorageManager();
+		loadVSType();				
+	}
+	
+	public void loadEditingValues(){
+		if (editingVS != null){
+			new AsyncTask<Activity, Void, AbstractVirtualSensor>(){
+				@Override
+				protected AbstractVirtualSensor doInBackground(Activity... params) {
+					return storage.getVSByName(editingVS);	
+				}
+				@Override
+				protected void onPostExecute(AbstractVirtualSensor result) {
+					if(result != null){
+						result.getVirtualSensorConfiguration().getName();
+						//TODO
+					}
+				}
+			}.execute((Activity)null);
+		}
 	}
 
 	public void loadVSType() {

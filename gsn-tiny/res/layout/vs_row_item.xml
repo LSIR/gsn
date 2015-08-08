@@ -31,25 +31,25 @@
             android:layout_height="fill_parent"
             android:orientation="horizontal" >
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/view"
-                android:scaleType="fitCenter"
+                android:gravity="center"
                 android:layout_width="60dip"
                 android:layout_height="40dip"
                 android:background="@color/white"
                 android:src="@drawable/combo_chart" />
 
-            <ImageButton
+          <!--  <ImageView
                 android:id="@+id/config"
-                android:scaleType="fitCenter"
+                android:gravity="center"
                 android:layout_width="60dip"
                 android:layout_height="40dip"
                 android:background="@color/white"
-                android:src="@drawable/support" />
+                android:src="@drawable/support" /> --> 
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/delete"
-                android:scaleType="fitCenter"
+                android:gravity="center"
                 android:layout_width="60dip"
                 android:layout_height="40dip"
                 android:background="@color/white"
