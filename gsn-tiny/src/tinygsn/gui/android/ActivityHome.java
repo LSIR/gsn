@@ -105,7 +105,7 @@ public class ActivityHome extends SherlockActivity {
 	}
 
 	public void open_publishActivity(View view) {
-		Intent myIntent = new Intent(this, ActivityPublishData.class);
+		Intent myIntent = new Intent(this, ActivityListPublish.class);
 		this.startActivity(myIntent);
 	}
 
@@ -114,7 +114,7 @@ public class ActivityHome extends SherlockActivity {
 		this.startActivity(myIntent);
 	}
 
-	public void open_BrowseActivity(View view) {
+	public void open_browseActivity(View view) {
 		Intent myIntent = new Intent(this, ActivityListSubscription.class);
 		this.startActivity(myIntent);
 	}

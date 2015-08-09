@@ -113,6 +113,10 @@
             android:label="@string/publish_activity" >
         </activity>
         <activity
+            android:name="tinygsn.gui.android.ActivityListPublish"
+            android:label="@string/publish_activity" >
+        </activity>
+        <activity
             android:name="tinygsn.gui.android.gcm.DemoActivity"
             android:label="@string/title_activity_tinygsn_main" >
            

@@ -62,8 +62,9 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 				+ ");";
 		db.execSQL(createQuery);
 
-		createQuery = "CREATE TABLE SUBSCRIPTION_ROW (_id integer primary key,"
-				+ "SERVER text, VSNAME text, DATA text, READ text"
+		
+		createQuery = "CREATE TABLE publishDestination (_id integer primary key autoincrement,"
+				+ "url text, vsname text, key text, mode integer, lastTime bigint, active int"
 				+ ");";
 		db.execSQL(createQuery);
 	
@@ -125,7 +126,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		db.execSQL("Drop table vsList");
 		db.execSQL("Drop table sourcesList");
 		db.execSQL("Drop table wrapperList");
-		db.execSQL("Drop table SUBSCRIPTION_ROW");
+		db.execSQL("Drop table publishDestination");
 		db.execSQL("Drop table Samples");
 		db.execSQL("Drop table settings");
 		onCreate(db);

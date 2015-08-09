@@ -130,7 +130,7 @@
             android:layout_width="60dip"
             android:layout_height="60dip"
             android:gravity="center"
-            android:onClick="open_PublishActivity"
+            android:onClick="open_publishActivity"
             android:src="@drawable/upload" />
 
         <ImageView
@@ -143,7 +143,7 @@
             android:layout_width="60dip"
             android:layout_height="60dip"
             android:gravity="center"
-            android:onClick="open_BrowseActivity"
+            android:onClick="open_browseActivity"
             android:src="@drawable/globe" />
     </TableRow>
 

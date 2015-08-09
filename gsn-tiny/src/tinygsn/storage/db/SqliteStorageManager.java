@@ -28,16 +28,15 @@ package tinygsn.storage.db;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
@@ -47,7 +46,6 @@ import tinygsn.storage.StorageManager;
 import tinygsn.utils.Const;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
@@ -187,7 +185,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		while (cursor.moveToNext()) {
 			fieldValues = new Serializable[FIELD_NAMES.length];
 			for (int i = 0; i < FIELD_NAMES.length; i++) {
-				fieldValues[i] = cursor.getDouble(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase()));
+				fieldValues[i] = cursor.getDouble(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase(Locale.ENGLISH)));
 			}
 			long time = cursor.getLong(cursor.getColumnIndex("timed"));
 
@@ -607,6 +605,74 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}else{
 			updateWrapperInfo(name,interval,duration);
 		}
+	}
+	
+	
+	public boolean updatePublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active) 
+	{
+		String query = "UPDATE publishDestination SET url = ?, vsname = ?, key = ?, mode = ?, lastTime = ?, active = ?  WHERE _id = ?;";
+		Cursor cursor = database.rawQuery(query, new String[] {url,vsname,key,mode+"",lastTime+"", active?"0":"1"});
+		if(cursor.moveToNext())
+			return true;
+		return false;
+	}
+	
+	public DeliveryRequest getPublishInfo(int id)
+	{
+		String query = "Select * from publishDestination WHERE _id = ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{id+""});
+		
+		while (cursor.moveToNext()) {
+			String url = cursor.getString(cursor.getColumnIndex("url"));
+			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
+			String key = cursor.getString(cursor.getColumnIndex("key"));
+			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
+			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
+			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
+			DeliveryRequest dr = new DeliveryRequest(url,key,mode,vsname,id);
+			dr.setActive(active);
+			dr.setLastTime(lastTime);
+			return dr;
+		}
+		return null;
+
+	}
+	
+	public void setPublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active)
+	{
+		if (id == -1 || getPublishInfo(id) == null){
+			ContentValues newCon = new ContentValues();
+			newCon.put("url", url);
+			newCon.put("vsname", vsname);
+			newCon.put("key", key);
+			newCon.put("mode", mode);
+			newCon.put("lastTime", lastTime);
+			newCon.put("active", active?"1":"0");
+			database.insert("publishDestination", null, newCon);
+		}else{
+			updatePublishInfo(id, url, vsname, key, mode, lastTime, active);
+		}
+	}
+	
+	public ArrayList<DeliveryRequest> getPublishList(){
+		ArrayList<DeliveryRequest> r = new ArrayList<DeliveryRequest>();
+		String query = "Select * from publishDestination;";
+		Cursor cursor = database.rawQuery(query, new String[] {});
+		while (cursor.moveToNext()) {
+			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
+			String url = cursor.getString(cursor.getColumnIndex("url"));
+			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
+			String key = cursor.getString(cursor.getColumnIndex("key"));
+			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
+			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
+			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
+			DeliveryRequest dr = new DeliveryRequest(url,key,mode,vsname,id);
+			dr.setActive(active);
+			dr.setLastTime(lastTime);
+			r.add(dr);
+		}
+		return r;
+		
 	}
 	
 	public DataField[] tableToStructure(CharSequence tableName) throws SQLException {

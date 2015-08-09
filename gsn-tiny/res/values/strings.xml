@@ -44,7 +44,8 @@
     <string name="sixty">60</string>
     <string name="publish">Publish Now</string>
     <string name="select">Select Virtual Sensors</string>
-
+	<string name="select_mode">Select publish mode</string>
+	<string name="pubKey">Server Key</string>
     <string name="error_config">Please set the %1$s constant and recompile the app.</string>
     <string name="already_registered">Device is already registered on server.</string>
     <string name="gcm_registered">From GCM: device successfully registered (regId = %1$s)!</string>

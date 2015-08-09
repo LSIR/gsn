@@ -31,79 +31,27 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import tinygsn.beans.DataField;
+import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StreamElement;
-import tinygsn.gui.android.ActivityPublishData;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
-import tinygsn.storage.StorageManager;
 import tinygsn.storage.db.SqliteStorageManager;
-import android.app.Activity;
-import android.os.Handler;
-import android.os.Message;
 
-public class AndroidControllerPublishData extends AbstractController {
 
-	private ActivityPublishData view = null;
-
-	private Handler handlerVS = null;
+public class AndroidControllerPublish extends AbstractController {
 
 	private ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
 
 	private SqliteStorageManager storage = null;
 	
-	public AndroidControllerPublishData(ActivityPublishData androidViewer) {
-		this.view = androidViewer;
+	public AndroidControllerPublish() {
 		storage = new SqliteStorageManager();
 	}
 
-	public void loadListVS() {
+	public ArrayList<String> loadListVS() {
 
-		vsList = storage.getListofVS();
-		Message msg = new Message();
-		msg.obj = vsList;
-		handlerVS.sendMessage(msg);
+		return storage.getListofVSName();
 	}
 
-	public Handler getHandlerVS() {
-		return handlerVS;
-	}
-
-	public void setHandlerVS(Handler handlerVS) {
-		this.handlerVS = handlerVS;
-	}
-	
-	public StreamElement loadLatestData(String vsName) {
-		return loadLatestData(1, vsName);
-	}
-	
-	public StreamElement loadLatestData(int numLatest, String vsName) {
-		StreamElement latest = null;
-		
-		for (AbstractVirtualSensor vs : vsList) {
-			if (vs.getConfig().getName().endsWith(vsName)) {
-				DataField[] df = vs.getConfig().getOutputStructure();
-
-				String[] fieldList = new String[df.length];
-				Byte[] fieldType = new Byte[df.length];
-				for(int i=0;i<df.length;i++){
-					fieldList[i] = df[i].getName();
-					fieldType[i] = df[i].getDataTypeID();
-				}
-				ArrayList<StreamElement> result = storage.executeQueryGetLatestValues(
-						"vs_" + vsName, fieldList, fieldType, numLatest);
-
-				if ((result != null) && (result.size() != 0))
-					latest = result.get(0);
-				else 
-					return null;
-				
-				break;
-			}
-		}
-		
-		return latest;
-	}
-	
-	
 	public StreamElement[] loadRangeData(String vsName, String fromdate,
 			String fromtime, String todate, String totime) {
 		StreamElement[] ret = new StreamElement[0];
@@ -132,5 +80,10 @@ public class AndroidControllerPublishData extends AbstractController {
 			}
 		}catch(ParseException p){}
 		return ret;
+	}
+
+	public ArrayList<DeliveryRequest> loadList() {
+		ArrayList<DeliveryRequest> a = storage.getPublishList();
+		return a;
 	}
 }
