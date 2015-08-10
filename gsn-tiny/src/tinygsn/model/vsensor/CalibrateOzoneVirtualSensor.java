@@ -84,8 +84,8 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 				BufferedReader bufferedReader = new BufferedReader(is);
 		        String line = bufferedReader.readLine();
 		        if(line != null){
-		        	JSONObject obj = new JSONObject(line);
-		        	JSONArray f = obj.getJSONArray("result").getJSONObject(0).getJSONArray("fields");
+		        	JSONArray obj = new JSONArray(line);
+		        	JSONArray f = obj.getJSONObject(0).getJSONArray("fields");
 		        	for (int i = 1;i<f.length();i++){
 		        		JSONObject v = f.getJSONObject(i);
 		        		if (v.getString("name").equals("o3_res")){
