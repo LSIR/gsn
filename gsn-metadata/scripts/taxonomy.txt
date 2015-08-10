@@ -1,0 +1,2258 @@
+TDR_P3_150cm_a,volumetric soil water content
+wind_speed,wind speed
+TDR_P4_110cm_a,volumetric soil water content
+incoming_shortwave_radiation_campbell,radiation
+sDavis_Rain2,precipitation
+dendrometer_21,relative change in radius
+temp_225cm,snow temperature
+soil_water_potential_10cm(1),water potential
+soil_water_potential_5cm(2),water potential
+incoming_shortwave_radiation,radiation
+e5p1w_20cm,air temperature
+sm3_avg,soil moisture
+ilwr_net_avg,radiation
+ts1_avg,soil temperature
+temperature_2000cm,soil temperature
+temperature_300cm,soil temperature
+temperature_400cm,soil temperature
+temperature_800cm,soil temperature
+diffuse_irradiation,radiation
+outgoing_longwave_radiation,radiation
+wind_direction_1,Wind direction
+wind_speed_max_2,wind speed
+wind_speed_max_1,wind speed
+wind_speed_avg_2,wind speed
+temperature_8cm,rock temperature
+temperature_200cm,soil temperature
+pine1_north,relative change in radius
+M13_F_soil_Temp,soil temperature
+Sperbelgraben_Kurzeneialp_1200,air temperature
+S2_WP_soil_VWC,volumetric snow water content
+temp_137_5cm,snow temperature
+toppvwc_6,water potential
+toppvwc_10,water potential
+toppvwc_11,water potential
+toppvwc_14,water potential
+toppvwc_18,water potential
+toppvwc_1,water potential
+toppvwc_4,water potential
+panel_temp_avg,instrument parameter
+incoming shortwave radiation beerli reference,radiation
+e2p2w_10cm,air temperature
+S10_WP_soil_Temp,soil temperature
+air_temp_tnx,air temperature
+temperature_2cm,soil temperature
+wind_direction_stdev,wind speed
+A4_F_soil_VWC,volumetric snow water content
+a2l1c,soil temperature
+larch3_south,relative change in radius
+e5l1w,soil temperature
+e1p1w_10cm,air temperature
+wind_direction_2,Wind direction
+larch3_west,relative change in radius
+toppvwc_7,water potential
+S12_P_soil_VWC,volumetric snow water content
+S12_P_soil_Temp,soil temperature
+HP_BH5,hydraulic potential
+snow_surface_temperature,snow temperature
+counter_3_total,number of particles
+counter_1_max,number of particles
+S11_F_soil_Temp,soil temperature
+M8_WP_soil_VWC,volumetric snow water content
+spruce2_south,relative change in radius
+M8_WP_soil_Temp,soil temperature
+sMPS1_SoilPotential7,soil water potential
+M7_P_soil_VWC,volumetric snow water content
+M7_P_soil_Temp,soil temperature
+Rappengraben_R2_SH,snow height
+a3l1c,soil temperature
+max_air_temp,air temperature
+avg_wind_speed,wind speed
+min_air_temp,air temperature
+daily_cumulative_precipitation,precipitation
+mode_wind_speed,wind speed
+avg_air_temp,air temperature
+precipitation_values,precipitation
+sMPS1_SoilPotential15,soil water potential
+atmospheric_pressure,atmospheric pressure
+temp_100cm,snow temperature
+temperature_920cm,rock temperature
+temperature_120cm,rock temperature
+temperature_2520cm,rock temperature
+temperature_1320cm,rock temperature
+temperature_2120cm,rock temperature
+waage_mmws,volumetric snow water content
+e4p1w_10cm,air temperature
+TDR_P3_70cm_b,volumetric soil water content
+TDR_P3_110cm_b,volumetric soil water content
+dendrometer_28,relative change in radius
+sSHT75_Temperature2,air temperature
+temperature_134cm,air temperature
+air_temperature_100cm,air temperature
+relative_humidity_100cm,relative humidity
+M5_F_soil_Temp,soil temperature
+sMPS1_SoilPotential11,soil water potential
+soil_temp_ectm_3,snow temperature
+soil_moisture_ectm_4,liquid water content
+lw_radiation_outgoing,radiation
+lw_radiation_incoming,radiation
+ref_sw_rad_normal_to_surf,radiation
+sMPS1_SoilPotential6,soil water potential
+S7_P_soil_Temp,soil temperature
+S7_P_soil_VWC,volumetric snow water content
+B4_P_soil_VWC,volumetric snow water content
+wind_speed_avg_3,wind speed
+B4_P_soil_Temp,soil temperature
+soil_temp_50cm,soil temperature
+atm_pressure,atmospheric pressure
+A10_WP_soil_VWC,volumetric snow water content
+A10_WP_soil_Temp,soil temperature
+air_temp_fuehler,air temperature
+a4p2c,soil temperature
+ta_avg,air temperature
+sTNX_SurfaceTemperature,surface temperature
+record,NA
+air_temp_rotro,air temperature
+wind_speed_max,wind speed
+rel_humidity_rotro,relative humidity
+A3_P_soil_Temp,soil temperature
+HP_BH2,hydraulic potential
+S14_F_soil_Temp,soil temperature
+TDR_P1_110cm_a,volumetric soil water content
+Rappengraben_Riedbad_1200,air temperature
+Sperbelgraben_S1_SH,snow height
+A15_WP_soil_Temp,soil temperature
+temp_140cm,snow temperature
+incoming_allwave_radiation_beerli,radiation
+HP_BH4,hydraulic potential
+dendrometer_20,relative change in radius
+temperature_157cm,air temperature
+A5L2c_5cm,soil temperature
+A2_P_soil_VWC,volumetric snow water content
+A2_P_soil_Temp,soil temperature
+sMPS1_SoilPotential17,soil water potential
+incoming_longwave_radiation,radiation
+E3L2w_10cm,soil temperature
+GWL5,hydraulic potential
+larch1_north,relative change in radius
+a3p1c,soil temperature
+pluvio,precipitation
+temp_240cm,snow temperature
+ts1,soil temperature
+ws_mean,wind speed
+wd,Wind direction
+rh,relative humidity
+pressure_120m,atmospheric pressure
+temperature_120m,rock temperature
+A11_P_soil_VWC,volumetric snow water content
+snow_height_sensor_temp,instrument parameter
+logger_temp,instrument parameter
+spruce1_north,relative change in radius
+B3_P_soil_VWC,volumetric snow water content
+B3_P_soil_Temp,soil temperature
+surface_temperature,surface temperature
+TDR_P2_24cm_a,volumetric soil water content
+wind_speed,wind speed
+soil_temperature_10cm,soil temperature
+soil_temperature_5cm,soil temperature
+volumetric_soil_water_content_10cm,volumetric soil water content
+TDR_P4_70cm_a,volumetric soil water content
+S8_P_soil_Temp,soil temperature
+temp_312_5cm,snow temperature
+pressure,atmospheric pressure
+dendrometer_12,relative change in radius
+temp_380cm,snow temperature
+E2P1c_5cm,soil temperature
+atm_pressure,atmospheric pressure
+M11_P_soil_VWC,volumetric snow water content
+PAYLOAD_SIBADC00,NA
+temp_360cm,snow temperature
+tdr_p1_150cm_a,volumetric soil water content
+campbell_temp,snow temperature
+inc_sw_rad_normal_to_surf,radiation
+av_water_pressure,hydrostatic pressure
+min_water_pressure,volumetric snow water content
+air_temp_ir,snow temperature
+stdev_water_level,hydrostatic pressure
+max_water_pressure,hydrostatic pressure
+net_sw_radiation,radiation
+temperature_1720cm,rock temperature
+net_radiation,radiation
+ventilation_time,ventilation time
+wind_speed_stdev,wind speed
+snow_height,snow height
+B1_P_soil_VWC,volumetric snow water content
+B1_P_soil_Temp,soil temperature
+e4l1w,soil temperature
+tdr_p1_150cm_b,volumetric soil water content
+M13_F_soil_VWC,volumetric snow water content
+flow_rate,flow rate
+ts3_avg,snow temperature
+tss_avg,surface temperature
+prec_tot,precipitation
+wd_avg,wind direction
+sm1_avg,soil moisture
+rswr_avg,radiation
+vw_ms_avg,wind speed
+toppvwc_9,water potential
+sm2_avg,soil moisture
+dendrometer_29,relative change in radius
+sSHT75_Humidity2,relative humidity
+temperature_55cm,air temperature
+temperature_115cm,air temperature
+temperature_107cm,air temperature
+wind_speed_scalar_av,wind speed
+dendrometer_23,relative change in radius
+wind_speed_av,wind speed
+temp_60cm,snow temperature
+e4l2c,soil temperature
+pine3_north,relative change in radius
+relative_humidity,relative humidity
+soil_water_potential_10cm,water potential
+soil_water_potential_5cm,water potential
+temp_50cm,snow temperature
+spruce1_south,relative change in radius
+M15_F_soil_VWC,volumetric snow water content
+displacement_sb120_68m,axial strain
+TDR_P2_110cm_b,volumetric soil water content
+exergen_surface_temperature,surface temperature
+E3P2w_5cm,soil temperature
+HP_BH1,hydraulic potential
+rel_humidity_thygan,relative humidity
+wind_speed_y_component_680cm,wind speed
+soil_water_potential_10cm(2),water potential
+wind_speed_x_component_680cm,wind speed
+wind_speed_z_component_500cm,wind speed
+a1l2c,soil temperature
+surface_temp,surface temperature
+TDR_P4_150cm_a,volumetric soil water content
+exergen_ir_mv,instrument parameter
+surface_temperature,soil temperature
+precipitation,precipitation
+soil_temperature_5cm,soil temperature
+e1p1w_05cm,air temperature
+swe_pillow_2,snow water equivalent
+M6_P_soil_Temp,soil temperature
+counter_1_total,number of particles
+A3P1c_5cm,soil temperature
+soil_temperature,soil temperature
+temperature_200cm,rock temperature
+weather_code_4680,NA
+weather_code_4677,NA
+mor_visibility,visibility
+counter_2_max,number of particles
+fall_velocity,velocity
+soil_temp_0cm,soil temperature
+air_temp,air temperature
+soil_temp_10cm,soil temperature
+soil_moisture_20cm,volumetric snow water content
+air_temp_tnx,air temperature
+soil_water_potential_20cm,water potential
+GWL7,hydraulic potential
+u_battery,instrument parameter
+soil_moisture_10cm,volumetric snow water content
+temperature_320cm,rock temperature
+rain_meter,precipitation
+solar_rad,radiation
+air_temp,air temperature
+wind_speed_max,wind speed
+temperature_53cm,air temperature
+GWL10,hydraulic potential
+E3L1c_10cm,soil temperature
+a4l2c,soil temperature
+dendrometer_24,relative change in radius
+e5p2c,soil temperature
+temp_200cm,snow temperature
+wind_speed_max_4,wind speed
+tw_avg,water temperature
+PAYLOAD_SIBADC08,NA
+temperature_320cm,soil temperature
+PAYLOAD_SIBADC09,NA
+campbell_snow_height,air temperature
+air_temperature,air temperature
+A3P2w_10cm,soil temperature
+soil_volumetric_water_content_5,volumetric snow water content
+relative_humidity_200cm,relative humidity
+E1L1w_10cm,soil temperature
+snow_temperature_sensor_14,snow temperature
+A13_F_soil_VWC,volumetric snow water content
+snow_height,instrument parameter
+temp_62_5cm,snow temperature
+e5p2c_10cm,air temperature
+net_allwave_radiation_beerli,radiation
+larch1_south,relative change in radius
+M3_P_soil_Temp,soil temperature
+E2P2w_5cm,soil temperature
+g1_port4_ambient,volumetric snow water content
+larch2_north,relative change in radius
+snow_temp_1,snow temperature
+pine3_south,relative change in radius
+snow_temp_2,snow temperature
+sSHT75_Temperature5,air temperature
+wind_direction_mean,Wind direction
+snow_temp_3,snow temperature
+air_temp_ir,air temperature
+displacement_sb120_40m,axial strain
+snow_water_content_3,volumetric snow water content
+soil_moisture_profile_a_50cm,moisture
+snow_water_content_1,volumetric snow water content
+PAYLOAD_SIBADC05,NA
+dendrometer_26,relative change in radius
+soil_volumetric_water_content,volumetric snow water content
+Sperbelgraben_Kurzeneialp_2100,air temperature
+wind_speed_avg_1,wind speed
+a2p1c,soil temperature
+hw_pr_avg,flow height
+P_Sperbelgraben_S1,precipitation
+M15_F_soil_Temp,soil temperature
+soil_temperature_5cm,soil temperature
+g1_port2_warmed,volumetric snow water content
+A3P1c_10cm,soil temperature
+surface_temperature_1,surface temperature
+PAYLOAD_SIBADC04,NA
+sDavis_WindSpeed,wind speed
+temperature_z9,instrument parameter
+soil_moisture_profile_a_105cm,moisture
+displacement z9,displacement
+lysimeter_since_0700,runoff
+snow_water_equiv_mm,volumetric snow water content
+soil_moisture_profile_b_50cm,moisture
+swe_daily_sum_mm,volumetric snow water content
+station_no,NA
+e2l2w,soil temperature
+easterly_height_of_sensor_26,instrument parameter
+E5L1w_5cm,soil temperature
+drift_sum,particle flux
+soil_water_potential_5cm(1),water potential
+flux_3,particle flux
+turbulence_3,turbulence
+soil_volumetric_water_content_6,volumetric snow water content
+turbulence_1,turbulence
+flux_2,particle flux
+E3P2w_10cm,soil temperature
+sSHT75_Humidity,relative humidity
+TDR_P2_150cm_a,volumetric snow water content
+M4_WP_soil_VWC,volumetric snow water content
+displacement_z10,displacement
+wind_direction_standard_deviation,wind direction
+temp_25cm,snow temperature
+snow_temperature_sensor_11,snow temperature
+TDR_P4_24cm_a,volumetric soil water content
+dendrometer_22,relative change in radius
+temp_350cm,snow temperature
+temperature_920cm,soil temperature
+TDR_P1_24cm_a,volumetric soil water content
+a3p2w,soil temperature
+dendrometer_32,relative change in radius
+volumetric_soil_water_content_5cm,volumetric snow water content
+PAYLOAD_SIBADC09,NA
+soil_temperature_10cm,soil temperature
+volumetric_soil_water_content_10cm,volumetric snow water content
+soil_temp_1,soil temperature
+air_temperature_ir,air temperature
+S6_WP_soil_VWC,volumetric snow water content
+TDR_P1_70cm_b,volumetric soil water content
+a4p1w,soil temperature
+dendrometer_25,relative change in radius
+ground_temp_tnx,surface temperature
+soil_moisture_ectm_3,snow temperature
+soil_temp_ectm_2,snow temperature
+air_temperature_200cm,air temperature
+air_temp,air temperature
+max_wind_speed,wind speed
+easterly_height_of_sensor_17,instrument parameter
+S9_P_soil_VWC,volumetric snow water content
+soil_moisture_profile_b_105cm,moisture
+soil_moisture_ectm_2,liquid water content
+M10_F_soil_Temp,soil temperature
+e2p2w,soil temperature
+temp_375cm,snow temperature
+A1_P_soil_Temp,soil temperature
+GWL4,hydraulic potential
+toppvwc_5,water potential
+E3L1c_5cm,soil temperature
+dendrometer_14,relative change in radius
+swr_refl,radiation
+temp_280cm,snow temperature
+dendrometer_37,relative change in radius
+air_temp,air temperature
+e2p2w_05cm,air temperature
+A6_WP_soil_Temp,soil temperature
+dendrometer_09,relative change in radius
+vw_max,wind speed
+vw,wind speed
+ta,air temperature
+soil_moisture_profile_b_80cm,moisture
+hw_us_med,flow height
+TDR_P1_24cm_b,volumetric soil water content
+air_temperature_ir,air temperature
+e1p2c_05cm,air temperature
+wind_speed_avg_4,wind speed
+GWL9,hydraulic potential
+ta_3,air temperature
+outgoing shortwave radiation beerli reference,radiation
+temp_125cm,snow temperature
+E2P2w_10cm,soil temperature
+rh,relative humidity
+S15_F_soil_VWC,volumetric snow water content
+dendrometer_02,relative change in radius
+soil_water_potential_5cm,water potential
+air_temp_50cm,air temperature
+A5L1w_5cm,soil temperature
+volumetric_soil_water_content_10cm,volumetric snow water content
+E1L2c_5cm,soil temperature
+sECTM_SoilMoisture2,soil moisture
+temperature_216cm,air temperature
+surface_temperature,soil temperature
+sMPS1_SoilPotential5,soil water potential
+dendrometer_33,relative change in radius
+sECTM_SoilTemperature2,soil temperature
+rel_humidity_rotronic,relative humidity
+temperature_25cm,soil temperature
+snow_temperature_sensor_03,snow temperature
+snow_temperature_sensor_05,snow temperature
+toppvwc_12,water potential
+westerly_height_of_sensor_30,instrument parameter
+ground_temp_tnx,soil temperature
+easterly_height_of_sensor_23,instrument parameter
+easterly_height_of_sensor_22,instrument parameter
+tss,soil temperature
+easterly_height_of_sensor_25,instrument parameter
+easterly_height_of_sensor_24,instrument parameter
+easterly_height_of_sensor_27,instrument parameter
+easterly_height_of_sensor_29,instrument parameter
+S4_F_soil_Temp,soil temperature
+snow_temperature_sensor_06,snow temperature
+easterly_height_of_sensor_28,instrument parameter
+GWL6,hydraulic potential
+easterly_height_of_sensor_30,instrument parameter
+hs1,instrument parameter
+snow_temperature_sensor_29,snow temperature
+snow_surface_temp_ir,snow temperature
+sECTM_SoilTemperature3,soil temperature
+westerly_height_of_sensor_08,instrument parameter
+westerly_height_of_sensor_06,instrument parameter
+westerly_height_of_sensor_01,instrument parameter
+hs,snow hight
+westerly_height_of_sensor_02,instrument parameter
+flux_1,particle flux
+toppvwc_3,water potential
+sSHT75_Humidity5,relative humidity
+e2p1c,soil temperature
+westerly_height_of_sensor_03,instrument parameter
+temperature_520cm,soil temperature
+easterly_height_of_sensor_06,instrument parameter
+westerly_height_of_sensor_10,instrument parameter
+S11_F_soil_VWC,volumetric snow water content
+ground_temp_tnx,soil temperature
+header_seqnr,NA
+easterly_height_of_sensor_09,instrument parameter
+dendrometer_17,relative change in radius
+easterly_height_of_sensor_04,instrument parameter
+westerly_height_of_sensor_16,instrument parameter
+snow_temperature_sensor_22,snow temperature
+easterly_height_of_sensor_01,instrument parameter
+outgoing_shortwave_radiation_campbell,radiation
+snow_temperature_sensor_20,snow temperature
+e3p2w_05cm,air temperature
+e3p1c_10cm,air temperature
+soil_temperature_6,soil temperature
+TDR_P3_24cm_b,volumetric soil water content
+rain,precipitation
+westerly_height_of_sensor_17,instrument parameter
+snow_temperature_sensor_27,snow temperature
+westerly_height_of_sensor_12,instrument parameter
+temperature_1000cm,soil temperature
+payload_temperature,instrument parameter
+westerly_height_of_sensor_29,instrument parameter
+snow_temperature_sensor_26,snow temperature
+wind_direction_4,Wind direction
+M3_P_soil_VWC,volumetric snow water content
+westerly_height_of_sensor_11,instrument parameter
+pine1_south,relative change in radius
+snow_temperature_sensor_25,snow temperature
+larch2_south,relative change in radius
+air_temperature,air temperature
+PAYLOAD_SIBADC08,NA
+snow_temperature_sensor_17,snow temperature
+westerly_height_of_sensor_19,instrument parameter
+soil_temp_10cm,soil temperature
+temperature_2520cm,soil temperature
+temperature_600cm,soil temperature
+easterly_height_of_sensor_19,instrument parameter
+soil_pot_1,soil water potential
+westerly_height_of_sensor_20,instrument parameter
+M11_P_soil_Temp,soil temperature
+soil_temperature_7,soil temperature
+S1_F_soil_VWC,volumetric snow water content
+easterly_height_of_sensor_18,instrument parameter
+easterly_height_of_sensor_15,instrument parameter
+easterly_height_of_sensor_16,instrument parameter
+payload_flashstatus,NA
+easterly_height_of_sensor_14,instrument parameter
+easterly_height_of_sensor_12,instrument parameter
+snow_temperature_sensor_12,snow temperature
+dendrometer_04,relative change in radius
+control_sensor,relative change in radius
+temperature_16cm,soil temperature
+easterly_height_of_sensor_10,instrument parameter
+temperature_224cm,air temperature
+outgoing_lw_radiation,radiation
+temperature_99cm,air temperature
+PAYLOAD_SIBADC02,NA
+lw_sensor_temperature,instrument parameter
+toppvwc_15,water potential
+incoming_lw_radiation,radiation
+outgoing_longwave_radiation,radiation
+wind_speed_avg,wind speed
+dendrometer_03,relative change in radius
+logger_temperature,instrument parameter
+heat_flux_3,heat flux
+solar_rad,radiation
+heat_flux_2,heat flux
+E3L2w_5cm,soil temperature
+station_no,flow rate
+M5_F_soil_VWC,volumetric snow water content
+swe_pillow_1,snow water equivalent
+S3_P_soil_VWC,volumetric snow water content
+soil_temperature_0cm,soil temperature
+wind_speed_x_component_500cm,wind speed
+E2L2w_5cm,soil temperature
+TDR_P4_110cm_b,volumetric soil water content
+temperature_1720cm,soil temperature
+A12_WP_soil_VWC,volumetric snow water content
+water_potential,water potential
+A12_WP_soil_Temp,soil temperature
+ilwr_d_avg,radiation
+snow_water_content_2,volumetric snow water content
+dendrometer_30,relative change in radius
+temperature_107cm,air temperature
+dendrometer_11,relative change in radius
+HP_BH3,hydraulic potential
+dendrometer_01,relative change in radius
+ws_max,wind speed
+soil_moisture_profile_a_80cm,moisture
+E2L2w_10cm,soil temperature
+temp_237_5cm,snow temperature
+soil_moisture_profile_a_30cm,moisture
+S3_P_soil_Temp,soil temperature
+soil_moisture_profile_b_10cm,moisture
+snow_temperature_sensor_19,snow temperature
+air_temp_min_rotronic,air temperature
+dendrometer_27,relative change in radius
+incoming_sw_radiation,radiation
+wind_speed_mean,wind speed
+e4p2c,soil temperature
+wind_direction,wind direction
+air_humid,relative humidity
+surface_albedo,diffuse reflectivity
+E5P2c_10cm,soil temperature
+M4_WP_soil_Temp,soil temperature
+tdr_p2_70cm_b,volumetric soil water content
+temperature_150cm,soil temperature
+wind_speed_vertical_component,wind speed
+air_temperature_ir,air temperature
+TDR_P3_110cm_a,volumetric soil water content
+instrument_temp_exergen_ir,instrument parameter
+wind_speed_westerly_component,wind speed
+e1p2c_20cm,air temperature
+wind_speed_vector_av,wind speed
+precipitation,precipitation
+A5_F_soil_VWC,volumetric snow water content
+temp_250cm,snow temperature
+A5_F_soil_Temp,soil temperature
+P_Rappengraben_R3,precipitation
+S2_WP_soil_Temp,soil temperature
+precipitation,precipitation
+sDavis_Rain,precipitation
+B2_P_soil_Temp,soil temperature
+temperature_82cm,air temperature
+ts1_avg,snow temperature
+P_Rappengraben_R1,precipitation
+sDavis_SolarRadiation2,radiation
+wind_direction_stdev,wind direction
+counter_3_max,number of particles
+soil_volumetric_water_content_8,volumetric snow water content
+A3P2w_5cm,soil temperature
+turbulence_2,turbulence
+payload_sdivoltage,NA
+wind_speed_max,wind speed
+wind_speed_vector_av,wind speed
+temp_20cm,snow temperature
+sm3_avg,soil moisture
+temp_260cm,snow temperature
+temperature_171cm,air temperature
+temp_220cm,snow temperature
+snow_temperature_sensor_30,snow temperature
+temperature_16cm,rock temperature
+soil_temp_5cm,soil temperature
+sMPS1_SoilPotential18,soil water potential
+sECTM_SoilTemperature4,soil temperature
+PAYLOAD_SIBADC03,NA
+E3P1c_10cm,soil temperature
+westerly_height_of_sensor_09,instrument parameter
+e1l2c,soil temperature
+TDR_P2_70cm_a,volumetric soil water content
+logger_voltage,instrument parameter
+M1_WP_soil_VWC,volumetric snow water content
+sun_10min,sunlight
+soil_temp_20cm,soil temperature
+sSHT75_Temperature3,air temperature
+PAYLOAD_SIBADC03,NA
+s5TE_SoilBulkEC,soil conductivity
+dendrometer_05,relative change in radius
+sMPS1_SoilPotential16,soil water potential
+PAYLOAD_SIBADC02,NA
+wind_speed_westerly_component,wind speed
+air_temp_10cm,air temperature
+Rappengraben_R3_SH,snow height
+precipitation_intensity,precipitation
+wind_speed_max,wind speed
+snow height,instrument parameter
+westerly_height_of_sensor_23,instrument parameter
+rh_1,relative humidity
+ta_1,air temperature
+snow_surface_temperature,snow temperature
+sECTM_SoilMoisture4,soil moisture
+PAYLOAD_SIBADC03,NA
+payload_mspvoltage,NA
+PAYLOAD_SIBADC00,NA
+A2P1c_5cm,soil temperature
+sMPS1_SoilPotential,soil water potential
+P_Sperbelgraben_S3,precipitation
+payload_sampleno,NA
+snow_height,snow height
+air_humid,liquid water content
+westerly_height_of_sensor_07,instrument parameter
+soil_moisture_5cm,moisture
+sSHT75_Temperature4,air temperature
+sSHT75_Humidity4,relative humidity
+snow_temperature_sensor_21,snow temperature
+Rappengraben_Riedbad_0700,air temperature
+temp_362_5cm,snow temperature
+A9_P_soil_Temp,soil temperature
+pine2_north,relative change in radius
+sSHT75_Temperature,air temperature
+PAYLOAD_SAMPLENO,NA
+g5_port4_ambient,volumetric snow water content
+g5_port5_ambient,volumetric snow water content
+easterly_height_of_sensor_20,instrument parameter
+dew_point_temperature,dew point temperature
+temp_87_5cm,snow temperature
+swe_since_0700_mm,volumetric snow water content
+displacement_sb120_38m,axial strain
+A5P1w_5cm,soil temperature
+a5l1w,soil temperature
+stdev_ta_1,air temperature
+temp_0cm,snow temperature
+pine2_west,relative change in radius
+temp_80cm,snow temperature
+HP_BH6u,hydraulic potential
+speed,instrument parameter
+PAYLOAD_DCXDATA_FLOATARRAY3,NA
+M9_F_soil_Temp,soil temperature
+snow_temperature_sensor_02,snow temperature
+wd,wind direction
+wind_speed_northerly_component,wind speed
+M9_F_soil_VWC,volumetric snow water content
+temperature_127cm,air temperature
+TDR_P4_70cm_b,volumetric soil water content
+5TE_SoilBulkEC2,soil conductivity
+soil_temperature_5,soil temperature
+sMPS1_SoilPotential3,soil water potential
+air_temp_tnx,air temperature
+vw,wind speed
+M2_P_soil_Temp,soil temperature
+PAYLOAD_SIBADC04,NA
+payload_uptime_low,NA
+B5_P_soil_VWC,volumetric snow water content
+GWL2,hydraulic potential
+air_temp_thygan,air temperature
+a1p2c,soil temperature
+westerly_height_of_sensor_22,instrument parameter
+E2P1c_10cm,soil temperature
+PAYLOAD_SIBADC06,NA
+weather_code,NA
+PAYLOAD_SIBADC07,NA
+GWL1,hydraulic potential
+toppvwc_6,water potential
+batt_volt_avg,instrument parameter
+soil_volumetric_water_content_4,volumetric snow water content
+ts0,snow temperature
+wind_direction,Wind direction
+PAYLOAD_SIBADC00,NA
+S15_F_soil_Temp,soil temperature
+air temperature,air temperature
+temperature_100cm,rock temperature
+temperature_120cm,soil temperature
+P_Sperbelgraben_S2,precipitation
+sECTM_SoilMoisture5,soil moisture
+PAYLOAD_DCXDATA_STATUS0,NA
+TDR_P3_24cm_a,volumetric soil water content
+temp_340cm,snow temperature
+dendrometer_19,relative change in radius
+snow_temperature_sensor_24,snow temperature
+stdev_ta_3,air temperature
+easterly_height_of_sensor_03,instrument parameter
+E2L1c_5cm,soil temperature
+A5L1w_10cm,soil temperature
+solar_rad_2,radiation
+channel,NA
+e3l1c,soil temperature
+ts3,snow temperature
+air_humid,relative humidity
+snow_temperature_sensor_09,snow temperature
+soil_temp_ectm,snow temperature
+temperature_350cm,soil temperature
+A7_P_soil_Temp,soil temperature
+wind_direction_3,Wind direction
+temperature_250cm,soil temperature
+wind_speed_y_component_500cm,wind speed
+soil_temp_ectm,soil temperature
+M2_P_soil_VWC,volumetric snow water content
+temperature_720cm,soil temperature
+soil_moisture_ectm,liquid water content
+PAYLOAD_SIBADCCOM2,NA
+E3P1c_5cm,soil temperature
+E5L2c_10cm,soil temperature
+westerly_height_of_sensor_27,instrument parameter
+wind_speed_mean,wind speed
+temp_212_5cm,snow temperature
+soil_temperature_5cm,soil temperature
+temp_300cm,snow temperature
+snow_temperature_sensor_08,snow temperature
+dendrometer_34,relative change in radius
+PAYLOAD_SIBADC07,NA
+solar_rad,radiation
+g5_port3_warmed,volumetric snow water content
+ts2_avg,snow temperature
+PAYLOAD_SIBADCCOM1,NA
+PAYLOAD_SIBADC02,NA
+temperature_77cm,air temperature
+PAYLOAD_SIBADC02,NA
+A5L2c_10cm,soil temperature
+sECTM_SoilTemperature5,soil temperature
+PAYLOAD_DCXDATA_FLOATARRAY2,NA
+sDavis_SolarRadiation3,radiation
+soil_pot_3,soil water potential
+A2P2w_10cm,soil temperature
+temp_262_5cm,snow temperature
+easterly_height_of_sensor_05,instrument parameter
+E1L1w_5cm,soil temperature
+toppvwc_4,water potential
+toppvwc_3,water potential
+pressure_50m,atmospheric pressure
+dendrometer_16,relative change in radius
+PAYLOAD_DCXDATA_STATUS3,NA
+temperature_32cm,rock temperature
+easterly_height_of_sensor_02,instrument parameter
+E1L2c_10cm,soil temperature
+soil_temperature_4,soil temperature
+sMPS1_SoilPotential8,soil water potential
+PAYLOAD_SIBADC06,NA
+PAYLOAD_SIBADC02,NA
+air_temp_thygan,air temperature
+temp_180cm,snow temperature
+Rappengraben_R1_SH,snow height
+sECTM_SoilMoisture3,soil moisture
+PAYLOAD_SIBADC06,NA
+PAYLOAD_SIBADCCOM0,NA
+dendrometer_31,relative change in radius
+PAYLOAD_SIBADC00,NA
+temp_12_5cm,snow temperature
+radar_reflectivity,radar reflectivity
+snow_height,snow height
+outgoing_sw_radiation,radiation
+PAYLOAD_SIBADC04,NA
+soil_temp_ectm_4,snow temperature
+e3l2w,soil temperature
+TDR_P2_110cm_a,volumetric snow water content
+e4p2c_10cm,air temperature
+easterly_height_of_sensor_07,instrument parameter
+Sperbelgraben_Kurzeneialp_0700,air temperature
+relative_humidity,relative humidity
+toppvwc_13,water potential
+e1p2c_10cm,air temperature
+soil_temperature,soil temperature
+PAYLOAD_SIBADC01,NA
+dendrometer_18,relative change in radius
+soil_pot_2,soil water potential
+A1_P_soil_VWC,volumetric snow water content
+M14_WP_soil_VWC,volumetric snow water content
+radio_height,instrument parameter
+PAYLOAD_SIBADC05,NA
+temperature_224cm,air temperature
+sDavis_SolarRadiation,radiation
+probe_height,instrument parameter
+solar_rad,radiation
+soil_temp_100cm,soil temperature
+temp_TNX,air temperature
+GWL8,hydraulic potential
+air_temperature,air temperature
+atm_pressure,atmospheric pressure
+PAYLOAD_DCXDATA_STATUS2,NA
+pressure_digital,atmospheric pressure
+a2p2w,soil temperature
+dendrometer_06,relative change in radius
+temp_112_5cm,snow temperature
+soil_moist_1,soil moisture
+s5TE_SoilMoisture,soil moisture
+surface_temperature,surface temperature
+dw,wind direction
+logger_temperature,instrument parameter
+incoming_longwave_radiation,radiation
+soil_moisture_5cm,moisture
+A5P1w 5cm,soil temperature
+larch3_north,relative change in radius
+soil_humidity,volumetric snow water content
+incoming_sw_radiation,radiation
+radar_reflectivity,NA
+westerly_height_of_sensor_14,instrument parameter
+soil_moisture_profile_b_30cm,moisture
+e5p2c_20cm,air temperature
+measurement_quality_snow_height,NA
+wind_directon,Wind direction
+brusa_snow_height,snow height
+A9_P_soil_VWC,volumetric snow water content
+PAYLOAD_SIBADC01,NA
+payload_humidity,NA
+PAYLOAD_SIBADC01,NA
+wind_speed_max_3,wind speed
+air_temperature_IR,infrared temperature
+easterly_height_of_sensor_13,instrument parameter
+dendrometer_07,relative change in radius
+PAYLOAD_SIBADC04,NA
+temp_160cm,snow temperature
+a2l2w,soil temperature
+sMPS1_SoilPotential9,soil water potential
+E5L1w_10cm,soil temperature
+S5_WP_soil_VWC,volumetric snow water content
+A5P1w_10cm,soil temperature
+rel_humidity_thygan,relative humidity
+wind_speed_y_component_1000cm,wind speed
+header_originatorid,NA
+PAYLOAD_SIBADC01,NA
+S13_WP_soil_VWC,volumetric snow water content
+flow_rate,flow rate
+panel_temp_avg,instrument parameter
+PAYLOAD_DCXDATA_STATUS1,NA
+PAYLOAD_SIBADC03,NA
+B2_P_soil_VWC,volumetric snow water content
+soil_water_potential_2,water potential
+PAYLOAD_SIBADC07,NA
+PAYLOAD_SIBADC09,NA
+station_no,NA
+incoming_shortwave_radiation,radiation
+PAYLOAD_SIBADCCOM0,NA
+westerly_height_of_sensor_15,instrument parameter
+snow_temperature_sensor_04,snow temperature
+sMPS1_SoilPotential4,soil water potential
+pint,precipitation
+westerly_height_of_sensor_24,instrument parameter
+battery,instrument parameter
+ts3,surface temperature
+westerly_height_of_sensor_21,instrument parameter
+PAYLOAD_SIBADC02,NA
+temperature_64cm,rock temperature
+dendrometer_35,relative change in radius
+s5TE_SoilTemperature,soil temperature
+temperature_400cm,rock temperature
+PAYLOAD_SIBADCDIFF0,NA
+barometric_pressure,atmospheric pressure
+a1p1w,soil temperature
+stdev_ta_2,air temperature
+wind_speed,wind speed
+e2l1c,soil temperature
+ts2,snow temperature
+westerly_height_of_sensor_28,instrument parameter
+PAYLOAD_SIBADC02,NA
+sSHT75_Humidity3,relative humidity
+payload_sysvoltage,NA
+temperature_50cm,soil temperature
+record,NA
+surface_temperature,surface temperature
+station_no,NA
+A3_P_soil_VWC,volumetric snow water content
+soil_water_potential_5cm,water potential
+air_temp_ir,air temperature
+e5l2c,soil temperature
+westerly_height_of_sensor_05,instrument parameter
+a3l2w,soil temperature
+PAYLOAD_SIBADC09,NA
+temp_150cm,snow temperature
+air_temperature,air temperature
+e1p1w,soil temperature
+t_logger,instrument parameter
+S1_F_soil_Temp,soil temperature
+wind_speed_vector_av,wind speed
+wind_speed_average,wind speed
+soil_moisture_ectm,soil moisture
+heat_flux_1,heat flux
+stdev_rh_2,relative humidity
+wind_speed_vector_average,wind speed
+PAYLOAD_SIBADC06,NA
+flow_rate,flow rate
+PAYLOAD_SIBADC00,NA
+A11_P_soil_Temp,soil temperature
+easterly_height_of_sensor_08,instrument parameter
+soil_moisture_profile_a_10cm,moisture
+PAYLOAD_SIBADCCOM1,NA
+PAYLOAD_SIBADCDIFF2,NA
+temp_325cm,snow temperature
+wind_direction_stdev,wind direction
+westerly_height_of_sensor_26,instrument parameter
+scalar_wind_speed,wind speed
+B5_P_soil_Temp,soil temperature
+toppvwc_8,water potential
+soil_temp_3,soil temperature
+tss,snow temperature
+wind_speed,wind speed
+a4l1w,soil temperature
+header_atime_low,NA
+precipitation_intensity,precipitation
+Rappengraben_Riedbad_2100,air temperature
+soil_moisture_5cm,moisture
+a5p2c,soil temperature
+Wassermenge,runoff
+TDR_P2_150cm_b,volumetric soil water content
+spruce2_north,relative change in radius
+air_temperature,air temperature
+soil_moisture_ectm_3,liquid water content
+sMPS1_SoilPotential2,soil water potential
+westerly_height_of_sensor_04,instrument parameter
+A5P1w 10cm,soil temperature
+PAYLOAD_SIBADC03,NA
+dw,Wind direction
+soil_volumetric_water_content_2,volumetric snow water content
+S13_WP_soil_Temp,soil temperature
+surface_temperature,surface temperature
+A4_F_soil_Temp,soil temperature
+toppvwc_2,water potential
+detected_particles,number of particles
+rh_3,relative humidity
+ts1,snow temperature
+incoming_shortwave_radiation_beerli,radiation
+outgoing_shortwave_radiation,radiation
+lysimeter_2,liquid water content
+soil_water_potential_10cm,water potential
+air_temp_100cm,air temperature
+toppvwc_16,water potential
+battery_voltage,instrument parameter
+A2P2w_5cm,soil temperature
+incoming_shortwave_radiation_k_and_z,radiation
+snow_temperature_sensor_15,snow temperature
+outgoing_sw_radiation,radiation
+soil_temp_ectm_2,soil temperature
+soil_temperature_10cm,soil temperature
+soil_moisture_ectm_2,soil moisture
+PAYLOAD_DCXDATA_FLOATARRAY0,NA
+precipitation,precipitation
+soil_moisture_ectm_4,snow temperature
+s5TE_SoilMoisture2,soil moisture
+PAYLOAD_SIBADC00,NA
+air_temp,air temperature
+wind_speed_x_component_1000cm,wind speed
+PAYLOAD_SIBADC02,NA
+dendrometer_13,relative change in radius
+ground_temp_tnx,surface temperature
+toppvwc_17,water potential
+temp_162_5cm,snow temperature
+A7_P_soil_VWC,volumetric snow water content
+E5P2c_5cm,soil temperature
+temp_187_5cm,snow temperature
+soil_temperature_20cm,soil temperature
+S5_WP_soil_Temp,soil temperature
+PAYLOAD_BATTERYSTATUS,NA
+sECTM_SoilTemperature,soil temperature
+e3p1c_05cm,air temperature
+sMPS1_SoilPotential14,soil water potential
+RH_HS,relative humidity
+temperature_32cm,soil temperature
+ws,wind speed
+S6_WP_soil_Temp,soil temperature
+wind_direction,wind direction
+e1p2c,soil temperature
+M6_P_soil_VWC,volumetric snow water content
+temperature_550cm,soil temperature
+TDR_P1_110cm_b,volumetric soil water content
+snow_height,snow height
+M12_WP_soil_VWC,volumetric snow water content
+payload_hopcountchildcount,NA
+E2L1c_10cm,soil temperature
+TDR_P4_24cm_b,volumetric soil water content
+incoming_shortwave_radiation,radiation
+toppvwc_2,water potential
+soil_temperature,soil temperature
+e5p1w,soil temperature
+volumetric_soil_water_content_20cm,volumetric snow water content
+surface_temperature_2,surface temperature
+snow_temperature_sensor_01,snow temperature
+PAYLOAD_SIBADC04,NA
+sDavis_WindDirection,wind direction
+wind_speed_maximum,wind speed
+g1_port3_ambient,volumetric snow water content
+brusa_temp,air temperature
+PAYLOAD_DCXDATA_FLOATARRAY1,NA
+TDR_P3_150cm_b,volumetric soil water content
+wind_direction,wind direction
+temperature_247cm,air temperature
+snow_temperature_sensor_28,snow temperature
+lysimeter_current,runoff
+payload_uptime_high,NA
+mor_visibility,visibility
+snow_temperature_sensor_23,snow temperature
+M12_WP_soil_Temp,soil temperature
+iswr_avg,radiation
+payload_msptemperature,NA
+wind_direction_stdev,wind direction
+partial_cloud_amount,cloud cover
+soil_temperature_3cm,soil temperature
+air_temperature,air temperature
+temp_337_5cm,snow temperature
+temperature_500cm,air temperature
+a5p1w,soil temperature
+S8_P_soil_VWC,volumetric snow water content
+PAYLOAD_SIBADC01,NA
+temp_287_5cm,snow temperature
+soil_water_potential_10cm,water potential
+PAYLOAD_SIBADC04,NA
+a5l2c,soil temperature
+P_Rappengraben_R2,precipitation
+PAYLOAD_SIBADC03,NA
+temperature_1320cm,soil temperature
+E5L2c_5cm,soil temperature
+PAYLOAD_SIBADC00,NA
+payload_queuesize,NA
+sMPS1_SoilPotential13,soil water potential
+incoming_longwave_radiation,radiation
+TDR_P1_70cm_a,volumetric soil water content
+toppvwc_1,water potential
+surface_temperature,surface temperature
+lysimeter_1,liquid water content
+ir_voltage,instrument parameter
+temperature_100cm,soil temperature
+PAYLOAD_SIBADC05,NA
+soil_moist_3,soil moisture
+wind_speed_scalar_av,wind speed
+TDR_P4_150cm_b,volumetric soil water content
+GWL3,hydraulic potential
+e3p2w_10cm,air temperature
+dendrometer_08,relative change in radius
+air_temp,air temperature
+e2p1c_10cm,air temperature
+relative_humidity,relative humidity
+direction,Wind direction
+toppvwc_5,water potential
+e1p1w_20cm,air temperature
+temp_HS,air temperature
+soil_temp_5cm,air temperature
+e4p2c_05cm,air temperature
+volumetric_soil_water_content_5cm,volumetric soil water content
+lysimeter,liquid water content
+co2,CO2 concentration
+incoming_shortwave_radiation,radiation
+sECTM_SoilMoisture,soil moisture
+pine2_south,relative change in radius
+easterly_height_of_sensor_21,instrument parameter
+e3p2w,soil temperature
+counter_2_total,number of particles
+wind_direction,Wind direction
+soil_temperature_8,soil temperature
+e3p1c,soil temperature
+dew_point_temp_thygan,dew point temperature
+snow_temperature_sensor_10,snow temperature
+sMPS1_SoilPotential10,soil water potential
+payload_parentid,NA
+temp_120cm,snow temperature
+g1_port5_ambient,volumetric snow water content
+S10_WP_soil_VWC,volumetric snow water content
+soil_temp_2,soil temperature
+A14_F_soil_Temp,soil temperature
+M1_WP_soil_Temp,soil temperature
+e1l1w,soil temperature
+dendrometer_10,relative change in radius
+outgoing_sw_radiation,radiation
+air_temp_rotronic,air temperature
+e4p1w,soil temperature
+rh_2,relative humidity
+ta_2,air temperature
+temperature_50cm,soil temperature
+A15_WP_soil_VWC,volumetric snow water content
+A8_WP_soil_VWC,volumetric snow water content
+volumetric_soil_water_content_5cm,volumetric snow water content
+e5p1w_05cm,air temperature
+ir_temperature,instrument parameter
+air_temperature,air temperature
+temp_37_5cm,snow temperature
+snow_temperature_sensor_07,snow temperature
+Sperbelgraben_S3_SH,snow height
+air_humid,relative humidity
+A14_F_soil_VWC,volumetric snow water content
+westerly_height_of_sensor_25,instrument parameter
+gen_time,NA
+temperature_2120cm,soil temperature
+dendrometer_36,relative change in radius
+PAYLOAD_SIBADC00,NA
+temperature_0cm,soil temperature
+A6_WP_soil_VWC,volumetric snow water content
+hs1,snow height
+snow_temperature_sensor_13,snow temperature
+incoming_shortwave_radiation,radiation
+surface_temp,snow temperature
+hs1,snow height
+PAYLOAD_SIBADC05,NA
+e5p1w_10cm,air temperature
+S9_P_soil_Temp,soil temperature
+PAYLOAD_SIBADC03,NA
+S14_F_soil_VWC,volumetric snow water content
+temperature_0cm,rock temperature
+outgoing_shortwave_radiation,radiation
+PAYLOAD_SIBADC01,NA
+wind_direction,wind direction
+wind_speed_max,wind speed
+A13_F_soil_Temp,soil temperature
+air_temp,air temperature
+snow_depth,instrument parameter
+westerly_height_of_sensor_13,instrument parameter
+s5TE_SoilTemperature2,soil temperature
+incoming_sw_radiation,radiation
+soil_moisture_10cm,soil moisture
+PAYLOAD_SIBADC05,NA
+snow_temperature_sensor_16,snow temperature
+PAYLOAD_SIBADC08,NA
+snow_temperature_sensor_18,snow temperature
+g5_port2_warmed,volumetric snow water content
+solar_rad_2,radiation
+M14_WP_soil_Temp,soil temperature
+PAYLOAD_SIBADCDIFF3,NA
+ts_TNX,surface temperature
+TDR_P2_24cm_b,volumetric soil water content
+a1l1w,soil temperature
+cloud_free_index,cloud cover
+temperature_520cm,rock temperature
+A2P1c_10cm,soil temperature
+air_humid,air temperature
+soil_volumetric_water_content_3,volumetric snow water content
+temperature_z10,instrument parameter
+TDR_P3_70cm_a,volumetric soil water content
+sw_radiation_incoming,radiation
+PAYLOAD_SIBADC07,NA
+westerly_height_of_sensor_18,instrument parameter
+PAYLOAD_SIBADCCOM2,NA
+sDavis_Rain,precipitation
+vw_max,wind speed
+A8_WP_soil_Temp,soil temperature
+waage_ma,volumetric snow water content
+easterly_height_of_sensor_11,instrument parameter
+soil_water_potential,water potential
+stdev_rh_3,relative humidity
+precipitation_since_start,precipitation
+sTNX_AirTemperature,air temperature
+wind_speed_northerly_component,wind speed
+precipitation_since_start,precipitation
+g1_port1_warmed,volumetric snow water content
+PAYLOAD_SIBADC05,NA
+g5_port1_warmed,volumetric snow water content
+temperature_2cm,rock temperature
+temp_320cm,snow temperature
+wind_speed_av,wind speed
+batt_volt_avg,instrument parameter
+ta,air temperature
+relative_humidity,relative humidity
+incoming_sw_radiation,radiation
+battery,instrument parameter
+HP_BH6o,hydraulic potential
+soil_temperature_2,soil temperature
+rain_meter,precipitation
+PAYLOAD_SIBADC09,NA
+temperature_720cm,rock temperature
+soil_temperature_3,soil temperature
+soil_moist_2,soil moisture
+wind_speed,wind speed
+rswr,radiation
+stdev_rh_1,relative humidity
+wind_direction_stdev,wind speed
+logger_voltage,instrument parameter
+snow_surface_temp_ir,snow temperature
+temperature_1500cm,soil temperature
+header_atime_high,NA
+outgoing_shortwave_radiation_beerli,radiation
+outgoing_shortwave_radiation_k_and_z,radiation
+wind_speed_scalar_av,wind speed
+sTNX_SurfaceTemperature,surface temperature
+temp_40cm,snow temperature
+ta,air temperature
+outgoing_sw_radiation,radiation
+M10_F_soil_VWC,volumetric snow water content
+PAYLOAD_SIBADCDIFF1,NA
+PAYLOAD_SIBADC09,NA
+PAYLOAD_SIBADC08,NA
+S4_F_soil_VWC,volumetric snow water content
+dendrometer_15,relative change in radius
+relative_humidity,relative humidity
+temperature_50m,rock temperature
+lysimeter_daily_sum,runoff
+soil_volumetric_water_content_7,volumetric snow water content
+tss,precipitation
+multiplexer_offset_coefficient ,NA
+visibility ,radiation
+peak_coherent_tke_75m_qc ,wind
+vbat_avg ,instrument parameter
+dissipation_rate_direct__75m ,wind
+backscatter_650m ,wind
+potential_temperature_36_m_qc ,air temperature
+catchment_30_total_runoff ,runoff
+time ,NA
+backscatter_670m ,wind
+wind_speed_max_30min_pitot_obs ,wind speed
+temperature_slope_calibration ,air temperature
+catchment_17_precipitation ,precipitation
+rain_snow_hail ,NA
+backscatter_630m ,wind
+turbulent_kinetic_energy_75m ,wind
+coherent_tke_75m ,wind
+backscatter_930m ,wind
+temp_cr10 ,NA
+mean_wt_sonic_75m_qc ,wind
+temperature_1900cm ,air temperature
+sigma_t_sonic_36m ,wind
+p_12vlogm ,NA
+voltage_battery ,instrument parameter
+backscatter_910m ,wind
+testshort ,NA
+temperature_10cm ,air temperature
+ventilation_flag ,NA
+backscatter_610m ,wind
+pressure_sensor_min ,NA
+catchment_11_total_runoff ,runoff
+sigma_u_sonic_54m ,wind
+wind_speed_mean_lamprecht ,wind speed
+peak_coherent_tke_36m ,wind
+air_density_36_m_qc ,wind
+sigma_v_sonic_54m ,wind
+i_hrad_avg ,NA
+backscatter_220m ,wind
+a2p1c_05cm ,soil temperature
+height_sensor_04 ,instrument parameter
+bht_150cm ,ground temperature
+height_sensor_03 ,instrument parameter
+height_sensor_06 ,instrument parameter
+catchment_6_precipitation ,precipitation
+height_sensor_05 ,instrument parameter
+angle_from_horizontal_sonic_36m_qc ,wind
+catchment_44_precipitation ,precipitation
+height_sensor_08 ,instrument parameter
+soil_water_content_150cm ,soil water
+height_sensor_07 ,instrument parameter
+stability_parameter_zdivl_75m ,wind
+wind_speed_vec_pitot ,wind speed
+height_sensor_09 ,instrument parameter
+backscatter_900m ,wind
+cpu_volt ,instrument parameter
+stability_parameter_zdivl_36m ,wind
+bht_300cm_flag ,ground temperature
+t_l_h ,NA
+catchment_14_snowmelt ,runoff_snowmelt
+catchment_33_glacier_melt ,runoff_glaciermelt
+height_sensor_01 ,instrument parameter
+height_sensor_02 ,instrument parameter
+temperature_1520cm ,air temperature
+rh1 ,relative humidity
+backscatter_240m ,wind
+catchment_8_snowmelt ,runoff_snowmelt
+dendrometer_29_e4p1 ,vegetation
+ext_batt_volt ,instrument parameter
+temperature_3850cm ,air temperature
+stability_parameter_zdivl_54m_qc ,wind
+catchment_4_snowmelt ,runoff_snowmelt
+catchment_34_snowmelt ,runoff_snowmelt
+peak_upward_coherent_tke_75m_qc ,wind
+backscatter_990m ,wind
+v ,NA
+snow_height_flag ,snow height
+catchment_17_snowmelt ,runoff_snowmelt
+u ,NA
+t ,NA
+height_sensor_12 ,instrument parameter
+rlwr ,radiation
+height_sensor_10 ,instrument parameter
+surface_wt_qc ,wind
+height_sensor_11 ,instrument parameter
+p ,NA
+t_heizung ,NA
+temperature_1210cm ,air temperature
+incoming_solar_radiation ,radiation
+length_scale_w_36m_qc ,wind
+shortwave_cloud_flag ,radiation
+p_ladeg_1 ,NA
+p_ladeg_2 ,NA
+height ,NA
+sensible_heat_flux_36m_qc ,wind
+catchment_28_precipitation ,precipitation
+temperature_1390cm ,air temperature
+catchment_41_snowmelt ,runoff_snowmelt
+catchment_42_total_runoff ,runoff
+backscatter_690m ,wind
+snow_temperature_180cm ,air temperature
+temperature_1870cm ,air temperature
+temperature_220cm ,air temperature
+total_speed_sonic_75m ,wind
+temperature_3800cm ,air temperature
+catchment_1_snowmelt ,runoff_snowmelt
+peak_coherent_tke_54m_qc ,wind
+length_scale_w_75m_qc ,wind
+soil_water_tension_90cm ,soil water
+soil_water_tension_60cm ,soil water
+temperature_1590cm ,air temperature
+backscatter_310m ,wind
+e2l2w_05cm ,soil temperature
+soil_water_tension_120cm ,soil water
+sonde_range ,NA
+momentum_flux_36m_qc ,wind
+length_scale_u_54m ,wind
+catchment_39_total_runoff ,runoff
+ozone ,atmospheric chemistry
+dendrometer_22_e1p2 ,vegetation
+catchment_18_glacier_melt ,runoff_glaciermelt
+catchment_7_precipitation ,precipitation
+direction_sonic_54m_qc ,wind
+backscatter_710m ,wind
+tree_species ,vegetation
+catchment_35_precipitation ,precipitation
+t_star_36m ,wind
+wind_speed_vector_mean_60min_siap ,wind speed
+temperature_3000cm ,air temperature
+precipitation_30min_total ,precipitation
+wind_speed_flag ,wind speed
+t_star_36m_qc ,wind
+sigma_v_sonic_54m_qc ,wind
+a5p1w_05cm ,soil temperature
+temperature_3200cm ,air temperature
+soil_moisture_profile_2_10cm ,soil water
+backscatter_380m ,wind
+tss1 ,NA
+logger_battery ,instrument parameter
+length_scale_u_75m ,wind
+wind_speed_ridge ,wind speed
+temperature_350cm_flag ,air temperature
+catchment_7_total_runoff ,runoff
+wind_direction_pitot ,wind direction
+hours_of_sunshine ,radiation
+catchment_5_precipitation ,precipitation
+catchment_45_total_runoff ,runoff
+backscatter_10m ,wind
+dissipation_rate_direct__36m_qc ,wind
+snow_temperature_20cm ,air temperature
+total_speed_sonic_36m_qc ,wind
+outgoing_longwave_radiation_flag ,radiation
+incoming_longwave_global_radiation_stdev ,radiation
+power_status ,NA
+catchment_2_glacier_melt ,runoff_glaciermelt
+stability_parameter_zdivl_54m ,wind
+length_scale_v_75m_qc ,wind
+catchment_25_glacier_melt ,runoff_glaciermelt
+catchment_40_snowmelt ,runoff_snowmelt
+catchment_29_snowmelt ,runoff_snowmelt
+catchment_33_total_runoff ,runoff
+temperature_460cm ,air temperature
+tcg4_avg ,NA
+height_of_wt_surface_z_qc ,wind
+catchment_27_precipitation ,precipitation
+incoming_longwave_global_radiation ,radiation
+temperature_140cm ,air temperature
+catchment_31_precipitation ,precipitation
+tunnel_air_temp ,air temperature
+catchment_23_glacier_melt ,runoff_glaciermelt
+g_neg ,NA
+turbulent_kinetic_energy_54m ,wind
+min_g_ein ,NA
+backscatter_500m ,wind
+relative_humidity_rotro ,relative humidity
+temperature_1300cm ,air temperature
+storage_temperature_lamprecht ,air temperature
+backscatter_820m ,wind
+temperature_050cm_flag ,air temperature
+relative_humidity_thygan ,relative humidity
+dendrometer_26_a2p1 ,vegetation
+dissipation_rate_direct__54m ,wind
+wind_speed_flatfield ,wind speed
+backscatter_520m ,wind
+spukey ,NA
+sigma_u_sonic_75m ,wind
+hs11 ,snow height
+soil_water_content_15cm ,soil water
+dendrometer_27_e2p2 ,vegetation
+sigma_u_sonic_36m ,wind
+e1l1w_05cm ,soil temperature
+e2p1c_05cm ,soil temperature
+backscatter_540m ,wind
+p_5v_amse ,NA
+soiltemperature3 ,air temperature
+bht_600cm_flag ,ground temperature
+soiltemperature2 ,air temperature
+soiltemperature1 ,air temperature
+dendrometer_23_a1p1 ,vegetation
+winddirection ,wind direction
+catchment_9_glacier_melt ,runoff_glaciermelt
+temperature_025cm_flag ,air temperature
+snow_temperature_sensor_00 ,air temperature
+turbulent_kinetic_energy_75m_qc ,wind
+anetz_snow_height ,snow height
+temperature_990cm ,air temperature
+catchment_11_precipitation ,precipitation
+catchment_40_total_runoff ,runoff
+multiplexer_slope_coefficient ,NA
+station_id ,NA
+monin_obukhov_length_54m_qc ,wind
+length_scale_w_75m ,wind
+percent_c ,vegetation
+measurement_point ,NA
+length_scale_w_54m ,wind
+soil_moisture_profile_1_30cm ,soil water
+peak_upward_coherent_tke_36m_qc ,wind
+backscatter_440m ,wind
+catchment_37_precipitation ,precipitation
+temperature_620cm ,air temperature
+sigma_w_sonic_75m ,wind
+catchment_42_precipitation ,precipitation
+temperature_logger ,air temperature
+backscatter_840m ,wind
+snow_height_2 ,snow height
+snow_height_1 ,snow height
+instrument_temperature_snow_height ,instrument parameter
+backscatter_420m ,wind
+backscatter_110m ,wind
+catchment_11_snowmelt ,runoff_snowmelt
+momentum_flux_36m ,wind
+percent_n ,NA
+temperature_1000cm_flag ,air temperature
+catchment_30_snowmelt ,runoff_snowmelt
+wind_speed_east_pitot ,wind speed
+soil_water_content_90cm ,soil water
+dendrometer_35_a4p2 ,vegetation
+ti_sonic_75m_qc ,wind
+catchment_14_total_runoff ,runoff
+bht_2500cm ,ground temperature
+soil_conduct_decagon ,soil water
+catchment_32_snowmelt ,runoff_snowmelt
+a2p2w_05cm ,soil temperature
+forward_aq_time ,NA
+ti_sonic_36m_qc ,wind
+catchment_26_glacier_melt ,runoff_glaciermelt
+element_temperature ,air temperature
+temperature_3400cm ,air temperature
+catchment_45_precipitation ,precipitation
+backscatter_190m ,wind
+catchment_19_precipitation ,precipitation
+dissipation_rate_direct__54m_qc ,wind
+new_snow_water_equivalent_obs ,snow water equivalent
+temp_175cm ,NA
+tcgrc_avg ,NA
+momentum_flux_54m ,wind
+backscatter_580m ,wind
+temp__gen ,NA
+catchment_41_precipitation ,precipitation
+potential_temperature_36_m ,air temperature
+catchment_19_glacier_melt ,runoff_glaciermelt
+sigma_w_sonic_36m_qc ,wind
+backscatter_560m ,wind
+temperature_1750cm ,air temperature
+speed_sonic_75m_qc ,wind
+backscatter_970m ,wind
+soil_water_tension_140cm ,soil water
+backscatter_550m ,wind
+momentum_flux_54m_qc ,wind
+rlwr1 ,radiation
+length_scale_v_36m ,wind
+sigma_w_sonic_54m_qc ,wind
+ground_condition ,NA
+dendrometer_02_e1l1 ,vegetation
+p_generat ,NA
+sensible_heat_flux_36m ,wind
+wind_speed_north_pitot ,wind speed
+temperature ,air temperature
+u_star_75m_qc ,wind
+virtual_potential_temperature_36_m ,air temperature
+delta_gps ,NA
+speed_sonic_75m ,wind
+quality_flag ,NA
+backscatter_950m ,wind
+dendrometer_33_a4p1 ,vegetation
+backscatter_280m ,wind
+lasta_1u2 ,NA
+temperature_1600cm ,air temperature
+solarradiation ,radiation
+catchment_8_precipitation ,precipitation
+flag_outgoing_shortwave_radiation ,radiation
+dendrometer_15_e4l2 ,vegetation
+dendrometer_25_e2p1 ,vegetation
+rel_humidity ,relative humidity
+soil_water_potential_1 ,NA
+wind_speed_max_pitot ,wind speed
+soil_water_potential_3 ,NA
+backscatter_260m ,wind
+airtemperature ,air temperature
+temperature_050cm ,air temperature
+velocity_structure_function_parameter_36m ,wind
+precipitation_sum_30min ,precipitation
+temperature_1100cm ,air temperature
+a5p2c_05cm ,soil temperature
+backscatter_70m ,wind
+a3p2w_05cm ,soil temperature
+p_heizbat ,NA
+backscatter_450m ,wind
+gamma ,NA
+tcnr1_avg ,NA
+total_speed_sonic_75m_qc ,wind
+catchment_24_total_runoff ,runoff
+incoming_shortwave_global_radiation_stdev ,radiation
+relative_humidity_mean_60min ,relative humidity
+dissipation_rate_direct__36m ,wind
+catchment_23_total_runoff ,runoff
+catchment_29_total_runoff ,runoff
+m_betr_h ,NA
+ti_sonic_36m ,wind
+length_scale_u_75m_qc ,wind
+cpu_voltage ,instrument parameter
+bht_1200cm_flag ,ground temperature
+dissipation_rate_sf__36m_qc ,wind
+sonde_longitude ,NA
+catchment_40_precipitation ,precipitation
+backscatter_490m ,wind
+flag_outgoing_longwave_radiation ,radiation
+outgoing_allwave_radiation_beerli ,radiation
+reporterid ,NA
+stability_parameter_zdivl_36m_qc ,wind
+rswr1 ,radiation
+tempa__2 ,NA
+tempa__1 ,NA
+t_internal_ref ,NA
+backscatter_30m ,wind
+mean_wt_sonic_54m ,wind
+catchment_7_snowmelt ,runoff_snowmelt
+electronics_temp ,NA
+p_c_heiz ,NA
+photosynth_rad ,NA
+temperature_2400cm ,air temperature
+incoming_shortwave_radiation_beerli_reference ,radiation
+backscatter_340m ,wind
+length_scale_w_54m_qc ,wind
+radar_min ,NA
+test_ref_volt ,NA
+backscatter_360m ,wind
+usrkey ,NA
+bht_1200cm ,ground temperature
+global_radiation_mean_30min ,radiation
+catchment_44_total_runoff ,runoff
+bht_1500cm_flag ,ground temperature
+event_precipitation ,precipitation
+catchment_45_glacier_melt ,runoff_glaciermelt
+reverse_aq_time ,NA
+incoming_radiation ,radiation
+wind_direction_30min_flatfield ,wind direction
+catchment_29_glacier_melt ,runoff_glaciermelt
+backscatter_750m ,wind
+snow_temperature_1 ,air temperature
+snow_temperature_2 ,air temperature
+snow_temperature_3 ,air temperature
+p_luftern ,NA
+soil_moisture_profile_2_30cm ,soil water
+catchment_33_snowmelt ,runoff_snowmelt
+catchment_28_glacier_melt ,runoff_glaciermelt
+bht_100cm ,ground temperature
+catchment_42_snowmelt ,runoff_snowmelt
+sigma_u_sonic_36m_qc ,wind
+snow_temperature_140cm ,air temperature
+backscatter_130m ,wind
+i_rs12t_avg ,NA
+p_c_licht ,NA
+backscatter_860m ,wind
+bht_1000cm ,ground temperature
+backscatter_410m ,wind
+precipitation_sum_60min ,precipitation
+direction_sonic_75m ,wind
+plusum1 ,NA
+dendrometer_21_e1p1 ,vegetation
+backscatter_1000m ,wind
+velocity_structure_function_parameter_36m_qc ,wind
+peak_upward_coherent_tke_36m ,wind
+catchment_25_snowmelt ,runoff_snowmelt
+sigma_t_sonic_54m_qc ,wind
+global_radiation_sum_60min ,radiation
+shm2_sensor_temperature ,instrument parameter
+wind_direction_60min_flatfield ,wind direction
+catchment_15_glacier_melt ,runoff_glaciermelt
+precipitation_1_min_max ,precipitation
+peak_upward_coherent_tke_75m ,wind
+dendrometer_36_a5p2 ,vegetation
+catchment_16_glacier_melt ,runoff_glaciermelt
+bht_50cm ,ground temperature
+backscatter_170m ,wind
+catchment_43_snowmelt ,runoff_snowmelt
+temperature_1500cm_flag ,air temperature
+wind_speed_max_lamprecht ,wind speed
+peak_coherent_tke_54m ,wind
+bht_1500cm ,ground temperature
+g_pos ,NA
+laser_signal_amplitude ,NA
+airhumidity ,relative humidity
+length_scale_w_36m ,wind
+wind_tunnel_temp ,wind
+temperature_160cm ,air temperature
+pressure_sensor_max ,NA
+air_temperature_36_m ,air temperature
+snow_temperature_50cm ,air temperature
+catchment_9_total_runoff ,runoff
+e3l1c_05cm ,soil temperature
+temperature_20cm ,air temperature
+int_batt_volt ,instrument parameter
+peak_upward_coherent_tke_54m ,wind
+catchment_15_total_runoff ,runoff
+peak_downward_coherent_tke_75m_qc ,wind
+ti_sonic_54m_qc ,wind
+u_netz ,NA
+catchment_9_precipitation ,precipitation
+q_hs_avg ,snow height
+temperature_40cm ,air temperature
+catchment_3_precipitation ,precipitation
+wind_speed_max_60min_siap ,wind speed
+catchment_24_precipitation ,precipitation
+vw_vec ,NA
+dissipation_rate_sf__75m_qc ,wind
+catchment_16_precipitation ,precipitation
+bht_50cm_flag ,ground temperature
+bht_2000cm ,ground temperature
+catchment_28_total_runoff ,runoff
+temperature_1220cm ,air temperature
+ilwr ,radiation
+catchment_9_snowmelt ,runoff_snowmelt
+backscatter_800m ,wind
+u_batt ,instrument parameter
+treatment_temperature ,air temperature
+sigma_w_sonic_75m_qc ,wind
+snow_temperature_100cm ,air temperature
+soilmoisture2 ,soil water
+soilmoisture1 ,soil water
+flag_incoming_longwave_radiation ,radiation
+catchment_36_glacier_melt ,runoff_glaciermelt
+soilmoisture3 ,soil water
+dendrometer_05_e2l2 ,vegetation
+temperature_60cm ,air temperature
+stokes ,NA
+snow_temperature_25cm ,air temperature
+i_vrad_avg ,NA
+backscatter_470m ,wind
+wind_direction_30min_ridge ,wind direction
+catchment_2_snowmelt ,runoff_snowmelt
+catchment_43_precipitation ,precipitation
+catchment_34_glacier_melt ,runoff_glaciermelt
+kinternal ,NA
+surface_wt ,wind
+angle_from_horizontal_sonic_36m ,wind
+p_lufter1 ,NA
+p_lufter2 ,NA
+temp_75cm ,NA
+soil_water_content ,soil water
+air_temperature_flag ,air temperature
+backscatter_50m ,wind
+catchment_6_total_runoff ,runoff
+speed_sonic_54m ,wind
+catchment_38_glacier_melt ,runoff_glaciermelt
+dendrometer_18_e5l1 ,vegetation
+dendrometer_31_a3p2 ,vegetation
+sigma_t_sonic_36m_qc ,wind
+t_star_54m ,wind
+temperature_400cm_flag ,air temperature
+height_of_wt_surface_z ,wind
+backscatter_770m ,wind
+wind_direction_lamprecht ,wind direction
+default_loss_term ,NA
+monin_obukhov_length_36m ,wind
+catchment_39_precipitation ,precipitation
+rs12tflag ,NA
+e5l2c_05cm ,soil temperature
+e5l1w_05cm ,soil temperature
+id_stillberg_tree_number ,vegetation
+backscatter_730m ,wind
+mean_wt_sonic_36m ,wind
+wind_speed_max_200cm ,wind speed
+sigma_v_sonic_36m ,wind
+catchment_45_snowmelt ,runoff_snowmelt
+mean_wt_sonic_75m ,wind
+catchment_31_snowmelt ,runoff_snowmelt
+heizbattn ,instrument parameter
+temperature_structure_function_parameter_36m_qc ,air temperature
+radar_max ,NA
+momentum_flux_75m ,wind
+pressure_sensor_avg ,runoff
+dendrometer_32_e4p2 ,vegetation
+backscatter_210m ,wind
+relative_humidity_36_m ,relative humidity
+backscatter_150m ,wind
+backscatter_880m ,wind
+wind_speed_50cm ,wind speed
+flag_incoming_shortwave_radiation ,radiation
+length_scale_v_36m_qc ,wind
+treatment_co2 ,NA
+precipitation_1_min_min ,precipitation
+sensible_heat_flux_54m ,wind
+exergen_sensor_temperature ,instrument parameter
+catchment_13_glacier_melt ,runoff_glaciermelt
+bht_1000cm_flag ,ground temperature
+litter_respiration ,NA
+temperature_240cm ,air temperature
+catchment_24_snowmelt ,runoff_snowmelt
+dendrometer_17_a5l2 ,vegetation
+u_star_36m_qc ,wind
+outgoing_shortwave_radiation_flag ,radiation
+momentum_flux_75m_qc ,wind
+catchment_14_glacier_melt ,runoff_glaciermelt
+incoming_shortwave_radiation_flag ,radiation
+dendrometer_06_a2l2 ,vegetation
+wind_speed_max_50cm ,wind speed
+backscatter_680m ,wind
+aux_voltage ,NA
+temperature_900cm ,air temperature
+catchment_36_snowmelt ,runoff_snowmelt
+catchment_11_glacier_melt ,runoff_glaciermelt
+temperature_3925cm ,air temperature
+total ,NA
+dissipation_rate_direct__75m_qc ,wind
+backscatter_640m ,wind
+catchment_14_precipitation ,precipitation
+incoming_longwave_radiation_flag ,radiation
+temperature_4000cm ,air temperature
+catchment_32_precipitation ,precipitation
+incoming_shortwave_diffuse_radiation ,radiation
+ff ,NA
+backscatter_660m ,wind
+catchment_36_precipitation ,precipitation
+surface_temperature_ir ,air temperature
+d_udivd_t_sonic_54m_qc ,wind
+watertemp ,runoff
+dlwr1 ,radiation
+image ,NA
+soil_temp_decagon ,soil temperature
+catchment_20_glacier_melt ,runoff_glaciermelt
+backscatter_620m ,wind
+precipitation_intensity_2 ,precipitation
+precipitation_intensity_1 ,precipitation
+new_snow_density ,snow density
+peak_coherent_tke_75m ,wind
+temperature_3600cm ,air temperature
+length_scale_u_54m_qc ,wind
+q_lasta_2 ,NA
+sonde_latitude ,NA
+peak_coherent_tke_36m_qc ,wind
+backscatter_600m ,wind
+catchment_8_total_runoff ,runoff
+catchment_1_precipitation ,precipitation
+ventilation ,NA
+peak_downward_coherent_tke_36m_qc ,wind
+temperature_860cm ,air temperature
+temperature_3700cm ,air temperature
+dd ,NA
+conductivity ,NA
+temperature_025cm ,air temperature
+coherent_tke_54m_qc ,wind
+q_lasta_1 ,NA
+catchment_15_snowmelt ,runoff_snowmelt
+catchment_37_glacier_melt ,runoff_glaciermelt
+angle_from_horizontal_sonic_54m ,wind
+bht_400cm ,ground temperature
+ti_sonic_75m ,wind
+temperature_660cm ,air temperature
+wind_direction_siap ,wind direction
+soil_water_content_75cm ,soil water
+backscatter_790m ,wind
+temperature_250cm_flag ,air temperature
+dendrometer_37_a5p1 ,vegetation
+catchment_34_total_runoff ,runoff
+catchment_38_snowmelt ,runoff_snowmelt
+bht_3000cm ,ground temperature
+catchment_13_total_runoff ,runoff
+backscatter_390m ,wind
+temperature_200cm_flag ,air temperature
+catchment_29_precipitation ,precipitation
+e3l2w_05cm ,soil temperature
+new_snow_height_obs ,snow height
+skintemperature ,air temperature
+gsn_plot ,soil temperature
+catchment_31_glacier_melt ,runoff_glaciermelt
+air_temperature_mean_60min ,air temperature
+soil_water_content_120cm ,soil water
+i_ladea_2 ,NA
+catchment_3_snowmelt ,runoff_snowmelt
+i_ladea_1 ,NA
+catchment_26_total_runoff ,runoff
+percent_mass ,NA
+temperature_5290cm ,air temperature
+catchment_24_glacier_melt ,runoff_glaciermelt
+k_rate ,NA
+logtempavg ,NA
+wind_speed_siap ,wind speed
+gps_seconds ,NA
+snow_height_enet ,snow height
+catchment_20_precipitation ,precipitation
+soil_temperature_1 ,air temperature
+d_udivd_t_sonic_75m_qc ,wind
+soil_moisture_6 ,soil water
+soil_moisture_5 ,soil water
+ytilt_avg ,NA
+soil_moisture_4 ,soil water
+soil_moisture_3 ,soil water
+soil_moisture_2 ,soil water
+backscatter_920m ,wind
+soil_moisture_1 ,soil water
+air_pressure_36_m ,wind
+wind_speed_max_30min_siap ,wind speed
+soil_moisture_decagon_2 ,soil water
+catchment_21_glacier_melt ,runoff_glaciermelt
+rel_humidity_rotronic_ventilated ,relative humidity
+soil_moisture_7 ,soil water
+temperature_structure_function_parameter_75m_qc ,air temperature
+sensible_heat_flux_75m ,wind
+catchment_27_snowmelt ,runoff_snowmelt
+temperature_1190cm ,air temperature
+backscatter_320m ,wind
+catchment_12_snowmelt ,runoff_snowmelt
+catchment_36_total_runoff ,runoff
+heatflag ,NA
+liquid_water_content_by_volume ,snow water equivalent
+speed_sonic_36m_qc ,wind
+catchment_20_snowmelt ,runoff_snowmelt
+backscatter_720m ,wind
+backscatter_300m ,wind
+backscatter_230m ,wind
+catchment_12_precipitation ,precipitation
+temperature_1290cm ,air temperature
+p_12vvens ,NA
+catchment_7_glacier_melt ,runoff_glaciermelt
+p_stoppg ,NA
+sample ,NA
+az ,NA
+peak_downward_coherent_tke_54m_qc ,wind
+precipitation_10_min_min ,precipitation
+catchment_26_precipitation ,precipitation
+temperature_1900cm_flag ,air temperature
+landcover_treatment ,NA
+xtilt_avg ,NA
+backscatter_510m ,wind
+temperature_2250cm ,air temperature
+accumulated_precipitation ,precipitation
+speed_sonic_36m ,wind
+precipitation_sum_flag ,precipitation
+soil_water_content_60cm ,soil water
+temperature_600cm_flag ,air temperature
+soil_water_content_2 ,soil water
+dendrometer_28_e3p1 ,vegetation
+dendrometer_10_e3l2 ,vegetation
+bht_800cm_flag ,ground temperature
+velocity_structure_function_parameter_54m ,wind
+backscatter_20m ,wind
+dendrometer_34_e5p1 ,vegetation
+instrument_temperature_beerli_allwave_outgoing ,instrument parameter
+catchment_6_snowmelt ,runoff_snowmelt
+monin_obukhov_length_75m_qc ,wind
+sunshine_duration_sum_60min ,radiation
+temperature_450cm ,air temperature
+catchment_27_total_runoff ,runoff
+speed_sonic_54m_qc ,wind
+d_udivd_t_sonic_36m_qc ,wind
+temp_offset_calibration ,NA
+bht_3000cm_flag ,ground temperature
+catchment_10_total_runoff ,runoff
+catchment_18_snowmelt ,runoff_snowmelt
+mean_wt_sonic_54m_qc ,wind
+vbat_min ,instrument parameter
+backscatter_830m ,wind
+backscatter_430m ,wind
+soil_water_tension_30cm ,soil water
+backscatter_850m ,wind
+temperature_795cm ,air temperature
+length_scale_v_54m ,wind
+counter_4_total ,NA
+cpu_temp ,instrument parameter
+wind_from_direction ,wind direction
+soil_moisture_decagon ,soil water
+length_scale_v_75m ,wind
+soil_moisture_profile_1_10cm ,soil water
+ti_sonic_54m ,wind
+angle_from_horizontal_sonic_75m ,wind
+catchment_5_glacier_melt ,runoff_glaciermelt
+d_udivd_t_sonic_75m ,wind
+t_star_54m_qc ,wind
+catchment_22_precipitation ,precipitation
+p_24v_win ,NA
+catchment_10_glacier_melt ,runoff_glaciermelt
+stability_parameter_zdivl_75m_qc ,wind
+mst_surface_temp ,snow temperature
+displacement_z9 ,NA
+mr ,NA
+catchment_13_precipitation ,precipitation
+bht_800cm ,ground temperature
+o_lasta_2 ,NA
+o_lasta_1 ,NA
+dswr1 ,radiation
+total_precipitation ,precipitation
+relative_humidity_36_m_qc ,relative humidity
+catchment_41_total_runoff ,runoff
+peak_downward_coherent_tke_36m ,wind
+vwmean1 ,NA
+catchment_34_precipitation ,precipitation
+catchment_32_glacier_melt ,runoff_glaciermelt
+catchment_4_precipitation ,precipitation
+temperature_structure_function_parameter_54m ,air temperature
+dissipation_rate_sf__36m ,wind
+direction_sonic_54m ,wind
+instrument_temperature_beerli_allwave_incoming ,instrument parameter
+sensible_heat_flux_54m_qc ,wind
+input_records ,wind
+catchment_26_snowmelt ,runoff_snowmelt
+catchment_15_precipitation ,precipitation
+catchment_17_total_runoff ,runoff
+dendrometer_08_a2l1 ,vegetation
+sunshine_duration_sum_30min ,radiation
+precipitation_sum ,precipitation
+backscatter_100m ,wind
+catchment_22_glacier_melt ,runoff_glaciermelt
+dendrometer_19_e5l2 ,vegetation
+temperature_260cm ,air temperature
+easterly_height_of_sensor_00 ,instrument parameter
+backscatter_90m ,wind
+wind_direction_stdev_lamprecht ,wind direction
+lw_out ,radiation
+catchment_3_glacier_melt ,runoff_glaciermelt
+temperature_structure_function_parameter_54m_qc ,air temperature
+catchment_18_total_runoff ,runoff
+pscl ,NA
+dendrometer_13_a4l2 ,vegetation
+gwl10f ,NA
+direction_sonic_75m_qc ,wind
+velocity_structure_function_parameter_75m ,wind
+vw_scal ,NA
+catchment_25_precipitation ,precipitation
+snow_temperature_0cm ,air temperature
+sw_out ,radiation
+sigma_v_sonic_36m_qc ,wind
+fungi ,NA
+virtual_potential_temperature_36_m_qc ,air temperature
+catchment_35_total_runoff ,runoff
+backscatter_180m ,wind
+wind_direction_vector_mean_60min_siap ,wind direction
+dissipation_rate_sf__75m ,wind
+backscatter_590m ,wind
+catchment_28_snowmelt ,runoff_snowmelt
+soil_moisture_profile_2_47cm ,soil water
+precipitation_10_min_max ,precipitation
+dendrometer_11_a3l2 ,vegetation
+dissipation_rate_sf__54m ,wind
+temperature_5000cm ,air temperature
+catchment_4_total_runoff ,runoff
+lw_in ,radiation
+length_scale_v_54m_qc ,wind
+total_speed_sonic_54m_qc ,wind
+coherent_tke_36m_qc ,wind
+backscatter_570m ,wind
+catchment_30_glacier_melt ,runoff_glaciermelt
+sigma_t_sonic_75m_qc ,wind
+catchment_35_snowmelt ,runoff_snowmelt
+ir_surface_temp ,surface temperaturer
+backscatter_530m ,wind
+length_scale_u_36m_qc ,wind
+catchment_23_snowmelt ,runoff_snowmelt
+percent_c_remaining ,vegetation
+catchment_1_glacier_melt ,runoff_glaciermelt
+temperature_204cm ,air temperature
+displacement_extensiometer_q2 ,NA
+temperature_180cm ,air temperature
+catchment_30_precipitation ,precipitation
+u_akku_avg ,instrument parameter
+catchment_6_glacier_melt ,runoff_glaciermelt
+direction_sonic_36m_qc ,wind
+soil_water_tension_150cm ,soil water
+sensible_heat_flux_75m_qc ,wind
+fibre_end ,NA
+p_lasta_2 ,NA
+dendrometer_12_e3l1 ,vegetation
+valid_records ,wind
+p_lasta_1 ,NA
+catchment_27_glacier_melt ,runoff_glaciermelt
+temperature_280cm ,air temperature
+backscatter_350m ,wind
+soilconductivity2 ,soil water
+wind_direction_flag ,wind direction
+soilconductivity3 ,soil water
+temperature_1800cm ,air temperature
+soil_water_content_30cm ,soil water
+soilconductivity1 ,soil water
+catchment_47_glacier_melt ,runoff_glaciermelt
+temperature_1050cm ,air temperature
+temperature_700cm ,air temperature
+catchment_22_snowmelt ,runoff_snowmelt
+temperature_1490cm ,air temperature
+temperature_2500cm ,air temperature
+catchment_19_snowmelt ,runoff_snowmelt
+battmin ,instrument parameter
+catchment_46_precipitation ,precipitation
+cloud_thickness ,radiation
+temperature_1970cm ,air temperature
+temperature_800cm_flag ,air temperature
+bht_250cm ,ground temperature
+catchment_17_glacier_melt ,runoff_glaciermelt
+catchment_20_total_runoff ,runoff
+sigma_w_sonic_54m ,wind
+catchment_33_precipitation ,precipitation
+air_pressure_36_m_qc ,wind
+u_akku_1 ,instrument parameter
+catchment_22_total_runoff ,runoff
+u_akku_2 ,instrument parameter
+a5p2c_10cm ,soil temperature
+pyranometer_temperature ,air temperature
+av_water_level ,NA
+d_udivd_t_sonic_54m ,wind
+backscatter_80m ,wind
+flag_2 ,NA
+catchment_23_precipitation ,precipitation
+flag_1 ,NA
+snow_temperature_150cm ,air temperature
+date ,ground temperature
+catchment_13_snowmelt ,runoff_snowmelt
+new_snow_water_equivalent ,snow water equivalent
+catchment_37_snowmelt ,runoff_snowmelt
+t_external_ref_1 ,NA
+monin_obukhov_length_75m ,wind
+t_external_ref_2 ,NA
+u_star_75m ,wind
+displacement ,NA
+n_startve ,NA
+temperature_95cm ,air temperature
+catchment_44_snowmelt ,runoff_snowmelt
+temperature_1200cm_flag ,air temperature
+air_temp_basestation ,air temperature
+air_temp_rotronic_ventilated ,air temperature
+backscatter_460m ,wind
+catchment_46_snowmelt ,runoff_snowmelt
+sigma_v_sonic_75m_qc ,wind
+soil_conductivity_1 ,soil water
+catchment_31_total_runoff ,runoff
+dendrometer_04_e1l2 ,vegetation
+backscatter_1010m ,wind
+catchment_42_glacier_melt ,runoff_glaciermelt
+bht_150cm_flag ,ground temperature
+angle_from_horizontal_sonic_75m_qc ,wind
+temperature_100cm_flag ,air temperature
+bht_600cm ,ground temperature
+p_startg ,NA
+backscatter_40m ,wind
+soil_conductivity_4 ,soil water
+soil_conductivity_5 ,soil water
+soil_conductivity_2 ,soil water
+soil_conductivity_3 ,soil water
+soil_water_content_45cm ,soil water
+soil_conductivity_6 ,soil water
+soil_conductivity_7 ,soil water
+total_speed_sonic_54m ,wind
+bht_400cm_flag ,ground temperature
+coherent_tke_75m_qc ,wind
+anti_stokes ,NA
+u_star_36m ,wind
+bht_2000cm_flag ,ground temperature
+catchment_16_snowmelt ,runoff_snowmelt
+wind_speed_200cm ,wind speed
+td ,NA
+temperature_structure_function_parameter_75m ,air temperature
+catchment_19_total_runoff ,runoff
+radar_avg ,NA
+catchment_21_snowmelt ,runoff_snowmelt
+relative_humidity_flag ,relative humidity
+groundwater_level_m ,soil water
+turbulent_kinetic_energy_54m_qc ,wind
+backscatter_960m ,wind
+catchment_25_total_runoff ,runoff
+snow_height_obs ,snow height
+hsq1_avg ,snow height
+air_temperature_36_m_qc ,air temperature
+catchment_43_glacier_melt ,runoff_glaciermelt
+catchment_35_glacier_melt ,runoff_glaciermelt
+backscatter_270m ,wind
+monin_obukhov_length_54m ,wind
+backscatter_760m ,wind
+id_face_plot ,NA
+snow_temperature_200cm ,air temperature
+wind_speed_max_100cm ,wind speed
+watermark ,NA
+dendrometer_20_a5l1 ,vegetation
+dw1 ,NA
+a5l2c_05cm ,soil temperature
+pyrotherm_surface_temperature ,air temperature
+temperature_1610cm ,air temperature
+wind_direction_60min_ridge ,wind direction
+kexternal ,NA
+backscatter_120m ,wind
+catchment_18_precipitation ,precipitation
+catchment_2_precipitation ,precipitation
+mean_wt_sonic_36m_qc ,wind
+peak_downward_coherent_tke_54m ,wind
+fungi_bacteria ,NA
+input_records_qc ,wind
+catchment_32_total_runoff ,runoff
+e2l1c_05cm ,soil temperature
+coherent_tke_36m ,wind
+shm1_sensor_temperature ,instrument parameter
+temperature_50cm_flag ,air temperature
+windspeed ,wind speed
+total_speed_sonic_36m ,wind
+sigma_u_sonic_75m_qc ,wind
+ventflag ,NA
+temperature_1090cm ,air temperature
+temperature_3900cm ,air temperature
+monin_obukhov_length_36m_qc ,wind
+incoming_shortwave_global_radiation ,radiation
+precipitation_10_min_total ,precipitation
+velocity_structure_function_parameter_54m_qc ,wind
+temperature_150cm_flag ,air temperature
+percent_n_remaining ,NA
+rainmeter ,NA
+ratio_of_c_to_n ,NA
+temperature_80cm ,air temperature
+temperature_2800cm ,air temperature
+temperature_2750cm ,air temperature
+tlog_avg ,NA
+wind_speed_mean_pitot ,wind speed
+backscatter_160m ,wind
+temperature_structure_function_parameter_36m ,air temperature
+bht_200cm ,ground temperature
+tirref_avg ,NA
+dendrometer_14_a4l1 ,vegetation
+temperature_0m ,air temperature
+dendrometer_03_a1l1 ,vegetation
+catchment_4_glacier_melt ,runoff_glaciermelt
+turbulent_kinetic_energy_36m ,wind
+winddirection2 ,wind direction
+dendrometer_24_a1p2 ,vegetation
+a3p1c_05cm ,soil temperature
+temperature_75cm ,air temperature
+catchment_10_snowmelt ,runoff_snowmelt
+t_star_75m ,wind
+backscatter_370m ,wind
+dendrometer_16_e4l1 ,vegetation
+turbulent_kinetic_energy_36m_qc ,wind
+sigma_t_sonic_54m ,wind
+dendrometer_30_e3p2 ,vegetation
+valid_records_qc ,wind
+e1l2c_05cm ,soil temperature
+wind_speed_max_30min_pitot ,wind speed
+catchment_16_total_runoff ,runoff
+wassermenge1 ,runoff
+lw_sensor_temp ,radiation
+backscatter_330m ,wind
+catchment_47_precipitation ,precipitation
+dendrometer_09_a3l1 ,vegetation
+catchment_10_precipitation ,precipitation
+temperature_550cm_flag ,air temperature
+catchment_38_total_runoff ,runoff
+tree_height ,vegetation
+d_udivd_t_sonic_36m ,wind
+net_shortwave_radiation ,radiation
+direction_sonic_36m ,wind
+backscatter_890m ,wind
+catchment_46_glacier_melt ,runoff_glaciermelt
+u_star_54m ,wind
+bht_300cm ,ground temperature
+sigma_w_sonic_36m ,wind
+reference_temperature ,air temperature
+catchment_47_snowmelt ,runoff_snowmelt
+catchment_46_total_runoff ,runoff
+sigma_v_sonic_75m ,wind
+backscatter_870m ,wind
+backscatter_400m ,wind
+outgoing_shortwave_radiation_beerli_reference ,radiation
+backscatter_810m ,wind
+t_star_75m_qc ,wind
+catchment_12_glacier_melt ,runoff_glaciermelt
+a5l1w_05cm ,soil temperature
+velocity_structure_function_parameter_75m_qc ,wind
+westerly_height_of_sensor_00 ,instrument parameter
+catchment_38_precipitation ,precipitation
+q_ladea_1 ,NA
+temp_275cm ,NA
+backscatter_480m ,wind
+soil_moisture_profile_1_53cm ,soil water
+bht_200cm_flag ,ground temperature
+q_ladea_2 ,NA
+fog ,NA
+bacteria ,NA
+catchment_47_total_runoff ,runoff
+temperature_1400cm ,air temperature
+backscatter_60m ,wind
+angle_from_horizontal_sonic_54m_qc ,wind
+cloud_cover_obs ,radiation
+catchment_37_total_runoff ,runoff
+i_lasta_2 ,NA
+u_star_54m_qc ,wind
+dendrometer_01_e2l1 ,vegetation
+catchment_21_precipitation ,precipitation
+i_lasta_1 ,NA
+vradflag ,NA
+no_of_samples ,NA
+wind_speed_scalar_mean_30min_pitot ,wind speed
+backscatter_980m ,wind
+catchment_12_total_runoff ,runoff
+dissipation_rate_sf__54m_qc ,wind
+bht_250cm_flag ,ground temperature
+counter_4_max ,NA
+sigma_u_sonic_54m_qc ,wind
+wind_speed_100cm ,wind speed
+backscatter_290m ,wind
+exergen_sensor_voltage ,NA
+backscatter_780m ,wind
+catchment_44_glacier_melt ,runoff_glaciermelt
+soil_conduct_decagon_2 ,soil water
+catchment_21_total_runoff ,runoff
+temperature_300cm_flag ,air temperature
+catchment_2_total_runoff ,runoff
+catchment_1_total_runoff ,runoff
+backscatter_940m ,wind
+soilmoisture ,soil water
+temperature_890cm ,air temperature
+soil_water_tension_15cm ,soil water
+backscatter_740m ,wind
+u_12v ,NA
+backscatter_250m ,wind
+sw_in ,radiation
+soil_temp_decagon_2 ,soil temperature
+peak_upward_coherent_tke_54m_qc ,wind
+backscatter_200m ,wind
+catchment_39_snowmelt ,runoff_snowmelt
+catchment_5_total_runoff ,runoff
+coherent_tke_54m ,wind
+backscatter_700m ,wind
+wind_speed_vec_lamprecht ,wind speed
+backscatter_140m ,wind
+catchment_39_glacier_melt ,runoff_glaciermelt
+iswr ,radiation
+snow_temperature_60cm ,air temperature
+dendrometer_07_a1l2 ,vegetation
+catchment_43_total_runoff ,runoff
+catchment_40_glacier_melt ,runoff_glaciermelt
+dw_max ,NA
+catchment_8_glacier_melt ,runoff_glaciermelt
+catchment_3_total_runoff ,runoff
+sigma_t_sonic_75m ,wind
+peak_downward_coherent_tke_75m ,wind
+bht_2500cm_flag ,ground temperature
+epoch ,soil temperature
+catchment_41_glacier_melt ,runoff_glaciermelt
+temperature_1350cm ,air temperature
+temperature_1200cm ,air temperature
+bht_100cm_flag ,ground temperature
+wind_direction_stdev_pitot ,wind direction
+length_scale_u_36m ,wind
+displacement_extensiometer_x2 ,NA
+o_ladea_1 ,NA
+ta1 ,NA
+o_ladea_2 ,NA
+catchment_5_snowmelt ,runoff_snowmelt
+temperature_3950cm ,air temperature
+air_density_36_m ,wind
