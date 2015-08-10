@@ -223,7 +223,15 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
         
         
         FastVector v = new FastVector();
-        v.addElement(new Attribute("label"));
+        FastVector classVal = new FastVector();
+		classVal.addElement("0");
+		classVal.addElement("1");
+		classVal.addElement("2");
+		classVal.addElement("3");
+		classVal.addElement("4");
+		classVal.addElement("5");
+        Attribute label = new Attribute("label",classVal);
+        v.addElement(label);
         Attribute mean = new Attribute("julien-norm-mean-");
 		v.addElement(mean);
         Attribute std = new Attribute("julien-norm-std-");
@@ -242,13 +250,7 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		v.addElement(p25);
         Attribute p75 = new Attribute("julien-norm-percentile-percentile-75");
 		v.addElement(p75);
-		FastVector classVal = new FastVector();
-		classVal.addElement("0");
-		classVal.addElement("1");
-		classVal.addElement("2");
-		classVal.addElement("3");
-		classVal.addElement("4");
-		classVal.addElement("5");
+		
 		Instances dataset = new Instances("Test",v,0);
 		Instance i = new Instance(dataset.numAttributes());
 		i.setValue(mean, mean_norm);
