@@ -1,5 +1,6 @@
 language: java
 script: "ant build"
+sudo: false
 jdk:
   - openjdk7
 branches:
