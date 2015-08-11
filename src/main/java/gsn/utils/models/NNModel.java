@@ -78,7 +78,8 @@ public class NNModel extends AbstractModel {
            Double lon2 = (Double) s2.getData("longitude");
            if (lat1 != null && lat2 != null && lon1 != null && lon2 != null){ // get real distance in meter
         	   // !!!! _HARDCODED conversion of gps coordinates
-        	   return GeoTools.getDistance((lat1-1880)/60.0,(lon1-320)/60.0,(lat2-1880)/60.0,(lon2-320)/60.0);
+        	   //return GeoTools.getDistance((lat1-1880)/60.0,(lon1-320)/60.0,(lat2-1880)/60.0,(lon2-320)/60.0);
+        	   return GeoTools.getDistance(lat1, lon1, lat2, lon2);
            }
            else{ // get L2 distance using all parameters (considering only double and int)
         	   double diff = 0;
