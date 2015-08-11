@@ -16,7 +16,8 @@ var gsnWebApp = angular.module('gsnWebApp', [
     , 'ui.select'
     , 'ngMaterial'
     , 'gsnMap'
-    ,'rzModule'
+    , 'gsnMonitor'
+    , 'rzModule'
 ]);
 
 gsnWebApp.config(['$routeProvider', '$datepickerProvider',
@@ -40,9 +41,16 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
                 //, reloadOnSearch: true
             }).
             when('/monitor', {
-                templateUrl: 'partials/monitor.html'
-                //, controller: 'hcCtrl'
-                //, reloadOnSearch: true
+                templateUrl: 'partials/monitor.html',
+                resolve: {
+                    sensorData: [
+                        'MonitorSensorsData',
+                        function (MonitorSensorsData) {
+                            return MonitorSensorsData.getSensors();
+                        }
+                    ]
+                },
+                controller: 'MonitorController'
             }).
             when('/about', {
                 templateUrl: 'partials/about.html'
@@ -77,6 +85,7 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
 ]);
 
 gsnWebApp.controller('TabsCtrl', function ($scope, $location) {
+    var tabNames = ['/map', '/plot', '/monitor', '/about'];
     $scope.tabs = [
         {link: '#/map', label: 'Sensor map'},
         {link: '#/plot', label: 'Plot data'},
@@ -84,7 +93,12 @@ gsnWebApp.controller('TabsCtrl', function ($scope, $location) {
         {link: '#/about', label: 'About'},
     ];
 
-    $scope.selectedTab = $scope.tabs[0];
+    if (tabNames.indexOf($location.$$path) > -1) {
+        $scope.selectedTab = $scope.tabs[tabNames.indexOf($location.$$path)];
+    } else {
+        $scope.selectedTab = $scope.tabs[0];
+    }
+
     $scope.setSelectedTab = function (tab) {
         console.log(tab);
         $scope.selectedTab = tab;
@@ -110,6 +124,6 @@ gsnWebApp.controller('PaymentsCtrl', function ($scope) {
 });
 
 
-gsnWebApp.factory('_', ['$window', function($window) {
+gsnWebApp.factory('_', ['$window', function ($window) {
     return $window._; // assumes underscore has already been loaded on the page
 }]);

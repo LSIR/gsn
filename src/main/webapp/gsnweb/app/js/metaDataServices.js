@@ -20,6 +20,8 @@ var metaDataServices = angular.module('metaDataServices', [])
                     promise = $http.get(url).then(function (response) {
 
                         return response.data;
+                    }, function(reason) {
+                        console.log('ERROR : ' + reason.data);
                     });
 
                 }

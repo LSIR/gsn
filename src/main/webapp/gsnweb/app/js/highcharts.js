@@ -78,21 +78,9 @@ angular.module('hcControllers', [])
                 });
             }
 
-        }])
+        }]);
 
 
-    .factory('sharedService', ['$rootScope', function ($rootScope) {
-        var sharedService = {};
 
-        sharedService.prepForBroadcast = function () {
-            this.broadcastItem();
-        };
-
-        sharedService.broadcastItem = function () {
-            $rootScope.$broadcast('handleBroadcast');
-        };
-
-        return sharedService;
-    }]);
 
 

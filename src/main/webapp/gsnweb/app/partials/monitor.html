@@ -1,43 +1,30 @@
 <div layout="row" layout-sm="column" layout-margin>
 
-    <form name="monitorForm">
-        <div ng-controller="ParameterSelectCtrl">
-            <div>
+    <!--<form name="monitorForm">-->
+            <!--<div>-->
+                <!--Data: {{data}}-->
 
-                <div>
-                    <ui-select ng-model="sensor.selectedSensor" theme="select2" ng-disabled="disabled"
-                               on-select="updateSensor($item, $index)"
-                               style="min-width: 300px;">
-                        <ui-select-match placeholder="Select Sensor...">{{$select.selected}}
-                        </ui-select-match>
-                        <ui-select-choices
-                                repeat="sensor in sensorNames | filter:$select.search">
-                            <span ng-bind-html="sensor | highlight: $select.search"></span>
-                            <!--<img ng-src="{{getIconUlr(sensor)}}" style="width: 16px; height:16px">-->
-                        </ui-select-choices>
-                    </ui-select>
-                </div>
-                <div  ng-disabled="!sensor.sensorSelected" style="margin-left: 5px; margin-right: 5px">
-                    <ui-select multiple ng-model="sensor.parameters.selectedFields" theme="select2"
-                               ng-disabled="disabled"
-                               style="width: 400px;"
-                               on-select="updateParameter()">
-                        <ui-select-match placeholder="Select property...">
-                            {{$item.columnName}}({{$item.unit}})
-                        </ui-select-match>
-                        <ui-select-choices group-by="nameGroupFn"
-                                           repeat="property in sensor.fields | propsFilter: {name: $select.search, columnName: $select.search}">
-                            <div ng-bind-html="propWithUnit(property) | highlight: $select.search"></div>
+            <!--</div>-->
+    <!--</form>-->
+    <div>
+        <div ng:repeat="sensor in data">
+            <label>{{sensor.properties.vs_name}}</label>
+            <table>
+                <tr>
+                    <td>{{sensor.properties.fields[0].name}}</td>
+                    <td>{{sensor.properties.values[0][0] | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+                    <td></td>
+                </tr>
+                <tbody ng:repeat="field in sensor.properties.fields.slice(2, sensor.properties.fields.length)">
+                <tr>
+                    <td>{{field.name}}</td>
+                    <td>{{sensor.properties.values[0][$index+2]}}</td>
+                    <td>{{field.unit}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-                        </ui-select-choices>
-                    </ui-select>
-                </div>
-                <div ng-if="sensor.isSensorSelected()">
-                    <small><span class=".md-caption" style="color:GrayText"><i>({{sensor.from | date:'yyyy-MM-dd'}}
-                        to {{sensor.until |
-                        date:'yyyy-MM-dd'}})</i></span></small>
+    </div>
 
-                </div>
-            </div>
-    </form>
 </div>

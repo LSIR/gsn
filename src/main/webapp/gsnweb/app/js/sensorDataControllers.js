@@ -35,8 +35,8 @@ sensorData.filter('propsFilter', function () {
 
 
 sensorData.controller('ParameterSelectCtrl',
-    ['$scope', '$window', 'MetadataLoader', '$location', 'sharedService', 'UrlBuilder', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation', 'SensorModel', '$q',
-        function ($scope, $window, MetadataLoader, $location, sharedService, UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation, SensorModel, $q) {
+    ['$scope', '$window', 'MetadataLoader', '$location', 'UrlBuilder', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation', 'SensorModel', '$q',
+        function ($scope, $window, MetadataLoader, $location,  UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation, SensorModel, $q) {
 
             $scope.rowNumber = FilterParameters.rowNumber;
             $scope.limitByRows = FilterParameters.limitByRows;
@@ -161,13 +161,9 @@ sensorData.controller('ParameterSelectCtrl',
             $scope.submitSelected = function () {
 
                 updateFilterParameters();
-                sharedService.prepForBroadcast();
 
             };
 
-            $scope.handleClick = function (msg) {
-                sharedService.prepForBroadcast(msg);
-            };
 
             $scope.download = function () {
                 updateFilterParameters();
@@ -439,14 +435,16 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                     this.promise = $q.all(promises).then(function (data) {
 
                         for (var index = 0; index < data.length; index++) {
-                            var metadata = new SensorMetadata(data[index]);
 
-                            self.sensorModels[index].update(metadata);
+                            if (data[index]) {
+                                var metadata = new SensorMetadata(data[index]);
+                                self.sensorModels[index].update(metadata);
 
-                            for (var i = 0; i < self.sensorModels[index].fields.length; i++) {
-                                if (self.getFields().indexOf(self.sensorModels[index].fields[i].columnName) > -1) {
-                                    self.sensorModels[index].parameters.selectedFields.push(self.sensorModels[index].fields[i]);
+                                for (var i = 0; i < self.sensorModels[index].fields.length; i++) {
+                                    if (self.getFields().indexOf(self.sensorModels[index].fields[i].columnName) > -1) {
+                                        self.sensorModels[index].parameters.selectedFields.push(self.sensorModels[index].fields[i]);
 
+                                    }
                                 }
                             }
 

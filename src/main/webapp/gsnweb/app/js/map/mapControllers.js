@@ -1,7 +1,7 @@
 var gsnMap = angular.module("gsnMap", ["leaflet-directive"]);
 
-gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', '$filter', 'sensors', 'FilterParameters', 'sharedService', '$location', '_', 'MapFilterParameters',
-    function ($scope, leafletData, $compile, $filter, sensors, FilterParameters, sharedService, $location, _, MapFilterParameters) {
+gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', '$filter', 'sensors', 'FilterParameters', '$location', '_', 'MapFilterParameters',
+    function ($scope, leafletData, $compile, $filter, sensors, FilterParameters,  $location, _, MapFilterParameters) {
 
 
         $scope.geojson = {};
@@ -311,7 +311,13 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             FilterParameters.resetPromise();
             $location.path('/plot')
             FilterParameters.updateURLFromMap($location);
-            sharedService.prepForBroadcast();
+
+        };
+
+        $scope.monitor = function (feature) {
+            console.log('MONITOR ' + feature.properties.sensorName);
+            $location.path('/monitor')
+            $location.search('sensors', [feature.properties.sensorName].toString());
 
         };
 
