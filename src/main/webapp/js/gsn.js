@@ -942,7 +942,7 @@ var GSN = {
                 var dd,field,unit;
                 for (var i = 0; i<dds.size();i++){
                     dd = dds.get(i);
-                    field = $("field[@name="+$(dd).attr("class")+"]",vs);
+                    field = $("field[@name="+$(dd).attr("class")+"][@category!=predicate]",vs);
                     type = $(field).attr("type");
                     value = $(field).text();
                     unit = $(field).attr("unit");

@@ -26,13 +26,14 @@
 package gsn.http;
 
 import com.thoughtworks.xstream.XStream;
+
 import gsn.Main;
 import gsn.Mappings;
 import gsn.VirtualSensor;
 import gsn.VirtualSensorInitializationFailedException;
 import gsn.beans.DataField;
+import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-
 import gsn.http.ac.User;
 import gsn.http.rest.StreamElement4Rest;
 import gsn.utils.models.AbstractModel;
@@ -46,6 +47,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
@@ -65,7 +67,7 @@ public class ModelServlet extends HttpServlet {
      * The parameter vs is the name of the modeling virtual sensor and is mandatory. If the virtual sensor doesn't exists, it return a 404 error.
      * The parameter models is the index of the model within the VS. If not specified it is 0.
      * All the other parameters are used to build the query, if their value can be cast to int or double.
-     * The result is a set of StreamElement in xml.
+     * The result is a set of StreamElement in xml or json.
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -80,6 +82,7 @@ public class ModelServlet extends HttpServlet {
 
         int model = HttpRequestUtils.getIntParameter("model", 0, request);
         String vsname = HttpRequestUtils.getStringParameter("vs", null, request);
+        String format = HttpRequestUtils.getStringParameter("format", "xml", request);
         
 		if (vsname != null){
 			try {
@@ -114,7 +117,7 @@ public class ModelServlet extends HttpServlet {
 			Serializable[] sr = new Serializable[m.size()-2];
 			int i = 0;
 			for(String k : m.keySet()){
-				if(k.equals("vs") || k.equals("models")) continue;
+				if(k.equals("vs") || k.equals("models") || k.equals("format")) continue;
 				try{
 					sr[i] = Integer.parseInt(m.get(k)[0]);
 					df[i] = new DataField(k,"integer");
@@ -135,16 +138,39 @@ public class ModelServlet extends HttpServlet {
 			StreamElement[] se = modelClass.query(new StreamElement(df,sr));
 	        
 	        StringBuilder str = new StringBuilder();
-	        
-	        str.append("<results>");
-	        if (se != null){
-	        for (StreamElement s : se){
-	        	if (s != null){
-	        	    str.append(xstream.toXML(new StreamElement4Rest(s)));
-	        	}
+	        if (format.equalsIgnoreCase("xml")){
+		        str.append("<results>");
+		        if (se != null){
+		        for (StreamElement s : se){
+		        	if (s != null){
+		        	    str.append(xstream.toXML(new StreamElement4Rest(s)));
+		        	}
+		        }
+		        }
+		        str.append("</results>");
+	        }else{
+	        	str.append("[");
+		        if (se != null){
+		        for (StreamElement s : se){
+		        	if (s != null){
+		        		str.append("{timestamp:");
+		        		str.append(s.getTimeStamp());
+		        		str.append(",fields:[");
+		        		for(int j=0;j<s.getData().length;j++){
+		        			str.append("{name:\"");
+		        			str.append(s.getFieldNames()[j]);
+		        			str.append("\",type=\"");
+		        			str.append(DataTypes.TYPE_NAMES[s.getFieldTypes()[j]]);
+		        			str.append("\",value=\"");
+		        			str.append(s.getData());
+		        			str.append("\"},");
+		        		}
+		        		str.append("]}");
+		        	}
+		        }
+		        }
+		        str.append("]");
 	        }
-	        }
-	        str.append("</results>");
 	        response.getWriter().write(str.toString());
 		}
     }
