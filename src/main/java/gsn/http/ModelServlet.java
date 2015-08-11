@@ -82,7 +82,7 @@ public class ModelServlet extends HttpServlet {
 
         int model = HttpRequestUtils.getIntParameter("model", 0, request);
         String vsname = HttpRequestUtils.getStringParameter("vs", null, request);
-        String format = HttpRequestUtils.getStringParameter("format", "xml", request);
+        String format = HttpRequestUtils.getStringParameter("format", null, request);
         
 		if (vsname != null){
 			try {
@@ -112,9 +112,12 @@ public class ModelServlet extends HttpServlet {
 			response.sendError(404);
 		}else{
 			Map<String, String[]> m = request.getParameterMap();
-			
-			DataField[] df = new DataField[m.size()-2];
-			Serializable[] sr = new Serializable[m.size()-2];
+			int numParams = m.size()-2;
+			if (format != null){
+				numParams--;
+			}
+			DataField[] df = new DataField[numParams];
+			Serializable[] sr = new Serializable[numParams];
 			int i = 0;
 			for(String k : m.keySet()){
 				if(k.equals("vs") || k.equals("models") || k.equals("format")) continue;
@@ -138,7 +141,7 @@ public class ModelServlet extends HttpServlet {
 			StreamElement[] se = modelClass.query(new StreamElement(df,sr));
 	        
 	        StringBuilder str = new StringBuilder();
-	        if (format.equalsIgnoreCase("xml")){
+	        if (!format.equalsIgnoreCase("json")){
 		        str.append("<results>");
 		        if (se != null){
 		        for (StreamElement s : se){
