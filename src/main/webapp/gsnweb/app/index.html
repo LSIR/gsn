@@ -75,7 +75,7 @@
   <link rel="stylesheet" href="//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css" />
   <link rel="stylesheet" href="//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css" />
 
-<!--Slider-->
+  <!--Slider-->
   <script src="https://rawgit.com/rzajac/angularjs-slider/master/rzslider.js"></script>
   <!--<link rel="stylesheet" href="https://rawgit.com/rzajac/angularjs-slider/master/dist/rzslider.css" />-->
   <link rel="stylesheet" href="css/rzslider.css" />
@@ -88,18 +88,18 @@
   <script src="js/sensors.js"></script>
   <script src="js/map/mapControllers.js"></script>
 </head>
-<body style="background-image:url(img/CCES.jpg); background-repeat: no-repeat;">
+<body style="background-image:url(img/CCES.jpg); background-repeat: no-repeat;background-position: 30% 0%; ">
 
 <div id="header">
-<h1>Environmental Data Portal<br/>
-<small><i>Global Sensor Network</i></small></h1>
+  <h1>Environmental Data Portal<br/>
+    <small><i>Global Sensor Network</i></small></h1>
 </div>
 
 <ul class="nav nav-tabs" ng-controller="TabsCtrl">
 
   <li ng-class="" ng-repeat="tab in tabs" tab="tab"><a href="{{tab.link}}" ng-class="tabClass(tab)" ng-click="setSelectedTab(tab)">{{tab.label}}</a></li>
 </ul>
-  <div ng-view></div>
+<div ng-view></div>
 
 </body>
 </html>

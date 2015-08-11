@@ -16,7 +16,7 @@ var gsnWebApp = angular.module('gsnWebApp', [
     , 'ui.select'
     , 'ngMaterial'
     , 'gsnMap'
-,'rzModule'
+    ,'rzModule'
 ]);
 
 gsnWebApp.config(['$routeProvider', '$datepickerProvider',
@@ -36,6 +36,16 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
             }).
             when('/plot', {
                 templateUrl: 'partials/highcharts.html'
+                //, controller: 'hcCtrl'
+                //, reloadOnSearch: true
+            }).
+            when('/monitor', {
+                templateUrl: 'partials/monitor.html'
+                //, controller: 'hcCtrl'
+                //, reloadOnSearch: true
+            }).
+            when('/about', {
+                templateUrl: 'partials/about.html'
                 //, controller: 'hcCtrl'
                 //, reloadOnSearch: true
             }).
@@ -70,10 +80,13 @@ gsnWebApp.controller('TabsCtrl', function ($scope, $location) {
     $scope.tabs = [
         {link: '#/map', label: 'Sensor map'},
         {link: '#/plot', label: 'Plot data'},
+        {link: '#/monitor', label: 'Monitor'},
+        {link: '#/about', label: 'About'},
     ];
 
     $scope.selectedTab = $scope.tabs[0];
     $scope.setSelectedTab = function (tab) {
+        console.log(tab);
         $scope.selectedTab = tab;
     };
 
@@ -81,7 +94,7 @@ gsnWebApp.controller('TabsCtrl', function ($scope, $location) {
         if ($scope.selectedTab == tab)
             return 'active';
         else
-        return '';
+            return '';
 
     }
 });
@@ -100,4 +113,3 @@ gsnWebApp.controller('PaymentsCtrl', function ($scope) {
 gsnWebApp.factory('_', ['$window', function($window) {
     return $window._; // assumes underscore has already been loaded on the page
 }]);
-
