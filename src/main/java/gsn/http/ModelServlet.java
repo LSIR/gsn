@@ -168,7 +168,7 @@ public class ModelServlet extends HttpServlet {
 		        			str.append(s.getData());
 		        			str.append("\"},");
 		        		}
-		        		str.append("]}");
+		        		str.append("]},");
 		        	}
 		        }
 		        }
