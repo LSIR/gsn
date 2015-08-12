@@ -25,6 +25,8 @@
 
 package gsn.vsensor;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -116,6 +118,11 @@ public class ModellingVirtualSensor extends AbstractVirtualSensor {
 			}
 		}
 		if(out != null)
+			Arrays.sort(out,new Comparator<StreamElement>(){
+				@Override
+				public int compare(StreamElement o1, StreamElement o2) {
+					return Long.valueOf(o1.getTimeStamp()).compareTo(o2.getTimeStamp());
+				}});
 			for(int i=0;i<out.length;i++)
 				if(out[i] != null)
 		            dataProduced(out[i]);
