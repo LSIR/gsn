@@ -84,46 +84,81 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
     }
 ]);
 
-gsnWebApp.controller('TabsCtrl', function ($scope, $location) {
-    var tabNames = ['/map', '/plot', '/monitor', '/about'];
-    $scope.tabs = [
-        {link: '#/map', label: 'Sensor map'},
-        {link: '#/plot', label: 'Plot data'},
-        {link: '#/monitor', label: 'Monitor'},
-        {link: '#/about', label: 'About'},
-    ];
+gsnWebApp.controller('TabsCtrl', ['$scope', '$location', 'GsnTabs',
+    function ($scope, $location, GsnTabs) {
 
-    if (tabNames.indexOf($location.$$path) > -1) {
-        $scope.selectedTab = $scope.tabs[tabNames.indexOf($location.$$path)];
-    } else {
-        $scope.selectedTab = $scope.tabs[0];
-    }
-
-    $scope.setSelectedTab = function (tab) {
-        console.log(tab);
-        $scope.selectedTab = tab;
-    };
-
-    $scope.tabClass = function (tab) {
-        if ($scope.selectedTab == tab)
-            return 'active';
-        else
-            return '';
-
-    }
-});
-
-gsnWebApp.controller('JobsCtrl', function ($scope) {
-
-});
-gsnWebApp.controller('InvoicesCtrl', function ($scope) {
-
-});
-gsnWebApp.controller('PaymentsCtrl', function ($scope) {
-
-});
+        $scope.tabs = GsnTabs;
+        $scope.tabs.updateSelectedTab($location);
+        //var tabNames = ['/map', '/plot', '/monitor', '/about'];
+        //$scope.tabs = [
+        //    {link: '#/map', label: 'Sensor map'},
+        //    {link: '#/plot', label: 'Plot data'},
+        //    {link: '#/monitor', label: 'Monitor'},
+        //    {link: '#/about', label: 'About'},
+        //];
+        //
+        //if (tabNames.indexOf($location.$$path) > -1) {
+        //    $scope.selectedTab = $scope.tabs[tabNames.indexOf($location.$$path)];
+        //} else {
+        //    $scope.selectedTab = $scope.tabs[0];
+        //}
+        //
+        //$scope.setSelectedTab = function (tab) {
+        //    console.log(tab);
+        //    $scope.selectedTab = tab;
+        //};
+        //
+        //$scope.tabClass = function (tab) {
+        //    if ($scope.selectedTab == tab)
+        //        return 'active';
+        //    else
+        //        return '';
+        //
+        //}
+    }]);
 
 
 gsnWebApp.factory('_', ['$window', function ($window) {
     return $window._; // assumes underscore has already been loaded on the page
 }]);
+
+gsnWebApp.service('GsnTabs', function () {
+
+    function GsnTabs() {
+        this.tabs = [
+            {link: '#/map', label: 'Sensor map'},
+            {link: '#/plot', label: 'Plot data'},
+            {link: '#/monitor', label: 'Monitor'},
+            {link: '#/about', label: 'About'},
+        ];
+
+        this.tabNames = ['/map', '/plot', '/monitor', '/about'];
+
+        this.selectedTab = this.tabs[0];
+    }
+
+    GsnTabs.prototype = {
+        updateSelectedTab: function (location) {
+            if (this.tabNames.indexOf(location.$$path) > -1) {
+                this.selectedTab = this.tabs[this.tabNames.indexOf(location.$$path)];
+            } else {
+                this.selectedTab = this.tabs[0];
+            }
+        },
+
+        setSelectedTab: function (tab) {
+            console.log(tab);
+            this.selectedTab = tab;
+        },
+        tabClass: function (tab) {
+            if (this.selectedTab == tab)
+                return 'active';
+            else
+                return '';
+
+        }
+    };
+
+    return new GsnTabs();
+
+});
