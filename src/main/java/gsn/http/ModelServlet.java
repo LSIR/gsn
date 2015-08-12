@@ -165,7 +165,7 @@ public class ModelServlet extends HttpServlet {
 		        			str.append("\",type=\"");
 		        			str.append(DataTypes.TYPE_NAMES[s.getFieldTypes()[j]]);
 		        			str.append("\",value=\"");
-		        			str.append(s.getData());
+		        			str.append(s.getData()[j]);
 		        			str.append("\"},");
 		        		}
 		        		str.append("]},");
