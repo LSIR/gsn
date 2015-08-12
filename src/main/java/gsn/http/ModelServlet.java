@@ -162,9 +162,9 @@ public class ModelServlet extends HttpServlet {
 		        		for(int j=0;j<s.getData().length;j++){
 		        			str.append("{name:\"");
 		        			str.append(s.getFieldNames()[j]);
-		        			str.append("\",type=\"");
+		        			str.append("\",type:\"");
 		        			str.append(DataTypes.TYPE_NAMES[s.getFieldTypes()[j]]);
-		        			str.append("\",value=\"");
+		        			str.append("\",value:\"");
 		        			str.append(s.getData()[j]);
 		        			str.append("\"},");
 		        		}
