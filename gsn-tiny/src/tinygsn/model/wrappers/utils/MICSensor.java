@@ -29,16 +29,27 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import tinygsn.beans.DataField;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import android.content.Context;
 import android.os.Handler;
 import android.widget.Toast;
 import ch.serverbox.android.ftdiusb.FTDI_USB_Handler;
 
-/* This class draws the measurement screen.
+/* 
  * All the communication with the sensor happens here.
  */
 public class MICSensor extends FTDI_USB_Handler {
+	
+	private static MICSensor instance = null;
+	
+	public static MICSensor getInstance(){
+		if (instance == null){
+			instance = new MICSensor(StaticData.globalContext);
+		}
+		return instance;
+	}
+	
 
 	public interface ReadyListener {
 		public void onReady();
@@ -78,7 +89,7 @@ public class MICSensor extends FTDI_USB_Handler {
 	private char[] receiveBuffer; // A buffer to store the received bytes
 	private int bufferIndex; // The buffer index for the receive buffer
 
-	public MICSensor(Context a) {
+	private MICSensor(Context a) {
 		super(a);
 
 		try {

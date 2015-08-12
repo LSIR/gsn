@@ -1,5 +1,6 @@
 package tinygsn.beans;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -121,5 +122,15 @@ public class StaticData {
 	}
 	
 	public static Map<Integer, StreamSource> sourceMap = new HashMap<Integer, StreamSource>();
+
+	public static ArrayList<String> getLocalWrapperNames() {
+		ArrayList<String> a = new ArrayList<String>();
+		for (String s: wrapperMap.keySet()){
+			if (s.contains("?")){
+				a.add(s);
+			}
+		}
+		return a;
+	}
 		
 }

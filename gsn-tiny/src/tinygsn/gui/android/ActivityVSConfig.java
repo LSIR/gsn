@@ -323,7 +323,11 @@ public class ActivityVSConfig extends SherlockActivity {
 					protected SettingPanel doInBackground(Activity... params) {
 						try {
 							String wrapperName = panel.wrapper.getSelectedItem().toString();
-							wrapperName  = wrapperList.getProperty(wrapperName);
+							if(wrapperName.startsWith("local: ")){
+								wrapperName = "tinygsn.model.wrappers.LocalWrapper";
+							}else{
+								wrapperName  = wrapperList.getProperty(wrapperName);
+							}
 							String[] param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
 							panel.settings = new SettingPanel("wrapper", param);
 						} catch (Exception e) {

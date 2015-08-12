@@ -4,6 +4,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 
+import java.util.Collections;
+import java.util.Comparator;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
@@ -66,6 +69,12 @@ public class LocalWrapper extends AbstractWrapper {
 	public void runOnce() {
 		SqliteStorageManager storage = new SqliteStorageManager();
 		ArrayList<StreamElement> r = storage.executeQueryGetLatestValues("vs_"+getConfig().getParam(), getFieldList(), getFieldType(), 1000, lastRun);
+		Collections.sort(r, new Comparator<StreamElement>(){
+			@Override
+			public int compare(StreamElement lhs, StreamElement rhs) {
+				return Long.valueOf(lhs.getTimeStamp()).compareTo(rhs.getTimeStamp());
+			}});
+		
 		for (StreamElement s : r){
 			postStreamElement(s);
 			lastRun = s.getTimeStamp();

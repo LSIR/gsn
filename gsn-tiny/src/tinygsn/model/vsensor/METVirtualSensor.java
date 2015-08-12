@@ -13,7 +13,7 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	double weight = 60.0;
 	double age = 30;
 	String gender = "m";
-	private DataField[] outputStructure = new DataField[]{new DataField("MET",DataTypes.DOUBLE),new DataField("VA",DataTypes.DOUBLE)};
+	private DataField[] outputStructure = new DataField[]{new DataField("MET",DataTypes.DOUBLE),new DataField("VA",DataTypes.DOUBLE),new DataField("start",DataTypes.BIGINT),new DataField("end",DataTypes.BIGINT)};
 	double[] MET_Table = new double[]{3,1.8,10,7.5,5,1.3};
 	StreamElement lastActivity = null;
 	//3.bike : 7.5
@@ -88,8 +88,12 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 			double ECF = 0.21;
 			double RMR = getRMR();
 			double NVO2max = getNVO2max();
-			double VA = 19.63 * Math.min(ECF*MET*RMR, NVO2max*weight*(1.212-0.14*Math.log((streamElement.getTimeStamp()-lastActivity.getTimeStamp())/60000.0)));
-			dataProduced(new StreamElement(outputStructure, new Serializable[]{MET,VA}, lastActivity.getTimeStamp()));
+			double VAmax = NVO2max*weight*(1.212-0.14*Math.log((streamElement.getTimeStamp()-lastActivity.getTimeStamp())/60000.0));
+			double VA = 19.63 * ECF*MET*RMR;
+			if (VAmax != Double.NaN){
+				VA = 19.63 * Math.min(ECF*MET*RMR, VAmax);
+			}
+			dataProduced(new StreamElement(outputStructure, new Serializable[]{MET,VA,lastActivity.getTimeStamp(),streamElement.getTimeStamp()}, streamElement.getTimeStamp()));
 			lastActivity = streamElement;
 		}
 		

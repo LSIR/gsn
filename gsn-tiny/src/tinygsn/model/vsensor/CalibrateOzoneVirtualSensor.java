@@ -45,7 +45,7 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 		double ozone = 0;
 		double model = 0;
 		int source = 0;
-		if(inputStreamName.equalsIgnoreCase("GPS")){
+		if(inputStreamName.endsWith("gps")){
 			lastLatitude = (Double)streamElement.getData("latitude");
 			lastLongitude = (Double)streamElement.getData("longitude");
 			lastLocationTime = streamElement.getTimeStamp();		
@@ -53,14 +53,16 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 			double measure = (Double)streamElement.getData("ozoneCalibrated");
 			if (System.currentTimeMillis() - lastLocationTime < 60000){
 				model = getModelValue();
-				sr.addData(measure, model);
+				if (model > -1){
+				    sr.addData(measure, model);
+				}
 			}
 			if (System.currentTimeMillis() - lastLocationTime < 15000){
 				ozone = model;
 				source = 1;
 			}else{
 				double ozone_p = sr.predict(measure);
-				if (ozone_p != Double.NaN){
+				if (!Double.isNaN(ozone_p)){
 					ozone = ozone_p;
 					source = 2;
 				}else{
@@ -76,7 +78,7 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 			double ozone = -1;
 			HttpGet httpGet;
 			DefaultHttpClient httpclient = new DefaultHttpClient();
-			httpGet = new HttpGet("http://"+modelUrl+"/modeldata?vs="+modelName+"&model=0&format=json&latitude="+lastLatitude+"&longitude="+lastLongitude);
+			httpGet = new HttpGet("http://"+modelUrl+"/modeldata?vs="+modelName+"&models=0&format=json&latitude="+lastLatitude+"&longitude="+lastLongitude);
 			HttpResponse response = httpclient.execute(httpGet);
 			int statusCode = response.getStatusLine().getStatusCode();
 			InputStreamReader is = new InputStreamReader(response.getEntity().getContent(),"UTF-8");																				
@@ -88,7 +90,7 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 		        	JSONArray f = obj.getJSONObject(0).getJSONArray("fields");
 		        	for (int i = 1;i<f.length();i++){
 		        		JSONObject v = f.getJSONObject(i);
-		        		if (v.getString("name").equals("o3_res")){
+		        		if (v.getString("name").equalsIgnoreCase("O3_RES")){
 		        			ozone = v.getDouble("value");
 		        		}
 		        	}

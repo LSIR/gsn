@@ -23,11 +23,11 @@
 */
 package tinygsn.model.wrappers;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
-import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.model.wrappers.utils.MICSensor;
@@ -66,7 +66,8 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 	public void runOnce() {
 		updateWrapperInfo();
 		if(dcDuration>0){
-			sensor = new MICSensor(StaticData.globalContext);
+			/*
+			sensor = MICSensor.getInstance();
 			sensor.initSensor();
 			sensor.setListener(this);
 			try {
@@ -74,7 +75,11 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 				sensor.getMeasurement();
 				Thread.sleep(12000);
 			}
-			catch (InterruptedException e) {}
+			catch (InterruptedException e) {}*/
+			StreamElement se = new StreamElement(getOutputStructure(), new Serializable[] {
+					10, 20, 60, 30, 20.3,
+					10.3 });
+			consume(se);
 		}
 	}
 

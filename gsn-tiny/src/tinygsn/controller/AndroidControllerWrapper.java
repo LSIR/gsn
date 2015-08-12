@@ -51,6 +51,14 @@ public class AndroidControllerWrapper extends AbstractController {
 					e.printStackTrace();
 				}
 			}
+			for (String s : StaticData.getLocalWrapperNames()){
+				try {
+					wrapperList.add(StaticData.getWrapperByName(s));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
 		}
 		ArrayList<SensorRow> r = new ArrayList<SensorRow>();
 		for(AbstractWrapper w : wrapperList){
