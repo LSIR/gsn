@@ -347,18 +347,24 @@ gsnMap.directive('myRefresh', function ($location, $route) {
 
 
 gsnMap.factory('Sensors', ['$http', function ($http) {
+    this.promise;
+
+    var self = this;
     var sdo = {
         getSensors: function () {
-            var promise = $http({
-                method: 'GET',
-                url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors?onlyPublic=false'
-                //url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors'
-                //url: 'http://localhost:8090/web/virtualSensors?onlyPublic=false'
-            });
-            promise.success(function (data, status, headers, conf) {
-                return data;
-            });
-            return promise;
+
+            if (!self.promise) {
+                self.promise = $http({
+                    method: 'GET',
+                    url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors?onlyPublic=false'
+                    //url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors'
+                    //url: 'http://localhost:8090/web/virtualSensors?onlyPublic=false'
+                });
+                self.promise.success(function (data, status, headers, conf) {
+                    return data;
+                });
+            }
+            return self.promise;
         }
     };
     return sdo;

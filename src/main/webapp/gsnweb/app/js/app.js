@@ -84,37 +84,17 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
     }
 ]);
 
-gsnWebApp.controller('TabsCtrl', ['$scope', '$location', 'GsnTabs',
-    function ($scope, $location, GsnTabs) {
+gsnWebApp.controller('TabsCtrl', ['$scope', '$rootScope', '$location', 'GsnTabs',
+    function ($scope, $rootScope,$location, GsnTabs) {
 
         $scope.tabs = GsnTabs;
-        $scope.tabs.updateSelectedTab($location);
-        //var tabNames = ['/map', '/plot', '/monitor', '/about'];
-        //$scope.tabs = [
-        //    {link: '#/map', label: 'Sensor map'},
-        //    {link: '#/plot', label: 'Plot data'},
-        //    {link: '#/monitor', label: 'Monitor'},
-        //    {link: '#/about', label: 'About'},
-        //];
-        //
-        //if (tabNames.indexOf($location.$$path) > -1) {
-        //    $scope.selectedTab = $scope.tabs[tabNames.indexOf($location.$$path)];
-        //} else {
-        //    $scope.selectedTab = $scope.tabs[0];
-        //}
-        //
-        //$scope.setSelectedTab = function (tab) {
-        //    console.log(tab);
-        //    $scope.selectedTab = tab;
-        //};
-        //
-        //$scope.tabClass = function (tab) {
-        //    if ($scope.selectedTab == tab)
-        //        return 'active';
-        //    else
-        //        return '';
-        //
-        //}
+        $scope.tabs.updateSelectedTab($location.$$path);
+
+        $rootScope.$on('$routeChangeSuccess', function(route, location){
+            $scope.tabs.updateSelectedTab(location.$$route.originalPath);
+        });
+
+
     }]);
 
 
@@ -139,8 +119,8 @@ gsnWebApp.service('GsnTabs', function () {
 
     GsnTabs.prototype = {
         updateSelectedTab: function (location) {
-            if (this.tabNames.indexOf(location.$$path) > -1) {
-                this.selectedTab = this.tabs[this.tabNames.indexOf(location.$$path)];
+            if (this.tabNames.indexOf(location) > -1) {
+                this.selectedTab = this.tabs[this.tabNames.indexOf(location)];
             } else {
                 this.selectedTab = this.tabs[0];
             }
