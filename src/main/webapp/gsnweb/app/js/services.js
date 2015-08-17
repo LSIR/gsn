@@ -28,18 +28,20 @@ gsnDataServices.factory('dataProcessingService', ['UrlBuilder', '$http', 'Filter
             loadData: function () {
                 if (!promise) {
                     //promise = $http.get('http://montblanc.slf.ch:22001/multidata?nb=ALL&from=01/01/2015%2000:00:00&to=13/04/2015%2000:00:00&vs[0]=imis_fka_2&field[0]=rh&time_format=unix&download_format=csv&download_mode=inline&vs[1]=imis_fka_2&field[1]=ta&vs[2]=imis_fka_2&field[2]=rswr').then(function (response) {
-
                     var url = UrlBuilder.getGsnUrl();
 
                     console.log(url);
 
-
-                    promise = $http.get(url).then(function (response) {
+                    promise = $http.post(url).then(function (response) {
 
 
                         // The return value gets picked up by the then in the controller.
                         //return processData(response.data, fields);
-                        return response.data;
+                        return {status:'OK', data:response.data}
+                    //},
+                    //    function(reason) {
+                    //    console.log('Failed: ' + reason.statusText);
+                    //    return {status:'FAILED', data:reason.statusText};
                     });
                 }
 

@@ -155,3 +155,7 @@ h2 {
   text-justify: auto;
   margin-left:10px;
 }
+.login {
+  float: right !important;
+  right: 0px;
+}

@@ -100,6 +100,10 @@
 <ul class="nav nav-tabs" ng-controller="TabsCtrl">
 
   <li ng-class="" ng-repeat="tab in tabs.tabs" tab="tab"><a href="{{tab.link}}" ng-class="tabs.tabClass(tab)" ng-click="tabs.setSelectedTab(tab)">{{tab.label}}</a></li>
+
+  <li ng-class="" class="login" tab="_blank"><a  target="_blank"  href="https://montblanc.slf.ch:8443/gsn/MyUserCandidateRegistrationServlet">Register</a></li>
+  <li ng-class="" class="login" tab=""><a target="_blank" href="https://montblanc.slf.ch:8443/gsn/MyLoginHandlerServlet">Login</a></li>
+
 </ul>
 <div ng-view></div>
 

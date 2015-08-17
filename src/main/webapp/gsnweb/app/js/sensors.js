@@ -26,6 +26,21 @@ allSensors.factory('AllSensors', ['UrlBuilder', '$http',
                 return promise;
             },
 
+            loadSensorsWithPrivacy: function() {
+                if (!promise) {
+
+                    //var url = 'http://localhost:8090/web/virtualSensorNamesWithPrivacy';
+                    var url = 'http://eflumpc18.epfl.ch/gsn/web/virtualSensorNamesWithPrivacy';
+
+                    console.log(url);
+
+                    promise = $http.get(url).then(function (response) {
+                        return response.data;
+                    });
+                }
+                return promise;
+            },
+
             resetPromise: function() {
                 promise = null;
             }

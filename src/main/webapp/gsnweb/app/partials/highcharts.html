@@ -31,9 +31,9 @@
                                     <ui-select-match placeholder="Select Sensor...">{{$select.selected}}
                                     </ui-select-match>
                                     <ui-select-choices
-                                            repeat="sensor in sensorNames | filter:$select.search">
-                                        <span ng-bind-html="sensor | highlight: $select.search"></span>
-                                        <!--<img ng-src="{{getIconUlr(sensor)}}" style="width: 16px; height:16px">-->
+                                            repeat="sensor in sensorNames | propsFilter: {name: $select.search}">
+                                        <img ng-src="{{getSensorIcon(sensor)}}" style="width: 16px; height:16px">
+                                        <span ng-bind-html="sensor.name | highlight: $select.search"></span>
                                     </ui-select-choices>
                                 </ui-select>
                             </div>
@@ -212,13 +212,13 @@
             <!--</md-whiteframe>-->
             <!--</div>-->
 
-            <div ng-if="error" layout="row" layout-sm="column" layout-margin>
+            <div ng-if="errorTooMany" layout="row" layout-sm="column" layout-margin>
                 <div flex="25"></div>
                 <div flex="50" class="blue" layout layout-align="center center">
 
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <div class="panel-title">Retrieved too many data points ({{error}}) to build the plot!
+                            <div class="panel-title">Retrieved too many data points ({{errorTooMany}}) to build the plot!
                                 Please reduce number of points by:
                             </div>
                         </div>
@@ -230,6 +230,19 @@
                                 <li class="list-group-item">Selecting less parameters</li>
                             </ul>
                         </div>
+                    </div>
+
+                </div>
+                <div flex="25"></div>
+
+            </div>
+
+            <div ng-if="errorAccessFailed" layout="row" layout-sm="column" layout-margin>
+                <div flex="25"></div>
+                <div flex="50" layout layout-align="center center">
+
+                    <div class="panel panel-default">
+                        <b>{{errorAccessFailed}}</b>
                     </div>
 
                 </div>

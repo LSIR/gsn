@@ -57,7 +57,7 @@ sensorData.controller('ParameterSelectCtrl',
             $scope.loading = true;
 
 
-            AllSensors.loadData().then(function (d) {
+            AllSensors.loadSensorsWithPrivacy().then(function (d) {
                 $scope.sensorNames = d;
 
 
@@ -90,9 +90,16 @@ sensorData.controller('ParameterSelectCtrl',
                 return item.columnName + "(" + item.unit + ")";
             };
 
+            $scope.getSensorIcon = function(sensor) {
+                if(sensor.property) {
+                    return 'img/green_.png';
+                } else {
+                    return 'img/red_.png';
+                }
+            }
 
-            function updateSensorInfo(d, index) {
-                var metadata = new SensorMetadata(d);
+            function updateSensorInfo(sensor, index) {
+                var metadata = new SensorMetadata(sensor);
 
                 $scope.sensorsWithParameters[index].update(metadata);
 
@@ -100,11 +107,11 @@ sensorData.controller('ParameterSelectCtrl',
             }
 
             $scope.updateSensor = function (item, index) {
-                FilterParameters.vs = item;
-                $scope.sensorsWithParameters[index].selectedSensor = item;
+                FilterParameters.vs = item.name;
+                $scope.sensorsWithParameters[index].selectedSensor = item.name;
 
 
-                MetadataLoader.loadData(item, true).then(function (d) {
+                MetadataLoader.loadData(item.name, true).then(function (d) {
                     //$scope.metadata = d;
 
                     updateSensorInfo(d, index);
