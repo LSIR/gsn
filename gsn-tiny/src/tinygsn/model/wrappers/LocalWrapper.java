@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import tinygsn.beans.DataField;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
@@ -81,12 +85,49 @@ public class LocalWrapper extends AbstractWrapper {
 		}
 	}
 	
+	@Override
+	synchronized public boolean start(){
+		getConfig().setRunning(true);
+		return true;
+	}
+	
+	 public static boolean startLocal(){
+		try {
+			Intent serviceIntent = new Intent(StaticData.globalContext, LocalService.class);
+			StaticData.globalContext.startService(serviceIntent);
+			return true;
+		} catch (Exception e) {
+			// release anything?
+		}
+		return false;
+	}
+	
+	@Override
+	synchronized public boolean stop(){
+		getConfig().setRunning(false);
+		return true;
+	}
+	
 	public static class LocalService extends WrapperService{
 
 		public LocalService() {
 			super("localService");
 
 		}
+		@Override
+		protected void onHandleIntent(Intent intent) {
+			AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+			try {
+				for (String s:StaticData.getLocalWrapperNames()){
+					w = StaticData.getWrapperByName(s);
+					if(w.getConfig().isRunning()){
+						w.runOnce();
+					}
+				}
+			} catch (Exception e1) {}
+			am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000*10,PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
+		}
+		
 	}
 
 }

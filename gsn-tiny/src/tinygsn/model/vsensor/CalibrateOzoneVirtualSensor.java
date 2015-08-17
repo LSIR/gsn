@@ -92,6 +92,7 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 		        		JSONObject v = f.getJSONObject(i);
 		        		if (v.getString("name").equalsIgnoreCase("O3_RES")){
 		        			ozone = v.getDouble("value");
+		        			break;
 		        		}
 		        	}
 		        }

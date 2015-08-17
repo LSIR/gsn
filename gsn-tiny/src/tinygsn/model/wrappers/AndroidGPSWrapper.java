@@ -75,7 +75,6 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
 			}else{
 				timeToShutdown--;
 				if (timeToShutdown < 0){
-					stopGPS();
 					break;
 				}else{
 					startGPS();
@@ -84,7 +83,11 @@ public class AndroidGPSWrapper extends AbstractWrapper  implements LocationListe
 					}catch (InterruptedException e) {}
 				}
 			}
+			try{
+				getConfig().setRunning(StaticData.getWrapperByName(getWrapperName()).getConfig().isRunning());
+			}catch (Exception e){}
 		}
+		stopGPS();
 	}
 	
 	public void startGPS() {

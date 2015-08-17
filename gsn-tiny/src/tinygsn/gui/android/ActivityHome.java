@@ -26,11 +26,7 @@
 package tinygsn.gui.android;
 
 
-import java.util.ArrayList;
-
-import tinygsn.model.vsensor.AbstractVirtualSensor;
-import tinygsn.services.LocationScheduler;
-import tinygsn.storage.db.SqliteStorageManager;
+import tinygsn.model.wrappers.LocalWrapper;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -55,33 +51,20 @@ public class ActivityHome extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.home);
 		getSupportActionBar().hide();
-		TextView subscribe = (TextView) findViewById(R.id.tvSubscribe);
+		/*TextView subscribe = (TextView) findViewById(R.id.tvSubscribe);
 		BadgeView badge = new BadgeView(this, subscribe);
 		badge.setBadgePosition(BadgeView.POSITION_BOTTOM_RIGHT); 
 		badge.setText("2");
-		badge.show();
+		badge.show();*/
 
 		new AsyncTask<Activity, Void, Void>(){
 			@Override
 			protected Void doInBackground(Activity... params) {
-				//start all defined virtual sensors
-				SqliteStorageManager storage = new SqliteStorageManager();
-				ArrayList<AbstractVirtualSensor> vsList = storage.getListofVS();
-				for (AbstractVirtualSensor vs : vsList) {
-					if (vs.getConfig().getRunning() == true) {
-						vs.start();
-					}
-				}
-				
-				//start the scheduler
-				/*Intent serviceIntent = null;
-				serviceIntent = new Intent(this, schedular.class);
-				this.startService(serviceIntent);*/
+				LocalWrapper.startLocal();
 				return null;
 			}
 		}.execute(this);
-		
-		
+				
 	}
 
 	@Override

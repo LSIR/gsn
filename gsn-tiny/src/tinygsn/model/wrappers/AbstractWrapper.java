@@ -41,6 +41,7 @@ import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 public abstract class AbstractWrapper {
@@ -172,7 +173,9 @@ public abstract class AbstractWrapper {
 			{
 				serviceIntent = new Intent(StaticData.globalContext, getSERVICE());
 				config.setRunning(true);
-				serviceIntent.putExtra("tinygsn.beans.config",config );
+				Bundle bundle = new Bundle();
+				bundle.putParcelable("tinygsn.beans.config", config);
+				serviceIntent.putExtra("tinygsn.beans.config",bundle );
 				StaticData.addRunningService(getWrapperName(), serviceIntent);
 				StaticData.globalContext.startService(serviceIntent);
 				return true;
@@ -190,7 +193,9 @@ public abstract class AbstractWrapper {
 			{
 				serviceIntent.removeExtra("tinygsn.beans.config");
 				config.setRunning(false);
-				serviceIntent.putExtra("tinygsn.beans.config", config);
+				Bundle bundle = new Bundle();
+				bundle.putParcelable("tinygsn.beans.config", config);
+				serviceIntent.putExtra("tinygsn.beans.config", bundle);
 				StaticData.globalContext.startService(serviceIntent);
 				StaticData.IntentStopped(getWrapperName());
 				return true;

@@ -66,7 +66,7 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 	public void runOnce() {
 		updateWrapperInfo();
 		if(dcDuration>0){
-			/*
+			
 			sensor = MICSensor.getInstance();
 			sensor.initSensor();
 			sensor.setListener(this);
@@ -75,11 +75,9 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 				sensor.getMeasurement();
 				Thread.sleep(12000);
 			}
-			catch (InterruptedException e) {}*/
-			StreamElement se = new StreamElement(getOutputStructure(), new Serializable[] {
-					10, 20, 60, 30, 20.3,
-					10.3 });
-			consume(se);
+			catch (InterruptedException e) {}
+		    //StreamElement se = new StreamElement(getOutputStructure(), new Serializable[] {10, 20, 60, 30, 20.3,10.3 });
+			//consume(se);
 		}
 	}
 

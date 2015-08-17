@@ -293,7 +293,7 @@ public class MICSensor extends FTDI_USB_Handler {
 					counter++;
 					if (counter > 600) {
 						initThreadFlag = false;
-						initToast(false);
+						//initToast(false);
 						return;
 					}
 				}
@@ -302,7 +302,7 @@ public class MICSensor extends FTDI_USB_Handler {
 				sensorInitialized = true;
 				// Clear the thread flag.
 				initThreadFlag = false;
-				initToast(true);
+				//initToast(true);
 				
 //				showLog("Successfully initialized.");
 			}
