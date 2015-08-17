@@ -9,6 +9,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import com.sun.tools.javac.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Query;
@@ -72,6 +73,34 @@ public class SensorPageController {
 
     }
 
+    @RequestMapping(value = "/virtualSensorNamesWithPrivacy", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public
+    @ResponseBody
+    String getVirtualSensorNamesWithPrivacy(SensorQuery sensorQuery, HttpServletResponse response) {
+
+        setResponseHeader(response);
+        sensorQuery.setOnlyPublic(false);
+
+        Query query = queryBuilder.build(sensorQuery);
+
+        Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.findForQuery(query);
+
+        Set<VirtualSensorMetadata> sensorMetadataSet = Sets.newHashSet(virtualSensorMetadatas);
+
+        Collection<NameWithProperty<Boolean>> names = Collections2.transform(sensorMetadataSet, new Function<VirtualSensorMetadata, NameWithProperty<Boolean>>() {
+            @Override
+            public NameWithProperty<Boolean> apply(VirtualSensorMetadata virtualSensorMetadata) {
+                return new NameWithProperty(virtualSensorMetadata.getName(), virtualSensorMetadata.isPublic());
+            }
+        });
+
+        logger.info("query: " + sensorQuery + " results " + sensorMetadataSet.size());
+        ArrayList result = new ArrayList(names);
+        Collections.sort(result);
+        return new Gson().toJson(result);
+
+    }
+
     @RequestMapping(value = "/virtualSensors/{dbTableName}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public
     @ResponseBody
@@ -120,6 +149,29 @@ public class SensorPageController {
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Methods", "GET");
         response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+
+    protected static class NameWithProperty <T> implements Comparable<NameWithProperty>{
+        private String name;
+        private T property;
+
+        public NameWithProperty(String name, T property) {
+            this.name = name;
+            this.property = property;
+        }
+
+        public T getProperty() {
+            return property;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public int compareTo(NameWithProperty nameWithProperty) {
+            return this.name.compareTo(nameWithProperty.name);
+        }
     }
 
 }
