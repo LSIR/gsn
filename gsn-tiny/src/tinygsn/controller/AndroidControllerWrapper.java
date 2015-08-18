@@ -27,7 +27,10 @@ package tinygsn.controller;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Properties;
+
 import tinygsn.beans.StaticData;
 import tinygsn.gui.android.utils.SensorRow;
 import tinygsn.model.wrappers.AbstractWrapper;
@@ -51,6 +54,12 @@ public class AndroidControllerWrapper extends AbstractController {
 					e.printStackTrace();
 				}
 			}
+			Collections.sort(wrapperList,new Comparator<AbstractWrapper>(){
+				@Override
+				public int compare(AbstractWrapper lhs, AbstractWrapper rhs) {
+					return lhs.getWrapperName().compareTo(rhs.getWrapperName());
+				}});
+			
 			for (String s : StaticData.getLocalWrapperNames()){
 				try {
 					wrapperList.add(StaticData.getWrapperByName(s));

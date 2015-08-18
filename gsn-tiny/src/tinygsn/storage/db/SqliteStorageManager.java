@@ -611,7 +611,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	public boolean updatePublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active) 
 	{
 		String query = "UPDATE publishDestination SET url = ?, vsname = ?, key = ?, mode = ?, lastTime = ?, active = ?  WHERE _id = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] {url,vsname,key,mode+"",lastTime+"", active?"0":"1"});
+		Cursor cursor = database.rawQuery(query, new String[] {url,vsname,key,mode+"",lastTime+"", active?"1":"0",""+id});
 		if(cursor.moveToNext())
 			return true;
 		return false;

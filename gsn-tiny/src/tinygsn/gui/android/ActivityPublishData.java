@@ -37,7 +37,6 @@ import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StreamElement;
 import tinygsn.controller.AndroidControllerPublish;
 import tinygsn.storage.db.SqliteStorageManager;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -59,7 +58,6 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 	static int TEXT_SIZE = 10;
 	public static String DEFAULT_SERVER = "";
 
-	private Context context = null;
 	private AndroidControllerPublish controller;
 	private EditText serverEditText = null;
 	private Button publishButton = null;
@@ -90,27 +88,29 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 		vsnameSpinner = (Spinner)  findViewById(R.id.spinner_vsName);
 		modeSpinner = (Spinner) findViewById(R.id.spinner_mode);
 		publishButton = (Button) findViewById(R.id.Button_publish);
+
+		controller = new AndroidControllerPublish();
+		storage = new SqliteStorageManager();
 		
 		Date date = new Date();
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MINUTE, -15);
-		totimeEditText.setText(new SimpleDateFormat("HH:mm",Locale.ENGLISH).format(date));
-		todateEditText.setText(new SimpleDateFormat("dd.MM.yyyy",Locale.ENGLISH).format(date));
-		fromtimeEditText.setText(new SimpleDateFormat("HH:mm",Locale.ENGLISH).format(cal.getTime()));
-		fromdateEditText.setText(new SimpleDateFormat("dd.MM.yyyy",Locale.ENGLISH).format(cal.getTime()));
-
-		controller = new AndroidControllerPublish();
-		storage = new SqliteStorageManager();
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
+		
+		String extra = getIntent().getStringExtra("tynigsn.beans.id");
+		if (extra != null) {
 			try{
-			dr = storage.getPublishInfo(Integer.parseInt(extras.getString("id")));
+			dr = storage.getPublishInfo(Integer.parseInt(extra));
 			serverEditText.setText(dr.getUrl());
 			keyEditText.setText(dr.getKey());
+			cal.setTimeInMillis(dr.getLastTime());
 			}catch(Exception e){
 				e.printStackTrace();
 			}
 		}
+		totimeEditText.setText(new SimpleDateFormat("HH:mm",Locale.ENGLISH).format(date));
+		todateEditText.setText(new SimpleDateFormat("dd.MM.yyyy",Locale.ENGLISH).format(date));
+		fromtimeEditText.setText(new SimpleDateFormat("HH:mm",Locale.ENGLISH).format(cal.getTime()));
+		fromdateEditText.setText(new SimpleDateFormat("dd.MM.yyyy",Locale.ENGLISH).format(cal.getTime()));
 		renderVSList();
 		renderModeList();	
 	}
@@ -234,12 +234,15 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 		}
 
 		protected void onPostExecute(Boolean results) {
-			if (results == true)
-				Toast.makeText(context, "Published: " + se.length,
+			if (results == true){
+				Toast.makeText(ActivityPublishData.this, "Published: " + se.length,
 						Toast.LENGTH_SHORT).show();
-			else
-				Toast.makeText(context, "Publish fail: " + se.length,
+			    dr.setLastTime(System.currentTimeMillis());
+			    save();
+			}else{
+				Toast.makeText(ActivityPublishData.this, "Publish fail: " + se.length,
 						Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 

@@ -28,6 +28,7 @@ package tinygsn.gui.android;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -304,6 +305,7 @@ public class ActivityVSConfig extends SherlockActivity {
         for (String s : wrapperList.stringPropertyNames()){
 				list.add(s);
         }
+        Collections.sort(list);
         for (String s : storage.getListofVSName()){
         	list.add("local: "+s);
         }

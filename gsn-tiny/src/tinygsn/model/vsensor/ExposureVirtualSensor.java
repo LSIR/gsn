@@ -25,20 +25,26 @@ public class ExposureVirtualSensor extends AbstractVirtualSensor {
 	@Override
 	public void dispose() {
 	}
+	
+	@Override
+	public DataField[] getOutputStructure(DataField[] in){
+		return outputStructure;
+	}
 
 	@Override
 	public void dataAvailable(String inputStreamName,
 			StreamElement streamElement) {
-		if(inputStreamName.equalsIgnoreCase("met")){
+		if(inputStreamName.endsWith("MET")){
 			double va = (Double)streamElement.getData("VA"); 
-			long s = (Long)streamElement.getData("start");
-			long e = (Long)streamElement.getData("end");
+			long s = ((Double)streamElement.getData("start")).longValue();
+			long e = ((Double)streamElement.getData("end")).longValue();
 			
 			double sum = 0.0;
 			for (StreamElement se:buffer){
 				sum += ((Double)se.getData("o3"))/1000.0;
 			}
-			sum /= 1.0*buffer.size();
+			if (buffer.size()>0)
+			    sum /= 1.0*buffer.size();
 			double exposure = va * sum * (e-s)/60000.0;
 			dataProduced(new StreamElement(outputStructure, new Serializable[]{exposure,s,e}, streamElement.getTimeStamp()));
 			buffer.clear();

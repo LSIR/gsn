@@ -25,9 +25,6 @@
 
 package tinygsn.gui.android.utils;
 
-import java.util.List;
-
-
 
 import tinygsn.controller.AndroidControllerPublish;
 import tinygsn.gui.android.ActivityPublishData;
@@ -42,7 +39,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -126,7 +122,7 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 			@Override
 			public void onClick(View v) {
 				Intent myIntent = new Intent(context, ActivityPublishData.class);
-				myIntent.putExtra("id", vs.getId());
+				myIntent.putExtra("tynigsn.beans.id", ""+vs.getId());
 				context.startActivity(myIntent);
 			}
 		});

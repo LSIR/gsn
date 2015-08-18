@@ -39,16 +39,17 @@ import tinygsn.storage.db.SqliteStorageManager;
 
 public class AndroidControllerPublish extends AbstractController {
 
-	private ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
+	private ArrayList<AbstractVirtualSensor> vsList = null;
 
 	private SqliteStorageManager storage = null;
 	
 	public AndroidControllerPublish() {
 		storage = new SqliteStorageManager();
+		
 	}
 
 	public ArrayList<String> loadListVS() {
-
+		if (vsList==null) vsList = storage.getListofVS();
 		return storage.getListofVSName();
 	}
 
@@ -58,7 +59,7 @@ public class AndroidControllerPublish extends AbstractController {
 		try{
 			long start = new SimpleDateFormat("dd.MM.yyyy HH:mm",Locale.ENGLISH).parse(fromdate + " " + fromtime).getTime();
 			long end = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ENGLISH).parse(todate + " " + totime).getTime();
-		
+			
 			for (AbstractVirtualSensor vs : vsList) {
 				if (vs.getConfig().getName().endsWith(vsName)) {
 					DataField[] df = vs.getConfig().getOutputStructure();

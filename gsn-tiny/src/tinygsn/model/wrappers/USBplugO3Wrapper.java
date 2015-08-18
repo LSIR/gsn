@@ -66,7 +66,6 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 	public void runOnce() {
 		updateWrapperInfo();
 		if(dcDuration>0){
-			
 			sensor = MICSensor.getInstance();
 			sensor.initSensor();
 			sensor.setListener(this);
