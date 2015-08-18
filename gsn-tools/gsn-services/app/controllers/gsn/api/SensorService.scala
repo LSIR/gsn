@@ -188,7 +188,7 @@ object SensorService extends Controller with GsnService {
     }.get
   }
 
-  def sensorMetadata(sensorid:String) = Action.async {implicit request=>
+  def sensorMetadata(sensorid:String) = headings( Action.async {implicit request=>
     Try{
       //to enable
       //authorizeVs(sensorid)    	
@@ -212,7 +212,7 @@ object SensorService extends Controller with GsnService {
     }.recover{
       case t=> Future(BadRequest(t.getMessage))
     }.get
-  }
+  })
 
   def sensorSearch = Action.async {implicit request=>
     Try{
