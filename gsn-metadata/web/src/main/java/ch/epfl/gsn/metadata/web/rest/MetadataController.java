@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
 /**
@@ -45,8 +46,9 @@ public class MetadataController {
     @RequestMapping(value = "/virtualSensors", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    String getVirtualSensors(SensorQuery sensorQuery) {
-        System.out.println("sensorQuery = " + sensorQuery);
+    String getVirtualSensors(SensorQuery sensorQuery, HttpServletResponse response) {
+
+        addHeadersToResponce(response);
 
         Query query = queryBuilder.build(sensorQuery);
 
@@ -58,60 +60,23 @@ public class MetadataController {
 
     }
 
-//    @RequestMapping(value = "/measurementRecords/unfolded", method = RequestMethod.GET, produces = "application/json")
-//    public
-//    @ResponseBody
-//    String getMeasurementRecordsUnfolded(MetaDataQuery query) {
-//        System.out.println("query = " + query);
-//
-//        Collection<MeasurementRecord> allMeasurementRecords = queryService.findMeasurementRecords(query, true);
-//
-//        return converter.convertMeasurementRecords(allMeasurementRecords, false);
-//    }
-//
-//    @RequestMapping(value = "/measurementRecords/measurementLocation/{measurementLocationName}", method = RequestMethod.GET, produces = "application/json")
-//    public
-//    @ResponseBody
-//    String getMeasurementRecordsForMeasurementLocation(@PathVariable String measurementLocationName) {
-//        System.out.println("measurementLocationName = " + measurementLocationName);
-//        List<MeasurementRecord> allMeasurementRecords = queryService.findMeasurementRecordsByMeasurementLocation(measurementLocationName);
-//
-//        return converter.convertMeasurementRecords(allMeasurementRecords, false);
-//    }
-//
     @RequestMapping(value = "/virtualSensors/{dbTableName}", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    String getMeasurementRecordsForDbTableName(@PathVariable String dbTableName) {
-        System.out.println("dbTableName = " + dbTableName);
+    String getMeasurementRecordsForDbTableName(@PathVariable String dbTableName, HttpServletResponse response) {
 
-        VirtualSensorMetadata virtualSensorMetadata = sensorAccessService.getVirtualSensorMetadata(dbTableName);
+        VirtualSensorMetadata virtualSensorMetadata = sensorAccessService.getVirtualSensorMetadata(dbTableName.toLowerCase());
+
+        addHeadersToResponce(response);
 
         return geoJsonConverter.convertMeasurementRecords(Lists.newArrayList(virtualSensorMetadata), true);
     }
 
-//    @RequestMapping(value = "/measurementLocations", method = RequestMethod.GET, produces = "application/json")
-//    public
-//    @ResponseBody
-//    String getMeasurementLocations(MetaDataQuery query) {
-//
-//        System.out.println("query = " + query);
-//
-//        List<MeasurementLocation> result = queryService.findAllMeasurementLocations();
-//        Gson gson = new Gson();
-//        return gson.toJson(result);
-//
-//    }
-//
-//    @RequestMapping(value = "measurementRecords/position", method = RequestMethod.GET, produces = "application/json")
-//    public
-//    @ResponseBody
-//    String getMeasurementRecordsForLocation(@RequestParam String lat, @RequestParam String lon) {
-//
-//        Collection<MeasurementRecord> result = queryService.findMeasurementRecordByLocation(lat, lon);
-//
-//        return converter.convertMeasurementRecords(result, false);
-//
-//    }
+    private void addHeadersToResponce(HttpServletResponse response) {
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "GET");
+        response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+
 }
 

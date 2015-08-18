@@ -35,8 +35,8 @@ sensorData.filter('propsFilter', function () {
 
 
 sensorData.controller('ParameterSelectCtrl',
-    ['$scope', '$window', 'MetadataLoader', '$location', 'sharedService', 'UrlBuilder', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation', 'SensorModel', '$q',
-        function ($scope, $window, MetadataLoader, $location, sharedService, UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation, SensorModel, $q) {
+    ['$scope', '$window', 'MetadataLoader', '$location', 'UrlBuilder', 'FilterParameters', 'AllSensors', 'SensorMetadata', 'Aggregation', 'SensorModel', '$q',
+        function ($scope, $window, MetadataLoader, $location,  UrlBuilder, FilterParameters, AllSensors, SensorMetadata, Aggregation, SensorModel, $q) {
 
             $scope.rowNumber = FilterParameters.rowNumber;
             $scope.limitByRows = FilterParameters.limitByRows;
@@ -57,7 +57,7 @@ sensorData.controller('ParameterSelectCtrl',
             $scope.loading = true;
 
 
-            AllSensors.loadData().then(function (d) {
+            AllSensors.loadSensorsWithPrivacy().then(function (d) {
                 $scope.sensorNames = d;
 
 
@@ -90,9 +90,16 @@ sensorData.controller('ParameterSelectCtrl',
                 return item.columnName + "(" + item.unit + ")";
             };
 
+            $scope.getSensorIcon = function(sensor) {
+                if(sensor.property) {
+                    return 'img/green_.png';
+                } else {
+                    return 'img/red_.png';
+                }
+            }
 
-            function updateSensorInfo(d, index) {
-                var metadata = new SensorMetadata(d);
+            function updateSensorInfo(sensor, index) {
+                var metadata = new SensorMetadata(sensor);
 
                 $scope.sensorsWithParameters[index].update(metadata);
 
@@ -100,11 +107,11 @@ sensorData.controller('ParameterSelectCtrl',
             }
 
             $scope.updateSensor = function (item, index) {
-                FilterParameters.vs = item;
-                $scope.sensorsWithParameters[index].selectedSensor = item;
+                FilterParameters.vs = item.name;
+                $scope.sensorsWithParameters[index].selectedSensor = item.name;
 
 
-                MetadataLoader.loadData(item, true).then(function (d) {
+                MetadataLoader.loadData(item.name, true).then(function (d) {
                     //$scope.metadata = d;
 
                     updateSensorInfo(d, index);
@@ -161,13 +168,9 @@ sensorData.controller('ParameterSelectCtrl',
             $scope.submitSelected = function () {
 
                 updateFilterParameters();
-                sharedService.prepForBroadcast();
 
             };
 
-            $scope.handleClick = function (msg) {
-                sharedService.prepForBroadcast(msg);
-            };
 
             $scope.download = function () {
                 updateFilterParameters();
@@ -439,14 +442,16 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
                     this.promise = $q.all(promises).then(function (data) {
 
                         for (var index = 0; index < data.length; index++) {
-                            var metadata = new SensorMetadata(data[index]);
 
-                            self.sensorModels[index].update(metadata);
+                            if (data[index]) {
+                                var metadata = new SensorMetadata(data[index]);
+                                self.sensorModels[index].update(metadata);
 
-                            for (var i = 0; i < self.sensorModels[index].fields.length; i++) {
-                                if (self.getFields().indexOf(self.sensorModels[index].fields[i].columnName) > -1) {
-                                    self.sensorModels[index].parameters.selectedFields.push(self.sensorModels[index].fields[i]);
+                                for (var i = 0; i < self.sensorModels[index].fields.length; i++) {
+                                    if (self.getFields().indexOf(self.sensorModels[index].fields[i].columnName) > -1) {
+                                        self.sensorModels[index].parameters.selectedFields.push(self.sensorModels[index].fields[i]);
 
+                                    }
                                 }
                             }
 

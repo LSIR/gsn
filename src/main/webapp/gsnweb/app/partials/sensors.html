@@ -1,74 +1,6 @@
 <div layout="column" style="height:500px;">
     <section layout="row" flex>
 
-
-        <!--<md-sidenav class="md-sidenav-left md-whiteframe-z2 filter_panel" md-component-id="left"-->
-        <!--md-is-locked-open="$mdMedia('min-width: 250px')">&lt;!&ndash; gt-md &ndash;&gt;-->
-        <!--<md-toolbar class="md-theme-indigo filter_panel">-->
-        <!--<h1 class="md-toolbar-tools filter_panel">Filters</h1>-->
-        <!--</md-toolbar>-->
-        <!--<md-content layout-padding style="height: 500px;">-->
-
-
-        <!--<div>-->
-        <!--<input style="margin: 4px;" type="checkbox" ng-model="filter.onlyPublic"-->
-        <!--ng-change="changePrivacy()"/> Only public sensors-->
-        <!--</div>-->
-
-        <!--<div style="margin-bottom: 5px;">-->
-        <!--<ui-select ng-model="filter.group.selected" theme="select2" ng-disabled="disabled"-->
-        <!--on-select="updateGroup($item)" style="min-width: 250px;">-->
-        <!--<ui-select-match placeholder="Select a group">{{$select.selected}}</ui-select-match>-->
-        <!--<ui-select-choices repeat="group in groups | filter: $select.search">-->
-        <!--<span ng-bind-html="group | highlight: $select.search"></span>-->
-
-        <!--</ui-select-choices>-->
-        <!--</ui-select>-->
-        <!--</div>-->
-        <!--<div style="margin-bottom: 5px;">-->
-        <!--<ui-select multiple ng-model="filter.sensors" theme="select2"-->
-        <!--ng-disabled="disabled"-->
-        <!--on-select="submit()"-->
-        <!--on-remove="submit()" style="width: 250px;">-->
-        <!--<ui-select-match placeholder="Select sensors...">{{$item}}</ui-select-match>-->
-        <!--<ui-select-choices repeat="sensorName in sensorNames | filter:$select.search">-->
-        <!--{{sensorName}}-->
-        <!--</ui-select-choices>-->
-        <!--</ui-select>-->
-        <!--</div>-->
-        <!--<div style="margin-bottom: 5px;">-->
-        <!--<ui-select multiple ng-model="filter.parameters" theme="select2"-->
-        <!--ng-disabled="disabled"-->
-        <!--on-select="submit()"-->
-        <!--on-remove="submit()" style="width: 250px;">-->
-        <!--<ui-select-match placeholder="Select parameters...">{{$item}}</ui-select-match>-->
-        <!--<ui-select-choices repeat="param in parameters | filter:$select.search">-->
-        <!--{{param}}-->
-        <!--</ui-select-choices>-->
-        <!--</ui-select>-->
-        <!--</div>-->
-
-        <!--<div>-->
-        <!--<label>Dates</label>-->
-        <!--<input type="text" class="form-control"  data-autoclose="1" ng-model="filter.fromDate"-->
-        <!--placeholder="From" bs-datepicker>-->
-        <!--</div>-->
-        <!--<div>-->
-        <!--<input type="text" class="form-control" data-autoclose="1" ng-model="filter.untilDate"-->
-        <!--placeholder="Until" bs-datepicker>-->
-        <!--</div>-->
-        <!--<ul>-->
-
-        <!--<li><label>Name:</label><input type="text" ng-model="filter.sensorName" name="text"/></li>-->
-        <!--<li><label>Deployment:</label><input type="text" ng-model="filter.deployment" name="text"/></li>-->
-        <!--<li><label>Parameter:</label><input type="text" ng-model="filter.parameters" name="text"/></li>-->
-
-        <!--<input type="submit" id="submit" value="Filter"/>-->
-        <!--</ul>-->
-        <!--</form>-->
-
-        <!--</md-content>-->
-        <!--</md-sidenav>-->
         <div class="bs-sidebar hidden-print" role="complementary" data-offset-top="-80" bs-affix
              style="margin-left: 12px;margin-right: 8px;">
 
@@ -81,7 +13,7 @@
 
             <div style="margin-bottom: 5px;">
                 <ui-select ng-model="filter.group.selected" theme="select2" ng-disabled="disabled"
-                           on-select="updateGroup($item)" style="min-width: 250px;">
+                           on-select="updateGroup($item)" style="min-width: 280px;">
                     <ui-select-match placeholder="Select a group">{{$select.selected}}</ui-select-match>
                     <ui-select-choices repeat="group in groups | filter: $select.search">
                         <span ng-bind-html="group | highlight: $select.search"></span>
@@ -93,10 +25,10 @@
                 <ui-select multiple ng-model="filter.sensors" theme="select2"
                            ng-disabled="disabled"
                            on-select="submit()"
-                           on-remove="submit()" style="width: 250px;">
+                           on-remove="submit()" style="width: 280px;">
                     <ui-select-match placeholder="Select sensors...">{{$item}}</ui-select-match>
                     <ui-select-choices repeat="sensorName in sensorNames | filter:$select.search">
-                        {{sensorName}}
+                        <img src={{getSensorIcon(sensorName)}} style="width:16px;height:16px;">{{sensorName}}
                     </ui-select-choices>
                 </ui-select>
             </div>
@@ -104,7 +36,7 @@
                 <ui-select multiple ng-model="filter.parameters" theme="select2"
                            ng-disabled="disabled"
                            on-select="submit()"
-                           on-remove="submit()" style="width: 250px;">
+                           on-remove="submit()" style="width: 280px;">
                     <ui-select-match placeholder="Select parameters...">{{$item}}</ui-select-match>
                     <ui-select-choices repeat="param in parameters | filter:$select.search">
                         {{param}}
@@ -151,6 +83,13 @@
             </div>
         </md-content>
 
+        <div class="bs-sidebar hidden-print" role="complementary" data-offset-top="-80" bs-affix
+             style="margin-left: 12px;margin-right: 8px;">
+
+            <label>Selected Sensors</label>
+
+
+        </div>
     </section>
 </div>
 

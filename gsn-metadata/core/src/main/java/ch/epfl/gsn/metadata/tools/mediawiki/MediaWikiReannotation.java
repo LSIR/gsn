@@ -6,6 +6,7 @@ import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.core.model.WikiInfo;
 import ch.epfl.gsn.metadata.core.repositories.VirtualSensorMetadataRepository;
 import ch.epfl.gsn.metadata.tools.mediawiki.model.MeasurementRecord;
+import org.springframework.data.geo.Point;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,7 +28,7 @@ public class MediaWikiReannotation {
     }
 
     public int updateWikiAnnotations() {
-        int count =0;
+        int count = 0;
         Iterable<VirtualSensorMetadata> sensors = virtualSensorMetadataRepository.findAll();
         for (VirtualSensorMetadata sensor : sensors) {
             List<MeasurementRecord> measurementRecords = measurementRecordRepository.findByDbTableName(sensor.getName().toLowerCase());
@@ -35,6 +36,16 @@ public class MediaWikiReannotation {
                 System.out.println(sensor.getName());
             }
             for (MeasurementRecord measurementRecord : measurementRecords) {
+
+
+                Point locationPoint = measurementRecord.getLocationPoint();
+                if (locationPoint != null && sensor.getLocation() != null) {
+                    if (locationPoint.getX() != sensor.getLocation().getY() || locationPoint.getY() != sensor.getLocation().getX()) {
+                        System.out.println("sensor = " + sensor.getName());
+                        System.out.println("locationPoint = " + locationPoint);
+                        System.out.println("sensorlocation = " + sensor.getLocation());
+                    }
+                }
 
                 MeasurementRecord.RelativePosition relativePosition = measurementRecord.getRelativePosition();
                 WikiInfo wikiInfo = new WikiInfo(measurementRecord.getMeasurementLocationName(), measurementRecord.getMeasurementLocation().getDeploymentName(),
@@ -45,7 +56,7 @@ public class MediaWikiReannotation {
                 sensor.setWikiInfo(wikiInfo);
                 sensor.setSamplingFrequency(measurementRecord.getSamplingFrequency());
                 virtualSensorMetadataRepository.save(sensor);
-                count ++;
+                count++;
                 break;
             }
         }

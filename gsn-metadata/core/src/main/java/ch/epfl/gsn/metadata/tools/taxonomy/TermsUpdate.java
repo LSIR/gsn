@@ -1,13 +1,10 @@
 package ch.epfl.gsn.metadata.tools.taxonomy;
 
-import ch.epfl.gsn.metadata.core.model.GeoData;
 import ch.epfl.gsn.metadata.core.model.ObservedProperty;
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.core.repositories.VirtualSensorMetadataRepository;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.SetMultimap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

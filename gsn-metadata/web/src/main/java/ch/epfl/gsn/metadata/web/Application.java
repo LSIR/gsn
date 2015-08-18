@@ -4,8 +4,6 @@ import ch.epfl.gsn.metadata.mongodb.MongoApplicationConfig;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.ClassPathResource;
 
@@ -14,10 +12,9 @@ import org.springframework.core.io.ClassPathResource;
  */
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan
+@ComponentScan("ch.epfl.gsn.metadata")
 @Import(MongoApplicationConfig.class)
-//@SpringBootApplication
-public class Application extends SpringBootServletInitializer {
+public class Application {
 
     @Bean(name = "configuration")
     public PropertiesFactoryBean configuration() {
@@ -26,12 +23,7 @@ public class Application extends SpringBootServletInitializer {
         return bean;
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(Application.class);
-    }
-
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 

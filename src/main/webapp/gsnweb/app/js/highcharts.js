@@ -38,13 +38,15 @@ angular.module('hcControllers', [])
                 $scope.axisInfo = FilterParameters.getAllSelectedParameters();
                 var dataLoadingPromise = dataProcessingService.loadData().then(function (d) {
 
-                    $scope.pointCount = d.split(/\r\n|\n/).length;
-                    $scope.csvData = d;
+                    if (d.status === 'OK') {
+                        $scope.pointCount = d.data.split(/\r\n|\n/).length;
+                        $scope.csvData = d.data;
 
-                    if ($scope.pointCount * FilterParameters.getHeaders().length/FilterParameters.sensorModels.length > 40000) {
-                        throw $scope.pointCount;
+                        if ($scope.pointCount * FilterParameters.getHeaders().length / FilterParameters.sensorModels.length > 40000) {
+                            throw $scope.pointCount;
+                        }
+                        $scope.dataLoading = false;
                     }
-                    $scope.dataLoading = false;
 
                 })
                     .finally(function () {
@@ -71,28 +73,24 @@ angular.module('hcControllers', [])
                     }
                     $scope.pointCount = processed.pointCount;
                 }, function (error) {
-                    $scope.error = error;
+                    if (!isNaN(error)) {
+                        $scope.errorTooMany = error;
+                    } else {
+                        if(error.status === 406) {
+                            $scope.errorAccessFailed = 'Selected sensor is protected! If you believe you should have access to this sensor please login or contact us.'
+                        } else {
+                            $scope.errorAccessFailed = error.statusText;
+                        }
+                    }
                     $scope.noData = true;
                 }).finally(function () {
                     $scope.dataProcessing = false;
                 });
             }
 
-        }])
+        }]);
 
 
-    .factory('sharedService', ['$rootScope', function ($rootScope) {
-        var sharedService = {};
 
-        sharedService.prepForBroadcast = function () {
-            this.broadcastItem();
-        };
-
-        sharedService.broadcastItem = function () {
-            $rootScope.$broadcast('handleBroadcast');
-        };
-
-        return sharedService;
-    }]);
 
 

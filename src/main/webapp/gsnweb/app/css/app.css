@@ -138,11 +138,24 @@ ul.specs dt {
   color: #3949AB;
 }
 .active {
-  background-color: #3F51B5 !important;
-  color: rgba(255, 255, 255, 0.87) !important;
+  background-color: #DDD !important;
+  color: rgba(0,0,0, 0.87) !important;
 }
 .filter_panel {
   width: 265px !important;
   min-width: 265px !important;
   max-width: 265px !important;
+}
+h2 {
+  font-size: 30px;
+}
+.about {
+  width: 300px;
+  text-align: justify;
+  text-justify: auto;
+  margin-left:10px;
+}
+.login {
+  float: right !important;
+  right: 0px;
 }

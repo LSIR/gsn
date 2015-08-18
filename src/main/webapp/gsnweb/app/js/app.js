@@ -16,7 +16,8 @@ var gsnWebApp = angular.module('gsnWebApp', [
     , 'ui.select'
     , 'ngMaterial'
     , 'gsnMap'
-,'rzModule'
+    , 'gsnMonitor'
+    , 'rzModule'
 ]);
 
 gsnWebApp.config(['$routeProvider', '$datepickerProvider',
@@ -36,6 +37,23 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
             }).
             when('/plot', {
                 templateUrl: 'partials/highcharts.html'
+                //, controller: 'hcCtrl'
+                //, reloadOnSearch: true
+            }).
+            when('/monitor', {
+                templateUrl: 'partials/monitor.html',
+                resolve: {
+                    sensorData: [
+                        'MonitorSensorsData',
+                        function (MonitorSensorsData) {
+                            return MonitorSensorsData.getSensors();
+                        }
+                    ]
+                },
+                controller: 'MonitorController'
+            }).
+            when('/about', {
+                templateUrl: 'partials/about.html'
                 //, controller: 'hcCtrl'
                 //, reloadOnSearch: true
             }).
@@ -66,38 +84,61 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
     }
 ]);
 
-gsnWebApp.controller('TabsCtrl', function ($scope, $location) {
-    $scope.tabs = [
-        {link: '#/map', label: 'Sensor map'},
-        {link: '#/plot', label: 'Plot data'},
-    ];
+gsnWebApp.controller('TabsCtrl', ['$scope', '$rootScope', '$location', 'GsnTabs',
+    function ($scope, $rootScope,$location, GsnTabs) {
 
-    $scope.selectedTab = $scope.tabs[0];
-    $scope.setSelectedTab = function (tab) {
-        $scope.selectedTab = tab;
-    };
+        $scope.tabs = GsnTabs;
+        $scope.tabs.updateSelectedTab($location.$$path);
 
-    $scope.tabClass = function (tab) {
-        if ($scope.selectedTab == tab)
-            return 'active';
-        else
-        return '';
-
-    }
-});
-
-gsnWebApp.controller('JobsCtrl', function ($scope) {
-
-});
-gsnWebApp.controller('InvoicesCtrl', function ($scope) {
-
-});
-gsnWebApp.controller('PaymentsCtrl', function ($scope) {
-
-});
+        $rootScope.$on('$routeChangeSuccess', function(route, location){
+            $scope.tabs.updateSelectedTab(location.$$route.originalPath);
+        });
 
 
-gsnWebApp.factory('_', ['$window', function($window) {
+    }]);
+
+
+gsnWebApp.factory('_', ['$window', function ($window) {
     return $window._; // assumes underscore has already been loaded on the page
 }]);
 
+gsnWebApp.service('GsnTabs', function () {
+
+    function GsnTabs() {
+        this.tabs = [
+            {link: '#/map', label: 'Sensor map'},
+            {link: '#/plot', label: 'Plot data'},
+            {link: '#/monitor', label: 'Monitor'},
+            {link: '#/about', label: 'About'},
+        ];
+
+        this.tabNames = ['/map', '/plot', '/monitor', '/about'];
+
+        this.selectedTab = this.tabs[0];
+    }
+
+    GsnTabs.prototype = {
+        updateSelectedTab: function (location) {
+            if (this.tabNames.indexOf(location) > -1) {
+                this.selectedTab = this.tabs[this.tabNames.indexOf(location)];
+            } else {
+                this.selectedTab = this.tabs[0];
+            }
+        },
+
+        setSelectedTab: function (tab) {
+            console.log(tab);
+            this.selectedTab = tab;
+        },
+        tabClass: function (tab) {
+            if (this.selectedTab == tab)
+                return 'active';
+            else
+                return '';
+
+        }
+    };
+
+    return new GsnTabs();
+
+});

@@ -3,9 +3,11 @@ package ch.epfl.gsn.metadata.tools.taxonomy;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -15,10 +17,12 @@ import java.util.Set;
 @Named
 public class TaxonomyResolver {
     private TaxonomyRepository taxonomyRepository;
+    private MongoTemplate mongoTemplate;
 
     @Inject
-    public TaxonomyResolver(TaxonomyRepository repository) {
+    public TaxonomyResolver(TaxonomyRepository repository, MongoTemplate mongoTemplate) {
         this.taxonomyRepository = repository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     public Set<String> getColumnNamesForTerm(String term) {
@@ -35,5 +39,9 @@ public class TaxonomyResolver {
         TaxonomyProperty taxonomyProperty = taxonomyRepository.findByColumnName(columnName.toLowerCase());
         return taxonomyProperty != null? taxonomyProperty.getTaxonomyName():null;
 
+    }
+
+    public Collection<String> getAllTerms() {
+        return mongoTemplate.getCollection("taxonomy").distinct("taxonomyName");
     }
 }
