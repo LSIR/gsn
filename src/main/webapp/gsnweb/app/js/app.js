@@ -48,6 +48,12 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
                         function (MonitorSensorsData) {
                             return MonitorSensorsData.getSensors();
                         }
+                    ],
+                    sensorNames: [
+                        'AllSensors',
+                        function (AllSensors) {
+                            return AllSensors.loadData();
+                        }
                     ]
                 },
                 controller: 'MonitorController'
