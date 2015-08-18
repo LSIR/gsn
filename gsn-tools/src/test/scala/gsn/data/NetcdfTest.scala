@@ -2,7 +2,7 @@ package gsn.data
 
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
-import gsn.data.netcdf.NetCdf
+import gsn.data.format.NetCdfSerializer
 
 class NetcdfTest extends FunSpec with Matchers {
     
@@ -23,7 +23,7 @@ class NetcdfTest extends FunSpec with Matchers {
     val s=new Sensor("pipo",fields,null,Map("description"->"chochos"))
     
     it("should serialize it"){
-          NetCdf.serialize(s,values)
+          NetCdfSerializer.serialize(s,values)
       //nc.testCreate
 
     }

@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory
 import com.mchange.v2.c3p0.DataSources
 import java.sql.DriverManager
 import gsn.data.format.TimeFormats._
+import org.joda.time.MonthDay
+import org.joda.time.DateTime
 
 object SensorDatabase { 
   val log=LoggerFactory.getLogger(SensorDatabase.getClass)
@@ -111,7 +113,8 @@ object SensorDatabase {
 	    throw e
 	} 
   }   
-  
+
+ 
   private def timeOutput(sensorname:String)={
     Output("timestamp",sensorname,DataUnit("ms"),TimeType)
   }
@@ -169,13 +172,6 @@ object SensorDatabase {
     }
 //}
   }
-  /*
-  private def vsDB(ds:Option[DataSource])={
-	if (ds.isDefined)
-	  Database.forDataSource(ds.get)	  
-	else 
-	  Database.forDataSource(C3P0Registry.pooledDataSourceByName("gsn"))
-  }*/
 
   private def vsDs(dsName:String)={
 	val sc=if (dsReg.dsss.contains(dsName))

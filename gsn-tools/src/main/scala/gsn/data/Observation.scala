@@ -9,9 +9,10 @@ case class ObservationValue(value:Any,dataType:DataType)
 
 case class Series(output:Output,series:Seq[Any]){
   def asDoubles=series.iterator.map(d =>d.asInstanceOf[Double])
+  def asLongs=series.iterator.map(d =>d.asInstanceOf[Long])
 }
 
-class TimeSeries(output:Output,series:Seq[Any],time:Seq[Long]) extends Series(output,series){
+class TimeSeries(output:Output,series:Seq[Any], val time:Seq[Long]) extends Series(output,series){
   val iterator=(asDoubles zip time.iterator)
 }
 
