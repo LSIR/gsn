@@ -53,6 +53,7 @@ public class SensorPageController {
 
         setResponseHeader(response);
 
+        sensorQuery.setOnlyPublic(false);
         Query query = queryBuilder.build(sensorQuery);
 
         Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.findForQuery(query);
