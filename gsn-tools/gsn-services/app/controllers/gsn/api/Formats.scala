@@ -1,7 +1,7 @@
 package controllers.gsn.api
 
 case class OutputFormat(code:String) {
-  val formats=Seq("csv","json","xml")
+  val formats=Seq("csv","json","xml","shp")
   if  (!formats.exists(_==code))
     throw new IllegalArgumentException(s"Invalid format: $code")
 }
@@ -9,3 +9,4 @@ case class OutputFormat(code:String) {
 object Csv extends OutputFormat("csv")
 object Json extends OutputFormat("json")	
 object Xml extends OutputFormat("xml")	
+object Shapefile extends OutputFormat("shp")

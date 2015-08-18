@@ -1,6 +1,5 @@
 package gsn.data
 
-import gsn.data.netcdf.NetCdf
 import java.nio.charset.Charset
 import org.slf4j.LoggerFactory
 import com.typesafe.config.ConfigFactory
@@ -16,12 +15,3 @@ trait DataSerializer{
 
 
 
-object NetCdfSerializer extends DataSerializer{ 
-
-  def ser(data:Seq[SensorData],props:Seq[String],withVals:Boolean=true)={
-    NetCdf.serialize(null,null)
-  }
-  
-  override def ser(data:SensorData,props:Seq[String],latest:Boolean)= ???
-  
-}

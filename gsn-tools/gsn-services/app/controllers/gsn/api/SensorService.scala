@@ -4,56 +4,35 @@ import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.concurrent.Promise
-import scala.concurrent.duration.DurationInt
 import scala.util.Try
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatterBuilder
-import com.typesafe.config.ConfigFactory
 import akka.actor._
-import controllers.gsn.Global
-import gsn.data._
-import gsn.xpr.XprConditions
+import com.typesafe.config.ConfigFactory
+
+import play.Logger
+import play.api.mvc._
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.mvc._
-import play.Logger
-import scala.util.Success
-import gsn.data.format.XmlSerializer
-import play.api.http.ContentTypes
-import gsn.data.format.CsvSerializer
-import play.api.http.Writeable
 import play.api.libs.json.JsValue
-import play.api.libs.iteratee.Enumerator
-import java.io.OutputStream
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.core.JsonFactory
-import java.io.ByteArrayOutputStream
-import java.io.ObjectOutputStream
-import java.io.ByteArrayInputStream
-import play.api.libs.json.JacksonJson
-import gsn.data.format.JsonSerializer
+import play.api.http.ContentTypes
 
-object SensorService extends Controller{   
-  lazy val conf=ConfigFactory.load
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatterBuilder
+import controllers.gsn.Global
+import gsn.data._
+import gsn.data.format._
+import gsn.xpr.XprConditions
+
+object SensorService extends Controller with GsnService {   
   val defaultMetaProps=conf.getStringList("gsn.api.defaultMetadataProps")
-  val dateFormatter={
-    val parsers=conf.getStringList("gsn.api.dateTimeFormats").map{d=>
-      DateTimeFormat.forPattern(d).getParser
-    }.toArray
-    new DateTimeFormatterBuilder().append(null,parsers).toFormatter
-  }
 
-  val validFormats=Seq(Csv,Json)
-  val defaultFormat=Json
- 
-  def queryparam(name:String)(implicit req:Request[AnyContent])={
-    req.queryString.get(name).map(_.head)
+  def headings[A](act: Action[A])= Action.async(act.parser) { request =>
+     act(request).map{_.withHeaders("Access-Control-Allow-Origin"->"*",
+                                    "Access-Control-Allow-Methods"->"GET",
+                                    "Access-Control-Allow-Headers"->"Content-Type")}
+     
   }
-  def param[T](name:String,fun: String=>T,default:T)(implicit req:Request[AnyContent])=
-    queryparam(name).map(fun(_)).getOrElse(default)
-      
-  def sensors = Action.async {implicit request=>
+  def sensors = headings(Action.async {implicit request=>
     Try{    
       val format=param("format",OutputFormat,defaultFormat)    
       val latestVals=param("latestValues",_.toBoolean,false)
@@ -69,6 +48,7 @@ object SensorService extends Controller{
           case Json=>JsonSerializer.ser(data,Seq(),latestVals)
           case Csv=>CsvSerializer.ser(data, defaultMetaProps, latestVals)
           case Xml=>XmlSerializer.ser(data, defaultMetaProps, latestVals)
+          case Shapefile=>ShapefileSerializer.ser(data,defaultMetaProps,latestVals)
         }
         result(out,format)
       } 
@@ -77,7 +57,7 @@ object SensorService extends Controller{
         t.printStackTrace  
         Future(BadRequest(t.getMessage))    
     }.get    
-  }
+  })
   
   @deprecated("user-password authentication phased out","")
   private def authorizeUserPass(vsname:String)(implicit request:Request[AnyContent])={
@@ -89,8 +69,7 @@ object SensorService extends Controller{
 	}    
   }
   
-  private def globalKeyOk(key:String)=
-    key.equals(Global.globalKey )
+
   
   private def authorizeVs(vsname:String)(implicit request:Request[AnyContent])={     
     if (Global.gsnConf.accessControl.enabled && Global.acDs.hasAccessControl(vsname)){
@@ -107,7 +86,7 @@ object SensorService extends Controller{
     }
   }
   
-  def sensorData(sensorid:String) = Action.async {implicit request=>
+  def sensorData(sensorid:String) = headings(Action.async {implicit request=>
     Try{
       val vsname=sensorid.toLowerCase
       //to enable
@@ -118,6 +97,7 @@ object SensorService extends Controller{
       val filterStr:Option[String]=queryparam("filter")
       val fromStr:Option[String]=queryparam("from")
       val toStr:Option[String]=queryparam("to")
+      val period:Option[String]=queryparam("period")
       val timeFormat:Option[String]=queryparam("timeFormat")
 
       val format=param("format",OutputFormat,defaultFormat)           
@@ -137,7 +117,7 @@ object SensorService extends Controller{
       val p=Promise[Seq[SensorData]]               
       val q=Akka.system.actorOf(Props(new QueryActor(p)))
       Logger.debug("request the query actor")
-      q ! GetSensorData(vsname,fields,conds++filters,size,timeFormat)
+      q ! GetSensorData(vsname,fields,conds++filters,size,timeFormat,period)
       //val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 15.second)
       p.future.map{data=>        
         Logger.debug("before formatting")
@@ -172,7 +152,7 @@ object SensorService extends Controller{
     }.recover{
       case t=>Future(BadRequest("Error: "+t.getMessage))
     }.get
-  }
+  })
 
   
   def sensorField(sensorid:String,fieldid:String) = 
@@ -208,7 +188,7 @@ object SensorService extends Controller{
     }.get
   }
 
-  def sensorMetadata(sensorid:String) = Action.async {implicit request=>
+  def sensorMetadata(sensorid:String) = headings( Action.async {implicit request=>
     Try{
       //to enable
       //authorizeVs(sensorid)    	
@@ -232,7 +212,7 @@ object SensorService extends Controller{
     }.recover{
       case t=> Future(BadRequest(t.getMessage))
     }.get
-  }
+  })
 
   def sensorSearch = Action.async {implicit request=>
     Try{
@@ -297,15 +277,20 @@ object SensorService extends Controller{
   }
   
   def result(s:Object,out:OutputFormat)={
+    val headers=new ArrayBuffer[(String,String)]
     val contentType = out match {
       case Xml=>ContentTypes.XML
       case Json=>ContentTypes.JSON
+      case Shapefile=>
+        headers+= "Context-Disposition: attachment; filename=sensors.zip"->""
+        ContentTypes.BINARY 
       case _ =>ContentTypes.TEXT
     }
     s match {
       case s:String=>Ok(s).as(contentType)
       case j:JsValue=>
         Ok(j).as(contentType)
+      case b:Array[Byte]=>Ok(b)
     }
   }
   

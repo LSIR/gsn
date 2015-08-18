@@ -4,6 +4,8 @@ import scala.concurrent.Promise
 import akka.actor._
 import akka.actor.Status.Failure
 import akka.event.Logging
+import gsn.data.time.Periods
+import scala.collection.mutable.ArrayBuffer
 
 class QueryActor(p:Promise[Seq[SensorData]]) extends Actor {
   val gsnSensor=context.actorSelection("/user/gsnSensorStore")
@@ -33,12 +35,15 @@ class QueryActor(p:Promise[Seq[SensorData]]) extends Actor {
       }
     case g:GetSensorData =>
       log.debug(s"get sensor data from ${g.sensorid}")
+      val conds=new ArrayBuffer[String]
+      conds++=g.conditions 
       gsnSensor ! GetSensorInfo(g.sensorid )
       sensor.future.map{s=>
-        if (g.size.isDefined && g.size.get== 0)
-          p.success(Seq(asSensorData(s.sensor )))
-        else try
-          p.success(Seq(query(s,g.fields ,g.conditions ,g.size,g.timeFormat )))          
+        g.period.map{p=>
+          conds+=Periods.addConditions(s.stats.get.start.get, p)
+        }
+        try
+          p.success(Seq(query(s,g.fields ,conds ,g.size,g.timeFormat )))          
         catch {
           case e:Exception=>p.failure(e)
             log.error(e.getMessage)

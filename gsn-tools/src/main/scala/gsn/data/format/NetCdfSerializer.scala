@@ -1,14 +1,22 @@
-package gsn.data.netcdf
-import ucar.nc2.NetcdfFileWriter
-import ucar.nc2.Attribute
-import gsn.data.Sensor
-import ucar.ma2.DataType
-import ucar.ma2.ArrayDouble
-import java.util.UUID
-import java.nio.file.Files
-import java.nio.file.Paths
+package gsn.data.format
 
-object NetCdf {
+import gsn.data._
+import java.util.UUID
+import ucar.nc2.NetcdfFileWriter
+import ucar.ma2.ArrayDouble
+import java.nio.file.Paths
+import java.nio.file.Files
+import ucar.nc2.Attribute
+import ucar.ma2.DataType
+
+
+object NetCdfSerializer extends DataSerializer{ 
+
+  def ser(data:Seq[SensorData],props:Seq[String],withVals:Boolean=true)={
+    serialize(null,null)
+  }
+  
+  override def ser(data:SensorData,props:Seq[String],latest:Boolean)= ???
   val timeName="time"
     
   def serialize(s:Sensor,
@@ -80,5 +88,4 @@ object NetCdf {
       w.addGroupAttribute(null, new Attribute(k,v))
     }
   }
-
 }

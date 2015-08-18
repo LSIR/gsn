@@ -26,7 +26,8 @@ class DataProcessingTest extends FunSpec with Matchers {
     }
   }
   describe("time series irregular"){
-    val ts=new TimeSeries(Output("f1","s1",null,null),Seq(1d,2d,3d,4d),Seq(1,3,7,13))
+    val ts=new TimeSeries(Output("f1","s1",null,null),
+        Seq(1d,2d,3d,4d),Seq(1,3,7,13))
     it("should be interpolated"){
       val inter=new LinearInterpolation(1,2)
       val res=inter.process(ts)
