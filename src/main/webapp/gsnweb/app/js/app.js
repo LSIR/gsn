@@ -52,7 +52,7 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
                     sensorNames: [
                         'AllSensors',
                         function (AllSensors) {
-                            return AllSensors.loadData();
+                            return AllSensors.loadNames();
                         }
                     ]
                 },
