@@ -40,7 +40,7 @@ allSensors.factory('AllSensors', ['UrlBuilder', '$http',
                     });
                 }
                 return promiseWithPrivacy;
-            },
+            }
 
 
         };
