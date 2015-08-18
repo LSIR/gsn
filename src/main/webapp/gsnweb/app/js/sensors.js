@@ -31,7 +31,8 @@ allSensors.factory('AllSensors', ['UrlBuilder', '$http',
                 if (!promiseWithPrivacy) {
 
                     //var url = 'http://localhost:8090/web/virtualSensorNamesWithPrivacy';
-                    var url = 'http://eflumpc18.epfl.ch/gsn/web/virtualSensorNamesWithPrivacy';
+                    //var url = 'http://eflumpc18.epfl.ch/gsn/web/virtualSensorNamesWithPrivacy';
+                    var url = 'http://montblanc.slf.ch:8090/web/virtualSensorNamesWithPrivacy';
 
                     console.log(url);
 

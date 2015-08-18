@@ -7,7 +7,8 @@ var metaDataServices = angular.module('metaDataServices', [])
         var promise;
 
         var self = this;
-        self.metatdataUrl = 'http://eflumpc18.epfl.ch/gsn/';
+        self.metatdataUrl = 'http://montblanc.slf.ch:8090/';
+        //self.metatdataUrl = 'http://eflumpc18.epfl.ch/gsn/';
         //self.metatdataUrl = 'http://localhost:8090/';
 
         var MetadataLoader = {

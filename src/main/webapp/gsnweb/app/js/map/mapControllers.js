@@ -367,8 +367,8 @@ gsnMap.factory('Sensors', ['$http', function ($http) {
             if (!self.promise) {
                 self.promise = $http({
                     method: 'GET',
-                    url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors?onlyPublic=false'
-                    //url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors'
+                    url: 'http://montblanc.slf.ch:8090/web/virtualSensors?onlyPublic=false'
+                    //url: 'http://eflumpc18.epfl.ch/gsn/web/virtualSensors?onlyPublic=false'
                     //url: 'http://localhost:8090/web/virtualSensors?onlyPublic=false'
                 });
                 self.promise.success(function (data, status, headers, conf) {
