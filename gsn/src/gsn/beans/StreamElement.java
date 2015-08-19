@@ -361,21 +361,16 @@ public final class StreamElement implements Serializable {
 			return false;
 		if (this.getFieldNames().length != se.getFieldNames().length)
 			return false;
+		
 		Serializable[] fieldValues = se.getData();
 		String[] fieldNames = se.getFieldNames();
 		Byte[] fieldTypes = se.getFieldTypes();
-		//for (int i=this.getFieldNames().length-1; i>=0; i--) {
-		logger.info("compare each fields");
-		boolean toReturn = true;
+		
 		for (int i=0; i<this.getFieldNames().length; i++) {
-			if (this.fieldTypes[i] != fieldTypes[i]) {
-				logger.info("field types unequal: " + this.fieldTypes[i] + " != " + fieldTypes[i]);
-				toReturn = false;
-			}
-			if (this.fieldNames[i].compareToIgnoreCase(fieldNames[i]) != 0) {
-				logger.info("field names unequal: " + this.fieldNames[i] + " != " + fieldNames[i]);
-				toReturn = false;
-			}
+			if (this.fieldTypes[i].compareTo(fieldTypes[i]) != 0)
+				return false;
+			if (this.fieldNames[i].compareToIgnoreCase(fieldNames[i]) != 0)
+				return false;
 			
 			boolean cont = false;
 			for (int j=0; j<fieldNamesToBeIgnored.length; j++) {
@@ -387,90 +382,49 @@ public final class StreamElement implements Serializable {
 			if (cont)
 				continue;
 			
-			if (this.fieldValues[i] == null && fieldValues[i] != null) {
-				logger.info("only one field value is NULL");
-				toReturn = false;
-			}
-			if (this.fieldValues[i] != null && fieldValues[i] == null) {
-				logger.info("only one field value is NULL");
-				toReturn = false;
-			}
+			if (this.fieldValues[i] == null && fieldValues[i] != null)
+				return false;
+			if (this.fieldValues[i] != null && fieldValues[i] == null)
+				return false;
 
 			if (!(this.fieldValues[i] == null && fieldValues[i] == null)) {
 				switch ( fieldTypes[ i ] ) {
 					case DataTypes.DOUBLE :
-						logger.info(fieldNames[i] + " DOUBLE: " + ((Double)this.fieldValues[i]) + " != " + ((Double)fieldValues[i]) + "?");
-						if (((Double)this.fieldValues[i]).compareTo((Double)fieldValues[i]) != 0) {
-							logger.info("they are the different");
-							toReturn = false;
-						}
-						else
-							logger.info("they are the same");
+						if (((Double)this.fieldValues[i]).compareTo((Double)fieldValues[i]) != 0)
+							return false;
 						break;
 					case DataTypes.BIGINT :
-						logger.info(fieldNames[i] + " BIGINT: " + ((Long)this.fieldValues[i]) + " != " + ((Long)fieldValues[i]) + "?");
-						if (((Long)this.fieldValues[i]).compareTo((Long)fieldValues[i]) != 0) {
-							logger.info("they are the different");
-							toReturn = false;
-						}
-						else
-							logger.info("they are the same");
+						if (((Long)this.fieldValues[i]).compareTo((Long)fieldValues[i]) != 0)
+							return false;
 						break;
 					case DataTypes.TINYINT :
-						logger.info(fieldNames[i] + " SMALLINT: " + ((Byte)this.fieldValues[i]) + " != " + ((Byte)fieldValues[i]) + "?");
-						if (((Byte)this.fieldValues[i]).compareTo((Byte)fieldValues[i]) != 0) {
-							logger.info("they are the different");
-							toReturn = false;
-						}
-						else
-							logger.info("they are the same");
+						if (((Byte)this.fieldValues[i]).compareTo((Byte)fieldValues[i]) != 0)
+							return false;
 						break;
 					case DataTypes.SMALLINT :
-						logger.info(fieldNames[i] + " SMALLINT: " + ((Short)this.fieldValues[i]) + " != " + ((Short)fieldValues[i]) + "?");
-						if (((Short)this.fieldValues[i]).compareTo((Short)fieldValues[i]) != 0) {
-							logger.info("they are the different");
-							toReturn = false;
-						}
-						else
-							logger.info("they are the same");
+						if (((Short)this.fieldValues[i]).compareTo((Short)fieldValues[i]) != 0)
+							return false;
 						break;
 					case DataTypes.INTEGER :
-						logger.info(fieldNames[i] + " INTEGER: " + ((Integer)this.fieldValues[i]) + " != " + ((Integer)fieldValues[i]) + "?");
-						if (((Integer)this.fieldValues[i]).compareTo((Integer)fieldValues[i]) != 0) {
-							logger.info("they are the different");
-							toReturn = false;
-						}
-						else
-							logger.info("they are the same");
+						if (((Integer)this.fieldValues[i]).compareTo((Integer)fieldValues[i]) != 0)
+							return false;
 						break;
 					case DataTypes.CHAR :
 					case DataTypes.VARCHAR :
-						logger.info(fieldNames[i] + " CHAR VARCHAR: " + ((String)this.fieldValues[i]) + " != " + ((String)fieldValues[i]) + "?");
-						if (((String)this.fieldValues[i]).compareTo((String)fieldValues[i]) != 0) {
-							logger.info("they are the different");
-							toReturn = false;
-						}
-						else
-							logger.info("they are the same");
+						if (((String)this.fieldValues[i]).compareTo((String)fieldValues[i]) != 0)
+							return false;
 						break;
 					case DataTypes.BINARY :
-						logger.info(fieldNames[i] + " BINARY: " + (byte[])this.fieldValues[i] + " != " + (byte[])fieldValues[i] + "?");
-						if (Arrays.equals(this.fieldValues, fieldValues)) {
-							logger.info("they are the different");
-							toReturn = false;
-						}
-						else
-							logger.info("they are the same");
+						if (!Arrays.equals(this.fieldValues, fieldValues))
+							return false;
 						break;
 					default :
 						logger.error( "Type can't be converted : TypeID : " + fieldTypes[ i ] );
-						toReturn = false;
+						return false;
 				}
 			}
-			else
-				logger.info("both values are NULL");
 		}
-		return toReturn;
+		return true;
 	}
 
 	/**
