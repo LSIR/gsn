@@ -27,17 +27,14 @@ package tinygsn.gui.android.utils;
 
 import java.util.List;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import tinygsn.beans.StaticData;
 import tinygsn.controller.AndroidControllerWrapper;
 import tinygsn.gui.android.ActivityListSensor;
-import tinygsn.gui.android.ActivityViewData;
 import tinygsn.gui.android.ActivityWrapperEdit;
 import tinygsn.gui.android.R;
-import tinygsn.gui.android.ActivityViewData.DetailedDataFragment;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.content.Context;
 import android.content.Intent;
@@ -45,7 +42,6 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -57,7 +53,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class SensorListAdapter extends ArrayAdapter<SensorRow> {
@@ -78,7 +73,7 @@ public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		convertView = (LinearLayout) inflater.inflate(resource, null);
+		convertView = (LinearLayout) inflater.inflate(resource, parent);
 
 		final SensorRow vs = getItem(position);
 

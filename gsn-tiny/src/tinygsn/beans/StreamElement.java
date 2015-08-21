@@ -32,7 +32,6 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.TreeMap;
 
-import android.util.Log;
 
 public final class StreamElement implements Serializable {
 
@@ -51,9 +50,6 @@ public final class StreamElement implements Serializable {
 	private transient long internalPrimayKey = -1;
 
 	private static final String NULL_ENCODING = "NULL"; // null encoding for
-																											// transmission over
-																											// xml-rpc
-	private static final String TAG = "StreamElement";
 	
 	public StreamElement(StreamElement other) {
 		this.fieldNames = new String[other.fieldNames.length];
@@ -333,17 +329,4 @@ public final class StreamElement implements Serializable {
 		this.internalPrimayKey = internalPrimayKey;
 	}
 
-	public boolean isTheSame(StreamElement se){
-//		Log.v(TAG, se.toString());
-//		Log.v(TAG, this.toString());
-		for (int i = 0; i < this.fieldNames.length; i++) {
-			if (((Double) se.getData()[i] - (Double) this.getData()[i]) > 0.00001){
-				Log.v(TAG, "Different: " + ((Double) se.getData()[i] - (Double) this.getData()[i]));
-				return false;
-			}
-		}
-//		Log.v(TAG, "Same");
-		
-		return true;
-	}
 }

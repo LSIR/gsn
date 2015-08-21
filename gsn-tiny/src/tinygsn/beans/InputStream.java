@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 
-//import org.apache.log4j.Logger;
 
 public class InputStream implements Serializable {
 

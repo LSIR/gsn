@@ -75,7 +75,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 		this.activityListVSNew = activityListVSNew;
 	}
 
-	@SuppressLint("NewApi") @Override
+    @Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		convertView = (LinearLayout) inflater.inflate(resource, null);

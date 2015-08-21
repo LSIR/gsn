@@ -31,6 +31,8 @@ import tinygsn.beans.StreamElement;
 
 public class BridgeVirtualSensor extends AbstractVirtualSensor {
 
+	private static final long serialVersionUID = -7656375392762513783L;
+
 	@Override
 	public boolean initialize() {
 		return false;

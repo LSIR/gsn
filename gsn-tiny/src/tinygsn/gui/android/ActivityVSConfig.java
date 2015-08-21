@@ -36,7 +36,6 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
 import tinygsn.controller.AndroidControllerVS;
-import tinygsn.gui.android.utils.VSListAdapter;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.vsensor.NotificationVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
@@ -141,7 +140,8 @@ public class ActivityVSConfig extends SherlockActivity {
 				protected void onPostExecute(AbstractVirtualSensor result) {
 					if(result != null){
 						result.getVirtualSensorConfiguration().getName();
-						//TODO
+						//TODO load values inside fields and create the input sources
+						//some of them must be set readonly !!!
 					}
 				}
 			}.execute((Activity)null);
@@ -363,7 +363,7 @@ public class ActivityVSConfig extends SherlockActivity {
 		return row;
 	}
 
-	public void addViewNotifyConfig() {
+	public void addViewNotifyConfig() { //TODO remove and move parameters to VS parameters
 		table_notify_config.removeAllViews();
 
 		TableRow row = new TableRow(this);
@@ -376,7 +376,7 @@ public class ActivityVSConfig extends SherlockActivity {
 
 		field = new Spinner(this);
 		List<String> list = new ArrayList<String>();
-		String wrapperName = wrapperList.getProperty("gps"); //TODO dynamic
+		String wrapperName = wrapperList.getProperty("gps"); 
 
 		try {
 			AbstractWrapper w = (AbstractWrapper) StaticData.getWrapperByName(wrapperName);
@@ -651,9 +651,6 @@ public class ActivityVSConfig extends SherlockActivity {
 						Toast.LENGTH_SHORT).show();
 			break;
 		}
-
-		// Toast.makeText(this, "itemId " + itemId + " pressed", Toast.LENGTH_SHORT)
-		// .show();
 
 		return true;
 	}

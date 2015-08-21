@@ -24,8 +24,6 @@
 
 
 package tinygsn.beans;
-
-import java.util.Date;
 import java.util.regex.Pattern;
 import tinygsn.utils.GSNRuntimeException;
 
@@ -34,9 +32,6 @@ public class DataTypes {
 	public final static String OPTIONAL_NUMBER_PARAMETER = "\\s*(\\(\\s*\\d+\\s*\\))?";
 
 	public final static String REQUIRED_NUMBER_PARAMETER = "\\s*\\(\\s*\\d+\\s*\\)";
-
-//	private final static transient Logger logger = Logger
-//			.getLogger(DataTypes.class);
 
 	// NEXT FIELD
 	public final static String VAR_CHAR_PATTERN_STRING = "\\s*varchar"
@@ -127,11 +122,6 @@ public class DataTypes {
 	public final static String[] TYPE_NAMES = new String[] { VARCHAR_NAME,
 			CHAR_NAME, INTEGER_NAME, BIGINT_NAME, BINARY_NAME, DOUBLE_NAME,
 			TIME_NAME, TINYINT_NAME, SMALLINT_NAME };
-
-	public final static Object[] TYPE_SAMPLE_VALUES = { "A chain of chars", 'c',
-			new Integer(32), new Integer(66000), new Byte((byte) 12),
-			new Double(3.141592), new Date().getTime(), new Integer(1),
-			new Integer(9) };
 
 	public static byte convertTypeNameToGSNTypeID(final String type) {
 		if (type == null)

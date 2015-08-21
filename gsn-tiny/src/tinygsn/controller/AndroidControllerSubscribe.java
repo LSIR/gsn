@@ -62,13 +62,13 @@ import android.util.Log;
 public class AndroidControllerSubscribe extends AbstractController {
 	private static final String TAG = "AndroidControllerPullData";
 
-	private ActivitySubscribe view = null;
+	private Activity view = null;
 	private Handler handlerVS = null;
 	private Handler handlerData = null;
 
 	private SqliteStorageManager storage = null;
 	
-	public AndroidControllerSubscribe(ActivitySubscribe androidViewer) {
+	public AndroidControllerSubscribe(Activity androidViewer) {
 		this.view = androidViewer;
 		storage = new SqliteStorageManager();
 	}

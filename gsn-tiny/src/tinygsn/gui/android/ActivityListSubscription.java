@@ -27,7 +27,7 @@ package tinygsn.gui.android;
 
 import java.util.ArrayList;
 import java.util.List;
-import tinygsn.controller.AndroidControllerListSubscription;
+import tinygsn.controller.AndroidControllerSubscribe;
 import tinygsn.gui.android.gcm.CommonUtilities;
 import tinygsn.gui.android.utils.SensorListAdapter;
 import tinygsn.gui.android.utils.SensorRow;
@@ -57,7 +57,7 @@ public class ActivityListSubscription extends SherlockActivity {
 	private ListView listViewSubscription;
 	private Context context;
 	Handler handlerData;
-	AndroidControllerListSubscription controller;
+	AndroidControllerSubscribe controller;
 	List<SensorRow> subscriptionRowList;
 	ArrayList<SensorRow> dataList = new ArrayList<SensorRow>();
 	TextView numVS = null;
@@ -114,7 +114,7 @@ public class ActivityListSubscription extends SherlockActivity {
 			};
 		};
 
-		controller = new AndroidControllerListSubscription(this);
+		controller = new AndroidControllerSubscribe(this);
 		controller.setHandlerData(handlerData);
 		//controller.loadListSubsData();
 	}

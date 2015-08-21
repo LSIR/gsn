@@ -23,7 +23,7 @@
 */
 package tinygsn.model.wrappers;
 
-import java.io.Serializable;
+//import java.io.Serializable;
 import java.util.ArrayList;
 
 import tinygsn.beans.DataField;

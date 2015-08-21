@@ -27,12 +27,10 @@ package tinygsn.beans;
 
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 import tinygsn.model.wrappers.AbstractWrapper;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 
 public class VSensorConfig implements Parcelable  {
@@ -47,25 +45,14 @@ public class VSensorConfig implements Parcelable  {
 
 	private int id;
 	private String name;
-	private static final String TAG = "VSensorConfig";
 	private InputStream inputStream = null;
 	private DataField[] outputStructure;
 	private String processingClassName;
 	private boolean running;
+	
 	private String notify_field, notify_condition, notify_action, notify_contact;
 	private Double notify_value;
 	private boolean save_to_db;
-	
-	
-	public static final int DEFAULT_PRIORITY = 100;
-	public static final int NO_FIXED_RATE = 0;
-	public static final int DEFAULT_POOL_SIZE = 10;
-	private int priority = DEFAULT_PRIORITY;
-	private String description;
-	private int outputStreamRate;
-	private String storageHistorySize = null;
-	private transient Long lastModified;
-	private StorageConfig storage;
 	
 	
 	private ArrayList<StreamSource> streamSources = new ArrayList<StreamSource>();
@@ -99,7 +86,6 @@ public class VSensorConfig implements Parcelable  {
 			}
 			catch (Exception e1) {
 				e1.printStackTrace();
-				Log.e(TAG, "Error: " + e1.getMessage());
 			}
 		}
 		boolean runningState = Boolean.parseBoolean(source.readString());
@@ -182,13 +168,7 @@ public class VSensorConfig implements Parcelable  {
 		this.running = running;
 	}
 
-	/**
-	 * @return Returns the description.
-	 */
-	public String getDescription() {
-		return this.description;
-	}
-
+	
 	/**
 	 * @return Returns the inputStreams.
 	 */
@@ -200,45 +180,12 @@ public class VSensorConfig implements Parcelable  {
 		return this.name;
 	}
 
-	/**
-	 * @return Returns the outputStreamRate.
-	 */
-	public int getOutputStreamRate() {
-		return this.outputStreamRate;
-	}
 
 	/**
 	 * @return Returns the outputStructure.
 	 */
 	public DataField[] getOutputStructure() {
 		return this.outputStructure;
-	}
-
-	/**
-	 * @return Returns the priority.
-	 */
-	public int getPriority() {
-		return this.priority;
-	}
-
-	public Long getLastModified() {
-		return this.lastModified;
-	}
-
-	/**
-	 * @param description
-	 *          The description to set.
-	 */
-	public void setDescription(final String description) {
-		this.description = description;
-	}
-
-	/**
-	 * @param lastModified
-	 *          The lastModified to set.
-	 */
-	public void setLastModified(final Long lastModified) {
-		this.lastModified = lastModified;
 	}
 
 	/**
@@ -250,123 +197,11 @@ public class VSensorConfig implements Parcelable  {
 	}
 
 	/**
-	 * @param outputStreamRate
-	 *          The outputStreamRate to set.
-	 */
-	public void setOutputStreamRate(final int outputStreamRate) {
-		this.outputStreamRate = outputStreamRate;
-	}
-
-	/**
 	 * @param outputStructure
 	 *          The outputStructure to set.
 	 */
 	public void setOutputStructure(DataField[] outputStructure) {
 		this.outputStructure = outputStructure;
-	}
-
-	/**
-	 * @param priority
-	 *          The priority to set.
-	 */
-	public void setPriority(final int priority) {
-		this.priority = priority;
-	}
-
-	private boolean isStorageCountBased = true;
-
-	public static final int STORAGE_SIZE_NOT_SET = -1;
-
-	private long parsedStorageSize = STORAGE_SIZE_NOT_SET;
-
-	/**
-	 * @return Returns the storageHistorySize.
-	 */
-	public String getStorageHistorySize() {
-		if (storageHistorySize == null) {
-			if (storage == null || storage.getStorageSize() == null
-					|| storage.getStorageSize().trim().equals(""))
-				storageHistorySize = "0";
-			else
-				storageHistorySize = storage.getStorageSize();
-		}
-		return storageHistorySize;
-	}
-
-	/**
-	 * Checks whether the virtual sensor needs storage or not (checks the variable
-	 * <code>storageHistorySize</code>
-	 */
-	public boolean needsStorage() {
-		if (this.getStorageHistorySize().equals("0"))
-			return false;
-		return true;
-	}
-
-	public boolean validate() {
-		String storageHistorySize = this.getStorageHistorySize();
-		storageHistorySize = storageHistorySize.replace(" ", "").trim().toLowerCase(Locale.ENGLISH);
-		if (storageHistorySize.equalsIgnoreCase("0"))
-			return true;
-		final int second = 1000;
-		final int minute = second * 60;
-		final int hour = minute * 60;
-
-		final int mIndex = storageHistorySize.indexOf("m");
-		final int hIndex = storageHistorySize.indexOf("h");
-		final int sIndex = storageHistorySize.indexOf("s");
-		if (mIndex < 0 && hIndex < 0 && sIndex < 0) {
-			try {
-				this.parsedStorageSize = Integer.parseInt(storageHistorySize);
-				this.isStorageCountBased = true;
-			}
-			catch (final NumberFormatException e) {
-				// this.logger.error(
-				// new StringBuilder().append("The storage size, ")
-				// .append(storageHistorySize)
-				// .append(", specified for the virtual sensor : ")
-				// .append(this.name).append(" is not valid.").toString(), e);
-				return false;
-			}
-		}
-		else {
-			try {
-				final StringBuilder shs = new StringBuilder(storageHistorySize);
-				if (mIndex >= 0 && mIndex == shs.length() - 1)
-					this.parsedStorageSize = Integer.parseInt(shs.deleteCharAt(mIndex)
-							.toString()) * minute;
-				else if (hIndex >= 0 && hIndex == shs.length() - 1)
-					this.parsedStorageSize = Integer.parseInt(shs.deleteCharAt(hIndex)
-							.toString()) * hour;
-				else if (sIndex >= 0 && sIndex == shs.length() - 1)
-					this.parsedStorageSize = Integer.parseInt(shs.deleteCharAt(sIndex)
-							.toString()) * second;
-				else
-					Integer.parseInt("");
-				this.isStorageCountBased = false;
-			}
-			catch (final NumberFormatException e) {
-				// this.logger.error(
-				// new StringBuilder().append("The storage size, ")
-				// .append(storageHistorySize)
-				// .append(", specified for the virtual sensor : ")
-				// .append(this.name).append(" is not valid.").toString(), e);
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public StorageConfig getStorage() {
-		return storage;
-	}
-
-	public boolean isStorageCountBased() {
-		return this.isStorageCountBased;
-	}
-
-	public long getParsedStorageSize() {
-		return this.parsedStorageSize;
 	}
 
 	public boolean equals(Object obj) {
@@ -386,16 +221,6 @@ public class VSensorConfig implements Parcelable  {
 		}
 	}
 
-	
-	public void setStorageHistorySize(String storageHistorySize) {
-		this.storageHistorySize = storageHistorySize;
-	}
-
-	private boolean isTimestampUnique = false;
-
-		public boolean getIsTimeStampUnique() {
-		return isTimestampUnique;
-	}
 
 	public String getNotify_field() {
 		return notify_field;

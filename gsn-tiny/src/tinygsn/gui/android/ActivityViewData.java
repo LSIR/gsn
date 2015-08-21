@@ -529,21 +529,6 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		startActivity(intent);
 	}
 
-	/*@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		final MenuItem add = menu.add("Share");
-		add.setIcon(R.drawable.ic_action_share).setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			public boolean onMenuItemClick(final MenuItem item) {
-				shareOutputData();
-				return false;
-			}
-		});
-		return super.onCreateOptionsMenu(menu);
-	}*/
-
 	
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		int itemId = item.getItemId();
@@ -555,60 +540,6 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		return true;
 	}
 
-	/*
-	protected void shareOutputData() {
-		String text = getShareData();
-		String subject = "Share " + spinnerVS.getSelectedItem().toString()
-				+ " data";
-
-		Intent i = new Intent(android.content.Intent.ACTION_SEND);
-		i.setType("text/plain");
-		i.putExtra(Intent.EXTRA_SUBJECT, subject);
-		i.putExtra(Intent.EXTRA_TEXT, text);
-
-		copyTextToClipboard(text);
-		Toast.makeText(this,
-				"Customed message to post on Facebook is copied to clipboard!",
-				Toast.LENGTH_SHORT).show();
-
-		startActivity(Intent.createChooser(i, "Share TinyGSN data"));
-	}
-
-	@SuppressWarnings("deprecation")
-	private void copyTextToClipboard(String text) {
-		int sdk = android.os.Build.VERSION.SDK_INT;
-		if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-			android.text.ClipboardManager clipboard = (android.text.ClipboardManager) this
-					.getSystemService(Context.CLIPBOARD_SERVICE);
-			clipboard.setText(text);
-		}
-		else {
-			android.content.ClipboardManager clipboard = (android.content.ClipboardManager) this
-					.getSystemService(Context.CLIPBOARD_SERVICE);
-			android.content.ClipData clip = ClipData
-					.newPlainText("simple text", text);
-			clipboard.setPrimaryClip(clip);
-		}
-	}
-
-	
-	private void outputData(String out) {
-		lblOutput.setText(out);
-	}
-
-	private String getShareData() {
-		if (streamElements == null)
-			return "";
-
-		String out = "I'd like to share " + streamElements.size()
-				+ " stream data of virtual senor '"
-				+ spinnerVS.getSelectedItem().toString() + "'\n\n";
-		for (int i = 0; i < streamElements.size(); i++) {
-			out += streamElements.get(i).toString() + "\n";
-		}
-		return out;
-	}
-*/
 	private String getDataOutput() {
 		if (streamElements == null)
 			return "";
@@ -624,6 +555,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		String out = getDataOutput();
 
 		DialogFragment newFragment = DetailedDataFragment.newInstance(out);
+		newFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
 		newFragment.show(getSupportFragmentManager(), "dialog");
 	}
 

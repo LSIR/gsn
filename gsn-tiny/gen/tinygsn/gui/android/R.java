@@ -1423,13 +1423,10 @@ containing a value of this type.
         public static final int listMode=0x7f080014;
         public static final int loadBtn=0x7f080092;
         public static final int match_parent=0x7f08000c;
-        public static final int menu_settings=0x7f0800c9;
         public static final int monochrome=0x7f080013;
         public static final int none=0x7f080000;
         public static final int normal=0x7f080001;
         public static final int num_vs=0x7f080046;
-        public static final int options_clear=0x7f0800ca;
-        public static final int options_exit=0x7f0800cb;
         public static final int production=0x7f080007;
         public static final int progressbar=0x7f080096;
         public static final int publish_info=0x7f0800be;
@@ -1583,10 +1580,6 @@ containing a value of this type.
         public static final int text=0x7f030029;
         public static final int vs_list=0x7f03002a;
         public static final int vs_row_item=0x7f03002b;
-    }
-    public static final class menu {
-        public static final int activity_read_gps=0x7f0d0000;
-        public static final int options_menu=0x7f0d0001;
     }
     public static final class string {
         public static final int Publish_Data=0x7f07004d;

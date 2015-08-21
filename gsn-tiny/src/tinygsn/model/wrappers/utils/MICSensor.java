@@ -231,8 +231,6 @@ public class MICSensor extends FTDI_USB_Handler {
 			// pos 4: resistance O3
 			 int resistanceV = Integer.parseInt(values[4]);
 			 int resistanceO = Integer.parseInt(values[5]);
-//			double resistanceV = Double.parseDouble(values[4]);
-//			double resistanceO = Double.parseDouble(values[5]);
 
 			double temperature = Double.parseDouble(values[2]);
 			double humidity = Double.parseDouble(values[3]);
@@ -276,13 +274,13 @@ public class MICSensor extends FTDI_USB_Handler {
 				// Send a {A} to get a diagnostics answer from the sensor.
 				// The sensor should send a {A00} back.
 				write("{A}\n".getBytes());
-				handler.post(new Runnable() {
+				/*handler.post(new Runnable() {
 
 					public void run() {
 						Toast.makeText(activity.getApplicationContext(),
 								"Initialization started", Toast.LENGTH_SHORT).show();
 					}
-				});
+				});*/
 				l("diagnostic sent");
 				while (waitForDiagnostic == true) {
 					try {
@@ -293,7 +291,7 @@ public class MICSensor extends FTDI_USB_Handler {
 					counter++;
 					if (counter > 600) {
 						initThreadFlag = false;
-						//initToast(false);
+						initToast(false);
 						return;
 					}
 				}
@@ -302,7 +300,7 @@ public class MICSensor extends FTDI_USB_Handler {
 				sensorInitialized = true;
 				// Clear the thread flag.
 				initThreadFlag = false;
-				//initToast(true);
+				initToast(true);
 				
 //				showLog("Successfully initialized.");
 			}
@@ -315,12 +313,11 @@ public class MICSensor extends FTDI_USB_Handler {
 						public void run() {
 							if (initListener != null)
 								initListener.onReady();
-							Toast.makeText(activity.getApplicationContext(),
-									"Initialization succeded", Toast.LENGTH_SHORT).show();
+							//Toast.makeText(activity.getApplicationContext(),"Initialization succeded", Toast.LENGTH_SHORT).show();
 						}
 					});
 				}
-				else {
+				/*else {
 					handler.post(new Runnable() {
 
 						public void run() {
@@ -328,7 +325,7 @@ public class MICSensor extends FTDI_USB_Handler {
 									"Initialization failed", Toast.LENGTH_SHORT).show();
 						}
 					});
-				}
+				}*/
 			}
 		};
 
