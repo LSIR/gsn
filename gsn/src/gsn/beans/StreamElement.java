@@ -415,7 +415,7 @@ public final class StreamElement implements Serializable {
 							return false;
 						break;
 					case DataTypes.BINARY :
-						if (!Arrays.equals(this.fieldValues, fieldValues))
+						if (!Arrays.equals((byte[])this.fieldValues[i], (byte[])fieldValues[i]))
 							return false;
 						break;
 					default :
