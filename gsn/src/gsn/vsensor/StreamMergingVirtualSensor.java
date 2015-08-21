@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -27,6 +29,9 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	private static final String MATCHING_FIELD2 = "matching_field2";
 	private static final String DEFAULT_MERGE_OPERATOR = "default_merge_operator";
 	private static final String FILTER_DUPLICATES = "filter_duplicates";
+	private static final String DUPLICATES_IGNORE_FIELD = "duplicates_ignore_field";
+
+	private static final Long CLEANUP_TIMER_PERIOD = 86400000L;
 	
 	private static enum BucketEdgeType {
 		STATIC, DYNAMIC
@@ -58,6 +63,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 
 	private Map<Serializable,Map<Serializable,ArrayList<StreamElementContainer>>> streamElementBuffer = new HashMap<Serializable,Map<Serializable,ArrayList<StreamElementContainer>>>();
 	private Map<String,Operator> FieldNameToOperatorMap = new HashMap<String,Operator>();
+	private Map<String,Integer> validatedStreams = new HashMap<String,Integer>();
 	private Long bufferSizeInMs;
 	private Integer bucketSpace;
 	private String timeline;
@@ -67,7 +73,9 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	private String matchingFieldName2 = null;
 	private Operator defaultMergeOperator = null;
 	private boolean filterDuplicates = false;
+	private String duplicatesIgnoreField = null;
 	private DataField[] mergedDataFields;
+	Timer cleanupTimer = new Timer();
 
 	private static final DataField[] statisticsDataFields = {
 		new DataField("MERGED_STREAMS", "INTEGER"),
@@ -146,6 +154,13 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			else if (paramName.compareToIgnoreCase(FILTER_DUPLICATES) == 0) {
 				filterDuplicates = Boolean.parseBoolean(value);
 			}
+			else if (paramName.compareToIgnoreCase(DUPLICATES_IGNORE_FIELD) == 0) {
+				if (!isInOutputStructure(value)) {
+					logger.error(DUPLICATES_IGNORE_FIELD + " (" + value + ") can not be found in output structure");
+					return false;
+				}
+				duplicatesIgnoreField = value;
+			}
 			else if (paramName.compareToIgnoreCase(DEFAULT_MERGE_OPERATOR) == 0) {
 				if (MERGE_Operator.get(value) == null) {
 					logger.error("default merge operator (" + paramName + "=" + value + ") unknown");
@@ -202,6 +217,18 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 					return false;
 				}
 			}
+			else if (matchingFieldName1 != null && d.getName().compareToIgnoreCase(matchingFieldName1) == 0) {
+				if (d.getDataTypeID() == DataTypes.BINARY) {
+					logger.error("binary matching is not supported (" + MATCHING_FIELD1 + ")");
+					return false;
+				}
+			}
+			else if (matchingFieldName2 != null && d.getName().compareToIgnoreCase(matchingFieldName2) == 0) {
+				if (d.getDataTypeID() == DataTypes.BINARY) {
+					logger.error("binary matching is not supported (" + MATCHING_FIELD2 + ")");
+					return false;
+				}
+			}
 			
 			Operator op = getOperator(d.getName());
 			if (op == null) {
@@ -212,7 +239,9 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			boolean match = false;
 			switch (op) {
 			case ADD:
-				if (d.getDataTypeID() == DataTypes.VARCHAR)
+				if (d.getDataTypeID() == DataTypes.VARCHAR ||
+				    d.getDataTypeID() == DataTypes.CHAR ||
+				    d.getDataTypeID() == DataTypes.BINARY)
 					match = true;
 			case AVG:
 			case MIN:
@@ -279,11 +308,21 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			logger.info("Duplicated streams will be filtered");
 		else
 			logger.info("Duplicated streams will not be filtered");
+		if (duplicatesIgnoreField != null) {
+			if (filterDuplicates)
+				logger.info("field " + duplicatesIgnoreField + " will be ignorded during duplicate filtering");
+			else
+				logger.warn(DUPLICATES_IGNORE_FIELD + "(" + duplicatesIgnoreField + ") has no effect without enabling " + FILTER_DUPLICATES);
+		}
 		
 		logger.info("Merging list:");
 		for (DataField df: mergedFieldList) {
 			logger.info("	" + df.getName() + ": " + getOperator(df.getName()));
 		}
+		
+		// start clean-up timer
+		CleanupTimerTask timerTask = new CleanupTimerTask();
+    	cleanupTimer.scheduleAtFixedRate(timerTask, CLEANUP_TIMER_PERIOD, CLEANUP_TIMER_PERIOD);
 		
 		return ret;
 	}
@@ -309,10 +348,21 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		Serializable match1 = null;
 		if (matchingFieldName1 != null)
 			match1 = data.getData(matchingFieldName1);
-		try {
-			Long startTime = System.currentTimeMillis();
-			
-			//TODO: check source for correctness
+		try {	
+			Long startTime = 0L;
+			if (logger.isDebugEnabled())
+				startTime = System.currentTimeMillis();
+
+			// check source for correctness
+			if (!validatedStreams.containsKey(inputStreamName)) {
+				if(!isStreamValid(data)) {
+					logger.error("Input stream (" + inputStreamName + ") is not valide -> will not get processed");
+					return;
+				}
+				else
+					logger.info(inputStreamName + " successfully validated");
+				validatedStreams.put(inputStreamName, 1);
+			}
 			
 			if (!streamElementBuffer.containsKey(match1)) {
 				streamElementBuffer.put(match1, Collections.synchronizedMap(new HashMap<Serializable,ArrayList<StreamElementContainer>>()));
@@ -320,7 +370,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 					logger.debug("New StreamElement buffer created for " + matchingFieldName1 + " " + match1);
 			}
 
-			if ((Long)data.getData(timeline) > System.currentTimeMillis()-bufferSizeInMs) {
+			if (((Long)data.getData(timeline)).compareTo(System.currentTimeMillis()-bufferSizeInMs) > 0) {
 				processPerDeviceData(inputStreamName, data, streamElementBuffer.get(match1));
 			}
 			else {
@@ -334,6 +384,16 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		}
 	}
 	
+	private boolean isStreamValid(StreamElement data) {
+		for (DataField df: mergedDataFields) {
+			if (data.getType(df.getName()) == null) {
+				logger.error("there is no data field available in the stream element for " + df.getName());
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private void processPerDeviceData(String inputStreamName, StreamElement data, Map<Serializable,ArrayList<StreamElementContainer>> streamElementContainerMap) throws Exception {
 		Serializable match2 = null;
 		if (matchingFieldName2 != null)
@@ -352,26 +412,20 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			StreamElementContainer sec = iter.next();
 			
 			if (sec.checkTime((Long)data.getData(timeline))) {
-				logger.debug("checkTime passed");
 				if (sec.putStreamElement(data)) {
-					logger.debug("container is complete");
 					int mergedStreams = sec.getNumberOfStreams();
 					StreamElement newSE = sec.getMergedStreamElement();
 					iter.remove();
 					if (streamElementContainerMap.isEmpty()) {
-						logger.debug("streamElementContainerMap is empty -> remove it");
 						streamElementContainerMap.remove(match2);
 					}
 					else {
-						logger.debug("streamElementContainerMap not empty -> update it");
 						streamElementContainerMap.put(match2, streamElementContainerList);
 					}
 
 					super.dataAvailable("mergedStream", new StreamElement(newSE, statisticsDataFields, generateStats(mergedStreams, newSE)));
-					logger.debug("stream produced");
 				}
 				else {
-					logger.debug("container not yet complete -> add stream to it");
 					streamElementContainerMap.put(match2, streamElementContainerList);
 				}
 				return;
@@ -381,39 +435,38 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		StreamElementContainer sec = new StreamElementContainer(inputStreamName, data);
 		streamElementContainerList.add(sec);
 		streamElementContainerMap.put(match2, streamElementContainerList);
-		
-		//TODO: check for old data
 	}
 
 	@Override
 	public synchronized void dispose() {
-		//TODO: validate
-		emptyAllBuffers(streamElementBuffer);
+		cleanupTimer.cancel();
+		cleanupBuffers(true);
 		super.dispose();
 	}
 	
-	private void emptyAllBuffers(Map<Serializable, Map<Serializable, ArrayList<StreamElementContainer>>> streamElementBuffer2) {
-		//TODO: validate
-		for (Map<Serializable,ArrayList<StreamElementContainer>> sec: streamElementBuffer2.values()) {
-			for (ArrayList<StreamElementContainer> secList: sec.values()) {
-				emptyStreamElementContainerList(secList);
+	private void cleanupBuffers(boolean cleanupAll) {
+		Iterator<Map<Serializable,ArrayList<StreamElementContainer>>> iter1 = streamElementBuffer.values().iterator();
+		while (iter1.hasNext()) {
+			Map<Serializable,ArrayList<StreamElementContainer>> buf = iter1.next();
+			Iterator<ArrayList<StreamElementContainer>> iter2 = buf.values().iterator();
+			while (iter2.hasNext()) {
+				ArrayList<StreamElementContainer> secList = iter2.next();
+				Iterator<StreamElementContainer> iter3 = secList.iterator();
+				while (iter3.hasNext()) {
+					StreamElementContainer sec = iter3.next();
+					if (cleanupAll || (sec.getNewestTimestamp().compareTo((System.currentTimeMillis()-bufferSizeInMs))) < 0) {
+						StreamElement mergedSE = sec.getMergedStreamElement();
+						int numberOfStreams = sec.getNumberOfStreams();
+						iter3.remove();
+						super.dataAvailable("mergedStream", new StreamElement(mergedSE, statisticsDataFields, generateStats(numberOfStreams, mergedSE)));
+					}
+				}
+				if (secList.isEmpty())
+					iter2.remove();
 			}
-			sec.clear();
+			if (buf.isEmpty())
+				iter1.remove();
 		}
-		streamElementBuffer2.clear();
-	}
-	
-	private void emptyStreamElementContainerList(ArrayList<StreamElementContainer> buf) {
-		Iterator<StreamElementContainer> iter = buf.iterator();
-		while (iter.hasNext()) {
-			//TODO: validate
-			StreamElementContainer sec = iter.next();
-			StreamElement mergedSE = sec.getMergedStreamElement();
-			int numberOfStreams = sec.getNumberOfStreams();
-			iter.remove();
-			super.dataAvailable("mergedStream", new StreamElement(mergedSE, statisticsDataFields, generateStats(numberOfStreams, mergedSE)));
-		}
-		buf.clear();
 	}
 
 	private Serializable[] generateStats(Integer mergedStreams, StreamElement se) {
@@ -422,42 +475,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		stats[0] = mergedStreams;
 		
 		stats[1] = stats[2] = 0;
-		logger.debug("generate statistics");
 		for (Entry<Serializable, Map<Serializable, ArrayList<StreamElementContainer>>> match1Buffer: streamElementBuffer.entrySet()) {
-//			boolean sameId = false;
-//			
-//			switch (matchingField1Type) {
-//			case DataTypes.DOUBLE:
-//				if (((Double)match1Buffer.getKey()).compareTo((Double)matchingField1) == 0)
-//					sameId = true;
-//				break;
-//			case DataTypes.BIGINT:
-//				if (((Long)match1Buffer.getKey()).compareTo((Long)matchingField1) == 0)
-//					sameId = true;
-//				break;
-//			case DataTypes.INTEGER:
-//				if (((Integer)match1Buffer.getKey()).compareTo((Integer)matchingField1) == 0)
-//					sameId = true;
-//				break;
-//			case DataTypes.SMALLINT:
-//				if (((Short)match1Buffer.getKey()).compareTo((Short)matchingField1) == 0)
-//					sameId = true;
-//				break;
-//			case DataTypes.TINYINT:
-//				if (((Short)match1Buffer.getKey()).compareTo((Short)matchingField1) == 0)
-//					sameId = true;
-//				break;
-//			case DataTypes.CHAR:
-//			case DataTypes.VARCHAR:
-//				if (((String)match1Buffer.getKey()).compareTo((String)matchingField1) == 0)
-//					sameId = true;
-//				break;
-//			case DataTypes.BINARY:
-//				if (Arrays.equals(((byte[])match1Buffer.getKey()), (byte[])matchingField1))
-//					sameId = true;
-//				break;
-//			}
-			
 			for (ArrayList<StreamElementContainer> secList: match1Buffer.getValue().values()) {
 				for (StreamElementContainer sec: secList) {
 					if (matchingFieldName1 != null) {
@@ -504,7 +522,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			}
 		}
 
-		private boolean checkTime(Long incomingTime) {
+		protected boolean checkTime(Long incomingTime) {
 			return (bucketStartTime == null) || ((incomingTime >= bucketStartTime) && (incomingTime < bucketEndTime));
 		}
 
@@ -515,15 +533,12 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			if (filterDuplicates) {
 				// discard duplicates
 				for (StreamElement se : streamElements) {
-					logger.debug("iterate streamElements: " + se.getTimeStamp() + " timestamp");
-					//TODO: validate
 					if (((Long)se.getData(timeline)).compareTo((Long)streamElement.getData(timeline)) == 0) {
-						logger.info("found potential duplicate (same generation time)");
-	
-						if (se.equalsIgnoreTimedAndFields(streamElement, new String[]{"timestamp"})) {
-							logger.info("discard duplicate in StreamElement container: [" + streamElement.toString() + "]");
-							if (logger.isDebugEnabled())
-								logger.debug("discard duplicate in StreamElement container: [" + streamElement.toString() + "]");
+						String[] ignore = null;
+						if (duplicatesIgnoreField != null)
+							ignore = new String[]{duplicatesIgnoreField};
+						if (se.equalsIgnoreTimedAndFields(streamElement, ignore)) {
+							logger.warn("discard duplicate in StreamElement container: [" + streamElement.toString() + "]");
 							return false;
 						}
 					}
@@ -555,6 +570,10 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			return streamElements.size();
 		}
 		
+		protected Long getNewestTimestamp() {
+			return (Long)newSE.getData(timeline);
+		}
+		
 		protected StreamElement getMergedStreamElement() {
 			Serializable [] mergedData = new Serializable [mergedDataFields.length];
 
@@ -584,7 +603,6 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			return new StreamElement(mergedDataFields, mergedData);
 		}
 
-		//TODO: validate all merge functions!
 		private Serializable newFnc(DataField dataField) {
 			return newSE.getData(dataField.getName());
 		}
@@ -647,10 +665,11 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 						if (toReturn == null)
 							toReturn = (Byte)srl;
 						else
-							toReturn = (Byte)toReturn + (Byte)srl;
+							toReturn = (byte)((Byte)toReturn + (Byte)srl);
 					}
 				}
 				break;
+			case DataTypes.CHAR:
 			case DataTypes.VARCHAR:
 				for (StreamElement se: streamElements) {
 					Serializable srl = se.getData(d.getName());
@@ -856,6 +875,14 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			}
 			return toReturn;
 		}
+	}
+	
+	class CleanupTimerTask extends TimerTask {
+		@Override
+		public void run() {
+			cleanupBuffers(false);
+		}
+		
 	}
 
 }

@@ -343,7 +343,7 @@ public final class StreamElement implements Serializable {
 		StreamElement se = (StreamElement)obj;
 		if (this.timeStamp != se.timeStamp)
 			return false;
-		return equalsIgnoreTimedAndFields(se, new String[]{});
+		return equalsIgnoreTimedAndFields(se, null);
 	}
 
 	/**
@@ -373,10 +373,12 @@ public final class StreamElement implements Serializable {
 				return false;
 			
 			boolean cont = false;
-			for (int j=0; j<fieldNamesToBeIgnored.length; j++) {
-				if (this.fieldNames[i].compareToIgnoreCase(fieldNamesToBeIgnored[j]) == 0) {
-					cont = true;
-					break;
+			if (fieldNamesToBeIgnored != null) {
+				for (int j=0; j<fieldNamesToBeIgnored.length; j++) {
+					if (this.fieldNames[i].compareToIgnoreCase(fieldNamesToBeIgnored[j]) == 0) {
+						cont = true;
+						break;
+					}
 				}
 			}
 			if (cont)
