@@ -49,7 +49,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -73,77 +73,77 @@ public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		convertView = (LinearLayout) inflater.inflate(resource, parent);
-
-		final SensorRow vs = getItem(position);
-
-		TextView sensorTxt = (TextView) convertView.findViewById(R.id.sensor_name);
-		String[] name = vs.getName().split("\\.");
-		sensorTxt.setText(name[name.length-1]);
-
-		final Switch activeStch = (Switch) convertView.findViewById(R.id.enableWSwitch);
-		activeStch.setChecked(vs.isActive());
-		activeStch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				new AsyncTask<Boolean, Void, Boolean>(){
-					@Override
-					protected Boolean doInBackground(Boolean... params) {
-						try{
-							if (params[0]){
-								vs.setActive(true);
-								return StaticData.getWrapperByName(vs.getName()).start();
-							}else{
-								vs.setActive(false);
-								return StaticData.getWrapperByName(vs.getName()).stop();
+		if(convertView == null){
+			convertView = (LinearLayout) inflater.inflate(resource, null);
+	
+			final SensorRow vs = getItem(position);
+	
+			TextView sensorTxt = (TextView) convertView.findViewById(R.id.sensor_name);
+			String[] name = vs.getName().split("\\.");
+			sensorTxt.setText(name[name.length-1]);
+	
+			final Switch activeStch = (Switch) convertView.findViewById(R.id.enableWSwitch);
+			activeStch.setChecked(vs.isActive());
+			activeStch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					new AsyncTask<Boolean, Void, Boolean>(){
+						@Override
+						protected Boolean doInBackground(Boolean... params) {
+							try{
+								if (params[0]){
+									vs.setActive(true);
+									return StaticData.getWrapperByName(vs.getName()).start();
+								}else{
+									vs.setActive(false);
+									return StaticData.getWrapperByName(vs.getName()).stop();
+								}
+							}
+							catch(Exception e){
+								return false;
 							}
 						}
-						catch(Exception e){
-							return false;
+						@Override
+						protected void onPostExecute(Boolean result) {
+							((ActivityListSensor)context).disableManaged();
+							//activeStch.setChecked(result ^ activeStch.isChecked()); //infinite loop!
 						}
-					}
-					@Override
-					protected void onPostExecute(Boolean result) {
-						((ActivityListSensor)context).disableManaged();
-						//activeStch.setChecked(result ^ activeStch.isChecked()); //infinite loop!
-					}
-				}.execute(isChecked);
-				
+					}.execute(isChecked);
+					
+				}
+			});
+	
+			TextView dataTxt = (TextView) convertView.findViewById(R.id.info_values);
+			dataTxt.setText(vs.getInfo());
+	
+			ImageView view = (ImageView) convertView.findViewById(R.id.view_flows);
+			view.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showDialogDetail(vs.getName());
+				}
+			});
+	
+			ImageView edit = (ImageView) convertView.findViewById(R.id.edit_wrapper);
+			edit.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent myIntent = new Intent(context, ActivityWrapperEdit.class);
+					myIntent.putExtra(EXTRA_SENSOR_NAME, vs.getName());
+					context.startActivity(myIntent);
+				}
+			});
+			
+			if(vs.isManaged()){
+				activeStch.setEnabled(false);
+				view.setEnabled(false);
+				view.setVisibility(View.INVISIBLE);
+				edit.setEnabled(false);
+				edit.setVisibility(View.INVISIBLE);
+				convertView.setBackgroundColor(Color.rgb(200, 200, 200));
 			}
-		});
-
-		TextView dataTxt = (TextView) convertView.findViewById(R.id.info_values);
-		dataTxt.setText(vs.getInfo());
-
-		ImageButton view = (ImageButton) convertView.findViewById(R.id.view_flows);
-		view.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showDialogDetail(vs.getName());
-			}
-		});
-
-		ImageButton edit = (ImageButton) convertView
-				.findViewById(R.id.edit_wrapper);
-		edit.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent myIntent = new Intent(context, ActivityWrapperEdit.class);
-				myIntent.putExtra(EXTRA_SENSOR_NAME, vs.getName());
-				context.startActivity(myIntent);
-			}
-		});
-		
-		if(vs.isManaged()){
-			activeStch.setEnabled(false);
-			view.setEnabled(false);
-			view.setVisibility(View.INVISIBLE);
-			edit.setEnabled(false);
-			edit.setVisibility(View.INVISIBLE);
-			convertView.setBackgroundColor(Color.rgb(200, 200, 200));
 		}
-
 		
 		return convertView;
 	}

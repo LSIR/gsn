@@ -67,7 +67,12 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 				+ "url text, vsname text, key text, mode integer, lastTime bigint, active int"
 				+ ");";
 		db.execSQL(createQuery);
-	
+		
+		createQuery = "CREATE TABLE subscribeSource (_id integer primary key autoincrement,"
+				+ "url text, vsname text, mode integer, lastTime bigint, active int"
+				+ ");";
+		db.execSQL(createQuery);
+		
 		createQuery = "CREATE TABLE wrapperList (_id integer primary key, wrappername text,"
 				+ "dcinterval integer, dcduration integer"
 				+ ");";

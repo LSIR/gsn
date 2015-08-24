@@ -96,8 +96,8 @@
             android:label="Subscribed data" >
         </activity>
         <activity
-            android:name="tinygsn.gui.android.ActivitySubscribe"
-            android:label="" >
+            android:name="tinygsn.gui.android.ActivitySubscribeData"
+            android:label="Subscription" >
         </activity>
         <activity
             android:name="tinygsn.gui.android.ActivityHome"

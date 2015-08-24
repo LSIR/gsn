@@ -37,6 +37,7 @@ import java.util.Map;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.DeliveryRequest;
+import tinygsn.beans.Subscription;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
@@ -605,6 +606,70 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}else{
 			updateWrapperInfo(name,interval,duration);
 		}
+	}
+	
+	public boolean updateSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, boolean active) 
+	{
+		String query = "UPDATE subscribeSource SET url = ?, vsname = ?, mode = ?, lastTime = ?, active = ?  WHERE _id = ?;";
+		Cursor cursor = database.rawQuery(query, new String[] {url,vsname,mode+"",lastTime+"", active?"1":"0",""+id});
+		if(cursor.moveToNext())
+			return true;
+		return false;
+	}
+	
+	public Subscription getSubscribeInfo(int id)
+	{
+		String query = "Select * from subscribeSource WHERE _id = ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{id+""});
+		
+		while (cursor.moveToNext()) {
+			String url = cursor.getString(cursor.getColumnIndex("url"));
+			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
+			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
+			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
+			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
+			Subscription su = new Subscription(url,mode,vsname,id);
+			su.setActive(active);
+			su.setLastTime(lastTime);
+			return su;
+		}
+		return null;
+
+	}
+	
+	public void setSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, boolean active)
+	{
+		if (id == -1 || getSubscribeInfo(id) == null){
+			ContentValues newCon = new ContentValues();
+			newCon.put("url", url);
+			newCon.put("vsname", vsname);
+			newCon.put("mode", mode);
+			newCon.put("lastTime", lastTime);
+			newCon.put("active", active?"1":"0");
+			database.insert("subscribeSource", null, newCon);
+		}else{
+			updateSubscribeInfo(id, url, vsname, mode, lastTime, active);
+		}
+	}
+	
+	public ArrayList<Subscription> getSubscribeList(){
+		ArrayList<Subscription> r = new ArrayList<Subscription>();
+		String query = "Select * from subscribeSource;";
+		Cursor cursor = database.rawQuery(query, new String[] {});
+		while (cursor.moveToNext()) {
+			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
+			String url = cursor.getString(cursor.getColumnIndex("url"));
+			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
+			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
+			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
+			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
+			Subscription su = new Subscription(url,mode,vsname,id);
+			su.setActive(active);
+			su.setLastTime(lastTime);
+			r.add(su);
+		}
+		return r;
+		
 	}
 	
 	

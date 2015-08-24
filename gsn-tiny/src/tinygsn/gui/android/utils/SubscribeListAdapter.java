@@ -26,8 +26,8 @@
 package tinygsn.gui.android.utils;
 
 
-import tinygsn.controller.AndroidControllerPublish;
-import tinygsn.gui.android.ActivityPublishData;
+import tinygsn.controller.AndroidControllerSubscribe;
+import tinygsn.gui.android.ActivitySubscribeData;
 import tinygsn.gui.android.R;
 import android.content.Context;
 import android.content.Intent;
@@ -46,7 +46,7 @@ import android.widget.TextView;
 
 
 
-public class PublishListAdapter extends ArrayAdapter<PublishRow> {
+public class SubscribeListAdapter extends ArrayAdapter<SubscribeRow> {
 
 	public static final String EXTRA_SENSOR_NAME = "name";
 	private int resource;
@@ -54,7 +54,7 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 	private Context context;
 	static int TEXT_SIZE = 8;
 
-	public PublishListAdapter(Context ctx, int resourceId, AndroidControllerPublish controller) {
+	public SubscribeListAdapter(Context ctx, int resourceId, AndroidControllerSubscribe controller) {
 		super(ctx, resourceId);
 		resource = resourceId;
 		inflater = LayoutInflater.from(ctx);
@@ -67,12 +67,12 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 		if(convertView == null){
 			convertView = (LinearLayout) inflater.inflate(resource, null);
 	
-			final PublishRow vs = getItem(position);
+			final SubscribeRow vs = getItem(position);
 	
-			TextView sensorTxt = (TextView) convertView.findViewById(R.id.publish_name);
+			TextView sensorTxt = (TextView) convertView.findViewById(R.id.subscribe_name);
 			sensorTxt.setText(vs.getVsname()+" -> "+vs.getServerurl());
 	
-			final Switch activeStch = (Switch) convertView.findViewById(R.id.enablePSwitch);
+			final Switch activeStch = (Switch) convertView.findViewById(R.id.enableSubSwitch);
 			activeStch.setChecked(vs.isActive());
 			activeStch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 				
@@ -106,10 +106,10 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 				}
 			});
 	
-			TextView dataTxt = (TextView) convertView.findViewById(R.id.publish_info);
+			TextView dataTxt = (TextView) convertView.findViewById(R.id.subscribe_info);
 			dataTxt.setText(vs.getInfo());
 	
-			ImageView view = (ImageView) convertView.findViewById(R.id.delete);
+			ImageView view = (ImageView) convertView.findViewById(R.id.delete_subscribe);
 			view.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -118,11 +118,11 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 			});
 	
 			ImageView edit = (ImageView) convertView
-					.findViewById(R.id.config_publish);
+					.findViewById(R.id.config_subscribe);
 			edit.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Intent myIntent = new Intent(context, ActivityPublishData.class);
+					Intent myIntent = new Intent(context, ActivitySubscribeData.class);
 					myIntent.putExtra("tynigsn.beans.id", ""+vs.getId());
 					context.startActivity(myIntent);
 				}

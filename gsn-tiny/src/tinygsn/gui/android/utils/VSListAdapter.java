@@ -29,7 +29,6 @@ import tinygsn.controller.AndroidControllerVS;
 import tinygsn.gui.android.ActivityListVS;
 import tinygsn.gui.android.ActivityViewData;
 import tinygsn.gui.android.R;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -78,80 +77,81 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
     @Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
-		convertView = (LinearLayout) inflater.inflate(resource, null);
-
-		final VSRow vs = getItem(position);
-
-		TextView txtName = (TextView) convertView.findViewById(R.id.vs_name);
-		txtName.setText(vs.getName());
-
-		final Switch runningSwitch = (Switch) convertView
-				.findViewById(R.id.enableSwitch);
-		runningSwitch.setTextOn("Running");
-		runningSwitch.setTextOff("Disabled");
-		runningSwitch.setChecked(vs.isRunning());
-		runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				controller.startStopVS(vs.getName(), runningSwitch.isChecked());
-
-				String state = "enabled";
-				if (runningSwitch.isChecked() == false)
-					state = "disabled";
-				Toast.makeText(context,
-						vs.getName() + " is " + state + " successfully!",
-						Toast.LENGTH_SHORT).show();
-			}
-		});
-
-		TextView txtWiki = (TextView) convertView.findViewById(R.id.latest_values);
-		txtWiki.setText(vs.getLatestValue());
-
-		ImageView view = (ImageView) convertView.findViewById(R.id.view);
-		view.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivityViewData(vs.getName());
-			}
-		});
-/*
-		ImageView edit = (ImageView) convertView.findViewById(R.id.config);
-		edit.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Toast.makeText(context, "Config has not been implemented!", Toast.LENGTH_SHORT)
-						.show();
-			}
-		});
-*/
-		ImageView delete = (ImageView) convertView.findViewById(R.id.delete);
-		delete.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which) {
-						case DialogInterface.BUTTON_POSITIVE:
-							controller.deleteVS(vs.getName());
-							Toast.makeText(context, vs.getName() + " is deleted!",
-									Toast.LENGTH_SHORT).show();
-							activityListVSNew.initialize();
-
-							break;
-						case DialogInterface.BUTTON_NEGATIVE:
-							break;
+    	if(convertView == null){
+			convertView = (LinearLayout) inflater.inflate(resource, null);
+	
+			final VSRow vs = getItem(position);
+	
+			TextView txtName = (TextView) convertView.findViewById(R.id.vs_name);
+			txtName.setText(vs.getName());
+	
+			final Switch runningSwitch = (Switch) convertView
+					.findViewById(R.id.enableSwitch);
+			runningSwitch.setTextOn("Running");
+			runningSwitch.setTextOff("Disabled");
+			runningSwitch.setChecked(vs.isRunning());
+			runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					controller.startStopVS(vs.getName(), runningSwitch.isChecked());
+	
+					String state = "enabled";
+					if (runningSwitch.isChecked() == false)
+						state = "disabled";
+					Toast.makeText(context,
+							vs.getName() + " is " + state + " successfully!",
+							Toast.LENGTH_SHORT).show();
+				}
+			});
+	
+			TextView txtWiki = (TextView) convertView.findViewById(R.id.latest_values);
+			txtWiki.setText(vs.getLatestValue());
+	
+			ImageView view = (ImageView) convertView.findViewById(R.id.view);
+			view.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					startActivityViewData(vs.getName());
+				}
+			});
+	/*
+			ImageView edit = (ImageView) convertView.findViewById(R.id.config);
+			edit.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Toast.makeText(context, "Config has not been implemented!", Toast.LENGTH_SHORT)
+							.show();
+				}
+			});
+	*/
+			ImageView delete = (ImageView) convertView.findViewById(R.id.delete);
+			delete.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							switch (which) {
+							case DialogInterface.BUTTON_POSITIVE:
+								controller.deleteVS(vs.getName());
+								Toast.makeText(context, vs.getName() + " is deleted!",
+										Toast.LENGTH_SHORT).show();
+								activityListVSNew.initialize();
+	
+								break;
+							case DialogInterface.BUTTON_NEGATIVE:
+								break;
+							}
 						}
-					}
-				};
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setMessage("Are you sure you want to delete \'" + vs.getName() + "\'?")
-						.setPositiveButton("Yes", dialogClickListener)
-						.setNegativeButton("No", dialogClickListener).show();
-			}
-		});
-
+					};
+	
+					AlertDialog.Builder builder = new AlertDialog.Builder(context);
+					builder.setMessage("Are you sure you want to delete \'" + vs.getName() + "\'?")
+							.setPositiveButton("Yes", dialogClickListener)
+							.setNegativeButton("No", dialogClickListener).show();
+				}
+			});
+    	}
 		return convertView;
 
 	}

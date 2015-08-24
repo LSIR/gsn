@@ -95,6 +95,7 @@ public class WifiWrapper extends AbstractWrapper {
 		SqliteStorageManager storage = null;
 		long ctr = 0;
 		boolean scanning = false;
+		boolean wifiEnabled = false;
 		
 		public WifiService()
 		{
@@ -128,7 +129,8 @@ public class WifiWrapper extends AbstractWrapper {
 			int interval = w.getDcInterval();
 				
 		    if (duration > 0 && ctr % duration == 0 ){
-
+		    	
+		    	wifiEnabled = mainWifiObj.isWifiEnabled();
 				mainWifiObj.setWifiEnabled(true);
 				try {
 					Thread.sleep(2000);
@@ -148,7 +150,8 @@ public class WifiWrapper extends AbstractWrapper {
 					         break;
 					}
 				}
-				mainWifiObj.setWifiEnabled(false);
+				//return wifi to its previous state
+				mainWifiObj.setWifiEnabled(wifiEnabled);
 
 			}
 		    ctr++;

@@ -25,44 +25,163 @@
 
 package tinygsn.gui.android;
 
+
 import java.util.ArrayList;
-import java.util.List;
-import tinygsn.controller.AndroidControllerSubscribe;
-import tinygsn.gui.android.gcm.CommonUtilities;
-import tinygsn.gui.android.utils.SensorListAdapter;
-import tinygsn.gui.android.utils.SensorRow;
-import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import java.util.Date;
+import tinygsn.beans.Subscription;
+import tinygsn.gui.android.utils.SubscribeListAdapter;
+import tinygsn.gui.android.utils.SubscribeRow;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import tinygsn.controller.AndroidControllerSubscribe;
+import tinygsn.gui.android.gcm.CommonUtilities;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.widget.Toast;
 import com.google.android.gcm.GCMRegistrar;
 
-@SuppressLint("NewApi")
+
 public class ActivityListSubscription extends SherlockActivity {
 
-	private static final String TAG = "ActivityListSubscription";
-	private ListView listViewSubscription;
-	private Context context;
-	Handler handlerData;
-	AndroidControllerSubscribe controller;
-	List<SensorRow> subscriptionRowList;
-	ArrayList<SensorRow> dataList = new ArrayList<SensorRow>();
+	private ListView listViewSubscribe;
+	SubscribeListAdapter listAdapter;
+	AndroidControllerSubscribe controller = new AndroidControllerSubscribe();
+
 	TextView numVS = null;
 
 	private final Handler handler = new Handler();
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_subscribe_list);
+		listViewSubscribe = (ListView) findViewById(R.id.subscribe_list);
+		listAdapter = new SubscribeListAdapter(this, R.layout.subscribe_row_item, controller);
+		listViewSubscribe.setAdapter(listAdapter);
+
+		GCMRegistrar.checkDevice(this);
+		GCMRegistrar.checkManifest(this);
+		registerReceiver(mHandleMessageReceiver, new IntentFilter(
+				CommonUtilities.DISPLAY_MESSAGE_ACTION));
+		
+//		final String regId = GCMRegistrar.getRegistrationId(this);
+//		registerOnServer(regId);
+
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		initialize();
+	};
+
+
+	public void initialize() {
+		new AsyncTask<AndroidControllerSubscribe, Void, ArrayList<Subscription>>(){
+			@Override
+			protected ArrayList<Subscription> doInBackground(AndroidControllerSubscribe... params) {
+				return params[0].loadList();
+			}
+			@Override
+			protected void onPostExecute(ArrayList<Subscription> result) {
+				renderLayout(result);
+			}
+		}.execute(controller);
+	}
+
+	private void renderLayout(ArrayList<Subscription> list) {
+		
+		ActionBar actionBar = getSupportActionBar();
+		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
+		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
+				| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		numVS = (TextView) actionBar.getCustomView().findViewById(R.id.num_vs);
+		numVS.setText("0");
+		listAdapter.clear();
+		listAdapter.notifyDataSetChanged();
+
+		for (Subscription su : list) {
+			
+			new AsyncTask<Subscription, Void, SubscribeRow>(){
+				@Override
+				protected SubscribeRow doInBackground(Subscription... params) {
+					
+					return new SubscribeRow(params[0].getId(),params[0].getUrl(),params[0].isActive(),""+params[0].getLastTime(),params[0].getVsname());
+				}
+				@Override
+				protected void onPostExecute(SubscribeRow result) {
+					listAdapter.add(result);
+					listAdapter.notifyDataSetChanged();
+					numVS.setText(listAdapter.getCount() + "");
+				}
+			}.execute(su);
+
+		}
+		TextView lastUpdate = (TextView) actionBar.getCustomView().findViewById(
+				R.id.lastUpdate);
+		lastUpdate.setText("Last update:\n" + (new Date()).toString());
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		final MenuItem add = menu.add("Add");
+		add.setIcon(R.drawable.plus_b).setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+				add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			public boolean onMenuItemClick(final MenuItem item) {
+				Intent myIntent = new Intent(ActivityListSubscription.this, ActivitySubscribeData.class);
+				ActivityListSubscription.this.startActivity(myIntent);
+				return false;
+			}
+		});
+
+		final MenuItem refresh = menu.add("Refresh");
+		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+			// on selecting show progress spinner for 1s
+			public boolean onMenuItemClick(MenuItem item) {
+				item.setActionView(R.layout.indeterminate_progress_action);
+				handler.postDelayed(new Runnable() {
+					public void run() {
+						refresh.setActionView(null);
+						initialize();
+					}
+				}, 50);
+				return false;
+			}
+		});
+
+    	return super.onCreateOptionsMenu(menu);
+	}
+
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		int itemId = item.getItemId();
+		switch (itemId) {
+		case android.R.id.home:
+			finish();
+			break;
+		}
+		return true;
+	}
+
 	
 
 	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
@@ -71,8 +190,6 @@ public class ActivityListSubscription extends SherlockActivity {
 			String data = intent.getExtras().getString(CommonUtilities.EXTRA_MESSAGE);
 			String serverName = intent.getExtras().getString(
 					CommonUtilities.EXTRA_SERVER_NAME);
-
-			Log.i(TAG, "BroadcastReceiver onReceive: " + data);
 			
 			if (serverName == null)
 				Toast.makeText(context, data, Toast.LENGTH_SHORT).show();
@@ -83,120 +200,7 @@ public class ActivityListSubscription extends SherlockActivity {
 		}
 	};
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_sensors_list);
-		context = this;
-
-		GCMRegistrar.checkDevice(this);
-		GCMRegistrar.checkManifest(this);
-		registerReceiver(mHandleMessageReceiver, new IntentFilter(
-				CommonUtilities.DISPLAY_MESSAGE_ACTION));
-		
-//		final String regId = GCMRegistrar.getRegistrationId(this);
-//		registerOnServer(regId);
-
-		setUpController();
-	}
-
 	
-	@SuppressWarnings("unchecked")
-	public void setUpController() {
 
-		handlerData = new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-				dataList = (ArrayList<SensorRow>) msg.obj;
-				//TextView txt = (TextView) findViewById(R.id.txt);
-				//txt.setText(dataList.size() + " data are loaded!");
-				renderLayout(dataList);
-			};
-		};
-
-		controller = new AndroidControllerSubscribe(this);
-		controller.setHandlerData(handlerData);
-		//controller.loadListSubsData();
-	}
-
-	private void renderLayout(ArrayList<SensorRow> subscriptionRowList) {
-
-/*		listViewSubscription = (ListView) findViewById(R.id.subscription_list);
-		SensorListAdapter dataListAdapter = new SubscriptionListAdapter(
-				context, R.layout.sensor_row_item, subscriptionRowList,
-				controller, this);
-		listViewSubscription.setAdapter(dataListAdapter);
-		dataListAdapter.notifyDataSetChanged();
-
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		final MenuItem add = menu.add("Add");
-		add.setIcon(R.drawable.plus_b).setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-			public boolean onMenuItemClick(final MenuItem item) {
-				item.setIcon(R.drawable.plus_b);
-				handler.postDelayed(new Runnable() {
-					public void run() {
-						item.setIcon(R.drawable.plus_b);
-					}
-				}, 10);
-
-				startVSActivity();
-
-				return false;
-			}
-		});
-
-		final MenuItem deleteAll = menu.add("Delete all");
-		deleteAll.setIcon(R.drawable.full_trash).setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
-		deleteAll.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-			public boolean onMenuItemClick(MenuItem item) {
-			//	controller.deleteAll();
-			//	controller.loadListSubsData();
-				Toast.makeText(context, "Delete all subscribed data!",
-						Toast.LENGTH_SHORT).show();
-
-				return false;
-			}
-		});
-
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		int itemId = item.getItemId();
-		switch (itemId) {
-		case android.R.id.home:
-		//	controller.markDataUnreadToRead();
-			finish();
-			break;
-		}
-		return true;
-	}
-
-	@Override
-	protected void onDestroy() {
-		unregisterReceiver(mHandleMessageReceiver);
-//		GCMRegistrar.onDestroy(this);
-		super.onDestroy();
-	}
-
-	private void startVSActivity() {
-		Intent myIntent = new Intent(this, ActivitySubscribe.class);
-		this.startActivity(myIntent);
-	}
-
-	public void load_more(View view) {
-	//	controller.loadMore();
-	}
-}
+}	
+	
