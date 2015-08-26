@@ -98,11 +98,10 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 		return toReturn;
 	}
 
-	public long getOldestTimestamp() {
-		long timed1 = -1;
-		long timed2 = -1;
+	public String getCuttingCondition() {
+		long pk1 = -1;
+		long pk2 = -1;
 		long maxTupleCount = 0;
-		long maxTupleForTimeBased = 0;
 		long maxWindowSize = 0;
 
 		//WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE sliding windows are saved in streamSources list 
@@ -117,7 +116,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				if (streamSource.getWindowingType() == WindowType.TUPLE_BASED) {
 					maxTupleCount = Math.max(maxTupleCount, streamSource.getParsedStorageSize() + streamSource.getParsedSlideValue());
 				} else {
-					maxTupleForTimeBased = Math.max(maxTupleForTimeBased, streamSource.getParsedSlideValue());
+					maxTupleCount = Math.max(maxTupleCount, streamSource.getParsedSlideValue());
 					maxWindowSize = Math.max(maxWindowSize, streamSource.getParsedStorageSize());
 				}
 			}
@@ -126,14 +125,14 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 		if (maxTupleCount > 0) {
 			StringBuilder query = new StringBuilder();
 			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
-				query.append(" select timed from ").append(wrapper.getDBAliasInStr());
-				query.append(" order by timed desc limit 1 offset ").append(maxTupleCount - 1);
+				query.append(" select pk from ").append(wrapper.getDBAliasInStr());
+				query.append(" order by pk desc limit 1 offset ").append(maxTupleCount - 1);
 			} else if (Main.getWindowStorage().isSqlServer()) {
-				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
-						wrapper.getDBAliasInStr()).append(" order by timed desc )as X  ");
+				query.append(" select min(pk) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
+						wrapper.getDBAliasInStr()).append(" order by pk desc )as X  ");
 			}else if (Main.getWindowStorage().isOracle()) {
-				query.append(" select timed from (select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
-				query.append(" order by timed desc) where rownum = ").append(maxTupleCount);
+				query.append(" select pk from (select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
+				query.append(" order by pk desc) where rownum = ").append(maxTupleCount);
 			}
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query1 for getting oldest timestamp : " + query);
@@ -142,39 +141,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			try {
 				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
 				if (resultSet.next()) {
-					timed1 = resultSet.getLong(1);
+					pk1 = resultSet.getLong(1);
 				} else {
-					return -1;
-				}
-			} catch (SQLException e) {
-				logger.error(e.getMessage(), e);
-			} finally {
-				Main.getWindowStorage().close(conn);
-			}
-		}
-
-		if (maxTupleCount > 0) {
-			StringBuilder query = new StringBuilder();
-			if (Main.getWindowStorage().isH2() || Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
-				query.append(" select timed from ").append(wrapper.getDBAliasInStr());
-				query.append(" order by timed desc limit 1 offset ").append(maxTupleCount - 1);
-			} else if (Main.getWindowStorage().isSqlServer()) {
-				query.append(" select min(timed) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
-						wrapper.getDBAliasInStr()).append(" order by timed desc )as X  ");
-			}else if (Main.getWindowStorage().isOracle()) {
-				query.append(" select timed from ( select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
-				query.append(" order by timed desc) where rownum = ").append(maxTupleCount);
-			}
-			if (logger.isDebugEnabled()) {
-				logger.debug("Query1 for getting oldest timestamp : " + query);
-			}
-			Connection conn = null;
-			try {
-				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
-				if (resultSet.next()) {
-					timed1 = resultSet.getLong(1);
-				} else {
-					return -1;
+					return "pk < -1";
 				}
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
@@ -185,19 +154,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 
 		if (maxWindowSize > 0) {
 			StringBuilder query = new StringBuilder();
-			if (Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
-				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from ").append(wrapper.getDBAliasInStr());
-				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased - 1).append(" ) as X ");
-			} else if (Main.getWindowStorage().isH2()) {
-				query.append(" select timed - ").append(maxWindowSize).append(" from ").append(wrapper.getDBAliasInStr()).append(
-				" where timed in (select timed from ").append(wrapper.getDBAliasInStr());
-				query.append(" order by timed desc limit 1 offset ").append(maxTupleForTimeBased - 1).append(" ) ");
-			} else if (Main.getWindowStorage().isSqlServer()) {
-				query.append(" select min(timed) - ").append(maxWindowSize).append(" from (select top ").append(maxTupleForTimeBased).append(" * ").append(" from ").append(wrapper.getDBAliasInStr()).append(" order by timed desc ) as X  ");
-			}else if (Main.getWindowStorage().isOracle()){
-				query.append(" select timed - ").append(maxWindowSize).append(" from (select timed from (select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
-				query.append(" order by timed desc) where rownum = ").append(maxTupleForTimeBased).append(") ) ");
-			}
+			query.append(" select min(pk) from ").append(wrapper.getDBAliasInStr()).append(" where timed > (select max(timed) from ").append(wrapper.getDBAliasInStr()).append(") - ").append(maxWindowSize);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query2 for getting oldest timestamp : " + query);
 			}
@@ -205,9 +162,9 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			try {
 				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
 				if (resultSet.next()) {
-					timed2 = resultSet.getLong(1);
+					pk2 = resultSet.getLong(1);
 				} else {
-					return -1;
+					return "pk < -1";
 				}
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
@@ -216,10 +173,10 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			}
 		}
 
-		if (timed1 >= 0 && timed2 >= 0) {
-			return Math.min(timed1, timed2);
+		if (pk1 >= 0 && pk2 >= 0) {
+			return "pk < " + Math.min(pk1, pk2);
 		}
-		return (timed1 == -1) ? timed2 : timed1;
+		return "pk < " + ((pk1 == -1) ? pk2 : pk1);
 	}
 
 	public void removeStreamSource(StreamSource streamSource) {
@@ -294,15 +251,14 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 			WindowType windowingType = streamSource.getWindowingType();
 			if (windowingType == WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE) {
 				if (Main.getWindowStorage().isMysqlDB() || Main.getWindowStorage().isPostgres()) {
-					toReturn.append("timed >= (select timed from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(" ) order by timed desc ");
+					toReturn.append("pk >= (select pk from ").append(wrapperAlias).append(" order by pk desc limit 1 offset ").append(windowSize - 1).append(" ) order by pk desc ");
 				} else if (Main.getWindowStorage().isH2()) {
-					toReturn.append("timed >= (select distinct(timed) from ").append(wrapperAlias).append(" where timed in (select timed from ").append(wrapperAlias).append(" order by timed desc limit 1 offset ").append(windowSize - 1).append(
-					" )) order by timed desc ");
+					toReturn.append("pk >= (select pk from ").append(wrapperAlias).append(" order by pk desc limit 1 offset ").append(windowSize - 1).append(" ) order by pk desc ");
 				} else if (Main.getWindowStorage().isSqlServer()) {
-					toReturn.append("timed >= (select min(timed) from (select TOP ").append(windowSize).append(" timed from ").append(
-							wrapperAlias).append(" order by timed desc ) as y )");
+					toReturn.append("pk >= (select min(pk) from (select TOP ").append(windowSize).append(" pk from ").append(
+							wrapperAlias).append(" order by pk desc ) as y )");
 				}else if (Main.getWindowStorage().isOracle()) {
-					toReturn.append("(timed >= (select timed from (select timed from "+Main.getWindowStorage().tableNameGeneratorInString(wrapperAlias)+" order by timed desc ) where rownum="+windowSize+") )");
+					toReturn.append("(pk >= (select pk from (select pk from "+Main.getWindowStorage().tableNameGeneratorInString(wrapperAlias)+" order by pk desc ) where rownum="+windowSize+") )");
 				}else {
 					logger.fatal("Not supported DB!");
 				}
