@@ -31,6 +31,7 @@ import java.util.Scanner;
 import java.util.Date;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.net.MalformedURLException;
@@ -69,24 +70,19 @@ public class GSNCollector implements CollectdConfigInterface,
   {
     ValueList vl;
 
-
     vl = new ValueList();
 
+    vl.setHost(getHost()); 
     
-    String [] parts = metric.split ("\\.");
-    
-
-    vl.setHost(parts[0]);           // parts[0] is VS name OR core
-    vl.setPlugin(parts[1]);         // parts[1] could be anomaly, input, output etc
-    vl.setType(parts[2]);           // parts[2] could be gauge OR counter. It is always at the end of the string
-    
-    // Adding the remaining as type instance
-    StringBuilder sb = new StringBuilder(parts[3]);
-    for (int i = 4; i < parts.length; i++ ) {
-        sb.append("."+parts[i]); 
+    if (metric.endsWith("counter")){ // type could be gauge OR counter. It is always at the end of the string
+	    vl.setPlugin("gsn."+metric.substring(0, metric.length()-8));        
+	    vl.setType("counter");           
+    }else if(metric.endsWith("gauge")){
+	    vl.setPlugin("gsn."+metric.substring(0, metric.length()-6));        
+	    vl.setType("gauge");  
+    }else{
+    	Collectd.logError ("GSNCollector plugin: Unknown metric type for GSNCollector in '"+metric+"'");
     }
-    vl.setTypeInstance(sb.toString());
-        
     
     vl.addValue(value);
     Collectd.dispatchValues(vl);
@@ -121,7 +117,7 @@ public class GSNCollector implements CollectdConfigInterface,
     try {
         this.url = new URL (rawURL);
     } catch (MalformedURLException e) { //TODO: Proper exception handling
-        Collectd.logError("Invalid URL format " + rawURL.trim());
+        Collectd.logError("GSNCollector plugin: Invalid URL format " + rawURL.trim());
     }
     
     return 0;
@@ -150,7 +146,7 @@ public class GSNCollector implements CollectdConfigInterface,
       }
       else
       {
-        Collectd.logError ("JMXMemory plugin: Unknown config option: " + key);
+        Collectd.logError ("GSNCollector plugin: Unknown config option: " + key);
       }
     }
 
@@ -166,8 +162,8 @@ public class GSNCollector implements CollectdConfigInterface,
     public int read () {
         
         try {
-            URL url = new URL ("http://192.33.210.37:22001/stat");
-            Scanner s = new Scanner (url.openStream());
+            URL _url = new URL (this.url);
+            Scanner s = new Scanner (_url.openStream());
             
             while (s.hasNextLine()) {
                 String line = s.nextLine();
@@ -175,20 +171,24 @@ public class GSNCollector implements CollectdConfigInterface,
                 String [] parts = metric.split (" ");
 
                 if (parts.length  != 2) {
-                    Collectd.logError ("Metric format invalid");
+                    Collectd.logError ("GSNCollector plugin: Metric format invalid");
                     continue;
                 }
                 
                 String name = parts[0];
                 String val = parts[1];
-                //TODO: Handle numeric exception    
-                double value = Double.parseDouble(val);
-                submit(name,value);
-
+                try{
+                	double value = Double.parseDouble(val);
+                	submit(name,value);
+                }catch (NumberFormatException e){
+                	Collectd.logError ("GSNCollector plugin: unable to parse metric value: "+val);
+                }
             }
 
-        } catch (UnknownHostException e) { //TODO: Handle }
-        } catch (IOException e) { //TODO: Handle
+        } catch (UnknownHostException e) { 
+        	Collectd.logError ("GSNCollector plugin: unable to connect to GSN server: "+url);
+        } catch (IOException e) {
+        	Collectd.logError ("GSNCollector plugin: unable to connect to GSN server: "+url);
         }
     
     return (0);
@@ -200,12 +200,11 @@ public class GSNCollector implements CollectdConfigInterface,
     return (0);
   }
 
-    private String getHost (String metric) {
+    private String getHost() {
         
-        String [] parts = metric.split ( "\\.");
+    	String hostname = InetAddress.getLocalHost().getHostName().replaceAll("\\.", "_");
         
-
-        return parts[0];
+        return hostname;
 
     }
 

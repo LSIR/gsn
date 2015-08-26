@@ -35,17 +35,14 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.monitoring.Monitorable;
 import gsn.monitoring.AnomalyDetector;
-import gsn.storage.StorageManager;
 
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.lang.management.ThreadMXBean;
-import java.sql.*;
 
 import org.apache.log4j.Logger;
 
@@ -222,8 +219,8 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = anomalyDetector.getStatistics(); 
-		stat.put(virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.counter.produced", outputCount);
-		stat.put(virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".input.counter.produced", inputCount);
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.produced.counter", outputCount);
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".input.produced.counter", inputCount);
 
         /*
         *    We know the IDs of threads associated with this VSensor
@@ -251,11 +248,15 @@ public abstract class AbstractVirtualSensor implements Monitorable{
                 iter.remove();
                 continue;
             }
-            //TODO: Tackle overflow
-            totalCpuTime += cpuTime;
+            
+            if(Long.MAX_VALUE-totalCpuTime > cpuTime){
+            	totalCpuTime += cpuTime;
+            }else{
+            	totalCpuTime = cpuTime-(Long.MAX_VALUE-totalCpuTime);
+            }
         }
 
-        stat.put(virtualSensorConfiguration.getName().replaceAll("\\.","_")+".time.cputime.totalCpuTime", totalCpuTime);
+        stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.","_")+".cputime.totalCpuTime.counter", totalCpuTime);
 
 		return stat;
 	}

@@ -243,14 +243,13 @@ public class AnomalyDetector implements Monitorable {
                 
                 if (anomaly.isGroupBy()) {
                     while (rs.next()) {
-                        //TODO: Formulate a more meningful metric name
-                        stat.put(this.getMetricName (anomaly) +"."+ rs.getString(1), rs.getString(2));
+                        stat.put(this.getMetricName (anomaly) +"."+ rs.getString(1)+".gauge", rs.getString(2));
                     }
                     
                 }
                 else {
                     if (rs.next()) {    // Putting monitoring result for this anomaly in the HashMap stat
-                        stat.put( this.getMetricName(anomaly), rs.getString(1));
+                        stat.put( this.getMetricName(anomaly)+".gauge", rs.getString(1));
                     }
                 }
 
@@ -356,12 +355,12 @@ public class AnomalyDetector implements Monitorable {
             rs = ps.executeQuery();
             if (anomaly.isGroupBy()) {
                 while (rs.next()) {
-                    stat.put (this.getMetricName (anomaly) +"."+ rs.getString(1), rs.getString (2));
+                    stat.put (this.getMetricName (anomaly) +"."+ rs.getString(1)+".gauge", rs.getString (2));
                 }
             }
             else {
                 if (rs.next()) {
-                    stat.put(this.getMetricName(anomaly), rs.getString(1));
+                    stat.put(this.getMetricName(anomaly)+".gauge", rs.getString(1));
                 }
             }
             
@@ -476,12 +475,12 @@ public class AnomalyDetector implements Monitorable {
             rs = ps.executeQuery();
             if (anomaly.isGroupBy()) {
                 while (rs.next()) {
-                    stat.put (this.getMetricName(anomaly) +"."+ rs.getString(1),rs.getString(2));
+                    stat.put (this.getMetricName(anomaly) +"."+ rs.getString(1)+".gauge",rs.getString(2));
                 }
             } 
             else {
                 if(rs.next()) {
-                    stat.put(this.getMetricName(anomaly), rs.getString(1));
+                    stat.put(this.getMetricName(anomaly)+".gauge", rs.getString(1));
                 }   
             }
 
@@ -550,8 +549,8 @@ public class AnomalyDetector implements Monitorable {
     
     public String getMetricName (Anomaly anomaly) {
         
-        StringBuilder sb = new StringBuilder (sensor.getVirtualSensorConfiguration().getName().replaceAll("\\,","_" ));
-        sb.append(".anomaly.gauge." + anomaly.getFunction() + "." + anomaly.getField().getName());
+        StringBuilder sb = new StringBuilder ("vs."+sensor.getVirtualSensorConfiguration().getName().replaceAll("\\,","_" )+".output");
+        sb.append(".anomaly." + anomaly.getFunction() + "." + anomaly.getField().getName());
         
         if (anomaly.getFunction().equals ("positive_outlier") || anomaly.getFunction().equals ("negative_outlier"))
             sb.append("." + anomaly.getValue().trim());
