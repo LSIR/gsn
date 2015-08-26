@@ -214,7 +214,8 @@ public class VSensorLoader extends Thread {
                 Main.getStorage(vs).executeCreateTable(vs.getName(), vs.getOutputStructure(), pool.getConfig().getIsTimeStampUnique());
             else
                 logger.info("Reusing the existing " + vs.getName() + " table.");
-        } catch (SQLException e) {
+        } catch (Exception e) {
+        	removeAllVSResources(pool);
             if (e.getMessage().toLowerCase().contains("table already exists")) {
                 logger.error(e.getMessage());
                 if (logger.isInfoEnabled()) logger.info(e.getMessage(), e);
@@ -241,7 +242,7 @@ public class VSensorLoader extends Thread {
                 return false;
             }
         } else {
-            //TODO: release all vs resources
+        	removeAllVSResources(pool);
         }
         return true;
 
@@ -386,19 +387,30 @@ public class VSensorLoader extends Thread {
 	public boolean createInputStreams ( VirtualSensor pool ) throws InstantiationException, IllegalAccessException {
 		if ( logger.isDebugEnabled ( ) ) logger.debug ( new StringBuilder ( ).append ( "Preparing input streams for: " ).append ( pool.getConfig().getName ( ) ).toString ( ) );
 		if ( pool.getConfig().getInputStreams ( ).size ( ) == 0 ) logger.warn ( new StringBuilder ( "There is no input streams defined for *" ).append ( pool.getConfig().getName ( ) ).append ( "*" ).toString ( ) );
+		ArrayList<StreamSource> sources = new ArrayList<StreamSource>();
+		ArrayList<InputStream> streams = new ArrayList<InputStream>();
 		for ( Iterator < InputStream > inputStreamIterator = pool.getConfig().getInputStreams ( ).iterator ( ) ; inputStreamIterator.hasNext ( ) ; ) {
 			InputStream inputStream = inputStreamIterator.next ( );
 			for ( StreamSource  dataSouce : inputStream.getSources ( )) {
-				if ( prepareStreamSource ( pool.getConfig(),inputStream , dataSouce ) == false ) return false;
-				// TODO if one stream source fails all the resources used by other successfuly initialized stream sources
-				// for this input stream should be released.
+				if ( ! prepareStreamSource( pool.getConfig(),inputStream , dataSouce )){
+					for (StreamSource ss : sources){
+						releaseStreamSource(ss);
+					}
+					for (InputStream is : streams){
+						is.release();
+					}
+					return false;
+				}
+				sources.add(dataSouce);
 			}
+			streams.add(inputStream);
 			inputStream.setPool (pool );
 		}
 		return true;
 	}
 	/**
 	 * Instantiate the wrapper from its addressBean.
+	 * if it doesn't return null, the calling class is responsible for releasing the resources of the wrapper.
 	 * @param addressBean
 	 * @return
 	 * @throws InstantiationException
@@ -420,7 +432,12 @@ public class VSensorLoader extends Thread {
 				logger.debug("Wrapper name: "+wrapper.getWrapperName()+ " -- view name "+ wrapper.getDBAliasInStr());
 				if (!Main.getWindowStorage().tableExists(wrapper.getDBAliasInStr(),wrapper.getOutputFormat()))
 					Main.getWindowStorage().executeCreateTable ( wrapper.getDBAliasInStr ( ) , wrapper.getOutputFormat ( ),wrapper.isTimeStampUnique() );
-			} catch ( SQLException e ) {
+			} catch ( Exception e ) {
+				try{
+				wrapper.releaseResources();  //releasing resources
+				}catch (SQLException sql){
+					logger.error ( sql.getMessage ( ) , sql );
+				}
 				logger.error ( e.getMessage ( ) , e );
 				return null;
 			}
@@ -438,9 +455,18 @@ public class VSensorLoader extends Thread {
 				if (wrapper!=null && prepareStreamSource( streamSource,wrapper.getOutputFormat(),wrapper)) 
 					break;
 				else
-					//TODO: release wrapper's resources
+					if (wrapper!=null){
+						wrapper.releaseResources();
+					}
 					wrapper=null;
-			} catch (SQLException e) {
+			} catch (Exception e) {
+				if (wrapper!=null){
+					try{
+					    wrapper.releaseResources();
+					}catch(SQLException sql){
+						logger.error(sql.getMessage(),sql);
+					}
+				}
 				logger.error(e.getMessage(),e);
 				logger.error("Preparation of the stream source failed : "+streamSource.getAlias()+ " from the input stream : "+inputStream.getInputStreamName());
 			}
