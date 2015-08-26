@@ -155,7 +155,6 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 		if (maxWindowSize > 0) {
 			StringBuilder query = new StringBuilder();
 			query.append(" select min(pk) from ").append(wrapper.getDBAliasInStr()).append(" where timed > (select max(timed) from ").append(wrapper.getDBAliasInStr()).append(") - ").append(maxWindowSize);
-
 			if (logger.isDebugEnabled()) {
 				logger.debug("Query2 for getting oldest timestamp : " + query);
 			}

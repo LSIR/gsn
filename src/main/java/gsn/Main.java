@@ -80,6 +80,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -142,6 +144,12 @@ public final class Main {
     private static Map <String,VsConf> vsConf =new HashMap<String,VsConf>();
     private static ArrayList<Monitorable> toMonitor = new ArrayList<Monitorable>();
     
+    /*
+     *  Retrieving ThreadMXBean instance of JVM
+     *  It would be used for monitoring CPU time of each virtual sensor
+     */
+
+    private static ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
 
     private Main() throws Exception {
 
@@ -561,5 +569,11 @@ public final class Main {
     public ArrayList<Monitorable> getToMonitor(){
     	return toMonitor;
     }
+    
+    public static ThreadMXBean getThreadMXBean() {
+        return threadBean;
+    }
+
 }
+
 

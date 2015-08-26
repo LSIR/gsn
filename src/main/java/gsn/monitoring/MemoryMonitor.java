@@ -10,9 +10,9 @@ public class MemoryMonitor implements Monitorable {
 	
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put("core.memory.heap.value", mbean.getHeapMemoryUsage().getUsed());
-		stat.put("core.memory.nonHeap.value", mbean.getNonHeapMemoryUsage().getUsed());
-		stat.put("core.memory.pendingFinalizationCount.value", mbean.getObjectPendingFinalizationCount());
+		stat.put("core.memory.heap.gauge", mbean.getHeapMemoryUsage().getUsed());
+		stat.put("core.memory.nonHeap.gauge", mbean.getNonHeapMemoryUsage().getUsed());
+		stat.put("core.memory.pendingFinalizationCount.gauge", mbean.getObjectPendingFinalizationCount());
 		return stat;
 	}
 

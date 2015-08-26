@@ -72,7 +72,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 
 	private SlidingHandler timeBasedSlidingHandler;
 
-	private HashMap<Class, SlidingHandler> slidingHandlers = new HashMap<Class, SlidingHandler>();
+	private HashMap<Class<? extends SlidingHandler>, SlidingHandler> slidingHandlers = new HashMap<Class<? extends SlidingHandler>, SlidingHandler>();
 
 	private boolean usingRemoteTimestamp = false;
 
@@ -260,7 +260,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 			}
 			if (++noOfCallsToPostSE
 					% GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS == 0) {
-				int removedRaws = removeUselessValues();
+				removeUselessValues();
 			}
 			return toReturn;
 		} catch (Exception e) {
@@ -427,9 +427,12 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	
 	
 	public final boolean initialize_wrapper(){
-		Main.getInstance().getToMonitor().add(this);
-		setName(getWrapperName()+"::"+activeAddressBean.getVirtualSensorName());
-		return initialize();
+		boolean r = initialize();
+		if (r){
+			Main.getInstance().getToMonitor().add(this);
+			setName(getWrapperName()+"::"+activeAddressBean.getVirtualSensorName());
+		}
+		return r;
 	}
 
 	/**
@@ -496,8 +499,8 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	
 	public Hashtable<String, Object> getStatistics(){
 		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll("\\.", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll("\\.", "_") +".outOfOrder.count", oooCount);
-		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll("\\.", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll("\\.", "_") +".produced.count", elementCount);
+		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll("\\.", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll("\\.", "_") +".outOfOrder.counter", oooCount);
+		stat.put("vs."+activeAddressBean.getVirtualSensorName().replaceAll("\\.", "_")+".input."+ activeAddressBean.getInputStreamName().replaceAll("\\.", "_") +".produced.counter", elementCount);
 		return stat;
 	}
 	
