@@ -131,7 +131,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				query.append(" select min(pk) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" order by pk desc )as X  ");
 			}else if (Main.getWindowStorage().isOracle()) {
-				query.append(" select pk from (select timed from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
+				query.append(" select pk from (select pk from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
 				query.append(" order by pk desc) where rownum = ").append(maxTupleCount);
 			}
 			if (logger.isDebugEnabled()) {
