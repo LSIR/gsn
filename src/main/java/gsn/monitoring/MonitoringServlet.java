@@ -27,8 +27,6 @@ package gsn.monitoring;
 
 import gsn.Main;
 
-import org.apache.log4j.Logger;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +40,8 @@ import java.util.Map;
 
 public class MonitoringServlet extends HttpServlet {
 
-    private static transient Logger logger = Logger.getLogger(MonitoringServlet.class);
+
+	private static final long serialVersionUID = 4151528601585755923L;
     
     /**
      * Return statistics about the GSN server

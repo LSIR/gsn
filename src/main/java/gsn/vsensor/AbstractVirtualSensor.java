@@ -34,10 +34,15 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.monitoring.Monitorable;
+import gsn.monitoring.AnomalyDetector;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.lang.management.ThreadMXBean;
 
 import org.apache.log4j.Logger;
 
@@ -51,9 +56,17 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 	private Long 	    inputCount = 0L;
 	
 	private long        lastOutputedTime = 0;
-	
+
+    /*
+     * Map threads would keep track of thread ID (and name) of each wrapper associated with this Virtual Sensor
+     * It is populated in start method of VirtualSensor class when each wrapper thread is started
+     */
+    private Map <Long, String> threads = new HashMap <Long, String> ();
+    private AnomalyDetector anomalyDetector;
 
 	public final boolean initialize_wrapper(){
+
+        anomalyDetector = new AnomalyDetector(this);
 		Main.getInstance().getToMonitor().add(this);
 		return initialize();
 	}
@@ -196,13 +209,55 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 		this.virtualSensorConfiguration = virtualSensorConfiguration;
 	}
 	
-	/**
-	 * 
-	 */
+    public Map <Long, String> getThreads() {
+        return threads;
+    }
+
+    public void setThreads (Map <Long, String> threads) {
+        this.threads = threads;
+    }
+
 	public Hashtable<String, Object> getStatistics(){
-		Hashtable<String, Object> stat = new Hashtable<String, Object>();
-		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.produced.count", outputCount);
-		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".input.produced.count", inputCount);
+		Hashtable<String, Object> stat = anomalyDetector.getStatistics(); 
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".output.produced.counter", outputCount);
+		stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.", "_") +".input.produced.counter", inputCount);
+
+        /*
+        *    We know the IDs of threads associated with this VSensor
+        *    Using the IDs, we would extract the CPU times, sum them up and put them in the stats map
+        */
+        ThreadMXBean threadBean = Main.getThreadMXBean();
+        if (!threadBean.isThreadCpuTimeEnabled()) {
+            if (logger.isInfoEnabled())
+                logger.info("ThreadCpuTime is disabled. Enabling it | Thread time measurement might not be accurate");
+            threadBean.setThreadCpuTimeEnabled(true);
+        }
+
+        Iterator <Map.Entry<Long,String>> iter = threads.entrySet().iterator();
+        long totalCpuTime = 0L;
+
+        //TODO: Not using thread names | Should be used for logging in debug mode
+
+        while (iter.hasNext()) {
+            Map.Entry<Long,String> entry = iter.next();
+            Long id = entry.getKey();
+
+            long cpuTime = threadBean.getThreadCpuTime(id);
+
+            if (cpuTime == -1) {    // Thread is not alive anymore
+                iter.remove();
+                continue;
+            }
+            
+            if(Long.MAX_VALUE-totalCpuTime > cpuTime){
+            	totalCpuTime += cpuTime;
+            }else{
+            	totalCpuTime = cpuTime-(Long.MAX_VALUE-totalCpuTime);
+            }
+        }
+
+        stat.put("vs."+virtualSensorConfiguration.getName().replaceAll("\\.","_")+".cputime.totalCpuTime.counter", totalCpuTime);
+
 		return stat;
 	}
 	
