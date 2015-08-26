@@ -57,10 +57,10 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	@Override
 	public Hashtable<String,Object> getStatistics() {
 		Hashtable<String, Object> stat = super.getStatistics();
-		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".waitingTime.count", timeWaiting);
-		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".receivingTime.count", timeReceiving);
-		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".processingTime.count", timeProcessing);
-		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".connection.count", connectionCount);
+		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".waitingTime.counter", timeWaiting);
+		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".receivingTime.counter", timeReceiving);
+		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".processingTime.counter", timeProcessing);
+		stat.put("vs."+getActiveAddressBean().getVirtualSensorName().replaceAll("\\.", "_")+".input."+ getActiveAddressBean().getInputStreamName().replaceAll("\\.", "_") +".connection.counter", connectionCount);
 		return stat;
 	}
 	

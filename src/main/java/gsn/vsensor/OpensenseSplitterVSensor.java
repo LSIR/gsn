@@ -125,7 +125,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	@Override
 	public Hashtable<String,Object> getStatistics() {
 		Hashtable<String, Object> stat = super.getStatistics();
-		stat.put("vs."+getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".error.parsing.count", parsingErrorCount);
+		stat.put("vs."+getVirtualSensorConfiguration().getName().replaceAll("\\.", "_") +".error.parsing.counter", parsingErrorCount);
 		return stat;
 	}
 	
