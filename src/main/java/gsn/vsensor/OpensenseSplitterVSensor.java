@@ -240,11 +240,11 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	        		}
                     validateRange("latitude",(Double)temp.getData("latitude"),46.6909,46.4660);
                     validateRange("longitude",(Double)temp.getData("longitude"),6.8289,6.5031);
-                    validateRange("altitude",(Float)temp.getData("altitude"),1000f,300f);
+                    /*validateRange("altitude",(Float)temp.getData("altitude"),1000f,300f);
                     validateRange("speed",(Float)temp.getData("speed"),150f,0f);
                     validateRange("satellites",(Integer)temp.getData("satellites"),20,0);
                     validateRange("HDOP",(Float)temp.getData("HDOP"),100f,0f);
-                    validateRange("gyro",(Float)temp.getData("gyro"),45535f,20000f);
+                    validateRange("gyro",(Float)temp.getData("gyro"),45535f,20000f);*/
 	        		dataProduced(new StreamElement(temp));
 				 }
 	        } else if (data_type.equalsIgnoreCase("TL")){
