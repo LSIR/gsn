@@ -1170,7 +1170,7 @@ class CamZillaPluginClass(AbstractPluginClass):
                     if root == path:
                         for file in files:
                             matches.append(os.path.join(root, file))
-                toRemove = min(matches, key=os.path.getmtime)
+                toRemove = max(matches, key=os.path.getmtime)
                 self.warning('only %dMb free on %s --> deleting %s' % (freeSpace, path, toRemove))
                 os.remove(toRemove)
             else:
