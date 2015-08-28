@@ -162,8 +162,7 @@ public class GSNCollector implements CollectdConfigInterface,
     public int read () {
         
         try {
-            URL _url = new URL (this.url);
-            Scanner s = new Scanner (_url.openStream());
+            Scanner s = new Scanner (url.openStream());
             
             while (s.hasNextLine()) {
                 String line = s.nextLine();
