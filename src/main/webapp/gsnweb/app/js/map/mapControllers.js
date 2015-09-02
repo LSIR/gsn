@@ -1,7 +1,7 @@
 var gsnMap = angular.module("gsnMap", ["leaflet-directive"]);
 
 gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', '$filter', 'sensors', 'FilterParameters', '$location', '_', 'MapFilterParameters',
-    function ($scope, leafletData, $compile, $filter, sensors, FilterParameters,  $location, _, MapFilterParameters) {
+    function ($scope, leafletData, $compile, $filter, sensors, FilterParameters, $location, _, MapFilterParameters) {
 
 
         $scope.geojson = {};
@@ -48,40 +48,6 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             }
         }
 
-        function updateFilterParameters(namesOfGroup, parametersOfGroup) {
-            $scope.groups = ['All'].concat(_.keys(namesOfGroup).sort());
-            $scope.sensorNames = [].concat.apply([], _.values(namesOfGroup).sort());
-            $scope.parameters = _.uniq([].concat.apply([], _.values(parametersOfGroup)).sort(), true);
-        }
-
-
-        $scope.updateGroup = function (item) {
-            if (item === 'All') {
-                $scope.sensorNames = [].concat.apply([], _.values(namesOfGroup).sort());
-                $scope.parameters = _.uniq([].concat.apply([], _.values(parametersOfGroup)).sort(), true);
-            } else {
-                $scope.sensorNames = [].concat(namesOfGroup[item].sort());
-                $scope.parameters = _.uniq([].concat(parametersOfGroup[item].sort()), true);
-
-            }
-            $scope.filter.sensors = [];
-            updateMarkers();
-        };
-
-        $scope.changePrivacy = function () {
-            setFilterParameters();
-            updateMarkers();
-        };
-
-        function setFilterParameters() {
-            if ($scope.filter.onlyPublic) {
-                updateFilterParameters(namesOfGroupPublic, parametersOfGroupPublic);
-            } else {
-                updateFilterParameters(namesOfGroup, parametersOfGroup);
-            }
-
-        };
-
         angular.extend($scope, {
 
             layers: {
@@ -108,11 +74,51 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
 
         $scope.filter = MapFilterParameters;
 
+        setFilterParameters();
+        $scope.currentMarkers = L.markerClusterGroup();
+
+        updateMarkers();
+
+        function updateFilterParameters(namesOfGroup, parametersOfGroup) {
+            $scope.groups = ['All'].concat(_.keys(namesOfGroup).sort());
+            $scope.mapSensorNames = [].concat.apply([], _.values(namesOfGroup).sort());
+            $scope.parameters = _.uniq([].concat.apply([], _.values(parametersOfGroup)).sort(), true);
+        }
+
+
+        $scope.updateGroup = function (item) {
+            if (item === 'All') {
+                $scope.mapSensorNames = [].concat.apply([], _.values(namesOfGroup).sort());
+                $scope.parameters = _.uniq([].concat.apply([], _.values(parametersOfGroup)).sort(), true);
+            } else {
+                $scope.mapSensorNames = [].concat(namesOfGroup[item].sort());
+                $scope.parameters = _.uniq([].concat(parametersOfGroup[item].sort()), true);
+
+            }
+            $scope.filter.sensors = [];
+            updateMarkers();
+        };
+
+        $scope.changePrivacy = function () {
+            setFilterParameters();
+            updateMarkers();
+        };
+
+        function setFilterParameters() {
+            if ($scope.filter.onlyPublic) {
+                updateFilterParameters(namesOfGroupPublic, parametersOfGroupPublic);
+            } else {
+                updateFilterParameters(namesOfGroup, parametersOfGroup);
+            }
+
+        }
+
+
         $scope.submit = function () {
             updateMarkers();
         };
 
-        $scope.getSensorIcon = function(sensorName) {
+        $scope.getSensorIcon = function (sensorName) {
             //if (_.contains(publicSensors, sensorName)) {
             if (publicSensors.indexOf(sensorName) > -1) {
                 return 'img/green_.png';
@@ -121,11 +127,11 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             }
         };
 
-        $scope.currentMarkers = L.markerClusterGroup();
-
 
         function updateMarkers() {
             //var markers = L.markerClusterGroup();
+
+            $scope.filter.updateUrl();
 
             var iconOpen = {
                 iconUrl: 'img/green_.png',
@@ -139,10 +145,17 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             };
 
 
+            $scope.sensorsCount = 0;
+
             var geoJsonLayer = L.geoJson(sensors.data, {
                 onEachFeature: onEachFeature,
+
                 filter: function (feature, layer) {
-                    return filterSensor(feature);
+                    var included = filterSensor(feature);
+                    if (included) {
+                        $scope.sensorsCount ++;
+                    }
+                    return included;
                 },
                 pointToLayer: function (feature, latlng) {
                     if (feature.properties.isPublic) {
@@ -159,12 +172,12 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             leafletData.getMap().then(function (map) {
                 //map.removeLayer($scope.currentMarkers);
                 map.addLayer($scope.currentMarkers);
-                map.fitBounds($scope.currentMarkers.getBounds());
+                if ($scope.sensorsCount > 0) {
+                    map.fitBounds($scope.currentMarkers.getBounds());
+                }
             });
 
         }
-
-        setFilterParameters();
 
 
         function filterSensor(feature) {
@@ -208,17 +221,17 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             (feature.properties.slopeAngle <= $scope.filter.slopeAngle.max);
 
             var from = new Date(feature.properties.fromDate);
-            from.setHours(0,0,0,0);
+            from.setHours(0, 0, 0, 0);
             var to = new Date(feature.properties.toDate);
-            to.setHours(0,0,0,0);
+            to.setHours(0, 0, 0, 0);
 
             if (notEmptyDate($scope.filter.fromDate)) {
                 result = result && ($scope.filter.fromDate.valueOf() >= from.valueOf())
-                && ($scope.filter.fromDate.valueOf() < to.valueOf());
+                && ($scope.filter.fromDate.valueOf() <= to.valueOf());
             }
 
             if (notEmptyDate($scope.filter.untilDate)) {
-                result = result && ($scope.filter.untilDate.valueOf() > from.valueOf())
+                result = result && ($scope.filter.untilDate.valueOf() >= from.valueOf())
                 && ($scope.filter.untilDate.valueOf() <= to.valueOf());
             }
             return result;
@@ -228,23 +241,24 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
             updateMarkers();
         });
 
-        $scope.$watch('filter.fromDate' ,function(){
-            //if (!_.isEmpty($scope.filter.fromDate)) {
+        $scope.$watch('filter.fromDate', function (newVal, oldVal) {
+            if (newVal && oldVal && newVal.toString() != oldVal.toString()) {
+                console.log('From date' + $scope.filter.fromDate);
                 updateMarkers();
-            //}
-            console.log('From date' + $scope.filter.fromDate);
+            }
         });
 
-        $scope.$watch('filter.untilDate' ,function(){
-            //if (!_.isEmpty($scope.filter.untilDate)) {
+        $scope.$watch('filter.untilDate', function (newVal, oldVal) {
+            if (newVal && oldVal && newVal.toString() != oldVal.toString()) {
+                console.log('Until date' + $scope.filter.untilDate);
                 updateMarkers();
-            //}
-            console.log('Until date' + $scope.filter.untilDate);
+            }
         });
 
         function notEmptyDate(date) {
-            return (date && date.valueOf() > 0);
+            return (!isNaN(date) && date && date.valueOf() > 0);
         }
+
         //
         //function onEachFeature(feature, layer) {
         //    layer.on('click', function (e) {
@@ -412,38 +426,110 @@ gsnMap.factory('LatestData', ['$http', function ($http) {
 }]);
 
 
-gsnMap.factory('MapFilterParameters', [function () {
-    function MapFilterParameters() {
+gsnMap.factory('MapFilterParameters', ['$location', '$filter', '$route',
+    function ($location, $filter, $route) {
 
-        this.sensors = [];
-        this.sensorName = {};
-        this.group = {};
-        this.deployment = '';
-        this.parameters = [];
-        this.onlyPublic = false;
-        this.fromDate;
-        this.untilDate;
-        this.altitude = {
-            min: 0,
-            max: 4700,
-            floor: 0,
-            ceil: 4700
-        };
-        this.slopeAngle = {
-            min: 0,
-            max: 90,
-            floor: 0,
-            ceil: 90
-        };
+        function MapFilterParameters() {
 
-        this.aspect = {
-            min: 0,
-            max: 360,
-            floor: 0,
-            ceil: 360
+            if ($route.current.params.sensors)
+                this.sensors = $route.current.params.sensors.split(',');
+            else this.sensors = [];
+
+            this.group = {};
+            if ($route.current.params.group)
+                this.group.selected = $route.current.params.group;
+
+
+            if ($route.current.params.parameters)
+                this.parameters = $route.current.params.parameters.split(',');
+            else this.parameters = [];
+
+            this.onlyPublic = false;
+            if ($route.current.params.onlyPublic)
+                this.onlyPublic = ($route.current.params.onlyPublic === 'true');
+
+
+            this.fromDate = new Date($route.current.params.from);
+            this.fromDate.setHours(0, 0, 0, 0);
+            this.untilDate = new Date($route.current.params.to);
+            this.untilDate.setHours(0, 0, 0, 0);
+
+            this.altitude = {
+                min: 0,
+                max: 4700,
+                floor: 0,
+                ceil: 4700
+            };
+            this.slopeAngle = {
+                min: 0,
+                max: 90,
+                floor: 0,
+                ceil: 90
+            };
+
+            this.aspect = {
+                min: 0,
+                max: 360,
+                floor: 0,
+                ceil: 360
+            }
+
         }
 
-    }
+        MapFilterParameters.prototype = {
 
-    return new MapFilterParameters();
-}]);
+            updateUrl: function () {
+                console.log('UPDATE map filters');
+                $location.path('/map', false);
+
+                if (this.sensors.length > 0) {
+                    $location.search('sensors', this.sensors.toString());
+                } else {
+                    $location.search('sensors', null);
+
+                }
+
+                if (this.parameters.length > 0) {
+                    $location.search('parameters', this.parameters.toString());
+                } else {
+                    $location.search('parameters', null);
+                }
+
+                $location.search('group', this.group.selected);
+                $location.search('onlyPublic', this.onlyPublic.toString());
+
+                if (this.getDate(this.fromDate)) {
+                    $location.search('from', this.formatDateWeb(this.getDate(this.fromDate)));
+                } else {
+                    $location.search('from', null);
+                }
+
+                if (this.getDate(this.untilDate)) {
+                    $location.search('to', this.formatDateWeb(this.getDate(this.untilDate)));
+                } else {
+                    $location.search('to', null);
+                }
+
+            },
+
+            formatDateWeb: function (date) {
+                return $filter('date')(Date.parse(date), 'yyyy-MM-dd');
+            },
+
+            getDate: function (date) {
+                if (isNaN(date)) return null;
+
+                if (typeof(date) == 'number') {
+                    return new Date(date);
+                }
+                return date;
+            },
+
+
+            hasDates: function () {
+                return this.untilDate && this.fromDate;
+            }
+
+        };
+        return new MapFilterParameters();
+    }]);

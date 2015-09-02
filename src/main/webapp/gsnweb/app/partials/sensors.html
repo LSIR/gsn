@@ -3,11 +3,12 @@
 
         <div class="bs-sidebar hidden-print" role="complementary" data-offset-top="-80" bs-affix
              style="margin-left: 12px;margin-right: 8px;">
-
-            <label>Properties</label>
+            <div style="margin-top: 5px">Found <strong>{{sensorsCount}}</strong> sensor(s)</div>
+            <hr style="margin-bottom: 10px; margin-top: 7px">
+            <label>Filters</label>
 
             <div>
-                <input style="margin: 4px;" type="checkbox" ng-model="filter.onlyPublic"
+                <input style="margin: 4px;" type="checkbox" ng-model="filter.onlyPublic" ng-checked="filter.onlyPublic"
                        ng-change="changePrivacy()"/> Only public sensors
             </div>
 
@@ -27,7 +28,7 @@
                            on-select="submit()"
                            on-remove="submit()" style="width: 280px;">
                     <ui-select-match placeholder="Select sensors...">{{$item}}</ui-select-match>
-                    <ui-select-choices repeat="sensorName in sensorNames | filter:$select.search">
+                    <ui-select-choices repeat="sensorName in mapSensorNames | filter:$select.search">
                         <img src={{getSensorIcon(sensorName)}} style="width:16px;height:16px;">{{sensorName}}
                     </ui-select-choices>
                 </ui-select>
@@ -46,20 +47,20 @@
             <div style="margin-bottom: 5px;">
                 <label>Dates</label>
                 <input type="text" class="form-control" data-autoclose="1" ng-model="filter.fromDate"
-                       placeholder="From" bs-datepicker style="width: 250px;" ng-change="submit()">
+                       placeholder="From" bs-datepicker style="width: 250px;">
             </div>
             <div style="margin-bottom: 5px;">
                 <input type="text" class="form-control" data-autoclose="1" ng-model="filter.untilDate"
                        placeholder="Until" bs-datepicker style="width: 250px;">
             </div>
 
-            <div style="margin-bottom: 5px;">
+            <div>
                 <label>Elevation (m)</label>
                 <rzslider rz-slider-model="filter.altitude.min" rz-slider-high="filter.altitude.max"
                           rz-slider-floor="filter.altitude.floor" rz-slider-ceil="filter.altitude.ceil"></rzslider>
             </div>
 
-            <div style="margin-bottom: 5px;">
+            <div>
                 <label>Slope angle (&deg;)</label>
                 <rzslider rz-slider-model="filter.slopeAngle.min" rz-slider-high="filter.slopeAngle.max"
                           rz-slider-floor="filter.slopeAngle.floor" rz-slider-ceil="filter.slopeAngle.ceil"></rzslider>
@@ -70,7 +71,6 @@
                 <rzslider rz-slider-model="filter.aspect.min" rz-slider-high="filter.aspect.max"
                           rz-slider-floor="filter.aspect.floor" rz-slider-ceil="filter.aspect.ceil"></rzslider>
             </div>
-
 
 
         </div>
@@ -84,9 +84,9 @@
         </md-content>
 
         <!--<div class="bs-sidebar hidden-print" role="complementary" data-offset-top="-80" bs-affix-->
-             <!--style="margin-left: 12px;margin-right: 8px;">-->
+        <!--style="margin-left: 12px;margin-right: 8px;">-->
 
-            <!--<label>Selected Sensors</label>-->
+        <!--<label>Selected Sensors</label>-->
 
 
         <!--</div>-->

@@ -112,8 +112,8 @@ gsnWebApp.service('GsnTabs', function () {
 
     function GsnTabs() {
         this.tabs = [
-            {link: '#/map', label: 'Sensor map'},
-            {link: '#/plot', label: 'Plot data'},
+            {link: '#/map', label: 'Sensors'},
+            {link: '#/plot', label: 'Data'},
             {link: '#/monitor', label: 'Monitor'},
             {link: '#/about', label: 'About'},
         ];
@@ -148,3 +148,16 @@ gsnWebApp.service('GsnTabs', function () {
     return new GsnTabs();
 
 });
+gsnWebApp.run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+    var original = $location.path;
+    $location.path = function (path, reload) {
+        if (reload === false) {
+            var lastRoute = $route.current;
+            var un = $rootScope.$on('$locationChangeSuccess', function () {
+                $route.current = lastRoute;
+                un();
+            });
+        }
+        return original.apply($location, [path]);
+    };
+}]);

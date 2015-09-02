@@ -124,12 +124,12 @@ ul.specs dt {
   font-weight: bold;
 }
 
-#header h1 {
+#header h2 {
   border-bottom: 1px solid gray;
-  padding: 20px;
-  padding-top: 20px;
+  padding: 14px;
+  padding-top: 2px;
   padding-right: 20px;
-  padding-bottom: 20px;
+  padding-bottom: 18px;
   padding-left: 20px;
   text-align: right;
   color: #3949AB;
@@ -146,9 +146,9 @@ ul.specs dt {
   min-width: 265px !important;
   max-width: 265px !important;
 }
-h2 {
-  font-size: 30px;
-}
+/*h2 {*/
+  /*font-size: 30px;*/
+/*}*/
 .about {
   width: 300px;
   text-align: justify;
