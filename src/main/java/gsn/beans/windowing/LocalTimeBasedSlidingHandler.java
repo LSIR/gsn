@@ -51,11 +51,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 
-    private static final transient Logger logger = Logger.getLogger(LocalTimeBasedSlidingHandler.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(LocalTimeBasedSlidingHandler.class);
     private static int timerCount = 0;
     private List<StreamSource> streamSources;
     private AbstractWrapper wrapper;

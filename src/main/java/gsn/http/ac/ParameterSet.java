@@ -33,7 +33,8 @@ package gsn.http.ac;
  */
 
 import com.oreilly.servlet.MultipartRequest;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -51,7 +52,7 @@ public class ParameterSet
 	private Hashtable paramset;
     private MultipartRequest multipartreq;
     private static final int  maxPostSize=5 * 1024 * 1024;
-     private static transient Logger logger                             = Logger.getLogger( ParameterSet.class );
+     private static transient Logger logger                             = LoggerFactory.getLogger( ParameterSet.class );
 
     /****************************************** Constructors*******************************************/
     /*************************************************************************************************/

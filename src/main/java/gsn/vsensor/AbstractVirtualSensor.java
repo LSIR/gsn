@@ -44,11 +44,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.lang.management.ThreadMXBean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public abstract class AbstractVirtualSensor implements Monitorable{
 
-	private static final transient Logger logger = Logger.getLogger( AbstractVirtualSensor.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( AbstractVirtualSensor.class );
 
 	private VSensorConfig  virtualSensorConfiguration;
 

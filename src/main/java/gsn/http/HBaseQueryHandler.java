@@ -28,7 +28,8 @@ package gsn.http;
 import gsn.Main;
 import gsn.wrappers.storext.HBaseConnector;
 import gsn.wrappers.storext.Pair;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +46,7 @@ import java.util.*;
  */
 public class HBaseQueryHandler implements RequestHandler {
 
-    private static transient Logger logger = Logger.getLogger(HBaseQueryHandler.class);
+    private static transient Logger logger = LoggerFactory.getLogger(HBaseQueryHandler.class);
 
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String vsName = request.getParameter("name");

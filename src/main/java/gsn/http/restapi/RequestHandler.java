@@ -50,13 +50,14 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.commons.collections.KeyValue;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 
 import scala.util.Try;
 
 public class RequestHandler {
-    private static transient Logger logger = Logger.getLogger(RequestHandler.class);
+    private static transient Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     public static enum ErrorType {NO_SUCH_SENSOR, NO_SUCH_USER, NO_SENSOR_ACCESS, UNKNOWN_REQUEST, 
     	MALFORMED_DATE_FROM_TO, MALFORMED_DATE_DATE_FIELD, MALFORMED_SIZE, MALFORMED_FILTER,MALFORMED_FIELD_SELECT, 

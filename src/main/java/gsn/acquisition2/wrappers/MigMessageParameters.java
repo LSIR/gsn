@@ -36,13 +36,14 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MigMessageParameters {
 
 	private static Hashtable<Class<?>,String> typesMapping = null;
 
-	private final transient Logger logger = Logger.getLogger( MigMessageParameters.class );
+	private final transient Logger logger = LoggerFactory.getLogger( MigMessageParameters.class );
 
 	private ArrayList<Method> getters = null;
 

@@ -83,8 +83,8 @@ import java.util.Random;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -116,11 +116,10 @@ import org.eclipse.jetty.server.AbstractConnector;
 public final class Main {
 	
     public static final int        DEFAULT_MAX_DB_CONNECTIONS       = 8;
-	public static final String     DEFAULT_GSN_LOG4J_PROPERTIES     = "conf/log4j.properties";
 	public static final String     DEFAULT_GSN_CONF_FILE            = "conf/gsn.xml";
 	public static final String     DEFAULT_WEB_APP_PATH             = "src/main/webapp";
 	public static final String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
-	public static transient Logger logger                           = Logger.getLogger ( Main.class );
+	public static transient Logger logger                           = LoggerFactory.getLogger ( Main.class );
 
 	/**
 	 * Mapping between the wrapper name (used in addressing of stream source)
@@ -152,9 +151,8 @@ public final class Main {
 
     private Main() throws Exception {
 
-		ValidityTools.checkAccessibilityOfFiles ( DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
+		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
-		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 		//  initializeConfiguration();
 		try {
 			controlSocket = new GSNController(null, gsnControllerPort);
@@ -165,8 +163,6 @@ public final class Main {
 			System.out.println("To Stop GSN execute the gsn-stop script.");
 		} catch ( FileNotFoundException e ) {
 			logger.error ( "The the configuration file : conf/gsn.xml doesn't exist.");
-			logger.error ( e.getMessage ( ) );
-			logger.error ( "Check the path of the configuration file and try again." );
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
 			throw new Exception(e);
 		}
@@ -318,9 +314,8 @@ public final class Main {
 	}
 
 	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
-		ValidityTools.checkAccessibilityOfFiles ( Main.DEFAULT_GSN_LOG4J_PROPERTIES , WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
+		ValidityTools.checkAccessibilityOfFiles (  WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
 		ValidityTools.checkAccessibilityOfDirs ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
-		PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 		ContainerConfig toReturn = null;
 		try {
 			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FILE );
@@ -355,7 +350,7 @@ public final class Main {
 	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws //JiBXException, 
 	    FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
 		if (!new File(gsnXMLpath).isFile()) {
-			logger.fatal("Couldn't find the gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
+			logger.error("Couldn't find the gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
 			System.exit(1);
 		}		
 

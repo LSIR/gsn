@@ -40,7 +40,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.Header;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 import java.io.File;
@@ -70,7 +71,7 @@ public class GSNClient
     private KeyStore trustStore; // KeyStore for materials used for SSL/TLS protocl
     final static String trustStorePassWord="changeit"; // better to be stored in GSN.xml
 
-    private static transient Logger logger= Logger.getLogger( GSNClient.class );
+    private static transient Logger logger= LoggerFactory.getLogger( GSNClient.class );
 
     public GSNClient( String host, int gsnhttpport, int gsnhttpsport )
     {
@@ -201,7 +202,7 @@ public class GSNClient
             HttpEntity firstentity = response.getEntity();
 
             logger.info("----------------------------------------");
-            logger.info(response.getStatusLine());
+            logger.info(response.getStatusLine().toString());
             if (firstentity != null)
             {
                 logger.info("Response content length: " + firstentity.getContentLength());

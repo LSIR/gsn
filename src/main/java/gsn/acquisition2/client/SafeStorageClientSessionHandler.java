@@ -32,13 +32,14 @@ import gsn.acquisition2.messages.DataMsg;
 import gsn.acquisition2.messages.HelloMsg;
 import gsn.beans.AddressBean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 
 public class SafeStorageClientSessionHandler extends IoHandlerAdapter {
   
-  private static transient Logger                                logger                              = Logger.getLogger ( SafeStorageClientSessionHandler.class );
+  private static transient Logger                                logger                              = LoggerFactory.getLogger ( SafeStorageClientSessionHandler.class );
   
   AbstractMessage helloMsg = null;
   

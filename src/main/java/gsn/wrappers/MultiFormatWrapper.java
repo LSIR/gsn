@@ -32,7 +32,8 @@ import gsn.beans.DataField;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This wrapper presents a MultiFormat protocol in which the data comes from the
@@ -47,7 +48,7 @@ import org.apache.log4j.Logger;
 public class MultiFormatWrapper extends AbstractWrapper {
   private DataField[] collection = new DataField[] { new DataField("packet_type", "int", "packet type"),
       new DataField("temperature", "double", "Presents the temperature sensor."), new DataField("light", "double", "Presents the light sensor.") };
-  private final transient Logger logger = Logger.getLogger(MultiFormatWrapper.class);
+  private final transient Logger logger = LoggerFactory.getLogger(MultiFormatWrapper.class);
   private int counter;
   private AddressBean params;
   private long rate = 1000;

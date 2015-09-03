@@ -25,7 +25,8 @@
 
 package gsn.utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,7 +34,7 @@ import java.util.Properties;
 
 public class Utils {
 
-    private static final transient Logger logger = Logger.getLogger(Utils.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(Utils.class);
 
     public static Properties loadProperties(String path) {
         Properties properties = new Properties();

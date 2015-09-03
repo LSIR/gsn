@@ -26,7 +26,8 @@
 
 package gsn.http.ac;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -47,7 +48,7 @@ public class User
     private String isCandidate="no";// if isCandidte = yes, it means that user has alredy signed-up and is waiting for Admin  confirmation to become a real user */
     private String isWaiting="no";// if isWaiting = yes, it means that user has modified(added, changed, deleted) his access right for a virtual sensor or a group and waits for Owner/Admin decision
     private String origin=GSN_INTERNAL_ORIGIN;
-     private static transient Logger logger                             = Logger.getLogger( User.class );
+     private static transient Logger logger                             = LoggerFactory.getLogger( User.class );
 
 
     /****************************************** Constructors*******************************************/

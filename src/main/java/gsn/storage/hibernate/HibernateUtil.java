@@ -29,7 +29,8 @@ import gsn.storage.DataSources;
 import gsn.utils.jndi.GSNContext;
 import gsn.utils.jndi.GSNContextFactory;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.*;
@@ -39,7 +40,7 @@ import org.hibernate.tool.hbm2ddl.SchemaValidator;
 
 public class HibernateUtil {
 
-    private static final transient Logger logger = Logger.getLogger( HibernateUtil.class );
+    private static final transient Logger logger = LoggerFactory.getLogger( HibernateUtil.class );
 
     
 

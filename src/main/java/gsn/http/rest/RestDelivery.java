@@ -35,7 +35,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.io.WriterOutputStream;
 
@@ -54,7 +55,7 @@ public class RestDelivery implements DeliverySystem {
         objectStream = dataStream.createObjectOutputStream((new WriterOutputStream(continuation.getServletResponse().getWriter())));
     }
 
-    private static transient Logger logger = Logger.getLogger(RestDelivery.class);
+    private static transient Logger logger = LoggerFactory.getLogger(RestDelivery.class);
 
     public void writeStructure(DataField[] fields) throws IOException {
         objectStream.writeObject(fields);

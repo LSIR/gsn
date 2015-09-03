@@ -36,7 +36,8 @@ import java.util.Vector;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 /**
@@ -53,7 +54,7 @@ import org.apache.log4j.Logger;
  *  @see AbstractHCIProtocol
  */
 public class ProtocolManager {
-	private static final transient Logger logger = Logger.getLogger( ProtocolManager.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( ProtocolManager.class );
 	private AbstractHCIProtocol protocol;
 	private ProtocolStates currentState;
 	private AbstractHCIQuery lastExecutedQuery = null;

@@ -39,7 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.commons.collections.KeyValue;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class VSensorConfig implements Serializable {
 
@@ -87,7 +88,7 @@ public class VSensorConfig implements Serializable {
     private String timeZone;
     private SimpleDateFormat sdf = null;
 
-    private transient final Logger                 logger                                    = Logger.getLogger( VSensorConfig.class );
+    private transient final Logger                 logger                                    = LoggerFactory.getLogger( VSensorConfig.class );
 
 	private String directoryQuery ;
 

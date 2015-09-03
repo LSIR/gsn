@@ -38,7 +38,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class CameraIdentifier extends AbstractWrapper {
    
@@ -57,7 +58,7 @@ public class CameraIdentifier extends AbstractWrapper {
    
    private TedsToVSResult                                  tedsResult;
    
-   private final Logger                                    logger                = Logger.getLogger( CameraIdentifier.class );
+   private final Logger                                    logger                = LoggerFactory.getLogger( CameraIdentifier.class );
    
    private int                                             threadCounter         = 0;
    

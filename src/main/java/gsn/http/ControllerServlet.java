@@ -33,11 +33,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ControllerServlet extends HttpServlet {
 
-   private static transient Logger                                      logger                             = Logger.getLogger ( ControllerServlet.class );
+   private static transient Logger                                      logger                             = LoggerFactory.getLogger ( ControllerServlet.class );
 
    /**
     * HTTP RETURN CODES :

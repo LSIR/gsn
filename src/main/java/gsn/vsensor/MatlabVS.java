@@ -36,11 +36,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MatlabVS extends AbstractVirtualSensor {
 
-	private final static transient Logger      logger         = Logger.getLogger( AbstractVirtualSensor.class );
+	private final static transient Logger      logger         = LoggerFactory.getLogger( AbstractVirtualSensor.class );
 	private MatlabEngine engine;
 	
 	
@@ -81,7 +82,7 @@ public class MatlabVS extends AbstractVirtualSensor {
 			StreamElement result = new StreamElement(fieldNames, fieldTypes , new Serializable[] {answer});
 			dataProduced(result);
 		} catch (IOException e) {
-			logger.warn(e);
+			logger.warn(e.getMessage());
 		}
 
 		
@@ -95,9 +96,9 @@ public class MatlabVS extends AbstractVirtualSensor {
 		try {
 			engine.close();
 		} catch (InterruptedException e) {
-			logger.warn(e);
+			logger.warn(e.getMessage());
 		} catch (IOException e) {
-			logger.warn(e);
+			logger.warn(e.getMessage());
 		}
 	}
 
@@ -131,7 +132,7 @@ public class MatlabVS extends AbstractVirtualSensor {
                 success = true;
         }
         catch (Exception e) {
-                logger.warn(e);
+                logger.warn(e.getMessage());
         }
 		
 		

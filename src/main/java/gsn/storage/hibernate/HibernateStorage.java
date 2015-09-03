@@ -30,7 +30,8 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.storage.DataEnumeratorIF;
 import gsn.utils.GSNRuntimeException;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -44,7 +45,7 @@ import java.util.*;
 
 public class HibernateStorage implements VirtualSensorStorage {
 
-    private static final transient Logger logger = Logger.getLogger(HibernateStorage.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(HibernateStorage.class);
 
     private SessionFactory sf;
 

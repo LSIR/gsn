@@ -46,7 +46,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import gsn.storage.StorageManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ModelDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
 
@@ -56,7 +57,7 @@ public class ModelDistributer implements VirtualSensorDataListener, VSensorState
 
     private javax.swing.Timer keepAliveTimer = null;
 
-    private static transient Logger logger = Logger.getLogger(ModelDistributer.class);
+    private static transient Logger logger = LoggerFactory.getLogger(ModelDistributer.class);
 
     private static HashMap<Class<? extends DeliverySystem>, ModelDistributer> singletonMap = new HashMap<Class<? extends DeliverySystem>, ModelDistributer>();
     private Thread thread;

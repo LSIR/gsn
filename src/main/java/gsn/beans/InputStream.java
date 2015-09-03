@@ -40,7 +40,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class InputStream implements Serializable{
 
@@ -48,7 +49,7 @@ public class InputStream implements Serializable{
 
 	public static final int                             INITIAL_DELAY_5000MSC = 5000;
 
-	private transient static final Logger               logger                = Logger.getLogger( InputStream.class );
+	private transient static final Logger               logger                = LoggerFactory.getLogger( InputStream.class );
 
 	//private transient StorageManager                    storageMan = StorageManager.getInstance();
 

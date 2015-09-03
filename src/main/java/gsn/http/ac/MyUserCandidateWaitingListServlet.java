@@ -30,7 +30,8 @@ package gsn.http.ac;
 import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 import javax.servlet.ServletException;
@@ -49,7 +50,7 @@ import java.util.Vector;
  */
 public class MyUserCandidateWaitingListServlet extends HttpServlet
 {
-    private static transient Logger logger                             = Logger.getLogger( MyUserCandidateWaitingListServlet.class );
+    private static transient Logger logger                             = LoggerFactory.getLogger( MyUserCandidateWaitingListServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/
 

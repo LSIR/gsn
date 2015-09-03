@@ -53,13 +53,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import gsn.http.datarequest.QueriesBuilder;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MultiDataDownload extends HttpServlet {
 
     private static final long serialVersionUID = 4249739276150343437L;
 
-    private static transient Logger logger = Logger.getLogger(MultiDataDownload.class);
+    private static transient Logger logger = LoggerFactory.getLogger(MultiDataDownload.class);
 
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         doPost(req, res);
@@ -387,7 +388,7 @@ public class MultiDataDownload extends HttpServlet {
                 parameterMap.put("groupby", new String[] { timerange + ":" + req_agg_function });
             }
             catch (NumberFormatException e2) {
-                logger.debug(e2);
+                logger.debug(e2.getMessage());
             }
         }
 

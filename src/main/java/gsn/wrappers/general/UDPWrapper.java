@@ -39,7 +39,8 @@ import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Links GSN to a Wisenet sensors network. The computer running this wrapper
@@ -50,7 +51,7 @@ public class UDPWrapper extends AbstractWrapper {
    
    private static final String    RAW_PACKET    = "RAW_PACKET";
    
-   private final transient Logger logger        = Logger.getLogger( UDPWrapper.class );
+   private final transient Logger logger        = LoggerFactory.getLogger( UDPWrapper.class );
    
    private int                    threadCounter = 0;
    

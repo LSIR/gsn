@@ -40,14 +40,15 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.mina.common.IoSession;
 
 public class SafeStorage {
   
   public static final String SAFE_STORAGE_WRAPPERS_PROPERTIES = "conf/safe_storage_wrappers.properties";
 
-  private static transient Logger                                logger                              = Logger.getLogger ( SafeStorage.class );
+  private static transient Logger                                logger                              = LoggerFactory.getLogger ( SafeStorage.class );
   
   private Properties wrappers;
   

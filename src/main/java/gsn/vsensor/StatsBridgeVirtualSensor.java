@@ -27,7 +27,8 @@ package gsn.vsensor;
 
 import gsn.beans.StreamElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.TreeMap;
 
@@ -39,7 +40,7 @@ public class StatsBridgeVirtualSensor extends AbstractVirtualSensor {
     private long logging_counter = 0;
     private String vsname;
 
-    private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensor.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(BridgeVirtualSensor.class);
 
     public boolean initialize() {
 

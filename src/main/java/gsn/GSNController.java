@@ -37,7 +37,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class GSNController extends Thread {
 
@@ -51,7 +52,7 @@ public class GSNController extends Thread {
 
 	public static final String GSN_CONTROL_LIST_LOADED_VSENSORS = "LIST LOADED VSENSORS";
 
-	public static transient Logger logger = Logger.getLogger(GSNController.class);
+	public static transient Logger logger = LoggerFactory.getLogger(GSNController.class);
 
 	private VSensorLoader vsLoader;
 

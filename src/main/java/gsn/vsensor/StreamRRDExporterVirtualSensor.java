@@ -38,14 +38,15 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 	public static final String            PARAM_RRDFILE    = "rrdfile" ;
 
 	public static final String            PARAM_FIELD    = "field" ;
 
-	private static final transient Logger logger        = Logger.getLogger(StreamRRDExporterVirtualSensor.class );
+	private static final transient Logger logger        = LoggerFactory.getLogger(StreamRRDExporterVirtualSensor.class );
 
 	private String rrdfile = null;
 

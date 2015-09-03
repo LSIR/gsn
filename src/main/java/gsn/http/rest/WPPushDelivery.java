@@ -36,7 +36,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -56,7 +57,7 @@ public class WPPushDelivery implements DeliverySystem {
 
 	private boolean isClosed = false;
 
-	private static transient Logger       logger     = Logger.getLogger ( WPPushDelivery.class );
+	private static transient Logger       logger     = LoggerFactory.getLogger ( WPPushDelivery.class );
 
 	private HttpPost httpPost;
 

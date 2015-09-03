@@ -34,7 +34,8 @@ import gsn.beans.StreamElement;
 import java.io.File;
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class DiskSpaceWrapper extends AbstractWrapper{
     
@@ -42,7 +43,7 @@ public class DiskSpaceWrapper extends AbstractWrapper{
     
     private int                         samplingRate                = DEFAULT_SAMPLING_RATE;
     
-    private final transient Logger      logger                      = Logger.getLogger(DiskSpaceWrapper.class);
+    private final transient Logger      logger                      = LoggerFactory.getLogger(DiskSpaceWrapper.class);
     
     private static int                  threadCounter               = 0;
     

@@ -39,7 +39,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -57,7 +58,7 @@ public class WanWrapper extends AbstractWrapper {
   private static final String FILE = "file";
   private String filename  =null; //in milliseconds.
   
-  private final transient Logger   logger             = Logger.getLogger( WanWrapper.class );
+  private final transient Logger   logger             = LoggerFactory.getLogger( WanWrapper.class );
   private DataField[] structure;
   private int threadCounter=0;
   private SimpleDateFormat dateTimeFormat ;

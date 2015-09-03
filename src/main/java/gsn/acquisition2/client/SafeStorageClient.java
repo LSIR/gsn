@@ -26,15 +26,14 @@
 
 package gsn.acquisition2.client;
 
-import gsn.Main;
 import gsn.acquisition2.messages.DataMsg;
 import gsn.beans.AddressBean;
 import gsn.utils.KeyValueImp;
 
 import java.net.InetSocketAddress;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
@@ -47,7 +46,7 @@ public class SafeStorageClient {
   
   private static final int CONNECT_TIMEOUT = 30; // seconds 
   
-  private static transient Logger                                logger                              = Logger.getLogger ( SafeStorageClient.class );
+  private static transient Logger                                logger                              = LoggerFactory.getLogger ( SafeStorageClient.class );
   
   
   public SafeStorageClient(String host,int port,AddressBean wrapperDetails) {
@@ -84,7 +83,6 @@ public class SafeStorageClient {
   }
   
   public static void main(String[] args) {
-    PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
     AddressBean wrapperDetails = new AddressBean("mem2",new KeyValueImp("MyKey","MyValue"));
     new SafeStorageClient("localhost",12345,wrapperDetails);
   }

@@ -34,13 +34,14 @@ import gsn.beans.StreamElement;
 import net.tinyos.packet.BuildSource;
 import net.tinyos.packet.PacketSource;
 import net.tinyos.util.PrintStreamMessenger;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 
 public class SenscorscopeTest {
 
-    private static transient Logger logger = Logger.getLogger(SenscorscopeTest.class);
+    private static transient Logger logger = LoggerFactory.getLogger(SenscorscopeTest.class);
 
     private static final int DEFAULT_SAMPLING_RATE_IN_MSEC = 1000; //default thread_rate, every 1 second.
     private static int thread_rate = DEFAULT_SAMPLING_RATE_IN_MSEC;
@@ -882,7 +883,7 @@ public class SenscorscopeTest {
 
                                     StreamElement se = new StreamElement(outputStructureCache, buffer, timestamp);
 
-                                    logger.warn(se);
+                                    logger.warn(se.toString());
                                     System.out.println(se);
                                     /*
                                     StringBuilder sb = new StringBuilder();
@@ -935,7 +936,7 @@ public class SenscorscopeTest {
                 logger.warn("Error on " + reader.getName() + ": " + e);
             } catch (IndexOutOfBoundsException e) {
                 logger.warn("Error while parsing SensorScope packet:" + list_array(packet));
-                logger.warn(e);
+                logger.warn(e.getMessage());
             }
 
 
@@ -965,7 +966,6 @@ public class SenscorscopeTest {
     }
 
     public static void main(java.lang.String[] args) {
-        PropertyConfigurator.configure(gsn.Main.DEFAULT_GSN_LOG4J_PROPERTIES);
         System.out.println(args[0]);
         String source = args[0];
         reader = BuildSource.makePacketSource(source);

@@ -27,7 +27,8 @@ package gsn.vsensor;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import gsn.beans.StreamElement;
 import gsn.utils.models.AbstractModel;
@@ -43,7 +44,7 @@ import gsn.utils.models.AbstractModel;
  */
 public class ModellingVirtualSensor extends AbstractVirtualSensor {
 	
-	private static final transient Logger logger = Logger.getLogger(ModellingVirtualSensor.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(ModellingVirtualSensor.class);
 	
 	private static final String PARAM_MODEL_CLASS = "model";
 	private static final String PARAM_MODEL_PREFIX ="model";

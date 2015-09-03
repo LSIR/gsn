@@ -25,7 +25,8 @@
 
 package gsn.utils.jndi;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.naming.*;
 import java.util.Hashtable;
@@ -34,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GSNContext  implements Context {
 
-    private static final transient Logger logger = Logger.getLogger(GSNContext.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(GSNContext.class);
 
     private static InitialContext mainContext;
 

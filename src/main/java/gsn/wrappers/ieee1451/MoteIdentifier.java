@@ -44,7 +44,8 @@ import net.tinyos1x.message.Message;
 import net.tinyos1x.message.MessageListener;
 import net.tinyos1x.message.MoteIF;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class MoteIdentifier extends AbstractWrapper implements MessageListener , ChangeListener {
@@ -65,7 +66,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
    
    private TedsToVSResult           tedsResult;
    
-   private final Logger             logger              = Logger.getLogger( MoteIdentifier.class );
+   private final Logger             logger              = LoggerFactory.getLogger( MoteIdentifier.class );
    
    private int                      threadCounter       = 0;
    
@@ -177,7 +178,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
          if ( ( ( TedsMessage ) m ).dataLength( ) == 1 ) {
             if ( logger.isDebugEnabled( ) ) {
                logger.debug( "TedsMessage Received." );
-               logger.debug( m );
+               logger.debug( m.toString() );
             }
             int tedsID = ( ( TedsMessage ) m ).get_TEDS_ID( );
             if ( lazyActiveMicas.get( tedsID ) != null ) {

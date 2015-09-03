@@ -57,7 +57,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 
@@ -72,7 +73,7 @@ public class RestStreamHanlder extends HttpServlet {
 	private static final String STREAMING = "/streaming/";
 	private static final String PARAMETER_REG_ID = "regId";
 
-	private static transient Logger       logger     = Logger.getLogger ( RestStreamHanlder.class );
+	private static transient Logger       logger     = LoggerFactory.getLogger ( RestStreamHanlder.class );
 
 	public void doGet ( HttpServletRequest request , HttpServletResponse response ) throws ServletException{
 

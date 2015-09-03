@@ -28,14 +28,15 @@ package gsn.wrappers.tinyos;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.wrappers.AbstractWrapper;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
 
 public class SensorScope2ServerWrapper extends AbstractWrapper {
 
-    private transient Logger logger = Logger.getLogger(this.getClass());
+    private transient Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final int MAX_BUFFER_SIZE = 128;
 
@@ -985,10 +986,10 @@ public class SensorScope2ServerWrapper extends AbstractWrapper {
 
             } catch (IndexOutOfBoundsException e) {
                 logger.warn("Error while parsing SensorScope packet:" + list_array(packet));
-                logger.warn(e);
+                logger.warn(e.getMessage());
             } catch (NullPointerException e) {
                 logger.warn("Null packet");
-                logger.warn(e);
+                logger.warn(e.getMessage());
             }
 
 

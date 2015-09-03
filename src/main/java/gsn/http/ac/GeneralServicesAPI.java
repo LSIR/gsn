@@ -25,7 +25,8 @@
 
 package gsn.http.ac;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.Vector;
 
@@ -41,7 +42,7 @@ import java.util.Vector;
 public class GeneralServicesAPI
 {
     private static GeneralServicesAPI singleton = new GeneralServicesAPI();
-    private static transient Logger logger= Logger.getLogger( GeneralServicesAPI.class );
+    private static transient Logger logger= LoggerFactory.getLogger( GeneralServicesAPI.class );
 
     public static GeneralServicesAPI getInstance()
     {

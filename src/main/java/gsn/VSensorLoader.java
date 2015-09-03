@@ -47,7 +47,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jibx.runtime.JiBXException;
 
 public class VSensorLoader extends Thread {
@@ -62,7 +63,7 @@ public class VSensorLoader extends Thread {
 	
     private static int                            VSENSOR_LOADER_THREAD_COUNTER       = 0;
     private static VSensorLoader                  singleton                           = null;
-    private static transient Logger               logger                              = Logger.getLogger ( VSensorLoader.class );
+    private static transient Logger               logger                              = LoggerFactory.getLogger ( VSensorLoader.class );
     
 
 	public void addVSensorStateChangeListener(VSensorStateChangeListener listener) {
@@ -110,7 +111,7 @@ public class VSensorLoader extends Thread {
 
 	public void run ( ) {
 		if ( Main.getStorage((VSensorConfig)null) == null || Main.getWindowStorage() == null ) { // Checks only if the default storage and the window storage are defined.
-			logger.fatal ( "The Storage Manager shouldn't be null, possible a BUG." );
+			logger.error ( "The Storage Manager shouldn't be null, possible a BUG." );
 			return;
 		}
 		while ( isActive ) {

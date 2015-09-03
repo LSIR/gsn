@@ -40,7 +40,8 @@ import java.util.TreeMap;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 /**
@@ -50,7 +51,7 @@ import org.apache.log4j.Logger;
  */
 public class GPSNMEAVS extends AbstractVirtualSensor {
    
-   private static final transient Logger logger = Logger.getLogger( GPSNMEAVS.class );
+   private static final transient Logger logger = LoggerFactory.getLogger( GPSNMEAVS.class );
    
    private TreeMap < String , String >   params;
    

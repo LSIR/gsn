@@ -48,11 +48,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TupleBasedSlidingHandler implements SlidingHandler {
 
-	private static final transient Logger logger = Logger.getLogger(TupleBasedSlidingHandler.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(TupleBasedSlidingHandler.class);
 	private List<StreamSource> streamSources; //only holds WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE types of stream sources
 	private Map<StreamSource, Long> slidingHashMap;
 	private AbstractWrapper wrapper;
@@ -260,7 +261,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				}else if (Main.getWindowStorage().isOracle()) {
 					toReturn.append("(pk >= (select pk from (select pk from "+Main.getWindowStorage().tableNameGeneratorInString(wrapperAlias)+" order by pk desc ) where rownum="+windowSize+") )");
 				}else {
-					logger.fatal("Not supported DB!");
+					logger.error("Not supported DB!");
 				}
 			} else {
 				CharSequence viewHelperTableName =Main.getWindowStorage().tableNameGeneratorInString(SQLViewQueryRewriter.VIEW_HELPER_TABLE);
@@ -292,7 +293,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 						toReturn.append(" order by timed desc ");
 						// Note, in oracle rownum starts with 1.
 					}else {
-						logger.fatal("Not supported DB!");
+						logger.error("Not supported DB!");
 					}
 				} else { // WindowType.TIME_BASED_WIN_TUPLE_BASED_SLIDE
 					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(viewHelperTableName).append(" where U_ID='").append(Main.getWindowStorage().tableNameGeneratorInString(streamSource.getUIDStr())).append(

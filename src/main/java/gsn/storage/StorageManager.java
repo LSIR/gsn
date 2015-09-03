@@ -47,11 +47,12 @@ import java.sql.*;
 import java.util.ArrayList;
 
 import org.apache.commons.dbcp.*;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public abstract class StorageManager {
 
-    private static final transient Logger logger = Logger.getLogger(StorageManager.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(StorageManager.class);
 
     private String databaseDriver;
 
@@ -69,7 +70,7 @@ public abstract class StorageManager {
         Connection con = null;
         try {
             initDatabaseAccess(con = getConnection());
-            logger.info(new StringBuilder().append("StorageManager DB connection initialized successfuly. driver:").append(databaseDriver).append(" url:").append(databaseURL));
+            logger.info(new StringBuilder().append("StorageManager DB connection initialized successfuly. driver:").append(databaseDriver).append(" url:").append(databaseURL).toString());
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Connecting to the database with the following properties failed :").append("\n\t UserName :").append(username).append("\n\t Password : ").append(password).append("\n\t Driver class : ").append(databaseDriver).append("\n\t Database URL : ").append(databaseURL).toString());
             logger.error(new StringBuilder().append(e.getMessage()).append(", Please refer to the logs for more detailed information.").toString());
@@ -268,7 +269,7 @@ public abstract class StorageManager {
             if (e.getErrorCode() == getTableNotExistsErrNo() || e.getMessage().contains("does not exist"))
                 return false;
             else {
-                logger.error(e.getErrorCode());
+                logger.error(e.getMessage());
                 throw e;
             }
         } finally {
@@ -833,7 +834,7 @@ public abstract class StorageManager {
                     .append(", max-size: ")
                     .append(pool.getMaxActive())
                     .append(", idle: ")
-                    .append(pool.getNumIdle()));
+                    .append(pool.getNumIdle()).toString());
         return pool.getConnection();
     }
 

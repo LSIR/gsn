@@ -34,7 +34,8 @@ import gsn.storage.StorageManager;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SQLValidatorIntegration implements VSensorStateChangeListener{
 	
@@ -45,7 +46,7 @@ public class SQLValidatorIntegration implements VSensorStateChangeListener{
 	}
 	
 
-	private static final transient Logger logger = Logger.getLogger(SQLValidatorIntegration.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(SQLValidatorIntegration.class);
 
 	public boolean vsLoading(VSensorConfig config) {
 		try {

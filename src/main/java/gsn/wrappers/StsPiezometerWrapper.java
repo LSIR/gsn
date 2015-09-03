@@ -46,7 +46,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -92,7 +93,7 @@ public class StsPiezometerWrapper extends AbstractWrapper {
 
 	private boolean file_handling = true;
 
-	private final transient Logger   logger             = Logger.getLogger( StsPiezometerWrapper.class );
+	private final transient Logger   logger             = LoggerFactory.getLogger( StsPiezometerWrapper.class );
 	private DataField[] structure = {
 			new DataField( "pressure" , "double" , "pressure"),
 			new DataField( "temperature" , "double" , "water temperatured"),

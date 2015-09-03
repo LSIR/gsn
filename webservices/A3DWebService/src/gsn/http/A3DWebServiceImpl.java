@@ -33,19 +33,19 @@ import java.sql.SQLException;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.storage.DataEnumerator;
-import gsn.storage.StorageManager;
 import gsn.beans.VSensorConfig;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.DataTypes;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.collections.KeyValue;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 @WebService(endpointInterface = "gsn.http.A3DWebService")
 public class A3DWebServiceImpl implements A3DWebService {
 
-    private static transient Logger logger = Logger.getLogger(A3DWebServiceImpl.class);
+    private static transient Logger logger = LoggerFactory.getLogger(A3DWebServiceImpl.class);
 
     public String[] getSensors() {
         Iterator<VSensorConfig> vsIterator = Mappings.getAllVSensorConfigs();

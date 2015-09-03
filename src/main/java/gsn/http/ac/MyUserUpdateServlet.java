@@ -29,7 +29,8 @@ package gsn.http.ac;
 
 import gsn.Main;
 import gsn.beans.ContainerConfig;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 import javax.servlet.ServletException;
@@ -50,7 +51,7 @@ public class MyUserUpdateServlet  extends HttpServlet
 {
 
 
-    private static transient Logger logger                             = Logger.getLogger( MyUserUpdateServlet.class );
+    private static transient Logger logger                             = LoggerFactory.getLogger( MyUserUpdateServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/
 

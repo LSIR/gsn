@@ -66,7 +66,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class HttpGetAndroidWrapper extends AbstractWrapper {
    
@@ -74,7 +75,7 @@ public class HttpGetAndroidWrapper extends AbstractWrapper {
    
    private static int               threadCounter      = 0;
    
-   private final transient Logger   logger             = Logger.getLogger( HttpGetAndroidWrapper.class );
+   private final transient Logger   logger             = LoggerFactory.getLogger( HttpGetAndroidWrapper.class );
    
    private static String                   urlPath, Longitude, Latitude;
    

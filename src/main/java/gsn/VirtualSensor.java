@@ -30,7 +30,8 @@ import gsn.beans.StreamSource;
 import gsn.beans.VSensorConfig;
 import gsn.vsensor.AbstractVirtualSensor;
 import gsn.wrappers.AbstractWrapper;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -39,7 +40,7 @@ import java.util.HashMap;
 
 public class VirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(VirtualSensor.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(VirtualSensor.class);
     private static final int GARBAGE_COLLECTOR_INTERVAL = 2;
 
     private AbstractVirtualSensor virtualSensor = null;

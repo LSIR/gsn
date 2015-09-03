@@ -28,7 +28,8 @@ package gsn.utils.geo;
 
 import gsn.Main;
 import gsn.beans.DataTypes;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -41,7 +42,7 @@ import java.util.Map;
 
 public class GridTools {
 
-    private static transient Logger logger = Logger.getLogger(GridTools.class);
+    private static transient Logger logger = LoggerFactory.getLogger(GridTools.class);
 
     public static String deSerializeToString(byte[] bytes) {
 
@@ -70,9 +71,9 @@ public class GridTools {
             }
 
         } catch (IOException e) {
-            logger.warn(e);
+            logger.warn(e.getMessage());
         } catch (ClassNotFoundException e) {
-            logger.warn(e);
+            logger.warn(e.getMessage());
         }
 
         return sb.toString();
@@ -100,9 +101,9 @@ public class GridTools {
             value = deserial[ycell][xcell];
 
         } catch (IOException e) {
-            logger.warn(e);
+            logger.warn(e.getMessage());
         } catch (ClassNotFoundException e) {
-            logger.warn(e);
+            logger.warn(e.getMessage());
         }
 
         return value;
@@ -135,9 +136,9 @@ public class GridTools {
             }
 
         } catch (IOException e) {
-            logger.warn(e);
+            logger.warn(e.getMessage());
         } catch (ClassNotFoundException e) {
-            logger.warn(e);
+            logger.warn(e.getMessage());
         }
 
         return sb.toString();

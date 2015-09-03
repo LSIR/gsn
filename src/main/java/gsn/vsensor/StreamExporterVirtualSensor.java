@@ -33,7 +33,8 @@ import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.GSNRuntimeException;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -49,7 +50,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 
 	public static final String[] OBLIGATORY_PARAMS = new String[] {PARAM_USER,PARAM_URL,PARAM_DRIVER};
 
-	private static final transient Logger logger        = Logger.getLogger( StreamExporterVirtualSensor.class );
+	private static final transient Logger logger        = LoggerFactory.getLogger( StreamExporterVirtualSensor.class );
 
 	private Connection                    connection;
 

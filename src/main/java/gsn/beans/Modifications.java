@@ -50,7 +50,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
@@ -69,7 +70,7 @@ public final class Modifications {
 
 	private Graph<VSensorConfig> graph;
 
-	private static transient Logger     logger                  = Logger.getLogger( Modifications.class );
+	private static transient Logger     logger                  = LoggerFactory.getLogger( Modifications.class );
 
 	/**
 	 * The list of the virtual sensors, sorted by dependency relations between them,

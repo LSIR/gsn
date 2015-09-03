@@ -40,7 +40,8 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -66,7 +67,7 @@ import org.jfree.data.time.TimeSeriesCollection;
  */
 public class ChartVirtualSensor extends AbstractVirtualSensor {
    
-   private  final transient Logger               logger                             = Logger.getLogger( this.getClass() );
+   private  final transient Logger               logger                             = LoggerFactory.getLogger( this.getClass() );
    
    /**
     * The <code>GENERATE_COUNT</code> represents after how many inputs, the
@@ -203,7 +204,7 @@ class ChartInfo {
    
    private static final String             SYNTAX          = "INPUT_STREAM_VAR_NAME:CHART_NAME:VERTICAL_AXIS_TITLE [TYPE@SIZE] {WIDTH;HEIGHT}";
    
-   private  final transient Logger   logger          = Logger.getLogger( this.getClass() );
+   private  final transient Logger   logger          = LoggerFactory.getLogger( this.getClass() );
    
    private String                          plotTitle;
    

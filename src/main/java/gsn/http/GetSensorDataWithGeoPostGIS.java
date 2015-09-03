@@ -34,7 +34,8 @@ import com.vividsolutions.jts.io.WKTReader;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,7 +48,7 @@ import org.postgis.Point;
 public class GetSensorDataWithGeoPostGIS {
 
 
-    private static transient Logger logger = Logger.getLogger(GetSensorDataWithGeoPostGIS.class);
+    private static transient Logger logger = LoggerFactory.getLogger(GetSensorDataWithGeoPostGIS.class);
 
     private static GetSensorDataWithGeoPostGIS instance = null;
     private static STRtree geoIndex;

@@ -42,12 +42,13 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class DemoVSensor extends AbstractVirtualSensor {
 
-	private static final transient Logger logger                  = Logger.getLogger( DemoVSensor.class );
+	private static final transient Logger logger                  = LoggerFactory.getLogger( DemoVSensor.class );
 
 	private ArrayList < String >          fields                  = new ArrayList < String >( );
 

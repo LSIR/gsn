@@ -28,7 +28,8 @@ package gsn.vsensor;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.wrappers.storext.HBaseConnector;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.util.TreeMap;
@@ -37,7 +38,7 @@ import java.util.TreeMap;
 /** BASED ON THE BRIDGEVIRTUALSENSOR PROCESSING CLASS **/
 public class HBaseStorageVirtualSensor extends AbstractVirtualSensor {
     File file;
-    private static final transient Logger logger = Logger.getLogger(HBaseStorageVirtualSensor.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(HBaseStorageVirtualSensor.class);
     private boolean allow_nulls = true; // by default allow nulls
     private HBaseConnector hbase;
     private Long timestamp;

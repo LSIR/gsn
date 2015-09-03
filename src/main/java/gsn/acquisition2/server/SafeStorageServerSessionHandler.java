@@ -36,7 +36,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 
@@ -50,7 +51,7 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 		this.ss = ss;
 	}
 
-	private static transient Logger                                logger                              = Logger.getLogger ( SafeStorageServerSessionHandler.class );
+	private static transient Logger                                logger                              = LoggerFactory.getLogger ( SafeStorageServerSessionHandler.class );
 
 	public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
 		session.close();

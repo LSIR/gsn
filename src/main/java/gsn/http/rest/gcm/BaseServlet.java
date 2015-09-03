@@ -17,7 +17,8 @@ package gsn.http.rest.gcm;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +34,7 @@ abstract class BaseServlet extends HttpServlet {
   // change to true to allow GET calls
   static final boolean DEBUG = true;
 
-  protected final Logger logger = Logger.getLogger(getClass().getName());
+  protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -58,7 +59,7 @@ abstract class BaseServlet extends HttpServlet {
           String param = req.getParameter(name);
           parameters.append(name).append("=").append(param).append("\n");
         }
-        logger.fine("parameters: " + parameters);
+        logger.trace("parameters: " + parameters);
       }
       throw new ServletException("Parameter " + parameter + " not found");
     }

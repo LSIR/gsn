@@ -40,7 +40,8 @@ import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +61,7 @@ import java.util.Iterator;
 
 public class ContainerInfoHandler implements RequestHandler {
   
-  private static transient Logger logger             = Logger.getLogger( ContainerInfoHandler.class );
+  private static transient Logger logger             = LoggerFactory.getLogger( ContainerInfoHandler.class );
   
   public void handle ( HttpServletRequest request , HttpServletResponse response ) throws IOException {
 	  response.setStatus( HttpServletResponse.SC_OK );

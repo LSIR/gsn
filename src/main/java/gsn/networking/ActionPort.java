@@ -34,14 +34,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ActionPort {
 
 	public static void listen(final int port,final NetworkAction action){
 		Thread t = new Thread(){
 			ServerSocket ss;
-			Logger logger = Logger.getLogger ( this.getClass() );
+			Logger logger = LoggerFactory.getLogger ( this.getClass() );
 			{
 				try {
 					ss = new ServerSocket(port, 0, InetAddress.getByName("localhost"));

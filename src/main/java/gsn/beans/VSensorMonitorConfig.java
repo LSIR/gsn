@@ -28,7 +28,8 @@ package gsn.beans;
 
 import java.text.ParseException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class VSensorMonitorConfig {
 
@@ -43,7 +44,7 @@ public class VSensorMonitorConfig {
     protected String username;
     protected String password;
 
-    private transient final Logger logger = Logger.getLogger(VSensorMonitorConfig.class);
+    private transient final Logger logger = LoggerFactory.getLogger(VSensorMonitorConfig.class);
 
     public VSensorMonitorConfig(String name, String host, int port, long timeout, String path, boolean needspassword, String username, String password) {
         this.name = name;

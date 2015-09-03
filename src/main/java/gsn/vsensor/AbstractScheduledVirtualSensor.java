@@ -38,7 +38,8 @@ import java.util.Timer;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.TimerTask;
@@ -63,8 +64,7 @@ public abstract class AbstractScheduledVirtualSensor extends AbstractVirtualSens
 	private  final String CURRENT_TIME = ISODateTimeFormat.dateTime().print(System.currentTimeMillis());
 	
 	protected StreamElement dataItem	;	//Buffer for most recent stream element
-	protected static final transient Logger logger = Logger
-			.getLogger(AbstractScheduledVirtualSensor.class);
+	protected static final transient Logger logger = LoggerFactory.getLogger(AbstractScheduledVirtualSensor.class);
 	protected Timer timer0;
 	
 	/**

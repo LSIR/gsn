@@ -28,7 +28,8 @@ package gsn.storage;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -36,7 +37,7 @@ import gsn.utils.models.AbstractModel;
 
 public class ModelEnumerator implements DataEnumeratorIF {
 	
-	private static final transient Logger logger = Logger.getLogger(ModelEnumerator.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(ModelEnumerator.class);
 	
 	private StreamElement[] results;
 	private int ptr;

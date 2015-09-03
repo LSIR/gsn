@@ -30,7 +30,8 @@ import groovy.lang.*;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.vsensor.AbstractVirtualSensor;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.util.Timer;
@@ -123,7 +124,7 @@ import java.util.TreeMap;
  */
 public class ScriptletProcessor extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(ScriptletProcessor.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(ScriptletProcessor.class);
 
     private static final String PARAM_SCRIPTLET = "scriptlet";
 

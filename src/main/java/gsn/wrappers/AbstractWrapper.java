@@ -54,12 +54,12 @@ import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public abstract class AbstractWrapper extends Thread implements Monitorable {
 
-	private final static transient Logger logger = Logger
-			.getLogger(AbstractWrapper.class);
+	private final static transient Logger logger = LoggerFactory.getLogger(AbstractWrapper.class);
 
 	protected final List<StreamSource> listeners = Collections
 			.synchronizedList(new ArrayList<StreamSource>());

@@ -32,7 +32,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This class provides a common framework to easily
@@ -56,7 +57,7 @@ import org.apache.log4j.Logger;
  * @see AbstractHCIQuery
  */
 public abstract class AbstractHCIProtocol {
-	private static final transient Logger logger = Logger.getLogger( AbstractHCIProtocol.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( AbstractHCIProtocol.class );
 	private String protocolName;
 	private HashMap<String, AbstractHCIQuery> queries;
 	   

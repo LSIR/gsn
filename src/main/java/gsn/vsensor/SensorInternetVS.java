@@ -43,7 +43,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SensorInternetVS extends AbstractVirtualSensor {
 
@@ -63,7 +64,7 @@ public class SensorInternetVS extends AbstractVirtualSensor {
 
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss") ;
 
-	private static transient Logger logger  = Logger.getLogger ( SensorInternetVS.class );
+	private static transient Logger logger  = LoggerFactory.getLogger ( SensorInternetVS.class );
 
 	@Override
 	public boolean initialize() {

@@ -38,7 +38,8 @@ package gsn.http.ac;
 
 import java.text.SimpleDateFormat;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
@@ -72,7 +73,7 @@ public class ConnectToDB
 	private ResultSet rs ;
     private DatabaseMetaData meta;
     private String usedDB ; //used DB among diffrent choices(MySQL, Oracle, H2)
-    private static transient Logger logger= Logger.getLogger( ConnectToDB.class );
+    private static transient Logger logger= LoggerFactory.getLogger( ConnectToDB.class );
 
 
     /****************************************** Constructors*******************************************/

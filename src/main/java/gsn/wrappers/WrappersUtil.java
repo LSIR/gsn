@@ -31,10 +31,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 public class WrappersUtil {
   
-  public static transient Logger logger= Logger.getLogger ( WrappersUtil.class );
+  public static transient Logger logger= LoggerFactory.getLogger ( WrappersUtil.class );
   
   public static final String     DEFAULT_WRAPPER_PROPERTIES_FILE  = "conf/wrappers.properties";
   public static Properties loadWrappers(HashMap<String, Class<?>> wrappers, String location) {

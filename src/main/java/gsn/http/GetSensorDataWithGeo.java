@@ -36,14 +36,15 @@ import com.vividsolutions.jts.io.WKTReader;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.sql.*;
 import java.util.*;
 
 public class GetSensorDataWithGeo {
 
-    private static transient Logger logger = Logger.getLogger(GetSensorDataWithGeo.class);
+    private static transient Logger logger = LoggerFactory.getLogger(GetSensorDataWithGeo.class);
 
     private static GetSensorDataWithGeo instance = null;
     private static STRtree geoIndex;

@@ -34,7 +34,8 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.wrappers.AbstractWrapper;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 
@@ -105,7 +106,7 @@ public class XmlWrapper extends AbstractWrapper {
 	   
 	   private static int               threadCounter      = 0;
 	
-	   private final transient Logger     logger                 = Logger.getLogger ( XmlWrapper.class );
+	   private final transient Logger     logger                 = LoggerFactory.getLogger ( XmlWrapper.class );
 
 	   //private static  DataField [] outputStructure     = new DataField[] { new DataField( "nodeid" , "INTEGER", "Node ID" ) , new DataField( "parent" , "INTEGER", "Parent Node ID" ) , new DataField( "group" , "INTEGER" , "Group ID" ) , new DataField( "voltage" , "INTEGER" , "Voltage of This Node" ) , new DataField( "humid" , "INTEGER" , "Humidity" ) , new DataField( "humtemp" , "INTEGER" , "Temperature" ) , new DataField( "press" , "DOUBLE" , "Press" ) , new DataField( "accel_x" , "DOUBLE" , "accel_x" ) ,new DataField( "accel_y" ,"DOUBLE" , "accel_y" )};
 	   //private static  DataField [] outputStructure     = new DataField[] { new DataField( "nodeid" , "INTEGER", "Node ID" ) , new DataField( "humtemp" , "INTEGER", "Parent Node ID" )};

@@ -78,8 +78,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 import javax.imageio.ImageIO;
 
@@ -113,7 +114,7 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
    
    private PushBufferDataSource          source                       = null;
    
-   private static final transient Logger logger                       = Logger.getLogger( WebCamWrapper.class );
+   private static final transient Logger logger                       = LoggerFactory.getLogger( WebCamWrapper.class );
    
    /**
     * for debugging purposes.
@@ -345,7 +346,6 @@ public class WebCamWrapper extends AbstractWrapper implements ControllerListener
 }
    
    public static void main ( String [ ] args ) {
-	   PropertyConfigurator.configure( DEFAULT_GSN_LOG4J_PROPERTIES );
 	   if (args.length==0)
 		   printDeviceList();
 	   else if (args.length==1) {

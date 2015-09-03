@@ -34,7 +34,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public final class Mappings {
    
@@ -44,7 +45,7 @@ public final class Mappings {
    
    private static final ConcurrentHashMap < String , TreeMap < String , Boolean >> vsNamesToOutputStructureFields = new ConcurrentHashMap < String , TreeMap < String , Boolean >>( );
    
-   private static final transient Logger                                 logger                         = Logger.getLogger( Mappings.class );
+   private static final transient Logger                                 logger                         = LoggerFactory.getLogger( Mappings.class );
    
    public static boolean addVSensorInstance ( VirtualSensor sensorPool ) {
       try {

@@ -26,7 +26,8 @@
 
 package gsn.http.ac;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.Iterator;
 import java.util.List;
@@ -49,7 +50,7 @@ public class DataSource {
     private User owner;// owner of the virtual sensor ( the one who uploads the .XML file to the GSN Server)
     private String ownerDecision = "notreceived";// the decision of the owner about access granting to a user
     private String isCandidate = "no"; // a DataSource becomes candidate if its virtual sensor file is uploaded and it is waiting for the Admin confirmation of the registration of the virtual sensor to GSN server.
-    private static transient Logger logger = Logger.getLogger(DataSource.class);
+    private static transient Logger logger = LoggerFactory.getLogger(DataSource.class);
 
 
     /****************************************** Constructors*******************************************/

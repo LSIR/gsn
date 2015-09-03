@@ -43,7 +43,8 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public  class StreamSource implements Serializable{
   
@@ -51,7 +52,7 @@ public  class StreamSource implements Serializable{
 
 public static final String DEFAULT_QUERY = "select * from wrapper";
   
-  private static final transient Logger logger             = Logger.getLogger( StreamSource.class );
+  private static final transient Logger logger             = LoggerFactory.getLogger( StreamSource.class );
   
   private String                        alias;
   
@@ -240,7 +241,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
     	          .append( getAlias( ) ).toString( ) );
     }
     if (getAddressing().length==0) {
-      logger.warn(new StringBuilder("Validation failed because there is no addressing predicates provided for the stream source (the addressing part of the stream source is empty)").append("stream source alias = ").append(getAlias()));
+      logger.warn(new StringBuilder("Validation failed because there is no addressing predicates provided for the stream source (the addressing part of the stream source is empty)").append("stream source alias = ").append(getAlias()).toString());
       return validationResult=false;
     }
     if ( this.rawHistorySize != null ) {

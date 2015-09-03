@@ -32,14 +32,13 @@ import gsn.beans.ContainerConfig;
 import java.util.ArrayList;
 
 import gsn.beans.StorageConfig;
-import org.apache.log4j.PropertyConfigurator;
+
 /**
  * Removes the temporary tables, tables starting with underscore.
  */
 public class CleanDB {
   
   public static void main(String[] args) throws Exception {
-    PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
     ContainerConfig cc =Main.getContainerConfig();
     StorageConfig sc = cc.getSliding() != null ? cc.getSliding().getStorage() : cc.getStorage() ;
     Class.forName(sc.getJdbcDriver());

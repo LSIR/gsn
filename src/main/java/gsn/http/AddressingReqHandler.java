@@ -42,11 +42,12 @@ import javax.servlet.http.HttpSession;
 import gsn.http.ac.User;
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class AddressingReqHandler implements RequestHandler {
 
-    private static transient Logger logger = Logger.getLogger(AddressingReqHandler.class);
+    private static transient Logger logger = LoggerFactory.getLogger(AddressingReqHandler.class);
 
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);

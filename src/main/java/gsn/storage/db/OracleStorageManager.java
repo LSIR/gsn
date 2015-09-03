@@ -30,13 +30,14 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.storage.SQLUtils;
 import gsn.storage.StorageManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.sql.*;
 
 public class OracleStorageManager extends StorageManager {
 
-    private static final transient Logger logger = Logger.getLogger(OracleStorageManager.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(OracleStorageManager.class);
 
     public OracleStorageManager() {
         super();

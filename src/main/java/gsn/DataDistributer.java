@@ -51,7 +51,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import gsn.storage.StorageManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
 
 public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
@@ -62,7 +63,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     private javax.swing.Timer keepAliveTimer = null;
 
-    private static transient Logger logger = Logger.getLogger(DataDistributer.class);
+    private static transient Logger logger = LoggerFactory.getLogger(DataDistributer.class);
 
     private static HashMap<Class<? extends DeliverySystem>, DataDistributer> singletonMap = new HashMap<Class<? extends DeliverySystem>, DataDistributer>();
     private Thread thread;

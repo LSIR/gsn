@@ -49,11 +49,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 
-	private static final transient Logger logger = Logger.getLogger(RemoteTimeBasedSlidingHandler.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(RemoteTimeBasedSlidingHandler.class);
 	private List<StreamSource> streamSources;
 	private Map<StreamSource, Long> slidingHashMap;
 	private AbstractWrapper wrapper;

@@ -43,13 +43,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.TooManyListenersException;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 /**
  * Modified to used RXTX (http://users.frii.com/jarvi/rxtx/) which a LGPL
  * replacement for javacomm. The Easiest way to install RXTX is from the binary
@@ -74,7 +74,7 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
 
 	public static final String      RAW_PACKET    = "RAW_PACKET";
 
-	private final transient Logger  logger        = Logger.getLogger( SerialWrapper.class );
+	private final transient Logger  logger        = LoggerFactory.getLogger( SerialWrapper.class );
 
 	private SerialConnection        wnetPort;
 
@@ -478,14 +478,7 @@ public class SerialWrapper extends AbstractWrapper implements SerialPortEventLis
 		}
 	}
 	public static void main ( String [ ] args ) {
-		Properties properties = new Properties( );
-		properties.put( "log4j.rootLogger" , "DEBUG,console" );
-		properties.put( "log4j.appender.console" , "org.apache.log4j.ConsoleAppender" );
-		properties.put( "log4j.appender.console.Threshold" , "DEBUG" );
-		properties.put( "log4j.appender.console.layout" , "org.apache.log4j.PatternLayout" );
-		properties.put( "log4j.appender.console.layout.ConversionPattern" , "%-6p[%d] [%t] (%13F:%L) %3x - %m%n" );
-		PropertyConfigurator.configure( properties );
-		Logger logger = Logger.getLogger( SerialWrapper.class );
+		Logger logger = LoggerFactory.getLogger( SerialWrapper.class );
 		logger.info( "SerialWrapper Test Started" );
 		SerialWrapper serialWrapper = new SerialWrapper( );
 		ArrayList < KeyValueImp > predicates = new ArrayList < KeyValueImp >( );

@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -123,7 +122,7 @@ public class SendAllMessagesServlet extends BaseServlet {
         try {
           multicastResult = sender.send(message, devices, 5);
         } catch (IOException e) {
-          logger.log(Level.SEVERE, "Error posting messages", e);
+          logger.warn("Error posting messages", e);
           return;
         }
         List<Result> results = multicastResult.getResults();
@@ -133,7 +132,7 @@ public class SendAllMessagesServlet extends BaseServlet {
           Result result = results.get(i);
           String messageId = result.getMessageId();
           if (messageId != null) {
-            logger.fine("Succesfully sent message to device: " + regId +
+            logger.trace("Succesfully sent message to device: " + regId +
                 "; messageId = " + messageId);
             String canonicalRegId = result.getCanonicalRegistrationId();
             if (canonicalRegId != null) {
@@ -148,7 +147,7 @@ public class SendAllMessagesServlet extends BaseServlet {
               logger.info("Unregistered device: " + regId);
               Datastore.unregister(regId);
             } else {
-              logger.severe("Error sending message to " + regId + ": " + error);
+              logger.warn("Error sending message to " + regId + ": " + error);
             }
           }
         }

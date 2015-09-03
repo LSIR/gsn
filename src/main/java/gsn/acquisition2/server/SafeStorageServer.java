@@ -36,8 +36,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.mina.common.IoAcceptor;
 import org.apache.mina.common.ThreadModel;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -51,7 +51,7 @@ public class SafeStorageServer {
 	public static final byte SS_START_MODE   = 1;
 	public static final byte SS_CLEAN_MODE   = 100;
 	
-	public static transient Logger logger = Logger.getLogger(SafeStorageServer.class);
+	public static transient Logger logger = LoggerFactory.getLogger(SafeStorageServer.class);
 	
 	private static final String DEFAULT_SAFESTORAGE_LOG4J_PROPERTIES = "conf/log4j_safestorage.properties";
 	
@@ -84,8 +84,7 @@ public class SafeStorageServer {
 	  acceptor.unbindAll();
   }
   
-  public static void main(String[] args) throws Exception {
-	PropertyConfigurator.configure ( DEFAULT_SAFESTORAGE_LOG4J_PROPERTIES );    
+  public static void main(String[] args) throws Exception {   
 	int safeStorageServerPort = Integer.parseInt(args[0]);
 	int safeStorageControllerPort = Integer.parseInt(args[1]);
 	byte safeStorageMode = Byte.parseByte(args[2]);

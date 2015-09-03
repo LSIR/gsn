@@ -35,7 +35,8 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormat;
 
@@ -49,7 +50,7 @@ import org.joda.time.format.DateTimeFormat;
 
 public class ImageFileWrapper extends AbstractWrapper {
 
-    private static final transient Logger logger = Logger.getLogger(ImageFileWrapper.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(ImageFileWrapper.class);
 
     private int threadCounter;
     private String imagesDirectory;

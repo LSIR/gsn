@@ -17,7 +17,8 @@ package gsn.http.rest.gcm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Simple implementation of a data store using standard Java collections.
@@ -29,7 +30,7 @@ public final class Datastore {
 
   private static final List<String> regIds = new ArrayList<String>();
   private static final Logger logger =
-      Logger.getLogger(Datastore.class.getName());
+      LoggerFactory.getLogger(Datastore.class.getName());
 
   private Datastore() {
     throw new UnsupportedOperationException();

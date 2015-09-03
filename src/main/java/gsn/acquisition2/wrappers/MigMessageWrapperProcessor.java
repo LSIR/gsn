@@ -37,7 +37,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 
@@ -47,7 +48,7 @@ public class MigMessageWrapperProcessor extends SafeStorageAbstractWrapper {
 
 	private Constructor<?> messageConstructor = null;
 
-	private final transient Logger logger = Logger.getLogger( MigMessageWrapperProcessor.class );
+	private final transient Logger logger = LoggerFactory.getLogger( MigMessageWrapperProcessor.class );
 
 	public boolean initialize() {
 		logger.warn("tinyos processor wrapper initialize started...");
