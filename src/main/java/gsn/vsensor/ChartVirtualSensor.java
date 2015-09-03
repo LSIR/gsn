@@ -113,7 +113,7 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
    }
    
    public void dataAvailable ( String inputStreamName , StreamElement streamElement ) {
-      if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( "data received under the name *" ).append( inputStreamName ).append( "* to the ChartVS." ).toString( ) );
+      logger.debug( new StringBuilder( "data received under the name *" ).append( inputStreamName ).append( "* to the ChartVS." ).toString( ) );
       /**
        * Finding the appropriate ChartInfo object for this input stream.
        */
@@ -185,7 +185,7 @@ public class ChartVirtualSensor extends AbstractVirtualSensor {
       /**
        * For debugging purposes.
        */
-      if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
+      logger.debug( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
    }
    
    public void dispose ( ) {
@@ -283,7 +283,7 @@ public void setWidth ( int width ) {
          chart = ChartFactory.createTimeSeriesChart( plotTitle , "Time" , verticalAxisTitle , dataCollectionForTheChart , true , true , false );
          chart.setBorderVisible( true );
          ready = true;
-         if ( logger.isDebugEnabled( ) ) logger.debug( "The Chart Virtual Sensor is ready." );
+         logger.debug( "The Chart Virtual Sensor is ready." );
       }
    }
    

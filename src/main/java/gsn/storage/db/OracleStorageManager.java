@@ -232,7 +232,7 @@ public class OracleStorageManager extends StorageManager {
                 if (stmt != null && !stmt.isClosed())
                     stmt.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+            	logger.error(e.getMessage(), e);
             }
         }
     }
@@ -240,8 +240,7 @@ public class OracleStorageManager extends StorageManager {
     @Override
     public void executeCreateTable(CharSequence tableName, DataField[] structure, boolean unique, Connection connection) throws SQLException {
         StringBuilder sql = getStatementCreateTable(tableName, structure, connection);
-        if (logger.isDebugEnabled())
-            logger.debug(new StringBuilder().append("The create table statement is : ").append(sql).toString());
+        logger.debug(new StringBuilder().append("The create table statement is : ").append(sql).toString());
 
         PreparedStatement prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
@@ -256,9 +255,7 @@ public class OracleStorageManager extends StorageManager {
         executeCommand(oracleTrigger, connection);
 
         sql = getStatementCreateIndexOnTimed(tableName, unique);
-        if (logger.isDebugEnabled())
-            logger.debug(new StringBuilder().append(
-                    "The create index statement is : ").append(sql).toString());
+        logger.debug(new StringBuilder().append("The create index statement is : ").append(sql).toString());
         prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
 

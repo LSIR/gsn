@@ -68,8 +68,7 @@ public class GSNController extends Thread {
 		while (true) {
 			try {
 				Socket socket = mySocket.accept();
-				if (logger.isDebugEnabled())
-					logger.debug("Opened connection on control socket.");
+				logger.debug("Opened connection on control socket.");
 				socket.setSoTimeout(GSN_CONTROL_READ_TIMEOUT);
 
 				// Only connections from localhost are allowed
@@ -84,7 +83,6 @@ public class GSNController extends Thread {
 				}
 				new StopManager().start();
 			} catch (SocketTimeoutException e) {
-				if (logger.isDebugEnabled())
 					logger.debug("Connection timed out. Message was: " + e.getMessage());
 			} catch (IOException e) {
 				logger.warn("Error while accepting control connection: " + e.getMessage());

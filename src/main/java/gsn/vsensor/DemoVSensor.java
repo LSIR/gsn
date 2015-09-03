@@ -88,7 +88,7 @@ public class DemoVSensor extends AbstractVirtualSensor {
 			try {
 				bufferedImage = ImageIO.read( input );
 			} catch ( IOException e ) {
-				e.printStackTrace( );
+				logger.error(e.getMessage(), e);
 			}
 			Graphics2D graphics = ( Graphics2D ) bufferedImage.getGraphics( );
 			int size = 30;
@@ -125,7 +125,7 @@ public class DemoVSensor extends AbstractVirtualSensor {
 			StreamElement outputSE = new StreamElement( OUTPUT_FIELDS , OUTPUT_TYPES , new Serializable [ ] { outputStream.toByteArray( ) } , data.getTimeStamp( ) );
 			dataProduced( outputSE );
 		}
-		if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
+		logger.info( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
 	}
 
 	public boolean initialize ( ) {

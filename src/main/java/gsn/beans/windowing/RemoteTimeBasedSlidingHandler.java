@@ -149,9 +149,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 			StringBuilder query = new StringBuilder();
 			query.append("select max(timed) - ").append(maxWindowSize).append(" from ").append(wrapper.getDBAliasInStr());
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("Query1 for getting oldest timestamp : " + query);
-			}
+			logger.debug("Query1 for getting oldest timestamp : " + query);
 			Connection conn = null;
 			try {
 				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn = Main.getWindowStorage().getConnection());
@@ -177,9 +175,7 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 						wrapper.getDBAliasInStr()).append(" where timed <= ").append(System.currentTimeMillis() - timediff - maxSlideForTupleBased).append(" order by timed desc) as X  ");
 			}
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("Query2 for getting oldest timestamp : " + query);
-			}
+			logger.debug("Query2 for getting oldest timestamp : " + query);
 			Connection conn = null;
 			try {
 				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
@@ -294,11 +290,10 @@ public class RemoteTimeBasedSlidingHandler implements SlidingHandler {
 
 			toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));
 
-			if (logger.isDebugEnabled()) {
-				logger.debug(new StringBuilder().append("The original Query : ").append(streamSource.getSqlQuery()).toString());
-				logger.debug(new StringBuilder().append("The merged query : ").append(toReturn.toString()).append(" of the StreamSource ").append(streamSource.getAlias()).append(" of the InputStream: ").append(
+			logger.debug(new StringBuilder().append("The original Query : ").append(streamSource.getSqlQuery()).toString());
+			logger.debug(new StringBuilder().append("The merged query : ").append(toReturn.toString()).append(" of the StreamSource ").append(streamSource.getAlias()).append(" of the InputStream: ").append(
 						streamSource.getInputStream().getInputStreamName()).append("").toString());
-			}
+
 			return cachedSqlQuery = toReturn;
 		}
 	}

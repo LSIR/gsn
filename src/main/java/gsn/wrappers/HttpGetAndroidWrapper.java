@@ -124,7 +124,7 @@ public class HttpGetAndroidWrapper extends AbstractWrapper {
       if ( inputRate == null || inputRate.trim( ).length( ) == 0 ) rate = DEFAULT_RATE;
       else
          rate = Integer.parseInt( inputRate );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "AndroidWrapper is now running @" + rate + " Rate." );
+      logger.debug( "AndroidWrapper is now running @" + rate + " Rate." );
       return true;
    }
    
@@ -189,8 +189,7 @@ public class HttpGetAndroidWrapper extends AbstractWrapper {
 				postStreamElement( streamElement );
 	        
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 	}
    

@@ -94,7 +94,7 @@ public class ControllerServlet extends HttpServlet {
       StringBuilder sb = new StringBuilder ( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" );
       response.getWriter ( ).write ( sb.toString ( ) );
       RequestHandler handler;
-      if ( logger.isDebugEnabled ( ) ) logger.debug ( "Received a request with code : " + requestType );
+      logger.debug ( "Received a request with code : " + requestType );
 
       switch ( requestType ) {
       case 0 : //default case pointing to the /gsn

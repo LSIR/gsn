@@ -94,7 +94,7 @@ public class ValidityTools {
 			File f = new File( name );
 			if ( f.canRead( ) && f.canWrite( ) && f.isDirectory( ) ) continue;
 			else {
-				System.out.println( "The required directory : " + f.getAbsolutePath( ) + " is not accessible." );
+				logger.error( "The required directory : " + f.getAbsolutePath( ) + " is not accessible." );
 				System.exit( 1 );
 			}
 		}
@@ -105,7 +105,7 @@ public class ValidityTools {
 			File f = new File( name );
 			if ( f.canRead( ) && f.canWrite( ) && f.isFile( ) ) continue;
 			else {
-				System.out.println( "The required file : " + f.getAbsolutePath( ) + " is not accessible." );
+				logger.error( "The required file : " + f.getAbsolutePath( ) + " is not accessible." );
 				System.exit( 1 );
 			}
 		}
@@ -182,7 +182,7 @@ public class ValidityTools {
 
 			}
 		} catch ( Exception e ) {
-			e.printStackTrace( );
+			logger.error(e.getMessage(), e);
 		}
 	}
 	/**

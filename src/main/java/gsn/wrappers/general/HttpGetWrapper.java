@@ -84,7 +84,7 @@ public class HttpGetWrapper extends AbstractWrapper {
       if ( inputRate == null || inputRate.trim( ).length( ) == 0 ) rate = DEFAULT_RATE;
       else
          rate = Integer.parseInt( inputRate );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
+      logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
       return true;
    }
    

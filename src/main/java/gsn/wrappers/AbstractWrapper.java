@@ -110,8 +110,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 		}
 
 		listeners.add(ss);
-		if (logger.isDebugEnabled())
-			logger.debug("Adding listeners: " + ss.toString());
+		logger.debug("Adding listeners: " + ss.toString());
 	}
 
 	public void addSlidingHandler(SlidingHandler slidingHandler) {
@@ -248,9 +247,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 				return false;
 			boolean toReturn = false;
 
-			if (logger.isDebugEnabled())
-				logger.debug("Size of the listeners to be evaluated - "
-						+ listeners.size());
+			logger.debug("Size of the listeners to be evaluated - "+ listeners.size());
 
 			for (SlidingHandler slidingHandler : slidingHandlers.values()) {
 				toReturn = slidingHandler.dataAvailable(streamElement)
@@ -264,8 +261,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 			return toReturn;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			logger
-					.error("Produced data item from the wrapper couldn't be propagated inside the system.");
+			logger.error("Produced data item from the wrapper couldn't be propagated inside the system.");
 			return false;
 		}
 	}
@@ -385,13 +381,11 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 		StringBuilder query = getUselessWindow();
 		if (query == null)
 			return 0;
-		if (logger.isDebugEnabled())
-			logger.debug(new StringBuilder().append(
+		logger.debug(new StringBuilder().append(
 					"RESULTING QUERY FOR Table Size Enforce ").append(query)
 					.toString());
 		int deletedRows = Main.getWindowStorage().executeUpdate(query);
-		if (logger.isDebugEnabled())
-			logger.debug(new StringBuilder().append(deletedRows).append(
+		logger.debug(new StringBuilder().append(deletedRows).append(
 					" old rows dropped from ").append(getDBAliasInStr())
 					.toString());
 		return deletedRows;
@@ -401,8 +395,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 		isActive = false;
 		Main.getInstance().getToMonitor().remove(this);
 		dispose();
-		if (logger.isInfoEnabled())
-			logger.info("dispose called");
+		logger.info("dispose called");
 		listeners.clear();
 		for (SlidingHandler slidingHandler : slidingHandlers.values()) {
 			slidingHandler.dispose();

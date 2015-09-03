@@ -401,9 +401,7 @@ public class MyCreateGroupServlet  extends HttpServlet
 		}
         catch(Exception e)
         {
-            System.out.println("Exception caught : "+e.getMessage());
-            logger.error("ERROR IN getDSNames");
-			logger.error(e.getMessage(),e);
+            logger.error("ERROR IN getDSNames : " + e.getMessage());
         }
         finally
         {

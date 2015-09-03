@@ -509,7 +509,7 @@ public class VSensorConfig implements Serializable {
 		try {
 		return Boolean.parseBoolean(access_protected.trim());
 		}catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 	}

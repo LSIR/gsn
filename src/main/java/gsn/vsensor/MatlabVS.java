@@ -71,12 +71,10 @@ public class MatlabVS extends AbstractVirtualSensor {
 			}
 			if(nbArgs > 0)
 				matlabCommand = matlabCommand + ")";
-			if(logger.isDebugEnabled())
-				logger.debug("Calling matlab engine with command: " + matlabCommand);
+			logger.debug("Calling matlab engine with command: " + matlabCommand);
 			engine.evalString(matlabCommand);
 			String matlabAnswer = engine.getOutputString(100);
-			if(logger.isDebugEnabled())
-				logger.debug("Received output from matlab: " + matlabAnswer +". Trying to interpret this"
+			logger.debug("Received output from matlab: " + matlabAnswer +". Trying to interpret this"
 						+ " answer as a Java Float object.");
 			answer = Double.parseDouble(matlabAnswer);
 			StreamElement result = new StreamElement(fieldNames, fieldTypes , new Serializable[] {answer});
@@ -115,20 +113,17 @@ public class MatlabVS extends AbstractVirtualSensor {
                 // Matlab start command:
                 engine.open("matlab -nosplash -nojvm");
                 // Display output:
-                if(logger.isDebugEnabled())
-                	logger.debug(engine.getOutputString(500));
+                logger.debug(engine.getOutputString(500));
                 String functionName = params.get("function");
                 if(functionName == null || functionName.trim().equals(""))
                 	functionName = defaultFunctionName;
-                if(logger.isDebugEnabled())
-                	logger.debug("Function name configured to: " + functionName);
+                logger.debug("Function name configured to: " + functionName);
                 nbArgs = Integer.parseInt(params.get("arguments"));
                 if(nbArgs == null)
                 	nbArgs = new Integer(0);
                 else
                 	parameters = new Double[nbArgs];
-                if(logger.isDebugEnabled())
-                	logger.debug("Number of arguments configured to: " + nbArgs);
+                logger.debug("Number of arguments configured to: " + nbArgs);
                 success = true;
         }
         catch (Exception e) {

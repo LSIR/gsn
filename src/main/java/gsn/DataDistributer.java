@@ -273,9 +273,9 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     				DeliverySystem delivery = new ZeroMQDelivery(config);
 					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(),System.currentTimeMillis()));
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					logger.error(e1.getMessage(), e1);
 				} catch (SQLException e1) {
-					e1.printStackTrace();
+					logger.error(e1.getMessage(), e1);
 				}
     		}
     	}

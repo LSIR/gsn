@@ -172,7 +172,7 @@ public class SwissPegelWrapper extends AbstractWrapper {
 				}
 			}
 			catch (IOException ex){
-				ex.printStackTrace();
+				logger.error(ex.getMessage(), ex);
 			}
 			logger.warn("Content of the last line of the status file: "+contents);
 			if (contents!=null){

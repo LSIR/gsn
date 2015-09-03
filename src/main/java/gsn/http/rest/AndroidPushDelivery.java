@@ -148,13 +148,12 @@ public class AndroidPushDelivery implements DeliverySystem {
 		try {
 			Result result = sender.send(message, registrationId, 5);
 
-			logger.warn("AndroidPushDelivery: sent message=" + message.toString()
+			logger.debug("AndroidPushDelivery: sent message=" + message.toString()
 					+ " to the device with registrationId=" + registrationId
 					+ " via GCM, result=" + result);
 		}
 		catch (IOException e) {
-			logger.error("AndroidPushDelivery:Error: result=" + e.toString());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 
 		return true;
@@ -164,7 +163,7 @@ public class AndroidPushDelivery implements DeliverySystem {
 	 * No need to keep the connection alive
 	 */
 	public boolean writeKeepAliveStreamElement() {
-		logger.warn("AndroidPushDelivery: writeKeepAliveStreamElement");
+		logger.debug("AndroidPushDelivery: writeKeepAliveStreamElement");
 		return true;
 	}
 
@@ -172,7 +171,7 @@ public class AndroidPushDelivery implements DeliverySystem {
 	 * closing all connections
 	 */
 	public void close() {
-		logger.warn("AndroidPushDelivery: close");
+		logger.debug("AndroidPushDelivery: close");
 		httpclient.getConnectionManager().shutdown();
 		isClosed = true;
 	}

@@ -78,7 +78,7 @@ public class RssWrapper extends AbstractWrapper {
       return false;
     }
     rate = this.addressBean.getPredicateValueAsInt( "rate" ,SAMPLING_RATE_IN_MSEC);
-    if ( logger.isDebugEnabled( ) ) logger.debug( "RssWrapper is now running @" + rate + " Rate." );
+    logger.debug( "RssWrapper is now running @" + rate + " Rate." );
     return true;
   }
   

@@ -557,7 +557,6 @@ public class RequestHandler {
         	stringConstantsProperties.load(this.getClass().getClassLoader().getResourceAsStream(STRING_CONSTANTS_PROPERTIES_FILENAME));
         }
         catch (IOException ex){
-            ex.printStackTrace();
             logger.error(ex.getMessage(), ex);
         }
         
@@ -572,7 +571,6 @@ public class RequestHandler {
         try {
             if (stringConstantsPropertiesFileInputStream != null) stringConstantsPropertiesFileInputStream.close();
         } catch (IOException ex){
-            ex.printStackTrace();
             logger.error(ex.getMessage(), ex);
         }
     }

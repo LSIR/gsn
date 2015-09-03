@@ -176,7 +176,6 @@ public class WPPushDelivery implements DeliverySystem {
 	 * @return
 	 */
 	private boolean sendData(String xml) {
-		System.out.println(xml);
 		try {
 			httpPost.setHeader("X-NotificationClass",""+notificationClass);
 			httpPost.setEntity(new StringEntity(xml, HTTP.UTF_8));

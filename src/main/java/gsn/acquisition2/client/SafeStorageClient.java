@@ -46,7 +46,7 @@ public class SafeStorageClient {
   
   private static final int CONNECT_TIMEOUT = 30; // seconds 
   
-  private static transient Logger                                logger                              = LoggerFactory.getLogger ( SafeStorageClient.class );
+  private static transient Logger  logger = LoggerFactory.getLogger ( SafeStorageClient.class );
   
   
   public SafeStorageClient(String host,int port,AddressBean wrapperDetails) {
@@ -63,7 +63,7 @@ public class SafeStorageClient {
       ConnectFuture future = connector.connect(new InetSocketAddress(host, port), new SafeStorageClientSessionHandler(wrapperDetails ,new MessageHandler() {
 
         public boolean messageToBeProcessed(DataMsg dataMessage) {
-          System.out.println(dataMessage);
+          logger.trace(dataMessage.toString());
           return true;
         }
 

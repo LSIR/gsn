@@ -224,7 +224,7 @@ public class MultiDataDownload extends HttpServlet {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+            	logger.error(e.getMessage(), e);
                 //TODO
             }
         }
@@ -523,10 +523,10 @@ public class MultiDataDownload extends HttpServlet {
         Entry<String, ArrayList<String>> myentry;
         while (myiter.hasNext()) {
             myentry = myiter.next();
-            System.out.println("VSNAME: " + myentry.getKey());
+            logger.trace("VSNAME: " + myentry.getKey());
             Iterator<String> inneriter = myentry.getValue().iterator();
             while (inneriter.hasNext()) {
-                System.out.println("FIELD: " + inneriter.next());
+            	logger.trace("FIELD: " + inneriter.next());
             }
         }
     }

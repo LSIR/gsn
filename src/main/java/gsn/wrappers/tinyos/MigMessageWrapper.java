@@ -295,10 +295,8 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
           if(methodName.equals("get_" + fieldName)) {
             method.setAccessible(true);
             Serializable value = (Serializable) method.invoke(packetObject);
-            if (logger.isDebugEnabled()) {
               logger.debug("Using " + methodName);
               logger.debug("Got: " + value.getClass().getCanonicalName());
-            }
             if(isArray) {
               for(int i=0; i < Array.getLength(value); i++) {
                 retvals.add((Serializable) Array.get(value, i));

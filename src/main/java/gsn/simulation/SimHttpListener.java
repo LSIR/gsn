@@ -67,7 +67,7 @@ public class SimHttpListener extends HttpServlet {
                   }
                }
                try {
-                  if ( logger.isInfoEnabled( ) ) logger.info( "Data received for a typical client" );
+                  logger.info( "Data received for a typical client" );
                   dos.write( new StringBuffer( ).append( System.currentTimeMillis( ) ).append( '\n' ).toString( ).getBytes( ) );
                   dos.flush( );
                } catch ( IOException e ) {
@@ -75,7 +75,7 @@ public class SimHttpListener extends HttpServlet {
                   return;
                }
             }
-            if ( logger.isDebugEnabled( ) ) logger.debug( "Data Received" );
+            logger.debug( "Data Received" );
             break;
          
       }

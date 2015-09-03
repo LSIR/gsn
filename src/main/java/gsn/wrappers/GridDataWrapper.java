@@ -215,7 +215,6 @@ public class GridDataWrapper extends AbstractWrapper {
             }
 
             if (success) {
-                System.out.println("format is correct");
                 ncols = Integer.parseInt(header[0]);
                 nrows = Integer.parseInt(header[1]);
                 xllcorner = Double.parseDouble(header[2]);
@@ -332,7 +331,7 @@ public class GridDataWrapper extends AbstractWrapper {
             oos.close();
             bos.close();
 
-            System.out.println("size => " + bos.toByteArray().length);
+            logger.trace("size => " + bos.toByteArray().length);
 
             stream[0] = new Integer(ncols);
             stream[1] = new Integer(nrows);
@@ -385,7 +384,7 @@ public class GridDataWrapper extends AbstractWrapper {
                 for (int j = 0; j < deserial[0].length; j++) {
                     sb.append(deserial[i][j]).append(" ");
                 }
-                System.out.println(sb.toString());
+                logger.trace(sb.toString());
             }
 
         } catch (IOException e) {

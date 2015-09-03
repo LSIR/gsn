@@ -160,10 +160,7 @@ public class GridTools {
             deserial = (Double[][]) in.readObject();
             in.close();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("deserial.length" + deserial.length);
-                logger.debug("deserial[0].length" + deserial[0].length);
-            }
+            logger.debug("deserial.length : " + deserial.length +", deserial[0].length" + deserial[0].length);
 
             for (int i = 0; i < deserial.length; i++) {
                 StringBuilder sb = new StringBuilder();

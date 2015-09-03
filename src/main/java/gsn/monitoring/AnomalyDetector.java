@@ -572,7 +572,7 @@ public class AnomalyDetector implements Monitorable {
             countOutliers (stat, NEGATIVE);
             interQuartileRange(stat);
             countUnique(stat);
-        } catch (SQLException e) { e.printStackTrace(); } 
+        } catch (SQLException e) { logger.error(e.getMessage(), e); } 
     
         return stat; 
     

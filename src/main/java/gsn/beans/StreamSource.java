@@ -351,7 +351,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
   }
   
   public boolean windowSlided() throws SQLException{
-	  if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data availble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
+	  logger.debug( new StringBuilder( ).append( "Data availble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
 	  return inputStream.executeQuery( getUIDStr() );
 	  
   }
@@ -450,11 +450,9 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
       toReturn.append( " and ( mod( timed , 100)< " ).append( samplingRate*100 ).append( ")" );
     toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));
    // toReturn.append(" order by timed desc ");
-    if ( logger.isDebugEnabled( ) ) {
-      logger.debug( new StringBuilder( ).append( "The original Query : " ).append( getSqlQuery( ) ).toString( ) );
-      logger.debug( new StringBuilder( ).append( "The merged query : " ).append( toReturn.toString( ) ).append( " of the StreamSource " ).append( getAlias( ) ).append(
+    logger.debug( new StringBuilder( ).append( "The original Query : " ).append( getSqlQuery( ) ).toString( ) );
+    logger.debug( new StringBuilder( ).append( "The merged query : " ).append( toReturn.toString( ) ).append( " of the StreamSource " ).append( getAlias( ) ).append(
       " of the InputStream: " ).append( inputStream.getInputStreamName() ).append( "" ).toString( ) );
-    }
     return cachedSqlQuery=toReturn;
   }
   

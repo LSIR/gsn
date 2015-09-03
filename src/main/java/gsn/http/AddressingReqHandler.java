@@ -53,8 +53,7 @@ public class AddressingReqHandler implements RequestHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         String vsName = request.getParameter("name");
         VSensorConfig sensorConfig = Mappings.getVSensorConfig(vsName);
-        if (logger.isInfoEnabled())
-            logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
+        logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
         StringBuilder sb = new StringBuilder("<virtual-sensor name=\"").append(vsName).append("\" last-modified=\"").append(new File(sensorConfig.getFileName()).lastModified()).append("\">\n");
         for (KeyValue df : sensorConfig.getAddressing())
             sb.append("<predicate key=\"").append(StringEscapeUtils.escapeXml(df.getKey().toString())).append("\">").append(StringEscapeUtils.escapeXml(df.getValue().toString()))

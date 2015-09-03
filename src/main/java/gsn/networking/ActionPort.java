@@ -58,8 +58,7 @@ public class ActionPort {
 				while (running ) {
 					try {
 						Socket socket = ss.accept();
-						if (logger.isDebugEnabled())
-							logger.debug("Opened connection on control socket.");
+						logger.debug("Opened connection on control socket.");
 						socket.setSoTimeout(30000);
 
 						// Only connections from localhost are allowed
@@ -75,8 +74,7 @@ public class ActionPort {
 						running = action.actionPerformed(socket);
 
 					} catch (SocketTimeoutException e) {
-						if (logger.isDebugEnabled())
-							logger.debug("Connection timed out. Message was: " + e.getMessage());
+						logger.debug("Connection timed out. Message was: " + e.getMessage());
 					} catch (IOException e) {
 						logger.warn("Error while accepting control connection: " + e.getMessage());
 					}

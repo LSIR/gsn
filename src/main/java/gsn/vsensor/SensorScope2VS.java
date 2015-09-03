@@ -83,8 +83,7 @@ public class SensorScope2VS extends AbstractVirtualSensor {
         // if nulls are allowed
         if (allowNulls) {
             dataProduced(data);
-            if (logger.isDebugEnabled())
-                logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
+            logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
             return;
         }
 
@@ -111,8 +110,7 @@ public class SensorScope2VS extends AbstractVirtualSensor {
 
         if (publish) {
             dataProduced(data);
-            if (logger.isDebugEnabled())
-                logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
+            logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
         } else {
             logger.debug("null values, not published (" + this.getVirtualSensorConfiguration().getName() + ")");
         }

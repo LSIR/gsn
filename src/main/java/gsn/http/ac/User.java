@@ -400,21 +400,16 @@ public class User
             }
             catch(ClassNotFoundException e)
 		    {
-
-                logger.error("ERROR IN ISADMIN :Could not load database driver  ");
-			    logger.error(e.getMessage(),e);
+                logger.error("ERROR IN ISADMIN: Could not load database driver: "+ e.getMessage());
 		    }
 		    catch(SQLException e)
 		    {
-			    System.out.println(" ERROR IN ISADMIN : SQLException caught : ");
-			    while((e = e.getNextException())!= null )
-			    {
-				    System.out.println(e.getMessage());
-			    }
+			    logger.error(" ERROR IN ISADMIN: SQLException caught: "+ e.getMessage());
+
             }
             catch(Exception e)
             {
-                System.out.println("Exception caught :"+e.getLocalizedMessage());
+                logger.error("Exception caught: "+e.getMessage());
             }
             finally
             {

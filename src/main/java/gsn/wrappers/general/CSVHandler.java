@@ -204,7 +204,7 @@ public class CSVHandler {
                 }
 
                 if (currentLine < previousCheckPoint) {// skipping already read lines, based on line count
-                    if (logger.isDebugEnabled()) logger.debug("skipping");
+                    logger.debug("skipping");
                     currentLine++;
                     continue;
                 }

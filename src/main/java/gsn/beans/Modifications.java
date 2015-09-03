@@ -244,8 +244,7 @@ public final class Modifications {
 						Class<?> wrapperClass = Main.getWrapperClass(wrapper);
 						if (wrapperClass == null) {
 							//If this addressing element is the last one, remove VS from the graph
-							if(logger.isDebugEnabled())
-								logger.debug ( "The specified wrapper >"+addressing[addressingIndex].getWrapper()+"< does not exist");
+							logger.debug ( "The specified wrapper >"+addressing[addressingIndex].getWrapper()+"< does not exist");
 							if(addressingIndex == addressing.length && !hasValidAddressing){
 								try {
 									graph.removeNode(config);
@@ -268,8 +267,7 @@ public final class Modifications {
 							if(sensorConfig == null)
 								sensorConfig = Mappings.getVSensorConfig(vsName);
 							if(sensorConfig == null){
-								if(logger.isDebugEnabled())
-									logger.debug("There is no virtaul sensor with name >" +  vsName + "< in the >" + config.getName() + "< virtual sensor");
+								logger.debug("There is no virtaul sensor with name >" +  vsName + "< in the >" + config.getName() + "< virtual sensor");
 
 								//If this addressing element is the last one, remove VS from the graph
 								if(addressingIndex == addressing.length - 1 && !hasValidAddressing){

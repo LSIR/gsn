@@ -69,7 +69,7 @@ public class HBaseStorageVirtualSensor extends AbstractVirtualSensor {
            // globalSensorNumber++;
            // rowNumber=1;
         } catch (Exception e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage(), e);
         }
 
         TreeMap<String, String> params = vsensor.getMainClassInitialParams();
@@ -100,30 +100,28 @@ public class HBaseStorageVirtualSensor extends AbstractVirtualSensor {
                     hbase.addRecord(tablename, timestamp.toString(), "columnFamily", field, data.getData(field).toString());
                     estimatedTime += (System.nanoTime() - startTime);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                	logger.error(e.getMessage(), e);
                 }
             }
             if (counter >= limit) {
                 double seconds = (double)estimatedTime / 1000000000.0;
-                System.out.println("The estimated time (sec) is = "+seconds);
+                logger.trace("The estimated time (sec) is = "+seconds);
             }
             //if ((counter % 1000) == 0) System.out.println("Entry = "+counter);
             if ((counter % 1000) == 0) {
-                System.out.println("Up until the Entry = "+counter);
+            	logger.trace("Up until the Entry = "+counter);
                 double seconds = (double)estimatedTime / 1000000000.0;
-                System.out.println("The estimated time (sec) is = "+seconds);
-                logger.warn("*** ESTIMATED TIME (SEC) for counter = "+counter+" IS "+seconds);
+                logger.info("*** ESTIMATED TIME (SEC) for counter = "+counter+" IS "+seconds);
             }
            // rowNumber++;
         } else {
             if (!areAllFieldsNull(data))
                 dataProduced(data);
             else {
-                if (logger.isDebugEnabled())
-                    logger.debug("Nulls received for timestamp (" + data.getTimeStamp() + "), discarded");
+                 logger.debug("Nulls received for timestamp (" + data.getTimeStamp() + "), discarded");
             }
         }
-        if (logger.isDebugEnabled()) logger.debug("Data received under the name: " + inputStreamName);
+        logger.debug("Data received under the name: " + inputStreamName);
     }
 
     public boolean areAllFieldsNull(StreamElement data) {

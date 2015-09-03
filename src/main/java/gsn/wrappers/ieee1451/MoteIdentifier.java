@@ -150,7 +150,7 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
       lazyActiveMicas = new LazyTimedHashMap( TIMEOUT );
       lazyActiveMicas.addChangeListener( this );
       // Serial Forwarder Related
-      if ( logger.isDebugEnabled( ) ) logger.debug( "The MoteIdentifier connects to the Serial Forwarder interface at *" + host + ":" + port + "*" );
+      logger.debug( "The MoteIdentifier connects to the Serial Forwarder interface at *" + host + ":" + port + "*" );
       logger.info("Initializing the serial forwarder connection to:  "+host+":"+port);
       mote = new MoteIF( host , port );
       mote.registerListener( new TedsMessage( ) , this );
@@ -171,23 +171,20 @@ public class MoteIdentifier extends AbstractWrapper implements MessageListener ,
     */
    public synchronized void messageReceived ( int to , Message m ) {
       if ( isConsumed == false ) {
-         if ( logger.isInfoEnabled( ) ) logger.info( "A Message is dropped because buffer is full." );
+         logger.info( "A Message is dropped because buffer is full." );
          return;
       }
       if ( m instanceof TedsMessage ) {
          if ( ( ( TedsMessage ) m ).dataLength( ) == 1 ) {
-            if ( logger.isDebugEnabled( ) ) {
-               logger.debug( "TedsMessage Received." );
-               logger.debug( m.toString() );
-            }
+               logger.debug( "TedsMessage Received."+ m.toString() );
             int tedsID = ( ( TedsMessage ) m ).get_TEDS_ID( );
             if ( lazyActiveMicas.get( tedsID ) != null ) {
-               if ( logger.isDebugEnabled( ) ) logger.debug( "The sensor is alive and the virtual sensor file exists." );
+               logger.debug( "The sensor is alive and the virtual sensor file exists." );
             } else {
                status = ADD_ACTION;
                isConsumed = false;
                generateStreamElement( TedsReader.readTedsFromXMLFile( new File( templateFolder.getAbsolutePath( ) + "/" + micaTEDS.get( tedsID ) ) ) , status );
-               if ( logger.isInfoEnabled( ) ) logger.info( "TEDS received and virtual sensor is generated with ID " + tedsID );
+               logger.info( "TEDS received and virtual sensor is generated with ID " + tedsID );
             }
             lazyActiveMicas.put( tedsID , Integer.toString( tedsID ) );
          }

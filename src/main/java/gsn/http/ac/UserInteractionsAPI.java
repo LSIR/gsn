@@ -113,7 +113,7 @@ public class UserInteractionsAPI
         String oldAccessRight = getUserAccessRightForVirtualSensor(user, virtualsensorname);
         if(oldAccessRight.equals("no access"))
         {
-            System.out.println("User does not have any access right to the virtual sensor");
+        	logger.info("User does not have any access right to the virtual sensor");
 
         }
         else
@@ -132,14 +132,13 @@ public class UserInteractionsAPI
                 }
                 else
                {
-                   System.out.println("this user is waiting for updates, no update is possible !");
+                	logger.info("this user is waiting for updates, no update is possible !");
                }
             }
             catch(Exception e)
             {
 
-                logger.error("ERROR IN changeAccessRightForVirtualSensor");
-			    logger.error(e.getMessage(),e);
+                logger.error("ERROR IN changeAccessRightForVirtualSensor"+e.getMessage());
 
             }
             finally
@@ -160,7 +159,7 @@ public class UserInteractionsAPI
         String oldAccessRight = getUserAccessRightForVirtualSensor(user, virtualsensorname);
         if(oldAccessRight.equals("no access"))
         {
-            System.out.println("User does not have any access right to the virtual sensor");
+            logger.info("User does not have any access right to the virtual sensor");
         }
         else
         {
@@ -179,7 +178,7 @@ public class UserInteractionsAPI
                 }
                 else
                {
-                   System.out.println("this user is waiting for updates, no update is possible !");
+                   logger.info("this user is waiting for updates, no update is possible !");
                }
             }
             catch(Exception e)
@@ -204,7 +203,7 @@ public class UserInteractionsAPI
         String oldAccessRight = getUserAccessRightForVirtualSensor(user, virtualsensorname);
         if(oldAccessRight.equals("no access")== false)
         {
-            System.out.println("User has already access to the virtual sensor");
+            logger.info("User has already access to the virtual sensor");
         }
         else
         {
@@ -223,18 +222,17 @@ public class UserInteractionsAPI
                     }
                     else
                     {
-                        System.out.println("this user is waiting for updates, no update is possible !");
+                    	logger.info("this user is waiting for updates, no update is possible !");
                     }
                }
                 else
                {
-                   System.out.println("The virtual sensor does not exist!");
+                	logger.info("The virtual sensor does not exist!");
                }
             }
             catch(Exception e)
             {
-                   logger.error("ERROR IN addAccessRightForVirtualSensor");
-			       logger.error(e.getMessage(),e);
+                   logger.error("ERROR IN addAccessRightForVirtualSensor: "+e.getMessage());
             }
             finally
             {
@@ -251,7 +249,7 @@ public class UserInteractionsAPI
     {
         if(hasAccessToGroup(user, groupname)== false)
         {
-            System.out.println("User does not have access to the group");
+            logger.info("User does not have access to the group");
         }
         else
         {
@@ -270,13 +268,12 @@ public class UserInteractionsAPI
                 }
                 else
                {
-                   System.out.println("this user is waiting for updates, no update is possible !");
+                	logger.info("this user is waiting for updates, no update is possible !");
                }
             }
             catch(Exception e)
             {
-                logger.error("ERROR IN removeAccessToGroup");
-			       logger.error(e.getMessage(),e);
+                logger.error("ERROR IN removeAccessToGroup"+e.getMessage());
             }
             finally
             {
@@ -295,7 +292,7 @@ public class UserInteractionsAPI
     {
         if(hasAccessToGroup(user, groupname)== true)
         {
-            System.out.println("User has already access to the group");
+            logger.info("User has already access to the group");
         }
         else
         {
@@ -305,7 +302,7 @@ public class UserInteractionsAPI
                 ctdb = new ConnectToDB();
                  if(ctdb.valueExistsForThisColumn(new Column("GROUPNAME",groupname), "ACGROUP")== false)
                 {
-                   System.out.println("Group does not exist !");
+                	 logger.info("Group does not exist !");
                 }
                 else
                  {
@@ -318,14 +315,13 @@ public class UserInteractionsAPI
                      }
                     else
                     {
-                        System.out.println("this user is waiting for updates, no update is possible !");
+                    	logger.info("this user is waiting for updates, no update is possible !");
                     }
                  }
             }
             catch(Exception e)
             {
-                logger.error("ERROR IN applyForAccessToGroup");
-			   logger.error(e.getMessage(),e);
+                logger.error("ERROR IN applyForAccessToGroup"+e.getMessage());
             }
             finally
             {

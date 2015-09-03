@@ -106,9 +106,7 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
             query.append("' ");
             storageManager.executeUpdate(query);
             if (storageManager.isThereAnyResult(new StringBuilder("select * from ").append(streamSource.getUIDStr()))) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(streamSource.getWrapper().getWrapperName() + " - Output stream produced/received from a wrapper " + streamSource.toString());
-                }
+                logger.debug(streamSource.getWrapper().getWrapperName() + " - Output stream produced/received from a wrapper " + streamSource.toString());
                 return streamSource.windowSlided();
             }
         } catch (SQLException e) {

@@ -98,7 +98,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 		this.storageManager = storageManager;
         this.manualCloseConnection=manualClose;
 		if ( preparedStatement == null ) {
-			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
+			logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
 			hasNext = false;
 			return;
 		}

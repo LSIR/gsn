@@ -95,7 +95,7 @@ public class RestDelivery implements DeliverySystem {
         try {
             return continuation.getServletResponse().getWriter().checkError();
         } catch (IOException e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage(), e);
             return true;
         }
 

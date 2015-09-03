@@ -170,8 +170,7 @@ public class VSensorLoader extends Thread {
         	try{
                 loadPlugin(vs);
         	}catch(Exception e){
-        		logger.error("Unable to load VSensor " + vs.getName() + ", retrying later...");
-        		e.printStackTrace();
+        		logger.error("Unable to load VSensor " + vs.getName() + ", retrying later... : "+ e.getMessage());
         	}
         }
     }
@@ -219,7 +218,6 @@ public class VSensorLoader extends Thread {
         	removeAllVSResources(pool);
             if (e.getMessage().toLowerCase().contains("table already exists")) {
                 logger.error(e.getMessage());
-                if (logger.isInfoEnabled()) logger.info(e.getMessage(), e);
                 logger.error("Loading the virtual sensor specified in the file : " + vs.getFileName() + " failed");
                 logger.error("The table : " + vs.getName() + " is exists in the database specified in :" + Main.getContainerConfig().getContainerFileName() + ".");
                 logger.error("Solutions : ");
@@ -305,7 +303,7 @@ public class VSensorLoader extends Thread {
 		VSensorConfig config = pool.getConfig ( );
 		pool.closePool ( );
 		final String vsensorName = config.getName ( );
-		if ( logger.isInfoEnabled ( ) ) logger.info ("Releasing previously used resources used by [" + vsensorName + "].");
+		logger.info ("Releasing previously used resources used by [" + vsensorName + "].");
 		for ( InputStream inputStream : config.getInputStreams ( ) ) {
 			for ( StreamSource streamSource : inputStream.getSources ( ) ) 
 				releaseStreamSource(streamSource);
@@ -386,7 +384,7 @@ public class VSensorLoader extends Thread {
 	 * @throws InstantiationException 
 	 */
 	public boolean createInputStreams ( VirtualSensor pool ) throws InstantiationException, IllegalAccessException {
-		if ( logger.isDebugEnabled ( ) ) logger.debug ( new StringBuilder ( ).append ( "Preparing input streams for: " ).append ( pool.getConfig().getName ( ) ).toString ( ) );
+		logger.debug ( new StringBuilder ( ).append ( "Preparing input streams for: " ).append ( pool.getConfig().getName ( ) ).toString ( ) );
 		if ( pool.getConfig().getInputStreams ( ).size ( ) == 0 ) logger.warn ( new StringBuilder ( "There is no input streams defined for *" ).append ( pool.getConfig().getName ( ) ).append ( "*" ).toString ( ) );
 		ArrayList<StreamSource> sources = new ArrayList<StreamSource>();
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();

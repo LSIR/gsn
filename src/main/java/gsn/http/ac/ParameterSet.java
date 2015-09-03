@@ -112,11 +112,6 @@ public class ParameterSet
     /****************************************** Methods *******************************************/
     /*************************************************************************************************/
 
-	public void printHashtable(String name)
-	{
-		System.out.println("Param name = "+ name +" value =  "+ this.paramset.get(name));
-
-	}
 
 	boolean hasEmptyParameter()
 	{
@@ -174,7 +169,7 @@ public class ParameterSet
                     try {
                         FileUtils.moveFile(file, newFile);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                    	logger.error(e.getMessage(), e);
                     }
                     ds = new DataSource(vsname,"4",vsname+".xml",filetype,saveDirectory);
                 }
@@ -227,9 +222,9 @@ public class ParameterSet
             in.close();
             br.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage(), e);
         }
 
         try{
@@ -239,7 +234,7 @@ public class ParameterSet
             outobj.close();
 
         }catch (Exception e){
-            System.err.println("Error: " + e.getMessage());
+        	logger.error(e.getMessage(), e);
         }
     }
 

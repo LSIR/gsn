@@ -116,7 +116,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 
 	public void dataAvailable ( String inputStreamName , StreamElement data ) {
 		dataProduced( data );
-		if ( logger.isDebugEnabled( ) ) logger.debug( "Data received under the name: " + inputStreamName );
+		logger.debug( "Data received under the name: " + inputStreamName );
 	}
 
 	public void dispose ( ) {

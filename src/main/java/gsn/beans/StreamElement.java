@@ -463,7 +463,7 @@ public final class StreamElement implements Serializable {
 				try{ 
 					//          StreamElementTest.md5Digest(fieldValues[ i ]);
 				}catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e.getMessage(), e);
 				}
 				values.add((byte[]) fieldValues[ i ]);
 				break;

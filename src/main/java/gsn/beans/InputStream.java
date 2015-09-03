@@ -200,7 +200,7 @@ public class InputStream implements Serializable{
 	}
 
 	public void refreshAlias ( final String alias ) {
-		if ( logger.isInfoEnabled( ) ) logger.info( "REFERES ALIAS CALEED" );
+		logger.info( "REFERES ALIAS CALEED" );
 	}
 
 	public boolean equals ( final Object o ) {
@@ -266,27 +266,27 @@ public class InputStream implements Serializable{
 	}
 
 	public boolean executeQuery( final CharSequence alias ) throws SQLException{
-		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
+		logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
 		if ( this.pool == null ) {
 			logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
 			return false;
 		}
 
 		if ( this.currentCount > this.getCount( ) ) {
-			if ( logger.isInfoEnabled( ) ) logger.info( "Maximum count reached, the value *discarded*" );
+			logger.info( "Maximum count reached, the value *discarded*" );
 			return false;
 		}
 
 		final long currentTimeMillis = System.currentTimeMillis( );
 		if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
-			if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
+			logger.info( "Called by *discarded* b/c of the rate limit reached." );
 			return false;
 		}
 		this.lastVisited = currentTimeMillis;
 
 		if ( !queryCached ) {
 			rewriteQuery();
-			if ( logger.isDebugEnabled( ) && queryCached)
+			if ( queryCached)
 				logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( Main.getWindowStorage().isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
 						.toString( ) );
 		}
@@ -294,7 +294,7 @@ public class InputStream implements Serializable{
 		if ( queryCached && Main.getWindowStorage().isThereAnyResult( this.rewrittenSQL ) ) {
 			this.currentCount++;
 			AbstractVirtualSensor sensor = null;
-			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
+			logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
 
 			final Enumeration < StreamElement > resultOfTheQuery = Main.getWindowStorage().executeQuery( this.rewrittenSQL , false );
 			try {
@@ -316,9 +316,8 @@ public class InputStream implements Serializable{
 			}
 
 		}
-		if ( logger.isDebugEnabled( ) ) {
-			logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
-		}
+		logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
+
 		return true;
 	}
 

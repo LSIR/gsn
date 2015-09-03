@@ -163,7 +163,6 @@ public final class Main {
 			System.out.println("To Stop GSN execute the gsn-stop script.");
 		} catch ( FileNotFoundException e ) {
 			logger.error ( "The the configuration file : conf/gsn.xml doesn't exist.");
-			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
 			throw new Exception(e);
 		}
         int maxDBConnections = System.getProperty("maxDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxDBConnections"));
@@ -187,7 +186,7 @@ public final class Main {
         
         validationStorage = StorageManagerFactory.getInstance("org.h2.Driver", "sa", "", "jdbc:h2:mem:validator", Main.DEFAULT_MAX_DB_CONNECTIONS);
 
-        if ( logger.isInfoEnabled ( ) ) logger.info ( "The Container Configuration file loaded successfully." );
+        logger.trace ( "The Container Configuration file loaded successfully." );
         
         toMonitor.add(new MemoryMonitor());
 
@@ -303,12 +302,11 @@ public final class Main {
 		try {
 			Main.getInstance();
 		}catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/gsn.log for more information."});
 			try {
 				Thread.sleep(4000);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+			} catch (InterruptedException e1) {}
 		}
 		closeSplashIfneeded();
 	}
@@ -320,8 +318,8 @@ public final class Main {
 		try {
 			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FILE );
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
-			if ( logger.isInfoEnabled ( ) ) logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
-			if ( logger.isInfoEnabled ( ) ) logger.info ( "Wrappers initialization ..." );
+			logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
+			logger.info ( "Wrappers initialization ..." );
 		/*} catch ( JiBXException e ) {
 			logger.error ( e.getMessage ( ) );
 			logger.error ( "Can't parse the GSN configuration file : " + Main.DEFAULT_GSN_CONF_FILE );
@@ -333,7 +331,6 @@ public final class Main {
 			logger.error ("The the configuration file : " + Main.DEFAULT_GSN_CONF_FILE + " doesn't exist.");
 			logger.error ( e.getMessage ( ) );
 			logger.error ( "Check the path of the configuration file and try again." );
-			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
 			System.exit ( 1 );
 		} catch ( ClassNotFoundException e ) {
 			logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath");

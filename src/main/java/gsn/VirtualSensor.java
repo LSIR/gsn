@@ -65,8 +65,7 @@ public class VirtualSensor {
                 virtualSensor = null;
                 throw new VirtualSensorInitializationFailedException();
             }
-            if (logger.isDebugEnabled())
-                logger.debug("Created a new instance for VS " + config.getName());
+            logger.debug("Created a new instance for VS " + config.getName());
         }
         return virtualSensor;
     }
@@ -85,10 +84,10 @@ public class VirtualSensor {
     public synchronized void closePool() {
         if (virtualSensor != null) {
             virtualSensor.dispose_decorated();
-            if (logger.isDebugEnabled())
-                logger.debug("VS " + config.getName() + " is now released.");
-        } else if (logger.isDebugEnabled())
+            logger.debug("VS " + config.getName() + " is now released.");
+        } else {
             logger.debug("VS " + config.getName() + " was already released.");
+        }
     }
 
     public void start() throws VirtualSensorInitializationFailedException {
@@ -142,15 +141,13 @@ public class VirtualSensor {
 
         int effected = 0;
         try {
-            if (logger.isDebugEnabled())
-                logger.debug("Enforcing the limit size on the VS table by : " + query);
+            logger.debug("Enforcing the limit size on the VS table by : " + query);
             effected = Main.getStorage(config.getName()).executeUpdate(query);
         } catch (SQLException e) {
             logger.error("Error in executing: " + query);
             logger.error(e.getMessage(), e);
         }
-        if (logger.isDebugEnabled())
-            logger.debug("There were " + effected + " old rows dropped from " + config.getName());
+        logger.debug("There were " + effected + " old rows dropped from " + config.getName());
     }
 }
 

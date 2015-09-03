@@ -169,7 +169,7 @@ public class SafeStorage {
 		  rs.close();
 		  ps.close();
 	  } catch (SQLException e) {
-		  e.printStackTrace();
+		  logger.error(e.getMessage(), e);
 	  }
 	  return helloMessages;
   }

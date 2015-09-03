@@ -86,11 +86,8 @@ public class HBaseWrapper extends AbstractWrapper {
         AddressBean addressBean = getActiveAddressBean();
         // get each interesting value
         table_name = addressBean.getPredicateValue("table-name");
-        System.out.println("~~~~~~~~~~~~~ "+ table_name);
         rowKey = addressBean.getPredicateValue("rowKey");
-        System.out.println("~~~~~~~~~~~~~ "+ rowKey);
         fieldNames = addressBean.getPredicateValue("fields");
-        System.out.println("~~~~~~~~~~~~~ "+ fieldNames);
         ArrayList<DataField> output = new ArrayList<DataField>();
         String[] fields = fieldNames.split(",");  // seperate the names of the individual fields
         for (String f : fields) {
@@ -117,10 +114,8 @@ public class HBaseWrapper extends AbstractWrapper {
             }
 
             if (rowKey.compareTo("") != 0 ) { // if a row is selected
-                System.out.println("~~~A particular row is selected");
                 results = null;
             } else {
-                System.out.println("~~~All the rows will be selected");
                 results = hbase.getAllRecords(table_name);
             }
 

@@ -72,20 +72,20 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
       params = vsensor.getMainClassInitialParams( );
       wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
       protocolManager = new ProtocolManager( new SerComProtocol( ) , wrapper );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "Created protocolManager" );
+      logger.debug( "Created protocolManager" );
       try {
          wrapper.sendToWrapper( "h\n" ,null,null);
       } catch ( OperationNotSupportedException e ) {
-         e.printStackTrace( );
+    	  logger.error(e.getMessage(), e);
       }      
       
       // protocolManager.sendQuery( SerComProtocol.RESET , null );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "Initialization complete." );
+      logger.debug( "Initialization complete." );
       return true;
    }
    
    public void dataAvailable ( String inputStreamName , StreamElement data ) {
-      if ( logger.isDebugEnabled( ) ) logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getData(SerialWrapper.RAW_PACKET)));
+      logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getData(SerialWrapper.RAW_PACKET)));
       
       //needed? ######
       AbstractWrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );

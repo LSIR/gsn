@@ -100,7 +100,7 @@ public class HBaseQueryHandler implements RequestHandler {
                     sb.append("<field name=\"").append(p.getFieldName()).append("\" >").append(p.getFieldValue()).append("</field>\n");
                 }
                 Long time = Long.MAX_VALUE - (new Long((String)entry.getKey()));
-             System.out.println("Time is = "+ time);
+                logger.trace("Time is = "+ time);
                 sb.append("<field name=\"timed\" >").append(sdf.format(new Date(time))).append("</field>\n");
                 sb.append("</stream-element>\n");
             }

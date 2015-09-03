@@ -310,7 +310,7 @@ public class MyDataSourceCandidateWaitingListServlet extends HttpServlet
                         try {
                             FileUtils.copyFile(file, newFile);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                        	logger.error(e.getMessage(), e);
                         }
 
                         ctdb.updateOneColumnUnderOneCondition(new Column("ISCANDIDATE","no"),new Column("DATASOURCENAME",pm.valueForName("datasourcename")),"ACDATASOURCE");

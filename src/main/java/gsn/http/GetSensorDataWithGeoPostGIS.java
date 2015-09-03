@@ -290,14 +290,14 @@ public class GetSensorDataWithGeoPostGIS {
         if (ref_query.indexOf(UNION_RESERVED_WORD) > 0) {
             StringBuilder unionOfAll = new StringBuilder();
             if (unionElement != "") {
-                System.out.println("what_to_repeat => " + unionElement);
+            	logger.trace("what_to_repeat => " + unionElement);
                 for (int i = 0; i < listSensors.length; i++) {
                     unionOfAll.append(unionElement.replaceAll(SENSOR_RESERVED_WORD_REGEX, listSensors[i]));
                     if (i < listSensors.length - 1)
                         unionOfAll.append("\n union \n");
                 }
             }
-            System.out.println("unionofAll => " + unionOfAll);
+            logger.trace("unionofAll => " + unionOfAll);
             ref_query = ref_query.replaceAll(UNION_RESERVED_WORD_REGEX, unionOfAll.toString());
         }
 
@@ -386,8 +386,8 @@ public class GetSensorDataWithGeoPostGIS {
         String matchingsensors = "station1,station2,station3";
         String unionElement = "\"$sensor\" as station, wind_speed, timed as date from $sensor";
 
-        System.out.println("\n=====\n query: \n" + query);
-        System.out.println("\n=====\n reformatted: \n" + reformatQuery(query, matchingsensors, unionElement));
+        logger.trace("\n=====\n query: \n" + query);
+        logger.trace("\n=====\n reformatted: \n" + reformatQuery(query, matchingsensors, unionElement));
     }
 
     String makeStringFromList(List l) {
