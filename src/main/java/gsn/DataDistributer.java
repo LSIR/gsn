@@ -123,7 +123,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     public void addListener(DistributionRequest listener) {
         synchronized (listeners) {
             if (!listeners.contains(listener)) {
-                logger.warn("Adding a listener to Distributer:" + listener.toString());
+                logger.info("Adding a listener to Distributer:" + listener.toString());
                 boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
                 String query = SQLValidator.addPkField(listener.getQuery());
                 if (needsAnd)
@@ -143,7 +143,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                 addListenerToCandidates(listener);
 
             } else {
-                logger.warn("Adding a listener to Distributer failed, duplicated listener! " + listener.toString());
+                logger.info("Adding a listener to Distributer failed, duplicated listener! " + listener.toString());
             }
         }
     }
@@ -213,7 +213,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                     removeListenerFromCandidates(listener);
                     preparedStatements.get(listener).close();
                     listener.close();
-                    logger.warn("Removing listener completely from Distributer [Listener: " + listener.toString() + "]");
+                    logger.info("Removing listener completely from Distributer [Listener: " + listener.toString() + "]");
                 } catch (SQLException e) {
                     logger.error(e.getMessage(), e);
                 } finally {

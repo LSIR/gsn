@@ -112,13 +112,13 @@ public class ModelDistributer implements VirtualSensorDataListener, VSensorState
     public void addListener(DistributionRequest listener) {
         synchronized (listeners) {
             if (!listeners.contains(listener)) {
-                logger.warn("Adding a listener to ModelDistributer:" + listener.toString());
+                logger.info("Adding a listener to ModelDistributer:" + listener.toString());
                 
                 listeners.add(listener);
                 addListenerToCandidates(listener);
 
             } else {
-                logger.warn("Adding a listener to ModelDistributer failed, duplicated listener! " + listener.toString());
+                logger.info("Adding a listener to ModelDistributer failed, duplicated listener! " + listener.toString());
             }
         }
     }

@@ -338,8 +338,7 @@ public class VSensorConfig implements Serializable {
 			this.parsedStorageSize = p.getSecond();
 			this.isStorageCountBased = ! p.getFirst();
 			} catch ( final NumberFormatException e ) {
-				this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.name )
-						.append( " is not valid." ).toString( ) , e );
+				logger.error( "The storage size, " + storageHistorySize + ", specified for the virtual sensor : " + name + " is not valid.", e );
 				return false;
 			}
 		return true;

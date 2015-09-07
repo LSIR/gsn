@@ -82,9 +82,7 @@ public class OneShotQueryHandler implements RequestHandler {
         try {
             result = Main.getStorage(vsName).executeQuery(query, true);
         } catch (SQLException e) {
-            logger.error("ERROR IN EXECUTING, query: " + query);
-            logger.error(e.getMessage(), e);
-            logger.error("Query is from " + request.getRemoteAddr() + "- " + request.getRemoteHost());
+            logger.error("ERROR IN EXECUTING, query: " + query+" from " + request.getRemoteAddr() + "- " + request.getRemoteHost()+": "+e.getMessage());
             return;
         }
 

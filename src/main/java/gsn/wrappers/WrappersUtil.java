@@ -43,10 +43,8 @@ public class WrappersUtil {
     try {// Trying to load the wrapper specified in the configuration file of the container. 
       config.load(new FileReader( location ));
     } catch ( IOException e ) {
-      logger.error ( "The wrappers configuration file's syntax is not compatible." );
-      logger.error ( new StringBuilder ( ).append ( "Check the :" ).append ( location ).append ( " file and make sure it's syntactically correct." ).toString ( ) );
-      logger.error ( "Sample wrappers extention properties file is provided in GSN distribution." );
-      logger.error ( e.getMessage ( ) , e );
+      logger.error ( new StringBuilder ( ).append ( "Check the :" ).append ( location ).append ( " file and make sure it's syntactically correct: " ).append(e.getMessage()).toString ( ) );
+      logger.info ( "Sample wrappers extention properties file is provided in GSN distribution." );
       System.exit ( 1 );
     }  
    // TODO: Checking for duplicates in the wrappers file.

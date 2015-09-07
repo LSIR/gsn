@@ -144,8 +144,7 @@ public class VirtualSensor {
             logger.debug("Enforcing the limit size on the VS table by : " + query);
             effected = Main.getStorage(config.getName()).executeUpdate(query);
         } catch (SQLException e) {
-            logger.error("Error in executing: " + query);
-            logger.error(e.getMessage(), e);
+            logger.error("Error in executing: " + query + ". "+ e.getMessage());
         }
         logger.debug("There were " + effected + " old rows dropped from " + config.getName());
     }

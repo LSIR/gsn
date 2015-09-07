@@ -52,10 +52,8 @@ public final class Mappings {
          logger.info("Testing the pool for :" + sensorPool.getConfig( ).getName( ));
          sensorPool.returnVS( sensorPool.borrowVS( ) );
       } catch ( Exception e ) {
-         logger.error( e.getMessage( ) , e );
          sensorPool.closePool( );
-         logger.error( "GSN can't load the virtual sensor specified at " + sensorPool.getConfig( ).getFileName( ) + " because the initialization of the virtual sensor failed (see above exception)." );
-         logger.error( "Please fix the following error" );
+         logger.error( "GSN can't load the virtual sensor specified at " + sensorPool.getConfig( ).getFileName( ) + " because the initialization of the virtual sensor failed. "+e.getMessage( ) , e );
          return false;
       }
       TreeMap < String , Boolean > vsNameToOutputStructureFields = new TreeMap < String , Boolean >( );

@@ -13,7 +13,7 @@
       </Appenders>
       <Loggers>
         <Root level="info">
-          <AppenderRef ref="Console"/>
+          <AppenderRef ref="Console" level="FATAL"/>
           <AppenderRef ref="File"/>
         </Root>
         <Logger name="com.mchange" level="WARN" additivity="true" />

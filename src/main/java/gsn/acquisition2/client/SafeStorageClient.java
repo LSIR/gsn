@@ -74,8 +74,7 @@ public class SafeStorageClient {
       future.join();
       session = future.getSession();
     } catch (RuntimeIOException e) {
-      logger.error("Failed to connect to "+host+":"+port); 
-      logger.error( e.getMessage(),e);
+      logger.error("Failed to connect to "+host+":"+port+": "+e.getMessage()); 
     }finally {
       if (session!=null)
         session.getCloseFuture().join();

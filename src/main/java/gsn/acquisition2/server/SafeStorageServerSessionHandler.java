@@ -85,7 +85,7 @@ public class SafeStorageServerSessionHandler extends IoHandlerAdapter{
 			AcknowledgmentMsg ack = (AcknowledgmentMsg)message;
 			if (!ack.isAck()) {
 				logger.error("Recieved Nack for Hello Message sent for "+((HelloMsg) message).getWrapperDetails().toString());
-				logger.error("Closing the connection to the SafeStorageServer...");
+				logger.info("Closing the connection to the SafeStorageServer...");
 				session.close();
 				return;
 			}else {

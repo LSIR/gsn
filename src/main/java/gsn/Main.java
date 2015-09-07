@@ -317,8 +317,8 @@ public final class Main {
 		ContainerConfig toReturn = null;
 		try {
 			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FILE );
-			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
+			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			logger.info ( "Wrappers initialization ..." );
 		/*} catch ( JiBXException e ) {
 			logger.error ( e.getMessage ( ) );
@@ -328,13 +328,11 @@ public final class Main {
 			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
 			System.exit ( 1 );*/
 		} catch ( FileNotFoundException e ) {
-			logger.error ("The the configuration file : " + Main.DEFAULT_GSN_CONF_FILE + " doesn't exist.");
-			logger.error ( e.getMessage ( ) );
-			logger.error ( "Check the path of the configuration file and try again." );
+			logger.error ("The the configuration file : " + Main.DEFAULT_GSN_CONF_FILE + " doesn't exist. "+ e.getMessage());
+			logger.info ( "Check the path of the configuration file and try again." );
 			System.exit ( 1 );
 		} catch ( ClassNotFoundException e ) {
-			logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath");
-			logger.error ( e.getMessage ( ),e );
+			logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath"+ e.getMessage());
 			System.exit ( 1 );
 		}
 		return toReturn;

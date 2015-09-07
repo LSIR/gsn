@@ -127,13 +127,9 @@ public class FieldDownloadServlet extends HttpServlet {
 				}
 			}
 		} catch (NumberFormatException e1) {
-			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey);
-			logger.error(e1.getMessage(),e1);
-			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
+			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey+" from "+req.getRemoteAddr()+"- "+req.getRemoteHost()+": "+e1.getMessage());
 		} catch (SQLException e1) {
-			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey);
-			logger.error(e1.getMessage(),e1);
-			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
+			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey+" from "+req.getRemoteAddr()+"- "+req.getRemoteHost()+": "+e1.getMessage());
 		}finally{
 			Main.getStorage(vsName).close(conn);
 		}

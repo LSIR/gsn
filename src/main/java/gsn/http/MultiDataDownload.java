@@ -214,8 +214,7 @@ public class MultiDataDownload extends HttpServlet {
                                 vssfm.remove(sensorConfig.getName());
                             }
                         } catch (SQLException e) {
-                            logger.error("ERROR IN EXECUTING, query: " + queryMax);
-                            logger.error(e.getMessage(), e);
+                            logger.error("ERROR IN EXECUTING, query: " + queryMax +": "+e.getMessage());
                         }  finally {
                             if (conn != null) conn.close();
                             if (resultMax != null) resultMax.close();

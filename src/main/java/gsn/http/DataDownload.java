@@ -280,9 +280,7 @@ public class DataDownload extends HttpServlet {
                 try {
                     result = Main.getStorage(vsName).streamedExecuteQuery(generated_request_query, true);
                 } catch (SQLException e) {
-                    logger.error("ERROR IN EXECUTING, query: " + generated_request_query);
-                    logger.error(e.getMessage(), e);
-                    logger.error("Query is from " + req.getRemoteAddr() + "- " + req.getRemoteHost());
+                    logger.error("ERROR IN EXECUTING, query: "+generated_request_query+" from " + req.getRemoteAddr() + "- " + req.getRemoteHost() +": "+e.getMessage());
                     return;
                 }
                 if (!result.hasMoreElements()) {

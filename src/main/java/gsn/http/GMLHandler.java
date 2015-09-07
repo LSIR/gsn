@@ -175,8 +175,7 @@ public class GMLHandler implements RequestHandler {
             while (result.hasMoreElements())
                 toReturn.add(result.nextElement());
         } catch (SQLException e) {
-            logger.error("ERROR IN EXECUTING, query: " + query);
-            logger.error(e.getMessage(), e);
+            logger.error("ERROR IN EXECUTING, query: " + query +": "+e.getMessage());
             return null;
         }
         return toReturn;

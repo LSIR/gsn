@@ -237,8 +237,7 @@ public class InputStream implements Serializable{
 		}
 		for ( StreamSource ss : sources ) {
 			if ( !ss.validate( ) ) {
-				logger.error( new StringBuilder( ).append( "The Stream Source : " ).append( ss.getAlias( ) ).append( " specified in the Input Stream : " ).append( this.getInputStreamName( ) ).append(
-				" is not valid." ).toString( ) );
+				logger.error("The Stream Source : "+ss.getAlias( )+" specified in the Input Stream : "+getInputStreamName( )+" is not valid.");
 				return (cachedValidationResult=false);
 			}
 			streamSourceAliasNameToStreamSourceName.put( ss.getAlias( ) , ss );
@@ -266,7 +265,7 @@ public class InputStream implements Serializable{
 	}
 
 	public boolean executeQuery( final CharSequence alias ) throws SQLException{
-		logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
+		logger.debug("Notified by StreamSource on the alias: " + alias );
 		if ( this.pool == null ) {
 			logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
 			return false;
@@ -305,12 +304,10 @@ public class InputStream implements Serializable{
 					sensor.dataAvailable_decorated( this.getInputStreamName( ) , element );
 				}
 			} catch ( final UnsupportedOperationException e ) {
-				logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
-				logger.warn( e.getMessage( ) , e );
+				logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : "+ e.getMessage());
 			} catch ( final VirtualSensorInitializationFailedException e ) {
 				logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
-						+ " because initialization of that virtual sensor failed" );
-				logger.error(e.getMessage(),e);
+						+ " because initialization of that virtual sensor failed: " + e.getMessage());
 			} finally {
 				this.pool.returnVS( sensor );
 			}
