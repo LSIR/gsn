@@ -1,0 +1,75 @@
+<virtual-sensor name="ETZ_Radiometer__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                		TEMPERATURE = null;
+                		ENERGY_SHORTWAVE_UPPER = ENERGY_SHORTWAVE_LOWER = null;
+                		ENERGY_LONGWAVE_UPPER = ENERGY_LONGWAVE_LOWER = null;
+                		ENERGY_SUM = null;
+                    	
+                    	def v_ain = ((double)TEMPERATURE_A0)*1.024*2.5/Math.pow(2,16);
+                    	def v_27 = 2.5-v_ain;
+                    	def r_t = v_ain*27000/v_27;
+                    	TEMPERATURE = 1/(0.0010295+(0.0002391*Math.log(r_t)+0.0000001568*Math.pow(Math.log(r_t),3)))-273.15;
+                    	def t_k = TEMPERATURE+273.15;
+                    	
+                    	ENERGY_SHORTWAVE_UPPER = (((((double)SHORTWAVE_ADIFF01_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
+                    	ENERGY_SHORTWAVE_LOWER = (((((double)SHORTWAVE_ADIFF23_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
+                    	
+                    	ENERGY_LONGWAVE_UPPER = ((((((double)LONGWAVE_ADIFF01_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38)+(0.0000000567*Math.pow(t_k,4));
+                    	ENERGY_LONGWAVE_LOWER = ((((((double)LONGWAVE_ADIFF23_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38)+(0.0000000567*Math.pow(t_k,4));
+                    	
+                    	ENERGY_SUM = ENERGY_SHORTWAVE_UPPER - ENERGY_SHORTWAVE_LOWER + ENERGY_LONGWAVE_UPPER - ENERGY_LONGWAVE_LOWER;
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            
+            <field name="MERGED_STREAMS" type="INTEGER"/>
+            <field name="BUFFERED_STREAMS_FOR_MATCHING_FIELD1" type="BIGINT"/>
+            <field name="TOTAL_BUFFERED_STREAMS" type="BIGINT"/>
+            
+            <field name="SENSORTYPE" type="VARCHAR(100)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="TEMPERATURE" type="DOUBLE" unit="°C" />
+            <field name="ENERGY_SHORTWAVE_UPPER" type="DOUBLE" unit="W/m^2"/>
+            <field name="ENERGY_SHORTWAVE_LOWER" type="DOUBLE" unit="W/m^2" />
+            <field name="ENERGY_LONGWAVE_UPPER" type="DOUBLE" unit="W/m^2" />
+            <field name="ENERGY_LONGWAVE_LOWER" type="DOUBLE" unit="W/m^2" />
+            <field name="ENERGY_SUM" type="DOUBLE" unit="W/m^2" />
+        </output-structure>
+    </processing-class>
+    <description>Converted Radiometer messages from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data0">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Radiometer__merged</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

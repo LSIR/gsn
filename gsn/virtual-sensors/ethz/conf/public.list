@@ -357,6 +357,9 @@ Matterhorn_Mapping_Sensor.xml
 Matterhorn_Moisturechain1.xml
 Matterhorn_Moisturechain2.xml
 #Matterhorn_Moisturechain.xml
+Matterhorn_Radiometer__conv.xml
+Matterhorn_Radiometer__mapped.xml
+Matterhorn_Radiometer__merged.xml
 Matterhorn_Schedule__mapped.xml
 Matterhorn_Selfpotential.xml
 Matterhorn_Sensorrod1.xml

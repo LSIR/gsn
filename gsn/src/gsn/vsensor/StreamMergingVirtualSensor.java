@@ -29,7 +29,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	private static final String MATCHING_FIELD2 = "matching_field2";
 	private static final String DEFAULT_MERGE_OPERATOR = "default_merge_operator";
 	private static final String FILTER_DUPLICATES = "filter_duplicates";
-	private static final String DUPLICATES_IGNORE_FIELD = "duplicates_ignore_field";
+	private static final String DUPLICATES_IGNORE_FIELDS = "duplicates_ignore_field";
 
 	private static final Long CLEANUP_TIMER_PERIOD = 86400000L;
 	
@@ -73,7 +73,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	private String matchingFieldName2 = null;
 	private Operator defaultMergeOperator = null;
 	private boolean filterDuplicates = false;
-	private String duplicatesIgnoreField = null;
+	private String[] duplicatesIgnoreFields = null;
 	private DataField[] mergedDataFields;
 	Timer cleanupTimer = new Timer();
 
@@ -90,6 +90,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		TreeMap<String,String> params = vsensor.getMainClassInitialParams();
 		ArrayList<DataField> mergedFieldList = new ArrayList<DataField>();
 		String bucketEdgeTypeStr = null;
+		ArrayList<String> duplIgnoreFields = new ArrayList<String>();
 		
 		for (Entry<String,String> entry: params.entrySet()) {
 			String paramName = entry.getKey().trim().toLowerCase();
@@ -154,12 +155,13 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			else if (paramName.compareToIgnoreCase(FILTER_DUPLICATES) == 0) {
 				filterDuplicates = Boolean.parseBoolean(value);
 			}
-			else if (paramName.compareToIgnoreCase(DUPLICATES_IGNORE_FIELD) == 0) {
+			else if (paramName.toLowerCase().startsWith(DUPLICATES_IGNORE_FIELDS)) {
+				String postfix = paramName.replaceFirst(DUPLICATES_IGNORE_FIELDS, "");
 				if (!isInOutputStructure(value)) {
-					logger.error(DUPLICATES_IGNORE_FIELD + " (" + value + ") can not be found in output structure");
+					logger.error(DUPLICATES_IGNORE_FIELDS + postfix + " (" + value + ") can not be found in output structure");
 					return false;
 				}
-				duplicatesIgnoreField = value;
+				duplIgnoreFields.add(value);
 			}
 			else if (paramName.compareToIgnoreCase(DEFAULT_MERGE_OPERATOR) == 0) {
 				if (MERGE_Operator.get(value) == null) {
@@ -308,11 +310,15 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			logger.info("Duplicated streams will be filtered");
 		else
 			logger.info("Duplicated streams will not be filtered");
-		if (duplicatesIgnoreField != null) {
-			if (filterDuplicates)
-				logger.info("field " + duplicatesIgnoreField + " will be ignorded during duplicate filtering");
+		if (!duplIgnoreFields.isEmpty()) {
+			if (filterDuplicates) {
+				duplicatesIgnoreFields = new String[duplIgnoreFields.size()];
+				duplIgnoreFields.toArray(duplicatesIgnoreFields);
+				for (String s: duplIgnoreFields)
+					logger.info("field " + s + " will be ignorded during duplicate filtering");
+			}
 			else
-				logger.warn(DUPLICATES_IGNORE_FIELD + "(" + duplicatesIgnoreField + ") has no effect without enabling " + FILTER_DUPLICATES);
+				logger.warn(DUPLICATES_IGNORE_FIELDS + " has no effect without enabling " + FILTER_DUPLICATES);
 		}
 		
 		logger.info("Merging list:");
@@ -498,6 +504,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		private ArrayList<StreamElement> streamElements;
 		private StreamElement newSE;
 		private StreamElement oldSE;
+		private Long timestampSE = null;
 		private Long bucketStartTime = null;
 		private Long bucketEndTime = null;
 		
@@ -506,6 +513,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			streamElements.add(streamElement);
 			newSE = streamElement;
 			oldSE = streamElement;
+			timestampSE = streamElement.getTimeStamp();
 			
 			if (bucketSizeInMs != null) {
 				Long time = (Long) streamElement.getData(timeline);
@@ -533,14 +541,9 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			if (filterDuplicates) {
 				// discard duplicates
 				for (StreamElement se : streamElements) {
-					if (((Long)se.getData(timeline)).compareTo((Long)streamElement.getData(timeline)) == 0) {
-						String[] ignore = null;
-						if (duplicatesIgnoreField != null)
-							ignore = new String[]{duplicatesIgnoreField};
-						if (se.equalsIgnoreTimedAndFields(streamElement, ignore)) {
-							logger.warn("discard duplicate in StreamElement container: [" + streamElement.toString() + "]");
-							return false;
-						}
+					if (se.equalsIgnoreTimedAndFields(streamElement, duplicatesIgnoreFields)) {
+						logger.warn("discard duplicate in StreamElement container: [" + streamElement.toString() + "]");
+						return false;
 					}
 				}
 			}
@@ -556,6 +559,8 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 				bucketEndTime = bucketStartTime+bucketSizeInMs;
 			}
 			
+			if (streamElement.getTimeStamp() > timestampSE)
+				timestampSE = streamElement.getTimeStamp();
 			if (((Long)streamElement.getData(timeline)).compareTo((Long)newSE.getData(timeline)) > 0)
 				newSE = streamElement;
 			if (((Long)streamElement.getData(timeline)).compareTo((Long)oldSE.getData(timeline)) < 0)
@@ -600,7 +605,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 				}
 			}
 			
-			return new StreamElement(mergedDataFields, mergedData);
+			return new StreamElement(mergedDataFields, mergedData, timestampSE);
 		}
 
 		private Serializable newFnc(DataField dataField) {
