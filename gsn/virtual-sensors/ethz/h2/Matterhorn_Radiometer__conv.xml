@@ -12,19 +12,25 @@
                 		ENERGY_LONGWAVE_UPPER = ENERGY_LONGWAVE_LOWER = null;
                 		ENERGY_SUM = null;
                     	
-                    	def v_ain = ((double)TEMPERATURE_A0)*1.024*2.5/Math.pow(2,16);
-                    	def v_27 = 2.5-v_ain;
-                    	def r_t = v_ain*27000/v_27;
-                    	TEMPERATURE = 1/(0.0010295+(0.0002391*Math.log(r_t)+0.0000001568*Math.pow(Math.log(r_t),3)))-273.15;
-                    	def t_k = TEMPERATURE+273.15;
-                    	
-                    	ENERGY_SHORTWAVE_UPPER = (((((double)SHORTWAVE_ADIFF01_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
-                    	ENERGY_SHORTWAVE_LOWER = (((((double)SHORTWAVE_ADIFF23_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
-                    	
-                    	ENERGY_LONGWAVE_UPPER = ((((((double)LONGWAVE_ADIFF01_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38)+(0.0000000567*Math.pow(t_k,4));
-                    	ENERGY_LONGWAVE_LOWER = ((((((double)LONGWAVE_ADIFF23_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38)+(0.0000000567*Math.pow(t_k,4));
-                    	
-                    	ENERGY_SUM = ENERGY_SHORTWAVE_UPPER - ENERGY_SHORTWAVE_LOWER + ENERGY_LONGWAVE_UPPER - ENERGY_LONGWAVE_LOWER;
+                    	if (TEMPERATURE_A0 != null) {
+                    		def v_ain = ((double)TEMPERATURE_A0)*1.024*2.5/Math.pow(2,16);
+                    		def v_27 = 2.5-v_ain;
+                    		def r_t = v_ain*27000/v_27;
+                    		TEMPERATURE = 1/(0.0010295+(0.0002391*Math.log(r_t)+0.0000001568*Math.pow(Math.log(r_t),3)))-273.15;
+                    		def t_k = TEMPERATURE+273.15;
+                    		
+                    		if (SHORTWAVE_ADIFF01_1 != null )
+                    			ENERGY_SHORTWAVE_UPPER = (((((double)SHORTWAVE_ADIFF01_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
+                    		if (SHORTWAVE_ADIFF23_1 != null )
+                    			ENERGY_SHORTWAVE_LOWER = (((((double)SHORTWAVE_ADIFF23_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
+                    		
+                    		if (LONGWAVE_ADIFF01_1 != null )
+                    			ENERGY_LONGWAVE_UPPER = ((((((double)LONGWAVE_ADIFF01_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38)+(0.0000000567*Math.pow(t_k,4));
+                    		if (LONGWAVE_ADIFF23_1 != null )
+                    			ENERGY_LONGWAVE_LOWER = ((((((double)LONGWAVE_ADIFF23_1/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38)+(0.0000000567*Math.pow(t_k,4));
+                    		
+                    		ENERGY_SUM = ENERGY_SHORTWAVE_UPPER - ENERGY_SHORTWAVE_LOWER + ENERGY_LONGWAVE_UPPER - ENERGY_LONGWAVE_LOWER;
+                    	}
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -67,7 +73,7 @@
                     <predicate key="query"> select * from Matterhorn_Radiometer__merged</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select * from wrapper where position is not null </query>
             </source>
             <query> select * from source </query>
         </stream>

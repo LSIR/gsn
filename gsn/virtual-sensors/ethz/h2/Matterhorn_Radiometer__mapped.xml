@@ -54,7 +54,7 @@
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Dozer_AdcComDiff__mapped where timed > 1433116800000</predicate>
+                    <predicate key="query"> select * from Matterhorn_Dozer_AdcComDiff__mapped where generation_time > 1433116800000</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
