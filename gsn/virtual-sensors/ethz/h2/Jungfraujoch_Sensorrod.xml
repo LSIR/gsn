@@ -33,6 +33,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            
             <field name="SENSORTYPE" type="VARCHAR(100)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
@@ -40,6 +41,7 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            
             <field name="SR_REF1" type="VARCHAR(30)" unit="°C" />
             <field name="SR_REF2" type="VARCHAR(30)" unit="°C" />
             <field name="SR_T1" type="VARCHAR(30)" unit="°C" />
@@ -60,6 +62,10 @@
             <field name="SR_R42" type="VARCHAR(30)" unit="MΩ" />
             <field name="SR_R41" type="VARCHAR(30)" unit="MΩ" />
             <field name="SR_REF6" type="VARCHAR(30)" unit="MΩ" />
+            
+            <field name="MERGED_STREAMS" type="INTEGER"/>
+            <field name="BUFFERED_STREAMS_FOR_MATCHING_FIELD1" type="BIGINT"/>
+            <field name="TOTAL_BUFFERED_STREAMS" type="BIGINT"/>
         </output-structure>
     </processing-class>
     <description>Sensorrod/SR data (merged) from Jungfraujoch deployment</description>

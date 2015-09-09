@@ -33,6 +33,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            
             <field name="SENSORTYPE" type="VARCHAR(100)" />
             <field name="SENSORTYPE_SERIALID" type="BIGINT" />
             <field name="HEADER_SEQNR" type="INTEGER" />
@@ -40,6 +41,7 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s" />
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            
             <field name="TM_REF1" type="VARCHAR(30)" />
             <field name="TM_REF2" type="VARCHAR(30)" />
             <field name="TM_T1" type="VARCHAR(30)" />
@@ -54,6 +56,10 @@
             <field name="TM_M3" type="VARCHAR(30)" />
             <field name="TM_M4" type="VARCHAR(30)" />
             <field name="TM_REF6" type="VARCHAR(30)" />
+            
+            <field name="MERGED_STREAMS" type="INTEGER"/>
+            <field name="BUFFERED_STREAMS_FOR_MATCHING_FIELD1" type="BIGINT"/>
+            <field name="TOTAL_BUFFERED_STREAMS" type="BIGINT"/>
         </output-structure>
     </processing-class>
     <description>Moisturechain/TM data (merged) from Matterhorn deployment</description>
