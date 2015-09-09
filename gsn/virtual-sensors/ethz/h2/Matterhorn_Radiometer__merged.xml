@@ -58,10 +58,29 @@
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Radiometer__mapped</predicate>
+                    <predicate key="query"> select * from Matterhorn_Dozer_AdcComDiff__mapped where generation_time > 1433116800000</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper </query>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE,
+                               SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
+                               PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                               PAYLOAD_A0 as TEMPERATURE_A0,
+                               PAYLOAD_ADIFF01_1 as SHORTWAVE_ADIFF01_1,
+                               PAYLOAD_ADIFF23_1 as SHORTWAVE_ADIFF23_1 from wrapper where position = 15 </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Dozer_AdcComDiff__mapped where generation_time > 1433116800000</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE,
+                               SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
+                               PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                               PAYLOAD_ADIFF01_1 as LONGWAVE_ADIFF01_1,
+                               PAYLOAD_ADIFF23_1 as LONGWAVE_ADIFF23_1 from wrapper where position = 16 </query>
             </source>
             <query> select * from source </query>
         </stream>

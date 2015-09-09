@@ -63,7 +63,6 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 
 	private Map<Serializable,Map<Serializable,ArrayList<StreamElementContainer>>> streamElementBuffer = new HashMap<Serializable,Map<Serializable,ArrayList<StreamElementContainer>>>();
 	private Map<String,Operator> FieldNameToOperatorMap = new HashMap<String,Operator>();
-	private Map<String,Integer> validatedStreams = new HashMap<String,Integer>();
 	private Long bufferSizeInMs;
 	private Integer bucketSpace;
 	private String timeline;
@@ -359,16 +358,8 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			if (logger.isDebugEnabled())
 				startTime = System.currentTimeMillis();
 
-			// check source for correctness
-			if (!validatedStreams.containsKey(inputStreamName)) {
-				if(!isStreamValid(data)) {
-					logger.error("Input stream (" + inputStreamName + ") is not valide -> will not get processed");
-					return;
-				}
-				else
-					logger.info(inputStreamName + " successfully validated");
-				validatedStreams.put(inputStreamName, 1);
-			}
+			// add missing fields to stream element
+			data = addMissingFields(data);
 			
 			if (!streamElementBuffer.containsKey(match1)) {
 				streamElementBuffer.put(match1, Collections.synchronizedMap(new HashMap<Serializable,ArrayList<StreamElementContainer>>()));
@@ -390,14 +381,21 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		}
 	}
 	
-	private boolean isStreamValid(StreamElement data) {
+	private StreamElement addMissingFields(StreamElement data) {
+		ArrayList<DataField> dataFields = new ArrayList<DataField>();
 		for (DataField df: mergedDataFields) {
-			if (data.getType(df.getName()) == null) {
-				logger.error("there is no data field available in the stream element for " + df.getName());
-				return false;
-			}
+			if (data.getType(df.getName()) == null)
+				dataFields.add(df);
 		}
-		return true;
+		
+		if (dataFields.isEmpty())
+			return data;
+		
+		DataField[] dfArray = new DataField[dataFields.size()];
+		dataFields.toArray(dfArray);
+		Serializable[] d = new Serializable[dataFields.size()];
+		
+		return new StreamElement(data, dfArray, d);
 	}
 
 	private void processPerDeviceData(String inputStreamName, StreamElement data, Map<Serializable,ArrayList<StreamElementContainer>> streamElementContainerMap) throws Exception {

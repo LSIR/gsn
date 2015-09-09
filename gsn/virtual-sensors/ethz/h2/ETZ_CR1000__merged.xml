@@ -1,10 +1,10 @@
-<virtual-sensor name="Matterhorn_Thermistorchain" priority="10" >
+<virtual-sensor name="ETZ_CR1000__merged" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.StreamMergingVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="maximum_buffered_stream_age_in_days">90</param>
-            <param name="streams_needed_to_merge">2</param>
+            <param name="streams_needed_to_merge">5</param>
             <param name="timeline">GENERATION_TIME</param>
             <param name="default_merge_operator">ADD</param>
             <param name="merge_bucket_size_in_minutes">2</param>
@@ -20,41 +20,50 @@
             <param name="DEVICE_ID">OLD</param>
             <param name="GENERATION_TIME">OLD</param>
             <param name="TIMESTAMP">OLD</param>
-            <param name="SENSORTYPE">OLD</param>
-            <param name="SENSORTYPE_SERIALID">OLD</param>
             <param name="HEADER_SEQNR">OLD</param>
             <param name="HEADER_ORIGINATORID">OLD</param>
             <param name="HEADER_ATIME">OLD</param>
             <param name="PAYLOAD_SAMPLE_VALID">OLD</param>
             <param name="PAYLOAD_SAMPLE_NO">OLD</param>
+            <param name="PAYLOAD_SLAVE_ADDRESS">OLD</param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="SENSORTYPE" type="VARCHAR(100)" />
-            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+	    
             <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />
-            <field name="HEADER_ATIME" type="INTEGER" unit="s" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
-            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TC_REF1" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_REF2" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_T1" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_T2" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_T3" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_T4" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_REF3" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_REF4" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_T5" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_T6" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_T7" type="VARCHAR(30)" unit="°C" />
-            <field name="TC_T8" type="VARCHAR(30)" unit="°C" />
+            <field name="PAYLOAD_SLAVE_ADDRESS" type="SMALLINT" />
+            
+            <field name="BATTERY" type="DOUBLE" unit="V"/>
+            <field name="PANEL_TEMP" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_1" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_2" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_3" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_4" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_5" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_6" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_7" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_8" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_9" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_10" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_11" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_12" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_13" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_14" type="DOUBLE" unit="°C"/>
+            <field name="THERMISTOR_15" type="DOUBLE" unit="°C"/>
+            
+            <field name="MERGED_STREAMS" type="INTEGER"/>
+            <field name="BUFFERED_STREAMS_FOR_MATCHING_FIELD1" type="BIGINT"/>
+            <field name="TOTAL_BUFFERED_STREAMS" type="BIGINT"/>
         </output-structure>
     </processing-class>
-    <description>Thermistorchain/TC data (merged) from Matterhorn deployment</description>
+    <description>Merged CR1000 data from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -62,17 +71,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Thermistorchain1 </predicate>
-                    <predicate key="start-time">continue</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-        <stream name="data2">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Thermistorchain2 </predicate>
+                    <predicate key="query"> select * from ETZ_CR1000</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

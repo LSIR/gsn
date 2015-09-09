@@ -12,6 +12,7 @@ ETZ_CoreStationStatus_Static__mapped.xml
 ETZ_CoreStationStatus_Software__mapped.xml
 ETZ_CoreStationStatus_Hardware__mapped.xml
 ETZ_CR1000.xml
+ETZ_CR1000__merged.xml
 ETZ_Dozer_AdcComDiff__mapped.xml
 ETZ_Dozer_AdcMux1__mapped.xml
 ETZ_Dozer_AdcMux2__mapped.xml
