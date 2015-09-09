@@ -162,8 +162,8 @@ public class GSNCollector implements CollectdConfigInterface,
     public int read () {
         
         try {
-            URL _url = new URL (this.url);
-            Scanner s = new Scanner (_url.openStream());
+            //URL _url = new URL (this.url);
+            Scanner s = new Scanner (url.openStream());
             
             while (s.hasNextLine()) {
                 String line = s.nextLine();
@@ -201,10 +201,14 @@ public class GSNCollector implements CollectdConfigInterface,
   }
 
     private String getHost() {
-        
-    	String hostname = InetAddress.getLocalHost().getHostName().replaceAll("\\.", "_");
-        
-        return hostname;
+       
+    	try {
+            String hostname = InetAddress.getLocalHost().getHostName().replaceAll("\\.", "_");
+            return hostname;
+        } catch (UnknownHostException e) {
+            return "unknownhost";
+        } 
+        //return hostname;
 
     }
 
