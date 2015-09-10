@@ -30,18 +30,15 @@ import tinygsn.beans.StaticData;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.app.Activity;
-import android.graphics.Shader.TileMode;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuItem;
 
-public class ActivityWrapperEdit extends SherlockActivity {
+public class ActivityWrapperEdit extends Activity {
 
 	private EditText editText_dcDuration, editText_dcInterval;
 	private TextView textView_title;
@@ -53,21 +50,7 @@ public class ActivityWrapperEdit extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sensors_edit);
 
-		// This is a workaround for http://b.android.com/15340 from
-		// http://stackoverflow.com/a/5852198/132047
-		// if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-		// }
-		BitmapDrawable bg = (BitmapDrawable) getResources().getDrawable(
-				R.drawable.bg_striped);
-		bg.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-		getSupportActionBar().setBackgroundDrawable(bg);
-
-		BitmapDrawable bgSplit = (BitmapDrawable) getResources().getDrawable(
-				R.drawable.bg_striped_split_img);
-		bgSplit.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-		getSupportActionBar().setSplitBackgroundDrawable(bgSplit);
-
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		textView_title = (TextView) findViewById(R.id.textView_title);
 

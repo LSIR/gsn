@@ -68,13 +68,11 @@
         </activity>
         <activity
             android:name="tinygsn.gui.android.ActivityVSConfig"
-            android:label="@string/config"
-            android:theme="@style/Theme.Styled" >
+            android:label="@string/config" >
         </activity>
          <activity
             android:name="tinygsn.gui.android.ActivityWrapperEdit"
-            android:label="@string/edit"
-            android:theme="@style/Theme.Styled" >
+            android:label="@string/edit">
         </activity>
         <activity android:name="org.achartengine.GraphicalActivity" />
         <activity
@@ -131,8 +129,7 @@
         </activity>
         <activity
             android:name="tinygsn.gui.android.ActivityPullData"
-            android:label="@string/pull"
-            android:theme="@style/Theme.Styled" >
+            android:label="@string/pull" >
         </activity>
 
         <receiver

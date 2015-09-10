@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
 import tinygsn.beans.StreamElement;
 import tinygsn.controller.AndroidControllerVS;
 import tinygsn.gui.android.utils.VSListAdapter;
@@ -36,21 +37,20 @@ import tinygsn.gui.android.utils.VSRow;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 
 @SuppressLint("NewApi")
-public class ActivityListVS extends SherlockActivity implements Serializable  {
+public class ActivityListVS extends Activity implements Serializable  {
 
 	/**
 	 * 
@@ -96,12 +96,12 @@ public class ActivityListVS extends SherlockActivity implements Serializable  {
 
 	private void renderLayout(ArrayList<AbstractVirtualSensor> vsList) {
 		
-		ActionBar actionBar = getSupportActionBar();
+		ActionBar actionBar = getActionBar();
 		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
 				| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		numVS = (TextView) actionBar.getCustomView().findViewById(R.id.num_vs);
 		numVS.setText("0");

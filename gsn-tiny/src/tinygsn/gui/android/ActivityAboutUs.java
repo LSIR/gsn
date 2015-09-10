@@ -25,11 +25,11 @@
 
 package tinygsn.gui.android;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.MenuItem;
 
 /**
  * About the development team
@@ -37,13 +37,12 @@ import com.actionbarsherlock.view.MenuItem;
  * @author Do Ngoc Hoan (hoan.do@epfl.ch)
  *
  */
-public class ActivityAboutUs extends SherlockActivity {
+public class ActivityAboutUs extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.Sherlock___Theme_DarkActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         
         ((TextView)findViewById(R.id.text)).setText("About us: " 
         + "\n\n\tThis application is part of Global Sensor Networks (GSN)."

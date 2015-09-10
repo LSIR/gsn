@@ -28,10 +28,12 @@ package tinygsn.gui.android;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+
 import tinygsn.beans.DeliveryRequest;
 import tinygsn.controller.AndroidControllerPublish;
 import tinygsn.gui.android.utils.PublishListAdapter;
 import tinygsn.gui.android.utils.PublishRow;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,14 +41,13 @@ import android.os.Handler;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import android.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 
 
-public class ActivityListPublish extends SherlockActivity implements Serializable  {
+public class ActivityListPublish extends Activity implements Serializable  {
 
 	private static final long serialVersionUID = 8598546037770495346L;
 	private ListView listViewPublish;
@@ -88,12 +89,12 @@ public class ActivityListPublish extends SherlockActivity implements Serializabl
 
 	private void renderLayout(ArrayList<DeliveryRequest> list) {
 		
-		ActionBar actionBar = getSupportActionBar();
+		ActionBar actionBar = getActionBar();
 		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
 				| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		numVS = (TextView) actionBar.getCustomView().findViewById(R.id.num_vs);
 		numVS.setText("0");

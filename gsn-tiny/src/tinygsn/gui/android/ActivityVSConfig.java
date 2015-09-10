@@ -44,8 +44,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Shader.TileMode;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -65,11 +63,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuItem;
 
-public class ActivityVSConfig extends SherlockActivity {
+public class ActivityVSConfig extends Activity {
 	static int TEXT_SIZE = 10;
 	private Context context = this;
 	private Spinner spinnerVSType, field, condition, action;
@@ -97,21 +94,8 @@ public class ActivityVSConfig extends SherlockActivity {
 			editingVS = extras.getString("vsname");
 			loadEditingValues();
 		}
-		// This is a workaround for http://b.android.com/15340 from
-		// http://stackoverflow.com/a/5852198/132047
-		// if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-		// }
-		BitmapDrawable bg = (BitmapDrawable) getResources().getDrawable(
-				R.drawable.bg_striped);
-		bg.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-		getSupportActionBar().setBackgroundDrawable(bg);
 
-		BitmapDrawable bgSplit = (BitmapDrawable) getResources().getDrawable(
-				R.drawable.bg_striped_split_img);
-		bgSplit.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-		getSupportActionBar().setSplitBackgroundDrawable(bgSplit);
-
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		editText_vsName = (EditText) findViewById(R.id.editText_vsName);
 		table_notify_config = (TableLayout) findViewById(R.id.table_notify_config);

@@ -32,13 +32,12 @@ import tinygsn.gui.android.utils.SensorListAdapter;
 import tinygsn.gui.android.utils.SensorRow;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 
-
-public class ActivityListSensor extends SherlockFragmentActivity {
+public class ActivityListSensor extends FragmentActivity {
 
 
 	private ListView listViewSensors, listViewScheduler;
@@ -49,7 +48,7 @@ public class ActivityListSensor extends SherlockFragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sensors_list);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		listViewSensors = (ListView) findViewById(R.id.wrapper_list);
 		listViewScheduler = (ListView) findViewById(R.id.scheduler_list);
 		initialize();

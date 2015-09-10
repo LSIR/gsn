@@ -39,6 +39,7 @@ import tinygsn.controller.AndroidControllerPublish;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -49,11 +50,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuItem;
 
-public class ActivityPublishData extends SherlockFragmentActivity {
+public class ActivityPublishData extends FragmentActivity {
 	public static String[] STRATEGY = { "On demand", "Periodically", "Opportunistically" };
 	static int TEXT_SIZE = 10;
 	public static String DEFAULT_SERVER = "";
@@ -76,7 +76,7 @@ public class ActivityPublishData extends SherlockFragmentActivity {
 		super.onCreate(savedInstanceState);
 			
 		setContentView(R.layout.activity_publish_data);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		registerForContextMenu(findViewById(R.id.select_server_btn));
 
 		serverEditText = (EditText) findViewById(R.id.editText_server);

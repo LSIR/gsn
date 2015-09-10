@@ -46,6 +46,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -66,13 +67,11 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.MenuItem;
 
 
 
-public class ActivityViewData extends SherlockFragmentActivity {
+public class ActivityViewData extends FragmentActivity {
 	static int TEXT_SIZE = 10;
 
 
@@ -114,7 +113,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		if (extras != null) {
 			vsNameFromExtra = extras.getString(VSListAdapter.EXTRA_VS_NAME);
 		}
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		loadVSList();
 		loadViewMode();
@@ -559,7 +558,7 @@ public class ActivityViewData extends SherlockFragmentActivity {
 		newFragment.show(getSupportFragmentManager(), "dialog");
 	}
 
-	public static class DetailedDataFragment extends SherlockDialogFragment {
+	public static class DetailedDataFragment extends DialogFragment {
 		String text;
 
 		public static DetailedDataFragment newInstance(String text) {

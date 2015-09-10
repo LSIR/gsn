@@ -27,9 +27,6 @@ package tinygsn.gui.android.utils;
 
 import java.util.List;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import tinygsn.beans.StaticData;
 import tinygsn.controller.AndroidControllerWrapper;
 import tinygsn.gui.android.ActivityListSensor;
@@ -42,6 +39,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -155,10 +153,10 @@ public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 			sb.append(" - ").append(s).append("\n");
 		}
 		DialogFragment newFragment = DetailedDataFragment.newInstance(sb.toString());
-		newFragment.show(((SherlockFragmentActivity) context).getSupportFragmentManager(), "dialog");
+		newFragment.show(((FragmentActivity) context).getSupportFragmentManager(), "dialog");
 	}
 
-	public static class DetailedDataFragment extends SherlockDialogFragment {
+	public static class DetailedDataFragment extends DialogFragment {
 		String text;
 
 		public static DetailedDataFragment newInstance(String text) {

@@ -32,18 +32,17 @@ import tinygsn.controller.AndroidControllerSubscribe;
 import tinygsn.storage.db.SqliteStorageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import android.view.Menu;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-
-public class ActivitySubscribeData extends SherlockFragmentActivity {
+public class ActivitySubscribeData extends FragmentActivity {
 	public static String[] STRATEGY = { "Google Cloud Messaging (Push)", "GSN API (Pull)" };
 	static int TEXT_SIZE = 10;
 	public static String DEFAULT_SERVER = "";
@@ -60,7 +59,7 @@ public class ActivitySubscribeData extends SherlockFragmentActivity {
 		super.onCreate(savedInstanceState);
 			
 		setContentView(R.layout.activity_subscribe_data);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		registerForContextMenu(findViewById(R.id.select_server_btn_s));
 
 		serverEditText = (EditText) findViewById(R.id.editText_server_s);

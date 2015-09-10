@@ -35,13 +35,12 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 //import com.readystatesoftware.viewbadger.BadgeView;
 
-public class ActivityHome extends SherlockActivity {
+public class ActivityHome extends Activity {
 
 	Handler handlerVS;
 	TextView numVS = null;
@@ -50,7 +49,7 @@ public class ActivityHome extends SherlockActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.home);
-		getSupportActionBar().hide();
+		getActionBar().hide();
 		/*TextView subscribe = (TextView) findViewById(R.id.tvSubscribe);
 		BadgeView badge = new BadgeView(this, subscribe);
 		badge.setBadgePosition(BadgeView.POSITION_BOTTOM_RIGHT); 

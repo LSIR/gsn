@@ -28,30 +28,32 @@ package tinygsn.gui.android;
 
 import java.util.ArrayList;
 import java.util.Date;
+
 import tinygsn.beans.Subscription;
 import tinygsn.gui.android.utils.SubscribeListAdapter;
 import tinygsn.gui.android.utils.SubscribeRow;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import tinygsn.controller.AndroidControllerSubscribe;
 import tinygsn.gui.android.gcm.CommonUtilities;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.widget.Toast;
+
 import com.google.android.gcm.GCMRegistrar;
 
 
-public class ActivityListSubscription extends SherlockActivity {
+public class ActivityListSubscription extends Activity {
 
 	private ListView listViewSubscribe;
 	SubscribeListAdapter listAdapter;
@@ -101,12 +103,12 @@ public class ActivityListSubscription extends SherlockActivity {
 
 	private void renderLayout(ArrayList<Subscription> list) {
 		
-		ActionBar actionBar = getSupportActionBar();
+		ActionBar actionBar = getActionBar();
 		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
 				| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		numVS = (TextView) actionBar.getCustomView().findViewById(R.id.num_vs);
 		numVS.setText("0");
