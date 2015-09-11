@@ -117,15 +117,18 @@ public class ModellingVirtualSensor extends AbstractVirtualSensor {
 				am[i].pushData(streamElement,inputStreamName);//push the data to all other models too
 			}
 		}
-		if(out != null)
+		if(out != null){
 			Arrays.sort(out,new Comparator<StreamElement>(){
 				@Override
 				public int compare(StreamElement o1, StreamElement o2) {
 					return Long.valueOf(o1.getTimeStamp()).compareTo(o2.getTimeStamp());
 				}});
-			for(int i=0;i<out.length;i++)
-				if(out[i] != null)
-		            dataProduced(out[i]);
+			for(int i=0;i<out.length;i++){
+				if(out[i] != null){
+		            		dataProduced(out[i]);
+				}
+			}
+		}
 	}
 	
 	
