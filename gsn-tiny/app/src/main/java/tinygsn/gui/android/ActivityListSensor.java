@@ -127,5 +127,6 @@ public class ActivityListSensor extends FragmentActivity {
 				disableManaged();
 			}
 		}.execute(controller);
+
 	}
 }

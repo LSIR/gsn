@@ -1,26 +1,26 @@
 /**
-* Global Sensor Networks (GSN) Source Code
-* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
-*
-* This file is part of GSN.
-*
-* GSN is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* GSN is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with GSN. If not, see <http://www.gnu.org/licenses/>.
-*
-* File: gsn-tiny/src/tinygsn/gui/android/ActivityListSubscription.java
-*
-* @author Do Ngoc Hoan
-*/
+ * Global Sensor Networks (GSN) Source Code
+ * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+ * <p/>
+ * This file is part of GSN.
+ * <p/>
+ * GSN is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p/>
+ * GSN is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with GSN. If not, see <http://www.gnu.org/licenses/>.
+ * <p/>
+ * File: gsn-tiny/src/tinygsn/gui/android/ActivityListSubscription.java
+ *
+ * @author Do Ngoc Hoan
+ */
 
 
 package tinygsn.gui.android;
@@ -32,6 +32,7 @@ import java.util.Date;
 import tinygsn.beans.Subscription;
 import tinygsn.gui.android.utils.SubscribeListAdapter;
 import tinygsn.gui.android.utils.SubscribeRow;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -43,6 +44,7 @@ import android.widget.TextView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+
 import tinygsn.controller.AndroidControllerSubscribe;
 
 
@@ -51,7 +53,6 @@ public class ActivityListSubscription extends Activity {
 	private ListView listViewSubscribe;
 	SubscribeListAdapter listAdapter;
 	AndroidControllerSubscribe controller = new AndroidControllerSubscribe();
-
 
 	TextView numVS = null;
 
@@ -66,25 +67,25 @@ public class ActivityListSubscription extends Activity {
 		listAdapter = new SubscribeListAdapter(this, R.layout.subscribe_row_item, controller);
 		listViewSubscribe.setAdapter(listAdapter);
 
-		
+
 //		final String regId = GCMRegistrar.getRegistrationId(this);
 //		registerOnServer(regId);
 
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		initialize();
-	};
-
+	}
 
 	public void initialize() {
-		new AsyncTask<AndroidControllerSubscribe, Void, ArrayList<Subscription>>(){
+		new AsyncTask<AndroidControllerSubscribe, Void, ArrayList<Subscription>>() {
 			@Override
 			protected ArrayList<Subscription> doInBackground(AndroidControllerSubscribe... params) {
 				return params[0].loadList();
 			}
+
 			@Override
 			protected void onPostExecute(ArrayList<Subscription> result) {
 				renderLayout(result);
@@ -93,11 +94,11 @@ public class ActivityListSubscription extends Activity {
 	}
 
 	private void renderLayout(ArrayList<Subscription> list) {
-		
+
 		ActionBar actionBar = getActionBar();
 		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-				| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
+				                            | ActionBar.DISPLAY_SHOW_CUSTOM); // show it
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -107,13 +108,14 @@ public class ActivityListSubscription extends Activity {
 		listAdapter.notifyDataSetChanged();
 
 		for (Subscription su : list) {
-			
-			new AsyncTask<Subscription, Void, SubscribeRow>(){
+
+			new AsyncTask<Subscription, Void, SubscribeRow>() {
 				@Override
 				protected SubscribeRow doInBackground(Subscription... params) {
-					
-					return new SubscribeRow(params[0].getId(),params[0].getUrl(),params[0].isActive(),""+params[0].getLastTime(),params[0].getVsname());
+
+					return new SubscribeRow(params[0].getId(), params[0].getUrl(), params[0].isActive(), "" + params[0].getLastTime(), params[0].getVsname());
 				}
+
 				@Override
 				protected void onPostExecute(SubscribeRow result) {
 					listAdapter.add(result);
@@ -124,7 +126,7 @@ public class ActivityListSubscription extends Activity {
 
 		}
 		TextView lastUpdate = (TextView) actionBar.getCustomView().findViewById(
-				R.id.lastUpdate);
+				                                                                       R.id.lastUpdate);
 		lastUpdate.setText("Last update:\n" + (new Date()).toString());
 	}
 
@@ -133,8 +135,8 @@ public class ActivityListSubscription extends Activity {
 
 		final MenuItem add = menu.add("Add");
 		add.setIcon(R.drawable.plus_b).setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-				add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				                                              MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			public boolean onMenuItemClick(final MenuItem item) {
 				Intent myIntent = new Intent(ActivityListSubscription.this, ActivitySubscribeData.class);
@@ -145,7 +147,7 @@ public class ActivityListSubscription extends Activity {
 
 		final MenuItem refresh = menu.add("Refresh");
 		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+				                                                                      MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
@@ -162,18 +164,17 @@ public class ActivityListSubscription extends Activity {
 			}
 		});
 
-    	return super.onCreateOptionsMenu(menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		int itemId = item.getItemId();
 		switch (itemId) {
-		case android.R.id.home:
-			finish();
-			break;
+			case android.R.id.home:
+				finish();
+				break;
 		}
 		return true;
 	}
 
-}	
-	
+}
