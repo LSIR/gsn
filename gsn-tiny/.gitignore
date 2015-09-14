@@ -1,0 +1,9 @@
+# This gitignore is used to ignore local files of android app
+
+.gradle/
+.idea/
+build/
+gradle/
+gradlew*
+local.properties
+app/build/
