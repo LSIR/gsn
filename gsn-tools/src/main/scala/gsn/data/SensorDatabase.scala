@@ -13,6 +13,11 @@ import java.sql.DriverManager
 import gsn.data.format.TimeFormats._
 import org.joda.time.MonthDay
 import org.joda.time.DateTime
+import java.io.ByteArrayInputStream
+import java.io.ObjectInputStream
+import java.sql.ResultSet
+import com.hp.hpl.jena.datatypes.RDFDatatype
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 
 object SensorDatabase { 
   val log=LoggerFactory.getLogger(SensorDatabase.getClass)
@@ -27,8 +32,6 @@ object SensorDatabase {
 	Try{
 	  vsDB(ds).withSession {implicit session=>
 	 
-	  //val conn=vsDs(vsName)
-      //val stmt=conn.createStatement
 	  val stmt= session.conn.createStatement
       val rs= stmt.executeQuery(query)
       val data=fields map{f=>new ArrayBuffer[Any]}
@@ -63,23 +66,76 @@ object SensorDatabase {
   def asSensorData(s:Sensor)=
     SensorData(s.fields.map(f=>Series(f,Seq())),s )
   
+  def selectedFields(sensor:Sensor,fields:Seq[String])={
+    val selFields=
+      if (!fields.isEmpty)
+        sensor.fields.filter(f=>fields.contains(f.fieldName)).map(_.fieldName )
+      else sensor.fields.map(_.fieldName )
+    selFields.filterNot(_=="timestamp")
+  }  
+    
+  def aggregationQuery(sensorConf:SensorInfo, fields:Seq[String],
+			conditions:Seq[String], size:Option[Int],timeFormat:Option[String],
+			aggFunction:String,aggPeriod:Long):SensorData= {
+    val sensor=sensorConf.sensor
+    implicit val tf=timeFormat
+        
+    val selFields=selectedFields(sensor,fields)
+
+    val data=(0 until selFields.size).map{f=>new ArrayBuffer[Any]}
+    val time = new ArrayBuffer[Any]
+    
+ 	val query = new StringBuilder("select ")
+    val aggfields=selFields.map(f=>s"$aggFunction($f) as $f")
+    
+    query.append((Seq(s"floor(timed/$aggPeriod) as agg_interval")++aggfields).mkString(","))
+	query.append(" from ").append(sensor.name.toLowerCase )
+	if (conditions != null && conditions.length>0) 
+	  query.append(" where "+conditions.mkString(" and "))
+	query.append(" group by agg_interval")
+    if (size.isDefined) 
+	  query.append(" order by timed desc").append(" limit 0," + size.get);	
+
+    try{
+	  vsDB(sensorConf.ds).withSession {implicit session=>
+        val stmt=session.conn.createStatement
+	    log.debug("Query: "+query)
+        val rs=stmt.executeQuery(query.toString)
+        while (rs.next) {
+          time += formatTime(rs.getLong("agg_interval")*aggPeriod)
+          for (i <- selFields.indices) yield {
+            data(i) += (rs.getObject(selFields(i)) )
+          }           
+        }
+	  } 
+            	
+      val selectedOutput=sensor.fields.filter(f=>selFields.contains(f.fieldName) ) 
+      val ts=
+        Seq(Series(timeOutput(sensor.name),time)) ++
+        selectedOutput.indices.map{i=>
+          Series(selectedOutput(i),data(i).toSeq)
+        }
+      SensorData(ts,sensor)
+            
+	} catch {
+	  case e:Exception=> println(s"Query error ${e.getMessage}")
+	    throw e
+	} 
+  }   
+
+  
   def query(sensorConf:SensorInfo, fields:Seq[String],
 			conditions:Seq[String], size:Option[Int],timeFormat:Option[String]):SensorData= {
     val sensor=sensorConf.sensor
     implicit val tf=timeFormat
         
-    val ordered=(
-      if (!fields.isEmpty)
-        sensor.fields.filter(f=>fields.contains(f.fieldName))
-          .map(_.fieldName )
-      else sensor.fields.map(_.fieldName )
-    ).filterNot(_=="timestamp")
+    val selFields=selectedFields(sensor,fields)
 
-    val data=(0 until ordered.size).map{f=>new ArrayBuffer[Any]}
+    val data=(0 until selFields.size).map{f=>new ArrayBuffer[Any]}
     val time = new ArrayBuffer[Any]
     
  	val query = new StringBuilder("select ")
-    query.append((Seq("timed")++ordered).mkString(","))
+    query.append((Seq("timed")++selFields).mkString(","))
 	query.append(" from ").append(sensor.name.toLowerCase )
 	if (conditions != null && conditions.length>0) 
 	  query.append(" where "+conditions.mkString(" and "))
@@ -90,17 +146,16 @@ object SensorDatabase {
 	  vsDB(sensorConf.ds).withSession {implicit session=>
         val stmt=session.conn.createStatement
         val rs=stmt.executeQuery(query.toString)
-	    println(query)
+	    log.debug("Query: "+query)
         while (rs.next) {
-          //data(0) += ((rs.getLong("timed"),fmt.print(rs.getLong("timed"))))
           time += formatTime(rs.getLong("timed"))
-          for (i <- ordered.indices) yield {
-            data(i) += (rs.getObject(ordered(i)) )
+          for (i <- selFields.indices) yield {
+            data(i) += (rs.getObject(selFields(i)) )
           }           
         }
 	  } 
             	
-      val selectedOutput=sensor.fields.filter(f=>ordered.contains(f.fieldName) ) 
+      val selectedOutput=sensor.fields.filter(f=>selFields.contains(f.fieldName) ) 
       val ts=
         Seq(Series(timeOutput(sensor.name),time)) ++
         selectedOutput.indices.map{i=>
@@ -110,6 +165,82 @@ object SensorDatabase {
             
 	} catch {
 	  case e:Exception=> println(s"Query error ${e.getMessage}")
+	    throw e
+	} 
+  }   
+
+  
+  def queryGrid(sensorConf:SensorInfo,conditions:Seq[String],size:Option[Int],
+      timeFormat:Option[String],box:Option[Seq[Int]],
+      aggregation:Option[String],timeSeries:Boolean=false):SensorData= {
+    val sensor=sensorConf.sensor
+    implicit val tf=timeFormat
+        
+    val fieldNames=sensor.fields.map(_.fieldName).filterNot(_=="timestamp")
+
+    val data=(0 until fieldNames.size).map{f=>new ArrayBuffer[Any]}
+    val time = new ArrayBuffer[Any]    
+    
+ 	val query = new StringBuilder("select ")
+    query.append((Seq("timed")++fieldNames).mkString(","))
+	query.append(" from ").append(sensor.name.toLowerCase )
+	if (conditions != null && conditions.length>0) 
+	  query.append(" where "+conditions.mkString(" and "))
+    if (size.isDefined) 
+	  query.append(" order by timed desc").append(" limit 0," + size.get);	
+    try{
+	  vsDB(sensorConf.ds).withSession {implicit session=>
+        val stmt=session.conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY)
+        stmt.setFetchSize(Integer.MIN_VALUE)
+        val rs=stmt.executeQuery(query.toString)
+	    log.trace(query.toString)
+        while (rs.next) {
+          time += formatTime(rs.getLong("timed"))
+          for (i <- fieldNames.indices) yield {
+            if (sensor.fields(i).dataType == BinaryType){
+              val grid={
+                val rawGrid=GridTools.deserialize(rs.getBytes(fieldNames(i)))
+                val cropped=
+                  if (!box.isDefined) rawGrid               
+                  else GridTools.crop(rawGrid, GridTools.BoundingBox(box.get))
+                if (timeSeries) GridTools.summarize(cropped, aggregation.get, -999) 
+                else cropped
+              }
+              data(i) += (grid)
+            }
+            else 
+              data(i) += (rs.getObject(fieldNames(i)) )
+          }           
+        }
+	  } 
+      val selectedOutput=sensor.fields.filter(f=>fieldNames.contains(f.fieldName)) 
+      val noValueIdx=selectedOutput.zipWithIndex.
+        filter(a=>a._1.fieldName.equalsIgnoreCase("nodata_value")).head._2 
+	  if (aggregation.isDefined && !timeSeries){
+        val ts=
+          Seq(Series(timeOutput(sensor.name),Seq(time.head))) ++
+          selectedOutput.indices.map{i=>
+            if (selectedOutput(i).fieldName.equalsIgnoreCase("grid")){
+              val noValue=data(noValueIdx).head.asInstanceOf[Double]
+              val agg=GridTools.aggregate(data(i).asInstanceOf[Seq[GridTools.DoubleGrid]], aggregation.get, noValue)
+              Series(selectedOutput(i),Seq(agg))
+            }
+            else
+              Series(selectedOutput(i),Seq(data(i).head))
+          }
+        SensorData(ts,sensor)
+	  }
+	  else {
+        val ts=
+          Seq(Series(timeOutput(sensor.name),time)) ++
+          selectedOutput.indices.map{i=>
+            Series(selectedOutput(i),data(i).toSeq)
+          }
+        SensorData(ts,sensor)
+	  }
+	} catch {
+	  case e:Exception=> println(s"Query error ${e.getMessage}")
+	    e.printStackTrace()
 	    throw e
 	} 
   }   

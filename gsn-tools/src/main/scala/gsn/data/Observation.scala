@@ -25,3 +25,9 @@ case class SensorData(ts:Seq[Series],sensor:Sensor,stats:SensorStats=EmptyStats)
       ts.map{ t=>(t.output ,t.series.last) }
     }
 }
+
+class GridData(s:Sensor,stats:SensorStats,grid:Array[Array[Double]]) extends SensorData(Seq(),s,stats){
+  
+}
+
+

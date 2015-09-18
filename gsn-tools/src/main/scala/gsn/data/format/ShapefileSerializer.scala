@@ -17,10 +17,10 @@ import com.vividsolutions.jts.geom.Coordinate
 import java.util.UUID
 import java.nio.file.Paths
 import java.nio.file.Files
+import java.nio.file.Path
 import java.io.ByteArrayOutputStream
 import java.util.zip.ZipOutputStream
 import java.util.zip.ZipEntry
-import java.nio.file.Path
 import org.slf4j.LoggerFactory
 
 object ShapefileSerializer extends DataSerializer{
@@ -31,7 +31,7 @@ object ShapefileSerializer extends DataSerializer{
   override def ser(data:SensorData,props:Seq[String],latest:Boolean)=
     toShp(data,props).toString
 
-  private val extensions=Seq("dbf","shp","shx","prj")  
+  private val extensions=Seq("dbf","shp","shx","prj","fix")  
     
   def toShp(data:SensorData,props:Seq[String])=throw new NotImplementedError
   
@@ -41,7 +41,7 @@ object ShapefileSerializer extends DataSerializer{
     log.debug("Creating temp file "+id)
     val ff=Files.createTempFile(id.toString, ".shp")
     log.debug("Created temp file "+ff)
-    //val shp=new File(shpName)
+
     val dataStoreFac=new ShapefileDataStoreFactory
     val params=new java.util.HashMap[String,java.io.Serializable]()
     params.put("url", ff.toUri().toURL())
@@ -51,10 +51,11 @@ object ShapefileSerializer extends DataSerializer{
     
     val store=dataStoreFac.createNewDataStore(params)    
     
-    val propStr=props.map(p=>"$p:String").mkString(",")
+    val propStr=props.map(p=>s"${p.take(10)}:String").mkString(",")
     
     val TYPE = DataUtilities.createType("Location",
-                "the_geom:Point:srid=4326,vs_name:String," + propStr)// <- the geometry attribute: Point type
+                "the_geom:Point:srid=4326,vs_name:String," + propStr +
+                ",fields:String,units:String,dataTypes:String")
                                 
     
     val fBuilder = new SimpleFeatureBuilder(TYPE)
@@ -68,10 +69,14 @@ object ShapefileSerializer extends DataSerializer{
         fBuilder.add(point)
         fBuilder.add(d.sensor.name)
         props.foreach{p=>
-          fBuilder.add(d.sensor.properties.getOrElse(p, "") )
+          val dd=d.sensor.properties.getOrElse(p, "")
+          log.debug(p+"--"+dd)
+          fBuilder.add(dd )
         }
-        //fBuilder.add(d.sensor.name )
-        //fBuilder.add(2342)
+        fBuilder.add(d.sensor.fields.map{_.fieldName}.mkString(","))
+        fBuilder.add(d.sensor.fields.map{_.unit.code}.mkString(","))
+        fBuilder.add(d.sensor.fields.map{_.dataType.name}.mkString(","))
+
         val ff=fBuilder.buildFeature(null)
         features.add(ff)
       }
@@ -98,13 +103,13 @@ object ShapefileSerializer extends DataSerializer{
   private def zip(shpPath:Path)={
     val shpId=shpPath.getFileName.toString.replace(".shp","")
     val parent=shpPath.getParent.toString
-    val fNames=extensions.map(ext=>shpId+"."+ext)
+    //val fNames=extensions.map(ext=>shpId+"."+ext)
     val baos=new ByteArrayOutputStream
     val zos=new ZipOutputStream(baos)
-    fNames.foreach{name=>
-      val entry=new ZipEntry(name)
+    extensions.foreach{ext=>      
+      val entry=new ZipEntry("sensors."+ext)
       zos.putNextEntry(entry)
-      val path=Paths.get(parent+"/"+name)   
+      val path=Paths.get(parent+"/"+shpId+"."+ext)   
       val bt=toBytes(path)
       Files.delete(path)
       zos.write(bt)
@@ -119,6 +124,6 @@ object ShapefileSerializer extends DataSerializer{
   
   private def toPoint(loc:Location):Point={
     val gf=new GeometryFactory()
-    gf.createPoint(new Coordinate(loc.latitude.get,loc.longitude.get))    
+    gf.createPoint(new Coordinate(loc.longitude.get,loc.latitude.get))    
   }
 }

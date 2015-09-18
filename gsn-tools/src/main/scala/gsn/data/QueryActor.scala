@@ -42,8 +42,24 @@ class QueryActor(p:Promise[Seq[SensorData]]) extends Actor {
         g.period.map{p=>
           conds+=Periods.addConditions(s.stats.get.start.get, p)
         }
+        try{
+          if (g.agg.isEmpty)
+            p.success(Seq(query(s,g.fields ,conds ,g.size,g.timeFormat )))
+          else
+            p.success(Seq(aggregationQuery(s,g.fields ,conds ,g.size,g.timeFormat,g.agg.get.aggFunction,g.agg.get.aggPeriod)))
+        }                    
+        catch {
+          case e:Exception=>p.failure(e)
+            log.error(e.getMessage)
+        }                   
+        context stop self
+      }
+    case g:GetGridData =>
+      log.debug(s"get grid data from ${g.sensorid}")
+      gsnSensor ! GetSensorInfo(g.sensorid )
+      sensor.future.map{s=>
         try
-          p.success(Seq(query(s,g.fields ,conds ,g.size,g.timeFormat )))          
+          p.success(Seq(queryGrid(s,g.conditions ,g.size,g.timeFormat,g.boundingBox,g.aggregation,g.asTimeSeries)))          
         catch {
           case e:Exception=>p.failure(e)
             log.error(e.getMessage)

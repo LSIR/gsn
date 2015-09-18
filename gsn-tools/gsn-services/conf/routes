@@ -6,4 +6,6 @@ GET /api/sensors/:sensorid/data     controllers.gsn.api.SensorService.sensorData
 GET /api/sensors/:sensorid          controllers.gsn.api.SensorService.sensorMetadata(sensorid:String)
 GET /api/sensors/:sensorid/field/:fieldid         controllers.gsn.api.SensorService.sensorField(sensorid:String,fieldid:String)
 GET /api/sensors/:sensorid/field/:fieldid/process controllers.gsn.api.DataProcessService.processData(sensorid:String,fieldid:String)
+GET /api/sensors/:sensorid/grid     controllers.gsn.api.GridService.gridData(sensorid:String)
+GET /api/sensors/:sensorid/grid/timeseries    controllers.gsn.api.GridService.gridTimeseries(sensorid:String)
 #GET   /*path                       controllers.gsn.api.GsnProxy.v1(path: String)
