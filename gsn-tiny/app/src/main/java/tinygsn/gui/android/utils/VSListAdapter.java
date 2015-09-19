@@ -1,26 +1,26 @@
 /**
-* Global Sensor Networks (GSN) Source Code
-* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
-*
-* This file is part of GSN.
-*
-* GSN is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* GSN is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with GSN. If not, see <http://www.gnu.org/licenses/>.
-*
-* File: gsn-tiny/src/tinygsn/gui/android/utils/VSListAdapter.java
-*
-* @author Do Ngoc Hoan
-*/
+ * Global Sensor Networks (GSN) Source Code
+ * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+ * <p/>
+ * This file is part of GSN.
+ * <p/>
+ * GSN is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p/>
+ * GSN is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with GSN. If not, see <http://www.gnu.org/licenses/>.
+ * <p/>
+ * File: gsn-tiny/src/tinygsn/gui/android/utils/VSListAdapter.java
+ *
+ * @author Do Ngoc Hoan
+ */
 
 
 package tinygsn.gui.android.utils;
@@ -29,6 +29,7 @@ import tinygsn.controller.AndroidControllerVS;
 import tinygsn.gui.android.ActivityListVS;
 import tinygsn.gui.android.ActivityViewData;
 import tinygsn.gui.android.R;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -60,10 +61,10 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	static int TEXT_SIZE = 8;
 	AndroidControllerVS controller;
 	ActivityListVS activityListVSNew;
-	
 
-	public VSListAdapter(Context ctx, int resourceId, 
-			AndroidControllerVS controller, ActivityListVS activityListVSNew) {
+
+	public VSListAdapter(Context ctx, int resourceId,
+	                     AndroidControllerVS controller, ActivityListVS activityListVSNew) {
 
 		super(ctx, resourceId);
 		this.context = ctx;
@@ -74,46 +75,45 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 		this.activityListVSNew = activityListVSNew;
 	}
 
-    @Override
+	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+	    
+		convertView = (LinearLayout) inflater.inflate(resource, null);
 
-    	if(convertView == null){
-			convertView = (LinearLayout) inflater.inflate(resource, null);
-	
-			final VSRow vs = getItem(position);
-	
-			TextView txtName = (TextView) convertView.findViewById(R.id.vs_name);
-			txtName.setText(vs.getName());
-	
-			final Switch runningSwitch = (Switch) convertView
-					.findViewById(R.id.enableSwitch);
-			runningSwitch.setTextOn("Running");
-			runningSwitch.setTextOff("Disabled");
-			runningSwitch.setChecked(vs.isRunning());
-			runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					controller.startStopVS(vs.getName(), runningSwitch.isChecked());
-	
-					String state = "enabled";
-					if (runningSwitch.isChecked() == false)
-						state = "disabled";
-					Toast.makeText(context,
-							vs.getName() + " is " + state + " successfully!",
-							Toast.LENGTH_SHORT).show();
-				}
-			});
-	
-			TextView txtWiki = (TextView) convertView.findViewById(R.id.latest_values);
-			txtWiki.setText(vs.getLatestValue());
-	
-			ImageView view = (ImageView) convertView.findViewById(R.id.view);
-			view.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					startActivityViewData(vs.getName());
-				}
-			});
+		final VSRow vs = getItem(position);
+
+		TextView txtName = (TextView) convertView.findViewById(R.id.vs_name);
+		txtName.setText(vs.getName());
+
+		final Switch runningSwitch = (Switch) convertView
+				                                      .findViewById(R.id.enableSwitch);
+		runningSwitch.setTextOn("Running");
+		runningSwitch.setTextOff("Disabled");
+		runningSwitch.setChecked(vs.isRunning());
+		runningSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				controller.startStopVS(vs.getName(), runningSwitch.isChecked());
+
+				String state = "enabled";
+				if (runningSwitch.isChecked() == false)
+					state = "disabled";
+				Toast.makeText(context,
+						              vs.getName() + " is " + state + " successfully!",
+						              Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		TextView txtWiki = (TextView) convertView.findViewById(R.id.latest_values);
+		txtWiki.setText(vs.getLatestValue());
+
+		ImageView view = (ImageView) convertView.findViewById(R.id.view);
+		view.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivityViewData(vs.getName());
+			}
+		});
 	/*
 			ImageView edit = (ImageView) convertView.findViewById(R.id.config);
 			edit.setOnClickListener(new OnClickListener() {
@@ -124,34 +124,33 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 				}
 			});
 	*/
-			ImageView delete = (ImageView) convertView.findViewById(R.id.delete);
-			delete.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							switch (which) {
+		ImageView delete = (ImageView) convertView.findViewById(R.id.delete);
+		delete.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
 							case DialogInterface.BUTTON_POSITIVE:
 								controller.deleteVS(vs.getName());
 								Toast.makeText(context, vs.getName() + " is deleted!",
-										Toast.LENGTH_SHORT).show();
+										              Toast.LENGTH_SHORT).show();
 								activityListVSNew.initialize();
-	
+
 								break;
 							case DialogInterface.BUTTON_NEGATIVE:
 								break;
-							}
 						}
-					};
-	
-					AlertDialog.Builder builder = new AlertDialog.Builder(context);
-					builder.setMessage("Are you sure you want to delete \'" + vs.getName() + "\'?")
-							.setPositiveButton("Yes", dialogClickListener)
-							.setNegativeButton("No", dialogClickListener).show();
-				}
-			});
-    	}
+					}
+				};
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setMessage("Are you sure you want to delete \'" + vs.getName() + "\'?")
+						.setPositiveButton("Yes", dialogClickListener)
+						.setNegativeButton("No", dialogClickListener).show();
+			}
+		});
 		return convertView;
 
 	}
@@ -159,7 +158,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	protected void startActivityViewData(String vsName) {
 		Intent myIntent = new Intent(context, ActivityViewData.class);
 		myIntent.putExtra(EXTRA_VS_NAME, vsName);
-		
+
 		context.startActivity(myIntent);
 	}
 }
