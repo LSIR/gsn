@@ -21,7 +21,7 @@ public abstract class WrapperService extends IntentService{
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Bundle b = intent.getBundleExtra("tinygsn.beans.config");
-		config = (WrapperConfig) b.getParcelable("tinygsn.beans.config");
+		config = b.getParcelable("tinygsn.beans.config");
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
 		if (!config.isRunning()){
 			am.cancel(PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));

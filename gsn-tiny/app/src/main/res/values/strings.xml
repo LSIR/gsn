@@ -64,7 +64,7 @@
     <string name="options_clear">Clear</string>
     <string name="options_exit">Exit</string>
     <string name="test_vs_name">GPS virtual sensor</string>
-    <string name="test_value">longtitute: 20.2</string>
+    <string name="test_value">longitude: 20.2</string>
     <string name="view_data">tinyGSN - View data</string>
     <string name="config">tinyGSN - Config VS</string>
     <string name="edit">tinyGSN - Edit VS</string>

@@ -49,7 +49,7 @@
         <service android:name="tinygsn.model.wrappers.AndroidGyroscopeWrapper$GyroscopeService"/>
         <service android:name="tinygsn.model.wrappers.AndroidLightWrapper$LightService"/>
         <service android:name="tinygsn.model.wrappers.AndroidGPSWrapper$GPSService"/>
-        <service android:name="tinygsn.model.wrappers.AndroidAccelerometerWrapper$AccelometerService"/>
+        <service android:name="tinygsn.model.wrappers.AndroidAccelerometerWrapper$AccelerometerService"/>
         <service android:name="tinygsn.model.wrappers.AndroidGravityWrapper$GravityService"/>
         <service android:name="tinygsn.model.wrappers.AndroidLinearAccelerationWrapper$LinearAccService"/>
         <service android:name="tinygsn.model.wrappers.AndroidMagneticFieldWrapper$MagneticService"/>

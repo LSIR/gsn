@@ -69,7 +69,7 @@ public class AndroidControllerWrapper extends AbstractController {
 			}
 			
 		}
-		ArrayList<SensorRow> r = new ArrayList<SensorRow>();
+		ArrayList<SensorRow> r = new ArrayList<>();
 		for(AbstractWrapper w : wrapperList){
 			r.add(new SensorRow(w.getWrapperName(), w.getConfig().isRunning(), "duty cycle: "+w.getDcDuration() +"s every "+w.getDcInterval()+"s."));
 		}

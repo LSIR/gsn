@@ -51,7 +51,7 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements Sens
 	private static final String[] FIELD_DESCRIPTION = new String[] { "x", "y", "z" };
 	private static final String[] FIELD_TYPES_STRING = new String[] { "double", "double", "double" };
 
-	public final Class<? extends WrapperService> getSERVICE(){ return AccelometerService.class;}
+	public final Class<? extends WrapperService> getSERVICE(){ return AccelerometerService.class;}
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 
@@ -106,9 +106,9 @@ public class AndroidAccelerometerWrapper extends AbstractWrapper implements Sens
 		postStreamElement(streamElement);
 	}
 	
-	public static class AccelometerService extends WrapperService {
+	public static class AccelerometerService extends WrapperService {
 
-		public AccelometerService() {
+		public AccelerometerService() {
 			super("accelerometerService");
 		}
 	}
