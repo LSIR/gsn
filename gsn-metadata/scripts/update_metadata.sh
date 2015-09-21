@@ -8,6 +8,9 @@ server=${2:-$SERVER}
 
 echo "location = $location"
 
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+cd $DIR
 cd ../core/
 mvn compile exec:java -Dexec.mainClass="ch.epfl.gsn.metadata.tools.gsn.GSNImportTool" -Dexec.args="$location $server"
 

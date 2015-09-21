@@ -113,6 +113,7 @@ public class VirtualSensorMetadata extends GSNMetadata {
 
         this.description = newMetadata.getDescription();
         this.fromDate = newMetadata.getFromDate();
+        this.toDate = newMetadata.getToDate();
         this.isPublic = newMetadata.isPublic();
         this.metadataLink = newMetadata.getMetadataLink();
 

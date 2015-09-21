@@ -14,9 +14,9 @@
 rzslider {
     position: relative;
     display: inline-block;
-    width: 100%;
+    width: 90%;
     height: 4px;
-    margin: 25px 0 15px 0;
+    margin: 25px 5px 15px 5px;
     vertical-align: middle;
 }
 
@@ -34,9 +34,9 @@ rzslider span.rz-base {
 
 rzslider span.rz-bar-wrapper {
     width: 100%;
-    height: 32px;
-    padding-top: 16px;
-    margin-top: -16px;
+    height: 15px;
+    padding-top: 7px;
+    margin-top: -15px;
     box-sizing: border-box;
 }
 
@@ -60,23 +60,23 @@ rzslider span.rz-bar.rz-selection {
 }
 
 rzslider span.rz-pointer {
-    top: -11px;
+    top: -12px;
     z-index: 2;
-    width: 24px;
-    height: 24px;
+    width: 12px;
+    height: 12px;
     cursor: pointer;
     background-color: #B4BDC0;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 
 rzslider span.rz-pointer:after {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    width: 8px;
-    height: 8px;
+    top: 4px;
+    left: 4px;
+    width: 4px;
+    height: 4px;
     background: #ffffff;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -89,7 +89,7 @@ rzslider span.rz-pointer:hover:after {
 }
 
 rzslider span.rz-pointer.rz-active:after {
-    background-color: #451aff;
+    background-color: #136288;
 }
 
 rzslider span.rz-bubble {
@@ -97,6 +97,7 @@ rzslider span.rz-bubble {
     padding: 1px 3px;
     color: #2B2B2F;
     cursor: default;
+    font-size: smaller;
 }
 
 rzslider span.rz-bubble.rz-selection {

@@ -4,17 +4,18 @@ var allSensors = angular.module('allSensors', []);
 
 allSensors.factory('AllSensors', ['UrlBuilder', '$http',
     function (UrlBuilder, $http) {
-        var promise;
+        var promiseNames;
+        var promiseWithPrivacy;
 
         var AllSensors = {
-            loadData: function () {
-                if (!promise) {
+            loadNames: function () {
+                if (!promiseNames) {
 
                     var url = UrlBuilder.sensorListUrl();
 
                     console.log(url);
 
-                    promise = $http.get(url).then(function (response) {
+                    promiseNames = $http.get(url).then(function (response) {
 
                         // $http returns a promise, which has a then function, which also returns a promise
                         // The then function here is an opportunity to modify the response
@@ -23,27 +24,25 @@ allSensors.factory('AllSensors', ['UrlBuilder', '$http',
                     });
                 }
                 // Return the promise to the controller
-                return promise;
+                return promiseNames;
             },
 
             loadSensorsWithPrivacy: function() {
-                if (!promise) {
+                if (!promiseWithPrivacy) {
 
                     //var url = 'http://localhost:8090/web/virtualSensorNamesWithPrivacy';
-                    var url = 'http://eflumpc18.epfl.ch/gsn/web/virtualSensorNamesWithPrivacy';
+                    //var url = 'http://eflumpc18.epfl.ch/gsn/web/virtualSensorNamesWithPrivacy';
+                    var url = 'http://montblanc.slf.ch:8090/web/virtualSensorNamesWithPrivacy';
 
                     console.log(url);
 
-                    promise = $http.get(url).then(function (response) {
+                    promiseWithPrivacy = $http.get(url).then(function (response) {
                         return response.data;
                     });
                 }
-                return promise;
-            },
-
-            resetPromise: function() {
-                promise = null;
+                return promiseWithPrivacy;
             }
+
 
         };
 
