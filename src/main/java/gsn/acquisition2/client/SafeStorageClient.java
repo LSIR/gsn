@@ -26,15 +26,14 @@
 
 package gsn.acquisition2.client;
 
-import gsn.Main;
 import gsn.acquisition2.messages.DataMsg;
 import gsn.beans.AddressBean;
 import gsn.utils.KeyValueImp;
 
 import java.net.InetSocketAddress;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
@@ -47,7 +46,7 @@ public class SafeStorageClient {
   
   private static final int CONNECT_TIMEOUT = 30; // seconds 
   
-  private static transient Logger                                logger                              = Logger.getLogger ( SafeStorageClient.class );
+  private static transient Logger  logger = LoggerFactory.getLogger ( SafeStorageClient.class );
   
   
   public SafeStorageClient(String host,int port,AddressBean wrapperDetails) {
@@ -64,7 +63,7 @@ public class SafeStorageClient {
       ConnectFuture future = connector.connect(new InetSocketAddress(host, port), new SafeStorageClientSessionHandler(wrapperDetails ,new MessageHandler() {
 
         public boolean messageToBeProcessed(DataMsg dataMessage) {
-          System.out.println(dataMessage);
+          logger.trace(dataMessage.toString());
           return true;
         }
 
@@ -75,8 +74,7 @@ public class SafeStorageClient {
       future.join();
       session = future.getSession();
     } catch (RuntimeIOException e) {
-      logger.error("Failed to connect to "+host+":"+port); 
-      logger.error( e.getMessage(),e);
+      logger.error("Failed to connect to "+host+":"+port+": "+e.getMessage()); 
     }finally {
       if (session!=null)
         session.getCloseFuture().join();
@@ -84,7 +82,6 @@ public class SafeStorageClient {
   }
   
   public static void main(String[] args) {
-    PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
     AddressBean wrapperDetails = new AddressBean("mem2",new KeyValueImp("MyKey","MyValue"));
     new SafeStorageClient("localhost",12345,wrapperDetails);
   }

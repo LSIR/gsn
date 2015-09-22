@@ -42,12 +42,13 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class DemoVSensor extends AbstractVirtualSensor {
 
-	private static final transient Logger logger                  = Logger.getLogger( DemoVSensor.class );
+	private static final transient Logger logger                  = LoggerFactory.getLogger( DemoVSensor.class );
 
 	private ArrayList < String >          fields                  = new ArrayList < String >( );
 
@@ -87,7 +88,7 @@ public class DemoVSensor extends AbstractVirtualSensor {
 			try {
 				bufferedImage = ImageIO.read( input );
 			} catch ( IOException e ) {
-				e.printStackTrace( );
+				logger.error(e.getMessage(), e);
 			}
 			Graphics2D graphics = ( Graphics2D ) bufferedImage.getGraphics( );
 			int size = 30;
@@ -124,7 +125,7 @@ public class DemoVSensor extends AbstractVirtualSensor {
 			StreamElement outputSE = new StreamElement( OUTPUT_FIELDS , OUTPUT_TYPES , new Serializable [ ] { outputStream.toByteArray( ) } , data.getTimeStamp( ) );
 			dataProduced( outputSE );
 		}
-		if ( logger.isInfoEnabled( ) ) logger.info( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
+		logger.info( new StringBuilder( ).append( "Data received under the name: " ).append( inputStreamName ).toString( ) );
 	}
 
 	public boolean initialize ( ) {

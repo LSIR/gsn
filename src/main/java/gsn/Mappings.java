@@ -34,7 +34,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public final class Mappings {
    
@@ -44,17 +45,15 @@ public final class Mappings {
    
    private static final ConcurrentHashMap < String , TreeMap < String , Boolean >> vsNamesToOutputStructureFields = new ConcurrentHashMap < String , TreeMap < String , Boolean >>( );
    
-   private static final transient Logger                                 logger                         = Logger.getLogger( Mappings.class );
+   private static final transient Logger                                 logger                         = LoggerFactory.getLogger( Mappings.class );
    
    public static boolean addVSensorInstance ( VirtualSensor sensorPool ) {
       try {
-         if ( logger.isInfoEnabled( ) ) logger.info("Testing the pool for :" + sensorPool.getConfig( ).getName( ));
+         logger.info("Testing the pool for :" + sensorPool.getConfig( ).getName( ));
          sensorPool.returnVS( sensorPool.borrowVS( ) );
       } catch ( Exception e ) {
-         logger.error( e.getMessage( ) , e );
          sensorPool.closePool( );
-         logger.error( "GSN can't load the virtual sensor specified at " + sensorPool.getConfig( ).getFileName( ) + " because the initialization of the virtual sensor failed (see above exception)." );
-         logger.error( "Please fix the following error" );
+         logger.error( "GSN can't load the virtual sensor specified at " + sensorPool.getConfig( ).getFileName( ) + " because the initialization of the virtual sensor failed. "+e.getMessage( ) , e );
          return false;
       }
       TreeMap < String , Boolean > vsNameToOutputStructureFields = new TreeMap < String , Boolean >( );

@@ -30,7 +30,8 @@ package gsn.http.ac;
 import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -48,7 +49,7 @@ import java.util.Vector;
  */
 public class MyCreateGroupServlet  extends HttpServlet
 {
-     private static transient Logger logger                             = Logger.getLogger( MyCreateGroupServlet.class );
+     private static transient Logger logger                             = LoggerFactory.getLogger( MyCreateGroupServlet.class );
 
     /****************************************** Servlet Methods*******************************************/
     /******************************************************************************************************/
@@ -400,9 +401,7 @@ public class MyCreateGroupServlet  extends HttpServlet
 		}
         catch(Exception e)
         {
-            System.out.println("Exception caught : "+e.getMessage());
-            logger.error("ERROR IN getDSNames");
-			logger.error(e.getMessage(),e);
+            logger.error("ERROR IN getDSNames : " + e.getMessage());
         }
         finally
         {

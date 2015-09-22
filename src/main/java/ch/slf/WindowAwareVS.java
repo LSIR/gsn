@@ -34,7 +34,8 @@ import java.util.Hashtable;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * !! Get only the first value !! 
@@ -46,7 +47,7 @@ public abstract class WindowAwareVS extends AbstractVirtualSensor {
 
 	private static final String STEP_SIZE = "step-size";
 
-	private static transient Logger logger = Logger.getLogger ( WindowAwareVS.class );
+	private static transient Logger logger = LoggerFactory.getLogger ( WindowAwareVS.class );
 
 	private Hashtable<String, ArrayBlockingQueue<StreamElement>> circularBuffers;
 

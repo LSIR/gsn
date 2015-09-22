@@ -34,13 +34,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SafeStorageController {
 
 	public static final String SAFE_STORAGE_SHUTDOWN = "SS SHUTDOWN";
 
-	public static transient Logger logger = Logger.getLogger(SafeStorageController.class);
+	public static transient Logger logger = LoggerFactory.getLogger(SafeStorageController.class);
 
 	public SafeStorageController(final SafeStorageServer safeStorageServer, int safeStorageControllerPort) {
 		super();

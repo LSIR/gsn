@@ -29,7 +29,8 @@ package gsn.storage.db;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.storage.StorageManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -38,7 +39,7 @@ import java.sql.Types;
 
 public class H2StorageManager extends StorageManager {
 
-    private static final transient Logger logger = Logger.getLogger(H2StorageManager.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(H2StorageManager.class);
 
     public H2StorageManager() {
         super();

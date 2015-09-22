@@ -38,7 +38,8 @@ import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This wrapper enables one to reply the existing stream from a database.
@@ -46,7 +47,7 @@ import org.apache.log4j.Logger;
  */
 public class ReplayWrapper  extends AbstractWrapper{
   
-  private  transient Logger        logger            = Logger.getLogger( this.getClass() );
+  private  transient Logger        logger            = LoggerFactory.getLogger( this.getClass() );
   
   private int threadCounter= 0;
   
@@ -123,7 +124,7 @@ class DelayedDataEnumerator implements Enumeration<ScheduledStreamElement>{
   private int speed;
   private DataEnumerator data;
   private StreamElement previousElement =null;
-  private  transient Logger        logger            = Logger.getLogger( this.getClass() );
+  private  transient Logger        logger            = LoggerFactory.getLogger( this.getClass() );
   
   public DelayedDataEnumerator(String dbName, int speed) {
     this.speed = speed;

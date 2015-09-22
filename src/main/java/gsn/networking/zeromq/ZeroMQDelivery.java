@@ -3,6 +3,8 @@ package gsn.networking.zeromq;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
@@ -15,7 +17,6 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.rest.DeliverySystem;
-import gsn.http.rest.StreamElement4Rest;
 
 public class ZeroMQDelivery implements DeliverySystem{
 	
@@ -24,6 +25,7 @@ public class ZeroMQDelivery implements DeliverySystem{
 	private boolean closed = true;
 	private Kryo kryo = new Kryo();
 	private VSensorConfig config;
+	public static transient Logger logger = LoggerFactory.getLogger ( ZeroMQDelivery.class );
 	
 	public ZeroMQDelivery(VSensorConfig config){
         this.config = config;
@@ -58,7 +60,7 @@ public class ZeroMQDelivery implements DeliverySystem{
             //System.out.println(config.getName()+" sending on Delivery");
             return publisher.send(b);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		return false;
 	}

@@ -19,8 +19,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -36,7 +36,7 @@ public class ApiKeyInitializer implements ServletContextListener {
 
   private static final String PATH = "/api.key";
 
-  private final Logger logger = Logger.getLogger(getClass().getName());
+  private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
   public void contextInitialized(ServletContextEvent event) {
     logger.info("Reading " + PATH + " from resources (probably from " +
@@ -65,7 +65,7 @@ public class ApiKeyInitializer implements ServletContextListener {
       try {
         reader.close();
       } catch (IOException e) {
-        logger.log(Level.WARNING, "Exception closing " + PATH, e);
+        logger.warn("Exception closing " + PATH, e);
       }
     }
   }

@@ -52,7 +52,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class DownloadReport extends AbstractDataRequest {
 
@@ -60,7 +61,7 @@ public class DownloadReport extends AbstractDataRequest {
 
 	private static final int[] ALLOWED_REPORT_FIELDS_TYPES = new int[]{ Types.BIGINT, Types.DOUBLE, Types.FLOAT, Types.INTEGER, Types.NUMERIC, Types.REAL, Types.SMALLINT, Types.TINYINT};
 
-	private static transient Logger logger = Logger.getLogger(DownloadReport.class);
+	private static transient Logger logger = LoggerFactory.getLogger(DownloadReport.class);
 	
 	private Collection<Report> reports;
 	

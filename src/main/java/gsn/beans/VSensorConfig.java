@@ -39,7 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.commons.collections.KeyValue;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class VSensorConfig implements Serializable {
 
@@ -87,7 +88,7 @@ public class VSensorConfig implements Serializable {
     private String timeZone;
     private SimpleDateFormat sdf = null;
 
-    private transient final Logger                 logger                                    = Logger.getLogger( VSensorConfig.class );
+    private transient final Logger                 logger                                    = LoggerFactory.getLogger( VSensorConfig.class );
 
 	private String directoryQuery ;
 
@@ -337,8 +338,7 @@ public class VSensorConfig implements Serializable {
 			this.parsedStorageSize = p.getSecond();
 			this.isStorageCountBased = ! p.getFirst();
 			} catch ( final NumberFormatException e ) {
-				this.logger.error( new StringBuilder( ).append( "The storage size, " ).append( storageHistorySize ).append( ", specified for the virtual sensor : " ).append( this.name )
-						.append( " is not valid." ).toString( ) , e );
+				logger.error( "The storage size, " + storageHistorySize + ", specified for the virtual sensor : " + name + " is not valid.", e );
 				return false;
 			}
 		return true;
@@ -508,7 +508,7 @@ public class VSensorConfig implements Serializable {
 		try {
 		return Boolean.parseBoolean(access_protected.trim());
 		}catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 	}

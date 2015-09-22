@@ -31,7 +31,8 @@ import java.util.TreeMap;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SMACleaner extends AbstractVirtualSensor {
 	
@@ -39,7 +40,7 @@ public class SMACleaner extends AbstractVirtualSensor {
 	static double values[] ;
 	static private double error_threshold;
 	
-	private static final transient Logger logger = Logger.getLogger(SensorscopeVS.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(SensorscopeVS.class);
 	
 	public void dataAvailable(String inputStreamName,StreamElement in) {
 		Double input = (Double) in.getData()[0];

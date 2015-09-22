@@ -51,7 +51,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import gsn.storage.StorageManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
 
 public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
@@ -62,7 +63,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     private javax.swing.Timer keepAliveTimer = null;
 
-    private static transient Logger logger = Logger.getLogger(DataDistributer.class);
+    private static transient Logger logger = LoggerFactory.getLogger(DataDistributer.class);
 
     private static HashMap<Class<? extends DeliverySystem>, DataDistributer> singletonMap = new HashMap<Class<? extends DeliverySystem>, DataDistributer>();
     private Thread thread;
@@ -122,7 +123,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     public void addListener(DistributionRequest listener) {
         synchronized (listeners) {
             if (!listeners.contains(listener)) {
-                logger.warn("Adding a listener to Distributer:" + listener.toString());
+                logger.info("Adding a listener to Distributer:" + listener.toString());
                 boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
                 String query = SQLValidator.addPkField(listener.getQuery());
                 if (needsAnd)
@@ -142,7 +143,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                 addListenerToCandidates(listener);
 
             } else {
-                logger.warn("Adding a listener to Distributer failed, duplicated listener! " + listener.toString());
+                logger.info("Adding a listener to Distributer failed, duplicated listener! " + listener.toString());
             }
         }
     }
@@ -212,7 +213,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                     removeListenerFromCandidates(listener);
                     preparedStatements.get(listener).close();
                     listener.close();
-                    logger.warn("Removing listener completely from Distributer [Listener: " + listener.toString() + "]");
+                    logger.info("Removing listener completely from Distributer [Listener: " + listener.toString() + "]");
                 } catch (SQLException e) {
                     logger.error(e.getMessage(), e);
                 } finally {
@@ -272,9 +273,9 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     				DeliverySystem delivery = new ZeroMQDelivery(config);
 					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(),System.currentTimeMillis()));
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					logger.error(e1.getMessage(), e1);
 				} catch (SQLException e1) {
-					e1.printStackTrace();
+					logger.error(e1.getMessage(), e1);
 				}
     		}
     	}

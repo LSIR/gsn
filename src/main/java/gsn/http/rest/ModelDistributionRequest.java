@@ -34,11 +34,12 @@ import gsn.beans.VSensorConfig;
 import gsn.storage.SQLValidator;
 import gsn.utils.models.AbstractModel;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ModelDistributionRequest implements DistributionRequest {
 
-		private static transient Logger       logger     = Logger.getLogger ( DefaultDistributionRequest.class );
+		private static transient Logger       logger     = LoggerFactory.getLogger ( DefaultDistributionRequest.class );
 
 		private String query;
 

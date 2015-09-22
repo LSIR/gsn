@@ -30,12 +30,13 @@ package gsn.vsensor;
 import gsn.beans.StreamElement;
 
 import gsn.beans.VSensorConfig;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import java.util.TreeMap;
 
 public class BridgeVirtualSensor extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensor.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(BridgeVirtualSensor.class);
     private boolean allow_nulls = true; // by default allow nulls
 
     public boolean initialize() {
@@ -55,11 +56,10 @@ public class BridgeVirtualSensor extends AbstractVirtualSensor {
             if (!areAllFieldsNull(data))
                 dataProduced(data);
             else {
-                if (logger.isDebugEnabled())
-                    logger.debug("Nulls received for timestamp (" + data.getTimeStamp() + "), discarded");
+                logger.debug("Nulls received for timestamp (" + data.getTimeStamp() + "), discarded");
             }
         }
-        if (logger.isDebugEnabled()) logger.debug("Data received under the name: " + inputStreamName);
+        logger.debug("Data received under the name: " + inputStreamName);
     }
 
     public boolean areAllFieldsNull(StreamElement data) {

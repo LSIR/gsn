@@ -41,7 +41,8 @@ import java.util.TreeMap;
 
 import javax.swing.Timer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements ActionListener {
 
@@ -53,7 +54,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 	private String table_name;
 	private long last_updated;
 
-	private static final transient Logger logger = Logger.getLogger( ClockedBridgeVirtualSensor.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( ClockedBridgeVirtualSensor.class );
 
 	public boolean initialize ( ) {
 
@@ -115,7 +116,7 @@ public class ClockedBridgeVirtualSensor extends AbstractVirtualSensor implements
 
 	public void dataAvailable ( String inputStreamName , StreamElement data ) {
 		dataProduced( data );
-		if ( logger.isDebugEnabled( ) ) logger.debug( "Data received under the name: " + inputStreamName );
+		logger.debug( "Data received under the name: " + inputStreamName );
 	}
 
 	public void dispose ( ) {

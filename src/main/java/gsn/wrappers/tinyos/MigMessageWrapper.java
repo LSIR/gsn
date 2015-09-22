@@ -48,7 +48,8 @@ import net.tinyos.message.MoteIF;
 import net.tinyos.packet.BuildSource;
 import net.tinyos.util.PrintStreamMessenger;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /** MigMessageWrapper is used for reading TinyOS 2.x generated data packets.
  * The wrapper reads packet definition from a MIG-generated .java-file and
@@ -72,7 +73,7 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
   private String classPackage;
   
   private int threadCounter = 0;
-  private final transient Logger logger = Logger.getLogger( MigMessageWrapper.class );
+  private final transient Logger logger = LoggerFactory.getLogger( MigMessageWrapper.class );
   
   private transient DataField [ ] outputStructureCache;
   
@@ -294,10 +295,8 @@ public class MigMessageWrapper extends AbstractWrapper implements net.tinyos.mes
           if(methodName.equals("get_" + fieldName)) {
             method.setAccessible(true);
             Serializable value = (Serializable) method.invoke(packetObject);
-            if (logger.isDebugEnabled()) {
               logger.debug("Using " + methodName);
               logger.debug("Got: " + value.getClass().getCanonicalName());
-            }
             if(isArray) {
               for(int i=0; i < Array.getLength(value); i++) {
                 retvals.add((Serializable) Array.get(value, i));

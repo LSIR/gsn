@@ -27,11 +27,12 @@ package gsn.wrappers;
 
 import gsn.beans.AddressBean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ProxiedWrapper {
   
-  private final static transient Logger      logger         = Logger.getLogger( ProxiedWrapper.class );
+  private final static transient Logger      logger         = LoggerFactory.getLogger( ProxiedWrapper.class );
   
   String remoteHost ;
   String remotePort;

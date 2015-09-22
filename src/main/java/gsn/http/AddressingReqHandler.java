@@ -42,18 +42,18 @@ import javax.servlet.http.HttpSession;
 import gsn.http.ac.User;
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class AddressingReqHandler implements RequestHandler {
 
-    private static transient Logger logger = Logger.getLogger(AddressingReqHandler.class);
+    private static transient Logger logger = LoggerFactory.getLogger(AddressingReqHandler.class);
 
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         String vsName = request.getParameter("name");
         VSensorConfig sensorConfig = Mappings.getVSensorConfig(vsName);
-        if (logger.isInfoEnabled())
-            logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
+        logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
         StringBuilder sb = new StringBuilder("<virtual-sensor name=\"").append(vsName).append("\" last-modified=\"").append(new File(sensorConfig.getFileName()).lastModified()).append("\">\n");
         for (KeyValue df : sensorConfig.getAddressing())
             sb.append("<predicate key=\"").append(StringEscapeUtils.escapeXml(df.getKey().toString())).append("\">").append(StringEscapeUtils.escapeXml(df.getValue().toString()))

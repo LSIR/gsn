@@ -27,7 +27,8 @@
 package gsn.http.ac;
 
 import gsn.Main;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -37,7 +38,7 @@ import java.util.Vector;
 
 public class MyUserDetailUpdateServlet extends HttpServlet
 {
-    private static transient Logger logger                             = Logger.getLogger( MyUserDetailUpdateServlet.class );
+    private static transient Logger logger                             = LoggerFactory.getLogger( MyUserDetailUpdateServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/
     public void doGet(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException

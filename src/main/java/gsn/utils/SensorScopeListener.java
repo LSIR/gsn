@@ -30,15 +30,15 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SensorScopeListener {
     public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
     private static final String CONF_SENSORSCOPE_SERVER_PROPERTIES = "conf/sensorscope_server.properties";
     private static final String DEFAULT_FOLDER_FOR_CSV_FILES = "logs";
 
-    private static transient Logger logger = Logger.getLogger(SensorScopeListener.class);
+    private static transient Logger logger = LoggerFactory.getLogger(SensorScopeListener.class);
     private static String csvFolderName = null;
     private static String DEFAULT_NULL_STRING = "null";
     private static String nullString = DEFAULT_NULL_STRING;
@@ -96,7 +96,6 @@ public class SensorScopeListener {
 
     public static void main(String args[]) {
         config();
-        PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
         new SensorScopeListener(port);
     }
 }

@@ -29,7 +29,8 @@ package gsn.utils;
 import java.io.Serializable;
 
 import org.apache.commons.collections.KeyValue;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * The <I> Predicate </I> class represents mapping between a key and a value.
@@ -40,7 +41,7 @@ public class KeyValueImp implements KeyValue , Serializable {
    
 	private static final long serialVersionUID = 5739537343169906104L;
 
-	private transient final Logger logger = Logger.getLogger( KeyValueImp.class );
+	private transient final Logger logger = LoggerFactory.getLogger( KeyValueImp.class );
    
    private String                 key;
    

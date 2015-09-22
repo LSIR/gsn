@@ -50,13 +50,14 @@ import javax.servlet.http.HttpSession;
 
 import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 //path="/WEB-INF/file_not_found.jpg"
 
 public class FieldDownloadServlet extends HttpServlet {
 
-	private static transient Logger                                      logger                             = Logger.getLogger( FieldDownloadServlet.class );
+	private static transient Logger                                      logger                             = LoggerFactory.getLogger( FieldDownloadServlet.class );
 
 	static final String prefix  = "select * from ";
 
@@ -126,13 +127,9 @@ public class FieldDownloadServlet extends HttpServlet {
 				}
 			}
 		} catch (NumberFormatException e1) {
-			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey);
-			logger.error(e1.getMessage(),e1);
-			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
+			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey+" from "+req.getRemoteAddr()+"- "+req.getRemoteHost()+": "+e1.getMessage());
 		} catch (SQLException e1) {
-			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey);
-			logger.error(e1.getMessage(),e1);
-			logger.error("Query is from "+req.getRemoteAddr()+"- "+req.getRemoteHost());
+			logger.error("ERROR IN EXECUTING, query: "+query+", colName:"+colName+",primaryKey:"+primaryKey+" from "+req.getRemoteAddr()+"- "+req.getRemoteHost()+": "+e1.getMessage());
 		}finally{
 			Main.getStorage(vsName).close(conn);
 		}

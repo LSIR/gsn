@@ -36,7 +36,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import java.sql.SQLException;
 
 /**
@@ -48,7 +49,7 @@ import java.sql.SQLException;
  */
 public class MyUpdateUserWaitingForDataSourceServlet extends HttpServlet
 {
-    private static transient Logger logger                             = Logger.getLogger( MyUpdateUserWaitingForDataSourceServlet.class );
+    private static transient Logger logger                             = LoggerFactory.getLogger( MyUpdateUserWaitingForDataSourceServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/
     public void doPost(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException

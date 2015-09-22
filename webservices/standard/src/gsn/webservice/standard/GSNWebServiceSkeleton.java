@@ -37,7 +37,6 @@ import gsn.Mappings;
 import gsn.beans.*;
 import gsn.http.ac.GeneralServicesAPI;
 import gsn.http.ac.User;
-import gsn.http.ac.UserInteractionsAPI;
 import gsn.http.datarequest.AbstractQuery;
 import gsn.http.datarequest.LimitCriterion;
 import gsn.http.datarequest.QueriesBuilder;
@@ -48,7 +47,8 @@ import gsn.webservice.standard.xsd.*;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.commons.collections.KeyValue;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.sql.Connection;
@@ -59,7 +59,7 @@ import java.util.*;
  */
 public class GSNWebServiceSkeleton {
 
-    private static transient Logger logger = Logger.getLogger(GSNWebServiceSkeleton.class);
+    private static transient Logger logger = LoggerFactory.getLogger(GSNWebServiceSkeleton.class);
 
 
     /**

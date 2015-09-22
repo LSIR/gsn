@@ -26,7 +26,8 @@
 
 package gsn.http;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +35,7 @@ import java.io.IOException;
 
 public class IPSourceFilter implements Filter {
 
-    private static transient Logger logger = Logger.getLogger( IPSourceFilter.class );
+    private static transient Logger logger = LoggerFactory.getLogger( IPSourceFilter.class );
 
     private FilterConfig filterConfig;
 

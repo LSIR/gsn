@@ -38,7 +38,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.h2.command.CommandInterface;
 import org.h2.command.Parser;
 import org.h2.command.Prepared;
@@ -48,7 +49,7 @@ import org.h2.engine.Session;
 
 public class SQLValidator implements VSensorStateChangeListener {
 
-	private static final transient Logger logger             = Logger.getLogger( SQLValidator.class );
+	private static final transient Logger logger             = LoggerFactory.getLogger( SQLValidator.class );
 
 	private Session session = null;
 	private Connection connection;

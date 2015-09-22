@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.sql.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /*
  *  Each AbstractVirtualSensor will have a reference to its instance of AnomalyDetector
@@ -24,7 +25,7 @@ import org.apache.log4j.Logger;
 
 public class AnomalyDetector implements Monitorable { 
     
-    private static final transient Logger logger = Logger.getLogger (AnomalyDetector.class);
+    private static final transient Logger logger = LoggerFactory.getLogger (AnomalyDetector.class);
        
     /* Reference to the VirtualSensor this instance belongs to */
     private AbstractVirtualSensor sensor;
@@ -571,7 +572,7 @@ public class AnomalyDetector implements Monitorable {
             countOutliers (stat, NEGATIVE);
             interQuartileRange(stat);
             countUnique(stat);
-        } catch (SQLException e) { e.printStackTrace(); } 
+        } catch (SQLException e) { logger.error(e.getMessage(), e); } 
     
         return stat; 
     

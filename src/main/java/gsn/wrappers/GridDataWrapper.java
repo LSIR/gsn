@@ -28,7 +28,8 @@ package gsn.wrappers;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -42,7 +43,7 @@ import java.util.regex.Pattern;
 
 
 public class GridDataWrapper extends AbstractWrapper {
-    private static final transient Logger logger = Logger.getLogger(GridDataWrapper.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(GridDataWrapper.class);
     private static int threadCounter;
 
     private String directory;
@@ -172,17 +173,17 @@ public class GridDataWrapper extends AbstractWrapper {
         } catch (FileNotFoundException e) {
             success = false;
             logger.warn("File not found: " + fileName);
-            logger.warn(e);
+            logger.warn(e.getMessage());
         } catch (IOException e) {
             success = false;
             logger.warn("IO exception on opening of file: " + fileName);
-            logger.warn(e);
+            logger.warn(e.getMessage());
         } finally {
             try {
                 reader.close();
             } catch (IOException e) {
                 logger.warn("IO exception on closing of file: " + fileName);
-                logger.warn(e);
+                logger.warn(e.getMessage());
             }
         }
 
@@ -210,11 +211,10 @@ public class GridDataWrapper extends AbstractWrapper {
             } catch (IndexOutOfBoundsException e) {
                 success = false;
                 logger.warn("Badly formatted file: " + fileName);
-                logger.warn(e);
+                logger.warn(e.getMessage());
             }
 
             if (success) {
-                System.out.println("format is correct");
                 ncols = Integer.parseInt(header[0]);
                 nrows = Integer.parseInt(header[1]);
                 xllcorner = Double.parseDouble(header[2]);
@@ -246,7 +246,6 @@ public class GridDataWrapper extends AbstractWrapper {
                                 raw.add(NODATA_value);
                         } catch (java.lang.NumberFormatException e) {
                             logger.warn(j + ": \"" + aLine[j] + "\"");
-                            logger.warn(e);
                             logger.warn(e.getMessage());
                         }
                         //System.out.println(i + "," + j + " : " + d);
@@ -255,7 +254,7 @@ public class GridDataWrapper extends AbstractWrapper {
                 }
 
                 logger.debug("Size of list => " + raw.size() + " ? " + ncols * nrows);
-                logger.debug(raw);
+                logger.debug(raw.toString());
 
                 if (raw.size() == nrows * ncols) {
                     rawData = new Double[nrows][ncols];
@@ -332,7 +331,7 @@ public class GridDataWrapper extends AbstractWrapper {
             oos.close();
             bos.close();
 
-            System.out.println("size => " + bos.toByteArray().length);
+            logger.trace("size => " + bos.toByteArray().length);
 
             stream[0] = new Integer(ncols);
             stream[1] = new Integer(nrows);
@@ -385,7 +384,7 @@ public class GridDataWrapper extends AbstractWrapper {
                 for (int j = 0; j < deserial[0].length; j++) {
                     sb.append(deserial[i][j]).append(" ");
                 }
-                System.out.println(sb.toString());
+                logger.trace(sb.toString());
             }
 
         } catch (IOException e) {

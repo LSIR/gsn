@@ -30,7 +30,8 @@ import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.geo.GridTools;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.imageio.ImageIO;
 
 import java.awt.Color;
@@ -48,7 +49,7 @@ import java.util.TreeMap;
 
 public class GridRenderer extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(GridRenderer.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(GridRenderer.class);
 
     private static final String CELL_PIXELS = "cellpixels";
     private static final String MAP_OVERLAY = "mapoverlay";
@@ -228,9 +229,9 @@ public class GridRenderer extends AbstractVirtualSensor {
 	    		    cache.put(centerX+centerY*180+zoom*180*360+width*180*360*20+height*180*360*20*1000, osmap);
 	    		}
 			} catch (MalformedURLException e1) {
-				e1.printStackTrace();
+				logger.error(e1.getMessage(), e1);
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				logger.error(e1.getMessage(), e1);
 			}
 	    	//go through the picture pixel by pixel
 	    	for (int x=0;x<width;x++)

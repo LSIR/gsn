@@ -37,7 +37,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This virtual sensor is used for accessing Sensorscope data with
@@ -46,7 +47,7 @@ import org.apache.log4j.Logger;
 
 public class SensorscopeVS extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(SensorscopeVS.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(SensorscopeVS.class);
 
     private int SAMPLING_TIME = 30000;
     private static final int NO_VALUE = Short.MIN_VALUE;

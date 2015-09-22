@@ -37,7 +37,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class HttpGetWrapper extends AbstractWrapper {
    
@@ -45,7 +46,7 @@ public class HttpGetWrapper extends AbstractWrapper {
    
    private static int               threadCounter      = 0;
    
-   private final transient Logger   logger             = Logger.getLogger( HttpGetWrapper.class );
+   private final transient Logger   logger             = LoggerFactory.getLogger( HttpGetWrapper.class );
    
    private String                   urlPath;
    
@@ -83,7 +84,7 @@ public class HttpGetWrapper extends AbstractWrapper {
       if ( inputRate == null || inputRate.trim( ).length( ) == 0 ) rate = DEFAULT_RATE;
       else
          rate = Integer.parseInt( inputRate );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
+      logger.debug( "AXISWirelessCameraWrapper is now running @" + rate + " Rate." );
       return true;
    }
    

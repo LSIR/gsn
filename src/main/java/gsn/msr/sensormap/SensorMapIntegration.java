@@ -33,10 +33,11 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SensorMapIntegration implements VSensorStateChangeListener{
-	private static transient Logger logger = Logger.getLogger ( SensorMapIntegration.class );
+	private static transient Logger logger = LoggerFactory.getLogger ( SensorMapIntegration.class );
 	
 	public boolean vsLoading(VSensorConfig config) {
 		if (config.getPublishToSensorMap())

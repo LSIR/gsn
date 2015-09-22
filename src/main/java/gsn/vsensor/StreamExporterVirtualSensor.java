@@ -33,7 +33,8 @@ import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.utils.GSNRuntimeException;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -49,7 +50,7 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
 
 	public static final String[] OBLIGATORY_PARAMS = new String[] {PARAM_USER,PARAM_URL,PARAM_DRIVER};
 
-	private static final transient Logger logger        = Logger.getLogger( StreamExporterVirtualSensor.class );
+	private static final transient Logger logger        = LoggerFactory.getLogger( StreamExporterVirtualSensor.class );
 
 	private Connection                    connection;
 
@@ -115,18 +116,15 @@ public class StreamExporterVirtualSensor extends AbstractVirtualSensor {
             estimatedTime += (System.nanoTime() - startTime);
             if (counter >= limit) {
                 double seconds = (double)estimatedTime / 1000000000.0;
-                System.out.println("The estimated time (sec) is = "+seconds);
-		logger.warn("*** ESTIMATED TIME (SEC) IS "+seconds);
+                logger.trace("The estimated time (sec) is = "+seconds);
             }
 	    if ((counter % 1000) == 0) {
-                System.out.println("Up until the Entry = "+counter);
+                logger.trace("Up until the Entry = "+counter);
 		double seconds = (double)estimatedTime / 1000000000.0;
-                System.out.println("The estimated time (sec) is = "+seconds);
-                logger.warn("*** ESTIMATED TIME (SEC) for counter = "+counter+" IS "+seconds);
+                logger.trace("The estimated time (sec) is = "+seconds);
             }
 		} catch (SQLException e) {
-			logger.error(e.getMessage(),e);
-			logger.error("Insertion failed! ("+ query+")");
+			logger.error("Insertion failed! ("+ query+"): "+e.getMessage());
 		}finally {
 			dataProduced( streamElement );
 		}

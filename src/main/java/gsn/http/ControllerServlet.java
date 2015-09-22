@@ -33,11 +33,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ControllerServlet extends HttpServlet {
 
-   private static transient Logger                                      logger                             = Logger.getLogger ( ControllerServlet.class );
+   private static transient Logger                                      logger                             = LoggerFactory.getLogger ( ControllerServlet.class );
 
    /**
     * HTTP RETURN CODES :
@@ -93,7 +94,7 @@ public class ControllerServlet extends HttpServlet {
       StringBuilder sb = new StringBuilder ( "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" );
       response.getWriter ( ).write ( sb.toString ( ) );
       RequestHandler handler;
-      if ( logger.isDebugEnabled ( ) ) logger.debug ( "Received a request with code : " + requestType );
+      logger.debug ( "Received a request with code : " + requestType );
 
       switch ( requestType ) {
       case 0 : //default case pointing to the /gsn

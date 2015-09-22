@@ -36,7 +36,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This is a dummy data generator which is highly configurable through the
@@ -46,7 +47,7 @@ import org.apache.log4j.Logger;
 
 public class TEDSDummyDataProducer extends AbstractWrapper {
    
-   private final Logger                logger        = Logger.getLogger( TEDSDummyDataProducer.class );
+   private final Logger                logger        = LoggerFactory.getLogger( TEDSDummyDataProducer.class );
    
    /**
     * Initializes the DataSource object. This method should be called before any

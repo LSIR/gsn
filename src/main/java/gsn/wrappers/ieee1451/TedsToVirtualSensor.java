@@ -34,10 +34,11 @@ import java.io.PrintWriter;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TedsToVirtualSensor {
-   private final Logger             logger              = Logger.getLogger( TedsToVirtualSensor.class );
+   private final Logger             logger              = LoggerFactory.getLogger( TedsToVirtualSensor.class );
    
    /*
     * The directory in which the Virtual Sensor Template files are present.

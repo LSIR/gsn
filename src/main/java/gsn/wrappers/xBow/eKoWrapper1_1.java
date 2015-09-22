@@ -46,7 +46,8 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 import gsn.wrappers.AbstractWrapper;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 
@@ -66,7 +67,7 @@ public class eKoWrapper1_1 extends AbstractWrapper {
 
 	private int                      DEFAULT_RATE       = 5000;
 	private static int               threadCounter      = 0;
-	private final transient Logger     logger   = Logger.getLogger ( eKoWrapper.class );
+	private final transient Logger     logger   = LoggerFactory.getLogger ( eKoWrapper.class );
 	private static final String [ ]  FIELD_NAMES = new String [ ] { "amtype", "nodeid", "packetname",
 														"batteryV", "solarV", "enTemp",
 														"soilmoisture", "soiltemp",

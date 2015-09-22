@@ -36,11 +36,12 @@ import gsn.wrappers.AbstractWrapper;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class WSNSWrapper extends AbstractWrapper implements DataListener {
    
-   private final transient Logger   logger                     = Logger.getLogger( WSNSWrapper.class );
+   private final transient Logger   logger                     = LoggerFactory.getLogger( WSNSWrapper.class );
    
    private static int               threadCounter              = 0;
    

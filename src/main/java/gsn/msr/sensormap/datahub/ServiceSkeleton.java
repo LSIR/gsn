@@ -46,7 +46,8 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.tempuri.ArrayOfDateTime;
 import org.tempuri.ArrayOfDouble;
 import org.tempuri.ArrayOfSensorData;
@@ -62,7 +63,7 @@ import org.tempuri.SensorData;
     public class ServiceSkeleton{
 
 
-private static final transient Logger         logger          = Logger.getLogger( ServiceSkeleton.class );
+private static final transient Logger         logger          = LoggerFactory.getLogger( ServiceSkeleton.class );
 	/**
 	 * SensorTypes :
 	 * public  int Unknown = 0;

@@ -26,7 +26,8 @@
 
 package gsn.http.datarequest;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 
@@ -39,7 +40,7 @@ public class AbstractQuery {
     private String vsName;
     private ArrayList<StandardCriterion> criteria;
 
-    private static transient Logger logger = Logger.getLogger(AbstractQuery.class);
+    private static transient Logger logger = LoggerFactory.getLogger(AbstractQuery.class);
 
 	public AbstractQuery (LimitCriterion limitCriterion, AggregationCriterion aggregation, String vsname, String[] fields, ArrayList<StandardCriterion> criteria) {
 		//this.standardQuery = standardQuery;

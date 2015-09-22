@@ -41,7 +41,8 @@ import org.apache.commons.collections.Buffer;
 import org.apache.commons.collections.buffer.SynchronizedBuffer;
 import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
 import org.apache.commons.lang.math.RandomUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This wrapper presents the system current clock. 
@@ -67,7 +68,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
   
   private static int                    threadCounter     = 0;
   
-  private  transient Logger        logger            = Logger.getLogger( this.getClass() );
+  private  transient Logger        logger            = LoggerFactory.getLogger( this.getClass() );
   
   private Timer                         timer;
 
@@ -96,8 +97,7 @@ public class SystemTime extends AbstractWrapper implements ActionListener {
   public void run ( ) {
     timer.start( );
     if(delayPostingElements){
-    	if(logger.isDebugEnabled())
-    		logger.warn("Starting <" + getWrapperName() + "> with delayed elements.");
+    	logger.debug("Starting <" + getWrapperName() + "> with delayed elements.");
     	while(isActive()){
     		synchronized(objectLock){
     			while(streamElementBuffer.isEmpty()){

@@ -36,7 +36,8 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -48,7 +49,7 @@ import static gsn.utils.models.ModelFitting.getModelIdFromString;
 
 public class DataCleanVirtualSensor extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensor.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(BridgeVirtualSensor.class);
 
     private static final String OPERATOR = "_operator";
     private static final String DEPLOYMENT = "_deployment";
@@ -281,19 +282,19 @@ public class DataCleanVirtualSensor extends AbstractVirtualSensor {
         }
 
         catch (UnsupportedEncodingException e) {
-            logger.warn(new StringBuilder("Unsupported encoding for: ").append(url));
+            logger.warn(new StringBuilder("Unsupported encoding for: ").append(url).toString());
             success = false;
         }
 
         catch (HttpException e) {
             logger.warn(new StringBuilder("Error for: ")
-                    .append(url).append(e));
+                    .append(url).append(e).toString());
             success = false;
         }
 
         catch (IOException e) {
             logger.warn(new StringBuilder("Error for: ")
-                    .append(url).append(e));
+                    .append(url).append(e).toString());
             success = false;
         }
 

@@ -38,7 +38,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
 
@@ -54,7 +55,7 @@ public class RVirtualSensor extends AbstractVirtualSensor
   public String                                                script      = null;
   public String                                                stype       = null;
   
-  private static transient Logger                              logger      = Logger.getLogger(RVirtualSensor.class);
+  private static transient Logger                              logger      = LoggerFactory.getLogger(RVirtualSensor.class);
   
   private Hashtable<String, ArrayBlockingQueue<StreamElement>> circularBuffers;
   
@@ -263,7 +264,7 @@ public class RVirtualSensor extends AbstractVirtualSensor
           
         } catch (Exception e)
         {
-          logger.warn(e);
+          logger.warn(e.getMessage());
           // Close connection to R server
           logger.info("Connection to R server closed.");
           rc.close();

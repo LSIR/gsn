@@ -59,7 +59,8 @@ import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
@@ -68,7 +69,7 @@ public class PushRemoteWrapper extends AbstractWrapper{
 
     private static final int KEEP_ALIVE_PERIOD = 5000;
 
-    private final transient Logger logger = Logger.getLogger(PushRemoteWrapper.class);
+    private final transient Logger logger = LoggerFactory.getLogger(PushRemoteWrapper.class);
 
     protected final XStream XSTREAM = StreamElement4Rest.getXstream();
 
@@ -154,7 +155,7 @@ public class PushRemoteWrapper extends AbstractWrapper{
                 int sc = response.getStatusLine().getStatusCode();
                 //
                 if (sc == HttpStatus.SC_OK) {
-                    logger.debug(new StringBuilder().append("Wants to consume the structure packet from ").append(initParams.getRemoteContactPoint()));
+                    logger.debug(new StringBuilder().append("Wants to consume the structure packet from ").append(initParams.getRemoteContactPoint()).toString());
                     structure = (DataField[]) XSTREAM.fromXML(response.getEntity().getContent());
                     logger.debug("Connection established for: " + initParams.getRemoteContactPoint());
                     break;
@@ -168,7 +169,7 @@ public class PushRemoteWrapper extends AbstractWrapper{
                                 .append("Unexpected POST status code returned: ")
                                 .append(sc)
                                 .append("\nreason: ")
-                                .append(response.getStatusLine().getReasonPhrase()));
+                                .append(response.getStatusLine().getReasonPhrase()).toString());
                     }
                     if (authState != null) {
                         if (initParams.getUsername() == null || (tries > 1 && initParams.getUsername() != null)) {
@@ -176,7 +177,7 @@ public class PushRemoteWrapper extends AbstractWrapper{
                         } else {
                             
                             AuthScope authScope = authState.getAuthScope();
-                            logger.warn(new StringBuilder().append("Setting Credentials for host: ").append(authScope.getHost()).append(":").append(authScope.getPort()));
+                            logger.warn(new StringBuilder().append("Setting Credentials for host: ").append(authScope.getHost()).append(":").append(authScope.getPort()).toString());
                             Credentials creds = new UsernamePasswordCredentials(initParams.getUsername(), initParams.getPassword());
                             httpclient.getCredentialsProvider().setCredentials(authScope, creds);
                         }
@@ -205,7 +206,7 @@ public class PushRemoteWrapper extends AbstractWrapper{
     }
 
     public boolean manualDataInsertion(String Xstream4Rest) {
-        logger.debug(new StringBuilder().append("Received Stream Element at the push wrapper."));
+        logger.debug("Received Stream Element at the push wrapper.");
         try {
         
             StreamElement4Rest se = (StreamElement4Rest) XSTREAM.fromXML(Xstream4Rest);

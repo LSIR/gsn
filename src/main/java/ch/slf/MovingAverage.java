@@ -32,7 +32,8 @@ import gsn.beans.StreamElement;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MovingAverage extends WindowAwareVS {
 
@@ -42,7 +43,7 @@ public class MovingAverage extends WindowAwareVS {
 		new DataField(VALUES, DataTypes.DOUBLE_NAME)
 	};
 	
-	private static transient Logger logger  = Logger.getLogger ( MovingAverage.class );
+	private static transient Logger logger  = LoggerFactory.getLogger ( MovingAverage.class );
 	
 
 	public boolean init() {

@@ -72,7 +72,8 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.asteriskjava.manager.ManagerConnection;
 import org.asteriskjava.manager.ManagerConnectionFactory;
 import org.asteriskjava.manager.TimeoutException;
@@ -84,7 +85,7 @@ import org.asteriskjava.manager.response.ManagerResponse;
  */
 public class VoipVirtualSensor extends AbstractVirtualSensor
 {
-  private final static transient Logger logger = Logger.getLogger(VoipVirtualSensor.class);
+  private final static transient Logger logger = LoggerFactory.getLogger(VoipVirtualSensor.class);
   
   private ManagerConnection managerConnection;
   private OriginateAction originateAction;
@@ -149,7 +150,7 @@ public class VoipVirtualSensor extends AbstractVirtualSensor
         NumberOfCalls = 0;
       } catch (IOException e)
       {
-        logger.warn(e);
+        logger.warn(e.getMessage());
       }
       
       NumberOfCalls++;
@@ -276,7 +277,7 @@ public class VoipVirtualSensor extends AbstractVirtualSensor
       
     } catch (Exception e)
     {
-      logger.warn(e);
+      logger.warn(e.getMessage());
     }
   }
   
@@ -295,7 +296,7 @@ public class VoipVirtualSensor extends AbstractVirtualSensor
       
     } catch (Exception e)
     {
-      logger.warn(e);
+      logger.warn(e.getMessage());
     }
   }
   

@@ -40,11 +40,12 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ListAndDeleteRegisteredSensors {
 	
-    private static transient Logger logger = Logger.getLogger ( ListAndDeleteRegisteredSensors.class );
+    private static transient Logger logger = LoggerFactory.getLogger ( ListAndDeleteRegisteredSensors.class );
     
 	public static void main(String args[]) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException {
 		ContainerConfig conf = Main.loadContainerConfiguration();

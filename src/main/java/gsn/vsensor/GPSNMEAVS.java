@@ -40,7 +40,8 @@ import java.util.TreeMap;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 /**
@@ -50,7 +51,7 @@ import org.apache.log4j.Logger;
  */
 public class GPSNMEAVS extends AbstractVirtualSensor {
    
-   private static final transient Logger logger = Logger.getLogger( GPSNMEAVS.class );
+   private static final transient Logger logger = LoggerFactory.getLogger( GPSNMEAVS.class );
    
    private TreeMap < String , String >   params;
    
@@ -71,20 +72,20 @@ public class GPSNMEAVS extends AbstractVirtualSensor {
       params = vsensor.getMainClassInitialParams( );
       wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );
       protocolManager = new ProtocolManager( new SerComProtocol( ) , wrapper );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "Created protocolManager" );
+      logger.debug( "Created protocolManager" );
       try {
          wrapper.sendToWrapper( "h\n" ,null,null);
       } catch ( OperationNotSupportedException e ) {
-         e.printStackTrace( );
+    	  logger.error(e.getMessage(), e);
       }      
       
       // protocolManager.sendQuery( SerComProtocol.RESET , null );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "Initialization complete." );
+      logger.debug( "Initialization complete." );
       return true;
    }
    
    public void dataAvailable ( String inputStreamName , StreamElement data ) {
-      if ( logger.isDebugEnabled( ) ) logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getData(SerialWrapper.RAW_PACKET)));
+      logger.debug( "SERIAL RAW DATA :"+new String((byte[])data.getData(SerialWrapper.RAW_PACKET)));
       
       //needed? ######
       AbstractWrapper wrapper = vsensor.getInputStream( "input1" ).getSource( "source1" ).getWrapper( );

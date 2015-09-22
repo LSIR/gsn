@@ -26,7 +26,8 @@
 
 package gsn.http.ac;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.Vector;
 
 public class UserUtils {
 
-    private static transient Logger logger = Logger.getLogger(UserUtils.class);
+    private static transient Logger logger = LoggerFactory.getLogger(UserUtils.class);
 
     /*
    * Creates a User object following credentials in access control

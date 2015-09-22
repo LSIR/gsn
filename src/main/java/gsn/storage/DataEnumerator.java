@@ -41,7 +41,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * FIXME : 1. Because a prepared statements relies on the connection being
@@ -56,7 +57,7 @@ import org.apache.log4j.Logger;
  */
 public class DataEnumerator implements DataEnumeratorIF {
 
-	private transient Logger logger                   = Logger.getLogger( DataEnumerator.class );
+	private transient Logger logger                   = LoggerFactory.getLogger( DataEnumerator.class );
 
 	private ResultSet        resultSet                = null;
 
@@ -97,7 +98,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 		this.storageManager = storageManager;
         this.manualCloseConnection=manualClose;
 		if ( preparedStatement == null ) {
-			if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
+			logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
 			hasNext = false;
 			return;
 		}

@@ -29,7 +29,8 @@ package gsn.http.ac;
 
 import gsn.Main;
 import gsn.beans.ContainerConfig;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 import javax.servlet.ServletException;
@@ -51,7 +52,7 @@ public class MyOwnerWaitingListServlet extends HttpServlet
 {
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/
-    private static transient Logger logger = Logger.getLogger( MyOwnerWaitingListServlet.class );
+    private static transient Logger logger = LoggerFactory.getLogger( MyOwnerWaitingListServlet.class );
 
     public void doGet(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException
     {

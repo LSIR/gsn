@@ -47,14 +47,15 @@ import java.util.Date;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
 
 public class LocalDeliveryWrapper extends AbstractWrapper implements DeliverySystem{
 
 	private  final String CURRENT_TIME = ISODateTimeFormat.dateTime().print(System.currentTimeMillis());
 	
-	private static transient Logger                  logger           = Logger.getLogger( LocalDeliveryWrapper.class );
+	private static transient Logger                  logger           = LoggerFactory.getLogger( LocalDeliveryWrapper.class );
 	
 	private VSensorConfig vSensorConfig;
 	

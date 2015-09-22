@@ -34,12 +34,13 @@ import gsn.beans.AddressBean;
 import gsn.beans.ContainerConfig;
 import gsn.utils.Helpers;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.joda.time.format.ISODateTimeFormat;
 
 public class RemoteWrapperParamParser {
 
-	private final transient Logger     logger                 = Logger.getLogger ( RemoteWrapperParamParser.class );
+	private final transient Logger     logger                 = LoggerFactory.getLogger ( RemoteWrapperParamParser.class );
 
 	private long startTime;
 	private boolean isPushBased;
@@ -141,7 +142,7 @@ public class RemoteWrapperParamParser {
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
-		logger.debug ( new StringBuilder ("Wants to connect to ").append(getRemoteContactPoint()+query+"/"+getStartTimeInString(lastModifiedTime)).append( "==Encoded==> "+toSend));
+		logger.debug ( new StringBuilder ("Wants to connect to ").append(getRemoteContactPoint()+query+"/"+getStartTimeInString(lastModifiedTime)).append( "==Encoded==> "+toSend).toString());
 		return toSend;
 	}
 

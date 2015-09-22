@@ -27,8 +27,8 @@ package gsn.utils;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.net.*;
@@ -485,7 +485,7 @@ public class SensorScopeListenerClient extends Thread {
     public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
     private static final String CONF_SENSORSCOPE_SERVER_PROPERTIES = "conf/sensorscope_server.properties";
     private static final String DEFAULT_FOLDER_FOR_CSV_FILES = "logs";
-    private static transient Logger logger = Logger.getLogger(SensorScopeListenerClient.class);
+    private static transient Logger logger = LoggerFactory.getLogger(SensorScopeListenerClient.class);
 
     private static String csvFolderName = null;
     private static String DEFAULT_NULL_STRING = "null";
@@ -559,7 +559,6 @@ public class SensorScopeListenerClient extends Thread {
     }
 
     public SensorScopeListenerClient(Socket socket) {
-        PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
         mSocket = socket;
         config();
         start();

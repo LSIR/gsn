@@ -48,7 +48,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -62,7 +61,6 @@ public class TestStreamSource {
    
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-	  PropertyConfigurator.configure ( Main.DEFAULT_GSN_LOG4J_PROPERTIES );
 	  DriverManager.registerDriver( new org.h2.Driver( ) );
 	  sm = StorageManagerFactory.getInstance("org.h2.Driver","sa","" ,"jdbc:h2:mem:.", Main.DEFAULT_MAX_DB_CONNECTIONS);
 		

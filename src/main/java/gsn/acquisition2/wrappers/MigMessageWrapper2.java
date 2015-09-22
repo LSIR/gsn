@@ -34,7 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1x.message.MessageListener, net.tinyos.message.MessageListener {
 
@@ -56,7 +57,7 @@ public class MigMessageWrapper2  extends AbstractWrapper2 implements net.tinyos1
 	protected static Map<String,net.tinyos.message.MoteIF> moteIFList2x = new HashMap<String,net.tinyos.message.MoteIF>();
 	protected static Map<String,net.tinyos.packet.PhoenixSource> phoenixSourceList2x = new HashMap<String, net.tinyos.packet.PhoenixSource> () ;
 
-	private final transient Logger logger = Logger.getLogger( MigMessageWrapper2.class );
+	private final transient Logger logger = LoggerFactory.getLogger( MigMessageWrapper2.class );
 
 	@Override
 	public boolean initialize() {

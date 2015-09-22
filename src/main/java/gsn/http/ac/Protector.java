@@ -38,7 +38,8 @@ import java.security.*;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.commons.codec.binary.*;
 
 
@@ -46,7 +47,7 @@ import org.apache.commons.codec.binary.*;
 /* This class helps to encrypt user passwords using AES encryption algo, we use a salt for a more robust encryption, salt is stored in a property file "acuserpassword.properties"*/
 public class Protector
 {
-    private static transient Logger logger = Logger.getLogger( Protector.class );
+    private static transient Logger logger = LoggerFactory.getLogger( Protector.class );
 
     private static final String ALGORITHM = "AES";
     private static final int ITERATIONS = 2;

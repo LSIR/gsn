@@ -37,11 +37,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SafeStorageDB {
 
-  public static transient Logger logger= Logger.getLogger ( SafeStorageDB.class );
+  public static transient Logger logger= LoggerFactory.getLogger ( SafeStorageDB.class );
 
   private Connection connection;
 

@@ -52,11 +52,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class OneShotQueryWithAddressingHandler implements RequestHandler {
 
-    private static transient Logger logger = Logger.getLogger(OneShotQueryHandler.class);
+    private static transient Logger logger = LoggerFactory.getLogger(OneShotQueryHandler.class);
 
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -80,9 +81,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler {
         try {
             result = Main.getStorage(vsName).executeQuery(query, true);
         } catch (SQLException e) {
-            logger.error("ERROR IN EXECUTING, query: " + query);
-            logger.error(e.getMessage(), e);
-            logger.error("Query is from " + request.getRemoteAddr() + "- " + request.getRemoteHost());
+            logger.error("ERROR IN EXECUTING, query: " + query+" from " + request.getRemoteAddr() + "- " + request.getRemoteHost()+": "+e.getMessage());
             return;
         }
 
@@ -117,8 +116,7 @@ public class OneShotQueryWithAddressingHandler implements RequestHandler {
                     sb.append(StringEscapeUtils.escapeXml(se.getData()[i].toString())).append("</field>\n");
             }
             VSensorConfig sensorConfig = Mappings.getVSensorConfig(vsName);
-            if (logger.isInfoEnabled())
-                logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
+            logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
             //StringBuilder statement = new StringBuilder( "<virtual-sensor name=\"" ).append( vsName ).append( "\" last-modified=\"" ).append( new File( sensorConfig.getFileName( ) ).lastModified( ) ).append( "\">\n" );
             for (KeyValue df : sensorConfig.getAddressing())
                 sb.append("<field name=\"").append(StringEscapeUtils.escapeXml(df.getKey().toString())).append("\">").append(StringEscapeUtils.escapeXml(df.getValue().toString()))

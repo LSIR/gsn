@@ -25,7 +25,8 @@
 
 package gsn.vsensor;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 
@@ -34,7 +35,7 @@ import java.text.NumberFormat;
 
 public class SensorScope2VS extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(SensorScope2VS.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(SensorScope2VS.class);
 
     private Double[] buffer;
 
@@ -82,8 +83,7 @@ public class SensorScope2VS extends AbstractVirtualSensor {
         // if nulls are allowed
         if (allowNulls) {
             dataProduced(data);
-            if (logger.isDebugEnabled())
-                logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
+            logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
             return;
         }
 
@@ -110,8 +110,7 @@ public class SensorScope2VS extends AbstractVirtualSensor {
 
         if (publish) {
             dataProduced(data);
-            if (logger.isDebugEnabled())
-                logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
+            logger.debug("Data received under the name: " + inputStreamName + "\nData: " + data);
         } else {
             logger.debug("null values, not published (" + this.getVirtualSensorConfiguration().getName() + ")");
         }

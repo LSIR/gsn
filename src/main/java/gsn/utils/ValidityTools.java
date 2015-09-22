@@ -44,7 +44,8 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ValidityTools {
 
@@ -52,7 +53,7 @@ public class ValidityTools {
 
 	static Pattern hostAndPortPattern = Pattern.compile( "(.+):(\\d+)$" );
 
-	public static final transient Logger logger    = Logger.getLogger( ValidityTools.class );
+	public static final transient Logger logger    = LoggerFactory.getLogger( ValidityTools.class );
 	/**
 	 * Checks to see if the specified address is accessible. 3sec is used as the default
 	 * timeout period.
@@ -93,7 +94,7 @@ public class ValidityTools {
 			File f = new File( name );
 			if ( f.canRead( ) && f.canWrite( ) && f.isDirectory( ) ) continue;
 			else {
-				System.out.println( "The required directory : " + f.getAbsolutePath( ) + " is not accessible." );
+				logger.error( "The required directory : " + f.getAbsolutePath( ) + " is not accessible." );
 				System.exit( 1 );
 			}
 		}
@@ -104,7 +105,7 @@ public class ValidityTools {
 			File f = new File( name );
 			if ( f.canRead( ) && f.canWrite( ) && f.isFile( ) ) continue;
 			else {
-				System.out.println( "The required file : " + f.getAbsolutePath( ) + " is not accessible." );
+				logger.error( "The required file : " + f.getAbsolutePath( ) + " is not accessible." );
 				System.exit( 1 );
 			}
 		}
@@ -157,7 +158,7 @@ public class ValidityTools {
 				if ( address.equals( hostAddress ) ) return true;
 			return hostAddress.isLoopbackAddress();
 		} catch ( UnknownHostException e ) {
-			logger.debug( e );
+			logger.debug( e.getMessage() );
 			return false;
 		}
 	}
@@ -181,7 +182,7 @@ public class ValidityTools {
 
 			}
 		} catch ( Exception e ) {
-			e.printStackTrace( );
+			logger.error(e.getMessage(), e);
 		}
 	}
 	/**

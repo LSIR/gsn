@@ -31,7 +31,8 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.utils.models.ModelLoader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -47,7 +48,7 @@ import java.util.TreeMap;
 
 public class GridModelDataPredictVS extends AbstractVirtualSensor {
 
-    private static final transient Logger logger = Logger.getLogger(BridgeVirtualSensor.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(BridgeVirtualSensor.class);
 
     private static final String PARAM_MODEL = "model";
     private static final String PARAM_CLASS_INDEX = "class_index";

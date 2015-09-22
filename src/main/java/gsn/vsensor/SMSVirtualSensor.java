@@ -36,7 +36,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.antlr.stringtemplate.StringTemplate;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Virtual sensor for sending SMS'es.
@@ -49,7 +50,7 @@ import org.apache.log4j.Logger;
  */
 public class SMSVirtualSensor extends AbstractVirtualSensor {
 
-	private static final transient Logger logger = Logger.getLogger( SMSVirtualSensor.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( SMSVirtualSensor.class );
 
 	private static final String		PHONENUMBER_FIELD_NAME = "PHONENUMBER";
 	private static final String     MESSAGE_FIELD_NAME = "MESSAGE";
