@@ -38,12 +38,14 @@ public class SensorPageController {
 
     private WebJsonConverter geoJsonConverter;
     private QueryBuilder queryBuilder;
+    private MetadataService metadataService;
 
     @Inject
-    public SensorPageController(VirtualSensorAccessService sensorAccessService, WebJsonConverter geoJsonConverter, QueryBuilder queryBuilder) {
+    public SensorPageController(VirtualSensorAccessService sensorAccessService, WebJsonConverter geoJsonConverter, QueryBuilder queryBuilder, MetadataService metadataService) {
         this.sensorAccessService = sensorAccessService;
         this.geoJsonConverter = geoJsonConverter;
         this.queryBuilder = queryBuilder;
+        this.metadataService = metadataService;
     }
 
     @RequestMapping(value = "/virtualSensorNames", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
@@ -144,6 +146,16 @@ public class SensorPageController {
 //
 //        return geoJsonConverter.writeTableModel(Lists.newArrayList(virtualSensorMetadata));
 //    }
+
+    @RequestMapping(value = "/metadata/{dbTableName}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public
+    @ResponseBody
+    String getMetadata(@PathVariable String dbTableName, HttpServletResponse response) {
+
+        setResponseHeader(response);
+
+        return metadataService.getMetadataJson(dbTableName);
+    }
 
     private void setResponseHeader(HttpServletResponse response) {
         response.addHeader("Access-Control-Allow-Origin", "*");

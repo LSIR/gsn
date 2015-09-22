@@ -15,6 +15,7 @@ import java.util.Iterator;
  */
 @Named
 public class VirtualSensorAccessService {
+
     private VirtualSensorMetadataRepository sensorMetadataRepository;
 
     private MongoTemplate mongoTemplate;

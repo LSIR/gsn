@@ -33,7 +33,7 @@ public class GSNImportTool {
         ctx.scan("ch.epfl.gsn.metadata");
         VirtualSensorPersistenceService gsnUpdateService = ctx.getBean(VirtualSensorPersistenceService.class);
         TermsUpdate termsUpdate = ctx.getBean(TermsUpdate.class);
-        TopoDataUpdate service = ctx.getBean(TopoDataUpdate.class);
+        TopoDataUpdate topoService = ctx.getBean(TopoDataUpdate.class);
 
 
 
@@ -43,7 +43,7 @@ public class GSNImportTool {
             logger.info("====== UPDATING TAXONOMY MAPPINGS =======");
             termsUpdate.updateTaxonomyTerms();
             logger.info("====== UPDATING TOPO DATA =======");
-            service.updateGeoData();
+            topoService.updateGeoData();
         }
 
 
