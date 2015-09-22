@@ -38,14 +38,15 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 	public static final String            PARAM_RRDFILE    = "rrdfile" ;
 
 	public static final String            PARAM_FIELD    = "field" ;
 
-	private static final transient Logger logger        = Logger.getLogger(StreamRRDExporterVirtualSensor.class );
+	private static final transient Logger logger        = LoggerFactory.getLogger(StreamRRDExporterVirtualSensor.class );
 
 	private String rrdfile = null;
 
@@ -89,11 +90,9 @@ public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 		command = command + "RRA:MAX:0.5:288:797";
 		Runtime runtime = Runtime.getRuntime();
 		try {
-			if(logger.isDebugEnabled())
-				logger.debug( "The used rrdtool create command is: " + command);                        
+			logger.debug( "The used rrdtool create command is: " + command);                        
 			Process process = runtime.exec(command);
-			if(logger.isDebugEnabled())
-				logger.debug( "The exit value of the rrdtool create command is: " +
+			logger.debug( "The exit value of the rrdtool create command is: " +
 						process.exitValue());
 			return true;
 		} catch (IOException e) {
@@ -137,8 +136,7 @@ public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 	 */
 
 	private void exportValues ( StreamElement streamElement ) {
-		if(logger.isDebugEnabled())
-			logger.debug( "Trying to add new data items to the rrdfile:" + this.rrdfile );
+		logger.debug( "Trying to add new data items to the rrdfile:" + this.rrdfile );
 		String command ="rrdtool update "+rrdfile+" N";
 		Serializable[] stream = streamElement.getData();
 		String field;
@@ -150,11 +148,9 @@ public class StreamRRDExporterVirtualSensor extends AbstractVirtualSensor {
 		}
 		Runtime runtime = Runtime.getRuntime();
 		try {
-			if(logger.isDebugEnabled())
-				logger.debug( "The used rrdtool update command is: " + command);                        
+			logger.debug( "The used rrdtool update command is: " + command);                        
 			Process process = runtime.exec(command);
-			if(logger.isDebugEnabled())
-				logger.debug( "The processing did not generate an error!");                        
+			logger.debug( "The processing did not generate an error!");                        
 		} catch (IOException e) {
 			logger.debug("An IOException has occured: "+e);
 		} 

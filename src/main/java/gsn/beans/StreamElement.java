@@ -38,13 +38,14 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public final class StreamElement implements Serializable {
 
 	private static final long                      serialVersionUID  = 2000261462783698617L;
 
-	private static final transient Logger          logger            = Logger.getLogger( StreamElement.class );
+	private static final transient Logger          logger            = LoggerFactory.getLogger( StreamElement.class );
 
 	private transient TreeMap < String , Integer > indexedFieldNames = null;
 
@@ -289,7 +290,7 @@ public final class StreamElement implements Serializable {
 		generateIndex();
 		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {
-			logger.info("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
+			logger.warn("There is a request for field "+fieldName+" for StreamElement: "+this.toString()+". As the requested field doesn't exist, GSN returns Null to the callee.");
 			return null;
 		}
 		return this.fieldValues[ index ];
@@ -462,7 +463,7 @@ public final class StreamElement implements Serializable {
 				try{ 
 					//          StreamElementTest.md5Digest(fieldValues[ i ]);
 				}catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e.getMessage(), e);
 				}
 				values.add((byte[]) fieldValues[ i ]);
 				break;

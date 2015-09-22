@@ -26,7 +26,8 @@
 package gsn.http.rest;
 
 import gsn.beans.DataField;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Same as PushRemoteWrapper, but no registration needed to initialize the push stream.
@@ -39,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 public class DirectPushRemoteWrapper extends PushRemoteWrapper {
 
-    private final transient Logger logger = Logger.getLogger(DirectPushRemoteWrapper.class);
+    private final transient Logger logger = LoggerFactory.getLogger(DirectPushRemoteWrapper.class);
 
     private double uid = -1; //statically set from the parameters
 

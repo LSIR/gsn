@@ -48,11 +48,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TupleBasedSlidingHandler implements SlidingHandler {
 
-	private static final transient Logger logger = Logger.getLogger(TupleBasedSlidingHandler.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(TupleBasedSlidingHandler.class);
 	private List<StreamSource> streamSources; //only holds WindowType.TUPLE_BASED_SLIDE_ON_EACH_TUPLE types of stream sources
 	private Map<StreamSource, Long> slidingHashMap;
 	private AbstractWrapper wrapper;
@@ -131,12 +132,10 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				query.append(" select min(pk) from (select top ").append(maxTupleCount).append(" * ").append(" from ").append(
 						wrapper.getDBAliasInStr()).append(" order by pk desc )as X  ");
 			}else if (Main.getWindowStorage().isOracle()) {
-				query.append(" select pk from ( select pk from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
+				query.append(" select pk from (select pk from ").append(Main.getWindowStorage().tableNameGeneratorInString(wrapper.getDBAliasInStr()));
 				query.append(" order by pk desc) where rownum = ").append(maxTupleCount);
 			}
-			if (logger.isDebugEnabled()) {
-				logger.debug("Query1 for getting oldest timestamp : " + query);
-			}
+			logger.debug("Query1 for getting oldest timestamp : " + query);
 			Connection conn = null;
 			try {
 				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
@@ -155,9 +154,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 		if (maxWindowSize > 0) {
 			StringBuilder query = new StringBuilder();
 			query.append(" select min(pk) from ").append(wrapper.getDBAliasInStr()).append(" where timed > (select max(timed) from ").append(wrapper.getDBAliasInStr()).append(") - ").append(maxWindowSize);
-			if (logger.isDebugEnabled()) {
-				logger.debug("Query2 for getting oldest timestamp : " + query);
-			}
+			logger.debug("Query2 for getting oldest timestamp : " + query);
 			Connection conn = null;
 			try {
 				ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
@@ -260,7 +257,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 				}else if (Main.getWindowStorage().isOracle()) {
 					toReturn.append("(pk >= (select pk from (select pk from "+Main.getWindowStorage().tableNameGeneratorInString(wrapperAlias)+" order by pk desc ) where rownum="+windowSize+") )");
 				}else {
-					logger.fatal("Not supported DB!");
+					logger.error("Not supported DB!");
 				}
 			} else {
 				CharSequence viewHelperTableName =Main.getWindowStorage().tableNameGeneratorInString(SQLViewQueryRewriter.VIEW_HELPER_TABLE);
@@ -292,7 +289,7 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
 						toReturn.append(" order by timed desc ");
 						// Note, in oracle rownum starts with 1.
 					}else {
-						logger.fatal("Not supported DB!");
+						logger.error("Not supported DB!");
 					}
 				} else { // WindowType.TIME_BASED_WIN_TUPLE_BASED_SLIDE
 					toReturn.append("timed in (select timed from ").append(wrapperAlias).append(" where timed <= (select timed from ").append(viewHelperTableName).append(" where U_ID='").append(Main.getWindowStorage().tableNameGeneratorInString(streamSource.getUIDStr())).append(
@@ -312,11 +309,10 @@ public class TupleBasedSlidingHandler implements SlidingHandler {
             }
 
 			toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));
-			if (logger.isDebugEnabled()) {
-				logger.debug(new StringBuilder().append("The original Query : ").append(streamSource.getSqlQuery()).toString());
-				logger.debug(new StringBuilder().append("The merged query : ").append(toReturn.toString()).append(" of the StreamSource ").append(streamSource.getAlias()).append(" of the InputStream: ").append(
+			logger.debug(new StringBuilder().append("The original Query : ").append(streamSource.getSqlQuery()).toString());
+			logger.debug(new StringBuilder().append("The merged query : ").append(toReturn.toString()).append(" of the StreamSource ").append(streamSource.getAlias()).append(" of the InputStream: ").append(
 						streamSource.getInputStream().getInputStreamName()).append("").toString());
-			}
+
 			return cachedSqlQuery = toReturn;
 		}
 	}

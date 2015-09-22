@@ -48,7 +48,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * @todo validation & security part
@@ -56,7 +57,7 @@ import org.apache.log4j.Logger;
 
 public class FieldUpload extends HttpServlet {
 	static final long serialVersionUID = 13;
-	private static final transient Logger logger = Logger.getLogger( StreamElement.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( StreamElement.class );
 	   
 	public void  doGet ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
 		doPost(req, res);

@@ -38,7 +38,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SimHttpListener extends HttpServlet {
    
@@ -48,7 +49,7 @@ public class SimHttpListener extends HttpServlet {
    
    private OutputStream           dos       = null;
    
-   private final transient Logger logger    = Logger.getLogger( SimHttpListener.class );
+   private final transient Logger logger    = LoggerFactory.getLogger( SimHttpListener.class );
    
    public void doPost ( HttpServletRequest req , HttpServletResponse res ) throws ServletException , IOException {
       int requestType = Integer.parseInt( ( String ) req.getHeader( WebConstants.REQUEST ) );
@@ -66,7 +67,7 @@ public class SimHttpListener extends HttpServlet {
                   }
                }
                try {
-                  if ( logger.isInfoEnabled( ) ) logger.info( "Data received for a typical client" );
+                  logger.info( "Data received for a typical client" );
                   dos.write( new StringBuffer( ).append( System.currentTimeMillis( ) ).append( '\n' ).toString( ).getBytes( ) );
                   dos.flush( );
                } catch ( IOException e ) {
@@ -74,7 +75,7 @@ public class SimHttpListener extends HttpServlet {
                   return;
                }
             }
-            if ( logger.isDebugEnabled( ) ) logger.debug( "Data Received" );
+            logger.debug( "Data Received" );
             break;
          
       }

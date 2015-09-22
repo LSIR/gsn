@@ -4,8 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.log4j.Logger;
+
 import org.zeromq.ZContext;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.zeromq.ZMQ;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -20,7 +22,7 @@ import gsn.wrappers.AbstractWrapper;
 
 public class ZeroMQWrapper extends AbstractWrapper {
 	
-	private transient Logger logger = Logger.getLogger( this.getClass() );
+	private transient Logger logger = LoggerFactory.getLogger( this.getClass() );
 	private DataField[] structure;
 	private String remoteContactPoint_DATA;
 	private String remoteContactPoint_META;

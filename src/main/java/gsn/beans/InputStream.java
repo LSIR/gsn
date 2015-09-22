@@ -40,7 +40,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class InputStream implements Serializable{
 
@@ -48,7 +49,7 @@ public class InputStream implements Serializable{
 
 	public static final int                             INITIAL_DELAY_5000MSC = 5000;
 
-	private transient static final Logger               logger                = Logger.getLogger( InputStream.class );
+	private transient static final Logger               logger                = LoggerFactory.getLogger( InputStream.class );
 
 	//private transient StorageManager                    storageMan = StorageManager.getInstance();
 
@@ -199,7 +200,7 @@ public class InputStream implements Serializable{
 	}
 
 	public void refreshAlias ( final String alias ) {
-		if ( logger.isInfoEnabled( ) ) logger.info( "REFERES ALIAS CALEED" );
+		logger.info( "REFERES ALIAS CALEED" );
 	}
 
 	public boolean equals ( final Object o ) {
@@ -236,8 +237,7 @@ public class InputStream implements Serializable{
 		}
 		for ( StreamSource ss : sources ) {
 			if ( !ss.validate( ) ) {
-				logger.error( new StringBuilder( ).append( "The Stream Source : " ).append( ss.getAlias( ) ).append( " specified in the Input Stream : " ).append( this.getInputStreamName( ) ).append(
-				" is not valid." ).toString( ) );
+				logger.error("The Stream Source : "+ss.getAlias( )+" specified in the Input Stream : "+getInputStreamName( )+" is not valid.");
 				return (cachedValidationResult=false);
 			}
 			streamSourceAliasNameToStreamSourceName.put( ss.getAlias( ) , ss );
@@ -265,27 +265,27 @@ public class InputStream implements Serializable{
 	}
 
 	public boolean executeQuery( final CharSequence alias ) throws SQLException{
-		if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Notified by StreamSource on the alias: " ).append( alias ).toString( ) );
+		logger.debug("Notified by StreamSource on the alias: " + alias );
 		if ( this.pool == null ) {
 			logger.debug( "The input is dropped b/c the VSensorInstance is not set yet." );
 			return false;
 		}
 
 		if ( this.currentCount > this.getCount( ) ) {
-			if ( logger.isInfoEnabled( ) ) logger.info( "Maximum count reached, the value *discarded*" );
+			logger.info( "Maximum count reached, the value *discarded*" );
 			return false;
 		}
 
 		final long currentTimeMillis = System.currentTimeMillis( );
 		if ( this.rate > 0 && ( currentTimeMillis - this.lastVisited ) < this.rate ) {
-			if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
+			logger.info( "Called by *discarded* b/c of the rate limit reached." );
 			return false;
 		}
 		this.lastVisited = currentTimeMillis;
 
 		if ( !queryCached ) {
 			rewriteQuery();
-			if ( logger.isDebugEnabled( ) && queryCached)
+			if ( queryCached)
 				logger.debug( new StringBuilder( ).append( "Rewritten SQL: " ).append( this.rewrittenSQL ).append( "(" ).append( Main.getWindowStorage().isThereAnyResult( this.rewrittenSQL ) ).append( ")" )
 						.toString( ) );
 		}
@@ -295,7 +295,7 @@ public class InputStream implements Serializable{
 			if ( resultOfTheQuery != null ) {
 				this.currentCount++;
 				AbstractVirtualSensor sensor = null;
-				if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
+				logger.debug( new StringBuilder( ).append( "Executing the main query for InputStream : " ).append( this.getInputStreamName( ) ).toString( ) );
 				try {
 					sensor = pool.borrowVS( );
 					while ( resultOfTheQuery.hasMoreElements( ) ) {
@@ -304,21 +304,17 @@ public class InputStream implements Serializable{
 						sensor.dataAvailable_decorated( this.getInputStreamName( ) , element );
 					}
 				} catch ( final UnsupportedOperationException e ) {
-					logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " );
-					logger.warn( e.getMessage( ) , e );
+					logger.warn( "The stream element produced by the virtual sensor is dropped because of the following error : " + e.getMessage( ) , e );
 				} catch ( final VirtualSensorInitializationFailedException e ) {
 					logger.error( "The stream element can't deliver its data to the virtual sensor " + sensor.getVirtualSensorConfiguration( ).getName( )
-							+ " because initialization of that virtual sensor failed" );
-					logger.error(e.getMessage(),e);
+							+ " because initialization of that virtual sensor failed" + e.getMessage(),e);
 				} finally {
 					this.pool.returnVS( sensor );
 				}
-	
 			}
 		}
-		if ( logger.isDebugEnabled( ) ) {
-			logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
-		}
+		logger.debug( new StringBuilder( ).append( "Input Stream's result has *" ).append( elementCounterForDebugging ).append( "* stream elements" ).toString( ) );
+
 		return true;
 	}
 

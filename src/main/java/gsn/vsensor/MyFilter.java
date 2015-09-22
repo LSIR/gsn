@@ -28,11 +28,12 @@ package gsn.vsensor;
 
 import gsn.beans.StreamElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MyFilter extends AbstractVirtualSensor {
 
-  private static final transient Logger logger = Logger.getLogger( BridgeVirtualSensor.class );
+  private static final transient Logger logger = LoggerFactory.getLogger( BridgeVirtualSensor.class );
 
   public boolean initialize ( ) {
     return true;
@@ -41,7 +42,7 @@ public class MyFilter extends AbstractVirtualSensor {
   public void dataAvailable ( String inputStreamName , StreamElement data ) {
     
     dataProduced( data );
-    if ( logger.isDebugEnabled( ) ) logger.debug( "Data received under the name: " + inputStreamName );
+    logger.debug( "Data received under the name: " + inputStreamName );
   }
 
   public void dispose ( ) {

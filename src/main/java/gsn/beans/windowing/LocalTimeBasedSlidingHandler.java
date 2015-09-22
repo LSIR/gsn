@@ -51,11 +51,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class LocalTimeBasedSlidingHandler implements SlidingHandler {
 
-    private static final transient Logger logger = Logger.getLogger(LocalTimeBasedSlidingHandler.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(LocalTimeBasedSlidingHandler.class);
     private static int timerCount = 0;
     private List<StreamSource> streamSources;
     private AbstractWrapper wrapper;
@@ -94,9 +95,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             if (oldTimerTick != timerTick) {
                 timer.cancel();
                 timer = new Timer();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("About to schedule new timer task at period " + timerTick + "ms in the " + wrapper.getDBAliasInStr() + " wrapper");
-                }
+                logger.debug("About to schedule new timer task at period " + timerTick + "ms in the " + wrapper.getDBAliasInStr() + " wrapper");
                 timer.schedule(new LTBTimerTask(), 500, timerTick);
             }
         } else {
@@ -176,9 +175,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
                         wrapper.getDBAliasInStr()).append(" where timed <= ").append(System.currentTimeMillis() - maxSlideForTupleBased).append(" order by timed desc) as X  ");
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Query for getting oldest timestamp : " + query);
-            }
+            logger.debug("Query for getting oldest timestamp : " + query);
             Connection conn = null;
             try {
             	ResultSet resultSet = Main.getWindowStorage().executeQueryWithResultSet(query,conn=Main.getWindowStorage().getConnection());
@@ -234,9 +231,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
         if (oldTimerTick != timerTick && timerTick > 0) {
             timer.cancel();
             timer = new Timer();
-            if (logger.isDebugEnabled()) {
-                logger.debug("About to schedule new timer task at period " + timerTick + "ms in the " + wrapper.getDBAliasInStr() + " wrapper");
-            }
+            logger.debug("About to schedule new timer task at period " + timerTick + "ms in the " + wrapper.getDBAliasInStr() + " wrapper");
             timer.schedule(new LTBTimerTask(), 500, timerTick);
         }
     }
@@ -370,11 +365,10 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
             }
             toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(new StringBuilder().append("The original Query : ").append(sqlQuery).toString());
-                logger.debug(new StringBuilder().append("The merged query : ").append(toReturn.toString()).append(" of the StreamSource ").append(streamSource.getAlias()).append(" of the InputStream: ").append(
+         
+            logger.debug(new StringBuilder().append("The original Query : ").append(sqlQuery).toString());
+            logger.debug(new StringBuilder().append("The merged query : ").append(toReturn.toString()).append(" of the StreamSource ").append(streamSource.getAlias()).append(" of the InputStream: ").append(
                         streamSource.getInputStream().getInputStreamName()).append("").toString());
-            }
             return cachedSqlQuery = toReturn;
         }
     }

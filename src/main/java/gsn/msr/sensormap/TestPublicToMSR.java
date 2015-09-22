@@ -46,13 +46,14 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestPublicToMSR {
   
   private static final String HTTP_RESEARCH_MICROSOFT_COM_NEC = "http://research.microsoft.com/nec/";
   
-  private static transient Logger logger             = Logger.getLogger( TestPublicToMSR.class );
+  private static transient Logger logger             = LoggerFactory.getLogger( TestPublicToMSR.class );
   
   public static boolean register_to_sensor_map(String user,String password,String host,ContainerConfig container_conf ,VSensorConfig conf) throws SOAPException, IOException {
     URL wsdl = new URL("http://atom.research.microsoft.com/sensordatahub/service.asmx?WSDL");

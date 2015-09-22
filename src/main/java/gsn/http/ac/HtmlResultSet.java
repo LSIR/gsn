@@ -25,7 +25,8 @@
 
 package gsn.http.ac;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -43,7 +44,7 @@ import java.sql.SQLException;
 public class HtmlResultSet
 {
     private ResultSet rs;
-    private static transient Logger logger= Logger.getLogger( HtmlResultSet.class );
+    private static transient Logger logger= LoggerFactory.getLogger( HtmlResultSet.class );
 
     public void setResultSet(ResultSet rs)
     {

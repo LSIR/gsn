@@ -37,11 +37,12 @@ import gsn.utils.models.AbstractModel;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class DefaultDistributionRequest implements DistributionRequest {
 
-	private static transient Logger       logger     = Logger.getLogger ( DefaultDistributionRequest.class );
+	private static transient Logger       logger     = LoggerFactory.getLogger ( DefaultDistributionRequest.class );
 
 	private long startTime;
 

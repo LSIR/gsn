@@ -30,11 +30,12 @@ import gsn.utils.protocols.AbstractHCIQueryWithoutAnswer;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SetSpeed extends AbstractHCIQueryWithoutAnswer {
 	
-	private static final transient Logger logger = Logger.getLogger( SetSpeed.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( SetSpeed.class );
 	public static final String queryDescription = "Set the speed of the EPuck robot's two wheels.";
 	public static final String[] paramsDescriptions = {"Speed of the left wheel.","Speed of the right wheel."};
    

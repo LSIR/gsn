@@ -34,14 +34,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.mina.common.IoSession;
 
 public abstract class AbstractWrapper2  extends Thread{
   
   private AddressBean                        activeAddressBean;
   
-  private final transient Logger    logger                                = Logger.getLogger( AbstractWrapper2.class );
+  private final transient Logger    logger                                = LoggerFactory.getLogger( AbstractWrapper2.class );
   
   private LinkedBlockingQueue<Long> queue = new LinkedBlockingQueue<Long>(); 
   
@@ -105,7 +106,7 @@ public abstract class AbstractWrapper2  extends Thread{
         queue.put(sqlNo);
       }
     }catch (Exception e) {
-      logger.fatal(e.getMessage(),e);
+      logger.error(e.getMessage(),e);
       // TODO, Logging the data into some other storage.
     }
   }

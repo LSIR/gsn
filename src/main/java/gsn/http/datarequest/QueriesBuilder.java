@@ -36,11 +36,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class QueriesBuilder {
 	
-	private static transient Logger 	logger 						= Logger.getLogger(QueriesBuilder.class);
+	private static transient Logger 	logger 						= LoggerFactory.getLogger(QueriesBuilder.class);
 	
 	/* Mandatory Parameters */
 	public static final String 			PARAM_VSNAMES_AND_FIELDS 	= "vsname";

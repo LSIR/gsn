@@ -47,11 +47,12 @@ import java.sql.*;
 import java.util.ArrayList;
 
 import org.apache.commons.dbcp.*;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public abstract class StorageManager {
 
-    private static final transient Logger logger = Logger.getLogger(StorageManager.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(StorageManager.class);
 
     private String databaseDriver;
 
@@ -69,14 +70,12 @@ public abstract class StorageManager {
         Connection con = null;
         try {
             initDatabaseAccess(con = getConnection());
-            logger.info(new StringBuilder().append("StorageManager DB connection initialized successfuly. driver:").append(databaseDriver).append(" url:").append(databaseURL));
+            logger.info(new StringBuilder().append("StorageManager DB connection initialized successfuly. driver:").append(databaseDriver).append(" url:").append(databaseURL).toString());
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Connecting to the database with the following properties failed :").append("\n\t UserName :").append(username).append("\n\t Password : ").append(password).append("\n\t Driver class : ").append(databaseDriver).append("\n\t Database URL : ").append(databaseURL).toString());
-            logger.error(new StringBuilder().append(e.getMessage()).append(", Please refer to the logs for more detailed information.").toString());
-            logger.error("Make sure in the gsn.xml file, the <storage ...> element is correct.");
-            e.printStackTrace();
-            if (logger.isInfoEnabled())
-                logger.info(e.getMessage(), e);
+            logger.info(new StringBuilder().append(e.getMessage()).append(", Please refer to the logs for more detailed information.").toString());
+            logger.info("Make sure in the gsn.xml file, the <storage ...> element is correct.");
+            logger.error(e.getMessage(), e);
         } finally {
             close(con);
         }
@@ -277,7 +276,7 @@ public abstract class StorageManager {
             if (e.getErrorCode() == getTableNotExistsErrNo() || e.getMessage().contains("does not exist"))
                 return false;
             else {
-                logger.error(e.getErrorCode());
+                logger.error(e.getMessage());
                 throw e;
             }
         } finally {
@@ -431,8 +430,7 @@ public abstract class StorageManager {
         PreparedStatement prepareStatement = null;
         try {
             String stmt = getStatementDropTable(tableName, connection).toString();
-            if (logger.isDebugEnabled())
-                logger.debug("Dropping table structure: " + tableName + " With query: " + stmt);
+            logger.debug("Dropping table structure: " + tableName + " With query: " + stmt);
             prepareStatement = connection.prepareStatement(stmt);
             prepareStatement.execute();
         } catch (SQLException e) {
@@ -451,8 +449,7 @@ public abstract class StorageManager {
     }
 
     public void executeDropView(StringBuilder tableName, Connection connection) throws SQLException {
-        if (logger.isDebugEnabled())
-            logger.debug("Dropping table structure: " + tableName);
+        logger.debug("Dropping table structure: " + tableName);
         PreparedStatement prepareStatement = connection.prepareStatement(getStatementDropView(tableName, connection).toString());
         prepareStatement.execute();
         close(prepareStatement);
@@ -479,16 +476,13 @@ public abstract class StorageManager {
      */
     public void executeCreateTable(CharSequence tableName, DataField[] structure, boolean unique, Connection connection) throws SQLException {
         StringBuilder sql = getStatementCreateTable(tableName, structure, connection);
-        if (logger.isDebugEnabled())
-            logger.debug(new StringBuilder().append("The create table statement is : ").append(sql).toString());
+        logger.debug(new StringBuilder().append("The create table statement is : ").append(sql).toString());
 
         PreparedStatement prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
         prepareStatement.close();
         sql = getStatementCreateIndexOnTimed(tableName, unique);
-        if (logger.isDebugEnabled())
-            logger.debug(new StringBuilder().append(
-                    "The create index statement is : ").append(sql).toString());
+        logger.debug(new StringBuilder().append("The create index statement is : ").append(sql).toString());
         prepareStatement = connection.prepareStatement(sql.toString());
         prepareStatement.execute();
 
@@ -507,8 +501,7 @@ public abstract class StorageManager {
     }
 
     public DataEnumerator executeQuery(StringBuilder query, boolean binaryFieldsLinked, Connection connection) throws SQLException {
-        if (logger.isDebugEnabled())
-            logger.debug("Executing query: " + query + "( Binary Field Linked:" + binaryFieldsLinked + ")");
+        logger.debug("Executing query: " + query + "( Binary Field Linked:" + binaryFieldsLinked + ")");
         return new DataEnumerator(this, connection.prepareStatement(query.toString()), binaryFieldsLinked);
     }
     
@@ -546,8 +539,7 @@ public abstract class StorageManager {
             return executeQuery(abstractQuery.getStandardQuery(), binaryFieldsLinked, connection);
         }
         String query = addLimit(abstractQuery.getStandardQuery().toString(), abstractQuery.getLimitCriterion().getSize(), abstractQuery.getLimitCriterion().getOffset());
-        if (logger.isDebugEnabled())
-            logger.debug("Executing query: " + query + "(" + binaryFieldsLinked + ")");
+        logger.debug("Executing query: " + query + "(" + binaryFieldsLinked + ")");
         return new DataEnumerator(this, connection.prepareStatement(query.toString()), binaryFieldsLinked);
     }
 
@@ -556,8 +548,7 @@ public abstract class StorageManager {
             return streamedExecuteQuery(abstractQuery.getStandardQuery().toString(), binaryFieldsLinked, connection);
         }
         String query = addLimit(abstractQuery.getStandardQuery().toString(), abstractQuery.getLimitCriterion().getSize(), abstractQuery.getLimitCriterion().getOffset());
-        if (logger.isDebugEnabled())
-            logger.debug("Executing query: " + query + "(" + binaryFieldsLinked + ")");
+        logger.debug("Executing query: " + query + "(" + binaryFieldsLinked + ")");
         return streamedExecuteQuery(query, binaryFieldsLinked, connection);
     }
 
@@ -587,8 +578,7 @@ public abstract class StorageManager {
 
     public void executeCreateView(CharSequence viewName, CharSequence selectQuery, Connection connection) throws SQLException {
         StringBuilder statement = getStatementCreateView(viewName, selectQuery);
-        if (logger.isDebugEnabled())
-            logger.debug("Creating a view:" + statement);
+        logger.debug("Creating a view:" + statement);
         final PreparedStatement prepareStatement = connection.prepareStatement(statement.toString());
         prepareStatement.execute();
         close(prepareStatement);
@@ -616,7 +606,7 @@ public abstract class StorageManager {
                 if (stmt != null && !stmt.isClosed())
                     stmt.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+            	logger.error(e.getMessage(), e);
             }
         }
     }
@@ -854,15 +844,7 @@ public abstract class StorageManager {
      * @throws SQLException
      */
     public Connection getConnection() throws SQLException {
-        if (logger.isDebugEnabled())
-            logger.debug(new StringBuilder("Asking a con. to DB: ")
-                    .append(pool.getUrl())
-                    .append(" => busy: ")
-                    .append(pool.getNumActive())
-                    .append(", max-size: ")
-                    .append(pool.getMaxActive())
-                    .append(", idle: ")
-                    .append(pool.getNumIdle()));
+        logger.debug("Asking a con. to DB: "+pool.getUrl()+" => busy: "+pool.getNumActive()+", max-size: "+pool.getMaxActive()+", idle: "+pool.getNumIdle());
         return pool.getConnection();
     }
 

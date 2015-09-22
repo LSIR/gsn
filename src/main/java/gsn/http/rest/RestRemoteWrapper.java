@@ -61,7 +61,8 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -69,7 +70,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
 
     private final XStream XSTREAM = StreamElement4Rest.getXstream();
 
-    private final transient Logger logger = Logger.getLogger(RestRemoteWrapper.class);
+    private final transient Logger logger = LoggerFactory.getLogger(RestRemoteWrapper.class);
 
     private DataField[] structure = null;
 
@@ -164,7 +165,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
                 int sc = response.getStatusLine().getStatusCode();
                 //
                 if (sc == HttpStatus.SC_OK) {
-                    logger.debug(new StringBuilder().append("Wants to consume the structure packet from ").append(initParams.getRemoteContactPoint()));
+                    logger.debug(new StringBuilder().append("Wants to consume the structure packet from ").append(initParams.getRemoteContactPoint()).toString());
                     inputStream = XSTREAM.createObjectInputStream(response.getEntity().getContent());
                     structure = (DataField[]) inputStream.readObject();
                     logger.warn("Connection established for: " + initParams.getRemoteContactPoint());
@@ -179,7 +180,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
                                 .append("Unexpected GET status code returned: ")
                                 .append(sc)
                                 .append("\nreason: ")
-                                .append(response.getStatusLine().getReasonPhrase()));
+                                .append(response.getStatusLine().getReasonPhrase()).toString());
                     }
                     if (authState != null) {
                         if (initParams.getUsername() == null || (tries > 1 && initParams.getUsername() != null)) {
@@ -187,7 +188,7 @@ public class RestRemoteWrapper extends AbstractWrapper {
                         } else {
 
                             AuthScope authScope = authState.getAuthScope();
-                            logger.warn(new StringBuilder().append("Setting Credentials for host: ").append(authScope.getHost()).append(":").append(authScope.getPort()));
+                            logger.warn(new StringBuilder().append("Setting Credentials for host: ").append(authScope.getHost()).append(":").append(authScope.getPort()).toString());
                             Credentials creds = new UsernamePasswordCredentials(initParams.getUsername(), initParams.getPassword());
                             httpclient.getCredentialsProvider().setCredentials(authScope, creds);
                         }

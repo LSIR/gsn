@@ -27,11 +27,12 @@
 package gsn.storage;
 
 import gsn.storage.db.*;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class StorageManagerFactory {
 
-    private static final transient Logger logger = Logger.getLogger(StorageManagerFactory.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(StorageManagerFactory.class);
 
     /**
      * @param driver
@@ -63,7 +64,7 @@ public class StorageManagerFactory {
         }
 		else {
 			logger.error(new StringBuilder().append("The GSN doesn't support the database driver : ").append(driver).toString());
-			logger.error(new StringBuilder().append("Please check the storage elements in the configuration files."));
+			logger.error("Please check the storage elements in the configuration files.");
 		}
         // Initialise the storage manager
         if (storageManager != null) {

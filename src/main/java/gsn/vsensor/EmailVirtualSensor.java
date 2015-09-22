@@ -32,7 +32,8 @@ import gsn.beans.StreamElement;
 import java.util.TreeMap;
 
 import org.apache.commons.mail.SimpleEmail;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Virtual sensor for sending email. 
@@ -47,7 +48,7 @@ import org.apache.log4j.Logger;
  */
 public class EmailVirtualSensor extends AbstractVirtualSensor {
 
-	private static final transient Logger logger = Logger.getLogger( EmailVirtualSensor.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( EmailVirtualSensor.class );
 	private static final String		DEFAULT_SUBJECT = "GSN-Notification";
 	/*
 	 * These values are used when extracting receiver's email-address and the message to

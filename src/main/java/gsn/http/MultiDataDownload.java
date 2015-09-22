@@ -53,13 +53,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import gsn.http.datarequest.QueriesBuilder;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MultiDataDownload extends HttpServlet {
 
     private static final long serialVersionUID = 4249739276150343437L;
 
-    private static transient Logger logger = Logger.getLogger(MultiDataDownload.class);
+    private static transient Logger logger = LoggerFactory.getLogger(MultiDataDownload.class);
 
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         doPost(req, res);
@@ -213,8 +214,7 @@ public class MultiDataDownload extends HttpServlet {
                                 vssfm.remove(sensorConfig.getName());
                             }
                         } catch (SQLException e) {
-                            logger.error("ERROR IN EXECUTING, query: " + queryMax);
-                            logger.error(e.getMessage(), e);
+                            logger.error("ERROR IN EXECUTING, query: " + queryMax +": "+e.getMessage());
                         }  finally {
                             if (conn != null) conn.close();
                             if (resultMax != null) resultMax.close();
@@ -223,7 +223,7 @@ public class MultiDataDownload extends HttpServlet {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+            	logger.error(e.getMessage(), e);
                 //TODO
             }
         }
@@ -387,7 +387,7 @@ public class MultiDataDownload extends HttpServlet {
                 parameterMap.put("groupby", new String[] { timerange + ":" + req_agg_function });
             }
             catch (NumberFormatException e2) {
-                logger.debug(e2);
+                logger.debug(e2.getMessage());
             }
         }
 
@@ -522,10 +522,10 @@ public class MultiDataDownload extends HttpServlet {
         Entry<String, ArrayList<String>> myentry;
         while (myiter.hasNext()) {
             myentry = myiter.next();
-            System.out.println("VSNAME: " + myentry.getKey());
+            logger.trace("VSNAME: " + myentry.getKey());
             Iterator<String> inneriter = myentry.getValue().iterator();
             while (inneriter.hasNext()) {
-                System.out.println("FIELD: " + inneriter.next());
+            	logger.trace("FIELD: " + inneriter.next());
             }
         }
     }

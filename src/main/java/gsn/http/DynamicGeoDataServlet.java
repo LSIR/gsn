@@ -36,7 +36,8 @@ import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
 import gsn.http.ac.UserUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -54,7 +55,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
     private static GeometryFactory geometryFactory;
     private static STRtree geoIndex;
 
-    private static transient Logger logger = Logger.getLogger(DynamicGeoDataServlet.class);
+    private static transient Logger logger = LoggerFactory.getLogger(DynamicGeoDataServlet.class);
     private static final String SEPARATOR = ",";
     private static final String NEWLINE = "\n";
 
@@ -316,7 +317,7 @@ public class DynamicGeoDataServlet extends HttpServlet {
                 sensorReadingsHash.put(sensorName, sensorReadings);
 
                 //String
-                logger.warn(sensorReadings);
+                logger.warn(sensorReadings.toString());
 
                 for (int col = 0; col < numCols; col++) {
                     Object o = results.getObject(col + 1); // Get value of the column

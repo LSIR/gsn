@@ -34,7 +34,8 @@ import gsn.wrappers.AbstractWrapper;
 
 import java.net.InetSocketAddress;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.mina.common.ConnectFuture;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.common.RuntimeIOException;
@@ -53,7 +54,7 @@ public abstract class SafeStorageAbstractWrapper extends AbstractWrapper impleme
 	
 	private static final long CONNECTION_RETRY_TIME = 10000;
   
-  private final transient Logger     logger                 = Logger.getLogger ( SafeStorageAbstractWrapper.class );
+  private final transient Logger     logger                 = LoggerFactory.getLogger ( SafeStorageAbstractWrapper.class );
 
   public void dispose() {
     // TODO

@@ -44,11 +44,12 @@ import java.util.TreeMap;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class WebInteractiveVirtualSensor extends AbstractVirtualSensor {
    
-   private static final transient Logger logger            = Logger.getLogger( WebInteractiveVirtualSensor.class );
+   private static final transient Logger logger            = LoggerFactory.getLogger( WebInteractiveVirtualSensor.class );
    
    /*
     * This method is going to be called by the container when one of the input

@@ -44,11 +44,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.lang.management.ThreadMXBean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public abstract class AbstractVirtualSensor implements Monitorable{
 
-	private static final transient Logger logger = Logger.getLogger( AbstractVirtualSensor.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( AbstractVirtualSensor.class );
 
 	private VSensorConfig  virtualSensorConfiguration;
 
@@ -112,7 +113,7 @@ public abstract class AbstractVirtualSensor implements Monitorable{
 		final int outputStreamRate = getVirtualSensorConfiguration( ).getOutputStreamRate( );
 		final long currentTime = System.currentTimeMillis( );
 		if ( ( currentTime - lastOutputedTime ) < outputStreamRate ) {
-			if ( logger.isInfoEnabled( ) ) logger.info( "Called by *discarded* b/c of the rate limit reached." );
+			logger.info( "Called by *discarded* b/c of the rate limit reached." );
 			return;
 		}
 		lastOutputedTime = currentTime;
@@ -228,8 +229,7 @@ public abstract class AbstractVirtualSensor implements Monitorable{
         */
         ThreadMXBean threadBean = Main.getThreadMXBean();
         if (!threadBean.isThreadCpuTimeEnabled()) {
-            if (logger.isInfoEnabled())
-                logger.info("ThreadCpuTime is disabled. Enabling it | Thread time measurement might not be accurate");
+            logger.info("ThreadCpuTime is disabled. Enabling it | Thread time measurement might not be accurate");
             threadBean.setThreadCpuTimeEnabled(true);
         }
 

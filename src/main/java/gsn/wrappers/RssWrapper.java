@@ -34,7 +34,8 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -53,7 +54,7 @@ public class RssWrapper extends AbstractWrapper {
   
   private static int               threadCounter      = 0;
   
-  private final transient Logger   logger             = Logger.getLogger( RssWrapper.class );
+  private final transient Logger   logger             = LoggerFactory.getLogger( RssWrapper.class );
   
   private String                   urlPath               ;
   
@@ -77,7 +78,7 @@ public class RssWrapper extends AbstractWrapper {
       return false;
     }
     rate = this.addressBean.getPredicateValueAsInt( "rate" ,SAMPLING_RATE_IN_MSEC);
-    if ( logger.isDebugEnabled( ) ) logger.debug( "RssWrapper is now running @" + rate + " Rate." );
+    logger.debug( "RssWrapper is now running @" + rate + " Rate." );
     return true;
   }
   

@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.BasicConfigurator;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -51,7 +50,6 @@ public class CSVWrapperTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		BasicConfigurator.configure();
 //		wrapper.initialize(fields,formats);
 	}
 

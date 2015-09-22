@@ -37,7 +37,8 @@ import java.util.Date;
 import java.util.TreeMap;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This virtual sensor saves its input stream to any JDBC accessible source.
@@ -53,8 +54,7 @@ import org.apache.log4j.Logger;
 	private String user;
 	private String url;
 
-	private static final transient Logger logger = Logger
-			.getLogger(ScheduledStreamExporterVirtualSensor.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(ScheduledStreamExporterVirtualSensor.class);
 	
 	public boolean initialize() {
 		// Get the StreamExporter parameters

@@ -34,7 +34,8 @@ import java.io.Serializable;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.complex.Complex;
 import org.apache.commons.math.transform.FastFourierTransformer;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -63,7 +64,7 @@ public class FFTRealOneSided extends WindowAwareVS {
 		new DataField(VALUES, "BINARY:text/plain")
 	};
 
-	private static transient Logger logger  = Logger.getLogger ( FFTRealOneSided.class );
+	private static transient Logger logger  = LoggerFactory.getLogger ( FFTRealOneSided.class );
 
 	private static FastFourierTransformer fft;
 

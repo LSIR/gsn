@@ -43,7 +43,8 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public  class StreamSource implements Serializable{
   
@@ -51,7 +52,7 @@ public  class StreamSource implements Serializable{
 
 public static final String DEFAULT_QUERY = "select * from wrapper";
   
-  private static final transient Logger logger             = Logger.getLogger( StreamSource.class );
+  private static final transient Logger logger             = LoggerFactory.getLogger( StreamSource.class );
   
   private String                        alias;
   
@@ -232,15 +233,13 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
     windowingType = DEFAULT_WINDOW_TYPE;
     isValidated=true;
     if (samplingRate <=0 ) 
-      logger.warn( new StringBuilder( ).append( "The sampling rate is set to zero (or negative) which means no results. StreamSource = " )
-          .append( getAlias( ) ).toString( ) );
+      logger.warn("The sampling rate is set to zero (or negative) which means no results. StreamSource = " + getAlias( ));
     else if(samplingRate > 1){
     	samplingRate = 1;
-    	logger.warn( new StringBuilder( ).append( "The provided sampling rate is greater than 1, resetting it to 1. StreamSource = " )
-    	          .append( getAlias( ) ).toString( ) );
+    	logger.warn("The provided sampling rate is greater than 1, resetting it to 1. StreamSource = " + getAlias( ));
     }
     if (getAddressing().length==0) {
-      logger.warn(new StringBuilder("Validation failed because there is no addressing predicates provided for the stream source (the addressing part of the stream source is empty)").append("stream source alias = ").append(getAlias()));
+      logger.warn("Validation failed because there is no addressing predicates provided for the stream source (the addressing part of the stream source is empty) stream source alias = "+getAlias());
       return validationResult=false;
     }
     if ( this.rawHistorySize != null ) {
@@ -258,8 +257,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
           this.isStorageCountBased = true;
           windowingType = WindowType.TUPLE_BASED;
         } catch ( final NumberFormatException e ) {
-          logger.error( new StringBuilder( ).append( "The storage size, " ).append( this.rawHistorySize ).append( ", specified for the Stream Source : " ).append( this.getAlias( ) ).append(
-          " is not valid." ).toString( ) , e );
+          logger.error( "The storage size, " + this.rawHistorySize + ", specified for the Stream Source : " + this.getAlias( ) + " is not valid.", e );
           return (validationResult= false);
         }
       } else
@@ -272,13 +270,10 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
           this.isStorageCountBased = false;
           windowingType = WindowType.TIME_BASED;
         } catch ( NumberFormatException e ) {
-          logger.debug( e.getMessage( ) , e );
-          logger.error( new StringBuilder( ).append( "The storage size, " ).append( this.rawHistorySize ).append( ", specified for the Stream Source : " ).append( this.getAlias( ) ).append(
-          " is not valid." ).toString( ) );
+          logger.error("The storage size, "+rawHistorySize+", specified for the Stream Source : "+this.getAlias()+" is not valid: "+ e.getMessage());
           return (validationResult=false);
         }
     }
-    logger.debug("validate() called");   
     //Parsing slide value
     if(this.rawSlideValue == null){
     	//If slide value was not specified by the user, consider it as 1 tuple
@@ -306,8 +301,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
             else if(windowingType == WindowType.TIME_BASED)
             	windowingType = WindowType.TIME_BASED_WIN_TUPLE_BASED_SLIDE;
           } catch ( final NumberFormatException e ) {
-            logger.error( new StringBuilder( ).append( "The slide value, " ).append( this.rawSlideValue ).append( ", specified for the Stream Source : " ).append( this.getAlias( ) ).append(
-            " is not valid." ).toString( ) , e );
+            logger.error("The slide value, " + rawSlideValue + ", specified for the Stream Source : " + getAlias() + " is not valid.", e );
             return (validationResult= false);
           }
         } else
@@ -320,9 +314,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
             if(windowingType == WindowType.TUPLE_BASED)
             	windowingType = WindowType.TUPLE_BASED_WIN_TIME_BASED_SLIDE;
           } catch ( NumberFormatException e ) {
-            logger.debug( e.getMessage( ) , e );
-            logger.error( new StringBuilder( ).append( "The slide value, " ).append( this.rawSlideValue ).append( ", specified for the Stream Source : " ).append( this.getAlias( ) ).append(
-            " is not valid." ).toString( ) );
+            logger.error("The slide value, "+rawSlideValue+", specified for the Stream Source : "+getAlias()+" is not valid: "+e.getMessage());
             return (validationResult=false);
           }
     }
@@ -350,7 +342,7 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
   }
   
   public boolean windowSlided() throws SQLException{
-	  if ( logger.isDebugEnabled( ) ) logger.debug( new StringBuilder( ).append( "Data availble in the stream *" ).append( getAlias( ) ).append( "*" ).toString( ) );
+	  logger.debug("Data availble in the stream *" + getAlias( ) + "*");
 	  return inputStream.executeQuery( getUIDStr() );
 	  
   }
@@ -449,11 +441,8 @@ public static final String DEFAULT_QUERY = "select * from wrapper";
       toReturn.append( " and ( mod( timed , 100)< " ).append( samplingRate*100 ).append( ")" );
     toReturn = new StringBuilder(SQLUtils.newRewrite(toReturn, rewritingMapping));
    // toReturn.append(" order by timed desc ");
-    if ( logger.isDebugEnabled( ) ) {
-      logger.debug( new StringBuilder( ).append( "The original Query : " ).append( getSqlQuery( ) ).toString( ) );
-      logger.debug( new StringBuilder( ).append( "The merged query : " ).append( toReturn.toString( ) ).append( " of the StreamSource " ).append( getAlias( ) ).append(
-      " of the InputStream: " ).append( inputStream.getInputStreamName() ).append( "" ).toString( ) );
-    }
+    logger.debug("The original query : " + getSqlQuery());
+    logger.debug("The merged query : " + toReturn + " of the StreamSource " + getAlias( ) + " of the InputStream: " + inputStream.getInputStreamName());
     return cachedSqlQuery=toReturn;
   }
   

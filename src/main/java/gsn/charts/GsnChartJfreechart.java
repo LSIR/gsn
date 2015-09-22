@@ -36,7 +36,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
@@ -53,7 +54,7 @@ public class GsnChartJfreechart implements GsnChartIF {
 	
 	private static SimpleDateFormat ssdf = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
 	
-	public static transient Logger logger= Logger.getLogger ( GsnChartJfreechart.class );
+	public static transient Logger logger= LoggerFactory.getLogger ( GsnChartJfreechart.class );
 
 	private static final Font TICK_FONT = new Font("Helvetica", Font.PLAIN, 7) ;
 	

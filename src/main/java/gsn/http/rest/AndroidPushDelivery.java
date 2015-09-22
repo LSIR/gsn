@@ -34,7 +34,8 @@ import java.io.Writer;
 import java.util.List;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
@@ -57,8 +58,7 @@ public class AndroidPushDelivery implements DeliverySystem {
 
 	private boolean isClosed = false;
 
-	private static transient Logger logger = Logger
-			.getLogger(AndroidPushDelivery.class);
+	private static transient Logger logger = LoggerFactory.getLogger(AndroidPushDelivery.class);
 
 	private HttpPost httpPost;
 
@@ -148,13 +148,12 @@ public class AndroidPushDelivery implements DeliverySystem {
 		try {
 			Result result = sender.send(message, registrationId, 5);
 
-			logger.warn("AndroidPushDelivery: sent message=" + message.toString()
+			logger.debug("AndroidPushDelivery: sent message=" + message.toString()
 					+ " to the device with registrationId=" + registrationId
 					+ " via GCM, result=" + result);
 		}
 		catch (IOException e) {
-			logger.error("AndroidPushDelivery:Error: result=" + e.toString());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 
 		return true;
@@ -164,7 +163,7 @@ public class AndroidPushDelivery implements DeliverySystem {
 	 * No need to keep the connection alive
 	 */
 	public boolean writeKeepAliveStreamElement() {
-		logger.warn("AndroidPushDelivery: writeKeepAliveStreamElement");
+		logger.debug("AndroidPushDelivery: writeKeepAliveStreamElement");
 		return true;
 	}
 
@@ -172,7 +171,7 @@ public class AndroidPushDelivery implements DeliverySystem {
 	 * closing all connections
 	 */
 	public void close() {
-		logger.warn("AndroidPushDelivery: close");
+		logger.debug("AndroidPushDelivery: close");
 		httpclient.getConnectionManager().shutdown();
 		isClosed = true;
 	}

@@ -41,7 +41,8 @@ import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -58,7 +59,7 @@ public class CSVHandler {
 
     public static final String LOCAL_TIMEZONE_ID = DateTimeZone.getDefault().getID();
 
-    private static Logger logger = Logger.getLogger(CSVHandler.class);
+    private static Logger logger = LoggerFactory.getLogger(CSVHandler.class);
 
     private static final String TIMESTAMP = "timed";
 
@@ -203,7 +204,7 @@ public class CSVHandler {
                 }
 
                 if (currentLine < previousCheckPoint) {// skipping already read lines, based on line count
-                    if (logger.isDebugEnabled()) logger.debug("skipping");
+                    logger.debug("skipping");
                     currentLine++;
                     continue;
                 }

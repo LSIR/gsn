@@ -25,7 +25,8 @@
 
 package gsn.http;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class VirtualSensorDataForwarder {
    
@@ -33,7 +34,7 @@ public class VirtualSensorDataForwarder {
    
    public static final String     DATA_ITEM           = "data";
    
-   private final transient Logger logger              = Logger.getLogger( VirtualSensorDataForwarder.class );
+   private final transient Logger logger              = LoggerFactory.getLogger( VirtualSensorDataForwarder.class );
    
    // public ActionForward execute ( ActionMapping mapping , ActionForm
    // form ,

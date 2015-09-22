@@ -41,7 +41,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class GPSGenerator extends AbstractWrapper {
    
@@ -57,7 +58,7 @@ public class GPSGenerator extends AbstractWrapper {
    
    private int                      samplingRate          = DEFAULT_SAMPLING_RATE;
    
-   private final transient Logger   logger                = Logger.getLogger( GPSGenerator.class );
+   private final transient Logger   logger                = LoggerFactory.getLogger( GPSGenerator.class );
    
    private static int               threadCounter         = 0;
    

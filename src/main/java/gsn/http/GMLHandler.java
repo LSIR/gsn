@@ -50,13 +50,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.KeyValue;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import gsn.http.ac.UserUtils;
 
 public class GMLHandler implements RequestHandler {
 
-    private static transient Logger logger = Logger.getLogger(GMLHandler.class);
+    private static transient Logger logger = LoggerFactory.getLogger(GMLHandler.class);
 
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
@@ -174,8 +175,7 @@ public class GMLHandler implements RequestHandler {
             while (result.hasMoreElements())
                 toReturn.add(result.nextElement());
         } catch (SQLException e) {
-            logger.error("ERROR IN EXECUTING, query: " + query);
-            logger.error(e.getMessage(), e);
+            logger.error("ERROR IN EXECUTING, query: " + query +": "+e.getMessage());
             return null;
         }
         return toReturn;

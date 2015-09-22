@@ -42,7 +42,8 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Timezones: http://joda-time.sourceforge.net/timezones.html
@@ -50,7 +51,7 @@ import org.apache.log4j.Logger;
  */
 public class CSVWrapper extends AbstractWrapper {
 
-    private final transient Logger logger = Logger.getLogger(CSVWrapper.class);
+    private final transient Logger logger = LoggerFactory.getLogger(CSVWrapper.class);
 
     private static int threadCounter = 0;
 

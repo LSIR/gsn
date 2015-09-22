@@ -31,7 +31,8 @@ import gsn.http.ac.User;
 import gsn.http.ac.UserUtils;
 import gsn.utils.Helpers;
 import gsn.utils.geo.GridTools;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -46,7 +47,7 @@ import java.util.zip.ZipOutputStream;
 
 public class GridDataServlet extends HttpServlet {
 
-    private static transient Logger logger = Logger.getLogger(GridDataServlet.class);
+    private static transient Logger logger = LoggerFactory.getLogger(GridDataServlet.class);
     private static final String DEFAULT_TIMEFORMAT = "yyyyMMddHHmmss";
     private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
@@ -142,7 +143,7 @@ public class GridDataServlet extends HttpServlet {
 
         logger.warn("from: " + from);
         logger.warn("to:" + to);
-        logger.warn("from != null && to != null =>" + from != null && to != null);
+        logger.warn("from != null && to != null =>" + (from != null && to != null));
         logger.warn("timeBounds: \"" + timeBounds + "\"");
 
         String query = "select * from " + sensor + timeBounds;
@@ -275,7 +276,7 @@ public class GridDataServlet extends HttpServlet {
             out.print(content);
             out.close();
         } catch (IOException e) {
-            logger.warn(e);
+            logger.warn(e.getMessage());
         }
     }
 

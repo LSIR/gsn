@@ -4,8 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+
 import org.zeromq.ZContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
@@ -20,7 +22,6 @@ import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.rest.DeliverySystem;
-import gsn.http.rest.StreamElement4Rest;
 
 public class ZeroMQDelivery implements DeliverySystem{
 	
@@ -29,6 +30,10 @@ public class ZeroMQDelivery implements DeliverySystem{
 	private boolean closed = true;
 	private Kryo kryo = new Kryo();
 	private String name; 
+
+	private VSensorConfig config;
+	public static transient Logger logger = LoggerFactory.getLogger ( ZeroMQDelivery.class );
+
 	
 	public ZeroMQDelivery(String name){
         this.name = name;
@@ -59,7 +64,7 @@ public class ZeroMQDelivery implements DeliverySystem{
             byte[] b = bais.toByteArray();
             return publisher.send(b);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		return false;
 	}

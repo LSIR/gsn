@@ -39,7 +39,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -57,7 +58,7 @@ public class WanWrapper extends AbstractWrapper {
   private static final String FILE = "file";
   private String filename  =null; //in milliseconds.
   
-  private final transient Logger   logger             = Logger.getLogger( WanWrapper.class );
+  private final transient Logger   logger             = LoggerFactory.getLogger( WanWrapper.class );
   private DataField[] structure;
   private int threadCounter=0;
   private SimpleDateFormat dateTimeFormat ;
@@ -103,10 +104,10 @@ public class WanWrapper extends AbstractWrapper {
     headers[3]= reader.readNext();
     if (headers[0]==null||headers[1]==null ||headers[2]==null||headers[3]==null) {
       logger.debug("Header read incompletely.");
-      System.out.println(headers[0]==null);
-      System.out.println(headers[1]==null);
-      System.out.println(headers[2]==null);
-      System.out.println(headers[3]==null);
+      logger.debug(""+(headers[0]==null));
+      logger.debug(""+(headers[1]==null));
+      logger.debug(""+(headers[2]==null));
+      logger.debug(""+(headers[3]==null));
       return null;
     }
     reader.close();

@@ -43,17 +43,17 @@ import javax.servlet.http.HttpSession;
 //import gsn.http.accesscontrol.User;
 import gsn.http.ac.User;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class OutputStructureHandler implements RequestHandler {
-    private static transient Logger logger = Logger.getLogger(OutputStructureHandler.class);
+    private static transient Logger logger = LoggerFactory.getLogger(OutputStructureHandler.class);
 
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         String vsName = request.getParameter("name");
         VSensorConfig sensorConfig = Mappings.getVSensorConfig(vsName);
-        if (logger.isInfoEnabled())
-            logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
+        logger.info(new StringBuilder().append("Structure request for *").append(vsName).append("* received.").toString());
         StringBuilder sb = new StringBuilder("<virtual-sensor name=\"").append(vsName).append("\">\n");
         sb.append("<field name=\"time\" type=\"string\" description=\"The timestamp associated with the stream element\" unit=\"\"/>\n");
         for (DataField df : sensorConfig.getOutputStructure()){

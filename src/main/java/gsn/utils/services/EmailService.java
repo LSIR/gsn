@@ -29,7 +29,8 @@ import gsn.utils.Utils;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.mail.Session;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
  */
 public class EmailService {
 
-    private static final transient Logger logger = Logger.getLogger(EmailService.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     private static final String SMTP_FILE = "conf/emails.properties";
 

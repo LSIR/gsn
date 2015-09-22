@@ -30,7 +30,8 @@ package gsn.http.ac;
 import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 import javax.servlet.ServletException;
@@ -48,7 +49,7 @@ import java.sql.SQLException;
  */
 public class MyUpdateUserDataSourceServlet  extends HttpServlet
 {
-    private static transient Logger logger                             = Logger.getLogger( MyUpdateUserDataSourceServlet.class );
+    private static transient Logger logger                             = LoggerFactory.getLogger( MyUpdateUserDataSourceServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /******************************************************************************************************/
     public void doPost(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException

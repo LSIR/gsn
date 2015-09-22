@@ -51,7 +51,7 @@ import java.util.Vector;
 public class MyLoginHandlerServlet extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
-	// private static transient Logger logger                             = Logger.getLogger( MyLoginHandlerServlet.class );
+	// private static transient Logger logger                             = LoggerFactory.getLogger( MyLoginHandlerServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /******************************************************************************************************/
     public void doGet(HttpServletRequest req, HttpServletResponse res)

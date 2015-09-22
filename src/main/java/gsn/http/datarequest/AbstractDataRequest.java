@@ -31,7 +31,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -67,7 +68,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractDataRequest {
 
-	private static transient Logger 	logger 						= Logger.getLogger(AbstractDataRequest.class);
+	private static transient Logger 	logger 						= LoggerFactory.getLogger(AbstractDataRequest.class);
 
 	protected QueriesBuilder qbuilder = null;
 	

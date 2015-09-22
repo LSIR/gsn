@@ -40,8 +40,6 @@ import gsn.utils.graph.Graph;
 import gsn.utils.graph.Node;
 import gsn.utils.graph.NodeNotExistsExeption;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -50,11 +48,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This class holds the files changed in the virtual-sensor directory and
@@ -69,7 +64,7 @@ public final class Modifications {
 
 	private Graph<VSensorConfig> graph;
 
-	private static transient Logger     logger                  = Logger.getLogger( Modifications.class );
+	private static transient Logger     logger                  = LoggerFactory.getLogger( Modifications.class );
 
 	/**
 	 * The list of the virtual sensors, sorted by dependency relations between them,
@@ -124,9 +119,8 @@ public final class Modifications {
 				configuration=BeansInitializer.vsensor(vsConf);
 				configuration.setFileName( file );
 				if ( !configuration.validate( ) ) {
-					logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( file ).append( " failed because of one or more problems in configuration file." )
-							.toString( ) );
-					logger.error( new StringBuilder( ).append( "Please check the file and try again" ).toString( ) );
+					logger.error("Adding the virtual sensor specified in "+file+" failed because of one or more problems in configuration file.");
+					logger.info("Please check the file and try again");
 					continue ;
 				}
 
@@ -136,8 +130,7 @@ public final class Modifications {
 				logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( file ).append(
 				" failed because there is syntax error in the configuration file. Please check the configuration file and try again." ).toString( ) );*/
 			} catch ( Exception e ) {
-				logger.error( e.getMessage( ) , e );
-				logger.error( new StringBuilder( ).append( "Adding the virtual sensor specified in " ).append( file ).append( " failed." ).toString( ) );
+				logger.error("Adding the virtual sensor specified in "+file+" failed."+ e.getMessage());
 			}
 		}
 	}
@@ -243,8 +236,7 @@ public final class Modifications {
 						Class<?> wrapperClass = Main.getWrapperClass(wrapper);
 						if (wrapperClass == null) {
 							//If this addressing element is the last one, remove VS from the graph
-							if(logger.isDebugEnabled())
-								logger.debug ( "The specified wrapper >"+addressing[addressingIndex].getWrapper()+"< does not exist");
+							logger.warn ( "The specified wrapper >"+addressing[addressingIndex].getWrapper()+"< does not exist");
 							if(addressingIndex == addressing.length && !hasValidAddressing){
 								try {
 									graph.removeNode(config);
@@ -267,8 +259,7 @@ public final class Modifications {
 							if(sensorConfig == null)
 								sensorConfig = Mappings.getVSensorConfig(vsName);
 							if(sensorConfig == null){
-								if(logger.isDebugEnabled())
-									logger.debug("There is no virtaul sensor with name >" +  vsName + "< in the >" + config.getName() + "< virtual sensor");
+								logger.debug("There is no virtual sensor with name >" +  vsName + "< in the >" + config.getName() + "< virtual sensor");
 
 								//If this addressing element is the last one, remove VS from the graph
 								if(addressingIndex == addressing.length - 1 && !hasValidAddressing){
@@ -337,7 +328,7 @@ public final class Modifications {
 			}
 			port = addressBean.getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
 			if ( port > 65000 || port <= 0 ) {
-				logger.error("Remote wrapper initialization failed, bad port number:"+port);
+				logger.warn("Remote wrapper initialization failed, bad port number:"+port);
 				return false;
 			}
 		}

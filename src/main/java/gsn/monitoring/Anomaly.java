@@ -2,7 +2,8 @@ package gsn.monitoring;
 
 import gsn.beans.DataField;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /*  Each virtual sensor could have multiple anomalies
  *  
@@ -17,7 +18,7 @@ import org.apache.log4j.Logger;
 
 public class Anomaly {
     
-    private static final transient Logger logger = Logger.getLogger (Anomaly.class);    
+    private static final transient Logger logger = LoggerFactory.getLogger (Anomaly.class);    
     
     // Field which this anomaly represents 
     private DataField field;

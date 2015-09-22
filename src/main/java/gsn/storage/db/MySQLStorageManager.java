@@ -31,14 +31,15 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.storage.DataEnumerator;
 import gsn.storage.StorageManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class MySQLStorageManager extends StorageManager {
 
-    private static final transient Logger logger = Logger.getLogger(MySQLStorageManager.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(MySQLStorageManager.class);
 
     public MySQLStorageManager() {
         super();
@@ -186,7 +187,7 @@ public class MySQLStorageManager extends StorageManager {
         }
         result.delete(result.length() - 2, result.length());
         result.append(")");
-        if (tableName.contains("_")) logger.warn(result);
+        if (tableName.contains("_")) logger.warn(result.toString());
         return result;
     }
 

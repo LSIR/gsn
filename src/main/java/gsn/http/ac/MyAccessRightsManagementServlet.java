@@ -28,7 +28,8 @@ package gsn.http.ac;
 
 import gsn.Main;
 import gsn.beans.ContainerConfig;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -45,7 +46,7 @@ import java.io.PrintWriter;
 public class MyAccessRightsManagementServlet extends HttpServlet
 {
 
-     private static transient Logger logger= Logger.getLogger( MyAccessRightsManagementServlet.class );
+     private static transient Logger logger= LoggerFactory.getLogger( MyAccessRightsManagementServlet.class );
 
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/

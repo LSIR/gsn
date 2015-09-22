@@ -46,6 +46,8 @@ public class SafeStorageStop {
 	      PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 	      writer.println(SafeStorageController.SAFE_STORAGE_SHUTDOWN);
 	      writer.flush();
+	      writer.close();
+	      socket.close();
 	      System.out.println("[Done]");
 	    }catch (Exception e) {
 	      System.out.println("[Failed: "+e.getMessage()+ "]");

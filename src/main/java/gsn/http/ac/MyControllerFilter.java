@@ -32,7 +32,8 @@ import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.VSensorConfig;
 import gsn.http.WebConstants;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +48,7 @@ import java.util.List;
 public class MyControllerFilter implements Filter {
 
     private FilterConfig config = null;
-    private static transient Logger logger = Logger.getLogger(MyControllerFilter.class);
+    private static transient Logger logger = LoggerFactory.getLogger(MyControllerFilter.class);
     private boolean logging = false;
 
     public void init(FilterConfig config) throws ServletException {

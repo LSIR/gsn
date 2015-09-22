@@ -29,7 +29,8 @@ package ch.epfl.sensorscope.wrappers;
 import gsn.acquisition2.wrappers.MigMessageParameters;
 import gsn.acquisition2.wrappers.MigMessageWrapper2;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MigMessageSensorscopeWrapper extends MigMessageWrapper2 {
 
@@ -37,7 +38,7 @@ public class MigMessageSensorscopeWrapper extends MigMessageWrapper2 {
 	
 	private long last_timestamp_offset = 0;
 
-	private final transient Logger logger = Logger.getLogger( MigMessageSensorscopeWrapper.class );
+	private final transient Logger logger = LoggerFactory.getLogger( MigMessageSensorscopeWrapper.class );
 
 	@Override
 	public void run() {

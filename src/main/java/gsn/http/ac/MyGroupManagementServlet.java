@@ -37,7 +37,8 @@ package gsn.http.ac;
 import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 import javax.servlet.ServletException;
@@ -50,7 +51,7 @@ import java.util.Vector;
 public class MyGroupManagementServlet extends HttpServlet
 {
 
-    private static transient Logger logger                             = Logger.getLogger( MyGroupManagementServlet.class );
+    private static transient Logger logger                             = LoggerFactory.getLogger( MyGroupManagementServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /******************************************************************************************************/
     public void doGet(HttpServletRequest req, HttpServletResponse res)throws ServletException, IOException

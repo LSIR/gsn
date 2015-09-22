@@ -45,11 +45,12 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ReportManager {	
 	
-	public static transient Logger logger= Logger.getLogger ( ReportManager.class );
+	public static transient Logger logger= LoggerFactory.getLogger ( ReportManager.class );
 	
 	public static void generatePdfReport (Collection<Report> reports, String jasperFile, HashMap<String, String> params, OutputStream os) {
 		try {

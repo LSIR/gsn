@@ -25,13 +25,12 @@
 
 package gsn.utils;
 import java.net.*;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class SensorScopeListenerTest
 {
-    public static final String CONF_LOG4J_SENSORSCOPE_PROPERTIES = "conf/log4j_sensorscope.properties";
-    private static transient Logger logger = Logger.getLogger(SensorScopeListenerTest.class);
+    private static transient Logger logger = LoggerFactory.getLogger(SensorScopeListenerTest.class);
     public SensorScopeListenerTest(int port)
     {
         ServerSocket server;
@@ -63,7 +62,6 @@ public class SensorScopeListenerTest
 
     public static void main(String args[])
     {
-        PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
         new SensorScopeListenerTest(1234);
     }
 }

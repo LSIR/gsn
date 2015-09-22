@@ -27,7 +27,8 @@ package gsn.wrappers;
 
 import gsn.Main;
 import gsn.storage.StorageManagerFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -56,7 +57,7 @@ public class JDBCWrapper extends AbstractWrapper {
     private static long DEFAULT_RATE = 500;   // 1 second in milliseconds
     private static long DEFAULT_BUFFER_SIZE = 1000;
 
-    private transient Logger logger = Logger.getLogger(this.getClass());
+    private transient Logger logger = LoggerFactory.getLogger(this.getClass());
     private DataField[] outputFormat;
     private int threadCounter = 0;
     private String table_name;
@@ -318,7 +319,7 @@ public class JDBCWrapper extends AbstractWrapper {
                 if (se.getData("max(timed)") != null)
                     latest = (Long) se.getData("max(timed)");
                 logger.warn(" MAX ts = " + latest);
-                logger.warn(se);
+                logger.warn(se.toString());
 
             }
         } catch (SQLException e) {

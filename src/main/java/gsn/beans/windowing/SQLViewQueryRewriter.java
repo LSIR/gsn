@@ -37,11 +37,12 @@ import gsn.storage.StorageManager;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public abstract class SQLViewQueryRewriter extends QueryRewriter {
 
-    private static final transient Logger logger = Logger.getLogger(SQLViewQueryRewriter.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(SQLViewQueryRewriter.class);
     protected static StorageManager storageManager = Main.getWindowStorage();
     public static final CharSequence VIEW_HELPER_TABLE = Main.getWindowStorage().tableNameGeneratorInString("_SQL_VIEW_HELPER_".toLowerCase());
     private static DataField[] viewHelperFields = new DataField[]{new DataField("u_id", "varchar(17)")};
@@ -104,13 +105,7 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
             query.append(" set timed=").append(timestamp).append(" where u_id='").append(streamSource.getUIDStr());
             query.append("' ");
             storageManager.executeUpdate(query);
-            // can be ignored if no queries specified on the view. Every new data-item will then be visible when inserted, so it always returns true.
-           // if (storageManager.isThereAnyResult(new StringBuilder("select * from ").append(streamSource.getUIDStr()))) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(streamSource.getWrapper().getWrapperName() + " - Output stream produced/received from a wrapper " + streamSource.toString());
-                }
-                return streamSource.windowSlided();
-            //}
+            return streamSource.windowSlided();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }

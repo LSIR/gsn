@@ -32,7 +32,8 @@ import gsn.utils.ParamParser;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 /**
  * The output format is:
  * 
@@ -45,7 +46,7 @@ public class MemoryMontoringWrapper2 extends AbstractWrapper2{
   
   private int                       samplingRate                          = DEFAULT_SAMPLING_RATE;
   
-  private final transient Logger    logger                                = Logger.getLogger( MemoryMontoringWrapper2.class );
+  private final transient Logger    logger                                = LoggerFactory.getLogger( MemoryMontoringWrapper2.class );
   
   private static int                threadCounter                         = 0;
   

@@ -34,13 +34,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class VirtualSensor {
 	
-    private static transient Logger logger = Logger.getLogger(VirtualSensor.class);
+    private static transient Logger logger = LoggerFactory.getLogger(VirtualSensor.class);
 
 	private Map<String, String> metadata = new LinkedHashMap<String, String>();
 	private List<DataField> fields = new ArrayList<DataField>();

@@ -41,7 +41,8 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -57,7 +58,7 @@ public class PushDelivery implements DeliverySystem {
 
 	private boolean isClosed = false;
 
-	private static transient Logger       logger     = Logger.getLogger ( PushDelivery.class );
+	private static transient Logger       logger     = LoggerFactory.getLogger ( PushDelivery.class );
 
 	private HttpPut httpPut;
 

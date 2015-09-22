@@ -29,7 +29,8 @@ import gsn.utils.models.jgarch.armamodel.ARModel;
 import gsn.utils.models.jgarch.garchmodel.GarchModel;
 import gsn.utils.models.jgarch.util.ArrayUtils;
 import gsn.utils.models.jgarch.wrappers.REngineManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.lang.Math;
 
@@ -37,7 +38,7 @@ import java.util.List;
 
 public class ArmaGarchModel implements IModel {
 
-    private final transient Logger logger = Logger.getLogger(ArmaGarchModel.class);
+    private final transient Logger logger = LoggerFactory.getLogger(ArmaGarchModel.class);
     private double[] stream;
 
     private int windowSize;

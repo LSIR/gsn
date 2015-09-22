@@ -32,7 +32,8 @@ import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -51,7 +52,7 @@ import java.util.Vector;
  */
 public class MyDataSourceCandidateWaitingListServlet extends HttpServlet
 {
-    private static transient Logger logger                             = Logger.getLogger( MyDataSourceCandidateWaitingListServlet.class );
+    private static transient Logger logger                             = LoggerFactory.getLogger( MyDataSourceCandidateWaitingListServlet.class );
     /****************************************** Servlet Methods*******************************************/
     /******************************************************************************************************/
 
@@ -309,7 +310,7 @@ public class MyDataSourceCandidateWaitingListServlet extends HttpServlet
                         try {
                             FileUtils.copyFile(file, newFile);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                        	logger.error(e.getMessage(), e);
                         }
 
                         ctdb.updateOneColumnUnderOneCondition(new Column("ISCANDIDATE","no"),new Column("DATASOURCENAME",pm.valueForName("datasourcename")),"ACDATASOURCE");

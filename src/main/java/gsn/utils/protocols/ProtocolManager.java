@@ -36,7 +36,8 @@ import java.util.Vector;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 /**
@@ -53,7 +54,7 @@ import org.apache.log4j.Logger;
  *  @see AbstractHCIProtocol
  */
 public class ProtocolManager {
-	private static final transient Logger logger = Logger.getLogger( ProtocolManager.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( ProtocolManager.class );
 	private AbstractHCIProtocol protocol;
 	private ProtocolStates currentState;
 	private AbstractHCIQuery lastExecutedQuery = null;
@@ -94,30 +95,25 @@ public class ProtocolManager {
 			AbstractHCIQuery query = protocol.getQuery( queryName );
 			
 			if(query != null) {
-				if(logger.isDebugEnabled())
-					logger.debug( "Retrieved query " + queryName + ", trying to build raw query.");
+				logger.debug( "Retrieved query " + queryName + ", trying to build raw query.");
 
 				byte[] queryBytes = query.buildRawQuery( params );
 				if(queryBytes != null) {
 					try {
-						if(logger.isDebugEnabled())
-							logger.debug("Built query, it looks like: " + new String(queryBytes));
+						logger.debug("Built query, it looks like: " + new String(queryBytes));
 						outputWrapper.sendToWrapper(null,null,new Object[] {queryBytes});
 						lastExecutedQuery = query;
 						lastParams = params;
 						answer = queryBytes;
-						if(logger.isDebugEnabled())
-							logger.debug("Query succesfully sent!");
+						logger.debug("Query succesfully sent!");
 						if(query.needsAnswer( params )) {
-							if(logger.isDebugEnabled())
-								logger.debug("Now entering wait mode for answer.");
+							logger.debug("Now entering wait mode for answer.");
 							timer = new Timer();
 							currentState = ProtocolStates.WAITING;
 							timer.schedule( answerTimeout , new Date());
 						}
 					} catch( OperationNotSupportedException e ) {
-						if(logger.isDebugEnabled())
-							logger.debug("Query could not be sent ! See error message.");
+						logger.debug("Query could not be sent ! See error message.");
 						logger.error( e.getMessage( ) , e );
 						currentState = ProtocolStates.READY;
 					}

@@ -25,7 +25,8 @@
 
 package gsn.utils.services;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import winterwell.jtwitter.Twitter;
 
 import java.util.HashMap;
@@ -38,7 +39,7 @@ import java.util.HashMap;
  */
 public class TwitterService {
 
-    private static final transient Logger logger = Logger.getLogger(TwitterService.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(TwitterService.class);
 
     private static HashMap<String, Twitter> twitters = new HashMap<String, Twitter>();
 

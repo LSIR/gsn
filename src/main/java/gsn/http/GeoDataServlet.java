@@ -28,9 +28,9 @@ package gsn.http;
 
 import com.vividsolutions.jts.io.ParseException;
 import gsn.Main;
-import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -44,7 +44,7 @@ import java.util.Properties;
 
 public class GeoDataServlet extends HttpServlet {
 
-    private static transient Logger logger = Logger.getLogger(GeoDataServlet.class);
+    private static transient Logger logger = LoggerFactory.getLogger(GeoDataServlet.class);
     private boolean usePostGIS = true; // by default use JTS
     private User user = null;
     private boolean useUnion;

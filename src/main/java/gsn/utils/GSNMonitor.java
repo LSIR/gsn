@@ -55,8 +55,8 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -95,7 +95,7 @@ public class GSNMonitor {
 
     private static int status = STATUS_OK;
 
-    private static transient final Logger logger = Logger.getLogger(VSMonitor.class);
+    private static transient final Logger logger = LoggerFactory.getLogger(VSMonitor.class);
 
     public static HashMap<String, VSensorMonitorConfig> monitoredSensors = new HashMap<String, VSensorMonitorConfig>();
     public static HashMap<String, Long> sensorsUpdateDelay = new HashMap<String, Long>();
@@ -430,7 +430,6 @@ public class GSNMonitor {
 
     public static void main(String[] args) {
 
-        PropertyConfigurator.configure(DEFAULT_GSN_LOG4J_PROPERTIES);
         String configFileName;
 
         if (args.length >= 2) {

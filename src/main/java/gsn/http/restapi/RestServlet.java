@@ -38,13 +38,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class RestServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static transient Logger logger = Logger.getLogger(RestServlet.class);
+	private static transient Logger logger = LoggerFactory.getLogger(RestServlet.class);
 
     private static final int REQUEST_UNKNOWN = -1;
     private static final int REQUEST_GET_ALL_SENSORS = 0;

@@ -66,7 +66,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class HttpGetAndroidWrapper extends AbstractWrapper {
    
@@ -74,7 +75,7 @@ public class HttpGetAndroidWrapper extends AbstractWrapper {
    
    private static int               threadCounter      = 0;
    
-   private final transient Logger   logger             = Logger.getLogger( HttpGetAndroidWrapper.class );
+   private final transient Logger   logger             = LoggerFactory.getLogger( HttpGetAndroidWrapper.class );
    
    private static String                   urlPath, Longitude, Latitude;
    
@@ -123,7 +124,7 @@ public class HttpGetAndroidWrapper extends AbstractWrapper {
       if ( inputRate == null || inputRate.trim( ).length( ) == 0 ) rate = DEFAULT_RATE;
       else
          rate = Integer.parseInt( inputRate );
-      if ( logger.isDebugEnabled( ) ) logger.debug( "AndroidWrapper is now running @" + rate + " Rate." );
+      logger.debug( "AndroidWrapper is now running @" + rate + " Rate." );
       return true;
    }
    
@@ -188,8 +189,7 @@ public class HttpGetAndroidWrapper extends AbstractWrapper {
 				postStreamElement( streamElement );
 	        
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 	}
    

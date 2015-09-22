@@ -30,8 +30,8 @@ import gsn.beans.StreamElement;
 import gsn.utils.Formatter;
 import gsn.utils.Helpers;
 import gsn.utils.UnsignedByte;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.io.Serializable;
@@ -42,7 +42,7 @@ import java.util.*;
 
 public class SensorScopeServerListener {
 
-    private static transient Logger logger = Logger.getLogger(SensorScopeServerListener.class);
+    private static transient Logger logger = LoggerFactory.getLogger(SensorScopeServerListener.class);
 
     private static final String PASSKEY = "FD83EC5EA68E2A5B";
 
@@ -1568,7 +1568,7 @@ public class SensorScopeServerListener {
     }
 
     public static void main(java.lang.String[] args) {
-        PropertyConfigurator.configure(CONF_LOG4J_SENSORSCOPE_PROPERTIES);
+
 
         SensorScopeServerListener server = new SensorScopeServerListener();
 

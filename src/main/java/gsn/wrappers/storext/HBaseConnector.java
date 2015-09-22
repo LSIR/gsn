@@ -37,6 +37,8 @@ import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.filter.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,6 +53,7 @@ public class HBaseConnector {
     private ResultScanner ss;
     private boolean hasNext;   // shows if there are more values to be retrieved
     private HashMap<String, ArrayList<Pair>> results;  // key = row, value = the field and its value
+    private static final transient Logger logger = LoggerFactory.getLogger(HBaseConnector.class);
     /**
      * Initialization
      */
@@ -58,8 +61,7 @@ public class HBaseConnector {
         try {
         confHBase = HBaseConfiguration.create();
         } catch (Exception e) {
-            System.out.println(e);
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -74,14 +76,14 @@ public class HBaseConnector {
             throws Exception {
         HBaseAdmin admin = new HBaseAdmin(confHBase);
         if (admin.tableExists(tableName)) {
-            System.out.println("table already exists!");
+            logger.warn("table already exists!");
         } else {
             HTableDescriptor tableDesc = new HTableDescriptor(tableName);
             for (int i = 0; i < familys.length; i++) {
                 tableDesc.addFamily(new HColumnDescriptor(familys[i]));
             }
             admin.createTable(tableDesc);
-            System.out.println("create table " + tableName + " ok.");
+            logger.info("create table " + tableName + " ok.");
         }
         admin.close();
     }
@@ -94,11 +96,11 @@ public class HBaseConnector {
             HBaseAdmin admin = new HBaseAdmin(confHBase);
             admin.disableTable(tableName);
             admin.deleteTable(tableName);
-            System.out.println("delete table " + tableName + " ok.");
+            logger.info("delete table " + tableName + " ok.");
         } catch (MasterNotRunningException e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage());
         } catch (ZooKeeperConnectionException e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage());
         }
     }
 
@@ -107,9 +109,9 @@ public class HBaseConnector {
             HBaseAdmin admin = new HBaseAdmin(confHBase);
             return admin.tableExists(tablename);
         }catch (MasterNotRunningException e) {
-                e.printStackTrace();
+        	logger.error(e.getMessage());
         } catch (ZooKeeperConnectionException e) {
-                e.printStackTrace();
+        	logger.error(e.getMessage());
         }
         return false;
     }
@@ -128,7 +130,7 @@ public class HBaseConnector {
            /* System.out.println("insert recored " + rowKey + " to table "
                     + tableName + " ok.");*/
         } catch (IOException e) {
-            e.printStackTrace();
+        	logger.error(e.getMessage());
         }
     }
 
@@ -142,7 +144,7 @@ public class HBaseConnector {
         Delete del = new Delete(rowKey.getBytes());
         list.add(del);
         table.delete(list);
-        System.out.println("del recored " + rowKey + " ok.");
+        logger.info("del recored " + rowKey + " ok.");
     }
 
     /**
@@ -180,7 +182,7 @@ public class HBaseConnector {
             }
             return results;
         } catch (IOException e){
-            e.printStackTrace();
+        	logger.error(e.getMessage());
             return null;
         }
     }
@@ -214,8 +216,7 @@ public class HBaseConnector {
             }
             return results;
         } catch (IOException e){
-System.out.println("Problem");
-            e.printStackTrace();
+        	logger.error(e.getMessage());
             return null;
         }
     }
@@ -243,7 +244,7 @@ System.out.println("Problem");
             }
             return results;
         } catch (IOException e){
-            e.printStackTrace();
+        	logger.error(e.getMessage());
             return null;
         }
     }
@@ -269,7 +270,7 @@ System.out.println("Problem");
             }
             return results;
         } catch (IOException e){
-            e.printStackTrace();
+        	logger.error(e.getMessage());
             return null;
         }
     }
@@ -291,17 +292,12 @@ System.out.println("Problem");
             Result r;
             setHasNext(false);  // assume that there is no next
             for (r = ss.next(); r != null; r = ss.next()) {
-                System.out.println("#################");
                 ArrayList<Pair> dataFields = new ArrayList<Pair>();
                 KeyValue kv2 = null;
                 for(KeyValue kv : r.raw()){        // for each different key that you find
                     kv2 = kv;
                     dataFields.add(new Pair(new String(kv.getQualifier()), new String(kv.getValue())));  // add a new column associated with this row
-                 /**/   System.out.print(new String(kv.getRow()) + " ");
-                    System.out.print(new String(kv.getFamily()) + ":");
-                    System.out.print(new String(kv.getQualifier()) + " ");
-                    System.out.print(kv.getTimestamp() + " ");
-                    System.out.println(new String(kv.getValue()));   /**/
+                    logger.trace(kv.getRow() + " " + kv.getFamily() + ":" + kv.getQualifier() + " " + kv.getTimestamp() + " " + kv.getValue());  
                 }
                 results.put(new String(kv2.getRow()), dataFields);
                 iterations--;
@@ -310,7 +306,7 @@ System.out.println("Problem");
             setHasNext(r != null);  // set if there are more to be retrieved
             return results;
         } catch (IOException e){
-            e.printStackTrace();
+        	logger.error(e.getMessage());
             return null;
         }
     }
@@ -332,17 +328,12 @@ System.out.println("Problem");
             Result r;
             setHasNext(false);  // assume that there is no next
             for (r = ss.next(); r != null; r = ss.next()) {
-                System.out.println("#################");
                 ArrayList<Pair> dataFields = new ArrayList<Pair>();
                 KeyValue kv2 = null;
                 for(KeyValue kv : r.raw()){        // for each different key that you find
                     kv2 = kv;
                     dataFields.add(new Pair(new String(kv.getQualifier()), new String(kv.getValue())));  // add a new column associated with this row
-                 /**/   System.out.print(new String(kv.getRow()) + " ");
-                    System.out.print(new String(kv.getFamily()) + ":");
-                    System.out.print(new String(kv.getQualifier()) + " ");
-                    System.out.print(kv.getTimestamp() + " ");
-                    System.out.println(new String(kv.getValue()));   /**/
+                    logger.trace(kv.getRow() + " " + kv.getFamily() + ":" + kv.getQualifier() + " " + kv.getTimestamp() + " " + kv.getValue());  
                 }
                 results.put(new String(kv2.getRow()), dataFields);
                 iterations--;
@@ -351,7 +342,7 @@ System.out.println("Problem");
             setHasNext(r != null);  // set if there are more to be retrieved
             return results;
         } catch (IOException e){
-            e.printStackTrace();
+        	logger.error(e.getMessage());
             return null;
         }
     }

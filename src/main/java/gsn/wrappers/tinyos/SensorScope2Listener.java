@@ -25,7 +25,8 @@
 
 package gsn.wrappers.tinyos;
 
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class SensorScope2Listener implements Runnable {
 
     private static SensorScope2Listener instance = null;
 
-    private transient Logger logger = Logger.getLogger(this.getClass());
+    private transient Logger logger = LoggerFactory.getLogger(this.getClass());
     private int server_port;
     long counter = 0;
 

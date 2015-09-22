@@ -38,8 +38,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.collections.KeyValue;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class LoginToMSRSense {
 
@@ -49,8 +50,7 @@ public class LoginToMSRSense {
 	public static int DELETE_SENSOR_OK = 1;
 	public static int DELETE_SENSOR_ERROR_DOESNT_EXIST = 0;
 
-	private static transient Logger logger = Logger
-			.getLogger(LoginToMSRSense.class);
+	private static transient Logger logger = LoggerFactory.getLogger(LoginToMSRSense.class);
 	public static final String DEFAULT_GSN_LOG4J_PROPERTIES = "conf/log4j.properties";
 
 	private static ArrayList<String> dataTypeCache = new ArrayList<String>();
@@ -58,7 +58,6 @@ public class LoginToMSRSense {
 	public static void main(String[] args) throws RemoteException,
 			FileNotFoundException {
 
-		PropertyConfigurator.configure(DEFAULT_GSN_LOG4J_PROPERTIES);
 		String host = "http://micssrv22.epfl.ch/";
 		VSensorConfig conf = new VSensorConfig();
 		conf.setName("GSNTest");

@@ -30,7 +30,8 @@ package gsn.http.ac;
 import gsn.Main;
 import gsn.beans.ContainerConfig;
 import gsn.http.WebConstants;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 import javax.servlet.ServletException;
@@ -50,7 +51,7 @@ import java.util.Vector;
 public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
 {
 
-     private static transient Logger logger                             = Logger.getLogger( MyDataSourceCandidateRegistrationServlet.class );
+     private static transient Logger logger                             = LoggerFactory.getLogger( MyDataSourceCandidateRegistrationServlet.class );
 
     /****************************************** Servlet Methods*******************************************/
     /****************************************************************************************************/
@@ -196,7 +197,7 @@ public class MyDataSourceCandidateRegistrationServlet extends HttpServlet
 		PrintWriter out = (PrintWriter) session.getAttribute("out");
         User user = (User) session.getAttribute("user");
 		ParameterSet pm = new ParameterSet(req,"virtual-sensors/receivedVSFiles");
-        logger.warn(pm);
+        logger.warn(pm.toString());
         if(pm.hasEmptyParameter())
         {
             //out.println("Please enter the virtual sensor name. <BR>");
