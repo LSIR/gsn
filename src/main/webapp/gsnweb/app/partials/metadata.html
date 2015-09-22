@@ -1,0 +1,48 @@
+<div layout="row" layout-sm="column" layout-margin>
+
+    <!--<form name="monitorForm">-->
+    <!--<div>-->
+    <!--Data: {{data}}-->
+
+    <!--</div>-->
+    <!--</form>-->
+    <div>
+
+        <div class="box_border">
+            <label style="margin-top: 10px;">WANNENGRAT_WAN6</label>
+            <br/>
+            <label>Keywords</label>
+            <ul>
+                <li>snow, </li>
+                <li>wind transport,</li>
+                <li> avalanche,</li>
+                <li> avalanche fracture,</li>
+                <li> boundary layer meteorology,</li>
+                <li> ecosystem genetics,</li>
+                <li> snow hydrology</li>
+
+            </ul>
+            <label>Experiments 	</label>
+            <ul>
+                <li>growth limitations + phenotypic plasticity + micro-evolution in a long-lived alpine shrub (Growth limitations, phenotypic plasticity and micro-evolution in a long-lived alpine shrub)</li>
+                <li>sensorscope: self organizing wireless sensor networks of mobile meteo stations (Home)</li>
+                <li>how much snow is lost to sublimation? (How much snow is lost to sublimation?)</li>
+                <li>orographic effects on snowfall patterns in mountainous terrain (Orographic effects on snowfall patterns in mountainous terrain)</li>
+                <li>observational investigation of the relative importance of advective heat transport and boundary layer decoupling in the melt dynamics of a patchy snow cover (Patchy snow cover)</li>
+                <li>measuring and modelling the snow distribution on wannengrat (Snow redistribution by wind)</li>
+                <li>tramm: triggering of rapid mass movements in steep terrain (TRAMM)</li>
+                <li>toward better decision tools for the management of frequent avalanches (Toward better decision tools for the management of frequent avalanches)</li>
+                <li>wind erosion in the alpine zone at wannengrat (Wind erosion of in the alpine zone at Wannengrat)</li>
+            </ul>
+            <div ng-if="isImage(sensor)">
+                <img lazy-load ll-src="{{imageSrc(sensor)}}" style="height: 300px;"/>
+            </div>
+
+
+
+
+        </div>
+
+    </div>
+
+</div>

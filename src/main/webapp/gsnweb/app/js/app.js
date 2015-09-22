@@ -58,6 +58,10 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
                 },
                 controller: 'MonitorController'
             }).
+            when('/metadata', {
+                templateUrl: 'partials/metadata.html'
+
+            }).
             when('/about', {
                 templateUrl: 'partials/about.html'
                 //, controller: 'hcCtrl'
@@ -91,12 +95,12 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
 ]);
 
 gsnWebApp.controller('TabsCtrl', ['$scope', '$rootScope', '$location', 'GsnTabs',
-    function ($scope, $rootScope,$location, GsnTabs) {
+    function ($scope, $rootScope, $location, GsnTabs) {
 
         $scope.tabs = GsnTabs;
         $scope.tabs.updateSelectedTab($location.$$path);
 
-        $rootScope.$on('$routeChangeSuccess', function(route, location){
+        $rootScope.$on('$routeChangeSuccess', function (route, location) {
             $scope.tabs.updateSelectedTab(location.$$route.originalPath);
         });
 
@@ -115,10 +119,11 @@ gsnWebApp.service('GsnTabs', function () {
             {link: '#/map', label: 'Sensors'},
             {link: '#/plot', label: 'Data'},
             {link: '#/monitor', label: 'Monitor'},
+            {link: '#/metadata', label: 'Metadata'},
             {link: '#/about', label: 'About'},
         ];
 
-        this.tabNames = ['/map', '/plot', '/monitor', '/about'];
+        this.tabNames = ['/map', '/plot', '/monitor', '/metadata', '/about'];
 
         this.selectedTab = this.tabs[0];
     }
