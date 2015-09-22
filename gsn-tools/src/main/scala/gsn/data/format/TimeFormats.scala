@@ -8,7 +8,7 @@ import org.joda.time.format.DateTimeFormatter
 object TimeFormats {
   def formatTime(t:Long)(implicit timeFormat:Option[String])=timeFormat match{
     case Some("unixTime") | None => t
-    case _ => getTimeFormat(timeFormat).print(t)
+    case _ => getTimeFormat(timeFormat).withZoneUTC().print(t)
   }
 
   def formatTime(t:Long, timeFormat:DateTimeFormatter)=

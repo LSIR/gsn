@@ -13,6 +13,7 @@ import scala.util.{Failure=>ScalaFailure}
 import scala.util.Success
 import reactivemongo.bson.BSON
 import reactivemongo.api.MongoConnection
+import org.joda.time.Period
 
 object dsReg{
   val dsss=new collection.mutable.HashMap[String,StorageConf]
@@ -114,6 +115,14 @@ class SensorStore(ds:DataStore) extends Actor{
   }
 }
 
+case class Aggregation(aggFunction:String,aggPeriod:Long)
+object Aggregation{
+  def apply(func:String,pattern:String):Aggregation={
+    val period=Period.parse(pattern)
+    Aggregation(func,period.toStandardSeconds.getSeconds*1000)
+  }
+}
+
 case class GetSensorInfo(sensorid:String)
 case class GetAllSensorsInfo()
 case class SensorInfo(sensor:Sensor,ds:Option[String]=None,stats:Option[SensorStats]=None)			
@@ -122,4 +131,7 @@ case class AllSensorInfo(sensors:Seq[SensorInfo])
 case class GetAllSensors(latestValues:Boolean=false,timeFormat:Option[String]=None)
 case class GetSensor(sensorid:String,latestValues:Boolean=false,timeFormat:Option[String]=None)
 case class GetSensorData(sensorid:String,fields:Seq[String],
-			conditions:Seq[String], size:Option[Int],timeFormat:Option[String],period:Option[String]=None)
+			conditions:Seq[String], size:Option[Int],timeFormat:Option[String],
+			period:Option[String]=None,agg:Option[Aggregation]=None)
+case class GetGridData(sensorid:String,conditions:Seq[String], size:Option[Int],timeFormat:Option[String],
+    boundingBox:Option[Seq[Int]],aggregation:Option[String],asTimeSeries:Boolean)

@@ -42,7 +42,7 @@ object SensorService extends Controller with GsnService {
       val st=Akka.system.actorSelection("/user/gsnSensorStore")
       val q=Akka.system.actorOf(Props(new QueryActor(p)))
       q ! GetAllSensors(latestVals,timeFormat)
-      
+            
       p.future.map{data =>
         val out=format match{          
           case Json=>JsonSerializer.ser(data,Seq(),latestVals)
@@ -99,7 +99,9 @@ object SensorService extends Controller with GsnService {
       val toStr:Option[String]=queryparam("to")
       val period:Option[String]=queryparam("period")
       val timeFormat:Option[String]=queryparam("timeFormat")
-
+      val aggFunction=queryparam("agg")
+      val aggPeriod=queryparam("aggPeriod")
+      
       val format=param("format",OutputFormat,defaultFormat)           
       val filters=new ArrayBuffer[String]
       val fields:Array[String]=
@@ -112,12 +114,12 @@ object SensorService extends Controller with GsnService {
       val conds=XprConditions.parseConditions(filterStr.toArray).recover{                 
         case e=>throw new IllegalArgumentException("illegal conditions in filter: "+e.getMessage())
       }.get.map(_.toString)
- 
+      val agg=aggFunction.map{f=>Aggregation(f,aggPeriod.get)}
       
       val p=Promise[Seq[SensorData]]               
       val q=Akka.system.actorOf(Props(new QueryActor(p)))
       Logger.debug("request the query actor")
-      q ! GetSensorData(vsname,fields,conds++filters,size,timeFormat,period)
+      q ! GetSensorData(vsname,fields,conds++filters,size,timeFormat,period,agg)
       //val to=play.api.libs.concurrent.Promise.timeout(throw new Exception("bad things"), 15.second)
       p.future.map{data=>        
         Logger.debug("before formatting")
@@ -282,7 +284,7 @@ object SensorService extends Controller with GsnService {
       case Xml=>ContentTypes.XML
       case Json=>ContentTypes.JSON
       case Shapefile=>
-        headers+= "Context-Disposition: attachment; filename=sensors.zip"->""
+        headers+= "Content-Disposition"->"attachment; filename=sensors.zip"
         ContentTypes.BINARY 
       case _ =>ContentTypes.TEXT
     }
@@ -290,7 +292,7 @@ object SensorService extends Controller with GsnService {
       case s:String=>Ok(s).as(contentType)
       case j:JsValue=>
         Ok(j).as(contentType)
-      case b:Array[Byte]=>Ok(b)
+      case b:Array[Byte]=>Ok(b).withHeaders(headers:_*)
     }
   }
   
