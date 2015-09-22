@@ -2,7 +2,8 @@ package gsn.utils.models;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
@@ -10,7 +11,7 @@ import gsn.utils.geo.GeoTools;
 
 public class NNModel extends AbstractModel {
 	
-    private static final transient Logger logger = Logger.getLogger( NNModel.class );
+    private static final transient Logger logger = LoggerFactory.getLogger( NNModel.class );
 	
 	private int BUFFER_SIZE = 200;
 	

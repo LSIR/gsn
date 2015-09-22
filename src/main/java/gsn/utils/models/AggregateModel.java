@@ -3,8 +3,9 @@ package gsn.utils.models;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import gsn.Mappings;
 import gsn.VirtualSensor;
 import gsn.beans.DataField;
@@ -14,7 +15,7 @@ import gsn.vsensor.ModellingVirtualSensor;
 
 public class AggregateModel extends AbstractModel {
 	
-	private static final transient Logger logger = Logger.getLogger(AggregateModel.class);
+	private static final transient Logger logger = LoggerFactory.getLogger(AggregateModel.class);
 
 	private AbstractModel model_o3;
 	private AbstractModel model_pm;

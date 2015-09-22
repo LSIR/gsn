@@ -22,7 +22,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.naming.OperationNotSupportedException;
 import javax.net.ServerSocketFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -44,7 +45,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 	private Long timeProcessing = 0L;
 	private Long connectionCount = 0L;
 	
-	private final transient Logger logger = Logger.getLogger( OpensenseConnectorWrapper.class );
+	private final transient Logger logger = LoggerFactory.getLogger( OpensenseConnectorWrapper.class );
 	
 	private HashMap<Integer,byte[]> messages = new HashMap<Integer,byte[]>();
 	
@@ -141,9 +142,11 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 			    		id += 9000;
 			    	}
 			        messages.put(id,command.getBytes());
+			        logger.info("added message ("+id+"): "+command);
 			    }
 			}else if (action.equals("clear")){
 				messages.clear();
+				logger.info("cleared messages");
 			}
 		}catch(Exception e){
 			logger.error("Unable to parse command",e);

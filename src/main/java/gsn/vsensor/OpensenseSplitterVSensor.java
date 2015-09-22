@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
@@ -18,7 +19,7 @@ import gsn.utils.BinaryParser;
 public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 	
 
-	private final transient Logger logger = Logger.getLogger( OpensenseSplitterVSensor.class );
+	private final transient Logger logger = LoggerFactory.getLogger( OpensenseSplitterVSensor.class );
 	
 	private final static String PARAM_DATA_TYPE = "type";
 	
@@ -273,7 +274,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 
 		}catch(Exception e){
 			parsingErrorCount = parsingErrorCount == Long.MAX_VALUE ? 0 : parsingErrorCount + 1;
-			logger.warn("error processing packet",e);
+			logger.warn("error processing packet: "+e.getMessage());
 		}
 	}
 	

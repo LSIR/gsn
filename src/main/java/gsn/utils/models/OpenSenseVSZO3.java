@@ -3,7 +3,8 @@ package gsn.utils.models;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.Serializable;
@@ -21,7 +22,7 @@ public class OpenSenseVSZO3 extends AbstractModel {
 	
 	private String MODEL_FOLDER;
 
-	private static final transient Logger logger = Logger.getLogger( OpenSenseVSZO3.class );
+	private static final transient Logger logger = LoggerFactory.getLogger( OpenSenseVSZO3.class );
 	
 	private static final String[] OUTPUT_FIELDS = new String [] {"TEMPERATURE","HUMIDITY","LATITUDE","LONGITUDE","O3_REL","O3_ABS","OZONE_PPB"};
 	private static final double[] O3_THRESHOLDS = new double [] {0, 60, 120, 180, 240, Integer.MAX_VALUE};

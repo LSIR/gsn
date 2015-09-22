@@ -14,7 +14,8 @@ import gsn.http.rest.DefaultDistributionRequest;
 import gsn.http.rest.PushDelivery;
 import gsn.http.rest.RestStreamHanlder;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 import org.zeromq.ZThread.IAttachedRunnable;
@@ -59,7 +60,7 @@ public class ZeroMQProxy extends Thread implements Runnable {
 	   // System.out.println("Proxy binding to tcp://*:"+portOUT+" and tcp://*:"+portMETA);
 	    
 	    Thread monitoring = new Thread(new Runnable(){
-	    	private transient Logger logger = Logger.getLogger(ZeroMQProxy.class);
+	    	private transient Logger logger = LoggerFactory.getLogger(ZeroMQProxy.class);
 	    	@Override
 			public void run() {
 	    		Socket monit = ctx.createSocket(ZMQ.PAIR);
@@ -105,7 +106,7 @@ public class ZeroMQProxy extends Thread implements Runnable {
 	    dataProxy.start();
 	    
 	    Thread metaResponder =  new Thread(new Runnable(){
-	    	private transient Logger logger = Logger.getLogger ( ZeroMQProxy.class );
+	    	private transient Logger logger = LoggerFactory.getLogger ( ZeroMQProxy.class );
 			@Override
 			public void run() {
 				while (true) {

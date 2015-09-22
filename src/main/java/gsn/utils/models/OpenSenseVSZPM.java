@@ -4,7 +4,8 @@ import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.Serializable;
@@ -21,7 +22,7 @@ public class OpenSenseVSZPM extends AbstractModel {
 	
 	private String MODEL_FOLDER;
 
-        private static final transient Logger logger = Logger.getLogger( OpenSenseVSZPM.class );
+        private static final transient Logger logger = LoggerFactory.getLogger( OpenSenseVSZPM.class );
 	
 	private static final String[] OUTPUT_FIELDS = new String [] {"TEMPERATURE","LATITUDE","LONGITUDE","PM_REL","PM_ABS","NUMBER"};
 	private static final double[] PM_THRESHOLDS = new double [] {0, 15, 30, 50, 100, Integer.MAX_VALUE};

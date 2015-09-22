@@ -2,7 +2,8 @@ package gsn.utils.models;
 
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.Serializable;
@@ -21,7 +22,7 @@ public class OpenSenseVSZCO extends AbstractModel {
 	
 	private String MODEL_FOLDER;
 
-    private static final transient Logger logger = Logger.getLogger( OpenSenseVSZCO.class );
+    private static final transient Logger logger = LoggerFactory.getLogger( OpenSenseVSZCO.class );
 	
 	private static final String[] OUTPUT_FIELDS = new String [] {"SENSOR_PPM","CO_REL","CO_ABS","temperature"};
 	private static final double[] CO_THRESHOLDS = new double [] {0, 5000, 7500, 10000, 20000, Integer.MAX_VALUE};
