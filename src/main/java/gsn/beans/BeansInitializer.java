@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import org.apache.commons.collections.KeyValue;
 
-import play.Logger;
 import scala.collection.JavaConversions;
 import scala.collection.Map;
 import gsn.config.*;
@@ -165,7 +164,6 @@ public class BeansInitializer {
 	  ArrayList<KeyValue> ini=new ArrayList<KeyValue>();
       Iterable<String> initkeys=JavaConversions.asJavaIterable(init.keys());
 	  for (String ik:initkeys){
-		  Logger.trace("keys:"+ik);
 		  ini.add(new KeyValueImp(ik.toLowerCase(),init.apply(ik)));
 	  }
 	  v.setMainClassInitialParams(ini);
