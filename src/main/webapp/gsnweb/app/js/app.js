@@ -119,11 +119,12 @@ gsnWebApp.service('GsnTabs', function () {
             {link: '#/map', label: 'Sensors'},
             {link: '#/plot', label: 'Data'},
             {link: '#/monitor', label: 'Monitor'},
-            {link: '#/metadata', label: 'Metadata'},
+            //{link: '#/metadata', label: 'Metadata'},
             {link: '#/about', label: 'About'},
         ];
 
-        this.tabNames = ['/map', '/plot', '/monitor', '/metadata', '/about'];
+        //this.tabNames = ['/map', '/plot', '/monitor', '/metadata', '/about'];
+        this.tabNames = ['/map', '/plot', '/monitor', '/about'];
 
         this.selectedTab = this.tabs[0];
     }

@@ -411,7 +411,8 @@ sensorData.factory('FilterParameters', ['$routeParams', '$filter', 'Aggregation'
             },
 
             hasRequiredParameters: function () {
-                return this.sensors.length > 0 && this.fields.length > 0;
+                return this.sensors.length > 0 && this.fields.length > 0 &&
+                    (this.hasDates() || this.limitByRows);
             },
 
             getSensorModels: function () {

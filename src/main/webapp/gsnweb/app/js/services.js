@@ -9,12 +9,14 @@ gsnDataServices.factory('GsnResult', function () {
         missingData: {},
         hasValues: false,
         pointCount: 0,
+        columnWithValues:{},
 
         reset: function () {
             this.dataMap = {};
             this.missingData = {};
             this.hasValues = false;
-            pointCount: 0;
+            this.pointCount =0;
+            this.columnWithValues = {};
         }
     };
 });
@@ -94,12 +96,13 @@ gsnDataServices.factory('ProcessGsnData', ['GsnResult', 'FilterParameters',
                                 var value = parseFloat(data[j + 1]);
                                 if (!isNaN(value)) {
                                     tarr.push(value);
-                                    delete GsnResult.missingData[headers[j]]
+                                    GsnResult.columnWithValues[headers[j]] = true;
+                                    //GsnResult.dataMap[headers[j]].push(tarr);
+
 
                                 }
                                 else {
                                     tarr.push(null);
-                                    GsnResult.missingData[headers[j]] = true;
                                 }
                                 GsnResult.dataMap[headers[j]].push(tarr);
                                 GsnResult.hasValues = true;
@@ -107,6 +110,12 @@ gsnDataServices.factory('ProcessGsnData', ['GsnResult', 'FilterParameters',
 
 
                         }
+                    }
+                }
+
+                for (var i = 0; i < headers.length; i++) {
+                    if (!GsnResult.columnWithValues[headers[i]]) {
+                        GsnResult.missingData[headers[i]] = true;
                     }
                 }
                 return GsnResult;
@@ -163,12 +172,12 @@ gsnDataServices.factory('ProcessGsnData', ['GsnResult', 'FilterParameters',
                             var value = parseFloat(data[j + 1]);
                             if (!isNaN(value)) {
                                 tarr.push(value);
-                                delete GsnResult.missingData[gsnHeaders[index]]
+                                //delete GsnResult.missingData[gsnHeaders[index]]
 
                             }
                             else {
                                 tarr.push(null);
-                                GsnResult.missingData[gsnHeaders[index]] = true;
+                                //GsnResult.missingData[gsnHeaders[index]] = true;
                             }
                             GsnResult.dataMap[gsnHeaders[index]].push(tarr);
                             GsnResult.hasValues = true;
@@ -298,6 +307,7 @@ gsnDataServices.factory('ChartConfigService', ['$timeout', 'GsnResult',
                     tooltip: {
                         shared: true
                     },
+                    turboThreshold: 2000,
                     legend: {
                         layout: 'vertical',
                         align: 'left',
