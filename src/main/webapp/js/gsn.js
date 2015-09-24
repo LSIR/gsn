@@ -241,7 +241,7 @@ var GSN = {
                         "id":"menu-rubric-"+vsName[i][1]+""
                     },"  Group: "+vsName[i][1]));
                     $("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
-                        'src':'../img/group.png'
+                        'src':'./img/group.png'
                     }));                                                //vsmenu
                 }
                 else{
@@ -251,7 +251,7 @@ var GSN = {
                         "id":"menu-rubric-"+vsName[i][1]+""
                     },"  Group: "+vsName[i][1])));
                     $("#menu-rubric-"+vsName[i][1]).prepend($.IMG({
-                        'src':'../img/group.png'
+                        'src':'./img/group.png'
                     }));
                 }
                 previousCategoryName = vsName[i][1];
@@ -298,7 +298,7 @@ var GSN = {
                     "id":"menu-rubric-others"
                 },"  Others"));
                 $("#menu-rubric-others").prepend($.IMG({
-                    'src':'../img/group.png'
+                    'src':'./img/group.png'
                 }));
             }
             else{
@@ -308,7 +308,7 @@ var GSN = {
                     "id":"menu-rubric-others"
                 },"  Others")));
                 $("#menu-rubric-others").prepend($.IMG({
-                    'src':'../img/group.png'
+                    'src':'./img/group.png'
                 }));
             }
             GSN.numSensorAssociatedWithCategory.setItem("others",0);
