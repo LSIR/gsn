@@ -1,0 +1,38 @@
+<virtual-sensor name="geo_ostl" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+    	
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="door_state" type="smallint" />
+           <field name="tl_line" type="smallint" />
+           <field name="tl_destination" type="varchar(20)" />
+           <field name="tl_curr_stop" type="varchar(20)" />
+           <field name="tl_next_stop" type="varchar(20)" />
+           <field name="latitude" type="double" />
+           <field name="longitude" type="double" />
+           <field name="altitude" type="float" />
+           <field name="HDOP" type="float" />
+		</output-structure>
+	</processing-class>
+	<description>TL bus data</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		
+		<stream name="B">
+			<source alias="B"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq" partial-order-key="station">
+					<predicate key="address">tcp://disalsrv6.epfl.ch</predicate>
+					<predicate key="vsensor">geo_ostl</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from B</query>
+		</stream>
+	</streams>
+</virtual-sensor>

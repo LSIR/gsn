@@ -1,0 +1,34 @@
+<virtual-sensor name="geo_osapm" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+    	
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="pressure" type="int" />
+           <field name="latitude" type="double" />
+           <field name="longitude" type="double" />
+           <field name="altitude" type="float" />
+           <field name="HDOP" type="float" />
+		</output-structure>
+	</processing-class>
+	<description>Air pressure</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		
+		<stream name="B">
+			<source alias="B"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq" partial-order-key="station">
+					<predicate key="address">tcp://disalsrv6.epfl.ch</predicate>
+					<predicate key="vsensor">geo_osapm</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from B</query>
+		</stream>
+	</streams>
+</virtual-sensor>

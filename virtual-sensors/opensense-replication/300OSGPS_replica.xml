@@ -1,0 +1,35 @@
+<virtual-sensor name="p_osgps" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="latitude" type="double" />
+           <field name="longitude" type="double" />
+           <field name="altitude" type="float" />
+           <field name="speed" type="float" />
+           <field name="satellites" type="smallint" />
+           <field name="HDOP" type="float" />
+           <field name="gyro" type="float" />
+		</output-structure>
+	</processing-class>
+	<description>GPS</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq" partial-order-key="station">
+					<predicate key="address">tcp://disalsrv6.epfl.ch</predicate>
+					<predicate key="vsensor">p_osgps</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>
