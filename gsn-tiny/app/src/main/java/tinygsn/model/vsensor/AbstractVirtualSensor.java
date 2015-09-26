@@ -25,6 +25,9 @@
 
 package tinygsn.model.vsensor;
 
+import android.content.Context;
+import android.widget.TableLayout;
+
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -66,6 +69,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	
 	
 	public String[] getParameters(){return new String[]{};}
+	public void getRowParameters(TableLayout layout, Context context){}
 
 	public abstract boolean initialize();
 	
