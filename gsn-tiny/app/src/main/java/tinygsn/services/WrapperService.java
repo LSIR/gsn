@@ -1,19 +1,20 @@
 package tinygsn.services;
 
-import tinygsn.beans.StaticData;
-import tinygsn.beans.WrapperConfig;
-import tinygsn.model.wrappers.AbstractWrapper;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 
-public abstract class WrapperService extends IntentService{
+import tinygsn.beans.StaticData;
+import tinygsn.beans.WrapperConfig;
+import tinygsn.model.wrappers.AbstractWrapper;
+
+public abstract class WrapperService extends IntentService {
 
 	public WrapperConfig config = null;
 	public AbstractWrapper w;
-	
+
 	public WrapperService(String name) {
 		super(name);
 	}
@@ -23,15 +24,15 @@ public abstract class WrapperService extends IntentService{
 		Bundle b = intent.getBundleExtra("tinygsn.beans.config");
 		config = b.getParcelable("tinygsn.beans.config");
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-		if (!config.isRunning()){
-			am.cancel(PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
+		if (!config.isRunning()) {
+			am.cancel(PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 			return;
 		}
 		try {
 			w = StaticData.getWrapperByName(config.getWrapperName());
 			w.runOnce();
-		} catch (Exception e1) {}
-		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+1000*w.getDcInterval(),PendingIntent.getService(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT));
+		} catch (Exception e1) {
+		}
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * w.getDcInterval(), PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
-	
 }

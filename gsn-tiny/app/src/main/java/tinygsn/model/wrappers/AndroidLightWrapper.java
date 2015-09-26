@@ -61,6 +61,7 @@ public class AndroidLightWrapper extends AbstractWrapper implements
 	private Sensor mSensor;
 
 
+	@Override
 	public void runOnce() {
 		mSensorManager = (SensorManager) StaticData.globalContext.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);

@@ -60,6 +60,7 @@ public class AndroidLinearAccelerationWrapper extends AbstractWrapper implements
 	private SensorManager mSensorManager;
 	private Sensor mSensor;
 
+	@Override
 	public void runOnce() {
 		mSensorManager = (SensorManager) StaticData.globalContext.getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);

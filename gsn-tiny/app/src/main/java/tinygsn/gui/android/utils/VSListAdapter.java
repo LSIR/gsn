@@ -49,8 +49,8 @@ import android.widget.Toast;
 
 /**
  * This list adapter for the ListActivity of Virtual Sensors UI
- * @author Do Ngoc Hoan (hoan.do@epfl.ch)
  *
+ * @author Do Ngoc Hoan (hoan.do@epfl.ch)
  */
 public class VSListAdapter extends ArrayAdapter<VSRow> {
 
@@ -77,7 +77,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-	    
+
 		convertView = (LinearLayout) inflater.inflate(resource, null);
 
 		final VSRow vs = getItem(position);
@@ -114,16 +114,16 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 				startActivityViewData(vs.getName());
 			}
 		});
-	/*
-			ImageView edit = (ImageView) convertView.findViewById(R.id.config);
-			edit.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Toast.makeText(context, "Config has not been implemented!", Toast.LENGTH_SHORT)
-							.show();
-				}
-			});
-	*/
+
+		ImageView edit = (ImageView) convertView.findViewById(R.id.config);
+		edit.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(context, "Config has not been implemented!", Toast.LENGTH_SHORT)
+						.show();
+			}
+		});
+
 		ImageView delete = (ImageView) convertView.findViewById(R.id.delete);
 		delete.setOnClickListener(new OnClickListener() {
 			@Override

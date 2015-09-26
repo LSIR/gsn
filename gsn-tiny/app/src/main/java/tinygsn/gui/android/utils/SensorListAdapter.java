@@ -32,6 +32,7 @@ import tinygsn.controller.AndroidControllerWrapper;
 import tinygsn.gui.android.ActivityListSensor;
 import tinygsn.gui.android.ActivityWrapperEdit;
 import tinygsn.gui.android.R;
+import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
 import android.content.Context;
@@ -41,6 +42,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;

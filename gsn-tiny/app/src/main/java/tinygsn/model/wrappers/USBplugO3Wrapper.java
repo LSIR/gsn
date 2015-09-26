@@ -67,6 +67,7 @@ public class USBplugO3Wrapper extends AbstractWrapper implements VirtualSensorDa
 
 	private MICSensor sensor;
 
+	@Override
 	public void runOnce() {
 		updateWrapperInfo();
 		if (dcDuration > 0) {
