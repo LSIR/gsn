@@ -172,17 +172,6 @@ public class AndroidActivityRecognitionWrapper extends AbstractWrapper implement
 	public static class ActivityRecognitionService extends WrapperService {
 		private static Intent mIntent = null;
 
-
-		/*
-		// FIXME : From old version. What to do with that variables ?
-		private VSensorConfig config = null;
-		//private ActivityRecognitionClient arclient;
-		private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss.SSSZ";
-		private SimpleDateFormat mDateFormat;
-		SqliteStorageManager storage = null;
-		int samplingRate = -1;
-		*/
-
 		public ActivityRecognitionService() {
 			super("activityRecognitionService");
 		}
@@ -221,89 +210,6 @@ public class AndroidActivityRecognitionWrapper extends AbstractWrapper implement
 			else
 				return "";
 		}
-
-
-
-/*
-		@Override
-		public int onStartCommand(Intent intent, int flags, int startId) {
-			if (intent == null) {
-				return START_REDELIVER_INTENT;
-			}
-			Bundle b = intent.getExtras();
-			config = (VSensorConfig) b.get("tinygsn.beans.config");
-			storage = new SqliteStorageManager(config.getController().getActivity());
-			VirtualSensor vs = new VirtualSensor(config, config.getController().getActivity());
-
-
-			samplingRate = storage.getSamplingRateByName("tinygsn.model.wrappers.AndroidActivityRecognitionWrapper");
-
-
-			for (InputStream inputStream : config.getInputStreams()) {
-				for (StreamSource streamSource : inputStream.getSources()) {
-					w = streamSource.getWrapper();
-					break;
-				}
-				break;
-			}
-			try {
-				mDateFormat = (SimpleDateFormat) DateFormat.getDateTimeInstance();
-			} catch (Exception e) {
-
-			}
-
-			mDateFormat.applyPattern(DATE_FORMAT_PATTERN);
-			mDateFormat.applyLocalizedPattern(mDateFormat.toLocalizedPattern());
-
-
-			int resp = 0;
-			while (resp != ConnectionResult.SUCCESS)
-				resp = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-			if (resp == ConnectionResult.SUCCESS) {
-				arclient = new ActivityRecognitionClient(this, this, this);
-				arclient.connect();
-
-
-			}
-
-			if (ActivityRecognitionResult.hasResult(intent)) {
-
-				ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-				DetectedActivity mostProbableActivity = result.getMostProbableActivity();
-				Double confidence = (double) mostProbableActivity.getConfidence();
-				Double activityType = (double) mostProbableActivity.getType();
-
-				StreamElement streamElement = new StreamElement(w.getFieldList(),
-						                                               w.getFieldType(), new Serializable[]{activityType, confidence});
-
-				((AndroidActivityRecognitionWrapper) w).setTheLastStreamElement(streamElement);
-				((AndroidActivityRecognitionWrapper) w).getLastKnownData();
-			}
-			return START_NOT_STICKY; //START_REDELIVER_INTENT;
-
-		}
-
-		//@Override
-		public void onConnectionFailed(ConnectionResult arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		//@Override
-		public void onConnected(Bundle arg0) {
-			Intent intent = new Intent(this, ActivityRecognitionService.class);
-			pIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			/*if(samplingRate > 0)	
-				arclient.requestActivityUpdates(100, pIntent); 
-			else 
-				arclient.removeActivityUpdates(pIntent);
-		}
-
-		@Override
-		public void onDisconnected() {
-			// TODO Auto-generated method stub
-		}
-	*/
 	}
 
 	@Override
