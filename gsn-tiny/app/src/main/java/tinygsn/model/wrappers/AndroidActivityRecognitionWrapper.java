@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GSN. If not, see <http://www.gnu.org/licenses/>.
  * <p/>
- * File: gsn-tiny/src/tinygsn/model/wrappers/AndroidGPSWrapper.java
+ * File: gsn-tiny/src/tinygsn/model/wrappers/AndroidActivityRecognitionWrapper.java
  *
  * @author Marc Schaer
  */
@@ -60,8 +60,6 @@ public class AndroidActivityRecognitionWrapper extends AbstractWrapper implement
 	private static final String[] FIELD_TYPES_STRING = new String[]{"double", "double"};
 
 	private static final String TAG = "ActivityRecognitionWrap";
-
-	private StreamElement theLastStreamElement = null;
 
 	private Context context = StaticData.globalContext;
 	private GoogleApiClient mGoogleApiClient = null;
@@ -112,7 +110,7 @@ public class AndroidActivityRecognitionWrapper extends AbstractWrapper implement
 
 	@Override
 	public void runOnce() {
-		if (!ActivityRecognitionService.isRunning) {
+		if (!isRunning()) {
 			disconnectGoogleAPI();
 		} else {
 			if (mGoogleApiClient == null) {
@@ -173,7 +171,6 @@ public class AndroidActivityRecognitionWrapper extends AbstractWrapper implement
 
 	public static class ActivityRecognitionService extends WrapperService {
 		private static Intent mIntent = null;
-		private static boolean isRunning = true;
 
 
 		/*
@@ -194,19 +191,14 @@ public class AndroidActivityRecognitionWrapper extends AbstractWrapper implement
 		@Override
 		protected void onHandleIntent(Intent intent) {
 			mIntent = intent;
-			//FIXME: better solution ? Used for disconnecting GoogleAPI
-			Bundle b = intent.getBundleExtra("tinygsn.beans.config");
-			config = b.getParcelable("tinygsn.beans.config");
-			isRunning = config.isRunning();
-			if (!isRunning) {
-				try {
-					w = StaticData.getWrapperByName(config.getWrapperName());
-					w.runOnce();
-				} catch (Exception e1) {
-				}
-			}
-
 			super.onHandleIntent(intent);
+			try {
+				w = StaticData.getWrapperByName(config.getWrapperName());
+				if (!w.isRunning()) {
+					w.runOnce();
+				}
+			} catch (Exception e1) {
+			}
 		}
 
 		private static Intent getIntent() {

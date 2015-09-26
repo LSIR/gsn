@@ -180,6 +180,10 @@ public abstract class AbstractWrapper {
 		config.setRunning(false);
 	}
 
+	public boolean isRunning() {
+		return config.isRunning();
+	}
+
 	public abstract String[] getFieldList();
 
 	public abstract Byte[] getFieldType();
