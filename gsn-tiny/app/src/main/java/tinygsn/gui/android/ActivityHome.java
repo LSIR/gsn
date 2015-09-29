@@ -26,19 +26,19 @@
 package tinygsn.gui.android;
 
 
-import tinygsn.model.wrappers.LocalWrapper;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
-import android.widget.TextView;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.View;
+import android.widget.TextView;
+
+import tinygsn.model.wrappers.LocalWrapper;
 //import com.readystatesoftware.viewbadger.BadgeView;
 
 public class ActivityHome extends Activity {
@@ -65,6 +65,7 @@ public class ActivityHome extends Activity {
 			}
 		}.execute(this);
 
+		warnIfAPILessThan20();
 	}
 
 	@Override
@@ -110,5 +111,14 @@ public class ActivityHome extends Activity {
 	public void open_aboutActivity(View view) {
 		Intent myIntent = new Intent(this, ActivityAboutUs.class);
 		this.startActivity(myIntent);
+	}
+
+	private void warnIfAPILessThan20() {
+		int currentAPIVersion = android.os.Build.VERSION.SDK_INT;
+		//KITKAT corresponds to API 19
+		if (currentAPIVersion <= Build.VERSION_CODES.KITKAT) {
+			TextView messageAPI = (TextView) findViewById(R.id.warnAPIVersion);
+			messageAPI.setText(getString(R.string.warnAPIVersionText));
+		}
 	}
 }

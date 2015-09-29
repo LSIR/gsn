@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tableLayout1"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@color/white" >
+<TableLayout android:id="@+id/tableLayout1"
+             xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             android:background="@color/white">
 
     <!-- Title row TinyGSN -->
 
@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="5dip" >
+        android:padding="5dip">
 
         <ImageView
             android:id="@+id/imageViewListVS"
@@ -20,20 +20,20 @@
             android:layout_height="wrap_content"
             android:layout_span="3"
             android:paddingTop="30dip"
-            android:src="@drawable/gsn_tiny" />
+            android:src="@drawable/gsn_tiny"/>
 
-        
+
     </TableRow>
 
     <TableRow
         android:id="@+id/tableRowBreak0"
         android:layout_width="fill_parent"
-        android:layout_height="30dip" >
+        android:layout_height="30dip">
 
         <ImageView
             android:id="@+id/tableRowBreak"
             android:layout_width="fill_parent"
-            android:layout_height="30dip" />
+            android:layout_height="30dip"/>
     </TableRow>
 
     <!-- =======================ROW 1: LIST VS + PUBLISH======================= -->
@@ -42,7 +42,7 @@
         android:id="@+id/tableRow2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center" >
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/imageViewListVS0"
@@ -50,12 +50,12 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_listVSActivity"
-            android:src="@drawable/services" />
+            android:src="@drawable/services"/>
 
         <ImageView
             android:id="@+id/imageView1_1"
             android:layout_width="25dip"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"/>
 
         <ImageView
             android:id="@+id/imageViewPublish"
@@ -63,7 +63,7 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_listWrapperActivity"
-            android:src="@drawable/electronics" />
+            android:src="@drawable/electronics"/>
     </TableRow>
 
     <!-- Text below images -->
@@ -72,7 +72,7 @@
         android:id="@+id/tableRowTextBelowRow2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center" >
+        android:gravity="center">
 
         <TextView
             android:id="@+id/tvListVS"
@@ -85,12 +85,12 @@
             android:layout_margin="1dp"
             android:gravity="center"
             android:text="Processing Classes"
-            android:textColor="#000000" />
+            android:textColor="#000000"/>
 
         <ImageView
             android:id="@+id/t1_2"
             android:layout_width="25dip"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"/>
 
         <TextView
             android:id="@+id/tvPublish"
@@ -103,18 +103,18 @@
             android:layout_margin="1dp"
             android:gravity="center"
             android:text="Sensor Wrappers"
-            android:textColor="#000000" />
+            android:textColor="#000000"/>
     </TableRow>
 
     <TableRow
         android:id="@+id/tableRowBreak1"
         android:layout_width="fill_parent"
-        android:layout_height="30dip" >
+        android:layout_height="30dip">
 
         <ImageView
             android:id="@+id/ivRowBreak1"
             android:layout_width="fill_parent"
-            android:layout_height="30dip" />
+            android:layout_height="30dip"/>
     </TableRow>
 
     <!-- =======================ROW 2: PULL + SUBCRIBE======================= -->
@@ -123,7 +123,7 @@
         android:id="@+id/tableRow5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center" >
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/imageViewPull"
@@ -131,12 +131,12 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_publishActivity"
-            android:src="@drawable/upload" />
+            android:src="@drawable/upload"/>
 
         <ImageView
             android:id="@+id/imageView1_10"
             android:layout_width="25dip"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"/>
 
         <ImageView
             android:id="@+id/imageViewSubscribe"
@@ -144,7 +144,7 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_browseActivity"
-            android:src="@drawable/globe" />
+            android:src="@drawable/globe"/>
     </TableRow>
 
     <!-- Text below images -->
@@ -153,7 +153,7 @@
         android:id="@+id/tableRowTextBelowRow5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center" >
+        android:gravity="center">
 
         <TextView
             android:id="@+id/tvPull"
@@ -166,12 +166,12 @@
             android:layout_margin="1dp"
             android:gravity="center"
             android:text="Publish to GSN"
-            android:textColor="#000000" />
+            android:textColor="#000000"/>
 
         <ImageView
             android:id="@+id/t1_20"
             android:layout_width="25dip"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"/>
 
         <TextView
             android:id="@+id/tvSubscribe"
@@ -184,18 +184,19 @@
             android:layout_margin="1dp"
             android:gravity="center"
             android:text="GSN Servers"
-            android:textColor="#000000" />
+            android:textColor="#000000"/>
     </TableRow>
 
     <TableRow
         android:id="@+id/tableRowBreak2"
         android:layout_width="fill_parent"
-        android:layout_height="30dip" >
+        android:layout_height="30dip">
 
         <ImageView
             android:id="@+id/ivRowBreak2"
             android:layout_width="fill_parent"
-            android:layout_height="30dip" />
+            android:layout_height="30dip"/>
+
     </TableRow>
 
     <!-- =======================ROW 3: LIST VS + PUBLISH======================= -->
@@ -204,7 +205,7 @@
         android:id="@+id/tableRow8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center" >
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/imageViewHelp"
@@ -212,12 +213,12 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_helpActivity"
-            android:src="@drawable/about" />
+            android:src="@drawable/about"/>
 
         <ImageView
             android:id="@+id/imageView5_1"
             android:layout_width="25dip"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"/>
 
         <ImageView
             android:id="@+id/imageViewAbout"
@@ -225,7 +226,7 @@
             android:layout_height="60dip"
             android:gravity="center"
             android:onClick="open_aboutActivity"
-            android:src="@drawable/about" />
+            android:src="@drawable/about"/>
     </TableRow>
 
     <!-- Text below images -->
@@ -234,7 +235,7 @@
         android:id="@+id/tableRow9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center" >
+        android:gravity="center">
 
         <TextView
             android:id="@+id/tvHelp"
@@ -247,12 +248,12 @@
             android:layout_margin="1dp"
             android:gravity="center"
             android:text="Help"
-            android:textColor="#000000" />
+            android:textColor="#000000"/>
 
         <ImageView
             android:id="@+id/imageView3_2"
             android:layout_width="25dip"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"/>
 
         <TextView
             android:id="@+id/tvAbout"
@@ -265,7 +266,47 @@
             android:layout_margin="1dp"
             android:gravity="center"
             android:text="About"
-            android:textColor="#000000" />
+            android:textColor="#000000"/>
     </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/warnAPIVersion"
+            android:textColor="#ff0000"
+            android:layout_column="0"
+            android:layout_span="3"/>
+    </TableRow>
+
 
 </TableLayout>

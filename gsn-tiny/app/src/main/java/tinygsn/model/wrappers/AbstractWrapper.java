@@ -29,6 +29,7 @@ import android.content.pm.FeatureInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -78,32 +79,36 @@ public abstract class AbstractWrapper {
 			InputStream is = context.getAssets().open("wrapper_list.properties");
 			wrapperList.load(is);
 
-			SensorManager deviceSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-			List<android.hardware.Sensor> sensorList = deviceSensorManager.getSensorList(Sensor.TYPE_ALL);
+			int currentAPIVersion = android.os.Build.VERSION.SDK_INT;
+			//KITKAT corresponds to API 19
+			if (currentAPIVersion > Build.VERSION_CODES.KITKAT) {
+				SensorManager deviceSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+				List<android.hardware.Sensor> sensorList = deviceSensorManager.getSensorList(Sensor.TYPE_ALL);
 
-			Iterator it = sensorList.iterator();
-			while (it.hasNext()) {
-				Sensor sensorObject = (Sensor) it.next();
-				String property = wrapperList.getProperty(sensorObject.getStringType());
-				if (property != null) {
-					wrapperListTemp.put(sensorObject.getStringType(), property);
-				}
-			}
-
-			PackageManager pm = context.getPackageManager();
-			FeatureInfo[] featureInfos = pm.getSystemAvailableFeatures();
-			for (FeatureInfo featureInfo : featureInfos) {
-				if (featureInfo.name != null) {
-					String property = wrapperList.getProperty(featureInfo.name);
+				Iterator it = sensorList.iterator();
+				while (it.hasNext()) {
+					Sensor sensorObject = (Sensor) it.next();
+					String property = wrapperList.getProperty(sensorObject.getStringType());
 					if (property != null) {
-						wrapperListTemp.put(featureInfo.name, property);
+						wrapperListTemp.put(sensorObject.getStringType(), property);
 					}
 				}
+
+				PackageManager pm = context.getPackageManager();
+				FeatureInfo[] featureInfos = pm.getSystemAvailableFeatures();
+				for (FeatureInfo featureInfo : featureInfos) {
+					if (featureInfo.name != null) {
+						String property = wrapperList.getProperty(featureInfo.name);
+						if (property != null) {
+							wrapperListTemp.put(featureInfo.name, property);
+						}
+					}
+				}
+				if (isPlayServiceAvailable()) {
+					wrapperListTemp.put("activityrecognition", wrapperList.getProperty("activityrecognition"));
+				}
+				wrapperList = wrapperListTemp;
 			}
-			if (isPlayServiceAvailable()) {
-				wrapperListTemp.put("activityrecognition", wrapperList.getProperty("activityrecognition"));
-			}
-			wrapperList = wrapperListTemp;
 		} catch (IOException e) {
 		}
 
