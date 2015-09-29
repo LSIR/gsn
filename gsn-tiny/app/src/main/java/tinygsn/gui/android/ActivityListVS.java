@@ -51,7 +51,7 @@ import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 
 @SuppressLint("NewApi")
-public class ActivityListVS extends Activity implements Serializable {
+public class ActivityListVS extends AbstractActivity implements Serializable {
 
 	private static final long serialVersionUID = 8598546037770495346L;
 	private ListView listViewVS;

@@ -48,7 +48,7 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import tinygsn.controller.AndroidControllerSubscribe;
 
 
-public class ActivityListSubscription extends Activity {
+public class ActivityListSubscription extends AbstractActivity {
 
 	private ListView listViewSubscribe;
 	SubscribeListAdapter listAdapter;

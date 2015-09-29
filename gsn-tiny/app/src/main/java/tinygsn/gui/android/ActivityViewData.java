@@ -47,7 +47,6 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -71,7 +70,7 @@ import android.widget.TimePicker;
 import android.view.MenuItem;
 
 
-public class ActivityViewData extends FragmentActivity {
+public class ActivityViewData extends AbstractFragmentActivity {
 	static int TEXT_SIZE = 10;
 
 

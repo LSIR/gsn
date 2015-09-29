@@ -62,7 +62,7 @@ import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
-public class ActivityVSConfig extends Activity {
+public class ActivityVSConfig extends AbstractActivity {
 	static int TEXT_SIZE = 10;
 	private Context context = this;
 	private Spinner spinnerVSType;

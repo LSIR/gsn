@@ -33,7 +33,6 @@ import tinygsn.storage.db.SqliteStorageManager;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -41,7 +40,7 @@ import android.widget.Spinner;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ActivitySubscribeData extends FragmentActivity {
+public class ActivitySubscribeData extends AbstractFragmentActivity {
 	public static String[] STRATEGY = {"Google Cloud Messaging (Push)", "GSN API (Pull)"};
 	static int TEXT_SIZE = 10;
 	public static String DEFAULT_SERVER = "";

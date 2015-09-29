@@ -41,7 +41,7 @@ import android.widget.TextView;
 import tinygsn.model.wrappers.LocalWrapper;
 //import com.readystatesoftware.viewbadger.BadgeView;
 
-public class ActivityHome extends Activity {
+public class ActivityHome extends AbstractActivity {
 
 	Handler handlerVS;
 	TextView numVS = null;

@@ -19,41 +19,35 @@
  * <p/>
  * File: gsn-tiny/src/tinygsn/gui/android/TinyGSN.java
  *
- * @author Do Ngoc Hoan
+ * @author Schaer Marc
  */
-
 
 package tinygsn.gui.android;
 
 import android.app.Activity;
-import android.app.Application;
-import android.util.Log;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
-import tinygsn.beans.StaticData;
+public abstract class AbstractFragmentActivity extends FragmentActivity {
 
-public class TinyGSN extends Application {
-
-	private static Activity mCurrentActivity = null;
-
-	public TinyGSN() {
-
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 	}
-
-	@Override
-	public void onCreate() {
-		super.onCreate();
-
-		StaticData.globalContext = getApplicationContext();
-
-		Log.v("TinyGSN", "TinyGSN is called!");
-
+	protected void onResume() {
+		super.onResume();
+		TinyGSN.setCurrentActivity(this);
 	}
-
-	public static Activity getCurrentActivity() {
-		return mCurrentActivity;
+	protected void onPause() {
+		clearReferences();
+		super.onPause();
 	}
-
-	public static void setCurrentActivity(Activity currentActivity) {
-		mCurrentActivity = currentActivity;
+	protected void onDestroy() {
+		clearReferences();
+		super.onDestroy();
+	}
+	private void clearReferences(){
+		Activity currActivity = TinyGSN.getCurrentActivity();
+		if (currActivity != null && currActivity.equals(this))
+			TinyGSN.setCurrentActivity(null);
 	}
 }

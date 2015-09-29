@@ -39,7 +39,7 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-public class ActivityDateTimePicker extends Activity {
+public class ActivityDateTimePicker extends AbstractActivity {
 	TextView startLabel, endLabel;
 	Date startTime, endTime;
 	Calendar dateAndTime = Calendar.getInstance();

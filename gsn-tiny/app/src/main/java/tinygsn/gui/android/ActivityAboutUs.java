@@ -36,7 +36,7 @@ import android.view.MenuItem;
  *
  * @author Do Ngoc Hoan (hoan.do@epfl.ch)
  */
-public class ActivityAboutUs extends Activity {
+public class ActivityAboutUs extends AbstractActivity {
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		int itemId = item.getItemId();
@@ -49,7 +49,7 @@ public class ActivityAboutUs extends Activity {
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.text);
 		getActionBar().setDisplayHomeAsUpEnabled(true);

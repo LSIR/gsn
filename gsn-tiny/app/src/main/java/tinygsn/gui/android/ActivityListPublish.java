@@ -48,7 +48,7 @@ import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 
 
-public class ActivityListPublish extends Activity implements Serializable {
+public class ActivityListPublish extends AbstractActivity implements Serializable {
 
 	private static final long serialVersionUID = 8598546037770495346L;
 	private ListView listViewPublish;

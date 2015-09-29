@@ -31,9 +31,9 @@ import android.widget.TextView;
 
 import android.view.MenuItem;
 
-public class ActivityHelp extends Activity {
+public class ActivityHelp extends AbstractActivity {
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.text);
 		getActionBar().setDisplayHomeAsUpEnabled(true);

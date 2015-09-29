@@ -39,7 +39,7 @@ import android.widget.TextView;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ActivityWrapperEdit extends Activity {
+public class ActivityWrapperEdit extends AbstractActivity {
 
 	private EditText editText_dcDuration, editText_dcInterval;
 	private TextView textView_title;

@@ -40,7 +40,6 @@ import tinygsn.storage.db.SqliteStorageManager;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -53,7 +52,7 @@ import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ActivityPublishData extends FragmentActivity {
+public class ActivityPublishData extends AbstractFragmentActivity {
 	public static String[] STRATEGY = {"On demand", "Periodically", "Opportunistically"};
 	static int TEXT_SIZE = 10;
 	public static String DEFAULT_SERVER = "";

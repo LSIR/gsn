@@ -25,21 +25,20 @@
 
 package tinygsn.gui.android;
 
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
 import java.util.ArrayList;
 
 import tinygsn.controller.AndroidControllerWrapper;
 import tinygsn.gui.android.utils.SensorListAdapter;
 import tinygsn.gui.android.utils.SensorRow;
 
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
-
-public class ActivityListSensor extends FragmentActivity {
+public class ActivityListSensor extends AbstractFragmentActivity {
 
 
 	private ListView listViewSensors, listViewScheduler;
