@@ -1,7 +1,7 @@
 package ch.epfl.gsn.oai.rest.verbs;
 
-import ch.epfl.gsn.oai.interfaces.Record;
 import ch.epfl.gsn.oai.interfaces.DataAccessException;
+import ch.epfl.gsn.oai.interfaces.Record;
 import ch.epfl.gsn.oai.utils.ReadFileToString;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.text.StrSubstitutor;

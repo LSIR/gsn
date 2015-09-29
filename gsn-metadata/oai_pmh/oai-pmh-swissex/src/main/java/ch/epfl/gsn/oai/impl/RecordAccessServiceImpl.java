@@ -1,10 +1,10 @@
 package ch.epfl.gsn.oai.impl;
 
 import ch.epfl.gsn.oai.OaiIdentifierBuilder;
-import ch.epfl.gsn.oai.model.OaiRecordRepository;
-import ch.epfl.gsn.oai.model.OsperRecord;
 import ch.epfl.gsn.oai.interfaces.DataAccessException;
 import ch.epfl.gsn.oai.interfaces.RecordAccessService;
+import ch.epfl.gsn.oai.model.OaiRecordRepository;
+import ch.epfl.gsn.oai.model.OsperRecord;
 import com.google.common.collect.Sets;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;

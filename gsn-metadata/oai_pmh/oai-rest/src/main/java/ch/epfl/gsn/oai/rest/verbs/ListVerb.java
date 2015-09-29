@@ -1,15 +1,14 @@
 package ch.epfl.gsn.oai.rest.verbs;
 
+import ch.epfl.gsn.oai.interfaces.MetadataFormats;
 import ch.epfl.gsn.oai.interfaces.Record;
 import ch.epfl.gsn.oai.interfaces.RecordAccessService;
 import ch.epfl.gsn.oai.rest.ErrorOai;
-import ch.epfl.gsn.oai.interfaces.MetadataFormats;
 import ch.epfl.gsn.oai.rest.OaiListRequestParameters;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
-import sun.plugin.converter.util.StdUtils;
 
 import java.text.ParseException;
 import java.util.Date;

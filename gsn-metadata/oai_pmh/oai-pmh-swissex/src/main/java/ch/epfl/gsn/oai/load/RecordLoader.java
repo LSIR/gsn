@@ -1,7 +1,6 @@
 package ch.epfl.gsn.oai.load;
 
 import ch.epfl.gsn.oai.OaiConfigurationImpl;
-import ch.epfl.gsn.oai.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

@@ -2,15 +2,11 @@ package ch.epfl.gsn.oai.rest.verbs;
 
 import ch.epfl.gsn.oai.interfaces.*;
 import ch.epfl.gsn.oai.rest.ErrorOai;
-import ch.epfl.gsn.oai.interfaces.MetadataFormats;
 import ch.epfl.gsn.oai.rest.OaiListRequestParameters;
-
-import com.google.common.collect.Maps;
 import org.springframework.context.annotation.Scope;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Map;
 import java.util.Set;
 
 /**

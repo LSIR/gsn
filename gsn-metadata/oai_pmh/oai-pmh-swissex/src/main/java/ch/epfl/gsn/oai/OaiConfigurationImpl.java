@@ -9,12 +9,10 @@ import ch.epfl.gsn.oai.interfaces.MetadataFormat;
 import ch.epfl.gsn.oai.interfaces.OaiConfiguration;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.util.Set;

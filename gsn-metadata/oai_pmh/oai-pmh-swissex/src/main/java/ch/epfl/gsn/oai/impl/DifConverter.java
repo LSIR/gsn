@@ -2,9 +2,9 @@ package ch.epfl.gsn.oai.impl;
 
 import ch.epfl.gsn.metadata.core.model.VirtualSensorMetadata;
 import ch.epfl.gsn.metadata.core.repositories.VirtualSensorMetadataRepository;
-import ch.epfl.gsn.oai.model.OsperRecord;
 import ch.epfl.gsn.oai.interfaces.Converter;
 import ch.epfl.gsn.oai.interfaces.MetadataFormat;
+import ch.epfl.gsn.oai.model.OsperRecord;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
