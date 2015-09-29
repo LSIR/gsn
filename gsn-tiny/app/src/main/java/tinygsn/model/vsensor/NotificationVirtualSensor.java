@@ -154,7 +154,7 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public void getRowParameters(TableLayout table_notify_config, Context context) { //TODO remove and move parameters to Notification VS parameters
+	public void getRowParameters(TableLayout table_notify_config, Context context) {
 		int TEXT_SIZE = 10;
 		Spinner condition, field, action;
 		EditText editText_value, editText_contact;

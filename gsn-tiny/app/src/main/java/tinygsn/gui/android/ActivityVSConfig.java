@@ -65,17 +65,16 @@ import tinygsn.storage.db.SqliteStorageManager;
 public class ActivityVSConfig extends Activity {
 	static int TEXT_SIZE = 10;
 	private Context context = this;
-	private Spinner spinnerVSType, field, condition, action;
-	private EditText editText_vsName, editText_value, editText_contact;
+	private Spinner spinnerVSType;
+	private EditText editText_vsName;
 	private TableLayout table_notify_config, table_layout;
 	private TableRow table_vsensor_config;
-	private CheckBox saveToDB;
 	private SettingPanel vssetting;
 	private SqliteStorageManager storage = null;
 	private Properties wrapperList;
 	AndroidControllerVS controller = new AndroidControllerVS();
 
-	private ArrayList<StreamSourcePanel> pannels = new ArrayList<ActivityVSConfig.StreamSourcePanel>();
+	private ArrayList<StreamSourcePanel> pannels = new ArrayList<>();
 
 	private boolean isEnableSave = true;
 	private String editingVS = null;
@@ -268,11 +267,11 @@ public class ActivityVSConfig extends Activity {
 		inrow.addView(label);
 
 		panel.aggregator = new Spinner(this);
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for (String s : StreamSource.AGGREGATOR) {
 			list.add(s);
 		}
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, list);
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, list);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		panel.aggregator.setAdapter(dataAdapter);
 		inrow.addView(panel.aggregator);
@@ -286,7 +285,7 @@ public class ActivityVSConfig extends Activity {
 		inrow.addView(label);
 
 		panel.wrapper = new Spinner(this);
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 		for (String s : wrapperList.stringPropertyNames()) {
 			list.add(s);
 		}
@@ -294,7 +293,7 @@ public class ActivityVSConfig extends Activity {
 		for (String s : storage.getListofVSName()) {
 			list.add("local: " + s);
 		}
-		dataAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, list);
+		dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, list);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		panel.wrapper.setAdapter(dataAdapter);
 		inrow.addView(panel.wrapper);
@@ -357,26 +356,15 @@ public class ActivityVSConfig extends Activity {
 	//FIXME : think about how to create the row for db
 	public void saveVS() {
 		String vsName = editText_vsName.getText().toString();
-		String notify_field = "", notify_condition = "", notify_value = "", notify_action = "", notify_contact = "", save_to_db = "";
 
 		int vsType = spinnerVSType.getSelectedItemPosition();
-		if (vsType == 1) {
-			notify_field = field.getSelectedItem().toString();
-			notify_condition = condition.getSelectedItem().toString();
-			notify_value = editText_value.getText().toString();
-			notify_action = action.getSelectedItem().toString();
-			notify_contact = editText_contact.getText().toString();
-			save_to_db = saveToDB.isChecked() + "";
-		}
 
 		try {
 			storage.executeInsert(
 					                     "vsList",
 					                     new ArrayList<String>(Arrays.asList("running", "vsname",
-							                                                        "vstype", "notify_field", "notify_condition", "notify_value", "notify_action",
-							                                                        "notify_contact", "save_to_db")),
-					                     new ArrayList<String>(Arrays.asList("1", vsName, "" + vsType, notify_field, notify_condition,
-							                                                        notify_value, notify_action, notify_contact, save_to_db)));
+							                                                        "vstype")),
+					                     new ArrayList<String>(Arrays.asList("1", vsName, "" + vsType)));
 
 			vssetting.saveTo(vsName, storage);
 
