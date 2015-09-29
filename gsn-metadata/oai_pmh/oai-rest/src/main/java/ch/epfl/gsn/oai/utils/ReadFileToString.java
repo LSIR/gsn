@@ -1,8 +1,10 @@
 package ch.epfl.gsn.oai.utils;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,18 +23,17 @@ public class ReadFileToString {
 
     public static String readFileFromClasspath(final String fileName) throws IOException {
         try {
-            URL resource = ReadFileToString.class.getClassLoader()
-                    .getResource(fileName);
 
-            if (resource == null) {
+            logger.info("Reading " + fileName);
+            ClassPathResource classPathResource = new ClassPathResource(fileName);
+            if (!classPathResource.exists()) {
                 logger.error("File doesn't exists " + fileName);
                 return StringUtils.EMPTY;
             }
 
-            URI uri = resource.toURI();
-            return new String(Files.readAllBytes(
-                    Paths.get(uri)));
-        } catch (IOException | URISyntaxException e) {
+            return IOUtils.toString(classPathResource.getInputStream());
+
+        } catch (IOException e) {
             throw new IOException(e);
         }
     }
