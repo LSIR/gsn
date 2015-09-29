@@ -8,7 +8,10 @@ import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
+
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 public class LocationScheduler extends AbstractScheduler{
 	
@@ -19,12 +22,12 @@ public class LocationScheduler extends AbstractScheduler{
 	public static final int REASON_WIFI = 1;
 	public static final int REASON_GPS = 2;
 	
-	private static final String accelometerType = "tinygsn.model.wrappers.AndroidAccelerometerWrapper";
+	private static final String accelerometerType = "tinygsn.model.wrappers.AndroidAccelerometerWrapper";
 	private static final String gpsType = "tinygsn.model.wrappers.AndroidGPSWrapper";
 	private static final String gyroscopeType = "tinygsn.model.wrappers.AndroidGyroscopeWrapper";
 	private static final String wifiType = "tinygsn.model.wrappers.WifiWrapper";
 
-	private static final String[] wrappers = new String[]{accelometerType,gpsType,gyroscopeType,wifiType};
+	private static final String[] wrappers = new String[]{accelerometerType,gpsType,gyroscopeType,wifiType};
 	
 	public final Class<? extends WrapperService> getSERVICE(){ return LocationSchedulerService.class;}
 			
@@ -49,13 +52,13 @@ public class LocationScheduler extends AbstractScheduler{
 		
 		//constants:
 		int numLatest = 10;
-		double accelometerThereshold = 1.3;
+		double accelerometerThreshold = 1.3;
 		
 		int wifiCountThreshold = 15;
 		
-		int SamplingRateAccelometerMoving = 3;
-		int SamplingRateAccelometerStationary = 1;
-	    int SamplingRateAccelometerLost = 2;
+		int SamplingRateAccelerometerMoving = 3;
+		int SamplingRateAccelerometerStationary = 1;
+	    int SamplingRateAccelerometerLost = 2;
 	    
 		int SamplingRateGyroscopeMoving = 3;
 		int SamplingRateGyroscopeStationary = 1;
@@ -70,8 +73,8 @@ public class LocationScheduler extends AbstractScheduler{
 	    int SamplingRateWifiLost = 1;
 	    //end of constants
 		
-		AbstractWrapper accelometerWrapper;
-		String accelometerVsName = null;
+		AbstractWrapper accelerometerWrapper;
+		String accelerometerVsName = null;
 		
 		AbstractWrapper gpsWrapper;
 		String gpsVsName = null;
@@ -85,14 +88,15 @@ public class LocationScheduler extends AbstractScheduler{
 		
 		try {
 			//get the wrappers
-			accelometerWrapper = StaticData.getWrapperByName(accelometerType);
+			accelerometerWrapper = StaticData.getWrapperByName(accelerometerType);
 			gpsWrapper = StaticData.getWrapperByName(gpsType);
 			wifiWrapper = StaticData.getWrapperByName(wifiType);
 			//get the first attached VS
-			accelometerVsName = storage.getVSfromSource(accelometerType).get(0);
+			accelerometerVsName = storage.getVSfromSource(accelerometerType).get(0);
 			wifiVsName = storage.getVSfromSource(wifiType).get(0);
 			gpsVsName = storage.getVSfromSource(gpsType).get(0);
 		}catch(Exception e){
+
 			e.printStackTrace();
 			return;
 		}
@@ -140,9 +144,9 @@ public class LocationScheduler extends AbstractScheduler{
 			
 			Log.d("tinygsn-scheduler","is GPS constant: "+ gpsConstant);
 		}
-		if(accelometerVsName != null)
+		if(accelerometerVsName != null)
 		{
-			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelometerVsName, accelometerWrapper.getFieldList(), accelometerWrapper.getFieldType(), 32, curTime-30000);
+			accelometerResult =  storage.executeQueryGetLatestValues("vs_" + accelerometerVsName, accelerometerWrapper.getFieldList(), accelerometerWrapper.getFieldType(), 32, curTime - 30000);
 			if(accelometerResult.size() > 1)
 			{
 				for(int i = 1; i < accelometerResult.size(); i++)
@@ -185,7 +189,7 @@ public class LocationScheduler extends AbstractScheduler{
 			case STATE_LOST:
 
 				storage.setWrapperInfo(gyroscopeType, 15, SamplingRateGyroscopeLost);
-				storage.setWrapperInfo(accelometerType, 15, SamplingRateAccelometerLost);
+				storage.setWrapperInfo(accelerometerType, 15, SamplingRateAccelerometerLost);
 				storage.setWrapperInfo(gpsType, 15, SamplingRateGPSLost);
 				storage.setWrapperInfo(wifiType, 60, SamplingRateWifiLost);
 
@@ -202,7 +206,7 @@ public class LocationScheduler extends AbstractScheduler{
 					reason = REASON_WIFI;
 					Log.d("tinygsn-scheduler", "new state STATIONARY (wifi)");
 				}
-				else if (accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer < accelometerThereshold)
+				else if (accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer < accelerometerThreshold)
 				{
 					machineState = STATE_STATIONARY;
 					reason = REASON_ACC;
@@ -212,7 +216,7 @@ public class LocationScheduler extends AbstractScheduler{
 			case STATE_GPS: 
 
 				storage.setWrapperInfo(gyroscopeType, 15, SamplingRateGyroscopeMoving);
-				storage.setWrapperInfo(accelometerType, 15, SamplingRateAccelometerMoving);
+				storage.setWrapperInfo(accelerometerType, 15, SamplingRateAccelerometerMoving);
 				storage.setWrapperInfo(gpsType, 15, SamplingRateGPSMoving);
 				storage.setWrapperInfo(wifiType, 60, SamplingRateWifiMoving);		
 
@@ -228,7 +232,7 @@ public class LocationScheduler extends AbstractScheduler{
 					reason = REASON_GPS;
 					Log.d("tinygsn-scheduler", "new state STATIONARY (gps)");
 				}
-				else if(accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer < accelometerThereshold) 
+				else if(accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer < accelerometerThreshold)
 				{
 					machineState = STATE_STATIONARY;
 					reason = REASON_ACC;
@@ -238,7 +242,7 @@ public class LocationScheduler extends AbstractScheduler{
 			case STATE_STATIONARY:
 
 				storage.setWrapperInfo(gyroscopeType, 15, SamplingRateGyroscopeStationary);
-				storage.setWrapperInfo(accelometerType, 15, SamplingRateAccelometerStationary);
+				storage.setWrapperInfo(accelerometerType, 15, SamplingRateAccelerometerStationary);
 				storage.setWrapperInfo(gpsType, 15, SamplingRateGPSStationary);
 				storage.setWrapperInfo(wifiType, 60, SamplingRateWifiStationary);
 
@@ -255,7 +259,7 @@ public class LocationScheduler extends AbstractScheduler{
 						reason = REASON_WIFI;
 						Log.d("tinygsn-scheduler", "new state STATIONARY (wifi)");
 					}
-					else if(accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer > accelometerThereshold)
+					else if(accelometerResult != null && accelometerResult.size() != 0 && avgChangedAccelometer > accelerometerThreshold)
 					{
 						machineState = STATE_LOST;
 						Log.d("tinygsn-scheduler", "new state LOST");
