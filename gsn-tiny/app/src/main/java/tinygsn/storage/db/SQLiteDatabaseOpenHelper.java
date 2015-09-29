@@ -53,7 +53,6 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		
 		String createQuery = "CREATE TABLE vsList (_id integer primary key autoincrement,"
 				+ "running, vsname, vstype, "
-				+ "notify_field, notify_condition, notify_value, notify_action, notify_contact, save_to_db"
 				+ ");";
 		db.execSQL(createQuery);
 		

@@ -1,29 +1,35 @@
 /**
-* Global Sensor Networks (GSN) Source Code
-* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
-*
-* This file is part of GSN.
-*
-* GSN is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* GSN is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with GSN. If not, see <http://www.gnu.org/licenses/>.
-*
-* File: gsn-tiny/src/tinygsn/storage/db/SqliteStorageManager.java
-*
-* @author Do Ngoc Hoan
-*/
+ * Global Sensor Networks (GSN) Source Code
+ * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+ * <p/>
+ * This file is part of GSN.
+ * <p/>
+ * GSN is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p/>
+ * GSN is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with GSN. If not, see <http://www.gnu.org/licenses/>.
+ * <p/>
+ * File: gsn-tiny/src/tinygsn/storage/db/SqliteStorageManager.java
+ *
+ * @author Do Ngoc Hoan
+ */
 
 
 package tinygsn.storage.db;
+
+import android.annotation.SuppressLint;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 
 import java.io.File;
 import java.io.Serializable;
@@ -37,38 +43,33 @@ import java.util.Map;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.DeliveryRequest;
-import tinygsn.beans.Subscription;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
+import tinygsn.beans.Subscription;
 import tinygsn.beans.VSensorConfig;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.storage.StorageManager;
 import tinygsn.utils.Const;
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 
 /**
- * 
+ *
  * @author Do Ngoc Hoan (hoan.do@epfl.ch)
- * 
+ *
  */
-public class SqliteStorageManager extends StorageManager implements Serializable{
+public class SqliteStorageManager extends StorageManager implements Serializable {
 
 
 	private static final long serialVersionUID = 7774503312823392567L;
 	private SQLiteDatabase database;
 	private static SQLiteDatabaseOpenHelper dbOpenHelper;
-	
+
 	public SqliteStorageManager() {
 		super();
 		this.isSQLite = true;
 		dbOpenHelper = getInstance();
 		File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/Android/data/tinygsn" );
+				                           + "/Android/data/tinygsn");
 		myFilesDir.mkdirs();
 		database = dbOpenHelper.getWritableDatabase();
 	}
@@ -76,14 +77,14 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	public static synchronized SQLiteDatabaseOpenHelper getInstance() {
 		if (dbOpenHelper == null) {
 			dbOpenHelper = new SQLiteDatabaseOpenHelper(StaticData.globalContext, Const.DATABASE_NAME,
-					null, Const.DATABASE_VERSION);
+					                                           null, Const.DATABASE_VERSION);
 		}
 		return dbOpenHelper;
 	}
 
-    @Override
+	@Override
 	public void executeCreateTable(CharSequence tableName, DataField[] outputStructure, boolean uniq) {
-		
+
 		ArrayList<String> fields = new ArrayList<String>();
 
 		for (DataField f : outputStructure) {
@@ -95,7 +96,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 	public void createTable(CharSequence vsName, ArrayList<String> fields) {
 		String createQuery = "CREATE TABLE " + vsName
-				+ "(_id integer primary key autoincrement";
+				                     + "(_id integer primary key autoincrement";
 
 		for (String f : fields) {
 			createQuery += ", " + f;
@@ -105,26 +106,24 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		database.execSQL(createQuery);
 	}
 
-	public void executeInsertWifiFrequency(String macAdr)
-	{
+	public void executeInsertWifiFrequency(String macAdr) {
 		ContentValues newCon = new ContentValues();
 		newCon.put("frequency", 1);
 		newCon.put("mac", macAdr);
-		
+
 		database.insert("WifiFrequency", null, newCon);
 
 	}
-	
-	public void executeInsertSamples(int sample,int reason)
-	{
+
+	public void executeInsertSamples(int sample, int reason) {
 		ContentValues newCon = new ContentValues();
 		newCon.put("time", System.currentTimeMillis());
 		newCon.put("sample", sample);
 		newCon.put("reason", reason);
-		
+
 		database.insert("Samples", null, newCon);
 	}
-	
+
 	/**
 	 * As PreparedStatement on Android can't apply for Query (only for Insert,
 	 * Update) => Therefore, we have to override the function.
@@ -132,9 +131,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	// synchronized
 	@Override
 	public void executeInsert(CharSequence tableName, DataField[] fields,
-			StreamElement se) throws SQLException {
+	                          StreamElement se) throws SQLException {
 		ContentValues newCon = new ContentValues();
-		
+
 		for (int i = 0; i < se.getFieldNames().length; i++) {
 			newCon.put(se.getFieldNames()[i], se.getData(se.getFieldNames()[i]) + "");
 		}
@@ -145,43 +144,43 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	}
 
 	public void executeInsert(String tableName, ArrayList<String> fields,
-			ArrayList<String> values) throws SQLException {
+	                          ArrayList<String> values) throws SQLException {
 		ContentValues newCon = new ContentValues();
 		for (int i = 0; i < fields.size(); i++) {
 			newCon.put(fields.get(i), values.get(i));
 		}
 		database.insert((String) tableName, null, newCon);
 	}
-	
-	public int[] getLatestState(){
+
+	public int[] getLatestState() {
 		String query = "Select * from Samples order by time desc limit 1;";
-		Cursor cursor = database.rawQuery(query, new String[] {});
-		if (cursor.moveToNext()){
-			return new int[]{cursor.getInt(cursor.getColumnIndex("sample")),cursor.getInt(cursor.getColumnIndex("reason"))};
-		}else{
-			return new int[]{0,0};
+		Cursor cursor = database.rawQuery(query, new String[]{});
+		if (cursor.moveToNext()) {
+			return new int[]{cursor.getInt(cursor.getColumnIndex("sample")), cursor.getInt(cursor.getColumnIndex("reason"))};
+		} else {
+			return new int[]{0, 0};
 		}
 	}
 
 	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName,
-			String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num) {
-		return executeQueryGetLatestValues(tableName,FIELD_NAMES,FIELD_TYPES,num,0);
+	                                                            String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num) {
+		return executeQueryGetLatestValues(tableName, FIELD_NAMES, FIELD_TYPES, num, 0);
 	}
-	
+
 	/**
 	 * Get num latest values
-	 * 
+	 *
 	 * @param tabletName
 	 * @param num
 	 * @return
 	 */
 	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName,
-			String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num, long minTimestamp) {
-		
+	                                                            String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num, long minTimestamp) {
+
 		Serializable[] fieldValues;
 		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
-		String query = "Select * from " + tableName + " where timed > "+minTimestamp+" order by _id desc limit ?";
-		Cursor cursor = database.rawQuery(query, new String[] { num + "" });
+		String query = "Select * from " + tableName + " where timed > " + minTimestamp + " order by _id desc limit ?";
+		Cursor cursor = database.rawQuery(query, new String[]{num + ""});
 
 		while (cursor.moveToNext()) {
 			fieldValues = new Serializable[FIELD_NAMES.length];
@@ -191,7 +190,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			long time = cursor.getLong(cursor.getColumnIndex("timed"));
 
 			StreamElement se = new StreamElement(FIELD_NAMES, FIELD_TYPES,
-					fieldValues, time);
+					                                    fieldValues, time);
 			result.add(se);
 		}
 		cursor.close();
@@ -199,7 +198,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	}
 
 	public ArrayList<StreamElement> executeQueryGetRangeData(String vsName,
-			long start, long end, String[] FIELD_NAMES, Byte[] FIELD_TYPES) {
+	                                                         long start, long end, String[] FIELD_NAMES, Byte[] FIELD_TYPES) {
 		Serializable[] fieldValues;
 		String[] fieldNames;
 		Byte[] fieldTypes;
@@ -207,56 +206,51 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
 
 		String query = "Select * from " + vsName
-				+ " where CAST(timed AS NUMERIC) >= ? AND CAST(timed AS NUMERIC) <= ? ORDER BY timed ASC";
+				               + " where CAST(timed AS NUMERIC) >= ? AND CAST(timed AS NUMERIC) <= ? ORDER BY timed ASC";
 
-		Cursor cursor = database.rawQuery(query, new String[] { start + "",
-				end + "" });
+		Cursor cursor = database.rawQuery(query, new String[]{start + "",
+				                                                     end + ""});
 
 		while (cursor.moveToNext()) {
-			fieldValues = new Serializable[FIELD_NAMES.length+1];
-			fieldNames = new String[FIELD_NAMES.length+1];
-			fieldTypes = new Byte[FIELD_NAMES.length+1];
+			fieldValues = new Serializable[FIELD_NAMES.length + 1];
+			fieldNames = new String[FIELD_NAMES.length + 1];
+			fieldTypes = new Byte[FIELD_NAMES.length + 1];
 			for (int i = 0; i < FIELD_NAMES.length; i++) {
 				fieldValues[i] = cursor
-						.getDouble(cursor.getColumnIndex(FIELD_NAMES[i]));
+						                 .getDouble(cursor.getColumnIndex(FIELD_NAMES[i]));
 				fieldNames[i] = FIELD_NAMES[i];
 				fieldTypes[i] = FIELD_TYPES[i];
 			}
 			long time = cursor.getLong(cursor.getColumnIndex("timed"));
-			fieldNames[fieldNames.length-1] = "userid";
-			fieldTypes[fieldTypes.length-1] = DataTypes.INTEGER;
-			fieldValues[fieldValues.length-1] = Integer.valueOf(Const.USER_ID);
+			fieldNames[fieldNames.length - 1] = "userid";
+			fieldTypes[fieldTypes.length - 1] = DataTypes.INTEGER;
+			fieldValues[fieldValues.length - 1] = Integer.valueOf(Const.USER_ID);
 			StreamElement se = new StreamElement(fieldNames, fieldTypes,
-					fieldValues, time);
+					                                    fieldValues, time);
 
 			result.add(se);
 		}
 		return result;
 	}
-	
-	public boolean updateWifiFrequency(String macAdr)
-	{
+
+	public boolean updateWifiFrequency(String macAdr) {
 		int frequency = getFrequencyByMac(macAdr);
-		if(frequency != -1)
-		{
+		if (frequency != -1) {
 			String query = "UPDATE WifiFrequency SET frequency = ? WHERE mac = ?;";
-			Cursor cursor = database.rawQuery(query, new String[] {(frequency+1)+"", macAdr});
-			if(cursor.moveToNext())
+			Cursor cursor = database.rawQuery(query, new String[]{(frequency + 1) + "", macAdr});
+			if (cursor.moveToNext())
 				return true;
-		}
-		else 
+		} else
 			executeInsertWifiFrequency(macAdr);
 		return false;
 	}
-	
+
 	@SuppressLint("UseSparseArrays")
-	public Map<Long, Integer> getFrequencies()
-	{
+	public Map<Long, Integer> getFrequencies() {
 		Map<Long, Integer> freqs = new HashMap<Long, Integer>();
 		String query = "Select * from WifiFrequency;";
 		Cursor cursor = database.rawQuery(query, new String[]{});
-		while (cursor.moveToNext())
-		{
+		while (cursor.moveToNext()) {
 			int frequency = cursor.getInt(cursor.getColumnIndex("frequency"));
 			String mac = cursor.getString(cursor.getColumnIndex("mac"));
 			mac = mac.replaceAll(":", "");
@@ -265,26 +259,25 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return freqs;
 	}
 
-	
+
 	private int getFrequencyByMac(String macAdr) {
 		String query = "Select * from WifiFrequency;";
 		Cursor cursor = database.rawQuery(query, new String[]{});
-		while (cursor.moveToNext())
-		{
+		while (cursor.moveToNext()) {
 			int frequency = cursor.getInt(cursor.getColumnIndex("frequency"));
 			String mac = cursor.getString(cursor.getColumnIndex("mac"));
-			if(mac.equals(macAdr))
+			if (mac.equals(macAdr))
 				return frequency;
 		}
 		return -1;
 	}
 
 	public boolean update(String tableName, String vsName, String field,
-			String value) {
+	                      String value) {
 		String query = "UPDATE " + tableName + " SET " + field + " = ? "
-				+ " WHERE vsname = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] { value, vsName });
-		
+				               + " WHERE vsname = ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{value, vsName});
+
 		if (cursor.moveToNext()) {
 			return true;
 		}
@@ -293,15 +286,15 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 	public void deleteVS(String vsName) {
 		String query = "DELETE from vsList where vsname = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] { vsName });
+		Cursor cursor = database.rawQuery(query, new String[]{vsName});
 		if (cursor.moveToNext()) {
 			return;
 		}
 	}
-	
+
 	public void deleteSS(String vsName) {
 		String query = "DELETE from sourcesList where vsname = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] { vsName });
+		Cursor cursor = database.rawQuery(query, new String[]{vsName});
 		if (cursor.moveToNext()) {
 			return;
 		}
@@ -309,7 +302,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 	public void deleteTable(String tableName) {
 		String query = "DROP TABLE " + tableName;
-		Cursor cursor = database.rawQuery(query, new String[] {});
+		Cursor cursor = database.rawQuery(query, new String[]{});
 		if (cursor.moveToNext()) {
 			return;
 		}
@@ -329,18 +322,18 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	public String convertGSNTypeToLocalType(DataField gsnType) {
 		String convertedType = null;
 		switch (gsnType.getDataTypeID()) {
-		case DataTypes.CHAR:
-		case DataTypes.VARCHAR:
-			// Because the parameter for the varchar is not
-			// optional.
-			if (gsnType.getType().trim().equalsIgnoreCase("string"))
-				convertedType = "TEXT";
-			else
-				convertedType = gsnType.getType();
-			break;
-		default:
-			convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
-			break;
+			case DataTypes.CHAR:
+			case DataTypes.VARCHAR:
+				// Because the parameter for the varchar is not
+				// optional.
+				if (gsnType.getType().trim().equalsIgnoreCase("string"))
+					convertedType = "TEXT";
+				else
+					convertedType = gsnType.getType();
+				break;
+			default:
+				convertedType = DataTypes.TYPE_NAMES[gsnType.getDataTypeID()];
+				break;
 		}
 		return convertedType;
 	}
@@ -348,17 +341,17 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	@Override
 	public byte convertLocalTypeToGSN(int jdbcType, int precision) {
 		switch (jdbcType) {
-		case Cursor.FIELD_TYPE_INTEGER:
-			return DataTypes.INTEGER;
-		case Cursor.FIELD_TYPE_STRING:
-			return DataTypes.VARCHAR;
-		case Cursor.FIELD_TYPE_FLOAT:
-			return DataTypes.DOUBLE;
-		case Cursor.FIELD_TYPE_BLOB:
-			return DataTypes.BINARY;
-		default:
-			// logger.error("The type can't be converted to GSN form : " + jdbcType);
-			break;
+			case Cursor.FIELD_TYPE_INTEGER:
+				return DataTypes.INTEGER;
+			case Cursor.FIELD_TYPE_STRING:
+				return DataTypes.VARCHAR;
+			case Cursor.FIELD_TYPE_FLOAT:
+				return DataTypes.DOUBLE;
+			case Cursor.FIELD_TYPE_BLOB:
+				return DataTypes.BINARY;
+			default:
+				// logger.error("The type can't be converted to GSN form : " + jdbcType);
+				break;
 		}
 		return -100;
 	}
@@ -390,7 +383,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 	@Override
 	public StringBuilder getStatementDropTable(CharSequence tableName,
-			Connection conn) throws SQLException {
+	                                           Connection conn) throws SQLException {
 		StringBuilder sb = new StringBuilder("Drop table if exists ");
 		sb.append(tableName);
 		return sb;
@@ -398,66 +391,53 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 	@Override
 	public StringBuilder getStatementCreateTable(String tableName,
-			DataField[] structure) {
+	                                             DataField[] structure) {
 		StringBuilder result = new StringBuilder("CREATE TABLE ").append(tableName);
 		return result;
 	}
 
 	@Override
 	public StringBuilder getStatementUselessDataRemoval(String virtualSensorName,
-			long storageSize) {
+	                                                    long storageSize) {
 		return null;
 	}
 
 	@Override
 	public StringBuilder getStatementRemoveUselessDataCountBased(
-			String virtualSensorName, long storageSize) {
+			                                                            String virtualSensorName, long storageSize) {
 		return null;
 	}
-	
+
 	public ArrayList<String> getListofVSName() {
 		ArrayList<String> vsList = new ArrayList<String>();
 		String query = "Select vsname from vsList;";
-		Cursor cursor = database.rawQuery(query, new String[] {});
+		Cursor cursor = database.rawQuery(query, new String[]{});
 		while (cursor.moveToNext()) {
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			vsList.add(vsname);
 		}
 		return vsList;
 	}
-	
+
 
 	@Override
 	public ArrayList<AbstractVirtualSensor> getListofVS() {
 		ArrayList<AbstractVirtualSensor> vsList = new ArrayList<AbstractVirtualSensor>();
 		String query = "Select * from vsList;";
-		Cursor cursor = database.rawQuery(query, new String[] {});
+		Cursor cursor = database.rawQuery(query, new String[]{});
 		while (cursor.moveToNext()) {
-			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
+			int id = cursor.getInt(cursor.getColumnIndex("_id"));
 			int running = cursor.getInt(cursor.getColumnIndex("running"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
-			String notify_field = cursor.getString(cursor
-					.getColumnIndex("notify_field"));
-			String notify_condition = cursor.getString(cursor
-					.getColumnIndex("notify_condition"));
-			Double notify_value = cursor.getDouble(cursor
-					.getColumnIndex("notify_value"));
-			String notify_action = cursor.getString(cursor
-					.getColumnIndex("notify_action"));
-			String notify_contact = cursor.getString(cursor
-					.getColumnIndex("notify_contact"));
-			boolean save_to_db = cursor
-					.getString(cursor.getColumnIndex("save_to_db")).equals("true");
-	
+
 			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
-			
+
 			AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsname);
-			if (vs == null){
-				VSensorConfig vsc = new VSensorConfig(id ,processingClass, vsname, getSourcesOfVS(vsname),
-						 running == 1, notify_field, notify_condition,
-						notify_value, notify_action, notify_contact, save_to_db);
-	
+			if (vs == null) {
+				VSensorConfig vsc = new VSensorConfig(id, processingClass, vsname, getSourcesOfVS(vsname),
+						                                     running == 1);
+
 				try {
 					vs = StaticData.getProcessingClassByVSConfig(vsc);
 					StaticData.addConfig(id, vsc);
@@ -469,65 +449,53 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			if (vs != null) vsList.add(vs);
 		}
 		return vsList;
-	};
-	
-		public AbstractVirtualSensor getVSByName(String vsName)
-		{
-			String query = "Select * from vsList where vsname = ?;";
-			Cursor cursor = database.rawQuery(query, new String[] { vsName });
-			
-			while (cursor.moveToNext()) {
-				int id  = cursor.getInt(cursor.getColumnIndex("_id"));
-				int running = cursor.getInt(cursor.getColumnIndex("running"));
-				String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
-				int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
-				String notify_field = cursor.getString(cursor
-						.getColumnIndex("notify_field"));
-				String notify_condition = cursor.getString(cursor
-						.getColumnIndex("notify_condition"));
-				Double notify_value = cursor.getDouble(cursor
-						.getColumnIndex("notify_value"));
-				String notify_action = cursor.getString(cursor
-						.getColumnIndex("notify_action"));
-				String notify_contact = cursor.getString(cursor
-						.getColumnIndex("notify_contact"));
-				boolean save_to_db = cursor
-						.getString(cursor.getColumnIndex("save_to_db")).equals("true");
-		
-				String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
-				
-				AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsname);
-				if (vs == null){
-				    VSensorConfig vsc = new VSensorConfig(id ,processingClass, vsname, getSourcesOfVS(vsName),
-						 running == 1, notify_field, notify_condition,
-						notify_value, notify_action, notify_contact, save_to_db);
-				    try {
-					    vs = StaticData.getProcessingClassByVSConfig(vsc);
-					    StaticData.addConfig(id, vsc);
-					    StaticData.saveNameID(id, vsname);
-				    } catch (Exception e) {
-					    e.printStackTrace();
-				    }
+	}
+
+	;
+
+	public AbstractVirtualSensor getVSByName(String vsName) {
+		String query = "Select * from vsList where vsname = ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{vsName});
+
+		while (cursor.moveToNext()) {
+			int id = cursor.getInt(cursor.getColumnIndex("_id"));
+			int running = cursor.getInt(cursor.getColumnIndex("running"));
+			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
+			int vstype = cursor.getInt(cursor.getColumnIndex("vstype"));
+
+			String processingClass = AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vstype];
+
+			AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsname);
+			if (vs == null) {
+				VSensorConfig vsc = new VSensorConfig(id, processingClass, vsname, getSourcesOfVS(vsName),
+						                                     running == 1);
+				try {
+					vs = StaticData.getProcessingClassByVSConfig(vsc);
+					StaticData.addConfig(id, vsc);
+					StaticData.saveNameID(id, vsname);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				
-				return vs;
-				
 			}
-			return null;
+
+			return vs;
+
 		}
+		return null;
+	}
 
 	public boolean vsExists(String vsName) {
 		String query = "Select vsname from vsList where vsname = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] { vsName });
+		Cursor cursor = database.rawQuery(query, new String[]{vsName});
 		while (cursor.moveToNext()) {
 			return true;
 		}
 		return false;
 	}
-	
-	public ArrayList<String> getVSfromSource(String name){
+
+	public ArrayList<String> getVSfromSource(String name) {
 		String query = "Select * from sourcesList where wrappername = ? order by vsname asc;";
-		Cursor cursor = database.rawQuery(query, new String[] { name });
+		Cursor cursor = database.rawQuery(query, new String[]{name});
 		ArrayList<String> r = new ArrayList<String>();
 		while (cursor.moveToNext()) {
 			r.add(cursor.getString(cursor.getColumnIndex("vsname")));
@@ -540,20 +508,20 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		ArrayList<StreamSource> sources = new ArrayList<StreamSource>();
 		String query = "Select * from sourcesList where vsname = ?;";
 		// open();
-		Cursor cursor = database.rawQuery(query, new String[] { name });
-		
+		Cursor cursor = database.rawQuery(query, new String[]{name});
+
 		while (cursor.moveToNext()) {
-			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
+			int id = cursor.getInt(cursor.getColumnIndex("_id"));
 			int sswindow = cursor.getInt(cursor.getColumnIndex("sswindowsize"));
 			int ssstep = cursor.getInt(cursor.getColumnIndex("ssstep"));
 			boolean sstimebased = cursor.getString(cursor.getColumnIndex("sstimebased")).equals("true");
 			int aggregator = cursor.getInt(cursor.getColumnIndex("ssaggregator"));
 			String wrappername = cursor.getString(cursor.getColumnIndex("wrappername"));
-	
+
 			StreamSource ss = null;
-			if(StaticData.sourceMap.containsKey(id)){
+			if (StaticData.sourceMap.containsKey(id)) {
 				ss = StaticData.sourceMap.get(id);
-			}else{
+			} else {
 				ss = new StreamSource();
 				ss.setId(id);
 				StaticData.sourceMap.put(id, ss);
@@ -571,64 +539,59 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}
 		return sources;
 	}
-	
-	public boolean updateWrapperInfo(String name, int interval, int duration) 
-	{
+
+	public boolean updateWrapperInfo(String name, int interval, int duration) {
 		String query = "UPDATE wrapperList SET dcinterval = ?, dcduration = ? WHERE wrappername = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] {interval+"",duration+"", name});
-		if(cursor.moveToNext())
+		Cursor cursor = database.rawQuery(query, new String[]{interval + "", duration + "", name});
+		if (cursor.moveToNext())
 			return true;
 		return false;
 	}
-	
-	public int[] getWrapperInfo(String name)
-	{
+
+	public int[] getWrapperInfo(String name) {
 		String query = "Select * from wrapperList WHERE wrappername = ?;";
 		Cursor cursor = database.rawQuery(query, new String[]{name});
-		
+
 		while (cursor.moveToNext()) {
 			int duration = cursor.getInt(cursor.getColumnIndex("dcduration"));
 			int interval = cursor.getInt(cursor.getColumnIndex("dcinterval"));
-			return new int[]{interval, duration};			
+			return new int[]{interval, duration};
 		}
 		return null;
 
 	}
-	
-	public void setWrapperInfo(String name, int interval, int duration)
-	{
-		if (getWrapperInfo(name) == null){
+
+	public void setWrapperInfo(String name, int interval, int duration) {
+		if (getWrapperInfo(name) == null) {
 			ContentValues newCon = new ContentValues();
 			newCon.put("wrappername", name);
 			newCon.put("dcinterval", interval);
 			newCon.put("dcduration", duration);
 			database.insert("wrapperList", null, newCon);
-		}else{
-			updateWrapperInfo(name,interval,duration);
+		} else {
+			updateWrapperInfo(name, interval, duration);
 		}
 	}
-	
-	public boolean updateSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, boolean active) 
-	{
+
+	public boolean updateSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, boolean active) {
 		String query = "UPDATE subscribeSource SET url = ?, vsname = ?, mode = ?, lastTime = ?, active = ?  WHERE _id = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] {url,vsname,mode+"",lastTime+"", active?"1":"0",""+id});
-		if(cursor.moveToNext())
+		Cursor cursor = database.rawQuery(query, new String[]{url, vsname, mode + "", lastTime + "", active ? "1" : "0", "" + id});
+		if (cursor.moveToNext())
 			return true;
 		return false;
 	}
-	
-	public Subscription getSubscribeInfo(int id)
-	{
+
+	public Subscription getSubscribeInfo(int id) {
 		String query = "Select * from subscribeSource WHERE _id = ?;";
-		Cursor cursor = database.rawQuery(query, new String[]{id+""});
-		
+		Cursor cursor = database.rawQuery(query, new String[]{id + ""});
+
 		while (cursor.moveToNext()) {
 			String url = cursor.getString(cursor.getColumnIndex("url"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			Subscription su = new Subscription(url,mode,vsname,id);
+			Subscription su = new Subscription(url, mode, vsname, id);
 			su.setActive(active);
 			su.setLastTime(lastTime);
 			return su;
@@ -636,57 +599,54 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return null;
 
 	}
-	
-	public void setSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, boolean active)
-	{
-		if (id == -1 || getSubscribeInfo(id) == null){
+
+	public void setSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, boolean active) {
+		if (id == -1 || getSubscribeInfo(id) == null) {
 			ContentValues newCon = new ContentValues();
 			newCon.put("url", url);
 			newCon.put("vsname", vsname);
 			newCon.put("mode", mode);
 			newCon.put("lastTime", lastTime);
-			newCon.put("active", active?"1":"0");
+			newCon.put("active", active ? "1" : "0");
 			database.insert("subscribeSource", null, newCon);
-		}else{
+		} else {
 			updateSubscribeInfo(id, url, vsname, mode, lastTime, active);
 		}
 	}
-	
-	public ArrayList<Subscription> getSubscribeList(){
+
+	public ArrayList<Subscription> getSubscribeList() {
 		ArrayList<Subscription> r = new ArrayList<Subscription>();
 		String query = "Select * from subscribeSource;";
-		Cursor cursor = database.rawQuery(query, new String[] {});
+		Cursor cursor = database.rawQuery(query, new String[]{});
 		while (cursor.moveToNext()) {
-			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
+			int id = cursor.getInt(cursor.getColumnIndex("_id"));
 			String url = cursor.getString(cursor.getColumnIndex("url"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			Subscription su = new Subscription(url,mode,vsname,id);
+			Subscription su = new Subscription(url, mode, vsname, id);
 			su.setActive(active);
 			su.setLastTime(lastTime);
 			r.add(su);
 		}
 		return r;
-		
+
 	}
-	
-	
-	public boolean updatePublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active) 
-	{
+
+
+	public boolean updatePublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active) {
 		String query = "UPDATE publishDestination SET url = ?, vsname = ?, key = ?, mode = ?, lastTime = ?, active = ?  WHERE _id = ?;";
-		Cursor cursor = database.rawQuery(query, new String[] {url,vsname,key,mode+"",lastTime+"", active?"1":"0",""+id});
-		if(cursor.moveToNext())
+		Cursor cursor = database.rawQuery(query, new String[]{url, vsname, key, mode + "", lastTime + "", active ? "1" : "0", "" + id});
+		if (cursor.moveToNext())
 			return true;
 		return false;
 	}
-	
-	public DeliveryRequest getPublishInfo(int id)
-	{
+
+	public DeliveryRequest getPublishInfo(int id) {
 		String query = "Select * from publishDestination WHERE _id = ?;";
-		Cursor cursor = database.rawQuery(query, new String[]{id+""});
-		
+		Cursor cursor = database.rawQuery(query, new String[]{id + ""});
+
 		while (cursor.moveToNext()) {
 			String url = cursor.getString(cursor.getColumnIndex("url"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
@@ -694,7 +654,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			DeliveryRequest dr = new DeliveryRequest(url,key,mode,vsname,id);
+			DeliveryRequest dr = new DeliveryRequest(url, key, mode, vsname, id);
 			dr.setActive(active);
 			dr.setLastTime(lastTime);
 			return dr;
@@ -702,48 +662,47 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		return null;
 
 	}
-	
-	public void setPublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active)
-	{
-		if (id == -1 || getPublishInfo(id) == null){
+
+	public void setPublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active) {
+		if (id == -1 || getPublishInfo(id) == null) {
 			ContentValues newCon = new ContentValues();
 			newCon.put("url", url);
 			newCon.put("vsname", vsname);
 			newCon.put("key", key);
 			newCon.put("mode", mode);
 			newCon.put("lastTime", lastTime);
-			newCon.put("active", active?"1":"0");
+			newCon.put("active", active ? "1" : "0");
 			database.insert("publishDestination", null, newCon);
-		}else{
+		} else {
 			updatePublishInfo(id, url, vsname, key, mode, lastTime, active);
 		}
 	}
-	
-	public ArrayList<DeliveryRequest> getPublishList(){
+
+	public ArrayList<DeliveryRequest> getPublishList() {
 		ArrayList<DeliveryRequest> r = new ArrayList<DeliveryRequest>();
 		String query = "Select * from publishDestination;";
-		Cursor cursor = database.rawQuery(query, new String[] {});
+		Cursor cursor = database.rawQuery(query, new String[]{});
 		while (cursor.moveToNext()) {
-			int id  = cursor.getInt(cursor.getColumnIndex("_id"));
+			int id = cursor.getInt(cursor.getColumnIndex("_id"));
 			String url = cursor.getString(cursor.getColumnIndex("url"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			String key = cursor.getString(cursor.getColumnIndex("key"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			DeliveryRequest dr = new DeliveryRequest(url,key,mode,vsname,id);
+			DeliveryRequest dr = new DeliveryRequest(url, key, mode, vsname, id);
 			dr.setActive(active);
 			dr.setLastTime(lastTime);
 			r.add(dr);
 		}
 		return r;
-		
+
 	}
-	
+
 	public DataField[] tableToStructure(CharSequence tableName) throws SQLException {
 		StringBuilder sb = new StringBuilder("select * from ").append(tableName)
-				.append(" where 1=0 ");
-		Cursor cursor = database.rawQuery(sb.toString(), new String[] {});
+				                   .append(" where 1=0 ");
+		Cursor cursor = database.rawQuery(sb.toString(), new String[]{});
 		boolean c = cursor.moveToFirst();
 		ArrayList<DataField> toReturnArr = new ArrayList<DataField>();
 		for (int i = 0; i < cursor.getColumnCount(); i++) {
@@ -751,20 +710,20 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			if (colName.equalsIgnoreCase("_id") || colName.equalsIgnoreCase("timed"))
 				continue;
 			int colType = Cursor.FIELD_TYPE_FLOAT;
-			if (c){ //can only get type from data
+			if (c) { //can only get type from data
 				colType = cursor.getType(i);
 			}
 			byte colTypeInGSN = convertLocalTypeToGSN(colType);
 			toReturnArr.add(new DataField(colName, colTypeInGSN));
 		}
-		return toReturnArr.toArray(new DataField[] {});
+		return toReturnArr.toArray(new DataField[]{});
 
 	}
-	
-	public HashMap<String,String> getSetting(String keyPrefix){
+
+	public HashMap<String, String> getSetting(String keyPrefix) {
 		String query = "Select * from settings WHERE key LIKE ?;";
-		Cursor cursor = database.rawQuery(query, new String[]{keyPrefix+"%"});
-		HashMap<String,String> res = new HashMap<String, String>();
+		Cursor cursor = database.rawQuery(query, new String[]{keyPrefix + "%"});
+		HashMap<String, String> res = new HashMap<String, String>();
 		while (cursor.moveToNext()) {
 			String v = cursor.getString(cursor.getColumnIndex("value"));
 			String k = cursor.getString(cursor.getColumnIndex("key"));
@@ -772,16 +731,15 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}
 		return res;
 	}
-	
-	public void setSetting(String key, String value){
+
+	public void setSetting(String key, String value) {
 		ContentValues newCon = new ContentValues();
 		newCon.put("key", key);
 		newCon.put("value", value);
-		if (getSetting(key).size()!=0){
-			database.update("settings",newCon,"key = ?",new String[]{key});
-		}
-		else{
-			database.insert("settings",null,newCon);
+		if (getSetting(key).size() != 0) {
+			database.update("settings", newCon, "key = ?", new String[]{key});
+		} else {
+			database.insert("settings", null, newCon);
 		}
 	}
 

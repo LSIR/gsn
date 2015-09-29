@@ -49,11 +49,11 @@ public class VSensorConfig implements Parcelable  {
 	private DataField[] outputStructure;
 	private String processingClassName;
 	private boolean running;
-	
+
 	private String notify_field, notify_condition, notify_action, notify_contact;
 	private Double notify_value;
 	private boolean save_to_db;
-	
+
 	
 	private ArrayList<StreamSource> streamSources = new ArrayList<StreamSource>();
 
@@ -116,21 +116,12 @@ public class VSensorConfig implements Parcelable  {
 	}
 
 	public VSensorConfig(int id, String processingClass, String vsName,
-			ArrayList<StreamSource> ss, boolean running, String notify_field,
-			String notify_condition, Double notify_value, String notify_action,
-			String notify_contact, boolean save_to_db) {
+			ArrayList<StreamSource> ss, boolean running) {
 
 		this.id = id;
 		this.name = vsName;
 		this.processingClassName = processingClass;
 		this.running = running;
-
-		this.notify_field = notify_field;
-		this.notify_condition = notify_condition;
-		this.notify_value = notify_value;
-		this.notify_action = notify_action;
-		this.notify_contact = notify_contact;
-		this.save_to_db = save_to_db;
 
 		inputStream = new InputStream();
 		for (StreamSource s:ss){
