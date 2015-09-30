@@ -21,7 +21,7 @@
 	<addressing>
 		<predicate key="geographical">Lausanne, Switzerland</predicate>
 	</addressing>
-	<storage history-size="-1" />
+	 <storage history-size="-1" user="gsn" password="opensense" driver="org.postgresql.Driver" url="jdbc:postgresql://127.0.0.1:5433/opensense" />
 	<streams>
 		
 		<stream name="B">
