@@ -40,12 +40,13 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
+import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.storage.db.SqliteStorageManager;
 
 public abstract class AbstractVirtualSensor implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -94046553047097162L;
 	public static final String[] VIRTUAL_SENSOR_LIST = { "bridge", "notification", "activity","MET compute", "O3 calibrate","Exposure" };
@@ -56,9 +57,9 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	private transient SqliteStorageManager storage = new SqliteStorageManager();
 	private VSensorConfig config;
 	public InputStream is;
-	
-	
-	
+
+
+
 	public boolean initialize_wrapper(){
 		HashMap<String,String> param = storage.getSetting("vsensor:"+config.getName()+":");
 		for(Entry<String,String> e : param.entrySet()){
@@ -66,13 +67,14 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		}
 		return initialize();
 	}
-	
-	
-	public String[] getParameters(){return new String[]{};}
+
+
+	public VSParameter[] getParameters(){return new VSParameter[]{};}
+	//TODO: TO REMOVE
 	public void getRowParameters(TableLayout layout, Context context){}
 
 	public abstract boolean initialize();
-	
+
 	protected void initParameter(String key, String value){}
 
 	// synchronized
@@ -89,7 +91,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 
 	/**
 	 * Calls the dataProduced with adjust = false.
-	 * 
+	 *
 	 * @param streamElement
 	 */
 	protected synchronized void dataProduced(StreamElement streamElement) {
@@ -105,7 +107,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 * stream element and returns true if and only if the number of data items is
 	 * equal to the number of output data structure defined for this virtual
 	 * sensor. If the adjust=true, then this test is not performed.
-	 * 
+	 *
 	 * @param se
 	 * @param outputStructure
 	 * @param adjust
@@ -147,7 +149,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		// }
 		return true;
 	}*/
-	
+
 	public DataField[] getOutputStructure(DataField[] in){
 		return in;
 	}
@@ -163,7 +165,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 */
 	public abstract void dispose();
 
-	
+
 	/**
 	 * @return the virtualSensorConfiguration
 	 */
@@ -192,7 +194,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 * by simply adding itself to the list of the virtual sensors which have
 	 * produced data. (calling <code>container.publishData(this)</code>. For more
 	 * information please check the <code>AbstractVirtalSensor</code>
-	 * 
+	 *
 	 * @param inputStreamName
 	 *          is the name of the input stream as specified in the configuration
 	 *          file of the virtual sensor.
@@ -203,12 +205,12 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 */
 	public abstract void dataAvailable(String inputStreamName,
 			StreamElement streamElement);
-	
+
 	public void dataAvailable(String inputStreamName,
 			ArrayList<StreamElement> data){
 		if (!data.isEmpty()) dataAvailable(inputStreamName,data.get(data.size()-1));
 	}
-	
+
 	synchronized public void start() {
 		config = StaticData.findConfig(config.getId());
 		if (!config.getRunning()){
@@ -221,13 +223,13 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		if (config.getRunning()){
 			config.setRunning(false);
 		}
-		
+
 	}
 
 	public VSensorConfig getConfig() {
 		return config;
 	}
-	
+
 	public void delete(){
 		stop();
 		for (StreamSource streamSource : config.getInputStream().getSources()) {

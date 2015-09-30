@@ -33,6 +33,8 @@ import android.os.Environment;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamElement;
+import tinygsn.model.vsensor.utils.ParameterType;
+import tinygsn.model.vsensor.utils.VSParameter;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -42,7 +44,7 @@ import weka.core.SerializationHelper;
 
 
 /*
- 
+
 y_max- <= -2.444118: 5 (31.0/1.0)
 y_max- > -2.444118
 |   z_moment-moment-6 <= 1571.756023
@@ -64,8 +66,8 @@ y_max- > -2.444118
 |   |   |   |   y_mean- <= -2.287655: 0 (17.0)
 |   |   |   |   y_mean- > -2.287655: 4 (4.0)
 |   |   |   z_min- > -6.830595: 4 (12.0/1.0)
-|   z_moment-moment-6 > 1571.756023: 2 (26.0) 
-  
+|   z_moment-moment-6 > 1571.756023: 2 (26.0)
+
  */
 
 
@@ -88,12 +90,12 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		}
 		return true;
 	}
-	
+
 	@Override
-	public String[] getParameters(){
-		return new String[]{"model_file"};
+	public VSParameter[] getParameters(){
+		return new VSParameter[]{new VSParameter("model_file", ParameterType.STRING)};
 		}
-	
+
 	@Override
 	protected void initParameter(String key, String value){
 		if (key.endsWith("model_file")){
@@ -108,17 +110,17 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {}
-	
+
 	@Override
 	public void dataAvailable(String inputStreamName, ArrayList<StreamElement> streamElements) {
-		
+
 		if (streamElements.size() < 3) return; //too small to compute
-		
+
 		double[] x = new double[streamElements.size()];
 		double[] y = new double[x.length];
 		double[] z = new double[x.length];
 		double[] norm = new double[x.length];
-		
+
 		double mean_x = 0;
 		double mean_y = 0;
 		double mean_z = 0;
@@ -135,7 +137,7 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		double max_y = Double.MIN_VALUE;
 		double max_z = Double.MIN_VALUE;
 		double max_norm = Double.MIN_VALUE;
-		
+
 		for (int i=0;i<x.length;i++){
 			Serializable[] d = streamElements.get(i).getData();
 			x[i] = (Double)d[0];
@@ -163,12 +165,12 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		mean_y /= y.length;
 		mean_z /= z.length;
 		mean_norm /= norm.length;
-		
+
 		std_x = Math.sqrt(std_x / x.length - mean_x * mean_x);
 		std_y = Math.sqrt(std_y / y.length - mean_y * mean_y);
 		std_z = Math.sqrt(std_z / z.length - mean_z * mean_z);
 		std_norm = Math.sqrt(std_norm / norm.length - mean_norm * mean_norm);
-		
+
 		double range_x = max_x - min_x;
 		double range_y = max_y - min_y;
 		double range_z = max_z - min_z;
@@ -178,50 +180,50 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		double cv_y = std_y / mean_y;
 		double cv_z = std_z / mean_z;
 		double cv_norm = std_norm / mean_norm;
-		
+
 		double kurt_x = 0;
 		double kurt_y = 0;
 		double kurt_z = 0;
 		double kurt_norm = 0;
-		
+
         for (int i=0;i<x.length;i++){
         	kurt_x += Math.pow(x[i]-mean_x, 4);
         	kurt_y += Math.pow(y[i]-mean_y, 4);
         	kurt_z += Math.pow(z[i]-mean_z, 4);
         	kurt_norm += Math.pow(norm[i]-mean_norm, 4);
         }
-        
+
         kurt_x = (kurt_x / x.length) / Math.pow(std_x, 4);
         kurt_y = (kurt_y / y.length) / Math.pow(std_y, 4);
         kurt_z = (kurt_z / z.length) / Math.pow(std_z, 4);
         kurt_norm = (kurt_norm / norm.length) / Math.pow(std_norm, 4);
-        
+
         Arrays.sort(x);
         Arrays.sort(y);
         Arrays.sort(z);
         Arrays.sort(norm);
-        
+
      /*   double median_x = x.length % 2 == 1 ? x[(x.length - 1)/2] : x[(x.length)/2] + x[(x.length)/2 - 1] / 2.0;
         double median_y = y.length % 2 == 1 ? y[(y.length - 1)/2] : y[(y.length)/2] + y[(y.length)/2 - 1] / 2.0;
         double median_z = z.length % 2 == 1 ? z[(z.length - 1)/2] : z[(z.length)/2] + z[(z.length)/2 - 1] / 2.0;
-       */ 
+       */
         double percent25_x = x[(int)Math.round(x.length/4.0)];
         double percent25_y = y[(int)Math.round(y.length/4.0)];
         double percent25_z = z[(int)Math.round(z.length/4.0)];
         double percent25_norm = norm[(int)Math.round(norm.length/4.0)];
-        
+
         double percent75_x = x[(int)Math.round(3.0*x.length/4)];
         double percent75_y = y[(int)Math.round(3.0*y.length/4)];
         double percent75_z = z[(int)Math.round(3.0*z.length/4)];
         double percent75_norm = norm[(int)Math.round(3.0*norm.length/4)];
-        
+
         /*double[] vector = new double[]{mean_x,std_x,min_x,max_x,range_x,cv_x,kurt_x,percent25_x,percent75_x,
         		                       mean_y,std_y,min_y,max_y,range_y,cv_y,kurt_y,percent25_y,percent75_y,
         		                       mean_z,std_z,min_z,max_z,range_z,cv_z,kurt_z,percent25_z,percent75_z};
 		*/
-        
-        
-        
+
+
+
         FastVector v = new FastVector();
         FastVector classVal = new FastVector();
 		classVal.addElement("0");
@@ -250,7 +252,7 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		v.addElement(p25);
         Attribute p75 = new Attribute("julien-norm-percentile-percentile-75");
 		v.addElement(p75);
-		
+
 		Instances dataset = new Instances("Test",v,0);
 		Instance i = new Instance(dataset.numAttributes());
 		i.setValue(mean, mean_norm);
@@ -272,13 +274,13 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		}
 		dataProduced(new StreamElement(outputStructure, new Serializable[]{classe}, streamElements.get(streamElements.size()-1).getTimeStamp()));
 	}
-	
+
 	@Override
 	public DataField[] getOutputStructure(DataField[] in){
 		return outputStructure;
 	}
 
-	
-	
+
+
 
 }

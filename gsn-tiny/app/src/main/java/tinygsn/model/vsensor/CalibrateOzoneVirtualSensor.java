@@ -14,22 +14,24 @@ import org.json.JSONObject;
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamElement;
+import tinygsn.model.vsensor.utils.ParameterType;
+import tinygsn.model.vsensor.utils.VSParameter;
 
 public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -6312509806997497585L;
 	private String modelUrl;
 	private String modelName;
 	//source: 0=local sensor, 1=remote model, 2=local calibrated
-	private DataField[] outputStructure = new DataField[]{new DataField("o3",DataTypes.DOUBLE),new DataField("source",DataTypes.INTEGER)};
+	private DataField[] outputStructure = new DataField[]{new DataField("o3", DataTypes.DOUBLE), new DataField("source", DataTypes.INTEGER)};
 	private double lastLatitude;
 	private double lastLongitude;
 	private long lastLocationTime = 0;
 	private SimpleRegression sr = new SimpleRegression();
-		
+
 
 	@Override
 	public boolean initialize() {
@@ -37,94 +39,95 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public void dispose() {	}
+	public void dispose() {
+	}
 
 	@Override
 	public void dataAvailable(String inputStreamName,
-			StreamElement streamElement) {
+	                          StreamElement streamElement) {
 		double ozone = 0;
 		double model = 0;
 		int source = 0;
-		if(inputStreamName.endsWith("gps")){
-			lastLatitude = (Double)streamElement.getData("latitude");
-			lastLongitude = (Double)streamElement.getData("longitude");
-			lastLocationTime = streamElement.getTimeStamp();		
-		}else{
-			double measure = (Double)streamElement.getData("ozoneCalibrated");
-			if (System.currentTimeMillis() - lastLocationTime < 60000){
+		if (inputStreamName.endsWith("gps")) {
+			lastLatitude = (Double) streamElement.getData("latitude");
+			lastLongitude = (Double) streamElement.getData("longitude");
+			lastLocationTime = streamElement.getTimeStamp();
+		} else {
+			double measure = (Double) streamElement.getData("ozoneCalibrated");
+			if (System.currentTimeMillis() - lastLocationTime < 60000) {
 				model = getModelValue();
-				if (model > -1){
-				    sr.addData(measure, model);
+				if (model > -1) {
+					sr.addData(measure, model);
 				}
 			}
-			if (System.currentTimeMillis() - lastLocationTime < 15000){
+			if (System.currentTimeMillis() - lastLocationTime < 15000) {
 				ozone = model;
 				source = 1;
-			}else{
+			} else {
 				double ozone_p = sr.predict(measure);
-				if (!Double.isNaN(ozone_p)){
+				if (!Double.isNaN(ozone_p)) {
 					ozone = ozone_p;
 					source = 2;
-				}else{
+				} else {
 					ozone = measure;
 				}
 			}
-			dataProduced(new StreamElement(outputStructure, new Serializable[]{ozone,source}, streamElement.getTimeStamp()));
-		}	
+			dataProduced(new StreamElement(outputStructure, new Serializable[]{ozone, source}, streamElement.getTimeStamp()));
+		}
 	}
-	
+
 	private double getModelValue() {
-		try{
+		try {
 			double ozone = -1;
 			HttpGet httpGet;
 			DefaultHttpClient httpclient = new DefaultHttpClient();
-			httpGet = new HttpGet("http://"+modelUrl+"/modeldata?vs="+modelName+"&models=0&format=json&latitude="+lastLatitude+"&longitude="+lastLongitude);
+			httpGet = new HttpGet("http://" + modelUrl + "/modeldata?vs=" + modelName + "&models=0&format=json&latitude=" + lastLatitude + "&longitude=" + lastLongitude);
 			HttpResponse response = httpclient.execute(httpGet);
 			int statusCode = response.getStatusLine().getStatusCode();
-			InputStreamReader is = new InputStreamReader(response.getEntity().getContent(),"UTF-8");																				
+			InputStreamReader is = new InputStreamReader(response.getEntity().getContent(), "UTF-8");
 			if (statusCode == 200) {
 				BufferedReader bufferedReader = new BufferedReader(is);
-		        String line = bufferedReader.readLine();
-		        if(line != null){
-		        	JSONArray obj = new JSONArray(line);
-		        	JSONArray f = obj.getJSONObject(0).getJSONArray("fields");
-		        	for (int i = 1;i<f.length();i++){
-		        		JSONObject v = f.getJSONObject(i);
-		        		if (v.getString("name").equalsIgnoreCase("O3_RES")){
-		        			ozone = v.getDouble("value");
-		        			break;
-		        		}
-		        	}
-		        }
+				String line = bufferedReader.readLine();
+				if (line != null) {
+					JSONArray obj = new JSONArray(line);
+					JSONArray f = obj.getJSONObject(0).getJSONArray("fields");
+					for (int i = 1; i < f.length(); i++) {
+						JSONObject v = f.getJSONObject(i);
+						if (v.getString("name").equalsIgnoreCase("O3_RES")) {
+							ozone = v.getDouble("value");
+							break;
+						}
+					}
+				}
 			}
 			is.close();
 			return ozone;
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
 		}
 	}
 
 	@Override
-	public String[] getParameters(){
-		return new String[]{"server_url","model_name"};
-		}
-	
+	public VSParameter[] getParameters() {
+		return new VSParameter[]{
+				                        new VSParameter("server_url", ParameterType.STRING),
+				                        new VSParameter("model_name", ParameterType.STRING)};
+	}
+
 	@Override
-	protected void initParameter(String key, String value){
-		if (key.endsWith("server_url")){
+	protected void initParameter(String key, String value) {
+		if (key.endsWith("server_url")) {
 			modelUrl = value;
-		}else if(key.endsWith("model_name")){
+		} else if (key.endsWith("model_name")) {
 			modelName = value;
 		}
 	}
-	
+
 	@Override
-	public DataField[] getOutputStructure(DataField[] in){
+	public DataField[] getOutputStructure(DataField[] in) {
 		return outputStructure;
 	}
-	
 
 
 }

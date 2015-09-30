@@ -52,6 +52,8 @@ import java.util.Properties;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.gui.android.ActivityViewData;
+import tinygsn.model.vsensor.utils.ParameterType;
+import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.model.wrappers.AbstractWrapper;
 
 public class NotificationVirtualSensor extends AbstractVirtualSensor {
@@ -151,6 +153,35 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		notification.flags = Notification.FLAG_AUTO_CANCEL;
 
 		nm.notify(notify_id++, notification);
+	}
+
+	@Override
+	public VSParameter[] getParameters() {
+		ArrayList<String> condition = new ArrayList<>();
+		String[] conditions = new String[]{"==", "is >=", "is <=", "is <", "is >", "changes", "frozen", "back after frozen"};
+		for (int i = 0; i < conditions.length; i++) {
+			condition.add(conditions[i]);
+		}
+
+		ArrayList<String> action = new ArrayList<>();
+		String[] actions = new String[]{"Notification", "SMS", "Email"};
+		for (int i = 0; i < actions.length; i++) {
+			action.add(actions[i]);
+		}
+
+		return new VSParameter[]{
+				                        //TODO : find a way to have right fields.
+				                        new VSParameter("field", ParameterType.SPINNER),
+				                        new VSParameter("condition",
+						                                       condition,
+						                                       ParameterType.SPINNER),
+										new VSParameter("value", "10", ParameterType.STRING),
+										new VSParameter("action",
+												               action,
+												               ParameterType.SPINNER),
+										new VSParameter("Contact", "+41798765432", ParameterType.STRING),
+										new VSParameter("Save to Database", ParameterType.CHECKBOX)
+		};
 	}
 
 	@Override
