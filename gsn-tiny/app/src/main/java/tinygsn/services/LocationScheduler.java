@@ -2,6 +2,11 @@ package tinygsn.services;
 
 import android.content.Context;
 import android.util.Log;
+
+import android.view.View;
+import android.widget.ListView;
+import android.widget.Switch;
+
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -10,6 +15,11 @@ import java.util.Map;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
+
+import tinygsn.gui.android.R;
+import tinygsn.gui.android.TinyGSN;
+import tinygsn.gui.android.utils.SensorRow;
+
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 import tinygsn.utils.ToastUtils;
@@ -99,7 +109,31 @@ public class LocationScheduler extends AbstractScheduler {
 			wifiVsName = storage.getVSfromSource(wifiType).get(0);
 			gpsVsName = storage.getVSfromSource(gpsType).get(0);
 		} catch (Exception e) {
+			// Get Switch to click on it to deactivate the LocationScheduler
+			ListView listViewScheduler = (ListView) TinyGSN.getCurrentActivity().findViewById(R.id.scheduler_list);
+			int count = listViewScheduler.getChildCount();
+			for (int i = 0; i < count; i++) {
+				View view = listViewScheduler.getChildAt(i);
+				ArrayList<View> views = view.getTouchables();
+				for (int j = 0; j < views.size(); j++) {
+					SensorRow sensorRow = (SensorRow) listViewScheduler.getAdapter().getItem(j);
+					if (sensorRow.getName().equals("tinygsn.services.LocationScheduler")) {
+						final Switch sw = (Switch) views.get(j);
+						sw.post(new Runnable() {
+							@Override
+							public void run() {
+								sw.performClick();
+							}
+						});
+						j = views.size();
+						i = count;
+					}
+				}
+			}
+
+			// Warn the user with a Toast
 			warnUserOfError();
+
 			return;
 		}
 
@@ -119,7 +153,7 @@ public class LocationScheduler extends AbstractScheduler {
 		if (wifiVsName != null) {
 			wifiResult = storage.executeQueryGetLatestValues("vs_" + wifiVsName, wifiWrapper.getFieldList(), wifiWrapper.getFieldType(), numLatest, curTime - 120000);
 			isInKnownWifiAccess = ContainsFamiliarWifis(wifiResult, wifiCountThreshold);
-			Log.d("tinygsn-scheduler", "is in knownwifi accesspoint: " + isInKnownWifiAccess);
+			Log.d("tinygsn-scheduler", "is in known wifi access point: " + isInKnownWifiAccess);
 		}
 		if (gpsVsName != null) {
 			gpsResult = storage.executeQueryGetLatestValues("vs_" + gpsVsName, gpsWrapper.getFieldList(), gpsWrapper.getFieldType(), 180, curTime - 180000);
@@ -144,17 +178,17 @@ public class LocationScheduler extends AbstractScheduler {
 			accelerometerResult = storage.executeQueryGetLatestValues("vs_" + accelerometerVsName, accelerometerWrapper.getFieldList(), accelerometerWrapper.getFieldType(), 32, curTime - 30000);
 			if (accelerometerResult.size() > 1) {
 				for (int i = 1; i < accelerometerResult.size(); i++) {
-					double changedAccelometer = Math.pow((Double) (accelerometerResult.get(i).getData("x")) - (Double) (accelerometerResult.get(i - 1).getData("x")), 2);
-					changedAccelometer += Math.pow((Double) (accelerometerResult.get(i).getData("y")) - (Double) (accelerometerResult.get(i - 1).getData("y")), 2);
-					changedAccelometer += Math.pow((Double) (accelerometerResult.get(i).getData("z")) - (Double) (accelerometerResult.get(i - 1).getData("z")), 2);
-					avgChangedAccelometer += Math.sqrt(changedAccelometer);
+					double changedAccelerometer = Math.pow((Double) (accelerometerResult.get(i).getData("x")) - (Double) (accelerometerResult.get(i - 1).getData("x")), 2);
+					changedAccelerometer += Math.pow((Double) (accelerometerResult.get(i).getData("y")) - (Double) (accelerometerResult.get(i - 1).getData("y")), 2);
+					changedAccelerometer += Math.pow((Double) (accelerometerResult.get(i).getData("z")) - (Double) (accelerometerResult.get(i - 1).getData("z")), 2);
+					avgChangedAccelometer += Math.sqrt(changedAccelerometer);
 				}
 				avgChangedAccelometer = avgChangedAccelometer / accelerometerResult.size();
 			}
 			Log.d("tinygsn-scheduler", "average Acc change: " + avgChangedAccelometer);
 		}
 
-		//end of parameter calculation 
+		//end of parameter calculation
 		//checking for next state
 
 		if (gpsResult != null && gpsResult.size() != 0) {

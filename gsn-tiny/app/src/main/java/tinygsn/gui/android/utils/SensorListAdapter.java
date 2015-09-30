@@ -25,16 +25,6 @@
 
 package tinygsn.gui.android.utils;
 
-import java.util.List;
-
-import tinygsn.beans.StaticData;
-import tinygsn.controller.AndroidControllerWrapper;
-import tinygsn.gui.android.ActivityListSensor;
-import tinygsn.gui.android.ActivityWrapperEdit;
-import tinygsn.gui.android.R;
-import tinygsn.model.wrappers.AbstractWrapper;
-import tinygsn.storage.db.SqliteStorageManager;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -42,7 +32,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -51,9 +40,17 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import java.util.List;
+
+import tinygsn.beans.StaticData;
+import tinygsn.controller.AndroidControllerWrapper;
+import tinygsn.gui.android.ActivityListSensor;
+import tinygsn.gui.android.ActivityWrapperEdit;
+import tinygsn.gui.android.R;
+import tinygsn.storage.db.SqliteStorageManager;
 
 
 public class SensorListAdapter extends ArrayAdapter<SensorRow> {
@@ -80,7 +77,6 @@ public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 		TextView sensorTxt = (TextView) convertView.findViewById(R.id.sensor_name);
 		String[] name = vs.getName().split("\\.");
 		sensorTxt.setText(name[name.length - 1]);
-
 		final Switch activeStch = (Switch) convertView.findViewById(R.id.enableWSwitch);
 		activeStch.setChecked(vs.isActive());
 		activeStch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
