@@ -1,5 +1,5 @@
 /**
-* Global Sensor Networks (GSN) Source Code 
+* Global Sensor Networks (GSN) Source Code
 * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
 *
 * This file is part of GSN.
@@ -38,7 +38,7 @@ import android.os.Environment;
 public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4345330326921532L;
 
@@ -50,33 +50,33 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		
+
 		String createQuery = "CREATE TABLE vsList (_id integer primary key autoincrement,"
-				+ "running, vsname, vstype, "
+				+ "running, vsname, vstype "
 				+ ");";
 		db.execSQL(createQuery);
-		
+
 		createQuery = "CREATE TABLE sourcesList (_id integer primary key autoincrement,"
 				+ "vsname, sswindowsize, ssstep, sstimebased, ssaggregator, wrappername "
 				+ ");";
 		db.execSQL(createQuery);
 
-		
+
 		createQuery = "CREATE TABLE publishDestination (_id integer primary key autoincrement,"
 				+ "url text, vsname text, key text, mode integer, lastTime bigint, active int"
 				+ ");";
 		db.execSQL(createQuery);
-		
+
 		createQuery = "CREATE TABLE subscribeSource (_id integer primary key autoincrement,"
 				+ "url text, vsname text, mode integer, lastTime bigint, active int"
 				+ ");";
 		db.execSQL(createQuery);
-		
+
 		createQuery = "CREATE TABLE wrapperList (_id integer primary key, wrappername text,"
 				+ "dcinterval integer, dcduration integer"
 				+ ");";
 		db.execSQL(createQuery);
-		
+
 		createQuery = "CREATE TABLE WifiFrequency (_id integer primary key,"
 				+ "frequency integer, mac text"
 				+ ");";
@@ -88,20 +88,20 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		db.execSQL(createQuery);
 		createQuery = "CREATE TABLE settings (key text primary key, value text);";
 		db.execSQL(createQuery);
-		
-	
+
+
 	}
-	
+
 	@Override
 	public void onOpen(SQLiteDatabase db) {
-		
+
 		//clean the database if any virtual sensor is not completely defined
 		String query = "Select * from vsList;";
 		Cursor cursor = db.rawQuery(query, new String[] {});
 		ArrayList<String> toRemove = new ArrayList<String>();
 		while (cursor.moveToNext()){
 			String name = cursor.getString(cursor.getColumnIndex("vsname"));
-			
+
 			//check if it has a data table
 			query = "SELECT * FROM sqlite_master WHERE type = 'table' AND name = ?;";
 			Cursor cursor0 = db.rawQuery(query, new String[] {"vs_"+name});
@@ -109,7 +109,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 				toRemove.add(name);
 			}
 			cursor0.close();
-			
+
 			//check if it has at least one stream source
 			query = "Select * from sourcesList where vsname = ?;";
 			cursor0 = db.rawQuery(query, new String[] {name});
