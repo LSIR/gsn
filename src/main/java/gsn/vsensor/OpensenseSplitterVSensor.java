@@ -155,7 +155,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 				 if(s_type == 13){ //LCSs
 					 temp.setData(1,(float)(p.readNextLong(false) / 100.0));
 					 temp.setData(2,(float)(p.readNextChar(false) / 10.0));
-					 temp.setData(3,p.readNextShort(true));
+					 temp.setData(3,p.readNextShort(false));
 					 temp.setData(4,(float)(p.readNextShort(true) / 100.0));
 					 dataProduced(new StreamElement(temp));
 				 }
