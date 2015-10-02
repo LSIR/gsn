@@ -24,5 +24,5 @@
 package tinygsn.model.vsensor.utils;
 
 public enum ParameterType {
-	SPINNER, CHECKBOX, STRING
+	SPINNER, CHECKBOX, EDITBOX
 }

@@ -70,8 +70,6 @@ public abstract class AbstractVirtualSensor implements Serializable {
 
 
 	public VSParameter[] getParameters(){return new VSParameter[]{};}
-	//TODO: TO REMOVE
-	public void getRowParameters(TableLayout layout, Context context){}
 
 	public abstract boolean initialize();
 

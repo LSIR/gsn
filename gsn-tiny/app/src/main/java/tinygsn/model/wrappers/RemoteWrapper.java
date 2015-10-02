@@ -21,6 +21,8 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
+import tinygsn.model.vsensor.utils.ParameterType;
+import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.services.WrapperService;
 
 
@@ -49,8 +51,10 @@ public class RemoteWrapper extends AbstractWrapper {
 	private String vs_name = "";
 
 	@Override
-	public String[] getParameters() {
-		return new String[]{"url", "vs_name"};
+	public VSParameter[] getParameters() {
+		return new VSParameter[]{
+				                        new VSParameter("url", ParameterType.EDITBOX),
+				                        new VSParameter("vs_name", ParameterType.EDITBOX)};
 	}
 
 	@Override

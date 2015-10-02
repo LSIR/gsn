@@ -106,9 +106,9 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	@Override
 	public VSParameter[] getParameters() {
 		return new VSParameter[]{
-				                        new VSParameter("weight", ParameterType.STRING),
-				                        new VSParameter("age", ParameterType.STRING),
-				                        new VSParameter("gender(m/f)", ParameterType.STRING)};
+				                        new VSParameter("weight", ParameterType.EDITBOX),
+				                        new VSParameter("age", ParameterType.EDITBOX),
+				                        new VSParameter("gender(m/f)", ParameterType.EDITBOX)};
 	}
 
 	@Override

@@ -30,6 +30,7 @@ public class VSParameter {
 	private String mName;
 	private ArrayList<String> mParameters;
 	private String mDefaultParameter = "";
+
 	private ParameterType mType;
 
 	public VSParameter(String mName, ParameterType mType) {
@@ -63,7 +64,7 @@ public class VSParameter {
 	}
 
 	public ArrayList<String> getmParameters() {
-		return mParameters;
+		return (ArrayList<String>) mParameters.clone();
 	}
 
 	public void setmParameters(ArrayList<String> mParameters) {
@@ -80,5 +81,13 @@ public class VSParameter {
 
 	public void setmDefaultParameter(String mDefaultParameter) {
 		this.mDefaultParameter = mDefaultParameter;
+	}
+
+	public ParameterType getmType() {
+		return mType;
+	}
+
+	public void setmType(ParameterType mType) {
+		this.mType = mType;
 	}
 }

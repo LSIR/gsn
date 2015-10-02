@@ -26,11 +26,14 @@
 package tinygsn.gui.android;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,6 +62,8 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
 import tinygsn.controller.AndroidControllerVS;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
+import tinygsn.model.vsensor.utils.ParameterType;
+import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
@@ -93,7 +98,6 @@ public class ActivityVSConfig extends AbstractActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		editText_vsName = (EditText) findViewById(R.id.editText_vsName);
-		table_notify_config = (TableLayout) findViewById(R.id.table_notify_config);
 		table_vsensor_config = (TableRow) findViewById(R.id.table_vsensor_config);
 		table_layout = (TableLayout) findViewById(R.id.tableLayout_vs);
 		Button button_add = (Button) findViewById(R.id.button_add);
@@ -144,20 +148,13 @@ public class ActivityVSConfig extends AbstractActivity {
 			public void onItemSelected(AdapterView<?> parent, View view, final int pos, long id) {
 				table_vsensor_config.removeAllViews();
 
-				try {
-					table_notify_config.removeAllViews();
-					((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getRowParameters(table_notify_config, context);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
 				new AsyncTask<Activity, Void, SettingPanel>() {
 					@Override
 					protected SettingPanel doInBackground(Activity... params) {
 
 						vssetting = null;
 						try {
-							String[] param = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters();
+							VSParameter[] param = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters();
 							vssetting = new SettingPanel("vsensor", param);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -314,7 +311,7 @@ public class ActivityVSConfig extends AbstractActivity {
 							} else {
 								wrapperName = wrapperList.getProperty(wrapperName);
 							}
-							String[] param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
+							VSParameter[] param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
 							panel.settings = new SettingPanel("wrapper", param);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -353,7 +350,7 @@ public class ActivityVSConfig extends AbstractActivity {
 		super.onPause();
 	}
 
-	//FIXME : think about how to create the row for db
+	// FIXME : Is it ok like that ?
 	public void saveVS() {
 		String vsName = editText_vsName.getText().toString();
 
@@ -489,18 +486,43 @@ public class ActivityVSConfig extends AbstractActivity {
 		}
 	}
 
+	//TODO : To adapt with VSParameter
 	private class SettingPanel { //key-value parameters (for VS and wrappers)
 
 		private String prefix;
-		private String[] params;
-		private EditText[] values;
+		private VSParameter[] params;
+		private TextView[] values;
+		private Spinner[] spinners;
 
-		SettingPanel(String prefix, String[] params) {
+		SettingPanel(String prefix, VSParameter[] params) {
 			this.prefix = prefix;
 			this.params = params;
 		}
 
 		public TableLayout getPanel() {
+
+			TextWatcher textWatcher = new TextWatcher() {
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+				}
+
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count,
+				                              int after) {
+				}
+
+				@Override
+				public void afterTextChanged(Editable s) {
+					try {
+						// numLatest =
+						// Integer.parseInt(editText_numLatest.getText().toString());
+						// loadLatestData();
+					} catch (NumberFormatException e) {
+						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivityVSConfig.this);
+						alertDialogBuilder.setTitle("Please Fill in all fields!");
+					}
+				}
+			};
 
 			TableLayout layout = new TableLayout(ActivityVSConfig.this);
 			layout.setColumnStretchable(1, true);
@@ -509,33 +531,60 @@ public class ActivityVSConfig extends AbstractActivity {
 			p.width = TableRow.LayoutParams.MATCH_PARENT;
 			layout.setLayoutParams(p);
 
-			values = new EditText[params.length];
+			values = new TextView[params.length];
+			spinners = new Spinner[params.length];
 
+			int indexSpinner = 0;
+			int indexTextView = 0;
 			for (int i = 0; i < params.length; i++) {
 				TableRow inrow = new TableRow(ActivityVSConfig.this);
 				TextView label = new TextView(ActivityVSConfig.this);
-				label.setText(params[i] + ": ");
+				label.setText(params[i].getmName() + ": ");
 				label.setTextColor(Color.rgb(0, 0, 0));
 				inrow.addView(label);
 
-				values[i] = new EditText(ActivityVSConfig.this);
-				values[i].setTextSize(TEXT_SIZE + 5);
-				values[i].setTextColor(Color.rgb(0, 0, 0));
-				inrow.addView(values[i]);
-				layout.addView(inrow);
+				switch (params[i].getmType()) {
+					case EDITBOX:
+						values[indexTextView] = new EditText(ActivityVSConfig.this);
+						break;
+					case CHECKBOX:
+						values[indexTextView] = new CheckBox(ActivityVSConfig.this);
+						break;
+					case SPINNER:
+						spinners[indexSpinner] = new Spinner(ActivityVSConfig.this);
+						List<String> list = params[i].getmParameters();
+						ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context,
+								                                                           tinygsn.gui.android.R.layout.spinner_item, list);
+						dataAdapter
+								.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+						spinners[indexSpinner].setAdapter(dataAdapter);
+						inrow.addView(spinners[indexSpinner]);
+						layout.addView(inrow);
+						indexSpinner++;
+						break;
+					default:
+						values[indexTextView] = new EditText(ActivityVSConfig.this);
+						break;
+				}
+
+				if (params[i].getmType() != ParameterType.SPINNER) {
+					values[indexTextView].setTextSize(TEXT_SIZE + 5);
+					values[indexTextView].setText(params[i].getmDefaultParameter());
+					values[indexTextView].setTextColor(Color.rgb(0, 0, 0));
+					inrow.addView(values[indexTextView]);
+					values[indexTextView].addTextChangedListener(textWatcher);
+					indexTextView++;
+					layout.addView(inrow);
+				}
 			}
 			return layout;
 		}
 
+		//FIXME : how to save parameters ?
 		public void saveTo(String module, SqliteStorageManager storage) {
 			for (int i = 0; i < params.length; i++) {
 				storage.setSetting(prefix + ":" + module + ":" + params[i], values[i].getText().toString());
 			}
-
 		}
-
-
 	}
-
-
 }

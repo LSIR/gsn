@@ -111,8 +111,8 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 	@Override
 	public VSParameter[] getParameters() {
 		return new VSParameter[]{
-				                        new VSParameter("server_url", ParameterType.STRING),
-				                        new VSParameter("model_name", ParameterType.STRING)};
+				                        new VSParameter("server_url", ParameterType.EDITBOX),
+				                        new VSParameter("model_name", ParameterType.EDITBOX)};
 	}
 
 	@Override

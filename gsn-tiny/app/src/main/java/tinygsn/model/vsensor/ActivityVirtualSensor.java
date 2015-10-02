@@ -93,7 +93,7 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public VSParameter[] getParameters(){
-		return new VSParameter[]{new VSParameter("model_file", ParameterType.STRING)};
+		return new VSParameter[]{new VSParameter("model_file", ParameterType.EDITBOX)};
 		}
 
 	@Override

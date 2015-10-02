@@ -157,6 +157,11 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public VSParameter[] getParameters() {
+		ArrayList<String> field = new ArrayList();
+		String[] fields = new String[]{"temp", "value"};
+		for (int i = 0; i < fields.length; i++) {
+			field.add(fields[i]);
+		}
 		ArrayList<String> condition = new ArrayList<>();
 		String[] conditions = new String[]{"==", "is >=", "is <=", "is <", "is >", "changes", "frozen", "back after frozen"};
 		for (int i = 0; i < conditions.length; i++) {
@@ -171,20 +176,21 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 		return new VSParameter[]{
 				                        //TODO : find a way to have right fields.
-				                        new VSParameter("field", ParameterType.SPINNER),
+				                        new VSParameter("field", field, ParameterType.SPINNER),
 				                        new VSParameter("condition",
 						                                       condition,
 						                                       ParameterType.SPINNER),
-										new VSParameter("value", "10", ParameterType.STRING),
-										new VSParameter("action",
-												               action,
-												               ParameterType.SPINNER),
-										new VSParameter("Contact", "+41798765432", ParameterType.STRING),
-										new VSParameter("Save to Database", ParameterType.CHECKBOX)
+				                        new VSParameter("value", "10", ParameterType.EDITBOX),
+				                        new VSParameter("action",
+						                                       action,
+						                                       ParameterType.SPINNER),
+				                        new VSParameter("Contact", "+41798765432", ParameterType.EDITBOX),
+				                        new VSParameter("Save to Database", ParameterType.CHECKBOX)
 		};
 	}
 
-	@Override
+	/***********************************************************************************************
+	//FIXME : KEPT only for the moment, but will be removed
 	public void getRowParameters(TableLayout table_notify_config, Context context) {
 		int TEXT_SIZE = 10;
 		Spinner condition, field, action;
@@ -375,4 +381,5 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		// TableRow.LayoutParams params = new TableRow.LayoutParams();
 		// params.span = 2;
 	}
+	 **********************************************************************************************/
 }
