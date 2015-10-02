@@ -580,10 +580,19 @@ public class ActivityVSConfig extends AbstractActivity {
 			return layout;
 		}
 
-		//FIXME : how to save parameters ?
 		public void saveTo(String module, SqliteStorageManager storage) {
 			for (int i = 0; i < params.length; i++) {
-				storage.setSetting(prefix + ":" + module + ":" + params[i], values[i].getText().toString());
+				String value;
+				int indexSpinner = 0;
+				int indexTextView = 0;
+				if (params[i].getmType() == ParameterType.SPINNER) {
+					value = spinners[indexSpinner].getSelectedItem().toString();
+					indexSpinner++;
+				} else {
+					value = values[indexTextView].getText().toString();
+					indexTextView++;
+				}
+				storage.setSetting(prefix + ":" + module + ":" + params[i].getmName(), value);
 			}
 		}
 	}
