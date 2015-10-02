@@ -123,7 +123,8 @@ public class VirtualSensorMetadata extends GSNMetadata {
             logger.info("NEW LOCATION for = " + newMetadata.getName());
         }
 
-        if (this.getObservedProperties().size() != newMetadata.getObservedProperties().size()) {
+
+        if (!this.getObservedProperties().equals(newMetadata.getObservedProperties())) {
             this.replaceAllPropertyNames(newMetadata.getPropertyNames());
             this.replaceObservedProperties(newMetadata.getObservedProperties());
             logger.info("NEW properties= " + newMetadata.getName());

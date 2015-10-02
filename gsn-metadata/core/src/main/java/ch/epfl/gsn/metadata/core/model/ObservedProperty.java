@@ -40,6 +40,7 @@ public class ObservedProperty {
         this.name = name;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -47,18 +48,12 @@ public class ObservedProperty {
 
         ObservedProperty that = (ObservedProperty) o;
 
-        if (columnName != null ? !columnName.equals(that.columnName) : that.columnName != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        return columnName.equals(that.columnName);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
-        return result;
+        return columnName.hashCode();
     }
-
-
 }
