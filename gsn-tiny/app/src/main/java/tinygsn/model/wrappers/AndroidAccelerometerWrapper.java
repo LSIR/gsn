@@ -38,6 +38,8 @@ import tinygsn.beans.DataTypes;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
+import tinygsn.model.vsensor.utils.ParameterType;
+import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.services.WrapperService;
 
 public class AndroidAccelerometerWrapper extends AbstractWrapper implements SensorEventListener {

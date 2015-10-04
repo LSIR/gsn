@@ -3,6 +3,7 @@ package tinygsn.model.vsensor;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.http.HttpResponse;
@@ -109,10 +110,11 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public VSParameter[] getParameters() {
-		return new VSParameter[]{
-				                        new VSParameter("server_url", ParameterType.EDITBOX),
-				                        new VSParameter("model_name", ParameterType.EDITBOX)};
+	public ArrayList<VSParameter> getParameters() {
+		ArrayList<VSParameter> list = new ArrayList<>();
+		list.add(new VSParameter("server_url", ParameterType.EDITBOX));
+		list.add(new VSParameter("model_name", ParameterType.EDITBOX));
+		return list;
 	}
 
 	@Override

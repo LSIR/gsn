@@ -1,6 +1,7 @@
 package tinygsn.model.vsensor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
@@ -104,11 +105,12 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public VSParameter[] getParameters() {
-		return new VSParameter[]{
-				                        new VSParameter("weight", ParameterType.EDITBOX),
-				                        new VSParameter("age", ParameterType.EDITBOX),
-				                        new VSParameter("gender(m/f)", ParameterType.EDITBOX)};
+	public ArrayList<VSParameter> getParameters() {
+		ArrayList<VSParameter> list = new ArrayList<>();
+		list.add(new VSParameter("weight", ParameterType.EDITBOX));
+		list.add(new VSParameter("age", ParameterType.EDITBOX));
+		list.add(new VSParameter("gender(m/f)", ParameterType.EDITBOX));
+		return list;
 	}
 
 	@Override

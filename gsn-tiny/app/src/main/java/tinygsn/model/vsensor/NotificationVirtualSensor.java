@@ -46,8 +46,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
@@ -155,13 +157,9 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		nm.notify(notify_id++, notification);
 	}
 
+
 	@Override
-	public VSParameter[] getParameters() {
-		ArrayList<String> field = new ArrayList();
-		String[] fields = new String[]{"temp", "value"};
-		for (int i = 0; i < fields.length; i++) {
-			field.add(fields[i]);
-		}
+	public ArrayList<VSParameter> getParameters() {
 		ArrayList<String> condition = new ArrayList<>();
 		String[] conditions = new String[]{"==", "is >=", "is <=", "is <", "is >", "changes", "frozen", "back after frozen"};
 		for (int i = 0; i < conditions.length; i++) {
@@ -173,213 +171,217 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		for (int i = 0; i < actions.length; i++) {
 			action.add(actions[i]);
 		}
+		ArrayList<VSParameter> list = new ArrayList<>();
+		list.add(new VSParameter("condition", condition, ParameterType.SPINNER));
+		list.add(new VSParameter("value", "10", ParameterType.EDITBOX));
+		list.add(new VSParameter("action", action, ParameterType.SPINNER));
+		list.add(new VSParameter("Contact", "+41798765432", ParameterType.EDITBOX));
+		list.add(new VSParameter("Save to Database", ParameterType.CHECKBOX));
 
-		return new VSParameter[]{
-				                        //TODO : find a way to have right fields.
-				                        new VSParameter("field", field, ParameterType.SPINNER),
-				                        new VSParameter("condition",
-						                                       condition,
-						                                       ParameterType.SPINNER),
-				                        new VSParameter("value", "10", ParameterType.EDITBOX),
-				                        new VSParameter("action",
-						                                       action,
-						                                       ParameterType.SPINNER),
-				                        new VSParameter("Contact", "+41798765432", ParameterType.EDITBOX),
-				                        new VSParameter("Save to Database", ParameterType.CHECKBOX)
-		};
+		return list;
+	}
+
+	@Override
+	public ArrayList<VSParameter> getParameters(ArrayList<String> params) {
+		ArrayList<VSParameter> list = getParameters();
+		Set<String> set = new HashSet();
+		for (String field : params) {
+			set.add(field);
+		}
+		ArrayList<String> paramsWithoutDuplicates = new ArrayList<>();
+		for (String field : set) {
+			paramsWithoutDuplicates.add(field);
+		}
+		list.add(0, new VSParameter("field", paramsWithoutDuplicates, ParameterType.SPINNER));
+
+		return list;
 	}
 
 	/***********************************************************************************************
-	//FIXME : KEPT only for the moment, but will be removed
-	public void getRowParameters(TableLayout table_notify_config, Context context) {
-		int TEXT_SIZE = 10;
-		Spinner condition, field, action;
-		EditText editText_value, editText_contact;
-		CheckBox saveToDB;
-		final Context ctx = context;
+	 //FIXME : KEPT only for the moment, but will be removed
+	 public void getRowParameters(TableLayout table_notify_config, Context context) {
+	 int TEXT_SIZE = 10;
+	 Spinner condition, field, action;
+	 EditText editText_value, editText_contact;
+	 CheckBox saveToDB;
+	 final Context ctx = context;
 
-		initialize();
+	 initialize();
 
-		table_notify_config.removeAllViews();
+	 table_notify_config.removeAllViews();
 
-		// Row Field
-		TableRow row = new TableRow(context);
+	 // Row Field
+	 TableRow row = new TableRow(context);
 
-		TextView txt = new TextView(context);
-		txt.setText("Field");
-		txt.setTextColor(Color.parseColor("#000000"));
-		row.addView(txt);
+	 TextView txt = new TextView(context);
+	 txt.setText("Field");
+	 txt.setTextColor(Color.parseColor("#000000"));
+	 row.addView(txt);
 
-		field = new Spinner(context);
-		List<String> list = new ArrayList<String>();
-		// FIXME : have every wrapper and not only gps
-		String wrapperName = wrapperList.getProperty("android.hardware.location.gps");
+	 field = new Spinner(context);
+	 List<String> list = new ArrayList<String>();
+	 // FIXME : have every wrapper and not only gps
+	 String wrapperName = wrapperList.getProperty("android.hardware.location.gps");
 
-		try {
-			AbstractWrapper w = (AbstractWrapper) StaticData.getWrapperByName(wrapperName);
-			for (String s : w.getFieldList()) {
-				list.add(s);
-			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+	 try {
+	 AbstractWrapper w = (AbstractWrapper) StaticData.getWrapperByName(wrapperName);
+	 for (String s : w.getFieldList()) {
+	 list.add(s);
+	 }
+	 } catch (Exception e1) {
+	 e1.printStackTrace();
+	 }
 
-		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context,
-				                                                           tinygsn.gui.android.R.layout.spinner_item, list);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		field.setAdapter(dataAdapter);
+	 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context,
+	 tinygsn.gui.android.R.layout.spinner_item, list);
+	 dataAdapter
+	 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	 field.setAdapter(dataAdapter);
 
-		row.addView(field);
-		table_notify_config.addView(row);
+	 row.addView(field);
+	 table_notify_config.addView(row);
 
-		// Row condition
-		row = new TableRow(context);
+	 // Row condition
+	 row = new TableRow(context);
 
-		txt = new TextView(context);
-		txt.setText("Sampling Rate");
-		txt.setText("Condition    ");
-		txt.setTextColor(Color.parseColor("#000000"));
-		row.addView(txt);
+	 txt = new TextView(context);
+	 txt.setText("Sampling Rate");
+	 txt.setText("Condition    ");
+	 txt.setTextColor(Color.parseColor("#000000"));
+	 row.addView(txt);
 
-		condition = new Spinner(context);
-		List<String> list_condition = new ArrayList<String>();
+	 condition = new Spinner(context);
+	 List<String> list_condition = new ArrayList<String>();
 
-		for (String s : NotificationVirtualSensor.CONDITIONS) {
-			list_condition.add(s);
-		}
-		ArrayAdapter<String> dataAdapter_condition = new ArrayAdapter<String>(context,
-				                                                                     tinygsn.gui.android.R.layout.spinner_item, list_condition);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		condition.setAdapter(dataAdapter_condition);
-		row.addView(condition);
+	 for (String s : NotificationVirtualSensor.CONDITIONS) {
+	 list_condition.add(s);
+	 }
+	 ArrayAdapter<String> dataAdapter_condition = new ArrayAdapter<String>(context,
+	 tinygsn.gui.android.R.layout.spinner_item, list_condition);
+	 dataAdapter
+	 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	 condition.setAdapter(dataAdapter_condition);
+	 row.addView(condition);
 
-		table_notify_config.addView(row);
+	 table_notify_config.addView(row);
 
-		// Row value
-		row = new TableRow(context);
+	 // Row value
+	 row = new TableRow(context);
 
-		txt = new TextView(context);
-		txt.setText("Value");
-		txt.setTextColor(Color.parseColor("#000000"));
-		row.addView(txt);
+	 txt = new TextView(context);
+	 txt.setText("Value");
+	 txt.setTextColor(Color.parseColor("#000000"));
+	 row.addView(txt);
 
-		editText_value = new EditText(context);
-		editText_value.setText("10");
-		editText_value.setTextSize(TEXT_SIZE + 5);
-		editText_value.setInputType(InputType.TYPE_CLASS_NUMBER);
-		// editText_value.requestFocus();
-		editText_value.setTextColor(Color.parseColor("#000000"));
-		row.addView(editText_value);
+	 editText_value = new EditText(context);
+	 editText_value.setText("10");
+	 editText_value.setTextSize(TEXT_SIZE + 5);
+	 editText_value.setInputType(InputType.TYPE_CLASS_NUMBER);
+	 // editText_value.requestFocus();
+	 editText_value.setTextColor(Color.parseColor("#000000"));
+	 row.addView(editText_value);
 
-		editText_value.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-			                              int after) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				try {
-					// numLatest =
-					// Integer.parseInt(editText_numLatest.getText().toString());
-					// loadLatestData();
-				} catch (NumberFormatException e) {
-					AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-							                                                                ctx);
-					alertDialogBuilder.setTitle("Please input a number!");
-				}
-			}
-		});
-
-		table_notify_config.addView(row);
-
-		// Row action
-		row = new TableRow(context);
-
-		txt = new TextView(context);
-		txt.setText("Action");
-		txt.setTextColor(Color.parseColor("#000000"));
-		row.addView(txt);
-
-		action = new Spinner(context);
-		List<String> list_action = new ArrayList<String>();
-
-		for (String s : NotificationVirtualSensor.ACTIONS) {
-			list_action.add(s);
-		}
-		ArrayAdapter<String> dataAdapter_action = new ArrayAdapter<String>(context,
-				                                                                  tinygsn.gui.android.R.layout.spinner_item, list_action);
-		dataAdapter
-				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		action.setAdapter(dataAdapter_action);
-		row.addView(action);
-
-		table_notify_config.addView(row);
-
-		// Row contact
-		row = new TableRow(context);
-
-		txt = new TextView(context);
-		txt.setText("Contact");
-		txt.setTextColor(Color.parseColor("#000000"));
-		row.addView(txt);
-
-		editText_contact = new EditText(context);
-		editText_contact.setText("+41798765432");
-		editText_contact.setTextSize(TEXT_SIZE + 5);
-		// editText_contact.setInputType(InputType.TYPE_CLASS_NUMBER);
-		// editText_contact.requestFocus();
-		editText_contact.setTextColor(Color.parseColor("#000000"));
-		row.addView(editText_contact);
-
-		editText_contact.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-			                              int after) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				try {
-					// numLatest =
-					// Integer.parseInt(editText_numLatest.getText().toString());
-					// loadLatestData();
-				} catch (NumberFormatException e) {
-					AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-							                                                                ctx);
-					alertDialogBuilder.setTitle("Please input a phone number!");
-				}
-			}
-		});
-
-		table_notify_config.addView(row);
-
-		// Row Save to DB
-		row = new TableRow(context);
-
-		txt = new TextView(context);
-		txt.setText("Save to Database?");
-		txt.setTextColor(Color.parseColor("#000000"));
-		row.addView(txt);
-
-		saveToDB = new CheckBox(context);
-		saveToDB.setTextColor(Color.parseColor("#000000"));
-		row.addView(saveToDB);
-
-
-		table_notify_config.addView(row);
-		// TableRow.LayoutParams params = new TableRow.LayoutParams();
-		// params.span = 2;
+	 editText_value.addTextChangedListener(new TextWatcher() {
+	@Override public void onTextChanged(CharSequence s, int start, int before, int count) {
 	}
+
+	@Override public void beforeTextChanged(CharSequence s, int start, int count,
+	int after) {
+	}
+
+	@Override public void afterTextChanged(Editable s) {
+	try {
+	// numLatest =
+	// Integer.parseInt(editText_numLatest.getText().toString());
+	// loadLatestData();
+	} catch (NumberFormatException e) {
+	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+	ctx);
+	alertDialogBuilder.setTitle("Please input a number!");
+	}
+	}
+	});
+
+	 table_notify_config.addView(row);
+
+	 // Row action
+	 row = new TableRow(context);
+
+	 txt = new TextView(context);
+	 txt.setText("Action");
+	 txt.setTextColor(Color.parseColor("#000000"));
+	 row.addView(txt);
+
+	 action = new Spinner(context);
+	 List<String> list_action = new ArrayList<String>();
+
+	 for (String s : NotificationVirtualSensor.ACTIONS) {
+	 list_action.add(s);
+	 }
+	 ArrayAdapter<String> dataAdapter_action = new ArrayAdapter<String>(context,
+	 tinygsn.gui.android.R.layout.spinner_item, list_action);
+	 dataAdapter
+	 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	 action.setAdapter(dataAdapter_action);
+	 row.addView(action);
+
+	 table_notify_config.addView(row);
+
+	 // Row contact
+	 row = new TableRow(context);
+
+	 txt = new TextView(context);
+	 txt.setText("Contact");
+	 txt.setTextColor(Color.parseColor("#000000"));
+	 row.addView(txt);
+
+	 editText_contact = new EditText(context);
+	 editText_contact.setText("+41798765432");
+	 editText_contact.setTextSize(TEXT_SIZE + 5);
+	 // editText_contact.setInputType(InputType.TYPE_CLASS_NUMBER);
+	 // editText_contact.requestFocus();
+	 editText_contact.setTextColor(Color.parseColor("#000000"));
+	 row.addView(editText_contact);
+
+	 editText_contact.addTextChangedListener(new TextWatcher() {
+	@Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+	}
+
+	@Override public void beforeTextChanged(CharSequence s, int start, int count,
+	int after) {
+	}
+
+	@Override public void afterTextChanged(Editable s) {
+	try {
+	// numLatest =
+	// Integer.parseInt(editText_numLatest.getText().toString());
+	// loadLatestData();
+	} catch (NumberFormatException e) {
+	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+	ctx);
+	alertDialogBuilder.setTitle("Please input a phone number!");
+	}
+	}
+	});
+
+	 table_notify_config.addView(row);
+
+	 // Row Save to DB
+	 row = new TableRow(context);
+
+	 txt = new TextView(context);
+	 txt.setText("Save to Database?");
+	 txt.setTextColor(Color.parseColor("#000000"));
+	 row.addView(txt);
+
+	 saveToDB = new CheckBox(context);
+	 saveToDB.setTextColor(Color.parseColor("#000000"));
+	 row.addView(saveToDB);
+
+
+	 table_notify_config.addView(row);
+	 // TableRow.LayoutParams params = new TableRow.LayoutParams();
+	 // params.span = 2;
+	 }
 	 **********************************************************************************************/
 }

@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -51,10 +52,11 @@ public class RemoteWrapper extends AbstractWrapper {
 	private String vs_name = "";
 
 	@Override
-	public VSParameter[] getParameters() {
-		return new VSParameter[]{
-				                        new VSParameter("url", ParameterType.EDITBOX),
-				                        new VSParameter("vs_name", ParameterType.EDITBOX)};
+	public ArrayList<VSParameter> getParameters() {
+		ArrayList<VSParameter> list = new ArrayList<>();
+		list.add(new VSParameter("url", ParameterType.EDITBOX));
+		list.add(new VSParameter("vs_name", ParameterType.EDITBOX));
+		return list;
 	}
 
 	@Override

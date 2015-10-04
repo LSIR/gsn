@@ -51,6 +51,7 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.WrapperConfig;
+import tinygsn.model.vsensor.utils.ParameterType;
 import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
@@ -259,8 +260,8 @@ public abstract class AbstractWrapper {
 	protected void initParameter(String key, String value) {
 	}
 
-	public VSParameter[] getParameters() {
-		return new VSParameter[]{};
+	public ArrayList<VSParameter> getParameters() {
+		return new ArrayList<>();
 	}
 
 	public void initialize() {

@@ -1,26 +1,26 @@
 /**
-* Global Sensor Networks (GSN) Source Code
-* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
-*
-* This file is part of GSN.
-*
-* GSN is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* GSN is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with GSN. If not, see <http://www.gnu.org/licenses/>.
-*
-* File: gsn-tiny/src/tinygsn/model/vsensor/AbstractVirtualSensor.java
-*
-* @author Do Ngoc Hoan
-*/
+ * Global Sensor Networks (GSN) Source Code
+ * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+ * <p/>
+ * This file is part of GSN.
+ * <p/>
+ * GSN is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p/>
+ * GSN is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with GSN. If not, see <http://www.gnu.org/licenses/>.
+ * <p/>
+ * File: gsn-tiny/src/tinygsn/model/vsensor/AbstractVirtualSensor.java
+ *
+ * @author Do Ngoc Hoan
+ */
 
 
 package tinygsn.model.vsensor;
@@ -49,31 +49,37 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = -94046553047097162L;
-	public static final String[] VIRTUAL_SENSOR_LIST = { "bridge", "notification", "activity","MET compute", "O3 calibrate","Exposure" };
-	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor","tinygsn.model.vsensor.NotificationVirtualSensor",
-		"tinygsn.model.vsensor.ActivityVirtualSensor","tinygsn.model.vsensor.METVirtualSensor","tinygsn.model.vsensor.CalibrateOzoneVirtualSensor",
-		"tinygsn.model.vsensor.ExposureVirtualSensor"};
+	public static final String[] VIRTUAL_SENSOR_LIST = {"bridge", "notification", "activity", "MET compute", "O3 calibrate", "Exposure"};
+	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor", "tinygsn.model.vsensor.NotificationVirtualSensor",
+			                                                      "tinygsn.model.vsensor.ActivityVirtualSensor", "tinygsn.model.vsensor.METVirtualSensor", "tinygsn.model.vsensor.CalibrateOzoneVirtualSensor",
+			                                                      "tinygsn.model.vsensor.ExposureVirtualSensor"};
 
 	private transient SqliteStorageManager storage = new SqliteStorageManager();
 	private VSensorConfig config;
 	public InputStream is;
 
 
-
-	public boolean initialize_wrapper(){
-		HashMap<String,String> param = storage.getSetting("vsensor:"+config.getName()+":");
-		for(Entry<String,String> e : param.entrySet()){
+	public boolean initialize_wrapper() {
+		HashMap<String, String> param = storage.getSetting("vsensor:" + config.getName() + ":");
+		for (Entry<String, String> e : param.entrySet()) {
 			initParameter(e.getKey(), e.getValue());
 		}
 		return initialize();
 	}
 
 
-	public VSParameter[] getParameters(){return new VSParameter[]{};}
+	public ArrayList<VSParameter> getParameters() {
+		return new ArrayList<>();
+	}
+
+	public ArrayList<VSParameter> getParameters(ArrayList<String> params) {
+		return getParameters();
+	}
 
 	public abstract boolean initialize();
 
-	protected void initParameter(String key, String value){}
+	protected void initParameter(String key, String value) {
+	}
 
 	// synchronized
 
@@ -81,8 +87,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 
 		try {
 			storage.executeInsert("vs_" + config.getName(), null, streamElement);
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -100,7 +105,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 * First checks compatibility of the data type of each output data item in the
 	 * stream element with the defined output in the VSD file. (this check is done
 	 * regardless of the value for adjust flag).
-	 * <p>
+	 * <p/>
 	 * If the adjust flag is set to true, the method checks the newly generated
 	 * stream element and returns true if and only if the number of data items is
 	 * equal to the number of output data structure defined for this virtual
@@ -108,8 +113,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 *
 	 * @param se
 	 * @param outputStructure
-	 * @param adjust
-	 *          default is false.
+	 * @param adjust          default is false.
 	 * @return
 	 */
 	/*private static boolean compatibleStructure(StreamElement se,
@@ -147,8 +151,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		// }
 		return true;
 	}*/
-
-	public DataField[] getOutputStructure(DataField[] in){
+	public DataField[] getOutputStructure(DataField[] in) {
 		return in;
 	}
 
@@ -175,11 +178,10 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	}
 
 	/**
-	 * @param virtualSensorConfiguration
-	 *          the virtualSensorConfiguration to set
+	 * @param virtualSensorConfiguration the virtualSensorConfiguration to set
 	 */
 	public void setVirtualSensorConfiguration(
-			VSensorConfig virtualSensorConfiguration) {
+			                                         VSensorConfig virtualSensorConfiguration) {
 		this.config = virtualSensorConfiguration;
 	}
 
@@ -193,32 +195,30 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 * produced data. (calling <code>container.publishData(this)</code>. For more
 	 * information please check the <code>AbstractVirtalSensor</code>
 	 *
-	 * @param inputStreamName
-	 *          is the name of the input stream as specified in the configuration
-	 *          file of the virtual sensor.
-	 * @param streamElement
-	 *          is actually the real data which is produced by the input stream
-	 *          and should be delivered to the virtual sensor for possible
-	 *          processing.
+	 * @param inputStreamName is the name of the input stream as specified in the configuration
+	 *                        file of the virtual sensor.
+	 * @param streamElement   is actually the real data which is produced by the input stream
+	 *                        and should be delivered to the virtual sensor for possible
+	 *                        processing.
 	 */
 	public abstract void dataAvailable(String inputStreamName,
-			StreamElement streamElement);
+	                                   StreamElement streamElement);
 
 	public void dataAvailable(String inputStreamName,
-			ArrayList<StreamElement> data){
-		if (!data.isEmpty()) dataAvailable(inputStreamName,data.get(data.size()-1));
+	                          ArrayList<StreamElement> data) {
+		if (!data.isEmpty()) dataAvailable(inputStreamName, data.get(data.size() - 1));
 	}
 
 	synchronized public void start() {
 		config = StaticData.findConfig(config.getId());
-		if (!config.getRunning()){
+		if (!config.getRunning()) {
 			config.setRunning(true);
 		}
 	}
 
 	synchronized public void stop() {
 		config = StaticData.findConfig(config.getId());
-		if (config.getRunning()){
+		if (config.getRunning()) {
 			config.setRunning(false);
 		}
 
@@ -228,7 +228,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		return config;
 	}
 
-	public void delete(){
+	public void delete() {
 		stop();
 		for (StreamSource streamSource : config.getInputStream().getSources()) {
 			streamSource.dispose();
