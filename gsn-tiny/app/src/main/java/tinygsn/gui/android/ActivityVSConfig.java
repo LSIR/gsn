@@ -80,6 +80,7 @@ public class ActivityVSConfig extends AbstractActivity {
 	AndroidControllerVS controller = new AndroidControllerVS();
 
 	private ArrayList<StreamSourcePanel> pannels = new ArrayList<>();
+	private ArrayList<String> selectedVS = new ArrayList<>();
 
 	private boolean isEnableSave = true;
 	private String editingVS = null;
@@ -154,7 +155,14 @@ public class ActivityVSConfig extends AbstractActivity {
 
 						vssetting = null;
 						try {
-							VSParameter[] param = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters();
+							ArrayList<String> vp = new ArrayList<>();
+							for (String wrapperName : selectedVS) {
+								String[] fields = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getFieldList();
+								for (int i = 0; i < fields.length; i++) {
+									vp.add(fields[i]);
+								}
+							}
+							ArrayList<VSParameter> param = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters(vp);
 							vssetting = new SettingPanel("vsensor", param);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -209,6 +217,14 @@ public class ActivityVSConfig extends AbstractActivity {
 		separator.addView(b);
 		b.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				// Get wrapper name of deleted stream source
+				String wrapperName = panel.wrapper.getSelectedItem().toString();
+				wrapperName = wrapperList.getProperty(wrapperName);
+				int index = selectedVS.indexOf(wrapperName);
+				//Remove name of the selected list
+				selectedVS.remove(index);
+				//Update the "field" list in the VS
+				updateVSSpinnerParameter("field");
 				pannels.remove(panel);
 				table_layout.removeView(row);
 			}
@@ -311,8 +327,9 @@ public class ActivityVSConfig extends AbstractActivity {
 							} else {
 								wrapperName = wrapperList.getProperty(wrapperName);
 							}
-							VSParameter[] param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
+							ArrayList<VSParameter> param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
 							panel.settings = new SettingPanel("wrapper", param);
+							selectedVS.add(wrapperName);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -323,6 +340,7 @@ public class ActivityVSConfig extends AbstractActivity {
 					protected void onPostExecute(SettingPanel result) {
 						if (result != null) {
 							settingLayout.addView(panel.settings.getPanel());
+							updateVSSpinnerParameter("field");
 						}
 					}
 				}.execute((Activity) null);
@@ -345,12 +363,40 @@ public class ActivityVSConfig extends AbstractActivity {
 		return row;
 	}
 
+	/**
+	 * Update the spinner list of one field of a Virtual Sensor
+	 *
+	 * @param paramName
+	 */
+	private void updateVSSpinnerParameter(String paramName) {
+		try {
+			for (VSParameter param : vssetting.params) {
+				if (param.getmName().equals(paramName)) {
+					ArrayList<String> vp = new ArrayList<>();
+					for (String wrapperName : selectedVS) {
+						System.out.println(wrapperName);
+						String[] fields = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getFieldList();
+						for (int i = 0; i < fields.length; i++) {
+							if (!vp.contains(fields[i])) {
+								vp.add(fields[i]);
+							}
+						}
+					}
+					param.setmParameters(vp);
+					table_vsensor_config.removeAllViews();
+					table_vsensor_config.addView(vssetting.getPanel());
+					return;
+				}
+			}
+		} catch (Exception e) {
+		}
+	}
+
 	@Override
 	protected void onPause() {
 		super.onPause();
 	}
 
-	// FIXME : Is it ok like that ?
 	public void saveVS() {
 		String vsName = editText_vsName.getText().toString();
 
@@ -486,15 +532,14 @@ public class ActivityVSConfig extends AbstractActivity {
 		}
 	}
 
-	//TODO : To adapt with VSParameter
 	private class SettingPanel { //key-value parameters (for VS and wrappers)
 
 		private String prefix;
-		private VSParameter[] params;
+		private ArrayList<VSParameter> params;
 		private TextView[] values;
 		private Spinner[] spinners;
 
-		SettingPanel(String prefix, VSParameter[] params) {
+		SettingPanel(String prefix, ArrayList<VSParameter> params) {
 			this.prefix = prefix;
 			this.params = params;
 		}
@@ -531,19 +576,19 @@ public class ActivityVSConfig extends AbstractActivity {
 			p.width = TableRow.LayoutParams.MATCH_PARENT;
 			layout.setLayoutParams(p);
 
-			values = new TextView[params.length];
-			spinners = new Spinner[params.length];
+			values = new TextView[params.size()];
+			spinners = new Spinner[params.size()];
 
 			int indexSpinner = 0;
 			int indexTextView = 0;
-			for (int i = 0; i < params.length; i++) {
+			for (int i = 0; i < params.size(); i++) {
 				TableRow inrow = new TableRow(ActivityVSConfig.this);
 				TextView label = new TextView(ActivityVSConfig.this);
-				label.setText(params[i].getmName() + ": ");
+				label.setText(params.get(i).getmName() + ": ");
 				label.setTextColor(Color.rgb(0, 0, 0));
 				inrow.addView(label);
 
-				switch (params[i].getmType()) {
+				switch (params.get(i).getmType()) {
 					case EDITBOX:
 						values[indexTextView] = new EditText(ActivityVSConfig.this);
 						break;
@@ -552,7 +597,7 @@ public class ActivityVSConfig extends AbstractActivity {
 						break;
 					case SPINNER:
 						spinners[indexSpinner] = new Spinner(ActivityVSConfig.this);
-						List<String> list = params[i].getmParameters();
+						List<String> list = params.get(i).getmParameters();
 						ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context,
 								                                                           tinygsn.gui.android.R.layout.spinner_item, list);
 						dataAdapter
@@ -567,9 +612,9 @@ public class ActivityVSConfig extends AbstractActivity {
 						break;
 				}
 
-				if (params[i].getmType() != ParameterType.SPINNER) {
+				if (params.get(i).getmType() != ParameterType.SPINNER) {
 					values[indexTextView].setTextSize(TEXT_SIZE + 5);
-					values[indexTextView].setText(params[i].getmDefaultParameter());
+					values[indexTextView].setText(params.get(i).getmDefaultParameter());
 					values[indexTextView].setTextColor(Color.rgb(0, 0, 0));
 					inrow.addView(values[indexTextView]);
 					values[indexTextView].addTextChangedListener(textWatcher);
@@ -581,18 +626,18 @@ public class ActivityVSConfig extends AbstractActivity {
 		}
 
 		public void saveTo(String module, SqliteStorageManager storage) {
-			for (int i = 0; i < params.length; i++) {
+			for (int i = 0; i < params.size(); i++) {
 				String value;
 				int indexSpinner = 0;
 				int indexTextView = 0;
-				if (params[i].getmType() == ParameterType.SPINNER) {
+				if (params.get(i).getmType() == ParameterType.SPINNER) {
 					value = spinners[indexSpinner].getSelectedItem().toString();
 					indexSpinner++;
 				} else {
 					value = values[indexTextView].getText().toString();
 					indexTextView++;
 				}
-				storage.setSetting(prefix + ":" + module + ":" + params[i].getmName(), value);
+				storage.setSetting(prefix + ":" + module + ":" + params.get(i).getmName(), value);
 			}
 		}
 	}
