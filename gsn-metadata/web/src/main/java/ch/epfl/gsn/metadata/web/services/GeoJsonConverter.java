@@ -73,7 +73,7 @@ public class GeoJsonConverter {
 //    }
 
     protected void writeRecord(JsonWriter writer, VirtualSensorMetadata record, boolean detailed) throws IOException {
-        if (record.getLocation() == null) {
+        if (record == null || record.getLocation() == null) {
             return;
         }
         writer.beginObject();

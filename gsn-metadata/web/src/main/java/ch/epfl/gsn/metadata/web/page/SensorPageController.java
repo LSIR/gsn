@@ -9,6 +9,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Query;
@@ -155,6 +156,26 @@ public class SensorPageController {
         setResponseHeader(response);
 
         return metadataService.getMetadataJson(dbTableName);
+    }
+
+    @RequestMapping(value = "/metadatadif/{dbTableName}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public
+    @ResponseBody
+    String getMetadataDif(@PathVariable String dbTableName, HttpServletResponse response) {
+
+        setResponseHeader(response);
+        JSONObject jsonObject = new JSONObject();
+
+        String metadataDifJson = metadataService.getMetadataDifJson(dbTableName);
+        jsonObject.append("dif", metadataDifJson);
+
+
+        VirtualSensorMetadata sensorMetadata = sensorAccessService.getVirtualSensorMetadata(dbTableName);
+
+        String sensorMetadataJson = geoJsonConverter.convertMeasurementRecords(Lists.newArrayList(sensorMetadata), true);
+
+        jsonObject.append("gsn", sensorMetadataJson);
+        return jsonObject.toString();
     }
 
     private void setResponseHeader(HttpServletResponse response) {

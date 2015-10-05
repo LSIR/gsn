@@ -39,7 +39,30 @@
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
+            </exclusions>
+        </dependency>
 
+        <dependency>
+            <groupId>ch.epfl.gsn.oai</groupId>
+            <artifactId>oai-pmh-swissex</artifactId>
+            <version>0.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.epfl.gsn</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -72,6 +95,11 @@
             <version>1.9.1.RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20140107</version>
+        </dependency>
 
         <!--Test dependencies-->
         <dependency>
