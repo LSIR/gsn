@@ -40,7 +40,8 @@ var metadata = angular.module("metadata", [])
                 if (sensorName == null) {
                     return "No metadata available";
                 }
-                    var url = 'http://localhost:8090/web/metadatadif/' + sensorName;
+                    //var url = 'http://localhost:8090/web/metadatadif/' + sensorName;
+                    var url = 'http://montblanc.slf.ch:8090/web/metadatadif/' + sensorName;
 
                     self.promise = $http({
                         method: 'GET',
