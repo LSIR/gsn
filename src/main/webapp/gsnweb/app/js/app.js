@@ -18,6 +18,7 @@ var gsnWebApp = angular.module('gsnWebApp', [
     , 'gsnMap'
     , 'gsnMonitor'
     , 'rzModule'
+    ,'metadata'
 ]);
 
 gsnWebApp.config(['$routeProvider', '$datepickerProvider',
@@ -59,7 +60,16 @@ gsnWebApp.config(['$routeProvider', '$datepickerProvider',
                 controller: 'MonitorController'
             }).
             when('/metadata', {
-                templateUrl: 'partials/metadata.html'
+                templateUrl: 'partials/metadata.html',
+                resolve: {
+                    difMetadata: [
+                        'DifMetadataLoad',
+                        function (DifMetadataLoad) {
+                            return DifMetadataLoad.getData();
+                        }
+                    ]
+                },
+                controller: 'MetadataController'
 
             }).
             when('/about', {
@@ -119,12 +129,12 @@ gsnWebApp.service('GsnTabs', function () {
             {link: '#/map', label: 'Sensors'},
             {link: '#/plot', label: 'Data'},
             {link: '#/monitor', label: 'Monitor'},
-            //{link: '#/metadata', label: 'Metadata'},
+            {link: '#/metadata', label: 'Metadata'},
             {link: '#/about', label: 'About'},
         ];
 
-        //this.tabNames = ['/map', '/plot', '/monitor', '/metadata', '/about'];
-        this.tabNames = ['/map', '/plot', '/monitor', '/about'];
+        this.tabNames = ['/map', '/plot', '/monitor', '/metadata', '/about'];
+        //this.tabNames = ['/map', '/plot', '/monitor', '/about'];
 
         this.selectedTab = this.tabs[0];
     }

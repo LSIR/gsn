@@ -341,8 +341,15 @@ gsnMap.controller("GoogleMapsController", ["$scope", 'leafletData', '$compile', 
 
         $scope.monitor = function (feature) {
             console.log('MONITOR ' + feature.properties.sensorName);
-            $location.path('/monitor')
+            $location.path('/monitor');
             $location.search('sensors', [feature.properties.sensorName].toString());
+
+        };
+
+        $scope.metadata = function (feature) {
+            console.log('METADATA ' + feature.properties.sensorName);
+            $location.path('/metadata');
+            $location.search('sensor', [feature.properties.sensorName].toString());
 
         };
 

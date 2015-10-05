@@ -29,7 +29,7 @@
                            on-remove="submit()" style="width: 280px;">
                     <ui-select-match placeholder="Select sensors...">{{$item}}</ui-select-match>
                     <ui-select-choices repeat="sensorName in mapSensorNames | filter:$select.search">
-                        <img src={{getSensorIcon(sensorName)}} style="width:16px;height:16px;">{{sensorName}}
+                        <img ng-src={{getSensorIcon(sensorName)}} style="width:16px;height:16px;">{{sensorName}}
                     </ui-select-choices>
                 </ui-select>
             </div>
