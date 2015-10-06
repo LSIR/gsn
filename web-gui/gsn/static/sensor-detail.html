@@ -1,0 +1,11 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header" ng-bind-template="Sensors Detail: {{ sensorName }}">Sensor Details: {{ sensorName }}</h1>
+    </div>
+
+    <div ng-show="loading">loading...</div>
+
+    <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have access to this controller.</p>
+
+
+</div>
