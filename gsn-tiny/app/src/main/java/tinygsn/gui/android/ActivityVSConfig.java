@@ -36,6 +36,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -311,7 +312,19 @@ public class ActivityVSConfig extends AbstractActivity {
 		panel.wrapper.setAdapter(dataAdapter);
 		inrow.addView(panel.wrapper);
 		layout.addView(inrow);
+		final LastVSSelected lastVSSelected = new LastVSSelected();
 
+		// used only to keep somewhere the previous value of a spinner
+		// to remove the corresponding fields
+		panel.wrapper.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (panel.wrapper != null) {
+					lastVSSelected.setLastVSSelected(wrapperList.getProperty(panel.wrapper.getSelectedItem().toString()));
+				}
+				return false;
+			}
+		});
 		panel.wrapper.setOnItemSelectedListener(new OnItemSelectedListener() {
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 
@@ -329,6 +342,7 @@ public class ActivityVSConfig extends AbstractActivity {
 							}
 							ArrayList<VSParameter> param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
 							panel.settings = new SettingPanel("wrapper", param);
+							selectedVS.remove(lastVSSelected.getLastVSSelected());
 							selectedVS.add(wrapperName);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -374,7 +388,6 @@ public class ActivityVSConfig extends AbstractActivity {
 				if (param.getmName().equals(paramName)) {
 					ArrayList<String> vp = new ArrayList<>();
 					for (String wrapperName : selectedVS) {
-						System.out.println(wrapperName);
 						String[] fields = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getFieldList();
 						for (int i = 0; i < fields.length; i++) {
 							if (!vp.contains(fields[i])) {
@@ -529,6 +542,18 @@ public class ActivityVSConfig extends AbstractActivity {
 			}
 			return wrapperName;
 
+		}
+	}
+
+	private class LastVSSelected { // use to keep the value of wrapper in VS to remove corresponding fields
+		String lastVSSelected = "";
+
+		public void setLastVSSelected(String s) {
+			this.lastVSSelected = s;
+		}
+
+		public String getLastVSSelected() {
+			return this.lastVSSelected;
 		}
 	}
 
