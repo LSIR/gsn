@@ -651,10 +651,10 @@ public class ActivityVSConfig extends AbstractActivity {
 		}
 
 		public void saveTo(String module, SqliteStorageManager storage) {
+			int indexSpinner = 0;
+			int indexTextView = 0;
 			for (int i = 0; i < params.size(); i++) {
 				String value;
-				int indexSpinner = 0;
-				int indexTextView = 0;
 				if (params.get(i).getmType() == ParameterType.SPINNER) {
 					value = spinners[indexSpinner].getSelectedItem().toString();
 					indexSpinner++;
