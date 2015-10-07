@@ -46,6 +46,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -53,10 +54,12 @@ import java.util.Set;
 
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
+import tinygsn.beans.VSensorConfig;
 import tinygsn.gui.android.ActivityViewData;
 import tinygsn.model.vsensor.utils.ParameterType;
 import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.model.wrappers.AbstractWrapper;
+import tinygsn.storage.db.SqliteStorageManager;
 
 public class NotificationVirtualSensor extends AbstractVirtualSensor {
 	public static String[] ACTIONS = {"Notification", "SMS", "Email"};
@@ -68,10 +71,12 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 	private String action;
 	private long lastTimeHasData = 0;
 	private Properties wrapperList;
+	private SqliteStorageManager storage = null;
 
 	@Override
 	public boolean initialize() {
 		wrapperList = AbstractWrapper.getWrapperList(StaticData.globalContext);
+		storage = new SqliteStorageManager();
 		return true;
 	}
 
@@ -81,11 +86,19 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
-		String field = getVirtualSensorConfiguration().getNotify_field();
-		String condition = getVirtualSensorConfiguration().getNotify_condition();
-		Double value = getVirtualSensorConfiguration().getNotify_value();
-		action = getVirtualSensorConfiguration().getNotify_action();
-		String contact = getVirtualSensorConfiguration().getNotify_contact();
+		String prefix = "vsensor:" + getVirtualSensorConfiguration().getName();
+		HashMap settings = storage.getSetting(prefix);
+		String field = (String) settings.get(prefix + ":" + "field");
+		String condition = (String) settings.get(prefix + ":" +  "condition");
+		Double value = Double.parseDouble((String) settings.get(prefix + ":" +  "value"));
+		action = (String) settings.get(prefix + ":" +  "action");
+		String contact = (String) settings.get(prefix + ":" +  "Contact");
+		boolean saveToDB;
+		if (((String) settings.get(prefix + ":" +  "Save to Database")).equals("true")) {
+			saveToDB = true;
+		} else {
+			saveToDB = false;
+		}
 
 		notify_contentText = field + " " + condition + " " + value;
 		Date time = new Date();
@@ -119,7 +132,7 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 			//TODO: to do
 		}
 
-		if (getVirtualSensorConfiguration().isSave_to_db()) {
+		if (saveToDB) {
 			dataProduced(streamElement);
 		}
 	}
