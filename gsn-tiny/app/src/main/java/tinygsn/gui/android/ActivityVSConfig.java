@@ -658,6 +658,14 @@ public class ActivityVSConfig extends AbstractActivity {
 				if (params.get(i).getmType() == ParameterType.SPINNER) {
 					value = spinners[indexSpinner].getSelectedItem().toString();
 					indexSpinner++;
+				} else if (params.get(i).getmType() == ParameterType.CHECKBOX) {
+					boolean boolValue = ((CheckBox) values[indexTextView]).isChecked();
+					if (boolValue) {
+						value = "true";
+					} else {
+						value = "false";
+					}
+					indexTextView++;
 				} else {
 					value = values[indexTextView].getText().toString();
 					indexTextView++;
