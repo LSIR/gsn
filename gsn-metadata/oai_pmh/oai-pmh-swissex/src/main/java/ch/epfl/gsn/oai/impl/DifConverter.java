@@ -6,6 +6,7 @@ import ch.epfl.gsn.oai.interfaces.Converter;
 import ch.epfl.gsn.oai.interfaces.MetadataFormat;
 import ch.epfl.gsn.oai.model.OsperRecord;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import javax.inject.Inject;
@@ -44,6 +45,12 @@ public class DifConverter implements Converter<OsperRecord> {
             parameters.put("fromDate", DATE_FORMAT.format(metadata.getFromDate() == null ? new Date() : metadata.getFromDate()));
             parameters.put("toDate", DATE_FORMAT.format(metadata.getToDate() == null ? new Date() : metadata.getToDate()));
             parameters.put("latitude", String.valueOf(metadata.getLocation().getY()));
+            parameters.put("longitude", String.valueOf(metadata.getLocation().getX()));
+            if (StringUtils.isNotBlank(metadata.getMetadataLink())) {
+                parameters.put("WIKIPAGE", metadata.getMetadataLink());
+            } else {
+                parameters.put("WIKIPAGE", "NA");
+            }
             parameters.put("longitude", String.valueOf(metadata.getLocation().getX()));
         }
 
