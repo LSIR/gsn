@@ -32,6 +32,8 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
     });
 
+
+
     //TODO
 
 }]);

@@ -1,11 +1,75 @@
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header" ng-bind-template="Sensors Detail: {{ sensorName }}">Sensor Details: {{ sensorName }}</h1>
+        <h1 class="page-header" ng-bind-template="Sensors Detail: {{ sensorName }}">Sensor details[0]: {{ sensorName
+            }}</h1>
     </div>
 
     <div ng-show="loading">loading...</div>
 
-    <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have access to this controller.</p>
+    <p class="col-lg-12 lead" ng-if="details[0]==undefined && !loading">This sensor does not exist or you do not have
+        access to this controller.</p>
+
+    <div ng-if="details[0]">
+        <!--<div class="row" >-->
+
+        <div class="col-lg-6" ng-if="!loading">
+            <div class="panel panel-default">
+                <div class="panel-heading">Properties</div>
+                <div class="panel-body">
+                    <div ng-repeat="(key, value) in details[0].properties"><p
+                            ng-if="key != 'fields' && key != 'geographical' "><b>{{key}}:</b> {{value}}</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6" ng-if="!loading">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Geographical data</div>
+                <div class="panel-body">
+                    <p ng-if="details[0].properties.geographical"><b>Location:</b>
+                        {{details[0].properties.geographical}}</p>
+
+                    <div ng-repeat="(key, value) in details[0].geometry">
+                        <p ng-if="key != 'coordinates'"><b>{{key}}:</b> {{value}}</p>
+                    </div>
+                    <ul ng-if="details[0].geometry.coordinates">
+                        <li><b>Longitude:</b> {{details[0].geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{details[0].geometry.coordinates[1]}}</li>
+                        <li ng-if="details[0].geometry.coordinates[2]"><b>Altitude:</b>
+                            {{details[0].geometry.coordinates[2]}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!--</div>-->
+
+
+        <div class="col-lg-12" ng-if="!loading">
+            <div class="panel panel-default">
+                <div class="panel-heading">Data</div>
+                <div class="panel-body">
+                    <form role="form">
+
+                    </form>
+                </div>
+
+                <table class="table table-bordered table-hover table-striped" ng-if="details[0].properties.fields">
+                    <thead>
+                    <tr>
+                        <th ng-repeat="field in details[0].properties.fields">{{field.name}} ({{field.type}}<span
+                                ng-if="field.unit">, {{field.unit}}</span>)
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
 
 
 </div>
