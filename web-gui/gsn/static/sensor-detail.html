@@ -121,27 +121,59 @@
                             </div>
 
                         </div>
-                        <button type="submit" class="btn btn-primary btn-lg btn-block">Refresh data</button>
+                        <button type="submit" class="btn btn-primary" style="margin: 1em">Refresh data</button>
 
                     </form>
+
+                    <p ng-if="details[0].properties.values"> {{details[0].properties.values.length}} results found for
+                        the specified timeframe. </p>
+
+                    <p ng-if="!details[0].properties.values"> No data found for the specified timeframe. </p>
+
+
+                    <div class="col-lg-12">
+                        <h4 style="text-align: right">Page size:
+                            <label class="form-inline">
+                                <input type="number" min="1" max="100" class="form-control" placeholder="25"
+                                       ng-model="pageSize">
+                            </label>
+                            <button type="button" class="btn btn-primary form-inline"
+                                    ng-click="updateRowCount(pageSize)">
+                                Apply
+                            </button>
+
+                        </h4>
+
+
+                        <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
+                               ng-if="details[0].properties.fields">
+
+
+                            <thead>
+                            <tr>
+                                <th ng-repeat="field in details[0].properties.fields">{{field.name}}
+                                    ({{field.type}}<span
+                                            ng-if="field.unit">, {{field.unit}}</span>)
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody ng-if="details[0].properties.values">
+                            <tr dir-paginate="values in details[0].properties.values |itemsPerPage: truePageSize ">
+                                <td ng-repeat="value in values">{{value}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <dir-pagination-controls
+                                max-size="10"
+                                direction-links="true"
+                                boundary-links="true">
+                        </dir-pagination-controls>
+
+                    </div>
+
+
                 </div>
-
-                <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
-                       ng-if="details[0].properties.fields">
-                    <thead>
-                    <tr>
-                        <th ng-repeat="field in details[0].properties.fields">{{field.name}} ({{field.type}}<span
-                                ng-if="field.unit">, {{field.unit}}</span>)
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody ng-if="details[0].properties.values">
-                    <tr ng-repeat="values in details[0].properties.values">
-                        <td ng-repeat="value in values">{{value}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-
 
             </div>
 

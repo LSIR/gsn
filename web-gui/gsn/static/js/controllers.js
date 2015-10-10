@@ -7,7 +7,7 @@
 
 /* Controllers */
 
-var gsnControllers = angular.module('gsnControllers', []);
+var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination']);
 
 gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope, $http) {
 
@@ -25,6 +25,11 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
     $scope.loading = true;
     $scope.sensorName = $routeParams.sensorName;
 
+    $scope.truePageSize = 25;
+
+    $scope.updateRowCount = function (pageSize) {
+        $scope.truePageSize = pageSize
+    };
 
     var today = new Date().toJSON();
     var yesterday = new Date((new Date()).getTime() - (1000 * 60 * 60)).toJSON();
@@ -57,6 +62,7 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         $http.get('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/').success(function (data) {
             $scope.details = data.features;
             $scope.loading = false;
+
 
             //TODO: REMOVE
             console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');
