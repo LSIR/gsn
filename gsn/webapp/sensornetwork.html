@@ -170,7 +170,7 @@ $(document).ready(function() {
         signals: [{
           vsensor:"dirruhorn_dozer_nodehealth__conv",
           field:["sdivoltage"],
-          select:"sensornode[position=0],sensornode[position=5],sensornode[position=10],sensornode[position=11]"
+          select:"sensornode[position=0],sensornode[position=5],sensornode[position=10],sensornode[position=11],sensornode[position=12]"
         }]
       },
       { title:"Dirruhorn WGPS PV Voltages",
@@ -201,6 +201,13 @@ $(document).ready(function() {
           select:"sensornode[position=8][iscorestation='true']"
         }]
       },
+      { title:"Randa WGPS PV Voltages",
+          signals: [{
+            vsensor:"dirruhorn_dozer_nodehealth__conv",
+            field:["sdivoltage"],
+            select:"sensornode[position=6],sensornode[position=9]"
+          }]
+        },
       { title:"Randa PV MATE3 Voltages",
         signals: [{
           vsensor:"dirruhorn_outbackmate3__conv",
@@ -247,7 +254,7 @@ $(document).ready(function() {
         signals: [{
           vsensor:"matterhorn_dozer_nodehealth__conv",
           field:["sdivoltage"],
-          select:"sensornode[position=0],sensornode[position=14],sensornode[position=19],sensornode[position=23],sensornode[position=26],sensornode[position=28],sensornode[position=31]"
+          select:"sensornode[position=0],sensornode[position=14],sensornode[position=19],sensornode[position=23],sensornode[position=26],sensornode[position=28],sensornode[position=32],sensornode[position=31]"
         }]
       },
       { title:"Matterhorn WGPS Voltages",
