@@ -38,13 +38,13 @@ def sensors(request):
     return JsonResponse(json.loads(requests.get(server_address).text))
 
 
-def sensor_detail(request, sensor_name):
-    _from_ = str(datetime.now().replace(microsecond=0).isoformat(sep='T'))
-    _to_ = _from_
+def sensor_detail(request, sensor_name, from_date, to_date):
+    # _from_ = str(datetime.now().replace(microsecond=0).isoformat(sep='T'))
+    # _to_ = _from_
 
     payload = {
-        'from': _from_,
-        'to': _to_,
+        'from': from_date,
+        'to': to_date,
         'username': 'john',
         'password': 'john'
     }

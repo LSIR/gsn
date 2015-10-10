@@ -21,19 +21,57 @@ gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope
 
 }]);
 
-
 gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', function ($scope, $http, $routeParams) {
     $scope.loading = true;
     $scope.sensorName = $routeParams.sensorName;
 
-    $http.get('sensors/' + $routeParams.sensorName).success(function (data) {
-        $scope.details = data.features;
-        $scope.loading = false;
 
-    });
+    var today = new Date().toJSON();
+    var yesterday = new Date((new Date()).getTime() - (1000 * 60 * 60)).toJSON();
+
+    $scope.to = {
+        'year': parseInt(today.slice(0, 4)),
+        'month': parseInt(today.slice(5, 7)),
+        'day': parseInt(today.slice(8, 10)),
+        'hour': parseInt(today.slice(11, 13)),
+        'minute': parseInt(today.slice(14, 16)),
+        'second': parseInt(today.slice(17, 19))
+    };
 
 
+    $scope.from = {
+        'year': parseInt(yesterday.slice(0, 4)),
+        'month': parseInt(yesterday.slice(5, 7)),
+        'day': parseInt(yesterday.slice(8, 10)),
+        'hour': parseInt(yesterday.slice(11, 13)),
+        'minute': parseInt(yesterday.slice(14, 16)),
+        'second': parseInt(yesterday.slice(17, 19))
+    };
 
-    //TODO
+    function toISO8601String(date) {
+        return date.year + "-" + date.month + "-" + date.day + "T" + date.hour + ":" + date.minute + ":" + date.second;
+    }
+
+
+    $scope.load = function () {
+        $http.get('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/').success(function (data) {
+            $scope.details = data.features;
+            $scope.loading = false;
+
+            //TODO: REMOVE
+            console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');
+
+        });
+    };
+
+
+    $scope.submit = function () {
+        $scope.load();
+    };
+
+
+    $scope.load();
+
 
 }]);
+

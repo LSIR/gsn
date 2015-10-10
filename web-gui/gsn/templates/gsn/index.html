@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=edge">-->
 
     <title>Global Sensor Network Web App</title>
 
@@ -27,12 +27,14 @@
     <!-- Morris Charts CSS -->
     <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/morrisjs/morris.css' %}" rel="stylesheet">
 
+
     <!-- Custom Fonts -->
     <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/font-awesome/css/font-awesome.min.css' %}"
           rel="stylesheet" type="text/css">
 
     <!-- jQuery -->
-    <script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
 
     <!-- AngularJS -->
@@ -56,10 +58,16 @@
     <!-- Metis Menu Plugin JavaScript -->
     <script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/metisMenu/dist/metisMenu.min.js' %}"></script>
 
-    {#<!-- Morris Charts JavaScript -->#}
-    {#<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/raphael/raphael-min.js' %}"></script>#}
-    {#<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/morrisjs/morris.min.js' %}"></script>#}
-    {#<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/js/morris-data.js' %}"></script>#}
+    <!--{#&lt;!&ndash; Morris Charts JavaScript &ndash;&gt;#}-->
+    <!--{#-->
+    <!--<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/raphael/raphael-min.js' %}"></script>-->
+    <!--#}-->
+    <!--{#-->
+    <!--<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/morrisjs/morris.min.js' %}"></script>-->
+    <!--#}-->
+    <!--{#-->
+    <!--<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/js/morris-data.js' %}"></script>-->
+    <!--#}-->
 
     <!-- Custom Theme JavaScript -->
     <script src="{% static 'startbootstrap-sb-admin-2-1.0.7/dist/js/sb-admin-2.js' %}"></script>
@@ -68,9 +76,10 @@
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
 
 </head>
 
