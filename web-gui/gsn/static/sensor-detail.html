@@ -17,7 +17,7 @@
                 <div class="panel-heading">Properties</div>
                 <div class="panel-body">
                     <div ng-repeat="(key, value) in details[0].properties"><p
-                            ng-if="key != 'fields' && key != 'geographical' && key != 'values'"><label>{{key}}:</label>
+                            ng-if="key != 'fields' && key != 'geographical' && key != 'values'"><b>{{key}}:</b>
                         {{value}}</p>
                     </div>
                 </div>
@@ -28,16 +28,16 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Geographical data</div>
                 <div class="panel-body">
-                    <p ng-if="details[0].properties.geographical"><label>Location:</label>
+                    <p ng-if="details[0].properties.geographical"><b>Location:</b>
                         {{details[0].properties.geographical}}</p>
 
                     <div ng-repeat="(key, value) in details[0].geometry">
-                        <p ng-if="key != 'coordinates'"><label>{{key}}:</label> {{value}}</p>
+                        <p ng-if="key != 'coordinates'"><b>{{key}}:</b> {{value}}</p>
                     </div>
                     <ul ng-if="details[0].geometry.coordinates">
-                        <li><label>Longitude:</label> {{details[0].geometry.coordinates[0]}}</li>
-                        <li><label>Latitude:</label> {{details[0].geometry.coordinates[1]}}</li>
-                        <li ng-if="details[0].geometry.coordinates[2]"><label>Altitude:</label>
+                        <li><b>Longitude:</b> {{details[0].geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{details[0].geometry.coordinates[1]}}</li>
+                        <li ng-if="details[0].geometry.coordinates[2]"><b>Altitude:</b>
                             {{details[0].geometry.coordinates[2]}}
                         </li>
                     </ul>
@@ -61,7 +61,7 @@
                         <div class="row">
 
                             <div class="col-lg-6">
-                                <label>From: </label><br>
+                                <b>From: </b><br>
                                 <label class="form-inline"> Year <br>
                                     <input type="number" class="form-control" min="1900" max="9999"
                                            placeholder="YYYY" ng-model="from.year">
@@ -125,24 +125,40 @@
 
                     </form>
 
-                    <p ng-if="details[0].properties.values"> {{details[0].properties.values.length}} results found for
-                        the specified timeframe. </p>
-
-                    <p ng-if="!details[0].properties.values"> No data found for the specified timeframe. </p>
-
 
                     <div class="col-lg-12">
-                        <h4 style="text-align: right">Page size:
-                            <label class="form-inline">
-                                <input type="number" min="1" max="100" class="form-control" placeholder="25"
-                                       ng-model="pageSize">
-                            </label>
-                            <button type="button" class="btn btn-primary form-inline"
-                                    ng-click="updateRowCount(pageSize)">
-                                Apply
-                            </button>
 
-                        </h4>
+                        <div class="row">
+
+                            <p style="float: left; display:inline-block" ng-if="details[0].properties.values">
+                                <br>
+                                {{details[0].properties.values.length}} results found
+                                for
+                                the specified timeframe. </p>
+
+                            <p style="float:left; display:inline-block" ng-if="!details[0].properties.values"><br>
+                                No data found for the
+                                specified timeframe. </p>
+
+
+                            <h4 style="float: right; display:inline-block">Page size:
+                                <b class="form-inline">
+                                    <input type="number" min="1" max="100" class="form-control" placeholder="25"
+                                           ng-model="pageSize">
+                                </b>
+                                <button type="button" class="btn btn-primary form-inline"
+                                        ng-click="updateRowCount(pageSize)">
+                                    Apply
+                                </button>
+
+                            </h4>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-inline" ng-repeat="field in details[0].properties.fields">
+                                <input type="checkbox" ng-model="columns[$index]">{{field.name}}
+                            </label>
+                        </div>
 
 
                         <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
@@ -151,18 +167,20 @@
 
                             <thead>
                             <tr>
-                                <th ng-repeat="field in details[0].properties.fields">{{field.name}}
+                                <th ng-repeat="field in details[0].properties.fields" ng-if="columns[$index]">
+                                    {{field.name}}
                                     ({{field.type}}<span
-                                            ng-if="field.unit">, {{field.unit}}</span>)
+                                        ng-if="field.unit">, {{field.unit}}</span>)
                                 </th>
                             </tr>
                             </thead>
                             <tbody ng-if="details[0].properties.values">
                             <tr dir-paginate="values in details[0].properties.values |itemsPerPage: truePageSize ">
-                                <td ng-repeat="value in values">{{value}}</td>
+                                <td ng-repeat="value in values" ng-if="columns[$index]">{{value}}</td>
                             </tr>
                             </tbody>
                         </table>
+
 
                         <dir-pagination-controls
                                 max-size="10"

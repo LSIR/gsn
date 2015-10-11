@@ -12,47 +12,28 @@
     <div class="col-lg-6">
         <div ng-repeat="sensor in sensors">
             <div class="panel panel-default" ng-if="$even">
-                <div class="panel-heading" ><a href="#/sensors/{{ sensor.properties.vs_name }}" ng-bind="sensor.properties.vs_name"></a></div>
+                <div class="panel-heading"><a href="#/sensors/{{ sensor.properties.vs_name }}"
+                                              ng-bind="sensor.properties.vs_name"></a></div>
 
                 <div class="panel-body">
 
 
-                    <p >{{ sensor.properties.description }}</p>
+                    <p><b>Description:</b> {{ sensor.properties.description }}</p>
+
+                    <p><b>Public:</b> {{ sensor.properties.is_public}}</p>
                     <!--<ul>-->
-                        <!--<li>Geograhical data:-->
-                            <!--<ul>-->
-                                <!--<li>Position: {{ sensor.properties.geographical }}-->
-                                <!--<li>Type: {{ sensor.geometry.type }}</li>-->
-                                <!--<li>Latitude: {{ sensor.geometry.coordinates[0] }}</li>-->
-                                <!--<li>Longitude: {{ sensor.geometry.coordinates[1] }}</li>-->
-                            <!--</ul>-->
-                        <!--</li>-->
+                    <!--<li>Geograhical data:-->
+                    <!--<ul>-->
+                    <!--<li>Position: {{ sensor.properties.geographical }}-->
+                    <!--<li>Type: {{ sensor.geometry.type }}</li>-->
+                    <!--<li>Latitude: {{ sensor.geometry.coordinates[0] }}</li>-->
+                    <!--<li>Longitude: {{ sensor.geometry.coordinates[1] }}</li>-->
+                    <!--</ul>-->
+                    <!--</li>-->
 
 
                     <!--</ul>-->
 
-
-                    <table class="table table-bordered table-hover table-striped"
-                           ng-if="sensor.properties.values!==undefined">
-
-
-                        <thead>
-
-
-                        <tr>
-                            <td ng-repeat="field in sensor.properties.fields">
-                                {{ field.name }}
-                            </td>
-                        </tr>
-                        </thead>
-
-                        <tr ng-repeat="value in sensor.properties.values">
-                            <td ng-repeat="val in value">
-                                {{ val }}
-                            </td>
-                        </tr>
-
-                    </table>
 
                 </div>
             </div>
@@ -62,47 +43,29 @@
     <div class="col-lg-6">
         <div ng-repeat="sensor in sensors">
             <div class="panel panel-default" ng-if="$odd">
-                <div class="panel-heading" ><a href="#/sensors/{{ sensor.properties.vs_name }}" ng-bind="sensor.properties.vs_name"></a></div>
+                <div class="panel-heading"><a href="#/sensors/{{ sensor.properties.vs_name }}"
+                                              ng-bind="sensor.properties.vs_name"></a></div>
 
                 <div class="panel-body">
 
 
                     <p>{{ sensor.properties.description }}</p>
                     <!--<ul>-->
-                        <!--<li>Geograhical data:-->
-                            <!--<ul>-->
-                                <!--<li>Position: {{ sensor.properties.geographical }}-->
-                                <!--<li>Type: {{ sensor.geometry.type }}</li>-->
-                                <!--<li>Latitude: {{ sensor.geometry.coordinates[0] }}</li>-->
-                                <!--<li>Longitude: {{ sensor.geometry.coordinates[1] }}</li>-->
-                            <!--</ul>-->
-                        <!--</li>-->
+                    <!--<li>Geograhical data:-->
+                    <!--<ul>-->
+                    <!--<li>Position: {{ sensor.properties.geographical }}-->
+                    <!--<li>Type: {{ sensor.geometry.type }}</li>-->
+                    <!--<li>Latitude: {{ sensor.geometry.coordinates[0] }}</li>-->
+                    <!--<li>Longitude: {{ sensor.geometry.coordinates[1] }}</li>-->
+                    <!--</ul>-->
+                    <!--</li>-->
 
 
                     <!--</ul>-->
 
+                    <p><b>Description:</b> {{ sensor.properties.description }}</p>
 
-                    <table class="table table-bordered table-hover table-striped"
-                           ng-if="sensor.properties.values!==undefined">
-
-
-                        <thead>
-
-
-                        <tr>
-                            <td ng-repeat="field in sensor.properties.fields">
-                                {{ field.name }}
-                            </td>
-                        </tr>
-                        </thead>
-
-                        <tr ng-repeat="value in sensor.properties.values">
-                            <td ng-repeat="val in value">
-                                {{ val }}
-                            </td>
-                        </tr>
-
-                    </table>
+                    <p><b>Public:</b> {{ sensor.properties.is_public}}</p>
 
 
                 </div>

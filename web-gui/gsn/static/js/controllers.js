@@ -75,6 +75,7 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         $scope.load();
     };
 
+    $scope.columns= [true, true, true];
 
     $scope.load();
 
