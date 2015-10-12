@@ -7,7 +7,7 @@
 
 /* Controllers */
 
-var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination']);
+var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js']);
 
 gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope, $http) {
 
@@ -57,12 +57,68 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         return date.year + "-" + date.month + "-" + date.day + "T" + date.hour + ":" + date.minute + ":" + date.second;
     }
 
+    function buildSeries() {
+        if ($scope.details) {
+            for (var i = 2; i < $scope.details.properties.fields.length; i++) {
+                $scope.plot.series.push($scope.details.properties.fields[i].name);
+            }
+        }
+    }
+
+    function buildLabels() {
+
+        if ($scope.details && $scope.details.properties.values) {
+            for (var i = 0; i < $scope.details.properties.values.length; i++) {
+                $scope.plot.labels.push($scope.details.properties.values[i][0]);
+            }
+        }
+
+
+    }
+
+    function buildData() {
+
+
+        if ($scope.details && $scope.details.properties.values) {
+
+            for (var k = 2; k < $scope.details.properties.fields.length; k++) {
+                $scope.plot.data.push([]);
+            }
+
+
+            for (var i = 0; i < $scope.details.properties.values.length; i++) {
+                for (var j = 2; j < $scope.details.properties.fields.length; j++) {
+
+
+                    if ($scope.details.properties.values[i][j] === "" || !$scope.details.properties.values[i][j]) {
+                        $scope.plot.data[j - 2].push(0);
+                    } else {
+                        $scope.plot.data[j - 2].push($scope.details.properties.values[i][j]);
+                    }
+
+                }
+            }
+        }
+    }
 
     $scope.load = function () {
         $http.get('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/').success(function (data) {
-            $scope.details = data.features;
+            $scope.details = data.features ? data.features[0] : undefined;
             $scope.loading = false;
 
+
+            $scope.plot = {
+                'labels': [],
+                'series': [],
+                'data': [],
+                'onClick': function (points, evt) {
+                    console.log(points, evt);
+                }
+            };
+
+            buildSeries();
+            buildLabels();
+            buildData();
 
             //TODO: REMOVE
             console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');
@@ -75,10 +131,12 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         $scope.load();
     };
 
-    $scope.columns= [true, true, true];
+    $scope.columns = [true, true, true];
 
     $scope.load();
 
 
 }]);
+
+
 

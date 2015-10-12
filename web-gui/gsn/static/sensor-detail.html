@@ -6,17 +6,17 @@
 
     <div ng-show="loading">loading...</div>
 
-    <p class="col-lg-12 lead" ng-if="details[0]==undefined && !loading">This sensor does not exist or you do not have
+    <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have
         access to this it.</p>
 
-    <div ng-if="details[0]">
+    <div ng-if="details">
         <!--<div class="row" >-->
 
         <div class="col-lg-6" ng-if="!loading">
             <div class="panel panel-default">
                 <div class="panel-heading">Properties</div>
                 <div class="panel-body">
-                    <div ng-repeat="(key, value) in details[0].properties"><p
+                    <div ng-repeat="(key, value) in details.properties"><p
                             ng-if="key != 'fields' && key != 'geographical' && key != 'values'"><b>{{key}}:</b>
                         {{value}}</p>
                     </div>
@@ -28,17 +28,17 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Geographical data</div>
                 <div class="panel-body">
-                    <p ng-if="details[0].properties.geographical"><b>Location:</b>
-                        {{details[0].properties.geographical}}</p>
+                    <p ng-if="details.properties.geographical"><b>Location:</b>
+                        {{details.properties.geographical}}</p>
 
-                    <div ng-repeat="(key, value) in details[0].geometry">
+                    <div ng-repeat="(key, value) in details.geometry">
                         <p ng-if="key != 'coordinates'"><b>{{key}}:</b> {{value}}</p>
                     </div>
-                    <ul ng-if="details[0].geometry.coordinates">
-                        <li><b>Longitude:</b> {{details[0].geometry.coordinates[0]}}</li>
-                        <li><b>Latitude:</b> {{details[0].geometry.coordinates[1]}}</li>
-                        <li ng-if="details[0].geometry.coordinates[2]"><b>Altitude:</b>
-                            {{details[0].geometry.coordinates[2]}}
+                    <ul ng-if="details.geometry.coordinates">
+                        <li><b>Longitude:</b> {{details.geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{details.geometry.coordinates[1]}}</li>
+                        <li ng-if="details.geometry.coordinates[2]"><b>Altitude:</b>
+                            {{details.geometry.coordinates[2]}}
                         </li>
                     </ul>
                 </div>
@@ -130,13 +130,13 @@
 
                         <div class="row">
 
-                            <p style="float: left; display:inline-block" ng-if="details[0].properties.values">
+                            <p style="float: left; display:inline-block" ng-if="details.properties.values">
                                 <br>
-                                {{details[0].properties.values.length}} results found
+                                {{details.properties.values.length}} results found
                                 for
                                 the specified timeframe. </p>
 
-                            <p style="float:left; display:inline-block" ng-if="!details[0].properties.values"><br>
+                            <p style="float:left; display:inline-block" ng-if="!details.properties.values"><br>
                                 No data found for the
                                 specified timeframe. </p>
 
@@ -155,28 +155,28 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="checkbox-inline" ng-repeat="field in details[0].properties.fields">
+                            <label class="checkbox-inline" ng-repeat="field in details.properties.fields">
                                 <input type="checkbox" ng-model="columns[$index]">{{field.name}}
                             </label>
                         </div>
 
 
                         <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
-                               ng-if="details[0].properties.fields">
+                               ng-if="details.properties.fields">
 
 
                             <thead>
                             <tr>
-                                <th ng-repeat="field in details[0].properties.fields" ng-if="columns[$index]">
+                                <th ng-repeat="field in details.properties.fields" ng-if="columns[$index]">
                                     {{field.name}}
                                     ({{field.type}}<span
-                                        ng-if="field.unit">, {{field.unit}}</span>)
+                                        ng-show="field.unit">, {{field.unit}}</span>)
                                 </th>
                             </tr>
                             </thead>
-                            <tbody ng-if="details[0].properties.values">
-                            <tr dir-paginate="values in details[0].properties.values |itemsPerPage: truePageSize ">
-                                <td ng-repeat="value in values" ng-if="columns[$index]">{{value}}</td>
+                            <tbody ng-if="details.properties.values">
+                            <tr dir-paginate="values in details.properties.values  |itemsPerPage: truePageSize ">
+                                <td ng-repeat="value in values track by $index" ng-show="columns[$index]">{{value}}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -187,6 +187,13 @@
                                 direction-links="true"
                                 boundary-links="true">
                         </dir-pagination-controls>
+
+                        <canvas ng-if="details.properties.values" id="line" class="chart chart-line"
+                                chart-data="plot.data"
+                                chart-labels="plot.labels" chart-legend="true" chart-series="plot.series"
+                                chart-click="plot.onClick" chart-options="{showXLabels: 25}">
+                        </canvas>
+
 
                     </div>
 

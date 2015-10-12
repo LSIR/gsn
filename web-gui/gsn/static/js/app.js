@@ -16,15 +16,15 @@ var gsnApp = angular.module('gsnApp', [
 gsnApp.config(['$routeProvider',
     function ($routeProvider) {
         $routeProvider.
-      when('/sensors', {
-        templateUrl: 'static/sensors_list.html',
-        controller: 'SensorListCtrl'
-      }).
-      when('/sensors/:sensorName', {
-        templateUrl: 'static/sensor-detail.html',
-        controller: 'SensorDetailsCtrl'
-      }).
-      otherwise({
-        redirectTo: '/sensors'
-      });
+            when('/sensors', {
+                templateUrl: 'static/sensors_list.html',
+                controller: 'SensorListCtrl'
+            }).
+            when('/sensors/:sensorName', {
+                templateUrl: 'static/sensor-detail.html',
+                controller: 'SensorDetailsCtrl'
+            }).
+            otherwise({
+                redirectTo: '/sensors'
+            });
     }]);

@@ -24,9 +24,11 @@
     <link rel="stylesheet" type="text/css" href="{% static 'gsn/sb-admin-2.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'gsn/timeline.css' %}"/>
 
-    <!-- Morris Charts CSS -->
-    <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/morrisjs/morris.css' %}" rel="stylesheet">
+    <!--&lt;!&ndash; Morris Charts CSS &ndash;&gt;-->
+    <!--<link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/morrisjs/morris.css' %}" rel="stylesheet">-->
 
+    <!-- Angular Chart CSS -->
+    <link rel="stylesheet" href="{% static 'css/angular-chart.css' %}">
 
     <!-- Custom Fonts -->
     <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/font-awesome/css/font-awesome.min.css' %}"
@@ -44,9 +46,16 @@
     <script src="{% static 'js/controllers.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
 
+
     <!-- DirPaginate-->
 
     <script src="{% static 'js/dirPagination.js' %}"></script>
+
+
+    <!-- Charts and Angular Chart -->
+    <script src="https://rawgit.com/hay-wire/Chart.js/skip-xlabels/Chart.js"></script>
+    <script src="https://rawgit.com/jtblin/angular-chart.js/master/dist/angular-chart.js"></script>
+
 
     <!-- Flot -->
     <script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/flot/excanvas.js' %}"></script>
