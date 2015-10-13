@@ -29,7 +29,19 @@ gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope
 
         for (var i = 0; i < $scope.sensors.length; i++) {
             var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
-            $scope.dynMarkers.push(new google.maps.Marker({position: latLng}));
+
+            var marker = new google.maps.Marker({
+                position: latLng,
+                title: $scope.sensors[i].properties.vs_name,
+                url: '#/sensors/' + $scope.sensors[i].properties.vs_name
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                window.location.href = this.url;
+            });
+
+            $scope.dynMarkers.push(marker);
+
         }
 
         $scope.markerClusterer = new MarkerClusterer(map, $scope.dynMarkers, {});
@@ -147,6 +159,8 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
     };
 
     $scope.columns = [true, true, true];
+
+    $scope.graph = false;
 
     $scope.load();
 

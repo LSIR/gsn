@@ -2,13 +2,22 @@
     <div class="col-lg-12">
         <h1 class="page-header">Sensors List</h1>
     </div>
-
-
 </div>
 
 <div ng-show="loading">loading...</div>
 
+
 <div class="row">
+
+    <div class="col-lg-12" style="padding: 1em;">
+        <map center="current-location" zoom="6">
+        </map>
+    </div>
+</div>
+
+<div class="row">
+
+
     <div class="col-lg-6">
         <div ng-repeat="sensor in sensors">
             <div class="panel panel-default" ng-if="$even">
@@ -17,6 +26,7 @@
 
                 <div class="panel-body">
                     <p><b>Description:</b> {{ sensor.properties.description }}</p>
+
                     <p ng-if="sensor.properties.geographical"><b> Location: </b>{{sensor.properties.geographical}}</p>
                     <ul ng-if="sensor.geometry.coordinates">
                         <li><b>Longitude:</b> {{sensor.geometry.coordinates[0]}}</li>
@@ -41,6 +51,7 @@
 
                 <div class="panel-body">
                     <p><b>Description:</b> {{ sensor.properties.description }}</p>
+
                     <p ng-if="sensor.properties.geographical"><b> Location: </b>{{sensor.properties.geographical}}</p>
                     <ul ng-if="sensor.geometry.coordinates">
                         <li><b>Longitude:</b> {{sensor.geometry.coordinates[0]}}</li>
