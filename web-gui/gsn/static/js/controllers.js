@@ -7,7 +7,8 @@
 
 /* Controllers */
 
-var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap']);
+var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap', 'ngAnimate']);
+
 
 gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope, $http) {
 
@@ -28,19 +29,23 @@ gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope
         $scope.dynMarkers = [];
 
         for (var i = 0; i < $scope.sensors.length; i++) {
-            var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
 
-            var marker = new google.maps.Marker({
-                position: latLng,
-                title: $scope.sensors[i].properties.vs_name,
-                url: '#/sensors/' + $scope.sensors[i].properties.vs_name
-            });
+            if ($scope.sensors[i].geometry.coordinates[1] == $scope.sensors[i].geometry.coordinates[0] == 0) {
+                var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
 
-            google.maps.event.addListener(marker, 'click', function () {
-                window.location.href = this.url;
-            });
+                var marker = new google.maps.Marker({
+                    position: latLng,
+                    title: $scope.sensors[i].properties.vs_name,
+                    url: '#/sensors/' + $scope.sensors[i].properties.vs_name
+                });
 
-            $scope.dynMarkers.push(marker);
+                google.maps.event.addListener(marker, 'click', function () {
+                    window.location.href = this.url;
+                });
+
+                $scope.dynMarkers.push(marker);
+
+            }
 
         }
 
@@ -166,5 +171,3 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
 
 }]);
-
-

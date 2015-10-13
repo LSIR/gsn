@@ -10,7 +10,8 @@
 var gsnApp = angular.module('gsnApp', [
     'ngRoute',
     'gsnControllers',
-    'ng.django.urls'
+    'ng.django.urls',
+    'sensorAnimations'
 ]);
 
 gsnApp.config(['$routeProvider',

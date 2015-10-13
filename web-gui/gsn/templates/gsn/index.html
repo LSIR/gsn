@@ -34,6 +34,8 @@
     <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/font-awesome/css/font-awesome.min.css' %}"
           rel="stylesheet" type="text/css">
 
+    <!-- Animations -->
+    <link href="{% static 'css/animations.css' %}" rel="stylesheet" type="text/css">
     <!-- jQuery -->
     <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
     <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -59,6 +61,11 @@
     <script src="https://rawgit.com/hay-wire/Chart.js/skip-xlabels/Chart.js"></script>
     <script src="https://rawgit.com/jtblin/angular-chart.js/master/dist/angular-chart.js"></script>
 
+    <!--ngAnimate-->
+    <script src="https://code.angularjs.org/1.4.6/angular-animate.js"></script>
+
+    <!-- Javascript animations -->
+    <script src="{% static 'js/sensorAnimations.js'%}"></script>
 
     <!-- Flot -->
     <script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/flot/excanvas.js' %}"></script>
@@ -121,7 +128,7 @@
                 <ul class="nav" id="side-menu">
                     <li class="sidebar-search">
                         <div class="input-group custom-search-form">
-                            <input type="text" class="form-control" placeholder="Search...">
+                            <input type="text" class="form-control" placeholder="Search..." ng-model="query">
                                 <span class="input-group-btn">
                                 <button class="btn btn-default" type="button">
                                     <i class="fa fa-search"></i>
