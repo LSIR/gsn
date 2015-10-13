@@ -7,18 +7,33 @@
 
 /* Controllers */
 
-var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js']);
+var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap']);
 
 gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope, $http) {
 
     $scope.loading = true;
 
+    var map;
 
     $http.get('sensors').success(function (data) {
-        $scope.sensors = data.features;
-        $scope.loading = false;
-    });
+            $scope.sensors = data.features;
+            $scope.loading = false;
 
+        }
+    );
+
+    $scope.$on('mapInitialized', function (event, evtMap) {
+        map = evtMap;
+
+        $scope.dynMarkers = [];
+
+        for (var i = 0; i < $scope.sensors.length; i++) {
+            var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
+            $scope.dynMarkers.push(new google.maps.Marker({position: latLng}));
+        }
+
+        $scope.markerClusterer = new MarkerClusterer(map, $scope.dynMarkers, {});
+    });
 }]);
 
 gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', function ($scope, $http, $routeParams) {
@@ -137,6 +152,5 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
 
 }]);
-
 
 

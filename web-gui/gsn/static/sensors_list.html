@@ -16,23 +16,16 @@
                                               ng-bind="sensor.properties.vs_name"></a></div>
 
                 <div class="panel-body">
-
-
                     <p><b>Description:</b> {{ sensor.properties.description }}</p>
-
+                    <p ng-if="sensor.properties.geographical"><b> Location: </b>{{sensor.properties.geographical}}</p>
+                    <ul ng-if="sensor.geometry.coordinates">
+                        <li><b>Longitude:</b> {{sensor.geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{sensor.geometry.coordinates[1]}}</li>
+                        <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
+                            {{sensor.geometry.coordinates[2]}}
+                        </li>
+                    </ul>
                     <p><b>Public:</b> {{ sensor.properties.is_public}}</p>
-                    <!--<ul>-->
-                    <!--<li>Geograhical data:-->
-                    <!--<ul>-->
-                    <!--<li>Position: {{ sensor.properties.geographical }}-->
-                    <!--<li>Type: {{ sensor.geometry.type }}</li>-->
-                    <!--<li>Latitude: {{ sensor.geometry.coordinates[0] }}</li>-->
-                    <!--<li>Longitude: {{ sensor.geometry.coordinates[1] }}</li>-->
-                    <!--</ul>-->
-                    <!--</li>-->
-
-
-                    <!--</ul>-->
 
 
                 </div>
@@ -47,24 +40,15 @@
                                               ng-bind="sensor.properties.vs_name"></a></div>
 
                 <div class="panel-body">
-
-
-                    <p>{{ sensor.properties.description }}</p>
-                    <!--<ul>-->
-                    <!--<li>Geograhical data:-->
-                    <!--<ul>-->
-                    <!--<li>Position: {{ sensor.properties.geographical }}-->
-                    <!--<li>Type: {{ sensor.geometry.type }}</li>-->
-                    <!--<li>Latitude: {{ sensor.geometry.coordinates[0] }}</li>-->
-                    <!--<li>Longitude: {{ sensor.geometry.coordinates[1] }}</li>-->
-                    <!--</ul>-->
-                    <!--</li>-->
-
-
-                    <!--</ul>-->
-
                     <p><b>Description:</b> {{ sensor.properties.description }}</p>
-
+                    <p ng-if="sensor.properties.geographical"><b> Location: </b>{{sensor.properties.geographical}}</p>
+                    <ul ng-if="sensor.geometry.coordinates">
+                        <li><b>Longitude:</b> {{sensor.geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{sensor.geometry.coordinates[1]}}</li>
+                        <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
+                            {{sensor.geometry.coordinates[2]}}
+                        </li>
+                    </ul>
                     <p><b>Public:</b> {{ sensor.properties.is_public}}</p>
 
 

@@ -24,6 +24,11 @@ gsnApp.config(['$routeProvider',
                 templateUrl: 'static/sensor-detail.html',
                 controller: 'SensorDetailsCtrl'
             }).
+            when('/map', {
+                templateUrl: 'static/map.html',
+                controller: 'SensorListCtrl'
+            }).
+
             otherwise({
                 redirectTo: '/sensors'
             });
