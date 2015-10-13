@@ -33,6 +33,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -89,12 +91,12 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		String prefix = "vsensor:" + getVirtualSensorConfiguration().getName();
 		HashMap settings = storage.getSetting(prefix);
 		String field = (String) settings.get(prefix + ":" + "field");
-		String condition = (String) settings.get(prefix + ":" +  "condition");
-		Double value = Double.parseDouble((String) settings.get(prefix + ":" +  "value"));
-		action = (String) settings.get(prefix + ":" +  "action");
-		String contact = (String) settings.get(prefix + ":" +  "Contact");
+		String condition = (String) settings.get(prefix + ":" + "condition");
+		Double value = Double.parseDouble((String) settings.get(prefix + ":" + "value"));
+		action = (String) settings.get(prefix + ":" + "action");
+		String contact = (String) settings.get(prefix + ":" + "Contact");
 		boolean saveToDB;
-		if (((String) settings.get(prefix + ":" +  "Save to Database")).equals("true")) {
+		if (((String) settings.get(prefix + ":" + "Save to Database")).equals("true")) {
 			saveToDB = true;
 		} else {
 			saveToDB = false;
@@ -105,27 +107,27 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 		if (condition.equals("==")) {
 			if ((Double) streamElement.getData(field) == value) {
-				takeAction();
+				takeAction(field + " " + condition + " " + value + " (" + (Double) streamElement.getData(field) + ")");
 			}
 		} else if (condition.equals("is >=")) {
 			if ((Double) streamElement.getData(field) >= value) {
-				takeAction();
+				takeAction(field + " " + condition + " " + value + " (" + (Double) streamElement.getData(field) + ")");
 			}
 		} else if (condition.equals("is <=")) {
 			if ((Double) streamElement.getData(field) <= value) {
-				takeAction();
+				takeAction(field + " " + condition + " " + value + " (" + (Double) streamElement.getData(field) + ")");
 			}
 		} else if (condition.equals("is <")) {
 			if ((Double) streamElement.getData(field) < value) {
-				takeAction();
+				takeAction(field + " " + condition + " " + value + " (" + (Double) streamElement.getData(field) + ")");
 			}
 		} else if (condition.equals("is >")) {
 			if ((Double) streamElement.getData(field) > value) {
-				takeAction();
+				takeAction(field + " " + condition + " " + value + " (" + (Double) streamElement.getData(field) + ")");
 			}
 		} else if (condition.equals("changes")) {
 			notify_contentText = field + " is changed";
-			takeAction();
+			takeAction(field + " " + condition + " " + value + " (" + (Double) streamElement.getData(field) + ")");
 		} else if (condition.equals("frozen")) {
 			//TODO: to do
 		} else if (condition.equals("back after frozen")) {
@@ -137,9 +139,9 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		}
 	}
 
-	private void takeAction() {
+	private void takeAction(String notif) {
 		if (action.equals("Notification")) {
-			sendBasicNotification();
+			sendBasicNotification(notif);
 		} else if (action.equals("SMS")) {
 			//TODO: to do
 		} else {
@@ -147,27 +149,31 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		}
 	}
 
-	public void sendBasicNotification() {
+	public void sendBasicNotification(String notif) {
 
 		NotificationManager nm = (NotificationManager) StaticData.globalContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
 		int icon = R.drawable.alert_dark_frame;
-		CharSequence tickerText = "TinyGSN notification";
+		CharSequence contentTitle = "TinyGSN notification";
+		CharSequence tickerText = notif;
 		long when = System.currentTimeMillis();
 
-		//FIXME : deprecated
-		Notification notification = new Notification(icon, tickerText, when);
+		NotificationCompat.Builder mBuilder =
+				new NotificationCompat.Builder(StaticData.globalContext)
+						.setSmallIcon(icon)
+						.setContentTitle(contentTitle)
+						.setContentText(tickerText);
 
-		CharSequence contentTitle = "TinyGSN notification";
 		Intent notificationIntent = new Intent(StaticData.globalContext, ActivityViewData.class);
+
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(StaticData.globalContext);
+		stackBuilder.addParentStack(ActivityViewData.class);
+		stackBuilder.addNextIntent(notificationIntent);
+
 		PendingIntent contentIntent = PendingIntent.getActivity(StaticData.globalContext, 0,
 				                                                       notificationIntent, 0);
-		//FIXME : deprecated
-		notification.setLatestEventInfo(StaticData.globalContext, contentTitle, notify_contentText,
-				                               contentIntent);
-		notification.flags = Notification.FLAG_AUTO_CANCEL;
-
-		nm.notify(notify_id++, notification);
+		mBuilder.setContentIntent(contentIntent);
+		mBuilder.setAutoCancel(true);
+		nm.notify(notify_id++, mBuilder.build());
 	}
 
 
