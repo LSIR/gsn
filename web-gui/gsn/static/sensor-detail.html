@@ -9,6 +9,9 @@
     <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have
         access to this it.</p>
 
+    <div ng-if="loading" us-spinner style="position: relative"></div>
+
+
     <div ng-if="details">
         <!--<div class="row" >-->
 
@@ -190,7 +193,8 @@
 
                         <br>
                         <label>
-                            <input type="checkbox" ng-model="graph"> Show graph. Keep in mind that a graph is only a pretty way of showing data, and should be only used to look for small intervals.
+                            <input type="checkbox" ng-model="graph"> Show graph. Keep in mind that a graph is only a
+                            pretty way of showing data, and should be only used to look for small intervals.
                         </label>
 
                         <canvas ng-if="details.properties.values && graph" id="line" class="chart chart-line"

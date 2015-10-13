@@ -7,7 +7,7 @@
 
 /* Controllers */
 
-var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap', 'ngAnimate']);
+var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap', 'ngAnimate', 'angularSpinner']);
 
 
 gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope, $http) {
@@ -171,3 +171,4 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
 
 }]);
+
