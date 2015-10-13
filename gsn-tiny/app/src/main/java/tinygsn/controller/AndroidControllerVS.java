@@ -45,7 +45,7 @@ public class AndroidControllerVS extends AbstractController {
 	public AndroidControllerVS() {
 		Log.v(TAG, "Construction.");
 	}
-	
+
 	public ArrayList<AbstractVirtualSensor> loadListVS() {
 		vsList = storage.getListofVS();
 		return vsList;
@@ -57,24 +57,25 @@ public class AndroidControllerVS extends AbstractController {
 			return result.get(0);
 		return null;
 	}
-	
+
 	public ArrayList<StreamElement> loadLatestData(int numLatest, String vsName) {
 		ArrayList<StreamElement> latest = null;
 		AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsName);
 		if (vs != null){
 			DataField[] df = vs.getConfig().getOutputStructure();
-			String[] fieldList = new String[df.length];
-			Byte[] fieldType = new Byte[df.length];
-			for(int i=0;i<df.length;i++){
-				fieldList[i] = df[i].getName();
-				fieldType[i] = df[i].getDataTypeID();
+			if (df != null) {
+				String[] fieldList = new String[df.length];
+				Byte[] fieldType = new Byte[df.length];
+				for (int i = 0; i < df.length; i++) {
+					fieldList[i] = df[i].getName();
+					fieldType[i] = df[i].getDataTypeID();
+				}
+				latest = storage.executeQueryGetLatestValues("vs_" + vsName, fieldList, fieldType, numLatest);
 			}
-			latest = storage.executeQueryGetLatestValues("vs_" + vsName, fieldList, fieldType, numLatest);
-			
 		}
 		return latest;
 	}
-	
+
 	public ArrayList<StreamElement> loadRangeData(String vsName, long start, long end) {
 		ArrayList<StreamElement> result = null;
 		AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsName);
@@ -90,7 +91,7 @@ public class AndroidControllerVS extends AbstractController {
 		}
 		return result;
 	}
-	
+
 	public ArrayList<String> loadListFields(String vsName) {
 		ArrayList<String> fieldList = new ArrayList<String>();
 		DataField[] fields = null;
@@ -104,7 +105,7 @@ public class AndroidControllerVS extends AbstractController {
 		return fieldList;
 	}
 
-	
+
 	public void startStopVS(String vsName, boolean running) {
 		AbstractVirtualSensor vs = StaticData.getProcessingClassByName(vsName);
 		if (vs != null){

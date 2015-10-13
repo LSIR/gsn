@@ -470,6 +470,9 @@ public class ActivityVSConfig extends AbstractActivity {
 					} else if (storage.vsExists("vs_" + vsName) == true) {
 						Toast.makeText(this, "VS Name already exists, please choose a new one!",
 								              Toast.LENGTH_SHORT).show();
+					} else if (selectedVS.isEmpty()) {
+						Toast.makeText(this, "You must choose at least on wrapper for your VS",
+								              Toast.LENGTH_SHORT).show();
 					} else {
 						new AsyncTask<Activity, Void, Void>() {
 							@Override
