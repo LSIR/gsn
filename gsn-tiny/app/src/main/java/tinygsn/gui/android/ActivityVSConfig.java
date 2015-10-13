@@ -620,6 +620,14 @@ public class ActivityVSConfig extends AbstractActivity {
 					case EDITBOX:
 						values[indexTextView] = new EditText(ActivityVSConfig.this);
 						break;
+					case EDITBOX_NUMBER:
+						values[indexTextView] = new EditText(ActivityVSConfig.this);
+						values[indexTextView].setInputType(InputType.TYPE_CLASS_NUMBER);
+						break;
+					case EDITBOX_PHONE:
+						values[indexTextView] = new EditText(ActivityVSConfig.this);
+						values[indexTextView].setInputType(InputType.TYPE_CLASS_PHONE);
+						break;
 					case CHECKBOX:
 						values[indexTextView] = new CheckBox(ActivityVSConfig.this);
 						break;

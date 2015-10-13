@@ -186,9 +186,9 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		}
 		ArrayList<VSParameter> list = new ArrayList<>();
 		list.add(new VSParameter("condition", condition, ParameterType.SPINNER));
-		list.add(new VSParameter("value", "10", ParameterType.EDITBOX));
+		list.add(new VSParameter("value", "10", ParameterType.EDITBOX_NUMBER));
 		list.add(new VSParameter("action", action, ParameterType.SPINNER));
-		list.add(new VSParameter("Contact", "+41798765432", ParameterType.EDITBOX));
+		list.add(new VSParameter("Contact", "+41798765432", ParameterType.EDITBOX_PHONE));
 		list.add(new VSParameter("Save to Database", ParameterType.CHECKBOX));
 
 		return list;
