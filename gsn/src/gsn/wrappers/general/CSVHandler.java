@@ -48,6 +48,10 @@ public class CSVHandler {
 
     private String checkPointFile;
 
+    public boolean initialize(String inFields, String inFormats, char separator, char stringSeparator, int skipFirstXLines, String nullValues, String timeZone) {
+        return initialize(null, inFields, inFormats, separator, stringSeparator, skipFirstXLines, nullValues, timeZone, null);
+    }
+
     public boolean initialize(String dataFile, String inFields, String inFormats, char separator, char stringSeparator, int skipFirstXLines, String nullValues) {
         return initialize(dataFile, inFields, inFormats, separator, stringSeparator, skipFirstXLines, nullValues, LOCAL_TIMEZONE_ID, "check-poin/" + (new File(dataFile).getName() + ".chk-point"));
     }
@@ -60,11 +64,13 @@ public class CSVHandler {
         this.separator = separator;
         this.timeZone = DateTimeZone.forID(timeZone);
         this.checkPointFile = checkpointFile;
-        File file = new File(dataFile);
-
-        if (!file.isFile()) {
-            logger.error("The specified CSV data file: " + dataFile + " doesn't exists.");
-            return false;
+        if (dataFile != null) {
+	        File file = new File(dataFile);
+	
+	        if (!file.isFile()) {
+	            logger.error("The specified CSV data file: " + dataFile + " doesn't exists.");
+	            return false;
+	        }
         }
 
         try {
@@ -91,9 +97,11 @@ public class CSVHandler {
     }
 
     public void setupCheckPointFileIfNeeded() throws IOException {
-        String chkPointDir = new File(new File(getCheckPointFile()).getParent()).getAbsolutePath();
-        new File(chkPointDir).mkdirs();
-        new File(getCheckPointFile()).createNewFile();
+        if (checkPointFile != null) {
+	        String chkPointDir = new File(new File(getCheckPointFile()).getParent()).getAbsolutePath();
+	        new File(chkPointDir).mkdirs();
+	        new File(getCheckPointFile()).createNewFile();
+        }
     }
 
     public static boolean validateFormats(String[] formats) {
@@ -139,18 +147,21 @@ public class CSVHandler {
 
     public ArrayList<TreeMap<String, Serializable>> work(Reader dataFile, String checkpointDir) throws IOException {
         ArrayList<TreeMap<String, Serializable>> items = null;
-        setupCheckPointFileIfNeeded();
-        String val = FileUtils.readFileToString(new File(checkPointFile), "UTF-8");
         long lastItem = 0;
-        if (val != null && val.trim().length() > 0)
-            lastItem = Long.parseLong(val.trim());
+        if (checkPointFile != null) {
+	        setupCheckPointFileIfNeeded();
+	        String val = FileUtils.readFileToString(new File(checkPointFile), "UTF-8");
+	        if (val != null && val.trim().length() > 0)
+	            lastItem = Long.parseLong(val.trim());
+        }
         items = parseValues(dataFile, lastItem);
 
         return items;
     }
 
     public void updateCheckPointFile(long timestamp) throws IOException {
-        FileUtils.writeStringToFile(new File(checkPointFile), Long.toString(timestamp), "UTF-8");
+        if (checkPointFile != null)
+        	FileUtils.writeStringToFile(new File(checkPointFile), Long.toString(timestamp), "UTF-8");
     }
 
     private boolean loggedNoChange = false; // to avoid duplicate logging messages when there is no change
