@@ -1,0 +1,58 @@
+<virtual-sensor name="ETZ_IMIS__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.CSVParserVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="fields">SLF_LABEL,SLF_NR,GENERATION_TIME,TA,RH,VW,VW_MAX,DW,HS,HNW,PSUM,TSG,TSS,RSWR</param>
+            <param name="formats">string,numeric,timestamp(y-M-d H:m:s),numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric</param>
+            <param name="timezone">CET</param>
+            <param name="skip-first-lines">1</param>
+            <param name="bad-values"></param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" />
+            
+            <field name="SLF_LABEL" type="VARCHAR(16)" />
+            <field name="SLF_NR" type="INTEGER" />
+            
+            <field name="TA" type="DOUBLE" />
+            <field name="RH" type="DOUBLE" />
+            <field name="VW" type="DOUBLE" />
+            <field name="VW_MAX" type="DOUBLE" />
+            <field name="DW" type="DOUBLE" />
+            <field name="HS" type="DOUBLE" />
+            <field name="HNW" type="DOUBLE" />
+            <field name="PSUM" type="DOUBLE" />
+            <field name="TSG" type="DOUBLE" />
+            <field name="TSS" type="DOUBLE" />
+            <field name="RSWR" type="DOUBLE" />
+            <field name="" type="DOUBLE" />
+            <field name="" type="DOUBLE" />
+            <field name="" type="DOUBLE" />
+            <field name="" type="DOUBLE" />
+            <field name="" type="DOUBLE" />
+            <field name="" type="DOUBLE" />
+            <field name="" type="DOUBLE" />
+            <field name="" type="DOUBLE" />
+        </output-structure>
+    </processing-class>
+    <description>IMIS files from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from ETZ_IMIS__files</predicate>
+                    <predicate key="remote-contact-point">http://tpvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -1,0 +1,31 @@
+<virtual-sensor name="ETZ_IMIS__files__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            
+			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>
+        </output-structure>
+    </processing-class>
+    <description>IMIS files from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from ETZ_IMIS__files</predicate>
+                    <predicate key="remote-contact-point">http://tpvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

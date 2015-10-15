@@ -39,6 +39,7 @@ ETZ_Dozer_EnviroScanIdent.xml
 ETZ_Dozer_EnviroScanData.xml
 ETZ_GPS_Logger__files.xml
 ETZ_GPS_RAW.xml
+ETZ_IMIS__files.xml
 ETZ_Schedule.xml
 ETZ_Statistics.xml
 ETZ_SyslogNg.xml

@@ -1,0 +1,33 @@
+<virtual-sensor name="ETZ_IMIS__files" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+       	<web-input password="test">
+         	<command name="files">
+				<field name="imis_file" type="*binary">file</field>
+        	</command>
+   		</web-input>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            
+            <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>
+        </output-structure>
+    </processing-class>
+    <description>IMIS files from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <streams>
+      <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="file-getter">
+                    <predicate key="subdirectory-name">imis</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
