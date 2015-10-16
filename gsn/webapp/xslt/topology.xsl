@@ -132,7 +132,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
         <xsl:when test="@nodetype = 1">SIB TinyNode</xsl:when>
         <xsl:otherwise>
           <xsl:choose>
-            <xsl:when test="@nodetype = 2">WGPS TinyNode</xsl:when>
+            <xsl:when test="@nodetype = 2">GPS TinyNode</xsl:when>
             <xsl:otherwise>
               <xsl:choose>
                 <xsl:when test="@nodetype = 3">Powerswitch TN</xsl:when>
@@ -154,9 +154,24 @@ xmlns:atom="http://www.w3.org/2005/Atom">
                                     <xsl:otherwise>
                                       <xsl:choose>
                                         <xsl:when test="@nodetype = 9">AE TinyNode</xsl:when>
-                                        <xsl:otherwise>                        
-          				                unknown
-			                       		</xsl:otherwise>
+                                    	<xsl:otherwise>
+	                                      <xsl:choose>
+	                                        <xsl:when test="@nodetype = 10">Outback Mate 3</xsl:when>
+	                                    	<xsl:otherwise>
+		                                      <xsl:choose>
+		                                        <xsl:when test="@nodetype = 11">IMIS Weather Station</xsl:when>
+		                                    	<xsl:otherwise>
+			                                      <xsl:choose>
+			                                        <xsl:when test="@nodetype = 12">Leica GNSS</xsl:when>
+				                                        <xsl:otherwise>                        
+				          				                unknown
+							                       		</xsl:otherwise>
+						                      	  </xsl:choose>
+						                        </xsl:otherwise>
+					                      	  </xsl:choose>
+					                        </xsl:otherwise>
+				                      	  </xsl:choose>
+				                        </xsl:otherwise>
 			                      	  </xsl:choose>
 			                        </xsl:otherwise>
 			                      </xsl:choose>

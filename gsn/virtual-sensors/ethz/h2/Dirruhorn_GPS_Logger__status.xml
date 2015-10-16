@@ -9,7 +9,7 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
 		    <field name="SAMPLE_COUNT" type="INTEGER"/>
 			<field name="V12DC_IN" type="INTEGER" unit="mV"/>
 			<field name="HUMIDITY" type="INTEGER" unit="%"/>
@@ -31,7 +31,7 @@
                     <predicate key="query">select * from Dirruhorn_GPS_Logger__data__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, SAMPLE_COUNT,
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, DEVICE_TYPE, SAMPLE_COUNT,
                 STATUS_V12DC_IN as V12DC_IN, STATUS_HUMIDITY as HUMIDITY, STATUS_TEMPERATURE as TEMPERATURE,
                 cast(round(ASIN(STATUS_INCLINOMETER_X / 32000.0) * 180.0/PI(), 3) as CHAR(30)) as INCLINOMETER_X,
                 cast(round(ASIN(STATUS_INCLINOMETER_Y / 32000.0) * 180.0/PI(), 3) as CHAR(30)) as INCLINOMETER_Y,

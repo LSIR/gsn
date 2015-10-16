@@ -13,7 +13,7 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
 		    <field name="EVENT_COUNT" type="INTEGER"/>
 		    <field name="EVENT" type="VARCHAR(256)"/>
 		    

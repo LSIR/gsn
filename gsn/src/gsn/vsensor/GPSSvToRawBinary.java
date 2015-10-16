@@ -42,7 +42,7 @@ public class GPSSvToRawBinary extends BridgeVirtualSensorPermasense {
 		new DataField("DEVICE_ID", "INTEGER"),
 		new DataField("GPS_UNIXTIME", "BIGINT"),
 
-		new DataField("SENSOR_TYPE", "VARCHAR(16)"),
+		new DataField("DEVICE_TYPE", "VARCHAR(16)"),
 		new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
 		new DataField("GPS_SATS", "INTEGER"),
 		new DataField("GPS_MISSING_SV", "INTEGER"),

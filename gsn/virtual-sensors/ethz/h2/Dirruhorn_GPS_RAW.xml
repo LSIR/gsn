@@ -6,7 +6,7 @@
             <param name="persistant">true</param>
             <param name="scriptlet">
                 <![CDATA[
-                    SENSOR_TYPE = "gps-corestation";
+                    DEVICE_TYPE = "gps-corestation";
                 ]]>
             </param>
         </init-params>
@@ -15,7 +15,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SAMPLE_COUNT" type="INTEGER"/>
 		    <field name="GPS_SATS" type="INTEGER"/>

@@ -62,7 +62,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("GSN_TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
-			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
+			new DataField("DEVICE_TYPE", "VARCHAR(16)"),
 			new DataField("DATA_TYPE", "TINYINT"),
 			new DataField("SAMPLE_COUNT", "INTEGER"),
 			new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
@@ -81,7 +81,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("GSN_TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 
-			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
+			new DataField("DEVICE_TYPE", "VARCHAR(16)"),
 			new DataField("EVENT_COUNT", "INTEGER"),
 			new DataField("EVENT", "VARCHAR(256)")};
 	
@@ -92,7 +92,7 @@ public class GPSLoggerDataParser extends BridgeVirtualSensorPermasense {
 			new DataField("GSN_TIMESTAMP", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			
-			new DataField("SENSOR_TYPE", "VARCHAR(16)"),
+			new DataField("DEVICE_TYPE", "VARCHAR(16)"),
 			new DataField("START_DATE", "BIGINT"),
 			new DataField("END_DATE", "BIGINT"),
 			new DataField("UPLOADER", "VARCHAR(64)"),

@@ -13,7 +13,7 @@
 			<field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
 			
-			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
 			<field name="START_DATE" type="BIGINT" unit="unixtime" />
 			<field name="END_DATE" type="BIGINT" unit="unixtime" />
 			<field name="UPLOADER" type="VARCHAR(64)" />

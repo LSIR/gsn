@@ -12,7 +12,7 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" />
-	    	<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+	    	<field name="DEVICE_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 	    	<field name="GPS_SATS" type="INTEGER"/>
             <field name="GPS_TIME" type="INTEGER"/>
@@ -38,7 +38,7 @@
                     <predicate key="query">select * from Dirruhorn_GPS_RAW__single__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-               <!--<query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>-->
+               <!--<query> select POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, DEVICE_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, GPS_RAW_DATA from wrapper </query>-->
 		<query>select * from wrapper</query>
             </source>
             <query> select * from source </query>
@@ -49,7 +49,7 @@
                     <predicate key="query">select * from Dirruhorn_Dozer_GPSData__conv</predicate>
                    <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSOR_TYPE, GPS_RAW_DATA_VERSION, payload_timeofweekms as GPS_TIME, payload_vehiclenum as SPACE_VEHICLE, payload_measindicator as MEASUREMENT_QUALITY, payload_losslockindicator as LLI, carrierphase as CARRIER_PHASE, pseudorange as PSEUDO_RANGE, doppler as DOPPLER, payload_weeknumber as GPS_WEEK, payload_signalstrength as SIGNAL_STRENGTH from wrapper</query>
+                <query> select timed, timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, DEVICE_TYPE, GPS_RAW_DATA_VERSION, payload_timeofweekms as GPS_TIME, payload_vehiclenum as SPACE_VEHICLE, payload_measindicator as MEASUREMENT_QUALITY, payload_losslockindicator as LLI, carrierphase as CARRIER_PHASE, pseudorange as PSEUDO_RANGE, doppler as DOPPLER, payload_weeknumber as GPS_WEEK, payload_signalstrength as SIGNAL_STRENGTH from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>

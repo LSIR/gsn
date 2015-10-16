@@ -14,7 +14,7 @@
             <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-			<field name="SENSOR_TYPE" type="VARCHAR(32)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
             
             <field name="SLF_LABEL" type="VARCHAR(16)" />
             <field name="SLF_NR" type="INTEGER" />
@@ -46,7 +46,7 @@
                     <predicate key="query"> select * from Dirruhorn_IMIS__files__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMED, DEVICE_ID, SENSOR_TYPE, RELATIVE_FILE1 as FILE, SIZE_FILE1 as SIZE from wrapper </query>
+                <query> select TIMED, DEVICE_ID, DEVICE_TYPE, RELATIVE_FILE1 as FILE, SIZE_FILE1 as SIZE from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

@@ -12,7 +12,7 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" index="true" />
             
-			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
 		    <field name="GPS_MISSING_SV" type="INTEGER"/>
@@ -34,7 +34,7 @@
                     <predicate key="query"> select * from Dirruhorn_Dozer_WgpsSv__conv</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select *, 'wireless-gps' as SENSOR_TYPE from wrapper </query>
+                <query> select *, 'wireless-gps' as DEVICE_TYPE from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

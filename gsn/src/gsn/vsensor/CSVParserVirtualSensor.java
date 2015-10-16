@@ -21,9 +21,10 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
 
     private CSVHandler handler = new CSVHandler();
 
+    //TODO: make configurable in VS xml file
 	private static final DataField[] copiedDataFields = {
 		new DataField("DEVICE_ID", "INTEGER"),
-		new DataField("SENSOR_TYPE", "VARCHAR(32)"),
+		new DataField("DEVICE_TYPE", "VARCHAR(32)"),
 		new DataField("FILE", "VARCHAR(255)"),
 		new DataField("SIZE", "BIGINT")
 	};

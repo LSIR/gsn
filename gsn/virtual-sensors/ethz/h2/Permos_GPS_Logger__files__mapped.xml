@@ -5,7 +5,7 @@
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             
-			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
             <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>

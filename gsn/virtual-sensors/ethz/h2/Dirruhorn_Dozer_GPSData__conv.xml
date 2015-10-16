@@ -65,7 +65,7 @@
                 		else
                 			DOPPLER = null;
 				PAYLOAD_WEEKNUMBER = (short)PAYLOAD_WEEKNUMBER;
-                                SENSOR_TYPE = "gps-tinynode";
+                                DEVICE_TYPE = "gps-tinynode";
 				GPS_RAW_DATA_VERSION = (short)1; 
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
@@ -79,7 +79,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
 	    <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="SENSOR_TYPE" type="VARCHAR(16)" />
+            <field name="DEVICE_TYPE" type="VARCHAR(16)" />
 	    <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/> 
 	    <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />

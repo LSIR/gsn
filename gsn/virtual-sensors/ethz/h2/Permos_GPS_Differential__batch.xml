@@ -7,7 +7,7 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                		POSITION = DEVICE_ID = SENSOR_TYPE = GENERATION_TIME = LABEL = REFERENCE_LABEL = null;
+                		POSITION = DEVICE_ID = DEVICE_TYPE = GENERATION_TIME = LABEL = REFERENCE_LABEL = null;
                 		MIN_GENERATION_TIME = MAX_GENERATION_TIME = MIN_GSN_TIMESTAMP = MAX_GSN_TIMESTAMP = null;
                 		X_ECEF = Y_ECEF = Z_ECEF = SD_X = SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = null;
                 		SD_H = SD_EN = SD_EH = SD_NH = V_E = V_N = V_H = SD_V_E = SD_V_N = SD_V_H = V_3D = SD_V_3D = null;
@@ -20,7 +20,7 @@
                         if (spl[2].isNumber())
                             DEVICE_ID = spl[2].toInteger();
 			            if (spl[3].length()>0)
-				            SENSOR_TYPE = spl[3];
+				            DEVICE_TYPE = spl[3];
 						
                     	if (spl[4].isNumber())
                     		GENERATION_TIME = spl[4].toLong();
@@ -113,7 +113,7 @@
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
-			<field name="SENSOR_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
 			<field name="VERSION" type="SMALLINT" />
 			<field name="REFERENCE_LABEL" type="VARCHAR(4)" />
             

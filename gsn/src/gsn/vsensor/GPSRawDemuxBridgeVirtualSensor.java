@@ -19,7 +19,7 @@ public class GPSRawDemuxBridgeVirtualSensor extends BridgeVirtualSensorPermasens
 						new DataField("GSN_TIMESTAMP", "BIGINT"),
 						new DataField("DEVICE_ID", "INTEGER"),
 						new DataField("POSITION", "INTEGER"),
-						new DataField("SENSOR_TYPE", "VARCHAR(16)"),
+						new DataField("DEVICE_TYPE", "VARCHAR(16)"),
 						new DataField("GPS_RAW_DATA_VERSION", "SMALLINT"),
 					    new DataField("GPS_SATS", "INTEGER"),
 						new DataField("GPS_TIME", "INTEGER"),
