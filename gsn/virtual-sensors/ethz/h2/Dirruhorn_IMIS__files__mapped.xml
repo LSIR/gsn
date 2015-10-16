@@ -14,13 +14,13 @@
     <description>IMIS files from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
                     <predicate key="query"> select * from Dirruhorn_IMIS__files</predicate>
-                    <predicate key="remote-contact-point">http://tpvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="remote-contact-point">http://pvt.permasense.ethz.ch/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
