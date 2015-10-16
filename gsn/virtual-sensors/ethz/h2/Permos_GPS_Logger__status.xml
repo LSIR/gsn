@@ -9,7 +9,7 @@
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
 		    <field name="SAMPLE_COUNT" type="INTEGER"/>
 			<field name="V12DC_IN" type="INTEGER" unit="mV"/>
 			<field name="HUMIDITY" type="INTEGER" unit="%"/>

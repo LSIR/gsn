@@ -79,7 +79,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
 	    <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime"/>
-            <field name="DEVICE_TYPE" type="VARCHAR(16)" />
+            <field name="DEVICE_TYPE" type="VARCHAR(32)" />
 	    <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/> 
 	    <field name="HEADER_SEQNR" type="INTEGER" />
             <field name="HEADER_ORIGINATORID" type="INTEGER" />

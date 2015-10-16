@@ -89,7 +89,7 @@
             <field name="GPS_UNIXTIME" type="BIGINT" unit="unixtime" index="true" />
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
             
-			<field name="DEVICE_TYPE" type="VARCHAR(16)" />
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
             <field name="GPS_RAW_DATA_VERSION" type="SMALLINT"/>
 		    <field name="GPS_SATS" type="INTEGER"/>
 		    <field name="GPS_MISSING_SV" type="INTEGER"/>
