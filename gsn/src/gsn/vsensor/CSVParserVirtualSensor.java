@@ -13,12 +13,20 @@ import gsn.beans.StreamElement;
 import gsn.wrappers.general.CSVHandler;
 
 public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
-	
+
+	private final static String DEVICE_ID_FIELD_NAME = "device_id";
 	private final static String FILE_FIELD_NAME = "file";
 
     private final transient Logger logger = Logger.getLogger(CSVParserVirtualSensor.class);
 
     private CSVHandler handler = new CSVHandler();
+
+	private static final DataField[] copiedDataFields = {
+		new DataField("DEVICE_ID", "INTEGER"),
+		new DataField("SENSOR_TYPE", "VARCHAR(32)"),
+		new DataField("FILE", "VARCHAR(255)"),
+		new DataField("SIZE", "BIGINT")
+	};
     
 	private String storage_directory = null;
 
@@ -51,16 +59,6 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
         String timezone = (value == null) ? CSVHandler.LOCAL_TIMEZONE_ID : value;
         value = getVirtualSensorConfiguration().getMainClassInitialParams().get("bad-values");
         String nullValues = (value == null) ? "" : value;
-        
-        boolean hasFileField = false;
-		for (DataField d: getVirtualSensorConfiguration().getOutputStructure()) {
-			if (d.getName().equalsIgnoreCase(FILE_FIELD_NAME))
-				hasFileField = true;
-		}
-		if (!hasFileField) {
-			logger.error("the output structure has to contain the field: " + FILE_FIELD_NAME);
-			return false;
-		}
 
         if (csvSeparator != null && csvSeparator.length() != 1) {
             logger.warn("The provided CSV separator:>" + csvSeparator + "< should only have  1 character, thus ignored and instead \",\" is used.");
@@ -86,20 +84,27 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
 	
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
+		if (data.getData(FILE_FIELD_NAME) == null) {
+			logger.error("the received stream element from input stream \"" + inputStreamName + "\" does not contain the field: " + FILE_FIELD_NAME + ". Cannot process this element.");
+			return;
+		}
+		
 		File file = new File("");
 		try {
 			String relativeFile = (String) data.getData(FILE_FIELD_NAME);
 			if (relativeFile != null) {
-				file = new File(storage_directory, relativeFile);
+				file = new File(new File(storage_directory, Integer.toString((Integer)data.getData(DEVICE_ID_FIELD_NAME))).getPath(), relativeFile);
 				file = file.getAbsoluteFile();
 			
 		        FileReader reader = new FileReader(file);
 		        ArrayList<TreeMap<String, Serializable>> output = handler.work(reader, null);
-		        
-		        for (TreeMap<String, Serializable> se : output) {
-		            StreamElement streamElement = new StreamElement(se, handler.getDataFields());
-		            super.dataAvailable(inputStreamName, streamElement);
+		        Serializable [] s = new Serializable[copiedDataFields.length];
+		        for (int i=0; i<copiedDataFields.length; i++) {
+		        	s[i] = data.getData(copiedDataFields[i].getName());
 		        }
+		        
+		        for (TreeMap<String, Serializable> se : output)
+		            super.dataAvailable(inputStreamName, new StreamElement(new StreamElement(se, handler.getDataFields()), copiedDataFields, s));
 			}
 		} catch (Exception e) {
             logger.error(e.getMessage() + " :: " + file.getAbsolutePath(), e);
