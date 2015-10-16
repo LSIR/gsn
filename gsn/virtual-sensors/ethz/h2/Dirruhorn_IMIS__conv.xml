@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_IMIS__conv" priority="10" >
+<virtual-sensor name="Dirruhorn_IMIS__conv" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.CSVParserVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -35,7 +35,7 @@
             <field name="SIZE" type="BIGINT" unit="bytes"/>
         </output-structure>
     </processing-class>
-    <description>Converted IMIS weather station data from ETZ deployment</description>
+    <description>Converted IMIS weather station data from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
@@ -43,7 +43,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from ETZ_IMIS__files__mapped</predicate>
+                    <predicate key="query"> select * from Dirruhorn_IMIS__files__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select TIMED, DEVICE_ID, SENSOR_TYPE, RELATIVE_FILE1 as FILE, SIZE_FILE1 as SIZE from wrapper </query>

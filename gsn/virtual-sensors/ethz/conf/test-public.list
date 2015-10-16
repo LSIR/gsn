@@ -84,7 +84,7 @@ ETZ_GPS_RAW__binary__mapped.xml
 ETZ_GPS_RAW__single__conv.xml
 ETZ_GPS_RAW__tobinary__mapped.xml
 ETZ_IMIS__files__mapped.xml
-ETZ_IMIS__files__conv.xml
+ETZ_IMIS__conv.xml
 ETZ_Mapping_Chart.xml
 ETZ_Mapping_Geo.xml
 ETZ_Mapping_Position.xml

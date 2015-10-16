@@ -2,14 +2,24 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    SENSOR_TYPE = "imis-weather-station";
+                ]]>
+            </param>
+        </init-params>
        	<web-input password="test">
          	<command name="files">
-				<field name="imis_file" type="*binary">file</field>
+				<field name="device_id" type="*text">the device id from the station</field>
+				<field name="imis_file" type="*binary">a csv file from an IMIS weather station</field>
         	</command>
    		</web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="SENSOR_TYPE" type="VARCHAR(32)" />
             
             <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
             <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>

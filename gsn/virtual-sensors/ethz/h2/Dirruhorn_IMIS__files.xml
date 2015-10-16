@@ -1,27 +1,39 @@
-<virtual-sensor name="ETZ_IMIS__files__mapped" priority="10" >
+<virtual-sensor name="Dirruhorn_IMIS__files" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    SENSOR_TYPE = "imis-weather-station";
+                ]]>
+            </param>
+        </init-params>
+       	<web-input password="test">
+         	<command name="files">
+				<field name="device_id" type="*text">the device id from the station</field>
+				<field name="imis_file" type="*binary">a csv file from an IMIS weather station</field>
+        	</command>
+   		</web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="SENSOR_TYPE" type="VARCHAR(32)" />
-			
+            
             <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
             <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>
         </output-structure>
     </processing-class>
-    <description>IMIS files from ETZ deployment</description>
+    <description>IMIS files from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
     <streams>
-        <stream name="data">
+      <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="remote-rest">
-                    <predicate key="query"> select * from ETZ_IMIS__files</predicate>
-                    <predicate key="remote-contact-point">http://tpvt.permasense.ethz.ch/streaming/</predicate>
-                    <predicate key="start-time">continue</predicate>
+                <address wrapper="file-getter">
+                    <predicate key="subdirectory-name">imis</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
