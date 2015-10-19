@@ -172,7 +172,13 @@ public class CSVHandler {
         String[] values = null;
         long currentLine = 0;
         while ((values = reader.readNext()) != null) {
-            TreeMap<String, Serializable> se = convertTo(formats, fields, getNulls(), values, getSeparator());
+        	TreeMap<String, Serializable> se = null;
+        	try {
+        		se = convertTo(formats, fields, getNulls(), values, getSeparator());
+        	} catch (Exception e) {
+        		logger.error(e.getMessage());
+        		continue;
+        	}
             if (isEmpty(se))
                 continue;
             if (se.containsKey(TIMESTAMP)) {
@@ -257,7 +263,6 @@ public class CSVHandler {
                 streamElement.put(timeField, x.getMillis());
             } catch (IllegalArgumentException e) {
                 logger.error("Parsing error: TimeFormat=" + timeFormat + " , TimeValue=" + timeValue);
-                logger.error(e.getMessage(), e);
                 throw e;
             }
         }

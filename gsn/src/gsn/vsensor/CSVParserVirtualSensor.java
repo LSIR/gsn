@@ -97,15 +97,20 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
 				file = new File(new File(storage_directory, Integer.toString((Integer)data.getData(DEVICE_ID_FIELD_NAME))).getPath(), relativeFile);
 				file = file.getAbsoluteFile();
 			
-		        FileReader reader = new FileReader(file);
-		        ArrayList<TreeMap<String, Serializable>> output = handler.work(reader, null);
-		        Serializable [] s = new Serializable[copiedDataFields.length];
-		        for (int i=0; i<copiedDataFields.length; i++) {
-		        	s[i] = data.getData(copiedDataFields[i].getName());
+		        while (true) {
+			        FileReader reader = new FileReader(file);
+			        ArrayList<TreeMap<String, Serializable>> output = handler.work(reader, null);
+			        if (output.isEmpty())
+			        	break;
+		        	handler.setSkipFirstXLines(handler.getSkipFirstXLines() + output.size());
+			        Serializable [] s = new Serializable[copiedDataFields.length];
+			        for (int i=0; i<copiedDataFields.length; i++) {
+			        	s[i] = data.getData(copiedDataFields[i].getName());
+			        }
+			        
+			        for (TreeMap<String, Serializable> se : output)
+			            super.dataAvailable(inputStreamName, new StreamElement(new StreamElement(se, handler.getDataFields()), copiedDataFields, s));
 		        }
-		        
-		        for (TreeMap<String, Serializable> se : output)
-		            super.dataAvailable(inputStreamName, new StreamElement(new StreamElement(se, handler.getDataFields()), copiedDataFields, s));
 			}
 		} catch (Exception e) {
             logger.error(e.getMessage() + " :: " + file.getAbsolutePath(), e);
