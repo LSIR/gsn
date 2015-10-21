@@ -7,50 +7,83 @@
 
 /* Controllers */
 
-var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap', 'ngAnimate', 'angularSpinner']);
+var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap', 'angularSpinner', 'ngAutocomplete']);
 
 
-gsnControllers.controller('SensorListCtrl', ['$scope', '$http', function ($scope, $http) {
+gsnControllers.factory('sensorService', function ($http) {
+    return {
+        async: function () {
+            return $http.get('sensors');
+        }
+    };
+});
+
+gsnControllers.factory('mapDistanceService', function () {
+    return {
+        distance: function (circlePosition, sensor) {
+            var latLngA = new google.maps.LatLng(circlePosition.split(",")[0], circlePosition.split(",")[1]);
+
+            var latLngB = new google.maps.LatLng(sensor.geometry.coordinates[1], sensor.geometry.coordinates[0]);
+
+            return google.maps.geometry.spherical.computeDistanceBetween(latLngA, latLngB);
+
+        }
+    }
+});
+
+gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function ($scope, sensorService) {
 
     $scope.loading = true;
 
     var map;
 
-    $http.get('sensors').success(function (data) {
-            $scope.sensors = data.features;
-            $scope.loading = false;
 
-        }
-    );
+    sensorService.async().success(function (data) {
+        $scope.sensors = data.features;
+        $scope.loading = false;
 
-    $scope.$on('mapInitialized', function (event, evtMap) {
-        map = evtMap;
+        $scope.$on('mapInitialized', function (event, evtMap) {
 
-        $scope.dynMarkers = [];
 
-        for (var i = 0; i < $scope.sensors.length; i++) {
+            map = evtMap;
 
-            if ($scope.sensors[i].geometry.coordinates[1] == $scope.sensors[i].geometry.coordinates[0] == 0) {
-                var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
+            $scope.dynMarkers = [];
 
-                var marker = new google.maps.Marker({
-                    position: latLng,
-                    title: $scope.sensors[i].properties.vs_name,
-                    url: '#/sensors/' + $scope.sensors[i].properties.vs_name
-                });
+            for (var i = 0; i < $scope.sensors.length; i++) {
 
-                google.maps.event.addListener(marker, 'click', function () {
-                    window.location.href = this.url;
-                });
+                if ($scope.sensors[i].geometry.coordinates[1] == $scope.sensors[i].geometry.coordinates[0] == 0) {
+                    var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
 
-                $scope.dynMarkers.push(marker);
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        title: $scope.sensors[i].properties.vs_name,
+                        url: '#/sensors/' + $scope.sensors[i].properties.vs_name
+                    });
+
+                    google.maps.event.addListener(marker, 'click', function () {
+                        window.location.href = this.url;
+                    });
+
+                    $scope.dynMarkers.push(marker);
+
+                }
 
             }
 
-        }
+            $scope.markerClusterer = new MarkerClusterer(map, $scope.dynMarkers, {});
 
-        $scope.markerClusterer = new MarkerClusterer(map, $scope.dynMarkers, {});
+
+        });
     });
+
+
+    //$http.get('sensors').success(function (data) {
+    //        $scope.sensors = data.features;
+    //        $scope.loading = false;
+    //
+    //    }
+    //);
+
 }]);
 
 gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', function ($scope, $http, $routeParams) {
@@ -138,6 +171,8 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
             $scope.details = data.features ? data.features[0] : undefined;
             $scope.loading = false;
 
+            console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');    //TODO: REMOVE
+
 
             $scope.plot = {
                 'labels': [],
@@ -152,8 +187,6 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
             buildLabels();
             buildData();
 
-            //TODO: REMOVE
-            console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');
 
         });
     };
@@ -167,8 +200,67 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
     $scope.graph = false;
 
-    $scope.load();
+    console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');    //TODO: REMOVE
 
+    $scope.load();
 
 }]);
 
+gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceService', function ($scope, sensorService, mapDistanceService) {
+
+    $scope.loading = true;
+    $scope.test = "TEST";
+
+
+    $scope.defaultPosition = "46.520112399999995, 6.5659288";
+    $scope.circlePosition = "46.520112399999995, 6.5659288";
+    $scope.radius = 20000;
+
+    $scope.zoomLevel = 6;
+
+    $scope.centerChanged = function (event) {
+        $scope.circlePosition = this.getCenter().lat() + ", " + this.getCenter().lng();
+    };
+
+    $scope.boundsChanged = function (event) {
+        $scope.radius = this.getRadius();
+    };
+
+    $scope.centerOnMe = function () {
+        $scope.circlePosition = "current-location";
+        $scope.zoomLevel = 12;
+        $scope.radius = 2000;
+    };
+
+    $scope.locationSearchResult = '';
+    $scope.locationSearchDetails = '';
+
+    $scope.locationSearch = function () {
+        $scope.circlePosition = $scope.locationSearchDetails.geometry.location.lat() + ", " + $scope.locationSearchDetails.geometry.location.lng()
+    };
+
+
+    sensorService.async().success(function (data) {
+        $scope.sensors = data.features;
+        $scope.loading = false;
+    });
+
+    $scope.isCloseEnough = function () {
+        return function (sensor) {
+            return mapDistanceService.distance($scope.circlePosition, sensor) < $scope.radius;
+        }
+    };
+
+    //$scope.distance = function () {
+    //
+    //    var latLngA = new google.maps.LatLng($scope.circlePosition.split(",")[0], $scope.circlePosition.split(",")[1]);
+    //
+    //    var latLngB = new google.maps.LatLng(46.520112399999995, 5.5659288);
+    //
+    //    return google.maps.geometry.spherical.computeDistanceBetween(latLngA, latLngB);
+    //
+    //}
+
+
+}])
+;

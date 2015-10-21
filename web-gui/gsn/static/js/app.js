@@ -10,9 +10,9 @@
 var gsnApp = angular.module('gsnApp', [
     'ngRoute',
     'gsnControllers',
-    'ng.django.urls',
-    'sensorAnimations'
+    'ng.django.urls'
 ]);
+
 
 gsnApp.config(['$routeProvider',
     function ($routeProvider) {
@@ -25,10 +25,10 @@ gsnApp.config(['$routeProvider',
                 templateUrl: 'static/sensor-detail.html',
                 controller: 'SensorDetailsCtrl'
             }).
-            //when('/map', {
-            //    templateUrl: 'static/map.html',
-            //    controller: 'SensorListCtrl'
-            //}).
+            when('/map', {
+                templateUrl: 'static/map.html',
+                controller: 'MapCtrl'
+            }).
 
             otherwise({
                 redirectTo: '/sensors'
