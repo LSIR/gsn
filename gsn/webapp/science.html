@@ -1088,38 +1088,38 @@
 														select : "sensornode[position=10]"
 													} ]
 										},
-										{
-											title : "Acoustic Emission Events Channel 1",
-											signals : [ {
-												vsensor : ".*_dozer_aedata__demux",
-												field : [ "length_ch1", "risetime_ch1",
-														"amplitude_db_ch1",
-														"count_ch1", "energy_ch1" ],
-												select : "sensornode[nodetype=9]"
-											} ],
-										},
-										{
-											title : "Acoustic Emission Events Channel 2",
-											signals : [ {
-												vsensor : ".*_dozer_aedata__demux",
-												field : [ "length_ch2", "risetime_ch2",
-														"amplitude_db_ch2",
-														"count_ch2", "energy_ch2" ],
-												select : "sensornode[nodetype=9]"
-											} ],
-										},
-										{
-											title : "Acoustic Emission Statistics",
-											signals : [ {
-												vsensor : ".*_dozer_aestatistics__mapped",
-												field : [
-														"payload_ch1_measured",
-														"payload_ch1_noisefloor",
-														"payload_ch2_measured",
-														"payload_ch2_noisefloor" ],
-												select : "sensornode[nodetype=9]"
-											} ],
-										},
+// 										{
+// 											title : "Acoustic Emission Events Channel 1",
+// 											signals : [ {
+// 												vsensor : ".*_dozer_aedata__demux",
+// 												field : [ "length_ch1", "risetime_ch1",
+// 														"amplitude_db_ch1",
+// 														"count_ch1", "energy_ch1" ],
+// 												select : "sensornode[nodetype=9]"
+// 											} ],
+// 										},
+// 										{
+// 											title : "Acoustic Emission Events Channel 2",
+// 											signals : [ {
+// 												vsensor : ".*_dozer_aedata__demux",
+// 												field : [ "length_ch2", "risetime_ch2",
+// 														"amplitude_db_ch2",
+// 														"count_ch2", "energy_ch2" ],
+// 												select : "sensornode[nodetype=9]"
+// 											} ],
+// 										},
+// 										{
+// 											title : "Acoustic Emission Statistics",
+// 											signals : [ {
+// 												vsensor : ".*_dozer_aestatistics__mapped",
+// 												field : [
+// 														"payload_ch1_measured",
+// 														"payload_ch1_noisefloor",
+// 														"payload_ch2_measured",
+// 														"payload_ch2_noisefloor" ],
+// 												select : "sensornode[nodetype=9]"
+// 											} ],
+// 										},
 										{
 											title : "Moistures Enviroscan Position 19",
 											signals : [ {
