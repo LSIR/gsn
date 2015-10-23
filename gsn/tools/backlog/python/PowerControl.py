@@ -488,6 +488,7 @@ class PowerControlClass(Thread):
 
         try:
             while not self._stopped:
+                logTurnOffWlan = True
                 self._work.wait()
                 self._work.clear()
                 while not self._stopped and not self._wlanToBeState:
@@ -497,7 +498,10 @@ class PowerControlClass(Thread):
                     if self._wlanOff():
                         break
                     else:
-                        self._logger.info('trying to turn off wlan again in %s seconds' % (WLAN_TURN_OFF_CHECK_INTERVAL_SEC,))
+                        if logTurnOffWlan:
+                            self._logger.info('could not turn off wlan yet, will try again continuously')
+                            logTurnOffWlan = False
+                        self._logger.debug('trying to turn off wlan again in %s seconds' % (WLAN_TURN_OFF_CHECK_INTERVAL_SEC,))
                         self._work.wait(WLAN_TURN_OFF_CHECK_INTERVAL_SEC)
                         if self._wlanToBeState:
                             self._logger.info('turning off wlan has been canceled => will not retry')
