@@ -1,4 +1,4 @@
-<virtual-sensor name="Dirruhorn_GPS_Inclinometer" priority="10" >
+<virtual-sensor name="Saastal_GPS_Inclinometer" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -22,17 +22,7 @@
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from Dirruhorn_GPS_Logger__status</predicate>
-                    <predicate key="start-time">continue</predicate>
-                </address>
-                <query> select GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, DEVICE_TYPE as SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper</query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-        <stream name="data1">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="local">
-                    <predicate key="query">select * from Dirruhorn_Dozer_WgpsStatus__conv</predicate>
+                    <predicate key="query">select * from Saastal_Dozer_WgpsStatus__conv</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper where SAM7_VALID = 1</query>
