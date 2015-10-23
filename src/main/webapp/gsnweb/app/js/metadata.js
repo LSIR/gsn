@@ -14,6 +14,9 @@ var metadata = angular.module("metadata", [])
         $scope.hasGSNMetadata = function() {
             return $scope.hasMetadata() && difMetadata.data.gsn != "";        };
 
+        $scope.hasWikiLink= function() {
+            return  $scope.gsnMetadata.features[0].properties.wikiLink  != undefined;        };
+
         if ($scope.hasDif()) {
             $scope.dif = JSON.parse(difMetadata.data.dif);
         }
