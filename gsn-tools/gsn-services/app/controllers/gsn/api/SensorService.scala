@@ -19,6 +19,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 import play.Logger
 import scala.util.Success
+import controllers.gsn.GSNDataHandler
+import scalaoauth2.provider.OAuth2ProviderActionBuilders.AuthorizedAction
 
 object SensorService extends Controller{   
   lazy val conf=ConfigFactory.load
@@ -39,7 +41,8 @@ object SensorService extends Controller{
   def param[T](name:String,fun: String=>T,default:T)(implicit req:Request[AnyContent])=
     queryparam(name).map(fun(_)).getOrElse(default)
       
-  def sensors = Action.async {implicit request=>
+  def sensors = AuthorizedAction(new GSNDataHandler()).async {implicit request =>
+    val user = request.authInfo.user
     Try{    
       val format=param("format",OutputFormat,defaultFormat)    
       val latestVals=param("latestValues",_.toBoolean,false)
@@ -61,7 +64,7 @@ object SensorService extends Controller{
       case t=>
         t.printStackTrace  
         Future(BadRequest(t.getMessage))    
-    }.get    
+    }.get  
   }
   
   @deprecated("user-password authentication phased out","")
@@ -89,7 +92,8 @@ object SensorService extends Controller{
     }
   }
   
-  def sensorData(sensorid:String) = Action.async {implicit request=>
+  def sensorData(sensorid:String) = AuthorizedAction(new GSNDataHandler()).async {implicit request =>
+    val user = request.authInfo.user
     Try{
       val vsname=sensorid.toLowerCase
       //to enable

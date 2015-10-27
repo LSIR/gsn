@@ -30,13 +30,14 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.1" % "test",
   "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test"
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test",
+  "org.mindrot" % "jbcrypt" % "0.3m"
 )
 
 resolvers ++= Seq(
   DefaultMavenRepository,
   "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "lsir remote" at "http://planetdata.epfl.ch:8081/artifactory/remote-repos"
+  "lsir remote" at "http://osper.epfl.ch:8081/artifactory/remote-repos"
 )
 
 scalacOptions += "-deprecation"

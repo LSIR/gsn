@@ -4,6 +4,9 @@ import gsn.data.DataStore
 import scala.util.Try
 import slick.jdbc.JdbcBackend._
 import java.util.UUID
+import org.mindrot.jbcrypt.BCrypt
+
+
 
 class SecurityData(ds:DataStore) {
   private object Queries{
@@ -21,10 +24,10 @@ class SecurityData(ds:DataStore) {
       "INSERT INTO ACUSERKEY VALUES "+
       users.map(u=>s"('$u','${UUID.randomUUID}',null)").mkString(",")
       
-    def createUser(username:String,origin:String)=
-      s"""INSERT INTO ACUSER VALUES ('$username' ,'','','','','no','$origin'"""
+    def createUser(username:String, password:String ,origin:String)=
+      s"""INSERT INTO ACUSER VALUES ('$username' ,'','','','${BCrypt.hashpw(password, BCrypt.gensalt())}','no','$origin'"""
     def testTable(table:String)=s"SELECT * FROM $table"
-   
+        
   }  
   private def existsTable(tableQuery:String)(implicit session:Session)= 
     Try{session.conn.createStatement.execute(tableQuery)}
@@ -60,14 +63,9 @@ class SecurityData(ds:DataStore) {
               gds.datasourcetype >0"""
     ds.withSession{implicit session=>
       val rs=session.conn.createStatement.executeQuery(q)
-      val exists=
-        if (rs.next) true
-        else {
-          val rsGroup=session.conn.createStatement.executeQuery(qGroup)
-          rsGroup.next
-        }
-      exists
-    }
+      lazy val rsGroup=session.conn.createStatement.executeQuery(qGroup)
+      rs.next || rsGroup.next
+      }
   }
 
   def authorizeVs(vsname:String,user:String,pass:String):Boolean={
@@ -81,13 +79,8 @@ class SecurityData(ds:DataStore) {
               u.username=ug.username AND ug.groupname=gds.groupname"""
     ds.withSession{implicit session=>
       val rs=session.conn.createStatement.executeQuery(q)
-      val exists=
-        if (rs.next) true
-        else {
-          val rsGroup=session.conn.createStatement.executeQuery(qGroup)
-          rsGroup.next
-        }
-      exists
+      lazy val rsGroup=session.conn.createStatement.executeQuery(qGroup)
+      rs.next || rsGroup.next
     }
   }
 
@@ -96,7 +89,7 @@ class SecurityData(ds:DataStore) {
            WHERE ds.datasourcename='${resourceName.toLowerCase}'"""
     ds.withSession{implicit session=>
       val rs=session.conn.createStatement.executeQuery(q)
-      rs.next()      
+      rs.next      
     }
   }
 }
