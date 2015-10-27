@@ -27,4 +27,10 @@ object Application extends Controller{
     Future(Ok(""))
     
   }
+
+def oAuthDenied(provider: String) = Action.async {implicit request=>
+    //request.body.
+    Future(Ok("provider"))
+    
+  }
 }
