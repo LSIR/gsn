@@ -192,16 +192,9 @@
                         </dir-pagination-controls>
 
                         <br>
-                        <label>
-                            <input type="checkbox" ng-model="graph"> Show graph. Keep in mind that a graph is only a
-                            pretty way of showing data, and should be only used to look for small intervals.
-                        </label>
 
-                        <canvas ng-if="details.properties.values && graph" id="line" class="chart chart-line"
-                                chart-data="plot.data"
-                                chart-labels="plot.labels" chart-legend="true" chart-series="plot.series"
-                                chart-click="plot.onClick" chart-options="{showXLabels: 25}">
-                        </canvas>
+
+                        <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
 
 
                     </div>

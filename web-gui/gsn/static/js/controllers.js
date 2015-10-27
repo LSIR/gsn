@@ -7,7 +7,7 @@
 
 /* Controllers */
 
-var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap', 'angularSpinner', 'ngAutocomplete']);
+var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap', 'angularSpinner', 'ngAutocomplete', 'highcharts-ng']);
 
 
 gsnControllers.factory('sensorService', function ($http) {
@@ -122,56 +122,11 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         return date.year + "-" + date.month + "-" + date.day + "T" + date.hour + ":" + date.minute + ":" + date.second;
     }
 
-    function buildSeries() {
-        if ($scope.details) {
-            for (var i = 2; i < $scope.details.properties.fields.length; i++) {
-                $scope.plot.series.push($scope.details.properties.fields[i].name);
-            }
-        }
-    }
-
-    function buildLabels() {
-
-        if ($scope.details && $scope.details.properties.values) {
-            for (var i = 0; i < $scope.details.properties.values.length; i++) {
-                $scope.plot.labels.push($scope.details.properties.values[i][0]);
-            }
-        }
-
-
-    }
-
-    function buildData() {
-
-
-        if ($scope.details && $scope.details.properties.values) {
-
-            for (var k = 2; k < $scope.details.properties.fields.length; k++) {
-                $scope.plot.data.push([]);
-            }
-
-
-            for (var i = 0; i < $scope.details.properties.values.length; i++) {
-                for (var j = 2; j < $scope.details.properties.fields.length; j++) {
-
-
-                    if ($scope.details.properties.values[i][j] === "" || !$scope.details.properties.values[i][j]) {
-                        $scope.plot.data[j - 2].push(0);
-                    } else {
-                        $scope.plot.data[j - 2].push($scope.details.properties.values[i][j]);
-                    }
-
-                }
-            }
-        }
-    }
 
     $scope.load = function () {
         $http.get('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/').success(function (data) {
             $scope.details = data.features ? data.features[0] : undefined;
             $scope.loading = false;
-
-            console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');    //TODO: REMOVE
 
 
             $scope.plot = {
@@ -183,26 +138,86 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
                 }
             };
 
-            buildSeries();
-            buildLabels();
             buildData();
-
 
         });
     };
 
+    $scope.columns = [true, true, true];
 
     $scope.submit = function () {
         $scope.load();
     };
 
-    $scope.columns = [true, true, true];
+    function buildData() {
 
-    $scope.graph = false;
+        if ($scope.details && $scope.details.properties.values) {
+            var k;
+
+            $scope.chartConfig.series = [];
+
+            for (k = 2; k < $scope.details.properties.fields.length; k++) {
+
+
+                $scope.chartConfig.series.push({
+                    name: $scope.details.properties.fields[k].name + " (" + (!($scope.details.properties.fields[k].unit === "") ? $scope.details.properties.fields[k].unit : "no unit") + ") ",
+                    id: k,
+                    data: []
+                });
+
+                var i;
+                for (i = 0; i < $scope.details.properties.values.length; i++) {
+
+                    var array = [$scope.details.properties.values[i][1], $scope.details.properties.values[i][k]];
+                    $scope.chartConfig.series[k - 2].data.push(array)
+
+                }
+
+                $scope.chartConfig.series[k - 2].data.sort(function (a, b) {
+                    return a[0] - b[0]
+                })
+
+            }
+
+
+        }
+    }
+
+
+    $scope.chartConfig = {
+        options: {
+            chart: {
+                zoomType: 'x'
+            },
+            rangeSelector: {
+                enabled: true
+            },
+            navigator: {
+                enabled: true
+            },
+            legend: {
+                enabled: true
+            },
+            plotOptions: {
+                series: {
+                    marker: {
+                        enabled: false
+                    }
+                }
+            }
+        },
+        series: [],
+        title: {
+            text: 'Data'
+        },
+        useHighStocks: true
+    };
+
 
     console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');    //TODO: REMOVE
 
     $scope.load();
+
 
 }]);
 
@@ -228,8 +243,8 @@ gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceSer
 
     $scope.centerOnMe = function () {
         $scope.circlePosition = "current-location";
-        $scope.zoomLevel = 12;
-        $scope.radius = 2000;
+        //$scope.zoomLevel = 12;
+        //$scope.radius = 2000;
     };
 
     $scope.locationSearchResult = '';
@@ -250,16 +265,6 @@ gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceSer
             return mapDistanceService.distance($scope.circlePosition, sensor) < $scope.radius;
         }
     };
-
-    //$scope.distance = function () {
-    //
-    //    var latLngA = new google.maps.LatLng($scope.circlePosition.split(",")[0], $scope.circlePosition.split(",")[1]);
-    //
-    //    var latLngB = new google.maps.LatLng(46.520112399999995, 5.5659288);
-    //
-    //    return google.maps.geometry.spherical.computeDistanceBetween(latLngA, latLngB);
-    //
-    //}
 
 
 }])
