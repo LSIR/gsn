@@ -1,5 +1,5 @@
 import com.github.play2war.plugin._
-import com.typesafe.sbt.packager.Keys._
+//import com.typesafe.sbt.packager.Keys._
 
 name := "gsn-services"
 
@@ -29,8 +29,9 @@ libraryDependencies ++= Seq(
   "com.h2database" % "h2" % "1.4.181",
   "mysql" % "mysql-connector-java" % "5.1.6",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.14.0",
-  "com.feth" %% "play-authenticate" % "0.6.8"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.15.1",
+  "com.feth" %% "play-authenticate" % "0.7.0-SNAPSHOT",
+  "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1"
   )
 
 publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release")

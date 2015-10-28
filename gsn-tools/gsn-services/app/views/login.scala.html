@@ -1,0 +1,18 @@
+@**
+* This page displays login screen for local authentification
+*@
+@import providers.GSNUsernamePasswordAuthProvider
+
+@(loginForm: play.data.Form[providers.Login])
+
+@main("Login") {
+  <h1>Login</h1>
+  @helper.form(action = controllers.gsn.routes.Application.doLogin()) {
+      @if(loginForm.hasGlobalErrors) { 
+        <p class="error">@loginForm.globalError.message</p>
+      }
+      @helper.inputText(loginForm("email"))
+      @helper.inputPassword(loginForm("password"))
+      <button type="submit">Login</button>
+  }
+}

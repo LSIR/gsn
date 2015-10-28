@@ -5,7 +5,7 @@ import scala.util.Try
 import scala.util.Random
 
 
-case class Token(_pk: Int, user: Option[Int], app: Option[Int], token: String, refresh: Option[String], creation: Long, duration: Long) extends Model(_pk)
+case class Token(_pk: Int, user: Option[Int], app: Option[Int], token: String, refresh: Option[String], creation: Long, duration: Long) extends Model
 
 object TokenManager extends AbstractManager[Token] {
   

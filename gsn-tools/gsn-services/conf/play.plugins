@@ -1,1 +1,2 @@
-10005:models.gsn.GSNUserServicePlugin
+10005:service.gsn.GSNUserServicePlugin
+10040:providers.GSNUsernamePasswordAuthProvider

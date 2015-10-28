@@ -8,7 +8,7 @@ import java.sql.ResultSet
 import scala.util.Try
 import controllers.gsn.Global
 
-case class User(_pk: Int, id: String, provider: String) extends Model(_pk)
+case class User(_pk: Int, id: String, provider: String) extends Model
 
 object UserManager extends AbstractManager[User] {
   

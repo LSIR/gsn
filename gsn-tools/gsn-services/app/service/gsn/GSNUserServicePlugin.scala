@@ -1,14 +1,21 @@
 package service.gsn
 
 import com.feth.play.module.pa.service.UserServicePlugin
+import com.feth.play.module.pa.PlayAuthenticate
 import com.feth.play.module.pa.user.AuthUser
 import com.feth.play.module.pa.user.AuthUserIdentity
 import play.Application
 
+import com.google.inject.Inject;
+
 import controllers.gsn.Global
 import models.gsn.UserManager
 
-class GSNUserServicePlugin (a: Application) extends UserServicePlugin (a ){
+class  GSNUserServicePlugin @Inject() (a: Application) extends UserServicePlugin (a ){
+
+    override def onStart() = {
+        PlayAuthenticate.setUserService(this);
+    }
     
     override def save(authUser: AuthUser): Object = {
         UserManager.createUserIfNotExists(authUser)

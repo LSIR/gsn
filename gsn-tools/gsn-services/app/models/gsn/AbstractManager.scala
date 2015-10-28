@@ -6,7 +6,7 @@ import java.sql.ResultSet
 import scala.util.Try
 import scala.util.Success
 
-abstract class Model(_pk:Int){def pk:Int = _pk}
+trait Model {def _pk:Int}
 
 abstract class AbstractManager[T <: Model] {
   
@@ -32,9 +32,9 @@ abstract class AbstractManager[T <: Model] {
   }
   
   def updateOrCreate(obj: T): Boolean =
-      getByPk(obj.pk) match {
+      getByPk(obj._pk) match {
       case s:Some[T] => {
-        val s = s"""UPDATE $getTableName SET (${stringForUpdate(obj)}) WHERE PK='${obj.pk}'"""
+        val s = s"""UPDATE $getTableName SET (${stringForUpdate(obj)}) WHERE PK='${obj._pk}'"""
         Global.ds.withSession { implicit session => session.conn.createStatement.execute(s) }
       }
       case None => {

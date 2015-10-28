@@ -4,7 +4,7 @@ import java.sql.ResultSet
 import scala.util.Try
 import controllers.gsn.Global
 
-case class Application(_pk: Int, name: String, id: String, secret: String, user: Int, code: Option[String], redirect: Option[String]) extends Model(_pk)
+case class Application(_pk: Int, name: String, id: String, secret: String, user: Int, code: Option[String], redirect: Option[String]) extends Model
 
 object ApplicationManager extends AbstractManager[Application] {
   

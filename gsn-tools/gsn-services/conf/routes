@@ -6,10 +6,16 @@ GET /api/sensors/:sensorid  controllers.gsn.api.SensorService.sensorMetadata(sen
 
 POST    /oauth2/access_token                    controllers.gsn.OAuth2Controller.accessToken
 
+GET     /                           controllers.gsn.Application.index
+GET     /login                      controllers.gsn.Application.login
+POST    /login                      controllers.gsn.Application.doLogin
+GET     /signup                     controllers.gsn.Application.signup
+POST    /signup                     controllers.gsn.Application.doSignup
+GET     /user-exists                controllers.gsn.Application.userExists
+GET     /user-unverified            controllers.gsn.Application.userUnverified
+GET     /verify/:token              controllers.gsn.Application.verify(token: String)
 GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
 GET     /authenticate/:provider     com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
 GET     /authenticate/:provider/denied     controllers.gsn.Application.oAuthDenied(provider: String)
-
-GET     /index                  controllers.gsn.Application.index
 
 #GET   /*path               controllers.gsn.api.GsnProxy.v1(path: String)
