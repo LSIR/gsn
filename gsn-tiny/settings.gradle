@@ -1,1 +1,2 @@
-include ':tiny-gsn'
+include ':tiny-gsn', ':LocPrivLib'
+project(':LocPrivLib').projectDir = new File('libs/lp/LocPrivLib')
