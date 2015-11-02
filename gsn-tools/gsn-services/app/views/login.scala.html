@@ -1,18 +1,52 @@
-@**
-* This page displays login screen for local authentification
-*@
-@import providers.GSNUsernamePasswordAuthProvider
+@(loginForm: play.data.Form[_])
 
-@(loginForm: play.data.Form[providers.Login])
+@import helper._
+@import play.core.j.PlayMagicForJava._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+@import com.feth.play.module.pa.views.html._
 
-@main("Login") {
-  <h1>Login</h1>
-  @helper.form(action = controllers.gsn.routes.Application.doLogin()) {
-      @if(loginForm.hasGlobalErrors) { 
-        <p class="error">@loginForm.globalError.message</p>
-      }
-      @helper.inputText(loginForm("email"))
-      @helper.inputPassword(loginForm("password"))
-      <button type="submit">Login</button>
-  }
+@main(Messages("playauthenticate.login.title"),"login") {
+
+  <div class="row">
+    <div class="col-xs-6 col-sm-4">
+      <h1>@Messages("playauthenticate.login.title")</h1>
+    </div>
+  </div>
+
+  <div id="login" class="row">
+
+    <div class="col-xs-6 col-sm-4">
+      @* Display proprietary login form *@
+    	@helper.form(controllers.gsn.auth.routes.LocalAuthController.doLogin, 'class -> "form-horizontal", 'role -> "form") {
+
+        @if(loginForm.hasGlobalErrors) {
+          	<p class="alert alert-danger">
+	          @loginForm.globalError.message
+	     	</p>
+        }
+
+        @_emailPartial(loginForm)
+
+        @inputPassword(
+          loginForm("password"),
+          '_showConstraints -> false,
+          '_label -> Messages("playauthenticate.login.password.placeholder")
+        )
+
+            <button type="submit" class="btn btn-default">@Messages("playauthenticate.login.now")</button>
+
+        <a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@Messages("playauthenticate.login.forgot.password")</a>
+
+    	}
+    </div>
+
+   <div class="col-xs-6 col-sm-4">
+      @Messages("playauthenticate.login.oauth")
+      @* Display list of available providers *@
+      @_providerPartial(skipCurrent=false)
+    </div>
+
+  </div>
+
 }
+

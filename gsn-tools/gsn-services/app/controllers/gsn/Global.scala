@@ -10,7 +10,8 @@ import gsn.security.SecurityData
 import play.api._
 import play.api.libs.concurrent.Akka
 import play.mvc.Call
-import controllers.routes
+
+import models.gsn.auth.SecurityRole;
 
 import com.feth.play.module.pa.PlayAuthenticate
 import com.feth.play.module.pa.PlayAuthenticate.Resolver
@@ -33,16 +34,16 @@ object Global extends GlobalSettings {
     
     PlayAuthenticate.setResolver(new Resolver() {
             override def login: Call = {
-                routes.Application.index
+                controllers.gsn.auth.routes.LocalAuthController.index
             }
             override def  afterAuth: Call = {
                 // The user will be redirected to this page after authentication
                 // if no original URL was saved
-                routes.Application.index
+                controllers.gsn.auth.routes.LocalAuthController.index
             }
 
             override def  afterLogout: Call = {
-                routes.Application.index
+                controllers.gsn.auth.routes.LocalAuthController.index
             }
 
             override def auth(provider: String): Call = {
@@ -53,7 +54,7 @@ object Global extends GlobalSettings {
 
             override def  onException(e: AuthException): Call = {
                 e match {
-                  case ad : AccessDeniedException => routes.Application.oAuthDenied(ad.getProviderKey())
+                  case ad : AccessDeniedException => controllers.gsn.auth.routes.Signup.oAuthDenied(ad.getProviderKey())
                   case other => {super.onException(e)}
                 }
                }
@@ -61,20 +62,31 @@ object Global extends GlobalSettings {
             override def  askLink: Call = {
                 // We don't support moderated account linking in this sample.
                 // See the play-authenticate-usage project for an example
-               null
+               controllers.gsn.auth.routes.Account.askLink
             }
 
             override def  askMerge: Call = {
                 // We don't support moderated account merging in this sample.
                 // See the play-authenticate-usage project for an example
-                null
+                controllers.gsn.auth.routes.Account.askMerge
             }
         })
+
+		initialData
+
     }
 
   override def onStop(app: Application) {
     Logger.info("Application shutdown...")
   }
+
+  def initialData = {
+		if (SecurityRole.find.findRowCount == 0) {
+				val role = new SecurityRole()
+				role.roleName = controllers.gsn.auth.LocalAuthController.USER_ROLE
+				role.save
+		}
+	}
 
   /*
   override def onError(request: RequestHeader, ex: Throwable) = {
