@@ -1,0 +1,3 @@
+[submodule "gsn-tiny/libs/lp"]
+	path = gsn-tiny/libs/lp
+	url = git@github.com:AblionGE/LocPrivLib.git
