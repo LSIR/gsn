@@ -34,7 +34,7 @@
 
     <application
         android:name="TinyGSN"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@drawable/gsn_mark"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
