@@ -1,0 +1,60 @@
+@import scala.collection.mutable.Buffer
+@import controllers.gsn.auth.GSNGroup
+
+@(groups: Buffer[models.gsn.auth.Group], groupForm: Form[GSNGroup])
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+@main(Messages("gsn.access.groups.title"),"grouplist") {
+<div id="groups" class="row">
+<div class="col-md-12">
+<h1>@Messages("gsn.access.groups.title")</h1>
+</div>
+</div>
+     <div id="groups" class="row">
+		<div class="col-xs-12 col-md-8">
+		<ul>
+		@for(g <- groups) {
+            <li>@g.name : @g.description
+            <ul>
+            @for(u <- g.users) {
+            <li>@u.name</li>
+            }
+            </ul>
+            <ul>
+            @for(u <- g.dataSources) {
+            <li>@u.value</li>
+            }
+            </ul>
+            </li>
+        }
+        </ul>
+		</div>
+    	<div class="col-xs-12 col-md-4">
+    	<div class="highlight">
+    	@helper.form(controllers.gsn.auth.routes.PermissionsController.addgroup, 'class -> "form-horizontal", 'role -> "form") {
+
+            @if(groupForm.hasGlobalErrors) {
+		        <p class="alert alert-danger">
+		          @groupForm.globalError.get.message
+		     	</p>
+            }
+
+             @inputText(
+                groupForm("name"),
+                '_label -> Messages("gsn.access.groups.name")
+             )
+
+             @inputText(
+                groupForm("description"),
+                '_label -> Messages("gsn.access.groups.description")
+             )
+
+
+            <button type="submit" class="btn btn-default">@Messages("gsn.access.groups.add")</button>
+    	}
+    	</div>
+    	</div>
+    </div>
+}

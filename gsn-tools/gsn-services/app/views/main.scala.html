@@ -4,14 +4,14 @@
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 
 <!DOCTYPE html>
-<html lang="@play.mvc.Controller.lang().code()">
+<html>
     <head>
-        <title>@title</title>
+        <title>GSN::Access Control</title>
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Play Authenticate - an authentication module for the Play! Framework 2.0">
-        <meta name="author" content="The Play Authenticate Team">
+        <meta name="description" content="GSN Access Control">
+        <meta name="author" content="The GSN Team">
 
         <script type="text/javascript" src="@routes.Assets.at("lib/jquery/jquery.js")"></script>
         <script type="text/javascript" src="@routes.Assets.at("lib/bootstrap/js/bootstrap.js")"></script>
@@ -33,7 +33,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="@controllers.gsn.auth.routes.LocalAuthController.index()">Play! Authenticate</a>
+                    <a class="navbar-brand" href="@controllers.gsn.auth.routes.LocalAuthController.index()">Global Sensor Networks</a>
                 </div>
 
                     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -90,10 +90,11 @@
 
             <footer>
                 <p>&copy;
-                    2012-2014 Play! Authenticate. Licensed under Apache License, Version 2.0. View details <a href="https://github.com/joscha/play-authenticate/blob/master/LICENSE">
-                        here</a>.</p>
+                    2004-2015 Global Sensor Networks. Licensed under <a href="https://github.com/LSIR/gsn/blob/master/LICENSE">GPL v3+</a>.
+                </p>
                 <p>
-                    <small>Styles by <a href="http://getbootstrap.com" target="_blank">
+                    <small>Back-end by <a href="https://github.com/joscha/play-authenticate">Play! Authenticate</a> &middot; 
+                        Styles by <a href="http://getbootstrap.com" target="_blank">
                         Twitter Bootstrap</a> &middot;
                         Provider icons by <a href="https://github.com/paulrobertlloyd/socialmediaicons/" target="_blank">
                             Paul Robert Lloyd</a></small></p>

@@ -10,17 +10,16 @@
 
 
 <!-- SSL Support, Optional -->
-<!--
+
    <ssl-port>8443</ssl-port>
    <ssl-key-store-password>changeit</ssl-key-store-password>
    <ssl-key-password>changeit</ssl-key-password>
--->
 <!--
    <ssl-port>8443</ssl-port>
    <ssl-key-store-password>/home/ivo/.keystore</ssl-key-store-password>
    <ssl-key-password>password</ssl-key-password>
 -->
-<access-control>false</access-control>
+<access-control>true</access-control>
 <!-- Main Storage Database, Mandatory -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />   -->
 <!--<storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:./GsnMemDb" />-->

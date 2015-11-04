@@ -30,6 +30,7 @@ libraryDependencies ++= Seq(
   "com.h2database" % "h2" % "1.4.181",
   "mysql" % "mysql-connector-java" % "5.1.6",
   "be.objectify"  %% "deadbolt-java"     % "2.3.3",
+  "be.objectify"  %% "deadbolt-scala"     % "2.3.3",
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
   "com.nulab-inc" %% "play2-oauth2-provider" % "0.14.0",

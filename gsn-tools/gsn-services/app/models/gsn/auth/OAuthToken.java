@@ -18,6 +18,7 @@ public class OAuthToken extends AppModel{
 	public Long id;
 	@ManyToOne
 	public User user;
+	@ManyToOne
 	public Client client;
 	public String token;
 	public String refresh;

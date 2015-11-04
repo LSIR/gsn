@@ -22,11 +22,16 @@ public class Group extends AppModel{
 	public Long id;
 
 	public String name;
+	public String description;
 	
 	@ManyToMany
 	public List<DataSource> dataSources;
+	
+	@ManyToMany
+	public List<User> users;
 
-	public static final AppModel.Finder<Long, Group> find = new AppModel.Finder<Long, Group>(
+	//for some unknown reason the AppModel.Finder doesn't work ????
+	public static final play.db.ebean.Model.Finder<Long, Group> find = new play.db.ebean.Model.Finder<Long, Group>(
 			Long.class, Group.class);
 
 	public String getName() {

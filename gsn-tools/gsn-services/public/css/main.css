@@ -22,11 +22,18 @@ form .error .help-inline {
 }
 
 .help-block {
-    margin: -10px 0 10px 0;
     font-size: 10px;
     color: #ccc !important;
 }
 
 h1 {
     margin-bottom: 20px !important;
+}
+
+.highlight {
+    padding: 30px;
+    margin-bottom: 14px;
+    background-color: #F7F7F9;
+    border: 1px solid #E1E1E8;
+    border-radius: 4px;
 }

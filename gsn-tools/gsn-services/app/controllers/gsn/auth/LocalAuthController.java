@@ -26,6 +26,7 @@ public class LocalAuthController extends Controller {
 	public static final String FLASH_MESSAGE_KEY = "message";
 	public static final String FLASH_ERROR_KEY = "error";
 	public static final String USER_ROLE = "user";
+	public static final String ADMIN_ROLE = "admin";
 	
 	public static Result index() {
 		return ok(index.render());

@@ -5,4 +5,4 @@ To verify your e-mail address, follow this link now:
 @verificationUrl
 
 Cheers,
-The PlayAuthenticate Team
+The GSN Team

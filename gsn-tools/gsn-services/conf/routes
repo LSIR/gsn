@@ -1,5 +1,3 @@
-GET  /assets/*file        	controllers.Assets.at(path="/public", file)
-
 # API
 POST /api/sensors/download        controllers.gsn.api.SensorService.download
 GET  /api/sensors 			      controllers.gsn.api.SensorService.sensors
@@ -36,4 +34,10 @@ POST    /accounts/merge             controllers.gsn.auth.Account.doMerge
 GET     /login/password/forgot     controllers.gsn.auth.Signup.forgotPassword(email: String ?= "")
 POST    /login/password/forgot     controllers.gsn.auth.Signup.doForgotPassword
 
+#Permissions
+GET     /access/groups              controllers.gsn.auth.PermissionsController.groups
+POST    /access/groups/add          controllers.gsn.auth.PermissionsController.addgroup
+
 #GET   /*path               controllers.gsn.api.GsnProxy.v1(path: String)
+
+GET  /assets/*file        	controllers.Assets.at(path="/public", file)

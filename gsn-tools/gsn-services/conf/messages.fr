@@ -6,7 +6,7 @@ constraint.min=Valeur minimale: {0}
 constraint.max=Valeur maximale: {0}
 constraint.minLength=Longueur minimale: {0}
 constraint.maxLength=Longueur maximale: {0}
-constraint.email=Email
+constraint.email=E-mail
 
 # --- Formats
 format.date=Date (''{0}'')
@@ -22,7 +22,7 @@ error.min=Doit être plus grand ou égal à {0}
 error.max=Doit être plus petit ou égal à 0}
 error.minLength=Longueur minimale: {0}
 error.maxLength=Longueur maximale: {0}
-error.email=Un email valide est obligatoire
+error.email=Un e-mail valide est obligatoire
 error.pattern=Doit satisfaire: {0}
 
 ### --- play-authenticate START
@@ -32,13 +32,13 @@ error.pattern=Doit satisfaire: {0}
 playauthenticate.accounts.link.success=Comptes liés avec succès
 playauthenticate.accounts.merge.success=Comptes unifiés avec succès
 
-playauthenticate.verify_email.error.already_validated=Votre email a déjà été validé.
-playauthenticate.verify_email.error.set_email_first=Vous devez d'abord fournir un email.
-playauthenticate.verify_email.message.instructions_sent=Les instructions pour valider votre email ont été envoyé à l'adresse {0}.
-playauthenticate.verify_email.success=L'adresse E-mail  ({0}) a été validée avec succès.
+playauthenticate.verify_email.error.already_validated=Votre e-mail a déjà été validé.
+playauthenticate.verify_email.error.set_email_first=Vous devez d'abord fournir un e-mail.
+playauthenticate.verify_email.message.instructions_sent=Les instructions pour valider votre e-mail ont été envoyés à l'adresse {0}.
+playauthenticate.verify_email.success=L'adresse e-mail ({0}) a été validée avec succès.
 
 playauthenticate.reset_password.message.instructions_sent=Les instructions pour changer votre mot de passe ont été envoyées à l'adresse: {0}.
-playauthenticate.reset_password.message.email_not_verified=Votre email doit d'abord être vérifié, des instructions ont été envoyées. Réessayez ensuite.
+playauthenticate.reset_password.message.email_not_verified=Votre e-mail doit d'abord être vérifié, des instructions ont été envoyées. Réessayez ensuite.
 playauthenticate.reset_password.message.no_password_account=Votre utilisateur n'est pas configuré pour utiliser un mot de passe.
 playauthenticate.reset_password.message.success.auto_login=Votre mot de passe a été changé.
 playauthenticate.reset_password.message.success.manual_login=Votre mot de passe a été changé. Veillez vous connecter avec votre nouveau mot de passe.
@@ -49,27 +49,27 @@ playauthenticate.change_password.success=Mot de passe changé avec succès.
 playauthenticate.password.signup.error.passwords_not_same=Les mots de passe ne correspondent pas.
 playauthenticate.password.login.unknown_user_or_pw=Utilisateur et mot de passe inconnus.
 
-playauthenticate.password.verify_signup.subject=PlayAuthenticate: Finaliser votre enregistrement
-playauthenticate.password.verify_email.subject=PlayAuthenticate: Confirmer votre email
-playauthenticate.password.reset_email.subject=PlayAuthenticate: Comment changer votre mot de passe.
+playauthenticate.password.verify_signup.subject=Global Sensor Networks: Finaliser votre enregistrement
+playauthenticate.password.verify_email.subject=Global Sensor Networks: Confirmer votre e-mail
+playauthenticate.password.reset_email.subject=Global Sensor Networks: Comment changer votre mot de passe.
 
 # play-authenticate: Additional translations
 
-playauthenticate.login.email.placeholder=Votre adresse email
+playauthenticate.login.email.placeholder=Votre adresse e-mail
 playauthenticate.login.password.placeholder=Choisir un mot de passe
 playauthenticate.login.password.repeat=Réitérer votre mot de passe
 playauthenticate.login.title=Login
 playauthenticate.login.password.placeholder=Mot de passe
 playauthenticate.login.now=Se connecter maintenant
 playauthenticate.login.forgot.password=Mot de passe oublié?
-playauthenticate.login.oauth=ou connectez-vous avec un de ces fournisseurs:
+playauthenticate.login.oauth=ou connectez-vous avec l'un de ces fournisseurs:
 
 playauthenticate.signup.title=Enregistrement
 playauthenticate.signup.name=Votre nom
 playauthenticate.signup.now=S'enregistrer maintenant
-playauthenticate.signup.oauth=ou enregistrez-vous avec un de ces fournisseurs:
+playauthenticate.signup.oauth=ou enregistrez-vous avec l'un de ces fournisseurs:
 
-playauthenticate.verify.account.title=Vérification par email obligatoire
+playauthenticate.verify.account.title=Vérification par e-mail obligatoire
 playauthenticate.verify.account.before=Avant de spécifier un mot de passe, vous devez
 playauthenticate.verify.account.first=d'abord vérifier votre email
 
@@ -91,8 +91,8 @@ playauthenticate.link.account.ok=OK
 # play-authenticate: Signup folder translations
 
 playauthenticate.verify.email.title=Verifier votre e-mail
-playauthenticate.verify.email.requirement=Avant d'utiliser PlayAuthenticate, vous devez d'abord vérifier votre email.
-playauthenticate.verify.email.cta=Un email a été envoyé à votre adresse avec des instructions pour vous connecter.
+playauthenticate.verify.email.requirement=Avant d'utiliser GSN, vous devez d'abord vérifier votre e-mail.
+playauthenticate.verify.email.cta=Un e-mail a été envoyé à votre adresse avec les instructions pour vous connecter.
 
 playauthenticate.password.reset.title=Changer votre mot de passe
 playauthenticate.password.reset.cta=Changer votre mot de passe
@@ -101,8 +101,8 @@ playauthenticate.password.forgot.title=Mot de passe oublié
 playauthenticate.password.forgot.cta=Envoyer les instructions pour changer le mot de passe
 
 playauthenticate.oauth.access.denied.title=Accès OAuth refusé
-playauthenticate.oauth.access.denied.explanation=Si vous voulez utiliser PlayAuthenticate avec OAuth, vous devez accepter la connexion.
-playauthenticate.oauth.access.denied.alternative=Si vous ne préférez pas accepter la connexion, vous pouvez toujours
+playauthenticate.oauth.access.denied.explanation=Si vous voulez utiliser GSN avec OAuth, vous devez accepter la connexion.
+playauthenticate.oauth.access.denied.alternative=Si vous ne préférez ne pas accepter la connexion, vous pouvez toujours
 playauthenticate.oauth.access.denied.alternative.cta=vous enregistrer avec un nouveau compte.
 
 playauthenticate.token.error.title=Erreur de token
@@ -124,8 +124,8 @@ playauthenticate.navigation.signup=S'enregister
 playauthenticate.handler.loginfirst=Vous devez vous connecter pour accéder à: ''{0}''
 
 # play-authenticate: Profile
-playauthenticate.profile.title=Profile d'utilisateur
-playauthenticate.profile.mail=Votre nom est {0} et votre adresse email {1}!
+playauthenticate.profile.title=Profil d'utilisateur
+playauthenticate.profile.mail=Votre nom est {0} et votre adresse e-mail {1}!
 playauthenticate.profile.unverified=non vérifiée - cliquer pour vérifier
 playauthenticate.profile.verified=vérifiée
 playauthenticate.profile.providers_many=Il y a {0} fournisseurs liés à ce compte:
@@ -135,15 +135,9 @@ playauthenticate.profile.session=Votre ID d'utilisateur est {0} et votre session
 playauthenticate.profile.session_endless=Votre ID d'utilisateur est {0} et votre session ne se terminera jamais
 playauthenticate.profile.password_change=Changer le mot de passe de votre compte
 
-# play-authenticate - sample: Index page
-playauthenticate.index.title=Bienvenu sur Play Authenticate
-playauthenticate.index.intro=Play Authenticate démo
-playauthenticate.index.intro_2=Ceci est un modèle d'application avec authentification.
-playauthenticate.index.intro_3=Essayez la barre de navigation pour voir les fonctions d'authentification.
-playauthenticate.index.heading=Entête
-playauthenticate.index.details=Voir les détails
-
-# play-authenticate - sample: Restricted page
-playauthenticate.restricted.secrets=Ils nous cachent la vérité!
-
 ### --- play-authenticate END
+
+gsn.access.groups.title=Gestion des groupes
+gsn.access.groups.add=Ajouter
+gsn.access.groups.name=Nom
+gsn.access.groups.description=Description

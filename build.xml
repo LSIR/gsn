@@ -113,7 +113,7 @@
     </target>
 
     <target name="gsn" depends="cleandb" description="Run GSN server in non graphical mode.">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="true" fork="true" dir="${basedir}" classpathref="classpath">
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="false" fork="true" dir="${basedir}" classpathref="classpath">
             <jvmarg value="-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-DmaxServlets=${max-servlets}"/>

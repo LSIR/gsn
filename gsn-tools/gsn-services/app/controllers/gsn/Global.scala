@@ -85,6 +85,9 @@ object Global extends GlobalSettings {
 				val role = new SecurityRole()
 				role.roleName = controllers.gsn.auth.LocalAuthController.USER_ROLE
 				role.save
+				val admin = new SecurityRole()
+				admin.roleName = controllers.gsn.auth.LocalAuthController.ADMIN_ROLE
+				admin.save
 		}
 	}
 
