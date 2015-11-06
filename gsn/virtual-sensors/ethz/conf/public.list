@@ -383,6 +383,7 @@ Permos_GPS_Differential__batch.xml
 Permos_GPS_Differential__batch__daily.xml
 Permos_GPS_Differential__realtime.xml
 Permos_GPS_Differential__streaming.xml
+Permos_GPS_Inclinometer.xml
 Permos_GPS_Logger__config.xml
 Permos_GPS_Logger__data__mapped.xml
 Permos_GPS_Logger__events.xml
