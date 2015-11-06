@@ -38,6 +38,14 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.widget.TextView;
 
+import org.epfl.locationprivacy.map.databases.GridDBDataSource;
+import org.epfl.locationprivacy.map.databases.VenuesCondensedDBDataSource;
+import org.epfl.locationprivacy.privacyestimation.databases.LinkabilityGraphDataSource;
+import org.epfl.locationprivacy.privacyprofile.activities.PrivacyProfileActivity;
+import org.epfl.locationprivacy.privacyprofile.databases.SemanticLocationsDataSource;
+import org.epfl.locationprivacy.userhistory.databases.LocationTableDataSource;
+import org.epfl.locationprivacy.userhistory.databases.TransitionTableDataSource;
+
 import tinygsn.model.wrappers.LocalWrapper;
 //import com.readystatesoftware.viewbadger.BadgeView;
 
@@ -100,6 +108,11 @@ public class ActivityHome extends AbstractActivity {
 
 	public void open_browseActivity(View view) {
 		Intent myIntent = new Intent(this, ActivityListSubscription.class);
+		this.startActivity(myIntent);
+	}
+
+	public void open_privacySettings(View view) {
+		Intent myIntent = new Intent(this, PrivacyProfileActivity.class);
 		this.startActivity(myIntent);
 	}
 

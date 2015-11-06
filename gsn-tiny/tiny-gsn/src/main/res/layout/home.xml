@@ -109,15 +109,15 @@
     <TableRow
         android:id="@+id/tableRowBreak1"
         android:layout_width="fill_parent"
-        android:layout_height="30dip">
+        android:layout_height="15dip">
 
         <ImageView
             android:id="@+id/ivRowBreak1"
             android:layout_width="fill_parent"
-            android:layout_height="30dip"/>
+            android:layout_height="15dip"/>
     </TableRow>
 
-    <!-- =======================ROW 2: PULL + SUBCRIBE======================= -->
+    <!-- =======================ROW 2: PULL + SUBSCRIBE======================= -->
 
     <TableRow
         android:id="@+id/tableRow5"
@@ -190,19 +190,89 @@
     <TableRow
         android:id="@+id/tableRowBreak2"
         android:layout_width="fill_parent"
-        android:layout_height="30dip">
+        android:layout_height="15dip">
 
         <ImageView
             android:id="@+id/ivRowBreak2"
             android:layout_width="fill_parent"
-            android:layout_height="30dip"/>
+            android:layout_height="15dip"/>
 
     </TableRow>
 
-    <!-- =======================ROW 3: LIST VS + PUBLISH======================= -->
+    <!-- =======================ROW 3: PRIVACY ======================= -->
 
     <TableRow
         android:id="@+id/tableRow8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/imageViewPrivacy"
+            android:layout_width="60dip"
+            android:layout_height="60dip"
+            android:gravity="center"
+            android:onClick="open_privacySettings"
+            android:src="@drawable/loc_priv_lib_settings"/>
+
+        <ImageView
+            android:id="@+id/imageView3_1"
+            android:layout_width="25dip"
+            android:layout_height="fill_parent"/>
+        <ImageView
+            android:id="@+id/imageView3_2"
+            android:layout_width="25dip"
+            android:layout_height="fill_parent"/>
+    </TableRow>
+
+    <!-- Text below images -->
+
+    <TableRow
+        android:id="@+id/tableRow9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/privacy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageViewPrivacy"
+            android:layout_alignLeft="@+id/imageViewPrivacy"
+            android:layout_alignRight="@+id/imageViewPrivacy"
+            android:layout_alignTop="@+id/imageViewPrivacy"
+            android:layout_margin="1dp"
+            android:gravity="center"
+            android:text="Privacy Settings"
+            android:textColor="#000000"/>
+
+        <ImageView
+            android:id="@+id/imageView3_3"
+            android:layout_width="15dip"
+            android:layout_height="fill_parent"/>
+
+        <ImageView
+            android:id="@+id/imageView3_4"
+            android:layout_width="15dip"
+            android:layout_height="fill_parent"/>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRowBreak3"
+        android:layout_width="fill_parent"
+        android:layout_height="15dip">
+
+        <ImageView
+            android:id="@+id/ivRowBreak3"
+            android:layout_width="fill_parent"
+            android:layout_height="15dip"/>
+
+    </TableRow>
+
+    <!-- =======================ROW 4: LIST VS + PUBLISH======================= -->
+
+    <TableRow
+        android:id="@+id/tableRow10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center">
@@ -232,7 +302,7 @@
     <!-- Text below images -->
 
     <TableRow
-        android:id="@+id/tableRow9"
+        android:id="@+id/tableRow11"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center">
@@ -251,7 +321,7 @@
             android:textColor="#000000"/>
 
         <ImageView
-            android:id="@+id/imageView3_2"
+            android:id="@+id/imageView4_2"
             android:layout_width="25dip"
             android:layout_height="fill_parent"/>
 
