@@ -1,0 +1,212 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header" ng-bind-template="Sensors Detail: {{ sensorName }}">Sensor Detail: {{ sensorName
+            }}</h1>
+    </div>
+
+    <div ng-show="loading">loading...</div>
+
+    <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have
+        access to this it.</p>
+
+    <div ng-if="loading" us-spinner style="position: relative"></div>
+
+
+    <div ng-if="details">
+        <!--<div class="row" >-->
+
+        <div class="col-lg-6" ng-if="!loading">
+            <div class="panel panel-default">
+                <div class="panel-heading">Properties</div>
+                <div class="panel-body">
+                    <div ng-repeat="(key, value) in details.properties"><p
+                            ng-if="key != 'fields' && key != 'geographical' && key != 'values'"><b>{{key}}:</b>
+                        {{value}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6" ng-if="!loading">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Geographical data</div>
+                <div class="panel-body">
+                    <p ng-if="details.properties.geographical"><b>Location:</b>
+                        {{details.properties.geographical}}</p>
+
+                    <div ng-repeat="(key, value) in details.geometry">
+                        <p ng-if="key != 'coordinates'"><b>{{key}}:</b> {{value}}</p>
+                    </div>
+                    <ul ng-if="details.geometry.coordinates">
+                        <li><b>Longitude:</b> {{details.geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{details.geometry.coordinates[1]}}</li>
+                        <li ng-if="details.geometry.coordinates[2]"><b>Altitude:</b>
+                            {{details.geometry.coordinates[2]}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!--</div>-->
+
+
+        <div class="col-lg-12" ng-if="!loading">
+            <div class="panel panel-default">
+                <div class="panel-heading">Data</div>
+                <div class="panel-body">
+
+                    <form novalidate class="form" ng-submit="submit()">
+                        Placeholder until I get datepicker to work
+                        <br>
+
+                        <div class="row">
+
+                            <div class="col-lg-6">
+                                <b>From: </b><br>
+                                <label class="form-inline"> Year <br>
+                                    <input type="number" class="form-control" min="1900" max="9999"
+                                           placeholder="YYYY" ng-model="from.year">
+                                </label>
+                                <label class="form-inline"> Month <br>
+                                    <input type="number" class="form-control" min="1" max="12"
+                                           placeholder="MM" ng-model="from.month">
+                                </label>
+                                <label class="form-inline"> Day <br>
+                                    <input type="number" class="form-control" min="1" max="31"
+                                           placeholder="DD" ng-model="from.day">
+                                </label>
+                                <label class="form-inline"> Hour <br>
+                                    <input type="number" class="form-control" min="0" max="23"
+                                           placeholder="DD" ng-model="from.hour">
+                                </label>
+                                <label class="form-inline"> Minute <br>
+                                    <input type="number" class="form-control" min="0" max="59"
+                                           placeholder="DD" ng-model="from.minute">
+                                </label>
+                                <label class="form-inline"> Second <br>
+                                    <input type="number" class="form-control" min="0" max="59"
+                                           placeholder="DD" ng-model="from.second">
+                                </label>
+
+
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label>To: </label><br>
+                                <label class="form-inline"> Year <br>
+                                    <input type="number" class="form-control" min="1900" max="9999"
+                                           placeholder="YYYY" ng-model="to.year">
+                                </label>
+                                <label class="form-inline"> Month <br>
+                                    <input type="number" class="form-control" min="1" max="12"
+                                           placeholder="MM" ng-model="to.month">
+                                </label>
+                                <label class="form-inline"> Day <br>
+                                    <input type="number" class="form-control" min="1" max="31"
+                                           placeholder="DD" ng-model="to.day">
+                                </label>
+                                <label class="form-inline"> Hour <br>
+                                    <input type="number" class="form-control" min="0" max="23"
+                                           placeholder="DD" ng-model="to.hour">
+                                </label>
+                                <label class="form-inline"> Minute <br>
+                                    <input type="number" class="form-control" min="0" max="59"
+                                           placeholder="DD" ng-model="to.minute">
+                                </label>
+                                <label class="form-inline"> Second <br>
+                                    <input type="number" class="form-control" min="0" max="59"
+                                           placeholder="DD" ng-model="to.second">
+                                </label>
+
+
+                            </div>
+
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin: 1em">Refresh data</button>
+
+                    </form>
+
+
+                    <div class="col-lg-12">
+
+                        <div class="row">
+
+                            <p style="float: left; display:inline-block" ng-if="details.properties.values">
+                                <br>
+                                {{details.properties.values.length}} results found
+                                for
+                                the specified timeframe. </p>
+
+                            <p style="float:left; display:inline-block" ng-if="!details.properties.values"><br>
+                                No data found for the
+                                specified timeframe. </p>
+
+
+                            <h4 style="float: right; display:inline-block">Page size:
+                                <b class="form-inline">
+                                    <input type="number" min="1" max="100" class="form-control" placeholder="25"
+                                           ng-model="pageSize">
+                                </b>
+                                <button type="button" class="btn btn-primary form-inline"
+                                        ng-click="updateRowCount(pageSize)">
+                                    Apply
+                                </button>
+
+                            </h4>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-inline" ng-repeat="field in details.properties.fields">
+                                <input type="checkbox" ng-model="columns[$index]">{{field.name}}
+                            </label>
+                        </div>
+
+
+                        <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
+                               ng-if="details.properties.fields">
+
+
+                            <thead>
+                            <tr>
+                                <th ng-repeat="field in details.properties.fields" ng-if="columns[$index]">
+                                    {{field.name}}
+                                    ({{field.type}}<span
+                                        ng-show="field.unit">, {{field.unit}}</span>)
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody ng-if="details.properties.values">
+                            <tr dir-paginate="values in details.properties.values  |itemsPerPage: truePageSize ">
+                                <td ng-repeat="value in values track by $index" ng-show="columns[$index]">{{value}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+
+                        <dir-pagination-controls
+                                max-size="10"
+                                direction-links="true"
+                                boundary-links="true">
+                        </dir-pagination-controls>
+
+                        <br>
+
+
+                        <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
+
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
