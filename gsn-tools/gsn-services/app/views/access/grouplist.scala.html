@@ -1,7 +1,7 @@
 @import scala.collection.mutable.Buffer
 @import controllers.gsn.auth.GSNGroup
 
-@(groups: Buffer[models.gsn.auth.Group], groupForm: Form[GSNGroup])
+@(groups: Buffer[models.gsn.auth.Group], users: Buffer[models.gsn.auth.User], groupForm: Form[GSNGroup])
 
 @import helper._
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
@@ -27,8 +27,14 @@
             <li>@u.value</li>
             }
             </ul>
-            </li>
-        }
+	        <select id="u_@g.id">
+	        @for(u <- users) {
+	         <option value="@u.id">@u.name</option>
+	        }
+	        </select>
+	        <button  type="button" class="btn btn-default" onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtogroup?group_id=' + @g.id + '&user_id=' + $('#u_@g.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups');">@Messages("gsn.access.groups.add")</button>
+	        </li>
+	    }
         </ul>
 		</div>
     	<div class="col-xs-12 col-md-4">

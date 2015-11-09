@@ -27,7 +27,7 @@ public class Group extends AppModel{
 	@ManyToMany
 	public List<DataSource> dataSources;
 	
-	@ManyToMany
+	@ManyToMany(mappedBy = "groups")
 	public List<User> users;
 
 	//for some unknown reason the AppModel.Finder doesn't work ????

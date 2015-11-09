@@ -5,7 +5,9 @@ GET  /api/sensors/:sensorid/data  controllers.gsn.api.SensorService.sensorData(s
 GET  /api/sensors/:sensorid       controllers.gsn.api.SensorService.sensorMetadata(sensorid:String)
 
 # OAUTH2 for external access
-POST    /oauth2/access_token                    controllers.gsn.OAuth2Controller.accessToken
+POST    /oauth2/token             controllers.gsn.OAuth2Controller.accessToken
+GET     /oauth2/auth              controllers.gsn.OAuth2Controller.auth  
+POST    /oauth2/auth              controllers.gsn.OAuth2Controller.doAuth       
 
 # Authentication
 GET     /                           controllers.gsn.auth.LocalAuthController.index
@@ -37,6 +39,9 @@ POST    /login/password/forgot     controllers.gsn.auth.Signup.doForgotPassword
 #Permissions
 GET     /access/groups              controllers.gsn.auth.PermissionsController.groups
 POST    /access/groups/add          controllers.gsn.auth.PermissionsController.addgroup
+POST    /access/groups/addto        controllers.gsn.auth.PermissionsController.addtogroup
+GET     /access/vs                  controllers.gsn.auth.PermissionsController.vs
+POST    /access/vs/addto            controllers.gsn.auth.PermissionsController.addtovs
 
 #GET   /*path               controllers.gsn.api.GsnProxy.v1(path: String)
 

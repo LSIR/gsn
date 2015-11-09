@@ -10,6 +10,10 @@ case class GSNGroup(description: String, name: String) {
 
 
 	}
+case class GSNClient(response_type: String, redirect_uri: String, client_id: String) {
+
+
+	}
 
 object Forms {
  val groupForm = Form(
@@ -17,5 +21,12 @@ object Forms {
     "name" -> nonEmptyText,
     "description" -> text
   )(GSNGroup.apply)(GSNGroup.unapply)
+)
+ val clientForm = Form(
+  mapping(
+    "response_type" -> nonEmptyText,
+    "redirect_uri" -> nonEmptyText,
+    "client_id" -> nonEmptyText
+  )(GSNClient.apply)(GSNClient.unapply)
 )
 }

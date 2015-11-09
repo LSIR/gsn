@@ -1,7 +1,11 @@
 package models.gsn.auth;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.UniqueConstraint;
 
 import be.objectify.deadbolt.core.models.Permission;
 
@@ -18,10 +22,16 @@ public class DataSource extends AppModel implements Permission {
 
 	@Id
 	public Long id;
-
+    
 	public String value;
 
-	public static final AppModel.Finder<Long, DataSource> find = new AppModel.Finder<Long, DataSource>(
+	@ManyToMany(mappedBy = "dataSources")
+	public List<Group> groups;
+	
+	@ManyToMany(mappedBy = "dataSources")
+	public List<User> users;
+	
+	public static final play.db.ebean.Model.Finder<Long, DataSource> find = new play.db.ebean.Model.Finder<Long, DataSource>(
 			Long.class, DataSource.class);
 
 	public String getValue() {

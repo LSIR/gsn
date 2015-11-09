@@ -13,8 +13,11 @@ import scalaoauth2.provider._
 import play.mvc.Http
 import collection.JavaConversions._
 import com.feth.play.module.pa.PlayAuthenticate
+import org.slf4j.LoggerFactory
 
 case class APIPermissionAction(vsnames: String*)(implicit ctx: ExecutionContext) extends ActionFunction[Request, ({type L[A] = Request[A]})#L] with OAuth2Provider {
+  
+  private val log = LoggerFactory.getLogger(classOf[APIPermissionAction])
   
   override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
     if (PlayAuthenticate.isLoggedIn(new Http.Session(request.session.data))) {
@@ -22,7 +25,10 @@ case class APIPermissionAction(vsnames: String*)(implicit ctx: ExecutionContext)
       if (hasAccess(u,vsnames:_*)) block(request)
       else Future(Forbidden("Logged in user has no access to these resources"))
     }else{
-      authorize(new GSNDataHandler())({authInfo => block(AuthInfoRequest(authInfo, request))})(request, ctx)
+      authorize(new GSNDataHandler())({authInfo => {
+        if (hasAccess(authInfo.user,vsnames:_*)) block(AuthInfoRequest(authInfo, request))
+        else Future(Forbidden("Logged in user has no access to these resources"))
+      }})(request, ctx)
     }
   }
     

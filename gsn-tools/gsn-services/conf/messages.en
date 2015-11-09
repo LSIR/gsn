@@ -142,3 +142,12 @@ gsn.access.groups.title=Groups management
 gsn.access.groups.add=Add
 gsn.access.groups.name=Name
 gsn.access.groups.description=Description
+gsn.access.groups.addto.error=Error adding user to group
+gsn.access.vs.title=Virtual Sensors
+
+gsn.oauth2.auth.title=GSN External access
+gsn.oauth2.auth.access=An application would like to connect to your account
+gsn.oauth2.auth.access2=The application {0} would like the ability to access your virtual sensors.
+gsn.oauth2.auth.access3=Allow {0} access?
+gsn.oauth2.auth.allow=Allow
+gsn.oauth2.auth.deny=Deny
