@@ -7,7 +7,18 @@
 
 /* Controllers */
 
-var gsnControllers = angular.module('gsnControllers', ['angularUtils.directives.dirPagination', 'chart.js', 'ngMap', 'angularSpinner', 'ngAutocomplete', 'highcharts-ng']);
+var gsnControllers = angular.module('gsnControllers',
+    [
+        'angularUtils.directives.dirPagination',
+        'chart.js',
+        'ngMap',
+        'angularSpinner',
+        'ngAutocomplete',
+        'highcharts-ng',
+        'LocalStorageModule',
+        'ui.bootstrap.datetimepicker'
+    ]
+);
 
 
 gsnControllers.factory('sensorService', function ($http) {
@@ -30,6 +41,10 @@ gsnControllers.factory('mapDistanceService', function () {
         }
     }
 });
+
+gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', function ($scope, compareService) {
+
+}]);
 
 gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function ($scope, sensorService) {
 
@@ -86,7 +101,10 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function
 
 }]);
 
-gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', function ($scope, $http, $routeParams) {
+gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', 'localStorageService', function ($scope, $http, $routeParams, localStorageService) {
+
+
+
     $scope.loading = true;
     $scope.sensorName = $routeParams.sensorName;
 
@@ -128,6 +146,7 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
             $scope.details = data.features ? data.features[0] : undefined;
             $scope.loading = false;
 
+            console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');    //TODO: REMOVE
 
             $scope.plot = {
                 'labels': [],
@@ -214,7 +233,11 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
     };
 
 
-    console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');    //TODO: REMOVE
+    $scope.compare = function () {
+        localStorageService.set($scope.sensorName, $scope.chartConfig.series);
+        $scope.series = localStorageService.get($scope.sensorName);
+        console.log('ayy')
+    };
 
     $scope.load();
 

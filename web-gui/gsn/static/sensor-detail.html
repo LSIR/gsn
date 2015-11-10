@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header" ng-bind-template="Sensors Detail: {{ sensorName }}">Sensor Detail: {{ sensorName
-            }}</h1>
+                }}</h1>
     </div>
 
     <div ng-show="loading">loading...</div>
@@ -20,8 +20,8 @@
                 <div class="panel-heading">Properties</div>
                 <div class="panel-body">
                     <div ng-repeat="(key, value) in details.properties"><p
-                            ng-if="key != 'fields' && key != 'geographical' && key != 'values'"><b>{{key}}:</b>
-                        {{value}}</p>
+                            ng-if="key != 'fields' && key != 'geographical' && key != 'values'"><b>{{ key }}:</b>
+                        {{ value }}</p>
                     </div>
                 </div>
             </div>
@@ -32,16 +32,16 @@
                 <div class="panel-heading">Geographical data</div>
                 <div class="panel-body">
                     <p ng-if="details.properties.geographical"><b>Location:</b>
-                        {{details.properties.geographical}}</p>
+                        {{ details.properties.geographical }}</p>
 
                     <div ng-repeat="(key, value) in details.geometry">
-                        <p ng-if="key != 'coordinates'"><b>{{key}}:</b> {{value}}</p>
+                        <p ng-if="key != 'coordinates'"><b>{{ key }}:</b> {{ value }}</p>
                     </div>
                     <ul ng-if="details.geometry.coordinates">
-                        <li><b>Longitude:</b> {{details.geometry.coordinates[0]}}</li>
-                        <li><b>Latitude:</b> {{details.geometry.coordinates[1]}}</li>
+                        <li><b>Longitude:</b> {{ details.geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{ details.geometry.coordinates[1]}}</li>
                         <li ng-if="details.geometry.coordinates[2]"><b>Altitude:</b>
-                            {{details.geometry.coordinates[2]}}
+                            {{ details.geometry.coordinates[2]}}
                         </li>
                     </ul>
                 </div>
@@ -58,8 +58,27 @@
                 <div class="panel-body">
 
                     <form novalidate class="form" ng-submit="submit()">
+
+                        <div class="dropdown">
+                            <a class="dropdown-toggle my-toggle-select" id="dLabel" role="button" data-toggle="dropdown"
+                               data-target="#" href="">
+                                <div class="input-append"><input type="text" class="input-large"
+                                                                 data-ng-model="data.date"><span class="add-on"><i
+                                        class="icon-calendar"></i></span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker data-ng-model="data.date"
+                                                data-datetimepicker-config="{ dropdownSelector: '.my-toggle-select' }"></datetimepicker>
+                            </ul>
+                        </div>
+
+                        <pre>{{ data.date }}</pre>
+
+
                         Placeholder until I get datepicker to work
                         <br>
+
 
                         <div class="row">
 
@@ -135,7 +154,7 @@
 
                             <p style="float: left; display:inline-block" ng-if="details.properties.values">
                                 <br>
-                                {{details.properties.values.length}} results found
+                                {{ details.properties.values.length }} results found
                                 for
                                 the specified timeframe. </p>
 
@@ -159,7 +178,7 @@
 
                         <div class="form-group">
                             <label class="checkbox-inline" ng-repeat="field in details.properties.fields">
-                                <input type="checkbox" ng-model="columns[$index]">{{field.name}}
+                                <input type="checkbox" ng-model="columns[$index]">{{ field.name }}
                             </label>
                         </div>
 
@@ -171,15 +190,16 @@
                             <thead>
                             <tr>
                                 <th ng-repeat="field in details.properties.fields" ng-if="columns[$index]">
-                                    {{field.name}}
-                                    ({{field.type}}<span
-                                        ng-show="field.unit">, {{field.unit}}</span>)
+                                    {{ field.name }}
+                                    ({{ field.type }}<span
+                                        ng-show="field.unit">, {{ field.unit }}</span>)
                                 </th>
                             </tr>
                             </thead>
                             <tbody ng-if="details.properties.values">
                             <tr dir-paginate="values in details.properties.values  |itemsPerPage: truePageSize ">
-                                <td ng-repeat="value in values track by $index" ng-show="columns[$index]">{{value}}</td>
+                                <td ng-repeat="value in values track by $index"
+                                    ng-show="columns[$index]">{{ value }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -193,8 +213,8 @@
 
                         <br>
 
-
                         <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
+                        <button class="btn btn-primary" ng-click="compare()">Compare this dataset</button>
 
 
                     </div>
