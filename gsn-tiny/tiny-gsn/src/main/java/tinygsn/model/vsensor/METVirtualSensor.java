@@ -82,8 +82,10 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public void dataAvailable(String inputStreamName,
-	                          StreamElement streamElement) {
+	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
+
+		streamElement = super.anonymizeData(inputStreamName, streamElement);
+
 		if (lastActivity == null) {
 			lastActivity = streamElement;
 		}

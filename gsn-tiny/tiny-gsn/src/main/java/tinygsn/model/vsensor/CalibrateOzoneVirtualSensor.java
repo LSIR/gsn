@@ -44,11 +44,13 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public void dataAvailable(String inputStreamName,
-	                          StreamElement streamElement) {
+	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
 		double ozone = 0;
 		double model = 0;
 		int source = 0;
+
+		streamElement = super.anonymizeData(inputStreamName, streamElement);
+
 		if (inputStreamName.endsWith("gps")) {
 			lastLatitude = (Double) streamElement.getData("latitude");
 			lastLongitude = (Double) streamElement.getData("longitude");

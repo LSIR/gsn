@@ -44,7 +44,8 @@ public class BridgeVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
-		dataProduced(streamElement);
+		StreamElement anonymizedData = super.anonymizeData(inputStreamName, streamElement);
+		dataProduced(anonymizedData);
 	}
 
 }

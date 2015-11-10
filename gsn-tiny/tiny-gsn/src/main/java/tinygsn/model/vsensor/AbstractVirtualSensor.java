@@ -26,7 +26,13 @@
 package tinygsn.model.vsensor;
 
 import android.content.Context;
+import android.util.Pair;
 import android.widget.TableLayout;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import org.epfl.locationprivacy.adaptiveprotection.AdaptiveProtection;
+import org.epfl.locationprivacy.adaptiveprotection.AdaptiveProtectionInterface;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -40,8 +46,12 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
+import tinygsn.gui.android.TinyGSN;
+import tinygsn.model.vsensor.utils.ParameterType;
 import tinygsn.model.vsensor.utils.VSParameter;
+import tinygsn.model.wrappers.AndroidGPSWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
+import tinygsn.utils.ToastUtils;
 
 public abstract class AbstractVirtualSensor implements Serializable {
 
@@ -73,7 +83,21 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	}
 
 	public ArrayList<VSParameter> getParameters(ArrayList<String> params) {
-		return getParameters();
+		return getPrivacyParameters();
+	}
+
+	/**
+	 * Add parameters for privacy
+	 *
+	 * @return
+	 */
+	public ArrayList<VSParameter> getPrivacyParameters() {
+		ArrayList<VSParameter> parameters = getParameters();
+
+		// TODO : show it only when GPS is selected
+		// GPS
+		parameters.add(0, new VSParameter("GPS Privacy", ParameterType.CHECKBOX));
+		return parameters;
 	}
 
 	public abstract boolean initialize();
@@ -180,8 +204,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	/**
 	 * @param virtualSensorConfiguration the virtualSensorConfiguration to set
 	 */
-	public void setVirtualSensorConfiguration(
-			                                         VSensorConfig virtualSensorConfiguration) {
+	public void setVirtualSensorConfiguration(VSensorConfig virtualSensorConfiguration) {
 		this.config = virtualSensorConfiguration;
 	}
 
@@ -201,12 +224,62 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 *                        and should be delivered to the virtual sensor for possible
 	 *                        processing.
 	 */
-	public abstract void dataAvailable(String inputStreamName,
-	                                   StreamElement streamElement);
+	public abstract void dataAvailable(String inputStreamName, StreamElement streamElement);
 
 	public void dataAvailable(String inputStreamName,
 	                          ArrayList<StreamElement> data) {
 		if (!data.isEmpty()) dataAvailable(inputStreamName, data.get(data.size() - 1));
+	}
+
+	/**
+	 * Transform a precise GPS position into an area depending
+	 * on privacy settings
+	 * @param streamElement
+	 * @return a streamElement containing the obfuscated area
+	 */
+	private StreamElement anonymizeGPS(StreamElement streamElement) {
+		String prefix = "vsensor:" + getVirtualSensorConfiguration().getName();
+		HashMap settings = storage.getSetting(prefix);
+		boolean gpsPrivacy;
+		if ((settings.get(prefix + ":" + "GPS Privacy")).equals("true")) {
+			gpsPrivacy = true;
+		} else {
+			gpsPrivacy = false;
+		}
+
+		if (gpsPrivacy) {
+			AdaptiveProtectionInterface prot = new AdaptiveProtection(StaticData.globalContext);
+			// get data from streamElement for obfuscate them
+			double latitude = (double) streamElement.getData("latitudeTopLeft");
+			double longitude = (double) streamElement.getData("longitudeTopLeft");
+			Pair<LatLng, LatLng> obfuscatedPosition = prot.getObfuscationLocation(new LatLng(latitude, longitude));
+
+			AndroidGPSWrapper wrapper = new AndroidGPSWrapper();
+			StreamElement obfuscatedStreamElement = new StreamElement(wrapper.getFieldList(), wrapper.getFieldType(),
+					                                               new Serializable[]{obfuscatedPosition.first.latitude, obfuscatedPosition.first.longitude,
+							                                                                 obfuscatedPosition.second.latitude, obfuscatedPosition.second.longitude});
+
+			return obfuscatedStreamElement;
+		} else {
+			return streamElement;
+		}
+	}
+
+	/**
+	 * Anonymize data
+	 * @param inputStreamName
+	 * @param streamElement
+	 * @return data anonymized
+	 */
+	public StreamElement anonymizeData(String inputStreamName, StreamElement streamElement) {
+		StreamElement anonymizedStreamElement;
+		if (inputStreamName.equals(tinygsn.model.wrappers.AndroidGPSWrapper.class.getCanonicalName())) {
+			anonymizedStreamElement = anonymizeGPS(streamElement);
+		} else {
+			anonymizedStreamElement = streamElement;
+		}
+
+		return anonymizedStreamElement;
 	}
 
 	synchronized public void start() {

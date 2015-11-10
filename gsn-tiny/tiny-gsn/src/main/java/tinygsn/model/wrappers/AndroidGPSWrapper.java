@@ -50,10 +50,11 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 	public AndroidGPSWrapper() {
 	}
 
-	private static final String[] FIELD_NAMES = new String[]{"latitude", "longitude"};
-	private static final Byte[] FIELD_TYPES = new Byte[]{DataTypes.DOUBLE, DataTypes.DOUBLE};
-	private static final String[] FIELD_DESCRIPTION = new String[]{"Latitude", "Longitude"};
-	private static final String[] FIELD_TYPES_STRING = new String[]{"double", "double"};
+	// A GPS position is represented as a rectangle (top left and bottom right points)
+	private static final String[] FIELD_NAMES = new String[]{"latitudeTopLeft", "longitudeTopLeft", "latitudeBottomRight", "longitudeBottomRight"};
+	private static final Byte[] FIELD_TYPES = new Byte[]{DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE, DataTypes.DOUBLE};
+	private static final String[] FIELD_DESCRIPTION = new String[]{"TopLeftLatitude", "TopLeftLongitude", "BottomRightLatitude", "BottomRightLongitude"};
+	private static final String[] FIELD_TYPES_STRING = new String[]{"double", "double", "double", "double"};
 
 	public final Class<? extends WrapperService> getSERVICE() {
 		return GPSService.class;
@@ -108,7 +109,9 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			if (location != null) {
 				StreamElement streamElement = new StreamElement(FIELD_NAMES,
-						                                               FIELD_TYPES, new Serializable[]{location.getLatitude(), location.getLongitude()});
+						                                               FIELD_TYPES,
+						                                               new Serializable[]{location.getLatitude(), location.getLongitude(),
+								                                                                              location.getLatitude(), location.getLongitude()});
 				streamElement.setTimeStamp(location.getTime());
 				postStreamElement(streamElement);
 			}
@@ -147,7 +150,8 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 	@Override
 	public void onLocationChanged(Location location) {
 		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
-				                                               new Serializable[]{location.getLatitude(), location.getLongitude()});
+				                                               new Serializable[]{location.getLatitude(), location.getLongitude(),
+						                                                                 location.getLatitude(), location.getLongitude()});
 
 		postStreamElement(streamElement);
 	}

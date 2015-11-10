@@ -88,6 +88,7 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
+		streamElement = super.anonymizeData(inputStreamName, streamElement);
 		String prefix = "vsensor:" + getVirtualSensorConfiguration().getName();
 		HashMap settings = storage.getSetting(prefix);
 		String field = (String) settings.get(prefix + ":" + "field");
@@ -202,7 +203,8 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public ArrayList<VSParameter> getParameters(ArrayList<String> params) {
-		ArrayList<VSParameter> list = getParameters();
+		ArrayList<VSParameter> list = super.getParameters(params);
+		list.addAll(getParameters());
 		Set<String> set = new HashSet();
 		for (String field : params) {
 			set.add(field);

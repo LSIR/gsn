@@ -113,6 +113,7 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
+
 	}
 
 	@Override
