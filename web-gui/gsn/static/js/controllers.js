@@ -104,7 +104,6 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function
 gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', 'localStorageService', function ($scope, $http, $routeParams, localStorageService) {
 
 
-
     $scope.loading = true;
     $scope.sensorName = $routeParams.sensorName;
 
@@ -117,24 +116,39 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
     var today = new Date().toJSON();
     var yesterday = new Date((new Date()).getTime() - (1000 * 60 * 60)).toJSON();
 
-    $scope.to = {
-        'year': parseInt(today.slice(0, 4)),
-        'month': parseInt(today.slice(5, 7)),
-        'day': parseInt(today.slice(8, 10)),
-        'hour': parseInt(today.slice(11, 13)),
-        'minute': parseInt(today.slice(14, 16)),
-        'second': parseInt(today.slice(17, 19))
+
+    $scope.date = {
+        from: {
+            date: yesterday.slice(0, 19),
+            config: {
+                dropdownSelector: '#dropdown2',
+                minuteStep: 1
+            },
+            onTimeSet: function () {
+                console.log('ayy');
+
+                if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
+                    $scope.date.to.date = $scope.date.from.date
+                }
+
+            }
+        },
+        to: {
+            date: today.slice(0, 19),
+            config: {
+                dropdownSelector: '#dropdown2',
+                minuteStep: 1
+            },
+            onTimeSet: function () {
+                if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
+                    $scope.date.from.date = $scope.date.to.date;
+                    console.log('lmao');
+                }
+
+            }
+        }
     };
 
-
-    $scope.from = {
-        'year': parseInt(yesterday.slice(0, 4)),
-        'month': parseInt(yesterday.slice(5, 7)),
-        'day': parseInt(yesterday.slice(8, 10)),
-        'hour': parseInt(yesterday.slice(11, 13)),
-        'minute': parseInt(yesterday.slice(14, 16)),
-        'second': parseInt(yesterday.slice(17, 19))
-    };
 
     function toISO8601String(date) {
         return date.year + "-" + date.month + "-" + date.day + "T" + date.hour + ":" + date.minute + ":" + date.second;
@@ -142,11 +156,11 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
 
     $scope.load = function () {
-        $http.get('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/').success(function (data) {
+        $http.get('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/').success(function (data) {
             $scope.details = data.features ? data.features[0] : undefined;
             $scope.loading = false;
 
-            console.log('sensors/' + $routeParams.sensorName + '/' + toISO8601String($scope.from) + '/' + toISO8601String($scope.to) + '/');    //TODO: REMOVE
+            console.log('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/');    //TODO: REMOVE
 
             $scope.plot = {
                 'labels': [],
@@ -236,8 +250,8 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
     $scope.compare = function () {
         localStorageService.set($scope.sensorName, $scope.chartConfig.series);
         $scope.series = localStorageService.get($scope.sensorName);
-        console.log('ayy')
     };
+
 
     $scope.load();
 
