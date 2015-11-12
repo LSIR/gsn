@@ -92,15 +92,13 @@ gsnControllers.service('compareService', ['localStorageService', function (local
 
 gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStorageService', function ($scope, compareService, localStorageService) {
 
-    $scope.test = 1;
+    $scope.filterTermsIn = '';
+    $scope.filterTermsOut = '';
 
-    $scope.filterTerms = '';
-
-
-    var filter = function (elem) {
+    var filterIn = function (elem) {
 
 
-        var substrings = $scope.filterTerms.split(';');
+        var substrings = $scope.filterTermsIn.split(';');
         var contains = false;
 
         if (substrings.some(function (v) {
@@ -114,13 +112,35 @@ gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStor
 
     };
 
+    var filterOut = function (elem) {
+
+
+        if($scope.filterTermsOut.length < 1) {
+            return true;
+        }
+
+        var substrings = $scope.filterTermsOut.split(';');
+        var contains = true;
+
+        if (substrings.some(function (v) {
+                return elem['name'].indexOf(v) >= 0;
+            })) {
+            contains = false;
+        }
+
+
+
+        return contains;
+
+    };
+
 
     $scope.update = function () {
         $scope.chartConfig.series.loading = true;
 
         $scope.sensorsSet = compareService.buildData(localStorageService.keys()).compareSet;
-        $scope.chartConfig.series = $scope.sensorsSet.filter(filter);
-        $scope.chartConfig.loading=false;
+        $scope.chartConfig.series = $scope.sensorsSet.filter(filterIn).filter(filterOut);
+        $scope.chartConfig.loading = false;
         $scope.sensors = localStorageService.keys();
 
     };
@@ -162,6 +182,11 @@ gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStor
                 opposite: false
             }
         }
+    };
+
+    $scope.remove = function (key) {
+        localStorageService.remove(key);
+        $scope.update();
     };
 
     $scope.update();
