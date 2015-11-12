@@ -20,6 +20,10 @@ var gsnControllers = angular.module('gsnControllers',
     ]
 );
 
+gsnControllers.config(function (localStorageServiceProvider) {
+    localStorageServiceProvider
+        .setPrefix('gsn_web_gui');
+});
 
 gsnControllers.factory('sensorService', function ($http) {
     return {
@@ -42,7 +46,123 @@ gsnControllers.factory('mapDistanceService', function () {
     }
 });
 
-gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', function ($scope, compareService) {
+gsnControllers.service('compareService', ['localStorageService', function (localStorageService) {
+
+    this.compareSet = [];
+
+    this.buildData = function (keys) {
+
+        this.compareSet = [];
+        var order = 0;
+
+        for (var key in keys) {
+
+
+            var value = JSON.parse(JSON.stringify(localStorageService.get(keys[key])));
+
+            for (var elem in value) {
+                value[elem]['name'] += ' ( ' + keys[key] + ' ) ';
+                value[elem]['id'] = order;
+
+                this.compareSet.push(value[elem]);
+
+
+                order++;
+            }
+
+
+        }
+        return this;
+    };
+
+
+    this.filter = function (elemToFilter) {
+
+
+        if (substrings.some(function (v) {
+                return str.indexOf(v) >= 0;
+            })) {
+            // There's at least one
+        }
+
+
+    }
+
+}]);
+
+gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStorageService', function ($scope, compareService, localStorageService) {
+
+    $scope.test = 1;
+
+    $scope.filterTerms = '';
+
+
+
+    var filter = function (elem) {
+
+
+        var substrings = $scope.filterTerms.split(';');
+        var contains = false;
+
+        if (substrings.some(function (v) {
+                return elem['name'].indexOf(v) >= 0;
+            })) {
+            contains = true;
+        }
+
+
+        return contains;
+
+    };
+
+
+    $scope.update = function () {
+        $scope.sensorsSet = compareService.buildData(localStorageService.keys()).compareSet;
+        $scope.chartConfig.series = $scope.sensorsSet.filter(filter);
+        $scope.sensors = localStorageService.keys();
+
+    };
+
+    $scope.chartConfig = {
+        options: {
+            chart: {
+                zoomType: 'x'
+            },
+            rangeSelector: {
+                enabled: true
+            },
+            navigator: {
+                enabled: true
+            },
+            legend: {
+                enabled: true
+            },
+            plotOptions: {
+                series: {
+                    marker: {
+                        enabled: false
+                    }
+                }
+            }
+        },
+        series: [],
+        title: {
+            text: 'Data'
+        },
+        useHighStocks: true,
+        size: {
+            height: 500
+        },
+        yAxis: {
+            labels: {
+                align: 'left',
+                opposite: false
+            }
+        }
+    };
+
+    $scope.update();
+
 
 }]);
 
@@ -243,7 +363,15 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         title: {
             text: 'Data'
         },
-        useHighStocks: true
+        useHighStocks: true,
+        size: {
+            height: 500
+        },
+        yAxis: {
+            labels: {
+                align: 'left'
+            }
+        }
     };
 
 

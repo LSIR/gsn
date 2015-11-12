@@ -29,7 +29,10 @@ gsnApp.config(['$routeProvider',
                 templateUrl: 'static/map.html',
                 controller: 'MapCtrl'
             }).
-
+            when('/compare', {
+                templateUrl: 'static/compare.html',
+                controller: 'CompareCtrl'
+            }).
             otherwise({
                 redirectTo: '/sensors'
             });
