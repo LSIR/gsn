@@ -21,15 +21,13 @@
 
             <input class="form-control" ng-model="filterTermsIn" ng-change="update()">
 
-            <div class="checkbox"><label> <input type="checkbox" ng-model="showFilterOut">I want to filter out some
-                terms</label></div>
+            <div class="checkbox"><label> <input type="checkbox" ng-model="showFilterOut">Show the filter out
+                box</label></div>
 
-            <div ng-if="showFilterOut">
+            <div ng-show="showFilterOut">
                 <label>Filter out (Fields that you don't want to show) </label>
-
                 <input class="form-control" ng-model="filterTermsOut" ng-change="update()">
             </div>
-
         </div>
 
         <highchart id="chart1" config="chartConfig"></highchart>

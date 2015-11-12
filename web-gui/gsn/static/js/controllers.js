@@ -115,11 +115,13 @@ gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStor
     var filterOut = function (elem) {
 
 
-        if($scope.filterTermsOut.length < 1) {
+        if ($scope.filterTermsOut == '') {
             return true;
         }
 
         var substrings = $scope.filterTermsOut.split(';');
+        substrings = substrings.filter(Boolean);
+
         var contains = true;
 
         if (substrings.some(function (v) {
@@ -127,7 +129,6 @@ gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStor
             })) {
             contains = false;
         }
-
 
 
         return contains;
