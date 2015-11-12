@@ -3,18 +3,17 @@
         <h1 class="page-header">Comparison</h1>
 
 
-        <div ng-if="chartConfig.series.length">
 
             <ul>
-                <li ng-repeat="key in sensors"> {{key}} </li>
+                <li ng-repeat="key in sensors"> {{key}}</li>
             </ul>
+
 
             <label>Filter fields (Separate each term with a semicolon)
                 <input class="form-control" ng-model="filterTerms" ng-change="update()">
             </label>
 
             <highchart id="chart1" config="chartConfig"></highchart>
-        </div>
 
 
     </div>

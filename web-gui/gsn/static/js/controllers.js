@@ -97,7 +97,6 @@ gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStor
     $scope.filterTerms = '';
 
 
-
     var filter = function (elem) {
 
 
@@ -117,8 +116,11 @@ gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStor
 
 
     $scope.update = function () {
+        $scope.chartConfig.series.loading = true;
+
         $scope.sensorsSet = compareService.buildData(localStorageService.keys()).compareSet;
         $scope.chartConfig.series = $scope.sensorsSet.filter(filter);
+        $scope.chartConfig.loading=false;
         $scope.sensors = localStorageService.keys();
 
     };
@@ -153,6 +155,7 @@ gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStor
         size: {
             height: 500
         },
+        loading: true,
         yAxis: {
             labels: {
                 align: 'left',
