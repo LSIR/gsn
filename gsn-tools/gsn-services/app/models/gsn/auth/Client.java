@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 
@@ -19,14 +18,13 @@ public class Client extends AppModel{
 	public String name;
 	public String clientId;
 	public String secret;
-	@ManyToOne
-	public User user;
-	public String code;
 	public String redirect;
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<OAuthToken> tokens;
+	@OneToMany(cascade = CascadeType.ALL)
+	public List<OAuthCode> codes;
 
-	public static final AppModel.Finder<Long, Client> find = new AppModel.Finder<Long, Client>(
+	public static final play.db.ebean.Model.Finder<Long, Client> find = new play.db.ebean.Model.Finder<Long, Client>(
 			Long.class, Client.class);
 
 
@@ -39,7 +37,4 @@ public class Client extends AppModel{
 		return find.where().eq("clientId", value).findUnique();
 	}
 	
-	public static Client findByCode(String value) {
-		return find.where().eq("code", value).findUnique();
-	}
 }

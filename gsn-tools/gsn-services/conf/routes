@@ -7,7 +7,9 @@ GET  /api/sensors/:sensorid       controllers.gsn.api.SensorService.sensorMetada
 # OAUTH2 for external access
 POST    /oauth2/token             controllers.gsn.OAuth2Controller.accessToken
 GET     /oauth2/auth              controllers.gsn.OAuth2Controller.auth  
-POST    /oauth2/auth              controllers.gsn.OAuth2Controller.doAuth       
+POST    /oauth2/auth              controllers.gsn.OAuth2Controller.doAuth
+GET     /oauth2/client            controllers.gsn.OAuth2Controller.listClients
+POST    /oauth2/client            controllers.gsn.OAuth2Controller.editClient     
 
 # Authentication
 GET     /                           controllers.gsn.auth.LocalAuthController.index

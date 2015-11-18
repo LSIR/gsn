@@ -1,4 +1,4 @@
-@(client: String, redirect: String, user: models.gsn.auth.User)
+@(client: String, secret: String, redirect: String, user: models.gsn.auth.User)
 
 @import helper._
 
@@ -17,7 +17,7 @@
 		@helper.form(controllers.gsn.routes.OAuth2Controller.doAuth, 'class -> "form-horizontal", 'role -> "form") {
 		<input type="hidden" name="response_type" value="code" />
 		<input type="hidden" name="client_id" value="@client" />
-		<input type="hidden" name="redirect_uri" value="@redirect" />
+		<input type="hidden" name="client_secret" value="@secret" />
 		<div align="center"><button type="button" class="btn btn-danger" onclick="document.location='@redirect';">@Messages("gsn.oauth2.auth.deny")</button>&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-success">@Messages("gsn.oauth2.auth.allow")</button></div>
 		}
 		</div>

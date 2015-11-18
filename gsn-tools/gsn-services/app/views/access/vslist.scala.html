@@ -35,7 +35,7 @@
 	         <option value="g@u.id">@u.name</option>
 	        }
 	        </select>
-	        <button  type="button" class="btn btn-default" onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs?vs_id=' + @v.id + '&id=' + $('#u_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs');">@Messages("gsn.access.groups.add")</button>
+	        <button  type="button" class="btn btn-primary" onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs?vs_id=' + @v.id + '&id=' + $('#u_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs');">@Messages("gsn.access.groups.add")</button>
 	        </li>
 	    }
         </ul>

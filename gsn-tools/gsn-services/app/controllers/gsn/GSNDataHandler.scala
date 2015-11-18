@@ -47,25 +47,20 @@ class GSNDataHandler extends DataHandler[User] {
     createAccessToken(authInfo: AuthInfo[User])
   }
   
-  def appToAuthInfo(app:Option[Client]):Option[AuthInfo[User]] = 
-    app.map(x=>x.user).map(x=>AuthInfo[User](x,app.map(y=>y.clientId),Some("all"),app.map(y=>y.redirect)))
-
   def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future {
-      appToAuthInfo(Option(Client.findByCode(code)))
+      Option(OAuthCode.findByCode(code)).map(c => AuthInfo[User](c.user,Option(c.client.clientId),Some("all"),Option(c.client.redirect)))
   }
 
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] = Future {
-    appToAuthInfo(Option(OAuthToken.findByRefresh(refreshToken)).map(x=>x.client))
+    Option(OAuthToken.findByRefresh(refreshToken)).map(t => AuthInfo[User](t.user,Option(t.client.clientId),Some("all"),Option(t.client.redirect)))
   }
 
   def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[User]] = Future {
-    Option(Client.findById(clientCredential.clientId)).map(x=>x.user)
+    Option(null) //not supported
   }
 
   def deleteAuthCode(code: String): Future[Unit] = Future{
-    val app = Option(Client.findByCode(code))
-    app.map(x => {x.code=null
-                  x.save()})
+    Option(OAuthCode.findByCode(code)).map(x => {x.delete()})
   }
 
   def findAccessToken(token: String): Future[Option[AccessToken]] = Future {
@@ -73,7 +68,7 @@ class GSNDataHandler extends DataHandler[User] {
   }
 
   def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[User]]] = Future {
-    appToAuthInfo(Option(OAuthToken.findByToken(accessToken.token)).map(x=>x.client))
+    Option(OAuthToken.findByToken(accessToken.token)).map(t => AuthInfo[User](t.user,Option(t.client.clientId),Some("all"),Option(t.client.redirect)))
   }
 
 }

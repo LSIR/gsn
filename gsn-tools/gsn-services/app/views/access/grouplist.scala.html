@@ -32,7 +32,7 @@
 	         <option value="@u.id">@u.name</option>
 	        }
 	        </select>
-	        <button  type="button" class="btn btn-default" onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtogroup?group_id=' + @g.id + '&user_id=' + $('#u_@g.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups');">@Messages("gsn.access.groups.add")</button>
+	        <button  type="button" class="btn btn-primary" onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtogroup?group_id=' + @g.id + '&user_id=' + $('#u_@g.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups');">@Messages("gsn.access.groups.add")</button>
 	        </li>
 	    }
         </ul>
@@ -58,7 +58,7 @@
              )
 
 
-            <button type="submit" class="btn btn-default">@Messages("gsn.access.groups.add")</button>
+            <button type="submit" class="btn btn-primary">@Messages("gsn.access.groups.add")</button>
     	}
     	</div>
     	</div>

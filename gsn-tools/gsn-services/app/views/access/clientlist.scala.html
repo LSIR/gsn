@@ -1,0 +1,65 @@
+@import scala.collection.mutable.Buffer
+@import controllers.gsn.auth.GSNEditClient
+
+@(clients: Buffer[models.gsn.auth.Client], editForm: Form[GSNEditClient])
+
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+@main(Messages("gsn.oauth2.clients.title"),"clientlist") {
+<div id="groups" class="row">
+<div class="col-md-12">
+<h1>@Messages("gsn.oauth2.clients.title")</h1>
+</div>
+</div>
+     <div id="groups" class="row">
+		<div class="col-xs-12 col-md-8">
+		<ul>
+		@for(c <- clients) {
+            <li data-id="@c.id" data-name="@c.name" data-client="@c.clientId" data-redirect="@c.redirect" data-secret="@c.secret">
+                @c.name : @c.redirect
+                <button class="btn btn-default" onclick="">@Messages("gsn.oauth2.clients.edit")</button>
+                <button class="btn btn-danger" onclick="">@Messages("gsn.oauth2.clients.delete")</button>
+            </li>
+	    }
+        </ul>
+		</div>
+    	<div class="col-xs-12 col-md-4">
+    	<div class="highlight">
+    	@helper.form(controllers.gsn.routes.OAuth2Controller.editClient, 'class -> "form-horizontal", 'role -> "form") {
+
+            @if(editForm.hasGlobalErrors) {
+		        <p class="alert alert-danger">
+		          @editForm.globalError.get.message
+		     	</p>
+            }
+            
+            <input type="hidden" name="id" value=""/>
+            
+             @inputText(
+                editForm("name"),
+                '_label -> Messages("gsn.oauth2.clients.name")
+             )
+
+             @inputText(
+                editForm("client_id"),
+                '_label -> Messages("gsn.oauth2.clients.id")
+             )
+             
+             @inputText(
+                editForm("client_secret"),
+                '_label -> Messages("gsn.oauth2.clients.secret")
+             )
+             
+             @inputText(
+                editForm("redirect"),
+                '_label -> Messages("gsn.oauth2.clients.redirect")
+             )
+
+
+            <button type="submit" class="btn btn-primary">@Messages("gsn.oauth2.clients.add")</button>
+    	}
+    	</div>
+    	</div>
+    </div>
+}
