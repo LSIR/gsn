@@ -43,10 +43,17 @@
 
                         @subjectNotPresent() {
                             <li class="@("active".when(nav == "signup"))"><a href="@controllers.gsn.auth.routes.LocalAuthController.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
+                        </ul>
                         }
+                        
+                        @subjectPresentOr() {
+                        	 <li class="@("active".when(nav == "grouplist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.groups()">@Messages("gsn.access.groups")</a></li>
+                        	 <li class="@("active".when(nav == "vslist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.vs()">@Messages("gsn.access.vs.title")</a></li>
+                        	 <li class="@("active".when(nav == "clientlist"))"><a href="@controllers.gsn.routes.OAuth2Controller.listClients()">@Messages("gsn.oauth2.clients")</a></li>
+
                     </ul>
 
-                    @subjectPresentOr() {
+                    
                         <ul class="nav navbar-nav navbar-right">
                         @defining(controllers.gsn.auth.LocalAuthController.getLocalUser(play.mvc.Controller.session())) { user =>
                             <li class="dropdown">

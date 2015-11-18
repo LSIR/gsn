@@ -17,7 +17,7 @@ class GSNDataHandler extends DataHandler[User] {
   def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] =  Future {
     //always require client credentials
     val c = Client.findById(clientCredential.clientId)
-    c != null && c.secret == clientCredential.clientSecret
+    c != null && c.secret.equals(clientCredential.clientSecret.getOrElse(""))
   }
 
   def findUser(username: String, password: String): Future[Option[User]] = Future {
@@ -48,11 +48,11 @@ class GSNDataHandler extends DataHandler[User] {
   }
   
   def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future {
-      Option(OAuthCode.findByCode(code)).map(c => AuthInfo[User](c.user,Option(c.client.clientId),Some("all"),Option(c.client.redirect)))
+      Option(OAuthCode.findByCode(code)).map(c => AuthInfo[User](c.user,Option(c.getClient.getClientId),Some("all"),Option(c.getClient.getRedirect)))
   }
 
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] = Future {
-    Option(OAuthToken.findByRefresh(refreshToken)).map(t => AuthInfo[User](t.user,Option(t.client.clientId),Some("all"),Option(t.client.redirect)))
+    Option(OAuthToken.findByRefresh(refreshToken)).map(t => AuthInfo[User](t.user,Option(t.getClient.getClientId),Some("all"),Option(t.getClient.getRedirect)))
   }
 
   def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[User]] = Future {
@@ -68,7 +68,7 @@ class GSNDataHandler extends DataHandler[User] {
   }
 
   def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[User]]] = Future {
-    Option(OAuthToken.findByToken(accessToken.token)).map(t => AuthInfo[User](t.user,Option(t.client.clientId),Some("all"),Option(t.client.redirect)))
+    Option(OAuthToken.findByToken(accessToken.token)).map(t => AuthInfo[User](t.user,Option(t.getClient.getClientId),Some("all"),Option(t.getClient.getRedirect)))
   }
 
 }

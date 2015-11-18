@@ -18,14 +18,15 @@
 		@for(c <- clients) {
             <li data-id="@c.id" data-name="@c.name" data-client="@c.clientId" data-redirect="@c.redirect" data-secret="@c.secret">
                 @c.name : @c.redirect
-                <button class="btn btn-default" onclick="">@Messages("gsn.oauth2.clients.edit")</button>
-                <button class="btn btn-danger" onclick="">@Messages("gsn.oauth2.clients.delete")</button>
+                <button class="btn btn-default" onclick="edit(this);">@Messages("gsn.oauth2.clients.edit")</button>
+                <button class="btn btn-danger" onclick="del(this);">@Messages("gsn.oauth2.clients.delete")</button>
             </li>
 	    }
         </ul>
 		</div>
     	<div class="col-xs-12 col-md-4">
     	<div class="highlight">
+    	<div id="info-box"></div>
     	@helper.form(controllers.gsn.routes.OAuth2Controller.editClient, 'class -> "form-horizontal", 'role -> "form") {
 
             @if(editForm.hasGlobalErrors) {
@@ -34,7 +35,8 @@
 		     	</p>
             }
             
-            <input type="hidden" name="id" value=""/>
+            <input type="hidden" id="idd" name="id" value="0"/>
+            <input type="hidden" id="actiond" name="action" value="add"/>
             
              @inputText(
                 editForm("name"),
@@ -62,4 +64,24 @@
     	</div>
     	</div>
     </div>
+    <script language="javascript">
+    function edit(t){
+    	$('#info-box').html("@Messages("gsn.oauth2.clients.editing") " + $(t).parent().attr('data-name'));
+    	$('#idd').val($(t).parent().attr('data-id'));
+    	$('#actiond').val('edit');
+    	$('#name').val($(t).parent().attr('data-name'));
+    	$('#client_id').val($(t).parent().attr('data-client'));
+    	$('#client_secret').val($(t).parent().attr('data-secret'));
+    	$('#redirect').val($(t).parent().attr('data-redirect'));
+    }
+    function del(t){
+    	$('#idd').val($(t).parent().attr('data-id'));
+    	$('#actiond').val('del');
+    	$('#name').val('name');
+    	$('#client_id').val('client');
+    	$('#client_secret').val('secret');
+    	$('#redirect').val('redirect');
+    	$('form').submit();
+    }
+    </script>
 }

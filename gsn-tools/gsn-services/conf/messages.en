@@ -137,7 +137,7 @@ playauthenticate.profile.session_endless=Your user ID is {0} and your session wi
 playauthenticate.profile.password_change=Change/set a password for your account
 
 ### --- play-authenticate END
-
+gsn.access.groups=Groups
 gsn.access.groups.title=Groups management
 gsn.access.groups.add=Add
 gsn.access.groups.name=Name
@@ -151,6 +151,7 @@ gsn.oauth2.auth.access2=The application {0} would like the ability to access you
 gsn.oauth2.auth.access3=Allow {0} access?
 gsn.oauth2.auth.allow=Allow
 gsn.oauth2.auth.deny=Deny
+gsn.oauth2.clients=Clients
 gsn.oauth2.clients.title=External clients management
 gsn.oauth2.clients.delete=Delete
 gsn.oauth2.clients.edit=Edit
@@ -159,3 +160,4 @@ gsn.oauth2.clients.redirect=Redirection URI
 gsn.oauth2.clients.id=Client ID
 gsn.oauth2.clients.secret=Client secret
 gsn.oauth2.clients.add=Save
+gsn.oauth2.clients.editing=Editing

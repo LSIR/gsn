@@ -84,12 +84,15 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
     }}}
    
    def editClient = Restrict(Array(LocalAuthController.USER_ROLE),new GSNScalaDeadboltHandler) { Action.async { implicit request => Future {
-     Context.current.set(JavaHelpers.createJavaContext(request))
+       Context.current.set(JavaHelpers.createJavaContext(request))
+       var ret:Result = null
        editClientForm.bindFromRequest.fold(
            formWithErrors => {
-               Ok(access.clientlist.render(Client.find.all().asScala, formWithErrors))
+               println(formWithErrors)
+               ret = BadRequest(access.clientlist.render(Client.find.all().asScala, formWithErrors))
             },
-            clientData => { clientData.action match {
+            clientData => { 
+              clientData.action match {
               case "add" => {
                                 val c = new Client()
                                 c.clientId = clientData.client_id
@@ -99,22 +102,25 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
                                 c.save()
                             }
               case "edit" => {
-                                val c = Client.findById(clientData.client_id)
-                                if (c == null) NotFound
-                                c.clientId = clientData.client_id
-                                c.name = clientData.name
-                                c.redirect = clientData.redirect
-                                c.secret = clientData.client_secret
-                                c.save()
+                                val c = Client.find.byId(clientData.id)
+                                if (c == null){ 
+                                  ret = NotFound
+                                } else {
+                                  c.setClientId(clientData.client_id)
+                                  c.setName(clientData.name)
+                                  c.setRedirect(clientData.redirect)
+                                  c.setSecret(clientData.client_secret)
+                                  c.update()
+                                }
                              }
               case "del" => {
-                                val c = Client.findById(clientData.client_id)
-                                if (c == null) NotFound
-                                c.delete()
+                                val c = Client.find.byId(clientData.id)
+                                if (c == null) ret = NotFound
+                                else c.delete()
                             }
                }
             })
-            Ok(access.clientlist.render(Client.find.all().asScala, editClientForm))  
+            if (ret != null)  ret else Ok(access.clientlist.render(Client.find.all().asScala, editClientForm))  
     }}}
  
 }
