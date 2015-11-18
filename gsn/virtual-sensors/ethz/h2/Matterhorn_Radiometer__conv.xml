@@ -8,9 +8,11 @@
                 <![CDATA[
                 	try {
                 		TEMPERATURE = null;
-                		ENERGY_SHORTWAVE_UPPER = ENERGY_SHORTWAVE_LOWER = null;
-                		ENERGY_LONGWAVE_UPPER = ENERGY_LONGWAVE_LOWER = null;
-                		ENERGY_SUM = null;
+                		IRRADIANCE_SHORTWAVE_UP = IRRADIANCE_SHORTWAVE_DOWN = null;
+                		IRRADIANCE_LONGWAVE_UP = IRRADIANCE_LONGWAVE_DOWN = null;
+                		ALBEDO = null;
+                		SKY_TEMPERATURE = GROUND_TEMPERATURE = null;
+                		NET_RADIATION = NET_SOLAR_RADIATION = NET_FAR_INFRARED_RADIATION = null;
                     	
                     	if (TEMPERATURE_A0 != null) {
                     		def v_ain = ((double)TEMPERATURE_A0)*1.024*2.5/Math.pow(2,16);
@@ -20,17 +22,30 @@
                     		TEMPERATURE = t_k-273.15;
                     		
                     		if (SHORTWAVE_ADIFF01_1 != null )
-                    			ENERGY_SHORTWAVE_LOWER = ((((((double)SHORTWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/12.76;
+                    			IRRADIANCE_SHORTWAVE_UP = ((((((double)SHORTWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
                     		if (SHORTWAVE_ADIFF23_1 != null )
-                    			ENERGY_SHORTWAVE_UPPER = ((((((double)SHORTWAVE_ADIFF23_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
+                    			IRRADIANCE_SHORTWAVE_DOWN = ((((((double)SHORTWAVE_ADIFF23_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/12.76;
                     		
                     		if (LONGWAVE_ADIFF01_1 != null )
-                    			ENERGY_LONGWAVE_LOWER = (((((((double)LONGWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/11.46)+(0.0000000567*Math.pow(t_k,4));
+                    			IRRADIANCE_LONGWAVE_UP = (((((((double)LONGWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.12)+(0.0000000567*Math.pow(t_k,4));
                     		if (LONGWAVE_ADIFF23_1 != null )
-                    			ENERGY_LONGWAVE_UPPER = (((((((double)LONGWAVE_ADIFF23_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.12)+(0.0000000567*Math.pow(t_k,4));
+                    			IRRADIANCE_LONGWAVE_DOWN = (((((((double)LONGWAVE_ADIFF23_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/11.46)+(0.0000000567*Math.pow(t_k,4));
                     		
-                    		if (ENERGY_SHORTWAVE_UPPER != null && ENERGY_SHORTWAVE_LOWER != null && ENERGY_LONGWAVE_UPPER != null && ENERGY_LONGWAVE_LOWER)
-                    			ENERGY_SUM = ENERGY_SHORTWAVE_UPPER - ENERGY_SHORTWAVE_LOWER + ENERGY_LONGWAVE_UPPER - ENERGY_LONGWAVE_LOWER;
+							if (IRRADIANCE_SHORTWAVE_UP != null && IRRADIANCE_SHORTWAVE_DOWN != null)
+								ALBEDO = IRRADIANCE_SHORTWAVE_DOWN/IRRADIANCE_SHORTWAVE_UP;
+								
+	                   		if (IRRADIANCE_LONGWAVE_UP != null)
+	                   			SKY_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_UP/0.0000000567),0.25);
+	                   		if (IRRADIANCE_LONGWAVE_DOWN != null)
+	                   			GROUND_TEMPERATURE = Math.pow(IRRADIANCE_LONGWAVE_DOWN/0.0000000567),0.25)
+
+							if (IRRADIANCE_SHORTWAVE_UP != null && IRRADIANCE_SHORTWAVE_DOWN != null)
+								NET_SOLAR_RADIATION = IRRADIANCE_SHORTWAVE_UP - IRRADIANCE_SHORTWAVE_DOWN;
+	                   		if (IRRADIANCE_LONGWAVE_UP != null && IRRADIANCE_LONGWAVE_DOWN)
+	                   			NET_FAR_INFRARED_RADIATION = IRRADIANCE_LONGWAVE_UP - IRRADIANCE_LONGWAVE_DOWN;
+
+                    		if (IRRADIANCE_SHORTWAVE_UP != null && IRRADIANCE_SHORTWAVE_DOWN != null && IRRADIANCE_LONGWAVE_UP != null && IRRADIANCE_LONGWAVE_DOWN)
+                    			NET_RADIATION = IRRADIANCE_SHORTWAVE_UP - IRRADIANCE_SHORTWAVE_DOWN + IRRADIANCE_LONGWAVE_UP - IRRADIANCE_LONGWAVE_DOWN;
                     	}
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
@@ -52,11 +67,16 @@
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
             <field name="TEMPERATURE" type="DOUBLE" unit="°C" />
-            <field name="ENERGY_SHORTWAVE_UPPER" type="DOUBLE" unit="W/m^2"/>
-            <field name="ENERGY_SHORTWAVE_LOWER" type="DOUBLE" unit="W/m^2" />
-            <field name="ENERGY_LONGWAVE_UPPER" type="DOUBLE" unit="W/m^2" />
-            <field name="ENERGY_LONGWAVE_LOWER" type="DOUBLE" unit="W/m^2" />
-            <field name="ENERGY_SUM" type="DOUBLE" unit="W/m^2" />
+            <field name="IRRADIANCE_SHORTWAVE_UP" type="DOUBLE" unit="W/m^2"/>
+            <field name="IRRADIANCE_SHORTWAVE_DOWN" type="DOUBLE" unit="W/m^2" />
+            <field name="IRRADIANCE_LONGWAVE_UP" type="DOUBLE" unit="W/m^2" />
+            <field name="IRRADIANCE_LONGWAVE_DOWN" type="DOUBLE" unit="W/m^2" />
+            <field name="ALBEDO" type="DOUBLE"/>
+            <field name="SKY_TEMPERATURE" type="DOUBLE" unit=°C" />
+            <field name="GROUND_TEMPERATURE" type="DOUBLE" unit="°C" />
+            <field name="NET_SOLAR_RADIATION" type="DOUBLE" unit="W/m^2" />
+            <field name="NET_FAR_INFRARED_RADIATION" type="DOUBLE" unit="W/m^2" />
+            <field name="NET_RADIATION" type="DOUBLE" unit="W/m^2" />
         </output-structure>
     </processing-class>
     <description>Converted Radiometer messages from Matterhorn deployment</description>

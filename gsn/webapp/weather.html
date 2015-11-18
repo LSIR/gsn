@@ -86,7 +86,7 @@ $(document).ready(function() {
           },{ title:"Hail [hits/cm²]",
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },
-          { title:"Radiation [W/m^2]",
+          { title:"Energy Balance [W/m^2]",
               signals: [ { vsensor:"matterhorn_radiometer__conv", field:["energy_longwave_upper","energy_longwave_lower","energy_shortwave_upper","energy_shortwave_lower","energy_sum"], position:[15]}]
           },
           ]);
