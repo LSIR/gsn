@@ -12,7 +12,7 @@
                 		IRRADIANCE_LONGWAVE_UP = IRRADIANCE_LONGWAVE_DOWN = null;
                 		ALBEDO = null;
                 		SKY_TEMPERATURE = GROUND_TEMPERATURE = null;
-                		NET_RADIATION = NET_SOLAR_RADIATION = NET_FAR_INFRARED_RADIATION = null;
+                		NET_RADIATION = NET_SOLAR_RADIATION = NET_FAR_INFRARED_RADIATION = NET_FAR_INFRARED_RADIATION_T = null;
                     	
                     	if (TEMPERATURE_A0 != null) {
                     		def v_ain = ((double)TEMPERATURE_A0)*1.024*2.5/Math.pow(2,16);
@@ -40,10 +40,11 @@
 
                     		if (IRRADIANCE_SHORTWAVE_UP != null && IRRADIANCE_SHORTWAVE_DOWN != null && IRRADIANCE_LONGWAVE_UP != null && IRRADIANCE_LONGWAVE_DOWN) {
                     			ALBEDO = IRRADIANCE_SHORTWAVE_DOWN/IRRADIANCE_SHORTWAVE_UP; 
- 	                   			SKY_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_UP/0.0000000567),0.25); 
- 	                   			GROUND_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_DOWN/0.0000000567),0.25); 
  								NET_SOLAR_RADIATION = IRRADIANCE_SHORTWAVE_UP - IRRADIANCE_SHORTWAVE_DOWN; 
+ 	                   			SKY_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_UP_T/0.0000000567),0.25); 
+ 	                   			GROUND_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_DOWN_T/0.0000000567),0.25); 
  	                   			NET_FAR_INFRARED_RADIATION = IRRADIANCE_LONGWAVE_UP - IRRADIANCE_LONGWAVE_DOWN;
+ 	                   			NET_FAR_INFRARED_RADIATION_T = IRRADIANCE_LONGWAVE_UP_T - IRRADIANCE_LONGWAVE_DOWN_T;
  	                   			NET_RADIATION = IRRADIANCE_SHORTWAVE_UP - IRRADIANCE_SHORTWAVE_DOWN + IRRADIANCE_LONGWAVE_UP - IRRADIANCE_LONGWAVE_DOWN;
  								}
                     	}
@@ -73,11 +74,12 @@
             <field name="IRRADIANCE_LONGWAVE_DOWN" type="DOUBLE" unit="W/m^2" />
             <field name="IRRADIANCE_LONGWAVE_UP_T" type="DOUBLE" unit="W/m^2" />
             <field name="IRRADIANCE_LONGWAVE_DOWN_T" type="DOUBLE" unit="W/m^2" />
+            <field name="NET_SOLAR_RADIATION" type="DOUBLE" unit="W/m^2" />
             <field name="ALBEDO" type="DOUBLE"/>
             <field name="SKY_TEMPERATURE" type="DOUBLE" unit="°C" />
             <field name="GROUND_TEMPERATURE" type="DOUBLE" unit="°C" />
-            <field name="NET_SOLAR_RADIATION" type="DOUBLE" unit="W/m^2" />
             <field name="NET_FAR_INFRARED_RADIATION" type="DOUBLE" unit="W/m^2" />
+            <field name="NET_FAR_INFRARED_RADIATION_T" type="DOUBLE" unit="W/m^2" />
             <field name="NET_RADIATION" type="DOUBLE" unit="W/m^2" />
         </output-structure>
     </processing-class>
