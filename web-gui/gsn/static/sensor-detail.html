@@ -4,6 +4,15 @@
             }}</h1>
     </div>
 
+    <script>
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+    </script>
+
+
     <div ng-show="loading">loading...</div>
 
     <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have
@@ -121,8 +130,8 @@
                                 the specified timeframe. </p>
 
                             <p style="float:left; display:inline-block" ng-if="!details.properties.values"><br>
-                                No data found for the
-                                specified timeframe. </p>
+                                <b>No data found for the
+                                    specified timeframe. </b></p>
 
 
                             <h4 style="float: right; display:inline-block">Page size:
@@ -144,6 +153,10 @@
                             </label>
                         </div>
 
+                        <button class="btn btn-info btn-block" ng-disabled="!details.properties.values">
+                            <i class="fa fa-download"></i>
+                            Download
+                        </button>
 
                         <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
                                ng-if="details.properties.fields">
@@ -173,6 +186,7 @@
                                 direction-links="true"
                                 boundary-links="true">
                         </dir-pagination-controls>
+
 
                         <br>
 
