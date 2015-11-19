@@ -418,7 +418,7 @@
 										{
 											title : "Crack Thermistorchain Position 1 [°C]",
 											signals : [ {
-												vsensor : "matterhorn_thermistorchain1",
+												vsensor : "matterhorn_thermistorchain",
 												field : [ "tc_t1", "tc_t2",
 														"tc_t3", "tc_t4" ],
 												select : "sensornode[position=1]"
@@ -444,14 +444,10 @@
 											title : "Crack Thermistorchain Position 2 [°C]",
 											signals : [
 													{
-														vsensor : "matterhorn_thermistorchain1",
+														vsensor : "matterhorn_thermistorchain",
 														field : [ "tc_t1",
-																"tc_t2" ],
-														select : "sensornode[position=2]"
-													},
-													{
-														vsensor : "matterhorn_thermistorchain2",
-														field : [ "tc_t6" ],
+																"tc_t2",
+																"tc_t6" ],
 														select : "sensornode[position=2]"
 													} ]
 										},
@@ -475,17 +471,13 @@
 											title : "Crack Thermistorchain Position 3 [°C]",
 											signals : [
 													{
-														vsensor : "matterhorn_thermistorchain1",
+														vsensor : "matterhorn_thermistorchain",
 														field : [ "tc_t1",
 																"tc_t2",
 																"tc_t3",
 																"tc_t4",
-																"tc_t5" ],
-														select : "sensornode[position=3]"
-													},
-													{
-														vsensor : "matterhorn_thermistorchain2",
-														field : [ "tc_t6",
+																"tc_t5",
+																"tc_t6",
 																"tc_t7" ],
 														select : "sensornode[position=3]"
 													} ]
@@ -502,17 +494,13 @@
 											title : "Crack Thermistorchain Position 4 [°C]",
 											signals : [
 													{
-														vsensor : "matterhorn_thermistorchain1",
+														vsensor : "matterhorn_thermistorchain",
 														field : [ "tc_t1",
 																"tc_t2",
 																"tc_t3",
 																"tc_t4",
-																"tc_t5" ],
-														select : "sensornode[position=4]"
-													},
-													{
-														vsensor : "matterhorn_thermistorchain2",
-														field : [ "tc_t6" ],
+																"tc_t5",
+																"tc_t6" ],
 														select : "sensornode[position=4]"
 													} ]
 										},
@@ -520,11 +508,11 @@
                                                                                         title : "Crack Thermistorchain Position 5 [°C]",
                                                                                         signals : [
                                                                                                         {
-                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                vsensor : "matterhorn_moisturechain",
                                                                                                                 field : [ "tm_t1",
-                                                                                                                                "tm_t2",
-                                                                                                                                "tm_t3",
-                                                                                                                                "tm_t4" ],
+                                                                                                                          "tm_t2",
+                                                                                                                          "tm_t3",
+                                                                                                                          "tm_t4" ],
                                                                                                                 select : "sensornode[position=5]"
                                                                                                         } ]
                                                                                 },
@@ -532,15 +520,11 @@
 											title : "Resistivity Position 5 [MΩ]",
 											signals : [
                                                                                                         {
-                                                                                                                vsensor : "matterhorn_moisturechain2",
+                                                                                                                vsensor : "matterhorn_moisturechain",
                                                                                                                 field : [ "tm_m2",
-                                                                                                                                "tm_m3",
-                                                                                                                                "tm_m4" ],
-                                                                                                                select : "sensornode[position=5]"
-													},
-                                                                                                        {
-                                                                                                                vsensor : "matterhorn_moisturechain1",
-                                                                                                                field : [ "tm_m1" ],
+                                                                                                                          "tm_m3",
+                                                                                                                          "tm_m4",
+                                                                                                                          "tm_m1" ],
                                                                                                                 select : "sensornode[position=5]"
                                                                                                         } ]
 										},
@@ -612,7 +596,7 @@
                                                                                         title : "Crack Thermistorchain Position 7 [°C]",
                                                                                         signals : [
                                                                                                         {
-                                                                                                                vsensor : "matterhorn_moisturechain1",
+                                                                                                                vsensor : "matterhorn_moisturechain",
                                                                                                                 field : [ "tm_t1",
                                                                                                                                 "tm_t2",
                                                                                                                                 "tm_t3",
@@ -624,13 +608,9 @@
 											title : "Resistivity Position 7 [MΩ]",
                                                                                         signals : [
                                                                                                         {
-                                                                                                                vsensor : "matterhorn_moisturechain1",
-                                                                                                                field : [ "tm_m1" ],
-                                                                                                                select : "sensornode[position=7]"
-                                                                                                        },
-                                                                                                        {
-                                                                                                                vsensor : "matterhorn_moisturechain2",
-                                                                                                                field : [ "tm_m2",
+                                                                                                                vsensor : "matterhorn_moisturechain",
+                                                                                                                field : [ "tm_m1",
+                                                                                                                          "tm_m2",
                                                                                                                                 "tm_m3",
                                                                                                                                 "tm_m4" ],
                                                                                                                 select : "sensornode[position=7]"
@@ -703,7 +683,7 @@
 										},
 										/*{ title:"Sensorrod Temperatures Position 8 [°C]",
 										   signals: [{
-										     vsensor:"matterhorn_sensorrod1",
+										     vsensor:"matterhorn_sensorrod",
 										     field:["sr_t1","sr_t2","sr_t3","sr_t4"],
 										     select:"sensornode[position=8]"
 										   }]
@@ -743,7 +723,7 @@
 										{
 											title : "Sensorrod Temperatures Position 10 [°C]",
 											signals : [ {
-												vsensor : "matterhorn_sensorrod1",
+												vsensor : "matterhorn_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=10]"
@@ -760,7 +740,7 @@
 										{
 											title : "Sensorrod Temperatures Position 11 [°C]",
 											signals : [ {
-												vsensor : "matterhorn_sensorrod1",
+												vsensor : "matterhorn_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=11]"
@@ -777,7 +757,7 @@
 										{
 											title : "Sensorrod Temperatures Position 12 [°C]",
 											signals : [ {
-												vsensor : "matterhorn_sensorrod1",
+												vsensor : "matterhorn_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=12]"
@@ -979,7 +959,7 @@
 										{
 											title : "Sensorrod Temperatures Position 1 [°C]",
 											signals : [ {
-												vsensor : "jungfraujoch_sensorrod1",
+												vsensor : "jungfraujoch_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=1]"
@@ -988,7 +968,7 @@
 										{
 											title : "Sensorrod Temperatures Position 2 [°C]",
 											signals : [ {
-												vsensor : "jungfraujoch_sensorrod1",
+												vsensor : "jungfraujoch_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=2]"
@@ -997,7 +977,7 @@
 										{
 											title : "Sensorrod Temperatures Position 3 [°C]",
 											signals : [ {
-												vsensor : "jungfraujoch_sensorrod1",
+												vsensor : "jungfraujoch_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=3]"
@@ -1006,7 +986,7 @@
 										{
 											title : "Sensorrod Temperatures Position 4 [°C]",
 											signals : [ {
-												vsensor : "jungfraujoch_sensorrod1",
+												vsensor : "jungfraujoch_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=4]"
@@ -1015,7 +995,7 @@
 										{
 											title : "Sensorrod Temperatures Position 5 [°C]",
 											signals : [ {
-												vsensor : "jungfraujoch_sensorrod1",
+												vsensor : "jungfraujoch_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=5]"
@@ -1024,7 +1004,7 @@
 										{
 											title : "Sensorrod Temperatures Position 6 [°C]",
 											signals : [ {
-												vsensor : "jungfraujoch_sensorrod1",
+												vsensor : "jungfraujoch_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=6]"
@@ -1033,7 +1013,7 @@
 										{
 											title : "Sensorrod Temperatures Position 7 [°C]",
 											signals : [ {
-												vsensor : "jungfraujoch_sensorrod1",
+												vsensor : "jungfraujoch_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=7]"
@@ -1043,17 +1023,13 @@
 											title : "Temperatures Thermistorchain Position 8 [°C]",
 											signals : [
 													{
-														vsensor : "jungfraujoch_thermistorchain1",
+														vsensor : "jungfraujoch_thermistorchain",
 														field : [ "tc_t1",
 																"tc_t2",
 																"tc_t3",
 																"tc_t4",
-																"tc_t5" ],
-														select : "sensornode[position=8]"
-													},
-													{
-														vsensor : "jungfraujoch_thermistorchain2",
-														field : [ "tc_t6",
+																"tc_t5",
+																"tc_t6",
 																"tc_t7",
 																"tc_t8" ],
 														select : "sensornode[position=8]"
@@ -1062,7 +1038,7 @@
 										{
 											title : "Sensorrod Temperatures Position 9 [°C]",
 											signals : [ {
-												vsensor : "jungfraujoch_sensorrod1",
+												vsensor : "jungfraujoch_sensorrod",
 												field : [ "sr_t1", "sr_t2",
 														"sr_t3", "sr_t4" ],
 												select : "sensornode[position=9]"
@@ -1072,17 +1048,13 @@
 											title : "Temperatures Thermistorchain Position 10 [°C]",
 											signals : [
 													{
-														vsensor : "jungfraujoch_thermistorchain1",
+														vsensor : "jungfraujoch_thermistorchain",
 														field : [ "tc_t1",
 																"tc_t2",
 																"tc_t3",
 																"tc_t4",
-																"tc_t5" ],
-														select : "sensornode[position=10]"
-													},
-													{
-														vsensor : "jungfraujoch_thermistorchain2",
-														field : [ "tc_t6",
+																"tc_t5",
+																"tc_t6",
 																"tc_t7",
 																"tc_t8" ],
 														select : "sensornode[position=10]"
