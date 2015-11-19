@@ -250,7 +250,7 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function
 
 }]);
 
-gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', 'localStorageService', function ($scope, $http, $routeParams, localStorageService) {
+gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', '$window', 'localStorageService', function ($scope, $http, $routeParams, $window, localStorageService) {
 
 
     $scope.loading = true;
@@ -409,12 +409,8 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         $scope.series = localStorageService.get($scope.sensorName);
     };
 
-    $scope.downloadCsv = function() {
-
-        $http.get('download/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/').success(function(response) {
-            console.log('Downloading !')
-        })
-
+    $scope.downloadCsv = function () {
+        $window.open('download/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/')
     };
 
     $scope.load();
