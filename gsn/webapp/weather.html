@@ -87,6 +87,9 @@ $(document).ready(function() {
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },
           { title:"Energy Balance [W/m^2]",
+              signals: [ { vsensor:"matterhorn_radiometer__conv", field:["irradiance_shortwave_up","irradiance_shortwave_down","albedo","net_shortwave_radiation","net_radiation"], position:[15]}]
+          },
+          { title:"Energy Balance [W/m^2]",
               signals: [ { vsensor:"matterhorn_radiometer__conv", field:["irradiance_shortwave_up","irradiance_shortwave_down","irradiance_longwave_up","irradiance_longwave_down","net_radiation"], position:[15]}]
           },
           ]);
