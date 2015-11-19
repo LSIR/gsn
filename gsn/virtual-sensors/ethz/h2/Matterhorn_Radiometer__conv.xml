@@ -11,7 +11,7 @@
                 		IRRADIANCE_SHORTWAVE_UP = IRRADIANCE_SHORTWAVE_DOWN = null;
                 		IRRADIANCE_LONGWAVE_UP = IRRADIANCE_LONGWAVE_DOWN = null;
                 		ALBEDO = null;
-                		SKY_TEMPERATURE = GROUND_TEMPERATURE = null;
+                		SKY_TEMPERATURE = GROUND_TEMPERATURE = SKY_TEMPERATURE_T = GROUND_TEMPERATURE_T =null;
                 		NET_RADIATION = NET_SOLAR_RADIATION = NET_FAR_INFRARED_RADIATION = NET_FAR_INFRARED_RADIATION_T = null;
                     	
                     	if (TEMPERATURE_A0 != null) {
@@ -40,8 +40,10 @@
 
                     		if (IRRADIANCE_SHORTWAVE_UP != null && IRRADIANCE_SHORTWAVE_DOWN != null && IRRADIANCE_LONGWAVE_UP != null && IRRADIANCE_LONGWAVE_DOWN) {
                     			NET_SOLAR_RADIATION = IRRADIANCE_SHORTWAVE_UP - IRRADIANCE_SHORTWAVE_DOWN; 
- 	                   			SKY_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_UP_T/0.0000000567),0.25); 
- 	                   			GROUND_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_DOWN_T/0.0000000567),0.25); 
+ 	                   			SKY_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_UP/0.0000000567),0.25); 
+ 	                   			GROUND_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_DOWN/0.0000000567),0.25); 
+ 	                   			SKY_TEMPERATURE_T = Math.pow((IRRADIANCE_LONGWAVE_UP_T/0.0000000567),0.25); 
+ 	                   			GROUND_TEMPERATURE_T = Math.pow((IRRADIANCE_LONGWAVE_DOWN_T/0.0000000567),0.25); 
  	                   			NET_FAR_INFRARED_RADIATION = IRRADIANCE_LONGWAVE_UP - IRRADIANCE_LONGWAVE_DOWN;
  	                   			NET_FAR_INFRARED_RADIATION_T = IRRADIANCE_LONGWAVE_UP_T - IRRADIANCE_LONGWAVE_DOWN_T;
  	                   			NET_RADIATION = IRRADIANCE_SHORTWAVE_UP - IRRADIANCE_SHORTWAVE_DOWN + IRRADIANCE_LONGWAVE_UP - IRRADIANCE_LONGWAVE_DOWN;
@@ -66,19 +68,21 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="TEMPERATURE" type="DOUBLE" unit="°C" />
-            <field name="IRRADIANCE_SHORTWAVE_UP" type="DOUBLE" unit="W/m^2"/>
-            <field name="IRRADIANCE_SHORTWAVE_DOWN" type="DOUBLE" unit="W/m^2" />
-            <field name="IRRADIANCE_LONGWAVE_UP" type="DOUBLE" unit="W/m^2" />
-            <field name="IRRADIANCE_LONGWAVE_DOWN" type="DOUBLE" unit="W/m^2" />
-            <field name="IRRADIANCE_LONGWAVE_UP_T" type="DOUBLE" unit="W/m^2" />
-            <field name="IRRADIANCE_LONGWAVE_DOWN_T" type="DOUBLE" unit="W/m^2" />
-            <field name="NET_SOLAR_RADIATION" type="DOUBLE" unit="W/m^2" />
+            <field name="IRRADIANCE_SHORTWAVE_UP" type="DOUBLE" unit="W/m²"/>
+            <field name="IRRADIANCE_SHORTWAVE_DOWN" type="DOUBLE" unit="W/m²" />
+            <field name="NET_SOLAR_RADIATION" type="DOUBLE" unit="W/m²" />
+            <field name="IRRADIANCE_LONGWAVE_UP" type="DOUBLE" unit="W/m²" />
+            <field name="IRRADIANCE_LONGWAVE_DOWN" type="DOUBLE" unit="W/m²" />
             <field name="SKY_TEMPERATURE" type="DOUBLE" unit="°C" />
             <field name="GROUND_TEMPERATURE" type="DOUBLE" unit="°C" />
-            <field name="NET_FAR_INFRARED_RADIATION" type="DOUBLE" unit="W/m^2" />
-            <field name="NET_FAR_INFRARED_RADIATION_T" type="DOUBLE" unit="W/m^2" />
-            <field name="NET_RADIATION" type="DOUBLE" unit="W/m^2" />
+            <field name="TEMPERATURE" type="DOUBLE" unit="°C" />
+            <field name="IRRADIANCE_LONGWAVE_UP_T" type="DOUBLE" unit="W/m²" />
+            <field name="IRRADIANCE_LONGWAVE_DOWN_T" type="DOUBLE" unit="W/m²" />
+            <field name="SKY_TEMPERATURE_T" type="DOUBLE" unit="°C" />
+            <field name="GROUND_TEMPERATURE_T" type="DOUBLE" unit="°C" />
+            <field name="NET_FAR_INFRARED_RADIATION" type="DOUBLE" unit="W/m²" />
+            <field name="NET_FAR_INFRARED_RADIATION_T" type="DOUBLE" unit="W/m²" />
+            <field name="NET_RADIATION" type="DOUBLE" unit="W/m²" />
         </output-structure>
     </processing-class>
     <description>Converted Radiometer messages from Matterhorn deployment</description>
