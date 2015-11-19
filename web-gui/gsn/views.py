@@ -1,14 +1,12 @@
 import json
 from datetime import datetime
-
 from django.views.generic import TemplateView
-
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 import requests
 import requests_cache
-
 from gsn.forms import TestForm
+import csv
 
 _from_ = '2015-10-06T13:04:04'
 _to_ = '2015-10-06T13:06:04'
@@ -19,7 +17,6 @@ server_address = "http://montblanc.slf.ch:22001/rest/sensors"
 # Create your views here.
 
 requests_cache.install_cache("demo_cache")
-
 
 
 def index(request):
@@ -44,3 +41,26 @@ def sensor_detail(request, sensor_name, from_date, to_date):
     }
 
     return JsonResponse(json.loads(requests.get(server_address + '/' + sensor_name + '/', params=payload).text))
+
+
+def download_csv(request, sensor_name, from_date, to_date):
+    payload = {
+        'from': from_date,
+        'to': to_date,
+        'username': 'john',
+        'password': 'john'
+    }
+
+    data = json.loads(requests.get(server_address + '/' + sensor_name + '/', params=payload).text)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="'+sensor_name+'.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([   field['name']+" ("+ field['unit']+" "+field['type']+")"
+                        for field in data['features'][0]['properties']['fields']   ] )
+
+    for value in data['features'][0]['properties']['values']:
+        writer.writerow(value)
+
+    return response

@@ -409,6 +409,13 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         $scope.series = localStorageService.get($scope.sensorName);
     };
 
+    $scope.downloadCsv = function() {
+
+        $http.get('download/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/').success(function(response) {
+            console.log('Downloading !')
+        })
+
+    };
 
     $scope.load();
 
