@@ -96,7 +96,7 @@ gsnControllers.service('downloadService', ['$window', '$http', function ($window
     this.download = function (scope) {
         $http.post('download/', scope.details).success(function (data, status, headers, config) {
 
-            var myBlob = new Blob(["example"], {type: 'text/html'});
+            var myBlob = new Blob([data], {type: 'text/html'});
             var blobURL = ($window.URL || $window.webkitURL).createObjectURL(myBlob);
             var anchor = document.createElement("a");
             anchor.download = scope.sensorName + ".csv";
