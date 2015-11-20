@@ -107,10 +107,83 @@ gsnControllers.service('downloadService', ['$window', '$http', function ($window
             console.log('Post failed')
         });
 
+    };
+
+    this.downloadMultiple = function (sensorList, from, to) {
+
+        sensorList.forEach(function (sensor) {
+
+            $http.get('download/' + sensor + '/' + from + '/' + to + '/').success(function (data, status, headers, config) {
+                var myBlob = new Blob([data], {type: 'text/html'});
+                var blobURL = ($window.URL || $window.webkitURL).createObjectURL(myBlob);
+                var anchor = document.createElement("a");
+                anchor.download = sensor + ".csv";
+                anchor.href = blobURL;
+                anchor.click();
+            }).error(function (data, status, headers, config) {
+                $window.alert('You do not have access to the sensor ' + sensor)
+            });
+
+        })
     }
 
 }]);
 
+
+gsnControllers.controller('DownloadCtrl', ['$scope', '$window', '$http', 'sensorService', 'downloadService', function ($scope, $window, $http, sensorService, downloadService) {
+
+    var today = new Date().toJSON();
+    var yesterday = new Date((new Date()).getTime() - (1000 * 60 * 60)).toJSON();
+
+
+    $scope.date = {
+        from: {
+            date: yesterday.slice(0, 19),
+            config: {
+                dropdownSelector: '#dropdown2',
+                minuteStep: 1
+            },
+            onTimeSet: function () {
+                console.log('ayy');
+
+                if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
+                    $scope.date.to.date = $scope.date.from.date
+                }
+
+            }
+        },
+        to: {
+            date: today.slice(0, 19),
+            config: {
+                dropdownSelector: '#dropdown2',
+                minuteStep: 1
+            },
+            onTimeSet: function () {
+                if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
+                    $scope.date.from.date = $scope.date.to.date;
+                    console.log('lmao');
+                }
+
+            }
+        }
+    };
+
+    sensorService.async().success(function (data) {
+
+
+        $scope.sensorsList = [];
+
+        data.features.forEach(function (sensor) {
+            $scope.sensorsList.push(sensor['properties']['vs_name']
+            )
+        })
+
+    });
+
+    $scope.download = downloadService.downloadMultiple
+
+
+}]);
 
 gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStorageService', function ($scope, compareService, localStorageService) {
 
@@ -322,9 +395,9 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         };
 
 
-        function toISO8601String(date) {
-            return date.year + "-" + date.month + "-" + date.day + "T" + date.hour + ":" + date.minute + ":" + date.second;
-        }
+        //function toISO8601String(date) {
+        //    return date.year + "-" + date.month + "-" + date.day + "T" + date.hour + ":" + date.minute + ":" + date.second;
+        //}
 
 
         $scope.load = function () {

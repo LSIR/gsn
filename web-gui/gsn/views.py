@@ -6,6 +6,7 @@ from django.template import loader
 import requests
 import requests_cache
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseForbidden
 from gsn.forms import TestForm
 import csv
 
@@ -58,13 +59,21 @@ def download_csv(request, sensor_name, from_date, to_date):
     response['Content-Disposition'] = 'attachment; filename="' + sensor_name + '.csv"'
 
     writer = csv.writer(response)
+
+    if 'error' in data:
+        return HttpResponseForbidden()
+
     writer.writerow([field['name'] + " (" + field['unit'] + " " + field['type'] + ")"
                      for field in data['features'][0]['properties']['fields']])
 
-    for value in data['features'][0]['properties']['values']:
-        writer.writerow(value)
+    if 'values' in data['features'][0]['properties']:
+        for value in data['features'][0]['properties']['values']:
+            writer.writerow(value)
+    else:
+        writer.writerow(["No data for the selected timespan: " + from_date + ", " + to_date])
 
     return response
+
 
 @csrf_exempt
 def download(request):
