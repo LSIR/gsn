@@ -90,6 +90,28 @@ gsnControllers.service('compareService', ['localStorageService', function (local
 
 }]);
 
+
+gsnControllers.service('downloadService', ['$window', '$http', function ($window, $http) {
+
+    this.download = function (scope) {
+        $http.post('download/', scope.details).success(function (data, status, headers, config) {
+
+            var myBlob = new Blob(["example"], {type: 'text/html'});
+            var blobURL = ($window.URL || $window.webkitURL).createObjectURL(myBlob);
+            var anchor = document.createElement("a");
+            anchor.download = scope.sensorName + ".csv";
+            anchor.href = blobURL;
+            anchor.click();
+
+        }).error(function (data, status, headers, config) {
+            console.log('Post failed')
+        });
+
+    }
+
+}]);
+
+
 gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStorageService', function ($scope, compareService, localStorageService) {
 
     $scope.filterTermsIn = '';
@@ -250,173 +272,179 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function
 
 }]);
 
-gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', '$window', 'localStorageService', function ($scope, $http, $routeParams, $window, localStorageService) {
+gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', '$window', 'downloadService', 'localStorageService',
+    function ($scope, $http, $routeParams, $window, downloadService, localStorageService) {
 
 
-    $scope.loading = true;
-    $scope.sensorName = $routeParams.sensorName;
+        $scope.loading = true;
+        $scope.sensorName = $routeParams.sensorName;
 
-    $scope.truePageSize = 25;
+        $scope.truePageSize = 25;
 
-    $scope.updateRowCount = function (pageSize) {
-        $scope.truePageSize = pageSize
-    };
+        $scope.updateRowCount = function (pageSize) {
+            $scope.truePageSize = pageSize
+        };
 
-    var today = new Date().toJSON();
-    var yesterday = new Date((new Date()).getTime() - (1000 * 60 * 60)).toJSON();
+        var today = new Date().toJSON();
+        var yesterday = new Date((new Date()).getTime() - (1000 * 60 * 60)).toJSON();
 
 
-    $scope.date = {
-        from: {
-            date: yesterday.slice(0, 19),
-            config: {
-                dropdownSelector: '#dropdown2',
-                minuteStep: 1
-            },
-            onTimeSet: function () {
-                console.log('ayy');
+        $scope.date = {
+            from: {
+                date: yesterday.slice(0, 19),
+                config: {
+                    dropdownSelector: '#dropdown2',
+                    minuteStep: 1
+                },
+                onTimeSet: function () {
+                    console.log('ayy');
 
-                if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
-                    $scope.date.to.date = $scope.date.from.date
+                    if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
+                        $scope.date.to.date = $scope.date.from.date
+                    }
+
                 }
+            },
+            to: {
+                date: today.slice(0, 19),
+                config: {
+                    dropdownSelector: '#dropdown2',
+                    minuteStep: 1
+                },
+                onTimeSet: function () {
+                    if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
+                        $scope.date.from.date = $scope.date.to.date;
+                        console.log('lmao');
+                    }
 
+                }
             }
-        },
-        to: {
-            date: today.slice(0, 19),
-            config: {
-                dropdownSelector: '#dropdown2',
-                minuteStep: 1
-            },
-            onTimeSet: function () {
-                if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
-                    $scope.date.from.date = $scope.date.to.date;
-                    console.log('lmao');
+        };
+
+
+        function toISO8601String(date) {
+            return date.year + "-" + date.month + "-" + date.day + "T" + date.hour + ":" + date.minute + ":" + date.second;
+        }
+
+
+        $scope.load = function () {
+            $http.get('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/').success(function (data) {
+                $scope.details = data.features ? data.features[0] : undefined;
+                $scope.loading = false;
+
+                console.log('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/');    //TODO: REMOVE
+
+                $scope.plot = {
+                    'labels': [],
+                    'series': [],
+                    'data': [],
+                    'onClick': function (points, evt) {
+                        console.log(points, evt);
+                    }
+                };
+
+                buildData();
+
+            });
+        };
+
+        $scope.columns = [true, true, true];
+
+        $scope.submit = function () {
+            $scope.load();
+        };
+
+        function buildData() {
+
+            if ($scope.details && $scope.details.properties.values) {
+                var k;
+
+                $scope.chartConfig.series = [];
+
+                for (k = 2; k < $scope.details.properties.fields.length; k++) {
+
+
+                    $scope.chartConfig.series.push({
+                        name: $scope.details.properties.fields[k].name + " (" + (!($scope.details.properties.fields[k].unit === "") ? $scope.details.properties.fields[k].unit : "no unit") + ") ",
+                        id: k,
+                        data: []
+                    });
+
+                    var i;
+                    for (i = 0; i < $scope.details.properties.values.length; i++) {
+
+                        var array = [$scope.details.properties.values[i][1], $scope.details.properties.values[i][k]];
+                        $scope.chartConfig.series[k - 2].data.push(array)
+
+                    }
+
+                    $scope.chartConfig.series[k - 2].data.sort(function (a, b) {
+                        return a[0] - b[0]
+                    })
+
                 }
+
 
             }
         }
-    };
 
 
-    function toISO8601String(date) {
-        return date.year + "-" + date.month + "-" + date.day + "T" + date.hour + ":" + date.minute + ":" + date.second;
-    }
-
-
-    $scope.load = function () {
-        $http.get('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/').success(function (data) {
-            $scope.details = data.features ? data.features[0] : undefined;
-            $scope.loading = false;
-
-            console.log('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/');    //TODO: REMOVE
-
-            $scope.plot = {
-                'labels': [],
-                'series': [],
-                'data': [],
-                'onClick': function (points, evt) {
-                    console.log(points, evt);
-                }
-            };
-
-            buildData();
-
-        });
-    };
-
-    $scope.columns = [true, true, true];
-
-    $scope.submit = function () {
-        $scope.load();
-    };
-
-    function buildData() {
-
-        if ($scope.details && $scope.details.properties.values) {
-            var k;
-
-            $scope.chartConfig.series = [];
-
-            for (k = 2; k < $scope.details.properties.fields.length; k++) {
-
-
-                $scope.chartConfig.series.push({
-                    name: $scope.details.properties.fields[k].name + " (" + (!($scope.details.properties.fields[k].unit === "") ? $scope.details.properties.fields[k].unit : "no unit") + ") ",
-                    id: k,
-                    data: []
-                });
-
-                var i;
-                for (i = 0; i < $scope.details.properties.values.length; i++) {
-
-                    var array = [$scope.details.properties.values[i][1], $scope.details.properties.values[i][k]];
-                    $scope.chartConfig.series[k - 2].data.push(array)
-
-                }
-
-                $scope.chartConfig.series[k - 2].data.sort(function (a, b) {
-                    return a[0] - b[0]
-                })
-
-            }
-
-
-        }
-    }
-
-
-    $scope.chartConfig = {
-        options: {
-            chart: {
-                zoomType: 'x'
-            },
-            rangeSelector: {
-                enabled: true
-            },
-            navigator: {
-                enabled: true
-            },
-            legend: {
-                enabled: true
-            },
-            plotOptions: {
-                series: {
-                    marker: {
-                        enabled: false
+        $scope.chartConfig = {
+            options: {
+                chart: {
+                    zoomType: 'x'
+                },
+                rangeSelector: {
+                    enabled: true
+                },
+                navigator: {
+                    enabled: true
+                },
+                legend: {
+                    enabled: true
+                },
+                plotOptions: {
+                    series: {
+                        marker: {
+                            enabled: false
+                        }
                     }
                 }
+            },
+            series: [],
+            title: {
+                text: 'Data'
+            },
+            useHighStocks: true,
+            size: {
+                height: 500
+            },
+            yAxis: {
+                labels: {
+                    align: 'left'
+                }
             }
-        },
-        series: [],
-        title: {
-            text: 'Data'
-        },
-        useHighStocks: true,
-        size: {
-            height: 500
-        },
-        yAxis: {
-            labels: {
-                align: 'left'
-            }
-        }
-    };
+        };
 
 
-    $scope.compare = function () {
-        localStorageService.set($scope.sensorName, $scope.chartConfig.series);
-        $scope.series = localStorageService.get($scope.sensorName);
-    };
+        $scope.compare = function () {
+            localStorageService.set($scope.sensorName, $scope.chartConfig.series);
+            $scope.series = localStorageService.get($scope.sensorName);
+        };
 
-    $scope.downloadCsv = function () {
-        $window.open('download/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/')
-    };
+        //$scope.downloadCsv = function () {
+        //    $window.open('download/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/')
+        //};
 
-    $scope.load();
+        $scope.download = function () {
+            downloadService.download($scope);
+        };
 
 
-}]);
+        $scope.load();
+
+
+    }]);
 
 gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceService', function ($scope, sensorService, mapDistanceService) {
 

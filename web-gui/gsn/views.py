@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 import requests
 import requests_cache
+from django.views.decorators.csrf import csrf_exempt
 from gsn.forms import TestForm
 import csv
 
@@ -54,13 +55,31 @@ def download_csv(request, sensor_name, from_date, to_date):
     data = json.loads(requests.get(server_address + '/' + sensor_name + '/', params=payload).text)
 
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="'+sensor_name+'.csv"'
+    response['Content-Disposition'] = 'attachment; filename="' + sensor_name + '.csv"'
 
     writer = csv.writer(response)
-    writer.writerow([   field['name']+" ("+ field['unit']+" "+field['type']+")"
-                        for field in data['features'][0]['properties']['fields']   ] )
+    writer.writerow([field['name'] + " (" + field['unit'] + " " + field['type'] + ")"
+                     for field in data['features'][0]['properties']['fields']])
 
     for value in data['features'][0]['properties']['values']:
+        writer.writerow(value)
+
+    return response
+
+@csrf_exempt
+def download(request):
+    data = json.loads(
+        request.body.decode('utf-8')
+    )
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="download.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([field['name'] + " (" + field['unit'] + " " + field['type'] + ")"
+                     for field in data['properties']['fields']])
+
+    for value in data['properties']['values']:
         writer.writerow(value)
 
     return response
