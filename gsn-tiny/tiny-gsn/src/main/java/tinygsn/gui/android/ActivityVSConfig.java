@@ -185,7 +185,7 @@ public class ActivityVSConfig extends AbstractActivity {
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
 				Toast.makeText(context, "Please select a virtual sensor",
-						              Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
@@ -364,7 +364,7 @@ public class ActivityVSConfig extends AbstractActivity {
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
 				Toast.makeText(context, "Please select a virtual sensor",
-						              Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -417,10 +417,10 @@ public class ActivityVSConfig extends AbstractActivity {
 
 		try {
 			storage.executeInsert(
-					                     "vsList",
-					                     new ArrayList<String>(Arrays.asList("running", "vsname",
-							                                                        "vstype")),
-					                     new ArrayList<String>(Arrays.asList("1", vsName, "" + vsType)));
+				"vsList",
+				new ArrayList<String>(Arrays.asList("running", "vsname",
+					"vstype")),
+				new ArrayList<String>(Arrays.asList("1", vsName, "" + vsType)));
 
 			vssetting.saveTo(vsName, storage);
 
@@ -449,8 +449,8 @@ public class ActivityVSConfig extends AbstractActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add("Save")
 //				.setIcon(R.drawable.ic_menu_save)
-				.setShowAsAction(
-						                MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			.setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -467,12 +467,15 @@ public class ActivityVSConfig extends AbstractActivity {
 					String vsName = editText_vsName.getText().toString();
 					if (vsName.equals("")) {
 						Toast.makeText(this, "Please input VS Name", Toast.LENGTH_SHORT).show();
+					} else if (vsName.matches("(.*)[[\\s*{}\\[\\]#~@'`!\"£$€%^&*()_\\-+=\\/\\?.,<>|\\\\¬|:;]](.*)")) {
+						Toast.makeText(this, "VS Name cannot have special characters!",
+							Toast.LENGTH_SHORT).show();
 					} else if (storage.vsExists("vs_" + vsName) == true) {
 						Toast.makeText(this, "VS Name already exists, please choose a new one!",
-								              Toast.LENGTH_SHORT).show();
+							Toast.LENGTH_SHORT).show();
 					} else if (selectedVS.isEmpty()) {
 						Toast.makeText(this, "You must choose at least on wrapper for your VS",
-								              Toast.LENGTH_SHORT).show();
+							Toast.LENGTH_SHORT).show();
 					} else {
 						new AsyncTask<Activity, Void, Void>() {
 							@Override
@@ -493,7 +496,7 @@ public class ActivityVSConfig extends AbstractActivity {
 
 				} else
 					Toast.makeText(this, "There is nothing changed to save!",
-							              Toast.LENGTH_SHORT).show();
+						Toast.LENGTH_SHORT).show();
 				break;
 		}
 
@@ -514,7 +517,7 @@ public class ActivityVSConfig extends AbstractActivity {
 		public boolean validate() {
 			if (windowsize.getText().toString().equals("")) {
 				Toast.makeText(ActivityVSConfig.this, "Please input Window Size", Toast.LENGTH_SHORT)
-						.show();
+					.show();
 				return false;
 			}
 			if (stepsize.getText().toString().equals("")) {
@@ -533,13 +536,13 @@ public class ActivityVSConfig extends AbstractActivity {
 			}
 			if (validate()) {
 				storage.executeInsert(
-						                     "sourcesList",
-						                     new ArrayList<String>(Arrays.asList("vsname",
-								                                                        "sswindowsize", "ssstep", "sstimebased", "ssaggregator",
-								                                                        "wrappername")),
-						                     new ArrayList<String>(Arrays.asList(vsname, windowsize.getText().toString(), stepsize
-								                                                                                                  .getText().toString(), timebased.isChecked() + "", aggregator.getSelectedItemPosition()
-										                                                                                                                                                     + "", wrapperName)));
+					"sourcesList",
+					new ArrayList<String>(Arrays.asList("vsname",
+						"sswindowsize", "ssstep", "sstimebased", "ssaggregator",
+						"wrappername")),
+					new ArrayList<String>(Arrays.asList(vsname, windowsize.getText().toString(), stepsize
+						.getText().toString(), timebased.isChecked() + "", aggregator.getSelectedItemPosition()
+						+ "", wrapperName)));
 				settings.saveTo(wrapperName, storage);
 
 			}
@@ -581,7 +584,7 @@ public class ActivityVSConfig extends AbstractActivity {
 
 				@Override
 				public void beforeTextChanged(CharSequence s, int start, int count,
-				                              int after) {
+											  int after) {
 				}
 
 				@Override
@@ -635,9 +638,9 @@ public class ActivityVSConfig extends AbstractActivity {
 						spinners[indexSpinner] = new Spinner(ActivityVSConfig.this);
 						List<String> list = params.get(i).getmParameters();
 						ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context,
-								                                                           tinygsn.gui.android.R.layout.spinner_item, list);
+							tinygsn.gui.android.R.layout.spinner_item, list);
 						dataAdapter
-								.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+							.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 						spinners[indexSpinner].setAdapter(dataAdapter);
 						inrow.addView(spinners[indexSpinner]);
 						layout.addView(inrow);
