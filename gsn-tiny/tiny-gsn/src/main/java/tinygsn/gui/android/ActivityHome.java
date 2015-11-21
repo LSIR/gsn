@@ -38,6 +38,7 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.widget.TextView;
 
+import org.epfl.locationprivacy.landingpage.LandingPageActivity;
 import org.epfl.locationprivacy.map.databases.GridDBDataSource;
 import org.epfl.locationprivacy.map.databases.VenuesCondensedDBDataSource;
 import org.epfl.locationprivacy.privacyestimation.databases.LinkabilityGraphDataSource;
@@ -113,6 +114,11 @@ public class ActivityHome extends AbstractActivity {
 
 	public void open_privacySettings(View view) {
 		Intent myIntent = new Intent(this, PrivacyProfileActivity.class);
+		this.startActivity(myIntent);
+	}
+
+	public void open_libApplication(View view) {
+		Intent myIntent = new Intent(this, LandingPageActivity.class);
 		this.startActivity(myIntent);
 	}
 

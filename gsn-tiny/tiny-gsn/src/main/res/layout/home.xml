@@ -219,10 +219,17 @@
             android:id="@+id/imageView3_1"
             android:layout_width="25dip"
             android:layout_height="fill_parent"/>
-        <ImageView
+        <!--<ImageView
             android:id="@+id/imageView3_2"
             android:layout_width="25dip"
-            android:layout_height="fill_parent"/>
+            android:layout_height="fill_parent"/>-->
+        <ImageView
+            android:id="@+id/imageViewPrivacy2"
+            android:layout_width="60dip"
+            android:layout_height="60dip"
+            android:gravity="center"
+            android:onClick="open_libApplication"
+            android:src="@drawable/loc_priv_lib_settings"/>
     </TableRow>
 
     <!-- Text below images -->
@@ -251,10 +258,23 @@
             android:layout_width="15dip"
             android:layout_height="fill_parent"/>
 
-        <ImageView
+        <!--<ImageView
             android:id="@+id/imageView3_4"
             android:layout_width="15dip"
-            android:layout_height="fill_parent"/>
+            android:layout_height="fill_parent"/>-->
+
+        <TextView
+            android:id="@+id/privacyapp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageViewPrivacy"
+            android:layout_alignLeft="@+id/imageViewPrivacy"
+            android:layout_alignRight="@+id/imageViewPrivacy"
+            android:layout_alignTop="@+id/imageViewPrivacy"
+            android:layout_margin="1dp"
+            android:gravity="center"
+            android:text="LocPrivLib App"
+            android:textColor="#000000"/>
     </TableRow>
 
     <TableRow
