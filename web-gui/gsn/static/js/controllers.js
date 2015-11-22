@@ -180,7 +180,9 @@ gsnControllers.controller('DownloadCtrl', ['$scope', '$window', '$http', 'sensor
 
     });
 
-    $scope.download = downloadService.downloadMultiple
+    $scope.download = downloadService.downloadMultiple;
+
+    $scope.minMultipleSelectSize = 20;
 
 
 }]);

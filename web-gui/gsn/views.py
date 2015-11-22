@@ -13,8 +13,8 @@ import csv
 _from_ = '2015-10-06T13:04:04'
 _to_ = '2015-10-06T13:06:04'
 
-server_address = "http://montblanc.slf.ch:22001/rest/sensors"
-# server_address = "http://opensense.epfl.ch:22001/rest/sensors"
+# server_address = "http://montblanc.slf.ch:22001/rest/sensors"
+server_address = "http://opensense.epfl.ch:22001/rest/sensors"
 
 # Create your views here.
 

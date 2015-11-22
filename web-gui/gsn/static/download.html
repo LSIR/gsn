@@ -6,9 +6,12 @@
 
         <div class="row">
 
-            <div class="col-lg-6">
+            <div class="col-lg-6 form-group">
+                <label>Select sensors to download</label>
                 <select ng-model="selected" multiple
-                        ng-options="sensor for sensor in sensorsList | filter : query | orderBy:'toString() '" size=30
+                        class="form-control"
+                        ng-options="sensor for sensor in sensorsList | filter : query | orderBy:'toString() '"
+                        data-ng-attr-size='{{minMultipleSelectSize}}'
                         style='width: 100%;resize: vertical'></select>
             </div>
 
@@ -52,13 +55,13 @@
                 </div>
 
 
-                    <br>
+                <br>
 
-                    <button class="btn btn-info btn-block" ng-click="download(selected, date.from.date, date.to.date)"
-                            ng-disabled="!selected.length">
-                        <i class="fa fa-download"></i>
-                        Download
-                    </button>
+                <button class="btn btn-info btn-block" ng-click="download(selected, date.from.date, date.to.date)"
+                        ng-disabled="!selected.length">
+                    <i class="fa fa-download"></i>
+                    Download
+                </button>
 
 
             </div>

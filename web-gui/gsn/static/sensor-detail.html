@@ -200,9 +200,20 @@
 
                         <br>
 
-                        <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
-                        <button class="btn btn-primary" ng-click="compare()">Compare this dataset</button>
+                        <div class="form-group">
+                            <label>Separate the graph according to field:</label>
+                            <select class="form-control"
+                                    ng-options="field as field.name for field in details.properties.fields"
+                                    ng-model="selectedField" ng-disabled="!details.properties.values">
+                            </select>
+                        </div>
 
+                        <br>
+
+                        <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
+                        <button class="btn btn-primary" ng-click="compare()" ng-disabled="!details.properties.values">
+                            Compare this dataset
+                        </button>
 
                     </div>
 
