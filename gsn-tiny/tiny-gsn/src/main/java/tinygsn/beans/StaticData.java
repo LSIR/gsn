@@ -8,6 +8,10 @@ import java.util.Map.Entry;
 
 import android.content.Context;
 import android.content.Intent;
+
+import org.epfl.locationprivacy.adaptiveprotection.AdaptiveProtection;
+import org.epfl.locationprivacy.adaptiveprotection.AdaptiveProtectionInterface;
+
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.wrappers.AbstractWrapper;
 
@@ -17,8 +21,15 @@ public class StaticData {
 	public static InputStream is;
 	private static Map<String, Intent> runningServices = new HashMap<String, Intent>();
 	private static Map<Integer, VSensorConfig> configMap = new HashMap<Integer, VSensorConfig>();
+	private static AdaptiveProtectionInterface protectionInterface;
 	public static Map<String, Integer> IDMap = new HashMap<String, Integer>();
-	
+
+	public static AdaptiveProtectionInterface getAdaptiveProtectionInterface() {
+		if (protectionInterface == null) {
+			protectionInterface = new AdaptiveProtection(StaticData.globalContext);
+		}
+		return protectionInterface;
+	}
 	public static void saveNameID(int id, String name)
 	{
 		IDMap.put(name, id);

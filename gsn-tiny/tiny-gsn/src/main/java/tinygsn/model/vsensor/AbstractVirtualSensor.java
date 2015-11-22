@@ -248,7 +248,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		}
 
 		if (gpsPrivacy) {
-			AdaptiveProtectionInterface prot = new AdaptiveProtection(StaticData.globalContext);
+			AdaptiveProtectionInterface prot = StaticData.getAdaptiveProtectionInterface();
 			// get data from streamElement for obfuscate them
 			double latitude = (double) streamElement.getData("latitudeTopLeft");
 			double longitude = (double) streamElement.getData("longitudeTopLeft");
