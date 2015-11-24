@@ -1,7 +1,9 @@
 __author__ = 'julie_000'
 
 from django import forms
+from  django.contrib.auth.forms import AuthenticationForm
 
 
-class TestForm(forms.Form):
-    your_name = forms.CharField(label='Your name', max_length=100)
+class TestForm(AuthenticationForm):
+    
+    pass;

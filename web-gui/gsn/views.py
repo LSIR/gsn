@@ -2,15 +2,17 @@ import json
 from datetime import datetime, timedelta
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.template.context_processors import csrf
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 import requests
 import requests_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 from django.conf import settings
-from gsn.models import User
+from django.contrib.auth import authenticate, login, logout
+from gsn.forms import AuthenticationForm
+from gsn.models import GSNUser
 import csv
 
 # Server adress and services
@@ -20,7 +22,8 @@ server_address = settings.GSN['SERVER_URL']
 sensor_suffix = settings.GSN['SUFFIXES']['SENSORS']
 
 # OAUTH2
-oauth_enabled = settings.GSN['OAUTH']['ENABLED']
+oauth_enabled = False  # TODO delete and uncomment when OAUTH ready
+# oauth_enabled = settings.GSN['OAUTH']['ENABLED']
 if oauth_enabled:
     oauth_server_address = settings.GSN['OAUTH']['SERVER_URL']
     oauth_client_id = settings.GSN['OAUTH']['CLIENT_ID']
@@ -39,8 +42,24 @@ requests_cache.install_cache("demo_cache")
 
 # Index view, just renders a template
 def index(request):
+    if request.user.is_authenticated():
+        context = {
+            'log_page': 'logout',
+            'logged_in': 'true',
+            'user': request.user.username
+
+        }
+    else:
+        context = {
+            'log_page': 'login',
+            'logged_out': 'true',
+            'form': AuthenticationForm(),
+        }
+
+    context.update(csrf(request))
+
     template = loader.get_template('gsn/index.html')
-    response = HttpResponse(template.render())
+    response = HttpResponse(template.render(context))
     response.set_cookie('test_cookie', 'test_value')
     return response
 
@@ -125,46 +144,76 @@ def download(request):
     return response
 
 
+def login_page(request):
+    template = loader.get_template('gsn/login.html')
+    return HttpResponse(template.render())
+
+
+def login_request(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    user = authenticate(username=username, password=password)
+
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+            return redirect('index')
+        else:
+            # TODO: add refused login
+            pass
+    else:
+        # TODO: add feedback about incorrect credentials
+        pass
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
+
 # OAUTH WORK FLOW:
 # 1- go OAUTH provider and follow the steps until redirect
 # 2- Redirected to page /gsn/logged with parameter id; id is the code, we get the tokens and create a new user in the DB with the according fields
 # 3-
 
 # View that redirects to OAUTH provider
-def oauth_logging_redirect(request):
-    return redirect(oauth_server_address + oauth_auth_suffix, response_type='code', client_id=oauth_client_id,
-                    oauth_client_secret=oauth_client_secret)
 
 
-def oauth_after_log(request):
-    code = request.GET['code']
 
-    if code is None:
-        return HttpResponseForbidden()
 
-    response = redirect("index")
-    response.set_cookie('access_token', code)
-
-    if User.objects.filter(code=code).exists():
-        return response
-
-    payload = {
-        'client_id': oauth_client_id,
-        'client_secret': oauth_client_secret,
-        'redirect_uri': '127.0.0.1:8000/gsn/',
-        'code': code,
-        'grant_type': 'authorization_code'
-    }
-
-    data = json.loads(
-        requests.get(oauth_server_address + oauth_token_suffix, params=payload).json())
-
-    now = datetime.now()
-    expire_date = datetime.now() + timedelta(seconds=data["expires_in"])
-
-    new_user = User(code=code, access_token=data['access_token'], refresh_token=['refresh_token'],
-                    token_created_date=now, token_expire_date=expire_date)
-
-    new_user.save()
-
-    return response
+# def oauth_logging_redirect(request):
+#     return redirect(oauth_server_address + oauth_auth_suffix, response_type='code', client_id=oauth_client_id,
+#                     oauth_client_secret=oauth_client_secret)
+#
+#
+# def oauth_after_log(request):
+#     code = request.GET['code']
+#
+#     if code is None:
+#         return HttpResponseForbidden()
+#
+#     response = redirect("index")
+#     response.set_cookie('access_token', code)
+#
+#     if User.objects.filter(code=code).exists():
+#         return response
+#
+#     payload = {
+#         'client_id': oauth_client_id,
+#         'client_secret': oauth_client_secret,
+#         'redirect_uri': '127.0.0.1:8000/gsn/',
+#         'code': code,
+#         'grant_type': 'authorization_code'
+#     }
+#
+#     data = json.loads(
+#         requests.get(oauth_server_address + oauth_token_suffix, params=payload).json())
+#
+#     now = datetime.now()
+#     expire_date = datetime.now() + timedelta(seconds=data["expires_in"])
+#
+#     new_user = User(code=code, access_token=data['access_token'], refresh_token=['refresh_token'],
+#                     token_created_date=now, token_expire_date=expire_date)
+#
+#     new_user.save()
+#
+#     return response
