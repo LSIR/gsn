@@ -180,9 +180,9 @@ def logout_view(request):
 
 
 
-# def oauth_logging_redirect(request):
-#     return redirect(oauth_server_address + oauth_auth_suffix, response_type='code', client_id=oauth_client_id,
-#                     oauth_client_secret=oauth_client_secret)
+def oauth_logging_redirect(request):
+    return redirect(oauth_server_address + oauth_auth_suffix, response_type='code', client_id=oauth_client_id,
+                    oauth_client_secret=oauth_client_secret)
 #
 #
 # def oauth_after_log(request):
