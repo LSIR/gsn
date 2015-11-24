@@ -15,7 +15,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = '4z_g+i&5omq3lbl@%*t!r1(6ag)9o619n2w@!eu0y@lg=p2gmj'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -39,7 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'bootstrap3',
     'gsn',
-    'djangular'
+    'djangular',
+    'allaccess'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -71,8 +70,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'web-gui.wsgi.application'
+AUTHENTICATION_BACKENDS = (
+    # Default backend
+    'django.contrib.auth.backends.ModelBackend',
+    # Additional backend
+    'allaccess.backends.AuthorizedServiceBackend',
+)
 
+WSGI_APPLICATION = 'web-gui.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -83,7 +88,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -98,9 +102,27 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/gsn/static/'
 STATIC_ROOT = '/static/'
+
+# Custom setting
+
+GSN = {
+    'OAUTH': {
+        'SERVER_URL': 'http://opensense.epfl.ch',
+        'ENABLED': False,
+        'CLIENT_ID': 'web-gui-dev-local-public',
+        'CLIENT_SECRET': 'web-gui-dev-local-jAzg',
+        'REDIRECTION_URL': 'http://127.0.0.1:8000/gsn/',
+        'SENSORS_SUFFIX': '/ws/api/sensors',
+        'AUTH_SUFFIX': '/ws/oauth2/auth',
+        'TOKEN_SUFFIX': '/ws/oauth2/token'
+    },
+    'SERVER_URL': 'http://opensense.epfl.ch:22001',
+    'SUFFIXES': {
+        'SENSORS': '/rest/sensors',
+    },
+}
