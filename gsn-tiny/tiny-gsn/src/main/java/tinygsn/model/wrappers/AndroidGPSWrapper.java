@@ -40,6 +40,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 
 public class AndroidGPSWrapper extends AbstractWrapper implements LocationListener {
 
@@ -100,18 +101,52 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 
 	public void startGPS() {
 		try {
-			locationManager = (LocationManager) StaticData.globalContext.getSystemService(Context.LOCATION_SERVICE);
+			locationManager = (LocationManager) StaticData.globalContext.getSystemService(StaticData.globalContext.LOCATION_SERVICE);
+
+			boolean isGPSUsageEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+			// getting network status
+			boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
 			if (!isGPSEnabled) {
-				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+				// getting GPS status
+
 				isGPSEnabled = true;
+
+				if (isNetworkEnabled) {
+					locationManager.requestLocationUpdates(
+						LocationManager.NETWORK_PROVIDER,
+						MIN_TIME_BW_UPDATES,
+						MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+				}
+				// if GPS Enabled get lat/long using GPS Services
+				if (isGPSUsageEnabled) {
+					locationManager.requestLocationUpdates(
+						locationManager.GPS_PROVIDER,
+						MIN_TIME_BW_UPDATES,
+						MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+				}
 			}
-			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+			Location location = null;
+			StreamElement streamElement = null;
+			if (isGPSEnabled && isNetworkEnabled) {
+				Location tempLocation = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
+				if (tempLocation != null) {
+					location = tempLocation;
+				}
+			}
+			if (isGPSEnabled && isGPSUsageEnabled) {
+				Location tempLocation = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
+				if (tempLocation != null) {
+					location = tempLocation;
+				}
+			}
 			if (location != null) {
-				StreamElement streamElement = new StreamElement(FIELD_NAMES,
-						                                               FIELD_TYPES,
-						                                               new Serializable[]{location.getLatitude(), location.getLongitude(),
-								                                                                              location.getLatitude(), location.getLongitude()});
+				streamElement = new StreamElement(FIELD_NAMES,
+					FIELD_TYPES,
+					new Serializable[]{location.getLatitude(), location.getLongitude(),
+						location.getLatitude(), location.getLongitude()});
 				streamElement.setTimeStamp(location.getTime());
 				postStreamElement(streamElement);
 			}
@@ -132,7 +167,7 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 		ArrayList<DataField> output = new ArrayList<DataField>();
 		for (int i = 0; i < FIELD_NAMES.length; i++)
 			output.add(new DataField(FIELD_NAMES[i], FIELD_TYPES_STRING[i],
-					                        FIELD_DESCRIPTION[i]));
+				FIELD_DESCRIPTION[i]));
 
 		return output.toArray(new DataField[]{});
 	}
@@ -150,8 +185,8 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 	@Override
 	public void onLocationChanged(Location location) {
 		StreamElement streamElement = new StreamElement(FIELD_NAMES, FIELD_TYPES,
-				                                               new Serializable[]{location.getLatitude(), location.getLongitude(),
-						                                                                 location.getLatitude(), location.getLongitude()});
+			new Serializable[]{location.getLatitude(), location.getLongitude(),
+				location.getLatitude(), location.getLongitude()});
 
 		postStreamElement(streamElement);
 	}
