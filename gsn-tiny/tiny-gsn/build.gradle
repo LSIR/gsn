@@ -3,15 +3,27 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 21
     buildToolsVersion '21.1.2'
-
     defaultConfig {
         applicationId "tinygsn.gui.android"
         minSdkVersion 16
         targetSdkVersion 21
     }
-
     buildTypes {
+        def BOOLEAN = "boolean"
+        def LOGGING = "LOGGING"
+        def PERF = "PERFORMANCE"
+        def TRUE = "true"
+        def FALSE = "false"
+
+        debug {
+            buildConfigField BOOLEAN, LOGGING, TRUE
+            buildConfigField BOOLEAN, PERF, TRUE
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
         release {
+            buildConfigField BOOLEAN, LOGGING, FALSE
+            buildConfigField BOOLEAN, PERF, FALSE
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
@@ -19,6 +31,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+    dexOptions {
+        incremental true
     }
 }
 
