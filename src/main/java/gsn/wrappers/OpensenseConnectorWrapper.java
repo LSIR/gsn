@@ -708,7 +708,7 @@ public class OpensenseConnectorWrapper extends AbstractWrapper {
 		public void readFPH(BinaryParser p) throws IOException {
 			//CsSCCS
 			readTimeFromLong(p);
-			payload = p.readBytes(9);			
+			payload = p.readBytes(8);			
 		}
 		
 		public void readAPM(BinaryParser p) throws IOException {
