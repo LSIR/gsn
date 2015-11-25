@@ -5,7 +5,7 @@
 
     {% load staticfiles %}
 
-    <title>Profile</title>
+    <title>Profile: {{ username }}</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/bootstrap/dist/css/bootstrap.min.css' %}"
@@ -27,7 +27,7 @@
         <div class="col-md-4 col-md-offset-4">
             <div class="login-panel panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Profile</h3>
+                    <h3 class="panel-title">Profile: {{ username }}</h3>
                 </div>
                 <div class="panel-body">
 
@@ -81,8 +81,12 @@
                                 </div>
                             {% endfor %}
 
+                            <a href="/gsn/oauth_code/" class="btn btn-sm btn-warning btn-block">Create or refresh OAUTH
+                                tokens</a>
+
+                            <br>
                             <button type="submit" class="btn btn-lg btn-success btn-block">Update Profile</button>
-                            <a href="/gsn/" class="btn btn-lg btn-danger btn-block">Cancel</a>
+                            <a href="/gsn/" class="btn btn-lg btn-danger btn-block">Cancel and return to app</a>
 
 
                         </fieldset>

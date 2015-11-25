@@ -13,12 +13,11 @@ urlpatterns = [
     url(r'^download/$', csrf_exempt(views.download),
         name='download'),
     url(r'^login/$', views.login_request, name='login'),
-    url(r'^^profile/$', views.profile, name='profile'),
+    url(r'^profile/$', views.profile, name='profile'),
     url(r'^signup/$', views.sign_up, name='signup'),
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^admin/', include(admin.site.urls)),
-
-    # url(r'^logging/$', views.oauth_logging_redirect, name='oauth_logging_redirect'),
+    url(r'^oauth_code/$', views.oauth_get_code, name='oauth_logging_redirect'),
     # url(r'^logged/$', views.oauth_after_log, name='oauth_after_log'),
     url(r'^accounts/', include('allaccess.urls')),
 

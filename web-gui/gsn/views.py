@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
 from django.template.context_processors import csrf
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 import requests
 import requests_cache
@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from oauthlib.common import urlencode
 from gsn.forms import GSNUserCreationForm, ProfileForm
 from gsn.models import GSNUser
 import csv
@@ -19,19 +20,19 @@ import csv
 
 # server_address = "http://montblanc.slf.ch:22001"
 server_address = settings.GSN['SERVER_URL']
-sensor_suffix = settings.GSN['SUFFIXES']['SENSORS']
+sensors_url = settings.GSN['SENSORS_URL']
 
 # OAUTH2
-oauth_enabled = False  # TODO delete and uncomment when OAUTH ready
+oauth_enabled = True  # TODO delete and uncomment when OAUTH ready
 # oauth_enabled = settings.GSN['OAUTH']['ENABLED']
 if oauth_enabled:
     oauth_server_address = settings.GSN['OAUTH']['SERVER_URL']
     oauth_client_id = settings.GSN['OAUTH']['CLIENT_ID']
     oauth_client_secret = settings.GSN['OAUTH']['CLIENT_SECRET']
     oauth_redirection_url = settings.GSN['OAUTH']['REDIRECTION_URL']
-    sensor_suffix = settings.GSN['OAUTH']['SENSORS_SUFFIX']
-    oauth_auth_suffix = settings.GSN['OAUTH']['AUTH_SUFFIX']
-    oauth_token_suffix = settings.GSN['OAUTH']['TOKEN_SUFFIX']
+    oauth_sensors_url = settings.GSN['OAUTH']['SENSORS_URL']
+    oauth_auth_url = settings.GSN['OAUTH']['AUTH_URL']
+    oauth_token_url = settings.GSN['OAUTH']['TOKEN_URL']
 
 # Cache setup
 requests_cache.install_cache("demo_cache")
@@ -64,7 +65,7 @@ def index(request):
 
 # View that returns in JSON a list of all the sensors
 def sensors(request):
-    return JsonResponse(json.loads(requests.get(server_address + sensor_suffix).text))
+    return JsonResponse(json.loads(requests.get(sensors_url).text))
 
 
 # View that gets the data of a sensor for a specified timeframe
@@ -84,7 +85,7 @@ def sensor_detail(request, sensor_name, from_date, to_date):
         }
 
         return JsonResponse(
-            json.loads(requests.get(server_address + sensor_suffix + '/' + sensor_name + '/', params=payload).text))
+            json.loads(requests.get(sensors_url + sensor_name + '/', params=payload).text))
 
 
 # View that downloads the data of a sensor for the specified time frame
@@ -100,7 +101,7 @@ def download_csv(request, sensor_name, from_date, to_date):
             'password': 'john'
         }
 
-        data = json.loads(requests.get(server_address + sensor_suffix + '/' + sensor_name + '/', params=payload).text)
+        data = json.loads(requests.get(sensors_url + sensor_name + '/', params=payload).text)
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="' + sensor_name + '.csv"'
@@ -194,10 +195,12 @@ def logout_view(request):
 
 
 def profile(request):
-    context = {}
-
     if not request.user.is_authenticated():
         return HttpResponseForbidden()
+
+    context = {
+        'username': request.user.username
+    }
 
     context.update(csrf(request))
 
@@ -205,6 +208,11 @@ def profile(request):
         user = request.user
     else:
         user = GSNUser.objects.get(id=request.user.id)
+
+        code = request.GET.get('code')
+        if code is not None:
+            create_token(code, user)
+            return redirect('profile')
 
     if request.method == "POST":
 
@@ -224,19 +232,59 @@ def profile(request):
     return render(request, 'gsn/profile.html', context)
 
 
-# OAUTH WORK FLOW:
-# 1- go OAUTH provider and follow the steps until redirect
-# 2- Redirected to page /gsn/logged with parameter id; id is the code, we get the tokens and create a new user in the DB with the according fields
-# 3-
-
-# View that redirects to OAUTH provider
-
+def oauth_get_code(request):
+    return HttpResponseRedirect(
+        oauth_auth_url + '?' + 'response_type=code' +
+        '&client_id=' + oauth_client_id +
+        '&client_secret=' + oauth_client_secret)
 
 
+def get_or_refresh_token(user):
+    if datetime.now() > user.token_expire_date:
+        return refresh_token(user)
+    else:
+        return user.access_token
 
-def oauth_logging_redirect(request):
-    return redirect(oauth_server_address + oauth_auth_suffix, response_type='code', client_id=oauth_client_id,
-                    oauth_client_secret=oauth_client_secret)
+
+def refresh_token(user):
+    payload = {
+        'client_id': oauth_client_id,
+        'client_secret': oauth_client_secret,
+        'redirect_uri': oauth_redirection_url,
+        'refresh_token': user.refresh_token,
+        'grant_type': 'refresh_token'
+    }
+
+    data = requests.get(oauth_token_url, params=payload).json()
+
+    user.access_token = data['access_token']
+    user.refresh_token = data['refresh_token']
+    user.token_created_date = datetime.now()
+    user.token_expire_date = user.token_created_date + timedelta(seconds=data['expires_in'])
+
+    user.save()
+
+    return user.access_token
+
+
+def create_token(code, user):
+    payload = {
+        'client_id': oauth_client_id,
+        'client_secret': oauth_client_secret,
+        'redirect_uri': oauth_redirection_url,
+        'code': code,
+        'grant_type': 'authorization_code'
+    }
+
+    data = requests.post(oauth_token_url, data=payload).json()
+
+    user.access_token = data['access_token']
+    user.refresh_token = data['refresh_token']
+    user.token_created_date = datetime.now()
+    user.token_expire_date = user.token_created_date + timedelta(seconds=data['expires_in'])
+    user.save()
+
+    return user.access_token
 
 #
 #
