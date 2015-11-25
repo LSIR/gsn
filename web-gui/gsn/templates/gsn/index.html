@@ -143,49 +143,54 @@
             <ul class="nav navbar-top-links navbar-right" style="height: 50px; display: table ">
 
                 {% if logged_out %}
-                <li class="dropdown" style="display: table-cell;vertical-align: middle;">
-                    <form role="form" action="/gsn/login/" method="post" class="form">
-                        {% csrf_token %}
-                        <ul>
-                            <li>
-                                <input class="form-control" placeholder="E-mail" type="text" id="username"
-                                       name="username">
+                    <li class="dropdown" style="display: table-cell;vertical-align: middle;">
+                        <form role="form" action="/gsn/login/" method="post" class="form">
+                            {% csrf_token %}
+                            <ul>
+                                <li>
+                                    <input class="form-control" placeholder="Username" type="text" id="username"
+                                           name="username">
 
-                            </li>
-                            <li>
-                                <input class="form-control" placeholder="Password" type="password" id="password"
-                                       name="password">
+                                </li>
+                                <li>
+                                    <input class="form-control" placeholder="Password" type="password" id="password"
+                                           name="password">
 
-                            </li>
-                            <li>
-                                <button type="submit" class="btn btn-default">Log in</button>
-                            </li>
-                            <li>
-                                <button class="btn btn-default" disabled>Sign in</button>
-                            </li>
-                        </ul>
-                    </form>
+                                </li>
+                                <li>
+                                    <button type="submit" class="btn btn-default">Log in</button>
+                                </li>
+                            </ul>
+                        </form>
 
-                </li>
+                    </li>
 
+                    <li class="dropdown" style="display: table-cell;vertical-align: middle;">
+                        <form action="/gsn/signup/">
+                            <button type="submit" class="btn btn-default ">
+                                Sign in
+                            </button>
+                        </form>
+
+                    </li>
 
                 {% endif %}
 
                 {% if logged_in %}
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="">
-                        <strong>{{user}}</strong>
-                        <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="">
+                            <strong>{{ user }}</strong>
+                            <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
 
-                    </a>
-                    <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
-                        </li>
-                        <li><a href="/gsn/logout/"><i class="fa fa-sign-out fa-fw"></i> Log Out</a>
-                        </li>
-                    </ul>
-                    <!-- /.dropdown-user -->
-                </li>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="/gsn/profile/"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                            </li>
+                            <li><a href="/gsn/logout/"><i class="fa fa-sign-out fa-fw"></i> Log Out</a>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-user -->
+                    </li>
                 {% endif %}
                 <!-- /.dropdown -->
             </ul>

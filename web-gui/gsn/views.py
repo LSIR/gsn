@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timedelta
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
 from django.template.context_processors import csrf
 from django.http import HttpResponse, JsonResponse
@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from gsn.forms import AuthenticationForm
+from gsn.forms import GSNUserCreationForm, ProfileForm
 from gsn.models import GSNUser
 import csv
 
@@ -47,13 +47,11 @@ def index(request):
             'log_page': 'logout',
             'logged_in': 'true',
             'user': request.user.username
-
         }
     else:
         context = {
             'log_page': 'login',
             'logged_out': 'true',
-            'form': AuthenticationForm(),
         }
 
     context.update(csrf(request))
@@ -144,11 +142,6 @@ def download(request):
     return response
 
 
-def login_page(request):
-    template = loader.get_template('gsn/login.html')
-    return HttpResponse(template.render())
-
-
 def login_request(request):
     username = request.POST.get('username')
     password = request.POST.get('password')
@@ -166,9 +159,70 @@ def login_request(request):
         pass
 
 
+def sign_up(request):
+    if request.user.is_authenticated():
+        logout(request)
+
+    context = {}
+
+    context.update(csrf(request))
+
+    if request.method == "POST":
+
+        form = GSNUserCreationForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+
+            context.update({'user_created': True})
+
+        else:
+            context.update({'form_invalid': True})
+
+
+    else:
+        form = GSNUserCreationForm()
+
+    context.update({'form': form})
+
+    return render(request, 'gsn/sign_up.html', context)
+
+
 def logout_view(request):
     logout(request)
     return redirect('index')
+
+
+def profile(request):
+    context = {}
+
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
+    context.update(csrf(request))
+
+    if not GSNUser.objects.filter(id=request.user.id):
+        user = request.user
+    else:
+        user = GSNUser.objects.get(id=request.user.id)
+
+    if request.method == "POST":
+
+        form = ProfileForm(data=request.POST, instance=user)
+
+        if form.is_valid():
+            user.email = form.cleaned_data['email']
+            user.save()
+            form = ProfileForm(instance=user)
+
+
+    else:
+        form = ProfileForm(instance=user)
+
+    context.update({'password_form': form})
+
+    return render(request, 'gsn/profile.html', context)
+
 
 # OAUTH WORK FLOW:
 # 1- go OAUTH provider and follow the steps until redirect
@@ -183,6 +237,7 @@ def logout_view(request):
 def oauth_logging_redirect(request):
     return redirect(oauth_server_address + oauth_auth_suffix, response_type='code', client_id=oauth_client_id,
                     oauth_client_secret=oauth_client_secret)
+
 #
 #
 # def oauth_after_log(request):

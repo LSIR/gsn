@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% load staticfiles %}
+
+    <title>Sign Up</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/bootstrap/dist/css/bootstrap.min.css' %}"
+          rel="stylesheet">
+
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/font-awesome/css/font-awesome.min.css' %}"
+          rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="row" style="margin-top: 25%">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="login-panel panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Sign Up</h3>
+                </div>
+                <div class="panel-body">
+
+                    {% csrf_token %}
+
+
+                    <form role="form" action="/gsn/signup/" method="post">
+                        {% csrf_token %}
+
+                        <fieldset>
+
+
+                            {% if form_invalid %}
+                                <p style="color: red">Invalid form. Please make sure fields are correctly filled,
+                                    although it may be possible that the username is already taken</p>
+                            {% endif %}
+
+                            {% if user_created %}
+                                <h4 style="color: green">User successfuly created ! Click <a href="/gsn/">here</a> to go
+                                    back to the main
+                                    web-app.</h4>
+                            {% endif %}
+
+
+
+                            {% for field in form %}
+
+                                <div class="form-group">
+
+                                    {% if "password" in field.name %}
+                                        <input class="form-control" type="password" name="{{ field.name }}"
+                                               placeholder="{{ field.label }}" required>
+                                    {% elif "email" in field.name %}
+                                        <input class="form-control" type="email" name="{{ field.name }}"
+                                               placeholder="{{ field.label }}" required>
+                                    {% else %}
+                                        <input class="form-control" type="text" name="{{ field.name }}"
+                                               placeholder="{{ field.label }}" required>
+                                    {% endif %}
+                                    <p class="help-block">{{ field.help_text }}</p>
+
+                                </div>
+                            {% endfor %}
+
+                            <button type="submit" class="btn btn-lg btn-success btn-block">Sign Up</button>
+
+                        </fieldset>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

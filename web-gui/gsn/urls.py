@@ -13,6 +13,8 @@ urlpatterns = [
     url(r'^download/$', csrf_exempt(views.download),
         name='download'),
     url(r'^login/$', views.login_request, name='login'),
+    url(r'^^profile/$', views.profile, name='profile'),
+    url(r'^signup/$', views.sign_up, name='signup'),
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^admin/', include(admin.site.urls)),
 
