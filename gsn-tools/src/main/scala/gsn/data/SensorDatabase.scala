@@ -131,7 +131,7 @@ object SensorDatabase {
           times+= t2-t1
         t1=t2
       }          
-	  rate=Some(times.sum/times.size)
+	  rate = if (times.size == 0) Some(0)  else Some(times.sum/times.size)
 	  log debug s"Computed rate for $vsName"
 	}
 	SensorStats(rate,min,max,latestValues(sensor,timeFormat))

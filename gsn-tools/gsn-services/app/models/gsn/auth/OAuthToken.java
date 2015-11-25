@@ -25,6 +25,9 @@ public class OAuthToken extends AppModel{
 	public Long creation;
 	public Long duration;
 
+	public Client getClient(){
+		return client;
+	}
 
 	public static final AppModel.Finder<Long, OAuthToken> find = new AppModel.Finder<Long, OAuthToken>(
 			Long.class, OAuthToken.class);

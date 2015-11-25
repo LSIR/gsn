@@ -13,6 +13,8 @@ Play2WarKeys.servletVersion := "2.5"
 
 scalaVersion := "2.11.2"
 
+javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
+
 crossPaths := false
 
 scriptClasspath := Seq("*")
@@ -29,6 +31,7 @@ libraryDependencies ++= Seq(
   javaEbean,
   "com.h2database" % "h2" % "1.4.181",
   "mysql" % "mysql-connector-java" % "5.1.6",
+  "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   "be.objectify"  %% "deadbolt-java"     % "2.3.3",
   "be.objectify"  %% "deadbolt-scala"     % "2.3.3",
   "org.webjars" % "bootstrap" % "3.2.0",

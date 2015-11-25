@@ -22,6 +22,10 @@ public class OAuthCode extends AppModel{
 	public Client client;
 	public String code;
 	public Long creation;
+	
+	public Client getClient(){
+		return client;
+	}
 
 
 	public static final AppModel.Finder<Long, OAuthCode> find = new AppModel.Finder<Long, OAuthCode>(
