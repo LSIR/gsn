@@ -143,7 +143,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 			ByteArrayInputStream input = new ByteArrayInputStream((byte[]) streamElement.getData("payload"));
 			BinaryParser p = new BinaryParser(input);
 			if(data_type.equalsIgnoreCase("FPH")){
-				 if(s_type == 12){//sSCCS
+				 if(s_type == 13){//sSCCS
 					 temp.setData(1,(float)(p.readNextShort(true)/10.0));
 					 temp.setData(2,p.readNextShort(false));
 					 temp.setData(3,(float)(p.readNextChar(false) / 100.0));
@@ -152,7 +152,7 @@ public class OpensenseSplitterVSensor extends AbstractVirtualSensor {
 					 dataProduced(new StreamElement(temp));
 				 } 
 			} else if (data_type.equalsIgnoreCase("FPM")){
-				 if(s_type == 13){ //LCSs
+				 if(s_type == 12){ //LCSs
 					 temp.setData(1,(float)(p.readNextLong(false) / 100.0));
 					 temp.setData(2,(float)(p.readNextChar(false) / 10.0));
 					 temp.setData(3,p.readNextShort(false));

@@ -29,7 +29,7 @@
 				</address>
 				<query>select * from wrapper</query>
 			</source>
-			<query>select * from source1 where type = '12'</query>
+			<query>select * from source1 where type = '13'</query>
 		</stream>
 	</streams>
 </virtual-sensor>
