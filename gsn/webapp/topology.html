@@ -61,7 +61,9 @@ var geoMarkersTypeToIconMap = {	1: {small: 'img/map-icons/map-icon-green-small-S
 				6: {small: 'img/map-icons/map-icon-green-small-CamZilla.png', big: 'img/map-icons/map-icon-green-big-CamZilla.png', offlinesmall: 'img/map-icons/map-icon-red-small-CamZilla.png', offlinebig: 'img/map-icons/map-icon-red-big-CamZilla.png'},
 				7: {small: 'img/map-icons/map-icon-blue-small-GPSLogger.png', big: 'img/map-icons/map-icon-blue-big-GPSLogger.png', offlinesmall: 'img/map-icons/map-icon-blue-small-GPSLogger.png', offlinebig: 'img/map-icons/map-icon-blue-big-GPSLogger.png'},
 				8: {small: 'img/map-icons/map-icon-purple-small-WebCam.png', big: 'img/map-icons/map-icon-purple-big-WebCam.png', offlinesmall: 'img/map-icons/map-icon-purple-small-WebCam.png', offlinebig: 'img/map-icons/map-icon-purple-big-WebCam.png'},
-				9: {small: 'img/map-icons/map-icon-green-small-AE.png', big: 'img/map-icons/map-icon-green-big-AE.png', offlinesmall: 'img/map-icons/map-icon-red-small-AE.png', offlinebig: 'img/map-icons/map-icon-red-big-AE.png'}};
+				9: {small: 'img/map-icons/map-icon-green-small-AE.png', big: 'img/map-icons/map-icon-green-big-AE.png', offlinesmall: 'img/map-icons/map-icon-red-small-AE.png', offlinebig: 'img/map-icons/map-icon-red-big-AE.png'},
+				11: {small: 'img/map-icons/map-icon-blue-small-IMIS.png', big: 'img/map-icons/map-icon-blue-big-IMIS.png', offlinesmall: 'img/map-icons/map-icon-blue-small-IMIS.png', offlinebig: 'img/map-icons/map-icon-blue-big-IMIS.png'}};
+var defaultGeoMarkerIcon = {small: 'img/map-icons/map-icon-orange-small-default.png', big: 'img/map-icons/map-icon-orange-big-default.png', offlinesmall: 'img/map-icons/map-icon-orange-small-default.png', offlinebig: 'img/map-icons/map-icon-orange-big-default.png'};
 
 var infowindow = new google.maps.InfoWindow({content: 'test'});
 
@@ -929,17 +931,17 @@ function PacketRate() {
       if (current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]] !== undefined) {
 	if (!current_deployment.geoMarkers[pos]) {
 	  if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] === undefined || !current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].online)
-	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinesmall});
+	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: getGeoMarkerIcon(current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type).offlinesmall});
 	  else
-	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small});
+	    current_deployment.geoMarkers[pos] = new google.maps.Marker({map: current_deployment.geoMap, icon: getGeoMarkerIcon(current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type).small});
 	  current_deployment.geoMarkers[pos].setPosition(new google.maps.LatLng(parseFloat($(this).attr("latitude")), parseFloat($(this).attr("longitude"))));
 	  current_deployment.geoMarkers[pos].setTitle("Position " + pos + "\n\n" + $(this).attr("comment") + "\ndevice_id=" + current_deployment.positionToDeviceIdMap[pos]);
 	  google.maps.event.addListener(current_deployment.geoMarkers[pos], 'mouseover', function() {
 	    current_deployment.geoMarkers[pos].setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] === undefined || !current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].online)
-	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinebig);
+	      current_deployment.geoMarkers[pos].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type).offlinebig);
 	    else
-	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].big);
+	      current_deployment.geoMarkers[pos].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type).big);
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] !== undefined) {
 	      current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].selected = true;
 	      current_deployment.node.render();
@@ -947,9 +949,9 @@ function PacketRate() {
 	  });
 	  google.maps.event.addListener(current_deployment.geoMarkers[pos], 'mouseout', function() {
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] === undefined || !current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].online)
-	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].offlinesmall);
+	      current_deployment.geoMarkers[pos].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type).offlinesmall);
 	    else
-	      current_deployment.geoMarkers[pos].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type].small);
+	      current_deployment.geoMarkers[pos].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[current_deployment.positionToDeviceIdMap[pos]].type).small);
 	    if (current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])] !== undefined) {
 	      current_deployment.sensornodes[nodeindex(current_deployment.positionToDeviceIdMap[pos])].selected = false;
 	      current_deployment.node.render();
@@ -1155,6 +1157,13 @@ function PacketRate() {
     nodeinfo.find(".infocontainer").empty().append(content);
     nodeinfo.show();
   }
+  
+  function getGeoMarkerIcon(deviceType) {
+  	var ret = geoMarkersTypeToIconMap[deviceType];
+  	if (ret === undefined)
+  		ret = defaultGeoMarkerIcon;
+        return ret;
+  }
 
 $(document).ready(function() {
   $.get('/menu.jsp', {selected: "topology"}, function(data) {
@@ -1348,7 +1357,7 @@ $(document).ready(function() {
 		if (d.online) {
 		  d.online = false;
 		  if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined)
-		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinesmall);
+		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[d.node_id].type).offlinesmall);
 		}
                 return d.selected?"#ff5555":"#ffa0a0";
               }
@@ -1356,7 +1365,7 @@ $(document).ready(function() {
 		if (!d.online) {
 		  d.online = true;
 		  if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined)
-		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
+		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[d.node_id].type).small);
 		}
 		return d.selected?"#1ae01a":"#a0c0a0";
 	      }
@@ -1364,7 +1373,7 @@ $(document).ready(function() {
 		if (!d.online) {
 		  d.online = true;
 		  if (current_deployment.deploymentHasMapping && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined)
-		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
+		    current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[d.node_id].type).small);
 		}
 		return d.selected?"#1ae01a":"#a0ffa0";
 	      }
@@ -1387,9 +1396,9 @@ $(document).ready(function() {
             .event("mouseover", function(d) {
               if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined) {
 		if (current_deployment.sensornodes[nodeindex(d.node_id)].online)
-		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].big);
+		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[d.node_id].type).big);
 		else
-		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinebig);
+		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[d.node_id].type).offlinebig);
 		//current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon({path : google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, strokeWeight: 1, strokeColor: "red", fillColor : "red", fillOpacity : 1, scale : 8});
 		current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
 	      }
@@ -1399,9 +1408,9 @@ $(document).ready(function() {
             .event("mouseout", function(d) {
               if (current_deployment.deploymentHasMapping && $("#geo_graph_"+current_deployment.name).is(":visible") && current_deployment.deviceIdMapping[d.node_id] !== undefined && current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position] !== undefined) {
 		if (current_deployment.sensornodes[nodeindex(d.node_id)].online)
-		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].small);
+		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[d.node_id].type).small);
 		else
-		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(geoMarkersTypeToIconMap[current_deployment.deviceIdMapping[d.node_id].type].offlinesmall);
+		  current_deployment.geoMarkers[current_deployment.deviceIdMapping[d.node_id].position].setIcon(getGeoMarkerIcon(current_deployment.deviceIdMapping[d.node_id].type).offlinesmall);
 	      }
 	      d.selected = false;
 	      this.render();
