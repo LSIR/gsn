@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+from django.utils import timezone
 from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
 from django.template.context_processors import csrf
@@ -23,7 +24,7 @@ server_address = settings.GSN['SERVER_URL']
 sensors_url = settings.GSN['SENSORS_URL']
 
 # OAUTH2
-oauth_enabled = True  # TODO delete and uncomment when OAUTH ready
+oauth_enabled = False  # TODO delete and uncomment when OAUTH ready
 # oauth_enabled = settings.GSN['OAUTH']['ENABLED']
 if oauth_enabled:
     oauth_server_address = settings.GSN['OAUTH']['SERVER_URL']
@@ -73,9 +74,41 @@ def sensor_detail(request, sensor_name, from_date, to_date):
     # _from_ = str(datetime.now().replace(microsecond=0).isoformat(sep='T'))
     # _to_ = _from_
 
-    if (oauth_enabled):
-        # TODO: complete for OAUTH
-        pass
+    if (oauth_enabled) and request.user.is_authenticated() and GSNUser.objects.filter(id=request.user.id).exists():
+
+        headers = {
+            'Authorization': 'Bearer ' + get_or_refresh_token(GSNUser.objects.get(id=request.user.id))
+        }
+
+        payload = {
+            'from': from_date,
+            'to': to_date,
+        }
+
+        data = json.loads(
+            requests.get(oauth_sensors_url + '/' + sensor_name + '/data', headers=headers, params=payload).text)
+
+        for index, values in enumerate(data['properties']['values']):
+            # data['properties']['values'][index] = [float(i) for i in values]
+            d = datetime.fromtimestamp(values[0] / 1000)
+            data['properties']['values'][index].insert(0, d.isoformat('T'))
+
+        data['properties']['fields'].insert(0, {
+            "unit": "",
+            "name": "time",
+            "type": "time"
+        })
+
+        def edit_data(values):
+
+            pass
+
+        dict = {
+            'features': [data, ]
+        }
+
+        return JsonResponse(dict)
+
     else:
         payload = {
             'from': from_date,
@@ -90,7 +123,8 @@ def sensor_detail(request, sensor_name, from_date, to_date):
 
 # View that downloads the data of a sensor for the specified time frame
 def download_csv(request, sensor_name, from_date, to_date):
-    if (oauth_enabled):
+    if (oauth_enabled) and request.user.is_authenticated() and GSNUser.objects.filter(id=request.user.id).exists():
+
         # TODO: complete for OAUTH
         pass
     else:
@@ -153,11 +187,13 @@ def login_request(request):
             login(request, user)
             return redirect('index')
         else:
-            # TODO: add refused login
-            pass
+            response = redirect('index')
+            response.set_cookie('user_inactive', True)
+            return redirect('index')
     else:
-        # TODO: add feedback about incorrect credentials
-        pass
+        response = redirect('index')
+        response.set_cookie('user_not_found', True)
+        return redirect('index')
 
 
 def sign_up(request):
@@ -240,7 +276,7 @@ def oauth_get_code(request):
 
 
 def get_or_refresh_token(user):
-    if datetime.now() > user.token_expire_date:
+    if timezone.now() > user.token_expire_date:
         return refresh_token(user)
     else:
         return user.access_token
@@ -255,7 +291,9 @@ def refresh_token(user):
         'grant_type': 'refresh_token'
     }
 
-    data = requests.get(oauth_token_url, params=payload).json()
+    json = requests.get(oauth_token_url, params=payload)
+
+    data = json.json()
 
     user.access_token = data['access_token']
     user.refresh_token = data['refresh_token']
@@ -276,7 +314,9 @@ def create_token(code, user):
         'grant_type': 'authorization_code'
     }
 
-    data = requests.post(oauth_token_url, data=payload).json()
+    data = requests.post(oauth_token_url, data=payload)
+
+    data = data.json()
 
     user.access_token = data['access_token']
     user.refresh_token = data['refresh_token']
