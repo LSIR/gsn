@@ -24,7 +24,7 @@ server_address = settings.GSN['SERVER_URL']
 sensors_url = settings.GSN['SENSORS_URL']
 
 # OAUTH2
-oauth_enabled = False  # TODO delete and uncomment when OAUTH ready
+oauth_enabled = True  # TODO delete and uncomment when OAUTH ready
 # oauth_enabled = settings.GSN['OAUTH']['ENABLED']
 if oauth_enabled:
     oauth_server_address = settings.GSN['OAUTH']['SERVER_URL']
@@ -187,13 +187,9 @@ def login_request(request):
             login(request, user)
             return redirect('index')
         else:
-            response = redirect('index')
-            response.set_cookie('user_inactive', True)
-            return redirect('index')
+            pass
     else:
-        response = redirect('index')
-        response.set_cookie('user_not_found', True)
-        return redirect('index')
+        pass
 
 
 def sign_up(request):
@@ -283,6 +279,7 @@ def get_or_refresh_token(user):
 
 
 def refresh_token(user):
+
     payload = {
         'client_id': oauth_client_id,
         'client_secret': oauth_client_secret,
@@ -291,7 +288,7 @@ def refresh_token(user):
         'grant_type': 'refresh_token'
     }
 
-    json = requests.get(oauth_token_url, params=payload)
+    json = requests.post(oauth_token_url, params=payload)
 
     data = json.json()
 
