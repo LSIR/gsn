@@ -17,16 +17,22 @@ crossPaths := false
 
 scriptClasspath := Seq("*")
 
+val buildSettings = Defaults.defaultSettings ++ Seq(
+   javaOptions += "-Xmx128m",
+   javaOptions += "-Xms64m"
+)
+
 libraryDependencies ++= Seq(
   jdbc,
   ws,
   cache,
   "com.h2database" % "h2" % "1.4.181",
   "mysql" % "mysql-connector-java" % "5.1.6",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
   "org.scalatestplus" %% "play" % "1.1.0" % "test"
   )
 
-publishTo := Some("Artifactory Realm" at "http://planetdata.epfl.ch:8081/artifactory/gsn-release")
+publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release")
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 

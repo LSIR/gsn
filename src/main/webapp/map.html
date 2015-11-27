@@ -5,6 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
         <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="style/gsn_theme.css" type="text/css" media="screen,projection" />
         <script type="text/javascript" src="js/jquery-latest.pack.js"></script>
         <script type="text/javascript" src="js/jquery-dom.js"></script>
         <script type="text/javascript" src="js/jquery.history.js"></script>
@@ -13,7 +14,7 @@
         <!-- Include Map engine-->
         <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAA2MV0HBY9S6-aGXtjN0b1ZxTNHpjHnpWHHgdGqnMBUpwQOS9hiRQYia2Wq5RjKhXafOPvhLZP4RAQOA" type="text/javascript"></script>
         <!--<script src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=YahooDemo" type="text/javascript"></script>-->
-        <script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>
+        <!--<script src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.3" type="text/javascript"></script>-->
         <script type="text/javascript" src="js/mapstraction.js"></script>
 
         <script type="text/javascript" src="js/constants.js"></script>
@@ -21,7 +22,7 @@
         <script type="text/javascript" src="js/gsn.js"></script>
 
         <script type="text/javascript">
-            <!--//<![CDATA[
+           // <!--//<![CDATA[
             var mapProvider = null;
 
             $(document).ready(function() {
@@ -57,19 +58,16 @@
 
                 //bind every buttons to javascript functionality (only once)
                 $("#refreshall_timeout").bind("change",GSN.updateallchange);
-                $("#refreshall").bind("click",GSN.updateall);
+                $("#refreshall").bind("click",GSN.refreshVSs);
                 $("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
                 $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
 
+    			$.historyInit(GSN.load);
 
-                GSN.load();
+                //GSN.load();
             });
-            //]]>-->
+            ////]]>-->
         </script>
-
-
-
-
 
     </head>
     <body onunload="">
@@ -83,7 +81,8 @@
             <div id="main">
                 <noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
 
-                <div id="control">
+         	   <div class="panel panel-default" style="width:68%;float:left;">
+		       <div id="control panel-body">
                     <iframe name="webupload" style="border:0;height:0;width:0;"></iframe>
                     <div id="msg">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
 
@@ -134,6 +133,7 @@
                     <li><a href="#">not loaded</a></li>
                 </ul>
                 <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
+            </div>
             </div>
             <div id="footer">
                 <p>Powered by <a href="https://github.com/LSIR/gsn">GSN</a>,  Distributed Information Systems Lab, EPFL 2014</p>

@@ -14,12 +14,12 @@ class WatchServiceTask(notifyActor: ActorRef) extends Runnable {
       path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY)
     def run() {
       try {
-        while (!Thread.currentThread().isInterrupted) {
-          val key = watchService.take()
-          key.pollEvents() foreach {event =>
-		    val relativePath = event.context().asInstanceOf[Path]
-		    val path = key.watchable().asInstanceOf[Path].resolve(relativePath)
-		    event.kind() match {
+        while (!Thread.currentThread.isInterrupted) {
+          val key = watchService.take
+          key.pollEvents foreach {event =>
+		    val relativePath = event.context.asInstanceOf[Path]
+		    val path = key.watchable.asInstanceOf[Path].resolve(relativePath)
+		    event.kind match {
 		      case ENTRY_CREATE =>
 		        notifyActor ! Created(path.toFile)
 		      case ENTRY_DELETE =>
@@ -30,13 +30,13 @@ class WatchServiceTask(notifyActor: ActorRef) extends Runnable {
 		        //logger.warn(s"Unknown event $x")
 		    }
           }
-          key.reset()
+          key reset
         }
       } catch {
           case e: InterruptedException =>
             //  logger.info("Interrupting, bye!")
         } finally {
-            watchService.close()
+            watchService close
         }
    }
 }

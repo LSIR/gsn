@@ -258,10 +258,17 @@ public class VirtualSensor {
             Iterator<Map.Entry<String, String>> metadataIterator = sensor.getMetadata().entrySet().iterator();
             while (metadataIterator.hasNext()){
                 Map.Entry<String, String> elem = metadataIterator.next();
-                if (RequestHandler.getConst("LONGITUDE").equalsIgnoreCase(elem.getKey())) longitude = Double.parseDouble(elem.getValue());
-                else if (RequestHandler.getConst("LATITUDE").equalsIgnoreCase(elem.getKey())) latitude = Double.parseDouble(elem.getValue());
-                else if (RequestHandler.getConst("ALTITUDE").equalsIgnoreCase(elem.getKey())) altitude = Double.parseDouble(elem.getValue());
-                else properties.put(elem.getKey(), elem.getValue());
+                try { 
+	                if (RequestHandler.getConst("LONGITUDE").equalsIgnoreCase(elem.getKey())) 
+	                	longitude = Double.parseDouble(elem.getValue());
+	                else if (RequestHandler.getConst("LATITUDE").equalsIgnoreCase(elem.getKey())) 
+	                	latitude = Double.parseDouble(elem.getValue());
+	                else if (RequestHandler.getConst("ALTITUDE").equalsIgnoreCase(elem.getKey())) 
+	                	altitude = Double.parseDouble(elem.getValue());
+	                else properties.put(elem.getKey(), elem.getValue());
+                } catch (NumberFormatException e){
+                	logger.warn("Error parsing coordinates: "+e.getMessage(),e);
+                }
             }
             coordinates.add(longitude);
             coordinates.add(latitude);

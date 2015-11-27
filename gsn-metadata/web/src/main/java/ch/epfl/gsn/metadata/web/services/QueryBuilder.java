@@ -59,7 +59,9 @@ public class QueryBuilder {
 
         }
 
-        criteriaList.addAll(buildGeoCriterias(sensorQuery));
+        if (sensorQuery.hasTopoQuery()) {
+            criteriaList.addAll(buildGeoCriterias(sensorQuery));
+        }
 
         criteriaList.add(buildOnlyWithMappedParametersCriteria());
 

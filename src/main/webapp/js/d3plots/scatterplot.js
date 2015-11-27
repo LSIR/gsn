@@ -9,7 +9,7 @@ function include(filename)
     head.appendChild(script)
 }
 
-include("http://d3js.org/d3.v3.min.js");
+include("js/d3plots/d3.v3.min.js");
 
 
 function drawScatterplot(dataset, nb_elements, f1fullname, f2fullname){

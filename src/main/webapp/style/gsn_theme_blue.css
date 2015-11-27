@@ -1,0 +1,197 @@
+
+a	{
+	color: #F1A629;
+}
+
+a:hover { 
+	color: #F1A629 /*#2a5a8a*/;
+}
+
+
+input[type=button],input[type=submit] {
+	border: 1px solid #011A59;
+	border-left: 10px solid #011A59;
+	background-color: #c5e2fe;
+}
+input[type=button]:active,input[type=button]:hover,input[type=submit]:active,input[type=submit]:hover {
+	color: #ABBBDF;
+}
+body, html {
+	background: #OO33OO; /*#DFDFDF; background outside GSN window*/ 
+}
+#header, #headerfm {
+	background:url("CCES.jpg") no-repeat;
+	background-color:#ffffff;
+}
+
+#header h1 {
+	padding:20px 20px;
+	text-align:right;
+}
+
+#headerfm h1  {
+	padding:30px 0 30px 30px;
+}
+#header a,#headerfm a  {
+	color:#002D4C; /*text colour of header eg slf data access::gsn*/
+}
+#navigation /*top menu bar*/ {
+	background:#002D4C;
+}
+#navigation #logintext li {
+	color: #ffffff;
+}
+#navigation li a /*top menu bar text colour*/ {
+	color: #FFFFFF;
+}
+#navigation .selected /*Top menu bar of the page that you are on*/ {
+    background:#c5e2fe;
+    color: black;
+}
+#navigation a:hover {
+	background:#c5e2fe; /*#ff6f00;*/
+}
+#seeLink{
+	background-color:#c5e2fe;
+	border: 1px solid #011A59;
+}
+#datechooser {
+	border: 1px solid #011A59;
+	background:#011A59;
+}
+
+.step{
+	background-color:#FFFFFF;
+}
+.data{
+	background-color:#FFFFFF;
+}
+.rubric{
+	border-left: 10px solid #f1A629;
+	background-color: #002D4C;
+	color: #FFFFFF;
+}
+.rubric:hover{
+	border-left-color: #002D4C;
+	background-color: #f1a629;
+}
+.sensorName{
+	border-left: 10px solid #002D4C;
+	background-color: #f1a629;
+	color: black;
+}
+#dropArea .sensorName:hover{
+	background-color: #DFDFDF;/*#F0F000; */
+	border-left-color: #011A59;
+	color: black;
+}
+#dropArea{
+	border: thin double #011A59;
+	background-color: #ffffff;
+}
+#dropAreaMask{
+	background-color: #FFFFFF;
+}
+
+#titleDropArea{
+	background-color: #c5e2fe;
+	border: thin double #011A59;
+}
+#vsmenu a:hover, #vsmenu div span:hover{
+	border-left: 10px solid #002D4C;
+	background-color: #f1a629;
+	color: #fff;
+}
+#msg /*message at top ....Welcome to GSN... */ {
+	border-top: 2px solid #c5e2fe;
+	border-bottom: 2px solid #c5e2fe;
+	background: #002D4C;
+	color:white;
+}
+/* specific style for vsbox and core below */
+.tooltip  {
+	border: 1px solid #011A59;
+	background: #c5e2fe;
+	color: white;
+}
+.vsbox  {
+	border: 1px solid #011A59;
+	background:#002D4C;
+	color:white;
+}
+.followed  {
+	background:#c5e2fe;
+	border: 1px solid #011A59;
+}
+.vsbox h3 a .vsname  {
+	color:#fff;text-decoration:underline;
+}
+.vsbox p, .vsbox dl  {
+	background:#FFFFFF; /*Virtual sensor real time box*/
+	color:black;
+}		
+
+.tabnav a:link, .tabnav a:visited {
+	background: #FFFFFF;
+	border: 1px solid #DFDFDF;
+}
+.tabnav a:link.active, .tabnav a:visited.active {
+	background: #FFFFFF;
+}
+.tabnav a:hover {
+	background: #DFDFDF;
+}
+div.popup-calendar  {
+	border: 2px solid #011A59;
+}
+div.popup-calendar div a:hover  {
+	background-color: #011A59;
+}
+div.popup-calendar table td a.selected, div.popup-calendar table td a:hover  {
+	background: #011A59; 
+}
+.chart {
+	border: 2px solid #404040;
+}
+
+#dataSet {
+	border: thin double #000;/*#c5e2fe;*/
+	background-color: #ffffff;
+}
+
+.stepContainer .step {
+	border: thin double #011A59;
+	background-color: #ffffff;
+}
+
+.stepContainer .step:hover {
+	background-color: #ffffff;
+}
+
+#colorDiv {
+	border: thin double #011A59;
+}
+div.full-page {
+    background-color: #ffffff;
+}
+.ui-accordion {
+    border: 1px solid #002D4C;
+}
+.ui-accordion-header a {
+    color: white;
+    background-color: #002D4C;
+}
+.ui-tabs-nav {
+    border-bottom: 1px solid #c5e2fe;
+}
+.ui-tabs-nav-item a {
+    border: 1px solid #c5e2fe;
+    background-color: #002D4C;
+}
+
+.ui-tabs-selected a {
+    background-color: #002D4C;
+}
+#gridContainer table th {
+    background-color: #c5e2fe;
+}

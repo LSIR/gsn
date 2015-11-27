@@ -1,0 +1,95 @@
+<div layout="column" style="height:500px;">
+    <section layout="row" flex>
+
+        <div class="bs-sidebar hidden-print" role="complementary" data-offset-top="-80" bs-affix
+             style="margin-left: 12px;margin-right: 8px;">
+            <div style="margin-top: 5px">Found <strong>{{sensorsCount}}</strong> sensor(s)</div>
+            <hr style="margin-bottom: 10px; margin-top: 7px">
+            <label>Filters</label>
+
+            <div>
+                <input style="margin: 4px;" type="checkbox" ng-model="filter.onlyPublic" ng-checked="filter.onlyPublic"
+                       ng-change="changePrivacy()"/> Only public sensors
+            </div>
+
+            <div style="margin-bottom: 5px;">
+                <ui-select ng-model="filter.group.selected" theme="select2" ng-disabled="disabled"
+                           on-select="updateGroup($item)" style="min-width: 280px;">
+                    <ui-select-match placeholder="Select a group">{{$select.selected}}</ui-select-match>
+                    <ui-select-choices repeat="group in groups | filter: $select.search">
+                        <span ng-bind-html="group | highlight: $select.search"></span>
+
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+            <div style="margin-bottom: 5px;">
+                <ui-select multiple ng-model="filter.sensors" theme="select2"
+                           ng-disabled="disabled"
+                           on-select="submit()"
+                           on-remove="submit()" style="width: 280px;">
+                    <ui-select-match placeholder="Select sensors...">{{$item}}</ui-select-match>
+                    <ui-select-choices repeat="sensorName in mapSensorNames | filter:$select.search">
+                        <img ng-src={{getSensorIcon(sensorName)}} style="width:16px;height:16px;">{{sensorName}}
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+            <div style="margin-bottom: 5px;">
+                <ui-select multiple ng-model="filter.parameters" theme="select2"
+                           ng-disabled="disabled"
+                           on-select="submit()"
+                           on-remove="submit()" style="width: 280px;">
+                    <ui-select-match placeholder="Select parameters...">{{$item}}</ui-select-match>
+                    <ui-select-choices repeat="param in parameters | filter:$select.search">
+                        {{param}}
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+            <div style="margin-bottom: 5px;">
+                <label>Dates</label>
+                <input type="text" class="form-control" data-autoclose="1" ng-model="filter.fromDate"
+                       placeholder="From" bs-datepicker style="width: 250px;">
+            </div>
+            <div style="margin-bottom: 5px;">
+                <input type="text" class="form-control" data-autoclose="1" ng-model="filter.untilDate"
+                       placeholder="Until" bs-datepicker style="width: 250px;">
+            </div>
+
+            <div>
+                <label>Elevation (m)</label>
+                <rzslider rz-slider-model="filter.altitude.min" rz-slider-high="filter.altitude.max"
+                          rz-slider-floor="filter.altitude.floor" rz-slider-ceil="filter.altitude.ceil"></rzslider>
+            </div>
+
+            <div>
+                <label>Slope angle (&deg;)</label>
+                <rzslider rz-slider-model="filter.slopeAngle.min" rz-slider-high="filter.slopeAngle.max"
+                          rz-slider-floor="filter.slopeAngle.floor" rz-slider-ceil="filter.slopeAngle.ceil"></rzslider>
+            </div>
+
+            <div style="margin-bottom: 5px;">
+                <label>Aspect (&deg;)</label>
+                <rzslider rz-slider-model="filter.aspect.min" rz-slider-high="filter.aspect.max"
+                          rz-slider-floor="filter.aspect.floor" rz-slider-ceil="filter.aspect.ceil"></rzslider>
+            </div>
+
+
+        </div>
+        <md-content flex layout-padding>
+            <div layout="column" layout-fill layout-align="top center">
+                <leaflet center="center" layers="layers" height="480px"></leaflet>
+
+                <!--<leaflet  markers="markers" event-broadcast="events" center="center" layers="layers" height="480px"></leaflet>-->
+
+            </div>
+        </md-content>
+
+        <!--<div class="bs-sidebar hidden-print" role="complementary" data-offset-top="-80" bs-affix-->
+        <!--style="margin-left: 12px;margin-right: 8px;">-->
+
+        <!--<label>Selected Sensors</label>-->
+
+
+        <!--</div>-->
+    </section>
+</div>
+

@@ -76,6 +76,11 @@ public abstract class GSNMetadata implements Serializable{
         propertyNames.add(propertyName);
     }
 
+    public void replaceAllPropertyNames(Set<String> propertyNames) {
+        this.propertyNames.clear();
+        this.propertyNames.addAll(propertyNames);
+    }
+
     public void clearPropertyNames() {
         propertyNames.clear();
     }

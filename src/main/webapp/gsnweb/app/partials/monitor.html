@@ -1,0 +1,55 @@
+<div layout="row" layout-sm="column" layout-margin>
+
+    <!--<form name="monitorForm">-->
+    <!--<div>-->
+    <!--Data: {{data}}-->
+
+    <!--</div>-->
+    <!--</form>-->
+    <div>
+
+
+        <div style="margin-bottom: 5px;">
+            <ui-select multiple ng-model="sensors.selected" theme="select2"
+                       ng-disabled="disabled"
+                       on-select="update()"
+                       on-remove="update()" style="width: 280px;">
+                <ui-select-match placeholder="Select sensors...">{{$item}}</ui-select-match>
+                <ui-select-choices
+                        repeat="sensor in sensorNames | filter:$select.search">
+                    <!--<img ng-src="{{getSensorIcon(sensor)}}" style="width: 16px; height:16px">-->
+                    <span ng-bind-html="sensor | highlight: $select.search"></span>
+                </ui-select-choices>
+            </ui-select>
+        </div>
+
+        <div ng:repeat="sensor in data" class="box_border">
+            <label style="margin-top: 10px;">{{sensor.properties.vs_name}}</label>
+
+            <table>
+                <tr>
+                    <td style="padding-right: 5px;">{{sensor.properties.fields[0].name}}</td>
+                    <td class="monitor_value">{{sensor.properties.values[0][0] | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+                    <td></td>
+                </tr>
+                <div ng-if="!isImage(sensor)">
+                    <tbody ng:repeat="field in sensor.properties.fields.slice(2, sensor.properties.fields.length)">
+                    <tr>
+                        <td style="padding-right: 5px;">{{field.name}}</td>
+                        <td class="monitor_value">{{sensor.properties.values[0][$index+2] || '-'}} &nbsp<i>{{field.unit}}</i></td>
+                    </tr>
+                    </tbody>
+                </div>
+            </table>
+            <div ng-if="isImage(sensor)">
+                <img lazy-load ll-src="{{imageSrc(sensor)}}" style="height: 300px;"/>
+            </div>
+
+
+
+
+        </div>
+
+    </div>
+
+</div>

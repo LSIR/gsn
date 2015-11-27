@@ -45,7 +45,7 @@ public class BeansInitializer {
   
   public static DataField dataField(FieldConf fc){
 	  DataField f=new DataField();
-	  f.setName(fc.name());
+	  f.setName(fc.name().toLowerCase());
 	  f.setType(fc.dataType());
 	  f.setDescription(fc.description());
 	  if (fc.unit().isDefined())

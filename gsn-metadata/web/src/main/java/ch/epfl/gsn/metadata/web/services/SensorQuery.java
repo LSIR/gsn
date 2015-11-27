@@ -37,9 +37,9 @@ public class SensorQuery {
     private double slopeMin = 0;
     private double aspectMin = 0;
 
-    private double altitudeMax = 20000;
-    private double slopeMax = 90;
-    private double aspectMax = 360;
+    private double altitudeMax = 0;
+    private double slopeMax = 0;
+    private double aspectMax = 0;
 
     private Date fromDateParsed;
     private Date toDateParsed;
@@ -229,6 +229,10 @@ public class SensorQuery {
 
     public void setSlopeMax(double slopeMax) {
         this.slopeMax = slopeMax;
+    }
+
+    public boolean hasTopoQuery() {
+        return (slopeMin + slopeMax + altitudeMax + altitudeMin + aspectMax + aspectMin) >0;
     }
 
     @Override

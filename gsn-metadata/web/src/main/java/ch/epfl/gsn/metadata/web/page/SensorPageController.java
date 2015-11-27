@@ -9,6 +9,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Query;
@@ -38,12 +39,14 @@ public class SensorPageController {
 
     private WebJsonConverter geoJsonConverter;
     private QueryBuilder queryBuilder;
+    private MetadataService metadataService;
 
     @Inject
-    public SensorPageController(VirtualSensorAccessService sensorAccessService, WebJsonConverter geoJsonConverter, QueryBuilder queryBuilder) {
+    public SensorPageController(VirtualSensorAccessService sensorAccessService, WebJsonConverter geoJsonConverter, QueryBuilder queryBuilder, MetadataService metadataService) {
         this.sensorAccessService = sensorAccessService;
         this.geoJsonConverter = geoJsonConverter;
         this.queryBuilder = queryBuilder;
+        this.metadataService = metadataService;
     }
 
     @RequestMapping(value = "/virtualSensorNames", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
@@ -53,6 +56,7 @@ public class SensorPageController {
 
         setResponseHeader(response);
 
+        sensorQuery.setOnlyPublic(false);
         Query query = queryBuilder.build(sensorQuery);
 
         Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.findForQuery(query);
@@ -64,6 +68,65 @@ public class SensorPageController {
                 return virtualSensorMetadata.getName();
             }
         });
+
+        logger.info("query: " + sensorQuery + " results " + sensorMetadataSet.size());
+        ArrayList result = new ArrayList(names);
+        Collections.sort(result);
+        return new Gson().toJson(result);
+
+    }
+
+    @RequestMapping(value = "/virtualSensorNamesWithPrivacy", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public
+    @ResponseBody
+    String getVirtualSensorNamesWithPrivacy(SensorQuery sensorQuery, HttpServletResponse response) {
+
+        setResponseHeader(response);
+        sensorQuery.setOnlyPublic(false);
+
+        Query query = queryBuilder.build(sensorQuery);
+
+        Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.findForQuery(query);
+
+        Set<VirtualSensorMetadata> sensorMetadataSet = Sets.newHashSet(virtualSensorMetadatas);
+
+        Collection<NameWithProperty<Boolean>> names = Collections2.transform(sensorMetadataSet, new Function<VirtualSensorMetadata, NameWithProperty<Boolean>>() {
+            @Override
+            public NameWithProperty<Boolean> apply(VirtualSensorMetadata virtualSensorMetadata) {
+                return new NameWithProperty(virtualSensorMetadata.getName(), virtualSensorMetadata.isPublic());
+            }
+        });
+
+        logger.info("query: " + sensorQuery + " results " + sensorMetadataSet.size());
+        ArrayList result = new ArrayList(names);
+        Collections.sort(result);
+        return new Gson().toJson(result);
+
+    }
+
+    @RequestMapping(value = "/virtualSensors/{dbTableName}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public
+    @ResponseBody
+    String getSensorWithTableModel(@PathVariable String dbTableName, SensorQuery sensorQuery, HttpServletResponse response) {
+
+        VirtualSensorMetadata virtualSensorMetadata = sensorAccessService.getVirtualSensorMetadata(dbTableName.toLowerCase());
+
+        setResponseHeader(response);
+
+        return geoJsonConverter.convertMeasurementRecords(Lists.newArrayList(virtualSensorMetadata), false);
+    }
+
+    @RequestMapping(value = "/virtualSensors", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getVirtualSensors(SensorQuery sensorQuery, HttpServletResponse response) {
+
+        setResponseHeader(response);
+
+        Query query = queryBuilder.build(sensorQuery);
+
+        Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.findForQuery(query);
+//        Iterable<VirtualSensorMetadata> virtualSensorMetadatas = sensorAccessService.allSensors();
 
         logger.info("query: " + sensorQuery + " results " + sensorMetadataSet.size());
         ArrayList result = new ArrayList(names);
@@ -119,10 +182,58 @@ public class SensorPageController {
 //        return geoJsonConverter.writeTableModel(Lists.newArrayList(virtualSensorMetadata));
 //    }
 
+    @RequestMapping(value = "/metadata/{dbTableName}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public
+    @ResponseBody
+    String getMetadata(@PathVariable String dbTableName, HttpServletResponse response) {
+
+        setResponseHeader(response);
+        return metadataService.getMetadataJson(dbTableName);
+    @RequestMapping(value = "/metadatadif/{dbTableName}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    String getMetadataDif(@PathVariable String dbTableName, HttpServletResponse response) {
+
+        setResponseHeader(response);
+        JSONObject jsonObject = new JSONObject();
+
+        String metadataDifJson = metadataService.getMetadataDifJson(dbTableName);
+        jsonObject.append("dif", metadataDifJson);
+
+
+        VirtualSensorMetadata sensorMetadata = sensorAccessService.getVirtualSensorMetadata(dbTableName);
+
+        String sensorMetadataJson = geoJsonConverter.convertMeasurementRecords(Lists.newArrayList(sensorMetadata), true);
+
+        jsonObject.append("gsn", sensorMetadataJson);
+        return jsonObject.toString();
+    }
+
     private void setResponseHeader(HttpServletResponse response) {
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Methods", "GET");
         response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+
+    protected static class NameWithProperty <T> implements Comparable<NameWithProperty>{
+        private String name;
+        private T property;
+
+        public NameWithProperty(String name, T property) {
+            this.name = name;
+            this.property = property;
+        }
+
+        public T getProperty() {
+            return property;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public int compareTo(NameWithProperty nameWithProperty) {
+            return this.name.compareTo(nameWithProperty.name);
+        }
     }
 
 }

@@ -72,7 +72,7 @@ public class ConnectToDB
     private PreparedStatement pstmt ;
 	private ResultSet rs ;
     private DatabaseMetaData meta;
-    private String usedDB ; //used DB among diffrent choices(MySQL, Oracle, H2)
+    //private String usedDB ; //used DB among diffrent choices(MySQL, Oracle, H2)
     private static transient Logger logger= LoggerFactory.getLogger( ConnectToDB.class );
 
 
@@ -81,14 +81,15 @@ public class ConnectToDB
     
 	public ConnectToDB()throws ClassNotFoundException,SQLException
 	{
+		con=gsn.Main.getDefaultStorage().getConnection();
         //Load and register the MySQL driver
-        Class.forName(driverName);
+        //Class.forName(driverName);
         //Get a connection to the database
-        con = DriverManager.getConnection(connectionname,dbUser,dbPassword);
+        //con = DriverManager.getConnection(connectionname,dbUser,dbPassword);
         //create a statement object
         stmt= con.createStatement();  ///// changed 20.03.2013
         meta= this.con.getMetaData();
-        initUsedDB();
+        //initUsedDB();
     }
     
     /****************************************** Init Methods*******************************************/
@@ -442,7 +443,7 @@ public class ConnectToDB
     }
 
     /* precise which DB platform we are using */
-    void initUsedDB()
+/*    void initUsedDB()
     {
         if(driverName.equals("com.mysql.jdbc.Driver"))
             {
@@ -458,7 +459,7 @@ public class ConnectToDB
                   usedDB="H2";
             }
 
-    }
+    }*/
     /****************************************** Set Methods*******************************************/
    /*************************************************************************************************/
 
@@ -478,10 +479,11 @@ public class ConnectToDB
     {
         this.meta=meta;
     }
+    /*
     void setUsedDB(String usedDB)
     {
         this.usedDB=usedDB;
-    }
+    }*/
 
     /****************************************** Get Methods*******************************************/
    /*************************************************************************************************/
@@ -502,10 +504,10 @@ public class ConnectToDB
     {
         return this.meta;
     }
-    String getUsedDB()
+    /*String getUsedDB()
     {
         return this.usedDB;
-    }
+    }*/
     Vector getACTables()
     {
         return ACTables;
