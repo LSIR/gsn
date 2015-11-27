@@ -35,12 +35,14 @@ import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
 import tinygsn.services.WrapperService;
 
-import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
+
+import org.epfl.locationprivacy.util.Utils;
+
+import static android.os.Debug.startMethodTracing;
 
 public class AndroidGPSWrapper extends AbstractWrapper implements LocationListener {
 

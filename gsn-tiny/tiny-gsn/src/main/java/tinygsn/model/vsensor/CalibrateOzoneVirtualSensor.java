@@ -9,14 +9,19 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.epfl.locationprivacy.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.model.vsensor.utils.ParameterType;
 import tinygsn.model.vsensor.utils.VSParameter;
+
+import static android.os.Debug.startMethodTracing;
+import static android.os.Debug.stopMethodTracing;
 
 public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 
@@ -50,6 +55,10 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 		double ozone = 0;
 		double model = 0;
 		int source = 0;
+
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+			startMethodTracing("Android/data/tinygsn.gui.android/files/" + LOGTAG + "_" + System.currentTimeMillis());
+		}
 
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");
@@ -86,6 +95,10 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 			log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Total Time to process data in dataAvailable() (without dataProduced()) : " + (endLogTime - startLogTime) + " ms.");
 
 			dataProduced(new StreamElement(outputStructure, new Serializable[]{ozone, source}, streamElement.getTimeStamp()));
+
+			if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+				stopMethodTracing();
+			}
 		}
 	}
 

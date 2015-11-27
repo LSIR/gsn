@@ -17,7 +17,7 @@ android {
 
         debug {
             buildConfigField BOOLEAN, LOGGING, TRUE
-            buildConfigField BOOLEAN, PERF, TRUE
+            buildConfigField BOOLEAN, PERF, FALSE
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }

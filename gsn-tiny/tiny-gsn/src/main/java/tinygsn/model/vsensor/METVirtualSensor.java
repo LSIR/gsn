@@ -1,13 +1,19 @@
 package tinygsn.model.vsensor;
 
+import org.epfl.locationprivacy.util.Utils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.model.vsensor.utils.ParameterType;
 import tinygsn.model.vsensor.utils.VSParameter;
+
+import static android.os.Debug.startMethodTracing;
+import static android.os.Debug.stopMethodTracing;
 
 public class METVirtualSensor extends AbstractVirtualSensor {
 
@@ -86,6 +92,9 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
 
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+			startMethodTracing("Android/data/tinygsn.gui.android/files/" + LOGTAG + "_" + System.currentTimeMillis());
+		}
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");
 		long startLogTime = System.currentTimeMillis();
@@ -111,6 +120,9 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 
 			dataProduced(new StreamElement(outputStructure, new Serializable[]{MET, VA, lastActivity.getTimeStamp(), streamElement.getTimeStamp()}, streamElement.getTimeStamp()));
 			lastActivity = streamElement;
+			if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+				stopMethodTracing();
+			}
 		}
 
 

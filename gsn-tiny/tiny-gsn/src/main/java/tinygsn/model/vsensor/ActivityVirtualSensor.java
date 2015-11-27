@@ -31,8 +31,11 @@ import java.util.Arrays;
 
 import android.os.Environment;
 
+import org.epfl.locationprivacy.util.Utils;
+
 import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
+import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.model.vsensor.utils.ParameterType;
 import tinygsn.model.vsensor.utils.VSParameter;
@@ -42,6 +45,9 @@ import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
+
+import static android.os.Debug.startMethodTracing;
+import static android.os.Debug.stopMethodTracing;
 
 
 /*
@@ -120,6 +126,9 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, ArrayList<StreamElement> streamElements) {
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+			startMethodTracing("Android/data/tinygsn.gui.android/files/" + LOGTAG + "_" + System.currentTimeMillis());
+		}
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");
 		long startLogTime = System.currentTimeMillis();
@@ -285,6 +294,10 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Total Time to process data in dataAvailable() (without dataProduced()) : " + (endLogTime - startLogTime) + " ms.");
 
 		dataProduced(new StreamElement(outputStructure, new Serializable[]{classe}, streamElements.get(streamElements.size() - 1).getTimeStamp()));
+
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+			stopMethodTracing();
+		}
 	}
 
 	@Override

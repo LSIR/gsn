@@ -46,6 +46,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import org.epfl.locationprivacy.util.Utils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,6 +64,9 @@ import tinygsn.model.vsensor.utils.ParameterType;
 import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
+
+import static android.os.Debug.startMethodTracing;
+import static android.os.Debug.stopMethodTracing;
 
 public class NotificationVirtualSensor extends AbstractVirtualSensor {
 	public static String[] ACTIONS = {"Notification", "SMS", "Email"};
@@ -91,6 +96,9 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
 
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+			startMethodTracing("Android/data/tinygsn.gui.android/files/" + LOGTAG + "_" + System.currentTimeMillis());
+		}
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");
 		long startLogTime = System.currentTimeMillis();
@@ -147,6 +155,10 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 		if (saveToDB) {
 			dataProduced(streamElement);
+		}
+
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+			stopMethodTracing();
 		}
 	}
 

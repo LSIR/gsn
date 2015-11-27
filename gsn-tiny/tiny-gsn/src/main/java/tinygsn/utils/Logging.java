@@ -2,10 +2,7 @@ package tinygsn.utils;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.Log;
 import android.widget.Toast;
-
-import org.epfl.locationprivacy.util.Utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
