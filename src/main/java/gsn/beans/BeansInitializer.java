@@ -4,8 +4,9 @@ package gsn.beans;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.KeyValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import play.Logger;
 import scala.collection.JavaConversions;
 import scala.collection.Map;
 import gsn.config.*;
@@ -13,6 +14,8 @@ import gsn.utils.KeyValueImp;
 
 
 public class BeansInitializer {
+  private transient static final Logger logger = LoggerFactory.getLogger( BeansInitializer.class );
+
   public static ContainerConfig container(GsnConf gsn){
 	  SlidingConfig sliding = new SlidingConfig();
 	  if (gsn.slidingConf().isDefined())
@@ -160,7 +163,7 @@ public class BeansInitializer {
 	  ArrayList<KeyValue> ini=new ArrayList<KeyValue>();
       Iterable<String> initkeys=JavaConversions.asJavaIterable(init.keys());
 	  for (String ik:initkeys){
-		  Logger.trace("keys:"+ik);
+		  logger.trace("keys:"+ik);
 		  ini.add(new KeyValueImp(ik.toLowerCase(),init.apply(ik)));
 	  }
 	  v.setMainClassInitialParams(ini);
