@@ -80,12 +80,14 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 	private String fileName = "activity-julien-norm.model";
 	private DataField[] outputStructure = new DataField[]{new DataField("activity", DataTypes.DOUBLE)};
 
+	private String LOGTAG = "ActivityVirtualSensor";
+
 
 	@Override
 	public boolean initialize() {
 		try {
 			cls_act = (Classifier) SerializationHelper.read(Environment.getExternalStorageDirectory().getAbsolutePath()
-					                                                + "/Android/data/tinygsn/" + fileName);
+				+ "/Android/data/tinygsn/" + fileName);
 		} catch (Exception e) {
 			return false;
 		}
@@ -118,7 +120,9 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, ArrayList<StreamElement> streamElements) {
-
+		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
+		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");
+		long startLogTime = System.currentTimeMillis();
 		if (streamElements.size() < 3) return; //too small to compute
 
 		double[] x = new double[streamElements.size()];
@@ -209,7 +213,7 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		Arrays.sort(norm);
 
      /*   double median_x = x.length % 2 == 1 ? x[(x.length - 1)/2] : x[(x.length)/2] + x[(x.length)/2 - 1] / 2.0;
-        double median_y = y.length % 2 == 1 ? y[(y.length - 1)/2] : y[(y.length)/2] + y[(y.length)/2 - 1] / 2.0;
+		double median_y = y.length % 2 == 1 ? y[(y.length - 1)/2] : y[(y.length)/2] + y[(y.length)/2 - 1] / 2.0;
         double median_z = z.length % 2 == 1 ? z[(z.length - 1)/2] : z[(z.length)/2] + z[(z.length)/2 - 1] / 2.0;
        */
 		double percent25_x = x[(int) Math.round(x.length / 4.0)];
@@ -223,7 +227,7 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		double percent75_norm = norm[(int) Math.round(3.0 * norm.length / 4)];
 
         /*double[] vector = new double[]{mean_x,std_x,min_x,max_x,range_x,cv_x,kurt_x,percent25_x,percent75_x,
-        		                       mean_y,std_y,min_y,max_y,range_y,cv_y,kurt_y,percent25_y,percent75_y,
+				                       mean_y,std_y,min_y,max_y,range_y,cv_y,kurt_y,percent25_y,percent75_y,
         		                       mean_z,std_z,min_z,max_z,range_z,cv_z,kurt_z,percent25_z,percent75_z};
 		*/
 
@@ -276,6 +280,10 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 		} catch (Exception e) {
 			return;
 		}
+
+		long endLogTime = System.currentTimeMillis();
+		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Total Time to process data in dataAvailable() (without dataProduced()) : " + (endLogTime - startLogTime) + " ms.");
+
 		dataProduced(new StreamElement(outputStructure, new Serializable[]{classe}, streamElements.get(streamElements.size() - 1).getTimeStamp()));
 	}
 

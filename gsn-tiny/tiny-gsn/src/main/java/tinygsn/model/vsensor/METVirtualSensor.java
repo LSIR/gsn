@@ -19,6 +19,8 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	private DataField[] outputStructure = new DataField[]{new DataField("MET", DataTypes.DOUBLE), new DataField("VA", DataTypes.DOUBLE), new DataField("start", DataTypes.BIGINT), new DataField("end", DataTypes.BIGINT)};
 	double[] MET_Table = new double[]{3, 1.8, 10, 7.5, 5, 1.3};
 	StreamElement lastActivity = null;
+
+	private String LOGTAG = "METVirtualSensor";
 	//3.bike : 7.5
 	//5.sitting : 1.3
 	//1.standing : 1.8
@@ -84,6 +86,10 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
 
+		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
+		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");
+		long startLogTime = System.currentTimeMillis();
+
 		streamElement = super.anonymizeData(inputStreamName, streamElement);
 
 		if (lastActivity == null) {
@@ -99,6 +105,10 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 			if (VAmax != Double.NaN) {
 				VA = 19.63 * Math.min(ECF * MET * RMR, VAmax);
 			}
+
+			long endLogTime = System.currentTimeMillis();
+			log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Total Time to process data in dataAvailable() (without dataProduced()) : " + (endLogTime - startLogTime) + " ms.");
+
 			dataProduced(new StreamElement(outputStructure, new Serializable[]{MET, VA, lastActivity.getTimeStamp(), streamElement.getTimeStamp()}, streamElement.getTimeStamp()));
 			lastActivity = streamElement;
 		}

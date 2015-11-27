@@ -32,6 +32,7 @@ import tinygsn.beans.StreamElement;
 public class BridgeVirtualSensor extends AbstractVirtualSensor {
 
 	private static final long serialVersionUID = -7656375392762513783L;
+	private String LOGTAG = "BridgeVirtualSensor";
 
 	@Override
 	public boolean initialize() {
@@ -44,7 +45,15 @@ public class BridgeVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
+		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
+		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");
+		long startLogTime = System.currentTimeMillis();
+
 		StreamElement anonymizedData = super.anonymizeData(inputStreamName, streamElement);
+
+		long endLogTime = System.currentTimeMillis();
+		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Total Time to process data in dataAvailable() (without dataProduced()) : " + (endLogTime - startLogTime) + " ms.");
+
 		dataProduced(anonymizedData);
 	}
 

@@ -25,14 +25,13 @@
 
 package tinygsn.model.vsensor;
 
-import android.content.Context;
+import android.util.Log;
 import android.util.Pair;
-import android.widget.TableLayout;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.epfl.locationprivacy.adaptiveprotection.AdaptiveProtection;
 import org.epfl.locationprivacy.adaptiveprotection.AdaptiveProtectionInterface;
+import org.epfl.locationprivacy.util.Utils;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -46,12 +45,11 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
-import tinygsn.gui.android.TinyGSN;
 import tinygsn.model.vsensor.utils.ParameterType;
 import tinygsn.model.vsensor.utils.VSParameter;
 import tinygsn.model.wrappers.AndroidGPSWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
-import tinygsn.utils.ToastUtils;
+import tinygsn.utils.Logging;
 
 public abstract class AbstractVirtualSensor implements Serializable {
 
@@ -68,8 +66,13 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	private VSensorConfig config;
 	public InputStream is;
 
+	private String LOGTAG = "AbstractVirtualSensor";
+	private String loggingSubFolder = "";
+	private long logTime = 0;
+
 
 	public boolean initialize_wrapper() {
+		initLog(config.getName());
 		HashMap<String, String> param = storage.getSetting("vsensor:" + config.getName() + ":");
 		for (Entry<String, String> e : param.entrySet()) {
 			initParameter(e.getKey(), e.getValue());
@@ -108,12 +111,16 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	// synchronized
 
 	protected void dataProduced(StreamElement streamElement, boolean adjust) {
-
+		log("dataProduced_" + config.getName(), "===========================================");
+		log("dataProduced_" + config.getName(), "Data produced (saved in db) for stream element : " + streamElement.toString());
+		long startTime = System.currentTimeMillis();
 		try {
 			storage.executeInsert("vs_" + config.getName(), null, streamElement);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		long endTime = System.currentTimeMillis();
+		log("dataProduced_" + config.getName(), "End of produced data for stream element in " + (endTime - startTime) + " ms.");
 	}
 
 	/**
@@ -309,4 +316,18 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		dispose();
 	}
 
+
+	protected void initLog(String logtag) {
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "LOGGING")) {
+			loggingSubFolder = Logging.createNewLoggingFolder(StaticData.globalContext, logtag);
+		}
+	}
+	protected void log(String logtag, String s) {
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "LOGGING")) {
+			long startlogging = System.currentTimeMillis();
+			Log.d(logtag, System.currentTimeMillis() + " : " + s);
+			Logging.appendLog(loggingSubFolder, logtag + ".txt", s, StaticData.globalContext);
+			logTime = (System.currentTimeMillis() - startlogging);
+		}
+	}
 }
