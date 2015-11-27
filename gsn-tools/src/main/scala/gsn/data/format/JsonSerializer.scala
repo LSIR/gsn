@@ -85,6 +85,7 @@ object JsonSerializer extends DataSerializer{
 
   private def valueToJson(any:Any):JsValue=any match{       
     case d:Double=>JsNumber(d)
+    case f:Float=>JsNumber(f)
     case i:Int=>JsNumber(i)
     case l:Long=>JsNumber(l)
     case s:String=>JsString(s)
