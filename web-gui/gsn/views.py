@@ -66,7 +66,12 @@ def index(request):
 
 # View that returns in JSON a list of all the sensors
 def sensors(request):
-    return JsonResponse(json.loads(requests.get(sensors_url).text))
+    if request.user.is_authenticated() and GSNUser.objects.filter(id=request.user.id).exists():
+        return JsonResponse(json.loads(requests.get(oauth_sensors_url, headers={
+            'Authorization': 'Bearer ' + get_or_refresh_token(GSNUser.objects.get(id=request.user.id))
+        }).text))
+    else:
+        return JsonResponse(json.loads(requests.get(sensors_url).text))
 
 
 # View that gets the data of a sensor for a specified timeframe
@@ -279,7 +284,6 @@ def get_or_refresh_token(user):
 
 
 def refresh_token(user):
-
     payload = {
         'client_id': oauth_client_id,
         'client_secret': oauth_client_secret,

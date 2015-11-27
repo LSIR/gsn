@@ -312,8 +312,8 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function
 
             for (var i = 0; i < $scope.sensors.length; i++) {
 
-                if ($scope.sensors[i].geometry.coordinates[1] == $scope.sensors[i].geometry.coordinates[0] == 0) {
-                    var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
+                if ($scope.sensors[i].geometry.coordinates[1] && $scope.sensors[i].geometry.coordinates[0]) {
+                    var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[0], $scope.sensors[i].geometry.coordinates[1]);
 
                     var marker = new google.maps.Marker({
                         position: latLng,

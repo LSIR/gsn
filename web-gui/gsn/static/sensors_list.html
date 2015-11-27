@@ -18,21 +18,21 @@
         <div ng-repeat="sensor in sensors | filter : query">
             <div class="panel panel-default" ng-if="$even">
                 <div class="panel-heading"><a href="#/sensors/{{ sensor.properties.vs_name }}"
-                                              name="{{sensor.properties.vs_name}}"
+                                              name="{{ sensor.properties.vs_name }}"
                                               ng-bind="sensor.properties.vs_name"></a></div>
 
                 <div class="panel-body">
                     <p><b>Description:</b> {{ sensor.properties.description }}</p>
 
-                    <p ng-if="sensor.properties.geographical"><b> Location: </b>{{sensor.properties.geographical}}</p>
+                    <p ng-if="sensor.properties.geographical"><b> Location: </b>{{ sensor.properties.geographical }}</p>
                     <ul ng-if="sensor.geometry.coordinates">
-                        <li><b>Longitude:</b> {{sensor.geometry.coordinates[0]}}</li>
-                        <li><b>Latitude:</b> {{sensor.geometry.coordinates[1]}}</li>
+                        <li><b>Latitude:</b> {{ sensor.geometry.coordinates[0]}}</li>
+                        <li><b>Longitude:</b> {{ sensor.geometry.coordinates[1]}}</li>
                         <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
-                            {{sensor.geometry.coordinates[2]}}
+                            {{ sensor.geometry.coordinates[2]}}
                         </li>
                     </ul>
-                    <p><b>Public:</b> {{ sensor.properties.is_public}}</p>
+                    <p><b>Public:</b> {{ sensor.properties.is_public }}</p>
 
 
                 </div>
@@ -44,21 +44,21 @@
         <div ng-repeat="sensor in sensors | filter : query">
             <div class="panel panel-default" ng-if="$odd">
                 <div class="panel-heading"><a href="#/sensors/{{ sensor.properties.vs_name }}"
-                                              name="{{sensor.properties.vs_name}}"
+                                              name="{{ sensor.properties.vs_name }}"
                                               ng-bind="sensor.properties.vs_name"></a></div>
 
                 <div class="panel-body">
                     <p><b>Description:</b> {{ sensor.properties.description }}</p>
 
-                    <p ng-if="sensor.properties.geographical"><b> Location: </b>{{sensor.properties.geographical}}</p>
+                    <p ng-if="sensor.properties.geographical"><b> Location: </b>{{ sensor.properties.geographical }}</p>
                     <ul ng-if="sensor.geometry.coordinates">
-                        <li><b>Longitude:</b> {{sensor.geometry.coordinates[0]}}</li>
-                        <li><b>Latitude:</b> {{sensor.geometry.coordinates[1]}}</li>
+                        <li><b>Latitude:</b> {{ sensor.geometry.coordinates[0]}}</li>
+                        <li><b>Longitude:</b> {{ sensor.geometry.coordinates[1]}}</li>
                         <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
-                            {{sensor.geometry.coordinates[2]}}
+                            {{ sensor.geometry.coordinates[2]}}
                         </li>
                     </ul>
-                    <p><b>Public:</b> {{ sensor.properties.is_public}}</p>
+                    <p><b>Public:</b> {{ sensor.properties.is_public }}</p>
 
 
                 </div>
