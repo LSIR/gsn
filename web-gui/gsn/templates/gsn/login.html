@@ -35,17 +35,18 @@
 
 
 
-                    {% if user_does_not_exist %}
+                    {% if error_message %}
 
-                        <h4 style="color: red">{{ user_does_not_exist }}</h4>
+                        <h4 style="color: red">{{ error_message }}</h4>
+
+                    {% endif %}
+
+                    {% if green_message %}
+
+                        <h4 style="color: green">{{ green_message }}</h4>
 
                     {% endif %}
 
-                    {% if user_desactivated %}
-
-                        <h4>{{ user_desactivated }}</h4>
-
-                    {% endif %}
 
 
                     {% if next %}

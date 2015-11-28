@@ -26,14 +26,13 @@ sensors_url = settings.GSN['SENSORS_URL']
 # OAUTH2
 oauth_enabled = True  # TODO delete and uncomment when OAUTH ready
 # oauth_enabled = settings.GSN['OAUTH']['ENABLED']
-if oauth_enabled:
-    oauth_server_address = settings.GSN['OAUTH']['SERVER_URL']
-    oauth_client_id = settings.GSN['OAUTH']['CLIENT_ID']
-    oauth_client_secret = settings.GSN['OAUTH']['CLIENT_SECRET']
-    oauth_redirection_url = settings.GSN['OAUTH']['REDIRECTION_URL']
-    oauth_sensors_url = settings.GSN['OAUTH']['SENSORS_URL']
-    oauth_auth_url = settings.GSN['OAUTH']['AUTH_URL']
-    oauth_token_url = settings.GSN['OAUTH']['TOKEN_URL']
+oauth_server_address = settings.GSN['OAUTH']['SERVER_URL']
+oauth_client_id = settings.GSN['OAUTH']['CLIENT_ID']
+oauth_client_secret = settings.GSN['OAUTH']['CLIENT_SECRET']
+oauth_redirection_url = settings.GSN['OAUTH']['REDIRECTION_URL']
+oauth_sensors_url = settings.GSN['OAUTH']['SENSORS_URL']
+oauth_auth_url = settings.GSN['OAUTH']['AUTH_URL']
+oauth_token_url = settings.GSN['OAUTH']['TOKEN_URL']
 
 # Cache setup
 requests_cache.install_cache("demo_cache")
@@ -82,11 +81,12 @@ def sensors(request):
 
 # View that gets the data of a sensor for a specified timeframe
 
+
 def sensor_detail(request, sensor_name, from_date, to_date):
     # _from_ = str(datetime.now().replace(microsecond=0).isoformat(sep='T'))
     # _to_ = _from_
 
-    if (oauth_enabled) and request.user.is_authenticated() and GSNUser.objects.filter(id=request.user.id).exists():
+    if request.user.is_authenticated() and GSNUser.objects.filter(id=request.user.id).exists():
 
         headers = {
             'Authorization': 'Bearer ' + get_or_refresh_token(GSNUser.objects.get(id=request.user.id))
@@ -97,8 +97,13 @@ def sensor_detail(request, sensor_name, from_date, to_date):
             'to': to_date,
         }
 
-        data = json.loads(
-            requests.get(oauth_sensors_url + '/' + sensor_name + '/data', headers=headers, params=payload).text)
+        r = requests.get(oauth_sensors_url + '/' + sensor_name + '/data', headers=headers, params=payload)
+
+        if r.status_code is not 200:
+            return JsonResponse({'error': 'The specified sensor doesn\'t exist'})
+            pass
+
+        data = json.loads(r.text)
 
         for index, values in enumerate(data['properties']['values']):
             # data['properties']['values'][index] = [float(i) for i in values]
@@ -115,11 +120,11 @@ def sensor_detail(request, sensor_name, from_date, to_date):
 
             pass
 
-        dict = {
-            'features': [data, ]
-        }
+        # dict = {
+        #     'features': [data, ]
+        # }
 
-        return JsonResponse(dict)
+        return JsonResponse(data)
 
     else:
         payload = {
@@ -191,6 +196,17 @@ def download(request):
 
 
 def login_request(request):
+    """
+    Log in the user from a LoginForm, assuming the credentials are correct. If they are, the user will be redirected to
+    the index page
+
+    If the credentials are incorrect or the user is inactive or the form is invalid, the user will be redirected to the
+    /gsn/login/ page, with the appropriate error message.
+
+    If the manages to log in successfuly, the function checks if there is a 'next' parameter; if there is, the user is
+    redirected to that page. If not, he is redirected to /gsn/
+    """
+
     context = {'form': LoginForm(), 'next': request.GET.get('next')}
     context.update(csrf(request))
 
@@ -212,22 +228,31 @@ def login_request(request):
                     return redirect('index')
                 else:
                     context.update({
-                        'user_desactivated': 'This user has been desactivated',
+                        'error_message': 'This user has been desactivated',
                     })
             else:
                 context.update({
-                    'user_does_not_exist': 'This username and password combination is not valid',
+                    'error_message': 'This username and password combination is not valid',
 
                 })
         else:
             context.update({
-                'invalid_form': 'You didn\'t fill the form correctly',
+                'error_message': 'You didn\'t fill the form correctly',
             })
 
     return render(request, 'gsn/login.html', context)
 
 
 def sign_up(request):
+    """
+    View that lets a user sign up for the website.
+
+    Ask for username, email and password using a GSNUserCreationForm. If the form is valid, the user is created, then
+    the login page is rendered and the user is prompted to log in.
+
+    If a user was already logged in, he will be logged out before this view is rendered.
+    """
+
     if request.user.is_authenticated():
         logout(request)
 
@@ -241,11 +266,19 @@ def sign_up(request):
 
         if form.is_valid():
             form.save()
-            context.update({'user_created': True})
+
+            context.update({'green_message': 'Your account was successfuly created. Please proceed to login.',
+                            'form': LoginForm()})
+
+            return render(request, 'gsn/login.html', context)
+
             # login(request)
 
         else:
-            context.update({'form_invalid': True})
+            context.update({
+                'error_message': 'A problem happened while submitting this form. It may be that this '
+                                 'username is already taken, that the passwords don\'t match or that the constraint on '
+                                 'the fields are not respected.'})
 
 
     else:
@@ -257,12 +290,25 @@ def sign_up(request):
 
 
 def logout_view(request):
+    """
+    Logs out the user then redirected him to the /gsn/ page
+    """
     logout(request)
     return redirect('index')
 
 
 @user_passes_test(gsn_user_check)
 def profile(request):
+    """
+    Profile of the user; contains a ProfileForm that lets the user edit their email adress, force refresh the oauth2
+    tokens or link their account to the server
+
+    If the user isn't a logged in or a GSNUser, he will be redirected to the login page, after which he will be
+    redirected there on successful login
+
+    If the user was redirected here from the oauth server, this view catches the code and generates the according oauth
+    tokens
+    """
     context = {
         'username': request.user.username
     }
@@ -292,12 +338,15 @@ def profile(request):
     else:
         form = ProfileForm(instance=user)
 
-    context.update({'password_form': form})
+    context.update({'form': form})
 
     return render(request, 'gsn/profile.html', context)
 
 
 def oauth_get_code(request):
+    """
+    Redirects to the oauth server
+    """
     return HttpResponseRedirect(
         oauth_auth_url + '?' + 'response_type=code' +
         '&client_id=' + oauth_client_id +

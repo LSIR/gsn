@@ -33,6 +33,12 @@
 
                     {% csrf_token %}
 
+                    {% if error_message %}
+
+                        <h4 style="color: red">{{ error_message }}</h4>
+
+                    {% endif %}
+
 
                     <form role="form" action="/gsn/signup/" method="post">
                         {% csrf_token %}
@@ -73,6 +79,8 @@
                             {% endfor %}
 
                             <button type="submit" class="btn btn-lg btn-success btn-block">Sign Up</button>
+                            <a href="/gsn/" class="btn btn-lg btn-danger btn-block">Cancel and return to app</a>
+
 
                         </fieldset>
 

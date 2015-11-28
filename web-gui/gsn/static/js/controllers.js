@@ -404,19 +404,12 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
         $scope.load = function () {
             $http.get('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/').success(function (data) {
-                $scope.details = data.features ? data.features[0] : undefined;
+                $scope.details = data.properties ? data : undefined;
+
                 $scope.loading = false;
 
                 console.log('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/');    //TODO: REMOVE
 
-                $scope.plot = {
-                    'labels': [],
-                    'series': [],
-                    'data': [],
-                    'onClick': function (points, evt) {
-                        console.log(points, evt);
-                    }
-                };
 
                 buildData();
 
