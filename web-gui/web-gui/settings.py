@@ -126,3 +126,5 @@ GSN = {
     'SERVER_URL': 'http://opensense.epfl.ch:22001/',
     'SENSORS_URL': 'http://opensense.epfl.ch:22001/rest/sensors/'
 }
+
+LOGIN_URL = '/gsn/login/'

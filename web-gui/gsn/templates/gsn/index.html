@@ -144,23 +144,40 @@
 
                 {% if logged_out %}
                     <li class="dropdown" style="display: table-cell;vertical-align: middle;">
+
+
                         <form role="form" action="/gsn/login/" method="post" class="form">
                             {% csrf_token %}
+
                             <ul>
-                                <li>
-                                    <input class="form-control" placeholder="Username" type="text" id="username"
-                                           name="username">
 
-                                </li>
-                                <li>
-                                    <input class="form-control" placeholder="Password" type="password" id="password"
-                                           name="password">
+                                {% for field in login_form %}
 
-                                </li>
+                                    <li>
+                                        {% if "password" in field.name %}
+                                            <input class="form-control" type="password" name="{{ field.name }}"
+                                                   placeholder="{{ field.label }}" required>
+                                        {% elif "email" in field.name %}
+                                            <input class="form-control" type="email" name="{{ field.name }}"
+                                                   value="{{ field.value }}" required>
+                                        {% elif "token" in field.name %}
+                                            <label>{{ field.label }}</label>
+                                            <input class="form-control" type="email" name="{{ field.name }}"
+                                                   value="{{ field.value }}" disabled>
+                                        {% else %}
+                                            <input class="form-control" type="text" name="{{ field.name }}"
+                                                   placeholder="{{ field.label }}" required>
+                                        {% endif %}
+                                    </li>
+
+                                {% endfor %}
+
                                 <li>
                                     <button type="submit" class="btn btn-default">Log in</button>
                                 </li>
                             </ul>
+
+
                         </form>
 
                     </li>

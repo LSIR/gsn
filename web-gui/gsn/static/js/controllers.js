@@ -432,7 +432,7 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         function buildData() {
 
             if ($scope.details && $scope.details.properties.values) {
-                var k;
+                var k, offset = 0;
 
                 $scope.chartConfig.series = [];
 
@@ -440,7 +440,7 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
 
                     $scope.chartConfig.series.push({
-                        name: $scope.details.properties.fields[k].name + " (" + (!($scope.details.properties.fields[k].unit === "") ? $scope.details.properties.fields[k].unit : "no unit") + ") ",
+                        name: $scope.details.properties.fields[k].name + " (" + (!($scope.details.properties.fields[k].unit === null) ? $scope.details.properties.fields[k].unit : "no unit") + ") ",
                         id: k,
                         data: []
                     });
@@ -448,16 +448,25 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
                     var i;
                     for (i = 0; i < $scope.details.properties.values.length; i++) {
 
+                        if (typeof $scope.details.properties.values[i][k] === 'string' || $scope.details.properties.values[i][k] instanceof String) {
+                            offset++;
+                            break
+                        }
                         var array = [$scope.details.properties.values[i][1], $scope.details.properties.values[i][k]];
                         $scope.chartConfig.series[k - 2].data.push(array)
 
                     }
 
+
                     $scope.chartConfig.series[k - 2].data.sort(function (a, b) {
                         return a[0] - b[0]
-                    })
+                    });
 
                 }
+
+                $scope.chartConfig.series = $scope.chartConfig.series.filter(function (serie) {
+                    return serie.data.length > 0
+                });
 
 
             }

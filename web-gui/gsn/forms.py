@@ -2,7 +2,7 @@ __author__ = 'julie_000'
 
 from django import forms
 from gsn.models import GSNUser
-from  django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+from  django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 
 class GSNUserCreationForm(UserCreationForm):
@@ -10,6 +10,10 @@ class GSNUserCreationForm(UserCreationForm):
         model = GSNUser
         fields = ('username', 'email')
 
+    pass
+
+
+class LoginForm(AuthenticationForm):
     pass
 
 

@@ -12,8 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from oauthlib.common import urlencode
-from gsn.forms import GSNUserCreationForm, ProfileForm
+from django.contrib.auth.decorators import user_passes_test
+from gsn.forms import GSNUserCreationForm, ProfileForm, LoginForm
 from gsn.models import GSNUser
 import csv
 
@@ -39,7 +39,12 @@ if oauth_enabled:
 requests_cache.install_cache("demo_cache")
 
 
+def gsn_user_check(user):
+    return user.is_authenticated() and GSNUser.objects.filter(id=user.id).exists()
+
+
 # Views
+
 
 
 # Index view, just renders a template
@@ -57,6 +62,7 @@ def index(request):
         }
 
     context.update(csrf(request))
+    context.update({'login_form': LoginForm()})
 
     template = loader.get_template('gsn/index.html')
     response = HttpResponse(template.render(context))
@@ -75,6 +81,7 @@ def sensors(request):
 
 
 # View that gets the data of a sensor for a specified timeframe
+
 def sensor_detail(request, sensor_name, from_date, to_date):
     # _from_ = str(datetime.now().replace(microsecond=0).isoformat(sep='T'))
     # _to_ = _from_
@@ -163,7 +170,6 @@ def download_csv(request, sensor_name, from_date, to_date):
 
 
 @csrf_exempt
-# View that downloads the data of multiple sensors for the specified time frame
 def download(request):
     data = json.loads(
         request.body.decode('utf-8')
@@ -173,8 +179,10 @@ def download(request):
     response['Content-Disposition'] = 'attachment; filename="download.csv"'
 
     writer = csv.writer(response)
-    writer.writerow([field['name'] + " (" + field['unit'] + " " + field['type'] + ")"
-                     for field in data['properties']['fields']])
+    writer.writerow(
+        [field['name'] + " (" + (field['unit'] if field['unit'] is not None else 'no unit') + " " + (
+            field['type'] if field['type'] is not None else 'no type') + ")"
+         for field in data['properties']['fields']])
 
     for value in data['properties']['values']:
         writer.writerow(value)
@@ -183,18 +191,40 @@ def download(request):
 
 
 def login_request(request):
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    user = authenticate(username=username, password=password)
+    context = {'form': LoginForm(), 'next': request.GET.get('next')}
+    context.update(csrf(request))
 
-    if user is not None:
-        if user.is_active:
-            login(request, user)
-            return redirect('index')
+    if request.method == "POST":
+
+        form = LoginForm(data=request.POST)
+
+        if form.is_valid:
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+
+                    if request.GET.get('next') is not None:
+                        return redirect(request.GET.get('next'))
+
+                    return redirect('index')
+                else:
+                    context.update({
+                        'user_desactivated': 'This user has been desactivated',
+                    })
+            else:
+                context.update({
+                    'user_does_not_exist': 'This username and password combination is not valid',
+
+                })
         else:
-            pass
-    else:
-        pass
+            context.update({
+                'invalid_form': 'You didn\'t fill the form correctly',
+            })
+
+    return render(request, 'gsn/login.html', context)
 
 
 def sign_up(request):
@@ -211,8 +241,8 @@ def sign_up(request):
 
         if form.is_valid():
             form.save()
-
             context.update({'user_created': True})
+            # login(request)
 
         else:
             context.update({'form_invalid': True})
@@ -231,10 +261,8 @@ def logout_view(request):
     return redirect('index')
 
 
+@user_passes_test(gsn_user_check)
 def profile(request):
-    if not request.user.is_authenticated():
-        return HttpResponseForbidden()
-
     context = {
         'username': request.user.username
     }
@@ -326,38 +354,3 @@ def create_token(code, user):
     user.save()
 
     return user.access_token
-
-#
-#
-# def oauth_after_log(request):
-#     code = request.GET['code']
-#
-#     if code is None:
-#         return HttpResponseForbidden()
-#
-#     response = redirect("index")
-#     response.set_cookie('access_token', code)
-#
-#     if User.objects.filter(code=code).exists():
-#         return response
-#
-#     payload = {
-#         'client_id': oauth_client_id,
-#         'client_secret': oauth_client_secret,
-#         'redirect_uri': '127.0.0.1:8000/gsn/',
-#         'code': code,
-#         'grant_type': 'authorization_code'
-#     }
-#
-#     data = json.loads(
-#         requests.get(oauth_server_address + oauth_token_suffix, params=payload).json())
-#
-#     now = datetime.now()
-#     expire_date = datetime.now() + timedelta(seconds=data["expires_in"])
-#
-#     new_user = User(code=code, access_token=data['access_token'], refresh_token=['refresh_token'],
-#                     token_created_date=now, token_expire_date=expire_date)
-#
-#     new_user.save()
-#
-#     return response

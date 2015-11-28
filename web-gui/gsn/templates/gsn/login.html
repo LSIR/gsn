@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% load staticfiles %}
+
+    <title>Profile: {{ username }}</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/bootstrap/dist/css/bootstrap.min.css' %}"
+          rel="stylesheet">
+
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/font-awesome/css/font-awesome.min.css' %}"
+          rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="row" style="margin-top: 25%">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="login-panel panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Login</h3>
+                </div>
+                <div class="panel-body">
+
+                    {% csrf_token %}
+
+
+
+                    {% if user_does_not_exist %}
+
+                        <h4 style="color: red">{{ user_does_not_exist }}</h4>
+
+                    {% endif %}
+
+                    {% if user_desactivated %}
+
+                        <h4>{{ user_desactivated }}</h4>
+
+                    {% endif %}
+
+
+                    {% if next %}
+                        <form role="form" action="/gsn/login/?next={{ next }}" method="post">
+                    {% else %}
+                        <form role="form" action="/gsn/login/" method="post">
+                    {% endif %}
+
+                    {% csrf_token %}
+
+                    <fieldset>
+                        {% for field in form %}
+
+                            <div class="form-group">
+
+                                {% if "password" in field.name %}
+                                    <input class="form-control" type="password" name="{{ field.name }}"
+                                           placeholder="{{ field.label }}" required>
+                                {% elif "email" in field.name %}
+                                    <input class="form-control" type="email" name="{{ field.name }}"
+                                           value="{{ field.value }}" required>
+                                {% elif "token" in field.name %}
+                                    <label>{{ field.label }}</label>
+                                    <input class="form-control" type="email" name="{{ field.name }}"
+                                           value="{{ field.value }}" disabled>
+                                {% else %}
+                                    <input class="form-control" type="text" name="{{ field.name }}"
+                                           placeholder="{{ field.label }}" required>
+                                {% endif %}
+                                <p class="help-block">{{ field.help_text }}</p>
+
+                            </div>
+                        {% endfor %}
+
+                        {% if next %}
+
+                            <input type="hidden" name="next" value="{{ next }}"/>
+
+                        {% endif %}
+
+
+                        <button type="submit" class="btn btn-lg btn-success btn-block">Log In</button>
+                        <a href="/gsn/" class="btn btn-lg btn-danger btn-block">Cancel and return to app</a>
+
+
+                    </fieldset>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
