@@ -334,6 +334,10 @@ def profile(request):
             user.save()
             prepopulate['email'] = user.email
             form = ProfileForm(prepopulate, instance=user.gsnuser)
+            context.update({'success_message': 'User profile successfuly updated'})
+
+        else:
+            context.update({'error_message': 'Form invalid, can\'t update user profile'})
 
 
     else:
