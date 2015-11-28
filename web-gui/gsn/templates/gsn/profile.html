@@ -34,21 +34,15 @@
                     {% csrf_token %}
 
 
-                    {% if profile_update %}
+                    {% if error_message %}
 
-                        <h4>Profile Updated</h4>
-
-                    {% endif %}
-
-                    {% if failed_to_ipdate %}
-
-                        <h4>not updated</h4>
+                        <h4 style="color : red;">{{ error_message }}</h4>
 
                     {% endif %}
 
-                    {% if not_post %}
+                    {% if success_message %}
 
-                        <h4>not_post</h4>
+                        <h4 style="color: green;">{{ success_message }}</h4>
 
                     {% endif %}
 

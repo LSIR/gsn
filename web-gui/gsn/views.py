@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from gsn.forms import GSNUserCreationForm, ProfileForm, LoginForm
 from gsn.models import GSNUser
 import csv
@@ -36,10 +36,6 @@ oauth_token_url = settings.GSN['OAUTH']['TOKEN_URL']
 
 # Cache setup
 requests_cache.install_cache("demo_cache")
-
-
-def gsn_user_check(user):
-    return user.is_authenticated() and GSNUser.objects.filter(id=user.id).exists()
 
 
 # Views
@@ -71,9 +67,9 @@ def index(request):
 
 # View that returns in JSON a list of all the sensors
 def sensors(request):
-    if request.user.is_authenticated() and GSNUser.objects.filter(id=request.user.id).exists():
+    if request.user.is_authenticated():
         return JsonResponse(json.loads(requests.get(oauth_sensors_url, headers={
-            'Authorization': 'Bearer ' + get_or_refresh_token(GSNUser.objects.get(id=request.user.id))
+            'Authorization': 'Bearer ' + get_or_refresh_token(request.user.gsnuser)
         }).text))
     else:
         return JsonResponse(json.loads(requests.get(sensors_url).text))
@@ -86,10 +82,10 @@ def sensor_detail(request, sensor_name, from_date, to_date):
     # _from_ = str(datetime.now().replace(microsecond=0).isoformat(sep='T'))
     # _to_ = _from_
 
-    if request.user.is_authenticated() and GSNUser.objects.filter(id=request.user.id).exists():
+    if request.user.is_authenticated():
 
         headers = {
-            'Authorization': 'Bearer ' + get_or_refresh_token(GSNUser.objects.get(id=request.user.id))
+            'Authorization': 'Bearer ' + get_or_refresh_token(request.user.gsnuser)
         }
 
         payload = {
@@ -140,7 +136,7 @@ def sensor_detail(request, sensor_name, from_date, to_date):
 
 # View that downloads the data of a sensor for the specified time frame
 def download_csv(request, sensor_name, from_date, to_date):
-    if (oauth_enabled) and request.user.is_authenticated() and GSNUser.objects.filter(id=request.user.id).exists():
+    if (oauth_enabled) and request.user.is_authenticated():
 
         # TODO: complete for OAUTH
         pass
@@ -297,7 +293,7 @@ def logout_view(request):
     return redirect('index')
 
 
-@user_passes_test(gsn_user_check)
+@login_required
 def profile(request):
     """
     Profile of the user; contains a ProfileForm that lets the user edit their email adress, force refresh the oauth2
@@ -315,28 +311,33 @@ def profile(request):
 
     context.update(csrf(request))
 
-    if not GSNUser.objects.filter(id=request.user.id):
-        user = request.user
-    else:
-        user = GSNUser.objects.get(id=request.user.id)
+    user = request.user
 
-        code = request.GET.get('code')
-        if code is not None:
-            create_token(code, user)
-            return redirect('profile')
+    prepopulate = {
+        'email': user.email,
+        'access_token': user.gsnuser.access_token,
+        'refresh_token': user.gsnuser.refresh_token,
+        'token_expire_date': user.gsnuser.token_expire_date
+    }
+
+    code = request.GET.get('code')
+    if code is not None:
+        create_token(code, user.gsnuser)
+        return redirect('profile')
 
     if request.method == "POST":
 
-        form = ProfileForm(data=request.POST, instance=user)
+        form = ProfileForm(request.POST, instance=user.gsnuser)
 
         if form.is_valid():
             user.email = form.cleaned_data['email']
             user.save()
-            form = ProfileForm(instance=user)
+            prepopulate['email'] = user.email
+            form = ProfileForm(prepopulate, instance=user.gsnuser)
 
 
     else:
-        form = ProfileForm(instance=user)
+        form = ProfileForm(prepopulate, instance=user.gsnuser)
 
     context.update({'form': form})
 
