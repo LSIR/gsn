@@ -79,9 +79,6 @@ def sensors(request):
 
 
 def sensor_detail(request, sensor_name, from_date, to_date):
-    # _from_ = str(datetime.now().replace(microsecond=0).isoformat(sep='T'))
-    # _to_ = _from_
-
     if request.user.is_authenticated():
 
         headers = {
@@ -380,7 +377,7 @@ def refresh_token(user):
 
     user.access_token = data['access_token']
     user.refresh_token = data['refresh_token']
-    user.token_created_date = datetime.now()
+    user.token_created_date = timezone.now()
     user.token_expire_date = user.token_created_date + timedelta(seconds=data['expires_in'])
 
     user.save()
@@ -403,7 +400,7 @@ def create_token(code, user):
 
     user.access_token = data['access_token']
     user.refresh_token = data['refresh_token']
-    user.token_created_date = datetime.now()
+    user.token_created_date = timezone.now()
     user.token_expire_date = user.token_created_date + timedelta(seconds=data['expires_in'])
     user.save()
 
