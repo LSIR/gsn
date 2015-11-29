@@ -28,7 +28,9 @@
                 <div class="panel-heading">Properties</div>
                 <div class="panel-body">
                     <div ng-repeat="(key, value) in details.properties"><p
-                            ng-if="key != 'fields' && key != 'geographical' && key != 'values'"><b>{{ key }}:</b>
+                            ng-if="key != 'fields' && key != 'geographical' && key != 'values' && key != 'latitude'
+                            && key != 'longitude'"><b
+                    >{{ key }}:</b>
                         {{ value }}</p>
                     </div>
                 </div>
@@ -45,10 +47,14 @@
                     <div ng-repeat="(key, value) in details.geometry">
                         <p ng-if="key != 'coordinates'"><b>{{ key }}:</b> {{ value }}</p>
                     </div>
-                    <ul ng-if="details.geometry.coordinates">
-                        <li><b>Latitude:</b> {{ sensor.geometry.coordinates[0]}}</li>
-                        <li><b>Longitude:</b> {{ sensor.geometry.coordinates[1]}}</li>
-                        <li ng-if="details.geometry.coordinates[2]"><b>Altitude:</b>
+                    <ul>
+                        <li ng-if="details.geometry.coordinates[0]"><b>Latitude:</b>
+                            {{ details.geometry.coordinates[0]}}
+                        </li>
+                        <li ng-if="details.geometry.coordinates[1]"><b>Longitude:</b>
+                            {{ details.geometry.coordinates[1]}}
+                        </li>
+                        <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
                             {{ details.geometry.coordinates[2]}}
                         </li>
                     </ul>

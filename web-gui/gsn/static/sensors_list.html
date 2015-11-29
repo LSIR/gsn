@@ -26,8 +26,12 @@
 
                     <p ng-if="sensor.properties.geographical"><b> Location: </b>{{ sensor.properties.geographical }}</p>
                     <ul ng-if="sensor.geometry.coordinates">
-                        <li><b>Latitude:</b> {{ sensor.geometry.coordinates[0]}}</li>
-                        <li><b>Longitude:</b> {{ sensor.geometry.coordinates[1]}}</li>
+                        <li ng-if="sensor.geometry.coordinates[0]"><b>Latitude:</b>
+                            {{ sensor.geometry.coordinates[0]}}
+                        </li>
+                        <li ng-if="sensor.geometry.coordinates[1]"><b>Longitude:</b>
+                            {{ sensor.geometry.coordinates[1]}}
+                        </li>
                         <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
                             {{ sensor.geometry.coordinates[2]}}
                         </li>
@@ -52,8 +56,12 @@
 
                     <p ng-if="sensor.properties.geographical"><b> Location: </b>{{ sensor.properties.geographical }}</p>
                     <ul ng-if="sensor.geometry.coordinates">
-                        <li><b>Latitude:</b> {{ sensor.geometry.coordinates[0]}}</li>
-                        <li><b>Longitude:</b> {{ sensor.geometry.coordinates[1]}}</li>
+                        <li ng-if="sensor.geometry.coordinates[0]"><b>Latitude:</b>
+                            {{ sensor.geometry.coordinates[0]}}
+                        </li>
+                        <li ng-if="sensor.geometry.coordinates[1]"><b>Longitude:</b>
+                            {{ sensor.geometry.coordinates[1]}}
+                        </li>
                         <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
                             {{ sensor.geometry.coordinates[2]}}
                         </li>
