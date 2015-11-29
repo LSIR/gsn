@@ -33,11 +33,7 @@
 
                     {% csrf_token %}
 
-                    {% if error_message %}
-
-                        <h4 style="color: red">{{ error_message }}</h4>
-
-                    {% endif %}
+                    <h4><strong style="color: red;">{{ form.non_field_errors }}</strong></h4>
 
 
                     <form role="form" action="/gsn/signup/" method="post">
@@ -46,22 +42,10 @@
                         <fieldset>
 
 
-                            {% if form_invalid %}
-                                <p style="color: red">Invalid form. Please make sure fields are correctly filled,
-                                    although it may be possible that the username is already taken</p>
-                            {% endif %}
-
-                            {% if user_created %}
-                                <h4 style="color: green">User successfuly created ! Click <a href="/gsn/">here</a> to go
-                                    back to the main
-                                    web-app.</h4>
-                            {% endif %}
-
-
-
                             {% for field in form %}
 
                                 <div class="form-group">
+                                    <p><strong style="color: red">{{ field.errors }}</strong></p>
 
                                     {% if "password" in field.name %}
                                         <input class="form-control" type="password" name="{{ field.name }}"

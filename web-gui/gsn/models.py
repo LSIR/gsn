@@ -26,5 +26,4 @@ def create_gsn_user(sender, instance, created, **kwargs):
         GSNUser.objects.create(user=instance)
 
 
-signals.post_save.connect(create_gsn_user, sender=User, weak=False,
-                          dispatch_uid='models.create_model_b')
+signals.post_save.connect(create_gsn_user, sender=User, weak=False, dispatch_uid='models.create_model_b')

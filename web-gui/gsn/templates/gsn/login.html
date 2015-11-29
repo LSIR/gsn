@@ -34,18 +34,9 @@
                     {% csrf_token %}
 
 
+                    <h4><strong style="color: red;">{{ form.non_field_errors }}</strong></h4>
 
-                    {% if error_message %}
 
-                        <h4 style="color: red">{{ error_message }}</h4>
-
-                    {% endif %}
-
-                    {% if green_message %}
-
-                        <h4 style="color: green">{{ green_message }}</h4>
-
-                    {% endif %}
 
 
 
@@ -57,10 +48,12 @@
 
                     {% csrf_token %}
 
+
                     <fieldset>
                         {% for field in form %}
 
                             <div class="form-group">
+                                <p><strong style="color: red">{{ field.errors }}</strong></p>
 
                                 {% if "password" in field.name %}
                                     <input class="form-control" type="password" name="{{ field.name }}"

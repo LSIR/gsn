@@ -33,12 +33,7 @@
 
                     {% csrf_token %}
 
-
-                    {% if error_message %}
-
-                        <h4 style="color : red;">{{ error_message }}</h4>
-
-                    {% endif %}
+                    <h4><strong style="color: red;">{{ errors }}</strong></h4>
 
                     {% if success_message %}
 
@@ -68,7 +63,7 @@
                                                value="{{ field.value }}" disabled>
                                     {% else %}
                                         <input class="form-control" type="text" name="{{ field.name }}"
-                                               placeholder="{{ field.label }}" required>
+                                               value="{{ field.value }}" required disabled>
                                     {% endif %}
                                     <p class="help-block">{{ field.help_text }}</p>
 
