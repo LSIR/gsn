@@ -11,14 +11,12 @@
         });
     </script>
 
-
     <div ng-show="loading">loading...</div>
 
     <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have
-        access to this it.</p>
+                                                                     access to this it.</p>
 
     <div ng-if="loading" us-spinner style="position: relative"></div>
-
 
     <div ng-if="details">
         <!--<div class="row" >-->
@@ -27,11 +25,14 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Properties</div>
                 <div class="panel-body">
-                    <div ng-repeat="(key, value) in details.properties"><p
-                            ng-if="key != 'fields' && key != 'geographical' && key != 'values' && key != 'latitude'
-                            && key != 'longitude'"><b
-                    >{{ key }}:</b>
-                        {{ value }}</p>
+                    <div ng-repeat="(key, value) in details.properties">
+                        <p
+                                ng-if="key != 'fields' && key != 'geographical' && key != 'values' && key != 'latitude'
+                            && key != 'longitude'">
+                            <b
+                            >{{ key }}:
+                            </b>
+                            {{ value }}</p>
                     </div>
                 </div>
             </div>
@@ -41,20 +42,26 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Geographical data</div>
                 <div class="panel-body">
-                    <p ng-if="details.properties.geographical"><b>Location:</b>
+                    <p ng-if="details.properties.geographical">
+                        <b>Location:</b>
                         {{ details.properties.geographical }}</p>
 
                     <div ng-repeat="(key, value) in details.geometry">
-                        <p ng-if="key != 'coordinates'"><b>{{ key }}:</b> {{ value }}</p>
+                        <p ng-if="key != 'coordinates'">
+                            <b>{{ key }}:</b>
+                            {{ value }}</p>
                     </div>
                     <ul>
-                        <li ng-if="details.geometry.coordinates[0]"><b>Latitude:</b>
+                        <li ng-if="details.geometry.coordinates[0]">
+                            <b>Latitude:</b>
                             {{ details.geometry.coordinates[0]}}
                         </li>
-                        <li ng-if="details.geometry.coordinates[1]"><b>Longitude:</b>
+                        <li ng-if="details.geometry.coordinates[1]">
+                            <b>Longitude:</b>
                             {{ details.geometry.coordinates[1]}}
                         </li>
-                        <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
+                        <li ng-if="sensor.geometry.coordinates[2]">
+                            <b>Altitude:</b>
                             {{ details.geometry.coordinates[2]}}
                         </li>
                     </ul>
@@ -62,28 +69,37 @@
             </div>
         </div>
 
-
         <!--</div>-->
 
+        <p class="col-lg-12 lead" ng-if="details.user.logged && !details.user.has_access && !loading ">
+            You do not have access to this sensor's data . If you think you should have access to it, please contact
+            your organization or make sure you have linked this account to your server's account.
+        </p>
 
-        <div class="col-lg-12" ng-if="!loading">
+        <p class="col-lg-12 lead" ng-if="!details.user.logged && !loading ">
+            As a non-registered user, you do not have access to this sensor's data, only its metadate. Please log in
+            or create an account.
+        </p>
+
+        <div class="col-lg-12" ng-if="!loading && details.user.has_access">
             <div class="panel panel-default">
                 <div class="panel-heading">Data</div>
                 <div class="panel-body">
 
                     <form novalidate class="form" ng-submit="submit()">
 
-
                         <div class="row">
 
                             <div class="col-lg-6">
-                                <b>From: </b><br>
+                                <b>From:</b>
+                                <br>
 
                                 <div class="dropdown">
                                     <a class="dropdown-toggle" id="fromDate" role="button" data-toggle="dropdown"
                                        data-target="#" href="">
-                                        <div class="input-group"><input type="text" class="form-control"
-                                                                        data-ng-model="date.from.date"><span
+                                        <div class="input-group">
+                                            <input type="text" class="form-control"
+                                                   data-ng-model="date.from.date"><span
                                                 class="input-group-addon"><i
                                                 class="glyphicon glyphicon-calendar"></i></span>
                                         </div>
@@ -98,13 +114,15 @@
                             </div>
 
                             <div class="col-lg-6">
-                                <label>To: </label><br>
+                                <label>To:</label>
+                                <br>
 
                                 <div class="dropdown">
                                     <a class="dropdown-toggle" id="toDate" role="button" data-toggle="dropdown"
                                        data-target="#" href="">
-                                        <div class="input-group"><input type="text" class="form-control"
-                                                                        data-ng-model="date.to.date"><span
+                                        <div class="input-group">
+                                            <input type="text" class="form-control"
+                                                   data-ng-model="date.to.date"><span
                                                 class="input-group-addon"><i
                                                 class="glyphicon glyphicon-calendar"></i></span>
                                         </div>
@@ -123,7 +141,6 @@
 
                     </form>
 
-
                     <div class="col-lg-12">
 
                         <div class="row">
@@ -131,13 +148,16 @@
                             <p style="float: left; display:inline-block" ng-if="details.properties.values">
                                 <br>
                                 {{ details.properties.values.length }} results found
-                                for
-                                the specified timeframe. </p>
+                                                                       for
+                                                                       the specified timeframe.
+                            </p>
 
-                            <p style="float:left; display:inline-block" ng-if="!details.properties.values"><br>
+                            <p style="float:left; display:inline-block" ng-if="!details.properties.values">
+                                <br>
                                 <b>No data found for the
-                                    specified timeframe. </b></p>
-
+                                   specified timeframe.
+                                </b>
+                            </p>
 
                             <h4 style="float: right; display:inline-block">Page size:
                                 <b class="form-inline">
@@ -154,7 +174,8 @@
 
                         <div class="form-group">
                             <label class="checkbox-inline" ng-repeat="field in details.properties.fields">
-                                <input type="checkbox" ng-model="columns[$index]">{{ field.name }}
+                                <input type="checkbox" ng-model="columns[$index]">
+                                {{ field.name }}
                             </label>
                         </div>
 
@@ -172,17 +193,16 @@
                             Download
                         </button>
 
-
                         <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
                                ng-if="details.properties.fields">
-
 
                             <thead>
                             <tr>
                                 <th ng-repeat="field in details.properties.fields" ng-if="columns[$index]">
                                     {{ field.name }}
                                     ({{ field.type }}<span
-                                        ng-show="field.unit">, {{ field.unit }}</span>)
+                                        ng-show="field.unit">, {{ field.unit }}</span>
+                                    )
                                 </th>
                             </tr>
                             </thead>
@@ -195,13 +215,11 @@
                             </tbody>
                         </table>
 
-
                         <dir-pagination-controls
                                 max-size="10"
                                 direction-links="true"
                                 boundary-links="true">
                         </dir-pagination-controls>
-
 
                         <br>
 
@@ -222,7 +240,6 @@
 
                     </div>
 
-
                 </div>
 
             </div>
@@ -230,6 +247,5 @@
         </div>
 
     </div>
-
 
 </div>

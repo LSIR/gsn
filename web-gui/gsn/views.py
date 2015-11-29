@@ -87,12 +87,19 @@ def sensor_detail(request, sensor_name, from_date, to_date):
     """
     Returns the details of a sensor and its values for a specified time frame in iso8601. Adds a time value to the
     data.
+
+    If the user is logged out, returns the details stripped from the value field.
     """
 
     if request.user.is_authenticated():
 
         headers = {
             'Authorization': 'Bearer ' + get_or_refresh_token(request.user.gsnuser)
+        }
+
+        user_data = {
+            'logged'    : True,
+            'has_access': True
         }
 
         payload = {
@@ -102,14 +109,24 @@ def sensor_detail(request, sensor_name, from_date, to_date):
         r = requests.get(oauth_sensors_url + '/' + sensor_name + '/data', headers=headers, params=payload)
 
         if r.status_code is not 200:
-            return JsonResponse({
-                'error': 'The specified sensor doesn\'t exist'
+
+            r = requests.get(oauth_sensors_url + '/' + sensor_name, headers=headers)
+            user_data.update({
+                'has_access': False
             })
-            pass
+
+            if r.status_code is not 200:
+                return JsonResponse({
+                    'error': 'The specified sensor doesn\'t exist'
+                })
 
         data = json.loads(r.text)
 
         data = add_time(data)
+
+        data.update({
+            'user': user_data
+        })
 
         return JsonResponse(data)
 
@@ -121,9 +138,29 @@ def sensor_detail(request, sensor_name, from_date, to_date):
             'password': 'john'
         }
 
-        data = json.loads(requests.get(sensors_url + sensor_name + '/', params=payload).text)
+        user_data = {
+            'logged'    : False,
+            'has_access': False
+        }
 
-        return JsonResponse(data['features'][0])
+        r = requests.get(oauth_sensors_url + '/' + sensor_name)
+
+        if r.status_code is not 200:
+            return JsonResponse({
+                'error': 'The specified sensor doesn\'t exist'
+            })
+
+        data = json.loads(r.text)
+
+        data.update({
+            'user': user_data
+        })
+
+        data['properties'].update({
+            'values': []
+        })
+
+        return JsonResponse(data)
 
 
 def download_csv(request, sensor_name, from_date, to_date):
@@ -398,7 +435,10 @@ def oauth_get_code(request):
 
 
 def get_or_refresh_token(user):
-    if timezone.now() > user.token_expire_date:
+    if user.refresh_token is None:
+        return ''
+
+    if timezone.now() > user.token_expire_date or user.token_expire_date is None:
         return refresh_token(user)
     else:
         return user.access_token
