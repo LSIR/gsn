@@ -52,6 +52,7 @@ def index(request):
             'logged_in': 'true',
             'user'     : request.user.username
         }
+
     else:
         context = {
             'log_page'  : 'login',
@@ -81,7 +82,6 @@ def sensors(request):
 
 
 # View that gets the data of a sensor for a specified timeframe
-
 
 def sensor_detail(request, sensor_name, from_date, to_date):
     """
@@ -163,6 +163,7 @@ def sensor_detail(request, sensor_name, from_date, to_date):
         return JsonResponse(data)
 
 
+@login_required
 def download_csv(request, sensor_name, from_date, to_date):
     """
     Create a CSV out of the sensor data then sends it to the client to be downloaded
@@ -212,6 +213,7 @@ def download_csv(request, sensor_name, from_date, to_date):
 
 
 @csrf_exempt
+@login_required
 def download(request):
     """
     Create a CSV out of POST data sent by the client then send it for download

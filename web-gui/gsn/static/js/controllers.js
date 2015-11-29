@@ -173,10 +173,12 @@ gsnControllers.controller('DownloadCtrl', ['$scope', '$window', '$http', 'sensor
 
         $scope.sensorsList = [];
 
-        data.features.forEach(function (sensor) {
-            $scope.sensorsList.push(sensor['properties']['vs_name']
-            )
-        })
+        if (data.user.logged) {
+            data.features.forEach(function (sensor) {
+                $scope.sensorsList.push(sensor['properties']['vs_name']
+                )
+            })
+        }
 
     });
 
@@ -407,7 +409,6 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
                 $scope.details = data.properties ? data : undefined;
 
                 $scope.loading = false;
-
                 console.log('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/');    //TODO: REMOVE
 
 
