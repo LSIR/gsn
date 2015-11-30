@@ -373,8 +373,8 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function
 
 }]);
 
-gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', '$window', 'downloadService', 'localStorageService',
-    function ($scope, $http, $routeParams, $window, downloadService, localStorageService) {
+gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams', '$window', 'downloadService', 'localStorageService', 'favoritesService',
+    function ($scope, $http, $routeParams, $window, downloadService, localStorageService, favoritesService) {
 
 
         $scope.loading = true;
@@ -544,6 +544,22 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
 
         $scope.load();
+
+        $scope.addFavorite = function (sensor_name) {
+            if (favoritesService.add(sensor_name)) {
+                $scope.favorite = True
+            } else {
+                console.log('Failed to add to favorites !')
+            }
+        };
+
+        $scope.remove = function (sensor_name) {
+            if (favoritesService.remove(sensor_name)) {
+                $scope.favorite = False
+            } else {
+                console.log('Failed to remove from favorites !')
+            }
+        }
 
 
     }]);
