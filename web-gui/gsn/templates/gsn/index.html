@@ -10,7 +10,6 @@
 
     {% load staticfiles %}
 
-
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/bootstrap/dist/css/bootstrap.min.css' %}"
           rel="stylesheet">
@@ -40,7 +39,6 @@
     <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
     <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
-
     <!-- AngularJS -->
     <script src="{% static 'js/angular.js' %}"></script>
     <script src="{% static 'js/django-angular.js' %}"></script>
@@ -48,13 +46,14 @@
     <script src="{% static 'js/controllers.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
 
-
     <!-- Moments -->
     <script src="{% static 'js/moment.js' %}"></script>
 
     <!-- DateTimePicker  -->
     <script src="{% static 'js/datetimepicker.js' %}"></script>
 
+    <!-- ui-bootstrap ui-bootstrap-custom-tpls-0.14.3.js -->
+    <script src="{% static 'js/ui-bootstrap-custom-tpls-0.14.3.js' %}"></script>
 
     <!-- DirPaginate-->
     <script src="{% static 'js/dirPagination.js' %}"></script>
@@ -82,13 +81,11 @@
     <script src="http://fgnass.github.io/spin.js/spin.js"></script>
     <script src="https://rawgit.com/urish/angular-spinner/master/angular-spinner.js"></script>
 
-
     <!-- Flot -->
     <!--<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/flot/excanvas.js' %}"></script>-->
     <!--<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/flot/jquery.flot.js' %}"></script>-->
     <!--<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/flot/jquery.flot.resize.js' %}"></script>-->
     <!--<script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/flot/jquery.flot.time.js' %}"></script>-->
-
 
     <!-- Bootstrap Core JavaScript -->
     <script src="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
@@ -110,7 +107,6 @@
     <!-- Custom Theme JavaScript -->
     <script src="{% static 'startbootstrap-sb-admin-2-1.0.7/dist/js/sb-admin-2.js' %}"></script>
 
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -118,11 +114,9 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-
 </head>
 
 <body>
-
 
 <div ng-controller="SensorListCtrl">
 
@@ -144,7 +138,6 @@
 
                 {% if logged_out %}
                     <li class="dropdown" style="display: table-cell;vertical-align: middle;">
-
 
                         <form role="form" action="/gsn/login/" method="post" class="form">
                             {% csrf_token %}
@@ -177,7 +170,6 @@
                                 </li>
                             </ul>
 
-
                         </form>
 
                     </li>
@@ -197,13 +189,22 @@
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="">
                             <strong>{{ user }}</strong>
-                            <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                            <i class="fa fa-user fa-fw"></i>
+                            <i class="fa fa-caret-down"></i>
 
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="/gsn/profile/"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                            <li>
+                                <a href="/gsn/profile/">
+                                    <i class="fa fa-user fa-fw"></i>
+                                    User Profile
+                                </a>
                             </li>
-                            <li><a href="/gsn/logout/"><i class="fa fa-sign-out fa-fw"></i> Log Out</a>
+                            <li>
+                                <a href="/gsn/logout/">
+                                    <i class="fa fa-sign-out fa-fw"></i>
+                                    Log Out
+                                </a>
                             </li>
                         </ul>
                         <!-- /.dropdown-user -->
@@ -229,17 +230,29 @@
                             <!-- /input-group -->
                         </li>
                         <li>
-                            <a href="#/sensors" target="_self"><i class="fa  fa-list-ul fa-fw"></i> Sensors</a>
+                            <a href="#/sensors" target="_self">
+                                <i class="fa  fa-list-ul fa-fw"></i>
+                                Sensors
+                            </a>
                         </li>
                         <li>
-                            <a href="#/compare" target="_self"><i class="fa  fa-list-ul fa-fw"></i> Compare</a>
+                            <a href="#/compare" target="_self">
+                                <i class="fa  fa-list-ul fa-fw"></i>
+                                Compare
+                            </a>
                         </li>
 
                         <li>
-                            <a href="#/map"><i class="fa fa-fw fa-globe"></i> Around Me</a>
+                            <a href="#/map">
+                                <i class="fa fa-fw fa-globe"></i>
+                                Around Me
+                            </a>
                         </li>
                         <li>
-                            <a href="#/download"><i class="fa fa-save fa-fw"></i> Data Export</a>
+                            <a href="#/download">
+                                <i class="fa fa-save fa-fw"></i>
+                                Data Export
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -253,18 +266,14 @@
                 <div ng-view></div>
             </div>
 
-
         </div>
-
 
         <!-- /#page-wrapper -->
 
 </div>
 <!-- /#wrapper -->
 
-
 </body>
-
 
 <footer style="margin: auto; margin-bottom: 2em; margin-top: 2em">
     <div style="text-align: center">

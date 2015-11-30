@@ -18,7 +18,9 @@ urlpatterns = [
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^oauth_code/$', views.oauth_get_code, name='oauth_logging_redirect'),
+    url(r'^favorite/$', views.favorite_manage, name='favorite'),
+    url(r'^dashboard/$', views.dashboard, name='dashboard'),
+
     # url(r'^logged/$', views.oauth_after_log, name='oauth_after_log'),
     url(r'^accounts/', include('allaccess.urls')),
-
 ]

@@ -16,7 +16,7 @@ var gsnControllers = angular.module('gsnControllers',
         'ngAutocomplete',
         'highcharts-ng',
         'LocalStorageModule',
-        'ui.bootstrap.datetimepicker'
+        'ui.bootstrap.tabs'
     ]
 );
 
@@ -572,3 +572,21 @@ gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceSer
 
 }])
 ;
+
+gsnControllers.controller('DashboardCtrl', ['$scope', '$http', function ($scope, $http) {
+
+    $scope.load = function () {
+        $http.get('dashboard/').success(function (data, status, headers, config) {
+            $scope.sensors = data
+        }).error(function (data, status, headers, config) {
+            if (status === 404) {
+                $scope.error_message = "You do not have any favorite sensors set !"
+            } else {
+                $scope.error_message = "Something went terribly wrong."
+            }
+        });
+    }
+
+}]);
+
+

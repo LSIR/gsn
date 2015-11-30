@@ -37,6 +37,11 @@ gsnApp.config(['$routeProvider',
             templateUrl: 'static/download.html',
             controller: 'DownloadCtrl'
         }).
+        when('/dashboard', {
+            templateUrl: 'static/dasjboard.html',
+            controller: 'DashboardCtrl'
+        }).
+
         otherwise({
             redirectTo: '/sensors'
         });

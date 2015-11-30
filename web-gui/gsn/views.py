@@ -1,20 +1,18 @@
 import csv
 import json
 from datetime import datetime, timedelta
-
 import requests
 import requests_cache
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.template import loader
 from django.template.context_processors import csrf
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-
 from gsn.forms import GSNUserCreationForm, ProfileForm, LoginForm
 
 # Server adress and services
@@ -68,14 +66,56 @@ def sensors(request):
     Return the list of sensors as gotten from the GSN server
     """
     if request.user.is_authenticated():
-        return JsonResponse(json.loads(requests.get(oauth_sensors_url, headers={
-            'Authorization': 'Bearer ' + get_or_refresh_token(request.user.gsnuser)
-        }).text))
+        return JsonResponse(
+            json.loads(requests.get(oauth_sensors_url, headers=create_headers(request.user.gsnuser)).text))
     else:
         return JsonResponse(json.loads(requests.get(oauth_sensors_url).text))
 
 
-# View that gets the data of a sensor for a specified timeframe
+@login_required
+def dashboard(request):
+    if request.user.gsnuser.favorites is None:
+        return HttpResponseNotFound()
+
+    data = {}
+
+    payload = {
+        'latestValues': True
+    }
+
+    for sensor_name in request.user.gsnuser.favorites:
+        r = requests.get(oauth_sensors_url + '/' + sensor_name, params=payload,
+                         headers=create_headers(request.user.gsnuser.favorites))
+        sensor_data = json.loads(r.text)
+
+        data[sensor_name] = {
+            'values': sensor_data['properties']['values'],
+            'geographical': sensor_data['properties']['geographical'],
+            'fields': sensor_data['properties']['field']
+        }
+
+    return JsonResponse(data)
+
+    pass
+
+
+@login_required
+def favorite_manage(request):
+    if request.method == "GET":
+        if 'add' in request.POST:
+            request.user.gsnuser.favorites.extend(request.GET.get('add'))
+            request.user.gsnuser.save()
+            return HttpResponse('')
+        elif 'remove' in request.POST:
+            try:
+                request.user.gsnuser.favorites.remove(request.GET.get('remove'))
+                request.user.gsnuser.save()
+            except ValueError:
+                pass
+            return HttpResponse('')
+
+    return HttpResponseNotFound()
+
 
 def sensor_detail(request, sensor_name, from_date, to_date):
     """
@@ -87,9 +127,7 @@ def sensor_detail(request, sensor_name, from_date, to_date):
 
     if request.user.is_authenticated():
 
-        headers = {
-            'Authorization': 'Bearer ' + get_or_refresh_token(request.user.gsnuser)
-        }
+        headers = create_headers(request.user.gsnuser)
 
         user_data = {
             'logged': True,
@@ -133,7 +171,11 @@ def sensor_detail(request, sensor_name, from_date, to_date):
             'has_access': False
         }
 
-        r = requests.get(oauth_sensors_url + '/' + sensor_name)
+        payload = {
+            'latestValues': False
+        }
+
+        r = requests.get(oauth_sensors_url + '/' + sensor_name, params=payload)
 
         if r.status_code is not 200:
             return JsonResponse({
@@ -165,9 +207,7 @@ def download_csv(request, sensor_name, from_date, to_date):
         'size': max_query_size
     }
 
-    headers = {
-        'Authorization': 'Bearer ' + get_or_refresh_token(request.user.gsnuser)
-    }
+    headers = create_headers(request.user.gsnuser)
 
     data = json.loads(requests.get(oauth_sensors_url + '/' + sensor_name + '/data', headers=headers, params=payload))
 
@@ -412,10 +452,15 @@ def oauth_get_code(request):
         oauth_client_secret)
 
 
+def create_headers(user):
+    return {
+        'Authorization': 'Bearer ' + get_or_refresh_token(user)
+    }
+
+
 def get_or_refresh_token(user):
     if user.refresh_token is None:
         return ''
-
     if timezone.now() > user.token_expire_date or user.token_expire_date is None:
         return refresh_token(user)
     else:

@@ -1,0 +1,52 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Dashboard</h1>
+
+        <h4>Dashboard</h4>
+        <table class="table table-striped">
+            <tbody>
+            <tr ng-repeat="key in sensors">
+                <td>
+                    <a href="#/sensors/{{ key }}">{{ key }}</a>
+                </td>
+                <td>
+                    <uib-tabset>
+                        <uib-tab heading="Latest values">
+                            <table id="sensor_data_table_id" class="table table-striped"
+                                   ng-if="details.properties.fields">
+                                <thead>
+                                <tr>
+                                    <th ng-repeat="field in key.fields">
+                                        {{ field.name }}
+                                        ({{ field.type }}<span
+                                            ng-show="field.unit">, {{ field.unit }}</span>
+                                        )
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody ng-if="details.properties.values">
+                                <tr>
+                                    <td ng-repeat="value in key.values track by $index">
+                                        {{ value }}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </uib-tab>
+                        <uib-tab heading="More data"></uib-tab>
+                    </uib-tabset>
+                </td>
+                <td>
+                    <a href="/gsn/favorites/?remove={{ key }}" class="btn btn-danger btn-sm" disabled>Remove from
+                                                                                                      favorites
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p class="col-lg-12 lead" ng-if="error_message">{{ error_message }}</p>
+
+    </div>
+</div>
