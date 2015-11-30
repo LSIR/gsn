@@ -73,50 +73,66 @@ def sensors(request):
 
 
 @login_required
-def dashboard(request):
-    if request.user.gsnuser.favorites is None:
+def dashboard(request, sensor_name):
+    if len(request.user.gsnuser.favorites) < 1:
         return HttpResponseNotFound()
 
     data = {}
 
     payload = {
-        'latestValues': True
-    }
+        'latestValues': True, }
 
-    for sensor_name in request.user.gsnuser.favorites:
+    if sensor_name in request.user.gsnuser.favorites:
         r = requests.get(oauth_sensors_url + '/' + sensor_name, params=payload,
-                         headers=create_headers(request.user.gsnuser.favorites))
+                         headers=create_headers(request.user.gsnuser))
         sensor_data = json.loads(r.text)
 
-        data[sensor_name] = {
-            'values': sensor_data['properties']['values'],
+        data = {
+            'values': sensor_data['properties']['values'][0],
             'geographical': sensor_data['properties']['geographical'],
-            'fields': sensor_data['properties']['field']
+            'fields': sensor_data['properties']['fields']
         }
 
-    return JsonResponse(data)
+        data['values'][0] = datetime.fromtimestamp(data['values'][0] / 1000).isoformat(sep='T')
 
-    pass
+        return JsonResponse(data)
+
+    return HttpResponseNotFound()
 
 
 @login_required
-def favorite_manage(request):
+def favorites_list(request):
+    list = []
+
+    for key, value in request.user.gsnuser.favorites.items():
+        list.append(key)
+
+    if len(list) > 0:
+        return JsonResponse({
+            'favorites_list': list
+        })
+    else:
+        return HttpResponseNotFound()
+
+
+@login_required
+def favorites_manage(request):
     add = request.GET.get('add')
 
     if add is not None:
-        request.user.gsnuser.favorites.extend(add)
+        request.user.gsnuser.favorites[add] = ''
         request.user.gsnuser.save()
-        return HttpResponse('')
+        return HttpResponse('added')
 
     remove = request.GET.get('remove')
 
     if remove is not None:
         try:
-            request.user.gsnuser.favorites.remove(remove)
+            request.user.gsnuser.favorites.pop(remove)
             request.user.gsnuser.save()
-        except ValueError:
+        except KeyError:
             pass
-        return HttpResponse('')
+        return HttpResponse('removed')
 
     return HttpResponseNotFound()
 
@@ -141,8 +157,7 @@ def sensor_detail(request, sensor_name, from_date, to_date):
 
         payload = {
             'from': from_date,
-            'to': to_date,
-            'size': max_query_size
+            'to': to_date
         }
 
         r = requests.get(oauth_sensors_url + '/' + sensor_name + '/data', headers=headers, params=payload)

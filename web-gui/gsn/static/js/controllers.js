@@ -16,7 +16,7 @@ var gsnControllers = angular.module('gsnControllers',
         'ngAutocomplete',
         'highcharts-ng',
         'LocalStorageModule',
-        'ui.bootstrap.tabs'
+        'ui.bootstrap'
     ]
 );
 
@@ -25,29 +25,21 @@ gsnControllers.config(function (localStorageServiceProvider) {
         .setPrefix('gsn_web_gui');
 });
 
-gsnControllers.service('favoritesService', [$http, function ($http) {
+gsnControllers.service('favoritesService', function ($http) {
     this.remove = function (sensor_name) {
-        $http.get('favorite/', {
+        return $http.get('favorites/', {
             params: {'remove': sensor_name}
-        }).success(function (data, status, headers, config) {
-            return true
-        }).error(function (data, status, headers, config) {
-            return false
-        });
+        })
     };
 
     this.add = function (sensor_name) {
-        $http.get('favorite/', {
+        return $http.get('favorites/', {
             params: {'add': sensor_name}
-        }).success(function (data, status, headers, config) {
-            return true
-        }).error(function (data, status, headers, config) {
-            return false
-        });
+        })
 
 
     }
-}]);
+});
 
 gsnControllers.factory('sensorService', function ($http) {
     return {
@@ -617,33 +609,56 @@ gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceSer
 gsnControllers.controller('DashboardCtrl', ['$scope', '$http', '$interval', 'favoritesService', function ($scope, $http, $interval, favoritesService) {
 
     $scope.refresh_interval = 60000;
+    $scope.sensors = {};
 
     $scope.load = function () {
-        $http.get('dashboard/').success(function (data, status, headers, config) {
-            $scope.sensors = data
+
+        $http.get('favorites_list/').success(function (data, status, headers, config) {
+
+            data.favorites_list.forEach(function (sensor_name) {
+                $http.get('dashboard/' + sensor_name).success(function (data, status, headers, config) {
+                    $scope.sensors[sensor_name] = data
+
+                }).error(function (data, status, headers, config) {
+                    $scope.error_message = "Something went wrong when getting the data of the sensor " + sensor_name
+                });
+            })
+
         }).error(function (data, status, headers, config) {
-            if (status === 404) {
-                $scope.error_message = "You do not have any favorite sensors set !"
+
+            if (status == 404) {
+                $scope.error_message = "You do not have any favorites set !"
+
             } else {
-                $scope.error_message = "Something went terribly wrong with the server. Please try again later."
+                $scope.error_message = "Something went wrong while fetching your favorites "
             }
+
         });
+
+
     };
 
     $scope.remove = function (sensor_name) {
 
-        if (favoritesService.remove(sensor_name)) {
+        console.log(favoritesService.remove(sensor_name));
+
+        favoritesService.remove(sensor_name).success(function (data, status, headers, config) {
             $scope.success_message = 'Sensor ' + sensor_name + ' successfuly removed from favorites';
+            $scope.sensors[sensor_name] = undefined;
             $scope.load()
-        } else {
+        }).error(function (data, status, headers, config) {
+            console.log(':(');
             $scope.error_message = "Something went terribly wrong with the server. Please try again later."
-        }
+        });
     };
 
-    var interv = $interval(load, $scope.refresh_interval);
-    $scope.$on('$destroy', function () {
-        $interval.cancel(interv);
-    });
+    //var interv = $interval($scope.load, $scope.refresh_interval);
+    //$scope.$on('$destroy', function () {
+    //    console.log($scope.sensors);
+    //    $interval.cancel(interv);
+    //});
+
+    $scope.load()
 
 
 }]);

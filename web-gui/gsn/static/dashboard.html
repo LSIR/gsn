@@ -2,49 +2,38 @@
     <div class="col-lg-12">
         <h1 class="page-header">Dashboard</h1>
 
-        <h4>Dashboard</h4>
-        <table class="table table-striped">
+        <p class="col-lg-12 lead" ng-if="success_message">{{ success_message }}</p>
+
+        <p class="col-lg-12 lead" ng-if="error_message">{{ error_message }}</p>
+        <table class="table table-striped" ng-if="sensors">
             <tbody>
-            <tr ng-repeat="(key, properties) in sensors">
+
+            <tr ng-repeat="(key, properties) in sensors" ng-if="properties">
                 <td>
                     <a href="#/sensors/{{ key }}">{{ key }}</a>
                 </td>
                 <td>
-                    <uib-tabset>
-                        <uib-tab heading="Latest values">
-                            <table id="sensor_data_table_id" class="table table-striped"
-                                   ng-if="properties.fields">
-                                <thead>
-                                <tr>
-                                    <th ng-repeat="field in properties.fields">
-                                        {{ field.name }}
-                                        ({{ field.type }}<span
-                                            ng-show="field.unit">, {{ field.unit }}</span>
-                                        )
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody ng-if="details.properties.values">
-                                <tr>
-                                    <td ng-repeat="value in properties.values track by $index">
-                                        {{ value }}
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-
-                        </uib-tab>
-                        <uib-tab heading="More data"></uib-tab>
-                    </uib-tabset>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th ng-repeat="field in properties.fields">{{ field.name }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td ng-repeat="value in properties.values track by $index">{{ value }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </td>
                 <td>
-                    <button class="btn btn-danger btn-sm" ng-click="remove(key)" disabled>Remove from favorites</button>
+                    <button class="btn btn-danger btn-sm" ng-click="remove(key)">Remove from favorites</button>
                 </td>
             </tr>
             </tbody>
         </table>
-
-        <p class="col-lg-12 lead" ng-if="error_message">{{ error_message }}</p>
 
     </div>
 </div>

@@ -38,7 +38,7 @@ gsnApp.config(['$routeProvider',
             controller: 'DownloadCtrl'
         }).
         when('/dashboard', {
-            templateUrl: 'static/dasjboard.html',
+            templateUrl: 'static/dashboard.html',
             controller: 'DashboardCtrl'
         }).
 
