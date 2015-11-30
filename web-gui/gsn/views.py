@@ -135,7 +135,8 @@ def sensor_detail(request, sensor_name, from_date, to_date):
 
         user_data = {
             'logged': True,
-            'has_access': True
+            'has_access': True,
+            'favorite': sensor_name in request.user.gsnuser.favorites
         }
 
         payload = {
