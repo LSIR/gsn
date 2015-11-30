@@ -5,7 +5,7 @@
         <h4>Dashboard</h4>
         <table class="table table-striped">
             <tbody>
-            <tr ng-repeat="key in sensors">
+            <tr ng-repeat="(key, properties) in sensors">
                 <td>
                     <a href="#/sensors/{{ key }}">{{ key }}</a>
                 </td>
@@ -13,10 +13,10 @@
                     <uib-tabset>
                         <uib-tab heading="Latest values">
                             <table id="sensor_data_table_id" class="table table-striped"
-                                   ng-if="details.properties.fields">
+                                   ng-if="properties.fields">
                                 <thead>
                                 <tr>
-                                    <th ng-repeat="field in key.fields">
+                                    <th ng-repeat="field in properties.fields">
                                         {{ field.name }}
                                         ({{ field.type }}<span
                                             ng-show="field.unit">, {{ field.unit }}</span>
@@ -26,7 +26,7 @@
                                 </thead>
                                 <tbody ng-if="details.properties.values">
                                 <tr>
-                                    <td ng-repeat="value in key.values track by $index">
+                                    <td ng-repeat="value in properties.values track by $index">
                                         {{ value }}
                                     </td>
                                 </tr>
@@ -38,9 +38,7 @@
                     </uib-tabset>
                 </td>
                 <td>
-                    <a href="/gsn/favorites/?remove={{ key }}" class="btn btn-danger btn-sm" disabled>Remove from
-                                                                                                      favorites
-                    </a>
+                    <button class="btn btn-danger btn-sm" ng-click="remove(key)" disabled>Remove from favorites</button>
                 </td>
             </tr>
             </tbody>

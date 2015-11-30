@@ -25,6 +25,30 @@ gsnControllers.config(function (localStorageServiceProvider) {
         .setPrefix('gsn_web_gui');
 });
 
+gsnControllers.service('favoritesService', [$http, function ($http) {
+    this.remove = function (sensor_name) {
+        $http.get('favorite/', {
+            params: {'remove': sensor_name}
+        }).success(function (data, status, headers, config) {
+            return true
+        }).error(function (data, status, headers, config) {
+            return false
+        });
+    };
+
+    this.add = function (sensor_name) {
+        $http.get('favorite/', {
+            params: {'add': sensor_name}
+        }).success(function (data, status, headers, config) {
+            return true
+        }).error(function (data, status, headers, config) {
+            return false
+        });
+
+
+    }
+}]);
+
 gsnControllers.factory('sensorService', function ($http) {
     return {
         async: function () {
@@ -573,7 +597,10 @@ gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceSer
 }])
 ;
 
-gsnControllers.controller('DashboardCtrl', ['$scope', '$http', function ($scope, $http) {
+
+gsnControllers.controller('DashboardCtrl', ['$scope', '$http', '$interval', 'favoritesService', function ($scope, $http, $interval, favoritesService) {
+
+    $scope.refresh_interval = 60000;
 
     $scope.load = function () {
         $http.get('dashboard/').success(function (data, status, headers, config) {
@@ -582,10 +609,26 @@ gsnControllers.controller('DashboardCtrl', ['$scope', '$http', function ($scope,
             if (status === 404) {
                 $scope.error_message = "You do not have any favorite sensors set !"
             } else {
-                $scope.error_message = "Something went terribly wrong."
+                $scope.error_message = "Something went terribly wrong with the server. Please try again later."
             }
         });
-    }
+    };
+
+    $scope.remove = function (sensor_name) {
+
+        if (favoritesService.remove(sensor_name)) {
+            $scope.success_message = 'Sensor ' + sensor_name + ' successfuly removed from favorites';
+            $scope.load()
+        } else {
+            $scope.error_message = "Something went terribly wrong with the server. Please try again later."
+        }
+    };
+
+    var interv = $interval(load, $scope.refresh_interval);
+    $scope.$on('$destroy', function () {
+        $interval.cancel(interv);
+    });
+
 
 }]);
 

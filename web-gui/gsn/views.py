@@ -101,18 +101,22 @@ def dashboard(request):
 
 @login_required
 def favorite_manage(request):
-    if request.method == "GET":
-        if 'add' in request.POST:
-            request.user.gsnuser.favorites.extend(request.GET.get('add'))
+    add = request.GET.get('add')
+
+    if add is not None:
+        request.user.gsnuser.favorites.extend(add)
+        request.user.gsnuser.save()
+        return HttpResponse('')
+
+    remove = request.GET.get('remove')
+
+    if remove is not None:
+        try:
+            request.user.gsnuser.favorites.remove(remove)
             request.user.gsnuser.save()
-            return HttpResponse('')
-        elif 'remove' in request.POST:
-            try:
-                request.user.gsnuser.favorites.remove(request.GET.get('remove'))
-                request.user.gsnuser.save()
-            except ValueError:
-                pass
-            return HttpResponse('')
+        except ValueError:
+            pass
+        return HttpResponse('')
 
     return HttpResponseNotFound()
 
