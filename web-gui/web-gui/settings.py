@@ -29,55 +29,32 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'bootstrap3',
-    'gsn',
-    'djangular',
-    'allaccess'
-)
+    'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions',
+    'django.contrib.messages', 'django.contrib.staticfiles', 'bootstrap3', 'gsn', 'djangular', 'allaccess')
 
 MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware', 'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-)
+    'django.contrib.messages.middleware.MessageMiddleware', 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',)
 
 ROOT_URLCONF = 'web-gui.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages'
-            ],
-        },
-    },
-]
+TEMPLATES = [{
+    'BACKEND' : 'django.template.backends.django.DjangoTemplates',
+    'DIRS'    : [os.path.join(BASE_DIR, 'templates')],
+    'APP_DIRS': True,
+    'OPTIONS' : {
+        'context_processors': ['django.template.context_processors.debug', 'django.template.context_processors.request',
+                               'django.contrib.auth.context_processors.auth',
+                               'django.contrib.messages.context_processors.messages',
+                               'django.contrib.auth.context_processors.auth',
+                               'django.contrib.messages.context_processors.messages'], }, }, ]
 
-AUTHENTICATION_BACKENDS = (
-    # Default backend
-    'django.contrib.auth.backends.ModelBackend',
-    # Additional backend
-    'allaccess.backends.AuthorizedServiceBackend',
-)
+AUTHENTICATION_BACKENDS = (  # Default backend
+    'django.contrib.auth.backends.ModelBackend',  # Additional backend
+    'allaccess.backends.AuthorizedServiceBackend',)
 
 WSGI_APPLICATION = 'web-gui.wsgi.application'
 
@@ -87,8 +64,7 @@ WSGI_APPLICATION = 'web-gui.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'NAME'  : os.path.join(BASE_DIR, 'db.sqlite3'), }
 }
 
 # Internationalization
@@ -113,18 +89,14 @@ STATIC_ROOT = '/static/'
 # Custom setting
 
 GSN = {
-    'OAUTH': {
-        'SERVER_URL': 'http://opensense.epfl.ch/',
-        'ENABLED': False,
-        'CLIENT_ID': 'web-gui-dev-local-public',
-        'CLIENT_SECRET': 'web-gui-dev-local-jAzg',
-        'REDIRECTION_URL': 'http://127.0.0.1:8000/gsn/profile/',
-        'SENSORS_URL': 'http://opensense.epfl.ch/ws/api/sensors',
-        'AUTH_URL': 'http://opensense.epfl.ch/ws/oauth2/auth',
-        'TOKEN_URL': 'http://opensense.epfl.ch/ws/oauth2/token'
-    },
-    'SERVER_URL': 'http://opensense.epfl.ch:22001/',
-    'SENSORS_URL': 'http://opensense.epfl.ch:22001/rest/sensors/'
+    'SERVER_URL'     : 'http://opensense.epfl.ch/',
+    'CLIENT_ID'      : 'web-gui-dev-local-public',
+    'CLIENT_SECRET'  : 'web-gui-dev-local-jAzg',
+    'REDIRECTION_URL': 'http://127.0.0.1:8000/gsn/profile/',
+    'SENSORS_URL'    : 'http://opensense.epfl.ch/ws/api/sensors',
+    'AUTH_URL'       : 'http://opensense.epfl.ch/ws/oauth2/auth',
+    'TOKEN_URL'      : 'http://opensense.epfl.ch/ws/oauth2/token',
+    'MAX_QUERY_SIZE' : 5000
 }
 
 LOGIN_URL = '/gsn/login/'
