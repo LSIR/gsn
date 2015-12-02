@@ -42,7 +42,7 @@ object SensorService extends Controller{
   def param[T](name:String,fun: String=>T,default:T)(implicit req:Request[AnyContent])=
     queryparam(name).map(fun(_)).getOrElse(default)
       
-  def sensors = (APIPermissionAction() compose Action).async {implicit request =>
+  def sensors = Action.async {implicit request =>
     Try{    
       val format=param("format",OutputFormat,defaultFormat)    
       val latestVals=param("latestValues",_.toBoolean,false)
@@ -122,7 +122,7 @@ object SensorService extends Controller{
     }.get
   }
 
-  def sensorMetadata(sensorid:String) = (APIPermissionAction(sensorid) compose Action).async {implicit request=>
+  def sensorMetadata(sensorid:String) = Action.async {implicit request=>
     Try{  	
       val timeFormat:Option[String]=queryparam("timeFormat")
       val format=param("format",OutputFormat,defaultFormat)            
@@ -142,7 +142,7 @@ object SensorService extends Controller{
     }.get
   }
 
-  def download= Action.async {implicit request=>
+  def download= (APIPermissionAction(sensorid) compose Action).async {implicit request=>
     //request.body.
     Future(Ok(""))
     
