@@ -142,7 +142,7 @@ object SensorService extends Controller{
     }.get
   }
 
-  def download= (APIPermissionAction(sensorid) compose Action).async {implicit request=>
+  def download= (APIPermissionAction() compose Action).async {implicit request=>
     //request.body.
     Future(Ok(""))
     

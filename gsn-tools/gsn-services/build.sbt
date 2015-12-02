@@ -23,7 +23,6 @@ resolvers += "play-authenticate (release)" at "https://oss.sonatype.org/content/
 
 resolvers += "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
-
 libraryDependencies ++= Seq(
   jdbc,
   ws,
@@ -40,7 +39,9 @@ libraryDependencies ++= Seq(
   "com.feth" %% "play-authenticate" % "0.6.9-SNAPSHOT",
   "com.google.inject" % "guice" % "3.0",
   javaCore,
-  "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1"
+  "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1",
+  "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
+  "com.typesafe.akka" % "akka-zeromq_2.11" % "2.3.14"
   )
 
 
