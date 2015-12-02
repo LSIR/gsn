@@ -93,7 +93,7 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
 
 		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
-			startMethodTracing("Android/data/tinygsn.gui.android/files/" + LOGTAG + "_" + System.currentTimeMillis());
+			startMethodTracing("Android/data/tinygsn.gui.android/" + LOGTAG + "_" + inputStreamName + "_" + System.currentTimeMillis());
 		}
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");

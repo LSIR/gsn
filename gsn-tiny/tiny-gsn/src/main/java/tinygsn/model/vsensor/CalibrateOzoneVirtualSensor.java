@@ -57,7 +57,7 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 		int source = 0;
 
 		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
-			startMethodTracing("Android/data/tinygsn.gui.android/files/" + LOGTAG + "_" + System.currentTimeMillis());
+			startMethodTracing("Android/data/tinygsn.gui.android/" + LOGTAG + "_" + inputStreamName + "_" + System.currentTimeMillis());
 		}
 
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
