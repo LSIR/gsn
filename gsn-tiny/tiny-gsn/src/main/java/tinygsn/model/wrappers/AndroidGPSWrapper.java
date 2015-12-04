@@ -140,7 +140,7 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 			}
 			if (isGPSEnabled && isGPSUsageEnabled) {
 				Location tempLocation = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
-				if (tempLocation != null) {
+				if (tempLocation != null && tempLocation.getTime() >= location.getTime()) {
 					location = tempLocation;
 				}
 			}

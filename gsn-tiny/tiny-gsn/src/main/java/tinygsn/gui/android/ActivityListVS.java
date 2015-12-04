@@ -74,7 +74,7 @@ public class ActivityListVS extends AbstractActivity implements Serializable {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		final MenuItem add = menu.add("Add");
 		add.setIcon(R.drawable.plus_b).setShowAsAction(
-				                                              MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 			public boolean onMenuItemClick(final MenuItem item) {
 				startVSActivity();
@@ -84,7 +84,7 @@ public class ActivityListVS extends AbstractActivity implements Serializable {
 
 		final MenuItem refresh = menu.add("Refresh");
 		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
-				                                                                      MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			// on selecting show progress spinner for 1s
@@ -139,7 +139,7 @@ public class ActivityListVS extends AbstractActivity implements Serializable {
 		ActionBar actionBar = getActionBar();
 		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-				                            | ActionBar.DISPLAY_SHOW_CUSTOM); // show it
+			| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
 
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -173,7 +173,7 @@ public class ActivityListVS extends AbstractActivity implements Serializable {
 
 		}
 		TextView lastUpdate = (TextView) actionBar.getCustomView().findViewById(
-				                                                                       R.id.lastUpdate);
+			R.id.lastUpdate);
 		lastUpdate.setText("Last update:\n" + (new Date()).toString());
 	}
 

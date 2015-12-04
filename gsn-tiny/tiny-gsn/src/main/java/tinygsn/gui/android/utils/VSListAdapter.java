@@ -25,6 +25,7 @@
 
 package tinygsn.gui.android.utils;
 
+import tinygsn.beans.StaticData;
 import tinygsn.controller.AndroidControllerVS;
 import tinygsn.gui.android.ActivityListVS;
 import tinygsn.gui.android.ActivityViewData;
@@ -134,6 +135,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 						switch (which) {
 							case DialogInterface.BUTTON_POSITIVE:
 								controller.deleteVS(vs.getName());
+								StaticData.deleteVS(vs.getName());
 								Toast.makeText(context, vs.getName() + " is deleted!",
 										              Toast.LENGTH_SHORT).show();
 								activityListVSNew.initialize();

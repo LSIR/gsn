@@ -89,7 +89,7 @@ public class StaticData {
 	
 	public static Context globalContext;
 	
-	private static Map<String, AbstractVirtualSensor> vsMap = new HashMap<String, AbstractVirtualSensor>();
+	private static Map<String, AbstractVirtualSensor> vsMap = new HashMap<>();
 	
 	public static AbstractVirtualSensor getProcessingClassByVSConfig(VSensorConfig config) throws Exception {
 		if(vsMap.containsKey(config.getName())){

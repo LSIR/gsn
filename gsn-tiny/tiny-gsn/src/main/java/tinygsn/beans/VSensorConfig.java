@@ -56,6 +56,7 @@ public class VSensorConfig implements Parcelable {
 	}
 
 	public VSensorConfig(Parcel source) {
+
 		inputStream = new InputStream();
 		int idid = Integer.parseInt(source.readString());
 		String processingClass = source.readString();
