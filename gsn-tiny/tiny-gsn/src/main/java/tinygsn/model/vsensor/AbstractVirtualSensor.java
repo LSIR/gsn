@@ -248,7 +248,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		String prefix = "vsensor:" + getVirtualSensorConfiguration().getName();
 		HashMap settings = storage.getSetting(prefix);
 		boolean gpsPrivacy;
-		if ((settings.get(prefix + ":" + "GPS Privacy")).equals("true")) {
+		if (settings.get(prefix + ":" + "GPS Privacy") != null && (settings.get(prefix + ":" + "GPS Privacy")).equals("true")) {
 			gpsPrivacy = true;
 		} else {
 			gpsPrivacy = false;
