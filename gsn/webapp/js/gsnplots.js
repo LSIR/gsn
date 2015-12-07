@@ -73,7 +73,7 @@ var GsnPlots = {
         // match configured plot vs
         $(GsnPlots.config).each( function(index) {
           $(this.signals).each(function() {
-            if (vsname.match(this.vsensor)) {
+              if (vsname.toLowerCase() == this.vsensor.toLowerCase()) {
               // create config if not available
               var graphconfigitem = GsnPlots.getGraphConfigItem(thisdeployment.graphconfig, index);
               // add vs
