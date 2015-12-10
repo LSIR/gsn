@@ -36,9 +36,12 @@ gsnControllers.service('favoritesService', function ($http) {
         return $http.get('favorites/', {
             params: {'add': sensor_name}
         })
+    };
 
-
+    this.list = function () {
+        return $http.get("favorites_list/")
     }
+
 });
 
 gsnControllers.factory('sensorService', function ($http) {
@@ -311,7 +314,7 @@ gsnControllers.controller('CompareCtrl', ['$scope', 'compareService', 'localStor
 
 }]);
 
-gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function ($scope, sensorService) {
+gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', 'favoritesService', function ($scope, sensorService, favoritesService) {
 
     $scope.loading = true;
 
@@ -321,6 +324,12 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', function
     sensorService.async().success(function (data) {
         $scope.sensors = data.features;
         $scope.loading = false;
+
+        favoritesService.list().success(function (data, status, headers, config) {
+            $scope.favorites = data.favorites_list;
+
+        }).error(function (data, status, headers, config) {
+        });
 
         $scope.$on('mapInitialized', function (event, evtMap) {
 
@@ -614,7 +623,8 @@ gsnControllers.controller('DashboardCtrl', ['$scope', '$http', '$interval', 'fav
 
     $scope.load = function () {
 
-        $http.get('favorites_list/').success(function (data, status, headers, config) {
+
+        favoritesService.list().success(function (data, status, headers, config) {
 
             data.favorites_list.forEach(function (sensor_name) {
                 $http.get('dashboard/' + sensor_name).success(function (data, status, headers, config) {
