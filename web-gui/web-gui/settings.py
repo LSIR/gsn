@@ -30,7 +30,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = (
     'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions',
-    'django.contrib.messages', 'django.contrib.staticfiles', 'bootstrap3', 'gsn', 'djangular', 'allaccess')
+    'django.contrib.messages', 'django.contrib.staticfiles', 'gsn')
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware', 'django.middleware.common.CommonMiddleware',
@@ -42,10 +42,10 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'web-gui.urls'
 
 TEMPLATES = [{
-    'BACKEND' : 'django.template.backends.django.DjangoTemplates',
-    'DIRS'    : [os.path.join(BASE_DIR, 'templates')],
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [os.path.join(BASE_DIR, 'templates')],
     'APP_DIRS': True,
-    'OPTIONS' : {
+    'OPTIONS': {
         'context_processors': ['django.template.context_processors.debug', 'django.template.context_processors.request',
                                'django.contrib.auth.context_processors.auth',
                                'django.contrib.messages.context_processors.messages',
@@ -64,7 +64,7 @@ WSGI_APPLICATION = 'web-gui.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME'  : os.path.join(BASE_DIR, 'db.sqlite3'), }
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'), }
 }
 
 # Internationalization
@@ -89,14 +89,14 @@ STATIC_ROOT = '/static/'
 # Custom setting
 
 GSN = {
-    'SERVER_URL'     : 'http://opensense.epfl.ch/',
-    'CLIENT_ID'      : 'web-gui-dev-local-public',
-    'CLIENT_SECRET'  : 'web-gui-dev-local-jAzg',
+    'SERVER_URL': 'http://opensense.epfl.ch/',
+    'CLIENT_ID': 'web-gui-dev-local-public',
+    'CLIENT_SECRET': 'web-gui-dev-local-jAzg',
     'REDIRECTION_URL': 'http://127.0.0.1:8000/gsn/profile/',
-    'SENSORS_URL'    : 'http://opensense.epfl.ch/ws/api/sensors',
-    'AUTH_URL'       : 'http://opensense.epfl.ch/ws/oauth2/auth',
-    'TOKEN_URL'      : 'http://opensense.epfl.ch/ws/oauth2/token',
-    'MAX_QUERY_SIZE' : 5000
+    'SENSORS_URL': 'http://opensense.epfl.ch/ws/api/sensors',
+    'AUTH_URL': 'http://opensense.epfl.ch/ws/oauth2/auth',
+    'TOKEN_URL': 'http://opensense.epfl.ch/ws/oauth2/token',
+    'MAX_QUERY_SIZE': 5000
 }
 
 LOGIN_URL = '/gsn/login/'

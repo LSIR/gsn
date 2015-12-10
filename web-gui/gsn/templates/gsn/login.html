@@ -11,11 +11,9 @@
     <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/bootstrap/dist/css/bootstrap.min.css' %}"
           rel="stylesheet">
 
-
     <!-- Custom Fonts -->
     <link href="{% static 'startbootstrap-sb-admin-2-1.0.7/bower_components/font-awesome/css/font-awesome.min.css' %}"
           rel="stylesheet" type="text/css">
-
 
 </head>
 
@@ -33,11 +31,15 @@
 
                     {% csrf_token %}
 
+                    <h4>
+                        <strong style="color: red;">{{ form.non_field_errors }}</strong>
+                    </h4>
 
-                    <h4><strong style="color: red;">{{ form.non_field_errors }}</strong></h4>
-
-
-
+                    {% if success_message %}
+                        <h4>
+                            <strong style="color: red;">{{ success_message }}</strong>
+                        </h4>
+                    {% endif %}
 
 
                     {% if next %}
@@ -48,12 +50,13 @@
 
                     {% csrf_token %}
 
-
                     <fieldset>
                         {% for field in form %}
 
                             <div class="form-group">
-                                <p><strong style="color: red">{{ field.errors }}</strong></p>
+                                <p>
+                                    <strong style="color: red">{{ field.errors }}</strong>
+                                </p>
 
                                 {% if "password" in field.name %}
                                     <input class="form-control" type="password" name="{{ field.name }}"
@@ -83,7 +86,6 @@
 
                         <button type="submit" class="btn btn-lg btn-success btn-block">Log In</button>
                         <a href="/gsn/" class="btn btn-lg btn-danger btn-block">Cancel and return to app</a>
-
 
                     </fieldset>
 

@@ -198,6 +198,7 @@ gsnControllers.controller('DownloadCtrl', ['$scope', '$window', '$http', 'sensor
 
     });
 
+
     $scope.download = downloadService.downloadMultiple;
 
     $scope.minMultipleSelectSize = 20;
@@ -427,7 +428,6 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
                 $scope.loading = false;
                 console.log('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/');    //TODO: REMOVE
 
-
                 buildData();
 
             });
@@ -537,21 +537,22 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
         $scope.load();
 
+
         $scope.addFavorite = function (sensor_name) {
-            if (favoritesService.add(sensor_name)) {
-                $scope.favorite = True
-            } else {
-                console.log('Failed to add to favorites !')
-            }
+
+            favoritesService.add(sensor_name).success(function (data, status, headers, config) {
+                $scope.load()
+            }).error(function (data, status, headers, config) {
+            });
         };
 
-        $scope.remove = function (sensor_name) {
-            if (favoritesService.remove(sensor_name)) {
-                $scope.favorite = False
-            } else {
-                console.log('Failed to remove from favorites !')
-            }
-        }
+        $scope.removeFavorite = function (sensor_name) {
+
+            favoritesService.remove(sensor_name).success(function (data, status, headers, config) {
+                $scope.load()
+            }).error(function (data, status, headers, config) {
+            });
+        };
 
 
     }]);

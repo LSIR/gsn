@@ -363,7 +363,7 @@ def sign_up(request):
             form.save()
 
             context.update({
-                'green_message': 'Your account was successfuly created. Please proceed to login.',
+                'success_message': 'Your account was successfuly created. Please proceed to login.',
                 'form': LoginForm()
             })
 

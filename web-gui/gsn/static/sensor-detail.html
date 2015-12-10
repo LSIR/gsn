@@ -34,6 +34,14 @@
                             </b>
                             {{ value }}</p>
                     </div>
+                    <div ng-if="details.user.logged">
+                        <button ng-if="details.user.favorite" ng-click="removeFavorite(sensorName)">Remove from
+                                                                                                    favorites
+                        </button>
+                        <button ng-if="!details.user.favorite" ng-click="addFavorite(sensorName)
+                        ">Add to favorites
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -77,7 +85,7 @@
         </p>
 
         <p class="col-lg-12 lead" ng-if="!details.user.logged && !loading ">
-            As a non-registered user, you do not have access to this sensor's data, only its metadate. Please log in
+            As a non-registered user, you do not have access to this sensor's data, only its metadata. Please log in
             or create an account.
         </p>
 
