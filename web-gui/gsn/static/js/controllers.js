@@ -18,7 +18,6 @@ var gsnControllers = angular.module('gsnControllers',
         'LocalStorageModule',
         'ui.bootstrap',
         'ui.bootstrap.datetimepicker'
-
     ]
 );
 
@@ -55,11 +54,22 @@ gsnControllers.factory('sensorService', function ($http) {
 });
 
 gsnControllers.factory('mapDistanceService', function () {
+
+
     return {
         distance: function (circlePosition, sensor) {
             var latLngA = new google.maps.LatLng(circlePosition.split(",")[0], circlePosition.split(",")[1]);
 
-            var latLngB = new google.maps.LatLng(sensor.geometry.coordinates[1], sensor.geometry.coordinates[0]);
+
+            if (!sensor.geometry.coordinates.some(function (v) {
+                    return v !== null;
+                })
+            ) {
+                return null
+            }
+
+            var latLngB = new google.maps.LatLng(sensor.geometry.coordinates[0], sensor.geometry.coordinates[1]);
+
 
             return google.maps.geometry.spherical.computeDistanceBetween(latLngA, latLngB);
 
@@ -609,7 +619,10 @@ gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceSer
 
     $scope.isCloseEnough = function () {
         return function (sensor) {
-            return mapDistanceService.distance($scope.circlePosition, sensor) < $scope.radius;
+
+            var dist = mapDistanceService.distance($scope.circlePosition, sensor);
+
+            return (dist < $scope.radius) && dist != null;
         }
     };
 
