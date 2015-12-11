@@ -16,7 +16,9 @@ var gsnControllers = angular.module('gsnControllers',
         'ngAutocomplete',
         'highcharts-ng',
         'LocalStorageModule',
-        'ui.bootstrap'
+        'ui.bootstrap',
+        'ui.bootstrap.datetimepicker'
+
     ]
 );
 
