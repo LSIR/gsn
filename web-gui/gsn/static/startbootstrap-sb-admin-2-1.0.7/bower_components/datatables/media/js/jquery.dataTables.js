@@ -2891,7 +2891,7 @@
 		var displayRows = settings.aiDisplay;
 		var row, rowIdx;
 	
-		for ( var i=0, ien=filters.length ; i<ien ; i++ ) {
+		for (var i=0, ien=filterFunctionList.length ; i<ien ; i++ ) {
 			var rows = [];
 	
 			// Loop over each row and see if it should be included
@@ -2899,7 +2899,7 @@
 				rowIdx = displayRows[ j ];
 				row = settings.aoData[ rowIdx ];
 	
-				if ( filters[i]( settings, row._aFilterData, rowIdx, row._aData, j ) ) {
+				if ( filterFunctionList[i]( settings, row._aFilterData, rowIdx, row._aData, j ) ) {
 					rows.push( rowIdx );
 				}
 			}

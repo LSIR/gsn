@@ -13229,7 +13229,7 @@ ASTCompiler.prototype = {
     var ast = this.astBuilder.ast(expression);
     this.state = {
       nextId: 0,
-      filters: {},
+      filterFunctionList: {},
       expensiveChecks: expensiveChecks,
       fn: {vars: [], body: [], own: {}},
       assign: {vars: [], body: [], own: {}},
@@ -13321,7 +13321,7 @@ ASTCompiler.prototype = {
   filterPrefix: function() {
     var parts = [];
     var self = this;
-    forEach(this.state.filters, function(id, filter) {
+    forEach(this.state.filterFunctionList, function(id, filter) {
       parts.push(id + '=$filter(' + self.escape(filter) + ')');
     });
     if (parts.length) return 'var ' + parts.join(',') + ';';
@@ -13568,10 +13568,10 @@ ASTCompiler.prototype = {
   },
 
   filter: function(filterName) {
-    if (!this.state.filters.hasOwnProperty(filterName)) {
-      this.state.filters[filterName] = this.nextId(true);
+    if (!this.state.filterFunctionList.hasOwnProperty(filterName)) {
+      this.state.filterFunctionList[filterName] = this.nextId(true);
     }
-    return this.state.filters[filterName];
+    return this.state.filterFunctionList[filterName];
   },
 
   ifDefined: function(id, defaultValue) {
@@ -18148,9 +18148,9 @@ function $FilterProvider($provide) {
     if (isObject(name)) {
       var filters = {};
       forEach(name, function(filter, key) {
-        filters[key] = register(key, filter);
+        filterFunctionList[key] = register(key, filter);
       });
-      return filters;
+      return filterFunctionList;
     } else {
       return $provide.factory(name + suffix, factory);
     }

@@ -5336,7 +5336,7 @@ Expr.pseudos["nth"] = Expr.pseudos["eq"];
 
 // Back-compat
 function setFilters() {}
-Expr.filters = setFilters.prototype = Expr.pseudos;
+Expr.filterFunctionList = setFilters.prototype = Expr.pseudos;
 Expr.setFilters = new setFilters();
 
 // Override sizzle attribute retrieval
@@ -7138,13 +7138,13 @@ jQuery(function() {
 
 });
 
-if ( jQuery.expr && jQuery.expr.filters ) {
-	jQuery.expr.filters.hidden = function( elem ) {
+if ( jQuery.expr && jQuery.expr.filterFunctionList ) {
+	jQuery.expr.filterFunctionList.hidden = function(elem ) {
 		return ( elem.offsetWidth === 0 && elem.offsetHeight === 0 ) || (!jQuery.support.reliableHiddenOffsets && ((elem.style && elem.style.display) || curCSS( elem, "display" )) === "none");
 	};
 
-	jQuery.expr.filters.visible = function( elem ) {
-		return !jQuery.expr.filters.hidden( elem );
+	jQuery.expr.filterFunctionList.visible = function(elem ) {
+		return !jQuery.expr.filterFunctionList.hidden( elem );
 	};
 }
 
@@ -9217,8 +9217,8 @@ jQuery.fx.speeds = {
 // Back Compat <1.8 extension point
 jQuery.fx.step = {};
 
-if ( jQuery.expr && jQuery.expr.filters ) {
-	jQuery.expr.filters.animated = function( elem ) {
+if ( jQuery.expr && jQuery.expr.filterFunctionList ) {
+	jQuery.expr.filterFunctionList.animated = function(elem ) {
 		return jQuery.grep(jQuery.timers, function( fn ) {
 			return elem === fn.elem;
 		}).length;

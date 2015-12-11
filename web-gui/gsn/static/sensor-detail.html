@@ -195,12 +195,6 @@
                                                 </button>
                         -->
 
-                        <button class="btn btn-info btn-block" ng-disabled="!details.properties.values"
-                                ng-click="download()">
-                            <i class="fa fa-download"></i>
-                            Download
-                        </button>
-
                         <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
                                ng-if="details.properties.fields">
 
@@ -229,22 +223,45 @@
                                 boundary-links="true">
                         </dir-pagination-controls>
 
+                        <button class="btn btn-success btn-block" ng-disabled="!details.properties.values"
+                                ng-click="download()">
+                            <i class="fa fa-download"></i>
+                            Download
+                        </button>
+
                         <br>
 
-                        <div class="form-group">
-                            <label>Separate the graph according to field:</label>
-                            <select class="form-control"
-                                    ng-options="field as field.name for field in details.properties.fields"
-                                    ng-model="selectedField" ng-disabled="!details.properties.values">
-                            </select>
-                        </div>
+                        <button class="btn btn-primary btn-block" ng-click="compare()" ng-disabled="!details.properties
+                        .values">
+                            Compare this dataset
+                        </button>
+
+                        <br>
 
                         <br>
 
                         <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
-                        <button class="btn btn-primary" ng-click="compare()" ng-disabled="!details.properties.values">
-                            Compare this dataset
+                        <br>
+
+                        <button ng-click="addFilter(1, '>', 1,filterFunctionList.length)">Add a
+                                                                                          filter
                         </button>
+
+                        <div ng-repeat="fil in filterFunctionList">
+                            <select ng-options="field as field.name for field in details.properties.fields"
+                                    ng-model="filterValuesList[$index][0]">
+                                <option value="">-- choose a column --</option>
+                            </select>
+                            <select ng-options="op as op for op in filterOperators"
+                                    ng-model="filterValuesList[$index][1]">
+                                <option value="">-- choose an operator --</option>
+                            </select>
+                            <input type="number" value="12" ng-model="filterValuesList[$index][2]">
+                            </button>
+                            <button ng-click="removeFilter($index)">Remove filter</button>
+                        </div>
+
+                        <button ng-click="applyFilterChanges();filter()">Apply filters</button>
 
                     </div>
 

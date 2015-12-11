@@ -443,13 +443,14 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
 
 
         $scope.load = function () {
+
+
             $http.get('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/').success(function (data) {
                 $scope.details = data.properties ? data : undefined;
 
                 $scope.loading = false;
-                console.log('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/');    //TODO: REMOVE
 
-                buildData();
+                buildData($scope.details);
 
             });
         };
@@ -460,30 +461,30 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
             $scope.load();
         };
 
-        function buildData() {
+        function buildData(details) {
 
-            if ($scope.details && $scope.details.properties.values) {
+            if (details && details.properties.values) {
                 var k, offset = 0;
 
                 $scope.chartConfig.series = [];
 
-                for (k = 2; k < $scope.details.properties.fields.length; k++) {
+                for (k = 2; k < details.properties.fields.length; k++) {
 
 
                     $scope.chartConfig.series.push({
-                        name: $scope.details.properties.fields[k].name + " (" + (!($scope.details.properties.fields[k].unit === null) ? $scope.details.properties.fields[k].unit : "no unit") + ") ",
+                        name: details.properties.fields[k].name + " (" + (!(details.properties.fields[k].unit === null) ? details.properties.fields[k].unit : "no unit") + ") ",
                         id: k,
                         data: []
                     });
 
                     var i;
-                    for (i = 0; i < $scope.details.properties.values.length; i++) {
+                    for (i = 0; i < details.properties.values.length; i++) {
 
-                        if (typeof $scope.details.properties.values[i][k] === 'string' || $scope.details.properties.values[i][k] instanceof String) {
+                        if (typeof details.properties.values[i][k] === 'string' || details.properties.values[i][k] instanceof String) {
                             offset++;
                             break
                         }
-                        var array = [$scope.details.properties.values[i][1], $scope.details.properties.values[i][k]];
+                        var array = [details.properties.values[i][1], details.properties.values[i][k]];
                         $scope.chartConfig.series[k - 2].data.push(array)
 
                     }
@@ -575,6 +576,66 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
             });
         };
 
+        $scope.filterFunctionList = [];
+
+        $scope.filterValuesList = [];
+
+        $scope.filterOperators = ['==', '!=', '>=', '>', '<=', '<'];
+
+
+        // Adds to the filter list a filter function
+        $scope.addFilter = function (ind, op, value, index) {
+            function filterFunc(ind, op, value) {
+                return function (a) {
+
+
+                    try {
+                        return eval(a[ind] + op + value)
+                    } catch (e) {
+                        return false
+                    }
+
+                }
+            }
+
+
+            $scope.filterFunctionList.splice(index, 1, filterFunc(ind, op, value))
+
+        };
+
+
+        $scope.filter = function () {
+            var dataset = JSON.parse(JSON.stringify($scope.details.properties.values));
+
+            for (var j = 0; j < $scope.filterFunctionList.length; j++) {
+                dataset = dataset.filter($scope.filterFunctionList[j])
+            }
+            var c = JSON.parse(JSON.stringify($scope.details));
+            c.properties.values = dataset;
+
+            console.log(dataset);
+
+            buildData(c)
+        };
+
+        $scope.removeFilter = function (index) {
+            $scope.filterFunctionList.splice(index, 1);
+            $scope.filterValuesList.splice(index, 1)
+        };
+
+        $scope.applyFilterChanges = function () {
+
+            for (var i = 0; i < $scope.filterFunctionList.length; i++) {
+                if ($scope.filterFunctionList[i] && $scope.filterValuesList[i] && $scope.filterValuesList[i][0] && $scope.filterValuesList[i][1] && $scope.filterValuesList[i][2]) {
+
+                    $scope.addFilter($scope.details.properties.fields.indexOf($scope.filterValuesList[i][0]),
+                        $scope.filterValuesList[i][1],
+                        $scope.filterValuesList[i][2], i)
+
+                }
+            }
+
+        }
 
     }]);
 
