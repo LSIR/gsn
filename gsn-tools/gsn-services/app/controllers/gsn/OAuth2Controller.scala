@@ -3,6 +3,7 @@ package controllers.gsn
 import scalaoauth2.provider._
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.mvc._
+import play.utils.UriEncoding
 import models.gsn.auth.{User, Client, OAuthCode}
 import com.feth.play.module.pa.PlayAuthenticate
 import be.objectify.deadbolt.scala.DeadboltActions
@@ -24,7 +25,7 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
   
     def accessToken = Action.async { implicit request =>
         issueAccessToken[AnyContent,User](new GSNDataHandler())
-  }
+    }
   
     def auth = Action.async { implicit request => Future {
       Context.current.set(JavaHelpers.createJavaContext(request))
@@ -66,7 +67,7 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
                if (client != null && client.secret == clientData.client_secret){
                    val c = OAuthCode.generate(u,client)
                    c.save()
-                   Redirect(client.redirect+"?code="+c.code+"&response_type=code")
+                   Redirect(client.redirect+"?code="+c.code+"&response_type=code&user_name="+UriEncoding.encodePathSegment(u.name,"UTF-8")+"&user_email="+UriEncoding.encodePathSegment(u.email,"UTF-8"))
                }else{
                    Forbidden("This client is not registered for accessing GSN, please contact the administrator if you need to add it.")
                }
