@@ -134,18 +134,18 @@ public class RVirtualSensor extends AbstractVirtualSensor
       
       if (circularBuffer.size() == windowSize)
       {
-        logger.info("Window for " + inputStreamName + " contains: " + circularBuffer.size() + " of " + windowSize);
+        logger.debug("Window for " + inputStreamName + " contains: " + circularBuffer.size() + " of " + windowSize);
         
         // Connect to Rserve and assign global variables
         try
         {
           rc = new RConnection(params.get(SERVER), Integer.parseInt(params.get(PORT)));
           
-          logger.info("Connected to R server " + params.get(SERVER) + ":" + params.get(PORT));
+          logger.debug("Connected to R server " + params.get(SERVER) + ":" + params.get(PORT));
           
           String[] fieldname = streamElement.getFieldNames();
           
-          logger.info("Sending " + fieldname.length + " data attributes to R server.");
+          logger.debug("Sending " + fieldname.length + " data attributes to R server.");
           
           // Assign R vector variables prior the script
           for (int n = 0; n < fieldname.length; n++)
@@ -166,7 +166,7 @@ public class RVirtualSensor extends AbstractVirtualSensor
             rc.assign("gsn_" + fieldname[n].toLowerCase(), values);
           }
           
-          logger.info("Done.");
+          logger.debug("Done.");
           
           // read the R script
           // open the script file every time we do some processing (this can be
@@ -174,14 +174,14 @@ public class RVirtualSensor extends AbstractVirtualSensor
           File file = new File(params.get(SCRIPT).toString());
           script = FileUtils.readFileToString(file, "UTF-8");
           
-          logger.info("Sending R script.");
+          logger.debug("Sending R script.");
           
           // evaluate the R script
           rc.voidEval(script);
-          logger.info("Done.");
+          logger.debug("Done.");
           
           // get the output timestamp
-          logger.info("Performing computation in R server (please wait).");
+          logger.debug("Performing computation in R server (please wait).");
           
           // collect vector values after computation
           DataField[] outStructure = null;
@@ -253,20 +253,20 @@ public class RVirtualSensor extends AbstractVirtualSensor
             se = new StreamElement(fieldname, fieldType, outputData);
           }
           
-          logger.info("Computation finished.");
+          logger.debug("Computation finished.");
           
           dataProduced(se);
           logger.debug("Stream published: " + se.toString().toLowerCase());
           
           // Close connection to R server
           rc.close();
-          logger.info("Connection to R server closed.");
+          logger.debug("Connection to R server closed.");
           
         } catch (Exception e)
         {
           logger.warn(e.getMessage());
           // Close connection to R server
-          logger.info("Connection to R server closed.");
+          logger.debug("Connection to R server closed.");
           rc.close();
         }
         

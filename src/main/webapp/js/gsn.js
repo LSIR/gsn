@@ -45,10 +45,8 @@ var GSN = {
             pageName[0] = "home";
         }
 		
-        var params=location.hash.substr(1).split(",");
-		
-        params[0] = pageName[0];
-		
+        var params=location.hash.substr(1).split(",");		
+        params[0] = pageName[0];		
         GSN.context = params[0];
 
         //highlight the right tab in the navigation bar
@@ -59,10 +57,10 @@ var GSN = {
                 $(this).removeClass("selected");
         });
 				
-        $("#main > div").hide();
+        //$("#main > div").hide();
         if (GSN.context!="map") {
             $("#toggleallmarkers").hide();
-            $("#vsmenu .toggle").hide();
+            //$("#vsmenu .toggle").hide();
         }
         //for each page context
         if (GSN.context=="home")	{
@@ -85,7 +83,7 @@ var GSN = {
             $("#main #mapdiv").show();
             $("#toggleallmarkers").show();
             $("#vsmenu .toggle").show();
-            if(!GSN.map.loaded) {
+            if(!GSN.loaded) {
                 GSN.updateall();
                 GSN.map.init();
             }
@@ -224,9 +222,9 @@ var GSN = {
         //GSN.vsName.push("genepi_meteo_10_replay", "genepi_meteo_11_replay","genepi_meteo_12_replay","genepi_meteo_13_replay","genepi_meteo_15_replay","genepi_meteo_16_replay","genepi_meteo_18_replay","genepi_meteo_2_replay","genepi_meteo_3_replay","genepi_meteo_4_replay","genepi_meteo_6_replay","genepi_meteo_7_replay");
       GSN.vsName = GSN.util.regroupByUnderscore(GSN.vsName);
       GSN.protect.sort();
-        for(var i=0;i<GSN.vsName.length;++i){
+        /*for(var i=0;i<GSN.vsName.length;++i){
             logIvo(GSN.vsName[i]+"--"+GSN.protect[i][0]+"--"+GSN.protect[i][1]);
-        }
+        }*/
 
         // Creation of the sidebar menu with categories
         var vsName = GSN.vsName;
@@ -536,7 +534,8 @@ var GSN = {
     ,
     updateallchange: function(){
         if($("#refreshall_timeout").attr("value") != 0)
-            GSN.updateall();
+            //GSN.updateall();
+        	GSN.refreshVSs();
     }
 	
 	
@@ -552,32 +551,22 @@ var GSN = {
         GSN.updatenb++;
 		
         $(".refreshing").show();
-		
-		
+  		
         $.ajax({
-            type: "GET",
+            type: "GET",            
+            //url: "ws/api/sensors?format=xml&latestValues=true",
             url: "gsn?REQUEST=0&omit_latest_values=true",
             success: function(data){
                 var start = new Date();
                 //initalisation of gsn info, vsmenu
                 if (!GSN.loaded) GSN.init(data);
-            }
-        });
-  		
-        $.ajax({
-            type: "GET",
-            url: "gsn?REQUEST=0&omit_latest_values=false",
-            success: function(data){
-                var start = new Date();
-                //initalisation of gsn info, vsmenu
-                //if (!GSN.loaded) GSN.init(data);
 			
                 //create vsbox on the first load
                 if (firstload && GSN.context == "home") {
-                    for (var i = 0; i < 10; ++i){
+                   /* for (var i = 0; i < 10; ++i){
                         var n = $($("virtual-sensor",data).get(i)).attr("name");
                         if (n!=null) GSN.vsbox.add(n);
-                    }
+                    }*/
                 } else if (firstload && GSN.context == "fullmap") {
                     $("virtual-sensor",data).each(function(){
                         GSN.vsbox.add($(this).attr("name"));
@@ -585,9 +574,9 @@ var GSN = {
                 }
 			
                 //update vsbox
-                $("virtual-sensor",data).each(function(){
-                    GSN.vsbox.update(this);
-                });
+                //$("virtual-sensor",data).each(function(){
+                //    GSN.vsbox.update(this);
+                //});
 			
 			
                 //next refresh
@@ -611,15 +600,23 @@ var GSN = {
 		
 		
     }
-	
-	
+
+    ,
+    refreshVSs: function(){
+
+    	sss= $(this.container).find("span[class='vsname']");
+	    for(i=0;i<sss.length;i++){
+		  vsname=$(sss[i]).text();
+		  GSN.updateVs(vsname);
+	    }
+    }
     /**
 	* Add a vsbox if it doesn't exist, bring it to front and update it
 	*/
     ,
     addandupdate: function(vsName){
         GSN.vsbox.bringToFront(vsName);
-        $.ajax({
+        /*$.ajax({
             type: "GET",
             url: "gsn?name="+vsName,
             success: function(data){
@@ -627,9 +624,22 @@ var GSN = {
                     GSN.vsbox.update(this);
                 });
             }
-        });
+        });*/    	
+        GSN.updateVs(vsName);
     }
-	
+	,
+    updateVs: function(vsName){
+        $.ajax({
+            type: "GET",
+            //url: "ws/api/sensors/"+vsName+"?format=xml&latestValues=true",
+            url: "gsn?name="+vsName,
+            success: function(data){
+                $("virtual-sensor[@name="+vsName+"]",data).each(function(){
+                    GSN.vsbox.update(this);
+                });
+            }
+        });    	
+    }
 	
     /**
 	* vsbox, display the vs info
@@ -689,7 +699,7 @@ var GSN = {
                 "class":"tabupload"
             },"Upload")),
             $.LI({},$.A({
-                "href":"./data.html",
+                "href":"./data.html?vsname="+vsName,
                 "class":"tabdata"
             },"Download"))
             ),
@@ -747,7 +757,6 @@ var GSN = {
 		*/
         ,
         update: function (vs){
-
             //when map is enable, update marker
             if (GSN.map.loaded){
                 var lat = $("field[@name=latitude]",vs).text();
@@ -846,10 +855,10 @@ var GSN = {
                             });
                         } else if (type.indexOf("binary") != -1){
                             value = '<a href="'+value+'">download <img src="style/download_arrow.gif" alt="" /></a>';
-                        } else if (unit==" s"){
-                            value = GSN.vsbox.formatTimeInterval(value);
-                        } else if (unit==" ms"){
-                            value = GSN.vsbox.formatTimeInterval(value / 1000);
+                        //} else if (unit==" s"){
+                        //    value = GSN.vsbox.formatTimeInterval(value);
+                        //} else if (unit==" ms"){
+                        //    value = GSN.vsbox.formatTimeInterval(value / 1000);
                         } else {
                             value = value + unit;
                         }
@@ -904,7 +913,7 @@ var GSN = {
                     if (GSN.protect[i][1] == " ") {
                          value2 =  $(vs).attr("description");
                          $("dl.description", vsd).empty().append('<p> Description:').append($.DD({}, value2)).append('</p>');
-                         logIvo("Iter = "+$(vs).attr("description"));
+                         //logIvo("Iter = "+$(vs).attr("description"));
                     } else  {
                         // $("dl.description", vsd).empty().append($.DD({},$(vs).attr("description")));
                         value2 =  $(vs).attr("description");
@@ -938,6 +947,7 @@ var GSN = {
                 return true;
             } else {
                 //update the vsbox when the value already exists
+            	//alert("papas"+$(vs).attr("name"));
                 var dds = $("dd",dl);
                 var dd,field,unit;
                 for (var i = 0; i<dds.size();i++){

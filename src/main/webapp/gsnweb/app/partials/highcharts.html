@@ -1,0 +1,259 @@
+<div>
+    <!--<div class="container">-->
+
+
+    <div layout="row" layout-sm="column" layout-margin>
+
+        <!--<form name="myForm">-->
+        <div ng-controller="ParameterSelectCtrl">
+            <div flex="100">
+
+                <div ng-repeat="sensor in sensorsWithParameters" layout="row" style="margin-bottom: 4px">
+
+                    <div>
+                        <md-button class="md-icon-button md-primary" ng-click="removeSensor($index)" aria-label="Remove"
+                                   ng-show="sensorsWithParameters.length>1"
+                                   style="height:36px; width:36px;line-height:36px">
+                            <md-icon style="height:20px;" md-svg-src="img/Less.svg"></md-icon>
+                        </md-button>
+
+                    </div>
+
+                    <div>
+                        <ui-select ng-model="sensor.selectedSensor" theme="select2" ng-disabled="disabled"
+                                   on-select="updateSensor($item, $index)"
+                                   style="min-width: 300px;">
+                            <ui-select-match placeholder="Select Sensor...">{{$select.selected}}
+                            </ui-select-match>
+                            <ui-select-choices
+                                    repeat="sensor in sensorNames | propsFilter: {name: $select.search}">
+                                <img ng-src="{{getSensorIcon(sensor)}}" style="width: 16px; height:16px">
+                                <span ng-bind-html="sensor.name | highlight: $select.search"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+
+                    <div ng-disabled="!sensor.sensorSelected" style="margin-left: 5px; margin-right: 5px">
+                        <ui-select multiple ng-model="sensor.parameters.selectedFields" theme="select2"
+                                   ng-disabled="disabled"
+                                   style="width: 400px;"
+                                   on-select="updateParameter()">
+                            <ui-select-match placeholder="Select property...">
+                                {{$item.columnName}}({{$item.unit}})
+                            </ui-select-match>
+                            <ui-select-choices group-by="nameGroupFn"
+                                               repeat="property in sensor.fields | propsFilter: {name: $select.search, columnName: $select.search}">
+                                <div ng-bind-html="propWithUnit(property) | highlight: $select.search"></div>
+
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                    <div ng-if="sensor.isSensorSelected()">
+                        <small><span class=".md-caption" style="color:GrayText"><i>({{sensor.from | date:'yyyy-MM-dd'}}
+                            to {{sensor.until |
+                            date:'yyyy-MM-dd'}})</i></span></small>
+
+                    </div>
+                </div>
+                <div>
+                    <md-button class="md-raised" ng-click="addSensor();">
+                        Add Sensor
+                    </md-button>
+                </div>
+
+                <div ng-controller="DatepickerCtrl" ng-disabled="!sensorsWithParameters[0].sensorSelected">
+
+
+                    <div append-source>
+                        <!--<form name="datepickerForm" class="form-inline" role="form">-->
+                        <!-- Date range example -->
+                        <div layout="row" layout-align="start center" layout-margin>
+
+                            <div>
+                                <input type="text" class="form-control" ng-model="dates.fromDate"
+                                       data-max-date="{{maxDateFrom()}}" data-min-date="{{minDateFrom()}}"
+                                       placeholder="From" bs-datepicker>
+                            </div>
+                            <div>
+                                <input type="text" class="form-control" ng-model="dates.untilDate"
+                                       data-min-date="{{minDateTo()}}"
+                                       placeholder="Until" bs-datepicker>
+                            </div>
+                        </div>
+
+                        <!--</form>-->
+                    </div>
+                    <div style="margin-bottom: 15px;" layout="column" layout-align="start">
+                        <div ng-if="sensorSelected">
+                            <small><span class=".md-caption"><i>Sensor has data between {{from | date:'yyyy-MM-dd'}}
+                                and {{until |
+                                date:'yyyy-MM-dd'}}</i></span></small>
+                        </div>
+
+                    </div>
+                </div>
+                <!--</md-whiteframe>-->
+
+
+                <div style="margin-top: 10px;" layout="row" layout-align="start">
+                    <!--<md-checkbox ng-model="limitRowNumber">-->
+                    <!--Show only-->
+                    <!--</md-checkbox>-->
+                    <input style="margin: 4px;" type="checkbox" ng-model="limitByRows"
+                           ng-change="changeLimitByRows()"/>
+                    Show only <input ng-disabled="!limitByRows"
+                                     style="margin-left: 4px; margin-right: 4px; max-width: 50px;"
+                                     name="rowNumber" ng-model="rowNumber"/> latest values
+
+                    <!--</div>-->
+
+                    <div style="margin-left: 10px;">
+                        <label>Aggregation</label>
+                        <ui-select ng-model="aggFunc.selected" theme="select2" ng-disabled="disabled"
+                                   style="min-width: 50px;">
+                            <ui-select-match placeholder="Select Aggregation...">{{$select.selected.name}}
+                            </ui-select-match>
+                            <ui-select-choices
+                                    repeat="func in aggregationFunctions">
+                                <span ng-bind-html="func.name | highlight: $select.search.name"></span>
+                            </ui-select-choices>
+                        </ui-select>
+
+                        <input ng-show="aggFunc.selected.value!= '-1'" name="input" ng-model="aggregationPeriod"
+                               required>
+
+                        <ui-select ng-model="aggUnit.selected" theme="select2" ng-disabled="disabled"
+                                   style="min-width: 50px;" ng-show="aggFunc.selected.value!= '-1'">
+                            <ui-select-match placeholder="Select Aggregation...">{{$select.selected.name}}
+                            </ui-select-match>
+                            <ui-select-choices
+                                    repeat="unit in aggregationUnits | filter: $select.search">
+                                <span ng-bind-html="unit.name | highlight: $select.search.name"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                </div>
+            </div>
+            <!--</md-whiteframe>-->
+
+            <div style="margin-top: 10px;">
+                <md-content>
+                    <section layout="row" layout-sm="column" layout-align="left center">
+                        <!--<button type="submit" ng-click="submitSelected();">Update Plot</button>-->
+                        <md-button class="md-raised" ng-click="submitSelected();" ng-disabled="!plotAvailable">
+                            Plot
+                        </md-button>
+                        <md-button class="md-raised"
+                                   ng-click="download();" ng-disabled="!plotAvailable">
+                            Download
+                        </md-button>
+                        <!--<md-button ng-disabled="true" class="md-raised md-primary">Disabled</md-button>-->
+                        <!--<md-button class="md-raised md-warn">Warn</md-button>-->
+                    </section>
+                </md-content>
+            </div>
+        </div>
+
+
+        <!--<div>-->
+        <!--Sensor name:-->
+        <!--Description:-->
+        <!--Parameters: air temperature, humidity-->
+        <!--dates:-->
+        <!--</div>-->
+
+        <!--</form>-->
+
+    </div>
+</div>
+
+<div>
+    <div ng-controller="hcCtrl">
+
+
+        <!--<div ng-if="dataProcessing" layout="column" layout-margin style="padding:50px;">-->
+        <!--Loading of the plot data might take a few minutes.-->
+        <!--<md-progress-linear md-mode="indeterminate"></md-progress-linear>-->
+        <!-- -->
+        <!--</div>-->
+
+        <div ng-if="canPlot">
+            <div ng-if="dataProcessing" layout="row" layout-sm="column" layout-align="space-around">
+                <md-progress-circular class="md-hue-2" md-mode="indeterminate"></md-progress-circular>
+            </div>
+
+            <div ng-if="!dataProcessing">
+                <div ng-if="!noData">
+                    <highchart id="chart1" config="chartConfig" class="container"></highchart>
+                    <div>
+                        <md-whiteframe class="md-whiteframe-z2" layout layout-align="center center">
+                            <span>Loaded <strong>{{pointCount}}</strong> time points.</span>
+                        </md-whiteframe>
+                    </div>
+                </div>
+
+                <div>
+
+                </div>
+                <div ng-if="missingData.length>0">
+                    <md-whiteframe class="md-whiteframe-z2" layout layout-align="center center">
+                        <span>No data available for property <strong>{{missingData.toString()}}</strong> during selected period of time.</span>
+                    </md-whiteframe>
+                </div>
+            </div>
+            <!--<div ng-if="!dataLoading">-->
+            <!--<md-whiteframe class="md-whiteframe-z2" layout layout-align="center center">-->
+            <!--<span>Loaded <strong>{{pointCount}}</strong> time points.</span>-->
+            <!--</md-whiteframe>-->
+            <!--</div>-->
+
+            <div ng-if="errorTooMany" layout="row" layout-sm="column" layout-margin>
+                <div flex="25"></div>
+                <div flex="50" class="blue" layout layout-align="center center">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">Retrieved too many data points ({{errorTooMany}}) to build the
+                                plot!
+                                Please reduce number of points by:
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="list-group">
+                                <li class="list-group-item">Selecting shorter period of time</li>
+                                <li class="list-group-item">Using aggregation</li>
+                                <li class="list-group-item">Limiting number of returned time points</li>
+                                <li class="list-group-item">Selecting less parameters</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+                <div flex="25"></div>
+
+            </div>
+
+            <div ng-if="errorAccessFailed" layout="row" layout-sm="column" layout-margin>
+                <div flex="25"></div>
+                <div flex="50" layout layout-align="center center">
+
+                    <div class="panel panel-default">
+                        <b>{{errorAccessFailed}}</b>
+                    </div>
+
+                </div>
+                <div flex="25"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<button-->
+<!--class="btn btn-block"-->
+<!--onclick="window.location.href='http://montblanc.slf.ch:22001/multidata?nb=ALL&from=07/05/2012%2000:00:00&to=13/04/2015%2000:00:00&vs[0]=imis_fka_2&field[0]=ta&vs[1]=imis_fka_2&field[1]=ts0&time_format=unix&download_format=csv'">-->
+<!--download-->
+<!--</button>-->
+
+
+</div>

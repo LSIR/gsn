@@ -1,0 +1,177 @@
+.select2 > .select2-choice.ui-select-match {
+  /* Because of the inclusion of Bootstrap */
+  height: 29px;
+}
+
+.selectize-control > .selectize-dropdown {
+  top: 36px;
+}
+
+
+
+
+.tab-content > .tab-pane,
+.pill-content > .pill-pane {
+  display: block;     /* undo display:none          */
+  height: 0;          /* height:0 is also invisible */
+  overflow-y: hidden; /* no-overflow                */
+}
+.tab-content > .active,
+.pill-content > .active {
+  height: auto;       /* let the content decide it  */
+}
+
+
+h4 {
+  margin-top: 25px;
+}
+.row {
+  margin-bottom: 20px;
+}
+.row .row {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+[class*="col-"] {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: #eee;
+  background-color: rgba(86,61,124,.15);
+  border: 1px solid #ddd;
+  border: 1px solid rgba(86,61,124,.2);
+}
+
+hr {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+
+
+body {
+  /*padding-top: 20px;*/
+  padding: 25px;
+  margin-top: 20px;
+}
+
+.phones {
+  list-style: none;
+}
+
+.thumb {
+  float: left;
+  margin: -0.5em 1em 1.5em 0;
+  padding-bottom: 1em;
+  height: 100px;
+  width: 100px;
+}
+
+.phones li {
+  clear: both;
+  height: 115px;
+  padding-top: 15px;
+}
+
+/** Detail View **/
+img.phone {
+  float: left;
+  border: 1px solid black;
+  margin-right: 3em;
+  margin-bottom: 2em;
+  background-color: white;
+  padding: 2em;
+  height: 400px;
+  width: 400px;
+}
+
+ul.phone-thumbs {
+  margin: 0;
+  list-style: none;
+}
+
+ul.phone-thumbs li {
+  border: 1px solid black;
+  display: inline-block;
+  margin: 1em;
+  background-color: white;
+}
+
+ul.phone-thumbs img {
+  height: 100px;
+  width: 100px;
+  padding: 1em;
+}
+
+ul.specs {
+  clear: both;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+ul.specs > li{
+  display: inline-block;
+  width: 200px;
+  vertical-align: top;
+}
+
+ul.specs > li > span{
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+ul.specs dt {
+  font-weight: bold;
+}
+
+#header h2 {
+  border-bottom: 1px solid gray;
+  padding: 14px;
+  padding-top: 2px;
+  padding-right: 20px;
+  padding-bottom: 18px;
+  padding-left: 20px;
+  text-align: right;
+  color: #3949AB;
+}
+#header small {
+  color: #3949AB;
+}
+.active {
+  background-color: #DDD !important;
+  color: rgba(0,0,0, 0.87) !important;
+}
+.filter_panel {
+  width: 265px !important;
+  min-width: 265px !important;
+  max-width: 265px !important;
+}
+/*h2 {*/
+  /*font-size: 30px;*/
+/*}*/
+.about {
+  width: 300px;
+  text-align: justify;
+  text-justify: auto;
+  margin-left:10px;
+}
+.login {
+  float: right !important;
+  right: 0px;
+}
+
+.box_border
+{
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  padding: 7px;
+  margin: 5px 5px;
+
+}
+.monitor_value
+{
+  border-left: 1px solid #ddd;
+  padding-left: 5px;
+
+
+}

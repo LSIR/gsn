@@ -215,7 +215,7 @@ public class MyCreateGroupServlet  extends HttpServlet
         if(dsNames.size()==0)
         {
             out.println("<table class=transparenttable>");
-            out.println("<tr><td><LI>No virtaul sensor is available.</LI></td></tr>");
+            out.println("<tr><td><LI>No virtual sensor is available.</LI></td></tr>");
             out.println("</table>");
         }
         else

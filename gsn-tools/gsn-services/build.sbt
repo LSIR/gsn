@@ -23,6 +23,11 @@ resolvers += "play-authenticate (release)" at "https://oss.sonatype.org/content/
 
 resolvers += "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
+val buildSettings = Defaults.defaultSettings ++ Seq(
+   javaOptions += "-Xmx128m",
+   javaOptions += "-Xms64m"
+)
+
 libraryDependencies ++= Seq(
   jdbc,
   ws,
@@ -42,8 +47,9 @@ libraryDependencies ++= Seq(
   "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1",
   "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
   "com.typesafe.akka" % "akka-zeromq_2.11" % "2.3.14"
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
+  "org.scalatestplus" %% "play" % "1.1.0" % "test"
   )
-
 
 publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release")
 

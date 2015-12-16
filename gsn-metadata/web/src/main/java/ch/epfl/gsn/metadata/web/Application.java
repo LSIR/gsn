@@ -1,6 +1,7 @@
 package ch.epfl.gsn.metadata.web;
 
 import ch.epfl.gsn.metadata.mongodb.MongoApplicationConfig;
+import ch.epfl.gsn.oai.OaiConfigurationImpl;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -13,7 +14,7 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan("ch.epfl.gsn.metadata")
-@Import(MongoApplicationConfig.class)
+@Import({MongoApplicationConfig.class, OaiConfigurationImpl.class})
 public class Application {
 
     @Bean(name = "configuration")

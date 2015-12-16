@@ -4,8 +4,12 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<title>GSN</title>
-	
+		
 	<link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="style/gsn_theme.css" type="text/css" media="screen,projection" />
+	<!-- <link href="style/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="style/bootstrap-3.3.4-dist/css/bootstrap-theme.min.css" rel="stylesheet"/>-->
+	
 	<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
 	<script type="text/javascript" src="js/jquery-dom.js"></script>
 	<script type="text/javascript" src="js/jquery.history.js"></script>
@@ -15,32 +19,34 @@
 	<script type="text/javascript" src="js/functions.js"></script>
 	
 	<script type="text/javascript" src="js/gsn.js"></script>
-<script type="text/javascript">
-<!--//<![CDATA[
-$(document).ready(function() {
-	//bind every buttons to javascript functionality (only once)
-	$("#refreshall_timeout").bind("change",GSN.updateallchange);
-	$("#refreshall").bind("click",GSN.updateall);
-	$("#closeall").bind("click",GSN.closeall);
-	//$("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
+	<script type="text/javascript">
+	<!--//<![CDATA[-->
+		$(document).ready(function() {
+			//bind every buttons to javascript functionality (only once)
+			$("#refreshall_timeout").bind("change",GSN.updateallchange);
+			$("#refreshall").bind("click",GSN.refreshVSs);
+			$("#closeall").bind("click",GSN.closeall);
+			//$("#toggleallmarkers").bind("click",GSN.map.toggleAllMarkers);
 	
-	$("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+			$("#navigation ul a.local").bind("click",function() { 
+				return GSN.nav($(this).text()); 
+			});
 		
-	//load the requested page
-	$.historyInit(GSN.load);
+			//load the requested page
+			$.historyInit(GSN.load);
 	
-	$("#refreshall_autozoomandcenter").bind("click",function() { 
-		if ($("#refreshall_autozoomandcenter").attr("checked")) {
-			GSN.map.userchange();
-			GSN.map.autozoomandcenter();
-		}
-	});
-    $.get('menu.jsp', {selected: "index"}, function(data) {
-        $('#navigation').html(data);
-    });
-});	
-//]]>-->
-</script>
+			$("#refreshall_autozoomandcenter").bind("click",function() { 
+				if ($("#refreshall_autozoomandcenter").attr("checked")) {
+					GSN.map.userchange();
+					GSN.map.autozoomandcenter();
+				}
+			});
+    		$.get('menu.jsp', {selected: "index"}, function(data) {
+        		$('#navigation').html(data);
+    		});
+		});	
+<!--//]]>-->
+	</script>
 </head>
 <body>
 
@@ -50,10 +56,11 @@ $(document).ready(function() {
 	</div>
 	<div id="navigation" style="text-align:right;">
     </div>
+            
 	<div id="main">
-		<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
-		
-		<div id="control">
+	<noscript><p class="error">Your browser doesn't appear to support JavaScript. This is most likely because you're using a text-based or otherwise non-graphical browser. Sadly, GSN require javascript in order to work properly. If you want to access directly the data, you can use the api at <a href="http://localhost:22001/gsn">http://localhost:22001/gsn</a>.</p></noscript>
+	<div class="panel panel-default" style="width:68%;float:left;">
+		<div id="control panel-body">
 		  <iframe name="webupload" style="border:0;height:0;width:0;"></iframe>
 		  <div id="msg">Welcome to Global Sensor Networks. The first ten sensors are displayed by default, but you can easily close them with the <em>close all</em> button. By clicking on a virtual sensors on the left sidebar, it will bring it to the top of the list.</div>
 		  <p>Auto-refresh every : 
@@ -77,8 +84,8 @@ $(document).ready(function() {
 				<div class="loading">Virtual sensors are currently loading...</div>
 			</div>		
 		</div>
+    </div>
 
-	</div>
 	<div id="sidebar">
 		<h3>Description</h3>
 		<p id="gsn-desc">none</p>
@@ -90,6 +97,8 @@ $(document).ready(function() {
         </ul>
         <p><input class="hidden" id="toggleallmarkers" type="button" value="Show/hide all markers" /></p>
 	</div>
+	</div>
+	
 	<div id="footer">
 		<p>Powered by <a href="https://github.com/LSIR/gsn">GSN</a>,  Distributed Information Systems Lab, EPFL 2014</p>
 		<p>

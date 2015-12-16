@@ -1,0 +1,17 @@
+<div>
+    <b>Virtual-sensor name: </b>{{sensorName}}
+    </br>
+    <b>Data range: </b>from {{fromDate}} to {{toDate}}
+    <br/>
+    <b>Parameters: </b>{{parameterString}}
+    <br/>
+    <b>Elevation: </b>{{elevation}} meters
+    <br/>
+    <b>Slope angle: </b>{{angle}} degrees
+    <br/>
+    <b>Aspect: </b>{{aspect}} degrees
+    <br/>
+    <button class="md-raised" ng-click="plot(feature)">Plot</button>
+    <button class="md-raised" ng-click="metadata(feature)">Metadata</button>
+    <button class="md-raised" ng-click="monitor(feature)">Monitor</button>
+</div>

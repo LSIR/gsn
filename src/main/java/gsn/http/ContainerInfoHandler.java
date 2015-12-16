@@ -39,7 +39,7 @@ import gsn.http.ac.DataSource;
 import gsn.http.ac.User;
 import gsn.storage.DataEnumerator;
 import org.apache.commons.collections.KeyValue;
-import org.apache.commons.lang.StringEscapeUtils;
+import static org.apache.commons.lang.StringEscapeUtils.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -54,10 +54,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-//import gsn.http.accesscontrol.User;
-
-
-//import gsn.http.accesscontrol.User;
 
 public class ContainerInfoHandler implements RequestHandler {
   
@@ -67,13 +63,13 @@ public class ContainerInfoHandler implements RequestHandler {
 	  response.setStatus( HttpServletResponse.SC_OK );
 	  String reqName = request.getParameter("name");
 
-        //Added by Behnaz
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+      //Added by Behnaz
+      HttpSession session = request.getSession();
+      User user = (User) session.getAttribute("user");
 
-        response.setHeader("Cache-Control","no-store");
-        response.setDateHeader("Expires", 0);
-        response.setHeader("Pragma","no-cache");
+      response.setHeader("Cache-Control","no-store");
+      response.setDateHeader("Expires", 0);
+      response.setHeader("Pragma","no-cache");
 
       String omitLatestValuesPar = request.getParameter ( "omit_latest_values" );
       boolean omitLatestValues = false;
@@ -81,71 +77,63 @@ public class ContainerInfoHandler implements RequestHandler {
           omitLatestValues = true;
       }
 
-  //System.out.println( "The handle was called" );
- // if (reqName != null) System.out.println("requst " + reqName);
- // if (user != null) System.out.println("User " + user.getUserName());
-        response.getWriter( ).write( buildOutput(reqName,user, omitLatestValues));
+      response.getWriter( ).write( buildOutput(reqName,user, omitLatestValues));
   }
-
   
   //return only the requested sensor if specified (otherwise use null)
-  //Added by Behnaz. New parameter User user to method buildOutput.
   public String buildOutput (String reqName, User user, boolean omitLatestValues) {
-	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());
+	  logger.trace("Start building reponse");
+	  SimpleDateFormat sdf = new SimpleDateFormat (Main.getContainerConfig().getTimeFormat());	  
 	  
-	  
-    StringBuilder sb = new StringBuilder( "<gsn " );
-    sb.append( "name=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebName( ) ) ).append( "\" " );
-    sb.append( "author=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebAuthor( ) ) ).append( "\" " );
-    sb.append( "email=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebEmail( ) ) ).append( "\" " );
-    sb.append( "description=\"" ).append( StringEscapeUtils.escapeXml( Main.getContainerConfig( ).getWebDescription( ) ) ).append("\">\n" );
+      StringBuilder sb = new StringBuilder( "<gsn " );
+      sb.append( "name=\"" ).append(escapeXml(Main.getContainerConfig().getWebName())).append( "\" " );
+      sb.append( "author=\"" ).append(escapeXml(Main.getContainerConfig().getWebAuthor())).append( "\" " );
+      sb.append( "email=\"" ).append(escapeXml(Main.getContainerConfig().getWebEmail())).append( "\" " );
+      sb.append( "description=\"" ).append(escapeXml(Main.getContainerConfig().getWebDescription())).append("\">\n" );
 
+      Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
 
-    Iterator < VSensorConfig > vsIterator = Mappings.getAllVSensorConfigs( );
-
-    boolean access;      // controls what will be shown from each sensor
-    while ( vsIterator.hasNext( ) ) {
-      access = true;  // by default it is considered that everything from the sensor will be retrieved
-      VSensorConfig sensorConfig = vsIterator.next( );
-   //System.out.println( "Inside buildOutput -- name = "+sensorConfig.getName());
-      if(Main.getContainerConfig().isAcEnabled())
-      {
-          if (user != null)
-          {
-              //System.out.println( "The user is defined"+sensorConfig.getName());
-              if ( (reqName != null && !sensorConfig.getName().equals(reqName) )|| ( user.hasReadAccessRight(sensorConfig.getName())== false && user.isAdmin()==false) ) {//continue;
-                                   access = false;
-                  //System.out.println("Source = "+sensorConfig.getName()+" has access = "+ access);
-              }
+      boolean access;      // controls what will be shown from each sensor
+      while ( vsIterator.hasNext( ) ) {
+          access = true;  
+          VSensorConfig sensorConfig = vsIterator.next( );
+   
+          logger.trace("check access for "+sensorConfig.getName());
+          if(Main.getContainerConfig().isAcEnabled()){
+        	  if (user != null){
+                if ( (reqName != null && !sensorConfig.getName().equals(reqName) )|| 
+                		( user.hasReadAccessRight(sensorConfig.getName())== false && user.isAdmin()==false) ) {
+                	access = false;
+                }
+        	  }
+        	  else {
+                if ( (reqName != null && !sensorConfig.getName().equals(reqName)) || 
+                		DataSource.isVSManaged(sensorConfig.getName())){
+                  logger.trace("access protected");
+                  access = false;
+                }
+        	  }
           }
           else {
-              //System.out.println("Datasource - "+DataSource.isVSManaged(sensorConfig.getName()));
-              if ( (reqName != null && !sensorConfig.getName().equals(reqName)) || DataSource.isVSManaged(sensorConfig.getName()))
-              {
-                  access = false;
-                  // continue;
-              }
-          }
-      }
-      else
-      {
             if ( (reqName != null && !sensorConfig.getName().equals(reqName))) continue;   
-      }
-
-      if (access == true) {
-          sb.append("<virtual-sensor");
-          sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
-          sb.append(" protected=\"").append(" \"" );
-          sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
-          if (sensorConfig.getDescription() != null) {
-              sb.append(" description=\"").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append("\"");
           }
-          sb.append( ">\n" );
+          
+
+          if (access == true) {
+              logger.trace("access is granted");
+	          sb.append("<virtual-sensor");
+	          sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );
+	          sb.append(" protected=\"").append(" \"" );
+	          sb.append(" last-modified=\"" ).append(new File(sensorConfig.getFileName()).lastModified()).append("\"");
+	          if (sensorConfig.getDescription() != null) {
+	              sb.append(" description=\"").append(escapeXml(sensorConfig.getDescription())).append("\"");
+	          }
+	          sb.append( ">\n" );
           ArrayList<StreamElement> ses = null;
           if (omitLatestValues == false) ses = getMostRecentValueFor(sensorConfig.getName());
-          int counter = 1;
           if (ses!=null ) {
-              for (StreamElement se:ses){
+              logger.trace("Adding fields and latest values ");
+        	  for (StreamElement se:ses){
                   SimpleDateFormat fsdf = sensorConfig.getSDF() != null ? sensorConfig.getSDF() : sdf ;
                   sb.append("\t<field name=\"time\" type=\"string\" description=\"The timestamp associated with the stream element\" unit=\"\">" ).append( se == null ? "" : fsdf.format(new Date(se.getTimeStamp( ))) ).append( "</field>\n" );
                   for ( DataField df : sensorConfig.getOutputStructure( ) ) {
@@ -153,7 +141,7 @@ public class ContainerInfoHandler implements RequestHandler {
                       sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
                       sb.append(" type=\"").append(df.getType()).append("\"");
                       if (df.getDescription() != null && df.getDescription().trim().length() != 0)
-                          sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
+                          sb.append(" description=\"").append(escapeXml(df.getDescription())).append("\"");
 
                       if (df.getUnit() != null && df.getUnit().trim().length() != 0)
                           sb.append(" unit=\"").append(df.getUnit()).append("\"");
@@ -164,14 +152,14 @@ public class ContainerInfoHandler implements RequestHandler {
                           if (df.getType().toLowerCase( ).trim( ).indexOf( "binary" ) > 0 )
                               sb.append( se.getData( df.getName( ) ) );
                           else
-                              sb.append( se.getData( StringEscapeUtils.escapeXml( df.getName( ) ) ) );
+                              sb.append( se.getData( escapeXml( df.getName( ) ) ) );
                       sb.append("</field>\n");
                   }
                   for ( KeyValue df : sensorConfig.getAddressing( )){
                       sb.append("\t<field");
-                      sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
+                      sb.append(" name=\"").append( escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
                       sb.append(" category=\"predicate\">");
-                      sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
+                      sb.append(escapeXml( df.getValue( ).toString( ) ) );
                       sb.append("</field>\n" );
                   }
                   if (sensorConfig.getWebinput( )!=null){
@@ -183,7 +171,7 @@ public class ContainerInfoHandler implements RequestHandler {
                               sb.append(" category=\"input\"");
                               sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
                               if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
-                                  sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
+                                  sb.append( " description=\"" ).append( escapeXml( df.getDescription( ) ) ).append( "\"" );
 
                               if ( df.getUnit( ) != null && df.getUnit( ).trim( ).length( ) != 0 )
                                   sb.append( " unit=\"" ).append( df.getUnit( ) ).append( "\"" );
@@ -193,17 +181,17 @@ public class ContainerInfoHandler implements RequestHandler {
                           }
                       }
                   }
-                  counter++;
               }
           } else {
-              SimpleDateFormat fsdf = sensorConfig.getSDF() != null ? sensorConfig.getSDF() : sdf ;
+              logger.trace("Adding fields metadata");
+
               sb.append("\t<field name=\"time\" type=\"string\" description=\"The timestamp associated with the stream element\" unit=\"\">" ).append(  ""  ).append( "</field>\n" );
               for ( DataField df : sensorConfig.getOutputStructure( ) ) {
                   sb.append("\t<field");
                   sb.append(" name=\"").append(df.getName().toLowerCase()).append("\"");
                   sb.append(" type=\"").append(df.getType()).append("\"");
                   if (df.getDescription() != null && df.getDescription().trim().length() != 0)
-                      sb.append(" description=\"").append(StringEscapeUtils.escapeXml(df.getDescription())).append("\"");
+                      sb.append(" description=\"").append(escapeXml(df.getDescription())).append("\"");
 
                   if (df.getUnit() != null && df.getUnit().trim().length() != 0)
                       sb.append(" unit=\"").append(df.getUnit()).append("\"");
@@ -214,9 +202,9 @@ public class ContainerInfoHandler implements RequestHandler {
               }
               for ( KeyValue df : sensorConfig.getAddressing( )){
                   sb.append("\t<field");
-                  sb.append(" name=\"").append( StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
+                  sb.append(" name=\"").append( escapeXml( df.getKey( ).toString( ).toLowerCase()) ).append( "\"");
                   sb.append(" category=\"predicate\">");
-                  sb.append(StringEscapeUtils.escapeXml( df.getValue( ).toString( ) ) );
+                  sb.append(escapeXml( df.getValue( ).toString( ) ) );
                   sb.append("</field>\n" );
               }
               if (sensorConfig.getWebinput( )!=null){
@@ -228,7 +216,7 @@ public class ContainerInfoHandler implements RequestHandler {
                           sb.append(" category=\"input\"");
                           sb.append(" type=\"").append( df.getType( ) ).append( "\"" );
                           if ( df.getDescription( ) != null && df.getDescription( ).trim( ).length( ) != 0 )
-                              sb.append( " description=\"" ).append( StringEscapeUtils.escapeXml( df.getDescription( ) ) ).append( "\"" );
+                              sb.append( " description=\"" ).append( escapeXml( df.getDescription( ) ) ).append( "\"" );
 
                           if ( df.getUnit( ) != null && df.getUnit( ).trim( ).length( ) != 0 )
                               sb.append( " unit=\"" ).append( df.getUnit( ) ).append( "\"" );
@@ -240,6 +228,8 @@ public class ContainerInfoHandler implements RequestHandler {
               }
           }
       } else {
+          logger.trace("Adding sensor minimal description ");
+
           sb.append("<virtual-sensor");
           sb.append(" name=\"").append(sensorConfig.getName()).append("\"" );  // (protected)
           sb.append(" protected=\"").append(" (protected)\"" );
@@ -257,12 +247,12 @@ public class ContainerInfoHandler implements RequestHandler {
           StringBuffer location = new StringBuffer();         // gather information about the location of the sensor
           location.append("Location:@ ");
           for ( KeyValue df : sensorConfig.getAddressing( )){
-              location.append(StringEscapeUtils.escapeXml( df.getKey( ).toString( ).toLowerCase())+" = "+StringEscapeUtils.escapeXml( df.getValue( ).toString( ) )+" | " );
+              location.append(escapeXml( df.getKey( ).toString( ).toLowerCase())+" = "+escapeXml( df.getValue( ).toString( ) )+" | " );
           }
           location.append("\n");
           //System.out.println("Loc = "+location.toString() );
           if (sensorConfig.getDescription() != null) {           // added May 2013
-              sb.append(" description=\"").append("Information:@"+StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append(" # ").append(location.toString()).append(" # ").append(fields.toString()).append("\"");     // .append(location.toString()+"").append(fields.toString())
+              sb.append(" description=\"").append("Information:@"+escapeXml(sensorConfig.getDescription())).append(" # ").append(location.toString()).append(" # ").append(fields.toString()).append("\"");     // .append(location.toString()+"").append(fields.toString())
               // sb.append(" description=\"").append("&lt;dl&gt; &lt;dt&gt;  INFORMATION: &lt;/dt&gt &lt;dd&gt;").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append(" &lt;/dd&gt &lt;/dl&gt;").append("\"");     // .append(location.toString()+"").append(fields.toString())
               //           sb.append(" description=\"").append("&lt;div&gt;  &lt;p&gt; INFORMATION: ").append(StringEscapeUtils.escapeXml(sensorConfig.getDescription())).append(" &lt;/p&gt; &lt;/div&gt;").append("\"");     // .append(location.toString()+"").append(fields.toString())
           }

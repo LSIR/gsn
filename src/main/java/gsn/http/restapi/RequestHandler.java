@@ -292,10 +292,10 @@ public class RequestHandler {
     }
 
     public RestResponse getMinAndMaxValuesForSensorField(User user, String sensor, String field) {
-        RestResponse restResponse = userHasAccessToVirtualSensor(user, sensor);
-        if (restResponse != null) { //error occured
-            return restResponse;
-        }
+        RestResponse restResponse = null;userHasAccessToVirtualSensor(user, sensor);
+        //if (restResponse != null) { //error occured
+        //    return restResponse;
+        //}
 
         restResponse = new RestResponse();
 

@@ -1,22 +1,22 @@
 /**
 * Global Sensor Networks (GSN) Source Code
 * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
-* 
+*
 * This file is part of GSN.
-* 
+*
 * GSN is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
-* 
+*
 * GSN is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU General Public License
 * along with GSN.  If not, see <http://www.gnu.org/licenses/>.
-* 
+*
 * File: src/gsn/http/datarequest/AbstractQuery.java
 *
 * @author Timotee Maret
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 
 public class AbstractQuery {
-	
+
 	//private StringBuilder 	standardQuery 	= null;
     private String[] fields;
 	private LimitCriterion 	limitCriterion;
@@ -50,7 +50,7 @@ public class AbstractQuery {
         this.fields = fields;
         this.criteria = criteria;
 	}
-	
+
 	public StringBuilder getStandardQuery() {
 		    // Standard Criteria
 			StringBuilder partStandardCriteria = new StringBuilder () ;
@@ -85,9 +85,17 @@ public class AbstractQuery {
 			for (int i = 0 ; i < fields.length ; i++) {
 				if (partFields.length()>0)
 					partFields.append(", ");
-				if (aggregation != null) 	partFields.append(aggregation.getGroupOperator() + "(");
+				if (aggregation != null) {
+					if ("timed".equals(fields[i])) {
+						partFields.append("max(");
+					} else {
+						partFields.append(aggregation.getGroupOperator() + "(");
+					}
+				}
 				partFields.append(fields[i]);
-				if (aggregation != null)	partFields.append(") as " + fields[i]);
+				if (aggregation != null)	{
+					partFields.append(") as " + fields[i]);
+				}
 
 			}
 

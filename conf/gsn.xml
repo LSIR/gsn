@@ -22,17 +22,17 @@
 <access-control>true</access-control>
 <!-- Main Storage Database, Mandatory -->
 <!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />   -->
-<!--<storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:./GsnMemDb" />-->
-  <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:~/GsnMemDb;AUTO_SERVER=TRUE" />
- <!-- <storage user="root" password="root" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" />  -->
+<!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:./GsnMemDb" />-->
+<!--  <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:~/GsnMemDb;AUTO_SERVER=TRUE" />-->
+  <storage user="root" password="root" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" />   
 <!-- <storage user="gsn" password="gsn" driver="net.sourceforge.jtds.jdbc.Driver" url="jdbc:jtds:sqlserver://192.168.51.14:12345/gsn;cachemetadata=true;prepareSQL=3" />-->
 <!--  <storage user="admin" password="" driver="org.postgresql.Driver" url="jdbc:postgresql://localhost/gsn" /> -->
 <!-- <storage user="gsn" password="gsn" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521" /> -->
 
 <!-- Processing Database, Optional. If not specified, the processing is implemented using the Main Storage Database specified above  -->
- 
+ <!-- 
    <sliding>
       <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:sliding;DB_CLOSE_DELAY=-1" />
    </sliding>
-
+ -->
 </sensor-server>

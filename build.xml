@@ -476,6 +476,7 @@
 	      <releases enabled="true"/>
 	      <snapshots enabled="true"/>
 	    </artifact:remoteRepository>
+
 	<artifact:pom id="gsnpom" file="pom.xml"></artifact:pom>
 	<artifact:dependencies filesetId="gsndeps" pomRefId="gsnpom" />
 </project>
