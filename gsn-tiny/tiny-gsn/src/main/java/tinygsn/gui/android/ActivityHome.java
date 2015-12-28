@@ -22,11 +22,10 @@
  * @author Do Ngoc Hoan
  */
 
-
 package tinygsn.gui.android;
 
-
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -38,7 +37,7 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.widget.TextView;
 
-import org.epfl.locationprivacy.landingpage.LandingPageActivity;
+import org.epfl.locationprivacy.map.activities.SemanticActivity;
 import org.epfl.locationprivacy.map.databases.GridDBDataSource;
 import org.epfl.locationprivacy.map.databases.VenuesCondensedDBDataSource;
 import org.epfl.locationprivacy.privacyestimation.databases.LinkabilityGraphDataSource;
@@ -54,6 +53,7 @@ public class ActivityHome extends AbstractActivity {
 
 	Handler handlerVS;
 	TextView numVS = null;
+	private ProgressDialog progressDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,69 @@ public class ActivityHome extends AbstractActivity {
 			}
 		}.execute(this);
 
+		// Load databases for LocPrivLib
+		new AsyncTask<Void, Integer, Void>() {
+			@Override
+			protected void onPreExecute() {
+				//Create a new progress dialog
+				progressDialog = new ProgressDialog(ActivityHome.this);
+				//Set the progress dialog to display a horizontal progress bar
+				progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				//Set the dialog title to 'Loading...'
+				progressDialog.setTitle("Loading...");
+				//Set the dialog message to 'Loading application View, please wait...'
+				progressDialog.setMessage("Loading databases, please wait...");
+				//This dialog can't be canceled by pressing the back key
+				progressDialog.setCancelable(false);
+				//This dialog isn't indeterminate
+				progressDialog.setIndeterminate(false);
+				//The maximum number of items is 100
+				progressDialog.setMax(100);
+				//Set the current progress to zero
+				progressDialog.setProgress(0);
+				//Display the progress dialog
+				progressDialog.show();
+			}
+
+			//The code to be executed in a background thread.
+			@Override
+			protected Void doInBackground(Void... params) {
+				//Get the current thread's token
+				synchronized (this) {
+					// open dbs
+					GridDBDataSource.getInstance(ActivityHome.this);
+					publishProgress((int) (1.0 * 100.0 / 6.0));
+					VenuesCondensedDBDataSource.getInstance(ActivityHome.this);
+					publishProgress((int) (2.0 * 100.0 / 6.0));
+					LocationTableDataSource.getInstance(ActivityHome.this);
+					publishProgress((int) (3.0 * 100.0 / 6.0));
+					TransitionTableDataSource.getInstance(ActivityHome.this);
+					publishProgress((int) (4.0 * 100.0 / 6.0));
+					SemanticLocationsDataSource.getInstance(ActivityHome.this);
+					publishProgress((int) (5.0 * 100.0 / 6.0));
+					LinkabilityGraphDataSource.getInstance(ActivityHome.this);
+					publishProgress((int) (6.0 * 100.0 / 6.0));
+				}
+				return null;
+			}
+
+			//Update the progress
+			protected void onProgressUpdate(Integer... values) {
+				//set the current progress of the progress dialog
+				progressDialog.setProgress(values[0]);
+			}
+
+			//after executing the code in the thread
+			@Override
+			protected void onPostExecute(Void result) {
+				//close the progress dialog
+				progressDialog.dismiss();
+			}
+		}.execute();
+
+
 		warnIfAPILessThan20();
+
 	}
 
 	@Override
@@ -117,8 +179,8 @@ public class ActivityHome extends AbstractActivity {
 		this.startActivity(myIntent);
 	}
 
-	public void open_libApplication(View view) {
-		Intent myIntent = new Intent(this, LandingPageActivity.class);
+	public void update_semantic_locations(View view) {
+		Intent myIntent = new Intent(this, SemanticActivity.class);
 		this.startActivity(myIntent);
 	}
 

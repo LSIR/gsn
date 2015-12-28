@@ -228,7 +228,7 @@
             android:layout_width="60dip"
             android:layout_height="60dip"
             android:gravity="center"
-            android:onClick="open_libApplication"
+            android:onClick="update_semantic_locations"
             android:src="@drawable/loc_priv_lib_settings"/>
     </TableRow>
 
@@ -273,7 +273,7 @@
             android:layout_alignTop="@+id/imageViewPrivacy"
             android:layout_margin="1dp"
             android:gravity="center"
-            android:text="LocPrivLib App"
+            android:text="Load Semantic Data"
             android:textColor="#000000"/>
     </TableRow>
 
