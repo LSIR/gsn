@@ -9,8 +9,8 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
-import tinygsn.model.vsensor.utils.ParameterType;
-import tinygsn.model.vsensor.utils.VSParameter;
+import tinygsn.model.utils.ParameterType;
+import tinygsn.model.utils.Parameter;
 
 import static android.os.Debug.startMethodTracing;
 import static android.os.Debug.stopMethodTracing;
@@ -129,11 +129,11 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public ArrayList<VSParameter> getParameters() {
-		ArrayList<VSParameter> list = new ArrayList<>();
-		list.add(new VSParameter("weight", ParameterType.EDITBOX));
-		list.add(new VSParameter("age", ParameterType.EDITBOX));
-		list.add(new VSParameter("gender(m/f)", ParameterType.EDITBOX));
+	public ArrayList<Parameter> getParameters() {
+		ArrayList<Parameter> list = new ArrayList<>();
+		list.add(new Parameter("weight", ParameterType.EDITBOX));
+		list.add(new Parameter("age", ParameterType.EDITBOX));
+		list.add(new Parameter("gender(m/f)", ParameterType.EDITBOX));
 		return list;
 	}
 

@@ -36,6 +36,8 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import org.epfl.locationprivacy.util.Utils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -51,8 +53,7 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.WrapperConfig;
-import tinygsn.model.vsensor.utils.ParameterType;
-import tinygsn.model.vsensor.utils.VSParameter;
+import tinygsn.model.utils.Parameter;
 import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
 
@@ -64,7 +65,9 @@ public abstract class AbstractWrapper {
 			                                               .synchronizedList(new ArrayList<StreamSource>());
 	protected int dcDuration = DEFAULT_DUTY_CYCLE_DURATION;
 	protected int dcInterval = DEFAULT_DUTY_CYCLE_INTERVAL;
+	protected HashMap<String, String> parameters = new HashMap<>();
 	private WrapperConfig config = null;
+	private static final String LOGTAG = "AbstractWrapper";
 
 	public AbstractWrapper(WrapperConfig wc) {
 		config = wc;
@@ -109,6 +112,7 @@ public abstract class AbstractWrapper {
 				if (isPlayServiceAvailable()) {
 					wrapperListTemp.put("activityrecognition", wrapperList.getProperty("activityrecognition"));
 				}
+				wrapperListTemp.put("file_reader", wrapperList.getProperty("file_reader"));
 				wrapperList = wrapperListTemp;
 			}
 		} catch (IOException e) {
@@ -257,15 +261,32 @@ public abstract class AbstractWrapper {
 		initialize();
 	}
 
-	protected void initParameter(String key, String value) {
+	public void update_wrapper() {
+		SqliteStorageManager storage = new SqliteStorageManager();
+		HashMap<String, String> param = storage.getSetting("wrapper:" + config.getWrapperName() + ":");
+		parameters.clear();
+		for (Entry<String, String> e : param.entrySet()) {
+			parameters.put(e.getKey(), e.getValue());
+		}
 	}
 
-	public ArrayList<VSParameter> getParameters() {
+	protected void initParameter(String key, String value) {
+		parameters.put(key, value);
+	}
+
+	public ArrayList<Parameter> getParameters() {
 		return new ArrayList<>();
 	}
 
 	public void initialize() {
 	}
 
+	protected static void log(Context context, String s) {
+		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
+			Log.d(LOGTAG, s);
+			Utils.createNewLoggingFolder(context, "Wrapper");
+			Utils.appendLog(LOGTAG + ".txt", s, context);
+		}
+	}
 
 }

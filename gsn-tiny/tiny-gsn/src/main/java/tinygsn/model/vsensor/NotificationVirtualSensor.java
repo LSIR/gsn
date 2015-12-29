@@ -26,25 +26,12 @@
 package tinygsn.model.vsensor;
 
 import android.R;
-import android.app.AlertDialog;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
 import org.epfl.locationprivacy.util.Utils;
 
@@ -52,16 +39,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
-import tinygsn.beans.VSensorConfig;
 import tinygsn.gui.android.ActivityViewData;
-import tinygsn.model.vsensor.utils.ParameterType;
-import tinygsn.model.vsensor.utils.VSParameter;
+import tinygsn.model.utils.ParameterType;
+import tinygsn.model.utils.Parameter;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
@@ -201,7 +186,7 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 
 
 	@Override
-	public ArrayList<VSParameter> getParameters() {
+	public ArrayList<Parameter> getParameters() {
 		ArrayList<String> condition = new ArrayList<>();
 		String[] conditions = new String[]{"==", "is >=", "is <=", "is <", "is >", "changes", "frozen", "back after frozen"};
 		for (int i = 0; i < conditions.length; i++) {
@@ -213,19 +198,19 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		for (int i = 0; i < actions.length; i++) {
 			action.add(actions[i]);
 		}
-		ArrayList<VSParameter> list = new ArrayList<>();
-		list.add(new VSParameter("condition", condition, ParameterType.SPINNER));
-		list.add(new VSParameter("value", "10", ParameterType.EDITBOX_NUMBER));
-		list.add(new VSParameter("action", action, ParameterType.SPINNER));
-		list.add(new VSParameter("Contact", "+41798765432", ParameterType.EDITBOX_PHONE));
-		list.add(new VSParameter("Save to Database", ParameterType.CHECKBOX));
+		ArrayList<Parameter> list = new ArrayList<>();
+		list.add(new Parameter("condition", condition, ParameterType.SPINNER));
+		list.add(new Parameter("value", "10", ParameterType.EDITBOX_NUMBER));
+		list.add(new Parameter("action", action, ParameterType.SPINNER));
+		list.add(new Parameter("Contact", "+41798765432", ParameterType.EDITBOX_PHONE));
+		list.add(new Parameter("Save to Database", ParameterType.CHECKBOX));
 
 		return list;
 	}
 
 	@Override
-	public ArrayList<VSParameter> getParameters(ArrayList<String> params) {
-		ArrayList<VSParameter> list = super.getParameters(params);
+	public ArrayList<Parameter> getParameters(ArrayList<String> params) {
+		ArrayList<Parameter> list = super.getParameters(params);
 		Set<String> set = new HashSet();
 		for (String field : params) {
 			set.add(field);
@@ -234,7 +219,7 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		for (String field : set) {
 			paramsWithoutDuplicates.add(field);
 		}
-		list.add(1, new VSParameter("field", paramsWithoutDuplicates, ParameterType.SPINNER));
+		list.add(1, new Parameter("field", paramsWithoutDuplicates, ParameterType.SPINNER));
 
 		return list;
 	}

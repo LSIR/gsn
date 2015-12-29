@@ -37,8 +37,8 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
-import tinygsn.model.vsensor.utils.ParameterType;
-import tinygsn.model.vsensor.utils.VSParameter;
+import tinygsn.model.utils.ParameterType;
+import tinygsn.model.utils.Parameter;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -101,9 +101,9 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public ArrayList<VSParameter> getParameters() {
-		ArrayList<VSParameter> list = new ArrayList<>();
-		list.add(new VSParameter("model_file", ParameterType.EDITBOX));
+	public ArrayList<Parameter> getParameters() {
+		ArrayList<Parameter> list = new ArrayList<>();
+		list.add(new Parameter("model_file", ParameterType.EDITBOX));
 		return list;
 	}
 

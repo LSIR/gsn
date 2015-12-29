@@ -45,8 +45,8 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.StreamSource;
 import tinygsn.beans.VSensorConfig;
-import tinygsn.model.vsensor.utils.ParameterType;
-import tinygsn.model.vsensor.utils.VSParameter;
+import tinygsn.model.utils.ParameterType;
+import tinygsn.model.utils.Parameter;
 import tinygsn.model.wrappers.AndroidGPSWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 import tinygsn.utils.Logging;
@@ -81,11 +81,11 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	}
 
 
-	public ArrayList<VSParameter> getParameters() {
+	public ArrayList<Parameter> getParameters() {
 		return new ArrayList<>();
 	}
 
-	public ArrayList<VSParameter> getParameters(ArrayList<String> params) {
+	public ArrayList<Parameter> getParameters(ArrayList<String> params) {
 		return getPrivacyParameters();
 	}
 
@@ -94,12 +94,12 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 *
 	 * @return
 	 */
-	public ArrayList<VSParameter> getPrivacyParameters() {
-		ArrayList<VSParameter> parameters = getParameters();
+	public ArrayList<Parameter> getPrivacyParameters() {
+		ArrayList<Parameter> parameters = getParameters();
 
 		// TODO : show it only when GPS is selected
 		// GPS
-		parameters.add(0, new VSParameter("GPS Privacy", ParameterType.CHECKBOX));
+		parameters.add(0, new Parameter("GPS Privacy", ParameterType.CHECKBOX));
 		return parameters;
 	}
 
@@ -280,7 +280,8 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 */
 	public StreamElement anonymizeData(String inputStreamName, StreamElement streamElement) {
 		StreamElement anonymizedStreamElement;
-		if (inputStreamName.equals(tinygsn.model.wrappers.AndroidGPSWrapper.class.getCanonicalName())) {
+		if (inputStreamName.equals(tinygsn.model.wrappers.AndroidGPSWrapper.class.getCanonicalName()) ||
+			inputStreamName.equals(tinygsn.model.wrappers.GPSFileWrapper.class.getCanonicalName())) {
 			anonymizedStreamElement = anonymizeGPS(streamElement);
 		} else {
 			anonymizedStreamElement = streamElement;

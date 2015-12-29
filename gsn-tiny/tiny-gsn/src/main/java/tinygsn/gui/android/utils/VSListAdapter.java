@@ -30,6 +30,7 @@ import tinygsn.controller.AndroidControllerVS;
 import tinygsn.gui.android.ActivityListVS;
 import tinygsn.gui.android.ActivityViewData;
 import tinygsn.gui.android.R;
+import tinygsn.storage.db.SqliteStorageManager;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -59,6 +60,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 	private int resource;
 	private LayoutInflater inflater;
 	private Context context = null;
+	private SqliteStorageManager storage = null;
 	static int TEXT_SIZE = 8;
 	AndroidControllerVS controller;
 	ActivityListVS activityListVSNew;
@@ -74,6 +76,7 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 		context = ctx;
 		this.controller = controller;
 		this.activityListVSNew = activityListVSNew;
+		storage = new SqliteStorageManager();
 	}
 
 	@Override
@@ -136,6 +139,9 @@ public class VSListAdapter extends ArrayAdapter<VSRow> {
 							case DialogInterface.BUTTON_POSITIVE:
 								controller.deleteVS(vs.getName());
 								StaticData.deleteVS(vs.getName());
+								// Remove all informations about vs in settings table
+								storage.deleteSetting("vsensor:" + vs.getName() + ":");
+
 								Toast.makeText(context, vs.getName() + " is deleted!",
 										              Toast.LENGTH_SHORT).show();
 								activityListVSNew.initialize();

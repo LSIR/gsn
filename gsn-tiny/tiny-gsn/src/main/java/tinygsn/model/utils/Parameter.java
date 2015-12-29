@@ -22,30 +22,30 @@
  * @author Schaer Marc
  */
 
-package tinygsn.model.vsensor.utils;
+package tinygsn.model.utils;
 
 import java.util.ArrayList;
 
-public class VSParameter {
+public class Parameter {
 	private String mName;
 	private ArrayList<String> mParameters;
 	private String mDefaultParameter = "";
 
 	private ParameterType mType;
 
-	public VSParameter(String mName, ParameterType mType) {
+	public Parameter(String mName, ParameterType mType) {
 		this.mName = mName;
 		this.mParameters = new ArrayList<>();
 		this.mType = mType;
 	}
 
-	public VSParameter(String mName, String mDefaultParameter, ParameterType mType) {
+	public Parameter(String mName, String mDefaultParameter, ParameterType mType) {
 		this.mName = mName;
 		this.mDefaultParameter = mDefaultParameter;
 		this.mType = mType;
 	}
 
-	public VSParameter(String mName, ArrayList<String> mParameters, ParameterType mType) {
+	public Parameter(String mName, ArrayList<String> mParameters, ParameterType mType) {
 		this.mName = mName;
 		if (mParameters == null) {
 			this.mParameters = new ArrayList<>();

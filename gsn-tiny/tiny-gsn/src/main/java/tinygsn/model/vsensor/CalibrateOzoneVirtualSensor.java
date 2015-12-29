@@ -17,8 +17,8 @@ import tinygsn.beans.DataField;
 import tinygsn.beans.DataTypes;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
-import tinygsn.model.vsensor.utils.ParameterType;
-import tinygsn.model.vsensor.utils.VSParameter;
+import tinygsn.model.utils.ParameterType;
+import tinygsn.model.utils.Parameter;
 
 import static android.os.Debug.startMethodTracing;
 import static android.os.Debug.stopMethodTracing;
@@ -135,10 +135,10 @@ public class CalibrateOzoneVirtualSensor extends AbstractVirtualSensor {
 	}
 
 	@Override
-	public ArrayList<VSParameter> getParameters() {
-		ArrayList<VSParameter> list = new ArrayList<>();
-		list.add(new VSParameter("server_url", ParameterType.EDITBOX));
-		list.add(new VSParameter("model_name", ParameterType.EDITBOX));
+	public ArrayList<Parameter> getParameters() {
+		ArrayList<Parameter> list = new ArrayList<>();
+		list.add(new Parameter("server_url", ParameterType.EDITBOX));
+		list.add(new Parameter("model_name", ParameterType.EDITBOX));
 		return list;
 	}
 

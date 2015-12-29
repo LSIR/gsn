@@ -743,4 +743,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}
 	}
 
+	public void deleteSetting(String key) {
+		String query = "DELETE FROM settings WHERE key LIKE '" + key + "%';";
+		database.execSQL(query);
+	}
+
 }

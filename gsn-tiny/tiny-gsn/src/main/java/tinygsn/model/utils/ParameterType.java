@@ -21,7 +21,7 @@
  *
  * @author Schaer Marc
  */
-package tinygsn.model.vsensor.utils;
+package tinygsn.model.utils;
 
 public enum ParameterType {
 	SPINNER, CHECKBOX, EDITBOX_NUMBER, EDITBOX_TEXT, EDITBOX_PHONE, EDITBOX

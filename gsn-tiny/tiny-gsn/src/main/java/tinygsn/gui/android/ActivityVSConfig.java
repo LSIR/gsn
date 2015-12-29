@@ -63,8 +63,8 @@ import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
 import tinygsn.controller.AndroidControllerVS;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
-import tinygsn.model.vsensor.utils.ParameterType;
-import tinygsn.model.vsensor.utils.VSParameter;
+import tinygsn.model.utils.ParameterType;
+import tinygsn.model.utils.Parameter;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.storage.db.SqliteStorageManager;
 
@@ -163,7 +163,7 @@ public class ActivityVSConfig extends AbstractActivity {
 									vp.add(fields[i]);
 								}
 							}
-							ArrayList<VSParameter> param = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters(vp);
+							ArrayList<Parameter> param = ((AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[pos]).newInstance()).getParameters(vp);
 							vssetting = new SettingPanel("vsensor", param);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -340,7 +340,7 @@ public class ActivityVSConfig extends AbstractActivity {
 							} else {
 								wrapperName = wrapperList.getProperty(wrapperName);
 							}
-							ArrayList<VSParameter> param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
+							ArrayList<Parameter> param = ((AbstractWrapper) Class.forName(wrapperName).newInstance()).getParameters();
 							panel.settings = new SettingPanel("wrapper", param);
 							selectedVS.remove(lastVSSelected.getLastVSSelected());
 							selectedVS.add(wrapperName);
@@ -384,7 +384,7 @@ public class ActivityVSConfig extends AbstractActivity {
 	 */
 	private void updateVSSpinnerParameter(String paramName) {
 		try {
-			for (VSParameter param : vssetting.params) {
+			for (Parameter param : vssetting.params) {
 				if (param.getmName().equals(paramName)) {
 					ArrayList<String> vp = new ArrayList<>();
 					for (String wrapperName : selectedVS) {
@@ -537,14 +537,17 @@ public class ActivityVSConfig extends AbstractActivity {
 			if (validate()) {
 				storage.executeInsert(
 					"sourcesList",
-					new ArrayList<String>(Arrays.asList("vsname",
+					new ArrayList<>(Arrays.asList("vsname",
 						"sswindowsize", "ssstep", "sstimebased", "ssaggregator",
 						"wrappername")),
-					new ArrayList<String>(Arrays.asList(vsname, windowsize.getText().toString(), stepsize
+					new ArrayList<>(Arrays.asList(vsname, windowsize.getText().toString(), stepsize
 						.getText().toString(), timebased.isChecked() + "", aggregator.getSelectedItemPosition()
 						+ "", wrapperName)));
+				// As Wrappers are singleton, remove first old settings for this wrapper
+				for (Parameter param : settings.params) {
+					storage.deleteSetting("wrapper" + ":" + wrapperName + ":" + param.getmName());
+				}
 				settings.saveTo(wrapperName, storage);
-
 			}
 			return wrapperName;
 
@@ -566,11 +569,11 @@ public class ActivityVSConfig extends AbstractActivity {
 	private class SettingPanel { //key-value parameters (for VS and wrappers)
 
 		private String prefix;
-		private ArrayList<VSParameter> params;
+		private ArrayList<Parameter> params;
 		private TextView[] values;
 		private Spinner[] spinners;
 
-		SettingPanel(String prefix, ArrayList<VSParameter> params) {
+		SettingPanel(String prefix, ArrayList<Parameter> params) {
 			this.prefix = prefix;
 			this.params = params;
 		}

@@ -33,6 +33,8 @@ import tinygsn.beans.DataTypes;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.WrapperConfig;
+import tinygsn.model.utils.Parameter;
+import tinygsn.model.utils.ParameterType;
 import tinygsn.services.WrapperService;
 
 import android.location.Location;

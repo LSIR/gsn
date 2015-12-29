@@ -112,9 +112,10 @@ public class StaticData {
 		return vsMap.get(name);
 	}
 	
-	private static Map<String, AbstractWrapper> wrapperMap = new HashMap<String, AbstractWrapper>();
+	private static Map<String, AbstractWrapper> wrapperMap = new HashMap<>();
 	public static AbstractWrapper getWrapperByName(String name) throws Exception {
 		if(wrapperMap.containsKey(name)){
+			wrapperMap.get(name).update_wrapper();
 			return wrapperMap.get(name);
 		}
 		String[] realNames = name.split("\\?");
