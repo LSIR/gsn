@@ -226,7 +226,6 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 	@Override
 	public ArrayList<VSParameter> getParameters(ArrayList<String> params) {
 		ArrayList<VSParameter> list = super.getParameters(params);
-		list.addAll(getParameters());
 		Set<String> set = new HashSet();
 		for (String field : params) {
 			set.add(field);
@@ -235,7 +234,7 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 		for (String field : set) {
 			paramsWithoutDuplicates.add(field);
 		}
-		list.add(0, new VSParameter("field", paramsWithoutDuplicates, ParameterType.SPINNER));
+		list.add(1, new VSParameter("field", paramsWithoutDuplicates, ParameterType.SPINNER));
 
 		return list;
 	}
