@@ -63,6 +63,8 @@ public class GPSFileWrapper extends AbstractWrapper {
 	private static final String[] FIELD_DESCRIPTION = new String[]{"TopLeftLatitude", "TopLeftLongitude", "BottomRightLatitude", "BottomRightLongitude"};
 	private static final String[] FIELD_TYPES_STRING = new String[]{"double", "double", "double", "double"};
 	private static final String LOGTAG = "GPSFileWrapper";
+	// Max wait time between processing two measurement (in ms)
+	private static final Long MAX_WAIT_TIME = Long.valueOf(30000);
 
 	public final Class<? extends WrapperService> getSERVICE() {
 		return GPSFileWrapperService.class;
@@ -113,7 +115,7 @@ public class GPSFileWrapper extends AbstractWrapper {
 						streamElement.setTimeStamp(currentTime);
 						log(StaticData.globalContext, "Post streamElement : " + streamElement.toString());
 						postStreamElement(streamElement);
-						Thread.sleep(Math.min(nextTime - currentTime, Long.valueOf(20000)));
+						Thread.sleep(Math.min(nextTime - currentTime, Long.valueOf(MAX_WAIT_TIME)));
 						currentTime = nextTime;
 					}
 				}
@@ -124,7 +126,7 @@ public class GPSFileWrapper extends AbstractWrapper {
 						location.latitude, location.longitude});
 				streamElement.setTimeStamp(currentTime);
 				postStreamElement(streamElement);
-				log(StaticData.globalContext, "End of file " + path + " for " + LOGTAG);
+				log(StaticData.globalContext, "End of Processing file " + path + " for " + LOGTAG);
 			}
 		} catch (Exception e) {
 			Log.e(LOGTAG, e.getMessage());
