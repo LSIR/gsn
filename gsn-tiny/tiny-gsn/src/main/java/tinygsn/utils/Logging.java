@@ -22,7 +22,7 @@ public class Logging {
 	public static String filePathPart2;
 
 	public static String createNewLoggingFolder(Context context, String task) {
-		filePathPart2 = task + "_" + System.currentTimeMillis();
+		filePathPart2 = task;
 		File path;
 		if (isExternalStorageWritable()) {
 			path = context.getExternalFilesDir(null);
@@ -43,6 +43,7 @@ public class Logging {
 		}
 		File completePath = new File(path, filePathPart1 + File.separator + subFolder);
 		File logFile = new File(completePath, fileName);
+		text = System.currentTimeMillis() + " : " + text;
 		if (!logFile.exists()) {
 			try {
 				logFile.createNewFile();

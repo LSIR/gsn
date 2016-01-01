@@ -56,6 +56,7 @@ import tinygsn.beans.WrapperConfig;
 import tinygsn.model.utils.Parameter;
 import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
+import tinygsn.utils.Logging;
 
 public abstract class AbstractWrapper {
 
@@ -284,8 +285,8 @@ public abstract class AbstractWrapper {
 	protected static void log(Context context, String s) {
 		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
 			Log.d(LOGTAG, s);
-			Utils.createNewLoggingFolder(context, "Wrapper");
-			Utils.appendLog(LOGTAG + ".txt", s, context);
+			Logging.createNewLoggingFolder(context, "Wrapper");
+			Logging.appendLog("Wrapper", LOGTAG + ".txt", s, context);
 		}
 	}
 
