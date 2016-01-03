@@ -1,6 +1,6 @@
 /**
  * Global Sensor Networks (GSN) Source Code
- * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+ * Copyright (c) 2006-2015, Ecole Polytechnique Federale de Lausanne (EPFL)
  * <p/>
  * This file is part of GSN.
  * <p/>
@@ -19,7 +19,7 @@
  * <p/>
  * File: gsn-tiny/src/tinygsn/gui/android/ActivityListVSNew.java
  *
- * @author Do Ngoc Hoan
+ * @author Do Ngoc Hoan and Schaer Marc
  */
 
 
@@ -64,7 +64,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_publish_list);
 		listViewPublish = (ListView) findViewById(R.id.publish_list);
-		listAdapter = new PublishListAdapter(this, R.layout.publish_row_item, controller);
+		listAdapter = new PublishListAdapter(this, R.layout.publish_row_item, controller, this);
 		listViewPublish.setAdapter(listAdapter);
 	}
 
@@ -94,7 +94,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 		ActionBar actionBar = getActionBar();
 		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-				                            | ActionBar.DISPLAY_SHOW_CUSTOM); // show it
+			| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -122,7 +122,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 
 		}
 		TextView lastUpdate = (TextView) actionBar.getCustomView().findViewById(
-				                                                                       R.id.lastUpdate);
+			R.id.lastUpdate);
 		lastUpdate.setText("Last update:\n" + (new Date()).toString());
 	}
 
@@ -131,7 +131,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 
 		final MenuItem add = menu.add("Add");
 		add.setIcon(R.drawable.plus_b).setShowAsAction(
-				                                              MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			public boolean onMenuItemClick(final MenuItem item) {
@@ -143,7 +143,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 
 		final MenuItem refresh = menu.add("Refresh");
 		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
-				                                                                      MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 

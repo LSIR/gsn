@@ -30,6 +30,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.io.Serializable;
@@ -635,9 +636,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	}
 
 
-	public boolean updatePublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active) {
-		String query = "UPDATE publishDestination SET url = ?, vsname = ?, key = ?, mode = ?, lastTime = ?, active = ?  WHERE _id = ?;";
-		Cursor cursor = database.rawQuery(query, new String[]{url, vsname, key, mode + "", lastTime + "", active ? "1" : "0", "" + id});
+	public boolean updatePublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, long iterationTime, boolean active) {
+		String query = "UPDATE publishDestination SET url = ?, vsname = ?, key = ?, mode = ?, lastTime = ?, iterationTime = ?, active = ?  WHERE _id = ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{url, vsname, key, mode + "", lastTime + "", iterationTime + "", active ? "1" : "0", "" + id});
 		if (cursor.moveToNext())
 			return true;
 		return false;
@@ -653,17 +654,22 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			String key = cursor.getString(cursor.getColumnIndex("key"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
+			long iterationTime = cursor.getLong(cursor.getColumnIndex("iterationTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			DeliveryRequest dr = new DeliveryRequest(url, key, mode, vsname, id);
+			DeliveryRequest dr = new DeliveryRequest(url, key, mode, vsname, id, iterationTime);
 			dr.setActive(active);
 			dr.setLastTime(lastTime);
 			return dr;
 		}
 		return null;
-
 	}
 
-	public void setPublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, boolean active) {
+	public void deletePublishInfo(int id) {
+		String query = "DELETE FROM publishDestination WHERE _id = " + id + ";";
+		database.execSQL(query);
+	}
+
+	public void setPublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, long iterationTime, boolean active) {
 		if (id == -1 || getPublishInfo(id) == null) {
 			ContentValues newCon = new ContentValues();
 			newCon.put("url", url);
@@ -671,10 +677,11 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			newCon.put("key", key);
 			newCon.put("mode", mode);
 			newCon.put("lastTime", lastTime);
+			newCon.put("iterationTime", iterationTime);
 			newCon.put("active", active ? "1" : "0");
 			database.insert("publishDestination", null, newCon);
 		} else {
-			updatePublishInfo(id, url, vsname, key, mode, lastTime, active);
+			updatePublishInfo(id, url, vsname, key, mode, lastTime, iterationTime, active);
 		}
 	}
 
@@ -689,14 +696,14 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			String key = cursor.getString(cursor.getColumnIndex("key"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
+			long iterationTime = cursor.getLong(cursor.getColumnIndex("iterationTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			DeliveryRequest dr = new DeliveryRequest(url, key, mode, vsname, id);
+			DeliveryRequest dr = new DeliveryRequest(url, key, mode, vsname, id, iterationTime);
 			dr.setActive(active);
 			dr.setLastTime(lastTime);
 			r.add(dr);
 		}
 		return r;
-
 	}
 
 	public DataField[] tableToStructure(CharSequence tableName) throws SQLException {

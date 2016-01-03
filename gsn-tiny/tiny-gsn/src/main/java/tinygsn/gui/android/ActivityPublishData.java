@@ -1,6 +1,6 @@
 /**
  * Global Sensor Networks (GSN) Source Code
- * Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+ * Copyright (c) 2006-2015, Ecole Polytechnique Federale de Lausanne (EPFL)
  * <p/>
  * This file is part of GSN.
  * <p/>
@@ -19,13 +19,11 @@
  * <p/>
  * File: gsn-tiny/src/tinygsn/gui/android/ActivityPublishData.java
  *
- * @author Do Ngoc Hoan
+ * @author Do Ngoc Hoan and Schaer Marc
  */
 
 
 package tinygsn.gui.android;
-
-import gsn.http.rest.PushDelivery;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,9 +32,13 @@ import java.util.Date;
 import java.util.Locale;
 
 import tinygsn.beans.DeliveryRequest;
-import tinygsn.beans.StreamElement;
 import tinygsn.controller.AndroidControllerPublish;
+import tinygsn.model.publishers.AbstractDataPublisher;
+import tinygsn.model.publishers.OnDemandDataPublisher;
+import tinygsn.model.publishers.OpportunisticDataPublisher;
+import tinygsn.model.publishers.PeriodicDataPublisher;
 import tinygsn.storage.db.SqliteStorageManager;
+import tinygsn.utils.ToastUtils;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,10 +49,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class ActivityPublishData extends AbstractFragmentActivity {
 	public static String[] STRATEGY = {"On demand", "Periodically", "Opportunistically"};
@@ -65,10 +67,12 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 	private EditText fromtimeEditText = null;
 	private EditText totimeEditText = null;
 	private EditText todateEditText = null;
+	private EditText iterationTime = null;
 	private Spinner vsnameSpinner = null;
 	private Spinner modeSpinner = null;
 	private DeliveryRequest dr = null;
 	private SqliteStorageManager storage;
+	private AbstractDataPublisher dataPublisher;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +90,7 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 		vsnameSpinner = (Spinner) findViewById(R.id.spinner_vsName);
 		modeSpinner = (Spinner) findViewById(R.id.spinner_mode);
 		publishButton = (Button) findViewById(R.id.Button_publish);
+		iterationTime = (EditText) findViewById(R.id.iterationTime);
 
 		controller = new AndroidControllerPublish();
 		storage = new SqliteStorageManager();
@@ -101,6 +106,7 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 				serverEditText.setText(dr.getUrl());
 				keyEditText.setText(dr.getKey());
 				cal.setTimeInMillis(dr.getLastTime());
+				iterationTime.setText("" + dr.getIterationTime());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -149,6 +155,8 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 					publishButton.setVisibility(View.GONE);
 					findViewById(R.id.textViewFrom).setVisibility(View.GONE);
 					findViewById(R.id.textViewTo).setVisibility(View.GONE);
+					iterationTime.setVisibility(View.VISIBLE);
+					findViewById(R.id.textIterationTime).setVisibility(View.VISIBLE);
 				} else {
 					fromdateEditText.setVisibility(View.VISIBLE);
 					todateEditText.setVisibility(View.VISIBLE);
@@ -157,8 +165,9 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 					publishButton.setVisibility(View.VISIBLE);
 					findViewById(R.id.textViewFrom).setVisibility(View.VISIBLE);
 					findViewById(R.id.textViewTo).setVisibility(View.VISIBLE);
+					iterationTime.setVisibility(View.GONE);
+					findViewById(R.id.textIterationTime).setVisibility(View.GONE);
 				}
-
 			}
 
 			@Override
@@ -170,11 +179,10 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 		}
 	}
 
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add("Save").setShowAsAction(
-				                                MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -185,62 +193,48 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 				finish();
 				break;
 			case 0:
-				save();
-				finish();
+				int mode = modeSpinner.getSelectedItemPosition();
+				if (iterationTime.getText().toString().equals("") || serverEditText.getText().toString().equals("") || vsnameSpinner.getSelectedItem().toString().equals("") ||
+					keyEditText.getText().toString().equals("")) {
+					ToastUtils.showToastInUiThread(this, "One of the field is empty. It should not !", Toast.LENGTH_SHORT);
+				} else {
+					createDataPublisher(mode).save(serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(),
+						keyEditText.getText().toString(), mode, Long.valueOf(iterationTime.getText().toString()), dr);
+					finish();
+				}
 				break;
 		}
 		return true;
 	}
 
-	public void save() {
-		int id = -1;
-		long lastTime = 0;
-		boolean active = false;
-		if (dr != null) {
-			id = dr.getId();
-			lastTime = dr.getLastTime();
-			active = dr.isActive();
-		}
-		storage.setPublishInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(),
-				                      keyEditText.getText().toString(), modeSpinner.getSelectedItemPosition(), lastTime, active);
-	}
-
+	/**
+	 * This method is called directly from the button on the view when it is an "On Demand" publisher
+	 *
+	 * @param view
+	 */
 	public void publish(View view) {
-		StreamElement[] se = controller.loadRangeData(vsnameSpinner.getSelectedItem().toString(), fromdateEditText.getText().toString(), fromtimeEditText.getText().toString(), todateEditText.getText().toString(), totimeEditText.getText().toString());
-		if (se.length > 0) {
-			new PublishDataTask(new PushDelivery(serverEditText.getText() + "/streaming/", Double.parseDouble(keyEditText.getText().toString()))).execute(se);
-		} else {
-			Toast.makeText(this, "No data to publish", Toast.LENGTH_SHORT)
-					.show();
-		}
+		dataPublisher = createDataPublisher(0);
+		dataPublisher.publish(dr);
 	}
 
-	private class PublishDataTask extends AsyncTask<StreamElement[], Void, Boolean> {
-
-		PushDelivery push;
-
-		public PublishDataTask(PushDelivery p) {
-			push = p;
+	private AbstractDataPublisher createDataPublisher(int mode) {
+		if (mode == 0) {
+			dataPublisher = new OnDemandDataPublisher(fromdateEditText.getText().toString(), fromtimeEditText.getText().toString(), todateEditText.getText().toString(), totimeEditText.getText().toString(), dr);
+		} else if (mode == 1) {
+			dataPublisher = new PeriodicDataPublisher(dr);
+		} else {
+			dataPublisher = new OpportunisticDataPublisher(dr);
 		}
+		return dataPublisher;
+	}
 
-		private StreamElement[] se = null;
-
-		@Override
-		protected Boolean doInBackground(StreamElement[]... params) {
-			se = params[0];
-			return push.writeStreamElements(se);
-		}
-
-		protected void onPostExecute(Boolean results) {
-			if (results == true) {
-				Toast.makeText(ActivityPublishData.this, "Published: " + se.length,
-						              Toast.LENGTH_SHORT).show();
-				dr.setLastTime(System.currentTimeMillis());
-				save();
-			} else {
-				Toast.makeText(ActivityPublishData.this, "Publish fail: " + se.length,
-						              Toast.LENGTH_SHORT).show();
-			}
+	public static AbstractDataPublisher createPublicDataPublisher(int mode, DeliveryRequest dr) {
+		if (mode == 0) {
+			return new OnDemandDataPublisher(dr);
+		} else if (mode == 1) {
+			return new PeriodicDataPublisher(dr);
+		} else {
+			return new OpportunisticDataPublisher(dr);
 		}
 	}
 }

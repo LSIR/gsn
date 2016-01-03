@@ -60,6 +60,9 @@
         <service android:name="tinygsn.model.wrappers.LocalWrapper$LocalService"/>
         <service android:name="tinygsn.model.wrappers.RemoteWrapper$RemoteService"/>
         <service android:name="tinygsn.model.wrappers.GPSFileWrapper$GPSFileWrapperService"/>
+        <service android:name="tinygsn.model.publishers.OnDemandDataPublisher$OnDemandDataPublisherService"/>
+        <service android:name="tinygsn.model.publishers.PeriodicDataPublisher$PeriodicallyDataPublisherService"/>
+        <service android:name="tinygsn.model.publishers.OpportunisticDataPublisher$OpportunisticDataPublisherService"/>
 
 
         <activity

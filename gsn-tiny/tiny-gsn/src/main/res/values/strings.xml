@@ -36,6 +36,7 @@
     <string name="defaultws">5</string>
     <string name="defaultstep">1</string>
     <string name="view_mode">View mode</string>
+    <string name="iteration_time">Iteration between two publish operations (in ms)</string>
     <string name="server">GSN server</string>
     <string name="strategy">Strategy</string>
     <string name="Publish_Data">Publish Data</string>

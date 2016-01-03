@@ -45,7 +45,6 @@ public class AndroidControllerPublish extends AbstractController {
 	
 	public AndroidControllerPublish() {
 		storage = new SqliteStorageManager();
-		
 	}
 
 	public ArrayList<String> loadListVS() {

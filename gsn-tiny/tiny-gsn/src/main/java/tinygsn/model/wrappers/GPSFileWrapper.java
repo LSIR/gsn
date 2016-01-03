@@ -73,8 +73,8 @@ public class GPSFileWrapper extends AbstractWrapper {
 	@Override
 	public void runOnce() {
 		if (getConfig().isRunning()) {
-			readGPSFile();
 			getConfig().setRunning(false);
+			readGPSFile();
 		}
 	}
 

@@ -98,7 +98,7 @@ public class ActivityListSubscription extends AbstractActivity {
 		ActionBar actionBar = getActionBar();
 		actionBar.setCustomView(R.layout.actionbar_top); // load your layout
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
-				                            | ActionBar.DISPLAY_SHOW_CUSTOM); // show it
+			| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -126,7 +126,7 @@ public class ActivityListSubscription extends AbstractActivity {
 
 		}
 		TextView lastUpdate = (TextView) actionBar.getCustomView().findViewById(
-				                                                                       R.id.lastUpdate);
+			R.id.lastUpdate);
 		lastUpdate.setText("Last update:\n" + (new Date()).toString());
 	}
 
@@ -135,7 +135,7 @@ public class ActivityListSubscription extends AbstractActivity {
 
 		final MenuItem add = menu.add("Add");
 		add.setIcon(R.drawable.plus_b).setShowAsAction(
-				                                              MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 			public boolean onMenuItemClick(final MenuItem item) {
@@ -147,7 +147,7 @@ public class ActivityListSubscription extends AbstractActivity {
 
 		final MenuItem refresh = menu.add("Refresh");
 		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
-				                                                                      MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 

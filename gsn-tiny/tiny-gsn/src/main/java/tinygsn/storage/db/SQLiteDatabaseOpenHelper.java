@@ -63,7 +63,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 
 
 		createQuery = "CREATE TABLE publishDestination (_id integer primary key autoincrement,"
-				+ "url text, vsname text, key text, mode integer, lastTime bigint, active int"
+				+ "url text, vsname text, key text, mode integer, lastTime bigint, iterationTime bigint, active int"
 				+ ");";
 		db.execSQL(createQuery);
 

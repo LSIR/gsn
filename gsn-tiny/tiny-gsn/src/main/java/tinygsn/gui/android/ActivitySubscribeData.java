@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import tinygsn.beans.Subscription;
 import tinygsn.controller.AndroidControllerSubscribe;
 import tinygsn.storage.db.SqliteStorageManager;
+import tinygsn.utils.ToastUtils;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,6 +40,9 @@ import android.widget.Spinner;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import org.epfl.locationprivacy.util.Utils;
 
 public class ActivitySubscribeData extends AbstractFragmentActivity {
 	public static String[] STRATEGY = {"Google Cloud Messaging (Push)", "GSN API (Pull)"};
@@ -140,7 +144,11 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 			lastTime = su.getLastTime();
 			active = su.isActive();
 		}
-		storage.setSubscribeInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), modeSpinner.getSelectedItemPosition(), lastTime, active);
+		if (serverEditText.getText() == null || vsnameSpinner.getSelectedItem() == null || modeSpinner.getSelectedItem() == null) {
+			ToastUtils.showToastInUiThread(this, "All arguments must be set", Toast.LENGTH_SHORT);
+		} else {
+			storage.setSubscribeInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), modeSpinner.getSelectedItemPosition(), lastTime, active);
+		}
 	}
 
 }
