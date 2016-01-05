@@ -259,7 +259,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 			// get data from streamElement for obfuscate them
 			double latitude = (double) streamElement.getData("latitudeTopLeft");
 			double longitude = (double) streamElement.getData("longitudeTopLeft");
-			Pair<LatLng, LatLng> obfuscatedPosition = prot.getObfuscationLocation(new LatLng(latitude, longitude));
+			Pair<LatLng, LatLng> obfuscatedPosition = prot.getObfuscationLocation(new LatLng(latitude, longitude), streamElement.getTimeStamp());
 
 			AndroidGPSWrapper wrapper = new AndroidGPSWrapper();
 			StreamElement obfuscatedStreamElement = new StreamElement(wrapper.getFieldList(), wrapper.getFieldType(),
