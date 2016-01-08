@@ -27,25 +27,19 @@ package gsn;
 
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-import gsn.http.rest.DeliverySystem;
-import gsn.http.rest.DistributionRequest;
-import gsn.storage.DataEnumerator;
+import gsn.http.delivery.DeliverySystem;
+import gsn.http.delivery.DistributionRequest;
 import gsn.storage.DataEnumeratorIF;
 import gsn.storage.ModelEnumerator;
-import gsn.storage.SQLValidator;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import gsn.storage.StorageManager;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 

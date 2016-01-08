@@ -30,7 +30,7 @@
 
 package gsn.beans;
 
-import gsn.http.rest.StreamElement4Rest;
+import gsn.http.delivery.StreamElement4Rest;
 import gsn.utils.CaseInsensitiveComparator;
 
 import java.io.Serializable;

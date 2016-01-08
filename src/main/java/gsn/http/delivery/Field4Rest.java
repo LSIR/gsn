@@ -17,32 +17,43 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN.  If not, see <http://www.gnu.org/licenses/>.
 * 
-* File: src/gsn/VirtualSensorInitializationFailedException.java
+* File: src/gsn/http/rest/Field4Rest.java
 *
 * @author Ali Salehi
 *
 */
 
-package gsn;
+package gsn.http.delivery;
 
-public class VirtualSensorInitializationFailedException extends Exception {
+import java.io.Serializable;
 
-	private static final long serialVersionUID = -6903638792983036844L;
+public class Field4Rest {
+	private String name;
+	private Serializable value;
+	private Byte type;
 
-	public VirtualSensorInitializationFailedException ( ) {
-      super( );
-   }
-   
-   public VirtualSensorInitializationFailedException ( String message ) {
-      super( message );
-   }
-   
-   public VirtualSensorInitializationFailedException ( String message , Throwable cause ) {
-      super( message , cause );
-   }
-   
-   public VirtualSensorInitializationFailedException ( Throwable cause ) {
-      super( cause );
-   }
-   
+	public Field4Rest(String name, Byte type, Serializable value) {
+		this.name = name;
+		this.type = type;
+		this.value = value;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Serializable getValue() {
+		return value;
+	}
+
+	public byte getType() {
+		return type;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Field(name:").append(name).append(",").append("type:").append(type).append(",value:").append(value).append(")");
+		return sb.toString();
+	}
+	
 }

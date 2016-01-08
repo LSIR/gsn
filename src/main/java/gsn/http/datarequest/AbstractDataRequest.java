@@ -26,13 +26,9 @@
 
 package gsn.http.datarequest;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * <p>
@@ -68,8 +64,6 @@ import org.slf4j.Logger;
  */
 public abstract class AbstractDataRequest {
 
-	private static transient Logger 	logger 						= LoggerFactory.getLogger(AbstractDataRequest.class);
-
 	protected QueriesBuilder qbuilder = null;
 	
 	protected Map<String, String[]> requestParameters = null;
@@ -86,32 +80,4 @@ public abstract class AbstractDataRequest {
 	public abstract void process() throws DataRequestException ;
 
 	public abstract void outputResult (OutputStream os) ;
-
-//	public InputStream getInputStream(int bufferSize) {
-//		DataRequestReaderTarget drrt = new DataRequestReaderTarget(bufferSize);
-//		(new Thread(drrt)).start();
-//		return drrt.getInputStream();
-//	}
-	
-/*	private class DataRequestReaderTarget implements Runnable {
-
-		private OutputInputStream ois = null;
-
-		public DataRequestReaderTarget(int bufferSize) {
-			ois = new OutputInputStream (bufferSize) ;
-		}
-		
-		public void run() {
-			try {
-				outputResult(ois.getOutputStream());
-				ois.getOutputStream().close();
-			} catch (IOException e) {
-				logger.debug(e.getMessage());
-			}
-		}
-		
-		public InputStream getInputStream () {
-			return ois.getInputStream();
-		}
-	}*/
 }

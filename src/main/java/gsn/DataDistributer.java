@@ -29,12 +29,10 @@ package gsn;
 
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-import gsn.http.rest.DefaultDistributionRequest;
-import gsn.http.rest.DeliverySystem;
-import gsn.http.rest.DistributionRequest;
-import gsn.http.rest.LocalDeliveryWrapper;
+import gsn.http.delivery.DefaultDistributionRequest;
+import gsn.http.delivery.DeliverySystem;
+import gsn.http.delivery.DistributionRequest;
 import gsn.networking.zeromq.ZeroMQDelivery;
-import gsn.networking.zeromq.ZeroMQWrapper;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLValidator;
 
@@ -53,7 +51,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import gsn.storage.StorageManager;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.joda.time.format.ISODateTimeFormat;
 
 public class DataDistributer implements VirtualSensorDataListener, VSensorStateChangeListener, Runnable {
 
@@ -70,7 +67,6 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     private DataDistributer() {
         try {
-            //conn = Main.getStorage().getConnection();
             thread = new Thread(this);
             thread.start();
             // Start the keep alive Timer -- Note that the implementation is backed by one single thread for all the RestDelivery instances.
@@ -89,7 +85,6 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                 }
             });
             keepAliveTimer.start();
-        //} catch (SQLException e) {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -111,8 +106,6 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     private HashMap<DistributionRequest, PreparedStatement> preparedStatements = new HashMap<DistributionRequest, PreparedStatement>();
 
     private ArrayList<DistributionRequest> listeners = new ArrayList<DistributionRequest>();
-
-    //private Connection conn;
 
     private ConcurrentHashMap<DistributionRequest, DataEnumerator> candidateListeners = new ConcurrentHashMap<DistributionRequest, DataEnumerator>();
 
@@ -195,7 +188,6 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
         }
 
         StreamElement se = dataEnum.nextElement();
-        //		boolean success = true;
         boolean success = listener.deliverStreamElement(se);
         if (!success) {
             logger.debug("FLushing an stream element failed, delivery failure [Listener: " + listener.toString() + "]");
@@ -336,8 +328,6 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 		}
 
 	}
-
-    //
 
     private HashMap<StorageManager, Connection> connections = new HashMap<StorageManager, Connection>();
     public Connection getPersistantConnection(VSensorConfig config) throws Exception {

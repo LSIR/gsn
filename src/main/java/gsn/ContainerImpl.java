@@ -35,43 +35,34 @@ import gsn.vsensor.AbstractVirtualSensor;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 public class ContainerImpl  {
-
-	private static transient Logger                                      logger                             = LoggerFactory.getLogger( ContainerImpl.class );
 
 	/**
 	 * The <code> waitingVirtualSensors</code> contains the virtual sensors that
 	 * recently produced data. This variable is useful for batch processing timed
 	 * couple virtual sensor produce data.
-	 */
-	/*
+	 *
+	 *
 	 * In the <code>registeredQueries</code> the key is the local virtual
 	 * sensor name.
 	 */
 
-	
 	private static ContainerImpl singleton;
-	
-	private static final Object                                          psLock                             = new Object( );
+	private static final Object psLock = new Object();
 
-	private ContainerImpl() {
-
-	}
+	private ContainerImpl() {}
 
 	public static ContainerImpl getInstance() {
-		if (singleton == null)
+		if (singleton == null) {
 			singleton = new ContainerImpl();
+		}
 		return singleton;
 	}
 
-
-	public void publishData ( AbstractVirtualSensor sensor ,StreamElement data) throws SQLException {
-		String name = sensor.getVirtualSensorConfiguration( ).getName( ).toLowerCase();
+	public void publishData(AbstractVirtualSensor sensor, StreamElement data) throws SQLException {
+		String name = sensor.getVirtualSensorConfiguration().getName( ).toLowerCase();
 		StorageManager storageMan = Main.getStorage(sensor.getVirtualSensorConfiguration().getName());
-		synchronized ( psLock ) {
+		synchronized(psLock) {
 			storageMan.executeInsert( name ,sensor.getVirtualSensorConfiguration().getOutputStructure(), data );
 		}
 		
@@ -83,8 +74,9 @@ public class ContainerImpl  {
 	private ArrayList<VirtualSensorDataListener> dataListeners = new ArrayList<VirtualSensorDataListener>();
 
 	public synchronized void addVSensorDataListener(VirtualSensorDataListener listener) {
-		if (!dataListeners.contains(listener))
+		if (!dataListeners.contains(listener)) {
 			dataListeners.add(listener);
+		}
 	}
 
 	public synchronized void removeVSensorDataListener(VirtualSensorDataListener listener) {

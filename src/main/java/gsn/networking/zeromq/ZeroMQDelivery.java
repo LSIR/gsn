@@ -16,7 +16,7 @@ import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-import gsn.http.rest.DeliverySystem;
+import gsn.http.delivery.DeliverySystem;
 
 public class ZeroMQDelivery implements DeliverySystem{
 	

@@ -85,16 +85,6 @@
     	</copy>
     </target>
 
-    <target name="bind" depends="build" description="Compile the JIBX mappings.">
-    	
-        <java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}"
-              failonerror="true" classpathref="classpath">
-            <arg value="src/main/resources/containerJIBX.xml"/>
-            <arg value="src/main/resources/VirtualSensorDescription.xml"/>
-        </java>
-    </target>
-
-	
     <target name="cleandb" depends="build">
         <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring=""  classpathref="classpath" />
     </target>
@@ -102,7 +92,7 @@
 
     <!-- Run -->
 
-    <target name="runcam" depends="bind">
+    <target name="runcam" depends="build">
         <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
               dir="${basedir}">
             <env key="LD_LIBRARY_PATH"
@@ -143,137 +133,6 @@
 
     <!-- Dev -->
 
-    <target name="generate-msr" depends="bind" description="Generate the Microsoft Sensor Map Webservice.">
-        <!-- generate the stub for the user management -->
-        <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
-            <arg value="-o"/>
-            <arg value="generated"/>
-            <arg value="-p"/>
-            <arg value="gsn.msr.sensormap.userman"/>
-            <arg value="-s"/>
-            <arg value="-uri"/>
-            <arg value="http://www.sensormap.org/SenseWebV3/usermanager/service.asmx?WSDL"/>
-        </java>
-        <!-- generate the stub for sensor management -->
-        <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
-            <arg value="-o"/>
-            <arg value="generated"/>
-            <arg value="-p"/>
-            <arg value="gsn.msr.sensormap.sensorman"/>
-            <arg value="-s"/>
-            <arg value="-uri"/>
-            <arg value="http://www.sensormap.org/SenseWebV3/sensormanager/service.asmx?WSDL"/>
-        </java>
-        <!-- generate the skeleton for the datahub -->
-        <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
-            <arg value="-o"/>
-            <arg value="generated"/>
-            <arg value="-p"/>
-            <arg value="gsn.msr.sensormap.datahub"/>
-            <arg value="-s"/>
-            <arg value="-ss"/>
-            <arg value="-sd"/>
-            <arg value="-uri"/>
-            <arg value="http://www.sensormap.org/SenseWebV3/DataHub/Service.asmx?WSDL"/>
-        </java>
-    </target>
-
-
-    <!--
-     Default Setting for compiling/generating/packaging the default GSN web services.
-     Use the ant -D options to override these values in order to operate with your own webservice.
-     eg: ant -Dwsroot=foo/bar -Dwsname=MyWebService dev-ws-generate-aar
-
-     http://localhost:22001/services/standard/GSNWebService?wsdl
-     
-      -->
-
-     <!-- Default Web Service root path -->
-     <property name="wsroot" value="${basedir}/webservices/standard"/>
-     <!-- Default Web Service SOAP Address -->
-     <property name="soapaddress" value="http://localhost:22001/services/standard/GSNWebService"/>
-     <!-- Default source class used to generate the service (contract Last approach) -->
-     <property name="sourceclass" value="gsn.webservice.standard.GSNWebService"/>
-     <!-- Default WSDL used to generate the service (Contract First approach) -->
-     <property name="sourcewsdl" value="${wsroot}/META-INF/GSNWebService.wsdl"/>
-     <!-- Default name for the Axis deployable ARchive (.aar) -->
-     <property name="wsname" value="GSNWebService"/>
-
-     <!--
-     Generate the web service deployable axis archive (.aar).
-     The archive contains the service description (wsdl), schema (xsd) and service file (xml) as well as the compiled
-     classes for the service.
-     Move the .aar archive to the webapp/WEB-INF/services in order to enable the webservice.
-     -->
-     <target name="dev-ws-package" depends="dev-ws-compile" description="Generate the web service deployable axis archive (.aar).">
-         <!--
-         <copy toDir="${wsroot}/build/META-INF" failonerror="false">
-             <fileset dir="${wsroot}/resources/">
-                 <include name="*.xml"/>
-                 <include name="*.wsdl"/>
-                 <include name="*.xsd"/>
-             </fileset>
-         </copy>
-         -->
-         <jar destfile="${wsroot}/${wsname}.aar">
-             <fileset excludes="**/Test.class" dir="${wsroot}/build"/>
-         </jar>
-     </target>
-
-     <!--
-     The java source files are generated in the ${wsroot}/src directory.
-     The ${sourcewsdl} sets the path to the WSDL file used to generate the classes.
-     -->
-     <target name="dev-ws-wsdl2java" depends="bind" description="Generates java code according to the given WSDL file to handle Web service invocation.">
-         <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="false" dir="${basedir}" classpathref="classpath">
-             <arg value="-o"/>
-             <arg value="${wsroot}"/>
-             <arg value="-s"/>
-             <arg value="-ss"/>
-             <arg value="-sd"/>
-             <arg value="-R"/>
-             <arg value="build/META-INF"/>
-             <arg value="-uri"/>
-             <arg value="${sourcewsdl}"/>
-         </java>
-     </target>
-
-     <!--
-     The WSDL is created in the ${wsroot}/META-INF directory, according to the ${sourceclass} class.
-     The ${soapaddress} url defines the access point to the webservice.
-     -->
-     <target name="dev-ws-java2wsdl" depends="dev-ws-compile" description="Generates the appropriate WSDL file for the given java class.">
-         <java classname="org.apache.ws.java2wsdl.Java2WSDL" fork="false" dir="${basedir}" classpathref="classpath">
-             <arg value="-o"/>
-             <arg value="${wsroot}/META-INF"/>
-             <arg value="-cp"/>
-             <arg value="${wsroot}/build/"/>
-             <arg value="-l"/>
-             <arg value="${soapaddress}"/>
-             <arg value="-cn"/>
-             <arg value="${sourceclass}"/>
-         </java>
-     </target>
-
-     <target name="dev-ws-compile" depends="bind" description="Compile the Web Service java classes.">
-         <javac debug="true" srcdir="${wsroot}/src" optimize="off" destdir="${wsroot}/build" failonerror="true" classpathref="classpath"/>
-     </target>
-    
-
-    <!--<target name="compile-reports" depends="init" description="Compile the Jasper Reports Layout files (.jrxml).">
-        <taskdef name="jrc" classname="net.sf.jasperreports.ant.JRAntCompileTask">
-            <classpath refid="classpath"/>
-        </taskdef>
-        <jrc destdir="./gsn-reports/" srcdir="./gsn-reports/">
-            <src>
-                <fileset dir="./">
-                    <include name="gsn-reports/*.jrxml"/>
-                </fileset>
-            </src>
-            <classpath refid="classpath"/>
-        </jrc>
-    </target>-->
-
     <target name="clean" depends="init" description="Erase built files and target.">
         <delete includeEmptyDirs="yes" failonerror="no">
             <fileset dir="${build.dir}" includes="**/*.class,**/*.xml"/>
@@ -303,18 +162,18 @@
     
     <!-- Tests -->
 
-    <target name="securityTest" depends="bind">
+    <target name="securityTest" depends="build">
         <java classpathref="classpath" classname="gsn.testss.SecurtiyTest" maxmemory="${maxMemoryUsage}" fork="true"
               dir="${build.dir}"/>
     </target>
 
-    <target name="rfidtest" depends="bind">
+    <target name="rfidtest" depends="build">
         <java classname="gsn.wrappers.RFIDTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
             <classpath refid="classpath"/>
         </java>
     </target>
 
-    <target name="camtest" depends="bind">
+    <target name="camtest" depends="build">
         <property name="dev" value=""/>
         <java classname="gsn.wrappers.cameras.usb.WebCamWrapper" maxmemory="${maxMemoryUsage}" fork="true"
               dir="${basedir}">
@@ -335,26 +194,7 @@
         </junitreport>
     </target>
 
-    <!--
-    <target name="test-sensorscope" depends="build" description="Tests sensorscope server">
-        <java classname="gsn.wrappers.tinyos.SenscorscopeTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
-            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
-            <arg id="sensorscope-server" value="sf@climaps.com:5010"/>
-            <arg id="log-conf-file" value="conf/debug.log"/>
-        </java>
-    </target>
-    -->
-
-    <target name="test-wsclient" depends="build" description="Tests web service client.">
-        <java classname="gsn.webservice.standard.GSNWebServiceClient" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
-            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
-            <arg id="EPR" value="http://localhost:22001/services/GSNWebService"/>
-        </java>
-    </target>
-
-    <target name="tests" depends="bind" description="Runs JUnit tests">
+    <target name="tests" depends="build" description="Runs JUnit tests">
         <junit printsummary="on" haltonerror="off" haltonfailure="off" showoutput="on">
             <formatter type="xml" usefile="true"/>
             <classpath refid="classpath"/>
@@ -385,59 +225,6 @@
         </junit>
     </target>
 
-
-    <!-- Performance Evaluation -->
-
-    <target name="eval-queries" depends="bind" description="Run GSN evaluation queries.">
-        <java classname="gsn.tests.performance.Queries" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
-            <jvmarg value="-DnbQueries=10"/>
-            <jvmarg value="-DnbThreads=10"/>
-            <jvmarg value="-DmaxQuerySize=50000"/>
-            <jvmarg value="-DgsnUrl=http://localhost:22001"/>
-        </java>
-    </target>
-
-    <!-- Safe Storage -->
-
-    <target name="start-acquisition" depends="bind">
-        <java classname="gsn.acquisition2.server.SafeStorageServer" fork="true" dir="${basedir}"
-              classpathref="classpath">
-            <arg id="ss-port" value="${safe-storage-port}"/>
-            <arg id="ssc-port" value="${safe-storage-controller-port}"/>
-            <arg id="ss-mode" value="1"/>
-        </java>
-    </target>
-
-    <target name="clean-acquisition" depends="bind">
-        <java classname="gsn.acquisition2.server.SafeStorageServer" fork="true" dir="${basedir}"
-              classpathref="classpath">
-            <arg id="ss-port" value="${safe-storage-port}"/>
-            <arg id="ssc-port" value="${safe-storage-controller-port}"/>
-            <arg id="ss-mode" value="100"/>
-        </java>
-    </target>
-
-    <target name="start-acquisition-nofork" depends="bind">
-        <java classname="gsn.acquisition2.server.SafeStorageServer" fork="false" dir="${basedir}"
-              classpathref="classpath">
-            <arg id="ss-port" value="${safe-storage-port}"/>
-            <arg id="ssc-port" value="${safe-storage-controller-port}"/>
-            <arg id="ss-mode" value="1"/>
-        </java>
-    </target>
-
-    <target name="stop-acquisition" depends="bind">
-        <java classname="gsn.SafeStorageStop" fork="true" dir="${basedir}" classpathref="classpath">
-            <arg id="ssc-port" value="${safe-storage-controller-port}"/>
-        </java>
-    </target>
-
-    <target name="start-all" depends="start-acquisition-nofork,gsn"/>
-
-    <target name="stop-all" depends="stop-acquisition,stop"/>
-
-
     <!-- Distribution -->
 
     <target name="docs" depends="setup">
@@ -461,7 +248,7 @@
         -->
     </target>
         
-    <target name="jar" depends="clean,bind" description="Create a jar file containing the GSN classes.">
+    <target name="jar" depends="clean,build" description="Create a jar file containing the GSN classes.">
         <jar destfile="${jars}/${jar.file}" basedir="${build.dir}">
             <manifest>
                 <attribute name="Built-By" value="GSN Development Team."/>

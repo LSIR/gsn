@@ -79,7 +79,7 @@ public class Node<T> implements Serializable{
 	}
 
 	private boolean edgeExists(Node<T> node) {
-		for (Edge edge : outputEdges) {
+		for (Edge<T> edge : outputEdges) {
 			if (edge.getEndNode().equals(node))
 				return true;
 		}

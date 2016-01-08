@@ -17,32 +17,30 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN.  If not, see <http://www.gnu.org/licenses/>.
 * 
-* File: src/gsn/VirtualSensorInitializationFailedException.java
+* File: src/gsn/http/rest/DeliverySystem.java
 *
 * @author Ali Salehi
+* @author Timotee Maret
 *
 */
 
-package gsn;
+package gsn.http.delivery;
 
-public class VirtualSensorInitializationFailedException extends Exception {
+import gsn.beans.DataField;
+import gsn.beans.StreamElement;
 
-	private static final long serialVersionUID = -6903638792983036844L;
+import java.io.IOException;
 
-	public VirtualSensorInitializationFailedException ( ) {
-      super( );
-   }
-   
-   public VirtualSensorInitializationFailedException ( String message ) {
-      super( message );
-   }
-   
-   public VirtualSensorInitializationFailedException ( String message , Throwable cause ) {
-      super( message , cause );
-   }
-   
-   public VirtualSensorInitializationFailedException ( Throwable cause ) {
-      super( cause );
-   }
-   
+public interface DeliverySystem {
+
+	public abstract void writeStructure(DataField[] fields) throws IOException;
+
+	public abstract boolean writeStreamElement(StreamElement se);
+
+    public abstract boolean writeKeepAliveStreamElement();
+
+	public abstract void close();
+
+	public abstract boolean isClosed();
+
 }

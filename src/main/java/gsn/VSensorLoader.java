@@ -49,21 +49,20 @@ import java.util.Iterator;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.jibx.runtime.JiBXException;
 
 public class VSensorLoader extends Thread {
  
-	public static final String                    VSENSOR_POOL                        = "VSENSOR-POOL";
-	public static final String                    STREAM_SOURCE                       = "STREAM-SOURCE";
-	public static final String                    INPUT_STREAM                        = "INPUT-STREAM";
+	public static final String VSENSOR_POOL = "VSENSOR-POOL";
+	public static final String STREAM_SOURCE = "STREAM-SOURCE";
+	public static final String INPUT_STREAM = "INPUT-STREAM";
 	
-	private String                                pluginsDir;
-	private boolean                               isActive                            = true;
-	private ArrayList<VSensorStateChangeListener> changeListeners                     = new ArrayList<VSensorStateChangeListener>();
+	private String pluginsDir;
+	private boolean isActive = true;
+	private ArrayList<VSensorStateChangeListener> changeListeners = new ArrayList<VSensorStateChangeListener>();
 	
-    private static int                            VSENSOR_LOADER_THREAD_COUNTER       = 0;
-    private static VSensorLoader                  singleton                           = null;
-    private static transient Logger               logger                              = LoggerFactory.getLogger ( VSensorLoader.class );
+    private static int VSENSOR_LOADER_THREAD_COUNTER = 0;
+    private static VSensorLoader singleton = null;
+    private static transient Logger logger = LoggerFactory.getLogger ( VSensorLoader.class );
     
 
 	public void addVSensorStateChangeListener(VSensorStateChangeListener listener) {
@@ -158,7 +157,7 @@ public class VSensorLoader extends Thread {
         return Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY + File.separator + fileName + ".xml";
     }
 
-    public synchronized void loadPlugin() throws SQLException, JiBXException {
+    public synchronized void loadPlugin() throws SQLException {
 
         Modifications modifications = getUpdateStatus(pluginsDir);
         ArrayList<VSensorConfig> removeIt = modifications.getRemove();
@@ -175,7 +174,7 @@ public class VSensorLoader extends Thread {
         }
     }
 
-    public synchronized boolean loadPlugin(String fileFilterName) throws SQLException, JiBXException {
+    public synchronized boolean loadPlugin(String fileFilterName) throws SQLException {
         Modifications modifications = getUpdateStatus(pluginsDir, fileFilterName);
         ArrayList<VSensorConfig> addIt = modifications.getAdd();
 
@@ -193,7 +192,7 @@ public class VSensorLoader extends Thread {
     }
 
 
-    private synchronized boolean loadPlugin(VSensorConfig vs) throws SQLException, JiBXException {
+    private synchronized boolean loadPlugin(VSensorConfig vs) throws SQLException {
 
         if (!isVirtualSensorValid(vs))
             return false;

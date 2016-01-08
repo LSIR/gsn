@@ -31,9 +31,8 @@ package gsn.beans;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.config.VsConf;
-import gsn.http.rest.LocalDeliveryWrapper;
-import gsn.http.rest.PushRemoteWrapper;
-import gsn.http.rest.RestRemoteWrapper;
+import gsn.http.delivery.LocalDeliveryWrapper;
+import gsn.http.delivery.PushRemoteWrapper;
 import gsn.storage.SQLUtils;
 import gsn.utils.ValidityTools;
 import gsn.utils.graph.Graph;
@@ -249,9 +248,9 @@ public final class Modifications {
 							continue;
 						}
 
-						boolean isLocalRemote = (wrapperClass.isAssignableFrom(RestRemoteWrapper.class)||wrapperClass.isAssignableFrom(PushRemoteWrapper.class)) && isInTheSameGSNInstance(addressing[addressingIndex]);
+						boolean isLocalRemote = wrapperClass.isAssignableFrom(PushRemoteWrapper.class) && isInTheSameGSNInstance(addressing[addressingIndex]);
 
-						if((( wrapperClass.isAssignableFrom(RestRemoteWrapper.class)||wrapperClass.isAssignableFrom(PushRemoteWrapper.class))) && !isLocalRemote){
+						if((wrapperClass.isAssignableFrom(PushRemoteWrapper.class)) && !isLocalRemote){
 							hasValidAddressing = true;
 						}else if(( wrapperClass.isAssignableFrom(LocalDeliveryWrapper.class)) || isLocalRemote ){
 							String vsName = vsensorName.toLowerCase().trim();

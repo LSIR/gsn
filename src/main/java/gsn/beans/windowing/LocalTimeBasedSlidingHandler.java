@@ -34,7 +34,6 @@ import gsn.Main;
 import gsn.beans.StreamElement;
 import gsn.beans.StreamSource;
 import gsn.storage.SQLUtils;
-import gsn.storage.StorageManager;
 import gsn.utils.CaseInsensitiveComparator;
 import gsn.utils.GSNRuntimeException;
 import gsn.wrappers.AbstractWrapper;

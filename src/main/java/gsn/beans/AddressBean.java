@@ -37,38 +37,38 @@ public final class AddressBean implements Serializable{
 
 	private static final long serialVersionUID = -8975180532136014200L;
 
-	private static final   KeyValue[] EMPTY_PREDICATES = new  KeyValue[0];
+	private static final KeyValue[] EMPTY_PREDICATES = new  KeyValue[0];
 
-	private String                 wrapper;
+	private String wrapper;
 
-	private  KeyValue[] predicates  = EMPTY_PREDICATES;
+	private  KeyValue[] predicates = EMPTY_PREDICATES;
 	
 	private DataField [] wrapperOutputStructure = new DataField[0];
 
 	private double random = Math.random();
 
 	public AddressBean () {
-		this.predicates=EMPTY_PREDICATES;
+		this.predicates = EMPTY_PREDICATES;
 	}
 
 	public AddressBean ( final String wrapper , KeyValue... newPredicates ) {
 		this.wrapper = wrapper;
-		if (newPredicates==null)
+		if (newPredicates == null)
 			this.predicates=EMPTY_PREDICATES;
 		else
 			this.predicates = newPredicates;
 	}
 
-	public AddressBean ( final String wrapper  ) {
+	public AddressBean(final String wrapper) {
 		this.wrapper = wrapper;
-		this.predicates=EMPTY_PREDICATES;
+		this.predicates = EMPTY_PREDICATES;
 	}
 
-	public String getWrapper ( ) {
+	public String getWrapper() {
 		return this.wrapper;
 	}
 
-	public  KeyValue[] getPredicates ( ) {
+	public  KeyValue[] getPredicates() {
 		return this.predicates;
 	}
 
@@ -95,7 +95,6 @@ public final class AddressBean implements Serializable{
 	public String getPredicateValue ( String key ) {
 		key = key.trim( );
 		for (  KeyValue predicate : this.predicates ) {
-			//    logger.fatal(predicate.getKey()+" --- " +predicate.getValue());
 			if ( predicate.getKey( ).toString( ).trim( ).equalsIgnoreCase( key ) ) return ( ( String ) predicate.getValue( ));
 		}
 		return null;

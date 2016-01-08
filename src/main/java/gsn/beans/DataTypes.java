@@ -33,16 +33,11 @@ import java.sql.Types;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 public class DataTypes {
    
    public final static String            OPTIONAL_NUMBER_PARAMETER = "\\s*(\\(\\s*\\d+\\s*\\))?";
    
    public final static String            REQUIRED_NUMBER_PARAMETER = "\\s*\\(\\s*\\d+\\s*\\)";
-   
-   private final static transient Logger logger                    = LoggerFactory.getLogger( DataTypes.class );
    
    // NEXT FIELD
    public final static String            VAR_CHAR_PATTERN_STRING   = "\\s*varchar" + REQUIRED_NUMBER_PARAMETER + "\\s*";

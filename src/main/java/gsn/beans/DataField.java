@@ -36,17 +36,17 @@ public final class DataField implements Serializable {
   
    private static final long serialVersionUID = -8841539191525018987L;
    
-   private String            description      = "Not Provided";
+   private String description = "Not Provided";
    
-   private String            name;
+   private String name;
    
-   private byte               dataTypeID       = -1;
+   private byte dataTypeID = -1;
    
-   private String            type;
+   private String type;
 
-   private String            unit = "";
+   private String unit = "";
    
-   public DataField ( ) {}
+   public DataField() {}
 
 
    public DataField ( final String fieldName , final String type , final String description) throws GSNRuntimeException {

@@ -17,32 +17,40 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN.  If not, see <http://www.gnu.org/licenses/>.
 * 
-* File: src/gsn/VirtualSensorInitializationFailedException.java
+* File: src/gsn/http/rest/DistributionRequest.java
 *
 * @author Ali Salehi
+* @author Timotee Maret
+* @author Julien Eberle
 *
 */
 
-package gsn;
+package gsn.http.delivery;
 
-public class VirtualSensorInitializationFailedException extends Exception {
+import gsn.beans.StreamElement;
+import gsn.beans.VSensorConfig;
+import gsn.utils.models.AbstractModel;
 
-	private static final long serialVersionUID = -6903638792983036844L;
+public interface DistributionRequest {
 
-	public VirtualSensorInitializationFailedException ( ) {
-      super( );
-   }
-   
-   public VirtualSensorInitializationFailedException ( String message ) {
-      super( message );
-   }
-   
-   public VirtualSensorInitializationFailedException ( String message , Throwable cause ) {
-      super( message , cause );
-   }
-   
-   public VirtualSensorInitializationFailedException ( Throwable cause ) {
-      super( cause );
-   }
-   
+	public abstract boolean deliverStreamElement(StreamElement se);
+
+    public boolean deliverKeepAliveMessage();
+
+    public abstract long getStartTime();
+
+    public abstract long getLastVisitedPk();
+
+    public abstract String getQuery();
+
+    public abstract VSensorConfig getVSensorConfig();
+
+    public abstract void close();
+
+    public abstract boolean isClosed();
+
+    public abstract DeliverySystem getDeliverySystem();
+    
+    public abstract AbstractModel getModel();
+
 }

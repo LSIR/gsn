@@ -33,13 +33,10 @@ import gsn.Mappings;
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.beans.DataField;
-import gsn.http.MultiDataDownload;
-import gsn.reports.beans.Stream;
 import gsn.storage.DataEnumerator;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -53,7 +50,7 @@ import org.slf4j.Logger;
 
 public class DownloadData extends AbstractDataRequest {
 
-    private static transient Logger logger = LoggerFactory.getLogger(MultiDataDownload.class);
+    private static transient Logger logger = LoggerFactory.getLogger(DownloadData.class);
 
     private static final String PARAM_OUTPUT_TYPE = "outputtype";
 

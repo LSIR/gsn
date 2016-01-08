@@ -40,16 +40,12 @@ import gsn.beans.VSensorConfig;
 import gsn.config.GsnConf;
 import gsn.config.VsConf;
 import gsn.data.DataStore;
-import gsn.http.ac.ConnectToDB;
-import gsn.http.rest.LocalDeliveryWrapper;
-import gsn.http.rest.PushDelivery;
-import gsn.http.rest.WPPushDelivery;
-import gsn.http.rest.RestDelivery;
+import gsn.http.delivery.LocalDeliveryWrapper;
+import gsn.http.delivery.PushDelivery;
 import gsn.monitoring.MemoryMonitor;
 import gsn.monitoring.Monitorable;
 import gsn.networking.zeromq.ZeroMQDelivery;
 import gsn.networking.zeromq.ZeroMQProxy;
-import gsn.security.SecurityData;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
 import gsn.storage.StorageManagerFactory;
@@ -99,10 +95,7 @@ import org.eclipse.jetty.server.session.HashSessionIdManager;
 import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
-//import org.jibx.runtime.BindingDirectory;
-//import org.jibx.runtime.IBindingFactory;
-//import org.jibx.runtime.IUnmarshallingContext;
-//import org.jibx.runtime.JiBXException;
+
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.eclipse.jetty.server.AbstractConnector;
@@ -171,13 +164,6 @@ public final class Main {
 
     	
     	DataStore ds = new DataStore(gsnConf);
-    	
-        // Init the AC db connection.
-        if(Main.getContainerConfig().isAcEnabled()) {
-        	SecurityData sec=new SecurityData(ds);
-            ConnectToDB.init ( containerConfig.getStorage().getJdbcDriver() , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) );            
-        	//sec.upgradeUsersTable();;
-        }
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getStorage().getJdbcDriver ( ) , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) , maxDBConnections);
         
@@ -196,7 +182,7 @@ public final class Main {
 			jettyServer.start ( );
 			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
 		} catch ( Exception e ) {
-			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used in most of the communications: "+ e.getMessage(),e);
+			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used for monitoring GSN and some remote communication: "+ e.getMessage(),e);
 		}
 		
 		if (containerConfig.isZMQEnabled()){
@@ -214,27 +200,14 @@ public final class Main {
 		}
 		controlSocket.setLoader(vsloader);
 
-		String msrIntegration = "gsn.msr.sensormap.SensorMapIntegration";
-		try {
-			vsloader.addVSensorStateChangeListener((VSensorStateChangeListener) Class.forName(msrIntegration).newInstance());
-		}catch (Exception e) {
-			logger.warn("MSR Sensor Map integration is disabled.");
-		}
-
 		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));
-		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(WPPushDelivery.class));
-		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(RestDelivery.class));
-		vsloader.addVSensorStateChangeListener(ModelDistributer.getInstance(WPPushDelivery.class));
 		if (containerConfig.isZMQEnabled())
 			vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDelivery.class));
 
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
-		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(WPPushDelivery.class));
-		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(RestDelivery.class));
-		ContainerImpl.getInstance().addVSensorDataListener(ModelDistributer.getInstance(WPPushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(ZeroMQDelivery.class));
 		vsloader.startLoading();
 
@@ -320,13 +293,6 @@ public final class Main {
 			logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			logger.info ( "Wrappers initialization ..." );
-		/*} catch ( JiBXException e ) {
-			logger.error ( e.getMessage ( ) );
-			logger.error ( "Can't parse the GSN configuration file : " + Main.DEFAULT_GSN_CONF_FILE );
-			logger.error ( "Please check the syntax of the file to be sure it is compatible with the requirements." );
-			logger.error ( "You can find a sample configuration file from the GSN release." );
-			if ( logger.isDebugEnabled ( ) ) logger.debug ( e.getMessage ( ) , e );
-			System.exit ( 1 );*/
 		} catch ( FileNotFoundException e ) {
 			logger.error ("The the configuration file : " + Main.DEFAULT_GSN_CONF_FILE + " doesn't exist. "+ e.getMessage());
 			logger.info ( "Check the path of the configuration file and try again." );
@@ -339,35 +305,26 @@ public final class Main {
 
 	}
 
-	/**
-	 * This method is called by Rails's Application.rb file.
-	 */
-	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws //JiBXException, 
+	public static ContainerConfig loadContainerConfig (String gsnXMLpath)throws
 	    FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
 		if (!new File(gsnXMLpath).isFile()) {
 			logger.error("Couldn't find the gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
 			System.exit(1);
 		}		
-
-		/*IBindingFactory bfact = BindingDirectory.getFactory ( ContainerConfig.class );
-		IUnmarshallingContext uctx = bfact.createUnmarshallingContext ( );
-		ContainerConfig conf = ( ContainerConfig ) uctx.unmarshalDocument ( new FileInputStream ( new File ( gsnXMLpath ) ) , null );*/
-		GsnConf gsn =GsnConf.load(gsnXMLpath);
-		gsnConf=gsn;
+		GsnConf gsn = GsnConf.load(gsnXMLpath);
+		gsnConf = gsn;
 		ContainerConfig conf=BeansInitializer.container(gsn);
 		Class.forName(conf.getStorage().getJdbcDriver());
 		conf.setContainerConfigurationFileName (  gsnXMLpath );
 		return conf;
 	}
 
-	//FIXME: COPIED_FOR_SAFE_STOAGE
 	public static Properties getWrappers()  {
 		if (singleton==null )
 			return WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 		return Main.wrappers;
 	}
     
-	//FIXME: COPIED_FOR_SAFE_STOAGE
 	public  static Class < ? > getWrapperClass ( String id ) {
 		try {
 			String className =  getWrappers().getProperty(id);
@@ -403,7 +360,6 @@ public final class Main {
 		
         Server server = new Server();
 		HandlerCollection handlers = new HandlerCollection();
-        //ContextHandlerCollection contexts = new ContextHandlerCollection();
         server.setThreadPool(new QueuedThreadPool(maxThreads));
 
         SslSocketConnector sslSocketConnector = null;
@@ -422,7 +378,7 @@ public final class Main {
         else if (getContainerConfig().isAcEnabled())
             logger.error("SSL MUST be configured in the gsn.xml file when Access Control is enabled !");
         
-        AbstractConnector connector=new SelectChannelConnector (); // before was connector//new SocketConnector ();//using basic connector for windows bug; Fast option=>SelectChannelConnector
+        AbstractConnector connector=new SelectChannelConnector ();
         connector.setPort ( port );
         connector.setMaxIdleTime(30000);
         connector.setAcceptors(2);
@@ -433,23 +389,12 @@ public final class Main {
 		else
 			server.setConnectors ( new Connector [ ] { connector,sslSocketConnector } );
 
-		WebAppContext webAppContext = new WebAppContext();//contexts, DEFAULT_WEB_APP_PATH ,"/gsn");
+		WebAppContext webAppContext = new WebAppContext();
 		webAppContext.setContextPath("/");
-		//webAppContext.
 		webAppContext.setResourceBase(DEFAULT_WEB_APP_PATH);
 		
-		//WebAppContext webAppPlay = new WebAppContext();
-		//webAppPlay.setContextPath("/new");
-		//webAppPlay.setWar("gsn-tools/gsn-services/target/gsn-services-0.0.2.war");
-		//ResourceCollection res=new ResourceCollection(new String[]{DEFAULT_WEB_APP_PATH,"gsn-tools/gsn-services/target/gsn-services-0.0.2.war"});
-		
-		//handlers.setHandlers(new Handler[]{contexts,new DefaultHandler()});
-		//webAppContext.setBaseResource(res);
 		handlers.addHandler(webAppContext);
-		//handlers.addHandler(webAppPlay);
-		//server.setHandler(webAppPlay);
 		server.setHandler(handlers);
-		//server.setHandler(webAppContext);
 
 		Properties usernames = new Properties();
 		usernames.load(new FileReader("conf/realm.properties"));
@@ -494,21 +439,15 @@ public final class Main {
     }
 
     public static StorageManager getStorage(VSensorConfig config) {
-        //StringBuilder sb = new StringBuilder("get storage for: ").append(config == null ? null : config.getName()).append(" -> use ");
         StorageManager sm = storagesConfigs.get(config == null ? null : config);
         if  (sm != null)
             return sm;
 
         DBConnectionInfo dci = null;
         if (config == null || config.getStorage() == null || !config.getStorage().isDefined()) {
-            // Use the default storage
-        //    sb.append("(default) config: ").append(config);
             sm = mainStorage;
         } else {
-        //    sb.append("(specific) ");
-            // Use the virtual sensor specific storage
             if (config.getStorage().isIdentifierDefined()) {
-                //TODO get the connection info with the identifier.
                 throw new IllegalArgumentException("Identifiers for storage is not supported yet.");
             } else {
                 dci = new DBConnectionInfo(config.getStorage().getJdbcDriver(),
@@ -523,9 +462,6 @@ public final class Main {
                 storagesConfigs.put(config, sm);
             }
         }
-        //sb.append("storage: ").append(sm.toString()).append(" dci: ").append(dci).append(" code: ").append(dci == null ? null : dci.hashCode());
-        //if (logger.isDebugEnabled())
-        //logger.warn(sb.toString());
         return sm;
 
     }

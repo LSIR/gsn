@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Graph<T> implements Serializable{
+
+	private static final long serialVersionUID = 9015284213829329797L;
+
 	private ArrayList<Node<T>> nodes;
 
 	private ArrayList<Node<T>> rootNodes;
