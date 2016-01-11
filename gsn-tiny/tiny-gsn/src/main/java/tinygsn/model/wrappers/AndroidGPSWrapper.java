@@ -105,6 +105,9 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 
 	public void startGPS() {
 		try {
+			if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
+				startMethodTracing("Android/data/tinygsn.gui.android/whole_gps_process" + System.currentTimeMillis());
+			}
 			locationManager = (LocationManager) StaticData.globalContext.getSystemService(StaticData.globalContext.LOCATION_SERVICE);
 
 			boolean isGPSUsageEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);

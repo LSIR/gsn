@@ -120,7 +120,7 @@ public class METVirtualSensor extends AbstractVirtualSensor {
 
 			dataProduced(new StreamElement(outputStructure, new Serializable[]{MET, VA, lastActivity.getTimeStamp(), streamElement.getTimeStamp()}, streamElement.getTimeStamp()));
 			lastActivity = streamElement;
-			if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+			if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE") || (boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
 				stopMethodTracing();
 			}
 		}

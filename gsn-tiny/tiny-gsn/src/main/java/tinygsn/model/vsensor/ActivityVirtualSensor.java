@@ -295,7 +295,7 @@ public class ActivityVirtualSensor extends AbstractVirtualSensor {
 
 		dataProduced(new StreamElement(outputStructure, new Serializable[]{classe}, streamElements.get(streamElements.size() - 1).getTimeStamp()));
 
-		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE") || (boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
 			stopMethodTracing();
 		}
 	}

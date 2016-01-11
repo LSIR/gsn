@@ -30,7 +30,6 @@ public class Parameter {
 	private String mName;
 	private ArrayList<String> mParameters;
 	private String mDefaultParameter = "";
-
 	private ParameterType mType;
 
 	public Parameter(String mName, ParameterType mType) {

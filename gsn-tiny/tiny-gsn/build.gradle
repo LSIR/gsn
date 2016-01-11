@@ -12,18 +12,21 @@ android {
         def BOOLEAN = "boolean"
         def LOGGING = "LOGGING"
         def PERF = "PERFORMANCE"
+        def GPSPERF = "GPSPERFORMANCE"
         def TRUE = "true"
         def FALSE = "false"
 
         debug {
             buildConfigField BOOLEAN, LOGGING, TRUE
             buildConfigField BOOLEAN, PERF, FALSE
+            buildConfigField BOOLEAN, GPSPERF, FALSE
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
         release {
             buildConfigField BOOLEAN, LOGGING, FALSE
             buildConfigField BOOLEAN, PERF, FALSE
+            buildConfigField BOOLEAN, GPSPERF, FALSE
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }

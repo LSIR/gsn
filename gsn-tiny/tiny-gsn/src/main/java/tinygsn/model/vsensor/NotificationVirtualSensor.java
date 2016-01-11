@@ -142,7 +142,7 @@ public class NotificationVirtualSensor extends AbstractVirtualSensor {
 			dataProduced(streamElement);
 		}
 
-		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE") || (boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
 			stopMethodTracing();
 		}
 	}

@@ -72,7 +72,7 @@ public class ExposureVirtualSensor extends AbstractVirtualSensor {
 		}else{
 			buffer.add(streamElement);
 		}
-		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE") || (boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
 			stopMethodTracing();
 		}
 	}

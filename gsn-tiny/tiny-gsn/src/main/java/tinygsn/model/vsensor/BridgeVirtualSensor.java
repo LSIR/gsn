@@ -64,7 +64,7 @@ public class BridgeVirtualSensor extends AbstractVirtualSensor {
 
 		dataProduced(anonymizedData);
 
-		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE") || (boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
 			stopMethodTracing();
 		}
 	}
