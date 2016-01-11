@@ -8,3 +8,4 @@ gradlew*
 local.properties
 app/build/
 *.iml
+captures/

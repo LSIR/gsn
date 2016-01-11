@@ -25,6 +25,11 @@ TinyGSN requires the following for building:
 * Android API 4.0.3 or higher.
 * http://actionbarsherlock.com/ setup as a dependent library project (in eclipse)
 
+TinyGSN uses also a location privacy library which is present as a git submodule. When you clone the repository, you need to init and pull the library using these commands :
+
+    git submodule init
+    git submodule update
+
 ## Download Package
 
 We will provide a compiled package for installing directly on Android devices with each GSN release, starting from version 1.1.5. 
