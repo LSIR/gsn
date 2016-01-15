@@ -135,15 +135,32 @@ playauthenticate.profile.logged=You are currently logged in with:
 playauthenticate.profile.session=Your user ID is {0} and your session will expire on {1}
 playauthenticate.profile.session_endless=Your user ID is {0} and your session will not expire, as it is endless
 playauthenticate.profile.password_change=Change/set a password for your account
+playauthenticate.profile.edit=Edit your profile
+playauthenticate.profile.edit.success=Profile updated
+playauthenticate.profile.edit.btn=Save
+playauthenticate.profile.firstname=Firstname
+playauthenticate.profile.lastname=Lastname
 
 ### --- play-authenticate END
 gsn.access.groups=Groups
 gsn.access.groups.title=Groups management
 gsn.access.groups.add=Add
+gsn.access.groups.edit=Edit
 gsn.access.groups.name=Name
+gsn.access.groups.delete=Delete
+gsn.access.groups.vs=Virtual Sensors linked
+gsn.access.groups.members=Members
 gsn.access.groups.description=Description
 gsn.access.groups.addto.error=Error adding user to group
 gsn.access.vs.title=Virtual Sensors
+gsn.access.vs.allowed.users=Allowed users
+gsn.access.vs.allowed.groups=Allowed groups
+gsn.access.users=Users
+gsn.access.users.title=Users management
+gsn.access.users.add=Add
+gsn.access.users.remove=Remove
+gsn.access.roles=Roles
+gsn.access.actions=Actions
 
 gsn.oauth2.auth.title=GSN External access
 gsn.oauth2.auth.access=An application would like to connect to your account

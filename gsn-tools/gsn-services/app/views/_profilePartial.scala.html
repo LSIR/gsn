@@ -1,0 +1,15 @@
+@(f: play.data.Form[_])
+
+@import helper._
+@import play.core.j.PlayMagicForJava._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+             @inputText(
+                f("firstname"),
+                '_label -> Messages("playauthenticate.profile.firstname")
+             )
+
+             @inputText(
+                f("lastname"),
+                '_label -> Messages("playauthenticate.profile.lastname")
+             )

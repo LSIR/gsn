@@ -134,15 +134,32 @@ playauthenticate.profile.logged=Vous êtes connecté avec:
 playauthenticate.profile.session=Votre ID d'utilisateur est {0} et votre session se termine le {1}
 playauthenticate.profile.session_endless=Votre ID d'utilisateur est {0} et votre session ne se terminera jamais
 playauthenticate.profile.password_change=Changer le mot de passe de votre compte
+playauthenticate.profile.edit=Modifier votre profil
+playauthenticate.profile.edit.success=Profil mis à jour
+playauthenticate.profile.edit.btn=Enregistrer
+playauthenticate.profile.firstname=Prénom
+playauthenticate.profile.lastname=Nom
 
 ### --- play-authenticate END
 gsn.access.groups=Groupes
 gsn.access.groups.title=Gestion des groupes
 gsn.access.groups.add=Ajouter
+gsn.access.groups.edit=Modifier
 gsn.access.groups.name=Nom
 gsn.access.groups.description=Description
+gsn.access.groups.delete=Supprimer
+gsn.access.groups.vs=Virtual Sensors liés
+gsn.access.groups.members=Membres
 gsn.access.groups.addto.error=Erreur d'ajout de l'utilisateur au groupe
 gsn.access.vs.title=Virtual Sensors
+gsn.access.vs.allowed.users=Utilisateurs autorisés
+gsn.access.vs.allowed.groups=Groupes autorisés
+gsn.access.users=Utilisateurs
+gsn.access.users.title=Gestion des utilisateurs
+gsn.access.users.add=Ajouter
+gsn.access.users.remove=Enlever
+gsn.access.roles=Rôles
+gsn.access.actions=Actions
 
 gsn.oauth2.auth.title=Accès externe à GSN
 gsn.oauth2.auth.access=Une application veut accéder à votre compte.

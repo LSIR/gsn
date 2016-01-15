@@ -32,8 +32,7 @@ case class APIPermissionAction(vsnames: String*)(implicit ctx: ExecutionContext)
     }
   }
     
-   def hasAccess(user:User,vsnames: String*):Boolean = 
-    (!Global.gsnConf.accessControl.enabled) || 
+   def hasAccess(user:User,vsnames: String*):Boolean =  
     vsnames.foldRight[Boolean](true)((vs,b) => b && hasAccess(user,vs))
 
        

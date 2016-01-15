@@ -1,7 +1,7 @@
 package security.gsn
 
 import be.objectify.deadbolt.scala.{DynamicResourceHandler, DeadboltHandler}
-import play.api.mvc.{Request, Result, Results}
+import play.api.mvc.{Request, Result, Results, Session}
 import play.api.mvc.Controller
 import be.objectify.deadbolt.core.models.Subject
 import models.gsn.auth.User
@@ -27,9 +27,10 @@ class GSNScalaDeadboltHandler(dynamicResourceHandler: Option[DynamicResourceHand
 			// if you don't call this, the user will get redirected to the page
 			// defined by your resolver
 		  val context = JavaHelpers.createJavaContext(request)
-			val originalUrl = PlayAuthenticate.storeOriginalUrl(context);
+			val originalUrl = PlayAuthenticate.storeOriginalUrl(context)
+		  println("++++++++++++++++"+originalUrl)
 			context.flash().put("error", "You need to log in first, to view '" + originalUrl + "'")
-      Option(Future(play.mvc.Results.redirect(PlayAuthenticate.getResolver().login()).toScala()))
+      Option(Future(play.mvc.Results.redirect(PlayAuthenticate.getResolver().login()).toScala().withSession(new Session(context.session().toMap))))
 
 		} 
   }

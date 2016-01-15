@@ -28,6 +28,8 @@ public class GSNDeadboltHandler extends AbstractDeadboltHandler {
 			// if you don't call this, the user will get redirected to the page
 			// defined by your resolver
 			final String originalUrl = PlayAuthenticate.storeOriginalUrl(context);
+			
+			System.out.println("-----------------"+originalUrl);
 
 			context.flash().put("error",
 					"You need to log in first, to view '" + originalUrl + "'");

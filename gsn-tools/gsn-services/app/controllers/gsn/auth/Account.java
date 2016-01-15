@@ -74,9 +74,34 @@ public class Account extends Controller {
 			return null;
 		}
 	}
+	
+	public static class EditProfile {
+		@Required
+		public String firstname;
+		
+		@Required
+		public String lastname;
+
+		public String getFirstname() {
+			return firstname;
+		}
+
+		public void setFirstname(String firstname) {
+			this.firstname = firstname;
+		}
+
+		public String getLastname() {
+			return lastname;
+		}
+
+		public void setLastname(String lastname) {
+			this.lastname = lastname;
+		}
+	}
 
 	private static final Form<Accept> ACCEPT_FORM = form(Accept.class);
 	private static final Form<Account.PasswordChange> PASSWORD_CHANGE_FORM = form(Account.PasswordChange.class);
+	private static final Form<Account.EditProfile> EDIT_PROFILE_FORM = form(Account.EditProfile.class);
 
 	@SubjectPresent
 	public static Result link() {
@@ -133,6 +158,37 @@ public class Account extends Controller {
 					true);
 			flash(LocalAuthController.FLASH_MESSAGE_KEY,
 					Messages.get("playauthenticate.change_password.success"));
+			return redirect(routes.LocalAuthController.profile());
+		}
+	}
+	
+	@Restrict(@Group(LocalAuthController.USER_ROLE))
+	public static Result editProfile() {
+		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		final User u = LocalAuthController.getLocalUser(session());
+
+		if (!u.emailValidated) {
+			return ok(unverified.render());
+		} else {
+			return ok(edit_profile.render(EDIT_PROFILE_FORM));
+		}
+	}
+
+	@Restrict(@Group(LocalAuthController.USER_ROLE))
+	public static Result doEditProfile() {
+		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		final Form<Account.EditProfile> filledForm = EDIT_PROFILE_FORM
+				.bindFromRequest();
+		if (filledForm.hasErrors()) {
+			// User did not select whether to link or not link
+			return badRequest(edit_profile.render(filledForm));
+		} else {
+			final User user = LocalAuthController.getLocalUser(session());
+			user.firstName = filledForm.get().firstname;
+			user.lastName = filledForm.get().lastname;
+			user.update();
+			flash(LocalAuthController.FLASH_MESSAGE_KEY,
+					Messages.get("playauthenticate.edit_profile.success"));
 			return redirect(routes.LocalAuthController.profile());
 		}
 	}

@@ -3,7 +3,6 @@ package gsn.data
 import akka.actor._
 import akka.actor.Status.Failure
 import gsn.config._
-import gsn.security.SecurityData
 import javax.sql.DataSource
 import concurrent.duration._
 import akka.event.Logging
@@ -22,7 +21,6 @@ object dsReg{
 
 class SensorStore(ds:DataStore) extends Actor{
   val log = Logging(context.system, this)
-  private val sec=new SecurityData(ds)
   val confWatch=context.actorOf(Props[ConfWatcher])
     
   val driver = new MongoDriver(context.system)
@@ -55,10 +53,9 @@ class SensorStore(ds:DataStore) extends Actor{
         val d=ds.datasource(vs.storage.get.url, vs.storage.get)
         vsDatasources.put(vsname, d.getDataSourceName)        
       }
-      val hasAc=sec.hasAccessControl(vs.name)
       implicit val source=vsDatasources.get(vsname)
       
-      val s=Sensor.fromConf(vs,hasAc,None)
+      val s=Sensor.fromConf(vs,None)
       val sStats= stats(s)
       //storeMongo(s)
       sensorStats put(vsname,sStats)

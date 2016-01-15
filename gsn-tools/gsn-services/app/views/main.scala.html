@@ -47,17 +47,19 @@
                         }
                         
                         @subjectPresentOr() {
-                        	 <li class="@("active".when(nav == "grouplist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.groups()">@Messages("gsn.access.groups")</a></li>
-                        	 <li class="@("active".when(nav == "vslist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.vs()">@Messages("gsn.access.vs.title")</a></li>
-                        	 <li class="@("active".when(nav == "clientlist"))"><a href="@controllers.gsn.routes.OAuth2Controller.listClients()">@Messages("gsn.oauth2.clients")</a></li>
-
+                        	@restrict(la(as("admin"))) {
+                        		<li class="@("active".when(nav == "userlist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.users()">@Messages("gsn.access.users")</a></li>
+                        		<li class="@("active".when(nav == "grouplist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.groups()">@Messages("gsn.access.groups")</a></li>
+                        	 	<li class="@("active".when(nav == "vslist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.vs()">@Messages("gsn.access.vs.title")</a></li>
+                        	 	<li class="@("active".when(nav == "clientlist"))"><a href="@controllers.gsn.routes.OAuth2Controller.listClients()">@Messages("gsn.oauth2.clients")</a></li>
+                            }
                     </ul>
 
                     
                         <ul class="nav navbar-nav navbar-right">
                         @defining(controllers.gsn.auth.LocalAuthController.getLocalUser(play.mvc.Controller.session())) { user =>
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.name <span class="caret"></span></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.firstName @user.lastName <span class="caret"></span></a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li class="@("active".when(nav == "profile"))"><a href="@controllers.gsn.auth.routes.LocalAuthController.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
                                     <li><a href="@controllers.gsn.auth.routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
@@ -91,6 +93,13 @@
                     @play.mvc.Controller.flash().get(controllers.gsn.auth.LocalAuthController.FLASH_MESSAGE_KEY)
                 </div>
             }
+            @for( v <- play.mvc.Controller.flash.values){
+            	 <div class="alert alert-info" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+                        Close</span></button>
+                    @v
+                </div>
+            	}
             @content
 
             <hr>

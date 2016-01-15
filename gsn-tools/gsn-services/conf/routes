@@ -21,8 +21,10 @@ GET     /accounts/verify/:token     controllers.gsn.auth.Signup.verify(token: St
 GET     /accounts/exists            controllers.gsn.auth.Signup.exists
 GET     /accounts/password/reset/:token     controllers.gsn.auth.Signup.resetPassword(token: String)
 POST    /accounts/password/reset            controllers.gsn.auth.Signup.doResetPassword
-GET    /accounts/password/change    controllers.gsn.auth.Account.changePassword
-POST   /accounts/password/change    controllers.gsn.auth.Account.doChangePassword
+GET     /accounts/password/change    controllers.gsn.auth.Account.changePassword
+POST    /accounts/password/change    controllers.gsn.auth.Account.doChangePassword
+GET     /accounts/edit               controllers.gsn.auth.Account.editProfile
+POST    /accounts/edit               controllers.gsn.auth.Account.doEditProfile
 GET     /accounts/verify            controllers.gsn.auth.Account.verifyEmail
 GET     /accounts/add               controllers.gsn.auth.Account.link
 GET     /accounts/link              controllers.gsn.auth.Account.askLink
@@ -34,10 +36,15 @@ POST    /login/password/forgot     controllers.gsn.auth.Signup.doForgotPassword
 
 #Permissions
 GET     /access/groups              controllers.gsn.auth.PermissionsController.groups
-POST    /access/groups/add          controllers.gsn.auth.PermissionsController.addgroup
+POST    /access/groups/edit         controllers.gsn.auth.PermissionsController.addgroup
 POST    /access/groups/addto        controllers.gsn.auth.PermissionsController.addtogroup
+POST    /access/groups/removefrom   controllers.gsn.auth.PermissionsController.removefromgroup
 GET     /access/vs                  controllers.gsn.auth.PermissionsController.vs
 POST    /access/vs/addto            controllers.gsn.auth.PermissionsController.addtovs
+POST    /access/vs/removefrom       controllers.gsn.auth.PermissionsController.removefromvs
+GET     /access/users               controllers.gsn.auth.PermissionsController.users
+POST    /access/users/addrole       controllers.gsn.auth.PermissionsController.addrole
+POST    /access/users/removerole    controllers.gsn.auth.PermissionsController.removerole
 
 #API
 GET  /assets/*file        	controllers.Assets.at(path="/public", file)

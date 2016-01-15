@@ -1,6 +1,5 @@
 package controllers.gsn
 
-import gsn.security._
 
 import scalaoauth2.provider._
 import scala.concurrent.Future

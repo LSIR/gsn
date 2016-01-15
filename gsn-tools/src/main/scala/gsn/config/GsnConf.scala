@@ -6,7 +6,7 @@ import com.typesafe.config.ConfigFactory
 
 case class GsnConf(name:String,author:String,description:String,
     email:String,port:Int,timeFormat:String, 
-    zmqConf:ZmqConf,accessControl:AcConf,
+    zmqConf:ZmqConf,ssl:SslConf,
     storageConf:StorageConf,slidingConf:Option[StorageConf])
     
 object GsnConf extends Conf {
@@ -17,7 +17,7 @@ object GsnConf extends Conf {
     take(xml \ "email").getOrElse(defaultGsn.email ),
     takeInt(xml \ "port").getOrElse(defaultGsn.port ),    
     take(xml \ "time-format").getOrElse(defaultGsn.timeFormat ),
-    ZmqConf.create(xml),AcConf.create(xml),
+    ZmqConf.create(xml),SslConf.create(xml),
     StorageConf.create((xml \ "storage").head),
     (xml \ "sliding").headOption.map(a=>StorageConf.create((a \ "storage").head))
   )
@@ -32,13 +32,13 @@ object ZmqConf extends Conf{
     takeInt(xml \ "zmqmeta").getOrElse(defaultZmq.metaPort ) )  
 }
 
-case class AcConf(enabled:Boolean,sslPort:Int,sslKeyStorePass:String,sslKeyPass:String) 
-object AcConf extends Conf{
-  def create(xml:Elem)=AcConf(
-    takeBool(xml \ "access-control").getOrElse(defaultAc.enabled ),
-    takeInt(xml \ "ssl-port").getOrElse(defaultAc.sslPort),
-    take(xml \ "ssl-key-store-password").getOrElse(defaultAc.sslKeyStorePass),
-    take(xml \ "ssl-key-password").getOrElse(defaultAc.sslKeyPass))    
+case class SslConf(sslPort:Int,sslKeyStorePass:String,sslKeyPass:String,sslKeyStore:String) 
+object SslConf extends Conf{
+  def create(xml:Elem)=SslConf(
+    takeInt(xml \ "ssl-port").getOrElse(defaultSsl.sslPort),
+    take(xml \ "ssl-key-store-password").getOrElse(defaultSsl.sslKeyStorePass),
+    take(xml \ "ssl-key-password").getOrElse(defaultSsl.sslKeyPass),
+    take(xml \ "ssl-key-store").getOrElse(defaultSsl.sslKeyStore))
 }
 
 case class StorageConf(driver:String,url:String,

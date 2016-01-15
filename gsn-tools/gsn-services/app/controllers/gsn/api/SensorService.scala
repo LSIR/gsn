@@ -41,10 +41,10 @@ object SensorService extends Controller with GsnService {
                                     "Access-Control-Allow-Headers"->"Content-Type")}
      
   }
-
+/*
   def param[T](name:String,fun: String=>T,default:T)(implicit req:Request[AnyContent])=
     queryparam(name).map(fun(_)).getOrElse(default)
-      
+  */    
 
   def sensors = headings(Action.async {implicit request=>
     Try{    
@@ -71,9 +71,9 @@ object SensorService extends Controller with GsnService {
         t.printStackTrace  
         Future(BadRequest(t.getMessage))    
     }.get  
-  }
+  })
   
-  def sensorData(sensorid:String) = (APIPermissionAction(sensorid) compose Action).async {implicit request =>
+  def sensorData(sensorid:String) = headings((APIPermissionAction(sensorid) compose Action).async {implicit request =>
     Try{
       val vsname=sensorid.toLowerCase
       val size:Option[Int]=queryparam("size").map(_.toInt)

@@ -41,12 +41,12 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
   "com.nulab-inc" %% "play2-oauth2-provider" % "0.14.0",
-  "com.feth" %% "play-authenticate" % "0.6.9-SNAPSHOT",
+  "com.feth" % "play-authenticate_2.11" % "0.6.9",
   "com.google.inject" % "guice" % "3.0",
   javaCore,
   "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1",
   "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
-  "com.typesafe.akka" % "akka-zeromq_2.11" % "2.3.14"
+  "com.typesafe.akka" % "akka-zeromq_2.11" % "2.3.14",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
   "org.scalatestplus" %% "play" % "1.1.0" % "test"
   )

@@ -35,15 +35,15 @@ import java.io.Serializable;
 
 public final class StreamElement implements Serializable {
 
-	private static final long                      serialVersionUID  = 2000261462783698617L;
+	private static final long serialVersionUID = 2000261462783698617L;
 
-	private long                                   timeStamp         = -1;
+	private long timeStamp = -1;
 
-	private String [ ]                             fieldNames;
+	private String[] fieldNames;
 
-	private Serializable [ ]                       fieldValues;
+	private Serializable[] fieldValues;
 
-	private transient Byte [ ]                               fieldTypes;
+	private transient Byte[] fieldTypes;
 
 	private boolean timestampProvided = false;
 

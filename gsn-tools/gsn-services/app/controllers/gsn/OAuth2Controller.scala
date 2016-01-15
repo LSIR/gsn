@@ -49,8 +49,7 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
          NotImplemented("Response type not implemented: "+ r.getOrElse("null"))
        }
       }else{
-        request.session.+(("pa.url.orig", request.uri))
-        Redirect(controllers.gsn.auth.routes.LocalAuthController.login())
+        Redirect(controllers.gsn.auth.routes.LocalAuthController.login()).withSession(request.session.+(("pa.url.orig", request.uri)))
       }
     }}
     
@@ -74,8 +73,7 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
             }
        )
       }else{
-        request.session.+(("pa.url.orig", request.uri))
-        Redirect(controllers.gsn.auth.routes.LocalAuthController.login())
+        Redirect(controllers.gsn.auth.routes.LocalAuthController.login()).withSession(request.session.+(("pa.url.orig", request.uri)))
       }
     }}
    

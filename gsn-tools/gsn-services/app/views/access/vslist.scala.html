@@ -1,44 +1,73 @@
-@import scala.collection.mutable.Buffer
-@import controllers.gsn.auth.GSNGroup
-
-@(vs: Buffer[models.gsn.auth.DataSource], groups: Buffer[models.gsn.auth.Group], users: Buffer[models.gsn.auth.User])
-
-@import helper._
+@import scala.collection.mutable.Buffer 
+@import controllers.gsn.auth.GSNGroup 
+@(vs: Buffer[models.gsn.auth.DataSource], groups: Buffer[models.gsn.auth.Group], users: Buffer[models.gsn.auth.User]) 
+@import helper._ 
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 
 @main(Messages("gsn.access.vs.title"),"vslist") {
 <div id="groups" class="row">
-<div class="col-md-12">
-<h1>@Messages("gsn.access.vs.title")</h1>
+	<div class="col-md-12">
+		<h1>@Messages("gsn.access.vs.title")</h1>
+	</div>
 </div>
+<div id="groups" class="row">
+	<div class="col-xs-12 col-md-12">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>@Messages("gsn.access.vs.title")</th>
+					<th>@Messages("gsn.access.vs.allowed.users")</th>
+					<th>@Messages("gsn.access.vs.allowed.groups")</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for(v <- vs) {
+				<tr>
+					<td>@v.value</td>
+					<td>
+						<ul class="list-unstyled">
+							@for(u <- v.users) {
+							<li>@u.firstName @u.lastName (@u.email)
+								<button type="button" class="btn btn-danger btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs?vs_id=' + @v.id + '&id=u' + @u.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs');">@Messages("gsn.access.users.remove")</button>
+							</li> } @if(v.users.size < users.size){
+							<li><select id="u_@v.id"> @for(u <- users) {
+									@if(!v.users.contains(u)){
+									<option value="u@u.id">@u.firstName @u.lastName
+										(@u.email)</option> } }
+							</select>
+								<button type="button" class="btn btn-primary btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs?vs_id=' + @v.id + '&id=' + $('#u_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs');">@Messages("gsn.access.groups.add")</button>
+							</li> }
+						</ul>
+					</td>
+					<td>
+						<ul class="list-unstyled">
+							@for(g <- v.groups) {
+							<li>[ @g.name ]
+								<button type="button" class="btn btn-danger btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs?vs_id=' + @v.id + '&id=g' + @g.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs');">@Messages("gsn.access.users.remove")</button>
+							</li>
+							<span class="text-muted">
+								<ul class="list-inline">
+									@for(u <- g.users){
+									<li>@u.firstName @u.lastName (@u.email)</li> }
+								</ul>
+							</span>
+							</li> } @if(v.groups.size < groups.size){
+							<li><select id="g_@v.id"> @for(u <- groups) {
+									@if(!v.groups.contains(u)){
+									<option value="g@u.id">[ @u.name ]</option> } }
+							</select>
+								<button type="button" class="btn btn-primary btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs?vs_id=' + @v.id + '&id=' + $('#g_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs');">@Messages("gsn.access.groups.add")</button>
+							</li> }
+						</ul>
+					</td>
+				</tr>
+				}
+			</tbody>
+		</table>
+	</div>
 </div>
-     <div id="groups" class="row">
-		<div class="col-xs-12 col-md-8">
-		<ul>
-		@for(v <- vs) {
-            <li>@v.value 
-            <ul>
-            @for(u <- v.users) {
-            <li>@u.name</li>
-            }
-            </ul>
-            <ul>
-            @for(u <- v.groups) {
-            <li>@u.name</li>
-            }
-            </ul>
-	        <select id="u_@v.id">
-	        @for(u <- users) {
-	         <option value="u@u.id">@u.name</option>
-	        }
-	        @for(u <- groups) {
-	         <option value="g@u.id">@u.name</option>
-	        }
-	        </select>
-	        <button  type="button" class="btn btn-primary" onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs?vs_id=' + @v.id + '&id=' + $('#u_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs');">@Messages("gsn.access.groups.add")</button>
-	        </li>
-	    }
-        </ul>
-		</div>
-    </div>
 }
