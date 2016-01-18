@@ -69,6 +69,7 @@ public class GSNUsernamePasswordAuthProvider
 		@Email
 		public String email;
 
+
 	}
 
 	public static class GSNLogin extends GSNIdentity
@@ -79,6 +80,7 @@ public class GSNUsernamePasswordAuthProvider
 		@MinLength(5)
 		public String password;
 
+		
 		@Override
 		public String getEmail() {
 			return email;
@@ -98,6 +100,12 @@ public class GSNUsernamePasswordAuthProvider
 
 		@Required
 		public String name;
+		
+		@Required
+		public String firstname;
+		
+		@Required
+		public String lastname;
 
 		public String validate() {
 			if (password == null || !password.equals(repeatPassword)) {

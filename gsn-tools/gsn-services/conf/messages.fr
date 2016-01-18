@@ -65,7 +65,9 @@ playauthenticate.login.forgot.password=Mot de passe oublié?
 playauthenticate.login.oauth=ou connectez-vous avec l'un de ces fournisseurs:
 
 playauthenticate.signup.title=Enregistrement
-playauthenticate.signup.name=Votre nom
+playauthenticate.signup.name=Votre nom d'utilisateur
+playauthenticate.signup.firstname=Votre prénom
+playauthenticate.signup.lastname=Votre nom de famille
 playauthenticate.signup.now=S'enregistrer maintenant
 playauthenticate.signup.oauth=ou enregistrez-vous avec l'un de ces fournisseurs:
 

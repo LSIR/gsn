@@ -9,6 +9,6 @@ INSERT INTO linked_account(id, user_id, provider_user_id, provider_key) VALUES (
 # --- !Downs
 
 DELETE FROM linked_account WHERE id = 0;
-DELETE FROM users_security_role WHERE users_id = 0;
+DELETE FROM users_security_role WHERE security_role_id = 1 or security_role_id = 2;
 DELETE FROM users WHERE id = 0;
 DELETE FROM security_role WHERE id = 1 OR id = 2;

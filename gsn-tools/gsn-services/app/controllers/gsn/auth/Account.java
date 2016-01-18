@@ -85,6 +85,12 @@ public class Account extends Controller {
 		public String getFirstname() {
 			return firstname;
 		}
+		public EditProfile() {}
+
+		public EditProfile(String firstname, String lastname) {
+			this.firstname = firstname;
+			this.lastname = lastname;
+		}
 
 		public void setFirstname(String firstname) {
 			this.firstname = firstname;
@@ -170,7 +176,7 @@ public class Account extends Controller {
 		if (!u.emailValidated) {
 			return ok(unverified.render());
 		} else {
-			return ok(edit_profile.render(EDIT_PROFILE_FORM));
+			return ok(edit_profile.render(EDIT_PROFILE_FORM.fill(new EditProfile(u.firstName, u.lastName))));
 		}
 	}
 

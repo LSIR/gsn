@@ -36,7 +36,7 @@ public class User extends AppModel implements Subject {
 	@Constraints.Email
 	// if you make this unique, keep in mind that users *must* merge/link their
 	// accounts then on signup with additional providers
-	// @Column(unique = true)
+	@Column(unique = true)
 	public String email;
 
 	public String name;
@@ -151,7 +151,18 @@ public class User extends AppModel implements Subject {
 	}
 
 	public static User create(final AuthUser authUser) {
-		final User user = new User();
+		final User user;
+		if (authUser instanceof EmailIdentity) {
+			User u = User.findByEmail(((EmailIdentity) authUser).getEmail());
+			if (u != null) {
+				user = u;
+			}else{
+				user = new User();
+			}
+		}else{
+			user = new User();
+		}
+		
 		user.roles = Collections.singletonList(SecurityRole
 				.findByRoleName(controllers.gsn.auth.LocalAuthController.USER_ROLE));
 		// user.permissions = new ArrayList<UserPermission>();

@@ -80,6 +80,7 @@ create table users (
   last_login                timestamp,
   active                    boolean,
   email_validated           boolean,
+  constraint uq_users_email unique (email),
   constraint pk_users primary key (id))
 ;
 
@@ -139,76 +140,72 @@ create sequence users_seq;
 
 create sequence user_permission_seq;
 
-alter table linked_account add constraint fk_linked_account_user_1 foreign key (user_id) references users (id) on delete restrict on update restrict;
+alter table linked_account add constraint fk_linked_account_user_1 foreign key (user_id) references users (id);
 create index ix_linked_account_user_1 on linked_account (user_id);
-alter table oauth_code add constraint fk_oauth_code_user_2 foreign key (user_id) references users (id) on delete restrict on update restrict;
+alter table oauth_code add constraint fk_oauth_code_user_2 foreign key (user_id) references users (id);
 create index ix_oauth_code_user_2 on oauth_code (user_id);
-alter table oauth_code add constraint fk_oauth_code_client_3 foreign key (client_id) references client (id) on delete restrict on update restrict;
+alter table oauth_code add constraint fk_oauth_code_client_3 foreign key (client_id) references client (id);
 create index ix_oauth_code_client_3 on oauth_code (client_id);
-alter table oauth_token add constraint fk_oauth_token_user_4 foreign key (user_id) references users (id) on delete restrict on update restrict;
+alter table oauth_token add constraint fk_oauth_token_user_4 foreign key (user_id) references users (id);
 create index ix_oauth_token_user_4 on oauth_token (user_id);
-alter table oauth_token add constraint fk_oauth_token_client_5 foreign key (client_id) references client (id) on delete restrict on update restrict;
+alter table oauth_token add constraint fk_oauth_token_client_5 foreign key (client_id) references client (id);
 create index ix_oauth_token_client_5 on oauth_token (client_id);
-alter table token_action add constraint fk_token_action_targetUser_6 foreign key (target_user_id) references users (id) on delete restrict on update restrict;
+alter table token_action add constraint fk_token_action_targetUser_6 foreign key (target_user_id) references users (id);
 create index ix_token_action_targetUser_6 on token_action (target_user_id);
 
 
 
-alter table groups_data_source add constraint fk_groups_data_source_groups_01 foreign key (groups_id) references groups (id) on delete restrict on update restrict;
+alter table groups_data_source add constraint fk_groups_data_source_groups_01 foreign key (groups_id) references groups (id);
 
-alter table groups_data_source add constraint fk_groups_data_source_data_so_02 foreign key (data_source_id) references data_source (id) on delete restrict on update restrict;
+alter table groups_data_source add constraint fk_groups_data_source_data_so_02 foreign key (data_source_id) references data_source (id);
 
-alter table users_security_role add constraint fk_users_security_role_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+alter table users_security_role add constraint fk_users_security_role_users_01 foreign key (users_id) references users (id);
 
-alter table users_security_role add constraint fk_users_security_role_securi_02 foreign key (security_role_id) references security_role (id) on delete restrict on update restrict;
+alter table users_security_role add constraint fk_users_security_role_securi_02 foreign key (security_role_id) references security_role (id);
 
-alter table users_user_permission add constraint fk_users_user_permission_user_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+alter table users_user_permission add constraint fk_users_user_permission_user_01 foreign key (users_id) references users (id);
 
-alter table users_user_permission add constraint fk_users_user_permission_user_02 foreign key (user_permission_id) references user_permission (id) on delete restrict on update restrict;
+alter table users_user_permission add constraint fk_users_user_permission_user_02 foreign key (user_permission_id) references user_permission (id);
 
-alter table users_data_source add constraint fk_users_data_source_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+alter table users_data_source add constraint fk_users_data_source_users_01 foreign key (users_id) references users (id);
 
-alter table users_data_source add constraint fk_users_data_source_data_sou_02 foreign key (data_source_id) references data_source (id) on delete restrict on update restrict;
+alter table users_data_source add constraint fk_users_data_source_data_sou_02 foreign key (data_source_id) references data_source (id);
 
-alter table users_groups add constraint fk_users_groups_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+alter table users_groups add constraint fk_users_groups_users_01 foreign key (users_id) references users (id);
 
-alter table users_groups add constraint fk_users_groups_groups_02 foreign key (groups_id) references groups (id) on delete restrict on update restrict;
+alter table users_groups add constraint fk_users_groups_groups_02 foreign key (groups_id) references groups (id);
 
 # --- !Downs
 
-SET REFERENTIAL_INTEGRITY FALSE;
+drop table if exists client cascade;
 
-drop table if exists client;
+drop table if exists data_source cascade;
 
-drop table if exists data_source;
+drop table if exists groups_data_source cascade;
 
-drop table if exists groups_data_source;
+drop table if exists users_data_source cascade;
 
-drop table if exists users_data_source;
+drop table if exists groups cascade;
 
-drop table if exists groups;
+drop table if exists users_groups cascade;
 
-drop table if exists users_groups;
+drop table if exists linked_account cascade;
 
-drop table if exists linked_account;
+drop table if exists oauth_code cascade;
 
-drop table if exists oauth_code;
+drop table if exists oauth_token cascade;
 
-drop table if exists oauth_token;
+drop table if exists security_role cascade;
 
-drop table if exists security_role;
+drop table if exists token_action cascade;
 
-drop table if exists token_action;
+drop table if exists users cascade;
 
-drop table if exists users;
+drop table if exists users_security_role cascade;
 
-drop table if exists users_security_role;
+drop table if exists users_user_permission cascade;
 
-drop table if exists users_user_permission;
-
-drop table if exists user_permission;
-
-SET REFERENTIAL_INTEGRITY TRUE;
+drop table if exists user_permission cascade;
 
 drop sequence if exists client_seq;
 

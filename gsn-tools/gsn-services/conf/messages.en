@@ -66,7 +66,9 @@ playauthenticate.login.oauth=or log in using one of the following providers:
 playauthenticate.login.basic=or try HTTP basic auth (as example/secret)
 
 playauthenticate.signup.title=Signup
-playauthenticate.signup.name=Your name
+playauthenticate.signup.name=Your username
+playauthenticate.signup.firstname=Your first name
+playauthenticate.signup.lastname=Your last name
 playauthenticate.signup.now=Sign up now
 playauthenticate.signup.oauth=or sign up using one of the following providers:
 

@@ -14,6 +14,7 @@ import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
+import play.api.libs.json.{Json => PlayJson}
 import play.api.http.ContentTypes
 
 import scalaoauth2.provider.AuthInfoRequest
@@ -80,7 +81,7 @@ object SensorService extends Controller with GsnService {
 
      request match{
          case AuthInfoRequest(auth:AuthInfo[User],req) => Future(
-         	Ok("{username:\""+auth.user.name+"\", firstname:\""+auth.user.firstName+"\", lastname:\""+auth.user.lastName+"\", email:\""+auth.user.email+"\"}")
+         	Ok(PlayJson.obj("username" -> auth.user.name, "firstname" -> auth.user.firstName, "lastname" -> auth.user.lastName, "email" -> auth.user.email))
             )
          case _ => Future(Forbidden("Page only accessible with a valid oauth token."))
      }

@@ -28,8 +28,10 @@
                 signupForm("name"),
                 '_label -> Messages("playauthenticate.signup.name")
              )
+             
+             @_profilePartial(signupForm)
 
-             @_emailPartial(signupForm)
+             @_emailPartial(signupForm, true)
 
              @_passwordPartial(signupForm)
 
