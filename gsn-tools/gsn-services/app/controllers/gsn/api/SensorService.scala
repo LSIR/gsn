@@ -16,6 +16,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.http.ContentTypes
 
+import scalaoauth2.provider.AuthInfoRequest
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatterBuilder
 import controllers.gsn.Global
@@ -30,6 +31,8 @@ import play.Logger
 import scala.util.Success
 import controllers.gsn.GSNDataHandler
 import controllers.gsn.APIPermissionAction
+import models.gsn.auth.User
+import scalaoauth2.provider.AuthInfo
 
 
 object SensorService extends Controller with GsnService {   
@@ -72,7 +75,17 @@ object SensorService extends Controller with GsnService {
         Future(BadRequest(t.getMessage))    
     }.get  
   })
-  
+   
+  def userInfo() = headings((APIPermissionAction() compose Action).async {implicit request =>
+
+     request match{
+         case AuthInfoRequest(auth:AuthInfo[User],req) => Future(
+         	Ok("{username:\""+auth.user.name+"\", firstname:\""+auth.user.firstName+"\", lastname:\""+auth.user.lastName+"\", email:\""+auth.user.email+"\"}")
+            )
+         case _ => Future(Forbidden("Page only accessible with a valid oauth token."))
+     }
+  })
+
   def sensorData(sensorid:String) = headings((APIPermissionAction(sensorid) compose Action).async {implicit request =>
     Try{
       val vsname=sensorid.toLowerCase

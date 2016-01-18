@@ -26,7 +26,8 @@ case class APIPermissionAction(vsnames: String*)(implicit ctx: ExecutionContext)
       else Future(Forbidden("Logged in user has no access to these resources"))
     }else{
       authorize(new GSNDataHandler())({authInfo => {
-        if (hasAccess(authInfo.user,vsnames:_*)) block(AuthInfoRequest(authInfo, request))
+        val u = User.findById(authInfo.user.id)
+        if (hasAccess(u,vsnames:_*)) block(AuthInfoRequest(AuthInfo[User](u, authInfo.clientId, authInfo.scope, authInfo.redirectUri), request))
         else Future(Forbidden("Logged in user has no access to these resources"))
       }})(request, ctx)
     }

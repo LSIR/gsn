@@ -60,8 +60,8 @@ object PermissionsController extends Controller with DeadboltActions {
                                 if (g == null){ 
                                   ret = NotFound
                                 } else {
-                                  g.setName(data.name)
-                                  g.setDescription(data.description)
+                                  g.name = data.name
+                                  g.description = data.description
                                   g.update
                                 }
                              }

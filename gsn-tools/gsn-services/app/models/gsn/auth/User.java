@@ -70,6 +70,10 @@ public class User extends AppModel implements Subject {
 	public static final play.db.ebean.Model.Finder<Long, User> find = new play.db.ebean.Model.Finder<Long, User>(
 			Long.class, User.class);
 
+    public static User findById(Long value) {
+		return find.where().eq("id", value).findUnique();
+	}
+
 	@Override
 	public String getIdentifier()
 	{
