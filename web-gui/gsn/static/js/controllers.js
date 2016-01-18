@@ -204,12 +204,12 @@ gsnControllers.controller('DownloadCtrl', ['$scope', '$window', '$http', 'sensor
 
         $scope.sensorsList = [];
 
-        if (data.user.logged) {
+        //if (data.user.logged) {
             data.features.forEach(function (sensor) {
                 $scope.sensorsList.push(sensor['properties']['vs_name']
                 )
-            })
-        }
+            });
+        //}
 
     });
 

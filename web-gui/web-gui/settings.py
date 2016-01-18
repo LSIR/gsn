@@ -96,6 +96,7 @@ GSN = {
     'SENSORS_URL': 'http://opensense.epfl.ch/ws/api/sensors',
     'AUTH_URL': 'http://opensense.epfl.ch/ws/oauth2/auth',
     'TOKEN_URL': 'http://opensense.epfl.ch/ws/oauth2/token',
+    'USER_INF_URL' : 'http://opensense.epfl.ch/ws/api/user',
     'MAX_QUERY_SIZE': 5000
 }
 
