@@ -24,6 +24,8 @@ public class DataSource extends AppModel implements Permission {
 	public Long id;
     
 	public String value;
+	
+	public boolean is_public;
 
 	@ManyToMany(mappedBy = "dataSources")
 	public List<Group> groups;
@@ -36,6 +38,14 @@ public class DataSource extends AppModel implements Permission {
 
 	public String getValue() {
 		return value;
+	}
+	
+	public boolean getIs_public(){
+		return is_public;
+	}
+	
+	public void setIs_public(boolean p){
+		is_public=p;
 	}
 
 	public static DataSource findByValue(String value) {

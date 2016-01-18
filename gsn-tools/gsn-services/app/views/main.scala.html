@@ -19,6 +19,15 @@
 
         <link rel="stylesheet" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.css")">
         <link href="@routes.Assets.at("css/main.css")" rel="stylesheet">
+        <style type="text/css">
+            .table-striped > tbody > tr.success:nth-child(odd) > td,
+            .table-striped > tbody > tr.success:nth-child(odd) > th {
+                background-color: #C3D5BC;
+            }
+            tr.success > td > ul.hideable {
+               display:none;
+            }
+        </style>
     </head>
 
     <body>

@@ -39,7 +39,7 @@ case class APIPermissionAction(vsnames: String*)(implicit ctx: ExecutionContext)
        
    def hasAccess(user:User,vsname: String):Boolean = {
      val ds = DataSource.findByValue(vsname)
-     ds == null || user.hasAccessTo(ds)
+     ds == null || ds.getIs_public || user.hasAccessTo(ds)
    }
     
     

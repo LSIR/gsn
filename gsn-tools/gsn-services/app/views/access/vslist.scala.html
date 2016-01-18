@@ -18,14 +18,15 @@
 					<th>@Messages("gsn.access.vs.title")</th>
 					<th>@Messages("gsn.access.vs.allowed.users")</th>
 					<th>@Messages("gsn.access.vs.allowed.groups")</th>
+					<th>@Messages("gsn.access.vs.allowed.all")</th>
 				</tr>
 			</thead>
 			<tbody>
 				@for(v <- vs) {
-				<tr>
+				<tr id="row_@v.id" @if(v.is_public){ class="success" }>
 					<td>@v.value</td>
 					<td>
-						<ul class="list-unstyled">
+						<ul class="list-unstyled hideable">
 							@for(u <- v.users) {
 							<li>@u.firstName @u.lastName (@u.email)
 								<button type="button" class="btn btn-danger btn-xs"
@@ -42,7 +43,7 @@
 						</ul>
 					</td>
 					<td>
-						<ul class="list-unstyled">
+						<ul class="list-unstyled  hideable">
 							@for(g <- v.groups) {
 							<li>[ @g.name ]
 								<button type="button" class="btn btn-danger btn-xs"
@@ -64,10 +65,23 @@
 							</li> }
 						</ul>
 					</td>
+					<td>
+					<input type="checkbox" @if(v.is_public) { checked="checked" } data-id="@v.id" onchange="check(this);"/>
+					</td>
 				</tr>
 				}
 			</tbody>
 		</table>
 	</div>
 </div>
+<script type="text/javascript">
+function check(item){
+	var i = $(item);
+	if (i[0].checked){
+		$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs?vs_id=' + i.data('id') + '&id=a').done($('#row_'+i.data('id')).toggleClass('success',true))
+	}else{
+		$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs?vs_id=' + i.data('id') + '&id=a').done($('#row_'+i.data('id')).toggleClass('success',false))
+	}
+}
+</script>
 }

@@ -157,6 +157,7 @@ gsn.access.groups.addto.error=Error adding user to group
 gsn.access.vs.title=Virtual Sensors
 gsn.access.vs.allowed.users=Allowed users
 gsn.access.vs.allowed.groups=Allowed groups
+gsn.access.vs.allowed.all=Publicly visible
 gsn.access.users=Users
 gsn.access.users.title=Users management
 gsn.access.users.add=Add

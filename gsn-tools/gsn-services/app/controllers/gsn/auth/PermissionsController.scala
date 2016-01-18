@@ -30,6 +30,7 @@ object PermissionsController extends Controller with DeadboltActions {
             data.map(s => Option(DataSource.findByValue(s.sensor.name)).getOrElse({
               val d = new DataSource()
               d.value = s.sensor.name
+              d.is_public = false
               d.save()
               d
             })
@@ -185,6 +186,10 @@ object PermissionsController extends Controller with DeadboltActions {
                   vs.groups.add(Group.find.byId(s.stripPrefix("g").toLong))
                   vs.saveManyToManyAssociations("groups")
                   }
+              case s if s.startsWith("a") => {
+                  vs.setIs_public(true)
+                  vs.save()
+              }
           }}
           Ok(access.vslist.render(DataSource.find.all().asScala, Group.find.all().asScala, User.find.all().asScala))
         })   
@@ -206,6 +211,10 @@ object PermissionsController extends Controller with DeadboltActions {
                   vs.groups.remove(Group.find.byId(s.stripPrefix("g").toLong))
                   vs.saveManyToManyAssociations("groups")
                   }
+              case s if s.startsWith("a") => {
+                  vs.setIs_public(false)
+                  vs.save()
+              }
           }}
           Ok(access.vslist.render(DataSource.find.all().asScala, Group.find.all().asScala, User.find.all().asScala))
         })   

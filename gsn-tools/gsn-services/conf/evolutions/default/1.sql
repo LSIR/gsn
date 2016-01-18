@@ -15,6 +15,7 @@ create table client (
 create table data_source (
   id                        bigint not null,
   value                     varchar(255),
+  is_public                 boolean,
   constraint pk_data_source primary key (id))
 ;
 
