@@ -25,6 +25,8 @@
 
 package gsn.vsensor;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.TreeMap;
 
 import org.slf4j.LoggerFactory;
@@ -107,17 +109,26 @@ public class ModellingVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
-		StreamElement out = streamElement;
+		StreamElement[] out = new StreamElement[]{streamElement};
 		if (am.length > 0){
-		    out = am[0].pushData(streamElement); //by default returns the result from the first model
+		    out = am[0].pushData(streamElement,inputStreamName); //by default returns the result from the first model
 		}
 		for(int i=1;i<am.length;i++){
 			if (am[i] != null){
-				am[i].pushData(streamElement);//push the data to all other models too
+				am[i].pushData(streamElement,inputStreamName);//push the data to all other models too
 			}
 		}
 		if(out != null)
-		    dataProduced(out);
+            Arrays.sort(out,new Comparator<StreamElement>(){
+                    @Override
+                    public int compare(StreamElement o1, StreamElement o2) {
+                           return Long.valueOf(o1.getTimeStamp()).compareTo(o2.getTimeStamp());
+                    }});
+           for(int i=0;i<out.length;i++){
+               if(out[i] != null){
+                    dataProduced(out[i]);
+               }
+           }
 	}
 	
 	

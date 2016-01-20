@@ -30,7 +30,9 @@ public class BeansInitializer {
 			 gsn.accessControl().enabled(),
 			 sslPort,
 			 gsn.accessControl().sslKeyStorePass(),
-			 gsn.accessControl().sslKeyPass(),storage(gsn.storageConf()),sliding);
+			 gsn.accessControl().sslKeyPass(),
+             gsn.accessControl().sslKeyStore(),
+             storage(gsn.storageConf()),sliding);
 	
 	 return con;
   }

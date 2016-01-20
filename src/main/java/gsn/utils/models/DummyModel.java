@@ -41,9 +41,9 @@ public class DummyModel extends AbstractModel {
 	private int defaultValue = 0;
 
 	@Override
-	public StreamElement pushData(StreamElement streamElement) {
+	public StreamElement[] pushData(StreamElement streamElement,String origin) {
 		lastone = streamElement;
-		return lastone;
+		return new StreamElement[]{lastone};
 	}
 
 	@Override
