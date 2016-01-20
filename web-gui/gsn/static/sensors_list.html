@@ -11,13 +11,15 @@
     </div>
 </div>
 
-{{ favorites }}
+<pre>
+    {{ sensors | json }}
+</pre>
 
 <div class="row" ng-if="!loading">
 
     <div class="col-lg-6">
         <div ng-repeat="sensor in sensors | filter : query">
-            <div class="panel panel-default" ng-if="$even">
+            <div class="panel panel-info" ng-if="$even">
                 <div class="panel-heading">
                     <a href="#/sensors/{{ sensor.properties.vs_name }}"
                        name="{{ sensor.properties.vs_name }}"
@@ -30,11 +32,13 @@
                 <div class="panel-body">
                     <p>
                         <b>Description:</b>
-                        {{ sensor.properties.description }}</p>
+                        {{ sensor.properties.description }}
+                    </p>
 
                     <p ng-if="sensor.properties.geographical">
                         <b> Location:</b>
-                        {{ sensor.properties.geographical }}</p>
+                        {{ sensor.properties.geographical }}
+                    </p>
                     <ul ng-if="sensor.geometry.coordinates">
                         <li ng-if="sensor.geometry.coordinates[0]">
                             <b>Latitude:</b>
@@ -51,7 +55,8 @@
                     </ul>
                     <p>
                         <b>Protected:</b>
-                        {{ sensor.properties.accessProtected }}</p>
+                        {{ sensor.properties.accessProtected }}
+                    </p>
 
                 </div>
             </div>
@@ -60,7 +65,7 @@
 
     <div class="col-lg-6">
         <div ng-repeat="sensor in sensors | filter : query">
-            <div class="panel panel-default" ng-if="$odd">
+            <div class="panel panel-info" ng-if="$odd">
                 <div class="panel-heading">
                     <a href="#/sensors/{{ sensor.properties.vs_name }}"
                        name="{{ sensor.properties.vs_name }}"
@@ -73,11 +78,13 @@
                 <div class="panel-body">
                     <p>
                         <b>Description:</b>
-                        {{ sensor.properties.description }}</p>
+                        {{ sensor.properties.description }}
+                    </p>
 
                     <p ng-if="sensor.properties.geographical">
                         <b> Location:</b>
-                        {{ sensor.properties.geographical }}</p>
+                        {{ sensor.properties.geographical }}
+                    </p>
                     <ul ng-if="sensor.geometry.coordinates">
                         <li ng-if="sensor.geometry.coordinates[0]">
                             <b>Latitude:</b>
@@ -94,7 +101,8 @@
                     </ul>
                     <p>
                         <b>Protected:</b>
-                        {{ sensor.properties.accessProtected }}</p>
+                        {{ sensor.properties.accessProtected }}
+                    </p>
 
                 </div>
 

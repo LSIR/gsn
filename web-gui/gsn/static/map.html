@@ -46,7 +46,7 @@
 <div class="row" ng-if="!loading">
     <div class="col-lg-6">
         <div ng-repeat="sensor in sensors | filter : query | filter : isCloseEnough()">
-            <div class="panel panel-default" ng-if="$even">
+            <div class="panel panel-info" ng-if="$even">
                 <div class="panel-heading"><a href="#/sensors/{{ sensor.properties.vs_name }}"
                                               name="{{sensor.properties.vs_name}}"
                                               ng-bind="sensor.properties.vs_name"></a></div>
@@ -72,7 +72,7 @@
 
     <div class="col-lg-6">
         <div ng-repeat="sensor in sensors | filter : query | filter : isCloseEnough()">
-            <div class="panel panel-default" ng-if="$odd">
+            <div class="panel panel-info" ng-if="$odd">
                 <div class="panel-heading"><a href="#/sensors/{{ sensor.properties.vs_name }}"
                                               name="{{sensor.properties.vs_name}}"
                                               ng-bind="sensor.properties.vs_name"></a></div>

@@ -58,11 +58,11 @@ gsnControllers.factory('mapDistanceService', function () {
 
     return {
         distance: function (circlePosition, sensor) {
-            var latLngA = new google.maps.LatLng(circlePosition.split(",")[0], circlePosition.split(",")[1]);
+            var latLngA = new google.maps.LatLng(circlePosition.split(",")[1], circlePosition.split(",")[0]);
 
 
             if (!sensor.geometry.coordinates.some(function (v) {
-                    return v !== null;
+                    return v != null;
                 })
             ) {
                 return null
@@ -205,10 +205,10 @@ gsnControllers.controller('DownloadCtrl', ['$scope', '$window', '$http', 'sensor
         $scope.sensorsList = [];
 
         //if (data.user.logged) {
-            data.features.forEach(function (sensor) {
-                $scope.sensorsList.push(sensor['properties']['vs_name']
-                )
-            });
+        data.features.forEach(function (sensor) {
+            $scope.sensorsList.push(sensor['properties']['vs_name']
+            )
+        });
         //}
 
     });
@@ -352,8 +352,8 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', 'favorit
 
             for (var i = 0; i < $scope.sensors.length; i++) {
 
-                if ($scope.sensors[i].geometry.coordinates[1] && $scope.sensors[i].geometry.coordinates[0]) {
-                    var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[0], $scope.sensors[i].geometry.coordinates[1]);
+                if ($scope.sensors[i].geometry && $scope.sensors[i].geometry.coordinates[1] && $scope.sensors[i].geometry.coordinates[0]) {
+                    var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
 
                     var marker = new google.maps.Marker({
                         position: latLng,
@@ -455,7 +455,7 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
             });
         };
 
-        $scope.columns = [true, true, true];
+        $scope.columns = [true, false, true];
 
         $scope.submit = function () {
             $scope.load();
@@ -680,6 +680,10 @@ gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceSer
 
     $scope.isCloseEnough = function () {
         return function (sensor) {
+
+            if (!sensor.geometry) {
+                return false;
+            }
 
             var dist = mapDistanceService.distance($scope.circlePosition, sensor);
 

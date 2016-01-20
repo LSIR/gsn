@@ -11,18 +11,17 @@
         });
     </script>
 
-    <div ng-show="loading">loading...</div>
+    <div ng-show="loading">.</div>
+    <div ng-if="loading" us-spinner style="position: relative"></div>
 
     <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have
                                                                      access to this it.</p>
-
-    <div ng-if="loading" us-spinner style="position: relative"></div>
 
     <div ng-if="details">
         <!--<div class="row" >-->
 
         <div class="col-lg-6" ng-if="!loading">
-            <div class="panel panel-default">
+            <div class="panel panel-info">
                 <div class="panel-heading">Properties</div>
                 <div class="panel-body">
                     <div ng-repeat="(key, value) in details.properties">
@@ -48,7 +47,7 @@
         </div>
         <div class="col-lg-6" ng-if="!loading">
 
-            <div class="panel panel-default">
+            <div class="panel panel-info">
                 <div class="panel-heading">Geographical data</div>
                 <div class="panel-body">
                     <p ng-if="details.properties.geographical">
@@ -78,6 +77,21 @@
                     </ul>
                 </div>
             </div>
+            <div class="panel panel-info"
+                 ng-if="details.properties.stats && (details.properties.stats.start-datetime || details.properties.stats.end-datetime)">
+                <div class="panel-heading">Geographical data</div>
+                <div class="panel-body">
+
+                    <div ng-repeat="(key, value) in details.properties.stats">
+                        <p ng-if="key != 'coordinates'">
+                            <b>{{ key }}:</b>
+                            {{ value }}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
 
         <!--</div>-->
@@ -93,7 +107,7 @@
         </p>
 
         <div class="col-lg-12" ng-if="!loading && details.user.has_access">
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading">Data</div>
                 <div class="panel-body">
 
