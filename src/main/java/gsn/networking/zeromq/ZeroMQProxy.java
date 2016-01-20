@@ -7,7 +7,7 @@ import gsn.Main;
 import gsn.beans.DataField;
 
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
+import org.zeromq.ZContext;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
@@ -15,7 +15,7 @@ import com.esotericsoftware.kryo.io.Output;
 
 public class ZeroMQProxy extends Thread implements Runnable {
 		
-	private Context ctx;
+	private ZContext ctx;
 	private ZMQ.Socket subscriberX;
 	private ZMQ.Socket publisherX;
 	private ZMQ.Socket clients;
@@ -27,12 +27,14 @@ public class ZeroMQProxy extends Thread implements Runnable {
 		kryo.register(DataField[].class);
 		ctx = Main.getZmqContext();
 		
-		subscriberX = ctx.socket(ZMQ.XSUB);
-	    publisherX = ctx.socket(ZMQ.XPUB);
+		subscriberX = ctx.createSocket(ZMQ.XSUB);
+	    publisherX = ctx.createSocket(ZMQ.XPUB);
 	    publisherX.setXpubVerbose(true);
+	    publisherX.setHWM(0);
+	    subscriberX.setHWM(0);
 	    publisherX.bind("tcp://*:"+portOUT);
 	    
-	    clients = ctx.socket(ZMQ.REP);
+	    clients = ctx.createSocket(ZMQ.REP);
 	    clients.bind ("tcp://*:"+portMETA);
 	   // System.out.println("Proxy binding to tcp://*:"+portOUT+" and tcp://*:"+portMETA);
 	    
@@ -40,7 +42,7 @@ public class ZeroMQProxy extends Thread implements Runnable {
 
 			@Override
 			public void run() {
-	            ZMQ.proxy(subscriberX, publisherX,null);
+		           ZMQ.proxy(subscriberX, publisherX,null);
 			}
 	    });
 	    dataProxy.setName("ZMQ-PROXY-Thread");
@@ -51,12 +53,17 @@ public class ZeroMQProxy extends Thread implements Runnable {
 			public void run() {
 				while (true) {
 					String request = clients.recvStr (0);
-					ByteArrayOutputStream bais = new ByteArrayOutputStream();
-		            Output o = new Output(bais);
-		            kryo.writeObjectOrNull(o,structures.get(request),DataField[].class);
-		            o.close();
-		            byte[] b = bais.toByteArray();
-					clients.send(b, 0);
+					byte[] b=new byte[0];
+					if (request.startsWith("?")){
+                        //zmq parameters (for replay function for example) not yet supported
+					}else{
+						ByteArrayOutputStream bais = new ByteArrayOutputStream();
+			            Output o = new Output(bais);
+			            kryo.writeObjectOrNull(o,structures.get(request),DataField[].class);
+			            o.close();
+			            b = bais.toByteArray();
+			            clients.send(b, 0);
+					}
 				}
 			}
 		});
