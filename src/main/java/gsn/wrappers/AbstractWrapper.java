@@ -313,7 +313,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
         }
 		try {
 			// Checks if the stream element is out of order
-            if (lastInOrderTimestamp.contains(key) || lastInOrderTimestamp.get(key) == null) {
+            if (lastInOrderTimestamp.get(key) == null) {
                 conn = Main.getWindowStorage().getConnection();
                 StringBuilder query = new StringBuilder();
 				query.append("select max(timed) from ").append(aliasCodeS);
