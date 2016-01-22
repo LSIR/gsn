@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en" ng-app="gsnWebApp">
+<head>
+  <meta charset="utf-8">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>GSN sensors</title>
+
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="css/app.css">
+
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="bower_components/angular-resource/angular-resource.js"></script>
+
+  <script  type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+
+
+
+
+  <!--<script src="lib/ui-bootstrap-tpls-0.12.1.min.js"></script>-->
+  <script src="lib/ui-bootstrap-tpls-0.13.0_.js"></script>
+  <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <script src="lib/underscore-min.js"></script>
+
+  <script src="https://rawgit.com/pablojim/highcharts-ng/master/dist/highcharts-ng.js"></script>
+  <script src="http://code.highcharts.com/stock/highstock.src.js"></script>
+
+
+  <script src="js/app.js"></script>
+
+
+
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-strap/2.1.2/angular-strap.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-strap/2.1.2/angular-strap.tpl.min.js"></script>
+
+  <script src="//code.angularjs.org/1.3.8/angular-animate.min.js" data-semver="1.3.8"></script>
+  <script src="//code.angularjs.org/1.3.8/angular-sanitize.min.js" data-semver="1.3.8"></script>
+  <!--<script src="bower_components/angularjs-datepicker/src/js/angular-datepicker.js"></script>-->
+
+  <!--<script src="bower_components/angular-busy/dist/angular-busy.js"></script>-->
+  <!--<script src="bower_components/jstree/dist/jstree.js"></script>-->
+  <!--<script src="bower_components/AngularJS-Toaster/toaster.js"></script>-->
+  <!--<script src="bower_components/underscore/underscore-min.js"></script>-->
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"></script>
+
+
+  <!-- Angular Material Javascript now available via Google CDN; version 0.8 used here -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.js"></script>
+
+  <script src="bower_components/angular-ui-select/dist/select.js"></script>
+  <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.css">
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">
+
+
+  <!-- Map dependencies -->
+  <script src="http://maps.google.com/maps/api/js?v=3&sensor=false"></script>
+  <script src="bower_components/leaflet/dist/leaflet.js"></script>
+  <script src="bower_components/leaflet-plugins/layer/tile/Google.js"></script>
+  <script src="lib/angular-leaflet-directive.js"></script>
+  <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css"/>
+
+  <!-- clustering -->
+  <script src="//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
+  <link rel="stylesheet" href="//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css" />
+  <link rel="stylesheet" href="//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css" />
+
+  <!--Slider-->
+  <script src="lib/rzslider.js"></script>
+  <!--<link rel="stylesheet" href="https://rawgit.com/rzajac/angularjs-slider/master/dist/rzslider.css" />-->
+  <link rel="stylesheet" href="css/rzslider.css" />
+
+
+  <script src="js/services.js"></script>
+  <script src="js/metaDataServices.js"></script>
+  <script src="js/highcharts.js"></script>
+  <script src="js/sensorDataControllers.js"></script>
+  <script src="js/sensors.js"></script>
+  <script src="js/monitor.js"></script>
+  <script src="js/map/mapControllers.js"></script>
+  <script src="js/metadata.js"></script>
+</head>
+<body style="background-image:url(img/CCES.jpg); background-repeat: no-repeat;background-position: 25% 0%; ">
+
+<img src="img/beta_icon.png" alt="Beta Icon" style="position: absolute; left: 20px; top: 0px; width: 70px;">
+<div id="header">
+  <h2>Environmental Data Portal<br/>
+    <small><i>Global Sensor Network</i></small></h2>
+</div>
+
+<ul class="nav nav-tabs" ng-controller="TabsCtrl">
+
+  <li ng-class="" ng-repeat="tab in tabs.tabs" tab="tab"><a href="{{tab.link}}" ng-class="tabs.tabClass(tab)" ng-click="tabs.setSelectedTab(tab)">{{tab.label}}</a></li>
+
+  <li ng-class="" class="login" tab="_blank"><a  target="_blank"  href="https://montblanc.slf.ch:8443/gsn/MyUserCandidateRegistrationServlet">Register</a></li>
+  <li ng-class="" class="login" tab=""><a target="_blank" href="https://montblanc.slf.ch:8443/gsn/MyLoginHandlerServlet">Login</a></li>
+
+</ul>
+<div ng-view></div>
+
+</body>
+</html>

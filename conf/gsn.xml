@@ -33,9 +33,9 @@
 <!-- <storage user="gsn" password="gsn" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521" /> -->
 
 <!-- Processing Database, Optional. If not specified, the processing is implemented using the Main Storage Database specified above  -->
- 
+ <!-- 
    <sliding>
       <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:sliding;DB_CLOSE_DELAY=-1" />
    </sliding>
-
+ -->
 </sensor-server>

@@ -50,6 +50,7 @@ public class WebJsonConverter extends GeoJsonConverter {
         if (nameParts.iterator().hasNext()) {
             writer.name("group").value(nameParts.iterator().next());
         }
+        writer.name("isPublic").value(record.isPublic());
     }
 
 //    public String writeTableModel(Collection<VirtualSensorMetadata> records){

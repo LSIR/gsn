@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-
 import org.zeromq.ZContext;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -185,7 +184,6 @@ public class ZeroMQWrapper extends AbstractWrapper {
 						connected = subscriber.base().connect(remoteContactPoint_DATA);
 					}
 					//System.out.println("timeout on wrapper, subscribing to "+ vsensor);
-					//subscriber.unsubscribe((vsensor+":").getBytes());
 					subscriber.subscribe((vsensor+":").getBytes());
 				}
 			}catch (Exception e)

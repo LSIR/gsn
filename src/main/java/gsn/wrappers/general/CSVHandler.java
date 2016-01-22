@@ -132,7 +132,7 @@ public class CSVHandler {
                 try {
                     String tmp = DateTimeFormat.forPattern(getTimeStampFormat(formats[i])).print(System.currentTimeMillis());
                 } catch (IllegalArgumentException e) {
-                    logger.error("Validating the time-format(" + formats[i] + ") used by the CSV-wrapper is failed. ");
+                    logger.error("Validating the time-format(" + formats[i] + ") used by the CSV-wrapper failed. ");
                     return false;
                 }
             } else {
@@ -244,7 +244,7 @@ public class CSVHandler {
                 try {
                     streamElement.put(fields[i], Double.parseDouble(values[i]));
                 } catch (java.lang.NumberFormatException e) {
-                    logger.error("Parsing to Numeric failed: Value to parse=" + values[i]);
+                    logger.error("Parsing to Numeric failed: Value to parse=" + values[i]+ " in"+getDataFile());
                     throw e;
                 }
             } else if (formats[i].equalsIgnoreCase("string")) {
@@ -253,7 +253,7 @@ public class CSVHandler {
             	try {
                     streamElement.put(fields[i], Long.parseLong(values[i]));
                 } catch (java.lang.NumberFormatException e) {
-                    logger.error("Parsing to BigInt failed: Value to parse=" + values[i]);
+                    logger.error("Parsing to BigInt failed: Value to parse=" + values[i]+ " in"+getDataFile());
                     throw e;
                 }
             } else if (isTimeStampFormat(formats[i])) {
@@ -282,7 +282,7 @@ public class CSVHandler {
                 DateTime x = DateTimeFormat.forPattern(timeFormat).withZone(getTimeZone()).parseDateTime(timeValue);
                 streamElement.put(timeField, x.getMillis());
             } catch (IllegalArgumentException e) {
-                logger.error("Parsing error: TimeFormat=" + timeFormat + " , TimeValue=" + timeValue);
+                logger.error("Parsing error: TimeFormat=" + timeFormat + " , TimeValue=" + timeValue+ " in"+getDataFile());
                 logger.error(e.getMessage(), e);
                 throw e;
             }

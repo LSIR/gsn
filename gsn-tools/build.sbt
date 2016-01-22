@@ -24,9 +24,13 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.3.4",
   "com.typesafe.akka" %% "akka-actor" % "2.3.4",
   "edu.ucar" % "netcdf" % "4.3.22",
+  "org.geotools" % "gt-shapefile" % "13.2",
+  "org.geotools" % "gt-geojson" % "13.2",
+  "org.geotools" % "gt-epsg-hsql" % "13.2",
   "org.apache.jena" % "jena-core" % "2.11.0" exclude("log4j","log4j") exclude("org.slf4j","slf4j-log4j12"),
   "com.typesafe.slick" %% "slick" % "2.1.0",
   "com.mchange" % "c3p0" % "0.9.5-pre10",
+  "org.reactivemongo" %% "reactivemongo" % "0.10.5.0.akka23",
   "ch.qos.logback" % "logback-classic" % "1.1.1" % "test",
   "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
@@ -36,7 +40,8 @@ libraryDependencies ++= Seq(
 resolvers ++= Seq(
   DefaultMavenRepository,
   "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "lsir remote" at "http://osper.epfl.ch:8081/artifactory/remote-repos"
+  "lsir remote" at "http://osper.epfl.ch:8081/artifactory/remote-repos",
+  "osgeo" at "http://download.osgeo.org/webdav/geotools/"
 )
 
 scalacOptions += "-deprecation"

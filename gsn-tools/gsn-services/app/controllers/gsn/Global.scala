@@ -17,6 +17,8 @@ object Global extends GlobalSettings {
   val ds =new DataStore(gsnConf)  
   val acDs=new SecurityData(ds)
   
+  val globalKey=conf.getString("gsn.security.globalKey")
+  
   override def onStart(app: Application) {
     Logger.info("Application has started")
     val sec=new SecurityData(ds)

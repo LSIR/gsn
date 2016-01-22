@@ -38,7 +38,7 @@ object AcConf extends Conf{
     takeBool(xml \ "access-control").getOrElse(defaultAc.enabled ),
     takeInt(xml \ "ssl-port").getOrElse(defaultAc.sslPort),
     take(xml \ "ssl-key-store-password").getOrElse(defaultAc.sslKeyStorePass),
-    take(xml \ "ssl-key-password").getOrElse(defaultAc.sslKeyPass),    
+    take(xml \ "ssl-key-password").getOrElse(defaultAc.sslKeyPass),
     take(xml \ "ssl-key-store").getOrElse(defaultAc.sslKeyStore))
 }
 

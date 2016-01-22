@@ -1,9 +1,6 @@
 package ch.epfl.gsn.metadata.tools.geoservice;
 
-import ch.epfl.gsn.metadata.core.model.GeoData;
 import ch.epfl.gsn.metadata.mongodb.MongoApplicationConfig;
-import ch.epfl.gsn.metadata.tools.taxonomy.MongoTaxonomyConfig;
-import ch.epfl.gsn.metadata.tools.taxonomy.TermsUpdate;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -15,7 +12,7 @@ public class GeoDataReload {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(ToolsConfiguration.class, MongoApplicationConfig.class);
         ctx.scan("ch.epfl.gsn.metadata");
-        GeoDataUpdate service = ctx.getBean(GeoDataUpdate.class);
+        TopoDataUpdate service = ctx.getBean(TopoDataUpdate.class);
 
 
         long count = service.updateGeoData();

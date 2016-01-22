@@ -9,7 +9,7 @@ function include(filename)
     head.appendChild(script)
 }
 
-include("http://d3js.org/d3.v3.min.js");
+include("js/d3plots/d3.v3.min.js");
 
 function drawHistogram(dataset, nb_elements){
 	drawChartHistogram(parseDataHistogram(dataset, nb_elements),  d3.keys(dataset));

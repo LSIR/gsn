@@ -123,7 +123,7 @@ public class GSNCollector implements CollectdConfigInterface,
     return 0;
   }
 
-  public int config (OConfigItem ci) /* {{{ */
+  public int config (OConfigItem ci)
   {
     
     List<OConfigItem> children;
@@ -151,9 +151,9 @@ public class GSNCollector implements CollectdConfigInterface,
     }
 
     return (0);
-  } /* }}} int config */
+  } 
 
-  public int init () /* {{{ */
+  public int init ()
   { 
     Collectd.logInfo("In init()");
     return (0);
@@ -200,17 +200,15 @@ public class GSNCollector implements CollectdConfigInterface,
   }
 
     private String getHost() {
-       
-    	try {
-            String hostname = InetAddress.getLocalHost().getHostName().replaceAll("\\.", "_");
-            return hostname;
-        } catch (UnknownHostException e) {
-            return "unknownhost";
-        } 
-        //return hostname;
 
+      try {
+    	    String hostname = InetAddress.getLocalHost().getHostName().replaceAll("\\.", "_");
+            return hostname;
+      } catch (UnknownHostException e) {
+            return "unknownhost";
+      }
+      //return hostname;
     }
 
 }
 
-/* vim: set sw=2 sts=2 et fdm=marker : */

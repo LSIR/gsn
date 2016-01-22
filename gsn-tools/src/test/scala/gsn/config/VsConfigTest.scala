@@ -36,4 +36,20 @@ class VsConfigTest extends FunSpec with Matchers {
       
     }
   }
+  
+  describe("scriptlet vs config"){
+    val vs=VsConf.load("src/test/resources/conf/vs/scriptlet.xml")
+    it("should read params"){
+      vs.name shouldBe "scriptletVS"
+      vs.processing.className shouldBe "gsn.processor.ScriptletProcessor"
+      vs.processing.initParams.size shouldBe 2
+      val pars=vs.processing.initParams
+      pars("persistant") should be ("true")
+      println(pars("scriptlet"))
+      pars("scriptlet").split("\n").length should be (7)
+      
+      val src=vs.streams.head.sources.head
+      src.query should be ("select tapo as papo from wrapper")
+    }
+  }
 }

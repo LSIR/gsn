@@ -126,7 +126,7 @@ public class ModellingVirtualSensor extends AbstractVirtualSensor {
 				}});
 			for(int i=0;i<out.length;i++){
 				if(out[i] != null){
-		            		dataProduced(out[i]);
+            		dataProduced(out[i]);
 				}
 			}
 		}

@@ -72,6 +72,8 @@ body, html
 
 body 
 {
+		font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	
 	min-width:750px;	
 	width: 100%; 
 	height: 100%; 
@@ -83,16 +85,24 @@ body
 {
 	margin:10px auto;
 	padding:1px;
-	width:750px;
+	width:100%;
 	background:#FFFFFF;
+    -moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 }
 #header, #headerfm 
 {
 	background:url("GSN_green_tiny.png") no-repeat;
 	background-position: left center;
 	background-color:#FFF;
-	margin:0 0 0 10px;
+	margin:0;
 	padding:0;
+	-moz-border-radius-topleft: 10px;
+	-webkit-border-top-right-radius: 10px;
+	-moz-border-radius-topright: 10px;
+	-webkit-border-top-left-radius: 10px;
 }
 
 #header h1 
@@ -149,7 +159,7 @@ body
     list-style-type:none;
 	border-right:1px solid #ffffff;
 	color: #000000;
-	font-weight:bold;
+	/*font-weight:bold;*/
 
 }
 #logintextprime 
@@ -252,10 +262,6 @@ body
 	background:#7c6;
 }
 
-#datachooser table 
-{
-	width:100%;
-}
 
 .step
 {
@@ -276,8 +282,8 @@ body
 #main 
 {
 	float:left;
-	width:490px;
-	padding:0 10px;
+	width:100%;
+	padding:10px 10px;
 }
 
 #main h2, #main h3, #main p 
@@ -287,8 +293,9 @@ body
     	
 #sidebar 
 {
-	float:left;
-	width:220px;
+	float:right;
+	width:30%;/*280px;*/
+	min-width:200px;
 	margin:0;
 	padding:0;
 	text-align:left;
@@ -381,7 +388,7 @@ body
 
 #dropAreaMask
 {
-	background-color: none;
+/*	background-color: none;*/
 	height: 300px;
 	width:80%;
 	margin-left: 10%;
@@ -406,7 +413,7 @@ html>body #vsmenu div a
 {
 	border-left: 10px solid #7c6;
 	background-color: #F0FFCF;
-	color: #fff;
+	color: #7c6;
 }
 
 #vsmenu .toggle, #vsmenu .toggle:hover, #vsmenu .toggle:visited 
@@ -526,7 +533,7 @@ html>body #vsmenu div a
 
 .vsbox dd img 
 {
-	/*height:150px;*/
+		max-width:540px;
 }
 
 .vsbox input[type=submit], .vsbox dl p 
@@ -595,7 +602,8 @@ html>body #vsmenu div a
 	display: inline;
 	list-style-type: none;
 }
-	
+
+/*tabs of real-time, addressing.....*/	
 .tabnav a:link, .tabnav a:visited
 {
 	float: left;
@@ -608,6 +616,10 @@ html>body #vsmenu div a
 	border: 1px solid #9d8;
 	text-decoration: none;
 	color: #666;
+	-moz-border-radius-topleft: 4px;
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topright: 4px;
+	-webkit-border-top-left-radius: 4px;
 }
 
 .tabnav a:link.active, .tabnav a:visited.active
@@ -785,7 +797,7 @@ input.date-picker
 .chart
 {
 	text-align:center;
-	border: 2px solid #404040;//#FFC29F;
+	border: 2px solid #404040;/*//#FFC29F;*/
 	background-color: #303030;
 	padding: 10px;
 }
@@ -823,9 +835,9 @@ input.date-picker
 }	
 
 /* gsn data part */
-div.full-page {
+/*div.full-page {
     width: 730px !important;
-}
+}*/
 
 .ui-accordion h3 {
     margin: 0;
@@ -913,6 +925,39 @@ div.full-page {
     padding: 4px;
 }
 
+.condition-slider {
+	margin:2px;
+}
+
+.slider-range {
+	display:inline-block;
+	width:130px;
+	margin-left:8px;
+	margin-right:8px;
+}
+
+.slider-min input{
+	width:45px;	
+}
+
+.slider-max {
+	width:45px;	
+}
+.ui-slider-horizontal {
+	height:9px;
+}
+
+.ui-slider-handle {
+	height:3px; 
+	width:3px; 
+	margin-left:0em; 
+}
+
+
+.fields{
+	display:inline-block;
+}
+
 #gridContainer table th {
     background-color: #9d8;
 }
@@ -934,8 +979,9 @@ div.full-page {
     padding:0px;
 }
 .gsn_chart{
-    width:480px;
-    height:250px;
+    width:620px;
+    height:275px;
+    left:20px
     /* position:absolute !important; */
 }
 .gsn_chart canvas{
@@ -978,5 +1024,58 @@ div.full-page {
     display: block;
     width: 1.3em;
     height: 1.4em;
-    background: #e6e6e6 url(../img/datepicker/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+    background: #e6e6e6 url(/img/datepicker/e6e6e6_40x100_textures_02_glass_75.png) 0 50% repeat-x;
+}
+
+.chosen-container{
+	margin: 0px 3px;
+}
+
+div.form-inline input button {
+	margin: 0px 6px;
+}
+
+.form-inline{
+	margin: 0px 0px 4px;
+}
+
+.panel-default{
+	margin: 2px;
+}
+
+
+#panel-data-filter
+{
+	width:40%;
+	float:left;
+	
+}
+
+#panel-plot
+{
+	width:59%;
+	float:right;
+	
+}
+
+#plotContainer{
+	overflow:auto;
+}
+
+#panel-grid
+{
+	width:59%;
+	float:right;
+	
+}
+
+.form-group-sm .form-control {
+	height:23px ;
+	padding: 2px;
+}
+
+.form-group-xs input{
+	height:23px;
+	font-size:11px;
+	padding: 0px;
 }

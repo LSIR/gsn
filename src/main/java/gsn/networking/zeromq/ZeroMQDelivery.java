@@ -4,12 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-
 import org.zeromq.ZContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 
 import zmq.Pub;
@@ -29,9 +27,9 @@ public class ZeroMQDelivery implements DeliverySystem{
 	private Socket publisher;
 	private boolean closed = true;
 	private Kryo kryo = new Kryo();
-	private String name; 
 
-	private VSensorConfig config;
+	private String name;
+
 	public static transient Logger logger = LoggerFactory.getLogger ( ZeroMQDelivery.class );
 
 	

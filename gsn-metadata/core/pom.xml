@@ -31,6 +31,11 @@
                     <groupId>org.springframework.data</groupId>
                     <artifactId>spring-data-commons</artifactId>
                 </exclusion>
+                    <!-- Exclude Commons Logging in favor of SLF4j -->
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+                    </exclusion>
             </exclusions>
         </dependency>
 
@@ -52,5 +57,51 @@
             <version>2.0</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <!--<mainClass>ch.epfl.gsn.metadata.tools.updates.TaxonomyTermReload</mainClass>-->
+                    <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                </configuration>
+                <!--<configuration>-->
+                    <!--<executable>java</executable>-->
+                    <!--<arguments>-->
+                        <!--<argument>-Dmyproperty=myvalue</argument>-->
+                        <!--<argument>-classpath</argument>-->
+                        <!--&lt;!&ndash; automatically creates the classpath using all project dependencies,-->
+                             <!--also adding the project build directory &ndash;&gt;-->
+                        <!--<classpath/>-->
+                        <!--<argument>ch.epfl.gsn.metadata.tools.updates.TaxonomyTermReload</argument>-->
+                    <!--</arguments>-->
+                <!--</configuration>-->
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

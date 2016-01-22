@@ -99,7 +99,7 @@ public class ZeroMQProxy extends Thread implements Runnable {
 
 			@Override
 			public void run() {
-	           ZMQ.proxy(subscriberX, publisherX,null);
+		           ZMQ.proxy(subscriberX, publisherX,null);
 			}
 	    });
 	    dataProxy.setName("ZMQ-PROXY-Thread");

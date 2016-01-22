@@ -4,6 +4,8 @@ package gsn.beans;
 import java.util.ArrayList;
 
 import org.apache.commons.collections.KeyValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import scala.collection.JavaConversions;
 import scala.collection.Map;
@@ -12,6 +14,8 @@ import gsn.utils.KeyValueImp;
 
 
 public class BeansInitializer {
+  private transient static final Logger logger = LoggerFactory.getLogger( BeansInitializer.class );
+
   public static ContainerConfig container(GsnConf gsn){
 	  SlidingConfig sliding = new SlidingConfig();
 	  if (gsn.slidingConf().isDefined())
@@ -46,7 +50,7 @@ public class BeansInitializer {
   
   public static DataField dataField(FieldConf fc){
 	  DataField f=new DataField();
-	  f.setName(fc.name());
+	  f.setName(fc.name().toLowerCase());
 	  f.setType(fc.dataType());
 	  f.setDescription(fc.description());
 	  if (fc.unit().isDefined())
