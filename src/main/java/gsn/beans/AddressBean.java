@@ -41,6 +41,8 @@ public final class AddressBean implements Serializable{
 
 	private String                 wrapper;
 
+	private String                 partialOrderKey;
+	
 	private  KeyValue[] predicates  = EMPTY_PREDICATES;
 	
 	private DataField [] wrapperOutputStructure = new DataField[0];
@@ -66,6 +68,15 @@ public final class AddressBean implements Serializable{
 
 	public String getWrapper ( ) {
 		return this.wrapper;
+	}
+	
+	public String getPartialOrderKey(){
+		return this.partialOrderKey;
+	}
+	
+	public void setPartialOrderKey(String key) {
+		this.partialOrderKey = key;
+		
 	}
 
 	public  KeyValue[] getPredicates ( ) {

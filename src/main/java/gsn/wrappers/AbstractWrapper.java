@@ -76,7 +76,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 
 	private boolean usingRemoteTimestamp = false;
 
-	private Long lastInOrderTimestamp;
+	private Hashtable<Object,Long> lastInOrderTimestamp = new Hashtable<Object, Long>();
 
 	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
 	
@@ -253,7 +253,6 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 				toReturn = slidingHandler.dataAvailable(streamElement)
 						|| toReturn;
 			}
-
 			if (++noOfCallsToPostSE
 					% GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS == 0) {
 				removeUselessValues();
@@ -290,7 +289,11 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 			}
 			conn = Main.getWindowStorage().getConnection();
 			Main.getWindowStorage().executeInsert(aliasCodeS, getOutputFormat(), se, conn);
-            lastInOrderTimestamp = se.getTimeStamp();
+			if (getPartialOrdersKey() != null){
+                lastInOrderTimestamp.put(se.getData(getPartialOrdersKey()), se.getTimeStamp());
+			}else{
+				lastInOrderTimestamp.put(0,se.getTimeStamp()); 
+			}
             elementCount = elementCount == Long.MAX_VALUE ? 0 : elementCount + 1;
             return true;
 		} finally {
@@ -302,27 +305,36 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
         if (listeners.size() == 0)
 			return false;
         Connection conn = null;
+        Object key = 0;
+        if (getPartialOrdersKey() != null){
+        	key = se.getData(getPartialOrdersKey());
+        }
 		try {
 			// Checks if the stream element is out of order
-            if (lastInOrderTimestamp == null) {
+            if (lastInOrderTimestamp.contains(key) || lastInOrderTimestamp.get(key) == null) {
                 conn = Main.getWindowStorage().getConnection();
                 StringBuilder query = new StringBuilder();
 				query.append("select max(timed) from ").append(aliasCodeS);
-				ResultSet rs2 = Main.getWindowStorage().executeQueryWithResultSet(new StringBuilder("select count(*) from "+aliasCodeS),
-						conn);
+				StringBuilder query2 = new StringBuilder();
+				query2.append("select count(*) from ").append(aliasCodeS);
+				if (getPartialOrdersKey() != null){
+					query.append(" where "+getPartialOrdersKey()+"="+key); // code injection !!!
+					query2.append(" where "+getPartialOrdersKey()+"="+key); 
+				}
+				ResultSet rs = Main.getWindowStorage().executeQueryWithResultSet(query,conn);
+				ResultSet rs2 = Main.getWindowStorage().executeQueryWithResultSet(query2,conn);
 				int n=rs2.next()?rs2.getInt(1):0;
-					
-				ResultSet rs = Main.getWindowStorage().executeQueryWithResultSet(query,
-						conn);
-				
-				if (rs.next() && n>0) {
 
-					lastInOrderTimestamp = rs.getLong(1);
+				if (rs.next() && n>0) {
+					lastInOrderTimestamp.put(key,rs.getLong(1));
 				} else {
-					lastInOrderTimestamp = Long.MIN_VALUE; // Table is empty
+					lastInOrderTimestamp.put(key,Long.MIN_VALUE); // Table is empty
 				}
 			}
-            return (se.getTimeStamp() <= lastInOrderTimestamp);
+            if (isTimeStampUnique())
+                return (se.getTimeStamp() <= lastInOrderTimestamp.get(key));
+            else
+            	return (se.getTimeStamp() < lastInOrderTimestamp.get(key));
 		} finally {
 			Main.getWindowStorage().close(conn);
 		}
@@ -453,14 +465,23 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	}
 
 	/**
-	 * Returns true if the wrapper can produce multiple different data items
-	 * [stream elements] with the same timestamp. If this is true, then all the
+	 * Returns false if the wrapper can produce multiple different data items
+	 * [stream elements] with the same timestamp. If this is false, then all the
 	 * stream elements with the same timestamp will be accepted. If this method
-	 * returns false (default value), duplicates override each other and the
-	 * latest received duplicate is the one which is going to be persisted.
+	 * returns true (default value), duplicates are discarded and only the first
+	 *  one is kept.
 	 */
 	public boolean isTimeStampUnique() {
 		return true;
+	}
+	
+	/**
+	 * Allows for having partial ordering by only checking the time stamp order of
+	 * stream elements having the same key.
+	 * null is total ordering should be applied
+	 */
+	public String getPartialOrdersKey(){
+		return activeAddressBean.getPartialOrderKey();
 	}
 
 	public boolean manualDataInsertion(StreamElement se) {
