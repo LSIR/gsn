@@ -90,12 +90,12 @@ object SourceConf{
   )
 }
     
-case class WrapperConf(wrapper:String,params:Map[String,String],output:Seq[FieldConf])
+case class WrapperConf(wrapper:String,partialKey:Option[String],params:Map[String,String],output:Seq[FieldConf])
 object WrapperConf{
   def create(xml:Node)=WrapperConf(
-      xml \@ "wrapper",
+      xml \@ "wrapper", 
+      xml.attribute("partial-order-key").map(_.toString),
       (xml \ "predicate").map(p=>(p \@ "key",p.text)).toMap,
       (xml \ "field").map(f=>FieldConf.create(f)))
 }    
-
       

@@ -81,8 +81,9 @@ public class SQLUtils {
 				fromClauseMather.appendReplacement( result , replacement.toString( ) + " ");         
 		}
 		String cleanFromClause = fromClauseMather.appendTail( result ).toString( );
-		String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
-		return new StringBuilder(finalResult);
+		//String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
+		StringBuilder finalResult = new StringBuilder(toReturn.substring(0, indexOfFrom)).append(cleanFromClause).append(toReturn.substring(indexOfWhere));
+		return finalResult;
 	}
 
 	/**
@@ -135,8 +136,9 @@ public class SQLUtils {
 				fromClauseMather.appendReplacement( result , replaceTo.toString( ) + " ");
 		}
 		String cleanFromClause = fromClauseMather.appendTail( result ).toString( );
-		String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
-		return new StringBuilder(finalResult);
+		//String finalResult = StringUtils.replace( toReturn , selection , cleanFromClause );
+		StringBuilder finalResult = new StringBuilder(toReturn.substring(0, indexOfFrom)).append(cleanFromClause).append(toReturn.substring(indexOfWhere));
+		return finalResult;
 	}
 
 	public static String extractProjection(String pQuery) {

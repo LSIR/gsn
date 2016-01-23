@@ -51,9 +51,7 @@ public abstract class AbstractModel {
 		
 	}
 
-	public abstract StreamElement pushData(StreamElement streamElement);
-
-
+	public abstract StreamElement[] pushData(StreamElement streamElement,String origin);
 
 	public abstract StreamElement[] query(StreamElement params);
 	

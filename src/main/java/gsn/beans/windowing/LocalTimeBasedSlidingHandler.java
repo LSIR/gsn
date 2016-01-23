@@ -192,7 +192,7 @@ public class LocalTimeBasedSlidingHandler implements SlidingHandler {
         }
 
         if (timed1 >= 0 && timed2 >= 0) {
-        	return "timed < " + Math.min(timed1, timed2);
+            return "timed < " + Math.min(timed1, timed2);
         }
 
         return "timed < " + ((timed1 == -1) ? timed2 : timed1);

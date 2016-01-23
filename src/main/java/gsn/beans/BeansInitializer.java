@@ -30,7 +30,9 @@ public class BeansInitializer {
 			 gsn.accessControl().enabled(),
 			 sslPort,
 			 gsn.accessControl().sslKeyStorePass(),
-			 gsn.accessControl().sslKeyPass(),storage(gsn.storageConf()),sliding);
+			 gsn.accessControl().sslKeyPass(),
+			 gsn.accessControl().sslKeyStore(),
+			 storage(gsn.storageConf()),sliding);
 	
 	 return con;
   }
@@ -99,6 +101,9 @@ public class BeansInitializer {
 		  i++;
 	  }
       AddressBean a = new AddressBean(w.wrapper(),p);
+      if(w.partialKey().isDefined()){
+      a.setPartialOrderKey(w.partialKey().get());
+      }
       DataField [] out=new DataField[(w.output().size())];
 	  for (int j=0;j<out.length;j++){
 		  out[j]=dataField(w.output().apply(j));
