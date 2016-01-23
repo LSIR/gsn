@@ -471,7 +471,6 @@
     </target>
 
     <target name="installer" depends="build-gsn" description="Build a GSN Server installer based on izpack."/>
-    <target name="packager" depends="pack-gsn" description="Build GSN Server Debian and RPM packages."/>
 
     <target name="packager" depends="pack-gsn" description="Build GSN Server Debian and RPM packages."/>
 
