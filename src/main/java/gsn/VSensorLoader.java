@@ -49,7 +49,6 @@ import java.util.Iterator;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.jibx.runtime.JiBXException;
 
 public class VSensorLoader extends Thread {
  
@@ -158,7 +157,7 @@ public class VSensorLoader extends Thread {
         return Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY + File.separator + fileName + ".xml";
     }
 
-    public synchronized void loadPlugin() throws SQLException, JiBXException {
+    public synchronized void loadPlugin() throws SQLException {
 
         Modifications modifications = getUpdateStatus(pluginsDir);
         ArrayList<VSensorConfig> removeIt = modifications.getRemove();
@@ -178,7 +177,7 @@ public class VSensorLoader extends Thread {
         }
     }
 
-    public synchronized boolean loadPlugin(String fileFilterName) throws SQLException, JiBXException {
+    public synchronized boolean loadPlugin(String fileFilterName) throws SQLException {
         Modifications modifications = getUpdateStatus(pluginsDir, fileFilterName);
         ArrayList<VSensorConfig> addIt = modifications.getAdd();
 
@@ -196,7 +195,7 @@ public class VSensorLoader extends Thread {
     }
 
 
-    private synchronized boolean loadPlugin(VSensorConfig vs) throws SQLException, JiBXException {
+    private synchronized boolean loadPlugin(VSensorConfig vs) throws SQLException {
 
         if (!isVirtualSensorValid(vs))
             return false;
