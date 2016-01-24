@@ -14,11 +14,9 @@ set -e
 SCRIPTNAME="${0##*/}"
 SCRIPTNAME="${SCRIPTNAME##[KS][0-9][0-9]}"
 
-#edit /etc/default/apache2 to change this.
-GSN_RUN="auto"
 GSN_CONTROL_PORT=22232
-GSN_FOLDER="/opt/gsn/1.1.7"
-GSN_PIDFILE="/var/run/gsn.pid"
+GSN_FOLDER="/opt/gsn/1.1.8"
+GSN_PIDFILE="/var/run/gsn_1.1.8.pid"
 
 JAVA_HOME="/usr"
 
@@ -26,7 +24,7 @@ if [ ! -x "$JAVA_HOME/bin/java" ] ; then
 	echo "No JRE/JDK installed"
 	exit 0
 fi
-if [ ! -e "$GSN_FOLDER/lib/gsn-1.1.7.jar" ] ; then
+if [ ! -e "$GSN_FOLDER/lib/gsn-1.1.8.jar" ] ; then
     echo "GSN is not installed in the directory $GSN_FOLDER"
     exit 0
 fi
@@ -110,7 +108,7 @@ case $1 in
 		log_daemon_msg "Restarting gsn streaming server" "gsn"
 		
 		PID=$(pidof_gsn) || true
-		if ! apache_wait_stop; then
+		if ! gsn_wait_stop; then
                         log_end_msg 1 || true
                 fi
 		gsn_start

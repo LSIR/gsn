@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project>
     <!-- UPDATE-ME: The name of your installer comes below in the gsn.name property -->
-    <property name="gsn.name" value="gsn-1.1.7"/>
+    <property name="gsn.name" value="gsn-1.1.8"/>
 
     <target name="build-gsn" depends="clean-installer">
 
