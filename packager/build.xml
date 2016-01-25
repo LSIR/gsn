@@ -26,9 +26,9 @@
 
         <mkdir dir="${pack}/opt/gsn/1.1.8/lib"/>
         <mkdir dir="${pack}/opt/gsn/1.1.8/conf"/>
-        <mkdir dir="${pack}/opt/gsn/1.1.8/logs"/>
+        <mkdir dir="${pack}/var/log/gsn"/>
         <mkdir dir="${pack}/opt/gsn/1.1.8/virtual-sensors"/>
-        <mkdir dir="${pack}/opt/gsn/1.1.8/src/main/resources"/>
+        <!--<mkdir dir="${pack}/opt/gsn/1.1.8/src/main/resources"/>-->
         <mkdir dir="${build.dir}"/>
 
 
@@ -46,6 +46,10 @@
             <exclude name="**/WebCamWrapper.java"/>
             <exclude name="**/DemoVSensor.java"/>
         </javac>
+
+        <copy todir="${build.dir}">
+    	    <fileset dir="${resources.dir}" includes="**/*.conf,**/*.properties" />
+    	</copy>
 
         <jar destfile="${pack}/opt/gsn/1.1.8/lib/${gsn.name}.jar" basedir="${build.dir}">
             <manifest>
@@ -73,12 +77,9 @@
         <copy file="${basedir}/conf/keystore" todir="${pack}/opt/gsn/1.1.8/conf/"/>
         <copy file="${basedir}/conf/servertestcer.cer" todir="${pack}/opt/gsn/1.1.8/conf/"/>
         <copy file="${basedir}/conf/servertestkeystore" todir="${pack}/opt/gsn/1.1.8/conf/"/>
-        <copy file="${resources.dir}/RestApiConstants.properties" todir="${pack}/opt/gsn/1.1.8/src/main/resources/"/>
-        <copy file="${resources.dir}/reference.conf" todir="${pack}/opt/gsn/1.1.8/src/main/resources/"/>
-        <copy file="${basedir}/packager/log4j.properties" todir="${pack}/opt/gsn/1.1.8/conf/"/>
+        <copy file="${basedir}/packager/log4j2.xml" todir="${pack}/opt/gsn/1.1.8/conf/"/>
         <copy file="${basedir}/packager/gsn.xml" todir="${pack}/opt/gsn/1.1.8/conf/"/>
         <copy file="${basedir}/icons/GSN_green_medium.png" todir="${pack}/opt/gsn/1.1.8/lib/"/>
-        <copy file="${basedir}/packager/pom.xml" todir="${pack}/opt/gsn/1.1.8/"/>
         <copy file="${basedir}/packager/license.txt" todir="${pack}/opt/gsn/1.1.8/"/>
 
         <copy todir="${pack}/opt/gsn/1.1.8/lib" flatten="yes" includeEmptyDirs="false">
@@ -94,7 +95,7 @@
                 <exclude name="**/.svn/**"/>
             </fileset>
         </copy>
-        <copy todir="${pack}/opt/gsn/1.1.8/src/main/webapp">
+        <copy todir="${pack}/opt/gsn/1.1.8/src/main/webapp" includeEmptyDirs="false">
             <fileset dir="${basedir}/src/main/webapp/">
                 <exclude name="**/.svn/**"/>
                 <exclude name="**/axis2.xml"/>

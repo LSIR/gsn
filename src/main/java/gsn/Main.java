@@ -256,8 +256,6 @@ public final class Main {
 
 	private static void updateSplashIfNeeded(String message[]) {
 		boolean headless_check = isHeadless();
-		for (int i=0;i<message.length;i++)
-			System.out.println(message[i]);
 
 		if (!headless_check) {
 			SplashScreen splash = SplashScreen.getSplashScreen();

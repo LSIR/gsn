@@ -5,7 +5,8 @@
 # Required-Stop:     $local_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# X-Interactive:     true
+# Should-Start:      postgresql mysql
+# Should-Stop:       postgresql mysql
 # Short-Description: Start/stop gsn streaming server
 ### END INIT INFO
 
@@ -57,13 +58,15 @@ gsn_wait_stop() {
          
         old_PWD=$PWD
         cd $GSN_FOLDER
-	$JAVA_HOME/bin/java -classpath "./lib/*" -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger -Dorg.mortbay.log.LogFactory.noDiscovery=false gsn.GSNStop $GSN_CONTROL_PORT > /dev/null 2>&1
+	$JAVA_HOME/bin/java -classpath "./conf/:./lib/*" gsn.GSNStop $GSN_CONTROL_PORT > /dev/null 2>&1
         cd $old_PWD
 	# wait until really stopped
 	if [ -n "${PID:-}" ]; then
 		i=0
 		while kill -0 "${PID:-}" 2> /dev/null;  do
         		if [ $i = '60' ]; then
+					echo -n " timeout: killing!"
+                    kill -9 "${PID:-}"
         			break;
         	 	else
         			if [ $i = '0' ]; then
@@ -76,23 +79,28 @@ gsn_wait_stop() {
         	      fi
 		 done
 	fi
+    rm -f $GSN_PIDFILE
 }
 
 gsn_start(){
     old_PWD=$PWD
     cd $GSN_FOLDER
-    $JAVA_HOME/bin/java -classpath "./lib/*" -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger -Dorg.mortbay.log.LogFactory.noDiscovery=false gsn.Main $GSN_CONTROL_PORT > /dev/null 2>&1 &
+    PID=`$JAVA_HOME/bin/java -classpath "./conf/:./lib/*" gsn.Main $GSN_CONTROL_PORT > /dev/null 2>&1 & echo $!`
     cd $old_PWD
+    echo $PID > $GSN_PIDFILE
 }
 
 case $1 in
 	start)
-		log_daemon_msg "Starting gsn streaming server" "gsn"
-
-        gsn_start
-
-        log_end_msg 0
-
+        log_daemon_msg "Starting gsn streaming server" "gsn"
+        PID=$(pidof_gsn) || true
+		if [ -n "$PID" ]; then
+			echo "GSN is already running (pid $PID)."
+            log_end_msg 1
+		else
+			 gsn_start
+             log_end_msg 0
+		fi
 	;;
 	stop)
 		log_daemon_msg "Stopping gsn streaming server" "gsn"

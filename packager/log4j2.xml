@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <Configuration status="INFO">
+      <Appenders>
+        <RollingFile name="File" fileName="/var/log/gsn/gsn.log" filePattern="/var/log/gsn/gsn-%i.log.gz">
+            <PatternLayout pattern="%-6p[%d] [%t] (%F\:%L) - %m%n"/>
+            <Policies>
+        		<SizeBasedTriggeringPolicy size="100 MB"/>
+      		</Policies>
+        </RollingFile >
+      </Appenders>
+      <Loggers>
+        <Root level="info">
+          <AppenderRef ref="File"/>
+        </Root>
+        <Logger name="com.mchange" level="WARN" additivity="true" />
+        <Logger name="org.apache" level="WARN" additivity="true" />
+        <Logger name="org.apache.axis.enterprise" level="FATAL" additivity="true" />
+        <Logger name="httpclient.wire" level="WARN" additivity="true" />
+        <Logger name="org.eclipse.jetty" level="WARN" additivity="true" />
+        <Logger name="net.sf.jasperreports" level="WARN" additivity="true" />
+        <Logger name="gsn.http.restapi" level="WARN" additivity="true" />
+      </Loggers>
+    </Configuration>
