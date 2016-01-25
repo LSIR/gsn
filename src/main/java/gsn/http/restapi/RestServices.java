@@ -2,8 +2,8 @@ package gsn.http.restapi;
 
 import gsn.beans.DataField;
 import gsn.beans.VSensorConfig;
-import gsn.data.CsvSerializer;
-import gsn.data.JsonSerializer;
+import gsn.data.format.CsvSerializer;
+import gsn.data.format.JsonSerializer;
 import gsn.data.SensorData;
 import gsn.Main;
 import gsn.Mappings;
