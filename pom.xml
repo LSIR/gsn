@@ -202,7 +202,11 @@
 				<exclusion>
 					<groupId>com.sun.jersey</groupId>
 					<artifactId>jersey-json</artifactId>
-				</exclusion>
+                </exclusion>
+                <exclusion>
+                	<artifactId>hsqldb</artifactId>
+                	<groupId>hsqldb</groupId>
+                </exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
