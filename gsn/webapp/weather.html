@@ -86,17 +86,17 @@ $(document).ready(function() {
           },{ title:"Hail [hits/cm²]",
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },
-          { title:"Energy Balance [W/m²]",
-              signals: [ { vsensor:"matterhorn_radiometer__conv", field:["irradiance_shortwave_up","irradiance_shortwave_down","net_solar_radiation","net_radiation"], position:[15]}]
+          { title:"Short Wave Energy Balance [W/m²]",
+              signals: [ { vsensor:"matterhorn_radiometer__conv", field:["irradiance_shortwave_up","irradiance_shortwave_down","net_solar_radiation"], position:[15]}]
           },
-          { title:"Energy Balance [W/m²]",
-              signals: [ { vsensor:"matterhorn_radiometer__conv", field:["irradiance_longwave_up","irradiance_longwave_down","temperature","net_far_infrared_radiation","net_radiation"], position:[15]}]
+          { title:"Long Wave Energy Balance [W/m²]",
+              signals: [ { vsensor:"matterhorn_radiometer__conv", field:["irradiance_longwave_up","irradiance_longwave_down","net_far_infrared_radiation"], position:[15]}]
           },
-          { title:"Energy Balance_T [W/m²]",
-              signals: [ { vsensor:"matterhorn_radiometer__conv", field:["irradiance_longwave_up_notemp","irradiance_longwave_down_notemp","temperature","net_far_infrared_radiation_notemp","net_radiation"], position:[15]}]
-          },
-          { title:"Energy Balance [°C]",
+          { title:"Energy Balance Temperatures [°C]",
               signals: [ { vsensor:"matterhorn_radiometer__conv", field:["sky_temperature","ground_temperature","temperature"], position:[15]}]
+          },
+          { title:"Net Energy Balance [W/m²]",
+              signals: [ { vsensor:"matterhorn_radiometer__conv", field:["net_solar_radiation","net_far_infrared_radiation","net_radiation"], position:[15]}]
           },
           ]);
 
