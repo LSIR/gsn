@@ -22,14 +22,14 @@
                     		TEMPERATURE = t_k-273.15;
                     		
                     		if (SHORTWAVE_ADIFF01_1 != null )
-                    			IRRADIANCE_SHORTWAVE_UP = ((((((double)SHORTWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/10.72;
+                    			IRRADIANCE_SHORTWAVE_UP = ((((((double)SHORTWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.38;
                     		if (SHORTWAVE_ADIFF23_1 != null )
-                    			IRRADIANCE_SHORTWAVE_DOWN = ((((((double)SHORTWAVE_ADIFF23_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/12.11;
+                    			IRRADIANCE_SHORTWAVE_DOWN = ((((((double)SHORTWAVE_ADIFF23_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/12.76;
                     		
                     		if (LONGWAVE_ADIFF01_1 != null )
-                    			IRRADIANCE_LONGWAVE_UP_NOTEMP = (((((((double)LONGWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/9.40);
+                    			IRRADIANCE_LONGWAVE_UP_NOTEMP = (((((((double)LONGWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.12);
                     		if (LONGWAVE_ADIFF23_1 != null )
-                    			IRRADIANCE_LONGWAVE_DOWN_NOTEMP = (((((((double)LONGWAVE_ADIFF23_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/11.07);
+                    			IRRADIANCE_LONGWAVE_DOWN_NOTEMP = (((((((double)LONGWAVE_ADIFF23_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/11.46);
 
                     		if (LONGWAVE_ADIFF01_1 != null )
                     			IRRADIANCE_LONGWAVE_UP = (((((((double)LONGWAVE_ADIFF01_1)/Math.pow(2,15))-1)*1.024*2.5/128)*Math.pow(10,6))/13.12)+(0.0000000567*Math.pow(t_k,4));
