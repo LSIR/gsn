@@ -2,7 +2,7 @@ name := "gsn-tools"
 
 organization := "gsn"
 
-version := "0.0.4-SNAPSHOT"
+version := "1.0.0-SNAPSHOT"
 
 scalaVersion := "2.11.2"
 

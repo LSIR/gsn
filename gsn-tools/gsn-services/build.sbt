@@ -5,7 +5,7 @@ name := "gsn-services"
 
 organization := "gsn"
 
-version := "0.0.3-SNAPSHOT"
+version := "1.0.0-SNAPSHOT"
 
 Play2WarPlugin.play2WarSettings
 
