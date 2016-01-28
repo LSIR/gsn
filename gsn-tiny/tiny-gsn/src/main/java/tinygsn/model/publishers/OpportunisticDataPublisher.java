@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with GSN. If not, see <http://www.gnu.org/licenses/>.
  * <p/>
- * File: gsn-tiny/src/tinygsn/model/publishers/OpportunisticDataPublisher.java
+ * File: gsn-tiny/src/tinygsn/model/publishers/OpportunisticGSNAPISubscriber.java
  *
  * @author Schaer Marc
  */
@@ -44,24 +44,23 @@ public class OpportunisticDataPublisher extends AbstractDataPublisher {
 		super(dr);
 	}
 
-	private final static String LOGTAG = "OpportunisticDataPublisher";
+	private final static String LOGTAG = "OpportunisticDataPublis";
 
 
-	public final Class<? extends PublisherService> getSERVICE() {
-		return OpportunisticDataPublisherService.class;
+	@Override
+	public long getNextRun() {
+		long currentTime = System.currentTimeMillis();
+		if (dr.getLastTime() + dr.getIterationTime() > currentTime){
+			return dr.getLastTime() + dr.getIterationTime() - currentTime;
+		}else{
+			// if deadline is passed, lets try at next iteration
+			return dr.getIterationTime() - (currentTime - dr.getLastTime()) % dr.getIterationTime();
+		}
 	}
 
 	@Override
-	public void publish(DeliveryRequest dr) {
-		long currentTime = System.currentTimeMillis();
-		long lastTime = dr.getLastTime();
-		SimpleDateFormat formatDay = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
-		SimpleDateFormat formatHour = new SimpleDateFormat("HH.mm", Locale.ENGLISH);
-		String fromDate = formatDay.format(lastTime);
-		String toDate = formatDay.format(currentTime);
-		String fromTime = formatHour.format(lastTime);
-		String toTime = formatHour.format(currentTime);
-		StreamElement[] se = controller.loadRangeData(dr.getVsname(), fromDate, fromTime, toDate, toTime);
+	public void publish(long until) {
+		StreamElement[] se = controller.loadRangeData(dr.getVsname(), dr.getLastTime(), until);
 		PushDelivery pd = new PushDelivery(dr.getUrl() + "/streaming/", Double.parseDouble(dr.getKey()));
 		if (se.length > 0) {
 
@@ -88,14 +87,9 @@ public class OpportunisticDataPublisher extends AbstractDataPublisher {
 
 	@Override
 	public void runOnce() {
-		publish(dr);
-	}
-
-	public static class OpportunisticDataPublisherService extends PublisherService {
-
-		public OpportunisticDataPublisherService() {
-			super("opportunisticDataPublisherService");
-
+		long currentTime = System.currentTimeMillis();
+		if (dr.getLastTime() + dr.getIterationTime() < currentTime){
+			publish(currentTime);
 		}
 	}
 }

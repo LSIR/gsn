@@ -70,7 +70,7 @@ public class SubscribeListAdapter extends ArrayAdapter<SubscribeRow> {
 			final SubscribeRow vs = getItem(position);
 	
 			TextView sensorTxt = (TextView) convertView.findViewById(R.id.subscribe_name);
-			sensorTxt.setText(vs.getVsname()+" -> "+vs.getServerurl());
+			sensorTxt.setText(vs.getServerurl()+" -> "+vs.getVsname());
 	
 			final Switch activeStch = (Switch) convertView.findViewById(R.id.enableSubSwitch);
 			activeStch.setChecked(vs.isActive());

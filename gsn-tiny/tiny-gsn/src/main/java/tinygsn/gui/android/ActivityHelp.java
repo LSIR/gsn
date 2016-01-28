@@ -25,7 +25,6 @@
 
 package tinygsn.gui.android;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -38,12 +37,12 @@ public class ActivityHelp extends AbstractActivity {
 		setContentView(R.layout.text);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		String text = "TinyGSN allows you to collect the sensor data accessible through Android-powered devices, process the data according to your customed specification, exchange the data with the Global Sensor Network (GSN) servers."
+		String text = "TinyGSN allows you to collect the sensor data accessible through Android-powered devices, process the data according to your own specifications and exchange the data with the Global Sensor Network (GSN) servers."
 				              + "\n\n\tMain functionalities:"
-				              + "\n\t\t* Collect sensor data: "
-				              + "\n\t\t* View sensor data: "
-				              + "\n\t\t* Publish sensor data to GSN servers: "
-				              + "\n\t\t* Get sensor data from GSN servers: ";
+				              + "\n\t\t* Collect sensor data"
+				              + "\n\t\t* View sensor data"
+				              + "\n\t\t* Publish sensor data to GSN servers"
+				              + "\n\t\t* Get sensor data from GSN servers";
 		((TextView) findViewById(R.id.text)).setText(text);
 	}
 

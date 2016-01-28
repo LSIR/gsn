@@ -27,12 +27,9 @@ package tinygsn.gui.android.utils;
 
 
 import tinygsn.beans.DeliveryRequest;
-import tinygsn.beans.StaticData;
-import tinygsn.controller.AndroidControllerPublish;
 import tinygsn.gui.android.ActivityListPublish;
 import tinygsn.gui.android.ActivityPublishData;
 import tinygsn.gui.android.R;
-import tinygsn.model.publishers.AbstractDataPublisher;
 import tinygsn.storage.db.SqliteStorageManager;
 
 import android.app.AlertDialog;
@@ -54,14 +51,12 @@ import android.widget.TextView;
 
 public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 
-	public static final String EXTRA_SENSOR_NAME = "name";
 	private int resource;
 	private LayoutInflater inflater;
 	private Context context;
-	static int TEXT_SIZE = 8;
 	private ActivityListPublish listPublish;
 
-	public PublishListAdapter(Context ctx, int resourceId, AndroidControllerPublish controller, ActivityListPublish listPublish) {
+	public PublishListAdapter(Context ctx, int resourceId, ActivityListPublish listPublish) {
 		super(ctx, resourceId);
 		resource = resourceId;
 		inflater = LayoutInflater.from(ctx);
@@ -75,13 +70,13 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 		if (convertView == null) {
 			convertView = (LinearLayout) inflater.inflate(resource, null);
 
-			final PublishRow vs = getItem(position);
+			final PublishRow pr = getItem(position);
 
 			TextView sensorTxt = (TextView) convertView.findViewById(R.id.publish_name);
-			sensorTxt.setText(vs.getVsname() + " -> " + vs.getServerurl());
+			sensorTxt.setText(pr.getVsname() + " -> " + pr.getServerurl());
 
 			final Switch activeStch = (Switch) convertView.findViewById(R.id.enablePSwitch);
-			activeStch.setChecked(vs.isActive());
+			activeStch.setChecked(pr.isActive());
 			activeStch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 				@Override
@@ -92,24 +87,14 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 							try {
 								SqliteStorageManager storage = new SqliteStorageManager();
 								if (params[0]) {
-									vs.setActive(true);
-									//start it
-									DeliveryRequest dr = storage.getPublishInfo(vs.getId());
-									AbstractDataPublisher publisher = ActivityPublishData.createPublicDataPublisher(dr.getMode(), dr);
-									StaticData.putDataPublisherByID(publisher);
-									if (publisher != null) {
-										publisher.start();
-									}
+                                    pr.setActive(true);
+									DeliveryRequest dr = storage.getPublishInfo(pr.getId());
+									storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getKey(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), true);
 									return true;
 								} else {
-									vs.setActive(false);
-									//stop it
-									DeliveryRequest dr = storage.getPublishInfo(vs.getId());
-									AbstractDataPublisher publisher = ActivityPublishData.createPublicDataPublisher(dr.getMode(), dr);
-									StaticData.removeDataPublisherByID(dr.getId());
-									if (publisher != null) {
-										publisher.stop();
-									}
+									pr.setActive(false);
+                                    DeliveryRequest dr = storage.getPublishInfo(pr.getId());
+                                    storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getKey(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), false);
 									return true;
 								}
 							} catch (Exception e) {
@@ -120,7 +105,6 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 						@Override
 						protected void onPostExecute(Boolean result) {
 
-							//activeStch.setChecked(result ^ activeStch.isChecked()); //infinite loop!
 						}
 					}.execute(isChecked);
 
@@ -128,7 +112,7 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 			});
 
 			TextView dataTxt = (TextView) convertView.findViewById(R.id.publish_info);
-			dataTxt.setText(vs.getInfo());
+			dataTxt.setText(pr.getInfo());
 
 			ImageView view = (ImageView) convertView.findViewById(R.id.delete);
 			view.setOnClickListener(new OnClickListener() {
@@ -139,7 +123,7 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 						public void onClick(DialogInterface dialog, int which) {
 							switch (which) {
 								case DialogInterface.BUTTON_POSITIVE:
-									new SqliteStorageManager().deletePublishInfo(vs.getId());
+									new SqliteStorageManager().deletePublishInfo(pr.getId());
 									listPublish.initialize();
 									break;
 								case DialogInterface.BUTTON_NEGATIVE:
@@ -149,7 +133,7 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 					};
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(context);
-					builder.setMessage("Are you sure you want to delete \'" + vs.getVsname() + "\' publisher?")
+					builder.setMessage("Are you sure you want to delete \'" + pr.getVsname() + "\' publisher?")
 						.setPositiveButton("Yes", dialogClickListener)
 						.setNegativeButton("No", dialogClickListener).show();
 				}
@@ -161,7 +145,7 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 				@Override
 				public void onClick(View v) {
 					Intent myIntent = new Intent(context, ActivityPublishData.class);
-					myIntent.putExtra("tynigsn.beans.id", "" + vs.getId());
+					myIntent.putExtra("tynigsn.beans.id", "" + pr.getId());
 					context.startActivity(myIntent);
 				}
 			});

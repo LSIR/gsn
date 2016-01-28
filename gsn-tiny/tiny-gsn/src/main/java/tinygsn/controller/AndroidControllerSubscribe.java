@@ -35,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import tinygsn.beans.Subscription;
 import tinygsn.storage.db.SqliteStorageManager;
+import tinygsn.utils.ToastUtils;
 
 
 public class AndroidControllerSubscribe extends AbstractController {
@@ -50,7 +51,7 @@ public class AndroidControllerSubscribe extends AbstractController {
 	public ArrayList<String> loadListVS(String server) {
 		ArrayList<String> output = new ArrayList<String>();
 		try{
-			httpGet = new HttpGet("http://"+server+"/rest/sensors?username=guest&password=guest");
+			httpGet = new HttpGet("http://"+server+"/rest/sensors");
 			HttpResponse response = httpclient.execute(httpGet);
 			int statusCode = response.getStatusLine().getStatusCode();
 			InputStreamReader is = new InputStreamReader(response.getEntity().getContent(),"UTF-8");																				
@@ -69,6 +70,7 @@ public class AndroidControllerSubscribe extends AbstractController {
 			is.close();
 		}catch(Exception e){
 			e.printStackTrace();
+			output.add("Unable to retrieve Virtual Sensors");
 		}
 		return output;
 	}

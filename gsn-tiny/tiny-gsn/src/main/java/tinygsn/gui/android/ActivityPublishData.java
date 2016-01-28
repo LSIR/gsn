@@ -25,10 +25,12 @@
 
 package tinygsn.gui.android;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import tinygsn.beans.DeliveryRequest;
@@ -56,8 +58,6 @@ import android.widget.Toast;
 
 public class ActivityPublishData extends AbstractFragmentActivity {
 	public static String[] STRATEGY = {"On demand", "Periodically", "Opportunistically"};
-	static int TEXT_SIZE = 10;
-	public static String DEFAULT_SERVER = "";
 
 	private AndroidControllerPublish controller;
 	private EditText serverEditText = null;
@@ -72,7 +72,6 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 	private Spinner modeSpinner = null;
 	private DeliveryRequest dr = null;
 	private SqliteStorageManager storage;
-	private AbstractDataPublisher dataPublisher;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -145,35 +144,42 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 
 	public void renderModeList() {
 
+		List<String> list = new ArrayList<>();
+		for (String s : STRATEGY) {
+			list.add(s);
+		}
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, list);
+		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		modeSpinner.setAdapter(dataAdapter);
 		modeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-				if (pos != 0) {
-					fromdateEditText.setVisibility(View.GONE);
-					todateEditText.setVisibility(View.GONE);
-					totimeEditText.setVisibility(View.GONE);
-					fromtimeEditText.setVisibility(View.GONE);
-					publishButton.setVisibility(View.GONE);
-					findViewById(R.id.textViewFrom).setVisibility(View.GONE);
-					findViewById(R.id.textViewTo).setVisibility(View.GONE);
-					iterationTime.setVisibility(View.VISIBLE);
-					findViewById(R.id.textIterationTime).setVisibility(View.VISIBLE);
-				} else {
-					fromdateEditText.setVisibility(View.VISIBLE);
-					todateEditText.setVisibility(View.VISIBLE);
-					totimeEditText.setVisibility(View.VISIBLE);
-					fromtimeEditText.setVisibility(View.VISIBLE);
-					publishButton.setVisibility(View.VISIBLE);
-					findViewById(R.id.textViewFrom).setVisibility(View.VISIBLE);
-					findViewById(R.id.textViewTo).setVisibility(View.VISIBLE);
-					iterationTime.setVisibility(View.GONE);
-					findViewById(R.id.textIterationTime).setVisibility(View.GONE);
-				}
-			}
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                if (pos != 0) {
+                    fromdateEditText.setVisibility(View.GONE);
+                    todateEditText.setVisibility(View.GONE);
+                    totimeEditText.setVisibility(View.GONE);
+                    fromtimeEditText.setVisibility(View.GONE);
+                    publishButton.setVisibility(View.GONE);
+                    findViewById(R.id.textViewFrom).setVisibility(View.GONE);
+                    findViewById(R.id.textViewTo).setVisibility(View.GONE);
+                    iterationTime.setVisibility(View.VISIBLE);
+                    findViewById(R.id.textIterationTime).setVisibility(View.VISIBLE);
+                } else {
+                    fromdateEditText.setVisibility(View.VISIBLE);
+                    todateEditText.setVisibility(View.VISIBLE);
+                    totimeEditText.setVisibility(View.VISIBLE);
+                    fromtimeEditText.setVisibility(View.VISIBLE);
+                    publishButton.setVisibility(View.VISIBLE);
+                    findViewById(R.id.textViewFrom).setVisibility(View.VISIBLE);
+                    findViewById(R.id.textViewTo).setVisibility(View.VISIBLE);
+                    iterationTime.setVisibility(View.GONE);
+                    findViewById(R.id.textIterationTime).setVisibility(View.GONE);
+                }
+            }
 
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-			}
-		});
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
 		if (dr != null) {
 			modeSpinner.setSelection(dr.getMode());
 		}
@@ -182,7 +188,7 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add("Save").setShowAsAction(
-			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -193,19 +199,40 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 				finish();
 				break;
 			case 0:
-				int mode = modeSpinner.getSelectedItemPosition();
-				if (iterationTime.getText().toString().equals("") || serverEditText.getText().toString().equals("") || vsnameSpinner.getSelectedItem().toString().equals("") ||
-					keyEditText.getText().toString().equals("")) {
-					ToastUtils.showToastInUiThread(this, "One of the field is empty. It should not !", Toast.LENGTH_SHORT);
-				} else {
-					createDataPublisher(mode).save(serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(),
-						keyEditText.getText().toString(), mode, Long.valueOf(iterationTime.getText().toString()), dr);
-					finish();
-				}
+				if (save()) finish();
 				break;
 		}
 		return true;
 	}
+
+    private boolean save(){
+        int mode = modeSpinner.getSelectedItemPosition();
+        long last = 0;
+        if (iterationTime.getText().toString().equals("") || serverEditText.getText().toString().equals("") || vsnameSpinner.getSelectedItem().toString().equals("") ||
+                keyEditText.getText().toString().equals("")) {
+            ToastUtils.showToastInUiThread(this, "One of the field is empty. It should not !", Toast.LENGTH_SHORT);
+            return false;
+        } else {
+            int id = -1;
+
+            boolean active = false;
+            if(dr != null){
+                id = dr.getId();
+                last = dr.getLastTime();
+                active = dr.isActive();
+            }
+            if (mode == 0) {
+                try {
+                    last = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ENGLISH).parse(fromdateEditText.getText() + " " + fromtimeEditText.getText()).getTime();
+                } catch (ParseException e) {
+                    ToastUtils.showToastInUiThread(this, "Unable to parse time.", Toast.LENGTH_SHORT);
+                    return false;
+                }
+            }
+            storage.setPublishInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), keyEditText.getText().toString(), mode, last, Long.valueOf(iterationTime.getText().toString()), active);
+            return true;
+        }
+    }
 
 	/**
 	 * This method is called directly from the button on the view when it is an "On Demand" publisher
@@ -213,28 +240,16 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 	 * @param view
 	 */
 	public void publish(View view) {
-		dataPublisher = createDataPublisher(0);
-		dataPublisher.publish(dr);
+        if(save()) {
+            try {
+                long end = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ENGLISH).parse(todateEditText.getText() + " " + totimeEditText.getText()).getTime();
+                AbstractDataPublisher dataPublisher = AbstractDataPublisher.getPublisher(dr);
+                dataPublisher.publish(end);
+            } catch (ParseException e) {
+                ToastUtils.showToastInUiThread(this, "Unable to parse time.", Toast.LENGTH_SHORT);
+            }
+
+        }
 	}
 
-	private AbstractDataPublisher createDataPublisher(int mode) {
-		if (mode == 0) {
-			dataPublisher = new OnDemandDataPublisher(fromdateEditText.getText().toString(), fromtimeEditText.getText().toString(), todateEditText.getText().toString(), totimeEditText.getText().toString(), dr);
-		} else if (mode == 1) {
-			dataPublisher = new PeriodicDataPublisher(dr);
-		} else {
-			dataPublisher = new OpportunisticDataPublisher(dr);
-		}
-		return dataPublisher;
-	}
-
-	public static AbstractDataPublisher createPublicDataPublisher(int mode, DeliveryRequest dr) {
-		if (mode == 0) {
-			return new OnDemandDataPublisher(dr);
-		} else if (mode == 1) {
-			return new PeriodicDataPublisher(dr);
-		} else {
-			return new OpportunisticDataPublisher(dr);
-		}
-	}
 }

@@ -9,12 +9,15 @@ public class Subscription {
 	private long lastTime;
 	private int id;
 	private boolean active;
-	
-	public Subscription(String url, int mode, String vsname, int id) {
+	private long iterationTime = 30000;
+
+    public Subscription(String url, int mode, String vsname, int id, long iterationTime) {
 		this.url = url;
 		this.mode = mode;
+
 		this.vsname = vsname;
 		this.id = id;
+		this.iterationTime = iterationTime;
 	}
 
 	public int getId() {
@@ -64,6 +67,9 @@ public class Subscription {
 	public void setLastTime(long lastTime) {
 		this.lastTime = lastTime;
 	}
-	
+
+    public long getIterationTime() { return iterationTime; }
+
+    public void setIterationTime(long iterationTime) { this.iterationTime = iterationTime; }
 
 }

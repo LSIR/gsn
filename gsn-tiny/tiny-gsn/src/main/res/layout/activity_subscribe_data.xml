@@ -1,77 +1,83 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:android1="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android1:background="@color/background" >
+    android:background="@color/background" >
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android1:layout_height="wrap_content"
-        android1:orientation="vertical" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
         <LinearLayout
-            android1:layout_width="match_parent"
-            android1:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
 
             <TextView
-                android1:id="@+id/textView_server_s"
-                android1:layout_width="wrap_content"
-                android1:layout_height="wrap_content"
-                android1:text="@string/server"
-                android1:textAppearance="?android:attr/textAppearanceSmall"
-                android1:textColor="#000000" />
+                android:id="@+id/textView_server_s"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/server"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" />
 
             <EditText
-                android1:id="@+id/editText_server_s"
-                android1:layout_height="wrap_content"
-                android1:layout_weight="1"
-                android1:layout_width="match_parent"
-                android1:ems="5"
-                android1:inputType="text"
-                android1:text="@string/gsnserver"
-                android1:textColor="#000000" />
+                android:id="@+id/editText_server_s"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:ems="5"
+                android:inputType="text"
+                android:text="@string/gsnserver"
+                android:textColor="#000000" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/connect"
+                android:id="@+id/button_connect" />
+
 
         </LinearLayout>
 
         <LinearLayout
-            android1:layout_width="match_parent"
-            android1:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
             
              <TextView
-                android1:id="@+id/textView_vsName_s"
-                android1:layout_width="wrap_content"
-                android1:layout_height="wrap_content"
-                android1:text="@string/select"
-                android1:textAppearance="?android:attr/textAppearanceSmall"
-                android1:textColor="@color/black" />
+                android:id="@+id/textView_vsName_s"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/black" />
 
             <Spinner
-                android1:id="@+id/spinner_vsName_s"
+                android:id="@+id/spinner_vsName_s"
                 style="@layout/spinner_item"
-                android1:layout_width="match_parent"
-                android1:layout_height="wrap_content"
-                android1:textColor="@color/black" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
         </LinearLayout>
         <LinearLayout
-            android1:layout_width="match_parent"
-            android1:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
             
              <TextView
-                android1:id="@+id/textView_mode_s"
-                android1:layout_width="wrap_content"
-                android1:layout_height="wrap_content"
-                android1:text="@string/select_mode"
-                android1:textAppearance="?android:attr/textAppearanceSmall"
-                android1:textColor="@color/black" />
+                android:id="@+id/textView_mode_s"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_sub_mode"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/black" />
 
             <Spinner
-                android1:id="@+id/spinner_mode_s"
+                android:id="@+id/spinner_mode_s"
                 style="@layout/spinner_item"
-                android1:layout_width="match_parent"
-                android1:layout_height="wrap_content"
-                android1:entries="@array/publish_mode_value"
-                android1:prompt="@string/select_mode"
-                android1:textColor="@color/black" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:prompt="@string/select_sub_mode"
+                android:textColor="@color/black" />
         </LinearLayout>
        
    </LinearLayout>

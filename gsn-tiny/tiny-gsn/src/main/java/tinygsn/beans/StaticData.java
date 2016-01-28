@@ -17,7 +17,7 @@ import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.model.publishers.AbstractDataPublisher;
 
 public class StaticData {
-	public static final int USER_ID = 123;
+
 	private static int LastIdUsed = 1;
 	public static InputStream is;
 	private static Map<String, Intent> runningServices = new HashMap<String, Intent>();
@@ -105,25 +105,6 @@ public class StaticData {
 
 	public static AbstractVirtualSensor getProcessingClassByName(String name) {
 		return vsMap.get(name);
-	}
-
-	private static Map<Integer, AbstractDataPublisher> dataPublishers = new HashMap<>();
-
-	public static void putDataPublisherByID(AbstractDataPublisher abp) {
-		dataPublishers.put(abp.getDr().getId(), abp);
-	}
-
-	public static void removeDataPublisherByID(Integer id) {
-		if (dataPublishers.containsKey(id)) {
-			dataPublishers.remove(id);
-		}
-	}
-
-	public static AbstractDataPublisher getDataPublisherByID(Integer id) {
-		if (dataPublishers.containsKey(id)) {
-			return dataPublishers.get(id);
-		}
-		return null;
 	}
 
 	private static Map<String, AbstractWrapper> wrapperMap = new HashMap<>();

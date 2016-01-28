@@ -40,12 +40,14 @@
     <string name="server">GSN server</string>
     <string name="strategy">Strategy</string>
     <string name="Publish_Data">Publish Data</string>
-    <string name="gsnserver">http://10.0.2.2:22001</string>
+    <string name="gsnserver">localhost:22001</string>
+    <string name="connect">Connect</string>
     <string name="every">Every (seconds)</string>
     <string name="sixty">60</string>
     <string name="publish">Publish Now</string>
     <string name="select">Select Virtual Sensors</string>
     <string name="select_mode">Select publish mode</string>
+    <string name="select_sub_mode">Select subscription mode</string>
     <string name="pubKey">Server Key</string>
     <string name="error_config">Please set the %1$s constant and recompile the app.</string>
     <string name="already_registered">Device is already registered on server.</string>
@@ -66,13 +68,13 @@
     <string name="options_exit">Exit</string>
     <string name="test_vs_name">GPS virtual sensor</string>
     <string name="test_value">longitude: 20.2</string>
-    <string name="view_data">tinyGSN - View data</string>
-    <string name="config">tinyGSN - Config VS</string>
-    <string name="edit">tinyGSN - Edit VS</string>
+    <string name="view_data">View data</string>
+    <string name="config">Config VS</string>
+    <string name="edit">Edit VS</string>
     <string name="list_vs">List of VS</string>
-    <string name="publish_activity">tinyGSN - Publish data</string>
-    <string name="help">tinyGSN - Help</string>
-    <string name="about_us">tinyGSN - About Us</string>
+    <string name="publish_activity">Publish data</string>
+    <string name="help">Help</string>
+    <string name="about_us">About Us</string>
     <string name="pull">"Pull data from GSN "</string>
     <string name="warnAPIVersionText">"Your Android version is less than Android 4.4W–4.4W.2 KitKat.\nThe sensors cannot be verified so it is possible the application does not work well!"</string>
 </resources>

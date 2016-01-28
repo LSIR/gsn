@@ -111,9 +111,9 @@ public abstract class AbstractWrapper {
 					}
 				}
 				if (isPlayServiceAvailable()) {
-					wrapperListTemp.put("activityrecognition", wrapperList.getProperty("activityrecognition"));
+					wrapperListTemp.put("activityrecognition", wrapperList.getProperty("android.google.activityrecognition"));
 				}
-				wrapperListTemp.put("file_reader", wrapperList.getProperty("file_reader"));
+				//wrapperListTemp.put("file_reader", wrapperList.getProperty("file_reader"));
 				wrapperList = wrapperListTemp;
 			}
 		} catch (IOException e) {

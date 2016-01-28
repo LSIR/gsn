@@ -26,6 +26,7 @@
 package tinygsn.gui.android;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import tinygsn.beans.Subscription;
 import tinygsn.controller.AndroidControllerSubscribe;
@@ -34,7 +35,9 @@ import tinygsn.utils.ToastUtils;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -42,7 +45,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import org.epfl.locationprivacy.util.Utils;
+
 
 public class ActivitySubscribeData extends AbstractFragmentActivity {
 	public static String[] STRATEGY = {"Google Cloud Messaging (Push)", "GSN API (Pull)"};
@@ -53,8 +56,10 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 	private EditText serverEditText = null;
 	private Spinner vsnameSpinner = null;
 	private Spinner modeSpinner = null;
+	private Button connectButton = null;
 	private Subscription su = null;
 	private SqliteStorageManager storage;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,7 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 		serverEditText = (EditText) findViewById(R.id.editText_server_s);
 		vsnameSpinner = (Spinner) findViewById(R.id.spinner_vsName_s);
 		modeSpinner = (Spinner) findViewById(R.id.spinner_mode_s);
+		connectButton = (Button) findViewById(R.id.button_connect);
 
 		controller = new AndroidControllerSubscribe();
 		storage = new SqliteStorageManager();
@@ -79,6 +85,12 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 				e.printStackTrace();
 			}
 		}
+		connectButton.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View view) {
+                                                 renderVSList();
+                                             }
+                                         });
 		renderVSList();
 		renderModeList();
 	}
@@ -108,6 +120,13 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 	}
 
 	public void renderModeList() {
+		List<String> list = new ArrayList<>();
+		for (String s : STRATEGY) {
+			list.add(s);
+		}
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, list);
+		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		modeSpinner.setAdapter(dataAdapter);
 		if (su != null) {
 			modeSpinner.setSelection(su.getMode());
 		}
@@ -116,8 +135,7 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add("Save").setShowAsAction(
-				                                MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+		menu.add("Save").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -136,19 +154,18 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 	}
 
 	public void save() {
-		int id = -1;
-		long lastTime = 0;
-		boolean active = false;
-		if (su != null) {
-			id = su.getId();
-			lastTime = su.getLastTime();
-			active = su.isActive();
-		}
-		if (serverEditText.getText() == null || vsnameSpinner.getSelectedItem() == null || modeSpinner.getSelectedItem() == null) {
-			ToastUtils.showToastInUiThread(this, "All arguments must be set", Toast.LENGTH_SHORT);
-		} else {
-			storage.setSubscribeInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), modeSpinner.getSelectedItemPosition(), lastTime, active);
-		}
-	}
-
+        int id = -1;
+        long lastTime = 0;
+        boolean active = false;
+        if (su != null) {
+            id = su.getId();
+            lastTime = su.getLastTime();
+            active = su.isActive();
+        }
+        if (serverEditText.getText() == null || vsnameSpinner.getSelectedItem() == null || modeSpinner.getSelectedItem() == null) {
+            ToastUtils.showToastInUiThread(this, "All arguments must be set", Toast.LENGTH_SHORT);
+        } else {
+            storage.setSubscribeInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), modeSpinner.getSelectedItemPosition(), lastTime, 30000, active);
+        }
+    }
 }

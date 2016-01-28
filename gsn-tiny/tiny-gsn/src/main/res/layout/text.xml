@@ -5,6 +5,14 @@
     android:orientation="vertical"
     android:padding="20dip" >
 
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:src="@drawable/gsn_tiny"
+        android:contentDescription="tinyGSN"
+        android:paddingBottom="@dimen/abc_action_bar_icon_vertical_padding_material" />
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" >
@@ -13,7 +21,8 @@
             android:id="@+id/text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white" />
+            android:background="@color/white"
+            android:padding="@dimen/abc_action_bar_icon_vertical_padding_material" />
     </ScrollView>
 
 </LinearLayout>

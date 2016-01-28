@@ -57,11 +57,13 @@ public abstract class AbstractVirtualSensor implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = -94046553047097162L;
-	public static final String[] VIRTUAL_SENSOR_LIST = {"bridge", "notification", "activity", "MET compute", "O3 calibrate", "Exposure"};
+	/*public static final String[] VIRTUAL_SENSOR_LIST = {"bridge", "notification", "activity", "MET compute", "O3 calibrate", "Exposure"};
 	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor", "tinygsn.model.vsensor.NotificationVirtualSensor",
 			                                                      "tinygsn.model.vsensor.ActivityVirtualSensor", "tinygsn.model.vsensor.METVirtualSensor", "tinygsn.model.vsensor.CalibrateOzoneVirtualSensor",
 			                                                      "tinygsn.model.vsensor.ExposureVirtualSensor"};
-
+    */
+	public static final String[] VIRTUAL_SENSOR_LIST = {"bridge", "notification"};
+	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor", "tinygsn.model.vsensor.NotificationVirtualSensor"};
 	private transient SqliteStorageManager storage = new SqliteStorageManager();
 	private VSensorConfig config;
 	public InputStream is;

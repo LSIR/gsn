@@ -68,7 +68,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		db.execSQL(createQuery);
 
 		createQuery = "CREATE TABLE subscribeSource (_id integer primary key autoincrement,"
-				+ "url text, vsname text, mode integer, lastTime bigint, active int"
+				+ "url text, vsname text, mode integer, lastTime bigint, iterationTime bigint, active int"
 				+ ");";
 		db.execSQL(createQuery);
 

@@ -73,7 +73,7 @@ public class ActivityListVS extends AbstractActivity implements Serializable {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		final MenuItem add = menu.add("Add");
-		add.setIcon(R.drawable.plus_b).setShowAsAction(
+		add.setIcon(R.drawable.ic_action_new).setShowAsAction(
 			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 			public boolean onMenuItemClick(final MenuItem item) {
@@ -83,7 +83,7 @@ public class ActivityListVS extends AbstractActivity implements Serializable {
 		});
 
 		final MenuItem refresh = menu.add("Refresh");
-		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
+		refresh.setIcon(R.drawable.ic_action_refresh).setShowAsAction(
 			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 

@@ -91,7 +91,6 @@
                 style="@layout/spinner_item"
                 android1:layout_width="match_parent"
                 android1:layout_height="wrap_content"
-                android1:entries="@array/publish_mode_value"
                 android1:prompt="@string/select_mode"
                 android1:textColor="@color/black"/>
         </LinearLayout>

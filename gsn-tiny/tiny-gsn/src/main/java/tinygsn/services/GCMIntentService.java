@@ -41,8 +41,8 @@
 package tinygsn.services;
 
 import tinygsn.gui.android.ActivityListSubscription;
-import tinygsn.gui.android.gcm.CommonUtilities;
-import tinygsn.gui.android.gcm.ServerUtilities;
+import tinygsn.model.subscribers.utils.CommonUtilities;
+import tinygsn.model.subscribers.utils.ServerUtilities;
 
 import android.app.Activity;
 import android.app.IntentService;

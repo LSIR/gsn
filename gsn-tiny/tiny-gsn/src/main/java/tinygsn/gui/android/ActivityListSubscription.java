@@ -134,7 +134,7 @@ public class ActivityListSubscription extends AbstractActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		final MenuItem add = menu.add("Add");
-		add.setIcon(R.drawable.plus_b).setShowAsAction(
+		add.setIcon(R.drawable.ic_action_new).setShowAsAction(
 			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
@@ -146,7 +146,7 @@ public class ActivityListSubscription extends AbstractActivity {
 		});
 
 		final MenuItem refresh = menu.add("Refresh");
-		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
+		refresh.setIcon(R.drawable.ic_action_refresh).setShowAsAction(
 			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {

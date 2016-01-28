@@ -21,41 +21,38 @@
  *
  * @author Schaer Marc
  */
-package tinygsn.model.publishers;
+package tinygsn.model.subscribers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.epfl.locationprivacy.util.Utils;
 
-import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StaticData;
-import tinygsn.controller.AndroidControllerPublish;
-import tinygsn.services.PublisherService;
+import tinygsn.beans.Subscription;
+import tinygsn.controller.AndroidControllerSubscribe;
+import tinygsn.services.SubscriberService;
 import tinygsn.storage.db.SqliteStorageManager;
 import tinygsn.utils.Logging;
-import tinygsn.utils.ToastUtils;
 
 
-public abstract class AbstractDataPublisher {
+public abstract class AbstractSubscriber {
 
-	private final static String LOGTAG = "AbstractDataPublisher";
+	private final static String LOGTAG = "AbstractSubscriber";
 	protected SqliteStorageManager storage;
-	protected DeliveryRequest dr;
-    protected  AndroidControllerPublish controller;
+	protected Subscription su;
+    protected AndroidControllerSubscribe controller;
 
-	public AbstractDataPublisher(DeliveryRequest dr) {
-        controller = new AndroidControllerPublish();
+	public AbstractSubscriber(Subscription su) {
+        controller = new AndroidControllerSubscribe();
 		storage = new SqliteStorageManager();
-		this.dr = dr;
+		this.su = su;
 	}
 
     public static boolean startService() {
         try {
-            Intent serviceIntent = new Intent(StaticData.globalContext, PublisherService.class);
+            Intent serviceIntent = new Intent(StaticData.globalContext, SubscriberService.class);
             StaticData.globalContext.startService(serviceIntent);
             return true;
         } catch (Exception e) {
@@ -64,16 +61,16 @@ public abstract class AbstractDataPublisher {
         return false;
     }
 
-	public abstract void publish(long until);
+	public abstract void retrieve(long until);
 
-    public static AbstractDataPublisher getPublisher(DeliveryRequest dr){
-        switch (dr.getMode()) {
+    public static AbstractSubscriber getSubscriber(Subscription su){
+        switch (su.getMode()) {
             case 0:
-                return new OnDemandDataPublisher(dr);
+                return new PeriodicGSNAPISubscriber(su);
             case 1:
-                return new PeriodicDataPublisher(dr);
+                return new OpportunisticGSNAPISubscriber(su);
             case 2:
-                return new OpportunisticDataPublisher(dr);
+                return new GCMSubscriber(su);
         }
         return null;
     }
@@ -81,8 +78,8 @@ public abstract class AbstractDataPublisher {
 	protected static void log(Context context, String s) {
 		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
 			Log.d(LOGTAG, s);
-			Logging.createNewLoggingFolder(context, "Publish");
-			Logging.appendLog("Publish", LOGTAG + ".txt", s, context);
+			Logging.createNewLoggingFolder(context, "Subscribe");
+			Logging.appendLog("Subscribe", LOGTAG + ".txt", s, context);
 		}
 	}
 

@@ -38,7 +38,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package tinygsn.gui.android.gcm;
+package tinygsn.model.subscribers.utils;
 
 import android.content.Context;
 import android.content.Intent;

@@ -54,9 +54,12 @@ public class ActivityAboutUs extends AbstractActivity {
 		setContentView(R.layout.text);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		((TextView) findViewById(R.id.text)).setText("About us: "
-				                                             + "\n\n\tThis application is part of Global Sensor Networks (GSN)."
-				                                             + "\n\t\t\t* Developers: Do Ngoc Hoan, Aida Amini, Julien Eberle \n\t\t\t\t"
-				                                             + "\n\n\tSource code available at https://github.com/LSIR/gsn/");
+		((TextView) findViewById(R.id.text)).setText("This application is part of Global Sensor Networks (GSN).\n" +
+				"\tDevelopers: \n" +
+				"\t\tDo Ngoc Hoan\n" +
+				"\t\tAida Amini\n" +
+				"\t\tJulien Eberle\n" +
+				"\t\tMarc Schär\n\n" +
+				"Source code available at https://github.com/LSIR/gsn/");
 	}
 }

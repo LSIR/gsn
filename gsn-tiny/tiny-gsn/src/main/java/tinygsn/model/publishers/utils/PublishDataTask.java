@@ -34,6 +34,7 @@ import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.model.publishers.AbstractDataPublisher;
+import tinygsn.storage.db.SqliteStorageManager;
 import tinygsn.utils.Logging;
 
 public class PublishDataTask extends AsyncTask<StreamElement[], Void, Boolean> {
@@ -61,7 +62,8 @@ public class PublishDataTask extends AsyncTask<StreamElement[], Void, Boolean> {
 		if (results == true) {
 			log(StaticData.globalContext, "Published: " + se.length);
 			dr.setLastTime(System.currentTimeMillis());
-			publisher.save(dr.getUrl(), dr.getVsname(), dr.getKey(), dr.getMode(), dr.getIterationTime(), dr);
+            SqliteStorageManager storage = new SqliteStorageManager();
+			storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getKey(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), dr.isActive());
 		} else {
 			log(StaticData.globalContext, "Publish fail: " + se.length);
 		}

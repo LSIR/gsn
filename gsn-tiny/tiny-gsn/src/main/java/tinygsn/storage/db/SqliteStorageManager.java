@@ -574,9 +574,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}
 	}
 
-	public boolean updateSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, boolean active) {
-		String query = "UPDATE subscribeSource SET url = ?, vsname = ?, mode = ?, lastTime = ?, active = ?  WHERE _id = ?;";
-		Cursor cursor = database.rawQuery(query, new String[]{url, vsname, mode + "", lastTime + "", active ? "1" : "0", "" + id});
+	public boolean updateSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, long iterationTime, boolean active) {
+		String query = "UPDATE subscribeSource SET url = ?, vsname = ?, mode = ?, lastTime = ?, iterationTime = ?, active = ?  WHERE _id = ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{url, vsname, mode + "", lastTime + "", iterationTime + "", active ? "1" : "0", "" + id});
 		if (cursor.moveToNext())
 			return true;
 		return false;
@@ -591,8 +591,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
+			long iterationTime = cursor.getLong(cursor.getColumnIndex("iterationTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			Subscription su = new Subscription(url, mode, vsname, id);
+			Subscription su = new Subscription(url, mode, vsname, id, iterationTime);
 			su.setActive(active);
 			su.setLastTime(lastTime);
 			return su;
@@ -601,17 +602,18 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 	}
 
-	public void setSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, boolean active) {
+	public void setSubscribeInfo(int id, String url, String vsname, int mode, long lastTime, long iterationTime, boolean active) {
 		if (id == -1 || getSubscribeInfo(id) == null) {
 			ContentValues newCon = new ContentValues();
 			newCon.put("url", url);
 			newCon.put("vsname", vsname);
 			newCon.put("mode", mode);
 			newCon.put("lastTime", lastTime);
+            newCon.put("iterationTime", iterationTime);
 			newCon.put("active", active ? "1" : "0");
 			database.insert("subscribeSource", null, newCon);
 		} else {
-			updateSubscribeInfo(id, url, vsname, mode, lastTime, active);
+			updateSubscribeInfo(id, url, vsname, mode, lastTime, iterationTime, active);
 		}
 	}
 
@@ -625,8 +627,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
+            long iterationTime = cursor.getLong(cursor.getColumnIndex("iterationTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			Subscription su = new Subscription(url, mode, vsname, id);
+			Subscription su = new Subscription(url, mode, vsname, id, iterationTime);
 			su.setActive(active);
 			su.setLastTime(lastTime);
 			r.add(su);

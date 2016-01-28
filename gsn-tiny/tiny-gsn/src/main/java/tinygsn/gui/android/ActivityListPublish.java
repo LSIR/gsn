@@ -64,7 +64,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_publish_list);
 		listViewPublish = (ListView) findViewById(R.id.publish_list);
-		listAdapter = new PublishListAdapter(this, R.layout.publish_row_item, controller, this);
+		listAdapter = new PublishListAdapter(this, R.layout.publish_row_item, this);
 		listViewPublish.setAdapter(listAdapter);
 	}
 
@@ -96,7 +96,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME
 			| ActionBar.DISPLAY_SHOW_CUSTOM); // show it
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayHomeAsUpEnabled(true);
 
 		numVS = (TextView) actionBar.getCustomView().findViewById(R.id.num_vs);
 		numVS.setText("0");
@@ -130,7 +130,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		final MenuItem add = menu.add("Add");
-		add.setIcon(R.drawable.plus_b).setShowAsAction(
+		add.setIcon(R.drawable.ic_action_new).setShowAsAction(
 			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		add.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
@@ -142,7 +142,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 		});
 
 		final MenuItem refresh = menu.add("Refresh");
-		refresh.setIcon(R.drawable.ic_menu_refresh_holo_light).setShowAsAction(
+		refresh.setIcon(R.drawable.ic_action_refresh).setShowAsAction(
 			MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
 		refresh.setOnMenuItemClickListener(new OnMenuItemClickListener() {

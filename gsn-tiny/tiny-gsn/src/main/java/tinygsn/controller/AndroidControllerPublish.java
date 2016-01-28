@@ -52,33 +52,29 @@ public class AndroidControllerPublish extends AbstractController {
 		return storage.getListofVSName();
 	}
 
-	public StreamElement[] loadRangeData(String vsName, String fromdate,
-			String fromtime, String todate, String totime) {
+	public StreamElement[] loadRangeData(String vsName, long start, long end) {
 		StreamElement[] ret = new StreamElement[0];
-		try{
-			long start = new SimpleDateFormat("dd.MM.yyyy HH:mm",Locale.ENGLISH).parse(fromdate + " " + fromtime).getTime();
-			long end = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ENGLISH).parse(todate + " " + totime).getTime();
-			
-			for (AbstractVirtualSensor vs : vsList) {
-				if (vs.getConfig().getName().endsWith(vsName)) {
-					DataField[] df = vs.getConfig().getOutputStructure();
+		if (vsList==null) vsList = storage.getListofVS();
 
-					String[] fieldList = new String[df.length];
-					Byte[] fieldType = new Byte[df.length];
-					for(int i=0;i<df.length;i++){
-						fieldList[i] = df[i].getName();
-						fieldType[i] = df[i].getDataTypeID();
-					}
-	
-					ArrayList<StreamElement> result = storage.executeQueryGetRangeData(
-							"vs_" + vsName, start,end ,fieldList, fieldType);
-	
-					if ((result != null) && (result.size() != 0))
-						ret = result.toArray(ret);
-					break;
+		for (AbstractVirtualSensor vs : vsList) {
+			if (vs.getConfig().getName().endsWith(vsName)) {
+				DataField[] df = vs.getConfig().getOutputStructure();
+
+				String[] fieldList = new String[df.length];
+				Byte[] fieldType = new Byte[df.length];
+				for(int i=0;i<df.length;i++){
+					fieldList[i] = df[i].getName();
+					fieldType[i] = df[i].getDataTypeID();
 				}
+
+				ArrayList<StreamElement> result = storage.executeQueryGetRangeData(
+						"vs_" + vsName, start,end ,fieldList, fieldType);
+
+				if ((result != null) && (result.size() != 0))
+					ret = result.toArray(ret);
+				break;
 			}
-		}catch(ParseException p){}
+		}
 		return ret;
 	}
 

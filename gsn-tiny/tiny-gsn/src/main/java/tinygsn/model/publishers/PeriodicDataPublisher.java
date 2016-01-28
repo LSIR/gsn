@@ -47,21 +47,20 @@ public class PeriodicDataPublisher extends AbstractDataPublisher {
 		super(dr);
 	}
 
-	public final Class<? extends PublisherService> getSERVICE() {
-		return PeriodicallyDataPublisherService.class;
+	@Override
+	public long getNextRun() {
+        long currentTime = System.currentTimeMillis();
+        if (dr.getLastTime() + dr.getIterationTime() > currentTime){
+            return dr.getLastTime() + dr.getIterationTime() - currentTime;
+        }else{
+            // if deadline is passed, lets try at next iteration
+            return dr.getIterationTime() - (currentTime - dr.getLastTime()) % dr.getIterationTime();
+        }
 	}
 
 	@Override
-	public void publish(DeliveryRequest dr) {
-		long currentTime = System.currentTimeMillis();
-		long lastTime = dr.getLastTime();
-		SimpleDateFormat formatDay = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
-		SimpleDateFormat formatHour = new SimpleDateFormat("HH.mm", Locale.ENGLISH);
-		String fromDate = formatDay.format(lastTime);
-		String toDate = formatDay.format(currentTime);
-		String fromTime = formatHour.format(lastTime);
-		String toTime = formatHour.format(currentTime);
-		StreamElement[] se = controller.loadRangeData(dr.getVsname(), fromDate, fromTime, toDate, toTime);
+	public void publish(long until) {
+		StreamElement[] se = controller.loadRangeData(dr.getVsname(), dr.getLastTime(), until);
 		PushDelivery pd = new PushDelivery(dr.getUrl() + "/streaming/", Double.parseDouble(dr.getKey()));
 		if (se.length > 0) {
 			ConnectivityManager connManager = (ConnectivityManager) StaticData.globalContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -82,14 +81,9 @@ public class PeriodicDataPublisher extends AbstractDataPublisher {
 
 	@Override
 	public void runOnce() {
-		publish(dr);
-	}
-
-	public static class PeriodicallyDataPublisherService extends PublisherService {
-
-		public PeriodicallyDataPublisherService() {
-			super("periodicallyDataPublisherService");
-
-		}
+        long currentTime = System.currentTimeMillis();
+        if (dr.getLastTime() + dr.getIterationTime() < currentTime){
+            publish(currentTime);
+        }
 	}
 }

@@ -36,7 +36,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
     dexOptions {
-        incremental true
+        incremental false
         jumboMode = true
     }
 }
@@ -49,4 +49,5 @@ dependencies {
     compile files('libs/weka-stable-3.6.6.jar')
     compile files('libs/xstream-1.4.3.jar')
     compile project(':LocPrivLib')
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }
