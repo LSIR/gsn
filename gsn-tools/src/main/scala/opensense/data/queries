@@ -1,0 +1,8 @@
+insert into tl(id,line,geom) select id,'8' as line,geom from b8;
+
+
+
+SELECT (geom::geography <-> st_setsrid(st_makepoint(6.63783785464, 46.517611804),4326)::geography) as dist,gid,id,line,geom
+FROM tl 
+ORDER BY dist
+LIMIT 100;
