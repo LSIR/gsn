@@ -21,14 +21,18 @@ public class PublisherService extends IntentService {
 		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         SqliteStorageManager storage = new SqliteStorageManager();
         long next_run = 10 * 60 * 1000L; //at least once every 10 minutes
-		for (DeliveryRequest dr : storage.getPublishList()) {
-            try {
-                AbstractDataPublisher adp = AbstractDataPublisher.getPublisher(dr);
-                adp.runOnce();
-                next_run = Math.min(next_run, adp.getNextRun());
-            } catch (Exception e1) {
-                Log.e("PublisherService", e1.getMessage());
+        try {
+            for (DeliveryRequest dr : storage.getPublishList()) {
+                try {
+                    AbstractDataPublisher adp = AbstractDataPublisher.getPublisher(dr);
+                    adp.runOnce();
+                    next_run = Math.min(next_run, adp.getNextRun());
+                } catch (Exception e1) {
+                    Log.e("PublisherService", e1.getMessage());
+                }
             }
+        } catch (Exception e) {
+            Log.e("PublisherService", e.getMessage());
         }
 		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + next_run, PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 	}

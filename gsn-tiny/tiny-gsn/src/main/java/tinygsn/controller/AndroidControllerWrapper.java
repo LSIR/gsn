@@ -32,9 +32,11 @@ import java.util.Comparator;
 import java.util.Properties;
 
 import tinygsn.beans.StaticData;
+import tinygsn.beans.Subscription;
 import tinygsn.gui.android.utils.SensorRow;
 import tinygsn.model.wrappers.AbstractWrapper;
 import tinygsn.services.AbstractScheduler;
+import tinygsn.storage.db.SqliteStorageManager;
 
 
 public class AndroidControllerWrapper extends AbstractController {
@@ -67,7 +69,6 @@ public class AndroidControllerWrapper extends AbstractController {
 					e.printStackTrace();
 				}
 			}
-			
 		}
 		ArrayList<SensorRow> r = new ArrayList<>();
 		for(AbstractWrapper w : wrapperList){

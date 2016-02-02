@@ -61,7 +61,7 @@ public class AndroidControllerSubscribe extends AbstractController {
 		        if(line != null){
 		        	JSONObject obj = new JSONObject(line);
 		        	JSONArray f = obj.getJSONArray("features");
-		        	for (int i = 1;i<f.length();i++){
+		        	for (int i = 0;i<f.length();i++){
 		        		JSONObject v = f.getJSONObject(i).getJSONObject("properties");
 		        		output.add(v.getString("vs_name"));
 		        	}

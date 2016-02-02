@@ -61,6 +61,7 @@ import java.util.Properties;
 import tinygsn.beans.DataField;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamSource;
+import tinygsn.beans.Subscription;
 import tinygsn.controller.AndroidControllerVS;
 import tinygsn.model.vsensor.AbstractVirtualSensor;
 import tinygsn.model.utils.ParameterType;
@@ -307,6 +308,14 @@ public class ActivityVSConfig extends AbstractActivity {
 		for (String s : storage.getListofVSName()) {
 			list.add("local: " + s);
 		}
+		SqliteStorageManager storage = new SqliteStorageManager();
+		for (Subscription s : storage.getSubscribeList()){
+			try {
+				list.add("remote: Subscription "+s.getId());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, list);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		panel.wrapper.setAdapter(dataAdapter);
@@ -337,6 +346,8 @@ public class ActivityVSConfig extends AbstractActivity {
 							String wrapperName = panel.wrapper.getSelectedItem().toString();
 							if (wrapperName.startsWith("local: ")) {
 								wrapperName = "tinygsn.model.wrappers.LocalWrapper";
+							} else if (wrapperName.startsWith("remote: ")) {
+								wrapperName = "tinygsn.model.wrappers.RemoteWrapper";
 							} else {
 								wrapperName = wrapperList.getProperty(wrapperName);
 							}
@@ -530,7 +541,9 @@ public class ActivityVSConfig extends AbstractActivity {
 		public String saveTo(String vsname, SqliteStorageManager storage) throws SQLException {
 			String wrapperName = wrapper.getSelectedItem().toString();
 			if (wrapperName.startsWith("local: ")) {
-				wrapperName = "tinygsn.model.wrappers.LocalWrapper?" + wrapperName.substring(7);
+                wrapperName = "tinygsn.model.wrappers.LocalWrapper?" + wrapperName.substring(7);
+            } else if (wrapperName.startsWith("remote: ")) {
+                wrapperName = "tinygsn.model.wrappers.RemoteWrapper?" + wrapperName.substring(21);
 			} else {
 				wrapperName = wrapperList.getProperty(wrapperName);
 			}

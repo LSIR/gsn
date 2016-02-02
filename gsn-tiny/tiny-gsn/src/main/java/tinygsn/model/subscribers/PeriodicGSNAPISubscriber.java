@@ -28,6 +28,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 import tinygsn.beans.StaticData;
 import tinygsn.beans.Subscription;
 import tinygsn.model.subscribers.utils.RetrieveDataTask;
@@ -59,7 +63,14 @@ public class PeriodicGSNAPISubscriber extends AbstractSubscriber {
 			log(StaticData.globalContext, "No Network for uploading data");
 		} else {
 			try {
-				new RetrieveDataTask(su).execute(su.getUrl()).get();
+                Calendar calf = Calendar.getInstance();
+                calf.setTimeInMillis(su.getLastTime());
+                Calendar calt = Calendar.getInstance();
+                calt.setTimeInMillis(until);
+                String fro = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).format(calf.getTime());
+                String to = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).format(calt.getTime());
+                String url = su.getUrl() + "/rest/sensors/" + su.getVsname() + "?from=" + fro + "&to=" + to;
+				new RetrieveDataTask(su).execute(url).get();
 			} catch (Exception e) {
 				Log.e(LOGTAG, e.getMessage());
 				e.printStackTrace();

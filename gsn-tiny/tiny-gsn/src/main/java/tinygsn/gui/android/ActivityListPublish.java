@@ -26,13 +26,17 @@
 package tinygsn.gui.android;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import tinygsn.beans.DeliveryRequest;
 import tinygsn.controller.AndroidControllerPublish;
 import tinygsn.gui.android.utils.PublishListAdapter;
 import tinygsn.gui.android.utils.PublishRow;
+import tinygsn.gui.android.utils.SubscribeRow;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -108,8 +112,10 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 			new AsyncTask<DeliveryRequest, Void, PublishRow>() {
 				@Override
 				protected PublishRow doInBackground(DeliveryRequest... params) {
-
-					return new PublishRow(params[0].getId(), params[0].getUrl(), params[0].getKey(), params[0].isActive(), "" + params[0].getLastTime(), params[0].getVsname());
+					Calendar cal = Calendar.getInstance();
+					cal.setTimeInMillis(params[0].getLastTime());
+					String info = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).format(cal.getTime());
+					return new PublishRow(params[0].getId(), params[0].getUrl(), params[0].getKey(), params[0].isActive(), "Last connection: " + info, params[0].getVsname());
 				}
 
 				@Override

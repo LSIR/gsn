@@ -60,7 +60,6 @@
         <service android:name="tinygsn.model.wrappers.USBplugO3Wrapper$USBplugService"/>
         <service android:name="tinygsn.model.wrappers.WifiWrapper$WifiService"/>
         <service android:name="tinygsn.model.wrappers.LocalWrapper$LocalService"/>
-        <service android:name="tinygsn.model.wrappers.RemoteWrapper$RemoteService"/>
 
 
         <activity

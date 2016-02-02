@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import tinygsn.beans.StaticData;
 import tinygsn.beans.WrapperConfig;
@@ -28,11 +29,14 @@ public abstract class WrapperService extends IntentService {
 			am.cancel(PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 			return;
 		}
+		long interval = 10;
 		try {
 			w = StaticData.getWrapperByName(config.getWrapperName());
 			w.runOnce();
-		} catch (Exception e1) {
+            interval = w.getDcInterval();
+		} catch (Exception e) {
+            Log.e("WrapperService["+this.getClass().getName()+"]", e.getMessage());
 		}
-		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * w.getDcInterval(), PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+		am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * interval, PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 }

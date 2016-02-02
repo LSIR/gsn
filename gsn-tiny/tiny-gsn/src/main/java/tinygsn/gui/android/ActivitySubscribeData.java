@@ -48,12 +48,12 @@ import android.widget.Toast;
 
 
 public class ActivitySubscribeData extends AbstractFragmentActivity {
-	public static String[] STRATEGY = {"Google Cloud Messaging (Push)", "GSN API (Pull)"};
-	static int TEXT_SIZE = 10;
-	public static String DEFAULT_SERVER = "";
+	public static String[] STRATEGY = {"GSN API (Periodic Pull)", "GSN API (Opportunistic Pull)", "Google Cloud Messaging (Push)"};
 
 	private AndroidControllerSubscribe controller;
 	private EditText serverEditText = null;
+	private EditText usernameEditText = null;
+    private EditText passwordEditText = null;
 	private Spinner vsnameSpinner = null;
 	private Spinner modeSpinner = null;
 	private Button connectButton = null;
@@ -69,6 +69,8 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		serverEditText = (EditText) findViewById(R.id.editText_server_s);
+        usernameEditText = (EditText) findViewById(R.id.editText_username_s);
+        passwordEditText = (EditText) findViewById(R.id.editText_passwd_s);
 		vsnameSpinner = (Spinner) findViewById(R.id.spinner_vsName_s);
 		modeSpinner = (Spinner) findViewById(R.id.spinner_mode_s);
 		connectButton = (Button) findViewById(R.id.button_connect);
@@ -81,6 +83,8 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
 			try {
 				su = storage.getSubscribeInfo(Integer.parseInt(extra));
 				serverEditText.setText(su.getUrl());
+                usernameEditText.setText(su.getUsername());
+                passwordEditText.setText(su.getPassword());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -165,7 +169,7 @@ public class ActivitySubscribeData extends AbstractFragmentActivity {
         if (serverEditText.getText() == null || vsnameSpinner.getSelectedItem() == null || modeSpinner.getSelectedItem() == null) {
             ToastUtils.showToastInUiThread(this, "All arguments must be set", Toast.LENGTH_SHORT);
         } else {
-            storage.setSubscribeInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), modeSpinner.getSelectedItemPosition(), lastTime, 30000, active);
+            storage.setSubscribeInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), modeSpinner.getSelectedItemPosition(), lastTime, 30000, active, usernameEditText.getText().toString(), passwordEditText.getText().toString());
         }
     }
 }

@@ -134,7 +134,7 @@ public class StaticData {
 	public static ArrayList<String> getLocalWrapperNames() {
 		ArrayList<String> a = new ArrayList<String>();
 		for (String s : wrapperMap.keySet()) {
-			if (s.contains("?")) {
+			if (s.contains("LocalWrapper?")) {
 				a.add(s);
 			}
 		}

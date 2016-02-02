@@ -41,6 +41,9 @@
     <string name="strategy">Strategy</string>
     <string name="Publish_Data">Publish Data</string>
     <string name="gsnserver">localhost:22001</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="guest">guest</string>
     <string name="connect">Connect</string>
     <string name="every">Every (seconds)</string>
     <string name="sixty">60</string>

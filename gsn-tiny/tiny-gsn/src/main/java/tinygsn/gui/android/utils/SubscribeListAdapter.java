@@ -26,9 +26,12 @@
 package tinygsn.gui.android.utils;
 
 
+import tinygsn.beans.Subscription;
 import tinygsn.controller.AndroidControllerSubscribe;
 import tinygsn.gui.android.ActivitySubscribeData;
 import tinygsn.gui.android.R;
+import tinygsn.storage.db.SqliteStorageManager;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -82,13 +85,16 @@ public class SubscribeListAdapter extends ArrayAdapter<SubscribeRow> {
 						@Override
 						protected Boolean doInBackground(Boolean... params) {
 							try{
+								SqliteStorageManager storage = new SqliteStorageManager();
 								if (params[0]){
 									vs.setActive(true);
-									//start it
+									Subscription su = storage.getSubscribeInfo(vs.getId());
+									storage.setSubscribeInfo(su.getId(), su.getUrl(), su.getVsname(), su.getMode(), su.getLastTime(), su.getIterationTime(), true, su.getUsername(), su.getPassword());
 									return true;
 								}else{
 									vs.setActive(false);
-									//stop it
+									Subscription su = storage.getSubscribeInfo(vs.getId());
+									storage.setSubscribeInfo(su.getId(), su.getUrl(), su.getVsname(), su.getMode(), su.getLastTime(), su.getIterationTime(), false, su.getUsername(), su.getPassword());
 									return true;
 								}
 							}

@@ -99,8 +99,10 @@ public class AndroidControllerVS extends AbstractController {
 		if (vs != null) {
 			fields = vs.getConfig().getOutputStructure();
 		}
-		for (DataField f : fields) {
-			fieldList.add(f.getName());
+		if (fields != null) {
+			for (DataField f : fields) {
+				fieldList.add(f.getName());
+			}
 		}
 		return fieldList;
 	}

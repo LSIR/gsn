@@ -4,6 +4,8 @@ public class Subscription {
 
 
 	private String url;
+    private String username="guest";
+    private String password="guest";
 	private int mode;
 	private String vsname;
 	private long lastTime;
@@ -14,7 +16,6 @@ public class Subscription {
     public Subscription(String url, int mode, String vsname, int id, long iterationTime) {
 		this.url = url;
 		this.mode = mode;
-
 		this.vsname = vsname;
 		this.id = id;
 		this.iterationTime = iterationTime;
@@ -71,5 +72,13 @@ public class Subscription {
     public long getIterationTime() { return iterationTime; }
 
     public void setIterationTime(long iterationTime) { this.iterationTime = iterationTime; }
+
+    public String getUsername() { return username; }
+
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+
+    public void setPassword(String password) { this.password = password; }
 
 }
