@@ -8,7 +8,7 @@ You can find the latest GSN documentation, including a deployment, installation,
 guide, on the project [wiki](https://github.com/LSIR/gsn/wiki).
 This README file only contains basic setup instructions.
 
-## Building
+## Building from the sources
 
 First download the code from the git repository (using ``--depth 1`` makes it a lot smaller if you don't need the 10 years history):
 
@@ -42,9 +42,9 @@ If you use a IDE such as eclipse or NetBeans you may need to install additional 
   * Press alt+F5 and update the maven libraries (it may take a while the first time) 
   * If it still complains about missing libraries, check if they are in the lib folder and if needed add them to the build path
 
-## Download Installer
+## Multiplatform installer
 
-We provide a multiplatform GSN Installer for the last release of the code. This installer is the best way to easily try GSN features. 
+We provide a multiplatform GSN Installer for each release of the code. This installer is the best way to easily try GSN features. 
 
 The installer binaries for the latest realease can be found at:
 <https://github.com/LSIR/gsn/releases>
@@ -52,6 +52,10 @@ The installer binaries for the latest realease can be found at:
 Once GSN is installed, you can start it, executing the batch file `gsn-start.bat` (Windows) or shell script `gsn-start.sh` (Linux). 
 
 The GSN web interface is accessible at <http://localhost:22001>
+
+## *NEW*  Debian package
+
+To make it even easier to test on Linux or deploy at large scale, we provide with the latest version (1.1.8) a debian package (https://github.com/LSIR/gsn/releases/download/gsn-release-1.1.8/gsn_1.1.8_all.deb). It includes an init script to start the GSN server automatically at boot and manage it like any other service. For this first packaged version, we put all configuration files in `/opt/gsn/1.1.8/conf/`, the virtual sensors in `/opt/gsn/1.1.8/virtual-sensors/` and the logs can be found at `/var/log/gsn/`. Starting and stopping GSN is performed with `service gsn start/stop`. By default, the GSN web interface is then accessible at <http://localhost:22001>, but you can change the port at installation time or later on, in the configuration file `gsn.xml`.
 
 ## Loading your first virtual sensor
 
