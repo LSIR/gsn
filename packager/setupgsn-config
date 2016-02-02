@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+db_input high gsn/webport || true
+db_go || true

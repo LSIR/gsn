@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+db_get gsn/webport
+GSN_PORT=$RET
+
+sed -i "s/<port>[0-9]*<\/port>/<port>$GSN_PORT<\/port>/" /opt/gsn/1.1.8/conf/gsn.xml 
+
+db_stop
+
+update-rc.d gsn defaults
+
+service gsn start

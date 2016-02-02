@@ -109,7 +109,7 @@
             </fileset>
         </tar>
         <exec dir="${basedir}/packager/" executable="fpm" os="Linux">
-            <arg line="-s tar -t deb -a all --deb-init './gsn' -n 'gsn' -v 1.1.8  --url http://gsn.epfl.ch --description 'GSN is a stream processor middleware' -m 'gsn@epfl.ch'  -d 'openjdk-7-jdk' --vendor 'LSIR-EPFL' --license 'GPLv3+' ../gsn-1.1.8-pack.tar.gz"/>
+            <arg line="-s tar -t deb -a all --deb-init './gsn' -n 'gsn' -v 1.1.8  --url http://gsn.epfl.ch --description 'GSN is a stream processor middleware' -m '&quot;GSN Team&quot;&lt;gsn@epfl.ch>'  -d 'openjdk-7-jdk' -d 'debconf' --after-install './setupgsn-postinst' --deb-config './setupgsn-config' --after-remove './setupgsn-postrem' --deb-templates 'templates' --vendor 'LSIR-EPFL' --license 'GPLv3+' ../gsn-1.1.8-pack.tar.gz"/>
         </exec>
     </target>
 
