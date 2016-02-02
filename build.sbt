@@ -5,7 +5,7 @@ name := "gsn"
 
 organization := "gsn"
 
-version := "1.1.5"
+version := "1.1.8"
 
 packageArchetype.java_application
 
