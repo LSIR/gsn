@@ -24,9 +24,11 @@ public class PublisherService extends IntentService {
         try {
             for (DeliveryRequest dr : storage.getPublishList()) {
                 try {
-                    AbstractDataPublisher adp = AbstractDataPublisher.getPublisher(dr);
-                    adp.runOnce();
-                    next_run = Math.min(next_run, adp.getNextRun());
+                    if (dr.isActive()) {
+                        AbstractDataPublisher adp = AbstractDataPublisher.getPublisher(dr);
+                        adp.runOnce();
+                        next_run = Math.min(next_run, adp.getNextRun());
+                    }
                 } catch (Exception e1) {
                     Log.e("PublisherService", e1.getMessage());
                 }

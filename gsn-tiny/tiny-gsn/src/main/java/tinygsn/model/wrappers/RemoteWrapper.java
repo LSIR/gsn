@@ -51,7 +51,7 @@ public class RemoteWrapper extends AbstractWrapper {
 	public DataField[] getOutputStructure() {
 		if (outputS == null) {
 			try {
-				httpGet = new HttpGet("http://" + sub.getUrl() + "/rest/sensors/" + sub.getVsname() + "?from=0000-00-00T00:00:00&to=0000-00-00T00:00:00");
+				httpGet = new HttpGet(sub.getUrl() + "/rest/sensors/" + sub.getVsname() + "?from=0000-00-00T00:00:00&to=0000-00-00T00:00:00");
 				HttpResponse response = httpclient.execute(httpGet);
 				int statusCode = response.getStatusLine().getStatusCode();
 				InputStreamReader is = new InputStreamReader(response.getEntity().getContent(), "UTF-8");

@@ -28,9 +28,11 @@ public class SubscriberService extends IntentService {
         try{
             for (Subscription su : storage.getSubscribeList()) {
                 try {
-                    AbstractSubscriber asu = AbstractSubscriber.getSubscriber(su);
-                    asu.runOnce();
-                    next_run = Math.min(next_run, asu.getNextRun());
+                    if (su.isActive()) {
+                        AbstractSubscriber asu = AbstractSubscriber.getSubscriber(su);
+                        asu.runOnce();
+                        next_run = Math.min(next_run, asu.getNextRun());
+                    }
                 } catch (Exception e1) {
                     Log.e("SubscriberService", e1.getMessage());
                 }

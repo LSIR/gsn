@@ -82,14 +82,16 @@ public class RetrieveDataTask extends AsyncTask<String, Void, ArrayList<StreamEl
                     if (f.length() > 0){
                         JSONObject vs = f.getJSONObject(0).getJSONObject("properties");
                         DataField[] structure = parseFields(vs.getJSONArray("fields"));
-                        JSONArray val = vs.getJSONArray("values");
-                        for (int i = 1;i<val.length();i++){
-                            JSONArray v = f.getJSONArray(i);
-                            Serializable[] vals = new Serializable[structure.length-2];
-                            for (int j = 0; j<structure.length-2;j++){
-                                vals[j] = parseValue(v,j,structure);
+                        if (vs.has("values")) {
+                            JSONArray val = vs.getJSONArray("values");
+                            for (int i = 0; i < val.length(); i++) {
+                                JSONArray v = val.getJSONArray(i);
+                                Serializable[] vals = new Serializable[structure.length];
+                                for (int j = 0; j < structure.length; j++) {
+                                    vals[j] = parseValue(v, j, structure);
+                                }
+                                se.add(new StreamElement(structure, vals, v.getLong(1)));
                             }
-                            se.add(new StreamElement(structure,vals,v.getLong(1)));
                         }
                     }
                 }
@@ -97,6 +99,7 @@ public class RetrieveDataTask extends AsyncTask<String, Void, ArrayList<StreamEl
             is.close();
         }catch(Exception e){
             e.printStackTrace();
+            se = null;
         }
 		return se;
 	}
@@ -109,7 +112,7 @@ public class RetrieveDataTask extends AsyncTask<String, Void, ArrayList<StreamEl
             case 2:
             case 7:
             case 8:
-                return v.getInt(i+2);
+                return v.getInt(i + 2);
             case 3:
                 return v.getLong(i + 2);
             case 5:
@@ -130,16 +133,20 @@ public class RetrieveDataTask extends AsyncTask<String, Void, ArrayList<StreamEl
     }
 
     protected void onPostExecute(ArrayList<StreamElement> results) {
-        log(StaticData.globalContext, "Retrieved: " + results.size());
-        try {
-            for (StreamElement s : results) {
-                StaticData.getWrapperByName("tinygsn.model.wrappers.RemoteWrapper?" + su.getId()).postStreamElement(s);
+        if (results != null) {
+            log(StaticData.globalContext, "Retrieved: " + results.size());
+            try {
+                for (StreamElement s : results) {
+                    StaticData.getWrapperByName("tinygsn.model.wrappers.RemoteWrapper?" + su.getId()).postStreamElement(s);
+                }
+                su.setLastTime(System.currentTimeMillis());
+                SqliteStorageManager storage = new SqliteStorageManager();
+                storage.setSubscribeInfo(su.getId(), su.getUrl(), su.getVsname(), su.getMode(), su.getLastTime(), su.getIterationTime(), su.isActive(), su.getUsername(), su.getPassword());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            su.setLastTime(System.currentTimeMillis());
-            SqliteStorageManager storage = new SqliteStorageManager();
-            storage.setSubscribeInfo(su.getId(), su.getUrl(), su.getVsname(), su.getMode(), su.getLastTime(), su.getIterationTime(), su.isActive(), su.getUsername(), su.getPassword());
-        }catch (Exception e){
-            e.printStackTrace();
+        } else {
+            log(StaticData.globalContext, "Error retrieving data from remote GSN.");
         }
 	}
 

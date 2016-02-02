@@ -77,7 +77,7 @@ public final class StreamElement implements Serializable {
 		}
 		if (this.fieldNames.length != data.length)
 			throw new IllegalArgumentException(
-					"The length of dataFileNames and the actual data provided in the constructor of StreamElement doesn't match.");
+					"The length of dataFieldNames and the actual data provided in the constructor of StreamElement doesn't match.");
 //		this.verifyTypesCompatibility(this.fieldTypes, data);
 		this.fieldValues = data;
 	}

@@ -47,6 +47,7 @@ import org.epfl.locationprivacy.userhistory.databases.LocationTableDataSource;
 import org.epfl.locationprivacy.userhistory.databases.TransitionTableDataSource;
 
 import tinygsn.model.publishers.AbstractDataPublisher;
+import tinygsn.model.subscribers.AbstractSubscriber;
 import tinygsn.model.wrappers.LocalWrapper;
 //import com.readystatesoftware.viewbadger.BadgeView;
 
@@ -72,6 +73,7 @@ public class ActivityHome extends AbstractActivity {
 			protected Void doInBackground(Activity... params) {
 				LocalWrapper.startLocal();
 				AbstractDataPublisher.startService();
+				AbstractSubscriber.startService();
 				return null;
 			}
 		}.execute(this);

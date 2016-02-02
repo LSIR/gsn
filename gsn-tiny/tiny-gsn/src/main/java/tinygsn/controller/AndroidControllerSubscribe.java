@@ -51,7 +51,7 @@ public class AndroidControllerSubscribe extends AbstractController {
 	public ArrayList<String> loadListVS(String server) {
 		ArrayList<String> output = new ArrayList<String>();
 		try{
-			httpGet = new HttpGet("http://"+server+"/rest/sensors");
+			httpGet = new HttpGet(server+"/rest/sensors");
 			HttpResponse response = httpclient.execute(httpGet);
 			int statusCode = response.getStatusLine().getStatusCode();
 			InputStreamReader is = new InputStreamReader(response.getEntity().getContent(),"UTF-8");																				
