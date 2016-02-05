@@ -1,5 +1,7 @@
 # GSN Global Sensor Networks [![Build Status](https://travis-ci.org/LSIR/gsn.svg)](https://travis-ci.org/LSIR/gsn)
 
+[![Join the chat at https://gitter.im/LSIR/gsn](https://badges.gitter.im/LSIR/gsn.svg)](https://gitter.im/LSIR/gsn?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 GSN is a software middleware designed to facilitate the deployment and programming of sensor networks. 
 
 ## Online Documentation
