@@ -109,9 +109,9 @@ import org.eclipse.jetty.server.AbstractConnector;
 public final class Main {
 	
     public static final int        DEFAULT_MAX_DB_CONNECTIONS       = 8;
-	public static final String     DEFAULT_GSN_CONF_FILE            = "conf/gsn.xml";
+	public static final String     DEFAULT_GSN_CONF_FOLDER            = "../conf/";
 	public static final String     DEFAULT_WEB_APP_PATH             = "src/main/webapp";
-	public static final String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "virtual-sensors";
+	public static final String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "../virtual-sensors";
 	public static transient Logger logger                           = LoggerFactory.getLogger ( Main.class );
 
 	/**
@@ -144,7 +144,7 @@ public final class Main {
 
     private Main() throws Exception {
 
-		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FILE );
+		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FOLDER + "gsn.xml");
 		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		//  initializeConfiguration();
 		try {
@@ -283,16 +283,16 @@ public final class Main {
 	}
 
 	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
-		ValidityTools.checkAccessibilityOfFiles (  WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , Main.DEFAULT_GSN_CONF_FILE );
-		ValidityTools.checkAccessibilityOfDirs ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+		ValidityTools.checkAccessibilityOfFiles (  WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FOLDER + "gsn.xml");
+		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
 		ContainerConfig toReturn = null;
 		try {
-			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FILE );
+			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FOLDER + "gsn.xml" );
 			logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			logger.info ( "Wrappers initialization ..." );
 		} catch ( FileNotFoundException e ) {
-			logger.error ("The the configuration file : " + Main.DEFAULT_GSN_CONF_FILE + " doesn't exist. "+ e.getMessage());
+			logger.error ("The the configuration file : " + DEFAULT_GSN_CONF_FOLDER + "gsn.xml doesn't exist. "+ e.getMessage());
 			logger.info ( "Check the path of the configuration file and try again." );
 			System.exit ( 1 );
 		} catch ( ClassNotFoundException e ) {
@@ -346,7 +346,7 @@ public final class Main {
 	public static ContainerConfig getContainerConfig() {
 		if (singleton == null)
 			try {
-				return loadContainerConfig(DEFAULT_GSN_CONF_FILE);
+				return loadContainerConfig(Main.DEFAULT_GSN_CONF_FOLDER + "gsn.xml");
 			} catch (Exception e) {
 				return null;
 			}
@@ -395,11 +395,11 @@ public final class Main {
 		server.setHandler(handlers);
 
 		Properties usernames = new Properties();
-		usernames.load(new FileReader("conf/realm.properties"));
+		usernames.load(new FileReader(DEFAULT_GSN_CONF_FOLDER + "realm.properties"));
 		if (!usernames.isEmpty()){
 			HashLoginService loginService = new HashLoginService();
 			loginService.setName("GSNRealm");
-			loginService.setConfig("conf/realm.properties");
+			loginService.setConfig(DEFAULT_GSN_CONF_FOLDER + "realm.properties");
 			loginService.setRefreshInterval(10000); //re-reads the file every 10 seconds.
 
 			Constraint constraint = new Constraint();

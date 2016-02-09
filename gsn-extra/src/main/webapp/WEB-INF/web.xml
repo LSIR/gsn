@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+	<display-name>GSN Server</display-name>
+	<!-- GSN START -->
+	<!-- Enable Only for development-->
+	<servlet>
+      <servlet-name>default</servlet-name>
+      <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
+      <init-param>
+        <param-name>useFileMappedBuffer</param-name>
+        <param-value>false</param-value>
+      </init-param>
+      <load-on-startup>0</load-on-startup>
+    </servlet> 
+	<servlet>
+		<servlet-name>Streaming</servlet-name>
+		<display-name>GSN Data Streaming Interface</display-name>
+		<servlet-class>gsn.http.delivery.RestStreamHandler</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>MonitoringServlet</servlet-name>
+		<display-name>MonitoringServlet</display-name>
+		<servlet-class>gsn.monitoring.MonitoringServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Streaming</servlet-name>
+		<url-pattern>/streaming/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>MonitoringServlet</servlet-name>
+		<url-pattern>/stat</url-pattern>
+	</servlet-mapping>
+</web-app>
