@@ -9,12 +9,12 @@ package ch.ethz.permasense.tinyos2x.messages;
 public class DozerPowerSwitchMsg extends ch.ethz.permasense.tinyos2x.messages.DataHeaderMsg {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 18;
+//    public static final int DEFAULT_MESSAGE_SIZE = 28;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 162;
 
-    /** Create a new DozerPowerSwitchMsg of size 18. */
+    /** Create a new DozerPowerSwitchMsg of size 28. */
     public DozerPowerSwitchMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -105,10 +105,10 @@ public class DozerPowerSwitchMsg extends ch.ethz.permasense.tinyos2x.messages.Da
         s += "  [payload.sample.no=0x"+Long.toHexString(get_payload_sample_no())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.V12Ext=0x"+Long.toHexString(get_payload_V12Ext())+"]\n";
+        s += "  [payload.V12Ext1=0x"+Long.toHexString(get_payload_V12Ext1())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
-        s += "  [payload.I12Ext=0x"+Long.toHexString(get_payload_I12Ext())+"]\n";
+        s += "  [payload.I12Ext1=0x"+Long.toHexString(get_payload_I12Ext1())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.IPort1=0x"+Long.toHexString(get_payload_IPort1())+"]\n";
@@ -124,6 +124,21 @@ public class DozerPowerSwitchMsg extends ch.ethz.permasense.tinyos2x.messages.Da
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [payload.PowerState=0x"+Long.toHexString(get_payload_PowerState())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.temperature=0x"+Long.toHexString(get_payload_temperature())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.humidity=0x"+Long.toHexString(get_payload_humidity())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.V12Ext2=0x"+Long.toHexString(get_payload_V12Ext2())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.V12Ext3=0x"+Long.toHexString(get_payload_V12Ext3())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [payload.V12Ext4=0x"+Long.toHexString(get_payload_V12Ext4())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -512,128 +527,128 @@ public class DozerPowerSwitchMsg extends ch.ethz.permasense.tinyos2x.messages.Da
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.V12Ext
+    // Accessor methods for field: payload.V12Ext1
     //   Field type: int
     //   Offset (bits): 72
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.V12Ext' is signed (false).
+     * Return whether the field 'payload.V12Ext1' is signed (false).
      */
-    public static boolean isSigned_payload_V12Ext() {
+    public static boolean isSigned_payload_V12Ext1() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.V12Ext' is an array (false).
+     * Return whether the field 'payload.V12Ext1' is an array (false).
      */
-    public static boolean isArray_payload_V12Ext() {
+    public static boolean isArray_payload_V12Ext1() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.V12Ext'
+     * Return the offset (in bytes) of the field 'payload.V12Ext1'
      */
-    public static int offset_payload_V12Ext() {
+    public static int offset_payload_V12Ext1() {
         return (72 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.V12Ext'
+     * Return the offset (in bits) of the field 'payload.V12Ext1'
      */
-    public static int offsetBits_payload_V12Ext() {
+    public static int offsetBits_payload_V12Ext1() {
         return 72;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.V12Ext'
+     * Return the value (as a int) of the field 'payload.V12Ext1'
      */
-    public int get_payload_V12Ext() {
-        return (int)getUIntBEElement(offsetBits_payload_V12Ext(), 16);
+    public int get_payload_V12Ext1() {
+        return (int)getUIntBEElement(offsetBits_payload_V12Ext1(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.V12Ext'
+     * Set the value of the field 'payload.V12Ext1'
      */
-    public void set_payload_V12Ext(int value) {
-        setUIntBEElement(offsetBits_payload_V12Ext(), 16, value);
+    public void set_payload_V12Ext1(int value) {
+        setUIntBEElement(offsetBits_payload_V12Ext1(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.V12Ext'
+     * Return the size, in bytes, of the field 'payload.V12Ext1'
      */
-    public static int size_payload_V12Ext() {
+    public static int size_payload_V12Ext1() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.V12Ext'
+     * Return the size, in bits, of the field 'payload.V12Ext1'
      */
-    public static int sizeBits_payload_V12Ext() {
+    public static int sizeBits_payload_V12Ext1() {
         return 16;
     }
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: payload.I12Ext
+    // Accessor methods for field: payload.I12Ext1
     //   Field type: int
     //   Offset (bits): 88
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
     /**
-     * Return whether the field 'payload.I12Ext' is signed (false).
+     * Return whether the field 'payload.I12Ext1' is signed (false).
      */
-    public static boolean isSigned_payload_I12Ext() {
+    public static boolean isSigned_payload_I12Ext1() {
         return false;
     }
 
     /**
-     * Return whether the field 'payload.I12Ext' is an array (false).
+     * Return whether the field 'payload.I12Ext1' is an array (false).
      */
-    public static boolean isArray_payload_I12Ext() {
+    public static boolean isArray_payload_I12Ext1() {
         return false;
     }
 
     /**
-     * Return the offset (in bytes) of the field 'payload.I12Ext'
+     * Return the offset (in bytes) of the field 'payload.I12Ext1'
      */
-    public static int offset_payload_I12Ext() {
+    public static int offset_payload_I12Ext1() {
         return (88 / 8);
     }
 
     /**
-     * Return the offset (in bits) of the field 'payload.I12Ext'
+     * Return the offset (in bits) of the field 'payload.I12Ext1'
      */
-    public static int offsetBits_payload_I12Ext() {
+    public static int offsetBits_payload_I12Ext1() {
         return 88;
     }
 
     /**
-     * Return the value (as a int) of the field 'payload.I12Ext'
+     * Return the value (as a int) of the field 'payload.I12Ext1'
      */
-    public int get_payload_I12Ext() {
-        return (int)getUIntBEElement(offsetBits_payload_I12Ext(), 16);
+    public int get_payload_I12Ext1() {
+        return (int)getUIntBEElement(offsetBits_payload_I12Ext1(), 16);
     }
 
     /**
-     * Set the value of the field 'payload.I12Ext'
+     * Set the value of the field 'payload.I12Ext1'
      */
-    public void set_payload_I12Ext(int value) {
-        setUIntBEElement(offsetBits_payload_I12Ext(), 16, value);
+    public void set_payload_I12Ext1(int value) {
+        setUIntBEElement(offsetBits_payload_I12Ext1(), 16, value);
     }
 
     /**
-     * Return the size, in bytes, of the field 'payload.I12Ext'
+     * Return the size, in bytes, of the field 'payload.I12Ext1'
      */
-    public static int size_payload_I12Ext() {
+    public static int size_payload_I12Ext1() {
         return (16 / 8);
     }
 
     /**
-     * Return the size, in bits, of the field 'payload.I12Ext'
+     * Return the size, in bits, of the field 'payload.I12Ext1'
      */
-    public static int sizeBits_payload_I12Ext() {
+    public static int sizeBits_payload_I12Ext1() {
         return 16;
     }
 
@@ -955,6 +970,321 @@ public class DozerPowerSwitchMsg extends ch.ethz.permasense.tinyos2x.messages.Da
      */
     public static int sizeBits_payload_PowerState() {
         return 1;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.temperature
+    //   Field type: int
+    //   Offset (bits): 144
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.temperature' is signed (false).
+     */
+    public static boolean isSigned_payload_temperature() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.temperature' is an array (false).
+     */
+    public static boolean isArray_payload_temperature() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.temperature'
+     */
+    public static int offset_payload_temperature() {
+        return (144 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.temperature'
+     */
+    public static int offsetBits_payload_temperature() {
+        return 144;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.temperature'
+     */
+    public Integer get_payload_temperature() {
+        try {return (int)getUIntBEElement(offsetBits_payload_temperature(), 16);} catch (IndexOutOfBoundsException e) { return null; }
+    }
+
+    /**
+     * Set the value of the field 'payload.temperature'
+     */
+    public void set_payload_temperature(int value) {
+        setUIntBEElement(offsetBits_payload_temperature(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.temperature'
+     */
+    public static int size_payload_temperature() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.temperature'
+     */
+    public static int sizeBits_payload_temperature() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.humidity
+    //   Field type: int
+    //   Offset (bits): 160
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.humidity' is signed (false).
+     */
+    public static boolean isSigned_payload_humidity() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.humidity' is an array (false).
+     */
+    public static boolean isArray_payload_humidity() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.humidity'
+     */
+    public static int offset_payload_humidity() {
+        return (160 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.humidity'
+     */
+    public static int offsetBits_payload_humidity() {
+        return 160;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.humidity'
+     */
+    public Integer get_payload_humidity() {
+        try {return (int)getUIntBEElement(offsetBits_payload_humidity(), 16);} catch (IndexOutOfBoundsException e) { return null; }
+    }
+
+    /**
+     * Set the value of the field 'payload.humidity'
+     */
+    public void set_payload_humidity(int value) {
+        setUIntBEElement(offsetBits_payload_humidity(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.humidity'
+     */
+    public static int size_payload_humidity() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.humidity'
+     */
+    public static int sizeBits_payload_humidity() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.V12Ext2
+    //   Field type: int
+    //   Offset (bits): 176
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.V12Ext2' is signed (false).
+     */
+    public static boolean isSigned_payload_V12Ext2() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.V12Ext2' is an array (false).
+     */
+    public static boolean isArray_payload_V12Ext2() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.V12Ext2'
+     */
+    public static int offset_payload_V12Ext2() {
+        return (176 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.V12Ext2'
+     */
+    public static int offsetBits_payload_V12Ext2() {
+        return 176;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.V12Ext2'
+     */
+    public Integer get_payload_V12Ext2() {
+        try {return (int)getUIntBEElement(offsetBits_payload_V12Ext2(), 16);} catch (IndexOutOfBoundsException e) { return null; }
+    }
+
+    /**
+     * Set the value of the field 'payload.V12Ext2'
+     */
+    public void set_payload_V12Ext2(int value) {
+        setUIntBEElement(offsetBits_payload_V12Ext2(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.V12Ext2'
+     */
+    public static int size_payload_V12Ext2() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.V12Ext2'
+     */
+    public static int sizeBits_payload_V12Ext2() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.V12Ext3
+    //   Field type: int
+    //   Offset (bits): 192
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.V12Ext3' is signed (false).
+     */
+    public static boolean isSigned_payload_V12Ext3() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.V12Ext3' is an array (false).
+     */
+    public static boolean isArray_payload_V12Ext3() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.V12Ext3'
+     */
+    public static int offset_payload_V12Ext3() {
+        return (192 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.V12Ext3'
+     */
+    public static int offsetBits_payload_V12Ext3() {
+        return 192;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.V12Ext3'
+     */
+    public Integer get_payload_V12Ext3() {
+        try {return (int)getUIntBEElement(offsetBits_payload_V12Ext3(), 16);} catch (IndexOutOfBoundsException e) { return null; }
+    }
+
+    /**
+     * Set the value of the field 'payload.V12Ext3'
+     */
+    public void set_payload_V12Ext3(int value) {
+        setUIntBEElement(offsetBits_payload_V12Ext3(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.V12Ext3'
+     */
+    public static int size_payload_V12Ext3() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.V12Ext3'
+     */
+    public static int sizeBits_payload_V12Ext3() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: payload.V12Ext4
+    //   Field type: int
+    //   Offset (bits): 208
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'payload.V12Ext4' is signed (false).
+     */
+    public static boolean isSigned_payload_V12Ext4() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'payload.V12Ext4' is an array (false).
+     */
+    public static boolean isArray_payload_V12Ext4() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'payload.V12Ext4'
+     */
+    public static int offset_payload_V12Ext4() {
+        return (208 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'payload.V12Ext4'
+     */
+    public static int offsetBits_payload_V12Ext4() {
+        return 208;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'payload.V12Ext4'
+     */
+    public Integer get_payload_V12Ext4() {
+        try {return (int)getUIntBEElement(offsetBits_payload_V12Ext4(), 16);} catch (IndexOutOfBoundsException e) { return null; }
+    }
+
+    /**
+     * Set the value of the field 'payload.V12Ext4'
+     */
+    public void set_payload_V12Ext4(int value) {
+        setUIntBEElement(offsetBits_payload_V12Ext4(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'payload.V12Ext4'
+     */
+    public static int size_payload_V12Ext4() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'payload.V12Ext4'
+     */
+    public static int sizeBits_payload_V12Ext4() {
+        return 16;
     }
 
 }
