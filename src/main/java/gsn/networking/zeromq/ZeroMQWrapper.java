@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.zeromq.ZContext;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.zeromq.ZMQ;
@@ -79,8 +80,8 @@ public class ZeroMQWrapper extends AbstractWrapper {
 			remoteContactPoint_META = "tcp://127.0.0.1:" + Main.getContainerConfig().getZMQMetaPort();
 		}
 		
-		ZMQ.Context ctx = Main.getZmqContext();
-		requester = ctx.socket(ZMQ.REQ);
+		ZContext ctx = Main.getZmqContext();
+		requester = ctx.createSocket(ZMQ.REQ);
 		requester.setReceiveTimeOut(1000);
 		requester.setSendTimeOut(1000);
 		requester.connect((remoteContactPoint_META).trim());
@@ -108,13 +109,14 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	
 	@Override
 	public void run(){
-		ZMQ.Context context = Main.getZmqContext();
-		ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
+		ZContext context = Main.getZmqContext();
+		ZMQ.Socket subscriber = context.createSocket(ZMQ.SUB);
 		
         boolean connected = subscriber.base().connect(remoteContactPoint_DATA);
 		subscriber.setReceiveTimeOut(3000);
+		subscriber.setRcvHWM(0); // no limit
 
-		subscriber.subscribe(vsensor.getBytes());
+		subscriber.subscribe((vsensor+":").getBytes());
 		//System.out.println("connected to Queue: "+ remoteContactPoint + " and subscribe to " + vsensor);
 
 		while (isActive()) {
@@ -123,7 +125,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 				if (rec != null){
 					//System.out.println("read from wrapper");
 					ByteArrayInputStream bais = new ByteArrayInputStream(rec);
-					bais.skip(vsensor.getBytes().length + 1);
+					bais.skip(vsensor.getBytes().length + 2);
 					//StreamElement se = ((StreamElement4Rest)(StreamElement4Rest.getXstream().fromXML(bais))).toStreamElement();
 					StreamElement se = kryo.readObjectOrNull(new Input(bais),StreamElement.class);
 			        //maybe queuing would be better here...
@@ -134,7 +136,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 						connected = subscriber.base().connect(remoteContactPoint_DATA);
 					}
 					//System.out.println("timeout on wrapper, subscribing to "+ vsensor);
-					subscriber.subscribe(vsensor.getBytes());
+					subscriber.subscribe((vsensor+":").getBytes());
 				}
 			}catch (Exception e)
 			{

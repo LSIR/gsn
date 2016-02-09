@@ -107,7 +107,7 @@ public class ContainerConfig {
 	
 	public ContainerConfig(String name,String author,String description,String email,
 			int port, String timeFormat, boolean zmqEnabled,int zmqProxyPort,int zmqMetaPort,
-			boolean acEnabled,int sslPort, String sslKSPass,String sslKPass, 
+			boolean acEnabled,int sslPort, String sslKSPass,String sslKPass,String sslKS, 
 			StorageConfig storage,SlidingConfig slide){
 		this.webName=name;
 		this.webAuthor=author;
@@ -122,6 +122,7 @@ public class ContainerConfig {
 		this.sslPort=sslPort;
 		this.sslKeyStorePassword=sslKSPass;
 		this.sslKeyPassword=sslKPass;
+		this.sslKeyStore=sslKS;
 		this.storage=storage;
 		this.sliding=slide;				
 				

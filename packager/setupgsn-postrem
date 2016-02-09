@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+db_purge
+
+service gsn stop
+
+update-rc.d gsn remove
+

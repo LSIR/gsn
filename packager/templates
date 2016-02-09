@@ -1,0 +1,5 @@
+Template: gsn/webport
+Type: string
+Default: 22001
+Description: GSN web UI port:
+ GSN is packaged with a web UI that allows you to see and explore the realtime streaming data. The default port is 22001, but you can change it here to any other available port. You will also be able to change it later on, in the file /opt/gsn/1.1.8/conf/gsn.xml.

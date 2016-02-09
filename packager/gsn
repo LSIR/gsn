@@ -5,7 +5,8 @@
 # Required-Stop:     $local_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# X-Interactive:     true
+# Should-Start:      postgresql mysql
+# Should-Stop:       postgresql mysql
 # Short-Description: Start/stop gsn streaming server
 ### END INIT INFO
 
@@ -14,11 +15,9 @@ set -e
 SCRIPTNAME="${0##*/}"
 SCRIPTNAME="${SCRIPTNAME##[KS][0-9][0-9]}"
 
-#edit /etc/default/apache2 to change this.
-GSN_RUN="auto"
 GSN_CONTROL_PORT=22232
-GSN_FOLDER="/opt/gsn/1.1.7"
-GSN_PIDFILE="/var/run/gsn.pid"
+GSN_FOLDER="/opt/gsn/1.1.8"
+GSN_PIDFILE="/var/run/gsn_1.1.8.pid"
 
 JAVA_HOME="/usr"
 
@@ -26,7 +25,7 @@ if [ ! -x "$JAVA_HOME/bin/java" ] ; then
 	echo "No JRE/JDK installed"
 	exit 0
 fi
-if [ ! -e "$GSN_FOLDER/lib/gsn-1.1.7.jar" ] ; then
+if [ ! -e "$GSN_FOLDER/lib/gsn-1.1.8.jar" ] ; then
     echo "GSN is not installed in the directory $GSN_FOLDER"
     exit 0
 fi
@@ -59,13 +58,15 @@ gsn_wait_stop() {
          
         old_PWD=$PWD
         cd $GSN_FOLDER
-	$JAVA_HOME/bin/java -classpath "./lib/*" -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger -Dorg.mortbay.log.LogFactory.noDiscovery=false gsn.GSNStop $GSN_CONTROL_PORT > /dev/null 2>&1
+	$JAVA_HOME/bin/java -classpath "./conf/:./lib/*" gsn.GSNStop $GSN_CONTROL_PORT > /dev/null 2>&1
         cd $old_PWD
 	# wait until really stopped
 	if [ -n "${PID:-}" ]; then
 		i=0
 		while kill -0 "${PID:-}" 2> /dev/null;  do
         		if [ $i = '60' ]; then
+					echo -n " timeout: killing!"
+                    kill -9 "${PID:-}"
         			break;
         	 	else
         			if [ $i = '0' ]; then
@@ -78,23 +79,28 @@ gsn_wait_stop() {
         	      fi
 		 done
 	fi
+    rm -f $GSN_PIDFILE
 }
 
 gsn_start(){
     old_PWD=$PWD
     cd $GSN_FOLDER
-    $JAVA_HOME/bin/java -classpath "./lib/*" -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger -Dorg.mortbay.log.LogFactory.noDiscovery=false gsn.Main $GSN_CONTROL_PORT > /dev/null 2>&1 &
+    PID=`$JAVA_HOME/bin/java -classpath "./conf/:./lib/*" gsn.Main $GSN_CONTROL_PORT > /dev/null 2>&1 & echo $!`
     cd $old_PWD
+    echo $PID > $GSN_PIDFILE
 }
 
 case $1 in
 	start)
-		log_daemon_msg "Starting gsn streaming server" "gsn"
-
-        gsn_start
-
-        log_end_msg 0
-
+        log_daemon_msg "Starting gsn streaming server" "gsn"
+        PID=$(pidof_gsn) || true
+		if [ -n "$PID" ]; then
+			echo "GSN is already running (pid $PID)."
+            log_end_msg 1
+		else
+			 gsn_start
+             log_end_msg 0
+		fi
 	;;
 	stop)
 		log_daemon_msg "Stopping gsn streaming server" "gsn"
@@ -110,7 +116,7 @@ case $1 in
 		log_daemon_msg "Restarting gsn streaming server" "gsn"
 		
 		PID=$(pidof_gsn) || true
-		if ! apache_wait_stop; then
+		if ! gsn_wait_stop; then
                         log_end_msg 1 || true
                 fi
 		gsn_start

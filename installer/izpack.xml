@@ -2,7 +2,7 @@
 <installation version="1.0">
     <info>
         <appname>gsn</appname>
-        <appversion>Version 1.1.7</appversion>
+        <appversion>Version 1.1.8</appversion>
         <authors>
             <author name="GSN Development Team." email="gsn@groupes.epfl.ch"/>
         </authors>

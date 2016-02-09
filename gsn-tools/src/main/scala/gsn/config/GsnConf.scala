@@ -32,13 +32,14 @@ object ZmqConf extends Conf{
     takeInt(xml \ "zmqmeta").getOrElse(defaultZmq.metaPort ) )  
 }
 
-case class AcConf(enabled:Boolean,sslPort:Int,sslKeyStorePass:String,sslKeyPass:String) 
+case class AcConf(enabled:Boolean,sslPort:Int,sslKeyStorePass:String,sslKeyPass:String,sslKeyStore:String) 
 object AcConf extends Conf{
   def create(xml:Elem)=AcConf(
     takeBool(xml \ "access-control").getOrElse(defaultAc.enabled ),
     takeInt(xml \ "ssl-port").getOrElse(defaultAc.sslPort),
     take(xml \ "ssl-key-store-password").getOrElse(defaultAc.sslKeyStorePass),
-    take(xml \ "ssl-key-password").getOrElse(defaultAc.sslKeyPass))    
+    take(xml \ "ssl-key-password").getOrElse(defaultAc.sslKeyPass),
+    take(xml \ "ssl-key-store").getOrElse(defaultAc.sslKeyStore))
 }
 
 case class StorageConf(driver:String,url:String,

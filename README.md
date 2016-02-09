@@ -10,14 +10,14 @@ This README file only contains basic setup instructions.
 
 ## Building
 
-First download the code from the git repository:
+First download the code from the git repository (using ``--depth 1`` makes it a lot smaller if you don't need the 10 years history):
 
-	git clone git@github.com:LSIR/gsn.git
+	git clone --depth 1 git@github.com:LSIR/gsn.git
 
 GSN requires the following software for building:
 
 * Jakarta apache ant version 1.7.x or higher.
-* Java JDK 1.6.x .
+* Java JDK 1.7.x .
 * [Apache Maven](http://maven.apache.org/download.cgi)
 
 To build GSN follow these steps:

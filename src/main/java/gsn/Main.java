@@ -96,8 +96,8 @@ import org.eclipse.jetty.server.ssl.SslSocketConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
+import org.zeromq.ZContext;
+
 import org.eclipse.jetty.server.AbstractConnector;
 
 
@@ -126,7 +126,7 @@ public final class Main {
 	private static StorageManager                         mainStorage;
     private static StorageManager                         windowStorage;
     private static StorageManager                         validationStorage;
-    private static Context                                zmqContext              = ZMQ.context(1);
+    private static ZContext                                zmqContext             = new ZContext();
     private static HashMap<Integer, StorageManager>       storages                = new HashMap<Integer, StorageManager>();
     private static HashMap<VSensorConfig, StorageManager> storagesConfigs         = new HashMap<VSensorConfig, StorageManager>();
     private GSNController                                 controlSocket;
@@ -228,8 +228,6 @@ public final class Main {
 
 	private static void updateSplashIfNeeded(String message[]) {
 		boolean headless_check = isHeadless();
-		for (int i=0;i<message.length;i++)
-			System.out.println(message[i]);
 
 		if (!headless_check) {
 			SplashScreen splash = SplashScreen.getSplashScreen();
@@ -478,7 +476,7 @@ public final class Main {
         return windowStorage;
     }
     
-    public static Context getZmqContext(){
+    public static ZContext getZmqContext(){
     	return zmqContext;
     }
     

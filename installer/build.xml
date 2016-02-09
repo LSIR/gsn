@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project>
     <!-- UPDATE-ME: The name of your installer comes below in the gsn.name property -->
-    <property name="gsn.name" value="gsn-1.1.7"/>
+    <property name="gsn.name" value="gsn-1.1.8"/>
 
     <target name="build-gsn" depends="clean-installer">
 
@@ -49,11 +49,9 @@
             <exclude name="**/DemoVSensor.java"/>
         </javac>
 
-        <!--<java classname="org.jibx.binding.Compile" fork="yes" dir="${basedir}" failonerror="true">
-            <classpath refid="classpath"/>
-            <arg value="${resources.dir}/containerJIBX.xml"/>
-            <arg value="${resources.dir}/VirtualSensorDescription.xml"/>
-        </java>-->
+        <copy todir="${build.dir}">
+    	    <fileset dir="${resources.dir}" includes="**/*.conf,**/*.properties" />
+    	</copy>
 
         <jar destfile="${dist}/lib/${gsn.name}.jar" basedir="${build.dir}">
             <manifest>
@@ -83,7 +81,7 @@
         <copy file="${basedir}/conf/servertestcer.cer" todir="${dist}/conf/"/>
         <copy file="${basedir}/conf/servertestkeystore" todir="${dist}/conf/"/>
         <copy file="${resources.dir}/RestApiConstants.properties" todir="${dist}/src/main/resources/"/>
-        <copy file="${basedir}/installer/log4j.properties" todir="${dist}/conf/"/>
+        <copy file="${basedir}/installer/log4j2.xml" todir="${dist}/conf/"/>
         <copy file="${basedir}/installer/gsn.xml" todir="${dist}/conf/"/>
         <copy file="${basedir}/icons/GSN_green_medium.png" todir="${dist}/lib/"/>
 
@@ -111,6 +109,7 @@
                 <exclude name="**/.svn/**"/>
                 <exclude name="**/axis2.xml"/>
                 <exclude name="**/*.aar"/>
+                <exclude name="**/gsnweb/**"/>
             </fileset>
         </copy>
         <taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask">

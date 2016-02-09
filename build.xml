@@ -259,6 +259,8 @@
 
     <target name="installer" depends="build-gsn" description="Build a GSN Server installer based on izpack."/>
 
+    <target name="packager" depends="pack-gsn" description="Build GSN Server Debian and RPM packages."/>
+
 	 <artifact:remoteRepository id="lsir.release" url="http://osper.epfl.ch:8081/artifactory/gsn-release/">
 	      <releases enabled="true"/>
 	      <snapshots enabled="true"/>

@@ -55,7 +55,7 @@ public final class StreamElement implements Serializable {
 
 	private Serializable [ ]                       fieldValues;
 
-	private transient Byte [ ]                               fieldTypes;
+	private Byte [ ]                               fieldTypes;
 
 	private transient long                                   internalPrimayKey = -1;
 
@@ -495,12 +495,12 @@ public final class StreamElement implements Serializable {
 	}
 	
 	/**
-	 * set the data in the coresponding field, throws an exception if the data type doesn't match
+	 * set the data in the corresponding field, throws an exception if the data type doesn't match
 	 * @param fieldName
 	 * @param data
 	 * @throws IllegalArgumentException
 	 */
-	protected void setData(String fieldName, Serializable data) throws IllegalArgumentException {
+	public void setData(String fieldName, Serializable data) throws IllegalArgumentException {
 		generateIndex();
 		Integer index = indexedFieldNames.get( fieldName );
 		if (index == null) {

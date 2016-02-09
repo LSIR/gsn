@@ -1,5 +1,21 @@
 ## GSN Change log
 
+### r1.1.8
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.8)
+* Adding monitoring of GSN internal metrics, output to munin and collectd
+* Adding anomaly detection on streams (outliers, iqr, unique values)
+* Adding the packager ant target for building Debian packages of GSN
+* Fixing bug with postgresql (<9.2) and prepared transactions
+* Making some small improvements of the web interface
+* Adding json output for queries on Model Servlet
+* Fixing wrapper resources released when initialization fails
+* Fixing StreamElement duplication when having non-unique timestamps by using pk in sliding windows
+* Switching to slf4j for logging (with default config using log4j2) + cleaning some log outputs
+* Adding more export formats and functions to the API v3. (experimental)
+* Updating the ZMQ protocol to match opensense deployment
+* Adding support for partial ordering in wrappers (when having several sensors pushing to a single virtual sensor)
+* Complete rewrite of tinyGSN, using singleton wrappers, queues and publisher. Adding subscription to GSN server and adaptive obfuscation of locations for privacy protection.
+
 ### r1.1.7
 [commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.7)
 * Improved tinyGSN background application using AlarmManagers for saving the battery.
