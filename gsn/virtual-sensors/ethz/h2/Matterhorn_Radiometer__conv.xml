@@ -38,6 +38,7 @@
 
                     		if (IRRADIANCE_SHORTWAVE_UP != null && IRRADIANCE_SHORTWAVE_DOWN != null && IRRADIANCE_LONGWAVE_UP != null && IRRADIANCE_LONGWAVE_DOWN&& IRRADIANCE_LONGWAVE_UP_NOTEMP != null && IRRADIANCE_LONGWAVE_DOWN_NOTEMP) {
  	                   			NET_FAR_INFRARED_RADIATION_NOTEMP = IRRADIANCE_LONGWAVE_UP_NOTEMP - IRRADIANCE_LONGWAVE_DOWN_NOTEMP;
+                    			ALBEDO = IRRADIANCE_SHORTWAVE_DOWN / IRRADIANCE_SHORTWAVE_UP;
                     			NET_SOLAR_RADIATION = IRRADIANCE_SHORTWAVE_UP - IRRADIANCE_SHORTWAVE_DOWN; 
  	                   			SKY_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_UP/0.0000000567),0.25)-273.15; 
  	                   			GROUND_TEMPERATURE = Math.pow((IRRADIANCE_LONGWAVE_DOWN/0.0000000567),0.25)-273.15; 
@@ -66,6 +67,7 @@
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
             <field name="IRRADIANCE_SHORTWAVE_UP" type="DOUBLE" unit="W/m²"/>
             <field name="IRRADIANCE_SHORTWAVE_DOWN" type="DOUBLE" unit="W/m²" />
+            <field name="ALBEDO" type="DOUBLE" />
             <field name="NET_SOLAR_RADIATION" type="DOUBLE" unit="W/m²" />
             <field name="IRRADIANCE_LONGWAVE_UP_NOTEMP" type="DOUBLE" unit="W/m²" />
             <field name="IRRADIANCE_LONGWAVE_DOWN_NOTEMP" type="DOUBLE" unit="W/m²" />
