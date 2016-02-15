@@ -158,6 +158,7 @@ public class ActivityHome extends AbstractActivity {
 			protected void onPostExecute(Void result) {
 				//close the progress dialog
 				progressDialog.dismiss();
+
 			}
 		}.execute();
 
