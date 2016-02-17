@@ -6,24 +6,19 @@ import akka.actor._
 import gsn.config.GsnConf
 import gsn.data.DataStore
 import gsn.data.SensorStore
-import gsn.security.SecurityData
 import play.api._
 import play.api.libs.concurrent.Akka
 
 
 object Global extends GlobalSettings {
-  private lazy val conf=ConfigFactory.load
-  val gsnConf=GsnConf.load(conf.getString("gsn.config"))
-  val ds =new DataStore(gsnConf)  
-  val acDs=new SecurityData(ds)
+  private lazy val conf = ConfigFactory.load
+  val gsnConf = GsnConf.load(conf.getString("gsn.config"))
+  val ds = new DataStore(gsnConf)
   
-  val globalKey=conf.getString("gsn.security.globalKey")
+  val globalKey = conf.getString("gsn.security.globalKey")
   
   override def onStart(app: Application) {
-    Logger.info("Application has started")
-    val sec=new SecurityData(ds)
-    //to enable 
-    //sec.upgradeUsersTable    
+    Logger.info("Application has started")  
     Akka.system(app).actorOf(Props(new SensorStore(ds)),"gsnSensorStore")
   }
 
