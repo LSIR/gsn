@@ -1,0 +1,101 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Sensors around me:</h1>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-12" style="padding: 1em;">
+        <map center="{{defaultPosition}}" zoom="{{zoomLevel}}" style="height: 40em">
+            <shape editable="true" name="circle" stroke-color="#FF0000" stroke-opacity="0.8" stroke-weight="2"
+                   fill-color="#FF0000"
+                   fill-opacity="0.35" center="{{circlePosition}}" radius="{{radius}}"
+                   on-center_changed="centerChanged()"
+                   on-bounds_changed="boundsChanged()"></shape>
+        </map>
+
+        <label><b>Radius (meters): </b>
+            <input class="form-control" type="text" ng-model="radius">
+        </label>
+        <label><b>Coordinates (Lat, Long):
+            <input class="form-control" style="width:25em" type="text" ng-model="circlePosition"></b>
+        </label>
+
+        <label>
+            <button class="btn btn-primary" ng-click="centerOnMe()">Center on me (Needs geolocation to be enabled)
+            </button>
+        </label>
+
+        <br>
+        <br>
+        <label>
+            <input type="text" id="Autocomplete" ng-model="locationSearchModel" class="form-control"
+                   ng-autocomplete="locationSearchResult" details="locationSearchDetails"
+                    />
+        </label>
+        <label>
+            <button class="btn btn-primary" ng-click="locationSearch()">Go to</button>
+        </label>
+
+
+
+    </div>
+</div>
+
+<div class="row" ng-if="!loading">
+    <div class="col-lg-6">
+        <div ng-repeat="sensor in sensors | filter : query | filter : isCloseEnough()">
+            <div class="panel panel-info" ng-if="$even">
+                <div class="panel-heading"><a href="#/sensors/{{ sensor.properties.vs_name }}"
+                                              name="{{sensor.properties.vs_name}}"
+                                              ng-bind="sensor.properties.vs_name"></a></div>
+
+                <div class="panel-body">
+                    <p><b>Description:</b> {{ sensor.properties.description }}</p>
+
+                    <p ng-if="sensor.properties.geographical"><b> Location: </b>{{sensor.properties.geographical}}</p>
+                    <ul ng-if="sensor.geometry.coordinates">
+                        <li><b>Longitude:</b> {{sensor.geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{sensor.geometry.coordinates[1]}}</li>
+                        <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
+                            {{sensor.geometry.coordinates[2]}}
+                        </li>
+                    </ul>
+                    <p><b>Public:</b> {{ sensor.properties.is_public}}</p>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div ng-repeat="sensor in sensors | filter : query | filter : isCloseEnough()">
+            <div class="panel panel-info" ng-if="$odd">
+                <div class="panel-heading"><a href="#/sensors/{{ sensor.properties.vs_name }}"
+                                              name="{{sensor.properties.vs_name}}"
+                                              ng-bind="sensor.properties.vs_name"></a></div>
+
+                <div class="panel-body">
+                    <p><b>Description:</b> {{ sensor.properties.description }}</p>
+
+                    <p ng-if="sensor.properties.geographical"><b> Location: </b>{{sensor.properties.geographical}}</p>
+                    <ul ng-if="sensor.geometry.coordinates">
+                        <li><b>Longitude:</b> {{sensor.geometry.coordinates[0]}}</li>
+                        <li><b>Latitude:</b> {{sensor.geometry.coordinates[1]}}</li>
+                        <li ng-if="sensor.geometry.coordinates[2]"><b>Altitude:</b>
+                            {{sensor.geometry.coordinates[2]}}
+                        </li>
+                    </ul>
+                    <p><b>Public:</b> {{ sensor.properties.is_public}}</p>
+
+
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
