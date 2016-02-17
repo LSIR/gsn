@@ -1,0 +1,73 @@
+<div class="row">
+
+
+    <div class="col-lg-12">
+        <h1 class="page-header">Data Export</h1>
+
+        <div class="row">
+
+            <div class="col-lg-6 form-group">
+                <label>Select sensors to download</label>
+                <select ng-model="selected" multiple
+                        class="form-control"
+                        ng-options="sensor for sensor in sensorsList | filter : query | orderBy:'toString() '"
+                        data-ng-attr-size='{{minMultipleSelectSize}}'
+                        style='width: 100%;resize: vertical'></select>
+            </div>
+
+            <div class="col-lg-6">
+
+                <b>From: </b><br>
+
+                <div class="dropdown">
+                    <a class="dropdown-toggle" id="fromDate" role="button" data-toggle="dropdown"
+                       data-target="#" href="">
+                        <div class="input-group"><input type="text" class="form-control"
+                                                        data-ng-model="date.from.date"><span
+                                class="input-group-addon"><i
+                                class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <datetimepicker data-ng-model="date.from.date"
+                                        data-on-set-time="date.from.onTimeSet()"
+                                        data-datetimepicker-config="{ dropdownSelector: '#fromDate' }"></datetimepicker>
+                    </ul>
+                </div>
+
+
+                <label>To: </label><br>
+
+                <div class="dropdown">
+                    <a class="dropdown-toggle" id="toDate" role="button" data-toggle="dropdown"
+                       data-target="#" href="">
+                        <div class="input-group"><input type="text" class="form-control"
+                                                        data-ng-model="date.to.date"><span
+                                class="input-group-addon"><i
+                                class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <datetimepicker data-ng-model="date.to.date"
+                                        data-on-set-time="date.to.onTimeSet()"
+                                        data-datetimepicker-config="{ dropdownSelector: '#toDate' }"></datetimepicker>
+                    </ul>
+                </div>
+
+
+                <br>
+
+                <button class="btn btn-info btn-block" ng-click="download(selected, date.from.date, date.to.date)"
+                        ng-disabled="!selected.length">
+                    <i class="fa fa-download"></i>
+                    Download
+                </button>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
