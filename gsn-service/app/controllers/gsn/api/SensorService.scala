@@ -14,14 +14,27 @@ import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
+import play.api.libs.json.{Json => PlayJson}
 import play.api.http.ContentTypes
 
+import scalaoauth2.provider.AuthInfoRequest
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatterBuilder
 import controllers.gsn.Global
 import gsn.data._
 import gsn.data.format._
 import gsn.xpr.XprConditions
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.mvc._
+import play.Logger
+import scala.util.Success
+import controllers.gsn.GSNDataHandler
+import controllers.gsn.APIPermissionAction
+import models.gsn.auth.User
+import scalaoauth2.provider.AuthInfo
+
 
 object SensorService extends Controller with GsnService {   
   val defaultMetaProps=conf.getStringList("gsn.api.defaultMetadataProps")
@@ -32,6 +45,11 @@ object SensorService extends Controller with GsnService {
                                     "Access-Control-Allow-Headers"->"Content-Type")}
      
   }
+/*
+  def param[T](name:String,fun: String=>T,default:T)(implicit req:Request[AnyContent])=
+    queryparam(name).map(fun(_)).getOrElse(default)
+  */    
+
   def sensors = headings(Action.async {implicit request=>
     Try{    
       val format=param("format",OutputFormat,defaultFormat)    
@@ -56,42 +74,22 @@ object SensorService extends Controller with GsnService {
       case t=>
         t.printStackTrace  
         Future(BadRequest(t.getMessage))    
-    }.get    
+    }.get  
   })
-  
-  @deprecated("user-password authentication phased out","")
-  private def authorizeUserPass(vsname:String)(implicit request:Request[AnyContent])={
-    val optUser=queryparam("username")
-	val optPass=queryparam("password")
-	if (optUser.isDefined && optPass.isDefined){
-	  if (!Global.acDs .authorizeVs(vsname, optUser.get, optPass.get))
-	    throw new IllegalArgumentException(s"Not authorized user ${optUser.get} for resource $vsname")
-	}    
-  }
-  
+   
+  def userInfo() = headings((APIPermissionAction() compose Action).async {implicit request =>
 
-  
-  private def authorizeVs(vsname:String)(implicit request:Request[AnyContent])={     
-    if (Global.gsnConf.accessControl.enabled && Global.acDs.hasAccessControl(vsname)){
-	  val optApikey=queryparam("apikey")
-	  // Deprecated user and pass on query params 
-	  //authorizeUserPass(vsname) 
-	   
-	  if (optApikey.isDefined){	    
-	    if (!globalKeyOk(optApikey.get) && !Global.acDs.authorizeVs(vsname, optApikey.get))	      
-	      throw new IllegalArgumentException(s"Apikey ${optApikey.get} not authorized for resource $vsname")      
-	  }
-	  else
-	    throw new IllegalArgumentException("Required apikey or user credentials were not provided")
-    }
-  }
-  
-  def sensorData(sensorid:String) = headings(Action.async {implicit request=>
+     request match{
+         case AuthInfoRequest(auth:AuthInfo[User],req) => Future(
+         	Ok(PlayJson.obj("username" -> auth.user.name, "firstname" -> auth.user.firstName, "lastname" -> auth.user.lastName, "email" -> auth.user.email))
+            )
+         case _ => Future(Forbidden("Page only accessible with a valid oauth token."))
+     }
+  })
+
+  def sensorData(sensorid:String) = headings((APIPermissionAction(sensorid) compose Action).async {implicit request =>
     Try{
       val vsname=sensorid.toLowerCase
-      //to enable
-      authorizeVs(sensorid)
-    	
       val size:Option[Int]=queryparam("size").map(_.toInt)
       val fieldStr:Option[String]=queryparam("fields")
       val filterStr:Option[String]=queryparam("filter")
@@ -271,8 +269,7 @@ object SensorService extends Controller with GsnService {
     }.get
   }
 
-  
-  def download= Action.async {implicit request=>
+  def download= (APIPermissionAction() compose Action).async {implicit request=>
     //request.body.
     Future(Ok(""))
     

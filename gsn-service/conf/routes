@@ -1,4 +1,54 @@
+# OAUTH2 for external access
+POST    /oauth2/token             controllers.gsn.OAuth2Controller.accessToken
+GET     /oauth2/auth              controllers.gsn.OAuth2Controller.auth  
+POST    /oauth2/auth              controllers.gsn.OAuth2Controller.doAuth
+GET     /oauth2/client            controllers.gsn.OAuth2Controller.listClients
+POST    /oauth2/client            controllers.gsn.OAuth2Controller.editClient    
+
+# Authentication
+GET     /                           controllers.gsn.auth.LocalAuthController.index
+GET     /assets/javascript/routes.js    controllers.gsn.auth.LocalAuthController.jsRoutes
+GET     /profile                    controllers.gsn.auth.LocalAuthController.profile
+GET     /login                      controllers.gsn.auth.LocalAuthController.login
+POST    /login                      controllers.gsn.auth.LocalAuthController.doLogin
+GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
+GET     /authenticate/:provider     com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
+GET     /signup                     controllers.gsn.auth.LocalAuthController.signup
+POST    /signup                     controllers.gsn.auth.LocalAuthController.doSignup
+GET     /accounts/unverified        controllers.gsn.auth.Signup.unverified
+GET     /authenticate/:provider/denied     controllers.gsn.auth.Signup.oAuthDenied(provider: String)
+GET     /accounts/verify/:token     controllers.gsn.auth.Signup.verify(token: String)
+GET     /accounts/exists            controllers.gsn.auth.Signup.exists
+GET     /accounts/password/reset/:token     controllers.gsn.auth.Signup.resetPassword(token: String)
+POST    /accounts/password/reset            controllers.gsn.auth.Signup.doResetPassword
+GET     /accounts/password/change    controllers.gsn.auth.Account.changePassword
+POST    /accounts/password/change    controllers.gsn.auth.Account.doChangePassword
+GET     /accounts/edit               controllers.gsn.auth.Account.editProfile
+POST    /accounts/edit               controllers.gsn.auth.Account.doEditProfile
+GET     /accounts/verify            controllers.gsn.auth.Account.verifyEmail
+GET     /accounts/add               controllers.gsn.auth.Account.link
+GET     /accounts/link              controllers.gsn.auth.Account.askLink
+POST    /accounts/link              controllers.gsn.auth.Account.doLink
+GET     /accounts/merge             controllers.gsn.auth.Account.askMerge
+POST    /accounts/merge             controllers.gsn.auth.Account.doMerge
+GET     /login/password/forgot     controllers.gsn.auth.Signup.forgotPassword(email: String ?= "")
+POST    /login/password/forgot     controllers.gsn.auth.Signup.doForgotPassword
+
+#Permissions
+GET     /access/groups              controllers.gsn.auth.PermissionsController.groups
+POST    /access/groups/edit         controllers.gsn.auth.PermissionsController.addgroup
+POST    /access/groups/addto        controllers.gsn.auth.PermissionsController.addtogroup
+POST    /access/groups/removefrom   controllers.gsn.auth.PermissionsController.removefromgroup
+GET     /access/vs                  controllers.gsn.auth.PermissionsController.vs
+POST    /access/vs/addto            controllers.gsn.auth.PermissionsController.addtovs
+POST    /access/vs/removefrom       controllers.gsn.auth.PermissionsController.removefromvs
+GET     /access/users               controllers.gsn.auth.PermissionsController.users
+POST    /access/users/addrole       controllers.gsn.auth.PermissionsController.addrole
+POST    /access/users/removerole    controllers.gsn.auth.PermissionsController.removerole
+
+#API
 GET  /assets/*file        	controllers.Assets.at(path="/public", file)
+GET  /api/user                      controllers.gsn.api.SensorService.userInfo
 POST /api/sensors/download          controllers.gsn.api.SensorService.download
 GET /api/sensors 			        controllers.gsn.api.SensorService.sensors
 GET /api/sensors/search             controllers.gsn.api.SensorService.sensorSearch
@@ -9,3 +59,4 @@ GET /api/sensors/:sensorid/field/:fieldid/process controllers.gsn.api.DataProces
 GET /api/sensors/:sensorid/grid     controllers.gsn.api.GridService.gridData(sensorid:String)
 GET /api/sensors/:sensorid/grid/timeseries    controllers.gsn.api.GridService.gridTimeseries(sensorid:String)
 #GET   /*path                       controllers.gsn.api.GsnProxy.v1(path: String)
+

@@ -20,9 +20,9 @@ trait Conf{
   lazy val defaultZmq=ZmqConf(
     zmq.getBoolean("enabled"),zmq.getInt("proxyPort"),zmq.getInt("metaPort"))  
 
-  lazy val ac=defaults.getConfig("ac")
-  lazy val defaultAc=AcConf(ac.getBoolean("enabled"),ac.getInt("sslPort"),
-      ac.getString("sslKeyStorePass"),ac.getString("sslKeyPass"),ac.getString("sslKeyStore"))
+  lazy val ssl=defaults.getConfig("ssl")
+  lazy val defaultSsl=SslConf(ssl.getInt("sslPort"),
+      ssl.getString("sslKeyStorePass"),ssl.getString("sslKeyPass"),ssl.getString("sslKeyStore"))
 
   lazy val storage=defaults.getConfig("storage")
   lazy val defaultStorage=StorageConf(storage.getString("driver"),storage.getString("url"),
@@ -31,5 +31,5 @@ trait Conf{
   lazy val defaultGsn=GsnConf(defaults.getString("name"),defaults.getString("author"),
       defaults.getString("description"),defaults.getString("email"),
       defaults.getInt("port"),defaults.getString("timeFormat"),
-      defaultZmq,defaultAc,defaultStorage,None)
+      defaultZmq,defaultSsl,defaultStorage,None)
 }

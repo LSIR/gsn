@@ -21,8 +21,8 @@ crossPaths := false
 libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",  
-  "com.typesafe.play" %% "play-json" % "2.3.4",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.4",
+  "com.typesafe.play" %% "play-json" % "2.3.10",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.14",
   "edu.ucar" % "netcdf" % "4.3.22",
   "org.geotools" % "gt-shapefile" % "13.2",
   "org.geotools" % "gt-geojson" % "13.2",
@@ -34,7 +34,8 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.1" % "test",
   "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test"
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.14" % "test",
+  "org.mindrot" % "jbcrypt" % "0.3m"
 )
 
 resolvers ++= Seq(
@@ -61,3 +62,4 @@ publishArtifact in (Test) := false
 publishArtifact in (Compile) := false
 
 publishArtifact in (Compile, packageBin) := true
+

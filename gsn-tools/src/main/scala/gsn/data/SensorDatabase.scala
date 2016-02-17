@@ -285,8 +285,7 @@ object SensorDatabase {
           times+= t2-t1
         t1=t2
       }          
-	  if (times.size>0)
-	    rate=Some(times.sum/times.size)
+	  rate = if (times.size == 0) Some(0)  else Some(times.sum/times.size)
 	  log debug s"Computed rate for $vsName"
 	  stmt2.close
 	  conn2.close

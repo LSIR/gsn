@@ -1,0 +1,182 @@
+# Override default Play's validation messages
+
+# --- Constraints
+constraint.required=Obligatoire
+constraint.min=Valeur minimale: {0}
+constraint.max=Valeur maximale: {0}
+constraint.minLength=Longueur minimale: {0}
+constraint.maxLength=Longueur maximale: {0}
+constraint.email=E-mail
+
+# --- Formats
+format.date=Date (''{0}'')
+format.numeric=Numérique
+format.real=Réel
+
+# --- Errors
+error.invalid=Valeur non autorisée
+error.required=Champ obligatoire
+error.number=Seul les valeurs numériques sont autorisées
+error.real=Seul les valeurs réelles sont autorisées
+error.min=Doit être plus grand ou égal à {0}
+error.max=Doit être plus petit ou égal à 0}
+error.minLength=Longueur minimale: {0}
+error.maxLength=Longueur maximale: {0}
+error.email=Un e-mail valide est obligatoire
+error.pattern=Doit satisfaire: {0}
+
+### --- play-authenticate START
+
+# play-authenticate: Initial translations
+
+playauthenticate.accounts.link.success=Comptes liés avec succès
+playauthenticate.accounts.merge.success=Comptes unifiés avec succès
+
+playauthenticate.verify_email.error.already_validated=Votre e-mail a déjà été validé.
+playauthenticate.verify_email.error.set_email_first=Vous devez d'abord fournir un e-mail.
+playauthenticate.verify_email.message.instructions_sent=Les instructions pour valider votre e-mail ont été envoyés à l'adresse {0}.
+playauthenticate.verify_email.success=L'adresse e-mail ({0}) a été validée avec succès.
+
+playauthenticate.reset_password.message.instructions_sent=Les instructions pour changer votre mot de passe ont été envoyées à l'adresse: {0}.
+playauthenticate.reset_password.message.email_not_verified=Votre e-mail doit d'abord être vérifié, des instructions ont été envoyées. Réessayez ensuite.
+playauthenticate.reset_password.message.no_password_account=Votre utilisateur n'est pas configuré pour utiliser un mot de passe.
+playauthenticate.reset_password.message.success.auto_login=Votre mot de passe a été changé.
+playauthenticate.reset_password.message.success.manual_login=Votre mot de passe a été changé. Veillez vous connecter avec votre nouveau mot de passe.
+
+playauthenticate.change_password.error.passwords_not_same=Les mots de passe ne correspondent pas.
+playauthenticate.change_password.success=Mot de passe changé avec succès.
+
+playauthenticate.password.signup.error.passwords_not_same=Les mots de passe ne correspondent pas.
+playauthenticate.password.login.unknown_user_or_pw=Utilisateur et mot de passe inconnus.
+
+playauthenticate.password.verify_signup.subject=Global Sensor Networks: Finaliser votre enregistrement
+playauthenticate.password.verify_email.subject=Global Sensor Networks: Confirmer votre e-mail
+playauthenticate.password.reset_email.subject=Global Sensor Networks: Comment changer votre mot de passe.
+
+# play-authenticate: Additional translations
+
+playauthenticate.login.email.placeholder=Votre adresse e-mail
+playauthenticate.login.password.placeholder=Choisir un mot de passe
+playauthenticate.login.password.repeat=Réitérer votre mot de passe
+playauthenticate.login.title=Login
+playauthenticate.login.password.placeholder=Mot de passe
+playauthenticate.login.now=Se connecter maintenant
+playauthenticate.login.forgot.password=Mot de passe oublié?
+playauthenticate.login.oauth=ou connectez-vous avec l'un de ces fournisseurs:
+
+playauthenticate.signup.title=Enregistrement
+playauthenticate.signup.name=Votre nom d'utilisateur
+playauthenticate.signup.firstname=Votre prénom
+playauthenticate.signup.lastname=Votre nom de famille
+playauthenticate.signup.now=S'enregistrer maintenant
+playauthenticate.signup.oauth=ou enregistrez-vous avec l'un de ces fournisseurs:
+
+playauthenticate.verify.account.title=Vérification par e-mail obligatoire
+playauthenticate.verify.account.before=Avant de spécifier un mot de passe, vous devez
+playauthenticate.verify.account.first=d'abord vérifier votre email
+
+playauthenticate.change.password.title=Changer votre mot de passe ici
+playauthenticate.change.password.cta=Changer votre mot de passe
+
+playauthenticate.merge.accounts.title=Unifier des comptes
+playauthenticate.merge.accounts.question=Voulez-vous unifier le compte ({0}) avec le compte: {1}?
+playauthenticate.merge.accounts.true=Oui, unifier les deux comptes
+playauthenticate.merge.accounts.false=Non, quitter la session et se connecter avec un autre compte
+playauthenticate.merge.accounts.ok=OK
+
+playauthenticate.link.account.title=Lier les comptes
+playauthenticate.link.account.question=Lier ({0}) avec votre utilisateur?
+playauthenticate.link.account.true=Oui, lier ce compte
+playauthenticate.link.account.false=Non, quitter la session et créer un nouveau compte
+playauthenticate.link.account.ok=OK
+
+# play-authenticate: Signup folder translations
+
+playauthenticate.verify.email.title=Verifier votre e-mail
+playauthenticate.verify.email.requirement=Avant d'utiliser GSN, vous devez d'abord vérifier votre e-mail.
+playauthenticate.verify.email.cta=Un e-mail a été envoyé à votre adresse avec les instructions pour vous connecter.
+
+playauthenticate.password.reset.title=Changer votre mot de passe
+playauthenticate.password.reset.cta=Changer votre mot de passe
+
+playauthenticate.password.forgot.title=Mot de passe oublié
+playauthenticate.password.forgot.cta=Envoyer les instructions pour changer le mot de passe
+
+playauthenticate.oauth.access.denied.title=Accès OAuth refusé
+playauthenticate.oauth.access.denied.explanation=Si vous voulez utiliser GSN avec OAuth, vous devez accepter la connexion.
+playauthenticate.oauth.access.denied.alternative=Si vous ne préférez ne pas accepter la connexion, vous pouvez toujours
+playauthenticate.oauth.access.denied.alternative.cta=vous enregistrer avec un nouveau compte.
+
+playauthenticate.token.error.title=Erreur de token
+playauthenticate.token.error.message=Le token reçu est soit trop vieux, soit il n'existe pas.
+
+playauthenticate.user.exists.title=L'utilisateur existe déjà
+playauthenticate.user.exists.message=Cet utilisateur existe déjà.
+
+# play-authenticate: Navigation
+playauthenticate.navigation.profile=Profile
+playauthenticate.navigation.link_more=Lier d'autres fournisseurs
+playauthenticate.navigation.logout=Se Déconnecter
+playauthenticate.navigation.login=Se Connecter
+playauthenticate.navigation.home=Page Principale
+playauthenticate.navigation.restricted=Page Protégée
+playauthenticate.navigation.signup=S'enregister
+
+# play-authenticate: Handler
+playauthenticate.handler.loginfirst=Vous devez vous connecter pour accéder à: ''{0}''
+
+# play-authenticate: Profile
+playauthenticate.profile.title=Profil d'utilisateur
+playauthenticate.profile.mail=Votre nom est {0} et votre adresse e-mail {1}!
+playauthenticate.profile.unverified=non vérifiée - cliquer pour vérifier
+playauthenticate.profile.verified=vérifiée
+playauthenticate.profile.providers_many=Il y a {0} fournisseurs liés à ce compte:
+playauthenticate.profile.providers_one =Il y a un fournisseur lié à ce compte:
+playauthenticate.profile.logged=Vous êtes connecté avec:
+playauthenticate.profile.session=Votre ID d'utilisateur est {0} et votre session se termine le {1}
+playauthenticate.profile.session_endless=Votre ID d'utilisateur est {0} et votre session ne se terminera jamais
+playauthenticate.profile.password_change=Changer le mot de passe de votre compte
+playauthenticate.profile.edit=Modifier votre profil
+playauthenticate.profile.edit.success=Profil mis à jour
+playauthenticate.profile.edit.btn=Enregistrer
+playauthenticate.profile.firstname=Prénom
+playauthenticate.profile.lastname=Nom
+
+### --- play-authenticate END
+gsn.access.groups=Groupes
+gsn.access.groups.title=Gestion des groupes
+gsn.access.groups.add=Ajouter
+gsn.access.groups.edit=Modifier
+gsn.access.groups.name=Nom
+gsn.access.groups.description=Description
+gsn.access.groups.delete=Supprimer
+gsn.access.groups.vs=Virtual Sensors liés
+gsn.access.groups.members=Membres
+gsn.access.groups.addto.error=Erreur d'ajout de l'utilisateur au groupe
+gsn.access.vs.title=Virtual Sensors
+gsn.access.vs.allowed.users=Utilisateurs autorisés
+gsn.access.vs.allowed.groups=Groupes autorisés
+gsn.access.vs.allowed.all=Visible par tous
+gsn.access.users=Utilisateurs
+gsn.access.users.title=Gestion des utilisateurs
+gsn.access.users.add=Ajouter
+gsn.access.users.remove=Enlever
+gsn.access.roles=Rôles
+gsn.access.actions=Actions
+
+gsn.oauth2.auth.title=Accès externe à GSN
+gsn.oauth2.auth.access=Une application veut accéder à votre compte.
+gsn.oauth2.auth.access2=L'application {0} demande l'autorisation pour accéder à vos Virtual Sensors.
+gsn.oauth2.auth.access3=Autoriser l'accés à {0} ?
+gsn.oauth2.auth.allow=Autoriser
+gsn.oauth2.auth.deny=Refuser
+gsn.oauth2.clients=Clients
+gsn.oauth2.clients.title=Gestion des clients externes
+gsn.oauth2.clients.delete=Supprimer
+gsn.oauth2.clients.edit=Modifier
+gsn.oauth2.clients.name=Nom
+gsn.oauth2.clients.redirect=URI de redirection
+gsn.oauth2.clients.id=ID du client
+gsn.oauth2.clients.secret=Secret du client
+gsn.oauth2.clients.add=Enregistrer
+gsn.oauth2.clients.editing=Edition de

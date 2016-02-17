@@ -1,0 +1,100 @@
+@import scala.collection.mutable.Buffer 
+@import controllers.gsn.auth.GSNGroup 
+@(groups: Buffer[models.gsn.auth.Group], users: Buffer[models.gsn.auth.User], groupForm: Form[GSNGroup]) 
+@import helper._ 
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+@main(Messages("gsn.access.groups.title"),"grouplist") {
+<div id="groups" class="row">
+	<div class="col-md-12">
+		<h1>@Messages("gsn.access.groups.title")</h1>
+	</div>
+</div>
+<div id="groups" class="row">
+	<div class="col-xs-12 col-md-9">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>@Messages("gsn.access.groups.name")</th>
+					<th>@Messages("gsn.access.groups.description")</th>
+					<th>@Messages("gsn.access.groups.vs")</th>
+					<th>@Messages("gsn.access.groups.members")</th>
+					<th>@Messages("gsn.access.actions")</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for(g <- groups) {
+				<tr>
+					<td>@g.name</td>
+					<td>@g.description</td>
+					<td>
+						<ul class="list-unstyled">
+							@for(u <- g.dataSources) {
+							<li>@u.value</li> }
+						</ul>
+					</td>
+					<td>
+						<ul class="list-unstyled">
+							@for(u <- g.users) {
+							<li>@u.firstName @u.lastName (@u.email)
+								<button type="button" class="btn btn-danger btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromgroup?user_id=' + @u.id + '&group_id=' + @g.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups');">@Messages("gsn.access.users.remove")</button>
+							</li> }
+						</ul> 
+						@if(g.users.size < users.size){ 
+							<select id="u_@g.id">
+							@for(u <- users) { @if(!g.users.contains(u)){
+								<option value="@u.id">@u.firstName @u.lastName (@u.email)</option> 
+							} 
+						}
+					</select>
+						<button type="button" class="btn btn-primary btn-xs"
+							onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtogroup?group_id=' + @g.id + '&user_id=' + $('#u_@g.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups');">@Messages("gsn.access.groups.add")</button>
+						}
+					</td>
+					<td data-id="@g.id" data-name="@g.name"
+						data-description="@g.description">
+						<button type="button" class="btn btn-default btn-xs"
+							onclick="edit(this);">@Messages("gsn.access.groups.edit")</button>
+						<button type="button" class="btn btn-danger btn-xs"
+							onclick="del(this);">@Messages("gsn.access.groups.delete")</button>
+					</td>
+				</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	<div class="col-xs-12 col-md-3">
+		<div class="highlight">
+			@helper.form(controllers.gsn.auth.routes.PermissionsController.addgroup, 'class -> "form-horizontal", 'role -> "form") {
+
+			@if(groupForm.hasGlobalErrors) {
+			<p class="alert alert-danger">@groupForm.globalError.get.message</p>
+			} 
+			<input type="hidden" id="idd" name="id" value="0" /> 
+			<input type="hidden" id="actiond" name="action" value="add" /> 
+			@inputText(	groupForm("name"), '_label -> Messages("gsn.access.groups.name") )
+			@inputText( groupForm("description"), '_label -> Messages("gsn.access.groups.description") )
+
+			<button id="submit-btn" type="submit" class="btn btn-primary">@Messages("gsn.access.groups.add")</button>
+			}
+		</div>
+	</div>
+</div>
+<script language="javascript">
+    function edit(t){
+    	$('#submit-btn').html("@Messages("gsn.access.groups.edit")");
+    	$('#idd').val($(t).parent().data('id'));
+    	$('#actiond').val('edit');
+    	$('#name').val($(t).parent().data('name'));
+    	$('#description').val($(t).parent().data('description'));
+
+    }
+    function del(t){
+    	$('#idd').val($(t).parent().data('id'));
+    	$('#actiond').val('edit');
+    	$('form').submit();
+    }
+    </script>
+
+}

@@ -13,5 +13,13 @@ trait DataSerializer{
   val dataLimit=ConfigFactory.load.getInt("gsn.data.limit")
 }
 
-
-
+/*  private def valueToJson(any:Any):JsValue=any match{       
+    case d:Double=>JsNumber(d)
+    case f:Float=>JsNumber(f)
+    case i:Int=>JsNumber(i)
+    case l:Long=>JsNumber(l)
+    case s:String=>JsString(s)
+    case a:Any=>JsString(a.toString) 
+    case null=>JsNull
+  }
+*/
