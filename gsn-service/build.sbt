@@ -1,27 +1,14 @@
-import com.github.play2war.plugin._
-import com.typesafe.sbt.packager.Keys._
-
 name := "gsn-services"
 
 organization := "gsn"
 
 version := "1.0.0-SNAPSHOT"
 
-Play2WarPlugin.play2WarSettings
-
-Play2WarKeys.servletVersion := "2.5"
-
 scalaVersion := "2.11.2"
 
 javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
 
 crossPaths := false
-
-scriptClasspath := Seq("*")
-
-resolvers += "play-authenticate (release)" at "https://oss.sonatype.org/content/repositories/releases/"
-
-resolvers += "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
 val buildSettings = Defaults.defaultSettings ++ Seq(
    javaOptions += "-Xmx128m",
@@ -44,12 +31,26 @@ libraryDependencies ++= Seq(
   "com.feth" % "play-authenticate_2.11" % "0.6.9",
   "com.google.inject" % "guice" % "3.0",
   javaCore,
-  "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1",
   "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
   "com.typesafe.akka" % "akka-zeromq_2.11" % "2.3.14",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
-  "org.scalatestplus" %% "play" % "1.1.0" % "test"
+  "org.scalatestplus" %% "play" % "1.1.0" % "test",
+  "gsn" % "gsn-tools" % "1.0.0-SNAPSHOT",
+  "com.typesafe.play" %% "play-json" % "2.3.10",
+  "com.typesafe.akka" %% "akka-actor" % "2.3.14"
   )
+
+resolvers ++= Seq(
+  DefaultMavenRepository,
+  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+  "lsir remote" at "http://osper.epfl.ch:8081/artifactory/remote-repos",
+  "lsir release" at "http://osper.epfl.ch:8081/artifactory/gsn-release",
+  "osgeo" at "http://download.osgeo.org/webdav/geotools/",
+  "play-authenticate (release)" at "https://oss.sonatype.org/content/repositories/releases/",
+  "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/"
+)
+
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release")
 

@@ -1,0 +1,6 @@
+Django>=1.8,<1.9
+django-bower
+requests
+requests-cache
+django-jsonfield
+django-all-access

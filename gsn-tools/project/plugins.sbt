@@ -8,5 +8,3 @@ addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.8")
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.3.8")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.6.4")
-
-addSbtPlugin("com.github.play2war" % "play2-war-plugin" % "1.3-beta3")
