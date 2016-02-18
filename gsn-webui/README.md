@@ -6,16 +6,11 @@ This is a web interface for exploring the data processed by GSN. It is based on 
 
 Before starting you need python3 and [bower](http://bower.io/). It is also recommended to work inside a [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
-  pip install -r requirements.txt
-
-  cp app/settingsLocal.py.dist app/settingsLocal.py
-  
-  python manage.py migrate
-  
-  python manage.py bower_install
-  
-  python manage.py runserver 
-
+    pip install -r requirements.txt
+    cp app/settingsLocal.py.dist app/settingsLocal.py
+    python manage.py migrate
+    python manage.py bower_install
+    python manage.py runserver 
 
 ## Configuration
 
