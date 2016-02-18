@@ -1,11 +1,11 @@
 import com.typesafe.sbt.SbtNativePackager._
 import NativePackagerKeys._
 
-name := "gsn"
+name := "gsn-extra"
 
 organization := "gsn"
 
-version := "1.1.8"
+version := "2.0.0"
 
 packageArchetype.java_application
 
@@ -77,8 +77,6 @@ resolvers ++= Seq(
   "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local" 
 )
 
-mainClass := Some("gsn.Main")
-
 unmanagedJars in Compile <++= baseDirectory map { base =>
     val libs = base / "lib"
     val option = libs / "optional"
@@ -86,11 +84,11 @@ unmanagedJars in Compile <++= baseDirectory map { base =>
     (dirs ** "*.jar").classpath
 }
 
-NativePackagerKeys.packageSummary in Linux := "GSN Server"
+NativePackagerKeys.packageSummary in Linux := "GSN Server - extra"
 
-NativePackagerKeys.packageSummary in Windows := "GSN Server"
+NativePackagerKeys.packageSummary in Windows := "GSN Server - extra"
 
-NativePackagerKeys.packageDescription := "Global Sensor Networks"
+NativePackagerKeys.packageDescription := "Global Sensor Networks: extra"
 
 NativePackagerKeys.maintainer in Windows := "LSIR EPFL"
 
@@ -111,7 +109,3 @@ credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 publishMavenStyle := true
 
 publishArtifact in (Compile) := false
-
-mainClass in Revolver.reStart := Some("gsn.Main")
-
-Revolver.reStartArgs := Seq("22232")

@@ -1,7 +1,5 @@
 <project name="gsn" default="build" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
-    <property name="safe-storage-port" value="25700"/>
-    <property name="safe-storage-controller-port" value="25712"/>
     <property name="gsn-controller-port" value="22932"/>
     <property name="max-servlets" value="20"/>
     <property name="max-form-size" value="500000000"/>
@@ -10,100 +8,42 @@
     <property name="remote-keep-alive-period" value="15000"/>
     <property name="aes-enc-salt" value="this is a simple clear salt"/>
 
+    <!-- Internal -->
+    <path id="maven-ant-tasks.classpath" path="${basedir}/lib/build/maven-ant-tasks-2.1.3.jar" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />
 
+    <import file="${basedir}/gsn-core/build.xml"/>
+    <import file="${basedir}/gsn-extra/build.xml"/>
     <import file="${basedir}/installer/build.xml"/>
     <import file="${basedir}/packager/build.xml"/>
-
-    <!-- Internal -->
-	 <path id="maven-ant-tasks.classpath" path="lib/build/maven-ant-tasks-2.1.3.jar" />
-	  <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-	           uri="antlib:org.apache.maven.artifact.ant"
-	           classpathref="maven-ant-tasks.classpath" />
 	
     <target name="init" description="Initializes properties and initialization tasks.">
         <tstamp>
             <format property="TODAY" pattern="yyyy-MMMM-d-'at'-hh-mm-aa" locale="en"/>
         </tstamp>
         <property environment="env"/>
-        <property name="conf.dir" value="${basedir}/conf"/>
-        <property name="resources.dir" value="src/main/resources"/>
-        <property name="build.dir" value="target/classes"/>    	
-        <property name="src.dir" value="src/main/java"/>
-        <property name="jars" value="jars"/>
-        <property name="libdir" value="lib"/>
-        <!--property name="dependencies" value="target/dependency"/>-->
-        <property name="reports" value="target/reports"/>
+        <property name="conf.dir" value="${basedir}/conf"/>  	
+        <property name="jars.dir" value="${basedir}/jars"/>
         <property name="maxMemoryUsage" value="128m"/>
-        <property name="jar.file" value="gsn-core.jar"/>
-        <!--  Enable the following line when you want to use Java Media Framework.
-              You should unarchive the complete archive provide by sun and fix the
-              following line to point to you path. -->
-        <!--  <property name="jmf.dir"     value="JMF-2.1.1e" /> -->
-        <path id="classpath">
-            <pathelement location="${build.dir}/jcoverage-classes/"/>
-            <pathelement location="${conf.dir}/"/>
-            <pathelement location="${build.dir}/"/>
-            <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
-            <fileset dir="${libdir}">
-                <include name="**/*.jar"/>
-            </fileset>
-        	  <fileset refid="gsndeps" />
-            <!--<fileset dir="${dependencies}">
-                  <include name="**/*.jar"/>
-              </fileset>-->         
-        	<!--  Enable the following line if you want to use Java Media Frame Work.
-                  Note that you should first set the jmf.dir path above -->
-            <!--  <fileset dir="${jmf.dir}">
-            <include name="**/*.jar" />
-            </fileset>  -->
-        </path>
-        <available type="dir" file="${jmf.dir}" property="jmf.exists"/>
-        <!--   	<fail unless="jmf.exists" message="The ${jmf.dir} directory is missing, please download  JMF from http://java.sun.com/products/java-media/jmf/2.1.1/download.html and place it in ${jmf.dir} directory." /> -->
     </target>
 
     <target name="setup" depends="init" description="Setup the build target.">
-        <mkdir dir="${build.dir}"/>
         <mkdir dir="logs"/>
-        <mkdir dir="${reports}/todos"/>
-        <mkdir dir="${reports}/javadoc"/>
-        <mkdir dir="${reports}/junit"/>
-        <!--<mkdir dir="${jars}"/>-->
+        <mkdir dir="${jars.dir}"/>
     	<echo>${ant.java.version}</echo>
-        <!--<condition property="java6">
-            <equals arg1="${ant.java.version}" arg2="1.6"/>
-        </condition>-->
     </target>
 
-    <target name="build" depends="setup" description="Compile the cource code.">
-        <javac debug="true" srcdir="${src.dir}" optimize="off"
-               destdir="${build.dir}" failonerror="true" classpathref="classpath">
-            <exclude name="**/TCPConnPool.java"/>
-            <exclude name="**/NetworkUtility.java"/>
-        </javac>
-    	<copy todir="${build.dir}">
-    	    <fileset dir="${resources.dir}" includes="**/*.conf,**/*.properties" />
-    	</copy>
-    </target>
+    <target name="build" depends="build-gsn-core,build-gsn-extra" description="Compile the cource code." />
 
     <target name="cleandb" depends="build">
-        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring=""  classpathref="classpath" />
+        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring=""  classpathref="core-classpath" />
     </target>
 
 
     <!-- Run -->
 
-    <target name="runcam" depends="build">
-        <java classpathref="classpath" classname="gsn.Main" maxmemory="${maxMemoryUsage}" fork="true"
-              dir="${basedir}">
-            <env key="LD_LIBRARY_PATH"
-                 value="${jmf.dir}/lib:${env.JAVA_HOME}/jre/lib/i386:${env.JAVA_HOME}/jre/lib/i386/client:${env.JAVA_HOME}/jre/lib/i386/xawt"/>
-            <env key="LD_PRELOAD" value="${env.JAVA_HOME}/jre/lib/i386/libjawt.so"/>
-            <arg id="gsnc-port" value="${gsn-controller-port}"/>
-        </java>
-    </target>
-
     <target name="gsn" depends="cleandb" description="Run GSN server in non graphical mode.">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="false" fork="true" dir="${basedir}" classpathref="classpath">
+        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="false" fork="true" dir="${basedir}" classpathref="core-classpath">
             <jvmarg value="-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-DmaxServlets=${max-servlets}"/>
@@ -125,7 +65,7 @@
 
     <target name="stop" depends="build" description="Stop the running GSN server (if any).">
         <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}" fork="false" dir="${basedir}"
-              classpathref="classpath">
+              classpathref="core-classpath">
             <arg id="gsnc-port" value="${gsn-controller-port}"/>
         </java>
     </target>
@@ -133,139 +73,28 @@
 
     <!-- Dev -->
 
-    <target name="clean" depends="init" description="Erase built files and target.">
+    <target name="clean" depends="init, clean-gsn-core, clean-gsn-extra" description="Erase built files and target.">
         <delete includeEmptyDirs="yes" failonerror="no">
-            <fileset dir="${build.dir}" includes="**/*.class,**/*.xml"/>
-            <fileset dir="${build.dir}" includes="**/*.xml"/>
-            <fileset dir="${reports}" includes="**/*html,**/*htm,**/*xml"/>
-            <fileset dir="${jars}" includes="**/*"/>
+            <fileset dir="${jars.dir}" includes="**/*"/>
         </delete>
-    </target>
-
-    <!-- Tools -->
-    <!-- Starts a sensorscope server, which listens on a port for data and publishes to CSV files -->
-    <!-- configuration is set in conf/sensorscope_server.properties -->
-    <target name="sensorscope-server" depends="build" description="Tests sensorscope server">
-            <java classname="gsn.utils.SensorScopeListener" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
-        <!--<java classname="gsn.wrappers.tinyos.SensorScopeServerListener" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">-->
-            <classpath refid="classpath"/>
-            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
-        </java>
-    </target>
-
-    <target name="sensorscope-server-test" depends="build" description="Tests sensorscope server">
-        <java classname="gsn.utils.SensorScopeListenerTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
-            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
-        </java>
     </target>
     
     <!-- Tests -->
 
-    <target name="securityTest" depends="build">
-        <java classpathref="classpath" classname="gsn.testss.SecurtiyTest" maxmemory="${maxMemoryUsage}" fork="true"
-              dir="${build.dir}"/>
-    </target>
-
-    <target name="rfidtest" depends="build">
-        <java classname="gsn.wrappers.RFIDTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
-            <classpath refid="classpath"/>
-        </java>
-    </target>
-
-    <target name="camtest" depends="build">
-        <property name="dev" value=""/>
-        <java classname="gsn.wrappers.cameras.usb.WebCamWrapper" maxmemory="${maxMemoryUsage}" fork="true"
-              dir="${basedir}">
-            <classpath refid="classpath"/>
-            <env key="LD_LIBRARY_PATH"
-                 value="${jmf.dir}/lib:${env.JAVA_HOME}/jre/lib/i386:${env.JAVA_HOME}/jre/lib/i386/client:${env.JAVA_HOME}/jre/lib/i386/xawt"/>
-            <env key="LD_PRELOAD" value="${env.JAVA_HOME}/jre/lib/i386/libjawt.so"/>
-            <arg value="${dev}"/>
-        </java>
-    </target>
-
-    <target name="test-report" depends="tests" description="Runs JUnit tests, generates jcoverage,junit,todo reports">
-        <junitreport todir="${reports}/junit">
-            <fileset dir="${reports}/junit">
-                <include name="TEST-*.xml"/>
-            </fileset>
-            <report format="frames" todir="${reports}/junit"/>
-        </junitreport>
-    </target>
-
-    <target name="tests" depends="build" description="Runs JUnit tests">
-        <junit printsummary="on" haltonerror="off" haltonfailure="off" showoutput="on">
-            <formatter type="xml" usefile="true"/>
-            <classpath refid="classpath"/>
-            <batchtest todir="${reports}/junit">
-                <fileset dir="${build.dir}">
-                    <include name="**/*Test*.class"/>
-                    <exclude name="**/TestStreamExporterVirtualSensor.class"/>
-                    <exclude name="**/TestContainerImpl.class"/>
-                    <exclude name="**/RFIDTest.class"/>
-                    <exclude name="**/TestDataPropogation.class"/>
-                    <exclude name="**/TestVSensorLoader.class"/>
-                    <exclude name="**/TestStreamSource.class"/>
-                    <exclude name="**/TestWindowing1.class"/>
-                    <exclude name="**/TestWindowing2.class"/>
-                    <exclude name="**/TestPublicToMSR.class"/>
-                    <exclude name="**/TestService.class"/>
-                    <exclude name="**/TestDataPacket.class"/>
-                    <exclude name="**/TestSQLUtils.class"/>
-                    <exclude name="**/TestStreamElement.class"/>
-                    <exclude name="**/TestValidityTools.class"/>
-                    <exclude name="**/TestGraph.class"/>
-                    <exclude name="**/TestContainerImpl.class"/>
-                    <exclude name="**/TestStreamExporterVirtualSensor.class"/>
-                    <exclude name="**/TestStorageManager.class"/>
-                    <exclude name="**/TestAbstractWrapper.class"/>
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
+    <target name="test-report" depends="test-report-gsn-core,test-report-gsn-extra" description="Runs JUnit tests, generates jcoverage,junit,todo reports"/>
 
     <!-- Distribution -->
 
-    <target name="docs" depends="setup">
-        <javadoc classpathref="classpath" destdir="${reports}/javadoc" author="false" version="true" use="true"
-                 windowtitle="Global Sensor Network Infrastructure">
-            <fileset dir="${src.dir}" defaultexcludes="yes">
-                <include name="**/*.java"/>
-                <exclude name="**/*Test.java"/>
-            </fileset>
-            <doctitle>Global Sensor Network</doctitle>
-            <bottom>GSN Development Team.</bottom>
-            <tag name="todo" scope="all" description="To do:"/>
-        </javadoc>
-        <!--
-        <documentdoclet destdir="${reports}/todos">
-            <fileset dir="${src.dir}">
-                <include name="**/*.java"/>
-            </fileset>
-            <info/>
-        </documentdoclet>
-        -->
-    </target>
+    <target name="docs" depends="setup, docs-gsn-core, docs-gsn-extra"/>
         
-    <target name="jar" depends="clean,build" description="Create a jar file containing the GSN classes.">
-        <jar destfile="${jars}/${jar.file}" basedir="${build.dir}">
-            <manifest>
-                <attribute name="Built-By" value="GSN Development Team."/>
-                <attribute name="Main-Class" value="gsn.Main"/>
-            </manifest>
-        </jar>
-    </target>
+    <target name="jar" depends="jar-gsn-core, jar-gsn-extra" description="Create jar files containing the GSN classes."/>
 
     <target name="installer" depends="build-gsn" description="Build a GSN Server installer based on izpack."/>
 
     <target name="packager" depends="pack-gsn" description="Build GSN Server Debian and RPM packages."/>
 
-	 <artifact:remoteRepository id="lsir.release" url="http://osper.epfl.ch:8081/artifactory/gsn-release/">
-	      <releases enabled="true"/>
-	      <snapshots enabled="true"/>
-	    </artifact:remoteRepository>
-
-	<artifact:pom id="gsnpom" file="pom.xml"></artifact:pom>
-	<artifact:dependencies filesetId="gsndeps" pomRefId="gsnpom" />
+	<artifact:remoteRepository id="lsir.release" url="http://osper.epfl.ch:8081/artifactory/gsn-release/">
+	    <releases enabled="true"/>
+	    <snapshots enabled="true"/>
+	</artifact:remoteRepository>
 </project>
