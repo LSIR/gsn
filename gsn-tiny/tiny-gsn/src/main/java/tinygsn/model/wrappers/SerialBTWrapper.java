@@ -92,12 +92,25 @@ public class SerialBTWrapper extends AbstractWrapper {
                         device.fetchUuidsWithSdp();
                         StreamElement[] se = new StreamElement[0];
                         for (ParcelUuid uuid : device.getUuids()) {
-                           // Log.d(TAG, "UUID : " + uuid.getUuid().toString());
+                            Log.d(TAG, "UUID : " + uuid.getUuid().toString());
                             if (uuid.getUuid().compareTo(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")) == 0) {
                                 BluetoothSocket socket = null;
                                 try {
                                     socket = device.createRfcommSocketToServiceRecord(uuid.getUuid());
-                                    socket.connect();
+                                    try {
+                                        socket.connect();
+                                        Log.e(TAG,"Connected");
+                                    } catch (IOException e) {
+                                        Log.e(TAG, e.getMessage());
+                                        try {
+                                            Log.e(TAG, "trying fallback...");
+                                            socket = (BluetoothSocket) device.getClass().getMethod("createRfcommSocket", new Class[]{int.class}).invoke(device, 1);
+                                            socket.connect();
+                                            Log.e(TAG, "Connected");
+                                        } catch (Exception e2) {
+                                            Log.e(TAG, "Couldn't establish Bluetooth connection!");
+                                        }
+                                    }
                                     if (socket.isConnected()) {
                                         sensor = new OpenSWISSensor(socket.getInputStream(), socket.getOutputStream());
                                         sensor.initialize();
@@ -109,6 +122,7 @@ public class SerialBTWrapper extends AbstractWrapper {
                                     try {
                                         socket.close();
                                     } catch (Exception e1){}
+                                //} catch (InterruptedException e){
                                 }
                                 break;
                             }
