@@ -32,12 +32,15 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import org.slf4j.LoggerFactory;
+
+import gsn.Main;
+
 import org.slf4j.Logger;
 public class WrappersUtil {
   
   public static transient Logger logger= LoggerFactory.getLogger ( WrappersUtil.class );
   
-  public static final String     DEFAULT_WRAPPER_PROPERTIES_FILE  = "../conf/wrappers.properties";
+  public static final String     DEFAULT_WRAPPER_PROPERTIES_FILE  = Main.gsnConfFolder +"/wrappers.properties";
   public static Properties loadWrappers(HashMap<String, Class<?>> wrappers, String location) {
     Properties config = new Properties ();
     try {// Trying to load the wrapper specified in the configuration file of the container. 

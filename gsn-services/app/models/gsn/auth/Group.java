@@ -31,7 +31,7 @@ public class Group extends AppModel{
 	public List<User> users;
 
 	//for some unknown reason the AppModel.Finder doesn't work ????
-	public static final play.db.ebean.Model.Finder<Long, Group> find = new play.db.ebean.Model.Finder<Long, Group>(
+	public static play.db.ebean.Model.Finder<Long, Group> find = new play.db.ebean.Model.Finder<Long, Group>(
 			Long.class, Group.class);
 
 	public String getName() {

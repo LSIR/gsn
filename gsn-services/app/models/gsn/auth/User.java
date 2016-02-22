@@ -67,7 +67,7 @@ public class User extends AppModel implements Subject {
 	@ManyToMany
 	public List<Group> groups;
 
-	public static final play.db.ebean.Model.Finder<Long, User> find = new play.db.ebean.Model.Finder<Long, User>(
+	public static play.db.ebean.Model.Finder<Long, User> find = new play.db.ebean.Model.Finder<Long, User>(
 			Long.class, User.class);
 
     public static User findById(Long value) {
@@ -91,7 +91,6 @@ public class User extends AppModel implements Subject {
 	}
 	
 	public boolean hasAccessTo(DataSource ds){
-		System.out.println(""+dataSources.size());
 		if (dataSources.contains(ds)) return true;
 		for (Group g : groups){
 			if (g.dataSources.contains(ds)) return true;

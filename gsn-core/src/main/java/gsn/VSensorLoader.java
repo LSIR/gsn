@@ -154,7 +154,7 @@ public class VSensorLoader extends Thread {
     }
 
      public static String getVSConfigurationFilePath(String fileName) {
-        return Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY + File.separator + fileName + ".xml";
+        return Main.virtualSensorDirectory + File.separator + fileName + ".xml";
     }
 
     public synchronized void loadPlugin() throws SQLException {

@@ -1,14 +1,6 @@
 name := "gsn-services"
 
-organization := "gsn"
-
-version := "1.0.0-SNAPSHOT"
-
-scalaVersion := "2.11.2"
-
 javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
-
-crossPaths := false
 
 val buildSettings = Defaults.defaultSettings ++ Seq(
    javaOptions += "-Xmx128m",
@@ -39,27 +31,3 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.3.10",
   "com.typesafe.akka" %% "akka-actor" % "2.3.14"
   )
-
-resolvers ++= Seq(
-  DefaultMavenRepository,
-  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "lsir remote" at "http://osper.epfl.ch:8081/artifactory/remote-repos",
-  "lsir release" at "http://osper.epfl.ch:8081/artifactory/gsn-release",
-  "osgeo" at "http://download.osgeo.org/webdav/geotools/",
-  "play-authenticate (release)" at "https://oss.sonatype.org/content/repositories/releases/",
-  "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/"
-)
-
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
-
-publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release")
-
-credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-
-publishMavenStyle := true
-
-publishArtifact in (Test) := false
-
-publishArtifact in (Compile) := false
-
-publishArtifact in (Compile, packageBin) := true

@@ -109,9 +109,9 @@ import org.eclipse.jetty.server.AbstractConnector;
 public final class Main {
 	
     public static final int        DEFAULT_MAX_DB_CONNECTIONS       = 8;
-	public static final String     DEFAULT_GSN_CONF_FOLDER            = "../conf/";
-	public static final String     DEFAULT_WEB_APP_PATH             = "src/main/webapp";
-	public static final String     DEFAULT_VIRTUAL_SENSOR_DIRECTORY = "../virtual-sensors";
+	public static final String     DEFAULT_GSN_CONF_FOLDER            = "../conf";
+	public static final String     DEFAULT_WEB_APP_FOLDER             = "src/main/webapp";
+	public static final String     DEFAULT_VIRTUAL_SENSOR_FOLDER = "../virtual-sensors";
 	public static transient Logger logger                           = LoggerFactory.getLogger ( Main.class );
 
 	/**
@@ -119,9 +119,12 @@ public final class Main {
 	 * into the class implementing DataSource.
 	 */
 	private static  Properties                            wrappers ;
-	private static final int                              DEFAULT_JETTY_SERVLETS  = 100;
+	private static final int                              DEFAULT_JETTY_SERVLETS = 100;
 	private static Main                                   singleton ;
-	private static int                                    gsnControllerPort;
+	private static int                                    gsnControllerPort      = 22232;
+	public static String                                  gsnConfFolder          = DEFAULT_GSN_CONF_FOLDER;
+	public static String                                  webAppPath             = DEFAULT_WEB_APP_FOLDER;
+	public static String                                  virtualSensorDirectory = DEFAULT_VIRTUAL_SENSOR_FOLDER;
 	private static ZeroMQProxy                            zmqproxy;
 	private static StorageManager                         mainStorage;
     private static StorageManager                         windowStorage;
@@ -144,8 +147,8 @@ public final class Main {
 
     private Main() throws Exception {
 
-		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FOLDER + "gsn.xml");
-		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/gsn.xml");
+		ValidityTools.checkAccessibilityOfDirs ( virtualSensorDirectory );
 		//  initializeConfiguration();
 		try {
 			controlSocket = new GSNController(null, gsnControllerPort);
@@ -190,8 +193,8 @@ public final class Main {
 			zmqproxy = new ZeroMQProxy(containerConfig.getZMQProxyPort(),containerConfig.getZMQMetaPort());
 		}
 		
-		VSensorLoader vsloader = VSensorLoader.getInstance ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
-		File vsDir=new File(DEFAULT_VIRTUAL_SENSOR_DIRECTORY);
+		VSensorLoader vsloader = VSensorLoader.getInstance ( virtualSensorDirectory );
+		File vsDir=new File(virtualSensorDirectory);
 		for (File f:vsDir.listFiles()){
 			if (f.getName().endsWith(".xml")){
 				VsConf vs= VsConf.load(f.getPath());
@@ -267,8 +270,16 @@ public final class Main {
 			return singleton;
 	}
 
-	public static void main ( String [ ]  args)  {
-		Main.gsnControllerPort = Integer.parseInt(args[0]) ;
+	public static void main(String[] args)  {
+		if (args.length > 0) {
+		    Main.gsnControllerPort = Integer.parseInt(args[0]);
+		}
+		if (args.length > 1) {
+			Main.gsnConfFolder = args[1];
+		}
+		if (args.length > 2) {
+			Main.virtualSensorDirectory = args[2];
+		}
 		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
 		try {
 			Main.getInstance();
@@ -283,16 +294,16 @@ public final class Main {
 	}
 
 	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
-		ValidityTools.checkAccessibilityOfFiles (  WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , DEFAULT_GSN_CONF_FOLDER + "gsn.xml");
-		ValidityTools.checkAccessibilityOfDirs ( DEFAULT_VIRTUAL_SENSOR_DIRECTORY );
+		ValidityTools.checkAccessibilityOfFiles (  WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/gsn.xml");
+		ValidityTools.checkAccessibilityOfDirs ( virtualSensorDirectory );
 		ContainerConfig toReturn = null;
 		try {
-			toReturn = loadContainerConfig (DEFAULT_GSN_CONF_FOLDER + "gsn.xml" );
+			toReturn = loadContainerConfig (gsnConfFolder + "/gsn.xml" );
 			logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			logger.info ( "Wrappers initialization ..." );
 		} catch ( FileNotFoundException e ) {
-			logger.error ("The the configuration file : " + DEFAULT_GSN_CONF_FOLDER + "gsn.xml doesn't exist. "+ e.getMessage());
+			logger.error ("The the configuration file : " + gsnConfFolder + "/gsn.xml doesn't exist. "+ e.getMessage());
 			logger.info ( "Check the path of the configuration file and try again." );
 			System.exit ( 1 );
 		} catch ( ClassNotFoundException e ) {
@@ -346,7 +357,7 @@ public final class Main {
 	public static ContainerConfig getContainerConfig() {
 		if (singleton == null)
 			try {
-				return loadContainerConfig(Main.DEFAULT_GSN_CONF_FOLDER + "gsn.xml");
+				return loadContainerConfig(Main.gsnConfFolder + "/gsn.xml");
 			} catch (Exception e) {
 				return null;
 			}
@@ -389,17 +400,17 @@ public final class Main {
 
 		WebAppContext webAppContext = new WebAppContext();
 		webAppContext.setContextPath("/");
-		webAppContext.setResourceBase(DEFAULT_WEB_APP_PATH);
+		webAppContext.setResourceBase(webAppPath);
 		
 		handlers.addHandler(webAppContext);
 		server.setHandler(handlers);
 
 		Properties usernames = new Properties();
-		usernames.load(new FileReader(DEFAULT_GSN_CONF_FOLDER + "realm.properties"));
+		usernames.load(new FileReader(gsnConfFolder + "/realm.properties"));
 		if (!usernames.isEmpty()){
 			HashLoginService loginService = new HashLoginService();
 			loginService.setName("GSNRealm");
-			loginService.setConfig(DEFAULT_GSN_CONF_FOLDER + "realm.properties");
+			loginService.setConfig(gsnConfFolder + "/realm.properties");
 			loginService.setRefreshInterval(10000); //re-reads the file every 10 seconds.
 
 			Constraint constraint = new Constraint();

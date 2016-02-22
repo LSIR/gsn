@@ -29,6 +29,7 @@
 
 package gsn.beans;
 
+import gsn.Main;
 import gsn.config.GsnConf;
 import gsn.utils.KeyValueImp;
 
@@ -62,7 +63,7 @@ public class ContainerConfig {
 	public static final String            DEFAULT_WEB_EMAIL                = "Email not specified.";
     private static final String           DEFAULT_SSL_KEYSTORE_PWD         = "changeit";
     private static final String           DEFAULT_SSL_KEY_PWD              = "changeit";
-    private static final String           DEFAULT_SSL_KEYSTORE             = "conf/servertestkeystore";
+    private static final String           DEFAULT_SSL_KEYSTORE             = Main.gsnConfFolder + "/servertestkeystore";
     
 	public static final String            FIELD_NAME_gsnPortNo             = "containerPort";
 	public static final String            FIELD_NAME_zmqEnabled            = "zmqEnabled";

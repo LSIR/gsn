@@ -33,7 +33,7 @@ public class DataSource extends AppModel implements Permission {
 	@ManyToMany(mappedBy = "dataSources")
 	public List<User> users;
 	
-	public static final play.db.ebean.Model.Finder<Long, DataSource> find = new play.db.ebean.Model.Finder<Long, DataSource>(
+	public static play.db.ebean.Model.Finder<Long, DataSource> find = new play.db.ebean.Model.Finder<Long, DataSource>(
 			Long.class, DataSource.class);
 
 	public String getValue() {

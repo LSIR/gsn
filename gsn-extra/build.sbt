@@ -1,25 +1,12 @@
 import com.typesafe.sbt.SbtNativePackager._
-import NativePackagerKeys._
 
 name := "gsn-extra"
-
-organization := "gsn"
-
-version := "2.0.0"
 
 packageArchetype.java_application
 
 packAutoSettings
 
-Revolver.settings
-
-scalaVersion := "2.11.2"
-
-crossPaths := false
-
 libraryDependencies ++= Seq(
-  "gsn" % "gsn-tools" % "0.0.4-SNAPSHOT" exclude("org.slf4j" ,"slf4j-nop") ,
-  "gsn" % "gsn-services" % "0.0.3-SNAPSHOT" exclude("org.slf4j" ,"slf4j-nop") ,
   "com.typesafe" % "config" % "1.2.1",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",
   "com.h2database" % "h2" % "1.4.181",
@@ -70,13 +57,6 @@ libraryDependencies ++= Seq(
   "org.httpunit" % "httpunit" % "1.7.2" % "test" exclude("xerces","xercesImpl") exclude("xerces","xmlParserAPIs") exclude("javax.servlet","servlet-api")
 )
 
-resolvers ++= Seq(
-  DefaultMavenRepository,
-  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "LSIR" at "http://osper.epfl.ch:8081/artifactory/gsn-release",
-  "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local" 
-)
-
 unmanagedJars in Compile <++= baseDirectory map { base =>
     val libs = base / "lib"
     val option = libs / "optional"
@@ -84,28 +64,6 @@ unmanagedJars in Compile <++= baseDirectory map { base =>
     (dirs ** "*.jar").classpath
 }
 
-NativePackagerKeys.packageSummary in Linux := "GSN Server - extra"
-
-NativePackagerKeys.packageSummary in Windows := "GSN Server - extra"
-
-NativePackagerKeys.packageDescription := "Global Sensor Networks: extra"
-
-NativePackagerKeys.maintainer in Windows := "LSIR EPFL"
-
-NativePackagerKeys.maintainer in Debian := "LSIR EPFL"
-
 scalacOptions += "-deprecation"
 
-EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
-
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
-
-parallelExecution in Test := false
-
-publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release")
-
-credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-
-publishMavenStyle := true
-
-publishArtifact in (Compile) := false

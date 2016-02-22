@@ -6,7 +6,7 @@ import com.typesafe.config.ConfigFactory
 
 case class GsnConf(name:String,author:String,description:String,
     email:String,port:Int,timeFormat:String, 
-    zmqConf:ZmqConf,ssl:SslConf,
+    zmqConf:ZmqConf,sslConf:SslConf,
     storageConf:StorageConf,slidingConf:Option[StorageConf])
     
 object GsnConf extends Conf {
