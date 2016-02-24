@@ -121,6 +121,12 @@ public abstract class AbstractWrapper {
                     if (!mBluetoothAdapter.isEnabled()) {
                         ToastUtils.showToastInUiThread(context, "To connect to external sensors, please enable Bluetooth.", Toast.LENGTH_LONG);
                     } else {
+						if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+							wrapperListTemp.put("serial.bluetoothle.openswiss", wrapperList.getProperty("serial.bluetoothle.openswiss"));
+
+						}else{
+							ToastUtils.showToastInUiThread(context, "Bluetooth Low Energy not available.", Toast.LENGTH_LONG);
+						}
                         wrapperListTemp.put("serial.bluetooth.openswiss", wrapperList.getProperty("serial.bluetooth.openswiss"));
                     }
                 }
