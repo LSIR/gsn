@@ -113,6 +113,7 @@ public class SerialBLEWrapper extends AbstractWrapper {
                                 gatt.discoverServices());
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                         Log.i(TAG, "Disconnected from GATT server.");
+                        gatt.close();
                     }
                 }
 
@@ -120,7 +121,7 @@ public class SerialBLEWrapper extends AbstractWrapper {
                 public void onServicesDiscovered(BluetoothGatt gatt, int status){
                    if (status == BluetoothGatt.GATT_SUCCESS){
 
-                       displayGattServices(gatt.getServices());
+                      // displayGattServices(gatt.getServices());
                        BluetoothGattService proprietary = gatt.getService(SERVICE_ISSC_PROPRIETARY);
                        if (proprietary != null) {
                            BluetoothGattCharacteristic mTransTx = proprietary.getCharacteristic(CHR_ISSC_TRANS_TX);
@@ -130,9 +131,12 @@ public class SerialBLEWrapper extends AbstractWrapper {
                            dsc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                            boolean success = gatt.writeDescriptor(dsc);
                            Log.d(TAG, "writing enable notif descriptor:" + success);
+                       } else {
+                           gatt.close();
                        }
                    } else {
                        Log.i(TAG, "Unable to discover services.");
+                       gatt.close();
                    }
                 }
 
@@ -168,8 +172,10 @@ public class SerialBLEWrapper extends AbstractWrapper {
                     if (status == BluetoothGatt.GATT_SUCCESS) {
                         byte[] value = dsc.getValue();
                         Log.d(TAG, "Write descriptor success :" +value.length);
-                        mTransRx.setValue("Hello world!".getBytes());
+                        mTransRx.setValue("application\n".getBytes());
                         gatt.writeCharacteristic(mTransRx);
+                        try { Thread.sleep(5*1000); } catch (InterruptedException e) {}
+                        gatt.close();
                     }
                 }
             };
@@ -187,14 +193,11 @@ public class SerialBLEWrapper extends AbstractWrapper {
                     mBluetoothAdapter.cancelDiscovery();
                     mLeDeviceListAdapter = new ArrayList<>();
                     mBluetoothAdapter.startLeScan(mLeScanCallback);
-                    try { Thread.sleep(3*1000); } catch (InterruptedException e) {}
+                    try { Thread.sleep(5*1000); } catch (InterruptedException e) {}
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
                     for (BluetoothDevice device : mLeDeviceListAdapter) {
                         BluetoothGatt mBluetoothGatt = device.connectGatt(StaticData.globalContext, false, mGattCallback);
-                        try { Thread.sleep(15*1000); } catch (InterruptedException e) {}
-
-                        mBluetoothGatt.close();
                     }
                 }
             }
