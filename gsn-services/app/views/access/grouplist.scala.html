@@ -93,9 +93,11 @@
     }
     function del(t){
     	$('#idd').val($(t).parent().data('id'));
-    	$('#actiond').val('edit');
+    	$('#actiond').val('del');
+    	$('#name').val($(t).parent().data('name'));
     	$('form').submit();
     }
+    $('select').select2();
     </script>
 
 }

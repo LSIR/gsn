@@ -84,5 +84,6 @@ function check(item){
 		$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + i.data('id') + '&id=a').done($('#row_'+i.data('id')).toggleClass('success',false))
 	}
 }
+$('select').select2();
 </script>
 }
