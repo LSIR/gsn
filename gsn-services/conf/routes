@@ -35,16 +35,19 @@ GET     /login/password/forgot     controllers.gsn.auth.Signup.forgotPassword(em
 POST    /login/password/forgot     controllers.gsn.auth.Signup.doForgotPassword
 
 #Permissions
-GET     /access/groups              controllers.gsn.auth.PermissionsController.groups
-POST    /access/groups/edit         controllers.gsn.auth.PermissionsController.addgroup
-POST    /access/groups/addto        controllers.gsn.auth.PermissionsController.addtogroup
-POST    /access/groups/removefrom   controllers.gsn.auth.PermissionsController.removefromgroup
-GET     /access/vs                  controllers.gsn.auth.PermissionsController.vs
-POST    /access/vs/addto            controllers.gsn.auth.PermissionsController.addtovs
-POST    /access/vs/removefrom       controllers.gsn.auth.PermissionsController.removefromvs
-GET     /access/users               controllers.gsn.auth.PermissionsController.users
-POST    /access/users/addrole       controllers.gsn.auth.PermissionsController.addrole
-POST    /access/users/removerole    controllers.gsn.auth.PermissionsController.removerole
+GET     /access/groups              controllers.gsn.auth.PermissionsController.groups(page:Int=1)
+POST    /access/groups/:page/edit         controllers.gsn.auth.PermissionsController.addgroup(page:Int)
+POST    /access/groups/:page/addto        controllers.gsn.auth.PermissionsController.addtogroup(page:Int)
+POST    /access/groups/:page/removefrom   controllers.gsn.auth.PermissionsController.removefromgroup(page:Int)
+GET     /access/groups/:page        controllers.gsn.auth.PermissionsController.groups(page:Int)
+GET     /access/vs                  controllers.gsn.auth.PermissionsController.vs(page:Int=1)
+POST    /access/vs/:page/addto            controllers.gsn.auth.PermissionsController.addtovs(page:Int)
+POST    /access/vs/:page/removefrom       controllers.gsn.auth.PermissionsController.removefromvs(page:Int)
+GET     /access/vs/:page            controllers.gsn.auth.PermissionsController.vs(page:Int)
+GET     /access/users               controllers.gsn.auth.PermissionsController.users(page:Int=1)
+POST    /access/users/:page/addrole       controllers.gsn.auth.PermissionsController.addrole(page:Int)
+POST    /access/users/:page/removerole    controllers.gsn.auth.PermissionsController.removerole(page:Int)
+GET     /access/users/:page         controllers.gsn.auth.PermissionsController.users(page:Int)
 
 #API
 GET  /assets/*file        	controllers.Assets.at(path="/public", file)

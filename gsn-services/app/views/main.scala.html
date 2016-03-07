@@ -57,9 +57,9 @@
                         
                         @subjectPresentOr() {
                         	@restrict(la(as("admin"))) {
-                        		<li class="@("active".when(nav == "userlist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.users()">@Messages("gsn.access.users")</a></li>
-                        		<li class="@("active".when(nav == "grouplist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.groups()">@Messages("gsn.access.groups")</a></li>
-                        	 	<li class="@("active".when(nav == "vslist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.vs()">@Messages("gsn.access.vs.title")</a></li>
+                        		<li class="@("active".when(nav == "userlist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.users(1)">@Messages("gsn.access.users")</a></li>
+                        		<li class="@("active".when(nav == "grouplist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.groups(1)">@Messages("gsn.access.groups")</a></li>
+                        	 	<li class="@("active".when(nav == "vslist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.vs(1)">@Messages("gsn.access.vs.title")</a></li>
                         	 	<li class="@("active".when(nav == "clientlist"))"><a href="@controllers.gsn.routes.OAuth2Controller.listClients()">@Messages("gsn.oauth2.clients")</a></li>
                             }
                     </ul>

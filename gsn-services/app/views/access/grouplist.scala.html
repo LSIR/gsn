@@ -1,6 +1,6 @@
 @import scala.collection.mutable.Buffer 
 @import controllers.gsn.auth.GSNGroup 
-@(groups: Buffer[models.gsn.auth.Group], users: Buffer[models.gsn.auth.User], groupForm: Form[GSNGroup]) 
+@(groups: Buffer[models.gsn.auth.Group], users: Buffer[models.gsn.auth.User], groupForm: Form[GSNGroup], count:Int, page:Int, pageLength:Int) 
 @import helper._ 
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
 
@@ -38,7 +38,7 @@
 							@for(u <- g.users) {
 							<li>@u.firstName @u.lastName (@u.email)
 								<button type="button" class="btn btn-danger btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromgroup?user_id=' + @u.id + '&group_id=' + @g.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups');">@Messages("gsn.access.users.remove")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromgroup(page)?user_id=' + @u.id + '&group_id=' + @g.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups(page)');">@Messages("gsn.access.users.remove")</button>
 							</li> }
 						</ul> 
 						@if(g.users.size < users.size){ 
@@ -49,7 +49,7 @@
 						}
 					</select>
 						<button type="button" class="btn btn-primary btn-xs"
-							onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtogroup?group_id=' + @g.id + '&user_id=' + $('#u_@g.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups');">@Messages("gsn.access.groups.add")</button>
+							onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtogroup(page)?group_id=' + @g.id + '&user_id=' + $('#u_@g.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.groups(page)');">@Messages("gsn.access.groups.add")</button>
 						}
 					</td>
 					<td data-id="@g.id" data-name="@g.name"
@@ -63,10 +63,11 @@
 				}
 			</tbody>
 		</table>
+		@paginate(page, pageLength, count, controllers.gsn.auth.routes.PermissionsController.groups(_))
 	</div>
 	<div class="col-xs-12 col-md-3">
 		<div class="highlight">
-			@helper.form(controllers.gsn.auth.routes.PermissionsController.addgroup, 'class -> "form-horizontal", 'role -> "form") {
+			@helper.form(controllers.gsn.auth.routes.PermissionsController.addgroup(page), 'class -> "form-horizontal", 'role -> "form") {
 
 			@if(groupForm.hasGlobalErrors) {
 			<p class="alert alert-danger">@groupForm.globalError.get.message</p>
