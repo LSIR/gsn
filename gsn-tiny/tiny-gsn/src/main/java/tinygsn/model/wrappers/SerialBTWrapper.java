@@ -112,9 +112,9 @@ public class SerialBTWrapper extends AbstractWrapper {
                                         }
                                     }
                                     if (socket.isConnected()) {
-                                        sensor = new OpenSWISSensor(socket.getInputStream(), socket.getOutputStream());
-                                        sensor.initialize();
-                                        se = sensor.getMeasurements();
+                                      //  sensor = new OpenSWISSensor(socket.getInputStream(), socket.getOutputStream());
+                                      //  sensor.initialize();
+                                      //  se = sensor.getMeasurements();
                                         socket.close();
                                     }
                                 } catch (IOException e){

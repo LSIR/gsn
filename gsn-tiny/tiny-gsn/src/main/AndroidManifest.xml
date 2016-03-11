@@ -65,9 +65,10 @@
         <service android:name="tinygsn.model.wrappers.AndroidRotationVectorWrapper$RotationService"/>
         <service android:name="tinygsn.model.wrappers.USBplugO3Wrapper$USBplugService"/>
         <service android:name="tinygsn.model.wrappers.SerialBTWrapper$SerialBTService"/>
-        <service android:name="tinygsn.model.wrappers.SerialBLEWrapper$SerialBLEService"/>
+        <service android:name="com.nordicsemi.nrfUARTv2.SerialBLEWrapper$SerialBLEService"/>
         <service android:name="tinygsn.model.wrappers.WifiWrapper$WifiService"/>
         <service android:name="tinygsn.model.wrappers.LocalWrapper$LocalService"/>
+        <service android:enabled="true" android:name="com.nordicsemi.nrfUARTv2.UartService" />
 
 
         <activity
