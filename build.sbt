@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "gsn",
-  version := "2.0.0",
+  version := "2.0.0-SNAPSHOT",
   scalaVersion := "2.11.2",
   resolvers ++= Seq(
     DefaultMavenRepository,

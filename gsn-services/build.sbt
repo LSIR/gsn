@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
   "com.google.inject" % "guice" % "3.0",
   javaCore,
   "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
-  "com.typesafe.akka" % "akka-zeromq_2.11" % "2.3.14",
+  "org.zeromq" % "jeromq" % "0.3.5",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
   "gsn" % "gsn-tools" % "1.0.0-SNAPSHOT",

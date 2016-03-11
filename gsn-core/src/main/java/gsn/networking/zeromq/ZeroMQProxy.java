@@ -65,8 +65,8 @@ public class ZeroMQProxy extends Thread implements Runnable {
        	            	byte[] _topic = new byte[msg.length-1];
        	            	System.arraycopy(msg, 1, _topic, 0, _topic.length);
        	            	final String topic = new String(_topic);
-       	            	if (topic.startsWith("?")){  //subscriptions can be either <vsname> or ?<vsname>?<fromtime>
-       	            		String[] r = topic.split("\\?");
+       	            	if (topic.startsWith("?")){  //subscriptions can be either <vsname>: or ?<vsname>?<fromtime>:
+       	            		String[] r = topic.split("(\\?|:)");
 	       	            	if (msg[0] == 0 && distributers.containsKey(topic)) {
 	       	            		logger.warn("removing unused publisher " + topic);
 	         	        	    DataDistributer.getInstance(ZeroMQDelivery.class).removeListener(distributers.get(topic));
@@ -76,47 +76,50 @@ public class ZeroMQProxy extends Thread implements Runnable {
 	       	            		logger.warn("new subscription " + topic);
 								long r_time = Long.parseLong(r[2]);
 								ZeroMQDelivery d = new ZeroMQDelivery(topic);
-								final DefaultDistributionRequest distributionReq = DefaultDistributionRequest.create(d, Mappings.getVSensorConfig(r[1]), "select * from "+r[1], r_time);
-								distributers.put(topic, distributionReq);
-								logger.debug("ZMQ request received: "+distributionReq.toString());
-								DataDistributer.getInstance(d.getClass()).addListener(distributionReq);
-								Timer t = new Timer(topic);
-								t.schedule(new TimerTask() {
-									@Override
-									public void run() {
-										if (distributers.containsKey(topic)){
-											logger.warn("timeout unused publisher " + topic);
-				         	        	    DataDistributer.getInstance(ZeroMQDelivery.class).removeListener(distributionReq);
-				         	        	    distributers.remove(topic);
-				         	        	    timers.remove(topic);
-										}
-									}
-								}, 60*1000);
-								timers.put(topic, t); 
-								} else if (msg[0] == 1) {
-									Timer t = timers.get(topic);
-									t.cancel();
+								try {
+									final DefaultDistributionRequest  distributionReq = DefaultDistributionRequest.create(d, Mappings.getVSensorConfig(r[1]), "select * from "+r[1], r_time);
+									distributers.put(topic, distributionReq);
+									logger.warn("ZMQ request received: "+distributionReq.toString());
+									DataDistributer.getInstance(d.getClass()).addListener(distributionReq);
+									Timer t = new Timer(topic);
 									t.schedule(new TimerTask() {
 										@Override
 										public void run() {
 											if (distributers.containsKey(topic)){
 												logger.warn("timeout unused publisher " + topic);
-					         	        	    DataDistributer.getInstance(ZeroMQDelivery.class).removeListener(distributers.get(topic));
+					         	        	    DataDistributer.getInstance(ZeroMQDelivery.class).removeListener(distributionReq);
 					         	        	    distributers.remove(topic);
 					         	        	    timers.remove(topic);
 											}
 										}
-									}, 60*1000);
-									
+									}, 70*1000);
+									timers.put(topic, t); 
+								} catch (Exception e) {
+									logger.error("Unable to register new publisher for subscription",e);
 								}
+							} else if (msg[0] == 1) {
+								Timer t = timers.get(topic);
+								logger.warn("keepalive " + topic);
+								t.cancel();
+								t = new Timer(topic);
+								t.schedule(new TimerTask() {
+									@Override
+									public void run() {
+										if (distributers.containsKey(topic)){
+											logger.warn("timeout unused publisher " + topic);
+					         	       	    DataDistributer.getInstance(ZeroMQDelivery.class).removeListener(distributers.get(topic));
+					         	       	    distributers.remove(topic);
+					         	       	    timers.remove(topic);
+										}
+									}
+								}, 70*1000);
+								timers.put(topic, t);
 	       	            	}  
        	            	}
        	            }
        	            f.destroy();
-	        	   
-	        	   }
-	    	}
-
+	        	 }   
+	         }
 	    });
 	    
 	    Thread dataProxy = new Thread(new Runnable(){

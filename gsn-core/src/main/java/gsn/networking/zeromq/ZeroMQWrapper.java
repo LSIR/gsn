@@ -16,8 +16,8 @@ import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.http.delivery.StreamElement4Rest;
 import gsn.wrappers.AbstractWrapper;
+import gsn.http.delivery.StreamElement4Rest;
 
 public class ZeroMQWrapper extends AbstractWrapper {
 	
@@ -26,6 +26,8 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	private String remoteContactPoint_DATA;
 	private String remoteContactPoint_META;
 	private String vsensor;
+	private boolean isLive = true;
+	private long startTime = -1;
 	private Kryo kryo = new Kryo();
 	private boolean isLocal = false;
 	ZMQ.Socket requester = null;
@@ -33,19 +35,16 @@ public class ZeroMQWrapper extends AbstractWrapper {
 	@Override
 	public DataField[] getOutputFormat() {
 		if (structure == null){
-			if (requester.send(vsensor)){
-			    byte[] rec = requester.recv();
-			    if (rec != null){
-			        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
-			        if (structure != null)
-			            requester.close();
-			        return structure;
-			    }
-			}
+				if (requester.send(vsensor)){
+				    byte[] rec = requester.recv();
+				    if (rec != null){
+				        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
+				        if (structure != null)
+				            requester.close();
+				        return structure;
+				    }
+				}
 		}
-		//if user defined structure is used... maybe
-		//DataField[] s = getActiveAddressBean().getOutputStructure();
-    	//if (s == null){throw new RuntimeException("ZeroMQ wrapper has an undefined output structure.");}
     	return structure;
 	}
 
@@ -63,6 +62,9 @@ public class ZeroMQWrapper extends AbstractWrapper {
 		vsensor = addressBean.getPredicateValue ( "vsensor" ).toLowerCase();
 		if ( address == null || address.trim().length() == 0 ) 
 			throw new RuntimeException( "The >address< parameter is missing from the ZeroMQWrapper wrapper." );
+		String time = addressBean.getPredicateValueWithDefault("starting","-1");
+		startTime = Long.parseLong(time);
+		if (startTime >= 0) isLive = false;  
 		
 		try {
             isLocal = new URI(address).getScheme().equals("inproc");
@@ -73,6 +75,9 @@ public class ZeroMQWrapper extends AbstractWrapper {
 			remoteContactPoint_DATA = address.trim() + ":" + dport;
 			remoteContactPoint_META = address.trim() + ":" + mport;
 		}else{
+			if(!isLive){
+				throw new IllegalArgumentException("The \"inproc\" communication can only be used for live streams.");
+			}
 			if(!Main.getContainerConfig().isZMQEnabled()){
 				throw new IllegalArgumentException("The \"inproc\" communication can only be used if the current GSN server has zeromq enabled. Please add <zmq-enable>true</zmq-enable> to conf/gsn.xml.");
 			}
@@ -85,6 +90,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 		requester.setReceiveTimeOut(1000);
 		requester.setSendTimeOut(1000);
 		requester.connect((remoteContactPoint_META).trim());
+		
 		if (requester.send(vsensor)){
 		    byte[] rec = requester.recv();
 		    if (rec != null){
@@ -99,7 +105,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 
 	@Override
 	public void dispose() {
-
+		
 	}
 
 	@Override
@@ -113,36 +119,56 @@ public class ZeroMQWrapper extends AbstractWrapper {
 		ZMQ.Socket subscriber = context.createSocket(ZMQ.SUB);
 		
         boolean connected = subscriber.base().connect(remoteContactPoint_DATA);
-		subscriber.setReceiveTimeOut(3000);
+		subscriber.setReceiveTimeOut(1000);
 		subscriber.setRcvHWM(0); // no limit
-
-		subscriber.subscribe((vsensor+":").getBytes());
-		//System.out.println("connected to Queue: "+ remoteContactPoint + " and subscribe to " + vsensor);
-
+		System.out.println("subscribed");
+		if (isLive) {
+			subscriber.subscribe((vsensor+":").getBytes());
+		} else {
+			subscriber.subscribe(("?"+vsensor+"?"+startTime+":").getBytes());
+		}
+		
+		long lastKeepAlive = 0;
+		
 		while (isActive()) {
 			try{
 				byte[] rec = subscriber.recv();
 				if (rec != null){
-					//System.out.println("read from wrapper");
+					System.out.println("read from wrapper");
 					ByteArrayInputStream bais = new ByteArrayInputStream(rec);
-					bais.skip(vsensor.getBytes().length + 2);
-					//StreamElement se = ((StreamElement4Rest)(StreamElement4Rest.getXstream().fromXML(bais))).toStreamElement();
+					if(isLive){
+					    bais.skip(vsensor.getBytes().length + 2);
+					}else{
+						bais.skip(("?"+vsensor+"?"+startTime+":").getBytes().length + 1);
+					}
 					StreamElement se = kryo.readObjectOrNull(new Input(bais),StreamElement.class);
-			        //maybe queuing would be better here...
 			        boolean status = postStreamElement(se);
 				}else{
 					if (isLocal && !connected){
 						subscriber.disconnect(remoteContactPoint_DATA);
 						connected = subscriber.base().connect(remoteContactPoint_DATA);
 					}
-					//System.out.println("timeout on wrapper, subscribing to "+ vsensor);
-					subscriber.subscribe((vsensor+":").getBytes());
+					if (isLive) {
+						System.out.println("subscribed");
+						subscriber.subscribe((vsensor+":").getBytes());
+					}
+				}
+				if (System.currentTimeMillis() - lastKeepAlive > 30000){
+					if (!isLive) {
+						System.out.println("subscribed");
+						subscriber.subscribe(("?"+vsensor+"?"+startTime+":").getBytes());
+						lastKeepAlive = System.currentTimeMillis();
+					}
 				}
 			}catch (Exception e)
 			{
-				logger.error(e.getMessage());
+				logger.error("ZMQ wrapper error: ",e);
 			}
 		}
+		subscriber.unsubscribe((vsensor+":").getBytes());
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {}
 		subscriber.close();
 	}
 	

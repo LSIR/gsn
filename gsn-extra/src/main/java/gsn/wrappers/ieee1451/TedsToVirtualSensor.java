@@ -55,7 +55,7 @@ public class TedsToVirtualSensor {
    /*
     * The directory in which the generated Virtual Sensor file should be stored.
     */
-   public static final String TARGET_VS_DIR = ( Main.DEFAULT_VIRTUAL_SENSOR_DIRECTORY + "/" );
+   public static final String TARGET_VS_DIR = ( Main.DEFAULT_VIRTUAL_SENSOR_FOLDER + "/" );
    
    /*
     * This function generates the virtual sensor file from the TEDS input.

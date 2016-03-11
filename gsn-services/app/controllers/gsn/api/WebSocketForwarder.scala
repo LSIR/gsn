@@ -37,10 +37,10 @@ object WebSocketForwarder extends Controller{
         val out = Enumerator.repeat {
         
             Try {
-                var rec = subscriber.recv(0)
+                var rec = subscriber.recv()
     				    while (rec == null){
     				        subscriber.subscribe(sensorid.getBytes)
-    				        rec = subscriber.recv(0)
+    				        rec = subscriber.recv()
     				    }
     					  val bais = new ByteArrayInputStream(rec)
     					  bais.skip(sensorid.length + 1)

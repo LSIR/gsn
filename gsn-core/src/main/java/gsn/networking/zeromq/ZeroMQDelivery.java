@@ -29,6 +29,9 @@ public class ZeroMQDelivery implements DeliverySystem{
 	public static transient Logger logger = LoggerFactory.getLogger ( ZeroMQDelivery.class );
 	
 	public ZeroMQDelivery(String name){
+		if (name.endsWith(":")){
+			name = name.substring(0, name.length()-1);
+		}
         this.name = name;
 		context = Main.getZmqContext();
 		// Socket to talk to clients
@@ -51,6 +54,7 @@ public class ZeroMQDelivery implements DeliverySystem{
 		try {
 			ByteArrayOutputStream bais = new ByteArrayOutputStream();
             bais.write((name + ": ").getBytes());
+            System.out.println("sending to " + name);
             Output o = new Output(bais);
             kryo.writeObjectOrNull(o,se,StreamElement.class);
             o.close();

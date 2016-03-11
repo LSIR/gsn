@@ -38,7 +38,7 @@ libraryDependencies ++= Seq(
   "net.rforge" % "Rserve" % "0.6-8.1",
   "org.rxtx" % "rxtx" % "2.1.7",
   "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
-  "org.zeromq" % "jeromq" % "0.3.0",
+  "org.zeromq" % "jeromq" % "0.3.5",
   "junit" % "junit" % "4.11" %  "test",
   "org.easymock" % "easymockclassextension" % "3.2" % "test",
   "org.httpunit" % "httpunit" % "1.7.2" % "test" exclude("xerces","xercesImpl") exclude("xerces","xmlParserAPIs") exclude("javax.servlet","servlet-api")
