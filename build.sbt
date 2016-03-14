@@ -42,3 +42,5 @@ lazy val services = (project in file("gsn-services")).
 
 lazy val tools = (project in file("gsn-tools")).
   settings(commonSettings: _*)
+
+lazy val webui = (project in file("gsn-webui"))
