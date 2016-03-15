@@ -44,3 +44,13 @@ lazy val tools = (project in file("gsn-tools")).
   settings(commonSettings: _*)
 
 lazy val webui = (project in file("gsn-webui"))
+
+
+lazy val startAll = taskKey[Unit]("Start all the GSN modules")
+
+
+//startAll := {
+  //(webui/startDjango in webui).value
+//  (re-start in core).value
+//  (run in services).value
+//}

@@ -4,3 +4,4 @@ requests
 requests-cache
 django-jsonfield
 django-all-access
+gunicorn
