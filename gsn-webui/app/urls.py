@@ -16,5 +16,5 @@ Including another URLconf
 from django.conf.urls import include, url
 
 urlpatterns = [
-    url(r'^gsn/', include('gsn.urls')),
+    url(r'^', include('gsn.urls')),
 ]

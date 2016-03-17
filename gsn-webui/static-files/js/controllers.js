@@ -12,7 +12,8 @@ var gsnControllers = angular.module('gsnControllers',
         'highcharts-ng',
         'LocalStorageModule',
         'ui.bootstrap',
-        'ui.bootstrap.datetimepicker'
+        'ui.bootstrap.datetimepicker',
+        'ui.dateTimeInput'
     ]
 );
 
@@ -407,8 +408,6 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
                     minuteStep: 1
                 },
                 onTimeSet: function () {
-                    console.log('ayy');
-
                     if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
                         $scope.date.to.date = $scope.date.from.date
                     }
@@ -424,7 +423,6 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
                 onTimeSet: function () {
                     if (new Date($scope.date.from.date) > new Date($scope.date.to.date)) {
                         $scope.date.from.date = $scope.date.to.date;
-                        console.log('lmao');
                     }
 
                 }
@@ -440,7 +438,7 @@ gsnControllers.controller('SensorDetailsCtrl', ['$scope', '$http', '$routeParams
         $scope.load = function () {
 
 
-            $http.get('sensors/' + $routeParams.sensorName + '/' + $scope.date.from.date + '/' + $scope.date.to.date + '/').success(function (data) {
+            $http.get('sensors/' + $routeParams.sensorName + '/' + new Date($scope.date.from.date).toJSON().slice(0, 19) + '/' + new Date($scope.date.to.date).toJSON().slice(0, 19) + '/').success(function (data) {
                 $scope.details = data.properties ? data : undefined;
 
                 $scope.loading = false;

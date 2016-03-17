@@ -46,6 +46,8 @@
     <script src="{% static 'angular-bootstrap-datetimepicker/src/js/datetimepicker.js' %}"></script>
     <script src="{% static 'angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js' %}"></script>
 
+   <script src="{% static 'angular-date-time-input/src/dateTimeInput.js' %}"></script>
+
     <!-- ui-bootstrap -->
     <script src="{% static 'angular-bootstrap/ui-bootstrap-tpls.js' %}"></script> 
 
@@ -116,24 +118,9 @@
             <ul class="nav navbar-top-links navbar-right" style="height: 50px; display: table ">
 
                 {% if logged_out %}
-                    <li class="dropdown" style="display: table-cell;vertical-align: middle;">
-
-                        <form role="form" action="/gsn/oauth_code/" method="post" class="form">
-                            {% csrf_token %}
-
-                            <ul>
-
-
-                                <li>
-                                    <button type="submit" class="btn btn-default">Log in</button>
-                                </li>
-                            </ul>
-
-                        </form>
-
+                    <li style="display: table-cell;vertical-align: middle;">
+                        <a href="{% url 'oauth_logging_redirect' %}" class="btn btn-default">Log in</a>
                     </li>
-
-
                 {% endif %}
 
                 {% if logged_in %}
@@ -146,7 +133,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-user">
                             <li>
-                                <a href="/gsn/logout/">
+                                <a href="{% url 'logout' %}">
                                     <i class="fa fa-sign-out fa-fw"></i>
                                     Log Out
                                 </a>
@@ -236,7 +223,7 @@
 <script type="text/javascript">
     
     gsnApp.config(function(paginationTemplateProvider) {
-        paginationTemplateProvider.setPath('{% static 'dirPagination/dirPagination.tpl.html' %}');
+        paginationTemplateProvider.setPath("{% static 'dirPagination/dirPagination.tpl.html' %}");
     });
     
 </script>

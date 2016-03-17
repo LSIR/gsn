@@ -12,8 +12,7 @@ from django.template import loader
 from django.template.context_processors import csrf
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from gsn.forms import LoginForm
-from django.contrib.auth.models import User
+from gsn.models import GSNUser
 
 # Server adress and services
 
@@ -49,12 +48,8 @@ def index(request):
             'logged_out': 'true',
         }
 
-    context.update(csrf(request))
-    context.update(dict(login_form=LoginForm()))
-
     template = loader.get_template('gsn/index.html')
     response = HttpResponse(template.render(context))
-    response.set_cookie('test_cookie', 'test_value')
     return response
 
 
@@ -64,14 +59,14 @@ def sensors(request):
     """
     if request.user.is_authenticated():
         return JsonResponse(
-            json.loads(requests.get(oauth_sensors_url, headers=create_headers(request.user.gsnuser)).text))
+            json.loads(requests.get(oauth_sensors_url, headers=create_headers(request.user)).text))
     else:
         return JsonResponse(json.loads(requests.get(oauth_sensors_url).text))
 
 
 @login_required
 def dashboard(request, sensor_name):
-    if len(request.user.gsnuser.favorites) < 1:
+    if len(request.user.favorites) < 1:
         return HttpResponseNotFound()
 
     data = {}
@@ -80,9 +75,9 @@ def dashboard(request, sensor_name):
         'latestValues': True,
     }
 
-    if sensor_name in request.user.gsnuser.favorites:
+    if sensor_name in request.user.favorites:
         r = requests.get(oauth_sensors_url + '/' + sensor_name, params=payload,
-                         headers=create_headers(request.user.gsnuser))
+                         headers=create_headers(request.user))
         sensor_data = json.loads(r.text)
 
         data = {
@@ -102,7 +97,7 @@ def dashboard(request, sensor_name):
 def favorites_list(request):
     list = []
 
-    for key, value in request.user.gsnuser.favorites.items():
+    for key, value in request.user.favorites.items():
         list.append(key)
 
     if len(list) > 0:
@@ -118,16 +113,16 @@ def favorites_manage(request):
     add = request.GET.get('add')
 
     if add is not None:
-        request.user.gsnuser.favorites[add] = ''
-        request.user.gsnuser.save()
+        request.user.favorites[add] = ''
+        request.user.save()
         return HttpResponse('added')
 
     remove = request.GET.get('remove')
 
     if remove is not None:
         try:
-            request.user.gsnuser.favorites.pop(remove)
-            request.user.gsnuser.save()
+            request.user.favorites.pop(remove)
+            request.user.save()
         except KeyError:
             pass
         return HttpResponse('removed')
@@ -145,12 +140,12 @@ def sensor_detail(request, sensor_name, from_date, to_date):
 
     if request.user.is_authenticated():
 
-        headers = create_headers(request.user.gsnuser)
+        headers = create_headers(request.user)
 
         user_data = {
             'logged': True,
             'has_access': True,
-            'favorite': sensor_name in request.user.gsnuser.favorites
+            'favorite': sensor_name in request.user.favorites
         }
 
         payload = {
@@ -225,7 +220,7 @@ def download_csv(request, sensor_name, from_date, to_date):
         'size': max_query_size
     }
 
-    headers = create_headers(request.user.gsnuser)
+    headers = create_headers(request.user)
 
     data = json.loads(requests.get(oauth_sensors_url + '/' + sensor_name + '/data', headers=headers, params=payload))
 
@@ -274,142 +269,22 @@ def download(request):
     return response
 
 
-# def login_request(request):
-#     """
-#     Log in the user from a LoginForm, assuming the credentials are correct. If they are, the user will be
-# redirected to
-#     the index page
-#
-#     If the credentials are incorrect or the user is inactive or the form is invalid, the user will be redirected to
-#  the
-#     /gsn/login/ page, with the appropriate error message.
-#
-#     If the manages to log in successfuly, the function checks if there is a 'next' parameter; if there is, the user is
-#     redirected to that page. If not, he is redirected to /gsn/
-#     """
-#
-#     context = {
-#         'next': request.GET.get('next')
-#     }
-#     context.update(csrf(request))
-#
-#     if request.method == "POST":
-#
-#         form = LoginForm(data=request.POST)
-#         context.update({
-#             'form': form
-#         })
-#
-#         if form.is_valid:
-#             username = request.POST.get('username')
-#             password = request.POST.get('password')
-#             user = authenticate(username=username, password=password)
-#             if user is not None:
-#                 if user.is_active:
-#                     login(request, user)
-#
-#                     if request.GET.get('next') is not None:
-#                         return redirect(request.GET.get('next'))
-#
-#                     return redirect('index')
-#                 """
-#                 else:
-#                     context.update({
-#                         'error_message': 'This user has been desactivated'
-#                     })
-#             else:
-#                 context.update({
-#                     'error_message': 'This username and password combination is not valid'
-#
-#                 })
-#         else:
-#             context.update({
-#                 'error_message': 'You didn\'t fill the form correctly'
-#             })
-#             """
-#     else:
-#         context.update({
-#             'form': LoginForm(request)
-#         })
-#         pass
-#
-#     return render(request, 'gsn/login.html', context)
-
-
-# def sign_up(request):
-#     """
-#     View that lets a user sign up for the website.
-#
-#     Ask for username, email and password using a GSNUserCreationForm. If the form is valid, the user is created, then
-#     the login page is rendered and the user is prompted to log in.
-#
-#     If a user was already logged in, he will be logged out before this view is rendered.
-#     """
-#
-#
-#     if request.user.is_authenticated():
-#         logout(request)
-#
-#     context = {}
-#
-#     context.update(csrf(request))
-#
-#     if request.method == "POST":
-#
-#         form = GSNUserCreationForm(request.POST)
-#
-#         if form.is_valid():
-#             form.save()
-#
-#             context.update({
-#                 'success_message': 'Your account was successfuly created. Please proceed to login.',
-#                 'form': LoginForm()
-#             })
-#
-#             return render(request, 'gsn/login.html', context)
-#
-#             # login(request)
-#
-#         else:
-#
-#             context.update({
-#                 'error_message': 'A problem happened while submitting this form. It may be that this '
-#                                  'username is already taken, that the passwords don\'t match or that '
-#                                  'the '
-#                                  'constraint on '
-#                                  'the fields are not respected.'
-#             })
-#
-#     else:
-#         form = GSNUserCreationForm()
-#
-#     context.update({
-#         'form': form
-#     })
-#
-#     return render(request, 'gsn/sign_up.html', context)
-
-
 def logout_view(request):
     """
-    Logs out the user then redirected them to the /gsn/ page
+    Logs out the user then redirected them to the / page
     """
     logout(request)
     return redirect('index')
 
 
 def profile(request):
-    """
-    View
-    """
 
     code = request.GET.get('code')
     if code is not None:
         user = get_or_create_user(code)
-        user.backend = 'django.contrib.auth.backends.ModelBackend'
-        login(request, user)
-        return redirect('profile')
-
+        if user:
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)
     return redirect('index')
 
 
@@ -471,6 +346,9 @@ def get_or_create_user(code):
 
     data = json.loads(data.text)
 
+    if "error" in data:
+        return None
+
     access_token = 'Bearer ' + data["access_token"]
 
     headers = {
@@ -481,19 +359,16 @@ def get_or_create_user(code):
 
     user_inf = requests.get(oauth_user_url, headers=headers).json()
 
-    if not User.objects.filter(username=user_inf['username'], email=user_inf['email']).exists():
-        user = User.objects.create_user(user_inf['username'], user_inf['email'], User.objects.make_random_password())
+    if not GSNUser.objects.filter(username=user_inf['username'], email=user_inf['email']).exists():
+        user = GSNUser.objects.create_user(user_inf['username'], user_inf['email'], GSNUser.objects.make_random_password())
     else:
-        user = User.objects.get(username=user_inf['username'], email=user_inf['email'])
+        user = GSNUser.objects.get(username=user_inf['username'], email=user_inf['email'])
 
+    user.access_token = data['access_token']
+    user.refresh_token = data['refresh_token']
+    user.token_created_date = timezone.now()
+    user.token_expire_date = user.token_created_date + timedelta(seconds=data['expires_in'])
     user.save()
-
-    gsnuser = user.gsnuser
-    gsnuser.access_token = data['access_token']
-    gsnuser.refresh_token = data['refresh_token']
-    gsnuser.token_created_date = timezone.now()
-    gsnuser.token_expire_date = gsnuser.token_created_date + timedelta(seconds=data['expires_in'])
-    gsnuser.save()
 
     return user
 

@@ -28,6 +28,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+AUTH_USER_MODEL = "gsn.GSNUser"
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -81,6 +83,7 @@ BOWER_INSTALLED_APPS = (
     "angularjs",
     "angular-route#^1.5.0",
     "angular-bootstrap-datetimepicker#^1.0.1",
+    "angular-date-time-input",
     "dirPagination#^1.0.0",
     "angular-bootstrap#^1.1.2",
     "bootstrap#^3.3.6",
@@ -105,7 +108,7 @@ BOWER_INSTALLED_APPS = (
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'CET'
 
 USE_I18N = True
 
@@ -116,7 +119,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/gsn/static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = '/static/'
 
 STATICFILES_DIRS = (
@@ -131,7 +134,7 @@ STATICFILES_FINDERS = (
 
 # Custom setting
 
-LOGIN_URL = '/gsn/login/'
+LOGIN_URL = '/login/'
 
 
 try:
