@@ -9,6 +9,8 @@ import java.io.ByteArrayInputStream
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.{Input => kInput};
 import gsn.beans.StreamElement;
+import gsn.data._
+import gsn.data.format._
 
 
 object WebSocketForwarder extends Controller{
@@ -19,9 +21,9 @@ object WebSocketForwarder extends Controller{
         
         val context = ZMQ.context(1)
 		    val subscriber = context.socket(ZMQ.SUB)
-		    subscriber.connect("tcp://localhost:22022/")
+		    subscriber.connect("tcp://localhost:22022")
 		    subscriber.setReceiveTimeOut(3000)
-		    subscriber.subscribe(sensorid.getBytes)
+		    subscriber.subscribe((sensorid+":").getBytes)
 
         val in = {
             def cont: Iteratee[String, Unit] = Cont {
@@ -29,34 +31,27 @@ object WebSocketForwarder extends Controller{
                   subscriber.close()
                   Done((), Input.EOF)
                 }
-                case _ => cont
+                case other => {
+                  cont
+                }
             }
             cont
         }
 
         val out = Enumerator.repeat {
-        
             Try {
                 var rec = subscriber.recv()
     				    while (rec == null){
-    				        subscriber.subscribe(sensorid.getBytes)
+    				        subscriber.subscribe((sensorid+":").getBytes)
     				        rec = subscriber.recv()
     				    }
     					  val bais = new ByteArrayInputStream(rec)
-    					  bais.skip(sensorid.length + 1)
-    					  val o = kryo.readObjectOrNull(new kInput(bais), classOf[StreamElement])
-    					  o.getFieldNames.toString()
-    
-    				    /*else{
-    					      if (!subscriber){
-    						        subscriber.disconnect(remoteContactPoint_DATA);
-    						        connected = subscriber.base().connect(remoteContactPoint_DATA);
-    					      }
-    					      subscriber.subscribe(vsensor.getBytes());
-    				    }*/
+    					  bais.skip(sensorid.length + 2)
+    					  val o = kryo.readObjectOrNull(new kInput(bais), classOf[StreamElement]) 
+    					  "{"+o.getFieldNames.map(x =>  "\"" + x + "\":" + o.getData(x)).mkString(",")+"}"
             }.recover{
-              case t=>
-                t.getMessage 
+              case t:Exception=>
+                "{\"error\": \""+t.getMessage+"\"}" 
             }.get 
 		    }
 		
