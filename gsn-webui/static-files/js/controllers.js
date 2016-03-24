@@ -13,9 +13,32 @@ var gsnControllers = angular.module('gsnControllers',
         'LocalStorageModule',
         'ui.bootstrap',
         'ui.bootstrap.datetimepicker',
-        'ui.dateTimeInput'
+        'ui.dateTimeInput',
+        'ngWebSocket'
     ]
 );
+
+gsnControllers.factory('SensorDataStream', function($websocket) {
+      // Open a WebSocket connection
+      var dataStream = $websocket('ws://localhost:9000/ws/api/sensors/memorymonitorvs/stream');
+
+      alert(dataStream.readyState);
+
+      var collection = [];
+
+      dataStream.onMessage(function(message) {
+        collection.push(JSON.parse(message.data));
+      });
+
+      var methods = {
+        collection: collection,
+        get: function() {
+          dataStream.send(JSON.stringify({ action: 'get' }));
+        }
+      };
+
+      return methods;
+    });
 
 gsnControllers.config(function (localStorageServiceProvider) {
     localStorageServiceProvider
@@ -689,10 +712,11 @@ gsnControllers.controller('MapCtrl', ['$scope', 'sensorService', 'mapDistanceSer
 ;
 
 
-gsnControllers.controller('DashboardCtrl', ['$scope', '$http', '$interval', 'favoritesService', function ($scope, $http, $interval, favoritesService) {
+gsnControllers.controller('DashboardCtrl', ['$scope', '$http', '$interval', 'favoritesService', 'SensorDataStream', function ($scope, $http, $interval, favoritesService, SensorDataStream) {
 
     $scope.refresh_interval = 60000;
     $scope.sensors = {};
+    $scope.SensorDataStream = SensorDataStream;
 
     $scope.load = function () {
 

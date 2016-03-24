@@ -125,7 +125,7 @@ public class ZeroMQWrapper extends AbstractWrapper {
 		if (isLive) {
 			subscriber.subscribe((vsensor+":").getBytes());
 		} else {
-			subscriber.subscribe(("?"+vsensor+"?"+startTime+":").getBytes());
+		//	subscriber.subscribe(("?"+vsensor+"?"+startTime+":").getBytes());
 		}
 		
 		long lastKeepAlive = 0;

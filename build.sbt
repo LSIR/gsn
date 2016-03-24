@@ -29,7 +29,8 @@ lazy val root = (project in file(".")).
 
 lazy val core = (project in file("gsn-core")).
   dependsOn(tools).
-  settings(commonSettings: _*)
+  settings(commonSettings: _*).
+  enablePlugins(JavaServerAppPackaging)
 
 lazy val extra = (project in file("gsn-extra")).
   dependsOn(core).

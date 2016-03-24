@@ -65,7 +65,7 @@
     <script src="{% static 'markerclustererplus/src/markerclusterer.js' %}"></script>
 
     <!-- Charts and Angular Chart -->
-    <script src="https://rawgit.com/hay-wire/Chart.js/skip-xlabels/Chart.js"></script>
+    <script src="{% static 'js/Chart.js' %}"></script>
     <script src="{% static 'angular-chart.js/dist/angular-chart.js' %}"></script>
 
     <!-- HighPlots -->
@@ -87,6 +87,9 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="{% static 'js/sb-admin-2.js' %}"></script>
+
+    <!--websockets-->
+    <script src="{% static 'angular-websocket/dist/angular-websocket.js' %}"></script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

@@ -47,15 +47,15 @@ libraryDependencies ++= Seq(
 
 mainClass := Some("gsn.Main")
 
-NativePackagerKeys.packageSummary in Linux := "GSN Server"
+NativePackagerKeys.packageSummary in com.typesafe.sbt.SbtNativePackager.Linux := "GSN Server"
 
-NativePackagerKeys.packageSummary in Windows := "GSN Server"
+NativePackagerKeys.packageSummary in com.typesafe.sbt.SbtNativePackager.Windows := "GSN Server"
 
 NativePackagerKeys.packageDescription := "Global Sensor Networks"
 
-NativePackagerKeys.maintainer in Windows := "LSIR EPFL"
+NativePackagerKeys.maintainer in com.typesafe.sbt.SbtNativePackager.Windows := "LSIR EPFL"
 
-NativePackagerKeys.maintainer in Debian := "LSIR EPFL"
+NativePackagerKeys.maintainer in com.typesafe.sbt.SbtNativePackager.Debian := "LSIR EPFL"
 
 scalacOptions += "-deprecation"
 

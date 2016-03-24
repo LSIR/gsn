@@ -95,12 +95,13 @@ BOWER_INSTALLED_APPS = (
     "angular-local-storage#^0.2.3",
     "ngmap#^1.16.7",
     "markerclustererplus#^2.1.4",
-    "angular-chart.js#^0.8.8",
+    "angular-chart.js#^0.9.0",
     "highcharts#^4.2.3",
     "highcharts-ng#^0.0.11",
     "ngAutocomplete#^1.0.0",
     "angular-spinner#^0.8.1",
     "moment#^2.11.2",
+    "angular-websocket",
 )
 
 # Internationalization
