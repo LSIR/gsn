@@ -62,8 +62,8 @@ public abstract class AbstractVirtualSensor implements Serializable {
 			                                                      "tinygsn.model.vsensor.ActivityVirtualSensor", "tinygsn.model.vsensor.METVirtualSensor", "tinygsn.model.vsensor.CalibrateOzoneVirtualSensor",
 			                                                      "tinygsn.model.vsensor.ExposureVirtualSensor"};
     */
-	public static final String[] VIRTUAL_SENSOR_LIST = {"bridge", "notification"};
-	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor", "tinygsn.model.vsensor.NotificationVirtualSensor"};
+	public static final String[] VIRTUAL_SENSOR_LIST = {"bridge", "notification", "geolocate"};
+	public static final String[] VIRTUAL_SENSOR_CLASSES = {"tinygsn.model.vsensor.BridgeVirtualSensor", "tinygsn.model.vsensor.NotificationVirtualSensor", "tinygsn.model.vsensor.GeolocateVirtualSensor"};
 	private transient SqliteStorageManager storage = new SqliteStorageManager();
 	private VSensorConfig config;
 	public InputStream is;

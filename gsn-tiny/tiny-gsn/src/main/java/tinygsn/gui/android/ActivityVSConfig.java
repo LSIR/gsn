@@ -435,22 +435,27 @@ public class ActivityVSConfig extends AbstractActivity {
 
 			vssetting.saveTo(vsName, storage);
 
-			String wrapperName = "";
-			for (StreamSourcePanel p : pannels) {
-				wrapperName = p.saveTo(vsName, storage); // TODO compute actual output structure !!!
-			}
-
-			//take the structure from the last wrapper !!
-			AbstractWrapper w;
+			DataField[] outputStructure = null;
 			try {
-				w = StaticData.getWrapperByName(wrapperName);
-				DataField[] outputStructure = w.getOutputStructure();
-				AbstractVirtualSensor vs = (AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vsType]).newInstance();
-				outputStructure = vs.getOutputStructure(outputStructure);
-				storage.executeCreateTable("vs_" + vsName, outputStructure, true);
+                for (StreamSourcePanel p : pannels) {
+                    String wrapperName = p.saveTo(vsName, storage);
+
+                    AbstractWrapper w = StaticData.getWrapperByName(wrapperName);
+                    DataField[] woutputStructure = w.getOutputStructure();
+                    AbstractVirtualSensor vs = (AbstractVirtualSensor) Class.forName(AbstractVirtualSensor.VIRTUAL_SENSOR_CLASSES[vsType]).newInstance();
+                    DataField[] _outputStructure = vs.getOutputStructure(woutputStructure);
+                    if (_outputStructure != null) {
+                        outputStructure = _outputStructure;
+                    }
+                }
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+            if (outputStructure != null) {
+                storage.executeCreateTable("vs_" + vsName, outputStructure, true);
+            } else {
+                Toast.makeText(context, "Unable to compute output structure, did you add the necessary wrappers for this virtual sensor?", Toast.LENGTH_SHORT).show();
+            }
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
