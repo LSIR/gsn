@@ -3,6 +3,10 @@ package tinygsn.model.wrappers.utils;
 
 import android.util.Log;
 
+import com.nordicsemi.nrfUARTv2.SerialBLEWrapper;
+
+import java.io.Serializable;
+
 import tinygsn.beans.StreamElement;
 import tinygsn.model.utils.WritableBT;
 
@@ -28,7 +32,7 @@ public class OpenSWISSensor extends AbstractSerialProtocol{
     @Override
     public void getMeasurements(){
         mstate = STATE_WAITING_MEASUREMENT;
-        getOut().write("temp\n".getBytes());
+        getOut().write("measure\n".getBytes());
     }
 
     @Override
@@ -39,6 +43,8 @@ public class OpenSWISSensor extends AbstractSerialProtocol{
                 break;
             case STATE_WAITING_MEASUREMENT:
                 Log.d(TAG, "Measurement: " + s);
+                String[] values = s.split(",");
+                getOut().publish(new StreamElement(SerialBLEWrapper.FIELD_NAMES,SerialBLEWrapper.FIELD_TYPES, new Serializable[]{Double.parseDouble(values[0]),Double.parseDouble(values[1])}));
                 getOut().done();
         }
     }

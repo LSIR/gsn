@@ -73,9 +73,9 @@ public class SerialBLEWrapper extends AbstractWrapper {
 
     public static final String TAG = "SerialBLEWrapper";
 
-	private static final String[] FIELD_NAMES = new String[]{ "humidity", "temperature"};
+	public static final String[] FIELD_NAMES = new String[]{ "humidity", "temperature"};
 
-	private static final Byte[] FIELD_TYPES = new Byte[]{DataTypes.DOUBLE,DataTypes.DOUBLE};
+	public static final Byte[] FIELD_TYPES = new Byte[]{DataTypes.DOUBLE,DataTypes.DOUBLE};
 
 	private static final String[] FIELD_DESCRIPTION = new String[]{"humidity", "temperature"};
 
