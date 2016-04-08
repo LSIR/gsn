@@ -32,7 +32,7 @@ public class OpenSWISSensor extends AbstractSerialProtocol{
     @Override
     public void getMeasurements(){
         mstate = STATE_WAITING_MEASUREMENT;
-        getOut().write("measure\n".getBytes());
+        getOut().write("temp\n".getBytes());
     }
 
     @Override
