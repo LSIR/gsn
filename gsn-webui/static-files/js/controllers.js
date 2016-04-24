@@ -22,7 +22,7 @@ gsnControllers.factory('SensorDataStream', function($websocket) {
 
     var methods = {
         register: function(vsname, stream_callback){
-            var dataStream = $websocket('ws://localhost:9000/ws/api/sensors/'+vsname+'/stream');
+            var dataStream = $websocket(WEBSOCKET_URL + 'api/sensors/'+vsname+'/stream');
             dataStream.onMessage(function(message) {
                 stream_callback(JSON.parse(message.data));
             });

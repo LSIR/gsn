@@ -7,6 +7,7 @@ DATABASES = {
 
 GSN = {
     'SERVER_URL': 'http://localhost:9000/',
+    'WEBSOCKET_URL': 'ws://localhost:9000/',
     'CLIENT_ID': 'web-gui-dev-local-public',
     'CLIENT_SECRET': 'web-gui-dev-local-jAzg',
     'REDIRECTION_URL': 'http://127.0.0.1:8000/profile/',

@@ -39,13 +39,15 @@ def index(request):
         context = {
             'log_page': 'logout',
             'logged_in': 'true',
-            'user': request.user.username
+            'user': request.user.username,
+            'ws_url': settings.GSN['WEBSOCKET_URL']
         }
 
     else:
         context = {
             'log_page': 'login',
             'logged_out': 'true',
+            'ws_url': settings.GSN['WEBSOCKET_URL']
         }
 
     template = loader.get_template('gsn/index.html')
