@@ -37,7 +37,7 @@ public class GeolocateVirtualSensor extends AbstractVirtualSensor {
 
 		streamElement = super.anonymizeData(inputStreamName, streamElement);
 
-		if (inputStreamName.endsWith("gps")) {
+		if (inputStreamName.endsWith("AndroidGPSWrapper")) {
 			lastLatitudeTL = (Double) streamElement.getData("latitudeTopLeft");
 			lastLongitudeTL = (Double) streamElement.getData("longitudeTopLeft");
             lastLatitudeBR = (Double) streamElement.getData("latitudeBottomRight");

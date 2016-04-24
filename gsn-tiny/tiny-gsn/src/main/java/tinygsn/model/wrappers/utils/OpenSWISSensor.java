@@ -32,6 +32,9 @@ public class OpenSWISSensor extends AbstractSerialProtocol{
     @Override
     public void getMeasurements(){
         mstate = STATE_WAITING_MEASUREMENT;
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) { }
         getOut().write("temp\n".getBytes());
     }
 
@@ -43,8 +46,8 @@ public class OpenSWISSensor extends AbstractSerialProtocol{
                 break;
             case STATE_WAITING_MEASUREMENT:
                 Log.d(TAG, "Measurement: " + s);
-                String[] values = s.split(",");
-                getOut().publish(new StreamElement(SerialBLEWrapper.FIELD_NAMES,SerialBLEWrapper.FIELD_TYPES, new Serializable[]{Double.parseDouble(values[0]),Double.parseDouble(values[1])}));
+                s = s.trim();
+                getOut().publish(new StreamElement(SerialBLEWrapper.FIELD_NAMES,SerialBLEWrapper.FIELD_TYPES, new Serializable[]{Double.parseDouble(s)}));
                 getOut().done();
         }
     }

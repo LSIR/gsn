@@ -73,13 +73,13 @@ public class SerialBLEWrapper extends AbstractWrapper {
 
     public static final String TAG = "SerialBLEWrapper";
 
-	public static final String[] FIELD_NAMES = new String[]{ "humidity", "temperature"};
+	public static final String[] FIELD_NAMES = new String[]{ "temperature"};
 
-	public static final Byte[] FIELD_TYPES = new Byte[]{DataTypes.DOUBLE,DataTypes.DOUBLE};
+	public static final Byte[] FIELD_TYPES = new Byte[]{DataTypes.DOUBLE};
 
-	private static final String[] FIELD_DESCRIPTION = new String[]{"humidity", "temperature"};
+	private static final String[] FIELD_DESCRIPTION = new String[]{"temperature"};
 
-	private static final String[] FIELD_TYPES_STRING = new String[]{"double", "double"};
+	private static final String[] FIELD_TYPES_STRING = new String[]{"double"};
 
 	public final Class<? extends WrapperService> getSERVICE() {
 		return SerialBLEService.class;
@@ -144,10 +144,12 @@ public class SerialBLEWrapper extends AbstractWrapper {
                             mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
                             for (BluetoothDevice device : mLeDeviceListAdapter) {
-                                mService.connect(device.getAddress());
-                                cdl = new CountDownLatch(1);
-                                cdl.await(60, TimeUnit.SECONDS);
-                                mService.disconnect();
+                                if(device.getAddress().startsWith("EE:D4:1F")) {
+                                    mService.connect(device.getAddress());
+                                    cdl = new CountDownLatch(1);
+                                    cdl.await(60, TimeUnit.SECONDS);
+                                    mService.disconnect();
+                                }
                             }
                             try {
                                 LocalBroadcastManager.getInstance(this).unregisterReceiver(UARTStatusChangeReceiver);
@@ -237,6 +239,7 @@ public class SerialBLEWrapper extends AbstractWrapper {
                         if (buffer.contains("\n")) {
                             String[] st = buffer.split("\n");
                             for (String s:st){
+                                if (s.trim().isEmpty()) continue;
                                 sensor.received(s);
                             }
                         }
