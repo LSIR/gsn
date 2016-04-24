@@ -6,6 +6,7 @@ import play.api.mvc._
 import scala.util.Try
 import org.zeromq.ZMQ
 import java.io.ByteArrayInputStream
+import java.util.Date
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.{Input => kInput};
 import gsn.beans.StreamElement;
@@ -47,8 +48,9 @@ object WebSocketForwarder extends Controller{
     				    }
     					  val bais = new ByteArrayInputStream(rec)
     					  bais.skip(sensorid.length + 2)
-    					  val o = kryo.readObjectOrNull(new kInput(bais), classOf[StreamElement]) 
-    					  "{"+o.getFieldNames.map(x =>  "\"" + x + "\":" + o.getData(x)).mkString(",")+"}"
+    					  val o = kryo.readObjectOrNull(new kInput(bais), classOf[StreamElement])
+    					  val ts = new Date(o.getTimeStamp())
+    					  "{ \"timestamp\":\""+ts+"\","+o.getFieldNames.map(x =>  "\"" + x.toLowerCase() + "\":" + o.getData(x)).mkString(",")+"}"
             }.recover{
               case t:Exception=>
                 "{\"error\": \""+t.getMessage+"\"}" 

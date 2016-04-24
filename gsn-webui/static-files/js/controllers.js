@@ -19,26 +19,19 @@ var gsnControllers = angular.module('gsnControllers',
 );
 
 gsnControllers.factory('SensorDataStream', function($websocket) {
-      // Open a WebSocket connection
-      var dataStream = $websocket('ws://localhost:9000/ws/api/sensors/memorymonitorvs/stream');
 
-      alert(dataStream.readyState);
-
-      var collection = [];
-
-      dataStream.onMessage(function(message) {
-        collection.push(JSON.parse(message.data));
-      });
-
-      var methods = {
-        collection: collection,
-        get: function() {
-          dataStream.send(JSON.stringify({ action: 'get' }));
+    var methods = {
+        register: function(vsname, stream_callback){
+            var dataStream = $websocket('ws://localhost:9000/ws/api/sensors/'+vsname+'/stream');
+            dataStream.onMessage(function(message) {
+                stream_callback(JSON.parse(message.data));
+            });
+            //scope.stream_send = function() { dataStream.send(JSON.stringify({ action: 'get' })); }
         }
-      };
+    };
 
-      return methods;
-    });
+    return methods;
+});
 
 gsnControllers.config(function (localStorageServiceProvider) {
     localStorageServiceProvider
@@ -726,6 +719,13 @@ gsnControllers.controller('DashboardCtrl', ['$scope', '$http', '$interval', 'fav
             data.favorites_list.forEach(function (sensor_name) {
                 $http.get('dashboard/' + sensor_name).success(function (data, status, headers, config) {
                     $scope.sensors[sensor_name] = data
+                    $scope.SensorDataStream.register(sensor_name.toLowerCase(), function (data){
+                        if (data) {
+                            for (var k = 0; k < $scope.sensors[sensor_name].fields.length; k++) {
+                                    $scope.sensors[sensor_name].values[k] = data[$scope.sensors[sensor_name].fields[k].name.toLowerCase()];
+                                }
+                            }
+                        });
 
                 }).error(function (data, status, headers, config) {
                     $scope.error_message = "Something went wrong when getting the data of the sensor " + sensor_name
