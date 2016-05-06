@@ -282,11 +282,12 @@ public class StreamInterpolateJoinModel extends AbstractModel implements Monitor
 		if (cut>0){ //segment found
 			for (String k : arrays.get(type).keySet()){
 				double[] x = new double[cut];
-				int i = cut -1;
-				for(Double d :arrays.get(type).get(k)){
-					x[i] = d.doubleValue();
-					i--;
-					if (i<0)break;
+				int i = 0;
+				it = arrays.get(type).get(k).descendingIterator();
+				while(it.hasNext()){
+					x[i] = it.next().doubleValue();
+					i++;
+					if (i>=cut)break;
 				}
 				segments.get(type).put(k, x);
 			}
