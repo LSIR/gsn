@@ -20,6 +20,7 @@ public class ConditionalDeleteVirtualSensor extends BridgeVirtualSensorPermasens
 	
 	private PreparedStatement preparedDeleteStatement;
 	private ArrayList<String> fieldList;
+    String conditional = "";
 	
 	@Override
 	public boolean initialize() {
@@ -28,7 +29,6 @@ public class ConditionalDeleteVirtualSensor extends BridgeVirtualSensorPermasens
 		TreeMap<String,String> params = vsensor.getMainClassInitialParams();
 		fieldList = new ArrayList<String>();
 
-        String conditional = "";
 		int index = 1;
 		while (true) {
 			String field = params.get("field" + index);
@@ -81,47 +81,62 @@ public class ConditionalDeleteVirtualSensor extends BridgeVirtualSensorPermasens
 	
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement data) {
-		try {
-			long time = System.currentTimeMillis();
-			for (int i=0; i<fieldList.size(); i++) {
-				if (data.getData(fieldList.get(i)) == null) {
-					logger.warn("field " + fieldList.get(i) + " does not exist in stream element or is NULL -> delete query can not be applied");
-					super.dataAvailable(inputStreamName, data);
-					return;
-				}
-				else {
-					switch (data.getType(fieldList.get(i))) {
-						case DataTypes.BIGINT:
-							preparedDeleteStatement.setLong(i+1, (Long)data.getData(fieldList.get(i)));
-							break;
-						case DataTypes.INTEGER:
-						case DataTypes.SMALLINT:
-						case DataTypes.TINYINT:
-							preparedDeleteStatement.setInt(i+1, (Integer)data.getData(fieldList.get(i)));
-							break;
-						case DataTypes.DOUBLE:
-							preparedDeleteStatement.setDouble(i+1, (Double)data.getData(fieldList.get(i)));
-							break;
-						case DataTypes.VARCHAR:
-							preparedDeleteStatement.setString(i+1, (String)data.getData(fieldList.get(i)));
-							break;
-						case DataTypes.CHAR:
-							preparedDeleteStatement.setByte(i+1, (Byte)data.getData(fieldList.get(i)));
-							break;
-						default:
-							logger.error("unknown data type");
+		long time = System.currentTimeMillis();
+		
+		boolean retry = true;
+		int cnt = 0;
+		
+		while (retry && cnt++ < 3) {
+			try {
+				for (int i=0; i<fieldList.size(); i++) {
+					if (data.getData(fieldList.get(i)) == null) {
+						logger.warn("field " + fieldList.get(i) + " does not exist in stream element or is NULL -> delete query can not be applied");
+						super.dataAvailable(inputStreamName, data);
+						return;
+					}
+					else {
+						switch (data.getType(fieldList.get(i))) {
+							case DataTypes.BIGINT:
+								preparedDeleteStatement.setLong(i+1, (Long)data.getData(fieldList.get(i)));
+								break;
+							case DataTypes.INTEGER:
+							case DataTypes.SMALLINT:
+							case DataTypes.TINYINT:
+								preparedDeleteStatement.setInt(i+1, (Integer)data.getData(fieldList.get(i)));
+								break;
+							case DataTypes.DOUBLE:
+								preparedDeleteStatement.setDouble(i+1, (Double)data.getData(fieldList.get(i)));
+								break;
+							case DataTypes.VARCHAR:
+								preparedDeleteStatement.setString(i+1, (String)data.getData(fieldList.get(i)));
+								break;
+							case DataTypes.CHAR:
+								preparedDeleteStatement.setByte(i+1, (Byte)data.getData(fieldList.get(i)));
+								break;
+							default:
+								logger.error("unknown data type");
+						}
 					}
 				}
+			} catch (SQLException e) {
+				logger.error(e.getMessage());
 			}
 			
-			preparedDeleteStatement.execute();
-			
-			if (logger.isDebugEnabled())
-				logger.debug("delete execution time: " + (System.currentTimeMillis()-time) + "ms");
-		} catch (SQLException e) {
-			logger.error(e.getMessage());
+			try {
+				preparedDeleteStatement.execute();
+				retry = false;
+			} catch (SQLException e) {
+				try {
+					preparedDeleteStatement = Main.getStorage(getVirtualSensorConfiguration()).getConnection().prepareStatement(conditional);
+				} catch (SQLException e1) {
+					logger.error(e.getMessage());
+				}
+			}
 		}
 
+		if (logger.isDebugEnabled())
+			logger.debug("delete execution time: " + (System.currentTimeMillis()-time) + "ms");
+		
 		super.dataAvailable(inputStreamName, data);
 	}
 }
