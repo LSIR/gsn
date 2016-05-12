@@ -1,0 +1,43 @@
+<virtual-sensor name="Matterhorn_GPS_L2__files" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    DEVICE_TYPE = "gps-l2";
+                ]]>
+            </param>
+        </init-params>
+       	<web-input password="test">
+         	<command name="files">
+				<field name="device_id" type="*text">the device id from the station</field>
+				<field name="gps_file" type="*binary">a enh file from an GPS station</field>
+        	</command>
+   		</web-input>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+            
+            <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>
+        </output-structure>
+    </processing-class>
+    <description>GPS L2 station files from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+      <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="file-getter">
+                    <predicate key="subdirectory-name">gps</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

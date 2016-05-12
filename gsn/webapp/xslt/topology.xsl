@@ -162,7 +162,7 @@ xmlns:atom="http://www.w3.org/2005/Atom">
 		                                        <xsl:when test="@nodetype = 11">IMIS Weather Station</xsl:when>
 		                                    	<xsl:otherwise>
 			                                      <xsl:choose>
-			                                        <xsl:when test="@nodetype = 12">Leica GNSS</xsl:when>
+			                                        <xsl:when test="@nodetype = 12">GPS L2</xsl:when>
 				                                        <xsl:otherwise>                        
 				          				                unknown
 							                       		</xsl:otherwise>

@@ -1,0 +1,68 @@
+<virtual-sensor name="ETZ_GPS_L2__parsed" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.CSVParserVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="fields">GENERATION_YEAR,GENERATION_MONTH,GENERATION_DAY,GENERATION_HOUR,GENERATION_MINUTE,GENERATION_SECOND,,E,N,H,,,SD_E,,SD_N,,SD_H,,PROCESSING_YEAR,PROCESSING_MONTH,PROCESSING_DAY,PROCESSING_HOUR,PROCESSING_MINUTE,PROCESSING_SECOND</param>
+            <param name="formats">numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric</param>
+            <param name="timezone">UTC</param>
+            <param name="separator"> </param>
+            <param name="bad-values"></param>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                		GENERATION_TIME = PROCESSING_TIME = null;
+						GENERATION_TIME = Date.parse('yyyy-MM-dd HH:mm:ss.SSS', GENERATION_YEAR.toInteger()+"-"+GENERATION_MONTH.toInteger()+"-"+GENERATION_DAY.toInteger()+" "+GENERATION_HOUR.toInteger()+":"+GENERATION_MINUTE.toInteger()+":"+GENERATION_SECOND).getTime();
+                    	PROCESSING_TIME = Date.parse('yyyy-MM-dd HH:mm:ss.SSS', PROCESSING_YEAR.toInteger()+"-"+PROCESSING_MONTH.toInteger()+"-"+PROCESSING_DAY.toInteger()+" "+PROCESSING_HOUR.toInteger()+":"+PROCESSING_MINUTE.toInteger()+":"+PROCESSING_SECOND).getTime();
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="PROCESSING_TIME" type="BIGINT" unit="unixtime"/>
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+			
+            <field name="GENERATION_YEAR" type="DOUBLE" />
+            <field name="GENERATION_MONTH" type="DOUBLE" />
+            <field name="GENERATION_DAY" type="DOUBLE" />
+            <field name="GENERATION_HOUR" type="DOUBLE" />
+            <field name="GENERATION_MINUTE" type="DOUBLE" />
+            <field name="GENERATION_SECOND" type="DOUBLE" />
+            
+            <field name="E" type="DOUBLE" />
+            <field name="N" type="DOUBLE" />
+            <field name="H" type="DOUBLE" />
+            <field name="SD_E" type="DOUBLE" />
+            <field name="SD_N" type="DOUBLE" />
+            <field name="SD_H" type="DOUBLE" />
+			
+            <field name="PROCESSING_YEAR" type="DOUBLE" />
+            <field name="PROCESSING_MONTH" type="DOUBLE" />
+            <field name="PROCESSING_DAY" type="DOUBLE" />
+            <field name="PROCESSING_HOUR" type="DOUBLE" />
+            <field name="PROCESSING_MINUTE" type="DOUBLE" />
+            <field name="PROCESSING_SECOND" type="DOUBLE" />
+        </output-structure>
+    </processing-class>
+    <description>Parsed GPS L2 station data from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_GPS_L2__files__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select TIMED, DEVICE_ID, DEVICE_TYPE, RELATIVE_FILE1 as FILE, SIZE_FILE1 as SIZE from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

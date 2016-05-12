@@ -1,0 +1,39 @@
+<virtual-sensor name="ETZ_GPS_L2__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="PROCESSING_TIME" type="BIGINT" unit="unixtime"/>
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+            
+            <field name="E" type="DOUBLE" />
+            <field name="N" type="DOUBLE" />
+            <field name="H" type="DOUBLE" />
+            <field name="SD_E" type="DOUBLE" />
+            <field name="SD_N" type="DOUBLE" />
+            <field name="SD_H" type="DOUBLE" />
+        </output-structure>
+    </processing-class>
+    <description>Converted GPS L2 station data from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_GPS_L2__parsed</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

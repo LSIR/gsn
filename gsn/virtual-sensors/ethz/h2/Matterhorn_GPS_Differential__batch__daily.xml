@@ -45,10 +45,20 @@
     <addressing />
     <storage />
     <streams>
-        <stream name="data">
+        <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
                     <predicate key="query">select * from Matterhorn_GPS_Differential__batch</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_GPS_L2__conv</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

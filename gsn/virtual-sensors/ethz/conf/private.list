@@ -59,6 +59,7 @@ Dirruhorn_Dozer_WXT520Ident.xml
 Dirruhorn_Dozer_WXT520Prec.xml
 Dirruhorn_Dozer_WXT520Sup.xml
 Dirruhorn_Dozer_WXT520WindPth.xml
+Dirruhorn_GPS_L2__files.xml
 Dirruhorn_GPS_Logger__files.xml
 Dirruhorn_GPS_RAW.xml
 Dirruhorn_IMIS__files.xml
@@ -158,6 +159,7 @@ Matterhorn_Dozer_WXT520Ident.xml
 Matterhorn_Dozer_WXT520Prec.xml
 Matterhorn_Dozer_WXT520Sup.xml
 Matterhorn_Dozer_WXT520WindPth.xml
+Matterhorn_GPS_L2__files.xml
 Matterhorn_GPS_RAW.xml
 Matterhorn_Schedule.xml
 Matterhorn_Statistics.xml
@@ -191,6 +193,7 @@ Saastal_Dozer_Rssi.xml
 Saastal_Dozer_StateCounter.xml
 Saastal_Dozer_WgpsStatus.xml
 Saastal_Dozer_WgpsSv.xml
+Saastal_GPS_L2__files.xml
 Saastal_GPS_RAW.xml
 Saastal_Schedule.xml
 Saastal_Statistics.xml

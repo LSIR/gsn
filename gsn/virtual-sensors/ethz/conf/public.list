@@ -135,6 +135,9 @@ Dirruhorn_GPS_Differential__batch__daily.xml
 Dirruhorn_GPS_Differential__realtime.xml
 Dirruhorn_GPS_Differential__streaming.xml
 Dirruhorn_GPS_Inclinometer.xml
+Dirruhorn_GPS_L2__conv.xml
+Dirruhorn_GPS_L2__files__mapped.xml
+Dirruhorn_GPS_L2__parsed.xml
 Dirruhorn_GPS_Logger__config.xml
 Dirruhorn_GPS_Logger__data__mapped.xml
 Dirruhorn_GPS_Logger__events.xml
@@ -352,6 +355,9 @@ Matterhorn_GPS_Differential__batch__daily.xml
 Matterhorn_GPS_Differential__realtime.xml
 Matterhorn_GPS_Differential__streaming.xml
 Matterhorn_GPS_Inclinometer.xml
+Matterhorn_GPS_L2__conv.xml
+Matterhorn_GPS_L2__files__mapped.xml
+Matterhorn_GPS_L2__parsed.xml
 Matterhorn_GPS_RAW__binary__mapped.xml
 Matterhorn_GPS_RAW__tobinary__mapped.xml
 Matterhorn_Mapping_Chart.xml
@@ -440,6 +446,9 @@ Saastal_GPS_Differential__batch__daily.xml
 Saastal_GPS_Differential__realtime.xml
 Saastal_GPS_Differential__streaming.xml
 Saastal_GPS_Inclinometer.xml
+Saastal_GPS_L2__conv.xml
+Saastal_GPS_L2__files__mapped.xml
+Saastal_GPS_L2__parsed.xml
 Saastal_GPS_RAW__binary__mapped.xml
 Saastal_GPS_RAW__tobinary__mapped.xml
 Saastal_Mapping_Chart.xml
