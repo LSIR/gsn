@@ -77,6 +77,7 @@ public class RemoteWrapperParamParser {
 
 				// check if table already exists
 				rs = conn.getMetaData().getTables(null, null, addressBean.getVirtualSensorName(), new String[] {"TABLE"});
+				continuous = true;
 				if (rs.next()) {
 					StringBuilder query = new StringBuilder();
 					query.append("select max(timed) from ").append(addressBean.getVirtualSensorName());
@@ -84,7 +85,6 @@ public class RemoteWrapperParamParser {
 					rs = Main.getStorage(addressBean.getVirtualSensorConfig()).executeQueryWithResultSet(query, conn);
 					if (rs.next()) {
 						startTime = rs.getLong(1);
-						continuous = true;
 					}
 				}
 				else
