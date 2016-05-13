@@ -20,6 +20,7 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
     private final transient Logger logger = Logger.getLogger(CSVParserVirtualSensor.class);
 
     private CSVHandler handler = new CSVHandler();
+    private int skipFirstXLine;
 
     //TODO: make configurable in VS xml file
 	private static final DataField[] copiedDataFields = {
@@ -55,7 +56,7 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
         value = getVirtualSensorConfiguration().getMainClassInitialParams().get("quote");
         String csvStringQuote = (value == null) ? "\"" : value;
         value = getVirtualSensorConfiguration().getMainClassInitialParams().get("skip-first-lines");
-        int skipFirstXLine = (value == null) ? 0 : Integer.parseInt(value);
+        skipFirstXLine = (value == null) ? 0 : Integer.parseInt(value);
         value = getVirtualSensorConfiguration().getMainClassInitialParams().get("timezone");
         String timezone = (value == null) ? CSVHandler.LOCAL_TIMEZONE_ID : value;
         value = getVirtualSensorConfiguration().getMainClassInitialParams().get("bad-values");
@@ -96,6 +97,7 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
 			if (relativeFile != null) {
 				file = new File(new File(storage_directory, Integer.toString((Integer)data.getData(DEVICE_ID_FIELD_NAME))).getPath(), relativeFile);
 				file = file.getAbsoluteFile();
+	        	handler.setSkipFirstXLines(skipFirstXLine);
 			
 		        while (true) {
 			        FileReader reader = new FileReader(file);
