@@ -8,6 +8,7 @@
         <output-structure>
             <field name="POSITION" type="INTEGER" />
             <field name="DEVICE_ID" type="INTEGER" />
+			<field name="LABEL" type="VARCHAR(4)" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="PROCESSING_TIME" type="BIGINT" unit="unixtime"/>
 			<field name="DEVICE_TYPE" type="VARCHAR(32)" />

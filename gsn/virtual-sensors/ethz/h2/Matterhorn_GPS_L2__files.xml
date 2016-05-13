@@ -13,11 +13,13 @@
        	<web-input password="test">
          	<command name="files">
 				<field name="device_id" type="*text">the device id from the station</field>
+				<field name="label" type="*text">the station label</field>
 				<field name="gps_file" type="*binary">a enh file from an GPS station</field>
         	</command>
    		</web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
+			<field name="LABEL" type="VARCHAR(4)" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
 			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
             
@@ -33,7 +35,7 @@
       <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="file-getter">
-                    <predicate key="subdirectory-name">gps</predicate>
+                    <predicate key="subdirectory-name">gps-l2</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

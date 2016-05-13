@@ -23,6 +23,7 @@
         </init-params>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
+			<field name="LABEL" type="VARCHAR(4)" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="PROCESSING_TIME" type="BIGINT" unit="unixtime"/>
 			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
@@ -60,7 +61,7 @@
                     <predicate key="query"> select * from Dirruhorn_GPS_L2__files__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMED, DEVICE_ID, DEVICE_TYPE, RELATIVE_FILE1 as FILE, SIZE_FILE1 as SIZE from wrapper </query>
+                <query> select TIMED, DEVICE_ID, LABEL, DEVICE_TYPE, RELATIVE_FILE1 as FILE, SIZE_FILE1 as SIZE from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

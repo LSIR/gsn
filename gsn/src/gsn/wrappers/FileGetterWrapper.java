@@ -3,6 +3,7 @@ package gsn.wrappers;
 import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -19,7 +20,7 @@ import gsn.beans.InputInfo;
 
 public class FileGetterWrapper extends AbstractWrapper {
 	
-	private DataField[] outputStructure;
+	private ArrayList<DataField> outputStructure;
 
 	private final transient Logger logger = Logger.getLogger( FileGetterWrapper.class );
 
@@ -46,6 +47,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 	public boolean initialize() {
 		String rootBinaryDir = null;
 		format.setTimeZone(Main.getContainerConfig().getTimeZone());
+		outputStructure = new ArrayList<DataField>();
 		
 		try {
 			subdirectoryName = getActiveAddressBean().getPredicateValueWithException(PARAM_SUBDIRECTORY_NAME);
@@ -98,15 +100,25 @@ public class FileGetterWrapper extends AbstractWrapper {
 			return false;
 		}
 		
+		outputStructure.add(new DataField(DATAFIELD_DEVICE_ID, "INTEGER"));
+		outputStructure.add(new DataField(DATAFIELD_GENERATION_TIME, "BIGINT"));
+		
 		int fileCnt = 0;
 		for (DataField field: commandEntries) {
 			if (field.getName().endsWith(DATAFIELD_BINARY_SUFFIX))
 				fileCnt++;
+			else {
+				for (DataField outputField: getActiveAddressBean().getVirtualSensorConfig().getOutputStructure()) {
+					if (outputField.getName().equalsIgnoreCase(field.getName())
+							&& !outputField.getName().equalsIgnoreCase(DATAFIELD_DEVICE_ID)
+							&& !outputField.getName().equalsIgnoreCase(DATAFIELD_GENERATION_TIME)) {
+						outputStructure.add(outputField);
+						break;
+					}
+				}
+			}
 		}
 		
-		outputStructure = new DataField[(fileCnt*2)+2];
-		outputStructure[0] = new DataField(DATAFIELD_DEVICE_ID, "INTEGER");
-		outputStructure[1] = new DataField(DATAFIELD_GENERATION_TIME, "BIGINT");
 		filenamePatternArray = new Pattern [fileCnt];
 		boolean hasRegex = false;
 		for (int i=0; i<fileCnt; i++) {
@@ -123,8 +135,8 @@ public class FileGetterWrapper extends AbstractWrapper {
 			else
 				filenamePatternArray[i] = null;
 			
-			outputStructure[(i*2)+2] = new DataField(DATAFIELD_RELATIVE_FILE + (i+1), "VARCHAR(255)");
-			outputStructure[(i*2)+3] = new DataField(DATAFIELD_SIZE_FILE + (i+1), "BIGINT");
+			outputStructure.add(new DataField(DATAFIELD_RELATIVE_FILE + (i+1), "VARCHAR(255)"));
+			outputStructure.add(new DataField(DATAFIELD_SIZE_FILE + (i+1), "BIGINT"));
 		}
 		
 		
@@ -138,7 +150,9 @@ public class FileGetterWrapper extends AbstractWrapper {
 	
 	@Override
 	public InputInfo sendToWrapper ( String action , String [ ] paramNames , Serializable [ ] paramValues ) throws OperationNotSupportedException {
-		if( action.compareToIgnoreCase(COMMAND_NAME) == 0 ) {
+		if( action.equalsIgnoreCase(COMMAND_NAME) ) {
+			ArrayList<Serializable> output = new ArrayList<Serializable>();
+			ArrayList<Serializable> additionalFields = new ArrayList<Serializable>();
 			try {
 				long gentime = System.currentTimeMillis();
 				String deviceid = null;
@@ -146,9 +160,9 @@ public class FileGetterWrapper extends AbstractWrapper {
 				
 				for( int i=0; i<paramNames.length; i++ ) {
 					String tmp = paramNames[i];
-					if( tmp.compareToIgnoreCase(DATAFIELD_DEVICE_ID) == 0 )
+					if( tmp.equalsIgnoreCase(DATAFIELD_DEVICE_ID) )
 						deviceid = (String) paramValues[i];
-					else if( tmp.compareToIgnoreCase(DATAFIELD_GENERATION_TIME) == 0 ) {
+					else if( tmp.equalsIgnoreCase(DATAFIELD_GENERATION_TIME) ) {
 						try {
 							gentime = Long.parseLong((String) paramValues[i]);
 						} catch(Exception e) {
@@ -158,8 +172,18 @@ public class FileGetterWrapper extends AbstractWrapper {
 					}
 					else if( tmp.endsWith(DATAFIELD_BINARY_SUFFIX) )
 						inputFileItems.add(new BinaryFile((FileItem) paramValues[i], tmp));
-					else
-						logger.warn("unknown upload field: " + tmp + " -> skip it");
+					else {
+						boolean hit = false;
+						for (DataField df: getOutputFormat()) {
+							if (tmp.equalsIgnoreCase(df.getName())) {
+								additionalFields.add(paramValues[i]);
+								hit = true;
+								break;
+							}
+						}
+						if (!hit)
+							logger.warn("unknown upload field: " + tmp + " -> skip it");
+					}
 				}
 				
 				FileItem lastFileItem = null;
@@ -210,18 +234,17 @@ public class FileGetterWrapper extends AbstractWrapper {
 			    	else
 			    		logger.info("created new storage directory >" + storageDir + "<");
 				}
-				
-				Serializable[] output = new Serializable[inputFileItems.size()*2+2];
-				output[0] = id;
-				output[1] = gentime;
-				int i = 2;
+				output.add(id);
+				output.add(gentime);
+				for (Serializable s: additionalFields)
+					output.add(s);
 				for (Iterator<BinaryFile> it = inputFileItems.iterator (); it.hasNext (); ) {
 					BinaryFile inputLoggerFile = it.next ();
 					if (inputLoggerFile.getFileItem().getSize() <= 0) {
 						if (!inputLoggerFile.getFileItem().getName().isEmpty())
 							logger.warn("uploaded file " + inputLoggerFile.getFileItem().getName() + " is empty => skip it");
-						output[i++] = null;
-						output[i++] = null;
+						output.add(null);
+						output.add(null);
 						
 					}
 					else {
@@ -237,12 +260,12 @@ public class FileGetterWrapper extends AbstractWrapper {
 							logger.error(e.getMessage());
 							return new InputInfo(getActiveAddressBean().toString(), e.getMessage(), false);
 						}
-						output[i++] = subdirectoryName + "/" + filename;
-						output[i++] = outputFile.length();
+						output.add(subdirectoryName + "/" + filename);
+						output.add(outputFile.length());
 					}
 				}
 				
-				if (postStreamElement(output))
+				if (postStreamElement(output.toArray(new Serializable[output.size()])))
 					return new InputInfo(getActiveAddressBean().toString(), "file successfully uploaded", true);
 				else
 					return new InputInfo(getActiveAddressBean().toString(), "file could not be uploaded", false);
@@ -259,7 +282,7 @@ public class FileGetterWrapper extends AbstractWrapper {
 
 	@Override
 	public DataField[] getOutputFormat() {
-		return outputStructure;
+		return outputStructure.toArray(new DataField[outputStructure.size()]);
 	}
 
 	@Override
