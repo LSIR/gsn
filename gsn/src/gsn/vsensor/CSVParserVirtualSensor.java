@@ -22,13 +22,7 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
     private CSVHandler handler = new CSVHandler();
     private int skipFirstXLine;
 
-    //TODO: make configurable in VS xml file
-	private static final DataField[] copiedDataFields = {
-		new DataField("DEVICE_ID", "INTEGER"),
-		new DataField("DEVICE_TYPE", "VARCHAR(32)"),
-		new DataField("FILE", "VARCHAR(255)"),
-		new DataField("SIZE", "BIGINT")
-	};
+	private ArrayList<DataField> copiedDataFields = new ArrayList<DataField>();
     
 	private String storage_directory = null;
 
@@ -75,10 +69,21 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
         try {
             if (!handler.initialize(csvFields, csvFormats, csvSeparator.toCharArray()[0], csvStringQuote.toCharArray()[0], skipFirstXLine, nullValues, timezone))
                 return false;
-
         } catch (Exception e) {
             logger.error("Loading the csv-wrapper failed:" + e.getMessage(), e);
             return false;
+        }
+        
+        for (DataField df: getVirtualSensorConfiguration().getOutputStructure()) {
+        	boolean add = true;
+        	for (DataField csvDf: handler.getDataFields()) {
+        		if (csvDf.getName().equalsIgnoreCase(df.getName())) {
+        			add = false;
+        			break;
+        		}
+        	}
+        	if (add)
+        		copiedDataFields.add(df);
         }
 
         return ret;
@@ -104,14 +109,17 @@ public class CSVParserVirtualSensor extends BridgeVirtualSensorPermasense {
 			        ArrayList<TreeMap<String, Serializable>> output = handler.work(reader, null);
 			        if (output.isEmpty())
 			        	break;
+			        
 		        	handler.setSkipFirstXLines(handler.getSkipFirstXLines() + output.size());
-			        Serializable [] s = new Serializable[copiedDataFields.length];
-			        for (int i=0; i<copiedDataFields.length; i++) {
-			        	s[i] = data.getData(copiedDataFields[i].getName());
+			        Serializable [] s = new Serializable[copiedDataFields.size()];
+			        for (int i=0; i<copiedDataFields.size(); i++) {
+			        	s[i] = data.getData(copiedDataFields.get(i).getName());
 			        }
 			        
-			        for (TreeMap<String, Serializable> se : output)
-			            super.dataAvailable(inputStreamName, new StreamElement(new StreamElement(se, handler.getDataFields()), copiedDataFields, s));
+			        for (TreeMap<String, Serializable> se : output) {
+			        	StreamElement newSE = new StreamElement(new StreamElement(se, handler.getDataFields()), copiedDataFields.toArray(new DataField[copiedDataFields.size()]), s);
+			            super.dataAvailable(inputStreamName, newSE);
+			        }
 		        }
 			}
 		} catch (Exception e) {
