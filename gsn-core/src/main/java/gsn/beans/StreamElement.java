@@ -32,6 +32,7 @@ package gsn.beans;
 
 import gsn.http.delivery.StreamElement4Rest;
 import gsn.utils.CaseInsensitiveComparator;
+import play.libs.Json;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,6 +40,9 @@ import java.util.TreeMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.slf4j.Logger;
 
 public final class StreamElement implements Serializable {
@@ -360,6 +364,63 @@ public final class StreamElement implements Serializable {
 		return toReturn;
 
 	}
+	
+	/**
+	 * Build stream elements from a JSON representation like this one:
+	 * {"type":"Feature","properties":{"vs_name":"geo_oso3m","values":[[1464094800000,21,455.364922]],"fields":[{"name":"timestamp","type":"time","unit":"ms"},{"name":"station","type":"smallint","unit":null},{"name":"altitude","type":"float","unit":null}],"stats":{"start-datetime":1381953249010,"end-datetime":1464096133100},"geographical":"Lausanne, Switzerland","description":"OZ47 Sensor"},"geometry":{"type":"Point","coordinates":[6.565356337141691,46.5608445136986,689.7967]},"total_size":0,"page_size":0}
+	 * Expecting the first value to be the timestamp
+	 * @param s
+	 * @return
+	 */
+	
+	public static StreamElement[] fromJSON(String s){
+		JsonNode jn = Json.parse(s).get("properties");
+		DataField[] df = new DataField[jn.get("fields").size()-1];
+		int i = 0;
+		for(JsonNode f : jn.get("fields")){
+			if (f.get("name").asText().equals("timestamp")) continue; 
+			df[i] = new DataField(f.get("name").asText(),f.get("type").asText());
+			i++;
+		}
+		StreamElement[] ret = new StreamElement[jn.get("values").size()];
+		int k = 0;
+		for(JsonNode v : jn.get("values")){
+			Serializable[] data = new Serializable[df.length];
+			for(int j=1;j < v.size();j++){
+				switch(df[j].getDataTypeID()){
+				case DataTypes.DOUBLE:
+					data[j] = v.get(j).asDouble();
+					break;
+				case DataTypes.FLOAT:
+					data[j] = (float)v.get(j).asDouble();
+					break;
+				case DataTypes.BIGINT:
+					data[j] = v.get(j).asLong();
+					break;
+				case DataTypes.TINYINT:
+					data[j] = (byte)v.get(j).asInt();
+					break;
+				case DataTypes.SMALLINT:
+				case DataTypes.INTEGER:
+					data[j] = v.get(j).asInt();
+					break;
+				case DataTypes.CHAR:
+				case DataTypes.VARCHAR:
+					data[j] = v.get(j).asText();
+					break;
+				case DataTypes.BINARY:
+					data[j] = (byte[])Base64.decodeBase64(v.get(j).asText());
+					break;
+				default:
+					logger.error("The data type of the field cannot be parsed: " + df[j].toString());
+				}
+			}
+			ret[k] = new StreamElement(df, data, v.get(0).asLong());
+		}
+		return ret;
+	}
+	
+	
 
 	
 	/**
