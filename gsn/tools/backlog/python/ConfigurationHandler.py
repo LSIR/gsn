@@ -170,6 +170,9 @@ class ConfigurationHandlerClass():
         servicewakeupminutes = None
         wlandutycyclewhileresending = None
         platformVersion = None
+        bolt_i2c_device = None
+        bolt_i2c_address = None
+        boltI2cPollingIntervalSec = None
 
         try:
             # readout options from config
@@ -208,6 +211,12 @@ class ConfigurationHandlerClass():
                         configHashFile = value
                     elif name == 'platform':
                         platformVersion = int(value)
+                    elif name == 'bolt_i2c_device':
+                        boltI2cDevice = int(value, 16)
+                    elif name == 'bolt_i2c_address':
+                        boltI2cAddress = int(value, 16)
+                    elif name == 'bolt_i2c_polling_interval_sec':
+                        boltI2cPollingIntervalSec = int(value)
         except ConfigParser.NoSectionError:
             raise TypeError('no [options] section specified in %s' % (config_file,))
         
@@ -315,6 +324,12 @@ class ConfigurationHandlerClass():
             ret.update(platform=platformVersion)
         else:
             raise TypeError('platform has to be set to 1 or 2')
+        
+        if boltI2cDevice is not None and (boltI2cPollingIntervalSec is None or boltI2cAddress is None):
+            raise TypeError('if bolt_i2c_device is specified: bolt_i2c_address and bolt_i2c_polling_interval_sec have to be specified as well')
+        ret.update(bolt_i2c_device=boltI2cDevice)
+        ret.update(bolt_i2c_address=boltI2cAddress)
+        ret.update(bolt_i2c_polling_interval_sec=boltI2cPollingIntervalSec)
         
         # get schedule section from config files
         try:

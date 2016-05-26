@@ -1,0 +1,48 @@
+<virtual-sensor name="ETZ_BOLT_Status__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="GENERATION_TIME_MICROSEC" type="BIGINT"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="MESSAGE_TYPE" type="INTEGER" />
+            <field name="SEQNR" type="INTEGER" />
+            <field name="PAYLOAD_LENGTH" type="INTEGER" />
+            
+            <field name="TEMP" type="INTEGER" />
+            <field name="VCC" type="INTEGER" />
+            <field name="CPU_DC" type="INTEGER" />
+            <field name="RF_DC" type="INTEGER" />
+            <field name="RX_CNT" type="INTEGER" />
+            <field name="N_RX_HOPS" type="INTEGER" />
+            <field name="PER" type="SMALLINT" />
+            <field name="SNR" type="SMALLINT" />
+            <field name="RSSI1" type="SMALLINT" />
+            <field name="RSSI2" type="SMALLINT" />
+            <field name="RSSI3" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>BOLT Status messages from the ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from ETZ_BOLT_Status</predicate>
+                    <predicate key="remote-contact-point">http://tpvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

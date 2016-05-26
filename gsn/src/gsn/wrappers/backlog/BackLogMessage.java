@@ -178,6 +178,11 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.Sampler6712Plugin Sampler6712Plugin}. */
 	public static final short SAMPLER_6712_MESSAGE_TYPE = 100;
 	
+	/** BOLT
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.BOLTMessagePlugin BOLTMessagePlugin}. */
+	public static final short BOLT_MESSAGE_TYPE = 110;
+	
 	/** B4Sensor
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.B4SensorPlugin B4SensorPlugin}. */

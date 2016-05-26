@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <title>GSN</title>
+        
+        <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery-dom.js"></script>
+        <script type="text/javascript" src="js/jquery.history.js"></script>
+        <script type="text/javascript" src="js/jquery.cookie.js"></script>
+        <script type="text/javascript" src="js/uptime.js"></script>
+
+        <!-- Visualization -->
+        <link rel="stylesheet" type="text/css" href="http://vizzly.ethz.ch/vizzly.min.css" />
+        <link rel="stylesheet" type="text/css" href="style/jquery-ui.custom.min.css" />
+        <!--[if IE]><script src="http://vizzly.ethz.ch/excanvas.js"></script><![endif]-->
+        <script type='text/javascript' src='js/jquery-ui.min.js'></script>
+        <script type='text/javascript' src='http://vizzly.ethz.ch/extlib/dygraph-combined.js'></script>
+        <script type='text/javascript' src='http://vizzly.ethz.ch/vizzly.min.js'></script>
+        <script type='text/javascript' src='js/gsnplots.js'></script>
+
+<script type="text/javascript">
+<!--//<![CDATA[
+
+$(document).ready(function() {
+    $.get('/menu.jsp', {selected: "bolt"}, function(data) {
+      $('#navigation').html(data);
+    }, 'html');
+    $("#navigation ul a.local").bind("click",function() { return GSN.nav($(this).text()); });
+
+    // plot configuration
+    GsnPlots.setConfig([
+      
+      { title:"BOLT Sequence Number",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["seqnr"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Temperature",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["temp"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Voltage",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["vcc"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT CPU duty-cycle",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["cpu_dc"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Radio duty-cycle",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["rf_dc"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Packet Receive Count",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["rx_cnt"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Packets received last Glossy Flood",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["n_rx"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Hop Count first Reception per Glossy Flood",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["n_hops1"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Hop Count second Reception per Glossy Flood",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["n_hops2"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Hop Count third Reception per Glossy Flood",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["n_hops3"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT RSSI first Reception per Glossy Flood",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["rssi1"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT RSSI second Reception per Glossy Flood",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["rssi2"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT RSSI third Reception per Glossy Flood",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["rssi3"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Packet Error Rate",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["per"],
+          select:"sensornode[position]"
+        }]
+      },
+      { title:"BOLT Signal to Noise Ratio",
+        signals: [{
+          vsensor:".*_bolt_status__conv",
+          field:["snr"],
+          select:"sensornode[position]"
+        }]
+      },
+    ]);
+    
+    $.ajax({
+      type: "GET",
+      url: "/gsn?structure",
+      success: function(data){
+        if ($(document).attr("title")=="GSN") {
+          var gsn = $("gsn",data);
+          $(document).attr("title",$(gsn).attr("name"));
+          $("#gsn-name").empty().append($(gsn).attr("name"));
+          $("#gsn-desc").empty().append($(gsn).attr("description"));
+          $("#gsn-author").empty().append($(gsn).attr("author")+" ("+$(gsn).attr("email")+")");
+          var gsnname = $(gsn).attr("name").replace(/.*::\s*GSN\s*-\s*/, "").replace(/\s/g,"").toLowerCase();
+          $('head', document).append('<link rel="shortcut icon" href="/img/favicon/permasense-'+gsnname+'.ico"><link rel="icon" href="/img/favicon/permasense-'+gsnname+'.ico">');
+        }
+        $("#gsn-name").show();
+        uptime.setTime($(gsn).attr("uptime"));
+        GsnPlots.initPlots(data, function(){addDeployments();});
+      }
+    });
+});
+
+function addDeployments() {
+  // add deployment tabs and container
+  var visible=-1;
+  var d = GsnPlots.getDeployments(".*","Statistics");
+  $(d).each(function() {
+    if ($.cookie("deployment")==this)
+      visible = this;
+  });
+  if (visible==-1) {
+      visible = d[0];
+  }
+  $(d).each(function() {
+    $('#deployment_menu').append('<li><a href="javascript:showPlots(\''+this+'\')" id="deployment_menu_item_'+this+'">'+this+'</a></li>');
+    $('#plotscontainer').append('<div id="plot_'+this+'"></div>');
+    $('#plot_'+this).hide();
+  });
+  showPlots(visible);
+}
+
+function showPlots(id) {
+  $(GsnPlots.getDeployments(".*","Statistics")).each(function() {
+      $("#plot_"+this).empty().hide();
+      $("#deployment_menu_item_"+this).removeClass("selected");
+  });
+  $("#plot_"+id).show();
+  $("#deployment_menu_item_"+id).addClass("selected");
+  // add graphs
+  GsnPlots.addPlots($("#plot_"+id), id)
+  $.cookie("deployment" , id);
+}	
+//]]>-->
+</script>
+</head>
+<body>
+
+<div id="container">
+	<div id="header">
+		<h1><a href="." id="gsn-name" style="display:none">GSN</a></h1>
+		<div id="breadcrumbnav"><a href="http://www.permasense.ch">PermaSense</a> > <a href="." id="gsn-name">GSN</a> > Sensor Network</div>
+	</div>
+	<div id="navigation">
+	</div>
+	
+	<div id="separator">
+		<div id="starttext">
+			<p>
+				A collection of sensor network specific plots related to the PermaSense Deployments.
+			</p>
+		</div>
+	</div>
+
+	<div id="maindiv">
+		<div id="deployment_navigation">
+		<ul id="deployment_menu">
+		<li />
+		</ul>
+		</div>	
+		
+		<div id="plotscontainer" style="margin-top:5px"></div>
+		
+	</div>
+	<div class="separator">
+		<div id="footer">
+		      <table width="100%">
+				<tr>
+					<td style="width:50%;color:#444444;"><b>A Project of <a href="http://www.ethz.ch" target="_blank">ETH Zurich</a>, <a href="http://www.unibas.ch" target="_blank">Uni Basel</a> and <a href="http://www.uzh.ch" target="_blank">Uni Zurich</a></b></td>
+					<td style="text-align:right;width:50%;font-size:9px;">Powered by <a href="http://gsn.sourceforge.net/">GSN</a>,  Distributed Information Systems Lab, EPFL 2006</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<!-- script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-5632004-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script -->
+</body>
+</html>

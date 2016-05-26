@@ -26,6 +26,7 @@ from ConfigurationHandler import ConfigurationHandlerClass
 from BackLogDB import BackLogDBClass
 from GSNPeer import GSNPeerClass
 from TOSPeer import TOSPeerClass
+from BOLTPeer import BOLTPeerClass
 from JobsObserver import JobsObserverClass
 from ScheduleHandler import ScheduleHandlerClass, SUBPROCESS_BUG_BYPASS
 from PowerMonitor import PowerMonitor
@@ -178,6 +179,13 @@ class BackLogMainClass(Thread, Statistics):
         self._tosPeerLock = Lock()
         self._tosListeners = {}
         
+        self._boltpeer = None
+        self._bolt_i2c_device = self.confighandler.getParsedConfig()['bolt_i2c_device']
+        self._bolt_i2c_address = self.confighandler.getParsedConfig()['bolt_i2c_address']
+        self._bolt_i2c_polling_interval_sec = self.confighandler.getParsedConfig()['bolt_i2c_polling_interval_sec']
+        self._boltPeerLock = Lock()
+        self._boltListeners = {}
+        
         self.powerControl = PowerControlClass(self, self.confighandler.getParsedConfig()['wlan_port'], dutycyclewhileresending, platform)
         self._logger.info('loaded PowerControl class')
         self.gsnpeer = GSNPeerClass(self, self.device_id, self.confighandler.getParsedConfig()['gsn_port'])
@@ -246,6 +254,8 @@ class BackLogMainClass(Thread, Statistics):
         self.jobsobserver.start()
         if self._tospeer and not self._tospeer.isAlive():
             self._tospeer.start()
+        if self._boltpeer and not self._boltpeer.isAlive():
+            self._boltpeer.start()
         self.confighandler.start()
         if self.powerMonitor:
             self.powerMonitor.start()
@@ -278,6 +288,9 @@ class BackLogMainClass(Thread, Statistics):
         if self._tospeer:
             self._tospeer.join()
             self._logger.info('TOSPeerClass joined')
+        if self._boltpeer:
+            self._boltpeer.join()
+            self._logger.info('BOLTPeerClass joined')
         self.backlog.join()
         self._logger.info('BackLogDBClass joined')
         self.gsnpeer.join()
@@ -331,6 +344,13 @@ class BackLogMainClass(Thread, Statistics):
             except Exception, e:
                 self.incrementExceptionCounter()
                 self._logger.exception(e)
+
+        if self._boltpeer:
+            try:
+                self._boltpeer.stop()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
                 
         try:
             self.backlog.stop()
@@ -356,8 +376,8 @@ class BackLogMainClass(Thread, Statistics):
     def instantiateTOSPeer(self):
         self._tosPeerLock.acquire()
         if not self._tospeer:
-            if self._tos_address:
-                if not self._tos_version:
+            if self._tos_address is not None:
+                if self._tos_version is None:
                     self._tos_version = DEFAULT_TOS_VERSION
                 self._logger.info('tos_source_addr: %s' % (self._tos_address,))
                 self._logger.info('tos_version: %s' % (self._tos_version,))
@@ -451,6 +471,107 @@ class BackLogMainClass(Thread, Statistics):
     def getTOSPeerStatus(self):
         if self._tospeer:
             return self._tospeer.getStatus()
+        else:
+            return [None]*3
+        
+        
+    def instantiateBOLTPeer(self):
+        self._boltPeerLock.acquire()
+        if not self._boltpeer:
+            if self._bolt_i2c_device is not None:
+                self._logger.info('bolt_i2c_device: %s' % (self._bolt_i2c_device,))
+                self._logger.info('bolt_i2c_addresse: %s' % (self._bolt_i2c_address,))
+                self._logger.info('bolt_i2c_polling_interval_sec: %s' % (self._bolt_i2c_polling_interval_sec,))
+                try:
+                    self._boltpeer = BOLTPeerClass(self, self._bolt_i2c_device, self._bolt_i2c_address, self._bolt_i2c_polling_interval_sec)
+                    if self.isAlive() or self.duty_cycle_mode:
+                        self._boltpeer.start()
+                    self._logger.info('BOLTPeerClass instantiated')
+                except Exception, e:
+                    self._boltPeerLock.release()
+                    raise Exception('BOLTPeerClass could not be loaded: %s' % (e,))
+            else:
+                self._boltPeerLock.release()
+                raise TypeError('BOLTPeer can not be loaded as no bolt_i2c_device is specified in config file')
+        self._boltPeerLock.release()
+        
+        
+    def registerBOLTListener(self, listener, types=[], excempted=False):
+        self.instantiateBOLTPeer()
+        if excempted:
+            tmp = range(0,256)
+            for type in types:
+                tmp.remove(type)
+        else:
+            tmp = types
+            
+        for type in tmp:
+            listeners = self._boltListeners.get(type)
+            if listeners == None:
+                self._boltListeners[type] = [listener]
+            else:
+                listeners.append(listener)
+                self._boltListeners.update({type: listeners})
+        if excempted:
+            self._logger.info('%s registered as BOLT listener (listening to all types except %s)' % (listener.__class__.__name__, types))
+        else:
+            self._logger.info('%s registered as BOLT listener (listening to types %s)' % (listener.__class__.__name__, types))
+        
+        
+    def deregisterBOLTListener(self, listener):
+        for type, listeners in self._boltListeners.items():
+            for index, listenerfromlist in enumerate(listeners):
+                if listener == listenerfromlist:
+                    del listeners[index]
+                    if not listeners:
+                        del self._boltListeners[type]
+                    else:
+                        self._boltListeners.update({type: listeners})
+                    break
+            
+        self._logger.info('%s deregistered as BOLT listener' % (listener.__class__.__name__,))
+        if not self._boltListeners:
+            self._logger.info('no more BOLT listeners around -> stop BOLTPeer')
+            self._boltPeerLock.acquire()
+            try:
+                self._boltpeer.stop()
+                self._boltpeer.join()
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
+            self._boltpeer = None
+            self._boltPeerLock.release()
+        
+        
+    def processBOLTMsg(self, timestamp, boltMsg):
+        ret = False
+        if self._logger.isEnabledFor(logging.DEBUG):
+            self._logger.debug('received BOLT message with type %s' % (boltMsg['type'],))
+            
+        listeners = self._boltListeners.get(boltMsg['type'])
+        if not listeners:
+            self._logger.warning('There is no listener for BOLT message with type %s.' % (boltMsg['type'],))
+            return False
+        
+        for listener in listeners:
+            if self._logger.isEnabledFor(logging.DEBUG):
+                self._logger.debug('forwarding BOLT message to listener %s' % (listener.__class__.__name__,))
+            try:
+                if listener.boltMsgReceived(timestamp, boltMsg):
+                    ret = True
+            except Exception, e:
+                self.incrementExceptionCounter()
+                self._logger.exception(e)
+                
+        if not ret:
+            self._logger.warning('BOLT message with type %s could not be processed properly by the plugin(s).' % (boltMsg['type'],))
+
+        return ret
+    
+    
+    def getBOLTPeerStatus(self):
+        if self._boltpeer:
+            return self._boltpeer.getStatus()
         else:
             return [None]*3
     

@@ -608,7 +608,7 @@ class BinaryWriter(Thread):
         Thread.__init__(self, name='BinaryWriter-Thread')
         self._logger = logging.getLogger(self.__class__.__name__)
         self._binaryPluginClass = parent
-        self._sendqueue = Queue.Queue(1)
+        self._sendqueue = Queue.Queue(2)
         self._stopsending = Event()
         self._messageNr = -1
         self._resendcounter = 0

@@ -112,6 +112,9 @@ CamZillaPlugin = 90,
 # Sampler 6712
 Sampler6712Plugin = 100,
 
+# BOLT
+BOLTPlugin = 110,
+
 TestPlugin = 126
 )
 

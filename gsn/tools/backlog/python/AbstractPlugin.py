@@ -258,6 +258,62 @@ class AbstractPluginClass(Thread, Statistics):
         @return: True if the message has been put into sendbuffer successfully.
         '''
         return self._backlogMain._tospeer.sendTOSMsg(packet, amId, timeout, blocking, maxretries)
+    
+    
+    def registerBOLTListener(self, types, excempted=False):
+        '''
+        Register a plugin as a BOLT listener.
+        
+        This function should be used by the plugins to register themselves as BOLT listeners.
+        After registering the specified BOLT message types will be received with boltMsgReceived(...).
+        
+        @param types: A list containing all BOLT message types this listener is listening to.
+        
+        @param excempted: if set to True all BOLT message types will be listened to except the ones
+                          specified in types.
+        
+        @raise Exception: if the BOLTPeerClass can not be started.
+        '''
+        self._backlogMain.registerBOLTListener(self, types, excempted)
+    
+    
+    def deregisterBOLTListener(self):
+        '''
+        Deregister a plugin from BOLT peer.
+        
+        This function should be used by the plugins to deregister themselves from the BOLT peer.
+        After deregistering no more BOLT messages will be received with boltMsgReceived(...).
+        If a plugin registered itself with registerBOLTListener(), this function has to be called
+        at least once, if stop() is called!
+        '''
+        self._backlogMain.deregisterBOLTListener(self)
+    
+    
+    def boltMsgReceived(self, timestamp, boltMsg):
+        '''
+        This function will be executed if a BOLT message has been received from the I2C
+        port and this plugin listening to the specific BOLT message type.
+        
+        @param boltMsg: the BOLT message as specified in BOLTTypes
+                   
+        @return: This function should ONLY return True if the message has been processed
+                 successfully.
+        '''
+        pass
+    
+    
+    def sendBOLTmsg(self, boltMsg):
+        '''
+        Send a BOLT message over the I2C port.
+        
+        This function should be used by the plugins to send any data to a node running
+        Glossy/LWB connected over the I2C port.
+        
+        @param boltMsg: the BOLT message as specified in BOLTTypes
+                       
+        @return: True if the message has been successfully put into sendbuffer.
+        '''
+        return self._backlogMain._boltpeer.sendBOLTMsg(boltMsg)
        
         
     def run(self):

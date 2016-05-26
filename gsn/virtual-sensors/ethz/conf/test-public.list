@@ -4,6 +4,8 @@ ETZ_BackLogStatus_Revision__mapped.xml
 ETZ_BackLogStatus_Dynamic__mapped.xml
 ETZ_Binary__mapped.xml
 ETZ_Binary_Upload__mapped.xml
+ETZ_BOLT_Status__mapped.xml
+ETZ_BOLT_Status__conv.xml
 ETZ_Camera_pos0__scaled.xml
 ETZ_Camera_pos1__scaled.xml
 ETZ_CamZilla__mapped.xml
